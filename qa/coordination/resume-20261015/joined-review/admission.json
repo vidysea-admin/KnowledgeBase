@@ -1,0 +1,51 @@
+{
+  "status": "SEALED_METADATA_READY_FOR_ONE_MANUAL_CHECKER_PENDING_ROOT_COMMAND",
+  "dispatch_allowed": false,
+  "semantic_verdict": null,
+  "created_utc": "2026-10-15T22:47:44.933138+00:00",
+  "candidate_sha256": "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+  "candidate_kind": "dirty-source-content-sha256-not-Git",
+  "required_pending": [
+    "Root explicit next dispatch command for ONE fresh instruction-aware manual checker; recheck source/dependency seal immediately before launch"
+  ],
+  "source_pin_mismatches": [],
+  "dependency_pin_mismatches": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+      "receipt_sha256": "119d23af7c90dfea17b4de7512b0c5427b75cb385d083202f0afc245e34aef16",
+      "current_sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+      "match": false
+    }
+  ],
+  "historical_usage": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\independent-telemetry.json",
+    "classification": "shared prior control-validation review; preserved not reset or charged to this new unit",
+    "actual_total_tokens": 133880,
+    "prior_limit": 51981,
+    "actual_active_s": null,
+    "breach": true
+  },
+  "ratio_status": "UNVERIFIED",
+  "native_hard_total_token_cap_established": false,
+  "helper_results": "helper-results.json",
+  "pure_validate_status": "READY exit0 at2026-10-15T23:14:09.480254+00:00",
+  "pure_assess_status": "BOOTSTRAP_REVIEW exit0 at2026-10-15T23:14:09.653486+00:00; ratio UNVERIFIED",
+  "updated_utc": "2026-10-15T22:57:59.904030+00:00",
+  "central_gate_binding": "central-gates.json",
+  "historical_phase": "phase1-metadata-history",
+  "current_dependency_drift": [],
+  "old_archive_mismatch": "Preserved in phase1/phase2; superseded by real current T03713+2 broker receipts, never classified unrelated",
+  "schema_readiness_complete": true,
+  "current_focused_binding": "current-focused-bindings.json",
+  "current_environment_binding": "current-environment-bindings.json",
+  "history": [
+    "phase1-metadata-history",
+    "phase2-metadata-history",
+    "phase3-metadata-history"
+  ],
+  "final_epoch_binding": "final-epoch-bindings.json",
+  "prospective_verdict_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\verdicts\\t013-t037-t056-joined-source-slices.md",
+  "identity": "t013-t037-t056-joined-source-slices/0/eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+  "manual_workflow": "checker/SKILL.md fresh context, explicit finite allocation, independently review source and authenticate evidence, broker-only checks and persisted canonical verdict; optional managed launcher not requested",
+  "sealed_dependency_count": 1657
+}

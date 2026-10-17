@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "index": 39,
+  "originalIndex": 41,
+  "claimId": "2026-07-08-beyond-black-robes-law-careers-c01",
+  "inputHash": "ae7305211511a115718ac592b563fc5063e81e40a91969c5b6b434dfba768434",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original quote supports a required two-year Bar Council of India bridge course for working in India after an abroad three-year program. It does not explicitly identify that program as a completed undergraduate law degree or establish the claim's blanket applicability to foreign undergraduate law graduates.",
+    "missingReferences": [],
+    "caveats": [
+      "The foreign program is described only as a three-year program; qualification level and law-degree scope require unavailable context.",
+      "Stored speakerRef is unknown; the name embedded in transcript text does not independently establish speaker identity.",
+      "Transcript support for the bridge-course statement does not establish the external legal rule."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+        "contextVersion": "originalMigration",
+        "quote": "you will need to do a bridge course which is conducted by Bar Council of India. So it is itself a 2-year program.",
+        "textSha256": "184d3d65cb1ba8ea034547eaaf02a1cc7cc93902f5d3194d872afb3ef50f7ab5",
+        "contextSha256": "22c476f208b3a53b349ad7bc47b6785cb4c259146655fd2acaa68009bde9d13c",
+        "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3133,
+        "tEnd": 3164,
+        "supports": "Supports required bridge course, Bar Council of India, and two-year duration; qualification scope remains unstated."
+      },
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+        "contextVersion": "originalMigration",
+        "quote": "So you go abroad, do a 3-year program, come back to India, do another 2-year program,",
+        "textSha256": "184d3d65cb1ba8ea034547eaaf02a1cc7cc93902f5d3194d872afb3ef50f7ab5",
+        "contextSha256": "22c476f208b3a53b349ad7bc47b6785cb4c259146655fd2acaa68009bde9d13c",
+        "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3133,
+        "tEnd": 3164,
+        "supports": "Supports abroad-to-India program sequence; does not explicitly identify undergraduate law degree completion."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t095 is a session wrap-up about law-career opportunities and informed decisions. It supplies no foreign undergraduate qualification, Indian practice requirement, bridge course, Bar Council of India, or two-year duration.",
+    "missingReferences": [],
+    "caveats": [
+      "The same turn ID now has different content, speakerRef, and timings: original unknown at 3133–3164; current Anchal at 3547–3552.",
+      "Stored speakerRef Anchal is a source label, not independently verified identity.",
+      "Raw artifact SHA256 and normalized-LF SHA256 are distinct; only provided context records were checked."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+        "contextVersion": "current",
+        "quote": "onto Law as a career avenue and how it's not linear anymore, and how it's an ecosystem of opportunities.",
+        "textSha256": "b9bdc447e343473fa00dac285ecf971bb0672773d44bfc5a7698fb6d01fd9163",
+        "contextSha256": "2c918ae30d96dd76c5f5fb05ed1cdc5722ef2eaf328e84f50c3c47ce0f2fff8d",
+        "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+        "revision": null,
+        "speakerRef": "Anchal",
+        "tStart": 3547,
+        "tEnd": 3552,
+        "supports": "Merely related to law careers; does not support any bridge-course requirement."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original supports the bridge-course duration and necessity but leaves qualification scope unstated; current same-ID context is unrelated. Both whole-claim labels are provisional unsupported, with no hash-check failures or human factual approval."
+}

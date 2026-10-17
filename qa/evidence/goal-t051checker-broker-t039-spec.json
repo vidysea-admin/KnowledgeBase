@@ -1,0 +1,29 @@
+{
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/manual-jobs/store.test.ts",
+    "packages/meeting-bot/src/manual-jobs/worker.test.ts",
+    "packages/meeting-bot/src/manual-jobs/command.test.ts",
+    "scripts/webinar/manual-jobs/host.test.ts"
+  ],
+  "timeoutMs": 120000,
+  "pins": {
+    "apps/api/src/join-rules/send-now.ts": "a29558060dfa84f019ddc8fb8ff99e71ec31e10a68745ecdaf45ffaf98f0fc4a",
+    "apps/web/src/api/send-now.ts": "1b9adbf27dc2559af87f27b2825967766805afd217cc588f4e260e7f5ac09585",
+    "apps/web/src/pages/meeting-bot/SendNowForm.tsx": "a2fdfafd8e9552d521e288f2558a42d93ebafc53b0a5e287d6403e7f428f46a2",
+    "apps/web/src/pages/meeting-bot/ManualJobsSection.tsx": "88b96e40f39662d38f5ad296e6118895dd773cafef6724df58fe531b25eb1c14",
+    "apps/web/src/pages/meeting-bot/ManualJobsSection.test.tsx": "dcc672b6e0e10cbea0566229ab8fbb8ea2fc3aea760b59aeace993a421ba5a7b",
+    "scripts/webinar/manual-jobs/host.ts": "9f635696583359b602ebe26588d5040eea8ff1976e42f32e63a50aeb86bff18f",
+    "scripts/webinar/manual-jobs/host.test.ts": "c507ebe47d843c44f29aebe96b3989f966ecc7a787ff7c5972935b634295781f",
+    "packages/meeting-bot/src/manual-jobs/command.test.ts": "849b2762bc414fe8cba94f226101c92fc42b2dd5054686622c4409eaba83310f",
+    "packages/meeting-bot/src/manual-jobs/command.ts": "6e2be7c05548e30ebb7f1446137e1c4e319255d69f09114cf51efbb89fd7f858",
+    "packages/meeting-bot/src/manual-jobs/store.test.ts": "665c02922212972aae2e1fa87f8abb566a54fb63049e68791d40e3c1f8992f3a",
+    "packages/meeting-bot/src/manual-jobs/store.ts": "428e5d020c80be51d9fe9379a91b3de4abc4bcd23bf6de0600c08227fcf9e49e",
+    "packages/meeting-bot/src/manual-jobs/worker.test.ts": "bfaaa66cf5441cbd737c41717697d12de3e14cba724aca2af631c95f6489ac19",
+    "packages/meeting-bot/src/manual-jobs/worker.ts": "a038915001539c37a028e353cf30b91ff01b07d3b173fcb216728926ea8d51d2"
+  },
+  "output": "qa/evidence/goal-t051checker-broker-t039"
+}

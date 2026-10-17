@@ -1,0 +1,11 @@
+✔ planner refuses visual-to-human mapping and OCR/visual marker removal without changing originals (3.7083ms)
+✔ bounded OCR correction passes real planner, effective reader and source hydrator with immutable visual attribution (6.7452ms)
+✔ legacy human-mapped or origin-stripped overlay fails actual reader and hydrator while immutable audit remains accessible (2.8277ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2387.9207

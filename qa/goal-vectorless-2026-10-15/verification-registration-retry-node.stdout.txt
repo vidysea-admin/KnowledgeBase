@@ -1,0 +1,25 @@
+✔ proven pre-submit recovery needs changed configuration and persists a fresh no-repeat marker (20.2151ms)
+✔ pre-submit recovery rechecks source and policy; uncertain and legacy results never repeat (7.5284ms)
+✔ persisted action_required cannot promote from fresh confirmation or resubmit after restart (6.4869ms)
+▶ registration child lifecycle requires clean unique result and verified cleanup on failure
+  ✔ clean (120.784ms)
+  ✔ pre-submit-clean (115.2394ms)
+  ✔ pre-submit-dirty (203.0265ms)
+  ✔ receipt-on-submitted (218.4081ms)
+  ✔ malformed-receipt (219.8982ms)
+  ✔ nonzero (210.9984ms)
+  ✔ signal (224.009ms)
+  ✔ fatal (249.6831ms)
+  ✔ duplicate (230.133ms)
+  ✔ malformed (231.3487ms)
+  ✔ missing (237.5295ms)
+  ✔ cleanup-fails (243.8958ms)
+✔ registration child lifecycle requires clean unique result and verified cleanup on failure (2510.1728ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3394.0746

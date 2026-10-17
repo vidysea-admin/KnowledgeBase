@@ -1,0 +1,125 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-final-seal.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "3f1590249cb260dbded85a1dc5ba04f40b83c4909722226fa80ac74c6b602f94",
+    "bytes": 3401183
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "elapsed_s": 120.71900000000096,
+    "priorSetupFailure_s": 4.344,
+    "totalIncludingPriorSetup_s": 125.06300000000192,
+    "currentFloorTerminalResults": 210,
+    "floorObservedCounts": {
+      "pass": 206,
+      "fail": 0,
+      "skip": 4
+    },
+    "floorAllOriginalTitlesTerminal": false,
+    "prerequisiteSkipsAreIncomplete": true,
+    "genuineReuse": {
+      "receipt": "broker/genuine-phase-observer-original-positive-receipt.json",
+      "logSha256": "3959af50396e05b73e09f4f9aa33d49d6e04252be13143e4a4f4bfe26aab239d",
+      "scope": "only exact genuine node"
+    },
+    "pinCount": 1890,
+    "pinsUnchanged": true,
+    "fixtureRemoved": true,
+    "pending": [
+      "AssertionError: original title coverage incomplete"
+    ],
+    "priorUnavailableFailure": "UNEXPLAINED OPEN",
+    "wholeUnitPASS": false,
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "c386d47ce1a3f716292dc96c5591a66774754ebbfa951c5f2433979955fc5359",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-acl-create-receipt.json",
+        "rawBytes": 469125,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "447739aa3614c629eee1054b096c2bd51655c9b6d937dfc0a4c59a6f403b6bc2"
+      },
+      "logSha256": "811c8877fdfea8de42c620459f676141c2e6901512d017761ef1736879f0cc5a",
+      "label": "native-next-split-repaired-acl-create",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-acl-create.log"
+    },
+    {
+      "canonicalJsonSha256": "49ac6c2fbcbd321db3a2e4df8b2442f9b742beb7310df27c5e32bfa700065bc9",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-acl-verify-receipt.json",
+        "rawBytes": 469327,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "d16db6c99ffc0204429d4c747af4bb8e172dc13a30662321df8299d36e48b29e"
+      },
+      "logSha256": "c66b6389bccb32c81c29944a178c896b4f2a3af5a2450d6f49ea70c4a57ede20",
+      "label": "native-next-split-repaired-acl-verify",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-acl-verify.log"
+    },
+    {
+      "canonicalJsonSha256": "b50a1ddf0037d5130c7fe38aff4b99fb3b0dc1d7ac17ce58868cd7bceb6266cf",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-floor1-receipt.json",
+        "rawBytes": 471641,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "f13174447a46d8c6061bfa842ae65e953cd5cbb45af3967743dad35e3a70b3c8"
+      },
+      "logSha256": "9fc73b516c9eb8812a68dcc575b9d906b17c25d4a174252e815011f5ab0d15ce",
+      "label": "native-next-split-repaired-floor1",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+    },
+    {
+      "canonicalJsonSha256": "6793ef3b6cffddc91da7e97830f5a943fcb8a9e6fec5de23653579fc08037585",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-floor2-receipt.json",
+        "rawBytes": 471944,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "45fabe46beb21c8e139cc21cbfe6fa0b6a3c76eed5ec37c480d7a3171f97f311"
+      },
+      "logSha256": "1ccbad41ebc11e195befbd75f8b994218d2773f87f9b07712f0ae378e9c0c739",
+      "label": "native-next-split-repaired-floor2",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+    },
+    {
+      "canonicalJsonSha256": "8f779f5c8771530228efb2246ec06d13c82cf2befd2389c66fc86f301e7232c5",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-floor3a-receipt.json",
+        "rawBytes": 471675,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "3b06f09b3de4d569cd61824e209305f09e4cac83931804ad4662381e009b5cac"
+      },
+      "logSha256": "edd50bbf1cbef02de8d23e47caf4c99a6cbbcf80e48ec7c398dca3a1e500f4fc",
+      "label": "native-next-split-repaired-floor3a",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+    },
+    {
+      "canonicalJsonSha256": "59e3308dc49ab294a6a1a137177b71dc22cc39ecdb132c966a180802000b0064",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-floor3b-receipt.json",
+        "rawBytes": 469989,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "9857844dbd84f6fbd0d13077afc2940a748598b7e76cdb527c5c8d97801d9069"
+      },
+      "logSha256": "1721416fee38d00131f580abd51f0b9d6cdffc8b0acf60749e71c464109bd2b1",
+      "label": "native-next-split-repaired-floor3b",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3b.log"
+    },
+    {
+      "canonicalJsonSha256": "dd2971b2ea1c729d7604b4ca02bf37e7dfcfb9dabb1018e33a58553753527539",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-acl-cleanup-receipt.json",
+        "rawBytes": 469214,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "b6c0c1489d458dd24741bf8254d372c59bffdc0e0e19eae84c1ad7704b465de6"
+      },
+      "logSha256": "47469e480a553fa305465b39016fdd263ce949786f02028d33314c187ca855d1",
+      "label": "native-next-split-repaired-acl-cleanup",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-acl-cleanup.log"
+    }
+  ]
+}

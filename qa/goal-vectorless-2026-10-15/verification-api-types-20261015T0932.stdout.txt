@@ -1,0 +1,45 @@
+
+> @lkb/api@0.0.0 typecheck C:\Users\product\Desktop\KnowledgeBase\apps\api
+> tsc --noEmit -p tsconfig.json
+
+src/indexing/promote-entities.test.ts(387,44): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/indexing/vectorless-publication.test.ts(44,76): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/indexing/vectorless-publication.test.ts(65,53): error TS2322: Type '{ _id: string; tenantId: string; text: string; status: "verified"; evidence: { turnId: string; sessionId: string; quote: string; }[]; }' is not assignable to type 'Claims'.
+  Types of property 'evidence' are incompatible.
+    Type '{ turnId: string; sessionId: string; quote: string; }[]' is not assignable to type '[{ [k: string]: unknown; turnId: string; sessionId: string; quote?: string | undefined; }, ...{ [k: string]: unknown; turnId: string; sessionId: string; quote?: string | undefined; }[]]'.
+      Source provides no match for required element at position 0 in target.
+src/indexing/vectorless-publication.test.ts(67,53): error TS2322: Type '{ _id: string; tenantId: string; text: string; status: "verified"; evidence: { turnId: string; sessionId: string; quote: string; }[]; }' is not assignable to type 'Claims'.
+  Types of property 'evidence' are incompatible.
+    Type '{ turnId: string; sessionId: string; quote: string; }[]' is not assignable to type '[{ [k: string]: unknown; turnId: string; sessionId: string; quote?: string | undefined; }, ...{ [k: string]: unknown; turnId: string; sessionId: string; quote?: string | undefined; }[]]'.
+      Source provides no match for required element at position 0 in target.
+src/indexing/vectorless-publication.test.ts(78,43): error TS2345: Argument of type '{ _id: string; tenantId: string; text: string; status: string; evidence: { turnId: string; sessionId: string; quote: string; }[]; }' is not assignable to parameter of type 'OptionalId<Document>'.
+  Type '{ _id: string; tenantId: string; text: string; status: string; evidence: { turnId: string; sessionId: string; quote: string; }[]; }' is not assignable to type '{ _id?: ObjectId | undefined; }'.
+    Types of property '_id' are incompatible.
+      Type 'string' is not assignable to type 'ObjectId'.
+src/indexing/vectorless-publication.test.ts(88,60): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/indexing/vectorless-publication.test.ts(90,76): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/indexing/vectorless-publication.test.ts(101,59): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/whatsapp/review/store.test.ts(117,48): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/whatsapp/review/store.test.ts(130,48): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/whatsapp/review/store.test.ts(146,48): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+C:\Users\product\Desktop\KnowledgeBase\apps\api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/api@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`
+Exit status 2

@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import {constants, readFileSync} from 'node:fs';
+import {dirname, join, resolve} from 'node:path';
+import {runInNewContext} from 'node:vm';
+import {installUbuntuSupervisor, UNIT_NAME} from '../../scripts/webinar/supervisor/install-ubuntu-supervisor.mjs';
+
+const source = readFileSync(new URL('../../scripts/webinar/supervisor/install-ubuntu-supervisor.test.mjs', import.meta.url), 'utf8');
+const definition = source.slice(source.indexOf('function fixture()'), source.indexOf('\ntest('));
+const f = runInNewContext(definition + '\nfixture()', {assert, constants, dirname, join, resolve, Buffer, UNIT_NAME});
+const installed = installUbuntuSupervisor({root:f.root, display:':0', install:true}, f.d);
+assert.equal(installed.status, 'installed-disabled');
+assert.equal(f.calls.some(row => row[1].includes('enable')), false);
+f.calls.length = 0;
+const activated = installUbuntuSupervisor({root:f.root, display:':0', activate:true}, f.d);
+const operations = f.calls.map(row=>row[1][1]);
+assert.equal(activated.status, 'activated');
+assert.equal(activated.unit, f.target);
+assert.equal(activated.liveRecoveryVerified, false);
+assert.ok(operations.indexOf('show') > operations.indexOf('daemon-reload'));
+assert.ok(operations.indexOf('enable') > operations.indexOf('show'));
+assert.ok(operations.indexOf('is-active') > operations.indexOf('enable'));
+console.log(JSON.stringify({result:activated, effectiveUnit:f.target, managerBindingVerifiedBeforeLaunch:true, operations, hostActions:false}));

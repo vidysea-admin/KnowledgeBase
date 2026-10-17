@@ -1,0 +1,19 @@
+{
+  "scope": "Single authorized existing Node --version health probe",
+  "scriptStartedAt": "2026-10-15T09:59:38.0784917Z",
+  "queueWaitMs": null,
+  "queueNote": "Tool queue and shell startup not separately observable",
+  "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "executableSha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "timeoutMs": 10000,
+  "started": true,
+  "exitCode": 0,
+  "errorClass": null,
+  "errorCode": null,
+  "version": "v24.19.0",
+  "launchAttemptAt": "2026-10-15T09:59:39.4116358Z",
+  "launchMs": 240.3103,
+  "runtimeWaitMs": 2505.066,
+  "totalProbeMs": 2748.2941,
+  "completedAt": "2026-10-15T09:59:42.1620360Z"
+}

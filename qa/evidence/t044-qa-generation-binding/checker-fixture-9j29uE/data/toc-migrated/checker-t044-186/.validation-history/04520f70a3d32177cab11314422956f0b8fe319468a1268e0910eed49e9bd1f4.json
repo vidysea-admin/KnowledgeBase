@@ -1,0 +1,35 @@
+{
+  "stage": "transcript",
+  "status": "failed",
+  "transcriptValidated": false,
+  "error": "QA current transcript: non-monotonic turn(s)",
+  "reasons": [
+    "QA current transcript: non-monotonic turn(s)"
+  ],
+  "durationSec": 186,
+  "turnCount": 2,
+  "lastTEnd": 186,
+  "coverage": 1,
+  "partial": false,
+  "shortfallSec": 0,
+  "gaps": [],
+  "qa": {
+    "version": 1,
+    "turnsSha256": "871218c44a223a8cefa6493decf66aa7d4735bd4c3d830071b4d1a7870ce7b35",
+    "durationValid": true,
+    "inputCount": 2,
+    "outputCount": 2,
+    "clampedCount": 0,
+    "dropped": 0,
+    "overshootSec": 0,
+    "pastEnd": 0,
+    "repeatedRuns": 0,
+    "nonMonotonic": 0,
+    "acceptedSpans": 1,
+    "rejectedAttempts": 0
+  },
+  "qaSha256": "1c4b424ce1987cb940860acacecde9847a3cbad2e4892a814885d3ed0f49b599",
+  "turnsSha256": "871218c44a223a8cefa6493decf66aa7d4735bd4c3d830071b4d1a7870ce7b35",
+  "validatedAt": "2026-10-14T20:43:23.634Z",
+  "validator": "scripts/webinar/validate/validate-session.mjs"
+}

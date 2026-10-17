@@ -1,0 +1,1174 @@
+{
+  "owner": "/root/docker_checker",
+  "authority": "Root delegated global CPU queue; one focused process at a time",
+  "updatedAt": "2026-10-14T22:33:17.499Z",
+  "active": null,
+  "completed": [
+    {
+      "agent": "/root/docker_checker",
+      "scope": "T051 cycle0",
+      "suite": "10/10 PASS",
+      "independentProbe": "FAIL shadowed manager binding",
+      "validator": "PASS vacuous",
+      "finishedAt": "2026-10-14T18:39:45.39863Z"
+    },
+    {
+      "agent": "/root/implementation_status",
+      "scope": "U22 maker cycle0",
+      "suite": "11/11 PASS",
+      "downstream": "build validate replay PASS idempotent",
+      "validator": "PASS vacuous",
+      "state": "released-no-active-handle"
+    },
+    {
+      "agent": "/root/implementation_status/checker_u22",
+      "scope": "U22 independent HTML/downstream",
+      "result": "probe exit0, hashes unchanged",
+      "duration": "0.7839278s",
+      "state": "released-no-active-handle; verdict readonly finishing"
+    },
+    {
+      "agent": "/root/roadmap_status/maker_u010",
+      "scope": "U010 provider baseline",
+      "suite": "final12/12 PASS",
+      "duration": "wrapper4.093s",
+      "previous": "initial10/11 inferred reciprocal fixed; intermediate11/11",
+      "state": "released-no-active-handle"
+    },
+    {
+      "agent": "/root/roadmap_status",
+      "scope": "T022 firstmakerproof",
+      "suite": "API+CLI14/14 PASS; DOM4/4 PASS",
+      "duration": "Node23.1832564s Vitest32.10s",
+      "state": "released; advisorysourcefix/requeue pending"
+    },
+    {
+      "agent": "/root/implementation_status/maker_t007",
+      "scope": "T007 review UI",
+      "suite": "19/19 PASS, 2 files",
+      "duration": "Vitest10.84s outer14.515s",
+      "prior": "sandboxesbuildEPERM0cases; exactescalatedrerunpassed",
+      "state": "released-no-active-handle"
+    },
+    {
+      "agent": "/root/implementation_status/maker_u23",
+      "scope": "U23 topics",
+      "suite": "21/21 PASS",
+      "duration": "TAP487.4704ms wall0.8987377s",
+      "state": "released"
+    },
+    {
+      "agent": "/root/implementation_status/maker_u25",
+      "scope": "U25 decisions firstproof",
+      "suite": "29/30 PASS; ledger2/2 PASS",
+      "failure": "test assumed291 actualsource51; testonlyrepair",
+      "duration": "outer7552ms",
+      "state": "released-requeued"
+    },
+    {
+      "agent": "/root/goal_attachment_reader",
+      "scope": "T040 contentboundary",
+      "suite": "12/12 PASS",
+      "duration": "TAP250.8109ms wall0.7289585s",
+      "state": "released"
+    },
+    {
+      "agent": "/root/goal_attachment_reader/maker_t042",
+      "scope": "T042 speakersuggest",
+      "suite": "12/12 PASS",
+      "duration": "TAP2203ms wall2.87s",
+      "state": "released"
+    },
+    {
+      "agent": "/root/goal_attachment_reader/maker_t044",
+      "scope": "T044 QArealconsumer",
+      "suite": "28/28 PASS",
+      "duration": "TAP3596.6491ms wall3.7819494s",
+      "state": "released"
+    },
+    {
+      "agent": "/root/deploy_environment/maker_t008",
+      "scope": "T008 firstproof",
+      "suite": "API49/49PASS; UI20/21fixturefailure",
+      "state": "released; currentmodel-boundary source+fixture rerun untested"
+    },
+    {
+      "agent": "/root/qa_status/maker_t046",
+      "scope": "T046 retention",
+      "suite": "API4/4 UI4/4 PASS",
+      "duration": "API1.194s UI3.462s",
+      "state": "released; checker notrun"
+    },
+    {
+      "agent": "/root/docker_runtime",
+      "scope": "T051 cycle1 repair maker",
+      "suite": "11/11 PASS; verbatimshadowprobe exit0 refused before enable/start",
+      "state": "released; independentcycle1verdict pending; fullT051HOLD"
+    },
+    {
+      "scope": "Shared dependencies",
+      "result": "lock-only 16765ms/frozen ignore-scripts 6321ms exit0",
+      "receipt": "qa/goal-2026-10-14/install-receipt.json"
+    },
+    {
+      "scope": "T051 independent cycle1",
+      "result": "11/11; verbatim shadow refused; genuine bound unit activated; C1 scoped PASS, full C2-C4 HOLD"
+    },
+    {
+      "scope": "Canonical schema/codegen/contracts",
+      "result": "43 schema PASS; one generation18files; frozen PASS vacuous",
+      "receipt": "qa/goal-2026-10-14/generate-receipt.json"
+    },
+    {
+      "scope": "G4 exact reference repair",
+      "result": "16 qualifications/12 actualIDs byte exact; tracker g4 exit0",
+      "receipt": "qa/evidence/goal-t051checker-g4-audit.json"
+    },
+    {
+      "scope": "T043 helper",
+      "result": "7/7 PASS exit0 367ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t043.json"
+    },
+    {
+      "scope": "T035 fake",
+      "result": "30 PASS/1 host symlink SKIP exit0 1168ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t035-fake.json"
+    },
+    {
+      "scope": "T039 Node maker",
+      "result": "16/16 PASS exit0 15067ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t039.json"
+    },
+    {
+      "scope": "T040 independent standing",
+      "result": "12/12 PASS206ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t040-standing.json"
+    },
+    {
+      "scope": "T040 checker ownprobe",
+      "result": "FAIL first authentic positive false!=true exit1 156ms; ownchecker diagnosing",
+      "receipt": "qa/evidence/goal-t051checker-broker-t040-independent.json"
+    },
+    {
+      "scope": "Canonical repair generation prerequisite firstattempt",
+      "result": "originalschema exit1 2702ms,2 valid formfixtures rejected nestedbinding mismatch; corrected schema,fixtures unchanged; no gen/types",
+      "receipt": "qa/goal-2026-10-14/schema-repair-attempt-1-failure.json"
+    },
+    {
+      "scope": "Original canonical late-field repair",
+      "result": "43schemas,52valid64invalid exit0 .929s; repairgen2outputs exit0 2.901s",
+      "receipt": "runtime canonical repair receipts"
+    },
+    {
+      "scope": "ONE coherent API/web typechecks",
+      "result": "API exit2 16diagnostics14694ms; web exit2 2Explorernames13813ms; sourceownersrepairing, no build",
+      "receipts": [
+        "qa/goal-2026-10-14/api-types-receipt.json",
+        "qa/goal-2026-10-14/web-types-receipt.json"
+      ]
+    },
+    {
+      "scope": "t048",
+      "result": "exit0 hashesUnchangedtrue 6186.5432ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t048.json"
+    },
+    {
+      "scope": "u25",
+      "result": "exit0 hashesUnchangedtrue 3155.4434ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-u25.json"
+    },
+    {
+      "scope": "u23-independent",
+      "result": "exit0 hashesUnchangedtrue 495.5281ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-u23-independent.json"
+    },
+    {
+      "scope": "t040-independent-corrected",
+      "result": "exit0 hashesUnchangedtrue 154.867ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t040-independent-corrected.json"
+    },
+    {
+      "scope": "t028-api",
+      "result": "exit0 unchangedtrue 3450.4958ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t028-api.json"
+    },
+    {
+      "scope": "t028-ui",
+      "result": "exit0 unchangedtrue 38610.5076ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t028-ui.json"
+    },
+    {
+      "scope": "t007-independent",
+      "result": "exit0 unchangedtrue 12542.586000000001ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t007-independent.json"
+    },
+    {
+      "scope": "t022-final",
+      "result": "exit0 unchangedtrue 14910.4942ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t022-final.json"
+    },
+    {
+      "name": "t044-final",
+      "start": "2026-10-14T20:11:11.236Z",
+      "end": "2026-10-14T20:11:14.39Z",
+      "ms": 3147.4811,
+      "exit": 0,
+      "pins": 16,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t044-final.json"
+    },
+    {
+      "name": "u25-independent",
+      "start": "2026-10-14T20:11:17.312Z",
+      "end": "2026-10-14T20:11:20.057Z",
+      "ms": 2739.3588,
+      "exit": 0,
+      "pins": 12,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-u25-independent.json"
+    },
+    {
+      "name": "t048-independent",
+      "start": "2026-10-14T20:11:23.003Z",
+      "end": "2026-10-14T20:11:23.672Z",
+      "ms": 662.4369,
+      "exit": 0,
+      "pins": 16,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t048-independent.json"
+    },
+    {
+      "name": "u010-final",
+      "start": "2026-10-14T20:11:28.228Z",
+      "end": "2026-10-14T20:11:32.645Z",
+      "ms": 4413.3813,
+      "exit": 0,
+      "pins": 9,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-u010-final.json"
+    },
+    {
+      "scope": "t015-tests",
+      "result": "exit0 unchangedtrue 4691.7098ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-tests.json"
+    },
+    {
+      "scope": "t015-plan",
+      "result": "exit0 unchangedtrue 179.5254ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-plan.json"
+    },
+    {
+      "scope": "t015-validate",
+      "result": "exit0 unchangedtrue 152.1629ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-validate.json"
+    },
+    {
+      "name": "t022-independent",
+      "start": "2026-10-14T20:16:07.335Z",
+      "end": "2026-10-14T20:16:12.734Z",
+      "ms": 5393.5913,
+      "exit": 0,
+      "pins": 18,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t022-independent.json"
+    },
+    {
+      "name": "t059-tests",
+      "start": "2026-10-14T20:16:16.977Z",
+      "end": "2026-10-14T20:16:24.167Z",
+      "ms": 7184.8054999999995,
+      "exit": 0,
+      "pins": 15,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t059-tests.json"
+    },
+    {
+      "name": "t035-bigint",
+      "start": "2026-10-14T20:16:27.214Z",
+      "end": "2026-10-14T20:16:27.97Z",
+      "ms": 753.3169,
+      "exit": 0,
+      "pins": 2,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t035-bigint.json"
+    },
+    {
+      "scope": "T035 measured encode initialgenerator",
+      "result": "exit1 1.374s sourcefixture0:a mappingwrong; no normalization",
+      "receipt": "qa/evidence/t035-lean-video-measured-encode/synthetic-4pKiA4/report.json"
+    },
+    {
+      "scope": "T035 measured encode correctedgenerator",
+      "result": "exit1 5.432s; public AV/size/decode/AAC PASS899654bytes269.9MBh; exactprivateblack proof refusedpublication",
+      "receipt": "qa/evidence/t035-lean-video-measured-encode/synthetic-YwNBww/report.json"
+    },
+    {
+      "scope": "Coherent compiler recheck2",
+      "result": "API exit2 1new optionalquote diagnostic11721ms allprior16gone; WEBexit0 14090ms allprior2gone; exactquote narrowing repaired",
+      "receipts": [
+        "qa/goal-2026-10-14/api-types-attempt-2.json",
+        "qa/goal-2026-10-14/web-types-attempt-2.json"
+      ]
+    },
+    {
+      "scope": "U010checkpoint targeted initial",
+      "result": "exit1 193.6768ms EARLYcheckerfixtureEISDIR,notactualproductcollision; correctedfixturedb57pending",
+      "receipt": "qa/evidence/goal-t051checker-broker-u010-checkpoint-red.json"
+    },
+    {
+      "scope": "Coherent types/build checkpoint",
+      "result": "APIattempt3exit0 14239ms,WEBattempt2green14090msreused; APIbuild1845ms1094357server/412045workerbytes; WEBbuild16647ms185modules; no providers",
+      "receipts": [
+        "qa/goal-2026-10-14/api-types-attempt-3.json",
+        "qa/goal-2026-10-14/api-build-attempt-1.json",
+        "qa/goal-2026-10-14/web-build-attempt-1.json"
+      ]
+    },
+    {
+      "scope": "U010checkpoint actual targeted productrepro",
+      "result": "exit1 183.561ms actualsamePIDfrozenclock refusedcontender deletedowner; pinsunchanged; rootmakerrepairafterledgerFAIL",
+      "receipt": "qa/evidence/goal-t051checker-broker-u010-checkpoint-repro.json"
+    },
+    {
+      "name": "u010-cycle1-standing",
+      "start": "2026-10-14T20:43:13.243Z",
+      "end": "2026-10-14T20:43:17.053Z",
+      "ms": 3805.5458,
+      "exit": 0,
+      "pins": 9,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-u010-cycle1-standing.json"
+    },
+    {
+      "name": "u010-cycle1-ledger",
+      "start": "2026-10-14T20:43:20.002Z",
+      "end": "2026-10-14T20:43:20.172Z",
+      "ms": 166.0382,
+      "exit": 0,
+      "pins": 10,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-u010-cycle1-ledger.json"
+    },
+    {
+      "name": "t044-independent",
+      "start": "2026-10-14T20:43:23.157Z",
+      "end": "2026-10-14T20:43:23.764Z",
+      "ms": 601.1521,
+      "exit": 0,
+      "pins": 17,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t044-independent.json"
+    },
+    {
+      "name": "t007-visibility",
+      "start": "2026-10-14T20:43:27.803Z",
+      "end": "2026-10-14T20:43:29.814Z",
+      "ms": 2007.3170999999998,
+      "exit": 0,
+      "pins": 4,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t007-visibility.json"
+    },
+    {
+      "name": "t035-private-keyframes",
+      "start": "2026-10-14T20:43:32.851Z",
+      "end": "2026-10-14T20:43:33.509Z",
+      "ms": 655.1031999999999,
+      "exit": 0,
+      "pins": 2,
+      "unchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t035-private-keyframes.json"
+    },
+    {
+      "scope": "T035 actual synthetic12sec repaired privatekeyframe measurement",
+      "result": "exit0 6.0991248s exact13wholeblackframes/silence/publicretention; pinsace429/2d913/ca0unchanged; full60minliveHOLD",
+      "receipt": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/report.json"
+    },
+    {
+      "scope": "u010-cycle1-independent",
+      "result": "exit0 unchangedtrue 1043.8314ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-u010-cycle1-independent.json"
+    },
+    {
+      "scope": "t015-independent",
+      "result": "exit1 unchangedtrue 150.32680000000002ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-independent.json"
+    },
+    {
+      "scope": "t042-independent",
+      "result": "exit0 unchangedtrue 3462.4672ms",
+      "receipt": "qa/evidence/goal-t051checker-broker-t042-independent.json"
+    },
+    {
+      "scope": "t015-cycle1-standing",
+      "exitCode": 0,
+      "elapsedMs": 4305.3803,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-cycle1-standing.json"
+    },
+    {
+      "scope": "t015-cycle1-ledger",
+      "exitCode": 0,
+      "elapsedMs": 131.5082,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-cycle1-ledger.json"
+    },
+    {
+      "scope": "t015-cycle1-plan",
+      "exitCode": 0,
+      "elapsedMs": 139.87189999999998,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-cycle1-plan.json"
+    },
+    {
+      "scope": "t015-cycle1-validate",
+      "exitCode": 0,
+      "elapsedMs": 127.6873,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-cycle1-validate.json"
+    },
+    {
+      "scope": "u24-maker",
+      "exitCode": 1,
+      "elapsedMs": 10212.9788,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-u24-maker.json"
+    },
+    {
+      "scope": "t041-maker",
+      "exitCode": 1,
+      "elapsedMs": 4577.6762,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t041-maker.json"
+    },
+    {
+      "scope": "t058-api",
+      "exitCode": 1,
+      "elapsedMs": 2041.0118999999997,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t058-api.json"
+    },
+    {
+      "scope": "t060-maker",
+      "exitCode": 0,
+      "elapsedMs": 8922.4856,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t060-maker.json"
+    },
+    {
+      "scope": "t036-guard",
+      "exitCode": 0,
+      "elapsedMs": 902.8335999999999,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t036-guard.json"
+    },
+    {
+      "scope": "t037-node",
+      "exitCode": 0,
+      "elapsedMs": 9284.8998,
+      "hashesUnchanged": true,
+      "receipt": "qa/evidence/goal-t051checker-broker-t037-node.json"
+    },
+    {
+      "scope": "u24-maker-cycle1",
+      "receipt": "qa/evidence/goal-t051checker-broker-u24-maker-cycle1.json",
+      "exitCode": 0,
+      "elapsedMs": 8807.6124,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t036-independent",
+      "receipt": "qa/evidence/goal-t051checker-broker-t036-independent.json",
+      "exitCode": 0,
+      "elapsedMs": 301.5871,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t037-capture-bridge",
+      "receipt": "qa/evidence/goal-t051checker-broker-t037-capture-bridge.json",
+      "exitCode": 0,
+      "elapsedMs": 682.5132,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t058-api-corrected",
+      "receipt": "qa/evidence/goal-t051checker-broker-t058-api-corrected.json",
+      "exitCode": 0,
+      "elapsedMs": 2500.7848,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t055-ingest",
+      "receipt": "qa/evidence/goal-t051checker-broker-t055-ingest.json",
+      "exitCode": 0,
+      "elapsedMs": 2811.0655,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t055-api",
+      "receipt": "qa/evidence/goal-t051checker-broker-t055-api.json",
+      "exitCode": 0,
+      "elapsedMs": 5741.0458,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t061-backend",
+      "receipt": "qa/evidence/goal-t051checker-broker-t061-backend.json",
+      "exitCode": 0,
+      "elapsedMs": 4221.2777,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t059-cycle1-ledger",
+      "receipt": "qa/evidence/goal-t051checker-broker-t059-cycle1-ledger.json",
+      "exitCode": 0,
+      "elapsedMs": 2385.4278,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t059-cycle1-standing",
+      "receipt": "qa/evidence/goal-t051checker-broker-t059-cycle1-standing.json",
+      "exitCode": 0,
+      "elapsedMs": 6433.1003,
+      "hashesUnchanged": false
+    },
+    {
+      "scope": "t058-ui",
+      "receipt": "qa/evidence/goal-t051checker-broker-t058-ui.json",
+      "exitCode": 0,
+      "elapsedMs": 2800.1347,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t037-ui",
+      "receipt": "qa/evidence/goal-t051checker-broker-t037-ui.json",
+      "exitCode": 0,
+      "elapsedMs": 13369.739599999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t040-product-frozen",
+      "receipt": "qa/evidence/goal-t051checker-broker-t040-product-frozen.json",
+      "exitCode": 1,
+      "elapsedMs": 5271.6801,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t054-api-frozen",
+      "receipt": "qa/evidence/goal-t051checker-broker-t054-api-frozen.json",
+      "exitCode": 1,
+      "elapsedMs": 5483.098599999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t022-independent-refresh",
+      "receipt": "qa/evidence/goal-t051checker-broker-t022-independent-refresh.json",
+      "exitCode": 0,
+      "elapsedMs": 3779.5553999999997,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t059-cycle1-mounted",
+      "receipt": "qa/evidence/goal-t051checker-broker-t059-cycle1-mounted.json",
+      "exitCode": 0,
+      "elapsedMs": 3029.2897,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t059-cycle1-rows",
+      "receipt": "qa/evidence/goal-t051checker-broker-t059-cycle1-rows.json",
+      "exitCode": 0,
+      "elapsedMs": 404.9337,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-helpers",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-helpers.json",
+      "exitCode": 1,
+      "elapsedMs": 120011.7972,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-api",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-api.json",
+      "exitCode": 0,
+      "elapsedMs": 1089.9195,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t061-ui",
+      "receipt": "qa/evidence/goal-t051checker-broker-t061-ui.json",
+      "exitCode": 0,
+      "elapsedMs": 3460.138,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t048-sealed-private",
+      "receipt": "qa/evidence/goal-t051checker-broker-t048-sealed-private.json",
+      "exitCode": 1,
+      "elapsedMs": 13447.1415,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t044-privacy",
+      "receipt": "qa/evidence/goal-t051checker-broker-t044-privacy.json",
+      "exitCode": 0,
+      "elapsedMs": 4939.2788,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t040-product-canonical",
+      "receipt": "qa/evidence/goal-t051checker-broker-t040-product-canonical.json",
+      "exitCode": 0,
+      "elapsedMs": 4540.8905,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t054-independent-race-diagnosis",
+      "receipt": "qa/evidence/goal-t051checker-broker-t054-independent-race-diagnosis.json",
+      "exitCode": 0,
+      "elapsedMs": 1214.4243,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t058-independent",
+      "receipt": "qa/evidence/goal-t051checker-broker-t058-independent.json",
+      "exitCode": 0,
+      "elapsedMs": 1341.7347,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t014-api",
+      "receipt": "qa/evidence/goal-t051checker-broker-t014-api.json",
+      "exitCode": 0,
+      "elapsedMs": 1686.0915,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t056-api-current",
+      "receipt": "qa/evidence/goal-t051checker-broker-t056-api-current.json",
+      "exitCode": 1,
+      "elapsedMs": 7034.6374,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t050-core-A",
+      "receipt": "qa/evidence/goal-t051checker-broker-t050-core-A.json",
+      "exitCode": 0,
+      "elapsedMs": 38350.055199999995,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-native-acl",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-native-acl.json",
+      "exitCode": 1,
+      "elapsedMs": 931.0813,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t040-product-independent",
+      "receipt": "qa/evidence/goal-t051checker-broker-t040-product-independent.json",
+      "exitCode": 0,
+      "elapsedMs": 6708.6318,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t060-retention-factory",
+      "receipt": "qa/evidence/goal-t051checker-broker-t060-retention-factory.json",
+      "exitCode": 0,
+      "elapsedMs": 2191.8519,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-known-clock-diagnostic",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-known-clock-diagnostic.json",
+      "exitCode": 1,
+      "elapsedMs": 6705.2344,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-native-script-diagnostic",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-native-script-diagnostic.json",
+      "exitCode": 1,
+      "elapsedMs": 450.1339,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t007-reviewer-independent-red",
+      "receipt": "qa/evidence/goal-t051checker-broker-t007-reviewer-independent-red.json",
+      "exitCode": 1,
+      "elapsedMs": 1185.062,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-native-modulepath-experiment",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-experiment.json",
+      "exitCode": 0,
+      "elapsedMs": 1252.7076,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t011-native-modulepath-proof",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-proof.json",
+      "exitCode": 1,
+      "elapsedMs": 1151.8968,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "u25-third-await-original-red",
+      "receipt": "qa/evidence/goal-t051checker-broker-u25-third-await-original-red.json",
+      "exitCode": 1,
+      "elapsedMs": 1246.2969,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t048-private-driver-corrected",
+      "receipt": "qa/evidence/goal-t051checker-broker-t048-private-driver-corrected.json",
+      "exitCode": 0,
+      "elapsedMs": 7140.898099999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t015-cycle2-import-current",
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-cycle2-import-current.json",
+      "exitCode": 0,
+      "elapsedMs": 134.8085,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t015-cycle2-validate-current",
+      "receipt": "qa/evidence/goal-t051checker-broker-t015-cycle2-validate-current.json",
+      "exitCode": 0,
+      "elapsedMs": 157.2978,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t013-web",
+      "receipt": "qa/evidence/goal-t051checker-broker-t013-web.json",
+      "exitCode": 0,
+      "elapsedMs": 8158.556500000001,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t014-web",
+      "receipt": "qa/evidence/goal-t051checker-broker-t014-web.json",
+      "exitCode": 0,
+      "elapsedMs": 5569.731400000001,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "live-toc-preflight",
+      "receipt": "qa/evidence/goal-t051checker-broker-live-toc-preflight.json",
+      "exitCode": 0,
+      "elapsedMs": 331.1167,
+      "hashesUnchanged": true,
+      "scopeLimit": "approved bounded non-strict TOC slice; no DB/index/Ask/human acceptance"
+    },
+    {
+      "scope": "live-toc-run",
+      "receipt": "qa/evidence/goal-t051checker-broker-live-toc-run.json",
+      "exitCode": 0,
+      "elapsedMs": 2582.9058,
+      "hashesUnchanged": true,
+      "scopeLimit": "approved bounded non-strict TOC slice; no DB/index/Ask/human acceptance"
+    },
+    {
+      "scope": "t011-protected-setup",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-protected-setup.json",
+      "exitCode": 0,
+      "elapsedMs": 565.0917000000001,
+      "hashesUnchanged": true,
+      "scopeLimit": "new private test-only UUID fixture; no production host acceptance"
+    },
+    {
+      "scope": "t011-protected-native-positive",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-protected-native-positive.json",
+      "exitCode": 0,
+      "elapsedMs": 1210.2709,
+      "hashesUnchanged": true,
+      "scopeLimit": "new private test-only UUID fixture; no production host acceptance"
+    },
+    {
+      "scope": "t011-protected-unsafe-negative",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-protected-unsafe-negative.json",
+      "exitCode": 1,
+      "elapsedMs": 1294.6634999999999,
+      "hashesUnchanged": true,
+      "scopeLimit": "new private test-only UUID fixture; no production host acceptance"
+    },
+    {
+      "scope": "t011-protected-known-clock",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-protected-known-clock.json",
+      "exitCode": 1,
+      "elapsedMs": 30691.9537,
+      "hashesUnchanged": true,
+      "scopeLimit": "new private test-only UUID fixture; no production host acceptance"
+    },
+    {
+      "scope": "t011-protected-cleanup",
+      "receipt": "qa/evidence/goal-t051checker-broker-t011-protected-cleanup.json",
+      "exitCode": 0,
+      "elapsedMs": 885.8627,
+      "hashesUnchanged": true,
+      "scopeLimit": "new private test-only UUID fixture; no production host acceptance"
+    },
+    {
+      "scope": "t040-consent-withdrawal-current",
+      "state": "preflight skipped",
+      "drift": [
+        {
+          "path": "apps/api/src/indexing/session.ts",
+          "expected": "B48EBB3A0E5E2D65CE2004D939E8C3BAC11610CDCD410EBF5EE936851102DE79",
+          "actual": "6734738ce50f493bc27c9db7b4170ed4db590f3dba6bda47f47dcbaa6e2709f5"
+        },
+        {
+          "path": "apps/api/src/indexing/grounded-write.ts",
+          "expected": "BD0D5A06920EBF1F831EC542E67C6D1B5A16788AC794EA9EF2A7746E26B29886",
+          "actual": "c6fa3b092e4ce159ee6cfe738d8d24fde79581ed0eefe7494947ec078c39b247"
+        },
+        {
+          "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+          "expected": "EBE3DEF7A4F586E87AA1D9BCF389F5307E368318FDBB0A28180D189052887A1E",
+          "actual": "a5d509a2caa30cbf25982faccca1477f2171dbe0f0146ade0c9f872586494244"
+        },
+        {
+          "path": "packages/core/src/generated/sessions.ts",
+          "expected": "FE53A0A4EA7B989257F6BD3377415807CCFBB4C939794FEBE85AA8F456102B11",
+          "actual": "3977b5aaf6c516512974f727322f82751b19a2415b1a500b88a752aa54ce5516"
+        }
+      ]
+    },
+    {
+      "scope": "t054-generation-focused",
+      "receipt": "qa/evidence/goal-t051checker-broker-t054-generation-focused.json",
+      "exitCode": 0,
+      "elapsedMs": 3081.18,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t054-isolated-history-dom",
+      "receipt": "qa/evidence/goal-t051checker-broker-t054-isolated-history-dom.json",
+      "exitCode": 0,
+      "elapsedMs": 2062.8364,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t054-isolated-editor-dom-standing",
+      "receipt": "qa/evidence/goal-t051checker-broker-t054-isolated-editor-dom-standing.json",
+      "exitCode": 0,
+      "elapsedMs": 2200.3967000000002,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "u23-cached-root-current-dependency-original-red",
+      "receipt": "qa/evidence/goal-t051checker-broker-u23-cached-root-current-dependency-original-red.json",
+      "exitCode": 1,
+      "elapsedMs": 1058.1843999999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "u25-third-await-current-regression",
+      "receipt": "qa/evidence/goal-t051checker-broker-u25-third-await-current-regression.json",
+      "exitCode": 0,
+      "elapsedMs": 1430.8159999999998,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t007-reviewer-snapshot-exact-floor",
+      "receipt": "qa/evidence/goal-t051checker-broker-t007-reviewer-snapshot-exact-floor.json",
+      "exitCode": 0,
+      "elapsedMs": 2234.2457,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t044-private-independent13",
+      "receipt": "qa/evidence/goal-t051checker-broker-t044-private-independent13.json",
+      "exitCode": 0,
+      "elapsedMs": 8199.874099999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "t028-t060-mounted-independent4",
+      "receipt": "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.json",
+      "exitCode": 0,
+      "elapsedMs": 6708.7519999999995,
+      "hashesUnchanged": true
+    }
+  ],
+  "queue": [
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/docker_ci_isolation_review",
+      "scope": "T035 one-thread12s FFmpeg measuredencode",
+      "previousState": "ready-same12s-diagnostics-only; aftercompiler"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/qa_status/maker_t057",
+      "scope": "T057 operations/explorer/routes focused",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/qa_status/maker_t028",
+      "scope": "T028 accounts eligibility focused afterT060",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T041 narrow slides integration",
+      "agent": "/root/goal_attachment_reader/maker_t041",
+      "state": "fresh-readiness-required",
+      "previousState": "ready-hermetic29-oneexplicitmedias kip-finalsource"
+    },
+    {
+      "scope": "T055 documents/collections",
+      "agent": "/root/implementation_status/maker_t055",
+      "state": "fresh-readiness-required",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "U24 speaker profiles",
+      "agent": "/root/goal_attachment_reader/maker_u24",
+      "state": "fresh-readiness-required",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T053 workflow API/UI",
+      "agent": "/root/implementation_status/maker_t053",
+      "state": "fresh-readiness-required",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T054 transcript review API/DOM",
+      "agent": "/root/goal_attachment_reader/maker_t054",
+      "state": "fresh-readiness-required",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T059 evaluation flywheel focused3files",
+      "state": "fresh-readiness-required",
+      "agent": "/root/roadmap_status/maker_t059",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T014 championship API3/UI2",
+      "state": "fresh-readiness-required",
+      "agent": "/root/roadmap_status/maker_t014",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T015 preparation synthetic8/localplan",
+      "state": "fresh-readiness-required",
+      "agent": "/root/roadmap_status/maker_t015",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T050 bounded local graph/restart",
+      "state": "fresh-readiness-required",
+      "agent": "/root/deploy_environment",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T036 Gmail/publicintake/localdriptransport",
+      "state": "fresh-readiness-required",
+      "agent": "/root/docker_dependency_review",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T05820API+1UI",
+      "state": "fresh-readiness-required",
+      "agent": "/root/deploy_environment/maker_t058",
+      "previousState": "waiting-finalgeneratedcitation-pins"
+    },
+    {
+      "scope": "T013 counsellor4UI",
+      "state": "fresh-readiness-required",
+      "agent": "/root/deploy_environment/maker_t013",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T014 independent aftermaker",
+      "state": "fresh-readiness-required",
+      "agent": "/root/roadmap_status/checker_t014",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T056 answerpolicy API-stage1",
+      "state": "fresh-readiness-required",
+      "agent": "/root/deploy_environment/maker_t056",
+      "previousState": "API-revoked-multiconflict-sourcefix; UI-frozen"
+    },
+    {
+      "scope": "T045 sourceacquisition2files + targetedconsumerregression",
+      "state": "fresh-readiness-required",
+      "agent": "/root/docker_governance_review",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T046 independent auth/projection",
+      "state": "fresh-readiness-required",
+      "agent": "/root/qa_status/checker_t046",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "U010 added13thGeminifixture",
+      "state": "fresh-readiness-required",
+      "agent": "/root/roadmap_status/maker_u010",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "scope": "T060 durablehosting20tests",
+      "state": "fresh-readiness-required",
+      "agent": "/root/qa_status",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/docker_publication",
+      "scope": "T061 automation10fixtures",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/roadmap_status",
+      "scope": "T022 repairedAPI9 CLI7 only",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/implementation_status/maker_u25",
+      "scope": "U25 countfixture corrected30cases",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/goal_attachment_reader/checker_t040",
+      "scope": "T040 independent corrected10 ONLY; standing12alreadygreen",
+      "previousState": "ready-final-pins-probe-only"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "agent": "/root/goal_attachment_reader/checker_t042",
+      "scope": "T042 independent12/boundaryprobe",
+      "previousState": "fresh-readiness-required"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "T007 independent19+3UI",
+      "agent": "/root/implementation_status/checker_t007",
+      "previousState": "ready-after-deps"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "U23 independent25",
+      "agent": "/root/implementation_status/checker_u23",
+      "previousState": "ready-after-deps"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "U32 searchAsk6UI",
+      "agent": "/root/deploy_environment/maker_u32",
+      "previousState": "waiting-sharedhook-App"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "T011 recordconsent15",
+      "agent": "/root/docker_frontend_review",
+      "previousState": "hold-newfinalizer-input-helper; ACLunchanged"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "T038 scheduler",
+      "agent": "/root/docker_context_review",
+      "previousState": "waiting-T011-real-private-controller"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "T037 policyNode10+UI",
+      "agent": "/root/docker_assets_review",
+      "previousState": "sourcefinalizing"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "T048 dispatcher27",
+      "agent": "/root/docker_health_review",
+      "previousState": "ready-fresh15pins"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "U25 independentrace2",
+      "agent": "/root/implementation_status/checker_u25",
+      "previousState": "waiting-maker"
+    },
+    {
+      "state": "fresh-readiness-required",
+      "scope": "U010 independentbaseline",
+      "agent": "/root/roadmap_status/checker_u010",
+      "previousState": "persistactualledger-cycle0FAILthenmakerfix"
+    },
+    {
+      "agent": "/root/docker_docs_review",
+      "scope": "T039 API/web aftergreenNode",
+      "state": "fresh-readiness-required",
+      "previousState": "HOLD-owned-terminal-redeliverylegacy-cache-fix"
+    },
+    {
+      "agent": "/root/implementation_status/maker_t007",
+      "scope": "T007 visibility24+3",
+      "state": "fresh-readiness-required",
+      "previousState": "source-ready-awaitingpins"
+    },
+    {
+      "agent": "/root/goal_attachment_reader",
+      "scope": "T040 productcomposition8",
+      "state": "fresh-readiness-required",
+      "previousState": "source-ready-awaitingpins"
+    },
+    {
+      "agent": "/root/goal_attachment_reader/maker_t044",
+      "scope": "T044 timingbinding30 finalfresh",
+      "state": "fresh-readiness-required",
+      "previousState": "ready-finalpins"
+    },
+    {
+      "agent": "/root/roadmap_status/checker_u010",
+      "scope": "independent6 fakeHTTP/tempboundaries aftermaker13green",
+      "state": "fresh-readiness-required",
+      "previousState": "persistactualledger-cycle0FAILthenmakerfix"
+    },
+    {
+      "agent": "/root/docker_migration_review",
+      "scope": "T052authcore11+D015sender/Gmail/candidates; approvedworkflow10/inactive11",
+      "state": "fresh-readiness-required",
+      "previousState": "sourcefreeze-pin-required"
+    },
+    {
+      "agent": "/root/docker_ci_trigger_review",
+      "scope": "T034captureworkspace54",
+      "state": "fresh-readiness-required",
+      "previousState": "waiting-sourcefreeze-finalizer"
+    },
+    {
+      "agent": "/root/docker_governance_review",
+      "scope": "T045durablejobs8",
+      "state": "fresh-readiness-required",
+      "previousState": "sourcefreeze-pin-required"
+    },
+    {
+      "agent": "/root/goal_attachment_reader/checker_t044",
+      "scope": "T044independent10 hostileactualconsumer",
+      "state": "fresh-readiness-required",
+      "previousState": "HOLD-single-sessionrows-new3b70dependency-repin"
+    }
+  ],
+  "rules": [
+    "One slot/process at a time",
+    "No duplicated full package typechecks/builds/validator across forty makers",
+    "All additional ready agents enter FIFO",
+    "Paired checkers queue their independent probe after maker readiness",
+    "Live browser/provider/DB/service actions are not authorized by a CPU slot"
+  ],
+  "executionFrozen": false,
+  "mode": "ROOT explicit RESUME; fresh pinned focused serial commands only",
+  "resumeRequires": "Explicit ROOT relay of new human authorization and fresh ready source/dependency pins; all prior grants revoked"
+}

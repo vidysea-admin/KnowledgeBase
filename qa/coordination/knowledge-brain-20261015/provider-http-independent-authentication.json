@@ -1,0 +1,42 @@
+{
+  "candidate_sha": "2b54637880a71839675df39113ab9754e6b0357d8f3925396b3996022ffffaca",
+  "candidate12_current": true,
+  "receipts": [
+    {
+      "name": "central-provider-outputs-20261015T0847",
+      "raw_sha256": "debb7a39eb2b14880c950c46b9f9d13482a9e5fb5f6d970c35423a355a9c18f2",
+      "exit": 0,
+      "current_drift": [],
+      "pins": 413,
+      "reuse": "REUSABLE_IDENTITY",
+      "stdout_tail": ") and uses the next capable one (0.6215ms)\n\u2714 embed() falls back past a provider whose embed() throws, and records the failure (0.4867ms)\n\u2714 embed() throws rather than returning zero vectors when NO chain member can embed (0.579ms)\n\u2139 tests 59\n\u2139 suites 0\n\u2139 pass 59\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 9246.1697\n"
+    },
+    {
+      "name": "current-composition-four-20261015T0944",
+      "raw_sha256": "0392ed0a7eb1f41db0e356d7b050bad0c2acdfb8e198875f176db685ab3b06d3",
+      "exit": 0,
+      "current_drift": [],
+      "pins": 1331,
+      "reuse": "REUSABLE_IDENTITY",
+      "stdout_tail": "g route (3.5902ms)\n\u2714 output verification cannot fall back to generation, even with an unsafe configured verifier chain (2.5049ms)\n\u2714 Compose requires an explicit database and does not bake provider secrets into web builds (0.8295ms)\n\u2139 tests 4\n\u2139 suites 0\n\u2139 pass 4\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 2212.5015\n"
+    },
+    {
+      "name": "local-ollama-mandatory-20261015T0954",
+      "raw_sha256": "9df34ca31623ca51138b9c496c0f234510ab62f1e05dd7955349031dce36c908",
+      "exit": 0,
+      "current_drift": [],
+      "pins": 198,
+      "reuse": "REUSABLE_IDENTITY",
+      "stdout_tail": "orrupt batch [[1]] (0.2318ms)\n\u2714 Nomic query uses the matching task prefix while literal prefix-looking text remains literal (0.2412ms)\n\u2714 Non-Nomic models retain raw input and absent purpose defaults to document for Nomic (0.3663ms)\n\u2139 tests 10\n\u2139 suites 0\n\u2139 pass 10\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 802.678\n"
+    },
+    {
+      "name": "ai-package-types-20261015T0954",
+      "raw_sha256": "6df41613ae4101c0d78778539c08661a6bea2402fc7a4b6c11bbea4bf63e7d45",
+      "exit": 0,
+      "current_drift": [],
+      "pins": 198,
+      "reuse": "REUSABLE_IDENTITY",
+      "stdout_tail": ""
+    }
+  ]
+}

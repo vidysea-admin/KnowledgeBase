@@ -13,10 +13,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, existsSync, readdirSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync, existsSync, readdirSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
+
+// The launcher under test is a Windows PowerShell script (Start-Process semantics, `powershell` binary): it cannot run on Linux/macOS.
+const WIN_ONLY = { skip: process.platform !== "win32" ? "start-record-detached.ps1 is Windows PowerShell; Windows-only launcher" : false };
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCRIPT = join(HERE, "start-record-detached.ps1");
@@ -32,12 +36,23 @@ function logsBefore() {
   return existsSync(LOG_DIR) ? new Set(readdirSync(LOG_DIR)) : new Set();
 }
 
+// The fixture child keeps its log open for ~8s on Windows, so rmSync can hit EPERM/EBUSY. Bounded
+// retry (up to ~20s) in the test cleanup only; rmSync's own maxRetries does not cover this case.
+function rmWithRetry(p) {
+  for (let i = 0; ; i++) {
+    try { rmSync(p, { force: true }); return; } catch (e) {
+      if (i >= 40 || !["EPERM", "EBUSY", "EACCES"].includes(e.code)) throw e;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500);
+    }
+  }
+}
+
 function cleanupNewLogs(before) {
   if (!existsSync(LOG_DIR)) return;
   for (const f of readdirSync(LOG_DIR)) {
     if (before.has(f) || !/^record-\d{4}-\d{2}-\d{2}_/.test(f)) continue;
     const p = join(LOG_DIR, f);
-    if (statSync(p).isFile()) rmSync(p, { force: true });
+    if (statSync(p).isFile()) rmWithRetry(p);
   }
 }
 
@@ -55,7 +70,49 @@ function runLauncher({ env = {}, extraArgs = [], livenessSeconds = 1, title = TI
   }
 }
 
-test("ISS-323(c): the Zoom join URL's `&` and a title with spaces reach the recorder argv intact", () => {
+test("scheduled -Job cannot bypass checked identity with direct overrides or a replacement CLI", WIN_ONLY, () => {
+  for (const override of [["-Url", ZOOM_URL], ["-Until", "23:59"], ["-SessionId", "replacement"],
+    ["-ExtraArgs", "--tenant foreign"], ["-CliEntry", FIXTURE]]) {
+    const dir = mkdtempSync(join(tmpdir(), "lkb-job-refusal-")), dump = join(dir, "argv.json");
+    try {
+      let status = 0;
+      try { execFileSync("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", SCRIPT,
+        "-Job", "unavailable-safe-key", ...override], {encoding:"utf8", env:{...process.env,LKB_ARGV_DUMP:dump},timeout:30000}); }
+      catch (error) { status = error.status ?? -1; assert.match(`${error.stdout ?? ""}${error.stderr ?? ""}`, /scheduled dispatch refuses replacement recording arguments/); }
+      assert.notEqual(status, 0); assert.equal(existsSync(dump), false);
+    } finally {rmSync(dir,{recursive:true,force:true});}
+  }
+});
+
+test("ISS-ALERTTENANT-001: actual PowerShell -Job path refuses untagged/foreign saved jobs through current checked module", {...WIN_ONLY,timeout:120000}, () => {
+  const cache = join(REPO_ROOT,".cache"); mkdirSync(cache,{recursive:true});
+  const helper = pathToFileURL(join(REPO_ROOT,"packages/meeting-bot/src/calendar/scheduled-dispatch.ts")).href;
+  for(const tenantId of [undefined,"foreign-tenant"]){
+    const root = mkdtempSync(join(cache,"t037-dispatch-"));
+    try {
+      const scripts = join(root,"scripts/webinar"), cliDir=join(root,"packages/meeting-bot/src"),stateDir=join(root,"raw/webinars");
+      mkdirSync(scripts,{recursive:true});mkdirSync(cliDir,{recursive:true});mkdirSync(join(stateDir,"scheduled"),{recursive:true});
+      writeFileSync(join(root,"package.json"),'{"type":"module"}');
+      writeFileSync(join(scripts,"start-record-detached.ps1"),readFileSync(SCRIPT));
+      const marker=join(root,"capture-called.json"),sessionId="session-one";
+      const key=`${sessionId}-${createHash("sha256").update(sessionId).digest("hex").slice(0,10)}`;
+      const policy={source:"calendar",sourceId:"event-one",sessionKey:sessionId,sender:"organizer@example.com",
+        meetingUrl:"https://meeting.zoho.com/join?key=123",startTime:"2026-10-15T12:00:00Z",endTime:"2026-10-15T13:00:00Z"};
+      const file=join(stateDir,"scheduled",`${key}.json`);
+      writeFileSync(file,JSON.stringify({tenantId,url:policy.meetingUrl,until:policy.endTime,title:"Webinar",sessionId,dispatchPolicyV1:policy}));
+      const before=readFileSync(file);
+      writeFileSync(join(cliDir,"cli.ts"),`import {runScheduledDispatch} from ${JSON.stringify(helper)};\nimport {writeFileSync} from 'node:fs';\nawait runScheduledDispatch(process.argv.slice(3), {stateDir:${JSON.stringify(stateDir)},tenantId:'dispatch-tenant',mode:'fail-closed',loadKeyTenant:async()=> 'dispatch-tenant',now:()=> '2026-10-15T12:00:00Z',log:()=>{},record:async args=>{writeFileSync(${JSON.stringify(marker)},JSON.stringify(args));},io:{load:()=>({ruleSet:{version:1,ownDomains:[],rules:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}})}});\n`);
+      let status=0;
+      try {execFileSync("powershell",["-NoProfile","-ExecutionPolicy","Bypass","-File",join(scripts,"start-record-detached.ps1"),"-Job",key,"-LivenessSeconds","30"],{encoding:"utf8",timeout:45000});}
+      catch(error){status=error.status??-1;}
+      const logs=readdirSync(stateDir).filter(name=>name.endsWith(".err.log")).map(name=>readFileSync(join(stateDir,name),"utf8")).join("\n");
+      assert.notEqual(status,0);assert.match(logs,/Scheduled dispatch refused: authorization unavailable/);
+      assert.equal(existsSync(marker),false);assert.deepEqual(readFileSync(file),before);
+    } finally {assert.ok(resolve(root).startsWith(resolve(cache)+"\\"));rmSync(root,{recursive:true,force:true});}
+  }
+});
+
+test("ISS-323(c): the Zoom join URL's `&` and a title with spaces reach the recorder argv intact", WIN_ONLY, () => {
   const before = logsBefore();
   const dir = mkdtempSync(join(tmpdir(), "lkb-argv-"));
   const dump = join(dir, "argv.json");
@@ -78,7 +135,7 @@ test("ISS-323(c): the Zoom join URL's `&` and a title with spaces reach the reco
   }
 });
 
-test("ISS-323(a,b): a recorder that dies immediately makes the launcher exit non-zero and never claim success", () => {
+test("ISS-323(a,b): a recorder that dies immediately makes the launcher exit non-zero and never claim success", WIN_ONLY, () => {
   const before = logsBefore();
   try {
     // 6s window: `node --import tsx` needs ~2s to start before it can exit, so a 1s window would
@@ -94,7 +151,7 @@ test("ISS-323(a,b): a recorder that dies immediately makes the launcher exit non
   }
 });
 
-test("ISS-323: the happy path still reports a real pid and exits 0", () => {
+test("ISS-323: the happy path still reports a real pid and exits 0", WIN_ONLY, () => {
   const before = logsBefore();
   const dir = mkdtempSync(join(tmpdir(), "lkb-argv-ok-"));
   try {
@@ -116,7 +173,7 @@ test("ISS-323: the happy path still reports a real pid and exits 0", () => {
 // packages/meeting-bot/src/calendar/task-scheduler.ts), so a pasted path fragment ending in `\`
 // is ordinary input. Not in the ISS-323 ledger row, so it is an ADDITION to that corpus, never a
 // substitution for it (D-015).
-test("review finding: a title ending in a backslash (and one holding a quote) must not swallow the arguments after it", () => {
+test("review finding: a title ending in a backslash (and one holding a quote) must not swallow the arguments after it", WIN_ONLY, () => {
   const before = logsBefore();
   const dir = mkdtempSync(join(tmpdir(), "lkb-argv-bs-"));
   const dump = join(dir, "argv.json");

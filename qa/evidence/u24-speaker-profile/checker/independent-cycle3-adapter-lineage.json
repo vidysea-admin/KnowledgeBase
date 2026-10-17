@@ -1,0 +1,17 @@
+{
+  "issueId": "ISS-U24PROFILECHECK-001",
+  "originalCorpus": "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts",
+  "originalSha256": "32B9CC8C0285612B4A3866C4488DE9624354F4580A0369043839C113DFFF1886",
+  "adaptedCorpus": "qa/evidence/u24-speaker-profile/checker/independent-cycle3-capability.test.mts",
+  "adaptedSha256": "f0556a3785b3810a285eeb20b818f636e81521f9a39d23696eb4ed15a547a55c",
+  "originalSixTestBodiesByteIdentical": true,
+  "withdrawalTriggerAndLatchAssertionsPreserved": true,
+  "changedSeam": "Only fixture Db capability construction and read-option inspection; actual MongoClient.db and SDK ClientSession without connect",
+  "addedSeparateControls": 2,
+  "fakeMvcc": false,
+  "snapshotCopies": false,
+  "actualServerTransactionProof": false,
+  "privateInputs": false,
+  "testExecutionPerformed": false,
+  "sdkResolution": "Node createRequire anchored at apps/api/package.json resolves that existing production mongodb dependency; root has no standalone mongodb package"
+}

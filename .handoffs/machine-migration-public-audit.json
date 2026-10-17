@@ -1,0 +1,10 @@
+{
+  "history_blobs": 3838,
+  "history_bytes": 170590243,
+  "working_files": 78,
+  "configured_secrets_checked": 2,
+  "patterns": 8,
+  "positive_controls": 8,
+  "negative_controls": 8,
+  "findings": []
+}

@@ -1,0 +1,39 @@
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✔ native document vertical: actual mounted consent/upload/publication, Hindi source and request-bound Ask (2122.7285ms)
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✔ native lifecycle vertical: retry/head advance/restart/body mutation/revoke/delete invalidate exact evidence (77.3223ms)
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✔ native Ask vertical: deletion after grounding refuses the completed answer (41.2134ms)
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✖ native policy vertical: actual policy release and mounted history refuse advanced or revoked canonical evidence (46.8022ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5811.0802
+
+✖ failing tests:
+
+test at src\native-evidence\vertical.test.ts:34:14590
+✖ native policy vertical: actual policy release and mounted history refuse advanced or revoked canonical evidence (46.8022ms)
+  AssertionError [ERR_ASSERTION]: HOLD: native policy must independently authorize current exact source evidence
+  + actual - expected
+  
+  + 'review'
+  - 'allowed'
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\vertical.test.ts:281:14)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'review',
+    expected: 'allowed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

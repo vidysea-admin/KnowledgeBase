@@ -1,0 +1,50 @@
+{
+  "unit": "t035-lean-video-measured-encode",
+  "scope": "checked-PASS cycle 1 local helper/EOF engineering only; shared consumer/provider and full-hour live/host acceptance remain HOLD",
+  "selectedFileCount": 21,
+  "files": [
+    "qa/contracts/goal-t035.md",
+    "qa/manifests/t035-lean-video-measured-encode.md",
+    "qa/packets/t035-lean-video-measured-encode.md",
+    "qa/verdicts/t035-lean-video-measured-encode.md",
+    "scripts/qa/t035-lean-video-measure.mjs",
+    "scripts/qa/t035-lean-video-eof-probe.mjs",
+    "qa/evidence/t035-lean-video-measured-encode/eof-current-spec.json",
+    "qa/evidence/t035-lean-video-measured-encode/scoped-helper-eof-pins.json",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-focused-20261014T230309Z.receipt.json",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-focused-20261014T230309Z.stdout.txt",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-focused-20261014T230309Z.stderr.txt",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-retained-media-20261014T230352Z.receipt.json",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-retained-media-20261014T230352Z.stdout.txt",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-retained-media-20261014T230352Z.stderr.txt",
+    "qa/evidence/t035-lean-video-measured-encode/eof-current-m5uNoV/report.json",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/report.json",
+    "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.json",
+    "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.stderr.txt",
+    "qa/evidence/t035-lean-video-measured-encode/checker-verdict-confirmation.json",
+    "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/report.json"
+  ],
+  "runnability": {
+    "freshOrdinarySyntheticFloor": "scripts/qa/t035-lean-video-measure.mjs generates its own synthetic AV with current helper and installed node/tsx/ffmpeg/ffprobe; generated media stays outside publication",
+    "exactEOFReplay": "The published script/spec document the executable command, but exact original-floor replay requires the intentionally excluded locally retained D07C93 synthetic media corpus. Baseline mode additionally requires the excluded ACE429 archived helper. No standalone EOF reproduction is claimed for this curated file set.",
+    "sourceDependencies": "Current helper and test are production candidate files curated separately by runtime; no source/test edits accompany this QA whitelist"
+  },
+  "exclude": [
+    "All original or encoded media, including synthetic mkv/mp4/m4a artifacts",
+    "Redundant pre-eof-helper.ts and pre-eof-probe.mjs source backups",
+    "Historical dependency-only candidate-pins.json shared consumer map",
+    "Earlier redundant focused/BigInt/keyframe logs and failed setup/pixel reports",
+    "All private real-hour recordings, receipts or proof"
+  ],
+  "receiptPins": {
+    "focused": "c708157c3f72073c8e1211d5addda6da5b3088909d564642487db8cc72c53150",
+    "currentReplay": "4d3382b15e202cf7f73357caccba46adf0af1ea2ebf27e1c0e070387cbfa3700",
+    "currentReport": "49ac3b6b654d9fb56152306604b9350bf89deec2ec7bed5b9b3b31ddf9504e8a",
+    "originalBaselineReport": "820a3012a67ae700a5b49dd9df21854e6a3c5341b0cc549726dc453fc4dbe2ed",
+    "verdict": "fbcf4b9bd41d3c98f27e2a10f1e013b51084644314f51e845163f8850c7aaa92",
+    "closedManifest": "242ff307823363b11e6671a56a3cf67027337c5c8157a66de0a6dfe2272c201e"
+  },
+  "metadataOnly": true,
+  "noGitOrExecution": true
+}

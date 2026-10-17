@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "scope": "Publication metadata reclassification only; originals unchanged",
+  "originalWhitelist": "qa/goal-2026-10-14/ops-family-public-qa-whitelist.json",
+  "originalCount": 48,
+  "additionalExcludeCount": 15,
+  "exclude": [
+    "qa/packets/goal-t028.md",
+    "qa/evidence/goal-t028-cycle1-verdict-preserved.md",
+    "qa/goal-t046/t046-retention-status-api-ui.md",
+    "qa/goal-t046/web-test.stdout.txt",
+    "qa/manifests/goal-t050.md",
+    "qa/packets/goal-t050.md",
+    "qa/evidence/goal-t051checker-broker-t050-core-A.json",
+    "qa/verdicts/goal-t060.md",
+    "qa/evidence/goal-t060-cycle0-HOLD.md",
+    "qa/evidence/goal-t051checker-broker-t060-maker.json",
+    "qa/evidence/goal-t051checker-broker-t060-retention-factory.json",
+    "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.json",
+    "qa/evidence/goal-t051checker-broker-t061-backend.json",
+    "qa/evidence/goal-t051checker-broker-t061-ui.json",
+    "qa/evidence/goal-t051checker-broker-t061-ui.stdout.txt"
+  ],
+  "excludedPrivateProvenance": [
+    "qa/manifests/goal-t050.md",
+    "qa/packets/goal-t050.md"
+  ],
+  "otherExclusionReason": "Concrete operational absolute-path metadata; no private values reproduced",
+  "publicCount": 33,
+  "paths": [
+    "qa/manifests/goal-t028.md",
+    "qa/contracts/goal-t028.md",
+    "qa/verdicts/goal-t028.md",
+    "qa/goal-t046/t046-production-retention-wiring.md",
+    "qa/goal-t046/api-test.stdout.txt",
+    "qa/goal-t046/api-test.stderr.txt",
+    "qa/goal-t046/web-test.stderr.txt",
+    "qa/contracts/goal-t046.md",
+    "qa/evidence/goal-t046-screen-citations.test.ts",
+    "qa/contracts/goal-t050.md",
+    "qa/evidence/goal-t050/checker-trailing-diagnostic.mjs",
+    "qa/evidence/goal-t051checker-broker-t050-core-A.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t050-core-A.stderr.txt",
+    "qa/manifests/goal-t057.md",
+    "qa/contracts/goal-t057.md",
+    "qa/contracts/goal-t060.md",
+    "qa/manifests/goal-t060.md",
+    "qa/packets/goal-t060.md",
+    "qa/evidence/goal-t028-central-check.test.ts",
+    "qa/evidence/goal-t051checker-broker-t060-maker.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t060-maker.stderr.txt",
+    "qa/evidence/goal-t051checker-broker-t060-retention-factory.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t060-retention-factory.stderr.txt",
+    "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.stderr.txt",
+    "qa/contracts/goal-t061.md",
+    "qa/manifests/goal-t061.md",
+    "qa/packets/goal-t061.md",
+    "qa/packets/goal-t061-schema-fixtures.json",
+    "qa/packets/goal-t061-form-schema-fixtures.json",
+    "qa/evidence/goal-t051checker-broker-t061-backend.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t061-backend.stderr.txt",
+    "qa/evidence/goal-t051checker-broker-t061-ui.stderr.txt"
+  ],
+  "verifiedSyntheticOnlyFloors": [
+    "qa/evidence/goal-t046-screen-citations.test.ts",
+    "qa/evidence/goal-t050/checker-trailing-diagnostic.mjs",
+    "qa/evidence/goal-t028-central-check.test.ts",
+    "qa/packets/goal-t061-schema-fixtures.json",
+    "qa/packets/goal-t061-form-schema-fixtures.json"
+  ],
+  "verifiedPublicHandshakes": [
+    "qa/manifests/goal-t028.md",
+    "qa/contracts/goal-t028.md",
+    "qa/verdicts/goal-t028.md",
+    "qa/goal-t046/t046-production-retention-wiring.md",
+    "qa/contracts/goal-t046.md",
+    "qa/contracts/goal-t050.md",
+    "qa/manifests/goal-t057.md",
+    "qa/contracts/goal-t057.md",
+    "qa/contracts/goal-t060.md",
+    "qa/manifests/goal-t060.md",
+    "qa/packets/goal-t060.md",
+    "qa/contracts/goal-t061.md",
+    "qa/manifests/goal-t061.md",
+    "qa/packets/goal-t061.md"
+  ],
+  "publicHashInventory": [
+    {
+      "path": "qa/manifests/goal-t028.md",
+      "sha256": "0113fb1cebe75daebb7e336e12ac10abf3ed6e16174d694fa030fda90e7e63a1"
+    },
+    {
+      "path": "qa/contracts/goal-t028.md",
+      "sha256": "ca67627935d47d6f6612f7e21fa8f85e31eda65d25d6d5826fd33e12401dc977"
+    },
+    {
+      "path": "qa/verdicts/goal-t028.md",
+      "sha256": "830e01b40a6425d3f3d49d454cc41742eec2899bbd5319c29809540c27c892e7"
+    },
+    {
+      "path": "qa/goal-t046/t046-production-retention-wiring.md",
+      "sha256": "9a7fbc8a46e24d4523a4d721695fd0c8d34536dcca8303b2ab7c51b0a8b72ce6"
+    },
+    {
+      "path": "qa/goal-t046/api-test.stdout.txt",
+      "sha256": "e7a4515ff0290569d8024275e6fa2d8584deaa3a046aba48e9f0331462b1ddb1"
+    },
+    {
+      "path": "qa/goal-t046/api-test.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/goal-t046/web-test.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/contracts/goal-t046.md",
+      "sha256": "166fd5871254bb942d21bc2dce4fa1998c9f89cfe5d2b8f522fa1bc57d1d1575"
+    },
+    {
+      "path": "qa/evidence/goal-t046-screen-citations.test.ts",
+      "sha256": "af78ae1dcc12b3e80d9400227650a1dfeddfc9937c7aa7f3e2d0d0dfd1c2505a"
+    },
+    {
+      "path": "qa/contracts/goal-t050.md",
+      "sha256": "2146aa5f3ec14827e5a19330272a1c87fca83168698e7c91ce5699c17eaf4207"
+    },
+    {
+      "path": "qa/evidence/goal-t050/checker-trailing-diagnostic.mjs",
+      "sha256": "46cef425bb42ad7610ee36c7829a6eb443dff7fa2b3808aa2adfb78c6ffba20f"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t050-core-A.stdout.txt",
+      "sha256": "6788a1cce80b87b0509238e9082c32a696a8c2bba2d16ff1f56f911190eceb06"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t050-core-A.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/manifests/goal-t057.md",
+      "sha256": "8e38cd14655d85f8ad822a058dd9ff24794f6a80c861421d270b9c589ca28de7"
+    },
+    {
+      "path": "qa/contracts/goal-t057.md",
+      "sha256": "6c80e1986b28f886b9d19584c573e2cdff1e880f323e787c16ef6fecb49a7cfe"
+    },
+    {
+      "path": "qa/contracts/goal-t060.md",
+      "sha256": "338522bed6524192b70203fb7d478d1f2ab314adce1f1d83dcb91bc9ffcee1eb"
+    },
+    {
+      "path": "qa/manifests/goal-t060.md",
+      "sha256": "740777486c971cb73c1acd92a8d53d762543fa1f180a3ede9efe9718aaa918b2"
+    },
+    {
+      "path": "qa/packets/goal-t060.md",
+      "sha256": "64d56988cef3684c0033092d8cc5ba4761e61f2ab684b6d0d88eb69b0b42fb7f"
+    },
+    {
+      "path": "qa/evidence/goal-t028-central-check.test.ts",
+      "sha256": "43bc9ae5ebca638504f8776060179b9a1fc25094367df5914c6524f122153084"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t060-maker.stdout.txt",
+      "sha256": "6fc77d42c22fc0046a855a20fadde15254bc6239e19181996289ba4419e87e90"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t060-maker.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t060-retention-factory.stdout.txt",
+      "sha256": "d3086967ba1d8ae5aa36034c42b7338fdff440c2036e48e6c774d4a4d1e961cc"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t060-retention-factory.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.stdout.txt",
+      "sha256": "2d04ee627ac945f124d31a184fd9b2205102be581a63e8e58b4ba57c0ee37aed"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/contracts/goal-t061.md",
+      "sha256": "3f640dd8ede5759736a09c91f9cadb43cc352d96fbc77784eb9a666b61ae4906"
+    },
+    {
+      "path": "qa/manifests/goal-t061.md",
+      "sha256": "2cf94cbde16baa7731692394621fa14153c84190875609a1afeb60100acfc889"
+    },
+    {
+      "path": "qa/packets/goal-t061.md",
+      "sha256": "cca05efdf00cd5925f37b4428ff07548dee356cf5635889ceb030e476c04136b"
+    },
+    {
+      "path": "qa/packets/goal-t061-schema-fixtures.json",
+      "sha256": "693d31e4318c74774212f3c06393a26abc81539ca838b62a8601331a6a12d7ad"
+    },
+    {
+      "path": "qa/packets/goal-t061-form-schema-fixtures.json",
+      "sha256": "b0c4bf105cf1749519d226cc3e06ebfca6c9a748ee911c9e846ffb58feb080e0"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t061-backend.stdout.txt",
+      "sha256": "0fe819f0180b9a6142c670681e27c31533a50882410fda6a90f6c24ce6cb379d"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t061-backend.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t061-ui.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": [
+    "Live/private source cases and planned unattended targets are not credited as public synthetic counterexamples",
+    "T051 actual host/private proof remains excluded, stopped owner not awakened",
+    "Synthetic floors use generated temporary data, mock adapters or explicit artificial schema values; no authentic recording/provider/actor payload",
+    "Public status prose preserves source-only acceptance and full-parent HOLD; links to excluded historical evidence do not make it a public artifact",
+    "No source/test/run/Git action or original receipt rewrite"
+  ]
+}

@@ -1,0 +1,607 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://answer_runs",
+  "title": "StoredAnswerRun",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "properties": {
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claimedBy": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "actor"
+      ],
+      "additionalProperties": false
+    },
+    "query": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "questionClass": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "filters": {
+      "type": "object",
+      "properties": {
+        "sessionIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "sources": {
+          "type": "string",
+          "enum": [
+            "all",
+            "internal"
+          ]
+        }
+      },
+      "required": [
+        "sessionIds",
+        "sources"
+      ],
+      "additionalProperties": false
+    },
+    "evidenceMode": {
+      "type": "boolean"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "allowed",
+        "review",
+        "refused",
+        "approved",
+        "rejected",
+        "conflicted"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "candidate": {
+      "type": "object",
+      "properties": {
+        "answer": {
+          "type": "string"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "correct",
+            "ambiguous",
+            "incorrect"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "scored": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "node": {
+                "$ref": "#/$defs/AnswerCandidateNode"
+              },
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "reason": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "node",
+              "score",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        },
+        "web_used": {
+          "type": "boolean"
+        },
+        "insufficient_coverage": {
+          "type": "boolean"
+        },
+        "sources": {
+          "type": "object",
+          "properties": {
+            "internal": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "node_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "evidence": {
+                    "type": "object",
+                    "properties": {},
+                    "required": [],
+                    "additionalProperties": true
+                  }
+                },
+                "required": [
+                  "node_id"
+                ],
+                "additionalProperties": false
+              },
+              "minItems": 0
+            },
+            "web": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {},
+                "required": [],
+                "additionalProperties": true
+              },
+              "minItems": 0
+            }
+          },
+          "required": [
+            "internal",
+            "web"
+          ],
+          "additionalProperties": false
+        },
+        "auditLog": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "jobKind": {
+                "type": "string"
+              },
+              "step": {
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "model": {
+                "type": "string"
+              },
+              "costUsd": {
+                "type": "number",
+                "minimum": 0
+              },
+              "excludedTurns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "sessionId": {
+                      "type": "string"
+                    },
+                    "turnId": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "sessionId",
+                    "turnId",
+                    "reason"
+                  ],
+                  "additionalProperties": false
+                },
+                "minItems": 0
+              }
+            },
+            "required": [
+              "jobKind",
+              "step"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "answer",
+        "verdict",
+        "reason",
+        "scored",
+        "web_used",
+        "insufficient_coverage",
+        "sources",
+        "auditLog"
+      ],
+      "additionalProperties": false
+    },
+    "candidateDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "evidenceDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/StoredAnswerEvidence"
+      },
+      "minItems": 0
+    },
+    "policy": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "tenantId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "policyId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+            },
+            "version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "questionClass": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "mode": {
+              "type": "string",
+              "enum": [
+                "internal-only",
+                "internal-and-web"
+              ]
+            },
+            "style": {
+              "type": "string",
+              "enum": [
+                "concise",
+                "detailed"
+              ]
+            },
+            "onInsufficient": {
+              "type": "string",
+              "enum": [
+                "review",
+                "refuse"
+              ]
+            },
+            "citations": {
+              "const": "required"
+            },
+            "action": {
+              "type": "string",
+              "enum": [
+                "save",
+                "retire"
+              ]
+            },
+            "retired": {
+              "type": "boolean"
+            },
+            "changedBy": {
+              "type": "object",
+              "properties": {
+                "actor": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "claimedBy": {
+                  "type": "string",
+                  "maxLength": 200
+                }
+              },
+              "required": [
+                "actor"
+              ],
+              "additionalProperties": false
+            },
+            "changedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "note": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "previousVersion": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "tenantId",
+            "policyId",
+            "version",
+            "questionClass",
+            "mode",
+            "style",
+            "onInsufficient",
+            "citations",
+            "action",
+            "retired",
+            "changedBy",
+            "changedAt",
+            "note",
+            "previousVersion"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "parentRunId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "resolutionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "approved",
+            "rejected"
+          ]
+        },
+        "by": {
+          "type": "object",
+          "properties": {
+            "actor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "claimedBy": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "actor"
+          ],
+          "additionalProperties": false
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "candidateDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "evidenceDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "decision",
+        "by",
+        "note",
+        "at",
+        "candidateDigest",
+        "evidenceDigest"
+      ],
+      "additionalProperties": false
+    },
+    "feedback": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "string",
+            "enum": [
+              "helpful",
+              "unhelpful"
+            ]
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "by": {
+            "type": "object",
+            "properties": {
+              "actor": {
+                "type": "string",
+                "minLength": 1
+              },
+              "claimedBy": {
+                "type": "string",
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "actor"
+            ],
+            "additionalProperties": false
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "rating",
+          "note",
+          "by",
+          "at"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 100
+    }
+  },
+  "required": [
+    "_id",
+    "id",
+    "tenantId",
+    "createdAt",
+    "actor",
+    "query",
+    "questionClass",
+    "filters",
+    "evidenceMode",
+    "state",
+    "reason",
+    "candidate",
+    "candidateDigest",
+    "evidenceDigest",
+    "evidence",
+    "policy",
+    "feedback"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "AnswerCandidateNode": {
+      "title": "AnswerCandidateNode",
+      "description": "The recursive node shape (root AND every nested child share this, per T-004's original design) -- generates `TreeIndexNode`, the name every existing reader (search.ts, flatten-graph.ts, packages/ask's router/select-nodes, tests) already imports for a node ANYWHERE in the tree, unchanged by this unit. Only the root additionally satisfies `TreeIndexRootDocument` (this file's own top-level type) once persisted.",
+      "type": "object",
+      "required": [
+        "node_id",
+        "title",
+        "level",
+        "summary",
+        "children"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "tenant",
+            "year",
+            "month",
+            "session",
+            "topic",
+            "org"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "sessionRef": {
+              "type": "string"
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AnswerCandidateNode"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "StoredAnswerEvidence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "internal",
+            "web"
+          ]
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": true
+        },
+        "excerpt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "origin",
+        "fingerprint",
+        "source",
+        "excerpt"
+      ],
+      "additionalProperties": false,
+      "title": "StoredAnswerEvidence"
+    }
+  }
+}

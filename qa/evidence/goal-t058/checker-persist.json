@@ -1,0 +1,13 @@
+{
+  "persistedAt": "2026-10-14T21:36:59.4672491Z",
+  "verdictPath": "qa/verdicts/goal-t058.md",
+  "verdictSHA256": "B1D6FC76BA471B9024023D83E97123C041BBFAF39BE958B804158D4316AF1010",
+  "verdict": "HOLD",
+  "cycle": 0,
+  "readyReviewCheckpoint": "2026-10-14T21:34:38Z",
+  "readyReviewCheckpointResolutionSeconds": 1,
+  "checkpointToPersistSeconds": 141.4672491,
+  "trueLaunchTime": "UNKNOWN",
+  "trueLaunchToVerdict": "UNKNOWN",
+  "liveHandles": "NONE"
+}

@@ -14,12 +14,13 @@
  * `loadTrustedSenderConfig` does this). */
 import { createHash } from "node:crypto";
 import { detectPlatform } from "../platform.js";
-import type { WebinarReconciliationResult, CalendarEvent } from "./calendar-client.js";
+import { parseStrictEmail, normalizeDomain } from "./join-rules/join-rules.js";
+import type { WebinarReconciliationResult, WebinarReconciliationState, CalendarEvent } from "@lkb/core";
+import type { TrustedSenderConfig, AutoRecordCandidateInput, AutoRecordItem, SkippedItem } from "@lkb/core";
+import { runWebinarRegistrations, mergeRegistrationOperationDraft } from "./registration-workflow.js";
+export { runWebinarRegistrations } from "./registration-workflow.js";
 
-export interface TrustedSenderConfig {
-  emails: string[];
-  domains: string[];
-}
+export type { TrustedSenderConfig } from "@lkb/core";
 
 /** Strips a `tk=`/`token=`/`access_token=`/`pwd=` query-string value from a join link before it
  * is ever printed or logged — the join token itself must never appear in a log line (unit
@@ -43,22 +44,17 @@ export function redactJoinLink(url: string): string {
   }
 }
 
-function domainOf(email: string): string {
-  const at = email.lastIndexOf("@");
-  return at === -1 ? "" : email.slice(at + 1).toLowerCase();
-}
-
-/** True iff `email`/`domain` matches the config allowlist. `domain` defaults to the part of
- * `email` after `@` when not given separately (calendar `organizer` has no separate domain
- * field). */
+/** True iff the sender matches the config allowlist. ISS-CAPTURE-001: the decision is made from a
+ * strictly parsed `email` only (see `parseStrictEmail`); the domain used for the domain match is the
+ * one PARSED FROM THE EMAIL. A supplied `domain` never grants trust on its own: if given (not
+ * undefined/null) it must equal the email's parsed domain after normalisation, otherwise the result is
+ * false. No valid email -> false. Domain matching stays exact (no subdomains). */
 export function isTrustedSender(email: string | undefined, domain: string | undefined,
   cfg: TrustedSenderConfig): boolean {
-  if (!email && !domain) return false;
-  const emailLc = email?.toLowerCase();
-  const domainLc = (domain ?? (email ? domainOf(email) : undefined))?.toLowerCase();
-  if (emailLc && cfg.emails.includes(emailLc)) return true;
-  if (domainLc && cfg.domains.includes(domainLc)) return true;
-  return false;
+  const parsed = parseStrictEmail(email);
+  if (!parsed) return false;
+  if (domain !== undefined && domain !== null && normalizeDomain(domain) !== parsed.domain) return false;
+  return cfg.emails.includes(parsed.email) || cfg.domains.includes(parsed.domain);
 }
 
 // ISS-318 (fix cycle 2): zoho.com/zoom.us were removed from the defaults. They are the
@@ -119,7 +115,6 @@ export function webinarIdentity(url: string, startTime: string): string | undefi
 export function webinarSessionKey(identity: string): string {
   return `webinar-${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
 }
-
 /** Only accepted source lineage can change an in-progress capture's planned boundary. */
 export function activeWebinarStopReason(id: string, originalEnd: string, result: Pick<WebinarReconciliationResult, "transitions" | "inventory">): "cancelled" | "rescheduled" | undefined {
   const changed = result.transitions.find(row => row.reason === "cancelled" && row.aliases.includes(id)) ??
@@ -179,4 +174,97 @@ export function projectWebinarInventory(previous: Record<string, Record<string, 
       title: row.title.replace(/https?:\/\/\S+/gi, "[link removed]"), sourceKind: "series", sourceId: row.id, attempts: 0});
   }
   return operations;
+}
+
+
+export function isDirectWebinarJoin(url: unknown, startTime: string): url is string {
+  if (typeof url !== "string" || !webinarIdentity(url, startTime)) return false;
+  try {
+    const parsed = new URL(url);
+    return !parsed.username && !parsed.password && (
+      (parsed.hostname === "meet.google.com" && /^\/[a-z]{3}-[a-z]{4}-[a-z]{3}\/?$/.test(parsed.pathname)) ||
+      ((parsed.hostname === "zoom.us" || parsed.hostname.endsWith(".zoom.us")) && /^\/(j|w)\/\d+\/?$/.test(parsed.pathname)) ||
+      (parsed.hostname === "teams.microsoft.com" && parsed.pathname.startsWith("/l/meetup-join/")));
+  } catch { return false; }
+}
+
+export interface WebinarRegistrationAttempt {
+  tenantId: string; sourceId: string; sourceMessageId: string; threadId: string; registrationUrl: string;
+  organizerEmail: string; startTime: string; endTime: string; attemptId: string; attemptedAt: string;
+  phase: "submitting" | "awaiting-confirmation" | "uncertain" | "action_required" | "confirmed";
+  confirmationMessageId?: string; confirmedAt?: string; meetingUrl?: string;
+  baselineMessageIds?: string[];
+  preSubmitEvidence?: {disposition: "not-attempted"; configurationHash: string};
+}
+
+export function projectWebinarRegistrations(input: {
+  registrations: readonly unknown[]; previous?: WebinarReconciliationState; candidates: AutoRecordCandidateInput[];
+  reconciled: WebinarReconciliationResult; tenantId: string; checkedAt: string;
+  validate: (value: unknown, tenantId: string, checkedAt: string) => WebinarRegistrationAttempt;
+  confirm: (attempt: WebinarRegistrationAttempt, tenantId: string, candidates: AutoRecordCandidateInput[], checkedAt: string) => WebinarRegistrationAttempt | undefined;
+}) {
+  const {reconciled, candidates, tenantId, checkedAt} = input;
+  if (!reconciled.newStartsBlocked) for (const rawProof of input.registrations) {
+    if (!rawProof) continue;
+    const proof = input.validate(rawProof, tenantId, checkedAt);
+
+    const bound = reconciled.candidates.filter(row => row.threadId === proof.threadId && row.messageId !== proof.sourceMessageId &&
+      typeof row.messageId === "string" && /^[A-Za-z0-9_-]{1,256}$/.test(row.messageId) && isDirectWebinarJoin(row.meetingUrl, row.startTime ?? "") &&
+      (row.messageId === proof.confirmationMessageId || row.senderEmail === proof.organizerEmail ||
+        (row.startTime === proof.startTime && row.endTime === proof.endTime)) && row.status !== "rejected" && !row.cancelled);
+    reconciled.candidates = reconciled.candidates.filter(row => !bound.includes(row));
+    for (const item of reconciled.inventory) if (bound.some(row => row.id === item.snapshot.id)) {
+      delete item.sessionKey; item.reason = "registration-confirmation-awaiting-source-validation";
+    }
+    if (proof.phase !== "confirmed") continue;
+    const changed = Object.entries(reconciled.state.occurrences).find(([, row]) => row.source === "gmail" && row.snapshot.id === proof.sourceId);
+    const prior = changed && input.previous?.occurrences[changed[0]];
+    if (changed && prior?.accepted && !prior.unresolved && prior.snapshot.status !== "rejected" && changed[1].snapshot.status !== "rejected" &&
+        changed[1].accepted && !changed[1].unresolved && changed[1].snapshot.messageId === proof.sourceMessageId &&
+        changed[1].snapshot.threadId === proof.threadId && changed[1].snapshot.senderEmail === proof.organizerEmail && prior.snapshot.messageId === proof.sourceMessageId &&
+        prior.snapshot.threadId === proof.threadId && prior.snapshot.senderEmail === proof.organizerEmail && prior.snapshot.startTime === proof.startTime && prior.snapshot.endTime === proof.endTime) {
+      const alias = webinarSessionKey(webinarIdentity(proof.meetingUrl!, proof.startTime)!);
+      for (const transition of reconciled.transitions) if (transition.occurrenceKey === changed[0] && ["cancelled", "rescheduled"].includes(transition.reason))
+        transition.aliases = [...new Set([...transition.aliases, alias])];
+    }
+    const originals = candidates.filter(row => row.id === proof.sourceId && row.messageId === proof.sourceMessageId &&
+      row.threadId === proof.threadId && row.senderEmail === proof.organizerEmail && row.registrationUrl === proof.registrationUrl &&
+      row.startTime === proof.startTime && row.endTime === proof.endTime && row.status !== "rejected" && !row.cancelled);
+    const confirmation = input.confirm({...proof, phase: "awaiting-confirmation", confirmationMessageId: undefined,
+      confirmedAt: undefined, meetingUrl: undefined}, tenantId, candidates, checkedAt);
+    if (originals.length !== 1 || !confirmation || confirmation.confirmationMessageId !== proof.confirmationMessageId || confirmation.meetingUrl !== proof.meetingUrl) continue;
+    const projected = reconciled.candidates.find(row => row.id === proof.sourceId);
+    const raw = Object.values(reconciled.state.occurrences).find(row => row.source === "gmail" && row.snapshot.id === proof.sourceId);
+    if (!projected || !raw?.accepted || raw.unresolved || projected.status === "rejected" || projected.cancelled ||
+        projected.startTime !== proof.startTime || projected.endTime !== proof.endTime) continue;
+    const resolved = {...projected, meetingUrl: proof.meetingUrl, registrationOnly: false};
+    reconciled.candidates[reconciled.candidates.indexOf(projected)] = resolved;
+    const item = reconciled.inventory.find(row => row.snapshot.id === proof.sourceId);
+    if (item) { item.snapshot = resolved; item.sessionKey = webinarSessionKey(webinarIdentity(proof.meetingUrl!, proof.startTime)!); delete item.reason; }
+  }
+}
+type RegistrationLifecycle = Parameters<typeof runWebinarRegistrations>[0];
+export async function reconcileWebinarRegistrationState<S extends RegistrationLifecycle["state"], P extends {state: S}, V>(input: {
+  state: S; tenantId: string; candidates: RegistrationLifecycle["candidates"]; now: RegistrationLifecycle["now"];
+  validate: RegistrationLifecycle["validate"]; confirm: RegistrationLifecycle["confirm"]; createUUID: RegistrationLifecycle["createUUID"];
+  value: V; checkedAt: string; prepare: (state: S, value: V, candidates: RegistrationLifecycle["candidates"], checkedAt: string) => P;
+  /** Atomic lane-owned file commit; async storage requires its own serialized/CAS boundary. */
+  persistSync: (state: S) => undefined;
+}): Promise<P> {
+  if (typeof input.persistSync !== "function" || input.persistSync.constructor.name === "AsyncFunction")
+    throw new Error("Registration reconciliation requires synchronous persistence");
+  const before: S = JSON.parse(JSON.stringify(input.state));
+  const draft: S = JSON.parse(JSON.stringify(before));
+  await runWebinarRegistrations({...input, state: draft, now: () => input.checkedAt,
+    update: (id, changes) => {draft.operations[id] = {...draft.operations[id], ...changes};}});
+  const latest: S = JSON.parse(JSON.stringify(input.state));
+  latest.operations = mergeRegistrationOperationDraft(before.operations, draft.operations, latest.operations);
+  const prepared = input.prepare(latest, input.value, input.candidates, input.checkedAt);
+  if (input.persistSync(prepared.state) !== undefined)
+    throw new Error("Registration persistence violated its synchronous contract");
+  Object.assign(input.state, prepared.state);
+  return prepared;
+}
+export function projectWebinarSelection(selection: {toSchedule: AutoRecordItem[]; skipped: SkippedItem[]}, run: boolean) {
+  return {status: run ? "running" : "preview", toRecord: selection.toSchedule.map(({meetingUrl: _secret, ...item}) => item), skipped: selection.skipped};
 }

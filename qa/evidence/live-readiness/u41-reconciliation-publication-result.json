@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "completedAt": "2026-10-09T15:43:26.846869+00:00",
+  "branch": "codex/machine-migration-2026-10-09",
+  "commitSHA": "020659549242faddba478362efe2d58e60cdf332",
+  "localSHA": "020659549242faddba478362efe2d58e60cdf332",
+  "remoteSHA": "020659549242faddba478362efe2d58e60cdf332",
+  "remoteReadbackVerified": true,
+  "commitURL": "https://github.com/vidysea-admin/KnowledgeBase/commit/020659549242faddba478362efe2d58e60cdf332",
+  "parentSHA": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "treeSHA": "53a1bbcf2fae7f675c3e9f742eb4faf8f0987144",
+  "committedPaths": [
+    "qa/contracts/gemini-audio-transcription.md",
+    "qa/contracts/upload-transcribe-worker.md",
+    "qa/manifests/u4.1-recording-upload-worker.md",
+    "qa/verdicts/u4.1-recording-upload-worker.md"
+  ],
+  "committedPathCount": 4,
+  "sourceFilesChanged": 0,
+  "commitExit": 0,
+  "remoteAncestryExit": 0,
+  "pushExit": 0,
+  "forceUsed": false,
+  "restagingPerformed": false,
+  "configOrHookBypass": false,
+  "identityMethod": "same verified public/noreply GitHub identity via per-command config only",
+  "indexEmpty": true,
+  "remainingUnstagedTracked": [
+    "docs/DECISIONS.md",
+    "qa/issues.jsonl"
+  ],
+  "visibleUntrackedFilesBeforeThisReport": 232,
+  "statusPermissionWarnings": 2,
+  "statusInventoryLimitation": "Denied private-cache directories excluded; visible untracked count is not full cache inventory.",
+  "audit": {
+    "path": "qa/evidence/live-readiness/u41-reconciliation-independent-staged-audit.json",
+    "sha256": "3af59830c4aa9d8eeeae3187d1859b0baf4a106521f1aa01d02f0cca31397795",
+    "result": "PASS-WIP-PUBLICATION-SAFETY QA only"
+  },
+  "scope": "Record existing standalone U4.1 C1-C10 scoped cycle3 PASS/CLOSED preserving historical HOLD and exact18sourcepins; Gemini D11912addition0deletion exception only.",
+  "preservedHolds": [
+    "Main Ask BUILDING/HOLD; experimental ranking excluded.",
+    "Actual Meet reception/account/capture/attendance activation,indexing/Ask/full portable release unverified.",
+    "Known baseline and new LOC/global directory failures remain."
+  ],
+  "noSourceGovernanceDataCachePrivateEvidenceOrRuntimeChanges": true
+}

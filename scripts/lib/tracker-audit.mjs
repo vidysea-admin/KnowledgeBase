@@ -28,51 +28,8 @@ import { join, resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 
-/**
- * Every ledger file: canonical `qa/issues.jsonl` first, then each lane shard
- * `qa/issues.<lane>.jsonl` alphabetically.
- *
- * ISS-129. D-019 declared that every reader treats this union as the ledger, and then no reader
- * did -- both production readers opened the single file by name, so a lane shard whose id is CITED
- * BY D-020 was counted by nothing and surfaced by nothing. A shard nobody reads is worse than no
- * shard: it looks like tracking while counting zero.
- *
- * Root cause worth keeping where it will be re-read: D-019's own `Changes-authorized` named only
- * `.claude/CLAUDE.md`, so the mechanism the rule required was never scoped to a file it was
- * allowed to touch. A governance rule whose mechanism sits outside its own authorization is a rule
- * that cannot be implemented.
- */
-export function ledgerFiles(root) {
-  const dir = join(root, "qa");
-  const canonical = join(dir, "issues.jsonl");
-  let shards = [];
-  try {
-    shards = readdirSync(dir)
-      .filter((f) => /^issues\..+\.jsonl$/.test(f))
-      .sort()
-      .map((f) => join(dir, f));
-  } catch (err) {
-    // Only "the directory is not there" is an expected outcome. A bare `catch {}` here previously
-    // swallowed a ReferenceError from a MISSING IMPORT and returned zero shards, so the union
-    // silently read nothing while every call site looked correct -- the same silent-failure class
-    // this audit exists to catch.
-    if (err?.code !== "ENOENT") throw err;
-  }
-  return [...(existsSync(canonical) ? [canonical] : []), ...shards];
-}
-
-/** Every row across the ledger union, plus a count of lines no consumer could parse. */
-export function readLedgerRows(root) {
-  const rows = [];
-  let unparseable = 0;
-  for (const file of ledgerFiles(root)) {
-    for (const line of readFileSync(file, "utf8").split("\n")) {
-      if (!line.trim()) continue;
-      try { rows.push(JSON.parse(line)); } catch { unparseable++; }
-    }
-  }
-  return { rows, unparseable };
-}
+import { ledgerFiles, readLedgerRows } from "./ledger-rows.mjs";
+export { ledgerFiles, readLedgerRows };
 
 export const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -137,12 +94,13 @@ export function audit(root = ROOT, { exec = execFileSync } = {}) {
   if (goal.progress?.done !== done) findings.push(`G1 progress.done says ${goal.progress?.done}, ${done} tasks are done`);
   if (goal.progress?.percent !== pct) findings.push(`G1 progress.percent says ${goal.progress?.percent}%, the rows give ${pct}%`);
 
-  // ---- G2: a fix nobody verified is not a fix.
+  // ---- G2: a fix nobody verified is not a fix. (G5, below, shares this read: a ledger line that
+  // does not parse is fully in the author's control and clearable in the same commit -- ISS-315.)
   const ledgerPaths = ledgerFiles(root);
   if (ledgerPaths.length > 0) {
     const { rows, unparseable } = readLedgerRows(root);
     const unverified = rows.filter((r) => r.status === "fixed" && !r.verified_date).map((r) => r.id);
-    if (unparseable > 0) findings.push(`G2 ledger: ${unparseable} unparseable line(s) — a line-by-line consumer skips or crashes on them`);
+    if (unparseable > 0) findings.push(`G5 ledger: ${unparseable} unparseable line(s) — a line-by-line consumer skips or crashes on them`);
     if (unverified.length > 0) {
       findings.push(`G2 unverified: ${unverified.length} issue(s) are "fixed" with no verified_date — ${unverified.slice(0, 8).join(", ")}${unverified.length > 8 ? ", …" : ""}`);
     }
@@ -180,14 +138,30 @@ export function audit(root = ROOT, { exec = execFileSync } = {}) {
  *
  * `qa/verdicts/` is checker-owned; a maker editing a verdict is the self-certification this pair
  * exists to prevent. So the debt is FROZEN and named here rather than silently tolerated: these
- * files keep their existing ambiguous references, any NEW one anywhere fails the gate, and the
- * list can only shrink. A checker that rewrites its own verdict deletes its line from this table.
+ * files keep their existing ambiguous references. The skip is per FILE, not per ref, so a NEW one
+ * added inside these four is also unreported (ISS-162); anywhere else it fails. A checker that
+ * qualifies its own verdict deletes its line from this table.
  */
 export const G4_FROZEN = new Set([
   "qa/verdicts/guarded-fetcher.md",
   "qa/verdicts/watched-sources-entrypoint.md",
   "qa/verdicts/watched-sources-run.md",
   "qa/verdicts/watched-sources-url-normalisation.md",
+  // Historical verdicts (immutable checker records, D-019) citing bare ids that collide with lane-shard ids.
+  "qa/verdicts/iss-298-ledger-id-allocator.md",
+  "qa/verdicts/lint-tracker-g4-qualify-issue-refs.md",
+  "qa/verdicts/medium-fix-batch-2-2026-10-10.md",
+  "qa/verdicts/r1-alert-title-policy-and-reasons.md",
+  "qa/verdicts/r1-attention-alerts.md",
+  "qa/verdicts/t-031-audio-watchdog.md",
+  "qa/verdicts/t-047-controller.md",
+  "qa/verdicts/t034-tab-capture-extension-logic-tests.md",
+  "qa/verdicts/t036-calendar-description-link-scan.md",
+  "qa/verdicts/t037-join-rules-stale-lock-takeover.md",
+  "qa/verdicts/t039-send-now-command.md",
+  "qa/verdicts/t040-strict-quote-verifier-and-windowing.md",
+  "qa/verdicts/t042-self-introduction-fusion.md",
+  "qa/verdicts/t046-retention-dry-run-report.md",
 ]);
 
 /**

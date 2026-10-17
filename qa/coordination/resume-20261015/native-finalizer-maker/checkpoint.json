@@ -1,0 +1,46 @@
+{
+  "policy_version": "managed-review/1",
+  "checker_dispatched": false,
+  "tests_executed": [],
+  "maker_usage": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "status": "SOURCE_FROZEN_AWAITING_BROKER",
+  "token_metric": "actual_total",
+  "required_receipts": [
+    "focused-node-tests",
+    "real-synthetic-ffmpeg-integration",
+    "scoped-typescript-diagnostics",
+    "parent-combined-candidate-and-checker"
+  ],
+  "candidate_sha": null,
+  "shared_types_sha256": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77",
+  "files": [
+    {
+      "sha256": "d3b2f373c8f37bef33b29a0dbf121b5dfc97732cb4b7ffdfb5fb31b71bf64abc",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.ts",
+      "baseline": "absent-new-file"
+    },
+    {
+      "sha256": "b61a96f520ae6a70cf78eabb2b46758842bc79f89233009e8e4e86b2204f3b12",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.test.ts",
+      "baseline": "absent-new-file"
+    },
+    {
+      "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.ts",
+      "baseline": "absent-new-file"
+    },
+    {
+      "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.test.ts",
+      "baseline": "absent-new-file"
+    }
+  ],
+  "unit": "t042-native-finalizer",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "fix_cycle": 0
+}

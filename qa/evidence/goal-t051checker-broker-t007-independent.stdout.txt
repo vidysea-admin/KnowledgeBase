@@ -1,0 +1,13 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/whatsapp/ReviewQueue.test.tsx (13 tests) 931ms
+ ✓ ../../qa/evidence/goal-t007/checker.test.tsx (3 tests) 684ms
+   ✓ independent exact evidence click reaches the real session consumer and a turn beyond its first page 539ms
+ ✓ src/pages/WhatsAppPage.test.tsx (6 tests) 444ms
+
+ Test Files  3 passed (3)
+      Tests  22 passed (22)
+   Start at  20:06:40
+   Duration  10.25s (transform 263ms, setup 711ms, collect 3.60s, tests 2.06s, environment 2.66s, prepare 466ms)
+

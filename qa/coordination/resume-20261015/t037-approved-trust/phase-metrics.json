@@ -1,0 +1,14 @@
+{
+  "phaseWallSeconds": 237.5598766,
+  "actual_total_tokens": null,
+  "waiting": "none recorded; queued broker time not charged as maker active",
+  "qpcFrequency": 10000000,
+  "active_seconds": null,
+  "reviewers": [],
+  "qpcStart": 123947669822,
+  "qpcEnd": 126323268268,
+  "token_metric": "actual_total",
+  "cost": null,
+  "priorSurveyUsage": "unknown and excluded from measured-success claims",
+  "tests_executed": 0
+}

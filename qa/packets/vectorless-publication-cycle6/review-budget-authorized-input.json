@@ -1,0 +1,51 @@
+{
+  "unit": "vectorless-publication",
+  "cycle": 6,
+  "candidate_sha": "8398a420331cd135944f727df98b0f25377f1c9bec1ffc9538574a5f1d894d06",
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "measured_partial_active_s": 838.7586968,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "tokens": null,
+      "id": "vectorless_checker-wip-shared",
+      "cost": null,
+      "active_s": null,
+      "scope": "Prior shared checker-owned contract and unexecuted probe preparation; no verdict; actual overhead unknown",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180
+      }
+    },
+    {
+      "tokens": 0,
+      "id": "vectorless-publication-cycle6-pending",
+      "cost": 0,
+      "active_s": 0,
+      "scope": "Not dispatched"
+    }
+  ],
+  "next_phase": {
+    "tokens": 6000,
+    "active_s": 180,
+    "cost": null
+  },
+  "bootstrap_scope": "One source publication unit cycle6: hash identity, delta/manual-transaction/preserved-review verification plus required narrowly scoped independent behavioral evidence; real provider/Mongo and full parent acceptance excluded",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "escalation": {
+    "limits": {
+      "cost": null,
+      "tokens": 12000,
+      "active_s": 360
+    },
+    "reason": "Mandatory data-write/security review after paid-callback retry, native atomicity and reviewed-source integrity fixes; historical author overhead actual unknown and centrally charged once",
+    "authority": "Root orchestrator explicit allocation, 2026-10-15: shared historical author ID and finite cumulative360s/12000 including next180s/6000"
+  },
+  "deduplication": "vectorless_checker-wip-shared charged once in root shared ledger; actual metrics null; conservative debit180s/6000tokens is allocation accounting, not measured usage."
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "newPath": "packages/db/src/collections/speaker-suggestions/index.ts",
+    "oldPath": "packages/db/src/collections/speaker-suggestions.ts",
+    "oldHeadTracked": true,
+    "existsNow": false
+  },
+  {
+    "newPath": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+    "oldPath": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "oldHeadTracked": true,
+    "existsNow": false
+  },
+  {
+    "newPath": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+    "oldPath": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "oldHeadTracked": true,
+    "existsNow": false
+  }
+]

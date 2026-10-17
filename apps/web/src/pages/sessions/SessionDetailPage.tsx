@@ -4,6 +4,10 @@ import { useAuth } from "../../auth/AuthContext.js";
 import { getSession, getSessionMedia, streamSessionMedia } from "../../api/sessions.js";
 import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
+import { SpeakerSuggestions } from "./SpeakerSuggestions.js";
+import { GroundedContentPanel } from "./grounded/GroundedContentPanel.js";
+import { SessionDecisionsPanel } from './decisions/SessionDecisionsPanel.js';
+import { TranscriptReview } from '../transcript-review/TranscriptReview.js';
 
 const MAX_TURNS_SHOWN = 200;
 
@@ -41,8 +45,10 @@ function speakerColor(ref: string): string {
 export function SessionDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
   const { hash } = useLocation();
-  const { apiKey } = useAuth();
-  const [detail, setDetail] = useState<SessionDetail | null>(null);
+  const { apiKey, sessionVersion } = useAuth();
+  const [revision, setRevision] = useState(0);
+  const [loaded, setLoaded] = useState<{ sessionId: string; key: string | null; version: number; data: SessionDetail } | null>(null);
+  const detail = loaded !== null && loaded.sessionId === id && loaded.key === apiKey && loaded.version === sessionVersion ? loaded.data : null;
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
@@ -53,7 +59,7 @@ export function SessionDetailPage(): React.ReactElement {
   const assetGeneration = useRef(0);
   useEffect(() => () => { if (mediaUrl) URL.revokeObjectURL(mediaUrl); }, [mediaUrl]);
   useEffect(() => () => { if (frameUrl) URL.revokeObjectURL(frameUrl); }, [frameUrl]);
-  useEffect(() => { assetGeneration.current++; pendingSeek.current = null; setMediaUrl(null); setStreaming(false); setFrameUrl(null); setMediaError(null); return () => { assetGeneration.current++; }; }, [apiKey, id]);
+  useEffect(() => { assetGeneration.current++; pendingSeek.current = null; setMediaUrl(null); setStreaming(false); setFrameUrl(null); setMediaError(null); return () => { assetGeneration.current++; }; }, [apiKey, sessionVersion, id]);
   useEffect(() => {
     if (!streaming || !video.current || !detail?.media) return;
     const stop = streamSessionMedia(apiKey, id!, detail.media.mime, video.current, setMediaError);
@@ -85,19 +91,22 @@ export function SessionDetailPage(): React.ReactElement {
       if (video.current.readyState > 0) pendingSeek.current = null;
     } else void loadAsset();
   }
-  const [error, setError] = useState<string | null>(null);
-  const highlightedTurn = hash.startsWith("#turn-") ? decodeURIComponent(hash.slice("#turn-".length)) : null;
+  const [loadFailure, setLoadFailure] = useState<{ sessionId: string; key: string | null; version: number; message: string } | null>(null);
+  const error = loadFailure !== null && loadFailure.sessionId === id && loadFailure.key === apiKey && loadFailure.version === sessionVersion ? loadFailure.message : null;
+  let highlightedTurn: string | null = null;
+  if (hash.startsWith("#turn-")) {
+    try { highlightedTurn = decodeURIComponent(hash.slice("#turn-".length)) || null; } catch { /* unresolved citation */ }
+  }
 
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    setDetail(null);
-    setError(null);
+    setLoadFailure(null);
     getSession(apiKey, id)
-      .then((data) => { if (!cancelled) setDetail(data); })
-      .catch((err: unknown) => { if (!cancelled) setError(err instanceof ApiError ? err.message : "failed to load session"); });
+      .then((data) => { if (!cancelled) setLoaded({ sessionId: id, key: apiKey, version: sessionVersion, data }); })
+      .catch((err: unknown) => { if (!cancelled) setLoadFailure({ sessionId: id, key: apiKey, version: sessionVersion, message: err instanceof ApiError ? err.message : "failed to load session" }); });
     return () => { cancelled = true; };
-  }, [apiKey, id]);
+  }, [apiKey, sessionVersion, id, revision]);
 
   // Runs after the transcript has rendered, which is why it depends on `detail`: the anchor does
   // not exist at mount time, so a browser's own hash handling lands on nothing.
@@ -110,6 +119,10 @@ export function SessionDetailPage(): React.ReactElement {
 
   if (error) return <div className="card error-note">{error}</div>;
   if (!detail) return <div className="card empty-note">Loading&hellip;</div>;
+  const citedIndex = highlightedTurn === null ? -1 : detail.turns.findIndex((turn) => turn._id === highlightedTurn);
+  const windowStart = citedIndex >= MAX_TURNS_SHOWN
+    ? Math.max(0, Math.min(citedIndex - Math.floor(MAX_TURNS_SHOWN / 2), detail.turns.length - MAX_TURNS_SHOWN)) : 0;
+  const visibleTurns = detail.turns.slice(windowStart, windowStart + MAX_TURNS_SHOWN);
 
   return (
     <>
@@ -123,6 +136,11 @@ export function SessionDetailPage(): React.ReactElement {
         <div className="section-title">Overview</div>
         <p>{detail.page ? detail.page.summary : "(no summary yet)"}</p>
       </div>
+
+      <SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} />
+      <GroundedContentPanel apiKey={apiKey} sessionId={detail.session._id} />
+      <SessionDecisionsPanel apiKey={apiKey} sessionId={detail.session._id} sessionVersion={sessionVersion} revision={revision} />
+      <TranscriptReview key={`${sessionVersion}:${detail.session._id}`} apiKey={apiKey} sessionId={detail.session._id} onCommitted={() => setRevision(value => value + 1)} />
 
       {detail.media && <div className="card">
         <div className="section-title">Recording</div>
@@ -163,12 +181,13 @@ export function SessionDetailPage(): React.ReactElement {
       <div className="card">
         <div className="section-title">Transcript ({detail.turns.length} turns)</div>
         {detail.turns.length === 0 && <div className="empty-note">No turns for this session.</div>}
+        {hash.startsWith("#turn-") && citedIndex < 0 && <p role="status">This cited passage was not found in this session.</p>}
         {/* Real turns with a resolved speakerLabel (currently: WhatsApp) get a chat-style
             rendering -- real sender name + real send time, closer to how the source itself
             looks, instead of a raw personId hash and a relative-offset timestamp. */}
-        {detail.turns.slice(0, MAX_TURNS_SHOWN).some((t) => t.speakerLabel) ? (
+        {visibleTurns.some((t) => t.speakerLabel) ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {detail.turns.slice(0, MAX_TURNS_SHOWN).map((t) => (
+            {visibleTurns.map((t) => (
               <div
                 key={t._id}
                 id={turnDomId(t._id)}
@@ -184,6 +203,7 @@ export function SessionDetailPage(): React.ReactElement {
                 <div style={{ fontWeight: 600, fontSize: "0.85rem", color: speakerColor(t.speakerRef) }}>
                   {t.speakerLabel ?? t.speakerRef}
                 </div>
+                <div className="row-meta">{t.tStart}{timeUnitLabel(t.speakerRef)}–{t.tEnd}{timeUnitLabel(t.speakerRef)}</div>
                 <div>{t.text}</div>
                 {t.occurredAt && (
                   <div className="row-meta" style={{ textAlign: "right", marginTop: "0.15rem" }}>
@@ -194,7 +214,7 @@ export function SessionDetailPage(): React.ReactElement {
             ))}
           </div>
         ) : (
-          detail.turns.slice(0, MAX_TURNS_SHOWN).map((t) => {
+          visibleTurns.map((t) => {
             const unit = timeUnitLabel(t.speakerRef);
             return (
               <div
@@ -211,7 +231,7 @@ export function SessionDetailPage(): React.ReactElement {
           })
         )}
         {detail.turns.length > MAX_TURNS_SHOWN && (
-          <div className="empty-note">&hellip; and {detail.turns.length - MAX_TURNS_SHOWN} more turns (truncated for this view).</div>
+          <div className="empty-note">Showing turns {windowStart + 1}–{windowStart + visibleTurns.length} of {detail.turns.length}.</div>
         )}
       </div>
     </>

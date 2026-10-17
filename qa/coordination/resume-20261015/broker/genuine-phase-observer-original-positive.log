@@ -1,0 +1,26 @@
+✔ genuine live seal precedes source ingestion; retained public recovery does not invent a clock (51730.21ms)
+ℹ {"stage":"before-seal","elapsedMs":13395}
+ℹ {"stage":"after-seal","elapsedMs":34170}
+ℹ {"stage":"after-first-drain","elapsedMs":35323}
+ℹ {"stage":"before-reopen","elapsedMs":35323}
+ℹ {"stage":"after-reopen","elapsedMs":36158}
+ℹ {"stage":"admit","event":"start","elapsedMs":36159}
+ℹ {"stage":"admit","event":"complete","elapsedMs":37874}
+ℹ {"stage":"receipt","event":"start","elapsedMs":37874}
+ℹ {"stage":"receipt","event":"complete","elapsedMs":38726}
+ℹ {"stage":"media","event":"start","elapsedMs":38726}
+ℹ {"stage":"media","event":"complete","elapsedMs":47028}
+ℹ {"stage":"provider","event":"start","elapsedMs":47028}
+ℹ {"stage":"provider","event":"complete","elapsedMs":50026}
+ℹ {"stage":"final-admission","event":"start","elapsedMs":50026}
+ℹ {"stage":"final-admission","event":"complete","elapsedMs":50876}
+ℹ {"stage":"after-recovery","elapsedMs":50876}
+ℹ {"stage":"after-final-drain","elapsedMs":51719}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56119.1125

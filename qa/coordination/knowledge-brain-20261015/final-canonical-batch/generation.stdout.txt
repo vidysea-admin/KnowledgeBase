@@ -1,0 +1,2 @@
+Generated only speaker_attributes.ts with exact gen-types.mjs compile options
+Generated only tree_index.ts with exact gen-types.mjs compile options

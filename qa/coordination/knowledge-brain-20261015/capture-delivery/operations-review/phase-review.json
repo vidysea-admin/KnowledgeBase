@@ -1,0 +1,20 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [{"id": "operations-checker-cycle1", "active_s": 0, "tokens": 0, "cost": null}],
+  "bootstrap_scope": "capture-operations-acceptance cycle1: three-script source/security review and focused independent probe only; no native operational or whole-parent acceptance",
+  "bootstrap": {"active_s": 180, "tokens": 6000},
+  "completion_reserve": true,
+  "completion_reserve_id": "capture-operations-acceptance/cycle1/8e2aa894f6e7530e4aa344ecd8657f3c917c8888e9e02dbb12dccccdb8456791",
+  "next_phase": {"kind": "review", "active_s": 150, "tokens": 5200, "cost": null},
+  "escalation": null,
+  "admission_note": "Coordinator reports no launched reviewer or committed review charges for this unique unit; initial zero reviewer usage is prospective only. Maker usage unknown. No measured efficiency claim.",
+  "broker_receipt": "qa/goal-vectorless-2026-10-15/verification-capture-operations-fixtures-20261015T1200.json",
+  "broker_observed": {"exitCode": 0, "elapsedMs": 747.8411999999998, "tests": 3, "pass": 3, "fail": 0, "skip": 0, "hashesUnchanged": true},
+  "candidate_sha": "8e2aa894f6e7530e4aa344ecd8657f3c917c8888e9e02dbb12dccccdb8456791",
+  "candidate_identity_kind": "SHA256 of ordered scoped final-file pins; not Git commit",
+  "source_pins": {
+    "scripts/qa/capture-operations-acceptance.mjs": "28e44a4af803a66237187f08951d1933334d1f379a679c46e693673c9cd1574f",
+    "scripts/qa/capture-operations-evidence.mjs": "b4adbfb08254b9fd2e45be0c4831f2ea5699dbaa84f81ad4aab4e49e863c38b1",
+    "scripts/qa/capture-operations-acceptance.test.mjs": "400205f705ac77b2b6118d448870d9e9654b5bad791a5528aaa1492062006957"
+  }
+}

@@ -1,0 +1,10 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/__checker_probes__/collections-kind-identity.test.tsx (1 test) 218ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  11:34:51
+   Duration  2.24s (transform 145ms, setup 216ms, collect 507ms, tests 218ms, environment 843ms, prepare 172ms)
+

@@ -1,0 +1,57 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+stderr | src/pages/meeting-bot/SendNowForm.test.tsx > SendNowForm > 403 keeps the rest of the meeting-bot page working
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/pages/meeting-bot/SendNowForm.test.tsx (23 tests) 746ms
+ ✓ src/pages/meeting-bot/useSendNowStatus.test.tsx (11 tests) 80ms
+stderr | src/pages/MeetingBotPage.test.tsx > MeetingBotPage operational status > shows real queued/failed/processing/ready/action-required states and retries
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ❯ src/pages/MeetingBotPage.test.tsx (7 tests | 1 failed) 336ms
+   × MeetingBotPage operational status > current successful discovery is healthy without an outage alert 27ms
+     → expected <div role="alert" …(1)>…(2)</div> to be null
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/MeetingBotPage.test.tsx > MeetingBotPage operational status > current successful discovery is healthy without an outage alert
+AssertionError: expected <div role="alert" …(1)>…(2)</div> to be null
+
+- Expected: 
+null
+
++ Received: 
+<div
+  class="card error-note"
+  role="alert"
+>
+  <p>
+    Bot activity unavailable.
+  </p>
+  <button
+    type="button"
+  >
+    Retry 
+    bot activity
+  </button>
+</div>
+
+ ❯ src/pages/MeetingBotPage.test.tsx:66:41
+     64|     }});
+     65|     display(); await screen.findByText(/Calendar discovery: healthy/);
+     66|     expect(screen.queryByRole("alert")).toBeNull();
+       |                                         ^
+     67|   });
+     68| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 40 passed (41)
+   Start at  09:32:20
+   Duration  8.03s (transform 415ms, setup 829ms, collect 1.39s, tests 1.16s, environment 3.23s, prepare 651ms)
+
+

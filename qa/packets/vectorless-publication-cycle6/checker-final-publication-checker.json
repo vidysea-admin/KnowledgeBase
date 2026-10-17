@@ -1,0 +1,24 @@
+{
+  "cycle": 6,
+  "tokens": null,
+  "checker": "publication_checker",
+  "allocated_tokens": 6000,
+  "utc_start": "2026-10-15T08:55:02.5744222Z",
+  "remaining_phase_active_s": 18.966497599999997,
+  "active_s": 161.0335024,
+  "ratio_verified": false,
+  "wait_intervals": [],
+  "monotonic_frequency": 10000000,
+  "verdict": "HOLD",
+  "allocated_active_s": 180,
+  "monotonic_start_ticks": 185924511856,
+  "cost": null,
+  "historical_shared_debit_charged_elsewhere_once": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "candidate_sha": "8398a420331cd135944f727df98b0f25377f1c9bec1ffc9538574a5f1d894d06",
+  "utc_end": "2026-10-15T08:57:43.6083287Z",
+  "unit": "vectorless-publication",
+  "monotonic_end_ticks": 187534846880
+}

@@ -1,0 +1,28 @@
+{
+  "baseCommit": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidateKind": "ordered file fingerprint map, not a commit",
+  "candidate": "4df6fb281dcb79e2910f96022628580e9b2094e9846d49e612ade3d03c285190",
+  "originals": {
+    "apps/api/src/source-intake/jobs/types.ts": "4d21094d10621281c2176987d10a6bd6d7019a3bccd93eb835648d4e61249581",
+    "apps/api/src/source-intake/jobs/input.ts": "6670ef0b2cfd4ef4238a4486e41b998aaefef5227afd00b07147ad8d00584528",
+    "apps/api/src/source-intake/jobs/store.ts": "cc65d9826ad8d35f3289e636994517046454512299c38af1f9fbba1aa537096d",
+    "apps/api/src/connector-workflow/watched.ts": "5cf41718a77794f476f81bf00b50de8d6dfa4e6868556d1437bfd0b2d8e0f4f0",
+    "apps/api/src/connector-workflow/jobs.ts": "1c73606cdf0729e3bcd33bc1e3ddc61ba87b2c6df8f3fb833338d16604134050",
+    "apps/api/src/connector-workflow/router.ts": "0879ab78cd24b9c213f0a2cb606c2ce004962508d0bde7e268557409a7ebeb52",
+    "apps/api/src/connector-workflow/workflow.test.ts": "79830a77adc17da6539d3ec9c79a3b6157ec2a010e9908665eaa38882d0a82a5",
+    "apps/api/src/source-intake/jobs/entry.ts": "a5112e9ad7c949ccb0f2976aaa05e4051b897c0c2fe8430cf07b475084e27fd1"
+  },
+  "pins": {
+    "apps/api/src/source-intake/jobs/types.ts": "f95f1c283f111d35077e15346888c3dd4df3bcb43d527804fa647372e1ebc99c",
+    "apps/api/src/source-intake/jobs/input.ts": "8528767d68149712edb3a1f00e88c6bc8de43fffa1ac2cf0ea896d9c3c8ec442",
+    "apps/api/src/source-intake/jobs/store.ts": "a8ec0080543078a6f9079a74bdaea81f261a1029c7c4e43d82e528657036088d",
+    "apps/api/src/connector-workflow/watched.ts": "377addcbcbb8e2972a160ff4b2476cfe1c31683c2ce16570ea5403c85f72445d",
+    "apps/api/src/connector-workflow/jobs.ts": "2010087154fc5be42f010efac272ad04a9540f6e9e834a93d344856ce1fbfcc4",
+    "apps/api/src/connector-workflow/router.ts": "03bbb742db2aedee7469cf28d8b60c75f332a7d43b4e0411816382c41f2791c8",
+    "apps/api/src/connector-workflow/workflow.test.ts": "d8ae7f3113b3dc9a57d6bf59c18fe4ecc8680a0ae0bc5d8b5974a93d84c7e295",
+    "apps/api/src/source-intake/jobs/entry.ts": "5ca9c9eb2e6822b9472d746845dfdfd529501ab50727baf1db886da0ffab0c7f",
+    "apps/api/src/connector-workflow/watched-job.ts": "1dafe811cfbf0520164555ef0586392a1dd4d90c69261bc3b49e9b025ae782e8",
+    "apps/api/src/connector-workflow/watched-job.test.ts": "975da23ced2eeb414532fd965d7ca15d71ec931d3e15da3d15f20adf449bfc0a",
+    "apps/api/src/composition/integrations/source-jobs.ts": "99ea968eb1655fb27abdcfe6ff8acab3eac9548b85cb215ee46f75e21036eb16"
+  }
+}

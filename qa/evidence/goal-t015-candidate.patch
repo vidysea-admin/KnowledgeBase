@@ -1,0 +1,809 @@
+diff --git a/scripts/training/plan.mjs b/scripts/training/plan.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/plan.mjs
+@@ -0,0 +1,95 @@
++/** T-015: content-free, private grounded-claim dataset proposal. No permission is minted. */
++import { createHash } from 'node:crypto';
++export const trainingHash = value => createHash('sha256').update(value).digest('hex');
++const normalized = text => text.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim();
++export const trainingId = value => typeof value === 'string' && /^[A-Za-z0-9][A-Za-z0-9_.:-]{0,199}$/.test(value);
++const requireValue = (condition, message) => { if (!condition) throw new Error(message); };
++
++/** Only an in-memory row builder. Returning rows is restricted to the approved exporter. */
++export function groundedTrainingRows(generation, tenantId) {
++  const {source, session, turns, claims} = generation.documents;
++  requireValue(source.tenantId === tenantId && session.tenantId === tenantId, 'tenant mismatch');
++  requireValue(trainingId(source._id) && session.sourceId === source._id, 'source identity mismatch');
++  requireValue(source.hash === undefined || (typeof source.hash === 'string' && /^[a-f0-9]{64}$/.test(source.hash)), 'invalid source hash');
++  requireValue(source.consent?.given === true && source.consent.revoked !== true, 'capture permission absent or revoked');
++  requireValue(source.trainingUse?.allowed !== false && source.trainingUse?.revoked !== true, 'source owner prohibits training');
++  for (const permission of [source.consent, source.trainingUse]) if (permission?.expiresAt !== undefined)
++    requireValue(typeof permission.expiresAt === 'string' && Number.isFinite(Date.parse(permission.expiresAt)) &&
++      Date.parse(permission.expiresAt) > Date.now(), 'source permission expired or invalid');
++  const byId = new Map(turns.map(t => [t._id, t])), seen = new Set(), rows = [], excluded = [];
++  for (const claim of claims) {
++    requireValue(claim.tenantId === tenantId && trainingId(claim._id) && !seen.has(claim._id), 'claim identity mismatch');
++    seen.add(claim._id);
++    if (claim.status !== 'verified') { excluded.push({id: claim._id, reason: 'claim-not-verified'}); continue; }
++    requireValue(typeof claim.text === 'string' && claim.text.trim() && claim.evidence?.length, 'claim invalid');
++    const evidence = claim.evidence.map(e => {
++      const turn = byId.get(e.turnId);
++      requireValue(e.sessionId === session._id && turn?.tenantId === tenantId && turn.sessionId === session._id &&
++        trainingId(turn._id) && typeof turn.text === 'string' && turn.text.trim() && trainingId(turn.speakerRef) &&
++        !['unknown','unresolved','anonymous'].includes(turn.speakerRef.toLowerCase()) &&
++        Number.isFinite(turn.tStart) && turn.tStart >= 0 && Number.isFinite(turn.tEnd) && turn.tEnd >= turn.tStart, 'claim evidence invalid');
++      requireValue(e.quote === undefined || (typeof e.quote === 'string' && e.quote.trim() && turn.text.includes(e.quote)), 'claim quote invalid');
++      return {turnId: turn._id, sessionId: session._id, speakerRef: turn.speakerRef, tStart: turn.tStart, tEnd: turn.tEnd, text: turn.text};
++    });
++    rows.push({format: 'grounded-claim-v1', id: claim._id, tenantId, sourceId: source._id, sessionId: session._id,
++      input: evidence, output: {text: claim.text, evidence: claim.evidence}, provenance: source.synthetic === true || source._id.startsWith('synthetic')
++        ? 'synthetic-fixture-current-derived-verified-claim' : 'current-derived-verified-claim'});
++  }
++  return {rows, excluded};
++}
++
++/** A row is a grounded claim task, not invented counselling question/answer supervision. */
++export function buildTrainingPlan(generations, config, exclusions = []) {
++  requireValue(trainingId(config?.tenantId) && trainingId(config.seed), 'tenant and seed identifier required');
++  requireValue(Array.isArray(config.sessions) && config.sessions.length && new Set(config.sessions).size === config.sessions.length &&
++    config.sessions.every(trainingId), 'explicit unique sessions required');
++  requireValue(Array.isArray(config.relatedGroups ?? []) && (config.relatedGroups ?? []).every(g => Array.isArray(g) && g.length > 1 &&
++    g.every(s => config.sessions.includes(s))), 'invalid related groups');
++  const accepted = [], omitted = [...exclusions], rowsBySession = new Map();
++  for (const g of generations) {
++    const id = g.documents.session._id, {rows, excluded} = groundedTrainingRows(g, config.tenantId);
++    requireValue(config.sessions.includes(id) && !rowsBySession.has(id), 'session selection mismatch');
++    omitted.push(...excluded.map(e => ({sessionId: id, ...e})));
++    rowsBySession.set(id, rows);
++    if (!rows.length) {omitted.push({sessionId: id, reason: 'no-verified-claims'}); continue;}
++    accepted.push({sessionId: id, sourceId: g.documents.source._id, sourceHash: g.documents.source.hash ?? null,
++      synthetic: rows.some(r => r.provenance.startsWith('synthetic')),
++      hashes: g.hashes, claimsSeen: g.documents.claims.length, rows});
++  }
++  // Preserve excluded selected IDs as relation bridges; only accepted sessions emit rows/splits.
++  const parent = new Map(config.sessions.map(id => [id, id]));
++  const find = id => { let p = parent.get(id); while (p !== parent.get(p)) p = parent.get(p); return p; };
++  const union = (a, b) => {if (parent.has(a) && parent.has(b)) parent.set(find(b), find(a));};
++  for (const group of config.relatedGroups ?? []) for (const id of group.slice(1)) union(group[0], id);
++  const owners = new Map();
++  for (const s of accepted) {
++    const keys = [...new Set([`source-id:${s.sourceId}`, ...(s.sourceHash ? [`source:${s.sourceHash}`] : []),
++      ...s.rows.flatMap(r => [`claim:${trainingHash(normalized(r.output.text))}`, ...r.input.map(t => `turn:${trainingHash(normalized(t.text))}`)])])];
++    for (const key of keys) { if (owners.has(key)) union(s.sessionId, owners.get(key)); else owners.set(key, s.sessionId); }
++  }
++  const groups = new Map();
++  for (const s of accepted) {const root = find(s.sessionId); if (!groups.has(root)) groups.set(root, []); groups.get(root).push(s.sessionId);}
++  const units = [...groups.values()].map(ids => ids.sort()).sort((a,b) => trainingHash(`${config.seed}\0${a.join('\0')}`).localeCompare(trainingHash(`${config.seed}\0${b.join('\0')}`)));
++  const splits = {train: [], validation: [], evaluation: []};
++  // Three independent leakage groups are the minimum for three nonempty splits, not a quality threshold.
++  units.forEach((ids, i) => splits[i === 0 ? 'evaluation' : i === 1 ? 'validation' : 'train'].push(...ids));
++  const membership = accepted.sort((a,b) => a.sessionId.localeCompare(b.sessionId)).map(s => ({
++    sessionId: s.sessionId, sourceId: s.sourceId, sourceHash: s.sourceHash, synthetic: s.synthetic, hashes: s.hashes,
++    claimsSeen: s.claimsSeen, rows: s.rows.map(r => ({id: r.id, sha256: trainingHash(JSON.stringify(r)),
++      outputSha256: trainingHash(r.output.text), evidence: r.input.map(({text, ...t}) => ({...t, sha256: trainingHash(text)}))}))
++  }));
++  const totalRows = membership.reduce((n,s) => n+s.rows.length,0);
++  const proposal = {format: 'own-model-plan-v1', taskFormat: 'grounded-claim-v1', tenantId: config.tenantId,
++    status: totalRows ? 'awaiting-exact-export-approval' : 'blocked-no-current-eligible-examples',
++    config: {tenantId: config.tenantId, seed: config.seed, sessions: [...config.sessions].sort(), relatedGroups: config.relatedGroups ?? []},
++    transformation: 'identity-v1; verified claim with full cited turns; no generated questions, redaction or semantic gold assertion',
++    permissions: 'capture permission is checked; training/export permission requires exact Umesh canonical decision; preparation never authorizes use',
++    provenance: 'only current derivation proof accepted; legacy-unbound/stale rejected',
++    membership, exclusions: omitted.sort((a,b) => JSON.stringify(a).localeCompare(JSON.stringify(b))),
++    splitAlgorithm: 'connected-source-session-content-v2; related closure over all selected sessions, accepted-only membership; first hashed group evaluation, second validation, remaining train',
++    leakageGroups: units, splits, counts: {selectedSessions: config.sessions.length, acceptedSessions: accepted.length,
++      rows: totalRows, groups: units.length, train: splits.train.reduce((n,id) => n+rowsBySession.get(id).length,0),
++      validation: splits.validation.reduce((n,id) => n+rowsBySession.get(id).length,0), evaluation: splits.evaluation.reduce((n,id) => n+rowsBySession.get(id).length,0)},
++    splitReady: units.length >= 3, exported: false, trained: false, evaluated: false, promoted: false};
++  return {...proposal, fingerprint: trainingHash(JSON.stringify(proposal))};
++}
+diff --git a/scripts/training/prepare.mjs b/scripts/training/prepare.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/prepare.mjs
+@@ -0,0 +1,80 @@
++/** Metadata preparation: never emits corpus text, calls models or modifies source data. */
++import { readFileSync, realpathSync, existsSync, writeFileSync } from 'node:fs';
++import { resolve, join, relative, isAbsolute, dirname } from 'node:path';
++import { pathToFileURL, fileURLToPath } from 'node:url';
++import { assertDerivedArtifactsCurrent } from '../lib/transcript-provenance.mjs';
++import { buildTrainingPlan, groundedTrainingRows, trainingId, trainingHash } from './plan.mjs';
++import { assertPrivateTrainingPath, resolvePrivateTrainingPath } from './private-path.mjs';
++export const TRAINING_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
++function exclusionReason(error) {
++  const reasons = {'foreign tenant':'source-unavailable-for-selected-tenant','capture permission absent or revoked':'capture-permission-absent-or-revoked',
++    'source owner prohibits training':'source-owner-training-prohibition','source permission expired or invalid':'source-permission-expired-or-invalid',
++    'source identity mismatch':'source-identity-invalid','session identity mismatch':'session-identity-invalid',
++    'claim identity mismatch':'claim-identity-invalid','claim evidence invalid':'claim-evidence-invalid','claim quote invalid':'claim-quote-invalid',
++    'claim invalid':'claim-invalid','tenant mismatch':'source-unavailable-for-selected-tenant','invalid source hash':'source-hash-invalid',
++    'input outside corpus root':'source-location-invalid','invalid derivation identity':'derivation-identity-invalid','invalid derived evidence':'derivation-evidence-invalid'};
++  if (reasons[error?.message]) return reasons[error.message];
++  if (error?.message?.startsWith('derived provenance absent;')) return 'derivation-proof-missing';
++  if (error?.message?.startsWith('derived provenance stale or mismatched;')) return 'derivation-proof-not-current';
++  if (error?.code === 'ENOENT') return 'source-files-missing';
++  return 'source-artifacts-invalid';
++}
++export function containedTrainingPath(base, path) {
++  assertPrivateTrainingPath(base);assertPrivateTrainingPath(path);
++  const actual = realpathSync(path), rel = relative(realpathSync(base), actual);
++  if (rel === '..' || rel.startsWith('../') || rel.startsWith('..\\') || isAbsolute(rel)) throw new Error('input outside corpus root');
++  return actual;
++}
++/** Exact buffers validated by provenance are reused; error messages never contain source text. */
++export function loadTrainingGenerations(root, config) {
++  if (!trainingId(config?.tenantId) || !Array.isArray(config.sessions) || !config.sessions.length ||
++    config.sessions.some(id => !trainingId(id)) || new Set(config.sessions).size !== config.sessions.length) throw new Error('invalid tenant or selected sessions');
++  const corpus = resolve(root, 'data/toc-migrated'), generations = [], exclusions = [];
++  for (const sessionId of [...config.sessions].sort()) {
++    const dir = join(corpus, sessionId);
++    try {
++      const actual = containedTrainingPath(corpus, dir);
++      // Check identity before loading detailed foreign-tenant rows or returning metadata.
++      const sourcePath = containedTrainingPath(actual, join(actual, 'source.json'));
++      const source = JSON.parse(readFileSync(sourcePath, 'utf8'));
++      if (source.tenantId !== config.tenantId) throw new Error('foreign tenant');
++      const snapshot = new Map();
++      const read = path => {const safe = containedTrainingPath(actual,path); if (!snapshot.has(safe)) snapshot.set(safe,readFileSync(safe)); return snapshot.get(safe);};
++      const g = assertDerivedArtifactsCurrent(actual, read);
++      g.hashes['derivation-provenance.json'] = trainingHash(read(join(actual,'derivation-provenance.json')));
++      if (g.documents.session._id !== sessionId) throw new Error('session identity mismatch');
++      groundedTrainingRows(g, config.tenantId);
++      generations.push(g);
++    } catch (error) {
++      // Do not disclose another tenant's IDs, text, timing or path through error details.
++      exclusions.push({sessionId, reason: exclusionReason(error)});
++    }
++  }
++  return {generations, exclusions};
++}
++export function prepareTrainingPlan(root, config) {
++  const {generations, exclusions} = loadTrainingGenerations(root, config);
++  return buildTrainingPlan(generations, config, exclusions);
++}
++export function trainingArguments(argv, required) {
++  const options = {};
++  if (argv.length !== required.length * 2) throw new Error('provide each required option exactly once');
++  for (let i=0; i<argv.length; i+=2) {
++    if (!required.includes(argv[i]) || options[argv[i]] || !argv[i+1] || argv[i+1].startsWith('--')) throw new Error('invalid option');
++    options[argv[i]] = argv[i+1];
++  }
++  if (required.some(k => !options[k])) throw new Error('missing option');
++  return options;
++}
++export function readTrainingJson(path) {return JSON.parse(readFileSync(resolvePrivateTrainingPath(path), 'utf8'));}
++export function writeTrainingMetadata(path, report) {
++  const out=resolvePrivateTrainingPath(path);
++  if (existsSync(out)) throw new Error('output exists');
++  writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`, {flag: 'wx', mode: 0o600});
++}
++if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
++  try {const o = trainingArguments(process.argv.slice(2), ['--config', '--out']);
++    const p = prepareTrainingPlan(TRAINING_ROOT, readTrainingJson(o['--config'])); writeTrainingMetadata(o['--out'], p);
++    console.log(JSON.stringify({status:p.status, fingerprint:p.fingerprint, counts:p.counts, splitReady:p.splitReady}));
++  } catch {console.error('training preparation refused; check configuration and metadata output path'); process.exitCode=2;}
++}
+diff --git a/scripts/training/validate.mjs b/scripts/training/validate.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/validate.mjs
+@@ -0,0 +1,54 @@
++/** Source drift and canonical operator approval validation. No exports or provider calls. */
++import { readFileSync, realpathSync } from 'node:fs';
++import { resolve, relative, isAbsolute } from 'node:path';
++import { hostname } from 'node:os';
++import { pathToFileURL } from 'node:url';
++import { prepareTrainingPlan, trainingArguments, readTrainingJson, TRAINING_ROOT } from './prepare.mjs';
++import { trainingHash } from './plan.mjs';
++import { assertPrivateTrainingPath } from './private-path.mjs';
++const requireValue = (condition, message) => {if (!condition) throw new Error(message);};
++export function validateTrainingPlan(root, packet) {
++  requireValue(packet?.format === 'own-model-plan-v1', 'invalid plan format');
++  const current = prepareTrainingPlan(root, packet.config);
++  requireValue(JSON.stringify(packet) === JSON.stringify(current), 'training plan changed or stale');
++  return current;
++}
++/** The append-only canonical ledger is the trusted operator boundary, not caller approval JSON. */
++export function trainingApproval(root, decisionId, kind, expected, now = new Date()) {
++  requireValue(/^D-\d{3,}$/.test(decisionId) && ['Training-export', 'Training-run'].includes(kind), 'invalid decision selection');
++  const ledger = readFileSync(resolve(root, 'docs/DECISIONS.md'), 'utf8');
++  const sections = ledger.split(/(?=^## D-\d+)/m);
++  const matches = sections.filter(s => s.startsWith(`## ${decisionId} |`));
++  requireValue(matches.length === 1 && /status: ACTIVE\s*$/m.test(matches[0].split(/\r?\n/)[0]), 'active decision required');
++  requireValue(!sections.some(s => s.split(/\r?\n/).some(l => l.startsWith('**Supersedes:** ') &&
++    new RegExp(`(?:^|[^A-Za-z0-9-])${decisionId}(?![A-Za-z0-9-])`).test(l))), 'decision superseded');
++  const entry = matches[0];
++  requireValue(/^\*\*Approved-by:\*\* Umesh\s*$/m.test(entry), 'explicit Umesh approval required');
++  const lines = entry.split(/\r?\n/).filter(l => l.startsWith(`**${kind}:** `));
++  requireValue(lines.length === 1, 'exact structured approval required');
++  const grant = JSON.parse(lines[0].slice(`**${kind}:** `.length));
++  requireValue(grant.version === 1 && grant.revoked === false && grant.privacy === 'local-only', 'private current approval required');
++  for (const [key,value] of Object.entries(expected)) requireValue(JSON.stringify(grant[key]) === JSON.stringify(value), 'approval scope mismatch');
++  for (const k of ['approvedAt','expiresAt']) requireValue(typeof grant[k] === 'string' && new Date(grant[k]).toISOString() === grant[k], 'canonical validity dates required');
++  requireValue(Date.parse(grant.approvedAt) <= now.getTime() && now.getTime() < Date.parse(grant.expiresAt), 'approval not effective or expired');
++  requireValue(typeof grant.purpose === 'string' && grant.purpose.trim() && typeof grant.restrictions === 'string' && grant.restrictions.trim(), 'purpose and restrictions required');
++  assertPrivateTrainingPath(grant.destination);
++  const binding=grant.storageProof;
++  requireValue(typeof binding?.path==='string' && /^qa\/evidence\/[A-Za-z0-9_.-]+\.json$/.test(binding.path) &&
++    /^[a-f0-9]{64}$/.test(binding.sha256),'canonical approval must bind host-private-storage proof');
++  const proofPath=realpathSync(resolve(root,binding.path)), rel=relative(realpathSync(resolve(root,'qa/evidence')),proofPath);
++  requireValue(rel && rel!=='..' && !rel.startsWith('../') && !rel.startsWith('..\\') && !isAbsolute(rel),'storage proof outside trusted evidence');
++  const proofBytes=readFileSync(proofPath); requireValue(trainingHash(proofBytes)===binding.sha256,'storage proof changed');
++  const proof=JSON.parse(proofBytes);
++  requireValue(proof.format==='private-storage-proof-v1' && proof.kind==='fixed-private-local-volume' && proof.status==='verified' &&
++    proof.hostId===hostname() && proof.destination===grant.destination && proof.verifiedBy==='Umesh' &&
++    typeof proof.evidence==='string' && proof.evidence.trim(),'current host-private-storage verification required');
++  for(const k of ['verifiedAt','expiresAt']) requireValue(typeof proof[k]==='string' && new Date(proof[k]).toISOString()===proof[k],'canonical storage proof dates required');
++  requireValue(Date.parse(proof.verifiedAt)<=now.getTime() && now.getTime()<Date.parse(proof.expiresAt),'storage proof not effective or expired');
++  return grant;
++}
++if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
++  try {const o = trainingArguments(process.argv.slice(2), ['--plan']); const p = validateTrainingPlan(TRAINING_ROOT, readTrainingJson(o['--plan']));
++    console.log(JSON.stringify({status: p.status, fingerprint: p.fingerprint, splitReady:p.splitReady, counts:p.counts, approvalRequired:true}));
++  } catch {console.error('training plan validation refused'); process.exitCode=2;}
++}
+diff --git a/scripts/training/export.mjs b/scripts/training/export.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/export.mjs
+@@ -0,0 +1,86 @@
++/** Local-only guarded corpus export. Preparation and D-170 never authorize this action. */
++import { readFileSync, realpathSync, existsSync, mkdirSync, writeFileSync, renameSync, rmSync } from 'node:fs';
++import { resolve, dirname, basename, join, relative, isAbsolute } from 'node:path';
++import { pathToFileURL } from 'node:url';
++import { randomUUID } from 'node:crypto';
++import { loadTrainingGenerations, trainingArguments, readTrainingJson, TRAINING_ROOT } from './prepare.mjs';
++import { buildTrainingPlan, groundedTrainingRows, trainingHash } from './plan.mjs';
++import { validateTrainingPlan, trainingApproval } from './validate.mjs';
++import { assertPrivateTrainingPath } from './private-path.mjs';
++const requireValue = (condition, message) => {if (!condition) throw new Error(message);};
++export function newTrainingDestination(path) {
++  assertPrivateTrainingPath(path);
++  requireValue(isAbsolute(path), 'absolute local destination required');
++  const destination = join(realpathSync(dirname(path)), basename(path));
++  requireValue(resolve(path) === destination && !existsSync(destination), 'new canonical local destination required');
++  return destination;
++}
++export function trainingOutputOutsideCorpus(root, destination) {
++  for (const scope of ['data/toc-migrated','raw','sources','docs','contracts','qa/contracts','.git','.codex','.Codex','.agents']) {
++    const rel = relative(resolve(root,scope), destination);
++    requireValue(rel === '..' || rel.startsWith('../') || rel.startsWith('..\\') || isAbsolute(rel), 'destination overlaps protected input');
++  }
++}
++export function exportTrainingDataset(root, packet, {decisionId, destination, purpose}) {
++  const selected = validateTrainingPlan(root, packet);
++  requireValue(selected.splitReady && selected.counts.rows > 0, 'three independent nonempty splits required');
++  assertPrivateTrainingPath(destination);
++  const proposed=resolve(destination);
++  const grant = trainingApproval(root, decisionId, 'Training-export', {fingerprint:selected.fingerprint, tenantId:selected.tenantId,
++    destination:proposed, purpose, taskFormat:selected.taskFormat});
++  const out = newTrainingDestination(proposed); trainingOutputOutsideCorpus(root,out);
++  const {generations, exclusions} = loadTrainingGenerations(root, selected.config);
++  requireValue(JSON.stringify(buildTrainingPlan(generations, selected.config, exclusions)) === JSON.stringify(selected), 'source changed before export');
++  // All approval checks precede serialization and corpus writes. The same validated snapshots supply rows.
++  const rows = generations.flatMap(g => groundedTrainingRows(g, selected.tenantId).rows);
++  const tmp = `${out}.${randomUUID()}.partial`, files = {}; let created=false;
++  try {
++    requireValue(dirname(tmp)===dirname(out),'temporary output escaped approved parent');
++    mkdirSync(tmp, {mode:0o700}); created=true;
++    for (const [split, ids] of Object.entries(selected.splits)) {
++      const members = rows.filter(r => ids.includes(r.sessionId));
++      members.sort((a,b) => a.sessionId.localeCompare(b.sessionId) || a.id.localeCompare(b.id));
++      const body = members.map(r => JSON.stringify(r)).join('\n')+'\n';
++      writeFileSync(join(tmp,`${split}.jsonl`),body,{flag:'wx',mode:0o600});
++      files[split] = {file:`${split}.jsonl`,count:members.length,sha256:trainingHash(body)};
++    }
++    const receipt = {format:'own-model-export-v1',status:'exported',plan:selected,decisionId, destination:out,
++      purpose:grant.purpose, privacy:grant.privacy, restrictions:grant.restrictions, files,
++      trained:false,evaluated:false,promoted:false};
++    receipt.exportFingerprint = trainingHash(JSON.stringify(receipt));
++    writeFileSync(join(tmp,'export.json'),JSON.stringify(receipt,null,2)+'\n',{flag:'wx',mode:0o600});
++    requireValue(!existsSync(out),'destination appeared during export');
++    renameSync(tmp,out); return receipt;
++  } finally {if(created)rmSync(tmp,{recursive:true,force:true});}
++}
++/** Actual training consumer checks exact bytes, membership/counts and a still-current approved snapshot. */
++export function validateTrainingExport(root, dir, now = new Date()) {
++  assertPrivateTrainingPath(dir);
++  const actual = realpathSync(dir), receipt = JSON.parse(readFileSync(join(actual,'export.json'),'utf8'));
++  const {exportFingerprint,...bound} = receipt;
++  requireValue(receipt.format === 'own-model-export-v1' && receipt.status === 'exported' && receipt.destination === actual &&
++    exportFingerprint === trainingHash(JSON.stringify(bound)), 'invalid export receipt');
++  const p = validateTrainingPlan(root,receipt.plan);
++  trainingApproval(root,receipt.decisionId,'Training-export',{fingerprint:p.fingerprint,tenantId:p.tenantId,destination:actual,
++    purpose:receipt.purpose,taskFormat:p.taskFormat},now);
++  const seen = new Set();
++  for (const split of ['train','validation','evaluation']) {
++    const expected = p.membership.filter(s => p.splits[split].includes(s.sessionId)).flatMap(s => s.rows.map(r => ({...r,sessionId:s.sessionId})));
++    const f = receipt.files?.[split];
++    requireValue(f?.file === `${split}.jsonl` && f.count === expected.length,'export split count invalid');
++    const path = realpathSync(join(actual,f.file)); requireValue(dirname(path) === actual,'dataset symlink escaped export');
++    const body = readFileSync(path,'utf8'); requireValue(trainingHash(body) === f.sha256,'dataset bytes changed');
++    const rows = body.trim().split('\n').map(l => JSON.parse(l)); requireValue(rows.length === expected.length,'dataset row count invalid');
++    for (const r of rows) {
++      const key = `${r.sessionId}\0${r.id}`, m = expected.find(e => e.id === r.id && e.sessionId === r.sessionId);
++      requireValue(r.tenantId === p.tenantId && m && m.sha256 === trainingHash(JSON.stringify(r)) && !seen.has(key),'dataset membership invalid'); seen.add(key);
++    }
++  }
++  return receipt;
++}
++if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
++  try {const o=trainingArguments(process.argv.slice(2),['--plan','--decision','--destination','--purpose']);
++    const r=exportTrainingDataset(TRAINING_ROOT,readTrainingJson(o['--plan']),{decisionId:o['--decision'],destination:o['--destination'],purpose:o['--purpose']});
++    console.log(JSON.stringify({status:r.status,fingerprint:r.plan.fingerprint,exportFingerprint:r.exportFingerprint,trained:false}));
++  } catch {console.error('training export refused; exact current Umesh decision and new private local destination required');process.exitCode=2;}
++}
+diff --git a/scripts/training/train.mjs b/scripts/training/train.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/train.mjs
+@@ -0,0 +1,85 @@
++/** Approved private local trainer orchestration. No model downloads, uploads or provider adapters. */
++import { spawn } from 'node:child_process';
++import { realpathSync, mkdirSync, existsSync, writeFileSync, statSync } from 'node:fs';
++import { resolve, join, isAbsolute, relative } from 'node:path';
++import { pathToFileURL } from 'node:url';
++import { createHash } from 'node:crypto';
++import { validateTrainingExport, newTrainingDestination, trainingOutputOutsideCorpus } from './export.mjs';
++import { trainingApproval } from './validate.mjs';
++import { trainingHash } from './plan.mjs';
++import { trainingArguments, readTrainingJson, TRAINING_ROOT } from './prepare.mjs';
++import { assertPrivateTrainingPath } from './private-path.mjs';
++import { hashTrainingFile } from './file-hash.mjs';
++const requireValue=(condition,message)=>{if(!condition)throw new Error(message);};
++export function validateLocalTrainingRecipe(recipe) {
++  requireValue(recipe?.format === 'private-training-recipe-v1' && recipe.privacy === 'local-only' &&
++    recipe.taskFormat === 'grounded-claim-v1','private supported recipe required');
++  requireValue(typeof recipe.baseModel === 'string' && recipe.baseModel.trim() && /^[a-f0-9]{64}$/.test(recipe.baseModelSha256) &&
++    typeof recipe.license === 'string' && recipe.license.trim() && typeof recipe.trainerVersion === 'string' && recipe.trainerVersion.trim(), 'versioned model/license/trainer identity required');
++  assertPrivateTrainingPath(recipe.baseModelPath); assertPrivateTrainingPath(recipe.executable);
++  for(const artifact of recipe.artifacts ?? []) assertPrivateTrainingPath(artifact?.path);
++  requireValue(isAbsolute(recipe.baseModelPath) && existsSync(recipe.baseModelPath) && realpathSync(recipe.baseModelPath) === recipe.baseModelPath &&
++    statSync(recipe.baseModelPath).isFile() && hashTrainingFile(recipe.baseModelPath) === recipe.baseModelSha256, 'exact local base-model file required');
++  requireValue(isAbsolute(recipe.executable) && existsSync(recipe.executable) && realpathSync(recipe.executable) === recipe.executable &&
++    /^[a-f0-9]{64}$/.test(recipe.executableSha256) && hashTrainingFile(recipe.executable) === recipe.executableSha256, 'exact local trainer executable required');
++  requireValue(Array.isArray(recipe.args) && recipe.args.length && recipe.args.every(a => typeof a === 'string' && !a.includes('\0')) &&
++    ['{train}','{validation}','{output}','{model}'].every(p => recipe.args.includes(p)) &&
++    !recipe.args.some(a => /evaluation\.jsonl|\{evaluation\}/i.test(a)), 'trainer must consume model/train/validation and output only');
++  requireValue(Array.isArray(recipe.artifacts) && new Set(recipe.artifacts.map(a=>a?.path)).size===recipe.artifacts.length,
++    'explicit trainer dependency artifact bindings required');
++  for(const artifact of recipe.artifacts) requireValue(isAbsolute(artifact?.path) && existsSync(artifact.path) &&
++    realpathSync(artifact.path)===artifact.path && statSync(artifact.path).isFile() && /^[a-f0-9]{64}$/.test(artifact.sha256) &&
++    hashTrainingFile(artifact.path)===artifact.sha256,'trainer dependency artifact changed');
++  requireValue(recipe.args.filter(a=>isAbsolute(a)).every(a=>recipe.artifacts.some(f=>f.path===a)),
++    'literal script/config paths require approved artifact hashes');
++  requireValue(Number.isInteger(recipe.timeoutMs) && recipe.timeoutMs >= 100 && recipe.timeoutMs <= 3600000 &&
++    Number.isInteger(recipe.seed) && recipe.seed >= 0 && typeof recipe.resources === 'string' && recipe.resources.trim(), 'bounded run/seed/resource declaration required');
++  requireValue(typeof recipe.checkpoint === 'string' && /^[A-Za-z0-9_.-]+$/.test(recipe.checkpoint) && !['.','..'].includes(recipe.checkpoint), 'single local checkpoint filename required');
++  return trainingHash(JSON.stringify(recipe));
++}
++export async function runPrivateTraining(root,{exportDir,recipe,decisionId,destination,purpose},spawnTrainer=spawn) {
++  const receipt=validateTrainingExport(root,exportDir), recipeFingerprint=validateLocalTrainingRecipe(recipe);
++  assertPrivateTrainingPath(destination); const proposed=resolve(destination), dataset=realpathSync(exportDir);
++  const out=proposed;
++  const rel=relative(dataset,out); requireValue(rel === '..'||rel.startsWith('../')||rel.startsWith('..\\')||isAbsolute(rel),'model output overlaps dataset');
++  // The trusted canonical grant must approve this exact recipe, export and model output before process creation.
++  const expected={fingerprint:receipt.plan.fingerprint,exportFingerprint:receipt.exportFingerprint,
++    recipeFingerprint,tenantId:receipt.plan.tenantId,destination:out,purpose,baseModel:recipe.baseModel};
++  const runGrant=trainingApproval(root,decisionId,'Training-run',expected);
++  const exportGrant=trainingApproval(root,receipt.decisionId,'Training-export',{fingerprint:receipt.plan.fingerprint,
++    tenantId:receipt.plan.tenantId,destination:dataset,purpose:receipt.purpose,taskFormat:receipt.plan.taskFormat});
++  requireValue(Math.min(Date.parse(runGrant.expiresAt),Date.parse(exportGrant.expiresAt)) > Date.now()+recipe.timeoutMs,'approvals must remain valid through bounded run');
++  newTrainingDestination(out);trainingOutputOutsideCorpus(root,out);
++  const substitutions={'{train}':join(dataset,'train.jsonl'),'{validation}':join(dataset,'validation.jsonl'),'{output}':out,'{model}':recipe.baseModelPath};
++  const args=recipe.args.map(a=>substitutions[a]??a);
++  mkdirSync(out,{mode:0o700});
++  const startedAt=new Date().toISOString(), stdout=createHash('sha256'),stderr=createHash('sha256');
++  let stdoutBytes=0,stderrBytes=0,result;
++  const env=Object.fromEntries(['PATH','Path','SystemRoot','WINDIR','TEMP','TMP'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]));
++  env.TRAINING_SEED=String(recipe.seed);env.HF_HUB_OFFLINE='1';env.TRANSFORMERS_OFFLINE='1';env.WANDB_DISABLED='true';
++  try {
++    result=await new Promise((done,reject)=>{
++      const child=spawnTrainer(recipe.executable,args,{cwd:out,env,shell:false,windowsHide:true,stdio:['ignore','pipe','pipe'],timeout:recipe.timeoutMs,killSignal:'SIGKILL'});
++      child.stdout.on('data',b=>{stdout.update(b);stdoutBytes+=b.length;}); child.stderr.on('data',b=>{stderr.update(b);stderrBytes+=b.length;});
++      child.once('error',reject);child.once('close',(code,signal)=>done({code,signal}));
++    });
++  } catch {result={code:null,signal:'launch-error'};}
++  const checkpoint=join(out,recipe.checkpoint), completed=result.code===0 && existsSync(checkpoint) &&
++    realpathSync(checkpoint)===checkpoint && statSync(checkpoint).isFile() && statSync(checkpoint).size>0;
++  const report={format:'private-training-run-v1',status:completed?'trainer-completed-unverified-checkpoint':'training-failed',
++    planFingerprint:receipt.plan.fingerprint,exportFingerprint:receipt.exportFingerprint,recipeFingerprint,decisionId,
++    executionEvidence:spawnTrainer===spawn?'local-process':'injected-test-runner',hostPlatform:process.platform,
++    baseModel:recipe.baseModel,baseModelSha256:recipe.baseModelSha256,startedAt,finishedAt:new Date().toISOString(),
++    process:result,stdout:{bytes:stdoutBytes,sha256:stdout.digest('hex')},stderr:{bytes:stderrBytes,sha256:stderr.digest('hex')},
++    checkpoint:completed?{file:recipe.checkpoint,sha256:hashTrainingFile(checkpoint)}:null,
++    privacy:'local-only requested; approved trainer must be independently audited for network behavior',
++    trainedModelVerified:false,inferenceVerified:false,evaluated:false,promoted:false};
++  writeFileSync(join(out,'training-run.json'),JSON.stringify(report,null,2)+'\n',{flag:'wx',mode:0o600});
++  return report;
++}
++if(process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url){
++  try{const o=trainingArguments(process.argv.slice(2),['--export','--recipe','--decision','--destination','--purpose']);
++    const r=await runPrivateTraining(TRAINING_ROOT,{exportDir:o['--export'],recipe:readTrainingJson(o['--recipe']),decisionId:o['--decision'],destination:o['--destination'],purpose:o['--purpose']});
++    console.log(JSON.stringify({status:r.status,evaluated:false,promoted:false}));if(r.status==='training-failed')process.exitCode=2;
++  }catch{console.error('private training refused; exact recipe/export/output Umesh approval and local host required');process.exitCode=2;}
++}
+diff --git a/scripts/training/private-path.mjs b/scripts/training/private-path.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/private-path.mjs
+@@ -0,0 +1,18 @@
++/** Pure lexical rejection precedes any filesystem operation; mapped volumes need host proof. */
++import { isAbsolute, resolve } from 'node:path';
++function rejectNamespace(path) {
++  if (typeof path !== 'string' || !path || path.includes('\0') || /^[a-z]+:\/\//i.test(path)) throw new Error('private local path required');
++  const normalized=path.replaceAll('\\','/');
++  if (normalized.startsWith('//') || /^\/(?:\?\?|Device)(?:\/|$)/i.test(normalized)) throw new Error('network and device namespaces refused');
++}
++export function assertPrivateTrainingPath(path, platform=process.platform) {
++  rejectNamespace(path);
++  const normalized=path.replaceAll('\\','/');
++  if (platform==='win32') {
++    if (!/^[A-Za-z]:[\\/](?![\\/])/.test(path)) throw new Error('absolute drive-qualified local path required');
++    const segments=normalized.slice(3).split('/');
++    if (segments.some(s=>/[<>:"|?*]/.test(s) || /^(?:CON|PRN|AUX|NUL|COM[0-9]|LPT[0-9])(?:\..*)?$/i.test(s))) throw new Error('device path refused');
++  } else if (!isAbsolute(path)) throw new Error('absolute local path required');
++  return path;
++}
++export function resolvePrivateTrainingPath(path) {rejectNamespace(path); return assertPrivateTrainingPath(resolve(path));}
+diff --git a/scripts/training/file-hash.mjs b/scripts/training/file-hash.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/file-hash.mjs
+@@ -0,0 +1,10 @@
++/** Hash large local model/dependency/checkpoint files without loading their contents into memory. */
++import { openSync, readSync, closeSync } from 'node:fs';
++import { createHash } from 'node:crypto';
++import { assertPrivateTrainingPath } from './private-path.mjs';
++export function hashTrainingFile(path) {
++  assertPrivateTrainingPath(path);
++  const hash=createHash('sha256'),buffer=Buffer.allocUnsafe(1024*1024),descriptor=openSync(path,'r');
++  try {let bytes;while((bytes=readSync(descriptor,buffer,0,buffer.length,null))>0)hash.update(buffer.subarray(0,bytes));return hash.digest('hex');}
++  finally {closeSync(descriptor);}
++}
+diff --git a/scripts/training/prepare.test.mjs b/scripts/training/prepare.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/scripts/training/prepare.test.mjs
+@@ -0,0 +1,164 @@
++/** All export/training success probes use disposable explicitly synthetic fixtures. No provider calls. */
++import test from 'node:test';
++import assert from 'node:assert/strict';
++import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync, rmSync, realpathSync } from 'node:fs';
++import { join } from 'node:path';
++import { tmpdir, hostname } from 'node:os';
++import { EventEmitter } from 'node:events';
++import { PassThrough } from 'node:stream';
++import { bindDerivedArtifacts } from '../lib/transcript-provenance.mjs';
++import { prepareTrainingPlan } from './prepare.mjs';
++import { trainingHash } from './plan.mjs';
++import { validateTrainingPlan, trainingApproval } from './validate.mjs';
++import { exportTrainingDataset, validateTrainingExport } from './export.mjs';
++import { runPrivateTraining, validateLocalTrainingRecipe } from './train.mjs';
++import { assertPrivateTrainingPath } from './private-path.mjs';
++const now = new Date().toISOString(), future = new Date(Date.now()+3600000).toISOString();
++const fixture = () => {const root=realpathSync(mkdtempSync(join(tmpdir(),'lkb-t015-synthetic-')));mkdirSync(join(root,'docs'));mkdirSync(join(root,'data/toc-migrated'),{recursive:true});writeFileSync(join(root,'docs/DECISIONS.md'),'');return root;};
++function session(root,id,{tenantId='test',text=`PRIVATE_SYNTHETIC_TEXT_${id}`,sourceHash=trainingHash(id),verified=true,consent=true}={}) {
++  const dir=join(root,'data/toc-migrated',id);mkdirSync(dir);
++  const source={_id:`synthetic-${id}-src`,tenantId,kind:'document',synthetic:true,hash:sourceHash,consent:{given:consent}};
++  const turn={_id:`${id}-turn`,tenantId,sessionId:id,speakerRef:'synthetic-speaker',tStart:0,tEnd:10,text};
++  const evidence=[{sessionId:id,turnId:turn._id,quote:text}];
++  for(const [name,data] of Object.entries({'source.json':source,'session.json':{_id:id,tenantId,sourceId:source._id},
++    'turns.json':[turn],'claims.json':[{_id:`${id}-claim`,tenantId,text:`SYNTHETIC_CLAIM_${id}`,status:verified?'verified':'needs-review',evidence}],
++    'session_page.json':{_id:`${id}-page`,tenantId,sessionId:id,evidence}})) writeFileSync(join(dir,name),JSON.stringify(data));
++  bindDerivedArtifacts(dir);return dir;
++}
++const config=(sessions=['a','b','c','d'])=>({tenantId:'test',seed:'private-fixture-v1',sessions,relatedGroups:[]});
++function grant(root,id,kind,value) {
++  mkdirSync(join(root,'qa/evidence'),{recursive:true});
++  const proof={format:'private-storage-proof-v1',kind:'fixed-private-local-volume',status:'verified',hostId:hostname(),destination:value.destination,
++    verifiedBy:'Umesh',verifiedAt:now,expiresAt:future,evidence:'SYNTHETIC FIXTURE ASSERTION ONLY; NO REAL HOST PROOF'};
++  const path=`qa/evidence/${id}-${kind}.json`,bytes=JSON.stringify(proof);writeFileSync(join(root,path),bytes);
++  writeFileSync(join(root,'docs/DECISIONS.md'),`\n## ${id} | 2026-10-14 | type: decision | status: ACTIVE\n**Approved-by:** Umesh\n**${kind}:** ${JSON.stringify({version:1,revoked:false,privacy:'local-only',approvedAt:now,expiresAt:future,restrictions:'Synthetic fixture only; never real corpus',storageProof:{path,sha256:trainingHash(bytes)},...value})}\n`,{flag:'a'});
++}
++function setup() {const root=fixture();for(const id of config().sessions)session(root,id);return {root,plan:prepareTrainingPlan(root,config())};}
++function approvedExport(root,plan) {
++  const destination=join(root,'synthetic-export'),purpose='test-synthetic-only';
++  grant(root,'D-900','Training-export',{fingerprint:plan.fingerprint,tenantId:'test',destination,purpose,taskFormat:plan.taskFormat});
++  return exportTrainingDataset(root,plan,{decisionId:'D-900',destination,purpose});
++}
++test('metadata preparation deterministic, content-free, exact downstream validation and no corpus mutations',()=>{
++  const {root,plan}=setup();try{
++    const before=readdirSync(root,{recursive:true}).filter(p=>p.endsWith('.json')).map(p=>[p,trainingHash(readFileSync(join(root,p)))]);
++    assert.deepEqual(plan,prepareTrainingPlan(root,config()));assert.deepEqual(validateTrainingPlan(root,plan),plan);
++    assert.equal(plan.counts.rows,4);assert.equal(plan.splitReady,true);assert.equal(plan.exported,false);
++    assert.ok(plan.membership.every(s=>s.synthetic));assert.ok(!JSON.stringify(plan).includes('PRIVATE_SYNTHETIC_TEXT'));assert.ok(!JSON.stringify(plan).includes('SYNTHETIC_CLAIM'));
++    assert.deepEqual(before,before.map(([p])=>[p,trainingHash(readFileSync(join(root,p)))]));
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
++test('no current proof, withdrawn capture, source prohibition, foreign tenant and unverified claims never qualify',()=>{
++  const root=fixture();try{
++    const a=session(root,'a'),b=session(root,'b',{consent:false}),c=session(root,'c',{tenantId:'secret-foreign'}),d=session(root,'d',{verified:false});
++    rmSync(join(a,'derivation-provenance.json'));
++    const p=prepareTrainingPlan(root,config());assert.equal(p.counts.rows,0);assert.equal(p.status,'blocked-no-current-eligible-examples');assert.equal(p.exclusions.length,5);
++    assert.ok(!JSON.stringify(p).includes('secret-foreign'));assert.ok(!JSON.stringify(p).includes('PRIVATE_SYNTHETIC_TEXT'));
++    assert.throws(()=>prepareTrainingPlan(root,config(['../outside'])));assert.throws(()=>prepareTrainingPlan(root,config([])));
++    const source=JSON.parse(readFileSync(join(b,'source.json')));source.consent.given=true;source.trainingUse={allowed:false};writeFileSync(join(b,'source.json'),JSON.stringify(source));bindDerivedArtifacts(b);
++    assert.equal(prepareTrainingPlan(root,config(['b'])).counts.rows,0);
++    source.trainingUse={allowed:true,expiresAt:'2000-01-01T00:00:00.000Z'};writeFileSync(join(b,'source.json'),JSON.stringify(source));bindDerivedArtifacts(b);
++    assert.equal(prepareTrainingPlan(root,config(['b'])).counts.rows,0);
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
++test('duplicate source, cited turn, and transitive explicit relations never cross split boundaries',()=>{
++  const root=fixture();try{
++    session(root,'a');session(root,'b',{sourceHash:trainingHash('a')});session(root,'c',{text:'PRIVATE_SYNTHETIC_TEXT_b'});session(root,'d');session(root,'e');
++    const cfg=config(['a','b','c','d','e']);cfg.relatedGroups=[['a','d']];const p=prepareTrainingPlan(root,cfg);
++    assert.equal(p.counts.groups,2);assert.equal(p.splitReady,false);
++    const same=p.leakageGroups.find(g=>g.includes('a'));assert.deepEqual(same,['a','b','c','d']);
++    assert.equal(Object.values(p.splits).filter(ids=>ids.includes('a')).length,1);
++  }finally{rmSync(root,{recursive:true,force:true});}
++  // ISS-GOALT015-001: the real preparation loader excludes b, but b still connects a/c.
++  const bridgeRoot=fixture();try{
++    for(const id of ['a','b','c','d','e'])session(bridgeRoot,id);
++    rmSync(join(bridgeRoot,'data/toc-migrated/b/derivation-provenance.json'));
++    const cfg=config(['a','b','c','d','e']);cfg.relatedGroups=[['a','b'],['b','c']];
++    const p=prepareTrainingPlan(bridgeRoot,cfg);
++    assert.deepEqual(p.leakageGroups.find(g=>g.includes('a')),['a','c']);
++    assert.equal(p.counts.acceptedSessions,4);assert.equal(p.counts.rows,4);assert.equal(p.counts.groups,3);
++    assert.equal(p.splitReady,true);assert.ok(!p.membership.some(s=>s.sessionId==='b'));
++    assert.ok(Object.values(p.splits).every(ids=>!ids.includes('b')));
++    assert.deepEqual(p.exclusions,[{sessionId:'b',reason:'derivation-proof-missing'}]);
++    assert.deepEqual(validateTrainingPlan(bridgeRoot,p),p);
++  }finally{rmSync(bridgeRoot,{recursive:true,force:true});}
++});
++test('generic D-170, request approved flag, absent/stale/revoked/expired/foreign/superseded canonical grants deny before output',()=>{
++  const {root,plan}=setup();try{
++    const destination=join(root,'denied'),purpose='test-synthetic-only',options={decisionId:'D-170',destination,purpose,approved:true};
++    writeFileSync(join(root,'docs/DECISIONS.md'),'## D-170 | 2026-10-14 | type: session | status: ACTIVE\n**Approved-by:** Umesh\n**What:** build ALL40\n');
++    assert.throws(()=>exportTrainingDataset(root,plan,options));assert.equal(existsSync(destination),false);
++    for(const path of [String.raw`\\server\share\data`,String.raw`\\?\UNC\server\share\data`,String.raw`\\?\C:\data`,String.raw`\\.\NUL`,String.raw`\??\C:\data`,String.raw`C:\NUL.txt`,String.raw`C:\file:stream`,'//server/share/data'])
++      assert.throws(()=>assertPrivateTrainingPath(path,'win32')); // Pure guard only: never contacts a share/device.
++    assert.equal(assertPrivateTrainingPath(String.raw`C:\private\new-data`,'win32'),String.raw`C:\private\new-data`);
++    for(const [i,override] of [{fingerprint:'0'.repeat(64)},{tenantId:'other'},{destination:join(root,'other')},{revoked:true},{expiresAt:'2001-01-01T00:00:00.000Z'},{privacy:'external'},{storageProof:null}].entries()){
++      const id=`D-${910+i}`;grant(root,id,'Training-export',{fingerprint:plan.fingerprint,tenantId:'test',destination,purpose,taskFormat:plan.taskFormat,...override});
++      assert.throws(()=>exportTrainingDataset(root,plan,{...options,decisionId:id}));assert.equal(existsSync(destination),false);
++    }
++    const networkProof=JSON.stringify({format:'private-storage-proof-v1',kind:'network-volume',status:'verified',hostId:hostname(),destination,verifiedBy:'Umesh',verifiedAt:now,expiresAt:future,evidence:'SYNTHETIC NETWORK KIND; NEVER CONTACT A SHARE'});
++    writeFileSync(join(root,'qa/evidence/synthetic-network-proof.json'),networkProof);
++    grant(root,'D-918','Training-export',{fingerprint:plan.fingerprint,tenantId:'test',destination,purpose,taskFormat:plan.taskFormat,storageProof:{path:'qa/evidence/synthetic-network-proof.json',sha256:trainingHash(networkProof)}});
++    assert.throws(()=>exportTrainingDataset(root,plan,{...options,decisionId:'D-918'}));assert.equal(existsSync(destination),false);
++    grant(root,'D-920','Training-export',{fingerprint:plan.fingerprint,tenantId:'test',destination,purpose,taskFormat:plan.taskFormat});
++    writeFileSync(join(root,'docs/DECISIONS.md'),'\n## D-921 | 2026-10-14 | type: decision | status: ACTIVE\n**Supersedes:** D-920 -- revoked\n',{flag:'a'});
++    assert.throws(()=>trainingApproval(root,'D-920','Training-export',{}));
++    assert.throws(()=>exportTrainingDataset(root,{...plan,approved:true},{...options,decisionId:'D-920'}));
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
++test('exact approved synthetic local export consumed with count/hash parity; changed sources and export bytes refuse',()=>{
++  const {root,plan}=setup();try{
++    const r=approvedExport(root,plan);assert.equal(r.trained,false);assert.deepEqual(validateTrainingExport(root,r.destination),r);
++    assert.equal(Object.values(r.files).reduce((n,f)=>n+f.count,0),4);
++    writeFileSync(join(r.destination,'train.jsonl'),'invalid corpus\n');assert.throws(()=>validateTrainingExport(root,r.destination));
++    const source=join(root,'data/toc-migrated/a/source.json');writeFileSync(source,readFileSync(source,'utf8')+' ');
++    assert.throws(()=>validateTrainingPlan(root,plan));
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
++test('invalid evidence and source generations reject; zero rows and fewer than three groups cannot export',()=>{
++  const root=fixture();try{
++    const dir=session(root,'a'),claims=join(dir,'claims.json'),rows=JSON.parse(readFileSync(claims));
++    rows[0].evidence[0].quote='NOT_IN_CITED_TURN';writeFileSync(claims,JSON.stringify(rows));bindDerivedArtifacts(dir);
++    const plan=prepareTrainingPlan(root,config(['a']));assert.equal(plan.counts.rows,0);
++    assert.throws(()=>exportTrainingDataset(root,plan,{decisionId:'D-900',destination:join(root,'never'),purpose:'synthetic'}));assert.equal(existsSync(join(root,'never')),false);
++    rows[0].evidence[0].quote='PRIVATE_SYNTHETIC_TEXT_a';rows[0].evidence[0].turnId='missing';writeFileSync(claims,JSON.stringify(rows));
++    assert.equal(prepareTrainingPlan(root,config(['a'])).counts.rows,0);
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
++test('training errors and missing artifacts retain failed receipt without claiming model/evaluation',async()=>{
++  const {root,plan}=setup();try{
++    const r=approvedExport(root,plan),model=join(root,'synthetic-model.bin');writeFileSync(model,'synthetic');const executable=realpathSync(process.execPath),destination=join(root,'failed-run');
++    const recipe={format:'private-training-recipe-v1',privacy:'local-only',taskFormat:'grounded-claim-v1',baseModel:'synthetic-only',baseModelPath:model,baseModelSha256:trainingHash('synthetic'),license:'fixture',trainerVersion:'fixture',
++      executable,executableSha256:trainingHash(readFileSync(executable)),args:['{train}','{validation}','{output}','{model}'],artifacts:[],timeoutMs:100,seed:0,resources:'injected fake runner',checkpoint:'missing.bin'};
++    grant(root,'D-950','Training-run',{fingerprint:plan.fingerprint,exportFingerprint:r.exportFingerprint,recipeFingerprint:trainingHash(JSON.stringify(recipe)),tenantId:'test',destination,purpose:'synthetic failure',baseModel:'synthetic-only'});
++    const fake=()=>{const child=new EventEmitter();child.stdout=new PassThrough();child.stderr=new PassThrough();queueMicrotask(()=>child.emit('close',null,'SIGKILL'));return child;};
++    const report=await runPrivateTraining(root,{exportDir:r.destination,recipe,decisionId:'D-950',destination,purpose:'synthetic failure'},fake);
++    assert.equal(report.status,'training-failed');assert.equal(report.checkpoint,null);assert.equal(report.evaluated,false);assert.equal(report.promoted,false);
++    assert.equal(JSON.parse(readFileSync(join(destination,'training-run.json'))).status,'training-failed');
++    const missingDestination=join(root,'zero-without-checkpoint');grant(root,'D-951','Training-run',{fingerprint:plan.fingerprint,exportFingerprint:r.exportFingerprint,recipeFingerprint:trainingHash(JSON.stringify(recipe)),tenantId:'test',destination:missingDestination,purpose:'synthetic failure',baseModel:'synthetic-only'});
++    const zero=()=>{const child=new EventEmitter();child.stdout=new PassThrough();child.stderr=new PassThrough();queueMicrotask(()=>child.emit('close',0,null));return child;};
++    const missing=await runPrivateTraining(root,{exportDir:r.destination,recipe,decisionId:'D-951',destination:missingDestination,purpose:'synthetic failure'},zero);
++    assert.equal(missing.status,'training-failed');assert.equal(missing.checkpoint,null);
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
++test('approved runner invokes exact private synthetic recipe, receives no heldout argument or secret env, and captures hashes only',async()=>{
++  const {root,plan}=setup();try{
++    const r=approvedExport(root,plan),model=join(root,'synthetic-model.bin');writeFileSync(model,'SYNTHETIC_BASE_MODEL');
++    const executable=realpathSync(process.execPath),destination=join(root,'synthetic-checkpoint'),purpose='synthetic-runner-probe';
++    const recipe={format:'private-training-recipe-v1',privacy:'local-only',taskFormat:'grounded-claim-v1',baseModel:'synthetic-only',baseModelPath:model,
++      baseModelSha256:trainingHash(readFileSync(model)),license:'synthetic-fixture',trainerVersion:'fixture-1',executable,executableSha256:trainingHash(readFileSync(executable)),
++      args:['{train}','{validation}','{output}','{model}'],artifacts:[],timeoutMs:1000,seed:1,resources:'no actual process; injected synthetic runner',checkpoint:'checkpoint.bin'};
++    const trainerScript=join(root,'synthetic-trainer.mjs');writeFileSync(trainerScript,'// synthetic dependency only');
++    const scripted={...recipe,args:[trainerScript,...recipe.args]};assert.throws(()=>validateLocalTrainingRecipe(scripted));
++    scripted.artifacts=[{path:trainerScript,sha256:trainingHash(readFileSync(trainerScript))}];assert.equal(typeof validateLocalTrainingRecipe(scripted),'string');
++    writeFileSync(trainerScript,'// changed synthetic dependency');assert.throws(()=>validateLocalTrainingRecipe(scripted));
++    let calls=0;const stub=(program,args,options)=>{calls++;assert.equal(program,executable);assert.ok(!args.some(a=>a.includes('evaluation')));assert.equal(options.shell,false);assert.equal(options.env.OPENAI_API_KEY,undefined);
++      const child=new EventEmitter();child.stdout=new PassThrough();child.stderr=new PassThrough();queueMicrotask(()=>{child.stdout.write('PRIVATE_SYNTHETIC_TEXT_DO_NOT_LOG');writeFileSync(join(destination,'checkpoint.bin'),'SYNTHETIC_MODEL_NOT_TRAINED');child.emit('close',0,null);});return child;};
++    const opts={exportDir:r.destination,recipe,decisionId:'D-901',destination,purpose};
++    await assert.rejects(runPrivateTraining(root,opts,stub));assert.equal(calls,0);assert.equal(existsSync(destination),false);
++    grant(root,'D-901','Training-run',{fingerprint:plan.fingerprint,exportFingerprint:r.exportFingerprint,recipeFingerprint:trainingHash(JSON.stringify(recipe)),tenantId:'test',destination,purpose,baseModel:'synthetic-only'});
++    const report=await runPrivateTraining(root,opts,stub);assert.equal(calls,1);assert.equal(report.status,'trainer-completed-unverified-checkpoint');assert.equal(report.evaluated,false);assert.equal(report.inferenceVerified,false);
++    assert.equal(report.executionEvidence,'injected-test-runner');assert.equal(report.trainedModelVerified,false);
++    assert.ok(!JSON.stringify(report).includes('PRIVATE_SYNTHETIC_TEXT_DO_NOT_LOG'));
++    assert.equal(report.checkpoint.sha256,trainingHash('SYNTHETIC_MODEL_NOT_TRAINED'));
++  }finally{rmSync(root,{recursive:true,force:true});}
++});
+diff --git a/docs/own-model-training.md b/docs/own-model-training.md
+new file mode 100644
+--- /dev/null
++++ b/docs/own-model-training.md
+@@ -0,0 +1,124 @@
++# Private own-model path — T-015
++
++This CLI implements private local preparation, an approval-bound exporter and an audited local
++trainer interface. It does not choose an external training provider or send knowledge to a global
++model. G10 capability is retained; activation, real export, training, inference, evaluation and
++promotion each require their own evidence. T-015 remains open until the whole contract passes.
++
++The supported dataset task is `grounded-claim-v1`: cited attributed turns are inputs and an existing
++verified claim with evidence is the target. These are not invented counselling question/answer
++examples, independent semantic gold, or a claim that this training objective improves counselling.
++Only current derivation proof is accepted. Stale and legacy-unbound sessions must be regenerated
++or independently reconciled by their existing provenance owner; this tool never binds real data.
++The WhatsApp source has its own governance and is not included by this TOC artifact adapter.
++
++## Prepare and validate without corpus export
++
++Create an ordinary metadata configuration, with an explicit tenant, seed and selected session IDs:
++
++```json
++{"tenantId":"toc","seed":"review-v1","sessions":["2026-05-08-funding-dreams-loans-forex"],"relatedGroups":[]}
++```
++
++```powershell
++node scripts/training/prepare.mjs --config <config.json> --out <new-plan.json>
++node scripts/training/validate.mjs --plan <new-plan.json>
++```
++
++Preparation reads existing source artifacts; only hashes, counts, identities, timestamps,
++exclusions and memberships are emitted. No transcript or claim text is returned. Capture permission
++must exist and remain effective; explicit source-owner training prohibitions/revocations/expiry
++exclude a source. Capture permission never becomes permission to train or export. Unknown intended
++training permission remains `awaiting-exact-export-approval`. A generic request `approved:true`
++is ignored; altered plan JSON is rejected.
++
++The plan fingerprints the exact ordered claim/cited-turn content hashes, source bytes and current
++derivation proof, identity transformation and configuration. It groups whole sessions connected
++by source hashes, identical normalized claims/cited turns, or explicitly reviewed relatedGroups.
++First seeded-hash group is evaluation, second validation, remaining groups training. Fewer than
++three groups is a blocked split; this is a structural requirement, not a quality threshold.
++Split algorithm v2 computes declared related-session closure over all selected sessions before
++projecting eligible membership. An excluded session still connects its related eligible sessions,
++but contributes no dataset rows, leakage-group membership or split membership. The algorithm
++version is fingerprinted, so earlier v1 plans and approvals require a new reviewed proposal.
++Near-duplicate/paraphrased sessions require operator-supplied relatedGroups and independent review;
++exact duplicate detection is not a semantic leakage guarantee. Evaluation membership never enters
++the trainer's supplied arguments. The actual host must independently prove access/network isolation
++of an audited trainer; ordinary filesystem access alone is not a sandbox for arbitrary executables.
++
++## Concrete export approval is a human gate
++
++Umesh must review the exact plan, restrictions, purpose and absolute private local destination.
++The central decision writer alone records the actual approval through `scripts/append_decision.ps1`.
++No decision is created by these tools. UNC/SMB paths, network/device namespaces and Windows device
++names are rejected lexically before filesystem access. Drive-letter absolute paths alone do not
++prove local/private storage: mapped drives and redirected directories remain a host HOLD until
++the reviewed target's fixed private local volume is independently verified. A unique ACTIVE canonical decision requires
++`**Approved-by:** Umesh` and one machine-readable line with the following shape:
++
++```text
++**Training-export:** {"version":1,"revoked":false,"privacy":"local-only","approvedAt":"<canonical ISO UTC>","expiresAt":"<canonical ISO UTC>","restrictions":"<reviewed conditions>","fingerprint":"<exact plan fingerprint>","tenantId":"<tenant>","destination":"<new absolute canonical local directory>","purpose":"<reviewed use>","taskFormat":"grounded-claim-v1","storageProof":{"path":"qa/evidence/<reviewed-proof>.json","sha256":"<exact proof hash>"}}
++```
++
++```powershell
++node scripts/training/export.mjs --plan <plan.json> --decision D-NNN --destination <new-absolute-directory> --purpose <exact-reviewed-purpose>
++```
++
++D-170's general implementation approval is insufficient. Missing, superseded, expired, revoked,
++foreign-tenant, stale or mismatched approval is rejected before corpus serialization or writes.
++The canonical grant must bind a current `private-storage-proof-v1` artifact under qa/evidence:
++kind `fixed-private-local-volume`, status `verified`, current hostId (OS hostname), exact destination,
++verifiedBy `Umesh`, canonical verifiedAt/expiresAt and retained evidence from real host verification.
++The hash, host, target and effective validity are checked before destination filesystem access.
++This artifact records operator-reviewed host evidence; the file tool cannot authenticate the
++reviewer or prove hardware topology itself. Synthetic test proof assertions never count as real
++private-storage acceptance. Source corpus/guarded directories cannot be output destinations. Export writes restrictive files
++into a temporary sibling and renames a complete bundle to a new destination. Windows POSIX mode
++bits do not establish NTFS ACL isolation: independently secure the approved destination on that host.
++The receipt binds train/validation/evaluation JSONL bytes, counts and membership. Existing output
++is refused; failure cleans the temporary bundle and never reports exported success.
++
++## Local training interface and separate approval
++
++An independently audited local trainer must support this JSONL format. Supply a
++`private-training-recipe-v1` JSON object with `privacy:local-only`, `taskFormat:grounded-claim-v1`,
++baseModel, absolute baseModelPath, baseModelSha256, license, trainerVersion, absolute executable,
++executableSha256, args containing separate `{train}`, `{validation}`, `{output}`, `{model}`
++arguments, artifacts (an explicit array of absolute path/SHA256 dependency bindings), timeoutMs
++(bounded), seed, resources and a single checkpoint filename. Literal script/config paths in args
++must be bound artifacts. Static arguments
++must identify the audited trainer/config; fingerprint the entire recipe. The model and executable
++must already exist locally with matching hashes. No automatic downloads, dependency installation,
++API-key credential fallback, paid calls, provider upload or shell expansion is implemented.
++
++Umesh separately approves the exact recipe/export fingerprint, model, tenant, purpose and new
++output destination in a canonical ACTIVE `**Training-run:**` line with the same validity/privacy
++fields and exact current host/storageProof binding, plus `fingerprint`, `exportFingerprint`, `recipeFingerprint`, `tenantId`, `destination`,
++`purpose` and `baseModel`. The decision writer records it only after the actual human approval.
++
++```powershell
++node scripts/training/train.mjs --export <approved-export-directory> --recipe <recipe.json> --decision D-NNN --destination <new-absolute-model-output> --purpose <exact-reviewed-purpose>
++```
++
++The runner validates the still-effective export approval, current sources, dataset bytes/membership,
++local model/executable and exact training approval before creating output or starting a process.
++It passes only basic OS environment variables, seed and offline/no-telemetry flags; API credentials
++are not inherited. Offline flags request behavior from an audited trainer; they are not network
++enforcement. Imported/transitive trainer dependencies must be covered by the audited recipe artifact
++closure and immutable host environment; an interpreter's own executable hash is not such closure.
++The direct process is bounded by timeout; descendant isolation/termination is a host
++acceptance requirement. Logs retain byte counts and hashes, never raw stdout/stderr corpus text.
++
++Exit zero plus a nonempty exact checkpoint file yields `trainer-completed-unverified-checkpoint`;
++nonzero/signal/launch-error/missing artifact yields `training-failed`. Neither means a verified model.
++Actual inference must load the identified checkpoint, then independently measure baseline versus
++candidate on unchanged held-out cases with citation/refusal/tenant safety and per-case failures.
++No automatic score, improvement, model activation or promotion is supplied. Promotion needs an
++explicit reversible provider/artifact selection and a separate authorized integration unit.
++
++## Evidence boundaries
++
++`qa/contracts/goal-t015.md` distinguishes P preparation, X export, R real model delivery and Q
++independent verification. Synthetic fixture exports/injected runner probes verify interfaces only.
++Real data with zero current eligible rows is honestly blocked; it is never repaired into a training
++corpus here. Metadata success cannot substitute for actual authorized corpus/training/live proof.
+diff --git a/qa/evidence/goal-t015-real-config.json b/qa/evidence/goal-t015-real-config.json
+new file mode 100644
+--- /dev/null
++++ b/qa/evidence/goal-t015-real-config.json
+@@ -0,0 +1,10 @@
++{
++  "tenantId": "toc",
++  "seed": "t015-real-readonly-v1",
++  "sessions": [
++    "2026-05-08-funding-dreams-loans-forex",
++    "2026-08-03-uk-beyond-offer-letters",
++    "2026-08-03-uk-beyond-offer-letters-reupload"
++  ],
++  "relatedGroups": [["2026-08-03-uk-beyond-offer-letters", "2026-08-03-uk-beyond-offer-letters-reupload"]]
++}
+diff --git a/qa/evidence/goal-t015-cycle1-ledger-replay.mjs b/qa/evidence/goal-t015-cycle1-ledger-replay.mjs
+new file mode 100644
+--- /dev/null
++++ b/qa/evidence/goal-t015-cycle1-ledger-replay.mjs
+@@ -0,0 +1,28 @@
++import {writeFileSync} from 'node:fs';
++import {performance} from 'node:perf_hooks';
++import {buildTrainingPlan,trainingHash} from '../../scripts/training/plan.mjs';
++import {assertPrivateTrainingPath} from '../../scripts/training/private-path.mjs';
++const startedAt=new Date().toISOString(), started=performance.now();
++const generation=id=>({hashes:{'source.json':trainingHash(id)},documents:{
++ source:{_id:`synthetic-${id}-source`,tenantId:'checker',hash:trainingHash(`source-${id}`),synthetic:true,consent:{given:true}},
++ session:{_id:id,tenantId:'checker',sourceId:`synthetic-${id}-source`},
++ turns:[{_id:`${id}-turn`,tenantId:'checker',sessionId:id,speakerRef:'synthetic-speaker',tStart:0,tEnd:1,text:`SYNTHETIC_UNIQUE_${id}`}],
++ claims:[{_id:`${id}-claim`,tenantId:'checker',status:'verified',text:`SYNTHETIC_CLAIM_${id}`,evidence:[{sessionId:id,turnId:`${id}-turn`}]}]
++}});
++const generations=['a','c','d','e'].map(generation), failures=[], samples=[];
++for(let i=0;i<20;i++){
++ const config={tenantId:'checker',seed:`independent-${i}`,sessions:['a','b','c','d','e'],relatedGroups:[['a','b'],['b','c']]};
++ const plan=buildTrainingPlan(generations,config,[{sessionId:'b',reason:'derivation-proof-missing'}]);
++ const splitOf=id=>Object.entries(plan.splits).find(([,ids])=>ids.includes(id))?.[0];
++ const sample={seed:config.seed,groups:plan.leakageGroups,splitA:splitOf('a'),splitC:splitOf('c'),splitReady:plan.splitReady};
++ samples.push(sample);if(sample.splitA!==sample.splitC || !plan.leakageGroups.some(ids=>ids.includes('a')&&ids.includes('c')) || plan.membership.some(s=>s.sessionId==='b') || Object.values(plan.splits).some(ids=>ids.includes('b')))failures.push(sample);
++}
++const paths=['\\\\server\\share\\new','//server/share/new','\\\\?\\C:\\new','\\\\.\\pipe\\new','\\??\\C:\\new','C:\\new:stream','C:\\NUL','C:\\CON.txt','C:\\AUX','C:\\LPT1','C:new','https://example.invalid/new'];
++const refused=paths.map(path=>{try{assertPrivateTrainingPath(path,'win32');return {path,refused:false};}catch{return {path,refused:true};}});
++let foreignRefused=false;try{const foreign=generation('f');foreign.documents.source.tenantId='foreign';buildTrainingPlan([foreign],{tenantId:'checker',seed:'tenant',sessions:['f'],relatedGroups:[]});}catch{foreignRefused=true;}
++let permissionRefused=false;try{const withdrawn=generation('w');withdrawn.documents.source.trainingUse={revoked:true};buildTrainingPlan([withdrawn],{tenantId:'checker',seed:'permission',sessions:['w'],relatedGroups:[]});}catch{permissionRefused=true;}
++const report={scope:'independent in-memory synthetic metadata and pure lexical refusal; no filesystem corpus, export or trainer',startedAt,completedAt:new Date().toISOString(),elapsedMs:performance.now()-started,
++ relatedThroughExcludedSession:{cases:20,crossSplitViolations:failures.length,samples},privateNamespaceRefusals:{cases:paths.length,refused:refused.filter(p=>p.refused).length,results:refused},foreignRefused,permissionRefused};
++writeFileSync(new URL('./goal-t015-cycle1-ledger-replay.json',import.meta.url),JSON.stringify(report,null,2)+'\n',{flag:'wx'});
++console.log(JSON.stringify({crossSplitViolations:failures.length,cases:20,privatePathsRefused:report.privateNamespaceRefusals.refused,foreignRefused,permissionRefused}));
++if(failures.length||refused.some(p=>!p.refused)||!foreignRefused||!permissionRefused)process.exitCode=1;

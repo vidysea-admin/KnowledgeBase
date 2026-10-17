@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 61,
+  "originalIndex": 68,
+  "claimId": "2026-08-24-uniaccess-leeds-arts-university-c03",
+  "inputHash": "ea824c0fe97542a67283c1d4e36fe5086379c790e72111e44d41f539baae7d48",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The citation directly states that the Leeds Government School moved to Vernon Street in 1903, but does not identify Vernon Street as the foundation-student campus; the entire compound claim is therefore not supported.",
+    "missingReferences": [],
+    "caveats": [
+      "One match is supplied for the cited reference; no missing or duplicate reference is present.",
+      "Stored speakerRef is unknown; an embedded speaker name does not establish identity.",
+      "The 1903 date is a transcript assertion, not external factual verification.",
+      "The same turn ID has changed content, timing (2904–3039 to 2008–2487), and speakerRef (unknown to spk:0) in the current context.",
+      "Artifact hashes are supplied only; raw byte hashes and normalizedLfSha256 values are distinct and were not independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "turnId": "2026-08-24-uniaccess-leeds-arts-university-t036",
+        "contextVersion": "originalMigration",
+        "quote": "in 1846 when this school was started, we were the Leeds Government School, which moved to Vernon Street in 1903. And then it was renamed to Leeds College of Art",
+        "textSha256": "8f0b2b7623a92dea3b83ef2080a89c1a0d0247239cf5edd959e563743b6997cf",
+        "contextSha256": "7fda4f5c401b6c75879a94cefeba4f9f74443e3f8a1433dfab49c51d17c5c69a",
+        "artifactSha256": "fd835b78b01a869731e56e8de8775f0104f505f5f82e2272be9e8499917d60b8",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2904,
+        "tEnd": 3039,
+        "supports": "Supports the Leeds Government School name and move to Vernon Street in 1903; does not establish the foundation-student campus designation."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn discusses Leeds, university facilities, and foundation entry requirements, but never states Vernon Street, 1903, the Leeds Government School name, or that a particular campus is for foundation students.",
+    "missingReferences": [],
+    "caveats": [
+      "One match is supplied for the cited reference; no missing or duplicate reference is present.",
+      "Stored speakerRef spk:0 is an anonymous label and does not establish a person identity.",
+      "The same turn ID refers to different text and timing from originalMigration; original support cannot be transferred to the current citation.",
+      "Calendar dates in metadata do not establish the historical claim.",
+      "Artifact hashes are supplied only; raw byte hashes and normalizedLfSha256 values are distinct and were not independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "turnId": "2026-08-24-uniaccess-leeds-arts-university-t036",
+        "contextVersion": "current",
+        "quote": "Some of the campuses which you see, it's state of the art facility helping students in public university to get printing and stationery for free.",
+        "textSha256": "38d9ddaf403a28feecd62128cd310dbb8ad6000dbb3e8e70abd1c863ba559035",
+        "contextSha256": "491b31718dec9aa68127a8b4f9ad9a55f81ff47dc4de06106f763d6ad9307677",
+        "artifactSha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 2008,
+        "tEnd": 2487,
+        "supports": "Describes unspecified campuses and facilities; does not support Vernon Street, the 1903 move, the Leeds Government School name, or foundation-student campus designation."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports the school name and 1903 move but leaves the foundation-campus qualifier unsupported; changed current content supports none of the specific historical components. AI preliminary review only; human approval and external truth remain open."
+}

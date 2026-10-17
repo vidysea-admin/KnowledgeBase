@@ -1,0 +1,39 @@
+{
+  "status": "building",
+  "fixCycle": 0,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "observedUtc": "2026-10-15T10:29:21.0873563Z",
+  "base": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidateCommit": "uncommitted shared working tree",
+  "owned": [
+    {
+      "path": "apps/api/src/ask/native-source-context.ts",
+      "sha256": "64263BB8892A5AA4E5D3C9CB08742577B066B03631872FA3C42918D2A032BA0B"
+    },
+    {
+      "path": "apps/api/src/ask/native-source-context.test.ts",
+      "sha256": "B83B03138AA1875A3232570E083C60EBE18BCEA7D57037B3B7AF8F3F1B06043B"
+    },
+    {
+      "path": "apps/api/src/answer-policy/native-evidence.ts",
+      "sha256": "9474928553F111A3DF0597898B1AC9AC8CA2385AC3C7FAFA9CFD108CBA832A92"
+    },
+    {
+      "path": "apps/api/src/answer-policy/native-evidence.test.ts",
+      "sha256": "C2E487AA80494BE86DCC39955FD3E624DAD887BF88CA823FC8DE0BF7B5FF3DF2"
+    },
+    {
+      "path": "apps/api/src/ask/passage-lexical.ts",
+      "sha256": "31A22B953E52A3ACC588AAD14CC7BEB97BE922D5F7CBF3EC2A981A8C13B9B3EE"
+    },
+    {
+      "path": "apps/api/src/ask/passage-lexical.test.ts",
+      "sha256": "A07101CC09A322758646E58EB4F2B0F07B146E8E155036159F78E412159E71AB"
+    }
+  ],
+  "authoredTests": 16,
+  "testsExecuted": 0,
+  "makerActiveSeconds": null,
+  "makerTokens": null,
+  "makerCostUsd": null
+}

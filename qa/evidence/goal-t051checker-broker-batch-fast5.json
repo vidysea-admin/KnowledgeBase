@@ -1,0 +1,20 @@
+{
+  "ready": [
+    "t061-backend",
+    "t059-cycle1-ledger",
+    "t059-cycle1-standing",
+    "t058-ui",
+    "t037-ui"
+  ],
+  "skipped": [
+    {
+      "n": "t055-speaker-ui",
+      "drift": [
+        [
+          "apps/web/src/App.tsx",
+          "d11b6566f5988e65226af4fdb198bbfb5d995a7d0d538586c58640d41e58f27d"
+        ]
+      ]
+    }
+  ]
+}

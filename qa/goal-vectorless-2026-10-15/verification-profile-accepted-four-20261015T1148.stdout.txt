@@ -1,0 +1,12 @@
+✔ snapshot accepted reader reuses canonical validator and excludes stale foreign unreviewed terminal rows (10.7597ms)
+✔ accepted reader refuses oversized inventory and identity/tenant mismatches without nested capability (2.8933ms)
+✔ source-only authority is session-free and relation-independent with exact effective transcript hashes (26.914ms)
+✔ optional accepted relationship reader runs only inside existing source snapshot (32.9286ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5085.8953

@@ -1,0 +1,27 @@
+{
+  "candidate": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "c877644c102b4ea666ac2cfbcf6f15560144f2f41094c90d3e30bd930e0c118f"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "3fe4d4cc5b8e3a9174bb64e5d45dcdf139ebd482e67d6c301c78975bec1a9ab9"
+    }
+  ],
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-name-pattern=preflight |three physical attempts stop|live disabled by default|source drift/forged citation",
+    "scripts/eval/vectorless-production-eval.test.mjs"
+  ],
+  "expectedSelectedTests": 7,
+  "outerTimeoutSeconds": 45,
+  "scope": "4new preflight/diagnostic cases +3legacy admission/source invariants",
+  "providerCallsAllowed": false,
+  "cpuBrokerOnly": true
+}

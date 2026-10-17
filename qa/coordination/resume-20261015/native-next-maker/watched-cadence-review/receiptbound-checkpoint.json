@@ -1,0 +1,13 @@
+{
+  "packet_sha256": "b616d4b09dfcbe13b9e4fcdcdd2de2051901c53cdae16d61e84fffffe74e6a95",
+  "source_count": 8,
+  "content_digest": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "broker_receipts_bound": true,
+  "readiness_complete": false,
+  "only_pending_maker_binding": "UpcomingWIPGitSHA+exact8source-to-commit verification",
+  "validation_exit": 2,
+  "validation_output": "validate-receiptbound-gitpending.json",
+  "reviewer_dispatched": false,
+  "maker_usage": null,
+  "prior_history": "PrebindHOLD/failedcompiler snapshots preserved"
+}

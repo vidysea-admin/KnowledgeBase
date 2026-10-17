@@ -1,0 +1,13 @@
+✔ GET /docs-ui serves HTML with no Authorization header (83.6682ms)
+✔ GET /docs-ui documents webhook permission and configuration requirements (46.1585ms)
+✔ a webhooks-only key cannot register without the hosting scope (99.1156ms)
+✔ a valid key lacking hosting scope gets 403 before webhook configuration is read (24.4787ms)
+✔ a hosting and webhooks key gets 503 when hosting runtime is not configured (16.1298ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4669.7947

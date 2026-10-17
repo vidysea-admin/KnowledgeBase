@@ -1,0 +1,35 @@
+{
+  "stage": "transcript",
+  "status": "failed",
+  "transcriptValidated": false,
+  "error": "QA current transcript: committed timing outside exact audio bounds",
+  "reasons": [
+    "QA current transcript: committed timing outside exact audio bounds"
+  ],
+  "durationSec": 186,
+  "turnCount": 1,
+  "lastTEnd": 186.0000001,
+  "coverage": 1,
+  "partial": false,
+  "shortfallSec": 0,
+  "gaps": [],
+  "qa": {
+    "version": 1,
+    "turnsSha256": "fc498e679efc4a15f3ff64f974b24bdc63e1b01f90617f1c62721f6009df4843",
+    "durationValid": true,
+    "inputCount": 1,
+    "outputCount": 1,
+    "clampedCount": 0,
+    "dropped": 0,
+    "overshootSec": 9.999999406318238e-8,
+    "pastEnd": 0,
+    "repeatedRuns": 0,
+    "nonMonotonic": 0,
+    "acceptedSpans": 1,
+    "rejectedAttempts": 0
+  },
+  "qaSha256": "482c156eb3f258cc281e3e168d2ea16cb9e2844f956cfba87e6b65700aaa56e9",
+  "turnsSha256": "fc498e679efc4a15f3ff64f974b24bdc63e1b01f90617f1c62721f6009df4843",
+  "validatedAt": "2026-10-14T20:43:23.515Z",
+  "validator": "scripts/webinar/validate/validate-session.mjs"
+}

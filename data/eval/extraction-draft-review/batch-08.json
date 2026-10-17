@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "batch": 8,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-08-27-in-focus-4",
+      "tenantId": "toc",
+      "sessionId": "2026-08-27-in-focus-4",
+      "sourceBindingSha256": "718ed04509468bb519435187d9de4d2cdf8d5a86b519f0142fec5009e53060f1",
+      "sourceBinding": {
+        "caseId": "2026-08-27-in-focus-4",
+        "tenantId": "toc",
+        "sessionId": "2026-08-27-in-focus-4",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-08-27-in-focus-4/claims.json",
+            "sha256": "14431f31571476ee525800c5d868a445b6e8b2219f174c6bef52b39e05fee735",
+            "normalizedLfSha256": "b0797f2bbde03e7545b3a606e697eac9788b620da172c4a47e1f636f8dd05d05",
+            "bytes": 1162
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+            "sha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+            "normalizedLfSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+            "bytes": 57407
+          }
+        }
+      },
+      "sourceTurns": 51,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+          "bytes": 68620
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-08-27-in-focus-4/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "b0797f2bbde03e7545b3a606e697eac9788b620da172c4a47e1f636f8dd05d05",
+          "bytes": 1122
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 71,
+      "claimId": "2026-08-27-in-focus-4-c02",
+      "sessionId": "2026-08-27-in-focus-4",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "162065200bf00164cc45ea130b3c1f0598caf890e8377ee2a49dc4f58ad29e4e",
+      "sourceBindingSha256": "718ed04509468bb519435187d9de4d2cdf8d5a86b519f0142fec5009e53060f1",
+      "persistedClaim": {
+        "_id": "2026-08-27-in-focus-4-c02",
+        "tenantId": "toc",
+        "text": "Education & You runs a diagnostic test for every student before building their study plan.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-08-27-in-focus-4-t014",
+            "sessionId": "2026-08-27-in-focus-4"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-08-27-in-focus-4",
+          "turnId": "2026-08-27-in-focus-4-t014",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+              "sha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+              "normalizedLfSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+              "bytes": 57407
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-27-in-focus-4-t014",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-27-in-focus-4",
+                  "speakerRef": "Parthosh",
+                  "tStart": 1594,
+                  "tEnd": 1722,
+                  "text": "Okay. I'll keep going then. Um, and, um, and this is what I want us to sort of think about, you know. Um, as a community, we are really interested in helping students get into college, the best college that they can get into, the one that fits them best. But we also need to make sure that they're going to colleges prepared to succeed in those colleges, right? Um, and too often, for us, it's very difficult to address these two issues at the same time. College access and college success because college access has become so competitive, um, and so difficult that if you focus on anything apart from college access, getting into college while you're in school, you're probably not going to get into college, um, right? I mean, if you're constantly thinking about preparing for what's coming later, who's going to think about the present? But that's a problem. We need to find a way as a community of bringing this together. And I think that's what we're really interested in. Um, can we um uh, can can counselors and academic service providers such as Reco collaborate to getting students into college and also getting prepared for college? And that's a big part of what we believe in. Um, right, so now how does this come, how does this, now what does this all have to do with the application, right? So, this is a stage where students are preparing their applications, we want them to prepare great applications, and we want them to learn a lot while they prepare those applications. Um, right, so colleges are more likely to admit students who are going to succeed on their campus and who are going to be less likely to drift around aimlessly like the hamster that we saw, right? Um, so now, I'm going to talk a little bit about the two key reasons that, according to this book and a lot of other research, students actually lose their footing in college. And I experienced both these reasons personally. So, the first one, um, I'm going to introduce them both through exercises, so this is another element of activity. Um, could I have a volunteer, uh, to please read a passage, right? So, I'm going to turn the passage on and if anyone can just unmute and start. Okay. Please, someone just jump in."
+                },
+                "textSha256": "63173db1f3a1512fcdcfb33b692d1c94cb234d446d12535ac44ae80d0ae84dc8"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+              "bytes": 68620
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-27-in-focus-4-t014",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-27-in-focus-4",
+                  "speakerRef": "unknown",
+                  "tStart": 357,
+                  "tEnd": 416,
+                  "text": "Priyamvada Agarwal: So all our exams, be it the very basic IELTS, or be it any of the other exams, we try to run a diagnostic test for them. Which helps us analyze a student's detailed understanding, gaps, strengths, weaknesses, which teacher to map—because we have to understand from the child also that you know, there's a foundational error, a strategical error, what is required before we are able to make a personalized plan. Also, it gives the student an understanding of what are they mentally coming to face. Because, you know, some of these exams are really overwhelming, at times intimidating, and time-consuming. So if a child comes without thinking of the amount of time they have to spend, just hearing peers or looking at Instagram, it's not going to help. This is like a reality check."
+                },
+                "textSha256": "c8094703f7288857ebe432771e5f252159f03e100cf479db93d55eeb02381465"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation discusses college access, preparation, and reading exercises; it does not describe Education & You diagnostics or individualized study plans.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 72,
+      "claimId": "2026-08-27-in-focus-4-c03",
+      "sessionId": "2026-08-27-in-focus-4",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "96a45970c927ad0e45ce27d4657e75c31c274d07e3cc7daaa453eae79bb73a19",
+      "sourceBindingSha256": "718ed04509468bb519435187d9de4d2cdf8d5a86b519f0142fec5009e53060f1",
+      "persistedClaim": {
+        "_id": "2026-08-27-in-focus-4-c03",
+        "tenantId": "toc",
+        "text": "Google's NotebookLM was cited in the Q&A as a productive tool for reading comprehension, used to summarize dense readings.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-08-27-in-focus-4-t102",
+            "sessionId": "2026-08-27-in-focus-4"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-08-27-in-focus-4",
+          "turnId": "2026-08-27-in-focus-4-t102",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+              "sha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+              "normalizedLfSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+              "bytes": 57407
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+              "bytes": 68620
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-27-in-focus-4-t102",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-27-in-focus-4",
+                  "speakerRef": "unknown",
+                  "tStart": 2959,
+                  "tEnd": 2998,
+                  "text": "Paritosh K.: Yeah. Yeah, Neeraj, I mean, the question is, \"What AI tools can be used for better reading and writing?\" I'm not sure about writing, but definitely for reading, we use NotebookLM a lot, which is one of Google's tools. So you upload the reading into NotebookLM, and then you ask it specific things that you want sort of fleshed out and explained, and then it can kind of create like a podcast episode that discusses that thing. It's really good. We use it all the time for our students, and we encourage our students to use AI all the time. So that's a big part of of what we focus on, is is you use the AI and then come and let's talk. So."
+                },
+                "textSha256": "6cec7524caa0af3633ba8011a12ea33bf704defed88a13cdd69480a6e81a71ab"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "The current literal citation has no matching turn record.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

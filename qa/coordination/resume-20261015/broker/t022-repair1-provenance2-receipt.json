@@ -1,0 +1,39 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=^executed provenance ",
+    "scripts/eval/human-calibration.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\163262f05ca48b9786acac31a437685e5c89394521574e363f25c75b32a6920d.json",
+    "sha256": "163262f05ca48b9786acac31a437685e5c89394521574e363f25c75b32a6920d",
+    "count": 56
+  },
+  "environmentWhitelistSha256": "f00c2cff115dd60b715adf069fe6f646a5ae3c12435ceeb0810dc3a4b7276623",
+  "beforeMatch": true,
+  "maxJobSeconds": 45,
+  "accounting": "MAKER ACCEPTANCE current T022, not checker",
+  "pid": 3136,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 1.9529999999977008,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t022-repair1-provenance2.log",
+    "sha256": "3746a41334698b33ddbe74d1bd61b5c926fe66c7df5cf93ec501603e5924feb6"
+  },
+  "counts": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

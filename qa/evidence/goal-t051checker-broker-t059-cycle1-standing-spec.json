@@ -1,0 +1,35 @@
+{
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts",
+    "apps/api/src/evaluation-flywheel/router.test.ts",
+    "apps/api/src/evaluation-flywheel/composition.test.ts"
+  ],
+  "pins": {
+    "apps/api/src/evaluation-flywheel/ask.ts": "b7aadf3a11ff2745514c03dd89062ff5cede73bc907a40667373714a0cbd1bd0",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "c58aff9cc1706df18bc9b2c8d2386a2cfb5fa77a57c3ea1001b5fbf8ead58c5d",
+    "apps/api/src/evaluation-flywheel/receipts.ts": "a6eb0492e8382288cf142c3848726d01bc3a3fc1ab93d90817c36e8d30ff38f3",
+    "apps/api/src/evaluation-flywheel/router.test.ts": "1c894b6f4090b6158e0ce405bec831ddaab64546bcc02c55bd3e339871d311d5",
+    "apps/api/src/evaluation-flywheel/router.ts": "3556ffbcb10d11cd1be60199027fbad41d002123d2369d851eda35117041b279",
+    "apps/api/src/evaluation-flywheel/store.ts": "bc5896226b0dab2f27d2e808a3153d7fd8bd62109abd93ab575b25115104ea8a",
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "6bd2229d3499ccb532a585a7325dcb8052250b22931978768e45f5608ffbd13f",
+    "apps/api/src/evaluation-flywheel/types.ts": "c1b031c9964dc26a835c410b3034760f6f2a307a73938015bc091e9c41b7003f",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "7fc46d1257e46579d85e985e70858623e2b43720adffecffdaa2419abd3496b7",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "d480ccc350e9fad85f7541f4fab6b03c1a2669bdf814d42842c7c5741ccef7e7",
+    "packages/core/src/generated/eval_runs.ts": "c6392ee60821c797ce773e37f8060d01282adb8234354aa80fcf307b8c16fd97",
+    "packages/core/src/generated/gaps.ts": "8ef8cb321c0198068a4d4642b817d69421108a7b9d33f0a0ebb742ec9a9eefbf",
+    "schema/eval_runs.schema.json": "0401d26c2e7d0f68c9b998769d40bfd25b6728af36416b0f0438fa82866e9742",
+    "schema/gaps.schema.json": "dc5792e0f1778d2da7724592c14fa1f702b58cd816cf74d9b52b4d3b4fc80563",
+    "apps/api/src/composition/integrations/evaluation.ts": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28",
+    "qa/evidence/goal-t059-checker-probe.ts": "b056b465a89ff02725a04cc1b79213be8bd67cffab104619fd3b02d9c7d82e59",
+    "qa/evidence/goal-t059-checker-rows.py": "afec2ee5c4b9076c327ad5dd62ef03a136b171d0b16f7219447d1619e985eeb0",
+    "qa/evidence/goal-t059-maker/rows.json": "6fe1f1ee906c9a0fbd65086dd77d82aca89ef78df402a9cf6b38092b864b78c9"
+  },
+  "timeoutMs": 120000,
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "output": "qa/evidence/goal-t051checker-broker-t059-cycle1-standing"
+}

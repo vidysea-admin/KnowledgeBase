@@ -1,0 +1,1188 @@
+{
+  "version": 1,
+  "batch": 3,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-05-28-in-focus-1",
+      "tenantId": "toc",
+      "sessionId": "2026-05-28-in-focus-1",
+      "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+      "sourceBinding": {
+        "caseId": "2026-05-28-in-focus-1",
+        "tenantId": "toc",
+        "sessionId": "2026-05-28-in-focus-1",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-28-in-focus-1/claims.json",
+            "sha256": "3c7fe2f9cb069b90fd157465388e2523e689366eeebf38d07e5bf556a680a3c2",
+            "normalizedLfSha256": "92dd436ea5dbb190d351d4ee541e1da02594e1c9a8c5f6e5316e5811336ee0fd",
+            "bytes": 1148
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+            "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+            "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+            "bytes": 52264
+          }
+        }
+      },
+      "sourceTurns": 59,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+          "bytes": 65053
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "92dd436ea5dbb190d351d4ee541e1da02594e1c9a8c5f6e5316e5811336ee0fd",
+          "bytes": 1108
+        }
+      }
+    },
+    {
+      "caseId": "2026-05-29-decoding-ever-expanding-cast",
+      "tenantId": "toc",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+      "sourceBinding": {
+        "caseId": "2026-05-29-decoding-ever-expanding-cast",
+        "tenantId": "toc",
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/claims.json",
+            "sha256": "76269dce42d0c0a1a1c4f2272c93944ba1883ec8bdaa00fd62035404b182b655",
+            "normalizedLfSha256": "479f7b6bb6a3f88ad11dcc043e9694d5c55edeed6aff3dd62b7ffecbca8d47e9",
+            "bytes": 1378
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+            "sha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+            "normalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+            "bytes": 13815
+          }
+        }
+      },
+      "sourceTurns": 15,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+          "bytes": 115627
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "479f7b6bb6a3f88ad11dcc043e9694d5c55edeed6aff3dd62b7ffecbca8d47e9",
+          "bytes": 1338
+        }
+      }
+    },
+    {
+      "caseId": "2026-06-03-dual-enrollment-pathway",
+      "tenantId": "toc",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+      "sourceBinding": {
+        "caseId": "2026-06-03-dual-enrollment-pathway",
+        "tenantId": "toc",
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/claims.json",
+            "sha256": "2871585795dde4b05b603344207e6ba98f2dc1594756bd6d629d9a49dcc7679d",
+            "normalizedLfSha256": "5bb0eeda41f1fadfbd49225f50827b88caa00a7a7662c5de50369e5ab8ac815a",
+            "bytes": 1315
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+            "sha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+            "normalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+            "bytes": 88408
+          }
+        }
+      },
+      "sourceTurns": 90,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [
+        "2026-06-03-dual-enrollment-pathway-t026"
+      ],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+          "bytes": 121735
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "5bb0eeda41f1fadfbd49225f50827b88caa00a7a7662c5de50369e5ab8ac815a",
+          "bytes": 1275
+        }
+      }
+    },
+    {
+      "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "tenantId": "toc",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+      "sourceBinding": {
+        "caseId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "tenantId": "toc",
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/claims.json",
+            "sha256": "124d5944e4a633718e3e14599e759a33a672570422a1633b559c2868b61f886a",
+            "normalizedLfSha256": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a",
+            "bytes": 2197
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+            "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "bytes": 71001
+          }
+        }
+      },
+      "sourceTurns": 38,
+      "sourceClaims": 4,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+          "bytes": 88391
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a",
+          "bytes": 2140
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 21,
+      "claimId": "2026-05-28-in-focus-1-c02",
+      "sessionId": "2026-05-28-in-focus-1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "83105f0b1271296f6d3f2f0b6817336c39d225b8487f9d0cc25465cadbf9a615",
+      "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+      "persistedClaim": {
+        "_id": "2026-05-28-in-focus-1-c02",
+        "tenantId": "toc",
+        "text": "Innovique secures a copyright certificate from the Government of India for student passion-project inventions.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-28-in-focus-1-t041",
+            "sessionId": "2026-05-28-in-focus-1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-28-in-focus-1",
+          "turnId": "2026-05-28-in-focus-1-t041",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+              "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+              "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+              "bytes": 52264
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-28-in-focus-1-t041",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-28-in-focus-1",
+                  "speakerRef": "Makrand",
+                  "tStart": 2476,
+                  "tEnd": 2478,
+                  "text": "I will hand over to Pranav Patel."
+                },
+                "textSha256": "a93d7b0050ad39afcfae1e72bb10b64507bd4ca986943cfe48b0bc5aa84f8563"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+              "bytes": 65053
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-28-in-focus-1-t041",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-28-in-focus-1",
+                  "speakerRef": "unknown",
+                  "tStart": 1095,
+                  "tEnd": 1128,
+                  "text": "Makrand Rajadhyaksha: Sure. A quick case study: passion project in sustainable soundproof materials. This was done by a student at Manastu Space Technologies. The point I'm trying to make out here is that we may not go after any awards, but we would do something which is more credible. And what we do in terms of passion projects is actually secure a copyright certificate from the Government of India that favors the student and the MSME."
+                },
+                "textSha256": "5a4f84219273491d4044acbea4cf02edd20ded4d522d409e233529751bde9eb3"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation hands over to Pranav Patel without mentioning Innovique, copyright certificates, or government registration.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 22,
+      "claimId": "2026-05-28-in-focus-1-c03",
+      "sessionId": "2026-05-28-in-focus-1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "5f71f93859f59ca0b5e97a5623ff53c60b6eaf6ea85387b5c5bae4d49048d221",
+      "sourceBindingSha256": "3f651d130d02b2ca4452f3a2aec8cfdccacbab8e711c21aadc8a5869c1cb9556",
+      "persistedClaim": {
+        "_id": "2026-05-28-in-focus-1-c03",
+        "tenantId": "toc",
+        "text": "Artiste 360 students produce 12-15 final portfolio works as part of its flagship program.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-28-in-focus-1-t056",
+            "sessionId": "2026-05-28-in-focus-1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-28-in-focus-1",
+          "turnId": "2026-05-28-in-focus-1-t056",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+              "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+              "normalizedLfSha256": "155e69c048c3c12f2dafddf32db6db0d1ed88f5dd38769276c668e03ae74fc7c",
+              "bytes": 52264
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-28-in-focus-1-t056",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-28-in-focus-1",
+                  "speakerRef": "Makrand",
+                  "tStart": 2968,
+                  "tEnd": 2969,
+                  "text": "Thank you very much."
+                },
+                "textSha256": "9e41164cb68b90cf8133a32422dceef505ce83d054281d47edff7b018531e88c"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+              "bytes": 65053
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-28-in-focus-1-t056",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-28-in-focus-1",
+                  "speakerRef": "unknown",
+                  "tStart": 1546,
+                  "tEnd": 1589,
+                  "text": "Yavya Jain: So students create 12 to 15 final works based on the requirements of international colleges, like the ones in the UK, US, Singapore, Australia, and beyond. They work 1-on-1 with our team of specialized artists and designers to create original works. So throughout the year, every piece that they create is an extension of who they are. It's about their identity and their representation of that. It's how they see the world, what they care about, etc. So originality is at the foundation, and we teach them the critical as well as creative thinking skills to achieve this."
+                },
+                "textSha256": "d0bba2f78ef493f0a942a5436a0ede735eede7829e20c20596b6fd266ee46b6a"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation says thanks without identifying Artiste 360 or a portfolio work count.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 23,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c01",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "ab263e74574f25c3a6efea970c92a910150eec33de52077700813db1d7194ea9",
+      "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+      "persistedClaim": {
+        "_id": "2026-05-29-decoding-ever-expanding-cast-c01",
+        "tenantId": "toc",
+        "text": "The facilitators mapped out roughly 24 distinct professional roles active across a student's educational journey.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+          "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+              "sha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+              "normalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+              "bytes": 13815
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-29-decoding-ever-expanding-cast-t012",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+                  "speakerRef": "Bhakti",
+                  "tStart": 389,
+                  "tEnd": 446,
+                  "text": "Yeah, I mean, that's a That's a fair point. The parent is missing because the parent is the So, if you look at, uh, how we are looking at this, the parent, the family, the student is in the center of it. Right? This is the They are the sun. We're talking about the planets that are revolving around them, the the surrounding ecosystem. That's but obvious. The family is in the center and, uh, that's not a professional. That's not an organization, right, that's external. Exactly, Jay, parents are internal, families are internal. So, we're not talking about them in the, like you said, Shweta, in the formal structure, but absolutely, like they are core. And and again, I think that's a whole conversation for a separate workshop which is also, by the way, a great segue into the next segment that Amrita is going to talk about the next slide. But, um, the whole conversation around the role of the parent and is the parent and the student one unit or are we looking at them as two different units? That's a great conversation to have. Right."
+                },
+                "textSha256": "8e9b2b2d1efbab1858ad43e53fc1cc85374493a7ff5509454c65b59529b7f602"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+              "bytes": 115627
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-29-decoding-ever-expanding-cast-t012",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+                  "speakerRef": "unknown",
+                  "tStart": 253,
+                  "tEnd": 303,
+                  "text": "Bhakti: So this is the current cast. These are the roles. So we actually mapped them out and they are 24 at this point and we could well be missing some of them. You know, we really, really scratched our heads and we were like, kaun, kaun, kaun? [who, who, who?] and we were like looking at every step in the lifecycle and and this is what we were able to come up with based on our experience and everything. I mean, I literally went through the Outreach Collective member directory, I was looking at all the roles everyone plays and this is basically the the cast. At this point according at at our count, it's 24, but Devesh, you could well be right, it could be over 50. These are umbrellas, right? Like these are umbrella categories. So yes, there could be subcategories within them, but these are the broader categories that we have mapped."
+                },
+                "textSha256": "0c860e216eb6e89fa34fbac3c93e40374adb37babe3e346d36f1779324913a9f"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation explains families as central and external professionals as the surrounding ecosystem; it supplies no mapped count of approximately 24 roles.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 24,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "f47e4ec5fde87e4fad4d537270d3b56e466e82b9aba27726dd8cfa326a0de122",
+      "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+      "persistedClaim": {
+        "_id": "2026-05-29-decoding-ever-expanding-cast-c02",
+        "tenantId": "toc",
+        "text": "75% of workshop participants identified university enrollment-yield goals versus family cost reality as the ecosystem's sharpest tension.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+          "turnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+              "sha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+              "normalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+              "bytes": 13815
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+              "bytes": 115627
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-29-decoding-ever-expanding-cast-t161",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+                  "speakerRef": "unknown",
+                  "tStart": 3861,
+                  "tEnd": 3890,
+                  "text": "Bhakti: Okay, awesome, awesome. All right, so good, good. So we're looking at currently 75% of you, and the largest is universities' enrollment goals versus families' cost reality. I actually did not expect this to come out on top. I was actually thinking it would be between one and two: the pre-enrollment agent and first-fit counseling, and school counselor capacity and family expectations. Amrita, go for it. This is so interesting."
+                },
+                "textSha256": "625c55181dbde80d31091d5eb162dcd445859feb00c0ca1b1d065b0e3a0679c7"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "The current literal citation has no matched source record.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 25,
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "6cc988461d01c9222236a99eed6bb2325ef5b8c8e9fac92fb7486d5935d5551e",
+      "sourceBindingSha256": "dbef499161c63e775b7131f4f89e681a9325c634a8c0e1f5fd71fce7c642d0aa",
+      "persistedClaim": {
+        "_id": "2026-05-29-decoding-ever-expanding-cast-c03",
+        "tenantId": "toc",
+        "text": "One proposed rule of engagement is to respect professional hand-offs and stay in your own lane of expertise.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+            "sessionId": "2026-05-29-decoding-ever-expanding-cast"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+          "turnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+              "sha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+              "normalizedLfSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+              "bytes": 13815
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "f71d34bcd4de42e8dee814bff2a5761ced144a7ce92ad25d294078970a85e974",
+              "bytes": 115627
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-29-decoding-ever-expanding-cast-t190",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+                  "speakerRef": "unknown",
+                  "tStart": 4759,
+                  "tEnd": 4792,
+                  "text": "Bhakti: Respect the handoff, okay? I think like don't reach past the introduction, right? Like, you know, if if you have been sort of put in touch with a student, right, respect and be in your lane, and it kind of ties in with the next one also: there's a specific expertise that has been, you know, that has the case has come to you for, stick to that, you know. Don't overreach, don't try to poach, and I think these are basic professional rules that everyone should follow, ideally."
+                },
+                "textSha256": "20150db26d666e3695d7a69a69068e157f3c37d3a33ac17a0965b4634dc67d75"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match; historical text does not substitute for current evidence.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 26,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c01",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "500b4cc44d51876fa2adf4fe7d58d29a23f4329dd084130f503db7e0f416f799",
+      "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+      "persistedClaim": {
+        "_id": "2026-06-03-dual-enrollment-pathway-c01",
+        "tenantId": "toc",
+        "text": "Roughly 80% of US high school students now have access to some form of dual-enrollment program.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t015",
+            "sessionId": "2026-06-03-dual-enrollment-pathway"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-03-dual-enrollment-pathway",
+          "turnId": "2026-06-03-dual-enrollment-pathway-t015",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+              "sha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+              "normalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+              "bytes": 88408
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-03-dual-enrollment-pathway-t015",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-03-dual-enrollment-pathway",
+                  "speakerRef": "Niharika Sondi",
+                  "tStart": 1029,
+                  "tEnd": 1054,
+                  "text": "I would like to ask Stephen this question then. What kind of students actually benefit from the dual enrollment opportunities? Who are the kind of students who can thrive in these programs? Or are these, this program specifically for a certain section, like the top academic performers or goal-driven students, or they are for a much wider range of students who can benefit from them?"
+                },
+                "textSha256": "83ec426023ecc373725bfe5a1b1bf639ab420e95835ae9746236b9a45e3fe63a"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+              "bytes": 121735
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-03-dual-enrollment-pathway-t015",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-03-dual-enrollment-pathway",
+                  "speakerRef": "unknown",
+                  "tStart": 336,
+                  "tEnd": 355,
+                  "text": "Justin Osborn: Now these kind of programs have been going on for a very long time in the United States. Over 50 years ago, the first dual enrollment program happened, and about 80% of US students now have access to some type of dual enrollment program. So it's very, very common."
+                },
+                "textSha256": "cfa61dca091fa0140214637c7915d1557b313317b66d33c19135290c78f609b1"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn asks which students benefit from dual enrollment; it provides no access percentage.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 27,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "ff4fddbb96eb8026ce1d4b3098ce0eabab40d0ccc84c0524149d0e71dd314168",
+      "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+      "persistedClaim": {
+        "_id": "2026-06-03-dual-enrollment-pathway-c02",
+        "tenantId": "toc",
+        "text": "Universities typically treat around 30 transferable credits as equivalent to about one academic year.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t092",
+            "sessionId": "2026-06-03-dual-enrollment-pathway"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-03-dual-enrollment-pathway",
+          "turnId": "2026-06-03-dual-enrollment-pathway-t092",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+              "sha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+              "normalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+              "bytes": 88408
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+              "bytes": 121735
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-03-dual-enrollment-pathway-t092",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-03-dual-enrollment-pathway",
+                  "speakerRef": "unknown",
+                  "tStart": 2352,
+                  "tEnd": 2355,
+                  "text": "Niharika Sondhi: So 30 credits would be almost like a year."
+                },
+                "textSha256": "30889ddee8b0f3251de920c13f86de0d92d9709c94854da20a789a58f9f670ce"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 28,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c03",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "05c75e750c83654b5a953552914079fcd8d4d524a8e3ca1942c96ab3d4dbb907",
+      "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+      "persistedClaim": {
+        "_id": "2026-06-03-dual-enrollment-pathway-c03",
+        "tenantId": "toc",
+        "text": "A student's classification as freshman versus transfer depends on whether their college credits were earned while still enrolled in high school.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t087",
+            "sessionId": "2026-06-03-dual-enrollment-pathway"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-03-dual-enrollment-pathway",
+          "turnId": "2026-06-03-dual-enrollment-pathway-t087",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+              "sha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+              "normalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+              "bytes": 88408
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-03-dual-enrollment-pathway-t087",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-03-dual-enrollment-pathway",
+                  "speakerRef": "Michelle Prince Spetz",
+                  "tStart": 3678,
+                  "tEnd": 3721,
+                  "text": "I think so because, you know, we know that those students have been challenged in those college-level courses, right? I know, when I'm looking at a student's application, if they've taken college-level courses, um, you know, of course, if they were available to them, that that student has taken something a little bit more rigorous than the traditional course, right? Um, or maybe they took the traditional course in um, physics for example, and then they took a college-level physics course, or an English course, or or what it might be, right? And so, you know, I do think that they are more prepared um, and when we're looking at their applications, we know that, um, you know, we know that they've challenged themselves with that additional rigor, and do look at that favorably."
+                },
+                "textSha256": "330e6e548ca2b463082f8f1f76a24133c739a7a4b8613129b68e3293a5e3bd28"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+              "bytes": 121735
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-03-dual-enrollment-pathway-t087",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-03-dual-enrollment-pathway",
+                  "speakerRef": "unknown",
+                  "tStart": 2173,
+                  "tEnd": 2217,
+                  "text": "Steven Fu: Yeah, that's a great question. So for at Ohio State, our definition for a freshman or new first-year student versus a transfer student depends on if you have enrolled in any college classes after you have graduated high school, right? So if you are a student who have taken dual enrollment classes during high school and then apply right after you graduate high school, you will still be a new first-year student. However, if you have graduated high school and then you're taking a gap year, and during that gap year you have taken, you know, college credits, then you will be classified as a transfer student."
+                },
+                "textSha256": "982a27faedffa942dda02da3ca8ee1e7096a39b6bd53e0724b5fadfb875f6935"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turn discusses college-course rigor and favorable application assessment, without freshman-versus-transfer classification rules.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 29,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c01",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "bafa3578b7917558ad05c3b8920dbe0f5b201cbf80017f931a789d2589d1a86d",
+      "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+      "persistedClaim": {
+        "_id": "2026-06-19-entrance-exams-pathways-india-part1-c01",
+        "tenantId": "toc",
+        "text": "Around 40,000 government engineering seats (NITs/IITs combined) exist against roughly 12 lakh JEE candidates -- the competition is effectively among the 40,000 seats, not the full applicant pool.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+          "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+              "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+              "bytes": 71001
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "Chirag",
+                  "tStart": 3069,
+                  "tEnd": 3071,
+                  "text": "Fine. Could you could you..."
+                },
+                "textSha256": "a3047a17fbde4b0786ec65f5273d5307afd51e2f8c8e34dceecf44e81f298834"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+              "bytes": 88391
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "unknown",
+                  "tStart": 465,
+                  "tEnd": 524,
+                  "text": "Anurag Tiwari: Number even looks into the lakhs. If you talk about JEE, 12, 13 lakh students. But one thing which is need to be remembered to every students, parents, and everyone: the competition is not among the lakhs of students, right? So, if you talk about the number of seats which are going to be offered to the to the students, specifically from government engineering colleges, NITs and IITs, these are close to 40,000 seats, right? So, so the competition is among 40,000 students. Not among the 12 lakh students, because every aspirant who is fighting for engineering seat, they are they are targeting for a government engineering college, either in NIT or IIT, right? So the first thing and the most important thing is to remember that, you know, you are going to fight for the 40,000 seats. So your competition is 40,000, no matter whether 12 lakh students are appearing or 20 lakh or, for that matter, just one lakh, right?"
+                },
+                "textSha256": "47a726a7dd30d88f77925b68b069dfcd657d95cd3c3ae88442a7b28fb3846a84"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+          "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+              "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+              "bytes": 71001
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "Ambika",
+                  "tStart": 3071,
+                  "tEnd": 3075,
+                  "text": "Yes, yes, please. How does one go for post-grad admissions in India?"
+                },
+                "textSha256": "79ccd6fd6faf8d6c875e633cf1045823499db6e7758beb9f9faea5eb70249d64"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+              "bytes": 88391
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "unknown",
+                  "tStart": 524,
+                  "tEnd": 573,
+                  "text": "Anurag Tiwari: Second thing which is very important: every entrance exam which happens in India, these are not the exams for selecting the students, rather these are the exams for rejecting ones. You just see the numbers. If 12 lakh students are appearing and only 40,000 have to get the seat, right, in in government engineering colleges in NITs and IITs, so 11 lakh 60,000 students have to be rejected. So actually, more number of students are going to be rejected in the entrance exam. So if if any anyone is, you know, considering that thing in mind that these are the exams for selection, let me tell you, this is not for selection. These exams are for rejection, given the fact that the population who are going to appear for the limited number of seats available in India, right?"
+                },
+                "textSha256": "9f2cb870563ab456d9432288b9509a2da90ab623c848f2269d716e547bcb3f76"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Cited turns contain an incomplete prompt and a postgraduate-admissions question, without engineering-seat or JEE-candidate figures.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 30,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "d3a8ef2cd6e421a9a8043009fd884e1434bd4085091bad6694a27b2d38238415",
+      "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+      "persistedClaim": {
+        "_id": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+        "tenantId": "toc",
+        "text": "Government MBBS seats are around 58,000-60,000 for 2026, producing a roughly 1:40 seat-to-qualified-candidate ratio.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+            "sessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+          "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+              "normalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+              "bytes": 71001
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+              "bytes": 88391
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+                  "tenantId": "toc",
+                  "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+                  "speakerRef": "unknown",
+                  "tStart": 1814,
+                  "tEnd": 1857,
+                  "text": "Chirag Khutia: So when I talk about the numbers, you know, so NEET aspirant, compared to what data is for last year, roughly around 22 lakh-plus students appeared the examination. But how many actually qualified? Roughly around 12 and 1/2 lakhs, so I mean at the 50th percentile. And same thing what Anurag mentioned, right, that real competition is for those government seat, which is about 58—you know, 60,000, which we'll be expecting in 2026. 50% of them are private and deemed, which are like really very expensive, so we have to consider that. So from the government seat perspective, the competition is 1:40. 40 students are competing for that one government seat."
+                },
+                "textSha256": "84effd6b87fd38a0164144ca847471b11efcaed06a7557aa7a212555098c7713"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "Current citation has no literal match.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

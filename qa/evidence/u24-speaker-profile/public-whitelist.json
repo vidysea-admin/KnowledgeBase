@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "unit": "u24-speaker-profile",
+  "fixCycle": 3,
+  "handshakeStatus": "checked-PASS",
+  "parentTaskStatus": "HOLD",
+  "publicationStatus": "Default-safe source whitelist candidate; no publication or checker acceptance claimed",
+  "ownedSourceAndTests": [
+    "packages/index/src/pipeline/speaker-profiles/profile.ts",
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts",
+    "apps/api/src/speaker-profiles/router.ts",
+    "apps/api/src/speaker-profiles/store.ts",
+    "apps/api/src/speaker-profiles/router.test.ts",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/indexing/speaker-suggest.ts",
+    "apps/api/src/indexing/speaker-suggest.test.ts"
+  ],
+  "selectedPublicQa": [
+    "qa/contracts/goal-U24.md",
+    "qa/evidence/u24-speaker-profile/public-whitelist.json"
+  ],
+  "requiredSyntheticFloor": [
+    "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "apps/api/src/indexing/testutils.ts",
+    "qa/evidence/u24-speaker-profile/broker-run-20261014T210625/scripted-producer-profile-responses.json"
+  ],
+  "excluded": [
+    "qa/evidence/u24-speaker-profile/actual-toc-api-response.json",
+    "qa/evidence/u24-speaker-profile/corpus-accounting.json",
+    "qa/evidence/u24-speaker-profile/scripted-producer-profile-responses.json",
+    "qa/evidence/u24-speaker-profile/broker-run-20261014T211701/**",
+    "qa/evidence/goal-t051checker-broker-u24-maker*",
+    "qa/manifests/u24-speaker-profile.md",
+    "data/toc-migrated/**",
+    "raw/TOC/**",
+    "source-before backups, dependency-only pin files, broad QA, private payloads and any source/data archive",
+    "packages/db/src/collections/speaker-suggestions.ts",
+    "packages/db/src/collections/speaker-suggestions.test.ts",
+    "qa/evidence/u24-speaker-profile/broker-run-20261014T210625/actual-toc-api-response.json"
+  ],
+  "exclusionNotes": [
+    "ROOT/runtime approved exactly one auditor-verified public synthetic artifact exception: broker-run-20261014T210625/scripted-producer-profile-responses.json. All authentic payloads and every other producer archive remain excluded.",
+    "The full local manifest includes authentic-derived identity/session metadata and private artifact references; it is not selected for publication. This JSON supplies only the public cycle/building/HOLD handshake.",
+    "The existing DB suggestion accessor/test lease was unused by this maker; those files are not maker-owned changes.",
+    "Canonical schema/generated files, central server/production/App and T055 consumers are owned and selected centrally, not by this whitelist."
+  ],
+  "sourceAudit": {
+    "method": "Root-authorized finite privacy source and SDK test typing repair; default-off private input gates unchanged. No test CPU/Git/publication by maker.",
+    "copiedAuthenticPrivateQuoteLiteralsFound": false,
+    "privateQuoteReadsAtRuntime": true,
+    "evidenceDirectoryEnvironmentIsAnInputGate": false,
+    "note": "Both authentic tests are now default-off before input access; authored public synthetics remain runnable. No synthetic oracle replaces authentic assertions.",
+    "publicSourcePins": {
+      "packages/index/src/pipeline/speaker-profiles/profile.ts": "6BE5B7EDE88B2887FE4C7A5E1ADB4B573B2303A8422B2185F64080CF8D873386",
+      "apps/api/src/speaker-profiles/router.ts": "18BAC45B3D9316CBD9FE7866AD79D8FE8148FEA4CC6DEA3D351F23883BFF37F7",
+      "apps/api/src/speaker-profiles/store.ts": "A57C28DB9DDEDC697669158B3B352C5C773592F607458DDFDB4E1427B57CB449",
+      "apps/api/src/speaker-profiles/store.test.ts": "1993644948C2CE298D2F0AE267420154F72D6C18D58A8FD87605C2A7401F59F0",
+      "apps/api/src/indexing/speaker-suggest.ts": "2B58A82039C070F0BE158FED4DF349E31E485E37893A7F578F2BD4A1C4B16667",
+      "apps/api/src/indexing/speaker-suggest.test.ts": "3ECF81D258E7ED79E7256821984E48B4CF5C4F32E6B2F2DFBA45DC9D954BAE86",
+      "packages/index/src/pipeline/speaker-profiles/profile.test.ts": "F5040A6919995C1D8C7522EE3606D21CC7BF997D915E9CAAA1EDE2542BC38BD7",
+      "apps/api/src/speaker-profiles/router.test.ts": "5A92A1DB666B947EC5099681E2687539D0BB8B320082691C7278DFDCC258304F"
+    },
+    "privateReadOptIn": "KB_U24_PRIVATE_TOC_TESTS must equal literal 1; U24_EVIDENCE_DIR remains output-only"
+  },
+  "publicSyntheticCommands": [
+    {
+      "command": "node --test --test-timeout=60000 --test-concurrency=1 --import tsx packages/index/src/pipeline/speaker-profiles/profile.test.ts apps/api/src/speaker-profiles/store.test.ts apps/api/src/speaker-profiles/router.test.ts apps/api/src/indexing/speaker-suggest.test.ts",
+      "expectedTests": 40,
+      "evidence": "Prospective runnable scope only. Current shared helper field-reference privacy repair requires fresh checker8+metadata2+fieldref2 and affected store7+helper4; original receipts retained.",
+      "dataClass": "Authored synthetic fixtures, scripted provider, predicate-enforcing in-memory DB, ephemeral loopback HTTP; no authentic corpus.",
+      "environment": "KB_U24_PRIVATE_TOC_TESTS=0; private callbacks default skip before reads. Existing node/tsx dependencies required. Sole ordinary coordinator owns validation.",
+      "executedDuringThisWhitelistRequest": false,
+      "expectedDefaultPrivateSkips": 2,
+      "expectedRunnableSyntheticCases": 38
+    }
+  ],
+  "remainingGates": [
+    "Whole parent live model precision, real Mongo persistence/MVCC/human confirmation, private authentic store/consumer and semantic persona producer acceptance remain HOLD",
+    "No commit/deployment/native/container/live evidence inferred from bounded worktree checked-PASS"
+  ],
+  "privateInputGates": [
+    {
+      "path": "packages/index/src/pipeline/speaker-profiles/profile.test.ts",
+      "sha256": "F5040A6919995C1D8C7522EE3606D21CC7BF997D915E9CAAA1EDE2542BC38BD7",
+      "gate": "KB_U24_PRIVATE_TOC_TESTS=1",
+      "default": "SKIP with explicit private-input HOLD reason",
+      "ordering": "Node test skip option is evaluated before callback; every authentic corpus read/stat/parse is inside callback",
+      "assertions": "Original real assertions preserved"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.test.ts",
+      "sha256": "5A92A1DB666B947EC5099681E2687539D0BB8B320082691C7278DFDCC258304F",
+      "gate": "KB_U24_PRIVATE_TOC_TESTS=1",
+      "default": "SKIP with explicit private-input HOLD reason",
+      "ordering": "Node test skip option is evaluated before callback; every authentic corpus read/stat/parse is inside callback",
+      "assertions": "Original real assertions preserved"
+    }
+  ],
+  "approvedPublicSyntheticArtifact": {
+    "path": "qa/evidence/u24-speaker-profile/broker-run-20261014T210625/scripted-producer-profile-responses.json",
+    "sha256": "98948CAE1B8F3D812346AC2528B822A616ED81B707FB62F33CD7005B731D2C62",
+    "authority": "Exact ROOT-approved exception confirmed by docker_runtime",
+    "proofClass": "synthetic-scripted-provider-in-memory-db",
+    "actualProducer": true,
+    "liveProviderCalls": 0,
+    "liveDatabaseWrites": 0,
+    "privateSourceInput": false,
+    "authenticityClaim": false
+  },
+  "currentScopedProof": {
+    "fixCycle": 3,
+    "originalRecordedCases": 19,
+    "distinctAddedHelperControls": 4,
+    "actualPass": 23,
+    "fail": 0,
+    "skip": 0,
+    "drift": 0,
+    "issueCorpusCounts": {
+      "ISS-U24PROFILECHECK-002": "2/2",
+      "ISS-U24PROFILECHECK-003": "2/2",
+      "ISS-U24PROFILECHECK-001": "6/6"
+    },
+    "coherentInputs": 1951,
+    "coherentCheckpointSha256": "53A5CFB891DAA746F88DC6AB8068AB9A3F6A3E89B4FCAFE48247380BA504C9EE",
+    "allFourTypesBuildExit": 0,
+    "proofClass": "authored-public-synthetic-disconnected-sdk-capability-and-worktree-compiler-build",
+    "realMongoMvcc": false,
+    "privateSourceRead": false,
+    "liveProvider": false,
+    "commitAttestation": false,
+    "parentAcceptance": "HOLD",
+    "originalFailureReceiptsPreserved": true,
+    "checkerVerdictSha256": "1AF412AF491320D849024D73290829B9CC2BA6336B731866C73238585658E085",
+    "checkerCycle": 3,
+    "boundedVerdict": "PASS"
+  }
+}

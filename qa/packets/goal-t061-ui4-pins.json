@@ -1,0 +1,19 @@
+{
+  "task": "T-061",
+  "cycle": 0,
+  "resubmission": "canonical-long-document-id",
+  "command": "pnpm --filter @lkb/web exec vitest run --maxWorkers=1 --minWorkers=1 src/pages/automation/ApplicationFormsPage.test.tsx",
+  "expectedCases": 4,
+  "sourcePins": {
+    "apps/web/src/pages/automation/ApplicationFormsPage.tsx": "b92bc52d6a84c73d8c4b8d06c6ce526bb34284babcc950dd099171435b417034",
+    "apps/web/src/pages/automation/ApplicationFormsPage.test.tsx": "158618d66c3147f2857a982f90d02e183fbd00d8a3142d54aa31bec6747912dd",
+    "apps/web/src/auth/AuthContext.tsx": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/src/setupTests.ts": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/tsconfig.json": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "tsconfig.base.json": "6bc2d632c06e482b900c73f73dd6c703b3791bd5b02b05aaf7701cd9ba417c47",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  }
+}

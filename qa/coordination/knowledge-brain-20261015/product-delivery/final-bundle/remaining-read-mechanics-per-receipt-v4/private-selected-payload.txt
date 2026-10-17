@@ -1,0 +1,322 @@
+FILE apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx L19-45
+19:  const generation = useRef(0);
+20:  useEffect(() => {
+21:    const stamp = ++generation.current;
+22:    setSessions([]); setOutputs([]); setSelected([]); setDraft(null); setEdits({}); setEditing(false); setBusy(false); setError(null); setLoading(true);
+23:    setTitle(""); setPurpose(""); setPolicyId(""); setEditTitle(""); setKind("faq");
+24:    setLoadFailed(false);
+25:    void Promise.all([listSessions(apiKey), listKnowledgeOutputs(apiKey)]).then(([sources, saved]) => {
+26:      if (stamp !== generation.current) return;
+27:      setSessions(sources.sessions); setOutputs(saved.outputs);
+28:    }).catch((e: unknown) => { if (stamp === generation.current) { setLoadFailed(true); setError(e instanceof ApiError ? e.message : "Could not load knowledge outputs."); } })
+29:      .finally(() => { if (stamp === generation.current) setLoading(false); });
+30:    return () => { generation.current++; };
+31:  }, [apiKey, sessionVersion]);
+32:  function show(next: KnowledgeOutputDraft): void {
+33:    setDraft(next); setEditTitle(next.title); setEdits({}); setEditing(false);
+34:    setOutputs((saved) => saved.map((output) => output.id === next._id
+35:      ? { id: next._id, title: next.title, kind: next.kind, revision: next.revision, updatedAt: next.updatedAt }
+36:      : output).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)));
+37:  }
+38:  async function action(fn: () => Promise<void>): Promise<void> {
+39:    if (busy) return;
+40:    setBusy(true); setError(null);
+41:    const stamp = generation.current;
+42:    try { await fn(); }
+43:    catch (e) { if (stamp === generation.current) setError(e instanceof ApiError ? `${e.message}${e.status === 409 ? " Reopen the draft or regenerate after reviewing changes." : ""}` : "Knowledge output operation failed."); }
+44:    finally { if (stamp === generation.current) setBusy(false); }
+45:  }
+
+FILE apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx L46-67
+46:  async function create(): Promise<void> {
+47:    const stamp = generation.current;
+48:    const next = await createKnowledgeOutput(apiKey, { kind, title, purpose, sessionIds: selected, ...(policyId.trim() ? { policyId: policyId.trim() } : {}) });
+49:    if (stamp !== generation.current) return;
+50:    show(next);
+51:    const saved = await listKnowledgeOutputs(apiKey); if (stamp === generation.current) setOutputs(saved.outputs);
+52:  }
+53:  async function open(id: string): Promise<void> {
+54:    const stamp = generation.current, next = await getKnowledgeOutput(apiKey, id);
+55:    if (stamp === generation.current) show(next);
+56:  }
+57:  async function save(): Promise<void> {
+58:    if (!draft) return;
+59:    const stamp = generation.current;
+60:    const next = await editKnowledgeOutput(apiKey, draft._id, { revision: draft.revision, title: editTitle, edits: Object.entries(edits).map(([id, text]) => ({ id, text })) });
+61:    if (stamp === generation.current) show(next);
+62:  }
+63:  async function validate(): Promise<void> {
+64:    if (!draft) return;
+65:    const stamp = generation.current, next = await revalidateKnowledgeOutput(apiKey, draft._id, draft.revision);
+66:    if (stamp === generation.current) show(next);
+67:  }
+
+FILE apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx L97-97
+97:    <section className="card"><h2>Saved drafts</h2>{!outputs.length && <p>{loadFailed ? "Saved drafts could not be loaded." : "No saved drafts."}</p>}<ul>{outputs.map((o) => <li key={o.id}><button disabled={busy} onClick={() => { void action(() => open(o.id)); }}>{o.title}</button> · {o.kind} · revision {o.revision}</li>)}</ul></section>
+
+FILE apps/web/src/pages/transcript-review/TranscriptReview.tsx L17-38
+17:  const current = useRef({ key: apiKey, sessionId, generation: 0 });
+18:  current.current.key = apiKey; current.current.sessionId = sessionId;
+19:  const snapshot = loaded?.key === apiKey && loaded.sessionId === sessionId ? loaded.value : null;
+20:  const notice = message?.key === apiKey && message.sessionId === sessionId ? message : null;
+21:  function resetDrafts() { setDrafts(new Map()); setReason(""); setSpeakerRef(""); setSpeakerLabel(""); setStart(0); setEnd(0); setConflict(false); }
+22:  async function load(reset = true, committedRevision?: string) {
+23:    const identity = { key: apiKey, sessionId, generation: ++current.current.generation };
+24:    const active = () => current.current.key === identity.key && current.current.sessionId === identity.sessionId && current.current.generation === identity.generation;
+25:    setBusy(true); setLoaded(null);
+26:    if (reset) { resetDrafts(); setMessage(null); }
+27:    try {
+28:      const value = await getTranscriptReview(apiKey, sessionId);
+29:      if (!active()) return;
+30:      if (committedRevision && value.revision !== committedRevision) throw new Error("Reload did not return the committed revision; reload again before editing.");
+31:      setLoaded({ key: apiKey, sessionId, value }); setSelected(value.turns[0]?._id ?? "");
+32:      return value;
+33:    } catch (error) {
+34:      if (active()) setMessage((previous) => ({ key: apiKey, sessionId,
+35:        text: `${!reset && previous?.key === apiKey && previous.sessionId === sessionId ? `${previous.text} ` : ""}${error instanceof Error ? error.message : "Transcript review unavailable"}`, error: true }));
+36:    } finally { if (active()) setBusy(false); }
+37:  }
+38:  useEffect(() => { void load(); return () => { current.current.generation++; }; }, [apiKey, sessionId]);
+
+FILE apps/web/src/pages/transcript-review/TranscriptReview.tsx L78-99
+78:  async function reloadAfterRefresh() {
+79:    const pending = load(false);
+80:    const identity = { ...current.current };
+81:    const value = await pending;
+82:    if (current.current.key !== identity.key || current.current.sessionId !== identity.sessionId || current.current.generation !== identity.generation) return;
+83:    if (value) setMessage({ key: apiKey, sessionId, error: value.refresh === "failed", text: value.refresh === "complete" ? "Knowledge refresh complete." :
+84:      value.refresh === "failed" ? "Knowledge refresh failed; existing answers may be stale." : "Knowledge refresh pending; existing answers may be stale." });
+85:    try { onCommitted?.(); } catch { /* reload truth remains intact */ }
+86:  }
+87:  return <section className="card" aria-label="Transcript review">
+88:    <h2>Transcript review</h2>
+89:    {notice && <p role={notice.error ? "alert" : "status"}>{notice.text}</p>}
+90:    <button onClick={() => void load()} disabled={busy && !!snapshot}>Reload transcript</button>
+91:    {!snapshot ? <p>{busy ? "Loading transcript review…" : "Transcript review unavailable."}</p> : <>
+92:      <p>Knowledge refresh: {snapshot.refresh}</p>
+93:      {snapshot.refresh !== "complete" && <p role="note" aria-label="Knowledge freshness warning">
+94:        Knowledge refresh {snapshot.refresh}; existing answers may be stale. {snapshot.refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below to update dependent knowledge."}
+95:      </p>}
+96:      {!!snapshot.orphanedTurnIds?.length && <p role="alert">Source passages changed after review. {snapshot.orphanedTurnIds.length} reviewed passage(s) no longer exist: {snapshot.orphanedTurnIds.join(", ")}. Their audit remains available; restore stable source passage identifiers before refreshing knowledge.</p>}
+97:      <ReviewHistory apiKey={apiKey} sessionId={sessionId} revision={snapshot.revision} refresh={snapshot.refresh} disabled={busy}
+98:        onRefreshed={reloadAfterRefresh} />
+99:      {snapshot.turns.length === 0 ? <p>No transcript turns to review.</p> : <>
+
+FILE apps/web/src/api/knowledge-outputs.ts L1-21
+1:import { apiFetch } from "./client.js";
+2:/** HTTP response projection, following api/types.ts's frontend boundary. The server alone owns collection shape. */
+3:export interface KnowledgeOutputDraft {
+4:  _id: string; tenantId: string; kind: "faq" | "report" | "meeting-brief"; title: string; purpose: string;
+5:  sessionIds: string[]; revision: number; createdAt: string; updatedAt: string; sourceDigest: string;
+6:  provider: string; model: string; reviewState: "draft";
+7:  sourceCoverage: { status: "ready" | "partial"; withheldClaims: number };
+8:  policy?: { policyId: string; version: number; questionClass: string; mode: "internal-only" | "internal-and-web"; style: "concise" | "detailed"; onInsufficient: "review" | "refuse"; citations: "required" };
+9:  sections: { key: string; title: string; missing: string; items: { id: string; text: string; kind: "fact" | "suggestion" | "question"; citationIds: string[]; validation: "ai-supported" | "needs-review"; assessmentDigest: string }[] }[];
+10:  citations: { id: string; claimId: string; turnId: string; sessionId: string; speakerRef: string; speakerLabel?: string; occurredAt?: string; start: number; end: number; unit: "seconds" | "characters"; quote: string; href: string }[];
+11:}
+12:export interface OutputSummary { id: string; title: string; kind: KnowledgeOutputDraft["kind"]; revision: number; updatedAt: string }
+13:const base = "/knowledge-outputs";
+14:const path = (id: string) => `${base}/${encodeURIComponent(id)}`;
+15:export const listKnowledgeOutputs = (key: string | null) => apiFetch<{ outputs: OutputSummary[] }>(base, key);
+16:export const getKnowledgeOutput = (key: string | null, id: string) => apiFetch<KnowledgeOutputDraft>(path(id), key);
+17:export const createKnowledgeOutput = (key: string | null, input: { kind: KnowledgeOutputDraft["kind"]; title: string; purpose: string; sessionIds: string[]; policyId?: string }) => apiFetch<KnowledgeOutputDraft>(base, key, { method: "POST", body: input });
+18:export const editKnowledgeOutput = (key: string | null, id: string, input: { revision: number; title: string; edits: { id: string; text: string }[] }) => apiFetch<KnowledgeOutputDraft>(path(id), key, { method: "PUT", body: input });
+19:export const revalidateKnowledgeOutput = (key: string | null, id: string, revision: number) => apiFetch<KnowledgeOutputDraft>(`${path(id)}/revalidate`, key, { method: "POST", body: { revision } });
+20:export const exportKnowledgeOutput = (key: string | null, id: string, revision: number) => apiFetch<{ markdown: string; filename: string }>(`${path(id)}/export`, key, { method: "POST", body: { revision } });
+21:
+
+FILE apps/web/src/pages/transcript-review/ReviewHistory.tsx L7-35
+7:  const identity = `${sessionId}\u0000${revision}`;
+8:  const current = useRef({ apiKey, identity, generation: 0 });
+9:  current.current.apiKey = apiKey; current.current.identity = identity;
+10:  const [state, setState] = useState<{ apiKey: string | null; identity: string; rows?: TranscriptReviewRevision[]; notice?: string; error?: string; busy?: boolean } | null>(null);
+11:  const visible = state?.apiKey === apiKey && state.identity === identity ? state : null;
+12:  useEffect(() => () => { current.current.generation++; }, [apiKey, identity]);
+13:  async function perform(action: "history" | "refresh") {
+14:    const sent = { ...current.current, generation: ++current.current.generation };
+15:    const active = () => current.current.apiKey === sent.apiKey && current.current.identity === sent.identity && current.current.generation === sent.generation;
+16:    setState({ apiKey, identity, busy: true });
+17:    try {
+18:      if (action === "history") {
+19:        const rows = await getTranscriptReviewHistory(apiKey, sessionId);
+20:        if (active()) setState({ apiKey, identity, rows });
+21:      } else {
+22:        const status = await refreshTranscriptReview(apiKey, sessionId, revision);
+23:        if (!active()) return;
+24:        setState({ apiKey, identity, notice: status === "complete" ? "Knowledge refresh complete." :
+25:          status === "failed" ? "Knowledge refresh failed. Retry when the service is available." : "Knowledge refresh remains pending." });
+26:        try { await onRefreshed(); } catch { /* a consumer exception cannot change a confirmed refresh receipt */ }
+27:      }
+28:    } catch (error) {
+29:      if (active()) setState({ apiKey, identity, error: error instanceof Error ? error.message : "Review operation unavailable" });
+30:    }
+31:  }
+32:  return <section aria-label="Review history and knowledge refresh">
+33:    <button disabled={disabled || visible?.busy} onClick={() => void perform("history")}>Show review history</button>
+34:    {refresh !== "complete" && <button disabled={disabled || visible?.busy} onClick={() => void perform("refresh")}>{refresh === "failed" ? "Retry knowledge refresh" : "Refresh knowledge"}</button>}
+35:    {visible?.busy && <p role="status">Loading review operation…</p>}
+
+FILE apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx L7-23
+7:export function TranscriptReviewPage(): React.ReactElement {
+8:  const { id } = useParams<{ id: string }>();
+9:  const { apiKey } = useAuth();
+10:  const [sessionId, setSessionId] = useState("");
+11:  const [opened, setOpened] = useState("");
+12:  const target = id ?? opened;
+13:  return <>
+14:    <h1>Transcript review and speaker mapping</h1>
+15:    <p>Select a session from the <Link to="/sessions">sessions library</Link>, or enter its session identifier.</p>
+16:    {!id && <form onSubmit={(e) => { e.preventDefault(); setOpened(sessionId.trim()); }}>
+17:      <label>Session identifier <input aria-label="Session identifier" value={sessionId} maxLength={400} onChange={(e) => setSessionId(e.target.value)} /></label>
+18:      <button disabled={!sessionId.trim()}>Open transcript</button>
+19:    </form>}
+20:    {target && <TranscriptReview apiKey={apiKey} sessionId={target} />}
+21:  </>;
+22:}
+23:
+
+FILE apps/web/src/api/transcriptReview.ts L16-32
+16:export async function getTranscriptReview(apiKey: string | null, sessionId: string): Promise<TranscriptReviewSnapshot> {
+17:  const v = await apiFetch<unknown>(base(sessionId), apiKey);
+18:  if (!obj(v) || v.sessionId !== sessionId || !revision(v.revision) || !refresh(v.refresh) || !Array.isArray(v.turns)) return invalid();
+19:  const ids = new Set<string>();
+20:  const turns = v.turns.map((t) => {
+21:    if (!obj(t) || !str(t._id) || ids.has(t._id) || typeof t.text !== "string" || !t.text.trim() || t.text.length > 20000 || t.text.includes("\u0000") || !str(t.speakerRef) ||
+22:        (t.speakerLabel !== undefined && !str(t.speakerLabel)) || typeof t.tStart !== "number" || typeof t.tEnd !== "number" ||
+23:        !Number.isFinite(t.tStart) || !Number.isFinite(t.tEnd) || t.tStart < 0 || t.tEnd < t.tStart) return invalid();
+24:    ids.add(t._id);
+25:    return { _id: t._id, text: t.text, speakerRef: t.speakerRef, tStart: t.tStart, tEnd: t.tEnd,
+26:      ...(t.speakerLabel !== undefined ? { speakerLabel: t.speakerLabel } : {}) };
+27:  });
+28:  if (turns.some((t, i) => i > 0 && t.tStart < turns[i - 1]!.tStart)) return invalid();
+29:  if (v.orphanedTurnIds !== undefined && (!Array.isArray(v.orphanedTurnIds) || !v.orphanedTurnIds.every(str) || new Set(v.orphanedTurnIds).size !== v.orphanedTurnIds.length || v.orphanedTurnIds.some((id) => ids.has(id)))) return invalid();
+30:  return { sessionId, revision: v.revision, turns, refresh: v.refresh,
+31:    ...(v.orphanedTurnIds !== undefined ? { orphanedTurnIds: v.orphanedTurnIds as string[] } : {}) };
+32:}
+
+FILE apps/web/src/api/transcriptReview.ts L62-70
+62:export async function refreshTranscriptReview(apiKey: string | null, sessionId: string, expectedRevision: string): Promise<TranscriptRefresh> {
+63:  if (!revision(expectedRevision)) throw new ApiError(400, "Invalid transcript revision");
+64:  const v = await apiFetch<unknown>(`${base(sessionId)}/refresh`, apiKey, { method: "POST", body: {}, headers: { "If-Match": `"${expectedRevision}"` } });
+65:  if (!obj(v) || v.sessionId !== sessionId || v.revision !== expectedRevision || !refresh(v.refresh) || !Array.isArray(v.completed) || !v.completed.every(str)) return invalid();
+66:  const targets = ["claims", "session-page", "chunks", "tree", "graph"];
+67:  if (v.completed.some((name, i) => name !== targets[i]) || v.refresh === "complete" && v.completed.length !== targets.length) return invalid();
+68:  return v.refresh;
+69:}
+70:
+
+CLAUSE qa/contracts/goal-t058.md C6 L12-12
+| C6 — Editable and revalidated | The user can edit the resulting draft and save/reopen it. Editing factual text cannot retain stale verified status or silently invent citation mappings. Any needed revalidation is explicit and durable. Source changes/deletion or stale revisions prevent unsafe acceptance/export; fresh checks use current authorized evidence. Adversarial edited fact, citation removal/replacement, concurrent writer and source-drift probes are required. |
+CLAUSE qa/contracts/goal-t058.md C8 L14-14
+| C8 — Product UI integration | A navigable authenticated web surface creates all three kinds from authorized knowledge, displays grounded outputs/coverage/status/citations, saves/loads edits, revalidates when required and exports through the real API. Loading, empty, unavailable, invalid input, provider failure, stale edit and permission/refusal states are truthful and usable. Citation click-through reaches the actual selected source turn. Real shared server/composition, web route/nav/client and persistence wiring must be present; an unmounted router or standalone component is not full-parent delivery. |
+CLAUSE qa/contracts/goal-t058.md C12 L18-18
+| C12 — File handshake and verification | A ready-for-check manifest/packet names the full candidate slug/cycle, changed paths, caller/security/dependency map and final hashes including untracked source. Required focused checks exercise successful stages, refusals, tenant/write/CAS/grounding/drift/export boundaries and immediate downstream consumption, with exact invocation/output/exit/count/duration/fixture provenance. contracts/verify_contracts.py runs with its empty-registry limitation disclosed. Shared integration has schema/generated/migration/type consistency evidence. Only independent checker writes matching-cycle verdict; changed candidate bytes require resubmission, maker closes only after matching scoped PASS. Full-parent PASS requires C1–C11, not selected tests. |
+
+CLAUSE qa/contracts/goal-T054.md 10 L18-18
+10. **Mounted review UX.** The real client/editor supports load, passage correction, bounded speaker-block selection, reason, save, canonical reload, audit/history and refresh status/retry. Save is enabled only for valid changed content. A durable receipt triggers canonical revision verification before another edit. Conflict or uncertain save retains drafts and prevents unsafe retry until reload. Pending/failed refresh visibly warns that dependent knowledge may be stale. Callback/reload failure cannot reclassify a confirmed commit as an uncertain write.
+
+CLAUSE AGENTS.md definition-of-done L28-33
+## Definition of done
+1. `contracts/verify_contracts.py` passes (once contracts exist; currently empty).
+2. The affected stage runs green on sample data.
+3. The immediate downstream stage consumes the output without error.
+Evidence (command + output) pasted, or it did not happen.
+
+
+SCOPED_DIFF
+diff --git a/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx b/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx
+index 4f589e17..6f97867d 100644
+--- a/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx
++++ b/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx
+@@ -29,7 +29,12 @@ export function KnowledgeOutputsPage(): React.ReactElement {
+       .finally(() => { if (stamp === generation.current) setLoading(false); });
+     return () => { generation.current++; };
+   }, [apiKey, sessionVersion]);
+-  function show(next: KnowledgeOutputDraft): void { setDraft(next); setEditTitle(next.title); setEdits({}); setEditing(false); }
++  function show(next: KnowledgeOutputDraft): void {
++    setDraft(next); setEditTitle(next.title); setEdits({}); setEditing(false);
++    setOutputs((saved) => saved.map((output) => output.id === next._id
++      ? { id: next._id, title: next.title, kind: next.kind, revision: next.revision, updatedAt: next.updatedAt }
++      : output).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)));
++  }
+   async function action(fn: () => Promise<void>): Promise<void> {
+     if (busy) return;
+     setBusy(true); setError(null);
+diff --git a/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx b/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx
+index 7fbbdeaf..bc3caa13 100644
+--- a/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx
++++ b/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx
+@@ -52,14 +52,17 @@ test("UI creates, cites, saves, reopens, revalidates and exports through authent
+     assert.equal(screen.getByRole("link", { name: /speaker:1/u }).getAttribute("href"), "/sessions/s1#turn-t1");
+     assert.match(screen.getByText(/Model grounding assessment completed/u).textContent ?? "", /human review required/u);
+     fireEvent.click(screen.getByRole("button", { name: "Edit draft" }));
++    fireEvent.change(screen.getByLabelText("Draft title"), { target: { value: "Updated admissions FAQ" } });
+     fireEvent.change(screen.getByLabelText("Edit faq-1 (saved edits need revalidation)"), { target: { value: "Q: When do applications open?\nA: Applications open Monday." } });
+     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+     await screen.findByText("Item withheld — needs grounding review.");
++    assert.match(screen.getByRole("button", { name: "Updated admissions FAQ" }).closest("li")?.textContent ?? "", /revision 2/u);
+     assert.equal((screen.getByRole("button", { name: "Download Markdown" }) as HTMLButtonElement).disabled, true);
+     fireEvent.click(screen.getByRole("button", { name: "Revalidate grounding" }));
+     await waitFor(() => assert.equal((screen.getByRole("button", { name: "Download Markdown" }) as HTMLButtonElement).disabled, false));
++    assert.match(screen.getByRole("button", { name: "Updated admissions FAQ" }).closest("li")?.textContent ?? "", /revision 3/u);
+     fireEvent.click(screen.getByRole("button", { name: "Download Markdown" })); await waitFor(() => assert.equal(downloads, 1));
+-    fireEvent.click(screen.getByRole("button", { name: "Admissions FAQ" }));
++    fireEvent.click(screen.getByRole("button", { name: "Updated admissions FAQ" }));
+     await waitFor(() => assert.ok(requests.some((r) => r.url === "/knowledge-outputs/o1" && r.method === "GET")));
+     assert.ok(requests.some((r) => r.method === "PUT")); assert.ok(requests.some((r) => r.url.endsWith("/revalidate")));
+   } finally {
+diff --git a/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx b/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx
+index c881b548..669c24a0 100644
+--- a/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx
++++ b/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx
+@@ -16,7 +16,7 @@ test("failed refresh exposes retry; successful refresh invokes canonical reload"
+   const refresh = vi.spyOn(api, "refreshTranscriptReview").mockResolvedValue("complete"), reload = vi.fn();
+   render(<ReviewHistory apiKey="k" sessionId="s1" revision="r1" refresh="failed" disabled={false} onRefreshed={reload} />);
+   fireEvent.click(screen.getByRole("button", { name: "Retry knowledge refresh" }));
+-  expect((await screen.findByRole("status")).textContent).toContain("Knowledge refresh complete");
++  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Knowledge refresh complete"));
+   await waitFor(() => expect(reload).toHaveBeenCalledTimes(1)); expect(refresh).toHaveBeenCalledWith("k", "s1", "r1");
+ });
+ test("late history and refresh cannot disclose old identity or trigger reload after unmount", async () => {
+diff --git a/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx b/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx
+index 73d02faa..199802cf 100644
+--- a/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx
++++ b/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx
+@@ -14,6 +14,19 @@ const edit = async () => {
+   fireEvent.change(await screen.findByLabelText("Corrected text"), { target: { value: "Corrected" } });
+   fireEvent.change(screen.getByLabelText("Review reason"), { target: { value: "Checked recording" } });
+ };
++test.each(["pending", "failed"] as const)("a loaded %s refresh warns about stale answers until canonical reload completes", async (refresh) => {
++  vi.spyOn(api, "getTranscriptReview").mockResolvedValueOnce({ ...snapshot(), refresh }).mockResolvedValue(snapshot());
++  render(<TranscriptReview apiKey="k" sessionId="s1" />);
++  const warning = await screen.findByRole("note", { name: "Knowledge freshness warning" });
++  expect(warning.textContent).toContain(`Knowledge refresh ${refresh}; existing answers may be stale.`);
++  expect(warning.textContent).toContain(refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below");
++  expect(screen.getByRole("button", { name: refresh === "failed" ? "Retry knowledge refresh" : "Refresh knowledge" })).toBeEnabled();
++  fireEvent.click(screen.getByRole("button", { name: "Reload transcript" }));
++  await screen.findByLabelText("Corrected text");
++  expect(screen.queryByRole("note", { name: "Knowledge freshness warning" })).toBeNull();
++  expect(screen.getByText("Knowledge refresh: complete")).toBeInTheDocument();
++});
++
+ test("corrections require reason and use loaded revision; pending refresh is not completed", async () => {
+   vi.spyOn(api, "getTranscriptReview").mockResolvedValueOnce(snapshot()).mockResolvedValue({ ...snapshot(), revision: "r2", refresh: "pending" });
+   const save = vi.spyOn(api, "saveTranscriptReview").mockResolvedValue({ sessionId: "s1", revision: "r2", commit: "committed", refresh: "pending" });
+diff --git a/apps/web/src/pages/transcript-review/TranscriptReview.tsx b/apps/web/src/pages/transcript-review/TranscriptReview.tsx
+index 897d6fac..b3ea57dc 100644
+--- a/apps/web/src/pages/transcript-review/TranscriptReview.tsx
++++ b/apps/web/src/pages/transcript-review/TranscriptReview.tsx
+@@ -90,6 +90,9 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
+     <button onClick={() => void load()} disabled={busy && !!snapshot}>Reload transcript</button>
+     {!snapshot ? <p>{busy ? "Loading transcript review…" : "Transcript review unavailable."}</p> : <>
+       <p>Knowledge refresh: {snapshot.refresh}</p>
++      {snapshot.refresh !== "complete" && <p role="note" aria-label="Knowledge freshness warning">
++        Knowledge refresh {snapshot.refresh}; existing answers may be stale. {snapshot.refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below to update dependent knowledge."}
++      </p>}
+       {!!snapshot.orphanedTurnIds?.length && <p role="alert">Source passages changed after review. {snapshot.orphanedTurnIds.length} reviewed passage(s) no longer exist: {snapshot.orphanedTurnIds.join(", ")}. Their audit remains available; restore stable source passage identifiers before refreshing knowledge.</p>}
+       <ReviewHistory apiKey={apiKey} sessionId={sessionId} revision={snapshot.revision} refresh={snapshot.refresh} disabled={busy}
+         onRefreshed={reloadAfterRefresh} />
+
+
+AUDIT_METADATA
+{"receipts":[{"file":"verification-ui2-output-independent-command.json","ownexit":0,"casecounts":"saved1passed","command_ref":"C0","fingerprint_counts":{"before":17,"after":17}},{"file":"verification-transcript-four-current-absent-env.json","ownexit":0,"casecounts":"editor2+history2=4passed/10filtered","command_ref":"C1","fingerprint_counts":{"before":18,"after":18}},{"file":"verification-web-types-coherent-current.json","ownexit":0,"casecounts":"not-test","command_ref":"C2","fingerprint_counts":{"before":1775,"after":1775}},{"file":"verification-web-build-coherent-current.json","ownexit":0,"casecounts":"not-test","command_ref":"C3","fingerprint_counts":{"before":1775,"after":1775}},{"file":"verification-contracts-combined-candidate.json","ownexit":0,"casecounts":"not-test","command_ref":"C4","fingerprint_counts":{"before":2,"after":2}}],"commands":[{"id":"C0","argv":["C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe","--test","--test-isolation=none","--test-concurrency=1","--test-timeout=30000","--test-name-pattern=^UI creates, cites, saves, reopens, revalidates and exports through authenticated API$","--import","./.cache/coordination/safe-test-runtime/register.mjs","apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx"]},{"id":"C1","argv":["C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe","node_modules/vitest/vitest.mjs","run","--pool=forks","--maxWorkers=1","--minWorkers=1","--no-file-parallelism","--testNamePattern","a loaded .* refresh warns about stale answers until canonical reload completes|failed refresh exposes retry; successful refresh invokes canonical reload|late history and refresh cannot disclose old identity or trigger reload after unmount","src/pages/transcript-review/TranscriptReview.test.tsx","src/pages/transcript-review/ReviewHistory.test.tsx"]},{"id":"C2","argv":["C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe","C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs","--filter","@lkb/web","typecheck"]},{"id":"C3","argv":["C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe","C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs","--filter","@lkb/web","build"]},{"id":"C4","argv":["C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe","-B","contracts/verify_contracts.py"]}],"fingerprint_counts":{"unique_files":1789,"declared_entries":3587,"identity_checks":9111},"mismatch_count":0,"mismatch_kinds":{},"representative_fields":[]}

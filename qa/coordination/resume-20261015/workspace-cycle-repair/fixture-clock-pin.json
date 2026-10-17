@@ -1,0 +1,9 @@
+{
+  "status": "FROZEN",
+  "cycle": 2,
+  "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.test.ts",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "before_sha256": "fde28f6bb74bc97ccae57aa391c186f4fde8dc61325de5233b28ce28bad58f38",
+  "after_sha256": "b2b2b34951ecff623896258bb2318f3dcd6e2caa2d448b3e2a6e97696809f60f",
+  "captured_at": "2026-10-15T23:08:46.1435258Z"
+}

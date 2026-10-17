@@ -1,0 +1,12 @@
+{
+  "command": "node node_modules/vitest/vitest.mjs run src/pages/sessions/SessionDetailPage.test.tsx --maxWorkers=1 --minWorkers=1",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+  "exitCode": 0,
+  "toolWallSeconds": 5.7205743,
+  "vitestDurationSeconds": 3.89,
+  "testCount": 8,
+  "passed": 8,
+  "failed": 0,
+  "output": "qa/evidence/execution-wave1-integration-grounded-session.stdout.txt",
+  "timingLimit": "Exact process launch/completion UTC not captured; Vitest start 09:31:47 and reported duration plus tool wall time retained. No estimate presented as measured UTC."
+}

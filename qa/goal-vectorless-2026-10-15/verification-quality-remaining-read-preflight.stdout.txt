@@ -1,0 +1,1 @@
+{"outcome":"READY_FOR_BOUNDED_READ_ONLY","counts":{"ranges":10,"lines":621,"sourcePins":10,"receipts":6,"pinEntries":221,"environmentDeclarations":6,"unitPins":9},"metadataBytes":309,"payloadBytes":70386,"payloadSha256":"dd6f043e8536157ea0dbd2f7f0b02ebbbecfcdf5e315b5b2fb4f1f22b1e49303","mismatches":[],"complete":true,"sourcePrinted":false,"reviewerReactivated":false}

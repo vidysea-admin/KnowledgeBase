@@ -1,0 +1,131 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "HOLD_AWAITING_GRAPH_FREEZE_AND_BROKER",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "unit": "resume-speaker-profile",
+  "existing_manifest": "qa/manifests/speaker-profile-vectorless-consumer.md",
+  "cycle": 0,
+  "tier": 3,
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "candidate_identity": "dirty working tree; HEAD is base reference only, exact file hashes below; no new commit authorized",
+  "files": [
+    {
+      "path": "apps/api/src/speaker-profiles/store.ts",
+      "sha256": "21ABD05E64A137F4BD444270CD03DE1FC897988A74E446E40AD8616CCD8A7FCA",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__store.ts",
+      "backup_sha256": "21ABD05E64A137F4BD444270CD03DE1FC897988A74E446E40AD8616CCD8A7FCA"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.ts",
+      "sha256": "CB58852A388F065A7B8DB1D7BD502587A73F737F0421AC1759C78E7C9E4EEE6B",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__router.ts",
+      "backup_sha256": "CB58852A388F065A7B8DB1D7BD502587A73F737F0421AC1759C78E7C9E4EEE6B"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "sha256": "75421C9896E4056B826FDEFBF38C29DAD9FBE57C119666284ABA5A27DDBE38EF",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__store.test.ts",
+      "backup_sha256": "75421C9896E4056B826FDEFBF38C29DAD9FBE57C119666284ABA5A27DDBE38EF"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.test.ts",
+      "sha256": "0CB275C6769C36FA127D9D52C6FCCDA714B2AD4C941A86A2AD3CE61EAAC3530D",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__router.test.ts",
+      "backup_sha256": "0CB275C6769C36FA127D9D52C6FCCDA714B2AD4C941A86A2AD3CE61EAAC3530D"
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+      "sha256": "C2F285E16E35C91F9C198558C1D1E1641D820DB229B266C979BB28835006439A",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__web__src__pages__knowledge__speakers__speakerProfileClient.ts",
+      "backup_sha256": "C2F285E16E35C91F9C198558C1D1E1641D820DB229B266C979BB28835006439A"
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "sha256": "0592805B111B1DC29DA2C333B451875A4CF05BE8C454A9A93776EEA011E5CE3E",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__web__src__pages__knowledge__speakers__speakerProfileClient.test.ts",
+      "backup_sha256": "0592805B111B1DC29DA2C333B451875A4CF05BE8C454A9A93776EEA011E5CE3E"
+    }
+  ],
+  "dependency_fingerprints": [
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.ts",
+      "sha256": "0A275D04C2807FBFE707FF0D9DAE430C5A4E3566E9AAFD94D79A8E6415AEA33D"
+    },
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.test.ts",
+      "sha256": "FF436078E56316D48943A9F4AB3A169A4B4651633AB27BF1AE75F40DAFE370DE"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-profiles/profile.ts",
+      "sha256": "6BE5B7EDE88B2887FE4C7A5E1ADB4B573B2303A8422B2185F64080CF8D873386"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/attribute-authority.ts",
+      "sha256": "5C114999DCE85BA83212C03946B5DEDD7F6A86EEF973BBC9A4CBDC3EC5B7753E"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/relationship-reader.ts",
+      "sha256": "489107E7F9CAAF5625438342D47C9F037E0EEE20E013FB84E4ADEE2315440B9F"
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "sha256": "BD54B93A2B6429F320A0468F7F062C05ECE08E6483851E570080EFFFB0DB12DC"
+    },
+    {
+      "path": "apps/api/src/visibility/read-snapshot.ts",
+      "sha256": "1B97FF09D53B7C0F7FE10F13C23803290864E2F5D43C6F57568876AB281030CF"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD"
+    },
+    {
+      "path": "package.json",
+      "sha256": "390796F4FB84EFB09F72CE233564A05E1A69E4C2B0B6806415E9677EF6234778"
+    },
+    {
+      "path": "apps/api/package.json",
+      "sha256": "678346DCCCC8310496005A777FD289CCB4FBE5CAE08B529F717D7259D7578EDE"
+    },
+    {
+      "path": "apps/web/package.json",
+      "sha256": "DF657C35FF929F98BBA82399F616C5B201A02A2C07C66D71905CA55CB720528E"
+    },
+    {
+      "path": "qa/contracts/speaker-knowledge-vectorless.md",
+      "sha256": "5A382665547CF53B48DCCA32C0F91F50B08376D49F395B2953B551F6BB02D90E"
+    }
+  ],
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "checker_dispatch": "prohibited until root runtime release; validate complete managed-review/1 input only after exact candidate/readiness receipts exist",
+  "readiness": {
+    "complete": false,
+    "executed_checks": [],
+    "reusable_receipts": [],
+    "pending": [
+      "graph and dependency freeze",
+      "sole broker focused checks",
+      "central typechecks and frozen verifier",
+      "independent checker under released runtime"
+    ]
+  },
+  "source_changes_this_phase": [],
+  "findings": "Existing implementation present. No proven missing clause, hence no product edits. Profile-specific contract does not exist; effective graph contract clauses 1-5 is explicitly referenced by existing manifest.",
+  "limitations": [
+    "No native Mongo snapshot transaction proof",
+    "No UI TSX ownership or browser acceptance",
+    "No private TOC opt-in",
+    "No provider, database, full-suite or external calls",
+    "No readiness or PASS claim"
+  ]
+}

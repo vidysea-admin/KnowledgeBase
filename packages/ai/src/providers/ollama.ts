@@ -11,11 +11,23 @@ const DEFAULT_BASE_URL = "http://localhost:11434";
 /** A dedicated embedding model, not the chat one — `llama3.1` has no embedding endpoint. */
 const DEFAULT_EMBED_MODEL = "nomic-embed-text";
 
+/** Nomic RAG task instructions are part of the model-semantic binding, not source text. */
+export function ollamaEmbeddingInputs(job: EmbedJob, model: string): string[] {
+  if (model.split(":")[0] !== "nomic-embed-text") return [...job.texts];
+  if (job.purpose !== undefined && job.purpose !== "query" && job.purpose !== "document") {
+    throw new Error("invalid nomic embedding purpose");
+  }
+  const prefix = job.purpose === "query" ? "search_query: " : "search_document: ";
+  return job.texts.map(text => prefix + text);
+}
+
 export interface OllamaConfig {
   baseUrl?: string;
   model?: string;
   /** Overrides DEFAULT_EMBED_MODEL; `model` selects the chat model and is unrelated. */
   embedModel?: string;
+  /** Ollama Cloud key (U0.10). When set, requests carry `authorization: Bearer <key>`; when unset or blank, headers are byte-identical to the local-only adapter. */
+  apiKey?: string;
 }
 
 export class OllamaProvider implements Provider {
@@ -27,6 +39,12 @@ export class OllamaProvider implements Provider {
     private readonly config: OllamaConfig = {},
   ) {
     this.baseUrl = config.baseUrl ?? DEFAULT_BASE_URL;
+  }
+
+  /** Request headers: the original content-type pair, plus authorization only when an apiKey is configured. */
+  private headers(): Record<string, string> {
+    const key = this.config.apiKey?.trim();
+    return key ? { "content-type": "application/json", authorization: `Bearer ${key}` } : { "content-type": "application/json" };
   }
 
   async complete(job: Job): Promise<CompleteResult> {
@@ -43,7 +61,7 @@ export class OllamaProvider implements Provider {
       kind: "http",
       url: `${this.baseUrl}/api/chat`,
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: this.headers(),
       body: {
         model,
         stream: false,
@@ -96,8 +114,8 @@ export class OllamaProvider implements Provider {
       kind: "http",
       url: `${this.baseUrl}/api/embed`,
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: { model, input: job.texts },
+      headers: this.headers(),
+      body: { model, input: ollamaEmbeddingInputs(job, model), truncate: false, options: { num_thread: 1 } },
     });
 
     if (res.status < 200 || res.status >= 300) {
@@ -126,6 +144,9 @@ export class OllamaProvider implements Provider {
         `ollama embed returned a ${vectors[ragged]?.length}-dim vector at index ${ragged} but ` +
           `${dims} at index 0 — a ragged set cannot be compared by cosine`,
       );
+    }
+    if (vectors.some((v) => v.some((value) => !Number.isFinite(value)))) {
+      throw new Error("ollama embed returned non-finite values");
     }
     return { vectors, dims, provider: this.name, model };
   }

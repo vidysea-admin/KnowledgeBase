@@ -5,6 +5,7 @@
  * injectable `Transport` seam as `whisper.ts` — no real network call in tests.
  */
 import type { Transport } from "../provider.js";
+import { detectGeminiFreeTier } from "../gemini-quota.js";
 import type { SttAdapter, Turn, TranscribeOpts } from "./transcribe.js";
 
 const DEFAULT_MODEL = "gemini-3.5-transcribe";
@@ -38,6 +39,8 @@ export function createGeminiSttAdapter(transport: Transport, config: GeminiSttCo
       });
 
       if (res.status < 200 || res.status >= 300) {
+        const quota = detectGeminiFreeTier(res.status, res.body, `gemini STT error ${res.status}`);
+        if (quota) throw quota;
         throw new Error(`gemini STT error ${res.status}: ${JSON.stringify(res.body)}`);
       }
 

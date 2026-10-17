@@ -1,0 +1,34 @@
+# Current maker packet: Ollama Cloud + HTTP boundary
+
+Root: C:/Users/product/Desktop/KnowledgeBase. Slug ollama-cloud-vectorless; Fix cycle 1; verdict qa/verdicts/ollama-cloud-vectorless.md. This coherent packet extends the unreviewed cloud candidate with its mandatory real HTTP transport boundary. No separate duplicate HTTP checker is requested.
+
+## Identity and authority
+Candidate/base and exact 12 file pins: qa/coordination/knowledge-brain-20261015/provider-http-current-candidate.json. Candidate SHA 2b54637880a71839675df39113ab9754e6b0357d8f3925396b3996022ffffaca (ordered scoped pins, not Git commit). Base 5c4cbade2d1a8aa4815de13d587db8de3b01cc4a. Cloud provider/test are new; HTTP base and source phase are in qa/packets/ollama-http-boundary.md. Prior bytes/baselines remain intact.
+
+Read C:/Users/product/.agents/skills/checker/SKILL.md; root AGENTS relevant tenant/credential/checker requirements; qa/contracts/ollama-cloud-vectorless.md clauses 1-5, verification boundary; qa/contracts/ai-provider-seam.md current cloud/cost amendment. D173 is narrowly restored by D174; earlier obligations remain authoritative despite computed-index caveat. Frozen registry remains empty; its validator is vacuous, not pipeline coverage.
+
+## Change map and immediate consumers
+- packages/ai/src/providers/ollama-cloud.ts: official HTTPS-only endpoint, injected bearer, GLM generator and DeepSeek verifier identities, sanitized failures, valid token counts and unknown price, text-only/no embed, structured JSON guidance without native guarantee.
+- apps/api/src/ai-transport.ts: createHttpTransport supplies realTransport HTTP branch. Manual redirect policy refuses/cancels all 3xx, 16MiB streaming bound, total 180s default deadline, caller abort and sanitized reader/fetch errors; CLI implementation unchanged.
+- packages/ai/src/provider.ts, jobs.ts, router.ts and barrel: optional unknown cost, actual usage ledger and provider export. Current active text chain cannot introduce embedding calls.
+- production composition/config instantiate distinct local and Cloud providers. integrations/answers.ts pins output GLM-only and DeepSeek-only assessor; tenant validation precedes either call, unavailable verifier never falls back to generator. Audio remains Gemini.
+Credentials/shared infrastructure/tenant ledger risks require failure/security probes. No .env read, live call, database write, deployment or model training is part of this check.
+
+## Existing evidence: preserve full fingerprint
+qa/goal-vectorless-2026-10-15/verification-central-provider-outputs-20261015T0847.json: own exit0, 59/59 PASS, 9.353s. Its entire after-pin inventory was compared with current bytes during packet prep: zero drift. Contains router-cost/router/jobs, cloud provider, HTTP security, output workbench/repository adapter; exact command/runtime executable hash/version/lock/import-root/environment hashes and stdout/stderr paths are embedded. Use canonical reuse helper with exact supplied identities; do not infer reuse from filenames.
+
+DO_NOT_REUSE full verification-api-remaining49-20261015T0925.json: three typing fixtures changed afterward. Replacement current proof qa/goal-vectorless-2026-10-15/verification-current-composition-four-20261015T0944.json passed 4/4, own exit0, 2.336s, all input pins unchanged: all three composition/vectorless-routing.test.ts cases and only existing ai-transport.test.ts test '^http transport passes the AbortSignal'. No 49-case repetition needed.
+
+Current coherence is now green with unchanged input pins and separate own-exit0 receipts under qa/goal-vectorless-2026-10-15/: verification-api-types-20261015T0940.json (13.997s), verification-web-types-20261015T0940.json (14.554s), verification-api-build-20261015T0940.json (2.606s), verification-web-build-20261015T0940.json (17.874s). These validate combined coherence, not full parent/live acceptance.
+
+Historical failures remain evidence: integrated API74 had three semantic failures later repaired; first API typecheck had eleven fixture diagnostics and stopped serial builds; these are not successful current receipts. Prior provider19 and pure67 are narrower historical evidence only. Root/broker receipts remain canonical for current identity.
+
+## Independent verification
+Review complete changed cloud/HTTP logic and named immediate consumers. Derive at least one independent credential/redirect/body-boundary failure probe using injected fetch/transport, preserving root CPU broker policy. Required tests and current coherence receipts cannot be omitted for time. Never call the private key or actual external provider. Recheck all candidate pins/cycle before verdict. Whole 39-parent acceptance, 92-question quality, human reviews and live host/operational gates remain outside this scoped verdict.
+
+## Accounting and admission
+Comparable complete maker duration/tokens remain unknown, including earlier inspection/packet work; known isolated source phase87.824516s is not a fabricated complete denominator. Canonical input provider-http-assess-input.json/result.json under qa/coordination/knowledge-brain-20261015: BOOTSTRAP_REVIEW, escalation true, ratio_verified false, exited0. Prior shared vectorless_checker-wip-shared has actual active/tokens/cost null and conservative debit180s/6000tokens, charged once across original four scopes. Root explicitly allocates next phase at most180s/6000tokens; cumulative cap360s/12000tokens. No reset, invented token usage or 10% success claim. Initial unsupported helper --output preparation error retained in provider-http-assess-command-error.txt; corrected assess command succeeded. Reassess before material phases, retain every child/retry/debit and explicit waits. Stop with NEEDS_EXTRA_REVIEW if allocation insufficient.
+
+Current mandatory shared gates also have own exit0 receipts: verification-frozen-contracts-20261015T0914.json (empty registry; vacuous), verification-generated-types-check-20261015T0914.json, verification-schema43-compatible-20261015T0914.json under qa/goal-vectorless-2026-10-15/. Initial schema43 command used incompatible Python before the compatible successful receipt; retain both, never credit the failed runtime as successful validation. Candidate12 pins were rechecked unchanged immediately before readiness. Reviewer must validate full fingerprints before any reuse; exact receipt paths above are not automatic evidence authentication.
+
+Cycle1 HOLD continuation packet: qa/coordination/knowledge-brain-20261015/provider-http-remaining-checkpoint.md. Missing mandatory local adapter10cases and packageAItypes now have ownexit0 current0954receipts. Next finite reviewphase120s3000tokens, cumulative480s15000tokens, preserves prior two unknown reviewer/debit entries; admission result BOOTSTRAP_REVIEW with ratio_verified=false. No source reread/epoch change is required by this metadata update.

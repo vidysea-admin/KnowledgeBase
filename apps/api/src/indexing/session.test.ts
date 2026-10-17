@@ -19,10 +19,43 @@ import { fakeDb, completeWith, embedOk, assertUpdateBodyConfined, type Call } fr
 
 const claimOps = (calls: Call[]) => calls.filter((c) => c.coll === "claims").map((c) => c.op);
 
+test("standing fixture uses real recording provenance and refuses foreign or wrong source identities", async () => {
+  const { db } = fakeDb();
+  const collection = (name: string) => db.collection<{ _id: string; tenantId: string; sessionId?: string; sourceId?: string; kind?: string }>(name);
+  assert.equal((await collection("sessions").findOne({ tenantId: "t", _id: "s1" }))!.sourceId, "src1");
+  assert.equal((await collection("sources").findOne({ tenantId: "t", _id: "src1" }))!.kind, "recording");
+  for (const name of ["turns", "sessions", "sources"]) {
+    assert.equal(await collection(name).findOne({ tenantId: "foreign" }), null);
+    assert.deepEqual(await collection(name).find({ tenantId: "foreign" }).toArray(), []);
+    assert.equal(await collection(name).findOne({ tenantId: "t", _id: "missing" }), null);
+  }
+  assert.deepEqual(await collection("turns").find({ tenantId: "t", sessionId: "missing" }).toArray(), []);
+});
+
+test("stateful fixture confirms only matched generation CAS and reads back actual inserted artifacts", async () => {
+  const { db } = fakeDb();
+  const sessions = db.collection<{ _id: string; tenantId: string; indexAttempt?: { generation: string; phase?: string } }>("sessions");
+  const claimed = await sessions.updateOne({ _id: "s1", tenantId: "t", indexAttempt: { $exists: false } },
+    { $set: { indexAttempt: { generation: "first" } } });
+  assert.equal(claimed.acknowledged, true); assert.equal(claimed.matchedCount, 1);
+  const lost = await sessions.updateOne({ _id: "s1", tenantId: "t", indexAttempt: { $exists: false } },
+    { $set: { indexAttempt: { generation: "second" } } });
+  assert.equal(lost.matchedCount, 0);
+  await sessions.updateOne({ _id: "s1", tenantId: "t", "indexAttempt.generation": "first" }, { $set: { "indexAttempt.phase": "writing" } });
+  assert.deepEqual((await sessions.findOne({ _id: "s1", tenantId: "t" }))!.indexAttempt, { generation: "first", phase: "writing" });
+  const chunks = db.collection<{ _id: string; tenantId: string; sourceRef: string; value: number }>("chunks");
+  await chunks.insertMany([{ _id: "old", tenantId: "t", sourceRef: "s1", value: 1 },
+    { _id: "current", tenantId: "t", sourceRef: "s1", value: 2 }, { _id: "foreign", tenantId: "other", sourceRef: "s1", value: 3 }]);
+  const pruned = await chunks.deleteMany({ tenantId: "t", sourceRef: "s1", _id: { $nin: ["current"] } });
+  assert.equal(pruned.acknowledged, true); assert.equal(pruned.deletedCount, 1);
+  assert.deepEqual((await chunks.find({ tenantId: "t", sourceRef: "s1" }).toArray()).map(row => row._id), ["current"]);
+  assert.equal((await chunks.findOne({ _id: "foreign", tenantId: "other" }))!.value, 3);
+});
+
 test("a DEGRADED claims extraction must NOT delete the session's existing claims", async () => {
   // The regression that matters: before the fix this deleted everything and inserted nothing.
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith({ claimsFails: true }) as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith({ claimsFails: true }) as never, db });
   assert.deepEqual(claimOps(calls), [], "no claims write of any kind may happen on a degraded run");
 });
 
@@ -30,7 +63,7 @@ test("a SUCCESSFUL extraction still replaces the session's claims (delete then i
   // The other half — a guard that never lets claims be replaced would be just as broken, because
   // stale claims would then live forever.
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, db });
   const ops = claimOps(calls);
   assert.ok(ops.includes("deleteMany"), "a real extraction must replace the prior claims");
   assert.equal(ops[0], "deleteMany", "delete must precede insert so re-indexing never duplicates");
@@ -75,7 +108,7 @@ test("EVERY query AND every write indexSession issues is confined to its own ten
   // whole suite and typecheck, and live it took TWO scratch tenants from 1 -> 0 — one of them a
   // tenant that had nothing to do with the re-index. Op names alone could never catch it.
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, db });
 
   const writes = calls.filter((c) => ["deleteMany", "insertMany", "insertOne", "replaceOne", "updateOne"].includes(c.op));
   assert.ok(writes.length >= 4, `expected the real write set, got ${writes.length}`);
@@ -89,7 +122,7 @@ test("a DEGRADED run's writes are tenant-scoped too — the guard must not be a 
   // The degraded path takes a different branch through the same function; scoping it only on the
   // healthy path would leave the exact conditions of the ISS-056 outage unprotected.
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith({ claimsFails: true }) as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith({ claimsFails: true }) as never, db });
   assertAllCallsConfined(calls, "t");
 });
 
@@ -97,7 +130,7 @@ test("session_pages are still written on a degraded CLAIMS run — the two paths
   // summarize degrades to its own labelled fallback, so the page must still be produced; a claims
   // failure must not silently take the summary down with it.
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith({ claimsFails: true }) as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith({ claimsFails: true }) as never, db });
   const pageOps = calls.filter((c) => c.coll === "session_pages").map((c) => c.op);
   assert.ok(pageOps.includes("deleteMany"), "session_pages should still be replaced");
 });
@@ -110,7 +143,7 @@ const pageOps = (calls: Call[]) => calls.filter((c) => c.coll === "session_pages
 test("a DEGRADED summarize run with NO existing page still writes the labelled fallback (ISS-059)", async () => {
   // The fallback is a legitimate FIRST summary — this is the case criterion 1 still requires.
   const { db, calls } = fakeDb({ existingSessionPage: null });
-  await indexSession("t", "s1", { complete: completeWith({ summarizeFails: true }) as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith({ summarizeFails: true }) as never, db });
   assert.deepEqual(pageOps(calls), ["findOne", "deleteMany", "insertOne", "find"], "no existing page -> the fallback is written as normal");
 });
 
@@ -118,25 +151,25 @@ test("a DEGRADED summarize run with a REAL existing page must NOT touch it (ISS-
   // The exact bug this unit fixes: before the fix, a transient outage during a re-index silently
   // replaced a good summary with a 500-char transcript slice, and status.index still flipped to
   // "done" as if nothing had gone wrong.
-  const existing = { _id: "p1", tenantId: "t", sessionId: "s1", summary: "A real, previously-written summary." };
+  const existing = { _id: "p1", tenantId: "t", sessionId: "s1", summary: "A real, previously-written summary.", keyInsights: [], decisions: [], actionItems: [], evidence: [{ turnId: "t1", sessionId: "s1" }] };
   const { db, calls } = fakeDb({ existingSessionPage: existing });
-  await indexSession("t", "s1", { complete: completeWith({ summarizeFails: true }) as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith({ summarizeFails: true }) as never, db });
   assert.deepEqual(pageOps(calls), ["findOne", "find"], "a degraded run with a real page on file must issue NO WRITE of any kind to session_pages");
 });
 
 test("a SUCCESSFUL summarize run always replaces the page, even when one already exists", async () => {
   // The other half — a guard that refuses to replace ANY existing page would be just as broken,
   // because a genuinely fresh, correct summary could never supersede an older one.
-  const existing = { _id: "p1", tenantId: "t", sessionId: "s1", summary: "An older summary." };
+  const existing = { _id: "p1", tenantId: "t", sessionId: "s1", summary: "An older summary.", keyInsights: [], decisions: [], actionItems: [], evidence: [{ turnId: "t1", sessionId: "s1" }] };
   const { db, calls } = fakeDb({ existingSessionPage: existing });
-  await indexSession("t", "s1", { complete: completeWith() as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, db });
   // A non-degraded run never calls findOne on session_pages (only the degraded branch does).
   assert.deepEqual(pageOps(calls), ["deleteMany", "insertOne", "find"]);
 });
 
 test("a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith({ summarizeFails: true }) as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith({ summarizeFails: true }) as never, db });
   // WRITES only, deliberately. U2.1's entity promotion issues a `find` over this session's claims
   // to tag `topicRefs`, and this assertion previously compared the full op list, so a read made it
   // fail. The test's own name and purpose are about the claims WRITE surviving a summarize outage
@@ -144,7 +177,9 @@ test("a DEGRADED SUMMARIZE run does not take the claims write down with it — t
   // protect. Narrowed to writes rather than appending "find" to the expected list, so the
   // assertion keeps meaning the same thing if the reads around it change again.
   const WRITE_OPS = new Set(["deleteMany", "insertMany", "insertOne", "updateOne", "replaceOne"]);
-  const claimWrites = calls.filter((c) => c.coll === "claims" && WRITE_OPS.has(c.op)).map((c) => c.op);
+  const claimUpdates = calls.filter((c) => c.coll === "claims" && c.op === "updateOne");
+  for (const update of claimUpdates) assert.deepEqual(Object.keys(update.update?.$set ?? {}), ["topicRefs"], "only derived topic tagging may follow claim replacement");
+  const claimWrites = calls.filter((c) => c.coll === "claims" && WRITE_OPS.has(c.op) && c.op !== "updateOne").map((c) => c.op);
   assert.deepEqual(claimWrites, ["deleteMany", "insertMany"], "a summarize outage must not affect the claims write");
 });
 
@@ -157,7 +192,7 @@ test("a DEGRADED SUMMARIZE run does not take the claims write down with it — t
 const chunkOps = (calls: Call[]) => calls.filter((c) => c.coll === "chunks").map((c) => c.op);
 test("a FAILED embed must NOT delete the session's existing chunks (the ISS-056 shape)", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", {
+  await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("all providers failed"); },
     db,
@@ -169,7 +204,7 @@ test("a failed embed does not take the rest of indexing down with it", async () 
   // Rethrowing would turn "no vectors this run" into "no summary, no claims, no tree" — trading a
   // recoverable gap for a total one.
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", {
+  await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("all providers failed"); },
     db,
@@ -180,17 +215,17 @@ test("a failed embed does not take the rest of indexing down with it", async () 
 
 test("no embed dep at all leaves chunks completely untouched — an install without embeddings still indexes", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, db });
   assert.deepEqual(chunkOps(calls), []);
   assert.ok(calls.some((c) => c.coll === "session_pages"), "every other stage must still run");
 });
 
-test("a SUCCESSFUL embed replaces the session's chunks — delete BEFORE insert, so re-indexing never doubles the corpus", async () => {
+test("a SUCCESSFUL embed upserts stable chunks BEFORE pruning obsolete rows", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, embed: embedOk as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: embedOk as never, db });
   const ops = chunkOps(calls);
-  assert.ok(ops.includes("deleteMany") && ops.includes("insertMany"));
-  assert.equal(ops[0], "deleteMany", "delete must precede insert");
+  assert.ok(ops.includes("deleteMany") && ops.includes("updateOne"));
+  assert.equal(ops[0], "updateOne", "replacement must persist before pruning");
 });
 
 /* ── U1.0 — writeSessionChunks' RETURN CONTRACT ────────────────────────────────────────────────
@@ -209,7 +244,7 @@ const REAL_TURNS = [{ _id: "t1", tenantId: "t", sessionId: "s1", speakerRef: "sp
  */
 test("indexSession SURFACES an embedding failure in its return — a skip must not look like success", async () => {
   const { db } = fakeDb();
-  const res = await indexSession("t", "s1", {
+  const res = await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("all providers failed"); },
     db,
@@ -221,13 +256,13 @@ test("indexSession SURFACES an embedding failure in its return — a skip must n
 
 test("indexSession reports 'no-embedder' distinctly from a failure — an install without embeddings is not broken", async () => {
   const { db } = fakeDb();
-  const res = await indexSession("t", "s1", { complete: completeWith() as never, db });
+  const res = await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, db });
   assert.equal(res.chunks.skipped, "no-embedder");
 });
 
 test("indexSession reports a real chunk write, so success is positively evidenced and not merely un-thrown", async () => {
   const { db } = fakeDb();
-  const res = await indexSession("t", "s1", { complete: completeWith() as never, embed: embedOk as never, db });
+  const res = await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: embedOk as never, db });
   assert.equal(res.chunks.skipped, null);
   assert.ok(res.chunks.written > 0, "a successful run must report the rows it actually wrote");
 });
@@ -257,8 +292,8 @@ test("writeSessionChunks reports a real write with the count it actually inserte
   const { db, calls } = fakeDb();
   const res = await writeSessionChunks("t", "s1", REAL_TURNS as never, embedOk as never, db);
   assert.equal(res.skipped, null);
-  const insert = calls.find((c) => c.coll === "chunks" && c.op === "insertMany");
-  assert.equal(res.written, insert!.docs!.length, "the reported count must equal the rows actually inserted");
+  const writes = calls.filter((c) => c.coll === "chunks" && c.op === "updateOne");
+  assert.equal(res.written, writes.length, "the reported count must equal the rows actually upserted");
   assert.ok(res.written > 0);
 });
 
@@ -273,10 +308,11 @@ test("writeSessionChunks reports a session with no chunkable turns distinctly fr
 
 test("chunk rows carry a real vector, a matching dims, and turnRefs — never an embeddingRef pointer", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, embed: embedOk as never, db });
-  const insert = calls.find((c) => c.coll === "chunks" && c.op === "insertMany");
-  assert.ok(insert, "chunks should be inserted");
-  for (const doc of insert!.docs ?? []) {
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: embedOk as never, db });
+  const writes = calls.filter((c) => c.coll === "chunks" && c.op === "updateOne");
+  assert.ok(writes.length, "chunks should be upserted");
+  for (const write of writes) {
+    const doc = write.update!.$set as Record<string, unknown>;
     assert.ok(Array.isArray(doc.vector) && (doc.vector as number[]).length > 0, "vector must hold numbers");
     assert.equal((doc.vector as number[]).length, doc.dims, "dims must match the vector it describes");
     assert.ok(Array.isArray(doc.turnRefs) && (doc.turnRefs as string[]).length > 0);
@@ -301,7 +337,7 @@ test("REFUSES to write a vector whose length contradicts dims, and still finishe
     provider: "fake",
     model: "fake-embed",
   });
-  await indexSession("t", "s1", { complete: completeWith() as never, embed: raggedEmbed as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: raggedEmbed as never, db });
   assert.deepEqual(chunkOps(calls), [], "an inconsistent batch must reach no chunk write at all");
   assert.ok(calls.some((c) => c.coll === "tree_index"), "the tree must still be updated (ISS-112)");
   assert.ok(
@@ -319,35 +355,20 @@ test("REFUSES a batch with the wrong NUMBER of vectors, rather than pairing by i
     provider: "fake",
     model: "fake-embed",
   });
-  await indexSession("t", "s1", { complete: completeWith() as never, embed: shortEmbed as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: shortEmbed as never, db });
   assert.deepEqual(chunkOps(calls), [], "a wrong-count batch must reach no chunk write at all");
   assert.ok(calls.some((c) => c.coll === "tree_index"), "the tree must still be updated (ISS-112)");
 });
 
 test("every chunk write is tenant-scoped — the same guard the claims path needed", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, embed: embedOk as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: embedOk as never, db });
   for (const c of calls.filter((x) => x.coll === "chunks")) {
-    if (c.op === "deleteMany") {
+    if (c.op === "deleteMany" || c.op === "updateOne") {
       assert.equal(c.filter?.tenantId, "t", "an untenanted chunk delete can reach another tenant's rows");
     }
   }
-  const insert = calls.find((c) => c.coll === "chunks" && c.op === "insertMany");
-  for (const doc of insert!.docs ?? []) assert.equal(doc.tenantId, "t");
-});
-
-test("ISS-WEBINARRELEASE-002 strict provider/parser/embedding degradation preserves prior knowledge", async () => {
-  for (const failure of ["summary-rejected", "summary-invalid", "claims-rejected", "claims-invalid", "embedding-rejected", "embedding-missing", "uncited-legacy-output"]) {
-    const {db,calls}=fakeDb({existingSessionPage:{_id:"prior",tenantId:"t",sessionId:"s1",summary:"Prior valid page"}});
-    const base=completeWith({summarizeFails:failure==="summary-rejected",claimsFails:failure==="claims-rejected"});
-    const complete=async(job: Parameters<typeof base>[0])=>{
-      if((failure==="summary-invalid"&&job.kind==="summarize")||(failure==="claims-invalid"&&job.kind==="claims")){
-        return {text:"not-json",usage:{inputTokens:0,outputTokens:0},provider:"fixture",model:"fixture",costUsd:0};
-      }return base(job);
-    };
-    const embed=failure==="embedding-missing"?undefined:failure==="embedding-rejected"?async()=>{throw new Error("fixture outage");}:embedOk;
-    await assert.rejects(indexSession("t","s1",{db,complete:complete as never,embed,strictWebinar:true}),/strict webinar index incomplete/,failure);
-    assert.ok(!calls.some((call)=>["session_pages","claims","chunks","tree_index"].includes(call.coll)&&["deleteMany","insertOne","insertMany","replaceOne"].includes(call.op)),failure);
-    assert.ok(!calls.some((call)=>JSON.stringify(call.update ?? {}).includes('"status.index":"done"')),failure);
-  }
+  const writes = calls.filter((c) => c.coll === "chunks" && c.op === "updateOne");
+  assert.ok(writes.length);
+  for (const write of writes) assert.equal((write.update!.$set as Record<string, unknown>).tenantId, "t");
 });

@@ -1,0 +1,11 @@
+CHECKER_SOURCE_PROBE matchedTrials=2 plannedPairs=4 CAS=1-success/1-conflict tenantRefusals=positive-and-negative immutableSnapshots=2 fullTask=HOLD
+✔ checker: actual mounted Compete feeds immutable partial 2x2 report; atomic conflicting imports and tenant refusals (252.8777ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2436.8426
+

@@ -1,0 +1,68 @@
+✔ pending reviewer source is exact projected evidence, not raw session/siblings or trusted authorization (12.7514ms)
+✔ real repository approval/materialization permits current reviewer evidence; withdrawn claim refuses (8.545ms)
+✔ foreign tenant, invalid identity and rejected candidate disclose no source (1.1976ms)
+✖ source/raw/effective changes, upstream deletion and pending invalidation refuse old evidence (9.2533ms)
+✔ attachment source exposes bound metadata and message evidence only, not file bytes (2.6374ms)
+✖ effective redaction during the last candidate consistency lookup refuses unchanged candidate JSON (1.706ms)
+✔ authoritative reviewer proof pins every read to one required snapshot transaction and ends its session (2.4605ms)
+✔ collection-only reader cannot return evidence without a snapshot capability (1.4987ms)
+✔ actual authenticated HTTP source route uses whatsapp scope and fixed private errors (95.8942ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 7
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1128.7217
+
+✖ failing tests:
+
+test at apps\api\src\whatsapp-review\review-source.test.ts:1:3339
+✖ source/raw/effective changes, upstream deletion and pending invalidation refuse old evidence (9.2533ms)
+  AssertionError [ERR_ASSERTION]: effective
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.test.ts:63:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: Error: Reviewed source passage changed; source reconciliation required
+        at readEffectiveTurns (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\transcript-review\effective-reader.ts:29:30)
+        at async validate (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.ts:71:27)
+        at async Object.get (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.ts:98:7)
+        at async Object.get (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.ts:37:25)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.test.ts:63:5)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\api\src\whatsapp-review\review-source.test.ts:1:5577
+✖ effective redaction during the last candidate consistency lookup refuses unchanged candidate JSON (1.706ms)
+  AssertionError [ERR_ASSERTION]: The error is expected to be an instance of "ReviewSourceStaleError". Received "Error"
+  
+  Error message:
+  
+  Reviewed source passage changed; source reconciliation required
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.test.ts:87:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Reviewed source passage changed; source reconciliation required
+        at readEffectiveTurns (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\transcript-review\effective-reader.ts:29:30)
+        at async validate (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.ts:71:27)
+        at async Object.get (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.ts:104:7)
+        at async Object.get (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.ts:37:25)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\whatsapp-review\review-source.test.ts:87:3)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:960:7),
+    operator: 'rejects',
+    diff: 'simple'
+  }
+

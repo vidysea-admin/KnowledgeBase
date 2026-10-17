@@ -1,0 +1,5 @@
+{
+  "command": "node node_modules/typescript/bin/tsc --noEmit -p apps/web/tsconfig.json",
+  "exitCode": 2,
+  "durationSeconds": 7.0946297
+}

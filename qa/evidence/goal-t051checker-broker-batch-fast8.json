@@ -1,0 +1,28 @@
+{
+  "ready": [
+    "t011-native-acl",
+    "t040-product-independent",
+    "t060-retention-factory",
+    "t011-known-clock-diagnostic"
+  ],
+  "skipped": [
+    {
+      "n": "t015-cycle2-import",
+      "drift": [
+        [
+          "scripts/lib/transcription/private-recording.mjs",
+          "f11d427af9259fec963dcc2bb3566f30ab50167ea738f8dd3563c18f09e0fcc6"
+        ]
+      ]
+    },
+    {
+      "n": "t015-cycle2-validate",
+      "drift": [
+        [
+          "scripts/lib/transcription/private-recording.mjs",
+          "f11d427af9259fec963dcc2bb3566f30ab50167ea738f8dd3563c18f09e0fcc6"
+        ]
+      ]
+    }
+  ]
+}

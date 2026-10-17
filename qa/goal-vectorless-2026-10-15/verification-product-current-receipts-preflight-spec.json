@@ -1,0 +1,35 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "ONE root-authorized current receipts bounded read-only mechanics preflight; no reviewer or PASS",
+  "phase": "verification-support",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-preflight-v3.mjs",
+    "--root",
+    "C:/Users/product/Desktop/KnowledgeBase",
+    "--spec",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-spec-current-receipts.json",
+    "--spec-sha",
+    "0af4f0fdc3dcc299730957cec17eb7cb1e113a9499d7731288b503b5e47087b1",
+    "--out",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-mechanics-current-receipts"
+  ],
+  "testIDs": [],
+  "expectedSelectedNames": 11,
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-product-current-receipts-preflight",
+  "pins": {
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v3.mjs": "f5d3d0171341d83f7a36997200daff213d44fcc8dd7148cbfca4f8543fb789c6",
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec-current-receipts.json": "0af4f0fdc3dcc299730957cec17eb7cb1e113a9499d7731288b503b5e47087b1"
+  }
+}

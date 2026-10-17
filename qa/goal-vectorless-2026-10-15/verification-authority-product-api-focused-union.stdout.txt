@@ -1,0 +1,71 @@
+✔ human-authorized history/answer-review endpoints preserve scope, tenant, revision and duplicate boundaries (259.3866ms)
+✔ API-key scopes and claimed human labels cannot approve, prefer sources or label usefulness without trusted authority (46.1099ms)
+✔ human verification fails closed on absent, foreign, nonhuman, malformed and unavailable authority (108.8331ms)
+✔ trusted human authority receives each action and persists source preference attribution (47.35ms)
+✔ composition denies unset review authority before either mounted router touches Mongo (10.519ms)
+✔ composition binds both mounted routes to the exact configured tenant and key (5.6799ms)
+✔ configured identity without proposal or review permission cannot read source authority (1.7994ms)
+✖ configured automation reaches authorized proposal and source snapshots but cannot review (13.4753ms)
+✔ malformed server review configuration fails composition before Mongo access (1.6199ms)
+✔ actual authenticated routes enforce all write scopes, tenant scope, body validation and gaps compatibility (235.6633ms)
+✔ unconfigured flywheel answers safe503 after scope validation, with no writes (19.9413ms)
+✔ actual shared createServer mount invokes the flywheel using the verified tenant (28.8514ms)
+✔ stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers (33.1991ms)
+✔ tie/win/missing/malformed finite score and foreign loss never write gaps (3.2778ms)
+✔ original input drift cannot silently bind a previously accepted gap (2.6271ms)
+✔ received requires actual scoped transcript/consent/source/session; forged receipts never index (18.0713ms)
+✔ degraded/index mismatch/empty/incomplete output refuses Ask, while received remains honest (24.4196ms)
+✔ drift during indexing and foreign chunks cannot be mistaken for current capture (7.636ms)
+✔ provider/index/Ask/child-write failures stay visible and valid retry reuses established capture/index (33.6829ms)
+✔ concurrent attempt CAS and expired restart lock preserve exactly one accepted child (17.2ms)
+✔ crash after immutable child persistence resumes without repeating Ask (17.1618ms)
+✔ expired gap and source URL rebinding refuse; DB names remain bounded (5.4293ms)
+✔ provider deadline returns honest failure and retains lease until expiry; late callback cannot advance head (16.6182ms)
+✔ idempotent retry preserves a later explicit internal child score without copying it to the original (4.5687ms)
+✔ ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head (7.8539ms)
+✔ newer interrupted child resumes promotion while completed historical replay leaves its recovery untouched (9.3912ms)
+✔ storage read deadlines refuse without dispatch or recovery writes (22.1634ms)
+✔ source and index read deadlines keep the lease and never trigger index rebuild (29.4018ms)
+✔ child readback deadline preserves the persisted child and retry never repeats Ask (16.0249ms)
+✔ terminal CAS deadline preserves committed completion or fences a late CAS after recovery (31.6708ms)
+✔ relationship source authenticates verified principal and scope before reading authority (71.1259ms)
+✔ relationship source projects exact current base digest hashes and trusted capabilities (7.3875ms)
+✔ relationship source rejects identity permission hash extras and invalid filters (53.4765ms)
+✔ relationship source fails closed on absent foreign malformed and unauthorized policy (31.4928ms)
+✔ relationship source refuses missing foreign unresolved stale-shaped authority (24.7584ms)
+✔ relationship source refuses missing malformed or inherited transcript hashes and evidence (26.0293ms)
+✔ relationship source refuses overbounds and duplicate statements without truncation (18.5798ms)
+✔ relationship source sanitizes asynchronous policy and snapshot failures (10.9077ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 37
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8771.8719
+
+✖ failing tests:
+
+test at apps\api\src\composition\integrations\reviews.test.ts:1:3986
+✖ configured automation reaches authorized proposal and source snapshots but cannot review (13.4753ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'speaker_relationships',
+      'speakers',
+  +   'speaker_relationships',
+      'speakers'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\reviews.test.ts:88:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'speaker_relationships', 'speakers', 'speaker_relationships', 'speakers' ],
+    expected: [ 'speakers', 'speakers' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,45 @@
+# T-042 — webinar speaker identification: parent acceptance
+
+**Owner:** independent checker; maker must not edit this contract.
+**Scope:** full T-042, not only the existing aligner, fusion, sampler or suggestion builder.
+**Priority:** tier 3 roadmap task. Contract established 2026-10-14 under the root's exclusive file lease.
+**Authority:** TASKS.md T-042; docs/meeting-bot-roadmap.md P4; ARCHITECTURE.md H3/H4 and tenancy/schema rules; D-141 and D-160; AGENTS.md definition of done and maker-checker handshake.
+
+The roadmap requires mapping anonymous `spk:N` webinar turns to panelist names using platform tiles, introductions and the existing speaker path, with four panelists named correctly. D-160 constrains tile-derived names, including tile/introduction agreement, to SUGGESTED until a human confirms. A default-off capture flag remains required. A fixture or synthetic four-person demonstration cannot establish real-platform correctness.
+
+## Full parent acceptance
+
+| ID | Required behavior | Evidence needed for parent closure |
+|---|---|---|
+| P1 | The meeting bot captures active-speaker display names on the actual supported webinar platform. Off by default; flag off adds no tile file reads, writes, sampling or suggestion calls. Unsupported markup, no highlight and multiple highlights are represented conservatively. | Real platform capture receipt and observed DOM/indicator behavior; focused flag-off, missing/ambiguous-markup and failure checks. Meet fixtures alone do not prove Zoho capture. |
+| P2 | Capture samples periodically with a measured interval compatible with the aligner's hold bound, including unchanged highlights and release events. Capture failure is observable without crashing or falsely succeeding the meeting pipeline. | Real sampling timestamps/cadence, documented coverage gaps and failure outcome. Candidate selectors and swallowed exceptions are not evidence of successful capture. |
+| P3 | Observations and transcript turns share a verified recording-relative time origin. Recording start and capture start come from trusted session context and a measured common clock; any offset is applied explicitly. No inference from the anonymous speaker labels substitutes for clock proof. | Origin provenance, offset computation, recording duration and timestamps; checks for missing/non-finite origins, clipping before recording, samples outside trusted bounds, stale/concatenated sidecars and drift. Sidecar assertions alone cannot certify the caller's tenant/session or clock. |
+| P4 | Alignment/fusion uses grounded evidence and preserves conservative refusals: weak coverage, excessive lag, multiple people per label, one name on multiple labels, introduction conflict, invalid names and contradictory tile evidence do not create a guessed attribution. | Relevant existing checker-qualified regressions plus independent boundary probes at the wired caller. Names, turn IDs, evidence spans and refusal reasons remain inspectable. |
+| P5 | Every result whose identity rests on a tile, including `agree`, is persisted only as a suggested name with tile provenance. It cannot become a final speaker through ingestion, indexing, sync, retry, UI display or a second agreeing signal. | Actual wired write/read path; no final-speaker write before confirmation. D-160 suggested-only behavior verified at the immediate consumer, not only in a pure helper. |
+| P6 | An explicit human confirmation is the only promotion path for tile-derived names. Rejection and confirmation survive re-indexing, retries and duplicate capture intake; automated rebuilding neither resets decisions nor silently reactivates a rejected row. | Confirmation/rejection API/store exercise, idempotent rerun and persisted readback with audit/provenance. Existing human decisions remain byte-identical where unaffected. |
+| P7 | Tenant and session identity come from trusted runtime context. Capture intake, suggestion insert/list/confirm/reject and final speaker aliases/evidence cannot read or mutate another tenant/session even when identifiers collide. | Two-tenant/session collision probes over the real production boundary, scoped filters and unchanged foreign rows. Local fake storage can verify source behavior but must be identified as such. |
+| P8 | Confirmed identity is compatible with the existing speaker/alias and transcript paths. Turn timestamps and text stay intact; anonymous labels are retained where unresolved. Evidence identifies the applicable session and turns; merged diarizer labels must not acquire unsupported label-wide identity. | Persisted alias/provenance readback and immediate transcript/review/KB consumer output. Accurate naming of one turn is insufficient proof for every turn sharing its label. |
+| P9 | Capture-to-suggestion processing is reachable from the production session flow through an explicit opt-in hook. File/string adapters or pure exports that have no caller are foundations only. Malformed capture cannot make indexing falsely report a complete naming result. | Changed caller map, exercised enabled/disabled branch, terminal/degraded outcome and retry behavior. Central integration owns any existing-hook edits. |
+| P10 | A real four-panelist webinar sample is checked against an independently established roster and turn-level speaker reference. Report 4/4 or the actual denominator, coverage, wrong/unresolved/conflicting labels and provenance; record any miss rather than replacing the reference with a simpler fixture. | Recording/capture/transcript identity and hashes, independent expected names/turns, measured naming results, human confirmations where tile-derived, and downstream named transcript/KB readback. |
+| P11 | Required repository checks pass on the final candidate, the affected stage runs green on sample data, and the immediate downstream stage consumes it without error. | Exact commands, exits/counts/output artifacts and final hashes; `contracts/verify_contracts.py` as applicable. Root CPU lease precedes execution. |
+| P12 | The current-cycle manifest, packet, evidence and independent verdict certify the same final bytes and accurately distinguish implemented features from real-runtime/human gates. | `ready-for-check` + Fix cycle N; matching verdict Cycle checked N; maker closes only after supported PASS. Whole-task status remains in progress until every P clause has evidence. |
+
+## Clock-verified adapter slice: permitted narrower verdict
+
+The proposed new API adapter can be checked at source/fixture scope without closing T-042. Its own manifest must name this narrower scope and retain all parent gates above.
+
+1. Default off returns without capture parsing, suggestion/store calls or metadata I/O.
+2. Enabled intake receives trusted tenant/session and independently verified common-clock recording context. It refuses missing/invalid/unverified origins and stale or duplicate capture metadata. Caller identity is never taken from untrusted sidecar data.
+3. It shifts sample times by `captureStart - recordingStart`, conservatively drops pre-recording observations and bounds samples against trusted session time. A late capture is valid when its samples overlap the recording; all-outside or insufficient coverage yields no name.
+4. It calls the existing alignment/fusion/suggestion mechanisms, records only suggested tile rows, preserves conflicts, and uses tenant/session-scoped idempotent writes. Confirmed/rejected rows survive retries.
+5. A focused four-person synthetic sample proves exact transformed times and suggestion rows; hostile clock/metadata, flag-off and foreign-tenant/session cases prove boundaries. The immediate existing suggestion read/confirmation consumer consumes those rows.
+6. Checks record exact final hashes and current cycle. An independent adapter PASS does not imply a production hook exists, live selectors work, measured cadence/drift is safe, people are correctly identified in a real session, or T-042 is done.
+
+## Current evidence limits
+
+- `t042-speaker-tile-alignment` and `t042-self-introduction-fusion` were independently PASSed as conservative helper slices, explicitly synthetic/unwired.
+- `w042` PASS covers a default-off Meet sampler and suggested-only builder using fixtures/fake storage. Its selectors remain unvalidated on a live call.
+- The existing `2026-09-24-zoho-next-european-study-destinations/meta.json` lists Devanshi, Anjum and Sagar: three names. It is not an independently checked four-panelist reference. Its prefilled metadata cannot prove automated capture attribution.
+- Browsers and CPU tests are currently restricted by root coordination. This contract records acceptance, not executed checks or a verdict. Missing live/human evidence is a HOLD on full completion, even if an adapter slice later passes.
+
+Issue-fix units replay their cited ledger reproductions verbatim from the union of issue shards and report counts by ID (D-015). Security/tenancy/write findings remain uncapped. No acceptance clause may be reduced merely to fit an available synthetic sample or time budget.

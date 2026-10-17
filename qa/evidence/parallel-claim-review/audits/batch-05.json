@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 5,
+  "entries": [
+    {
+      "index": 25,
+      "claimId": "2026-06-03-dual-enrollment-pathway-c03",
+      "inputHash": "064971b65cc8c720d9053c7e81c7a1fed688a6f67803f807bcb98028b1a1ad2d",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t087 states an Ohio State definition and timing of enrolment after high-school graduation, so the unqualified freshman/transfer rule extends its institutional scope. Current same-ID t087 discusses application rigor, not classification. All provided hashes and identity bindings verified. No duplicate supplied references. Original speakerRef unknown; embedded names establish no identity. Transcript support does not establish external truth or policy currency. Changed timings and speakers are recorded in evidenceHashes.",
+      "evidenceHashes": {
+        "inputHashVerified": true,
+        "claimRecordSha256": "05c75e750c83654b5a953552914079fcd8d4d524a8e3ca1942c96ab3d4dbb907",
+        "claimTextSha256": "20ee43d9bbc17ffc606232a4d6dfaeaa006971aaa90d4fe8f13996c49b04a6d7",
+        "sourceBindingSha256": "896494e6abeac3201f833684c75c1ebd6c0faf50ed7d1847f4cdec8d605a80ca",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t087",
+            "contextVersion": "originalMigration",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+            "artifactNormalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "records": [
+              {
+                "textSha256": "982a27faedffa942dda02da3ca8ee1e7096a39b6bd53e0724b5fadfb875f6935",
+                "contextSha256": "3d3c482f83300c61637b655d6e5612c86de7e413efa492cbc32953705bccef6e",
+                "textHashVerified": true,
+                "speakerRef": "unknown",
+                "tStart": 2173,
+                "tEnd": 2217
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t087",
+            "contextVersion": "current",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+            "artifactNormalizedLfSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+            "revision": null,
+            "records": [
+              {
+                "textSha256": "330e6e548ca2b463082f8f1f76a24133c739a7a4b8613129b68e3293a5e3bd28",
+                "contextSha256": "aeead451c7c53a0e3793223ecd679c6a04590294ea62e64f2188ee610171f556",
+                "textHashVerified": true,
+                "speakerRef": "Michelle Prince Spetz",
+                "tStart": 3678,
+                "tEnd": 3721
+              }
+            ]
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": true
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 26,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c01",
+      "inputHash": "eafb6424774958e09202c44b3e5ebe316033ecc51c7cb2232eb936acd148e09d",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t017-t018 directly state roughly 12-13 lakh JEE aspirants, close to 40,000 NIT/IIT seats and the speaker framing of competition for those seats. Current same-ID turns are a brief exchange and postgraduate-admission question; neither supports those numbers or framing. All provided hashes and identity bindings verified. No duplicate supplied references. Original speakerRef unknown; embedded names establish no identity. Transcript support does not establish external truth or policy currency. Changed timings and speakers are recorded in evidenceHashes.",
+      "evidenceHashes": {
+        "inputHashVerified": true,
+        "claimRecordSha256": "bafa3578b7917558ad05c3b8920dbe0f5b201cbf80017f931a789d2589d1a86d",
+        "claimTextSha256": "2473a887d7d4db50be4fa20d5cf946a5e6c50957a290c282dfa34a1447196bdb",
+        "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+            "contextVersion": "originalMigration",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+            "artifactNormalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "records": [
+              {
+                "textSha256": "47a726a7dd30d88f77925b68b069dfcd657d95cd3c3ae88442a7b28fb3846a84",
+                "contextSha256": "a375e2b223e955c267882ae72eaab48d69450519102af2a3d389add27180c2ec",
+                "textHashVerified": true,
+                "speakerRef": "unknown",
+                "tStart": 465,
+                "tEnd": 524
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+            "contextVersion": "current",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "artifactNormalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "revision": null,
+            "records": [
+              {
+                "textSha256": "a3047a17fbde4b0786ec65f5273d5307afd51e2f8c8e34dceecf44e81f298834",
+                "contextSha256": "55b01e63cc2df1b425f63fbfa751f16d3bd4736dcb5cb062eee687bbae25b6f3",
+                "textHashVerified": true,
+                "speakerRef": "Chirag",
+                "tStart": 3069,
+                "tEnd": 3071
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+            "contextVersion": "originalMigration",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+            "artifactNormalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "records": [
+              {
+                "textSha256": "9f2cb870563ab456d9432288b9509a2da90ab623c848f2269d716e547bcb3f76",
+                "contextSha256": "7c45ae06128461e9c29e69da70bdcd08e8b7d93790950e7e1f4a1d7ed5f912c8",
+                "textHashVerified": true,
+                "speakerRef": "unknown",
+                "tStart": 524,
+                "tEnd": 573
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+            "contextVersion": "current",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "artifactNormalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "revision": null,
+            "records": [
+              {
+                "textSha256": "79ccd6fd6faf8d6c875e633cf1045823499db6e7758beb9f9faea5eb70249d64",
+                "contextSha256": "9c5996347673b6d3def803072a7c112492e8118ec0fa9afccbe69c3a04862a2f",
+                "textHashVerified": true,
+                "speakerRef": "Ambika",
+                "tStart": 3071,
+                "tEnd": 3075
+              }
+            ]
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 27,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+      "inputHash": "47295b5229b8d8020ff21a639473bc81fa380f097fbd487dc67a6e606c6760cb",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": "Original t051 reports expected 2026 government seats around 58-60 thousand and 40 students competing per government seat, but never identifies those 40 as qualified candidates. It separately gives 12.5 lakh qualified, versus 22 lakh-plus appeared, and the 50% private/deemed statement introduces ambiguity. The claim converts an expectation into an actual seat count and changes the denominator. Current t051 is absent. All provided hashes and identity bindings verified. No duplicate supplied references. Original speakerRef unknown; embedded names establish no identity. Transcript support does not establish external truth or policy currency. Changed timings and speakers are recorded in evidenceHashes.",
+      "evidenceHashes": {
+        "inputHashVerified": true,
+        "claimRecordSha256": "d3a8ef2cd6e421a9a8043009fd884e1434bd4085091bad6694a27b2d38238415",
+        "claimTextSha256": "247e80e47178eb881f21ca4462c91f60eb7039b133480bc5c63ec4a810f07db1",
+        "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+            "contextVersion": "originalMigration",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+            "artifactNormalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "records": [
+              {
+                "textSha256": "84effd6b87fd38a0164144ca847471b11efcaed06a7557aa7a212555098c7713",
+                "contextSha256": "ea01eb53708c287011a68efda3aec574320407bbf7c9fed497abadfa7abb4232",
+                "textHashVerified": true,
+                "speakerRef": "unknown",
+                "tStart": 1814,
+                "tEnd": 1857
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+            "contextVersion": "current",
+            "available": false,
+            "reason": "turn-absent",
+            "artifactRawSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "artifactNormalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "revision": null,
+            "records": []
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": false
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 28,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+      "inputHash": "36c42422a7cea4cc4fdf95f666e147f3b22d3683668d4acb3c543a88cbd0bde0",
+      "originalLabel": "entailed",
+      "currentLabel": "unresolvable",
+      "reason": "Original t060 directly describes the NEET inter-se merit order as higher Biology marks, then Chemistry, then Physics. Current t060 is absent; original support cannot fill that missing current citation. All provided hashes and identity bindings verified. No duplicate supplied references. Original speakerRef unknown; embedded names establish no identity. Transcript support does not establish external truth or policy currency. Changed timings and speakers are recorded in evidenceHashes.",
+      "evidenceHashes": {
+        "inputHashVerified": true,
+        "claimRecordSha256": "1d4ad4100a28532e2ec5f20d1b23f93e234c11bd754e979794405507e3a58875",
+        "claimTextSha256": "aaffc966b02c3a57162d5caed31059eafb0ed01b5ec3a93e595f6c4944776621",
+        "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+            "contextVersion": "originalMigration",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+            "artifactNormalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "records": [
+              {
+                "textSha256": "542860dff71f83ae7830f6abd482fd3edef088816c7de57c061bbc60797e2af1",
+                "contextSha256": "712ead1c19511cebb5f03e7ae803ec32c432bea70c6b7434483742e8dd936507",
+                "textHashVerified": true,
+                "speakerRef": "unknown",
+                "tStart": 2095,
+                "tEnd": 2127
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+            "contextVersion": "current",
+            "available": false,
+            "reason": "turn-absent",
+            "artifactRawSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "artifactNormalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "revision": null,
+            "records": []
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": false
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 29,
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+      "inputHash": "f29f69ae34fede95e512194844bb34ac36ecb22ed1b7e6818909e0a8295c4b82",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": "Original t059 states an illustrative 30-mark/14,500-rank difference, but its A-to-B change ends at a state-dependent government seat. The private/AYUSH example is C at 580 versus A at 650; it does not securely support the claimed 30-mark transition into needing private/AYUSH. Current t059 is absent. All provided hashes and identity bindings verified. No duplicate supplied references. Original speakerRef unknown; embedded names establish no identity. Transcript support does not establish external truth or policy currency. Changed timings and speakers are recorded in evidenceHashes.",
+      "evidenceHashes": {
+        "inputHashVerified": true,
+        "claimRecordSha256": "84bc3028621371e6389c7beebf63be20ce37cef100c8a3471851897de121c3ea",
+        "claimTextSha256": "b0198a9c77b840217a4f8b8eeb33b2b9fbe1b38fa1ccfe2045a87629dc86eacd",
+        "sourceBindingSha256": "ae0e5b680071dfc461cf9c766b79af4637641455a903042785c9f0ad56a3e8c7",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+            "contextVersion": "originalMigration",
+            "available": true,
+            "reason": null,
+            "artifactRawSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+            "artifactNormalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "records": [
+              {
+                "textSha256": "b4bbea5a0b86d84c1f44ac1ce3a39a9ec01e5847575208f12e56ff618ccd76ba",
+                "contextSha256": "79ab649be8e20ff4693a2f4f6c3c40608d6b4b43affeb30f00916bce1c3535bd",
+                "textHashVerified": true,
+                "speakerRef": "unknown",
+                "tStart": 2056,
+                "tEnd": 2095
+              }
+            ]
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+            "contextVersion": "current",
+            "available": false,
+            "reason": "turn-absent",
+            "artifactRawSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+            "artifactNormalizedLfSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+            "revision": null,
+            "records": []
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": false
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

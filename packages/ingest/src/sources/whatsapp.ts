@@ -20,7 +20,7 @@
  * (D-002/D-005 in that submodule) — a deliberate, informed choice by the person who owns the
  * linked account, not a background silent capture (D-008's provided-first ordering).
  */
-import type { Source, SourceDoc, MediaDoc, ConsentContext, Turn } from "../source.js";
+import { tenantSourceId, type Source, type SourceDoc, type MediaDoc, type ConsentContext, type Turn } from "../source.js";
 
 export interface WhatsAppMessage {
   /** The real, upstream-unique WhatsApp message id (`sources/whatsapp_msg`'s own
@@ -91,7 +91,7 @@ export function createWhatsAppSource(deps: WhatsAppAdapterDeps): Source {
       const hash = await deps.hasher(`${input.groupJid}:${input.ownerUserId}`);
 
       const source: WhatsAppSourceDoc = {
-        _id: hash,
+        _id: tenantSourceId(tenantId, hash),
         tenantId,
         kind: "whatsapp-batch",
         captureMode: consent.captureMode,

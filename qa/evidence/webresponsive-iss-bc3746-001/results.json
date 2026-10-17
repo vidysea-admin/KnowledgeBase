@@ -1,0 +1,718 @@
+[
+ {
+  "ok": true,
+  "msg": "375px / no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px / main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px / menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px / menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ask no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ask main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ask menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ask menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /search no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /search main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /search menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /search menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /brain no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /brain main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /brain menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /brain menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /explorer no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /explorer main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /explorer menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /explorer menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /graph-confidence no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /graph-confidence main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /graph-confidence menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /graph-confidence menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /gaps no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /gaps main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /gaps menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /gaps menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /activity-health no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /activity-health main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /activity-health menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /activity-health menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /analytics no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /analytics main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /analytics menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /analytics menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /join-rules no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /join-rules main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /join-rules menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /join-rules menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /calendar no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /calendar main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /calendar menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /calendar menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /watch no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /watch main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /watch menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /watch menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sources no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sources main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sources menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sources menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /settings no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /settings main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /settings menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /settings menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /jobs no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /jobs main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /jobs menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /jobs menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /claims no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /claims main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /claims menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /claims menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /status no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /status main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /status menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /status menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /setup no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /setup main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /setup menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /setup menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ops-health no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ops-health main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ops-health menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ops-health menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /notifications no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /notifications main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /notifications menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /notifications menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ingest no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ingest main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ingest menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /ingest menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /meeting-bot no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /meeting-bot main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /meeting-bot menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /meeting-bot menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /whatsapp no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /whatsapp main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /whatsapp menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /whatsapp menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions/x no horizontal page scroll (scrollWidth 375 vs 375)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions/x main gutter 16px (16)"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions/x menu button visible"
+ },
+ {
+  "ok": true,
+  "msg": "375px /sessions/x menu collapsed then opens"
+ },
+ {
+  "ok": true,
+  "msg": "375px injected wide table+pre+brain: page scrollWidth 375 vs 375"
+ },
+ {
+  "ok": true,
+  "msg": "375px table/pre scroll inside own box (table 1466>343, pre 2859>343)"
+ },
+ {
+  "ok": true,
+  "msg": "375px brain panel stacked under graph (panel width 309)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px / no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px / sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px / menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sessions no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sessions sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sessions menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ask no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ask sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ask menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /search no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /search sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /search menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /brain no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /brain sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /brain menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /explorer no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /explorer sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /explorer menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /graph-confidence no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /graph-confidence sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /graph-confidence menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /gaps no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /gaps sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /gaps menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /activity-health no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /activity-health sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /activity-health menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /analytics no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /analytics sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /analytics menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /join-rules no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /join-rules sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /join-rules menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /calendar no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /calendar sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /calendar menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /watch no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /watch sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /watch menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sources no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sources sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sources menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /settings no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /settings sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /settings menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /jobs no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /jobs sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /jobs menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /claims no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /claims sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /claims menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /status no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /status sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /status menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /setup no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /setup sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /setup menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ops-health no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ops-health sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ops-health menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /notifications no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /notifications sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /notifications menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ingest no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ingest sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /ingest menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /meeting-bot no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /meeting-bot sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /meeting-bot menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /whatsapp no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /whatsapp sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /whatsapp menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sessions/x no horizontal page scroll (scrollWidth 1280 vs 1280)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sessions/x sidebar 220px (220)"
+ },
+ {
+  "ok": true,
+  "msg": "1280px /sessions/x menu button hidden"
+ },
+ {
+  "ok": true,
+  "msg": "1280px brain panel stays 340px beside graph (340)"
+ }
+]

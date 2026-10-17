@@ -1,0 +1,38 @@
+2026-10-14 — focused maker evidence; no real FFmpeg/browser/provider process.
+
+Command: node --test --import tsx packages/meeting-bot/src/lean-video-ffmpeg.test.ts
+Sandbox result: exit 1, spawn EPERM from node:test child process (0.81s tool wall time).
+
+Command: node --test --test-isolation=none --import tsx packages/meeting-bot/src/lean-video-ffmpeg.test.ts
+Sandbox result: exit 1, spawn EPERM from tsx/esbuild (1.92s tool wall time).
+
+Same focused command, require_escalated (automatic review allowed): exit 0.
+Tool wall time: 1.758s; node test runner duration: 694.0873ms.
+16 PASS, 1 SKIP (Windows host cannot create file symlink), 0 FAIL.
+
+PASS opt-in publishes complete verified derivative, preserves original and clears scratch
+PASS disabled option makes no filesystem/subprocess changes
+PASS existing output is preserved without invoking encoder
+PASS failed missing-tool derivative uses untouched original and publishes nothing
+PASS failed timeout derivative uses untouched original and publishes nothing
+PASS failed no-audio derivative uses untouched original and publishes nothing
+PASS failed zero-packets derivative uses untouched original and publishes nothing
+PASS failed truncated derivative uses untouched original and publishes nothing
+PASS failed wrong-fps derivative uses untouched original and publishes nothing
+PASS failed exact-target derivative uses untouched original and publishes nothing
+PASS failed corrupt-decode derivative uses untouched original and publishes nothing
+PASS source change during encode refuses publication
+PASS destination appearing during conversion is never overwritten
+PASS protocol/relative paths and unsafe aliases are refused before probing
+SKIP symlink source cannot redirect into a different recording: host disallows file symlinks
+PASS hard-linked source alias is refused before probing
+PASS command keeps required AV, no overwrite/shell/shortest/cut, bounded encoder and file size
+
+Command: python contracts/verify_contracts.py
+Exit 0; tool wall time 0.636s.
+verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity
+
+No actual encoder measured by this evidence. This is scoped fake-command behavior.
+Execution happened before the root clarified exclusive queue-manager CPU grant;
+maker has reported completion to root and the queue owner, and starts no further
+CPU work without an explicit per-command grant. No process remains running.

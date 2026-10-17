@@ -1,0 +1,31 @@
+{
+  "unit": "goal-t022-offline-review",
+  "cycle": 0,
+  "classification": "Exact TESTONLY readiness gate; no private execution or generation authorized",
+  "supersedesRequestOnly": "72b10a16f30cd80258df24117f2c2b2df66a8b57e47a48d35732d85fda5f86c6",
+  "status": "FROZEN_NOT_EXECUTED_PRIVATE_STAGE_HOLD",
+  "requiredLiteralOptIn": "KB_T022_PRIVATE_REVIEW_TESTS=1",
+  "defaultExpected": {
+    "registered": 8,
+    "passed": 0,
+    "skipped": 8,
+    "privatePacketReads": 0,
+    "privateSourceCopies": 0,
+    "privateHtmlGeneration": 0
+  },
+  "authenticPrivateChecks": "HOLD pending explicit ordinary-coordinator classification; all eight authentic assertions retained",
+  "privateGeneration": "HOLD checkpoint; excluded from publication",
+  "pins": [
+    {
+      "path": "scripts/eval/t022-offline-review.mjs",
+      "bytes": 15790,
+      "sha256": "48ab7207f4164a82d6fbc6af013706895db037c4fa0cf06b6ec7747b9c7b6201"
+    },
+    {
+      "path": "scripts/eval/t022-offline-review.test.mjs",
+      "bytes": 14423,
+      "sha256": "6d52afa30862d3193faa0a961a22d05db116c9c358cb1dcedca962728df85ea9"
+    }
+  ],
+  "noActiveProcessHandle": true
+}

@@ -1,0 +1,29 @@
+✔ all three kinds synthesize through provider and independent grounding pass, then editable Markdown consumer (18.8955ms)
+✔ unknown model citations refuse generation without persistence (1.4962ms)
+✔ unsupported model interpretations remain withheld and cannot export (2.0224ms)
+✔ excluded unverified source claims remain visible as partial coverage and refusal policy cannot call them ready (21.0182ms)
+✔ draft edits persist and need explicit revalidation; adversarial factual edits remain refused (4.2158ms)
+✔ supported saved edit revalidates then exports; citation replacement/removal and stale concurrent edits refuse (3.9871ms)
+✔ foreign tenant cannot read/list/edit/revalidate/export or select another tenant's source (1.2447ms)
+✔ tenant/evidence/provider fields in requests cannot replace server authority (0.5058ms)
+✔ current source edit/deletion/unverification blocks export and revalidation (4.3756ms)
+✔ protected databases refuse the new write store without borrowing other feature opt-ins (1.0322ms)
+✔ source snapshot cannot expose mixed tenants or duplicate identities (1.0667ms)
+✔ policy dependency forwards tenant/kind, style and insufficiency; conflicts cannot widen grounding (1.1205ms)
+✔ policy revision changes and cached citation tampering refuse reopen/export (3.7821ms)
+✔ actual schema and cross-field validator refuse damaged stored identities, references, ranges and shape (4.472ms)
+✔ actual T056 service lookup applies saved tenant policy and refuses its changed revision (4.9331ms)
+✔ actual T007 approval capability excludes raw WhatsApp and rechecks current source drift before output/export (40.1451ms)
+✔ actual T054 reader consumes corrected source projection and invalidates the prior draft without raw mutation (8.1131ms)
+✔ document offsets and hostile user text stay safe in source-linked Markdown (1.218ms)
+✔ removing a withheld item preserves other verified mappings and truthful coverage (1.6616ms)
+✔ actual TOC unreviewed sample refuses; a clearly synthetic verified copy demonstrates downstream consumption without raw mutation (13.0942ms)
+✔ mounted router enforces authentication/scopes; provider error secrets remain private (182.3637ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2357.7679

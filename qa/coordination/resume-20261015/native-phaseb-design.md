@@ -1,0 +1,52 @@
+# Phase B: durable native archive and confirmed-index hook (design only)
+
+Scope: inspected native-spool.ts, native-media-finalize.ts, tiles/native-measurement.ts, native-capture-runtime.ts, record-consent/native-provider-audio.ts; API indexing/types.ts, indexing/session.ts, indexing/generation.ts, composition/integrations/transcripts.ts and transcript-review/refresh-executor.ts. Loaded AGENTS.md and checker/SKILL.md. No source edits, execution, DB/provider work or verdict. Paths below identify logical components; coordinate movement and all composition edits with root's lease.
+
+## Present gap
+
+ClosedNativeSpool, NativeFinalizedMedia, QualifiedCaptureClock and NativeProviderAudio are process-private WeakMap/WeakSet capabilities. JSON copies are intentionally rejected. selected-provider.receipt.json currently says qualification unavailable and must remain descriptive. NativeMeasurementAuthority also requires a freshly issued canonical clock plus matching current committed tile binding. An import or cast cannot bridge CLI to API.
+
+## Least-scope durable bridge
+
+Add logical capture/native-archive.ts (final physical package location follows movement plan), with a private trusted store rooted in an administrator-selected, ACL-verified capture archive, distinct from imported source paths. Add native-archive-types.ts only if necessary for neutral wire-free types. Do not accept root, absolute artifact paths, issuer callbacks, qualification, decoder executable or manifest from HTTP/source JSON.
+
+Suggested internal surface:
+
+- `openNativeArchiveStore({root, readCurrentConsent, decoder, platformVerifier}) -> NativeArchiveStore`; functions/config supplied only by server composition.
+- `store.seal({media, providerAudio, recordDir, sourceBinding, sidecar}) -> ArchiveId`; requires live requireNativeFinalizedMedia/requireNativeProviderAudio and current exact receipt before and after readback. Source binding is independently admitted tenant/session/source identity plus raw source/sidecar bytes hashes, never a JSON native flag.
+- `store.rehydrate({archiveId, tenantId, sessionId, expectedCaptureGeneration, expectedReceiptSha256}) -> NativeArchive | unavailable`; archive ID selects only store-owned registry entries. Returned object is privately issued; its manifest is never an issuer.
+- `store.pending()` and `store.markPublished(id, expectedBinding)`; pending means eligible for verification, never native-ready.
+
+Store layout: immutable exclusive archive-id directory, bounded raw IVF/PCM/journal/completion marker, canonical selected WAV, playback and actual public video, actual provider WAV/mask receipt, sampler sidecar, raw source hash and consent bytes/hash, capture identity, finalizer parameters, original decoder identities, reservation/inventory. Keep an append-only private store journal of seal/pending/published/tombstone records referencing exact manifest hash. Only trusted seal code writes the admission record after live-capability checks; archive JSON alone, existing imported folders and completion markers cannot enroll themselves. Write/fsync files, atomically no-clobber install archive, then fsync admission journal; crash before admission leaves an orphan that is refused. A published record is only a replay hint: every consumer still verifies current index and consent.
+
+CLI/API deployment must share this trusted archive/control boundary. If the CLI cannot access the same trusted local store, it must submit capture to an authenticated existing server-owned admission channel; do not invent a new key or self-enroll JSON. OS processes running with the trusted writer identity are inside this threat boundary; ACLs do not authenticate a hostile same-user process. A stronger boundary needs an approved service identity/channel, currently unproven.
+
+## Reproof and exact component changes
+
+`native-spool.ts`: extract bounded journal replay/IVF/PCM validation used by resume into an internal closed-spool reader; add rehydrate from a private archive-admission capability, not a public options/JSON overload. Recheck identity, quotas, sequence/retry fingerprints, input/video/audio/clock observations, marker, no poison/incomplete/lease state, raw hashes, per-chunk hashes, exact file EOF/framing and ledger.finish(). Paths come from store-relative inventory. Recreate issued state and current inode/dev fingerprints only after all checks. Old persisted inode values are diagnostics, not authority after safe copying.
+
+`native-media-finalize.ts`: add internal reproof of existing retained outputs, avoiding a second mux. Freshly probe raw IVF, selected WAV and actual public playback using server-configured bounded decoder; require complete decode, exact selected PCM/sample count/zero PTS/no priming, exhaustive video decoded frame/interval map; rebuild transform and finalizer capabilities from actual readback. Refuse unsupported public-video transforms unless their existing authoritative transform subsystem can reprove them. Hash all files before/after; raw receipts never supply decoder argv/path authority.
+
+`native-measurement.ts`: rerun createNativeCaptureClockQualifier using the independently retained real-platform corpus verifier and matching full browser/extension/clock/host/sampler identity. Never reissue from persisted calculated bounds, residuals, signatures or qualification JSON. Missing verifier returns unavailable. Keep pre-index clock and post-index measurement authority separate.
+
+`native-provider-audio.ts`: internally reprove the archived provider WAV against current consent and reissued canonical measurement. Recompute guarded intervals, verify silence throughout each interval and exact original PCM outside intervals, full header/EOF/sample identity, mask receipt bytes and current consent hash. Reissue capability only after success; no need to allocate a replacement WAV. Nonprivate provider WAV must equal canonical WAV. Retain every canonical sample; arbitrary trimming unsupported.
+
+`native-capture-runtime.ts`: trusted finalizer seals the archive only after actual provider/public projection artifacts and source/sidecar binding are available (the owning downstream finalizer may be the correct caller). Do not seal early in onClosed before privacy/provider artifacts exist. Current unavailable receipt does not become qualification.
+
+## Successful index boundary, without a new DB schema
+
+No existing outbox/afterCommit hook was found in the scoped components. Add optional server-only `onIndexCommitted` dependency in indexing/types.ts/session.ts: input tenant/session and exact verified index binding (generation, sourceId, turnDigest) plus independently loaded review revision; returns a small availability outcome. Invoke in public indexSession only after acknowledged outer commit, or after confirmed completion in its non-owning nontransactional branch. Never invoke inside indexSessionWithinPublication: transcript refresh calls it inside a caller-owned transaction. Degraded/incomplete/failed/unknown-commit results do not invoke. Post-index hook failure records archive pending/unavailable and does not misreport already committed knowledge as rolled back.
+
+For caller-owned transcript refresh: add `onCommitted` server dependency to refresh-executor.ts, retain exact completed index result/binding, and call only after its own commit succeeds (including already-completed reconciliation by verified current generation). composition/integrations/transcripts.ts supplies this callback; do not pass the indexSession hook into the transactional inner call. Standalone Mongo unsupported transactions remain a real gate.
+
+Add logical API capture/native-index-archive.ts: `createNativePostIndexHook({archiveStore, readCommittedCapture, verifyIndexGeneration, readCurrentRevision, publish})`. Use the same readCommittedCapture for tiles and createNativeMeasurementAuthority. Rehydrate from trusted archive, reprove media/provider/qualification, join exact tenant/session/source bytes+sidecar hashes, current receipt digest/capture generation, current effective-turn digest, index generation/sourceId, review revision, sampler/host/platform, actual public/provider paths+hashes. Re-read current state immediately before CAS publication. Mark published idempotently by full binding; newer generation/revision/consent invalidates prior publication.
+
+Durability uses sealed archives' pending state, not a new collection: on startup/on index-success scan a bounded set of admitted pending archives, discover current verified index binding from DB, and perform the same full joins/CAS. This closes crash-after-index-commit-before-hook. Recovery must discover current source provenance through authoritative server readback, never copied IndexSessionResult JSON. If this join is unavailable, leave pending. No startup scan may create a platform qualifier or infer a successful commit. Transactional DB outbox is a possible later optimization, not required for this unit.
+
+Composition wiring remains root-owned: thread the optional hook into normal buildIndexer and refresh's outer-commit callback, construct archive store only with trusted roots/configuration, and wire authority into tile registry. Construction performs no provider calls or DB writes. Hook execution is after confirmed publication.
+
+## Failure and security probes required for implementation
+
+Restart/cross-process positive reproof; unattested JSON/copy/orphan refusal; wrong tenant/source/capture generation/index generation/review revision/current receipt; revoked consent; poisoned/incomplete/gapped spool; changed raw PCM/IVF/journal, selected WAV, sidecar/public video/provider mask; decoded sample/frame mismatch; substituted decoder/config/corpus; links/reparse ancestors/replacement during read; quotas/deadlines; crash before seal/admission/after index commit; repeated hooks; stale-generation CAS conflict; rollback and unknown commit never publishing. No native PASS without independent checker and required downstream checks.
+
+Remaining real-platform unknowns: independently measured Meet/browser-build/extension applicability corpus and host/audio-output/sampler lag/drift bounds; available trusted capture admission deployment identity/channel; durable sampler lineage across processes; actual public-video privacy transform reproof; exact authoritative source/review-revision join in production. These are gates, not zero bounds or simulated qualification.

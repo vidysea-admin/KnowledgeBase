@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 50,
+  "originalIndex": 55,
+  "claimId": "2026-07-30-in-focus-3-c03",
+  "inputHash": "ad3ae59c157bd06448602b634500e84cf84502312b2c933598901f123c059055",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original New Zealand context states a guaranteed three-year post-study work visa for bachelor students, says there are no ifs and buts, and explicitly says employer support is unnecessary. This supports the claim as a transcript assertion.",
+    "missingReferences": [],
+    "caveats": [
+      "The original speaks of students coming for a bachelor degree; graduate status is implicit in post-study work rather than separately specified.",
+      "The unconditional guarantee is the speaker assertion; legal eligibility and external factual truth are unverified.",
+      "Stored speakerRef is unknown; the name embedded in transcript text does not establish identity.",
+      "The same turn ID has changed content, speakerRef, and timing: original 2784-2818 seconds, current 3491-3509 seconds.",
+      "No missing or duplicate references in the supplied citation contexts. Raw artifact hashes and normalized-LF hashes are distinct; artifact bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-30-in-focus-3",
+        "turnId": "2026-07-30-in-focus-3-t094",
+        "contextVersion": "originalMigration",
+        "quote": "if a student is coming for a bachelor's degree, they will be given a three-year post-study work visa guaranteed. There are no ifs and buts about it; they don't even need an employer to support them.",
+        "textSha256": "e83ae7180505e3c7b5ccc66c41c9a594041aa5675457a3ad7e98c0195742f229",
+        "contextSha256": "b95f5c077f3a0b98b7cea8847b815fdd51984c2409414ff5ea0d3c1dd9b9288e",
+        "artifactSha256": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2784,
+        "tEnd": 2818,
+        "supports": "Supports New Zealand bachelor pathway, guaranteed three-year post-study work visa, and stated unconditionality/no employer support."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn concerns InFocus applications, monthly frequency, and selection of two applicants. It supports none of the New Zealand bachelor graduate, three-year visa, guarantee, or unconditionality components.",
+    "missingReferences": [],
+    "caveats": [
+      "Same citation ID now points to unrelated content; original evidence cannot substitute for current evidence.",
+      "Stored speakerRef spk:2 does not establish a person identity.",
+      "Timing changed from original 2784-2818 seconds to current 3491-3509 seconds.",
+      "No missing or duplicate references in the supplied citation contexts.",
+      "Raw artifact hash is distinct from normalized-LF hash; artifact bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-30-in-focus-3",
+        "turnId": "2026-07-30-in-focus-3-t094",
+        "contextVersion": "current",
+        "quote": "InFocus is for everyone, so you just got to apply for that, and it happens every month. We pick up two uh credible applicants",
+        "textSha256": "f75b448a80f8de5541b5720cf0d0b95864a74a38044651e6132d9f3e7f99ae18",
+        "contextSha256": "b390f91f7a64e7fc6ce060d07515f20a3e4fb6cf95a77a52fb5ba02ac48c52be",
+        "artifactSha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+        "revision": null,
+        "speakerRef": "spk:2",
+        "tStart": 3491,
+        "tEnd": 3509,
+        "supports": "Unrelated InFocus program discussion; supports no component of the visa claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports the claim as an asserted unconditional visa guarantee; the same current turn ID contains unrelated InFocus closing remarks. External factual truth and human adjudication remain open."
+}

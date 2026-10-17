@@ -1,0 +1,12 @@
+✔ memory fixture distinguishes missing dotted fields and acknowledges only matched CAS writes (2.8805ms)
+✔ stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers (17.6862ms)
+✔ concurrent attempt CAS and expired restart lock preserve exactly one accepted child (11.8665ms)
+✔ terminal CAS deadline preserves committed completion or fences a late CAS after recovery (38.9331ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1962.7862

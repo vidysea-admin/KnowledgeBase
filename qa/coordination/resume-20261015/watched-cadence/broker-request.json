@@ -1,0 +1,35 @@
+{
+  "receipt_fields": [
+    "exact executable/version/import roots/lock hash",
+    "complete stdout/stderr ownexit testcounts durations",
+    "before/after current candidate/dependency fingerprints",
+    "no secrets/environment values"
+  ],
+  "status": "REQUESTED_ROOT_SOLE_CPU_BROKER",
+  "required_later": [
+    "contracts/verify_contracts.py",
+    "affected API types plus imported root scripts through actual integration",
+    "scoped structure/cycle checks after central join"
+  ],
+  "cycle": 0,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "timeout_s": 60,
+  "source_pins": "qa/coordination/resume-20261015/watched-cadence/source-pins.json",
+  "expected_tests": 7,
+  "downstream": {
+    "cwd": "apps/api",
+    "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=10000 --import tsx src/connector-workflow/watched-job.test.ts",
+    "purpose": "existing snapshot consumer proof and queue/unchanged/failed downstream durability floor; do not reuse pre-cadence watched.ts identity receipts",
+    "expected_tests": 5
+  },
+  "candidate_content_manifest_sha256": "01b0a26ea7ab5658e80173a0616c874c8962aa8c24f32fdb50cf2acb45a1d317",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "prerequisites": [
+    "sole CPU lease; preserve Node24/tsx existing runtime; safe import containment and no provider/browser/native DB",
+    "hash exact source/dependency pins; stop on drift",
+    "apply existing approved QA runtime alias only if import preflight requires; no new canonical configuration"
+  ],
+  "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=10000 --import tsx scripts/watched-sources/host.test.ts",
+  "dependency_pins": "qa/coordination/resume-20261015/watched-cadence/dependency-pins.json",
+  "unit": "t053-watched-cadence"
+}

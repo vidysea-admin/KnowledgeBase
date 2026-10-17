@@ -1,0 +1,77 @@
+{
+  "unit": "resume-speaker-profile-client-observability",
+  "status": "QUEUED_ROOT_SOLE_BROKER",
+  "diagnosis": "Sandbox attempt failed config compilation because esbuild spawn EPERM. Escalated attempt passed config/startup banner but timed out before any collection/result receipt. Current two tests are synchronous, tiny fixtures with no timers/hooks/network; shared setup is a synchronous jest-dom import and ResizeObserver stub. Evidence cannot yet distinguish worker startup, environment/setup import, transform or collection hang; no product bug established.",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--require",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\worker-trace.cjs",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+    "--pool=threads",
+    "--poolOptions.threads.singleThread",
+    "--reporter=default",
+    "--reporter=C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\collection-reporter.mjs"
+  ],
+  "environment": {
+    "DEBUG": "vite:load,vite:transform,vite:resolve,vite-node:server:request,vite-node:client:execute,vite-node:client:native",
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeout_s": 35,
+  "execution": "Root broker only, require_escalated if admitted, existing scripts/qa/scoped-check-runner.py Tree JobObject containment; capture complete stdout/stderr and exit/timeout plus exact PID/tree ownership, source/config before-after pins. Existing test environment/plugins/setup/assertions remain intact.",
+  "expected_discrimination": [
+    "No reporter-init: reporter loading/config startup",
+    "paths/specs but no worker marker: scheduling/worker bootstrap",
+    "worker marker then vite-node/setup/jsdom import trace stall: environment/setup or module import",
+    "test module transformed but no collected: module evaluation/collection",
+    "collected/task-update: actual test execution/teardown"
+  ],
+  "source_changes": [],
+  "qa_probe_changes": [
+    "qa/coordination/resume-20261015/profile/collection-reporter.mjs",
+    "qa/coordination/resume-20261015/profile/worker-trace.cjs"
+  ],
+  "pins": [
+    {
+      "path": "apps/web/vitest.config.ts",
+      "sha256": "7F76B80C8E788CBD3EA649DB2596B69852CA0719B7F6D483CADD6DFEC88300F8"
+    },
+    {
+      "path": "apps/web/src/setupTests.ts",
+      "sha256": "2FDDD90FF11BED9CDA8302206EB123480FA8873E8FFD3B30BBD8E070973ADC08"
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "sha256": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802"
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+      "sha256": "C2F285E16E35C91F9C198558C1D1E1641D820DB229B266C979BB28835006439A"
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "sha256": "0592805B111B1DC29DA2C333B451875A4CF05BE8C454A9A93776EEA011E5CE3E"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/profile/collection-reporter.mjs",
+      "sha256": "F473F2CD94902CC35661C6FE3300F03DEC042E1B6E13DE45AB4384784368F3D9"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/profile/worker-trace.cjs",
+      "sha256": "33DFF582BEAA453FB3E94452C75913B0DDCE2D5D8E4741514D74CC7C73700E5A"
+    }
+  ],
+  "receipt_inputs": [
+    "qa/coordination/resume-20261015/broker/profile-vitest-receipt.json",
+    "qa/coordination/resume-20261015/broker/profile-vitest.log",
+    "qa/coordination/resume-20261015/broker/profile-escalated-receipt.json",
+    "qa/coordination/resume-20261015/broker/profile-escalated.log",
+    "qa/coordination/resume-20261015/broker/environment-checkpoint.md"
+  ],
+  "actual_total_tokens": null,
+  "independent_verdict": "not requested or claimed"
+}

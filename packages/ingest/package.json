@@ -8,6 +8,14 @@
     "test": "node --test --import tsx \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
-  "dependencies": { "@lkb/ai": "workspace:*", "@lkb/core": "workspace:*" },
-  "devDependencies": { "typescript": "5.9.3", "tsx": "4.23.13", "@types/node": "^24.0.0" }
+  "dependencies": {
+    "@lkb/ai": "workspace:*",
+    "@lkb/core": "workspace:*",
+    "pdfjs-dist": "6.4.299"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "tsx": "4.23.13",
+    "@types/node": "^24.0.0"
+  }
 }

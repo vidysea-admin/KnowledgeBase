@@ -1,0 +1,36 @@
+{
+  "schema": "review-runtime-usage/v1",
+  "unit": "runtime-accounting",
+  "cycle": 4,
+  "phase": "combined-review",
+  "boundary": "end",
+  "agent_prefix": "/root/checker_token_metric_fix/runtime_accounting_finisher",
+  "observed_at": "2026-10-15T11:46:57.536Z",
+  "coverage": "explicit_session_files_only",
+  "records": [
+    {
+      "identity": {
+        "thread_id": "01a13f5d-01ac-7a00-b7d0-dfd5d2157884",
+        "parent_thread_id": "01a13f31-b753-7c23-bf3f-2be93582454d",
+        "agent_path": "/root/checker_token_metric_fix/runtime_accounting_finisher"
+      },
+      "usage_timestamp": "2026-10-15T11:42:40.601Z",
+      "lifecycle": {
+        "type": "task_complete",
+        "timestamp": "2026-10-15T11:42:40.643Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 596557,
+        "cached_input_tokens": 565504,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4942,
+        "reasoning_output_tokens": 414,
+        "total_tokens": 601499
+      },
+      "status": "known",
+      "reasons": []
+    }
+  ],
+  "active_seconds": null,
+  "monetary_cost": null
+}

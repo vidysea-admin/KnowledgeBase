@@ -1,0 +1,8 @@
+{
+  "actualSourceMembership": 1573,
+  "totalPins": 1775,
+  "incorrectThreshold": 1700,
+  "compilerLaunched": false,
+  "reason": "Threshold incorrectly used total pin count while membership excludes external/runtime and supplemental configs",
+  "repair": "Separate exact expected membership count from total pin count; sentinel and exact membership checks retained"
+}

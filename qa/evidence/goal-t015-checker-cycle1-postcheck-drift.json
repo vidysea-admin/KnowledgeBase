@@ -1,0 +1,13 @@
+{
+  "checkedAt": "2026-10-14T21:19:44.7051587Z",
+  "cycle": 1,
+  "verdict": "HOLD",
+  "historicalSourcePassSHA256": "da9ccaac50c8b8d7e7a48aa7449e431c82f50b94374be90302e55818d1971a7f",
+  "currentVerdictSHA256": "76120b0ea2ce5e54940742f9e085a457a8220c5f7a5e6d26a75cee52d2f1ef96",
+  "sessionRowsSHA256": "684a6d3c5e6fafdd9879ce232d5b0703d6a1e7d667415e2be2b0543b70de8081",
+  "privateRecordingSHA256": "f11d427af9259fec963dcc2bb3566f30ab50167ea738f8dd3563c18f09e0fcc6",
+  "actualDependencyMutationTime": "unknown",
+  "activeHandle": "NONE",
+  "sourceChanged": false,
+  "required": "refreshed current dependency scope and minimal justified proof"
+}

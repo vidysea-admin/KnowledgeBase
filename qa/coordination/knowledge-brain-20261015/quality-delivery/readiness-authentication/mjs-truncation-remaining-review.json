@@ -1,0 +1,188 @@
+{
+  "status": "HOLD_NO_REVIEW_AUTHORITY",
+  "method": "Exact source-line presence in recorded delivered tool output, not proof of human/model comprehension; metadata preparation only.",
+  "actualTotalTokens": 950992,
+  "phaseWallBoundSeconds": 156.701271,
+  "capBreached": true,
+  "reviewerReactivationAuthorized": false,
+  "truncatedCalls": [
+    {
+      "id": "call_7e1af09fe9dd42ee8da352927d04740b",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:04:59.629Z",
+      "argChars": 938,
+      "paths": [
+        "scripts/review_budget.py",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/legacy-compatibility-input.json",
+        "qa/coordination/checker-runtime-total-20261015/review_budget.py",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/staged-actual-total-input.json",
+        "qa/packets/u22-extraction-review-resume.md",
+        "qa/packets/t022-executed-provenance.md",
+        "qa/packets/extraction-stage-receipts.md",
+        "qa/packets/t022-review-dirty-guard.md",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/recorded-environment-closure.json"
+      ],
+      "explicitMax": [
+        14500
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 41842,
+      "truncationMarkers": [
+        "4667 tokens truncated"
+      ]
+    },
+    {
+      "id": "call_689e306842cc4636a6b2005296bd99c4",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:05:06.801Z",
+      "argChars": 555,
+      "paths": [
+        "scripts/eval/extraction-review-resume.mjs",
+        "scripts/eval/extraction-stage-receipts.mjs",
+        "scripts/eval/human-calibration.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "qa/contracts/goal-u22.md",
+        "qa/contracts/goal-t022.md",
+        "qa/contracts/goal-t022-offline-review.md",
+        "qa/contracts/parallel-extraction-adjudication.md"
+      ],
+      "explicitMax": [
+        15000
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 40528,
+      "truncationMarkers": [
+        "229 tokens truncated"
+      ]
+    },
+    {
+      "id": "call_895f0a47b7a34048aeb6f4e4d7a47fd9",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:05:15.201Z",
+      "argChars": 618,
+      "paths": [
+        "scripts/eval/human-calibration.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "scripts/eval/extraction-review-resume.test.mjs",
+        "scripts/eval/t022-offline-review.test.mjs",
+        "scripts/eval/human-calibration.test.mjs",
+        "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.json"
+      ],
+      "explicitMax": [
+        13000
+      ],
+      "hasSlice": true,
+      "fullDump": true,
+      "outputChars": 42273,
+      "truncationMarkers": [
+        "output\\\":\\\"Warning: truncated output (original ",
+        "3499 tokens truncated"
+      ]
+    }
+  ],
+  "remainingReview": [
+    {
+      "path": "scripts/eval/human-calibration.mjs",
+      "from": 54,
+      "to": 169,
+      "lineCount": 116,
+      "wordCount": 977,
+      "sourceSha256": "bb91820014da89802e0641a4a232551c32d0fce498fee7f37f45c0798df6aa6c",
+      "reason": "transport, input validation, evaluation, source-current consumer"
+    },
+    {
+      "path": "scripts/eval/human-calibration.mjs",
+      "from": 264,
+      "to": 265,
+      "lineCount": 2,
+      "wordCount": 27,
+      "sourceSha256": "bb91820014da89802e0641a4a232551c32d0fce498fee7f37f45c0798df6aa6c",
+      "reason": "CLI entry"
+    },
+    {
+      "path": "scripts/eval/t022-offline-review.mjs",
+      "from": 131,
+      "to": 174,
+      "lineCount": 44,
+      "wordCount": 485,
+      "sourceSha256": "f3e971cd0bdee3853813a4b490ae317781898ef0622c347c75238699f5752357",
+      "reason": "HTML renderer, current snapshot, generator, draft verification, CLI"
+    },
+    {
+      "path": "scripts/eval/extraction-review.mjs",
+      "from": 1,
+      "to": 130,
+      "lineCount": 130,
+      "wordCount": 972,
+      "sourceSha256": "0eae318240d991b626ada193aa39fe9f213de068b50d2db22c5fed7358f08a44",
+      "reason": "actual direct consumer: bundle, pending export, strict validation, editor, bridge, CLI; prior Skip163 returned zero lines"
+    },
+    {
+      "path": "scripts/eval/extraction-stage-receipts.test.mjs",
+      "from": 1,
+      "to": 39,
+      "lineCount": 39,
+      "wordCount": 188,
+      "sourceSha256": "1808871b284d4bc852ea0a666994f7a0257cbc0f3f4844a7fa70eae46ff58c31",
+      "reason": "all standing stage cases not requested"
+    },
+    {
+      "path": "scripts/eval/human-calibration.test.mjs",
+      "from": 1,
+      "to": 76,
+      "lineCount": 76,
+      "wordCount": 573,
+      "sourceSha256": "6d9766ea7f67fdcf8530423f108d45ec2b9299c379e3064461df4dcf5045df63",
+      "reason": "test setup/helpers omitted by Last115"
+    },
+    {
+      "path": "scripts/eval/t022-offline-review.test.mjs",
+      "from": 72,
+      "to": 181,
+      "lineCount": 110,
+      "wordCount": 813,
+      "sourceSha256": "0b55e774cd9115255778741e125f8ba76ed96aba2d20a2ef8d792c924904faa9",
+      "reason": "async restore regression and test helpers omitted by truncated middle"
+    },
+    {
+      "path": "qa/contracts/goal-t022.md",
+      "from": 3,
+      "to": 10,
+      "lineCount": 8,
+      "wordCount": 283,
+      "sourceSha256": "2e56571308345202479b3c1bbd0b772016cebfc5737b0b78487777737d2acac4",
+      "reason": "contract clauses removed in 229-token truncation"
+    },
+    {
+      "path": "qa/packets/t022-executed-provenance.md",
+      "from": 52,
+      "to": 80,
+      "lineCount": 29,
+      "wordCount": 777,
+      "sourceSha256": "71e0753fd7adf949d0b3d1d7da06cd25a5db43b76e3d2b16eb0c0a38e951c42b",
+      "reason": "packet metadata truncated; retain required clauses/evidence scope, compare linked proof maps programmatically"
+    },
+    {
+      "path": "qa/packets/extraction-stage-receipts.md",
+      "from": 1,
+      "to": 67,
+      "lineCount": 67,
+      "wordCount": 1199,
+      "sourceSha256": "c6fa6cce259fbf776444a3c01c7141f1c6d3bfa85f407fb2bfce7a3b72456e81",
+      "reason": "packet metadata truncated; retain required clauses/evidence scope, compare linked proof maps programmatically"
+    }
+  ],
+  "totalLines": 621,
+  "totalWords": 6294,
+  "allClausesRetained": true,
+  "receiptPlan": "Compare JSON fingerprints programmatically and emit counts/mismatches only; no full fingerprint print. Existing proofs remain scoped, no independent verdict.",
+  "receiptsAffectedByPrinting": [
+    "recorded-environment-closure.json full concatenated dump",
+    "verification-quality-six-unit-twenty-six.json first70 lines contains fingerprint entries; independently authenticate full JSON programmatically, not via printed prefix"
+  ]
+}

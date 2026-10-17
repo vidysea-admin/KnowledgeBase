@@ -1,0 +1,89 @@
+{
+  "kind": "calibration",
+  "date": "2026-10-13",
+  "generatedAt": "2026-10-13T13:29:59.264Z",
+  "model": "deepseek-v4.1-flash",
+  "provider": "ollama",
+  "baseUrl": "https://ollama.com",
+  "jobKind": "evaluator",
+  "referenceSet": "data/eval/evaluator-calibration-set.json: DERIVED reference (own session 1.0 / other session 0.0), NOT human-hand-scored (qa/contracts/evaluator-calibration.md); an MAE here is a proxy, not the plan's final calibration",
+  "pairsSelected": 6,
+  "pairsScored": 6,
+  "pairsNotScored": 0,
+  "limitQuestions": 3,
+  "summary": {
+    "mae": 0.12166666666666669,
+    "n": 6,
+    "heuristicFallbackPairs": []
+  },
+  "calls": {
+    "made": 6,
+    "ok": 6,
+    "failed": 0,
+    "heuristicFallbacks": 0,
+    "capReached": false,
+    "maxCalls": 10,
+    "maxCostUsd": null,
+    "costUsd": 0,
+    "inputTokens": 2028,
+    "outputTokens": 1156,
+    "latency": {
+      "n": 6,
+      "meanMs": 1703,
+      "p50Ms": 1864,
+      "p95Ms": 3226,
+      "maxMs": 3226
+    },
+    "firstErrors": []
+  },
+  "details": [
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01-relevant",
+      "predicted": 1,
+      "reference": 1,
+      "absError": 0,
+      "reason": "The document directly confirms New Zealand's 76% 2025 visa approval rate and the 27,000-by-2030 target, matching both key facts in the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses US dual-enrollment programs, not New Zealand visa approval rates or Indian student targets.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02-relevant",
+      "predicted": 0.45,
+      "reference": 1,
+      "absError": 0.55,
+      "reason": "The document confirms secured nationalized-bank loans are accepted and NBFC/unsecured loans are rejected, but it omits the other three accepted sponsor types and the 14-bank detail, so it only partially answers the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses US dual-enrollment pathways for high school students and has no relevance to New Zealand visa funds test sponsor requirements.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex-gq01-relevant",
+      "predicted": 0.82,
+      "reference": 1,
+      "absError": 0.18000000000000005,
+      "reason": "The document directly corroborates the key claim that banks/Flywire mark up 2-2.5% versus FRR Forex's roughly 1%, though it doesn't mention FRR being an RBI-authorized Category II dealer.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses Indian engineering and medical entrance exams and has no relevance to forex dealers or remittance markup costs.",
+      "heuristicFallback": false
+    }
+  ]
+}

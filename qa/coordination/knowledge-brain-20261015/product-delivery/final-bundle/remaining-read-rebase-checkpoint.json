@@ -1,0 +1,43 @@
+{
+  "kind": "READ_PROTOCOL_CURRENT_RECEIPT_REBASE_BLOCKED_CHECKPOINT",
+  "recorded_at": "2026-10-15T12:38:01.517Z",
+  "state": "STOP_CURRENT_RECEIPT_PATHS_AND_OWNEXIT0_METADATA_ABSENT",
+  "source_protocol": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec.json",
+  "source_protocol_sha256": "bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de",
+  "source_pins_frozen": true,
+  "source_logic_criteria_unchanged": true,
+  "script": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v3.mjs",
+  "script_sha256": "f5d3d0171341d83f7a36997200daff213d44fcc8dd7148cbfca4f8543fb789c6",
+  "script_change": "V2 declared-runtime version fix retained; audit/display aggregation only now emits kind/count and max5representativefields<=5000, full mismatches retained private, FAIL not truncate. No drift/env waiver.",
+  "old_failed_report": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-artifacts/mechanics-receipt.json",
+  "old_failed_broker": "qa/goal-vectorless-2026-10-15/verification-product-remaining-read-preflight.json",
+  "all_originals_preserved": true,
+  "required_new_receipts": {
+    "web_types": {
+      "path": null,
+      "ownexit": null
+    },
+    "web_build": {
+      "path": null,
+      "ownexit": null
+    },
+    "vacuous_validator": {
+      "path": null,
+      "ownexit": null
+    },
+    "requirements": "Root authorized exactlyONE current same-env broker run each; use only actual successful receipts with source/command/env/runtime/lock/import/candidate bindings. Old seven references historical only; independent checker retains reuse decision."
+  },
+  "ui_probe_replays": "NOT_REQUESTED: existing saved1/transcript4PASS already ready",
+  "new_rebased_spec_written": false,
+  "new_spec_sha256": null,
+  "executable_current_command": null,
+  "command_blocker": "Cannot pin executable current-rebased command until actual successful current receipt paths arrive. No guessed paths, polling, old-spec retry or implicit grant.",
+  "support_accounting": "One broker verification-support run separately; no maker denominator growth.",
+  "reviewer_or_gate_or_grant_or_execution": false,
+  "existing_queues_untouched": [
+    "composition",
+    "helper",
+    "workflow5"
+  ],
+  "accounting_actual_aggregate_unchanged": 519546
+}

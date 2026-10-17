@@ -1,0 +1,12 @@
+✔ accepted attribute projection replaces cached fields and never falls back on absent or conflicted values (1.427ms)
+✔ attribute-derived revisions change on accepted-source generation and source correction (0.6657ms)
+✔ source-only attribute authority exposes exact confirmed blocks without recursive accepted attributes (34.1732ms)
+✔ accepted attributes update profile and graph in the same source snapshot and clear revoked cached fields (22.8758ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3912.2937

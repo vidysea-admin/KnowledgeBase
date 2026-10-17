@@ -1,0 +1,68 @@
+{
+  "unit": "collections-bounded-choice-retention",
+  "cycle": 0,
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_files_sha256": {
+    "apps/web/src/pages/knowledge/CuratedCollections.tsx": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+    "apps/web/src/pages/knowledge/CuratedCollections.test.tsx": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3"
+  },
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "id": "collections-checker-cycle0-not-launched",
+      "active_s": 0,
+      "tokens": 0
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 40,
+    "tokens": 1000,
+    "cost": null
+  },
+  "bootstrap_scope": "collections-bounded-choice-retention cycle 0 exact two-file candidate: review changed selection logic and immediate PUT consumer, verify broker receipts, one independent bounded-membership probe; mandatory verification remains required. Root allocation via product_delivery_coordinator. Prior unit charges none known; any discovered prior debit must be retained.",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "collections-bounded-choice-retention/c0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a/6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+  "escalation": null,
+  "staged_admission": {
+    "status": "PREDISPATCH_PREPARATION_ONLY",
+    "source_input": "qa/coordination/knowledge-brain-20261015/product-delivery/collections-assess-dispatch-retry2-input.json",
+    "unit": "collections-bounded-choice-retention",
+    "cycle": 0,
+    "total": {
+      "active_s": 120,
+      "tokens": 3000
+    },
+    "next_review": {
+      "active_s": 40,
+      "tokens": 1000
+    },
+    "remaining_review": {
+      "active_s": 50,
+      "tokens": 1200
+    },
+    "protected_finalization": {
+      "active_s": 30,
+      "tokens": 800
+    },
+    "authority": "Root approved staged40s1000 + remaining50s1200 + final30s800 WITHIN same120s3000; no extra allocation.",
+    "prior_charges": "All existing reviewer rows preserved exactly; no reviewer launched. Unknown maker/cost values unchanged.",
+    "dispatch_authorized_by_this_file": false
+  },
+  "protected_finalization": {
+    "kind": "finalization",
+    "active_s": 30,
+    "tokens": 800,
+    "cost": null,
+    "note": "Protected inside same total120s3000; retain prior actual metrics/debits and assess before finalization."
+  }
+}

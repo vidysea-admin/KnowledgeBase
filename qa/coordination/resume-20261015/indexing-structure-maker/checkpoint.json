@@ -1,0 +1,32 @@
+{
+  "sourcePins": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+  "moves": [
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "old": "apps/api/src/indexing/decisions-persist.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "old": "apps/api/src/indexing/decisions-persist.test.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "old": "apps/api/src/indexing/promote-entities.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "old": "apps/api/src/indexing/promote-entities.test.ts"
+    }
+  ],
+  "active_s": null,
+  "preimagePins": "qa/coordination/resume-20261015/indexing-structure-maker/before.json",
+  "oldReceiptsPreserved": true,
+  "token_metric": "actual_total",
+  "actual_total_tokens": null,
+  "counts": {
+    "persistence": 4,
+    "indexing": 30
+  },
+  "status": "MOVED_NOT_RUNTIME_CHECKED",
+  "integrationLeaseDisjoint": true
+}

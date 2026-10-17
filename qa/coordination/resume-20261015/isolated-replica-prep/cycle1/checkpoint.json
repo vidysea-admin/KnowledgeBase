@@ -1,0 +1,29 @@
+{
+  "status": "READY_FOR_MANUAL_SOURCE_REVIEW",
+  "runtimeReadiness": "HOLD",
+  "cycle": 1,
+  "candidate": "eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+  "actualFakeDiscovery": 11,
+  "fakeTestsPassed": 11,
+  "all21pinsStable": true,
+  "reviewAllocation": {
+    "tokens": 12000,
+    "active_s": 90
+  },
+  "completionAllocation": {
+    "tokens": 4000,
+    "active_s": 30
+  },
+  "cumulativeCeiling": {
+    "tokens": 36000,
+    "active_s": 270
+  },
+  "priorAllocated": {
+    "tokens": 20000,
+    "active_s": 150
+  },
+  "makerActualUsage": null,
+  "ratio": "UNVERIFIED",
+  "activationReady": false,
+  "sourceCheckerDispatched": false
+}

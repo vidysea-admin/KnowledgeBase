@@ -1,0 +1,33 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "scope": "Staged checker completion reserve reserve14; no global writes, adapted import/hash only recorded",
+  "phase": "shared-integration-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review; Python-B stdlib tests and ephemeral fixtures only",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "qa/coordination/checker-completion-reserve-20261015/test_completion_reserve.py"
+  ],
+  "testIDs": [
+    "reserve14"
+  ],
+  "env": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 20000,
+  "output": "qa/coordination/checker-completion-reserve-20261015/verification-reserve14-20261015T1033",
+  "pins": {
+    "qa/coordination/checker-efficiency-20261015/canonical-candidate/test_review_budget.py": "c46eabf72ab8a75b2214925430ae71f402d0618b0953e2cf13bb63ff5ac4cebc",
+    "qa/coordination/checker-completion-reserve-20261015/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-completion-reserve-20261015/test_completion_reserve.py": "87de2a3d0d38818376795cfe7f3c3c1e4a866af150bb40219d41d88fc7f293b8",
+    "qa/coordination/checker-completion-reserve-20261015/packet.md": "63d30308c86e4e4a040b59e6ff9aaf345b35fa0f32a57f4d6a8e8fad77071f23",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/test_review_budget.py": "19b32f7fde950f692621aeb76565ee0a6dd5dc6bb6853ba7e86bebea2e59478f",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/adapter.json": "f625b474eb7088f80cda915cdd1b8419e6b48c44da7f5c716863954f2c2c4589",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  }
+}

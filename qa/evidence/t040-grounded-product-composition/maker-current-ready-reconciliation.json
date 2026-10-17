@@ -1,0 +1,120 @@
+{
+  "unit": "t040-grounded-product-composition",
+  "cycle": 1,
+  "capturedAt": "2026-10-14T23:14:30.2421005Z",
+  "receipts": [
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/ordinary-withdrawal-20261014T230834Z.receipt.json",
+      "sha256": "5F0E4616A0BAEA83901C65D7E71C3A9B0E599786B234A1FA7294AA4D0423EAE2",
+      "pid": 24452,
+      "startedAt": "2026-10-14T23:08:34.5009612Z",
+      "completedAt": "2026-10-14T23:08:39.0873079Z",
+      "wallMs": 4586.0,
+      "exitCode": 0,
+      "beforeAfterUnchanged": true,
+      "currentDrift": [],
+      "pins": 49,
+      "args": [
+        "--import",
+        "./.cache/coordination/safe-test-runtime/register.mjs",
+        "--test",
+        "--test-isolation=none",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "apps/api/src/grounded-postprocessing/visibility.test.ts"
+      ],
+      "stdoutSHA256": "6CCCE17E6BB174F8D92EAC0550787851E83A344CA6136933BC1657FA6EB8013D",
+      "stderrSHA256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "nodeSummary": [
+        "ℹ tests 2",
+        "ℹ suites 0",
+        "ℹ pass 2",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 4371.8888"
+      ]
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/ordinary-reviewed-speech-20261014T230947Z.receipt.json",
+      "sha256": "DF412A72AE0F30DAB10515439523354E3503EAAE576B7108B0567687A2405F9A",
+      "pid": 23268,
+      "startedAt": "2026-10-14T23:09:47.1949165Z",
+      "completedAt": "2026-10-14T23:09:49.8615962Z",
+      "wallMs": 2667.0,
+      "exitCode": 0,
+      "beforeAfterUnchanged": true,
+      "currentDrift": [],
+      "pins": 49,
+      "args": [
+        "--import",
+        "./.cache/coordination/safe-test-runtime/register.mjs",
+        "--test",
+        "--test-isolation=none",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction$",
+        "apps/api/src/grounded-postprocessing/transcripts.test.ts"
+      ],
+      "stdoutSHA256": "1D45877B788EC79D34306CE81BE4848C5E96EE64584216F0624E86EF2B92318B",
+      "stderrSHA256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "nodeSummary": [
+        "ℹ tests 1",
+        "ℹ suites 0",
+        "ℹ pass 1",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 2465.9806"
+      ]
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/ordinary-independent-caller-20261014T231049Z.receipt.json",
+      "sha256": "8ECD5B5E5A7D926B1CDC77900223E3B9CCC0561B731FDDAFE25F22D11D3DDE23",
+      "pid": 9840,
+      "startedAt": "2026-10-14T23:10:49.7439727Z",
+      "completedAt": "2026-10-14T23:10:54.8648539Z",
+      "wallMs": 5121.0,
+      "exitCode": 0,
+      "beforeAfterUnchanged": true,
+      "currentDrift": [],
+      "pins": 50,
+      "args": [
+        "--import",
+        "./.cache/coordination/safe-test-runtime/register.mjs",
+        "--test",
+        "--test-isolation=none",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "qa/evidence/t040-grounded-product-composition/checker-caller.test.ts"
+      ],
+      "stdoutSHA256": "E3E1581FCF8319FBC4A82B67E2E53F2822F8D10999C10C0D45A76A58C9B99DEC",
+      "stderrSHA256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+      "nodeSummary": [
+        "ℹ tests 1",
+        "ℹ suites 0",
+        "ℹ pass 1",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 4904.1244"
+      ]
+    }
+  ],
+  "sourceProviderDatabaseMode": "Synthetic routed provider and persistent transaction-semantic fixture; actual factory/indexer/generation/reader functions. No real provider/Mongo/browser/host proof.",
+  "reviewedSpeechCounting": "Node24: one test/pass, zero skipped; three other standing definitions filtered out and not executed, never credited.",
+  "coherence": {
+    "path": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T225425Z.json",
+    "sha256": "9901FC4B8BA492648072584796450E1C8EC3EEDB87829E3E95B278750689ED68",
+    "stages": 4,
+    "exitAll": 0,
+    "inputs": 1939,
+    "drift": 0
+  },
+  "parent": "HOLD",
+  "request": "ready-for-check",
+  "verdictPending": true
+}

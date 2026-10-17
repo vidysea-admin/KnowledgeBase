@@ -1,0 +1,23 @@
+{
+  "_id": {
+    "tenantId": "fixture-tenant",
+    "policyId": "advice",
+    "version": 1
+  },
+  "tenantId": "fixture-tenant",
+  "policyId": "advice",
+  "version": 1,
+  "questionClass": "career",
+  "mode": "internal-only",
+  "style": "concise",
+  "onInsufficient": "review",
+  "citations": "required",
+  "action": "save",
+  "retired": false,
+  "changedBy": {
+    "actor": "api-key:synthetic"
+  },
+  "changedAt": "2026-10-14T00:00:00.000Z",
+  "note": "Synthetic schema fixture",
+  "previousVersion": null
+}

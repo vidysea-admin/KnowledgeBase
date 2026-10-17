@@ -1,0 +1,10 @@
+{
+  "maker": { "active_s": null, "tokens": null, "cost": null },
+  "reviewers": [],
+  "next_phase": { "kind": "review", "active_s": 90, "tokens": 2200, "cost": null },
+  "bootstrap_scope": "product-answer-trusted-reviewer cycle 0: exact two-file HTTP authority boundary review and mandatory focused verification. Human approval and whole T056 acceptance remain pending. Root approved finite 120 seconds/3000 allocated tokens including 30 seconds/800 finalization reserve.",
+  "bootstrap": { "active_s": 120, "tokens": 3000 },
+  "completion_reserve": true,
+  "completion_reserve_id": "product-answer-trusted-reviewer/c0/FD11C33E891ED2AE6CC01548A6FDCFDC9587FBE960B95C0E47095DCE04C5EFF7/DA244C5DA70AB85286D10DCD6BEE985701F74FA7E7607B121231644F141BE12D",
+  "escalation": null
+}

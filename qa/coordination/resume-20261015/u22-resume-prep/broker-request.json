@@ -1,0 +1,52 @@
+{
+  "unit": "u22-extraction-review-resume",
+  "cycle": 0,
+  "execution_authorized_by_this_request": false,
+  "sole_broker": true,
+  "max_total_seconds": 60,
+  "readiness_gap": "Old shared3/26 receipt has historical base/environment; current environment equivalence and same-HEAD binding unestablished. No qualified reuse asserted.",
+  "first_command": {
+    "argv": [
+      "C:/Program Files/Python312/python.exe",
+      "-B",
+      "contracts/verify_contracts.py"
+    ],
+    "timeout_s": 10,
+    "required": "Current verifier/registry/runtime/environment receipt. Existing watched cycle2 exit0/vacuous may replace ONLY with authenticated same script/registry/runtime/current environment/import-root; current environment not yet authenticated."
+  },
+  "second_command": {
+    "argv": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--test",
+      "--test-concurrency=1",
+      "--test-timeout=10000",
+      "scripts/eval/extraction-review-resume.test.mjs"
+    ],
+    "timeout_s": 45,
+    "expected_exact_nodes": [
+      {
+        "node": "resume restores saved controls and original date, pending items stay empty, export validates",
+        "reason": "Restored declared controls/date survive reorder and full export; pending controls/reset retain honest coverage S1/S2",
+        "boundary": "positive/immediate editor export"
+      },
+      {
+        "node": "render binds exact input bytes, retains context and prevents script breakout",
+        "reason": "Exact input SHA and drift refusal plus single script boundary S1/S3",
+        "boundary": "script injection/input drift"
+      },
+      {
+        "node": "resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer",
+        "reason": "Actual validateExport rejects stale packet/index, foreign binding, incomplete inventory and gold/threshold promotion S3/S4",
+        "boundary": "strict consumer refusal"
+      }
+    ],
+    "required_counts": "3 pass,0fail,0skip; own exit and full output"
+  },
+  "fingerprints_required": [
+    "current HEAD plus raw candidate and complete transitive consumer pins",
+    "Node executable/version; Python executable/version",
+    "lock hash; import root; current-helper hash; safe environment whitelist hashes only",
+    "owned process deadline/cleanup and before/after no drift"
+  ],
+  "no_provider_db_private_corpus": true
+}

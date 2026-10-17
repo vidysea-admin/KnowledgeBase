@@ -11,7 +11,7 @@ import { Router, type Request, type Response } from "express";
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, realpathSync, statSync } from "node:fs";
 import path from "node:path";
-import type { Claims, Gaps, Sessions, SessionPages, Sources, Turns } from "@lkb/core";
+import type { Claims, Gaps, SkipReason, Sessions, SessionPages, Sources, Turns } from "@lkb/core";
 import { requireScope } from "../auth.js";
 
 export interface SessionDetail {
@@ -23,6 +23,18 @@ export interface SessionDetail {
   notes?: { text: string; kind: string; tStart: number; turnId?: string; frameId?: string }[];
   frames?: { id: string; tStart: number; text: string }[];
 }
+
+/** Every SkipReason may appear as an operation reason. Total record: a new SkipReason fails the type-check here until it is listed. */
+const SKIP_REASON_KEYS: Record<SkipReason, true> = {
+  "no-join-link": true, "past": true, "untrusted-sender": true, "needs-registration": true, "duplicate-session": true, "overlap-lost": true,
+  "not-webinar": true, "needs-review": true, "cancelled": true, "invalid-time": true, "unsafe-join-link": true,
+  "opted-out": true, "rule-denied": true, "rules-unevaluable": true, "unverified-link-source": true,
+};
+/** Operation reasons that are not SkipReasons. Anything outside both lists is shown as the neutral "processing-failed". */
+const OPERATION_ONLY_REASONS = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage", "controller-disconnected",
+  "coverage-review", "source-discontinuity", "unproven-calendar-history", "rejected", "rescheduled", "rescheduled-completed", "recurring-series",
+  "unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity"];
+export const WEBINAR_OPERATION_REASONS: readonly string[] = [...OPERATION_ONLY_REASONS, ...Object.keys(SKIP_REASON_KEYS)];
 
 export interface SessionAsset { path: string; bytes: number; mime: string }
 export interface WebinarOperation {
@@ -97,8 +109,7 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
       if (state.tenantId !== tenantId) return { operations: [], omitted: 0 };
       if (state.version !== 1 || !state.operations || typeof state.operations !== "object" || Array.isArray(state.operations)) throw new Error("operation state unavailable");
       const statuses = ["queued", "recording", "processing", "failed", "ready", "action_required"];
-      const reasons = ["retry-limit", "interrupted-no-recording-artifact", "missed-while-processing", "missed-coverage", "cancelled", "controller-disconnected", "coverage-review", "overlap-lost", "needs-registration", "needs-review", "invalid-time", "unsafe-join-link",
-        "no-join-link", "source-discontinuity", "unproven-calendar-history", "rejected", "rescheduled", "rescheduled-completed", "recurring-series", "unknown-tombstone", "ambiguous-provider", "contradictory-revision", "missing-revision", "ambiguous-identity"];
+      const reasons = WEBINAR_OPERATION_REASONS;
       const date = (value: unknown) => typeof value === "string" && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : undefined;
       let discovery: WebinarOperations["discovery"];
       if (state.discovery !== undefined) {
@@ -197,7 +208,14 @@ export function createBrainRouter(deps: BrainReadDeps): Router {
   });
 
   router.get("/gaps", requireScope("gaps"), async (req: Request, res: Response) => {
-    const gaps = await deps.listGaps(req.auth!.tenantId);
+    const rows = await deps.listGaps(req.auth!.tenantId);
+    // Evaluation answers/scores and operation locks are available only through the
+    // separately authorized flywheel inspection route, never the ordinary gap list.
+    const gaps = rows.filter(row => row.tenantId === req.auth!.tenantId).map(row => {
+      const { flywheel, ...publicGap } = row;
+      void flywheel;
+      return publicGap;
+    });
     res.status(200).json({ gaps });
   });
 

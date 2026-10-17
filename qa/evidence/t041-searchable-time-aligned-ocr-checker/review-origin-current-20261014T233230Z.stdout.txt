@@ -1,0 +1,2 @@
+{"blockedAtWrite":true,"blockedAtRead":true,"effectiveSpeaker":"person:alice","scope":"synthetic planner, historical overlay, source hydrator; no real recording/provider/database"}
+review-origin-probe: PASS

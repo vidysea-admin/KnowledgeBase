@@ -1,0 +1,22 @@
+{
+  "completion_reserve_id": "t013-avatar-context-loss/cycle0/2e9e352329632b6ae58b1fe113965b8223db359db9948fc4f66e081a68548830",
+  "escalation": null,
+  "next_phase": {
+    "cost": null,
+    "tokens": 5200,
+    "active_s": 150,
+    "kind": "review"
+  },
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "completion_reserve": true,
+  "bootstrap_scope": "t013-avatar-context-loss cycle0 current pinned candidate only: contract C1-C6 identity/source/consumer inspection and attributable single-test receipt assessment; no test rerun/browser/provider/source edits. No scoped reviewer has yet been dispatched; parent goal-t013 HOLD review is separate, not comparable scoped maker usage.",
+  "reviewers": [],
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  }
+}

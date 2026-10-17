@@ -1,0 +1,13 @@
+✔ metadata allowlist, deduplication, cumulative phase delta and downstream receipt (70.0063ms)
+✔ reset, inflight, missing baseline and malformed tail are unknown (48.1908ms)
+✔ prefix boundary excludes siblings; retries/children aggregate by thread identity (44.5572ms)
+✔ explicit output refuses outside workspace and symlinked parent (11.9447ms)
+✔ actual sanitized runtime metadata accepts ordinal and arbitrary envelope/payload ordering (20.9923ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 325.4316

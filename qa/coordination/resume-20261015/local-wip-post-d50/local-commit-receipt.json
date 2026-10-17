@@ -1,0 +1,72 @@
+{
+  "schema": "post-d50-local-wip-commit/1",
+  "status": "LOCAL_WIP_COMMITTED_NO_PUSH",
+  "base": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "actions": {
+    "staging": 1,
+    "push": 0,
+    "commit": 1,
+    "config": 0
+  },
+  "failures": [
+    {
+      "type": "RuntimeException",
+      "message": "Staged whitespace check failed; no commit; index preserved"
+    }
+  ],
+  "historicalHelperBinding": "UNKNOWN; fresh current epoch binds current bytes only",
+  "dirtyBefore": {
+    "total": 5630,
+    "tracked": 182,
+    "untracked": 5448
+  },
+  "freshScan": {
+    "valuesPersisted": false,
+    "bytes": 228110,
+    "files": 15,
+    "findings": []
+  },
+  "approvedManifest": {
+    "bytes": 76639220,
+    "paths": 586,
+    "sha256": "2efe2f4ed67684af544537d509120bb3621dec33c6e723fb8963ccf5285347f8",
+    "path": "qa/coordination/resume-20261015/local-wip-post-d50/commit-allowlist.json"
+  },
+  "whitespaceExit": 2,
+  "stagedScan": {
+    "files": 583,
+    "sha256": "1a0861040b0f1d299e991ed9f24ec366de5605ad530b4dd71b254598ea99f40b",
+    "path": "qa/coordination/resume-20261015/local-wip-post-d50/actual-staged-content-safety.json",
+    "findings": 0
+  },
+  "whitespaceDisposition": {
+    "pathOnlyEvidence": "qa/coordination/resume-20261015/local-wip-post-d50/whitespace-path-only.json",
+    "rootDecision": "Advisory for THIS LOCAL WIP commit; no active contract requires global zero. Preserve three DB source EOF blank lines, two byte preimages and seven verbatim raw logs. No byte edit or Git/hook/config change.",
+    "issues": 37,
+    "paths": 12,
+    "actualExit": 2
+  },
+  "repositoryGuard": {
+    "pendingCheckerWarningsPreserved": true,
+    "denied": false,
+    "invoked": ".codex/hooks/mc-precommit.ps1"
+  },
+  "identity": {
+    "configMutation": false,
+    "emailPrintedOrPersisted": false,
+    "sourceCommit": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+    "historicalNameMatched": true
+  },
+  "commitExit": 0,
+  "commit": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "indexEmptyAfter": true,
+  "remainingDirty": {
+    "untracked": 5010,
+    "total": 5150,
+    "tracked": 140
+  },
+  "committedPaths": 586,
+  "unit73CommitBytesVerified": true,
+  "eightFileCommitIdentityVerified": true,
+  "unrelatedDirtyWork": "No reset/clean/stash; exact staged mutation set only committed. Remaining dirty status counted; shared-agent additions may increase untracked count."
+}

@@ -1,0 +1,11 @@
+PASS authentic full source rejects its existing reversed timestamp rather than blessing it
+PASS authentic whole-turn provenance and actual JSON receipt consumer
+PASS authentic source speaker tamper refuses
+PASS authentic source end tamper refuses
+PASS authentic source session tamper refuses
+PASS authentic source turn tamper refuses
+PASS authentic source availability tamper refuses
+PASS a supplied source-reviewed sibling reference is never covered by nonempty first-turn output
+PASS foreign tenant cannot bless authentic source rows
+PASS human review never hides invalid quote provenance
+{"checks":10,"sourcePath":"/C:/Users/product/Desktop/KnowledgeBase/data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json","sourceByteHash":"1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89","sourceTurnIds":["2026-04-21-visa-blueprint-part2-italy-france-nz-t002","2026-04-21-visa-blueprint-part2-italy-france-nz-t003"],"sourceMode":"authentic-file-two-row-positive-and-full-source-negative","contentMode":"assembled-DTO","fullSourceRows":291,"knownInvalidIntervalTurn":"2026-04-21-visa-blueprint-part2-italy-france-nz-t141","realProvider":false,"realPersistence":false,"liveHttp":false,"realBrowser":false,"fullTaskStatus":"HOLD"}

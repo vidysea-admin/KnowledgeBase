@@ -1,0 +1,101 @@
+{
+  "schema": "checker-hard-control-diagnosis/1",
+  "created_utc": "2026-10-15T19:40:03.692804+00:00",
+  "scope": "Local metadata/help/installed-script inspection only; no provider launches, no configuration changes",
+  "executable": "C:\\Users\\product\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe",
+  "version": "codex-cli 0.162.1",
+  "executable_sha256": "dd13bdb162a184fa04039488b234a8258ef9b76f84e926c505d5742b19249a6a",
+  "verified_exec_flags": [
+    "--json",
+    "--ephemeral",
+    "--ignore-user-config",
+    "--strict-config",
+    "--sandbox read-only",
+    "--disable FEATURE",
+    "--skip-git-repo-check",
+    "--cd DIR",
+    "--output-schema FILE",
+    "--output-last-message FILE",
+    "PROMPT - reads stdin"
+  ],
+  "not_exposed_in_exec_help": [
+    "hard actual-total input+output token cap",
+    "hard output token cap",
+    "max turns",
+    "timeout/deadline"
+  ],
+  "configuration_inspection": {
+    "path": "C:\\Users\\product\\.codex\\config.toml",
+    "token_time_control_keys": [],
+    "source_schema_available": false,
+    "limitation": "No exhaustive source/schema inspection established arbitrary hidden configuration support; no unsupported cap is inferred."
+  },
+  "managed_launcher": {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\managed_review.py",
+    "wall_control": "subprocess.run(timeout=worker.timeout_s), captures timeout only after subprocess communication; process-tree containment not established",
+    "active_control": "None; persisted active_s null",
+    "token_control": "Pre-phase allocation and post-run accounting only; observed startup floor not a future upper bound",
+    "usage": "turn.completed input_tokens + output_tokens; cached input already included; unknown on incomplete output"
+  },
+  "prior_review": {
+    "telemetry_path": "qa/coordination/checker-runtime-validation-20261015/independent-telemetry.json",
+    "runtime_version": "0.162.0-alpha.17.2 desktop subagent",
+    "budget_actual_total": 51981,
+    "first_request": {
+      "input_tokens": 41487,
+      "cached_input_subset": 40832,
+      "output_tokens": 87,
+      "total_tokens": 41574
+    },
+    "second_request": {
+      "input_tokens": 45314,
+      "output_tokens": 582,
+      "total_tokens": 45896
+    },
+    "second_cumulative_total": 87470,
+    "terminal": {
+      "input_tokens": 133052,
+      "cached_input_subset": 127360,
+      "output_tokens": 828,
+      "total_tokens": 133880
+    },
+    "excess_tokens": 81899,
+    "diagnosis": "Three repeatedly charged large input contexts dominated spend; first request left 10407 tokens, insufficient for second request. No token interceptor existed. Fresh subagent does not imply small injected system/policy context. No inherited user conversation proven from metadata.",
+    "active_seconds": null
+  },
+  "compact_alternative": {
+    "fresh_cli_template": [
+      "C:\\Users\\product\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin\\codex.exe",
+      "exec",
+      "--json",
+      "--ephemeral",
+      "--ignore-user-config",
+      "--sandbox",
+      "read-only",
+      "--skip-git-repo-check",
+      "--cd",
+      "<isolated compact packet root>",
+      "-"
+    ],
+    "effect": "Fresh standalone run avoids inherited chat; ignore-user-config only ignores config.toml, not all system/policy injections. Startup size remains unproven. No model launch performed.",
+    "no_provider_preflight": "codex debug prompt-input --help is verified; actual rendering would expose prompt body and was not invoked.",
+    "hard_guarantee": "Not established for model-mediated completion. Required independent deterministic checks can run as a bounded local subprocess with zero provider tokens; semantic review completeness cannot be asserted from that alone.",
+    "smallest_enforceable_design": "External local process-tree deadline plus independent deterministic check manifest; for a model reviewer, require a request-aware transport that bounds exact rendered input and output for every request before send, includes cache input and retries, and reserves completion. Installed CLI/help and managed launcher do not supply this transport."
+  },
+  "metrics_limits": {
+    "active_time_ratio_verified": false,
+    "total_token_hard_cap_verified": false,
+    "complete_quality_within_ratio_proven": false
+  },
+  "evidence": [
+    "C:/Users/product/.agents/skills/checker/scripts/managed_review.py",
+    "C:/Users/product/.agents/skills/checker/scripts/review_adapters.py",
+    "qa/coordination/checker-runtime-validation-20261015/independent-telemetry.json",
+    "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T19-34-13-01a1410e-d22e-7bb2-bd23-56030f097c68.jsonl"
+  ],
+  "limitations": [
+    "Only session metadata and first two token event objects read from native session; no conversation bodies output.",
+    "No provider-backed launch, browser, web, tests or child agents.",
+    "Two conceptual phases (policy then local diagnosis); multiple shell invocations were used, exceeding any interpretation of two tool calls."
+  ]
+}

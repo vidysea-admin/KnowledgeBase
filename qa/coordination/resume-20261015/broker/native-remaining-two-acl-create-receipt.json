@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-consent\\native-acl-fixture.ps1",
+    "-Action",
+    "Create"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\7492929ca47094b10e26bb2edd87ae04b615e72342672e294e13b078f86d5d8c.json",
+    "sha256": "7492929ca47094b10e26bb2edd87ae04b615e72342672e294e13b078f86d5d8c",
+    "count": 88
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 15,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 21892,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 1.5159999999996217,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-create.log",
+    "sha256": "8f24b1bbc7f27cc3f2c1c7607ee6462a3fbb51e1d4f6482789f91fe1da9abdce"
+  },
+  "counts": {}
+}

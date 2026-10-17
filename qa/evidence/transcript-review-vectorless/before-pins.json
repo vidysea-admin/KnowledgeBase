@@ -1,0 +1,17 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "40B3AFC65279C0072CBA70755ED9EF8F853BAB559418FF05C997C7A4A786AC57",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-executor.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "6240F4D44683D3191EF83C108CB13402B63E8DC88117F2399475496DFBF63FDC",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-executor.test.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "8458A196C774FF6196F7E992CB512B15A22A551A3BCFBE2F051699C9A7C42536",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\mongodb.integration.test.ts"
+  }
+]

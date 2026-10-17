@@ -1,0 +1,32 @@
+{
+  "format": "root-single-question-pilot-binding-v1",
+  "actor": "root acting on explicit user-approved goal",
+  "id": "root-user-approved-ollama-single-question-20261015",
+  "scope": "single-question-pilot",
+  "approvedAt": "2026-10-15T20:23:05.642Z",
+  "expiresAt": "2026-10-15T21:23:05.642Z",
+  "corpusSha256": "cbd1c84d1caf3b2f4a0c07808e10705411196aa93e19b875a0f66ccc39c19ebe",
+  "sourceCandidateSha256": "40852e5ea0cec9550f3600fe9bf7e6992aa1a5db96f30a6d4d837467d8629d65",
+  "configSha256": "811ecc20496f132fa3733d0dc5d0bd40dfa9a50f68ca8eef5250adbeb9154b6a",
+  "selection": "first approved question ID in deterministic lexical sort",
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "budget": {
+    "maxAttempts": 3,
+    "maxSeconds": 60,
+    "callTimeoutMs": 20000,
+    "maxInputBytes": 32000,
+    "maxRequestBytes": 32000,
+    "maxResponseBytes": 262144,
+    "outputLimit": 256,
+    "maxKnownInputTokens": 32768,
+    "maxKnownOutputTokens": 768
+  },
+  "evidenceReference": "parent root explicit single-question Ollama grant; no Umesh signature asserted",
+  "usagePolicy": "observed-tokens-stop-on-unknown-no-strict-input-token-cap",
+  "providerMetadata": {
+    "path": "packages/ai/src/providers/ollama-cloud.ts",
+    "sha256": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+    "configuredModel": "glm-5.3-flash",
+    "availability": "configured-access-unverified"
+  }
+}

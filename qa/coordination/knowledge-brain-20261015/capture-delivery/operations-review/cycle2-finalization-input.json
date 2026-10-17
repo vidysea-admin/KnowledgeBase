@@ -1,0 +1,83 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "tokens": null,
+      "active_s": null,
+      "budget_debit": {
+        "active_s": 150,
+        "tokens": 5200
+      },
+      "id": "operations-checker-cycle1",
+      "cost": null
+    },
+    {
+      "completion_reserve_id": "capture-operations-acceptance/cycle1/8e2aa894f6e7530e4aa344ecd8657f3c917c8888e9e02dbb12dccccdb8456791",
+      "tokens": null,
+      "active_s": null,
+      "cost": null,
+      "phase_kind": "finalization",
+      "id": "operations-checker-finalization",
+      "budget_debit": {
+        "tokens": 800,
+        "active_s": 30
+      }
+    },
+    {
+      "cost": null,
+      "tokens": null,
+      "id": "operations-checker-cycle2-review",
+      "active_s": null,
+      "budget_debit": {
+        "tokens": 2200,
+        "active_s": 90
+      }
+    }
+  ],
+  "bootstrap_scope": "capture-operations-acceptance cycle2: source temporal chronology repair and signed regressions/current three pins, actual RED and GREEN only; same checker resume, no native operational acceptance",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "capture-operations-acceptance/cycle2/2ce9b1298e30460f1fcf05701a8e91254b096b29a1faf925180daff307d3a6af",
+  "next_phase": {
+    "kind": "finalization",
+    "tokens": 800,
+    "cost": null,
+    "active_s": 30
+  },
+  "escalation": {
+    "limits": {
+      "tokens": 9000,
+      "active_s": 300,
+      "cost": null
+    },
+    "reason": "Candidate changed after independent static FAIL; actual signed temporal RED demonstrated three refusals failing, then attributable same-corpus GREEN8/8. Narrow source chronology and regression recheck requires finite additional review; all prior actual unknowns and180s/6000 committed debits retained.",
+    "authority": "Root coordinator explicit authorization 2026-10-15: additional120s/3000tokens, cumulative300s/9000 ceiling"
+  },
+  "candidate_sha": "2ce9b1298e30460f1fcf05701a8e91254b096b29a1faf925180daff307d3a6af",
+  "candidate_identity_kind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "source_pins": {
+    "scripts/qa/capture-operations-acceptance.mjs": "574b2dad2838c2a115398888bdac041fa8ed6f3776527b5f819c8e68b0d29f18",
+    "scripts/qa/capture-operations-evidence.mjs": "b4adbfb08254b9fd2e45be0c4831f2ea5699dbaa84f81ad4aab4e49e863c38b1",
+    "scripts/qa/capture-operations-acceptance.test.mjs": "28b86f190f0a3473eb7f5bd189015b6b35edcfce77daf17abf5b18d26599699d"
+  },
+  "prior_accounting": "qa\\coordination\\knowledge-brain-20261015\\capture-delivery\\operations-review\\final-accounting.json",
+  "red_receipt": "qa/goal-vectorless-2026-10-15/verification-capture-operations-temporal-red.json",
+  "green_receipt": "qa/goal-vectorless-2026-10-15/verification-capture-operations-temporal-green.json",
+  "green_observed": {
+    "fail": 0,
+    "pass": 8,
+    "skip": 0,
+    "tests": 8,
+    "exitCode": 0,
+    "hashesUnchanged": true,
+    "elapsedMs": 574.7737
+  },
+  "accounting_note": "Prior reviewer actual active seconds/tokens/cost remain unknown/null, preserved verbatim. Debits are allocation charges, not measured usage. Ratios remain unverified. Finite limits include prior charges and greater known actuals when supplied."
+}

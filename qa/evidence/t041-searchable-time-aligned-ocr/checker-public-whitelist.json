@@ -1,0 +1,37 @@
+{
+  "task": "T-041",
+  "scope": "Selected public checker ground truth, synthetic independent probes and minimal actual synthetic fixture failure receipts only. This whitelist does not authorize publication or claim task completion.",
+  "manifestStatus": "ready-for-check at checker completion; maker close-out is separate",
+  "manifestCycle": 1,
+  "selectedPaths": [
+    "qa/contracts/goal-T041.md",
+    "qa/manifests/t041-searchable-time-aligned-ocr.md",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs",
+    "qa/evidence/goal-t051checker-broker-t041-maker.json",
+    "qa/evidence/goal-t051checker-broker-t041-maker.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t041-maker.stderr.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.receipt.json",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.stdout.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.stderr.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.receipt.json",
+    "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.stdout.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.stderr.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current-20261014T234824Z.receipt.json",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current-20261014T234824Z.stdout.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current-20261014T234824Z.stderr.txt",
+    "qa/verdicts/t041-searchable-time-aligned-ocr.md",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/checker-completion.json"
+  ],
+  "actualEvidence": "Initial synthetic fixture RED retained27PASS/1FAIL/1mediaSKIP. Corrected current maker replay actual28PASS/0FAIL/1explicit native-mediaSKIP exit0/3813ms/16stablepins. Independent origin probe exit0/2258ms/9stablepins: planner refuses human mapping and actual downstream hydrator refuses invalid historical overlay; pure effectiveTurns helper still returns person:alice. No pre-fix origin runtimeRED was executed. Independent span probe actual134assertions/64all-pairs/64permutations exit0/167ms/twostablepins. All current source pins independently rechecked; matching source-only checker PASS cycle1 persisted, wholeparentL1-L3HOLD.",
+  "verdictPaths": ["qa/verdicts/t041-searchable-time-aligned-ocr.md"],
+  "verdictStatus": "Matching independent PASS cycle1 for source implementation/synthetic affected stage and immediate consumers; full T-041 remains HOLD. Maker may close this unit only.",
+  "fullParentGates": "Real finite recording OCR, independent recording-time/OCR comparison and actual tenant-scoped ingestion/index/search remain HOLD.",
+  "excluded": [
+    "Private recordings, transcript/OCR corpora or payloads",
+    "Actual TOC data JSON or source-before backups",
+    "Dependency-only pin files and execution specs",
+    "Broad QA inventories or unrelated receipts",
+    "Nonexistent verdicts and unearned full-parent READY/PASS evidence"
+  ]
+}

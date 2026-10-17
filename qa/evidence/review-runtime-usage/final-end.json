@@ -1,0 +1,37 @@
+{
+  "phase_output_exceeded": true,
+  "monetary_cost": null,
+  "verdict": "HOLD",
+  "phase_total_exceeded": false,
+  "reason": "Independent receipt lacks expected test-file before/after pin; current source/test/probe pins match; no further checker calls",
+  "phase_output_allocation": 800,
+  "phase": "finalization",
+  "prior_probe_phase_total": 130960,
+  "source_line": 68,
+  "phase_delta_tokens": {
+    "reasoning_output_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "total_tokens": 134998,
+    "input_tokens": 133766,
+    "output_tokens": 1232,
+    "cached_input_tokens": 117248
+  },
+  "cumulative_tokens": {
+    "input_tokens": 472844,
+    "cached_input_tokens": 420736,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2914,
+    "reasoning_output_tokens": 35,
+    "total_tokens": 475758
+  },
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl",
+  "boundary": "end",
+  "ratio_verified": false,
+  "unit": "review-runtime-usage",
+  "phase_total_limit": 200000,
+  "observed_at": "2026-10-15T11:15:22.5224658+00:00",
+  "prior_probe_phase_limit": 100000,
+  "cycle": 0,
+  "usage_timestamp": "2026-10-15T11:15:06.029Z",
+  "actual_active_seconds": null
+}

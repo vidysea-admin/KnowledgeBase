@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "start": "2026-10-14T18:43:13.016Z",
+  "end": "2026-10-14T18:43:13.210Z",
+  "sourceHashes": 25,
+  "cards": 72,
+  "contexts": 80,
+  "declarationsSynthetic": 1,
+  "refusals": 11,
+  "resetPending": 72,
+  "gold": 0,
+  "semanticLabels": 0,
+  "persistedClaims": 72,
+  "citations": 80,
+  "unresolved": 14,
+  "loadedCases": 29,
+  "acquisitionFailures": 6,
+  "rawMissing": 29
+}

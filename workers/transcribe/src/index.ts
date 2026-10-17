@@ -1,3 +1,3 @@
-// @lkb/transcribe — placeholder. This worker is Python (D-003: Python only in isolated ML workers);
-// the real entrypoint lands as src/worker.py in T-024/T-019. Exports nothing.
+// @lkb/transcribe is an isolated Python queue worker (D-003).
+// Execute src/worker.py; this workspace marker intentionally exports no TS application logic.
 export {};

@@ -1,0 +1,17 @@
+{
+  "kind": "ROOT_ONE_PER_RECEIPT_ORIGINAL_RECIPE_MECHANICS_PREFLIGHT",
+  "script": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v4.mjs",
+  "script_sha256": "0bad334c9736b23cb220cf0bea77bc931389eb8d666689654f0dddaa0b2de66f",
+  "spec": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec-per-receipt-v4.json",
+  "spec_sha256": "357805dcd7e24ac9daaa16c602330cc2adb32880c3772bf0d2c54d9acacece57",
+  "command": "& 'C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe' 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v4.mjs' --root 'C:/Users/product/Desktop/KnowledgeBase' --spec 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec-per-receipt-v4.json' --spec-sha '357805dcd7e24ac9daaa16c602330cc2adb32880c3772bf0d2c54d9acacece57' --out 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-per-receipt-v4'",
+  "outer_timeout_ms": 120000,
+  "outer_pragma": "// @exec: {\"max_output_tokens\":20000}",
+  "nested_max_output_tokens": 18000,
+  "only_print_bounded_summary": true,
+  "local_execution": false,
+  "tests": false,
+  "root_authority": "Root current dispatch authorizes ONE broker preflight; allwriters held. No webrefresh/reviewer/grants/PASS.",
+  "accounting": "Verification-support once separate from maker denominator.",
+  "failure_history_preserved": true
+}

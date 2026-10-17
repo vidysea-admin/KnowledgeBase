@@ -1,0 +1,14 @@
+[
+  {
+    "sha256": "835a1b49531e88782bbab01325e166d92dd3d1804909208765528f8f172ac3e3",
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts"
+  },
+  {
+    "sha256": "947df1788801021e8a32932597bc01df8639c62ac851f024b9a63f07a30a8cda",
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts"
+  },
+  {
+    "sha256": "efa9e1b7d25639e23082a1f909e2e9c31ff66d55dea592439d680cc49f9afb9e",
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  }
+]

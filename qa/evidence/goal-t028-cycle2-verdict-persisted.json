@@ -1,0 +1,20 @@
+{
+  "confirmedAt": "2026-10-14T23:11:13.9829400Z",
+  "cycle": 2,
+  "verdict": "PASS",
+  "scope": "Local verified-key counsellor runtime only; parent/live/deployment gates retained",
+  "verdictPath": "qa/verdicts/goal-t028.md",
+  "verdictSHA256": "830e01b40a6425d3f3d49d454cc41742eec2899bbd5319c29809540c27c892e7",
+  "evidenceReviewSHA256": "de91e7bf06484c328e979be8e077b36baf7621b09c0acb7764b29964395321a3",
+  "candidateMetadataMatches": true,
+  "candidateMetadataHashes": {
+    "qa/manifests/goal-t028.md": "f0e48740c71f7eb4421b8626a1a40ac9410bcf8407caae1fb152849806c4f09b",
+    "qa/packets/goal-t028.md": "cf7b3392a50cd2f36b6cded0aae066f8956f693d01cf268620af2e7950d35241",
+    "qa/contracts/goal-t028.md": "ca67627935d47d6f6612f7e21fa8f85e31eda65d25d6d5826fd33e12401dc977"
+  },
+  "priorHOLDPath": "qa/evidence/goal-t028-cycle1-verdict-preserved.md",
+  "priorHOLDSHA256": "96e3cdf78379bda14dc5df04dbcd619d504cb11d0713d5f52b39e1ea9e75d2a7",
+  "currentFollowupLaunch": "2026-10-14T23:05:13Z",
+  "totalOriginalLaunchDuration": "unknown",
+  "newBehavioralExecution": false
+}

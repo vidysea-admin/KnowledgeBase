@@ -1,0 +1,28 @@
+{"validOldCitation":true,"eligiblePages":["old","new"],"retainedRoot":true,"loadedMarker":true,"resolvedMarker":true,"providerCalls":0}
+{"validOldCitation":false,"eligiblePages":["new"],"retainedRoot":true,"loadedMarker":true,"resolvedMarker":true,"providerCalls":0}
+✔ positive control: valid cited old-year knowledge remains readable without inference (9.5553ms)
+✖ security regression: rejected old-page citation cannot survive cached parent/year through actual reader (5.1047ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 925.3992
+
+✖ failing tests:
+
+test at qa\evidence\goal-u23\cached-root-taint-original.test.ts:1:3947
+✖ security regression: rejected old-page citation cannot survive cached parent/year through actual reader (5.1047ms)
+  AssertionError [ERR_ASSERTION]: actual trustedTreeReads exposes rejected cached summary/topic or parent summary
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\qa\evidence\goal-u23\cached-root-taint-original.test.ts:82:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

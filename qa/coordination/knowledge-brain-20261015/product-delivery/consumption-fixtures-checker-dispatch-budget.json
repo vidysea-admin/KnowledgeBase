@@ -1,0 +1,14 @@
+{
+  "unit": "product-trusted-human-refusal-consumption",
+  "fix_cycle": 0,
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_file_sha256": "9252807CAE7AE843A6407DEF506ED81C97741A700817CD0CA411431933367D58",
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [],
+  "next_phase": {"kind": "review", "active_s": 90, "tokens": 2200, "cost": null},
+  "completion_reserve": true,
+  "completion_reserve_id": "product-trusted-human-refusal-consumption/cycle0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a/9252807CAE7AE843A6407DEF506ED81C97741A700817CD0CA411431933367D58",
+  "bootstrap_scope": "One new two-test mounted-consumer fixture: verify pinned bytes and authenticated actual-client refusal behavior, inspect sole-broker same-byte focused receipt and central mandatory validator receipt; no production edits, no broad suite. Remaining live parent gates stay open. No prior reviewer for this new unit.",
+  "bootstrap": {"active_s": 120, "tokens": 3000},
+  "escalation": null
+}

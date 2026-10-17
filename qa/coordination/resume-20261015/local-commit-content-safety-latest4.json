@@ -1,0 +1,81 @@
+{
+  "recordedAt": "2026-10-15T23:04:43.5713293Z",
+  "changed": [
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "oldSha256": "eb80e828c2e4246b4fdd8bc769d983ce718ceed26e6a051ed4de040d849eba7a",
+      "newSha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb"
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+      "oldSha256": "88193970859c005fddea9f38b1440fdd598024e99d5a9afb32469e945919f6cd",
+      "newSha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+      "oldSha256": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64",
+      "newSha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+      "oldSha256": "a67793310befb5cfb3372ef7f4866afb07f97df471c370655d9e0ecc112f2f9b",
+      "newSha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d"
+    }
+  ],
+  "scope": "Exactly latest four already-allowlisted files; other 241 files hash-compared to previous full content scan",
+  "allowlistSha256": "fb2e2a80cc2f43229f5369d69e15e47f21663cd2a20165a9dbd891410e687487",
+  "unexpectedDrift": [],
+  "identity": {
+    "evidenceCommit": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "environmentOverridesPresent": false,
+    "recentEightIdenticalAuthorAndCommitter": true,
+    "emailPrintedOrPersisted": false,
+    "name": "Umesh Sugara",
+    "reuseAuthorizedByRoot": true,
+    "configuredNamePresent": false,
+    "configuredEmailPresent": false
+  },
+  "missingFromAllowlist": [],
+  "checked": [
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+      "expectedMatch": true,
+      "expectedSha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+      "sha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+      "nulBytes": false
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+      "expectedMatch": true,
+      "expectedSha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+      "sha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+      "nulBytes": false
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "expectedMatch": true,
+      "expectedSha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "sha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "nulBytes": false
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+      "expectedMatch": true,
+      "expectedSha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+      "sha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+      "nulBytes": false
+    }
+  ],
+  "indexEmpty": true,
+  "actions": {
+    "builds": 0,
+    "pushed": 0,
+    "committed": 0,
+    "staged": 0,
+    "tests": 0
+  },
+  "findings": [],
+  "secretValuesPersisted": false,
+  "allowlist": "qa/coordination/resume-20261015/local-commit-final-allowlist.json",
+  "schema": "local-commit-content-safety-incremental/1"
+}

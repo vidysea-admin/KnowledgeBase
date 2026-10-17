@@ -1,0 +1,93 @@
+{
+  "version": 1,
+  "index": 27,
+  "originalIndex": 29,
+  "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+  "inputHash": "47295b5229b8d8020ff21a639473bc81fa380f097fbd487dc67a6e606c6760cb",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The record describes approximately 58,000-60,000 government seats as expected in 2026 and competition of 1:40, but does not identify the 40 as qualified candidates or explicitly identify MBBS seats. The claim presents an expectation as an actual seat count.",
+    "missingReferences": [],
+    "caveats": [
+      "The record compares prior-year applicants and qualifiers with seats expected in 2026; this mixes time periods.",
+      "The 1:40 competition denominator is unspecified; roughly 12.5 lakh qualifiers divided by 58,000-60,000 seats is approximately 21, not 40. This arithmetic does not establish external truth.",
+      "Stored speakerRef is unknown; the text prefix does not establish speaker identity.",
+      "No duplicate reference or changed same-ID record is supplied; current t051 is absent.",
+      "Artifact raw-byte and normalized-LF hashes are distinct supplied metadata; no on-disk artifact verification was performed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+        "contextVersion": "originalMigration",
+        "quote": "real competition is for those government seat, which is about 58—you know, 60,000, which we'll be expecting in 2026.",
+        "textSha256": "84effd6b87fd38a0164144ca847471b11efcaed06a7557aa7a212555098c7713",
+        "contextSha256": "ea01eb53708c287011a68efda3aec574320407bbf7c9fed497abadfa7abb4232",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1814,
+        "tEnd": 1857,
+        "supports": "Supports an approximate government-seat count expected for 2026, without explicit MBBS identification or an actual outcome."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+        "contextVersion": "originalMigration",
+        "quote": "But how many actually qualified? Roughly around 12 and 1/2 lakhs, so I mean at the 50th percentile.",
+        "textSha256": "84effd6b87fd38a0164144ca847471b11efcaed06a7557aa7a212555098c7713",
+        "contextSha256": "ea01eb53708c287011a68efda3aec574320407bbf7c9fed497abadfa7abb4232",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1814,
+        "tEnd": 1857,
+        "supports": "Reports roughly 12.5 lakh qualifiers, without linking that population to the 1:40 ratio."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+        "contextVersion": "originalMigration",
+        "quote": "So from the government seat perspective, the competition is 1:40. 40 students are competing for that one government seat.",
+        "textSha256": "84effd6b87fd38a0164144ca847471b11efcaed06a7557aa7a212555098c7713",
+        "contextSha256": "ea01eb53708c287011a68efda3aec574320407bbf7c9fed497abadfa7abb4232",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1814,
+        "tEnd": 1857,
+        "supports": "Supports the stated 1:40 government-seat competition ratio, with no qualified-candidate denominator."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The sole literal citation t051 is absent from the supplied current context; the entire claim cannot be assessed against a current record.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+        "reason": "turn-absent; no current match supplied"
+      }
+    ],
+    "caveats": [
+      "OriginalMigration support was not substituted for the missing current reference.",
+      "Current raw-byte and normalized-LF artifact hashes are provided but unverified."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original context partially supports expected seats and a competition ratio, but not MBBS identification or a qualified-candidate denominator; current citation is missing. All supplied claim/context hashes and identity binding pass; external factual and human adjudication remain open."
+}

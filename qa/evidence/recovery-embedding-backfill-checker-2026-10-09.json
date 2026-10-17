@@ -1,0 +1,118 @@
+{
+  "status": "PASS",
+  "scope": "source-and-execution-boundary-only",
+  "cycleChecked": 1,
+  "launchUtc": "2026-10-09T11:16:53Z",
+  "recordedUtc": "2026-10-09T11:29:21.4560482Z",
+  "sourceHashes": [
+    {
+      "path": "packages/index/src/chunk/source-spans.ts",
+      "sha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927"
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.test.ts",
+      "sha256": "421cb4666a189202de077315d9172216e1dd2d449389925fdfbfe153187bd607"
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "sha256": "15b5fa21efaef75581f8d99266cdb3fa7143884e99849f08bbb6f8867eed0d52"
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "sha256": "d2acfd87eb508c0bf2440c6cf2318433e711e1644a4db58e74a14087451a0757"
+    },
+    {
+      "path": "scripts/backfill.mjs",
+      "sha256": "b127a049ff9eae480cf38c295d744df7e91f82f66496516f7d9ad32c97ee9dd5"
+    },
+    {
+      "path": "scripts/lib/toc-embedding-backfill.mjs",
+      "sha256": "4ca19852fd7e8d4fb2dcef6c1873105c413c96b767fc00df150419851081bd8f"
+    },
+    {
+      "path": "scripts/lib/toc-embedding-backfill.test.mjs",
+      "sha256": "28a71e59fac87a4b51958f5a1c0ad65913aff977808f020068f73cffe6d19856"
+    },
+    {
+      "path": "qa/manifests/recovery-embedding-backfill.md",
+      "sha256": "63528b78028de976942619837edfed3188e38d18470c541efbfacbeb72bcafbf"
+    },
+    {
+      "path": "packages/ai/src/providers/ollama.ts",
+      "sha256": "2906aa9be90ee95dff3e5d4f8c332b70ece875f8d5bbcdd8dcd5ce36e888e492"
+    },
+    {
+      "path": "packages/ai/src/providers/ollama-boundary.test.ts",
+      "sha256": "67579167462c48a5e19f942737e4013c150d9c44b3fda53b315b270fc205cb9e"
+    }
+  ],
+  "sourceCoverage": {
+    "status": "PASS",
+    "createdUtc": "2026-10-09T11:24:05.819Z",
+    "elapsedMs": 4248,
+    "packetId": "477255b83bb0f001a7fce53d48af7631bdc8a92c2e24e85b3108a3c9ece749ef",
+    "sessions": 29,
+    "turns": 3424,
+    "slices": 2905,
+    "rawInputBytes": 1895878,
+    "embeddingInputBytes": 1945263,
+    "planSha256": "f68943ccf969bfbeb580c178812932dd45780e779d33f8cd3615eb3576a71695",
+    "allTurnsCoveredExactly": true,
+    "probeTargetsIncluded": 29,
+    "UTF16AndUTF8Validated": true,
+    "actualProviderCalls": 0,
+    "actualDatabaseWrites": 0,
+    "vectorOrSemanticAcceptance": false
+  },
+  "independent": {
+    "focused": {
+      "durationMs": 2121.8773,
+      "commandWallSeconds": 4.0745497,
+      "failed": 0,
+      "passed": 19,
+      "skipped": 0
+    },
+    "networkBoundary": {
+      "commandWallSeconds": 1.5095466,
+      "status": "PASS"
+    },
+    "partialInsertResume": {
+      "fixtureEmbeddingCalls": 1,
+      "commandWallSeconds": 2.4611736,
+      "realProviderCalls": 0,
+      "status": "PASS",
+      "actualChunkPreparer": true,
+      "fakeDatabase": true
+    },
+    "contracts": {
+      "exitCode": 0,
+      "commandWallSeconds": 1.421162,
+      "result": "PASS by vacuity"
+    }
+  },
+  "reusedMaker": {
+    "downstreamPassed": 64,
+    "downstreamDurationMs": 6820.9731,
+    "indexTypecheck": "PASS",
+    "apiTypecheck": "PASS",
+    "publicLocalModelProbe": "positive1024-byte768-vector and context refusal; no corpus retrieval inferred"
+  },
+  "protectedHashes": {
+    "evaluator": "02069c0be1aa416d80d90439d2906c2bd93d3f2ae69bc8d09aba0dc3709f2d67",
+    "router": "c69120e648ae1d901b02c2d9d09eb914cc857d2131701aab997c76c6bee7d817"
+  },
+  "realProviderCalls": 0,
+  "realDatabaseWrites": 0,
+  "bulkAuthorizedByThisEvidence": false,
+  "liveVectorAcceptance": false,
+  "askAcceptance": false,
+  "phaseOneAcceptance": false,
+  "limits": [
+    "Root-authorized live job pending",
+    "Production query/citation/tenant proof pending",
+    "No human semantic gold or threshold inferred",
+    "No full suite or browser",
+    "No concurrency-atomicity guarantee"
+  ],
+  "harnessCorrection": "Two scratch Windows ESM path failures occurred before provider/DB activity; corrected file URLs, no product-source edit"
+}

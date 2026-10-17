@@ -1,0 +1,12 @@
+{
+  "started": "2026-10-16T00:05:42.1471982Z",
+  "url": "https://fastdl.mongodb.org/windows/mongodb-windows-x86_64-8.0.34.zip",
+  "downloaded": true,
+  "verified": true,
+  "binaryExecuted": false,
+  "errorType": null,
+  "freeBefore": 51520229376,
+  "bytes": 807616685,
+  "sha256": "6b021a0864494e4decf278b36477a29eb36072432773e4e62c2f42c302630db0",
+  "completed": "2026-10-16T00:06:22.0860611Z"
+}

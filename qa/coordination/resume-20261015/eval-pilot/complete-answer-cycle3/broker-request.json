@@ -1,0 +1,42 @@
+{
+  "candidate": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1"
+    }
+  ],
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-name-pattern=complete tier|grant2 |preflight ",
+    "scripts/eval/vectorless-production-eval.test.mjs"
+  ],
+  "expectedSelectedTests": 13,
+  "selectedTitles": [
+    "grant2 preserves legacy ceilings and rejects unbound scope, IDs and nonfinite limits",
+    "grant2 authorization binds canonical artifact, actor, scope and current source corpus config",
+    "grant2 cumulative ledger permits only two physical calls across fresh transport instances",
+    "grant2 byte reservations and crash debits cannot reset with new authorization or directory",
+    "preflight deep routing rejects insufficient complete-answer budget before any call",
+    "preflight actual complete-answer path refuses two calls before transport and checkpoint creation",
+    "preflight sufficient lower bound admits but cannot promise a supported answer",
+    "preflight diagnostic-only two-call pilot remains allowed and admission failure overrides output labels",
+    "complete tier preserves legacy and grant2 ceilings and enforces every finite cap and exact identity",
+    "complete tier pending human approval refuses before credentials transport or checkpoint",
+    "complete tier approval binds all identities population baseline and immutable artifact",
+    "complete tier durable IDs6 through17 count crashes and cannot replay reset or refund",
+    "complete tier aggregate input reservations cannot exceed320KiB across fresh admissions"
+  ],
+  "outerTimeoutSeconds": 45,
+  "scope": "5new complete-tier authorization/durable-limit cases +4grant2 compatibility +4preflight cases",
+  "providerCallsAllowed": false,
+  "cpuBrokerOnly": true
+}

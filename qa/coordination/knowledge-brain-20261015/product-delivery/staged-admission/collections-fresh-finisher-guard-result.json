@@ -1,0 +1,66 @@
+{
+  "budget_debits": {
+    "active_s": {
+      "known_lower_bound": 120,
+      "value": 120
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 850752,
+      "value": 850752
+    }
+  },
+  "completion_reserve": {
+    "allocation": null,
+    "id": null,
+    "phase_kind": null,
+    "status": "legacy_unreserved"
+  },
+  "escalated": true,
+  "exceeded": [],
+  "limits": {
+    "active_s": 180,
+    "cost": null,
+    "tokens": 1150752
+  },
+  "observed_at": "2026-10-15T11:26:57.225038+00:00",
+  "ratio_verified": false,
+  "ratios": {
+    "active_s": null,
+    "cost": null,
+    "tokens": 0.23980300542997854
+  },
+  "status": "BOOTSTRAP_REVIEW",
+  "target_missed": [
+    "tokens"
+  ],
+  "totals": {
+    "active_s": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 850752,
+      "value": 850752
+    }
+  },
+  "unknown": [
+    "active_s",
+    "cost"
+  ],
+  "execution": {
+    "exitCode": 0,
+    "wallTimeSeconds": 0.5949302,
+    "stdout": "{\"budget_debits\": {\"active_s\": {\"known_lower_bound\": 120, \"value\": 120}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 850752, \"value\": 850752}}, \"completion_reserve\": {\"allocation\": null, \"id\": null, \"phase_kind\": null, \"status\": \"legacy_unreserved\"}, \"escalated\": true, \"exceeded\": [], \"limits\": {\"active_s\": 180, \"cost\": null, \"tokens\": 1150752}, \"observed_at\": \"2026-10-15T11:26:57.225038+00:00\", \"ratio_verified\": false, \"ratios\": {\"active_s\": null, \"cost\": null, \"tokens\": 0.23980300542997854}, \"status\": \"BOOTSTRAP_REVIEW\", \"target_missed\": [\"tokens\"], \"totals\": {\"active_s\": {\"known_lower_bound\": 0, \"value\": null}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 850752, \"value\": 850752}}, \"unknown\": [\"active_s\", \"cost\"]}\r\n"
+  },
+  "authority_companion": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-fresh-finisher-guard-authority.json",
+  "scope": "Only mechanical QA puts[0] missing guard, then STOP; final reserve not admitted now.",
+  "source_test_or_launch_performed": false
+}

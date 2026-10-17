@@ -1,0 +1,47 @@
+{
+  "kind": "maker-read-only-static-checks",
+  "candidateId": "sha256:c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+  "fixCycle": 0,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "results": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "cmd": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --check scripts/eval/extraction-review-resume.mjs",
+        "chunk_id": "6c8b71",
+        "wall_time_seconds": 0.6533061,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "cmd": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --check scripts/eval/extraction-review-resume.test.mjs",
+        "chunk_id": "b7d62c",
+        "wall_time_seconds": 0.667132,
+        "exit_code": 0,
+        "original_token_count": 0,
+        "output": ""
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "cmd": "$staticPaths = @('scripts/eval/extraction-review-resume.mjs','scripts/eval/extraction-review-resume.test.mjs'); foreach ($staticPath in $staticPaths) { $lineNumber=0; foreach ($staticLine in [System.IO.File]::ReadAllLines((Join-Path (Get-Location) $staticPath))) { $lineNumber++; if ($staticLine -match '[\\t ]+$') { throw ($staticPath+':'+$lineNumber+': trailing whitespace') } } }; Write-Output '2 source files: no trailing whitespace'",
+        "chunk_id": "003e1d",
+        "wall_time_seconds": 0.7169655,
+        "exit_code": 0,
+        "original_token_count": 10,
+        "output": "2 source files: no trailing whitespace\r\n"
+      }
+    }
+  ],
+  "priorGitNoIndexNote": "git diff --no-index --check /dev/null each-new-source returned 1 (new-file differences) and only LF-to-CRLF advisories, no whitespace diagnostics. The explicit syntax and trailing-whitespace checks below each returned 0. No exit-0 git diff result is claimed.",
+  "usage": {
+    "makerActiveSeconds": null,
+    "tokens": null,
+    "monetaryCost": null
+  }
+}

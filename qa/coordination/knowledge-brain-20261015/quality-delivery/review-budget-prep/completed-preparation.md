@@ -1,0 +1,9 @@
+# Seven protected admissions prepared
+
+Current gate index: `index.json`. Earlier README/prerequisites remain the original historical checkpoint and are superseded only for missing-identity status by this new index. No earlier assessment or ledger was overwritten.
+
+All seven packet/manifest-declared candidate identities now have canonical `*-assess-input.json` and `*-assess-result.json`. Dirtyguard is its original authoritative cycle1; the other six are cycle0. All seven actual canonical helper invocations exited0 with BOOTSTRAP_REVIEW and protected completion30s/800tokens inside total180s/6000tokens; requested review150s/5200tokens. No helper refused. All actual comparable maker usage remains null and ratio_verified:false. U23's141.174s partial source-only time is retained in its packet and not misused as a full denominator.
+
+U25 original canonical command wall0.4488571s. Dirtyguard command wall0.626525s includes lightweight input serialization; its result is a semantic transcription of that actual helper output, observed_at2026-10-15T10:28:19.154462+00:00, not a repeated review phase. The five later helper process walls were U22resume0.1682998s, extraction-stage0.1613219s, provenance0.1610757s, offline-transfer0.158769s, U23topic0.1702393s. These are preparation helper-process timings, never checker or maker measured-usage denominators.
+
+No reviewer dispatch, independent review, test/build, provider/DB/browser access, verdict or candidate edit occurred. No finalization allocation was precommitted. Required attributable affected-stage/downstream broker evidence, exact current fingerprints and history reconciliation remain gating; finalization later requires cumulative actual/debit rows and the same reserve ID, committed exactly once. Unknown historical usage must remain null. Actual92 evaluator unchanged; genuine human labels0/30.

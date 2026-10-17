@@ -1,0 +1,45 @@
+{
+  "utc": "2026-10-14T09:00:58.2026758Z",
+  "pins": [
+    {
+      "path": "apps/web/src/pages/ops-health/OpsHealthPage.tsx",
+      "sha256": "1d9bced83bac381f190346311b960f9d20d119668f5dd71d13c8f06b091549df"
+    },
+    {
+      "path": "apps/web/src/pages/ops-health/OpsHealthPage.test.tsx",
+      "sha256": "3831110bb4df56234e9b7f4bd97e6f7881a1b76f31583cffa7629ecd19ede212"
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802"
+    },
+    {
+      "path": "apps/web/src/api/client.test.ts",
+      "sha256": "cf251016b2ba3c46eeab96355095ed365ee9f87fa28cf6ffa8237973e7b2f757"
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.tsx",
+      "sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c"
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.test.tsx",
+      "sha256": "08622631c9d3899b88c85180e9e1e1b1863f982048131f87b02bbe93924b5227"
+    },
+    {
+      "path": ".cache/coordination/safe-test-runtime/register.mjs",
+      "sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+    },
+    {
+      "path": ".cache/coordination/safe-test-runtime/register-react.mjs",
+      "sha256": "ded9f20f16c15fcdc82e1b355eb13fefba7989f0294966936ed3660ea7b85f82"
+    },
+    {
+      "path": ".cache/coordination/safe-test-runtime/react-harness.mjs",
+      "sha256": "3e4b648688fb8a2d643158a4995a76d8235ced1033a6d4aefeae242d9c6f5068"
+    },
+    {
+      "path": "qa/evidence/t057-ops-health-key-boundary/checker.node.test.tsx",
+      "sha256": "08862da3754c1649ebbe890e699a7e6ac37ee6e41b66d8c3cbe92fc2a9196409"
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+[
+  {
+    "path": "apps/api/src/capture-readiness/host-connector.ts",
+    "sha256": "4c39abdfb4a9030c5cba4dab217b7f5ff12a4e43fcfa18815d9d2ddc42212814"
+  },
+  {
+    "path": "apps/api/src/capture-readiness/types.ts",
+    "sha256": "b9daa34d92a7d65bc455b025cbf1dc20112e8e57237c0bf0042683f759d50750"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/hosting.ts",
+    "sha256": "9b97eeef07c50b1d9326bab9b80cb8e432db41b9cca2c3e679a31a1fdd4e26ed"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/source-jobs.ts",
+    "sha256": "8639249c059e322e09a2f81dc12e104e2ee97653dd87dc062a3c0bc3b902f423"
+  },
+  {
+    "path": "apps/api/src/composition/lazy-database.test.ts",
+    "sha256": "a44e69a4e73b8ae0c3744fed601fffc7bfae88bc877a2c4486cc3adc7f5c5a77"
+  },
+  {
+    "path": "apps/api/src/composition/lazy-database.ts",
+    "sha256": "4a9e113192c08b5d137a558f3cb0f2b449620466b0563f6a15e4b80c70455e19"
+  },
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "86ec1d549ba0b0fa3c9017fae245c7237fde7cc3bcda90c4f534f3f0bc29f0fa"
+  },
+  {
+    "path": "apps/api/src/connector-workflow/watched.ts",
+    "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0"
+  },
+  {
+    "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+    "sha256": "922da63b562b45c7dfcfd4a1a26d5fb306b499ef4ff3ba48968ea748632419a4"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/binding.test.ts",
+    "sha256": "adf2d059b675b84d04377900bb1aff55601e9461c75ffb7016282b7236ed5ce9"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/binding.ts",
+    "sha256": "1c65a170e4e713e1a8cc57d35a52ea6fb81c288c3f8675621f7369dc10ab5f40"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/publication.mongo.test.ts",
+    "sha256": "ced01e0a9d59f79a84f319a37699d1c07a77d02dae93304a6049c58ee47b4c6b"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/publication.test.ts",
+    "sha256": "d535e0d24f1b8d6a99c3017a9404111051b2800a11f0e04da51dcb855398ad00"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/publication.ts",
+    "sha256": "9e10b7695f5841dab03e3057dfb5ff738eca1b138b376f8c405d652a11bd4a69"
+  },
+  {
+    "path": "apps/api/src/indexing/speaker-suggest.test.ts",
+    "sha256": "c6bb85e2c152c1d91584870b9bfab4478886f7b3c0e1adf154d77b4362f6eece"
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "sha256": "48e773860714013f7adf8a1a92e5fd759a4a778d9e6ce12936cefa48c97e2960"
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.ts",
+    "sha256": "2b483ff6c58004ba0aff583a3c9a3de512e8071e753740c4438e54ae7e81b46d"
+  },
+  {
+    "path": "apps/api/src/production.test.ts",
+    "sha256": "a53aaaed77d09dbd8eafc19c2a2e154f0d62dbe44ff6218c1bbb560a21aebc0b"
+  },
+  {
+    "path": "apps/api/src/source-intake/jobs/entry.ts",
+    "sha256": "435bdbfaaf16ab1b83a59f1c0876803dd16ebda43bf380334d54a1d7f4d99815"
+  },
+  {
+    "path": "apps/api/src/speaker-profiles/router.test.ts",
+    "sha256": "7a01a0c227a72e4d64bc98a35981b31f62712afcc011b5a25ee02c03f0775a79"
+  },
+  {
+    "path": "apps/api/src/speaker-profiles/store.test.ts",
+    "sha256": "194f127645a3529fbc316d049d0f29457175c12f082d1aa045945d07fe383e2f"
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+    "sha256": "f86ad71bf4c5db3ed0af56d14173b8b4cb0718164c4e0bdfde2904d77785e0b4"
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/router.ts",
+    "sha256": "8f6a261a7a679074b7ee09cb0402ed845ca47947e7906acdfeac6cb3c1050e9f"
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+    "sha256": "bac872e336a395d0ca14ac6ac96f515e9328608f1242d183e08e142bef362ac0"
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/store.ts",
+    "sha256": "eb3696c94243f7dad44e5ad93c2238a28677dbe3b297607708e791d9ca88ebbe"
+  },
+  {
+    "path": "apps/api/src/transcript-review/memdb.testsupport.ts",
+    "sha256": "a5c1f3f13530529b390977ca097beb23ffbd574ed4d83c049bd0c07bc9633c86"
+  },
+  {
+    "path": "apps/api/src/transcript-review/persist.testkit.ts",
+    "sha256": "def8da88cdedacf59918e4789a3c0df377e26d85cb86bf5987eab38cdad09363"
+  },
+  {
+    "path": "apps/api/src/transcript-review/refresh-executor.test.ts",
+    "sha256": "4fd7e368e1886c42d6c07bea001fa1764c8bcaf3cdf0621c28d1f5748642b6cd"
+  },
+  {
+    "path": "apps/api/src/transcript-review/refresh-executor.ts",
+    "sha256": "56b8d536c7628d043df7815b9acbbb36de4dbf6b56cad5492f99ff7baf8800a8"
+  },
+  {
+    "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+    "sha256": "ce6ec9a10b4790e32be25286fff3304c478df96737e518eae1605e3cde02c2ed"
+  },
+  {
+    "path": "apps/api/src/transcript-review/service.ts",
+    "sha256": "c30821512924a77420ad5917aa7df2575c9e32d234b0ad829394471f8d8eef87"
+  },
+  {
+    "path": "apps/api/src/transcript-review/store.ts",
+    "sha256": "260cab66dbff29bfd6ad3805eccd715e585f22bd14bca5e50921eff357bdac33"
+  },
+  {
+    "path": "packages/core/src/generated/sessions.ts",
+    "sha256": "67705753e1db14f35c2a0701e751396f155afaccb2b03353518943a3bc573637"
+  },
+  {
+    "path": "packages/core/src/generated/speaker_suggestions.ts",
+    "sha256": "cca58f06dfdd3509bf6184488b68846a214c10d727a951781aced5556dc1d2ac"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+    "sha256": "ae7f66a9c0559c104461ac980ffd6122c192fbc9cd604ad047e08e55fc5a7ce9"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions/index.ts",
+    "sha256": "70c9efc7fdd8cb66598e1e4b309006ef40284dbeacd0f870bf8e70a367b7b3a7"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+    "sha256": "c5ac29311c4fe2866cd679821af2a26f360a45f868a733a8620fbf0847915920"
+  },
+  {
+    "path": "packages/db/src/index.ts",
+    "sha256": "725504b6753f39e8d13107c8542513ae010db8d34c509c4cc05ce206081a9bac"
+  },
+  {
+    "path": "packages/db/src/lib/native-publication.ts",
+    "sha256": "c352fe74f2c96dbc92f240641e57ce854a1c7d0c542d73dec799b197e674524b"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+    "sha256": "947df1788801021e8a32932597bc01df8639c62ac851f024b9a63f07a30a8cda"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-capture.test.ts",
+    "sha256": "02fb26095ab977482b9e87e758b6214b289cd2e69602397999feacb95f1f6a5c"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-capture.ts",
+    "sha256": "bd32bc89a7d3fbd428a4abbfd9559b69be012c0533dee5dc4c6bf3fe6584f002"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-join-types.ts",
+    "sha256": "6c8e2318cfca5a103501c8b88bb106bdc5d1ef3fc7687f97a865e022c24262e7"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "sha256": "a125bb23755d9f51fb496b67bb0993415e3f2decec13949c9b8455cfef7db877"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+    "sha256": "9d96c19b487710be597a49136b02ee5d4910cc0addb6678ea408c1a36071f10b"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-restart.testsupport.ts",
+    "sha256": "cf3ecebb4b3fe37c52b70776bdab4cb20d6c08fc02150dea91fa8bdd3df4f7c2"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+    "sha256": "3062318d2b87c9213eac05afcd06d0f80feb38ad71117d2e91ffcd8c206f9634"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+    "sha256": "033454814c587afcfafd4edc0a46e66a5d612f3ae0e10a3458dc8a49f1f2c2a9"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-commands.ts",
+    "sha256": "1dafe3074f70ec5440dc51326f392a58dfbf55ea8b33f9ef18ea59cefd185d3e"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "sha256": "6349f52a186c0ec4c484e4a3b7d1ecfbb81a98e35e1298fc9029d822ca2dc0ff"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ps1",
+    "sha256": "48ec95f14880c235dd8812f7ef68d4afbdf11b9c2beb9a1421151aa4d50178ca"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/private-directory.test.ts",
+    "sha256": "22b44c4fdd5da97ded4bb539e629b9bed435ad4c5d4675e5c2c863f0c1486987"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ts",
+    "sha256": "1c430142519ed7f9ad8bf1ff82b561578cd7c36b0e9346424f339f599403f59d"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+    "sha256": "8ac3798f063c0bb9a06405d10cb274b33dd169cda9d59bf99b610e31e531e927"
+  },
+  {
+    "path": "schema/fixtures/sessions/invalid-native-publication.json",
+    "sha256": "9d14b633c431cf2cc400965329e329590526aa6d4f701eb79131c4fd9f08981f"
+  },
+  {
+    "path": "schema/fixtures/sessions/valid-native-publication.json",
+    "sha256": "86ab9e5efa018c537ff519dc23e5eef1f7a8fbe902a2e97cc7a4ca7e633ab7f2"
+  },
+  {
+    "path": "schema/fixtures/speaker_suggestions/invalid-native-publication.json",
+    "sha256": "e2805947b79063e47c677bf4bccc7a4ff9e62efce3b26a9abcf15863d3a818a8"
+  },
+  {
+    "path": "schema/fixtures/speaker_suggestions/valid-native-publication.json",
+    "sha256": "374070897e03f80be8de940c1fe4fde8bc4bfba0d785e39f90d3427759c86bf3"
+  },
+  {
+    "path": "schema/sessions.schema.json",
+    "sha256": "0591af585e542564c774b1f5154d7d34605752a09638e8fb529424d37a956a72"
+  },
+  {
+    "path": "schema/speaker_suggestions.schema.json",
+    "sha256": "a6a074dd628d193169209ce7356d6348e5c5bbcf86f09c9c6283efd2da0a4ad7"
+  },
+  {
+    "path": "scripts/native-capture/production.test.ts",
+    "sha256": "dc8b0f7e2a52d48f1b84175cb996b001fac5ecc827d1fda0a32f43359cd37f68"
+  },
+  {
+    "path": "scripts/native-capture/production.ts",
+    "sha256": "dd713b146c48892e298d8f22714a0d0b8e264d0522b33c0d029cb9c62ee0e31a"
+  },
+  {
+    "path": "scripts/native-capture/record.test.ts",
+    "sha256": "eaed76a22342a5502523613aa355071a8f8161d1af9c1e9523afce906b6b9487"
+  },
+  {
+    "path": "scripts/native-capture/record.ts",
+    "sha256": "ce44c0f7ccb58a0e0cb31f50a4aeaa3aa75ec31e7c249518d768c17a81ec5b56"
+  },
+  {
+    "path": "scripts/native-capture/server-watched.test.ts",
+    "sha256": "038f8c217e6980896156292d3a48c2a6e542129f1fb7ad42747635b490411f57"
+  },
+  {
+    "path": "scripts/native-capture/server.test.ts",
+    "sha256": "c63790a5cd115bf8b474508e688495f880231927c8d62b946a78e4e6321ba531"
+  },
+  {
+    "path": "scripts/native-capture/server.ts",
+    "sha256": "af7a4657c4d85f6c42c63760aeca436c273cf65ebb3abb8acf70af6d63c8d678"
+  },
+  {
+    "path": "scripts/watched-sources/host.test.ts",
+    "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae"
+  },
+  {
+    "path": "scripts/watched-sources/host.ts",
+    "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa"
+  },
+  {
+    "path": "scripts/watched-sources/README.md",
+    "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8"
+  },
+  {
+    "path": "scripts/watched-sources/supervisor.ts",
+    "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583"
+  },
+  {
+    "path": "scripts/webinar/sync-session.mjs",
+    "sha256": "8c23f05d7eacf349478797cd82379ddce55a3da51b331357583699d62b2d9ed0"
+  }
+]

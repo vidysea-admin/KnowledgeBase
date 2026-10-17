@@ -20,11 +20,32 @@
  */
 import { request as httpRequestRaw } from "node:http";
 import { request as httpsRequestRaw } from "node:https";
-import { lookup as dnsLookup } from "node:dns/promises";
+import { lookup as dnsLookup, Resolver } from "node:dns/promises";
 import type { LookupAddress } from "node:dns";
 
 /** Every address a hostname currently answers with — all of them must pass the guard. */
-export async function resolveAll(hostname: string): Promise<string[]> {
+export async function resolveAll(hostname: string, bounded?: {timeoutMs: number; resolver?: {
+  resolve4(host: string): Promise<string[]>; resolve6(host: string): Promise<string[]>; cancel(): void;
+}}): Promise<string[]> {
+  if (bounded) {
+    if (!Number.isFinite(bounded.timeoutMs) || bounded.timeoutMs <= 0) throw new Error("Invalid DNS deadline");
+    const resolver = bounded.resolver ?? new Resolver();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try {
+      return await Promise.race([
+        Promise.allSettled([resolver.resolve4(hostname), resolver.resolve6(hostname)]).then(results => {
+          const addresses: string[] = [];
+          for (const result of results) {
+            if (result.status === "fulfilled") addresses.push(...result.value);
+            else if (!["ENODATA", "ENOTFOUND"].includes(result.reason?.code)) throw new Error("DNS acquisition unavailable");
+          }
+          if (!addresses.length) throw new Error("DNS acquisition unavailable");
+          return [...new Set(addresses)];
+        }),
+        new Promise<string[]>((_resolve, reject) => {timer = setTimeout(() => {resolver.cancel(); reject(new Error("DNS acquisition timed out"));}, bounded.timeoutMs);}),
+      ]);
+    } finally {if (timer) clearTimeout(timer); resolver.cancel();}
+  }
   const records = await dnsLookup(hostname, { all: true, verbatim: true });
   return records.map((r: LookupAddress) => r.address);
 }
@@ -50,6 +71,8 @@ export function httpRequest(
   const send = isHttps ? httpsRequestRaw : httpRequestRaw;
 
   return new Promise<HttpTransportResponse>((resolve, reject) => {
+    let deadline: ReturnType<typeof setTimeout> | undefined;
+    const clearDeadline = () => { if (deadline !== undefined) {clearTimeout(deadline); deadline = undefined;} };
     const req = send(
       {
         protocol: target.protocol,
@@ -100,15 +123,24 @@ export function httpRequest(
           }
           chunks.push(chunk);
         });
-        res.on("end", () => resolve({ status, location, body: Buffer.concat(chunks).toString("utf8") }));
-        res.on("error", reject);
+        res.on("end", () => {clearDeadline(); resolve({ status, location, body: Buffer.concat(chunks).toString("utf8") });});
+        res.on("error", error => {clearDeadline(); req.destroy(); reject(error);});
+        res.on("close", () => {clearDeadline(); if (!res.complete) req.destroy(new Error("node-transport: response interrupted"));});
       },
     );
 
+    // Inactivity alone does not stop a peer that drips bytes forever. This timer also closes the
+    // owned socket at the absolute deadline, including connection/TLS and a continuously active body.
+    deadline = setTimeout(() => {
+      const error = new Error(`node-transport: timed out after ${opts.timeoutMs}ms`);
+      reject(error); req.destroy(error);
+    }, opts.timeoutMs);
+    req.once("close", clearDeadline);
     req.setTimeout(opts.timeoutMs, () => {
-      req.destroy(new Error(`node-transport: timed out after ${opts.timeoutMs}ms`));
+      const error = new Error(`node-transport: timed out after ${opts.timeoutMs}ms`);
+      reject(error); req.destroy(error);
     });
-    req.on("error", reject);
+    req.on("error", error => {clearDeadline(); reject(error);});
     req.end();
   });
 }

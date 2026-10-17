@@ -1,0 +1,7 @@
+{
+  "authority": "root latest frozen finalizer fix1; exact combined dependency binding",
+  "old_probe_sha256": "d3b2f373c8f37bef33b29a0dbf121b5dfc97732cb4b7ffdfb5fb31b71bf64abc",
+  "new_probe_sha256": "763a399a4cc02d63d1d28f07cf1e753430a95623c28b4cbb0f8f57fc63892ea0",
+  "fix_checkpoint_sha256": "4234ae4f102234917128c6f2a96eec1230a1c346e43950623ecc92e79cdb2a05",
+  "omitted_sampler": "active sb_join_tiles.py producer dependency; no sampler/Python test run"
+}

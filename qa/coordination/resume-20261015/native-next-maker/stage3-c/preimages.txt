@@ -1,0 +1,1 @@
+Both new lazy-database helper paths absent. scripts/native-capture/production.test.ts not edited; B diagnosed archive implementation read-only-bit propagation.

@@ -1,0 +1,120 @@
+✔ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (140.7199ms)
+✔ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (61.6125ms)
+✔ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (19.5254ms)
+✔ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (11.3586ms)
+✔ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (64.2976ms)
+✖ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (48.2381ms)
+✖ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (6.8836ms)
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (64.0143ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (9.3896ms)
+✔ flag ON via env var (6.114ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (7.8161ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (7.029ms)
+✔ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (39.8214ms)
+✔ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (34.5989ms)
+✔ ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids (4.5885ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (41.2591ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (0.9579ms)
+✖ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (11.2169ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (14.8108ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (16.7433ms)
+✖ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (8.8806ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.4558ms)
+✖ unknown commit retries cannot replay paid model calls or duplicate physical completion (7.1265ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 18
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9246.4425
+
+✖ failing tests:
+
+test at apps\api\src\indexing\promote-entities.test.ts:1:10911
+✖ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (48.2381ms)
+  AssertionError [ERR_ASSERTION]: the tree must yield a topic node, or nothing tests the topic write
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\promote-entities.test.ts:388:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\promote-entities.test.ts:1:11431
+✖ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (6.8836ms)
+  AssertionError [ERR_ASSERTION]: both entity collections must be written
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\promote-entities.test.ts:398:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\vectorless-publication.test.ts:1:3182
+✖ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (11.2169ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    {
+      _id: 'reviewed',
+      evidence: [
+        {
+          quote: 'A real sentence.',
+  ...
+      text: 'A previously reviewed abstract.',
+  +   topicRefs: []
+    }
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-publication.test.ts:73:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { _id: 'reviewed', tenantId: 't', text: 'A previously reviewed abstract.', status: 'verified', evidence: [ [Object] ], topicRefs: [] },
+    expected: { _id: 'reviewed', tenantId: 't', text: 'A previously reviewed abstract.', status: 'verified', evidence: [ [Object] ] },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\vectorless-publication.test.ts:1:6602
+✖ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (8.8806ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /synthetic mid-write failure/. Input:
+  
+  'DataCloneError: startTransaction(options){assert.equal(options.readConcern.level,"snapshot");assert.equal(options.writeConcern.w,"majority")} could not be cloned.'
+  
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-publication.test.ts:135:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: DataCloneError: startTransaction(options){assert.equal(options.readConcern.level,"snapshot");assert.equal(options.writeConcern.w,"majority")} could not be cloned.
+        at new DOMException (node:internal/per_context/domexception:76:18)
+        at structuredClone (node:internal/worker/js_transferable:127:26)
+        at rec (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\testutils.ts:104:20)
+        at Object.updateOne (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\testutils.ts:147:11)
+        at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\transcript-review\transaction-db.ts:49:119),
+    expected: /synthetic mid-write failure/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\vectorless-publication.test.ts:1:8634
+✖ unknown commit retries cannot replay paid model calls or duplicate physical completion (7.1265ms)
+  DataCloneError: startTransaction(){} could not be cloned.
+      at new DOMException (node:internal/per_context/domexception:76:18)
+      at structuredClone (node:internal/worker/js_transferable:127:26)
+      at rec (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\testutils.ts:104:20)
+      at Object.updateOne (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\testutils.ts:147:11)
+      at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\transcript-review\transaction-db.ts:49:119)

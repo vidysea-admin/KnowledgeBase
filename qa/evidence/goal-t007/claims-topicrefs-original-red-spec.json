@@ -1,0 +1,21 @@
+{
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "qa/evidence/goal-t007/claims-topicrefs-checker.test.ts"
+  ],
+  "pins": {
+    "apps/api/src/claims/store.ts": "e7b93eeb0d788ff9d57454ba94da7d86bda8a809b0ff8a737ee39a1b70f3fef3",
+    "apps/api/src/knowledge/metadata-visibility.ts": "416a94a4f40ec2eb35fce91249b64633f828e65ebe97aa4b00de1b8c5329495b",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/effective-reader.ts": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+    "qa/evidence/goal-t007/claims-topicrefs-checker.test.ts": "8b9e4c7d19a2d7a9afd44136e7aa0d84b3ef1ab9c6a12a6ab87fa3ef1738ab64",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/api/package.json": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede"
+  },
+  "timeoutMs": 90000,
+  "output": "qa/evidence/goal-t007/claims-topicrefs-original-red"
+}

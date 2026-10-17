@@ -1,0 +1,43 @@
+{
+  "phase": "read-only-staging-proposal-readiness",
+  "executionContext": "use_default restricted sandbox; DockerCLI lookup and only port27029 query; no activation",
+  "startedAt": "2026-10-15T09:02:55.0174740Z",
+  "completedAt": "2026-10-15T09:02:56.5672358Z",
+  "elapsedMs": 1528.738,
+  "portProbeExitCode": 1,
+  "portProbeTimedOut": false,
+  "probeBefore": "1CC0FFD542984520F777EFB22E86F1F3A387D933D1658791925E401C5AE17836",
+  "probeAfter": "1CC0FFD542984520F777EFB22E86F1F3A387D933D1658791925E401C5AE17836",
+  "safeReport": {
+    "dockerCliAvailableFromPath": false,
+    "dockerCliPath": null,
+    "dockerServerVersion": null,
+    "mongoImages": "unknown",
+    "proposedVolumes": [
+      {
+        "status": "unknown",
+        "name": "lkb-vectorless-transaction-data-v1"
+      },
+      {
+        "status": "unknown",
+        "name": "lkb-vectorless-transaction-key-v1"
+      }
+    ],
+    "proposedProject": {
+      "status": "unknown",
+      "name": "lkb-vectorless-transaction"
+    },
+    "port": {
+      "status": "unknown",
+      "listeners": [],
+      "port": 27029
+    },
+    "actions": {
+      "pulls": 0,
+      "databaseWrites": 0,
+      "networksCreated": 0,
+      "daemonStarts": 0,
+      "containersStarted": 0
+    }
+  }
+}

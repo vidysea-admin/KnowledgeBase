@@ -1,0 +1,36 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "historical-usage-unreconciled",
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "token_metric": "actual_total",
+    "kind": "review",
+    "active_s": 150,
+    "tokens": 4800,
+    "cost": null
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "resume-speaker-graph/1/dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "completion_reserve_tokens": 1200,
+  "bootstrap_scope": "Proposed default180s6000 cumulative incl30s1200completion; no spend/launch authorized while historical charge unknown",
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "tokens": 6000,
+    "cost": null
+  },
+  "escalation": null
+}

@@ -5,7 +5,7 @@ Accepted (maker draft per contract `qa/contracts/recording-gap-tracking.md` C5; 
 adopt/amend on first check).
 
 ## Context
-`Living-Knowledge-Base-Architecture.html` §1 Layer 1, step 2b ("Process-first gap handling"):
+`docs/Living-Knowledge-Base-Architecture.html` §1 Layer 1, step 2b ("Process-first gap handling"):
 when a session has no recording, the process is a **standing ask to Bhakti/TOC**, and only if
 it never arrives within N days is it "logged as a recording pending gap entry" — never silently
 dropped (ARCHITECTURE §5). The architecture doc left N and the escalation path unspecified;

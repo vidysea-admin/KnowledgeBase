@@ -1,0 +1,36 @@
+{
+  "endMonotonic": 248103173783,
+  "endUtc": "2026-10-15T10:38:40.4312779Z",
+  "phaseIncludesCoordinationWait": true,
+  "elapsedSeconds": 115.6422881,
+  "hashes": [
+    {
+      "sha256": "C949FE2697E3CF735601CAEE4372378E108E0BF3855079D299CB6CFFDA1483E8",
+      "path": "schema/index.json"
+    },
+    {
+      "sha256": "2B03A2DFACB9C747725FF261E17B7139E418F13E1E9D165CF524A1DD876FE146",
+      "path": "schema/tree_index.schema.json"
+    },
+    {
+      "sha256": "784BBECE740C2188ADB20463880918845A5CBC6677FAE9BA433BEA386C09567A",
+      "path": "schema/speaker_attributes.schema.json"
+    },
+    {
+      "sha256": "42A3854C5E15B297EE93BEAE7F840BB3976A114FD1C25EF6216502E3C905F231",
+      "path": "packages/core/src/index.ts"
+    },
+    {
+      "sha256": "89B52EB2EB2032798B762D92C25E1381665858E49034317DE1B92CB809E311F0",
+      "path": "packages/db/src/index.ts"
+    },
+    {
+      "sha256": "810C7994B1A571F6E18DEA8D265A1E32DF14D717D2E8AA76CF1E17D663E61D5D",
+      "path": "scripts/gen-types.mjs"
+    }
+  ],
+  "startUtc": "2026-10-15T10:36:44.779418Z",
+  "phase": "source-edits-ended-before-broker-result",
+  "startMonotonic": 246946750902,
+  "tokensActual": null
+}

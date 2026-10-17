@@ -1,0 +1,12 @@
+{
+  "checkedAt": "2026-10-14T22:03:12.0053929+00:00",
+  "sourcePath": "apps/api/src/visibility/knowledge.ts",
+  "sourceModified": false,
+  "currentSHA256": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+  "removedClause": " || source.consent?.given === false",
+  "removedSites": 1,
+  "memoryInverseSHA256": "6A0F17EAB3A02FC16975329E87C4D0BF234C2FFF035B59F34EE4D0ACB1BFDB2D",
+  "expectedTestedPriorSHA256": "4ED89B000892C5D55291ADD50CF80B9D060E1997A5A309495AE648AD17E84ADA",
+  "exactTestedPriorReconstructed": false,
+  "scope": "Independent static byte delta proof, not execution evidence; positive fixture consent:true bypasses only added refusal"
+}

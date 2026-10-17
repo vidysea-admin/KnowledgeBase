@@ -1,0 +1,32 @@
+✔ production integration construction is passive and unavailable configuration never permits key mutation (13.9125ms)
+✔ production integration consumes verified actor for audited keys and global account lifecycle after fresh construction (278.9766ms)
+✔ append/fsync failure blocks callback and fresh runtime, not silent successful replay (29.4177ms)
+✔ truncated and modified tenant journal is refused; no repair drops audit evidence (57.8885ms)
+✔ symlink ancestry cannot redirect durable state; abandoned locks refuse until operator recovery (26.3981ms)
+✔ crash after audited role append leaves pending target unable to regrant (61.4781ms)
+✔ failure in account completion append does not manufacture completion (32.0446ms)
+✔ authenticated runtime flows role mutation to durable audit and webhook delivery/status, with foreign reads refused (398.9197ms)
+✔ HTTP layer refuses absent identity, insufficient scopes and body actor/tenant injection (67.1985ms)
+✔ missing durable configuration is explicit unavailable, not successful registration (16.1703ms)
+✔ hosting authority is verified tenant/key plus server role, never privilege or tenant input (130.4336ms)
+✔ role/profile commit is read-checked, audited first, and rejects ordinary regrant after incomplete callback (50.7496ms)
+✔ successful account callback completes pending marker; inactive and revoked account identities fail closed (97.5096ms)
+✔ durable registry returns secret once; projections and audit omit ciphertext and payload (107.3816ms)
+✔ event replay is identity bound; roles and callbacks serialize rather than losing updates (85.0213ms)
+✔ key mutation has role/scope authority and durable intent/completion without raw credential audit (98.6801ms)
+✔ registration policy refuses hostile schemes, credentials, origins, query secret and private addresses (13.6353ms)
+✔ mixed hostile DNS and bounded DNS timeout are refused before any connection (9.276ms)
+✔ actual transport connects validated numeric address while TLS/Host stay original, never follows redirect (1.7758ms)
+✔ signed delivery consumes durable event and registry then survives restart/replay without ordinary duplicate (147.3674ms)
+✔ retry/restart preserves identity and reports non-2xx, private error and redirect without secrets (297.0807ms)
+✔ expired sending lease is honest ACK-uncertainty retry and revoke generation fences acknowledgement (125.2421ms)
+✔ viewer cannot enqueue or dispatch; editor cannot deliver or read mutation audit (62.0542ms)
+✔ revoke while DNS is paused prevents TLS initialization across fresh runtimes and persisted-only fencing (204.3826ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8770.7345

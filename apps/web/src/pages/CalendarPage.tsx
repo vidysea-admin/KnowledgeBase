@@ -25,6 +25,8 @@ import { MonthGrid } from "./calendar/MonthGrid.js";
 import { TimeGrid } from "./calendar/TimeGrid.js";
 import { EventDetail } from "./calendar/EventDetail.js";
 import { AgendaView } from "./calendar/AgendaView.js";
+import { OptOutControl } from "./calendar/OptOutControl.js";
+import { useOptedOutIds } from "./calendar/useOptedOutIds.js";
 import {
   activeCalendarFilterCount, filterEvents, isCalendarView, localTimeZoneName, monthMatrix,
   parseLocalDate, rangeFor, shiftRange, sourceOptions, toCalendarEvents, toDateParam,
@@ -42,6 +44,7 @@ export function CalendarPage(): React.ReactElement {
   const [scanning, setScanning] = useState(false);
   const [scanNote, setScanNote] = useState<string | null>(null);
   const [params, setParams] = useSearchParams();
+  const optedOut = useOptedOutIds(apiKey);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,6 +131,8 @@ export function CalendarPage(): React.ReactElement {
   const loaded = sessions !== null;
   const selectedId = params.get("event");
   const selected = visible.find((e) => e.id === selectedId) ?? null;
+  /** The raw API meeting behind a selected meeting: its `id` is the opt-out record id (the grid id is `meeting:`-prefixed). */
+  const selectedMeeting = selected?.kind === "meeting" ? (meetings ?? []).find((m) => `meeting:${m.id}` === selected.id) : undefined;
 
   const inRange = useMemo(() => {
     if (view === "list") return visible;
@@ -220,6 +225,18 @@ export function CalendarPage(): React.ReactElement {
           {selected && (
             <div className="card" style={{ width: 300, flexShrink: 0 }}>
               <EventDetail event={selected} onClose={() => setParam("event", null)} />
+              {selectedMeeting && apiKey && (
+                <OptOutControl
+                  key={selectedMeeting.id}
+                  apiKey={apiKey}
+                  eventId={selectedMeeting.id}
+                  title={selectedMeeting.title}
+                  meetingUrl={selectedMeeting.meetingUrl}
+                  linkCount={optedOut.linkCount}
+                  optedOut={optedOut.ids?.has(selectedMeeting.id) ?? false}
+                  onOptedOut={optedOut.add}
+                />
+              )}
             </div>
           )}
         </div>

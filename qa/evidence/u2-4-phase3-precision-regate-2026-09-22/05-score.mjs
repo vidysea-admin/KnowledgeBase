@@ -18,7 +18,20 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const OUT = "qa/evidence/u2-4-phase3-precision-regate-2026-09-22";
+// fix cycle 1: --tag <t> scores run-results.<t>.jsonl / raw-proposals.<t>.jsonl and writes
+// measurement-summary.<t>.json; no tag = the cycle-0 files, unchanged.
+const TAG = process.argv.includes("--tag") ? process.argv[process.argv.indexOf("--tag") + 1] : null;
+// fix cycle 1b: --raw-tag <r> reads raw-proposals.<r>.jsonl instead (an offline replay, 08-replay.mts,
+// re-scores recorded proposals, so its run-results tag differs from the proposals' tag).
+const RAW_TAG = process.argv.includes("--raw-tag") ? process.argv[process.argv.indexOf("--raw-tag") + 1] : TAG;
+const tagged = (base, ext) => {
+  const t = base === "raw-proposals" ? RAW_TAG : TAG;
+  return t ? `${base}.${t}.${ext}` : `${base}.${ext}`;
+};
 const gold = JSON.parse(readFileSync(join(OUT, "gold-labels.json"), "utf8"));
+// ISS-290: refuse to score a drifted corpus (hash-pinned in corpus.lock.json); unpinned sessions are named, not silent.
+const { verifyCorpus } = await import("./corpus-lock.mjs");
+const corpusLock = verifyCorpus();
 
 // per-turn gold override (mid-sentence diarizer join measured in the labelling notes:
 // in-focus-3 t071 continues Kshitij's answer into t072)
@@ -46,7 +59,7 @@ const personMatch = (accepted, goldPerson) => {
 };
 const POSITIONAL = /^spk:\d+$/;
 
-const results = readFileSync(join(OUT, "run-results.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const results = readFileSync(join(OUT, tagged("run-results", "jsonl")), "utf8").trim().split("\n").map((l) => JSON.parse(l));
 
 // ---- per-session turn -> block index (same block definition the pipeline uses)
 const sessionData = new Map();
@@ -150,6 +163,29 @@ for (const r of perRun) {
     wrongPairs += c.evChecks.filter((e) => !e.ok).length;
   }
 }
+// fix cycle 1b — ADDITIVE, the legacy `wrongPairs` above is unchanged. Legacy evChecks accept an
+// evidence turn only if it sits in a gold block OF THE NAMED PERSON, i.e. only a self-naming turn;
+// every greeting/handover/thanks turn (gold provenance kinds address-adjacent / handover-next /
+// called-on) is spoken by SOMEONE ELSE and fails it by construction. This relational check asks the
+// gold's own question instead: is the evidence turn inside, or immediately adjacent to (start-1 /
+// end+1), a claimed block whose gold person IS the accepted name, and (when adjacent) spoken by a
+// different speaker? Reported side by side; the checker rules which one bar 2 means.
+const relationalInvalid = [];
+for (const r of perRun) {
+  const { turns, turnInfo } = sessionData.get(r.session);
+  const idx = new Map(turns.map((t, i) => [t._id, i]));
+  const line = results.find((l) => l.session === r.session && l.outerRun === r.outerRun);
+  for (const c of r.checks) {
+    const blocks = (line.resolved.find((s) => s.speakerRef === c.speakerRef && s.displayName === c.displayName)?.blocks ?? [])
+      .filter((b) => { const t = turns[b.startTurnIndex]; const info = t && turnInfo.get(t._id); return info && info.label === c.speakerRef && personMatch(c.displayName, TURN_OVERRIDES[t._id] ?? info.person); });
+    for (const e of c.evidenceTurns) {
+      const k = idx.get(e);
+      const ok = k !== undefined && blocks.some((b) => (k >= b.startTurnIndex && k <= b.endTurnIndex) ||
+        ((k === b.startTurnIndex - 1 || k === b.endTurnIndex + 1) && turns[k].speakerRef !== c.speakerRef));
+      if (!ok) relationalInvalid.push({ session: r.session, outerRun: r.outerRun, speakerRef: c.speakerRef, displayName: c.displayName, turnId: e });
+    }
+  }
+}
 
 // ---- bar 3 — floor preservation
 let floorTurns = 0;
@@ -225,7 +261,7 @@ const visaRuns = perRun.filter((r) => r.session === visa).sort((a, b) => a.outer
 const visaSets = visaRuns.map((r) => JSON.stringify([...r.acceptedSet]));
 iss255.cases.push({ id: 2, name: "accepted set stable across outer runs 1-3 (recorded run 1 vs 2-3 instability)", pass: visaRuns.length === 3 && new Set(visaSets).size === 1, acceptedSets: visaSets });
 
-const rawLines = readFileSync(join(OUT, "raw-proposals.jsonl"), "utf8").trim().split("\n").map((l) => JSON.parse(l));
+const rawLines = readFileSync(join(OUT, tagged("raw-proposals", "jsonl")), "utf8").trim().split("\n").map((l) => JSON.parse(l));
 const multiNameLabels = [];
 for (const session of sessions) {
   for (const outer of [1, 2, 3]) {
@@ -271,24 +307,24 @@ for (const r of perRun) {
     }
   }
 }
-iss255.cases.push({ id: 4, name: "every accepted evidence pair carries the name verbatim in a cue-shaped turn", pass: invalidPairs.length === 0, evidencePairs, invalidCount: invalidPairs.length, invalid: invalidPairs.slice(0, 20) });
+iss255.cases.push({ id: 4, name: "every accepted evidence pair carries the name verbatim in a cue-shaped turn [ISS-289: NOT independent -- re-asks the base acceptance predicates and counts relation evidence as invalid; the independent citation measure is bar2.wrongEvidencePairsRelational, gold-based]", pass: invalidPairs.length === 0, evidencePairs, invalidCount: invalidPairs.length, invalid: invalidPairs.slice(0, 20) });
 iss255.verdict = `${iss255.cases.filter((c) => c.pass).length}/4`;
 
 const summary = {
   measuredAt: new Date().toISOString(),
-  corpus: { sessions: sessions.length, blocks: gold.sessions.reduce((n, g) => n + g.blocks.length, 0) },
+  corpus: { sessions: sessions.length, blocks: gold.sessions.reduce((n, g) => n + g.blocks.length, 0), lock: "corpus.lock.json verified", unpinnedPositionalSessions: corpusLock.unpinned },
   bar1_acceptedIdentityPrecision: { accepted: totalAccepted, correct: totalCorrect, precision: totalAccepted === 0 ? null : +(totalCorrect / totalAccepted).toFixed(4), bar: 1.0, holds: totalAccepted > 0 && totalCorrect === totalAccepted },
-  bar2_wrongLinks: { wrongIdentityCount: wrongLinkList.length, wrongEvidencePairs: wrongPairs, bar: 0, wrongLinkList },
+  bar2_wrongLinks: { wrongIdentityCount: wrongLinkList.length, wrongEvidencePairs: wrongPairs, wrongEvidencePairsRelational: relationalInvalid.length, relationalInvalid, bar: 0, wrongLinkList },
   bar3_floorPreservation: { floorTurnsCovered: floorTurns, floorBlockCoveredTurns: floorCoveredTurns, floorSpeakerLabels: floorLabelCount, floorList, contradictedByAccepted: contradictions, presence: floorPresence },
   bar4_stability: { perSession: stability, allStable: stability.every((s) => s.stable) },
   bar5_correctAdditions: { additions: distinctAdditions, count: distinctAdditions.length },
   iss255,
   perRun: perRun.map((r) => ({ session: r.session, outerRun: r.outerRun, windows: r.windows, providerCalls: r.providerCalls, ms: r.ms, degraded: r.degraded, accepted: r.checks.map((c) => ({ speakerRef: c.speakerRef, displayName: c.displayName, evidenceTurns: c.evidenceTurns, identityCorrect: c.identityCorrect, reasons: c.reasons })), unresolved: r.unresolved })),
 };
-writeFileSync(join(OUT, "measurement-summary.json"), JSON.stringify(summary, null, 2));
+writeFileSync(join(OUT, tagged("measurement-summary", "json")), JSON.stringify(summary, null, 2));
 console.log(JSON.stringify({
   accepted: totalAccepted, correct: totalCorrect, precision: summary.bar1_acceptedIdentityPrecision.precision,
-  wrongIdentities: wrongLinkList.length, wrongPairs,
+  wrongIdentities: wrongLinkList.length, wrongPairs, wrongPairsRelational: relationalInvalid.length,
   floorTurns, floorCoveredTurns, floorLabels: floorLabelCount, contradicted: contradictions.length,
   stableAll: summary.bar4_stability.allStable, additions: distinctAdditions.length,
   ISS255: iss255.verdict,

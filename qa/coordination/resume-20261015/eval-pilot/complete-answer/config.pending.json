@@ -1,0 +1,26 @@
+{
+  "execution": "real-provider",
+  "mode": "pilot",
+  "intent": "complete-answer",
+  "dispatchReal": true,
+  "model": "glm-5.3-flash",
+  "questionIds": [
+    "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01"
+  ],
+  "grant": {
+    "tier": "root-bound-complete-answer-v1",
+    "id": "root-ollama-complete-answer-same-question-20261015",
+    "scope": "single-question-complete-answer"
+  },
+  "limits": {
+    "maxAttempts": 12,
+    "maxSeconds": 210,
+    "callTimeoutMs": 20000,
+    "maxInputBytes": 327680,
+    "maxRequestBytes": 65536,
+    "maxResponseBytes": 1048576,
+    "outputLimit": 768,
+    "maxKnownInputTokens": 131072,
+    "maxKnownOutputTokens": 9216
+  }
+}

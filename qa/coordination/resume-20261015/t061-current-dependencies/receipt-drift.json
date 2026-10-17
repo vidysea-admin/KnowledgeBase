@@ -1,0 +1,72 @@
+[
+  {
+    "path": "packages/db/src/index.ts",
+    "pinned": "89b52eb2eb2032798b762d92c25e1381665858e49034317de1b92cb809e311f0",
+    "current": "725504b6753f39e8d13107c8542513ae010db8d34c509c4cc05ce206081a9bac"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.ts",
+    "pinned": "515626d26a77e18970d7cec8df60179646dcd56478304758f985bb165b62129c",
+    "current": "MISSING"
+  },
+  {
+    "path": "apps/api/src/routes/ask/ask.ts",
+    "pinned": "23f4f7463d92b22e5d9851b899bde43883fdfad1c1392586b935b7ba0878374b",
+    "current": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-workflow.ts",
+    "pinned": "e95b1a523a8b9ab9619a045944f686ae026547bde3a86d8fd039b670e3ae88e5",
+    "current": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb"
+  },
+  {
+    "path": "apps/api/src/transcript-review/service.ts",
+    "pinned": "757b5298cde4c098016380749612db7ca324cb31d6e177d853dd60e4e44ed9d7",
+    "current": "c30821512924a77420ad5917aa7df2575c9e32d234b0ad829394471f8d8eef87"
+  },
+  {
+    "path": "apps/api/src/transcript-review/store.ts",
+    "pinned": "852b9b48e22367c42158f532a9ede5cfb2305cc625887e78d0ad0c9dc3f5893c",
+    "current": "260cab66dbff29bfd6ad3805eccd715e585f22bd14bca5e50921eff357bdac33"
+  },
+  {
+    "path": "packages/core/src/generated/sessions.ts",
+    "pinned": "8405ad1db80ddf3cc95a7b62488486f05b85da1120d1fd8b48aaa93bb61115d6",
+    "current": "67705753e1db14f35c2a0701e751396f155afaccb2b03353518943a3bc573637"
+  },
+  {
+    "path": "packages/core/src/generated/speaker_suggestions.ts",
+    "pinned": "311a6484b448971abbb30b61528361e4f5001f2a1eec0e029eb2144d9ba9d09f",
+    "current": "cca58f06dfdd3509bf6184488b68846a214c10d727a951781aced5556dc1d2ac"
+  },
+  {
+    "path": "apps/api/src/visibility/knowledge.ts",
+    "pinned": "bd54b93a2b6429f320a0468f7f062c05ece08e6483851e570080efffb0db12dc",
+    "current": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/materializer.ts",
+    "pinned": "7fb6ed68352f9d6eccd0af49abc10310da972c56d5c0ba006037fb9ca8aa2eb9",
+    "current": "6d5e6c39fc3125d5999c220ccca2ed0d95a0e079392a5833ea65e2f5fc263a1b"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/invalidate.ts",
+    "pinned": "7512f739429b9bfb8848e35ac6673037f3a3b5ec20a2aa5dd0f5ae965cbe7214",
+    "current": "a64e5dc76e2d194213eb308b61450a0bf42d3a6279762ecf08592d8da831223f"
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/router.ts",
+    "pinned": "ea5a7098ac10e4c042f42668fe3d4623bb20238caf001b9c8f87a1ed1a52e489",
+    "current": "8f6a261a7a679074b7ee09cb0402ed845ca47947e7906acdfeac6cb3c1050e9f"
+  },
+  {
+    "path": "apps/api/src/evaluation-flywheel/types.ts",
+    "pinned": "c1b031c9964dc26a835c410b3034760f6f2a307a73938015bc091e9c41b7003f",
+    "current": "387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030"
+  },
+  {
+    "path": "apps/api/src/connector-workflow/watched.ts",
+    "pinned": "377addcbcbb8e2972a160ff4b2476cfe1c31683c2ce16570ea5403c85f72445d",
+    "current": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0"
+  }
+]

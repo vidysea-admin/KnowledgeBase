@@ -1,0 +1,4 @@
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/native-remaining-two-acl-verify.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/native-remaining-two-head-after.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/native-remaining-two-head-before.log', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/watched-checker-cycle2-boundary2.log', LF will be replaced by CRLF the next time Git touches it

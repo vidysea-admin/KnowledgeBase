@@ -1,0 +1,37 @@
+{
+  "utc": "2026-10-14T09:14:49.1292621Z",
+  "pins": [
+    {
+      "path": "apps/web/src/pages/ops-health/OpsHealthPage.tsx",
+      "sha256": "1d9bced83bac381f190346311b960f9d20d119668f5dd71d13c8f06b091549df",
+      "match": true
+    },
+    {
+      "path": "apps/web/src/pages/ops-health/OpsHealthPage.test.tsx",
+      "sha256": "3831110bb4df56234e9b7f4bd97e6f7881a1b76f31583cffa7629ecd19ede212",
+      "match": true
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+      "match": true
+    },
+    {
+      "path": "apps/web/src/api/client.test.ts",
+      "sha256": "cf251016b2ba3c46eeab96355095ed365ee9f87fa28cf6ffa8237973e7b2f757",
+      "match": true
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.tsx",
+      "sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+      "match": true
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.test.tsx",
+      "sha256": "08622631c9d3899b88c85180e9e1e1b1863f982048131f87b02bbe93924b5227",
+      "match": true
+    }
+  ],
+  "manifestSha256": "EA713DDA549E5198B096C87F2B9C86FCB869DA4695210596BF643463C9B246ED",
+  "packetSha256": "827D108BD1149DB54D1297BD7F038A0B318908D9741BF13808108C8B7790C42F"
+}

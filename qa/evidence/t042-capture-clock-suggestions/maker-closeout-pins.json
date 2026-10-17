@@ -1,0 +1,157 @@
+{
+  "scope": "T042 slice cycle 0 maker closeout",
+  "pinCount": 25,
+  "mismatchCount": 0,
+  "pins": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\indexing\\tile-speaker-suggest.ts",
+      "expected": "D3473147AB4010F533CAC8AE5BB36918A6020F33DEE2CA3EBB55B1D59EC5EDDE",
+      "actual": "D3473147AB4010F533CAC8AE5BB36918A6020F33DEE2CA3EBB55B1D59EC5EDDE",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\indexing\\tile-speaker-suggest.test.ts",
+      "expected": "8600237450FF563FECA024CC7D0A2A28CF56A7FD1C20C76F04279287BE413F91",
+      "actual": "8600237450FF563FECA024CC7D0A2A28CF56A7FD1C20C76F04279287BE413F91",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-capture-clock-suggestions\\checker-probe.test.mts",
+      "expected": "612752DACFC4C7D4951617CA94C8991471C02C015A1E56C36FBA7AC4CE982BE1",
+      "actual": "612752DACFC4C7D4951617CA94C8991471C02C015A1E56C36FBA7AC4CE982BE1",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-T042.md",
+      "expected": "3A8E8A8105C5BCC8B8A4A6F20F89464B33DE42A29B3EC1279F1BEDFB9846C19C",
+      "actual": "3A8E8A8105C5BCC8B8A4A6F20F89464B33DE42A29B3EC1279F1BEDFB9846C19C",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-tile-suggestions.ts",
+      "expected": "14425C1410D234C0839184443B3FA1075F1374A6B253048D93D7982F8A45EEAF",
+      "actual": "14425C1410D234C0839184443B3FA1075F1374A6B253048D93D7982F8A45EEAF",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-rules\\speaker-tile-fusion.ts",
+      "expected": "5EA93427AF55A60B5606D8427639A4664B7544782C96AB7BCD8BA76309BF5958",
+      "actual": "5EA93427AF55A60B5606D8427639A4664B7544782C96AB7BCD8BA76309BF5958",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-suggestions.ts",
+      "expected": "CFAA84BB8C640ADBF9FF7DAFEF4D88A10385E55D98209647E4CB4F7C22A2EB18",
+      "actual": "CFAA84BB8C640ADBF9FF7DAFEF4D88A10385E55D98209647E4CB4F7C22A2EB18",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speakers.ts",
+      "expected": "233A92BB6B766F7EF381564CAE2CD27353FAB520D1564F319CEDA2144FEA4B65",
+      "actual": "233A92BB6B766F7EF381564CAE2CD27353FAB520D1564F319CEDA2144FEA4B65",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-relation-rules.ts",
+      "expected": "1B6C012774F256F2EE3AF796CC049DC9E4B56F995D6D79CEBB00F4404E32583C",
+      "actual": "1B6C012774F256F2EE3AF796CC049DC9E4B56F995D6D79CEBB00F4404E32583C",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-name-rules.ts",
+      "expected": "7C97B352B115C6317D412053B52047D1E84EDCB8103F750FB84564CE9CE1BA98",
+      "actual": "7C97B352B115C6317D412053B52047D1E84EDCB8103F750FB84564CE9CE1BA98",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-rules\\speaker-selfid-rules.ts",
+      "expected": "A27AE08B384A3D82384E6ADFA1CCDA8236D43E9DB73205049630493824B74377",
+      "actual": "A27AE08B384A3D82384E6ADFA1CCDA8236D43E9DB73205049630493824B74377",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-rules\\speaker-reported-rules.ts",
+      "expected": "168D3FA8A30554CB293404FCF063CDC6416F909CC037C566629B3085CE4AA10A",
+      "actual": "168D3FA8A30554CB293404FCF063CDC6416F909CC037C566629B3085CE4AA10A",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\pipeline\\speaker-rules\\speaker-name-data.ts",
+      "expected": "D52B01BEB3386A73A6FB0CE148B22F74F36C855CCBDBFDF05529ED5EA700A4D6",
+      "actual": "D52B01BEB3386A73A6FB0CE148B22F74F36C855CCBDBFDF05529ED5EA700A4D6",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\db\\src\\collections\\speaker-suggestions.ts",
+      "expected": "515626D26A77E18970D7CEC8DF60179646DCD56478304758F985BB165B62129C",
+      "actual": "515626D26A77E18970D7CEC8DF60179646DCD56478304758F985BB165B62129C",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\db\\src\\collections\\speaker-suggestions.testdb.ts",
+      "expected": "BCE0534F0FD474788E97774DA274F8CFA186908A005876D7D1DABD8C95FEB000",
+      "actual": "BCE0534F0FD474788E97774DA274F8CFA186908A005876D7D1DABD8C95FEB000",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\db\\src\\lib\\tenantScope.ts",
+      "expected": "F9AB2F8FA8D21DD661D9752CFA85912FA548255EF85A0018E048634BC95EE513",
+      "actual": "F9AB2F8FA8D21DD661D9752CFA85912FA548255EF85A0018E048634BC95EE513",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\domain\\speaker-tile-alignment.ts",
+      "expected": "3A8A28C448C59C11E25D47267616FC1C2F81729861AF28DE6494BFE7ADA5D8BA",
+      "actual": "3A8A28C448C59C11E25D47267616FC1C2F81729861AF28DE6494BFE7ADA5D8BA",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\domain\\speaker-tile-scan.ts",
+      "expected": "6FF4554F0FD0C8638A98FD9B34331408D6FDC5A0431FCEE12661BAC24F44FF51",
+      "actual": "6FF4554F0FD0C8638A98FD9B34331408D6FDC5A0431FCEE12661BAC24F44FF51",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\domain\\speaker-tile-names.ts",
+      "expected": "74CB25EA1DFE5FCDD906E1900709E477612A36517D8EAC92E84F3BFDC258C4BB",
+      "actual": "74CB25EA1DFE5FCDD906E1900709E477612A36517D8EAC92E84F3BFDC258C4BB",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml",
+      "expected": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD",
+      "actual": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\package.json",
+      "expected": "678346DCCCC8310496005A777FD289CCB4FBE5CAE08B529F717D7259D7578EDE",
+      "actual": "678346DCCCC8310496005A777FD289CCB4FBE5CAE08B529F717D7259D7578EDE",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\tsx\\package.json",
+      "expected": "3ACE2493A0ACD26FC72A8433A38113EE04D5A1976910A3F40815F9E779D5C426",
+      "actual": "3ACE2493A0ACD26FC72A8433A38113EE04D5A1976910A3F40815F9E779D5C426",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\node_modules\\mongodb\\package.json",
+      "expected": "030CE1ED442BB09B3E08C7FCD0CF5629A98C0ABCB1723AB7F2E3A4C2A0253264",
+      "actual": "030CE1ED442BB09B3E08C7FCD0CF5629A98C0ABCB1723AB7F2E3A4C2A0253264",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+      "expected": "1240059FC2ABC63CDE58472EF8F7964978E74BA5BC2F5156A30379DDAE391DB3",
+      "actual": "1240059FC2ABC63CDE58472EF8F7964978E74BA5BC2F5156A30379DDAE391DB3",
+      "matches": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\contracts.json",
+      "expected": "D31DAD4C1FCE135238169F48C18BC5EF68EA0DEFF7978D9323441330778CC940",
+      "actual": "D31DAD4C1FCE135238169F48C18BC5EF68EA0DEFF7978D9323441330778CC940",
+      "matches": true
+    }
+  ]
+}

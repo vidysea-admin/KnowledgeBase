@@ -1,0 +1,299 @@
+{
+  "observedAt": "2026-10-15T00:19:26.7178902Z",
+  "scope": "Existing separately approved source-recovery packet metadata only; not corpus adapter admission/export or current whole-packet validation",
+  "packetPath": "C:\\Users\\product\\Documents\\Codex\\2026-10-09\\what-is-the-current-update-and\\work\\toc-recovery-v1\\packet.json",
+  "packetSha256": "268c94cc13d3c70def84ea2f959b9e0da1a22774f8fd7d74b5653866ef976205",
+  "expectedHistoricalPacketSha256": "268c94cc13d3c70def84ea2f959b9e0da1a22774f8fd7d74b5653866ef976205",
+  "rows": [
+    {
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "7aa0e8deab450f525a7e9e8d5b56213a26f11d1994a63f5b210b5a1fa9db296f",
+      "claimsSeen": 1,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "8d3c78b426796fd629a10b947dfc117099a599c943a64304d8d1931ad2002360",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "7a26effdc654bcbb2015a1d3627d20f18870e1b470ef15839e3beb8b336fd66d",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "c0ceca412ded91d151fff4c03fedd63f10693ebb3dde4b9dcf2a34c78670cebf",
+      "claimsSeen": 1,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "73b0478c78640157e8571d289952ce61a526a35a033d3ec88381b5895ff2252f",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-05-28-in-focus-1",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "03a727b749614fa3d4e67c80b7eca5e7c24dcba1576f0f911bfb52f88dc3002e",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "34b764d58ab73cdccc3cc49634543072ba384d956ac343376e7405742621d12e",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "58e5c8c3bd5890967a1ca12f1559ab3fe1b6095ea20705c59947305926404556",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "93de12c8a936f3cabdf25ba1261408c4f46a26b9939c16ab9d16b6bfe760d4c8",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-06-25-in-focus-2",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "7c3fe226b474105109158ed1f1d15f587632e826989c4d9e6d0dd21caac16785",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "0160ac5827914479e2720193191eae270a0803c8d689facf9f7841187544cfea",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "9321af3ca900cc2dbe2425f4aec349443827ee215c0c46be1953087cf59b8c7d",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "4b8e26a299564de4a3179289689e74f0f3cc08edee27cdabd1e6a1730f67442e",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-07-15-creative-futures",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "cb1da842ba9d25e1647ce355994f7c757000f9904e4d807e3f75c09e941c943b",
+      "claimsSeen": 2,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "6a39b8cfd54a3a2363468cb52a07267f534535c27365845b6a1a69808b6413ef",
+      "claimsSeen": 1,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "b3fefee05105c16ad5bf73663f80e2b5b9d006681de57bafcd94618d5163a1a1",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-07-30-in-focus-3",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "66b84ab3c746b3c203cb5705b68ccf47f735230c60d8fb05c967d9706c2dfb55",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "2d63dbbb1956af9dd75ac82f63b5b57cbc59da13f98b6c01c90c6ceee275927b",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "3e9147a9abd7a0889d88227248e96dbacb81a237490556c0bae5d9e095c6c41a",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "2b50d788efa035d64f1c179c75c1c63d2ea14c928dce20705d8c1a4c5e1b9912",
+      "claimsSeen": 1,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "eb78be82355cbdc1294e285daab640983a36cf3884bd2986a44b971c4b046da7",
+      "claimsSeen": 1,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "42014bedb1fe2312867989828f9e9eb0baa2d71c29401bade33f5adee3732944",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-08-27-in-focus-4",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "904d15ab836d692ff1d94d88e01597faf518af9d43ad87725b32a9811998cb68",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-09-02-india-test-series-part2",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "d3dd93f6ae4fd263ae62914e0d13686ca498b873dd5096bd757c35bdb84cbdb8",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-09-09-global-test-prep-pathways",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "12d27f0c3cb96e0629da9317c1a9946c731f0b212003a213ab22a766cfecd96b",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-09-16-pathways-in-psychology",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "7a68847efad23e92c9f7c6b42808d3f148debf21d7455bc96f1879f1af9f401f",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-09-21-uniaccess-japan",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "16a04cbe06ee524640fab4902a9268cbbb547dea871ba7e62639b6968143d645",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-09-24-in-focus",
+      "sourceHashIsSha256": false,
+      "proofStatus": "current",
+      "proofSha256": "ad6bbf8fe52aba0188f8dccfe46c5c82974a115ac8cc362d66b3c420b69d25c0",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    },
+    {
+      "sessionId": "2026-09-24-zoho-next-european-study-destinations",
+      "sourceHashIsSha256": true,
+      "proofStatus": "current",
+      "proofSha256": "7a9d826268acad05edc8705eeba268756a64b930a6e473d341a0b8178b204dd6",
+      "claimsSeen": 0,
+      "verifiedClaims": 0,
+      "captureGiven": true,
+      "validationExecuted": false
+    }
+  ]
+}

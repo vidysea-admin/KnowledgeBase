@@ -1,56 +1,43 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
-import { listWebinarOperations } from "../api/sessions.js";
-import type { WebinarOperation, WebinarDiscoveryHealth } from "../api/types.js";
-const DISCOVERY_STALE_MS = 15 * 60 * 1000;
+import { listWebinarOperations, listSessions } from "../api/sessions.js";
+import { listUpcomingMeetings } from "../api/calendar.js";
+import { listBotEvents } from "../api/botEvents.js";
+import { BotActivity } from "./meeting-bot/BotActivity.js";
+import { useLoad } from "./meeting-bot/useLoad.js";
+import { UpcomingSection } from "./meeting-bot/UpcomingSection.js";
+import { PastSection } from "./meeting-bot/PastSection.js";
+import { OperationsSections } from "./meeting-bot/OperationsSections.js";
+import { DiscoveryStatus } from "./meeting-bot/DiscoveryStatus.js";
+import { SendNowForm } from "./meeting-bot/SendNowForm.js";
+import { BotPrivacyControls } from './meeting-bot/privacy/BotPrivacyControls.js';
+import { CaptureReadinessControls } from './meeting-bot/readiness/CaptureReadinessControls.js';
+import { RetentionSection, loadRetentionStatus } from './meeting-bot/RetentionSection.js';
 
+/**
+ * /meeting-bot: upcoming calendar meetings, live/in-progress operations, operations history and past recordings.
+ * Three requests per load, one per endpoint (calendar/upcoming, webinar-operations [polled], sessions); each section has its own
+ * loading/error/retry state so one failing endpoint never blanks the others. Wording is descriptive only: this page does not
+ * evaluate bot mode, trust, join rules or overlap, so it never promises that a listed meeting will be joined.
+ */
 export function MeetingBotPage(): React.ReactElement {
   const { apiKey } = useAuth();
-  const [rows, setRows] = useState<WebinarOperation[]>([]);
-  const [omitted, setOmitted] = useState(0);
-  const [discovery, setDiscovery] = useState<Record<"calendar" | "gmail", WebinarDiscoveryHealth> | undefined>();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    let active = true, busy = false;
-    setRows([]); setDiscovery(undefined); setLoading(true); setError(null);
-    async function refresh() {
-      if (busy) return;
-      busy = true;
-      try {
-        const result = await listWebinarOperations(apiKey);
-        if (active) { setRows(result.operations); setDiscovery(result.discovery); setOmitted(result.omitted); setError(null); }
-      } catch { if (active) setError("Webinar status unavailable. Check the runner and connection."); }
-      finally { busy = false; if (active) setLoading(false); }
-    }
-    void refresh();
-    const timer = setInterval(() => void refresh(), 10000);
-    return () => { active = false; clearInterval(timer); };
-  }, [apiKey]);
+  const ops = useLoad(apiKey, listWebinarOperations, 10000);
+  const upcoming = useLoad(apiKey, listUpcomingMeetings);
+  const sessions = useLoad(apiKey, listSessions);
+  const botEvents = useLoad(apiKey, listBotEvents, 30000);
+  const retention = useLoad(apiKey, loadRetentionStatus);
   return <>
-    <div className="page-header"><h1>Webinar operations</h1>
-      <p>Track capture, processing and coverage gaps for your connected webinars.</p></div>
-    {error && <p role="alert">{error} Previously loaded statuses may be stale.</p>}
-    {loading && <p>Loading webinar status…</p>}
-    {!loading && !error && !discovery && <p role="alert">Connected source discovery is unverified. Run a successful discovery check before relying on coverage.</p>}
-    {!loading && discovery && (["calendar", "gmail"] as const).map(feed => {
-      const row = discovery[feed], age = Date.now() - Date.parse(row.checkedAt);
-      const stale = !Number.isFinite(age) || age > DISCOVERY_STALE_MS || age < -60000;
-      return <p key={feed} role={row.status === "failed" || stale ? "alert" : undefined}>
-        {feed === "gmail" ? "Gmail" : "Calendar"} discovery: {row.status === "failed" ? "unavailable; webinar coverage requires attention" : stale ? "stale; no fresh check within 15 minutes" : "healthy"}.
-        {row.lastSuccessAt && <> Last successful check: {new Date(row.lastSuccessAt).toLocaleString()}.</>}
-      </p>;
-    })}
-    {!loading && !error && !rows.length && <div className="card empty-note">No webinar operations recorded for this tenant yet. Check source discovery status above.</div>}
-    {omitted > 0 && <p>Showing the latest 200 operations; {omitted} older operations remain in the runner history.</p>}
-    {rows.map(row => <div className="card" key={row.id}>
-      <h2>{row.title}</h2><p><strong>{row.status.replaceAll("_", " ")}</strong> · Attempts: {row.attempts}</p>
-      {row.reason && <p>Reason: {row.reason.replaceAll("-", " ")}</p>}
-      {row.startTime && <p>Starts: {new Date(row.startTime).toLocaleString()}</p>}
-      {row.updatedAt && <p>Last update: {new Date(row.updatedAt).toLocaleString()}</p>}
-      {row.status === "ready" && <Link to={`/sessions/${encodeURIComponent(row.id)}`}>Open recording and knowledge</Link>}
-    </div>)}
+    <div className="page-header"><h1>Meeting bot</h1>
+      <p>Upcoming meetings, capture in progress, webinar operations and past recordings.</p></div>
+    <SendNowForm apiKey={apiKey} />
+    <BotPrivacyControls apiKey={apiKey} />
+    <CaptureReadinessControls apiKey={apiKey} />
+    <RetentionSection state={retention} />
+    <UpcomingSection state={upcoming} />
+    <DiscoveryStatus state={ops} />
+    <OperationsSections state={ops} />
+    <BotActivity state={botEvents} />
+    <PastSection state={sessions} />
     <div className="card"><p>Portable audio/video capture is undergoing local validation. Unattended recording requires a verified real webinar on this machine. Windows OBS remains the fallback; Ubuntu support requires independent capture and restart proof.</p></div>
   </>;
 }

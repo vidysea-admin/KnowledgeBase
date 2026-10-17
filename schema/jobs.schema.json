@@ -11,6 +11,10 @@
     "status": { "type": "string", "enum": ["pending", "processing", "done", "failed"] },
     "provider": { "type": "string" },
     "maxCost": { "type": "number", "minimum": 0 },
+    "inputTokens": { "type": "integer", "minimum": 0 },
+    "outputTokens": { "type": "integer", "minimum": 0 },
+    "costStatus": { "type": "string", "enum": ["unknown", "reported"] },
+    "costUsd": { "type": "number", "minimum": 0 },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }
   },

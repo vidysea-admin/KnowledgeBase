@@ -1,0 +1,21 @@
+{
+  "stage": "transcript",
+  "status": "failed",
+  "transcriptValidated": false,
+  "error": "QA report: invalid dropped indices",
+  "reasons": [
+    "QA report: invalid dropped indices"
+  ],
+  "durationSec": 186,
+  "turnCount": 1,
+  "lastTEnd": 186,
+  "coverage": 1,
+  "partial": false,
+  "shortfallSec": 0,
+  "gaps": [],
+  "qa": null,
+  "qaSha256": "fcab1e7369c6b4bc79665c7504e79294dd99d35cce59e08c5016f2d29c3af2d9",
+  "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+  "validatedAt": "2026-10-14T20:43:23.607Z",
+  "validator": "scripts/webinar/validate/validate-session.mjs"
+}

@@ -1,0 +1,36 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "watched-native-server-join",
+  "fix_cycle": 2,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "changed_path": "scripts/native-capture/server-watched.test.ts",
+  "source_sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+  "nonblank_lines": 168,
+  "preimage": {
+    "status": "COMPILER_HOLD_NO_RUNTIME_EXECUTION",
+    "sha256": "6e8a30515800404ebeccdd465be524979eb813c74f267a23c60c9d1dfc15c7c0",
+    "path": "backups/server-watched.test.ts"
+  },
+  "unchanged_server_sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+  "declaration": {
+    "status": "C_RELEASED_UNWRITTEN_LEASE_NO_C_EDITS",
+    "owner": "/root/watched_cadence_delivery",
+    "path": "scripts/webinar/scheduler/service.d.mts"
+  },
+  "status": "source-frozen-not-executed",
+  "required_checks": [
+    "Affected explicitrootcompiler first; ifgreen graph/scopedLOC +launcher16",
+    "New declaration exactpin supplied separately by watched cadence maker"
+  ],
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "cost": null,
+    "token_metric": "actual_total",
+    "tokens": null
+  },
+  "execution": "No tests/build/DB/provider/browser/decoder/ACL commands executed."
+}

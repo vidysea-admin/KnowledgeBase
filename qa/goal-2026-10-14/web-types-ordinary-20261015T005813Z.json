@@ -1,0 +1,19 @@
+{
+  "phase": "web-types",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/web",
+    "typecheck"
+  ],
+  "pid": 21864,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-15T00:59:32.141Z",
+  "endedAt": "2026-10-15T00:59:43.198Z",
+  "elapsedMs": 11057,
+  "stdout": "\n> @lkb/web@0.0.0 typecheck C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\n> tsc --noEmit -p tsconfig.json\n\n",
+  "stderr": ""
+}

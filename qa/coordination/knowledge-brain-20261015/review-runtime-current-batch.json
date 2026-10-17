@@ -1,0 +1,66 @@
+{
+  "observed_at": "2026-10-15T12:08:56.6245732+00:00",
+  "purpose": "verification accounting, not maker cost",
+  "own_attributable_actual_tokens": null,
+  "own_active_seconds": null,
+  "own_cost": null,
+  "counter_semantics": "Runtime cumulative dedicated thread values; phase/unit attribution requires separate boundaries. Cached/reasoning subsets not added again.",
+  "records": [
+    {
+      "agent_path": "/root/quality_delivery_coordinator/mjs_four_checker",
+      "thread_id": "01a13f73-3230-7ee0-a2fd-51458aeffffa",
+      "parent_thread_id": "01a13ef5-8f80-7e80-a33a-40ffe1d60303",
+      "context_identity": {
+        "subagent_history_start_ordinal": null,
+        "history_mode": "paginated",
+        "forked_from_id": null
+      },
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T12-04-36-01a13f73-3230-7ee0-a2fd-51458aeffffa.jsonl",
+      "usage_timestamp": "2026-10-15T12:07:19.971Z",
+      "latest_runtime_cumulative": {
+        "input_tokens": 945086,
+        "cached_input_tokens": 883712,
+        "reasoning_output_tokens": 316,
+        "cache_write_input_tokens": 0,
+        "total_tokens": 950992,
+        "output_tokens": 5906
+      },
+      "lifecycle": {
+        "timestamp": "2026-10-15T12:07:20.008Z",
+        "type": "task_complete"
+      },
+      "settled_status": "settled",
+      "settled_actual_total": 950992,
+      "active_seconds": null,
+      "cost": null
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/ui_revision_batch_checker",
+      "thread_id": "01a13f74-8363-7600-97e6-976d3b666409",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "context_identity": {
+        "subagent_history_start_ordinal": null,
+        "history_mode": "paginated",
+        "forked_from_id": null
+      },
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T12-06-03-01a13f74-8363-7600-97e6-976d3b666409.jsonl",
+      "usage_timestamp": "2026-10-15T12:06:58.813Z",
+      "latest_runtime_cumulative": {
+        "input_tokens": 222805,
+        "cached_input_tokens": 189568,
+        "reasoning_output_tokens": 158,
+        "cache_write_input_tokens": 0,
+        "total_tokens": 224697,
+        "output_tokens": 1892
+      },
+      "lifecycle": {
+        "timestamp": "2026-10-15T12:06:58.855Z",
+        "type": "task_complete"
+      },
+      "settled_status": "settled",
+      "settled_actual_total": 224697,
+      "active_seconds": null,
+      "cost": null
+    }
+  ]
+}

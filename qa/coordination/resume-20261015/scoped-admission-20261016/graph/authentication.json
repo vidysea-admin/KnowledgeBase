@@ -1,0 +1,48 @@
+{
+  "head": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "candidate": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "candidateKind": "Git commit",
+  "sourceFiles": [
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.ts",
+      "rawSha256": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "expectedMatch": true,
+      "headBlob": "295c3f19ac3e0d10f9edb9e043d56507dc928cd1",
+      "currentFilteredBlob": "295c3f19ac3e0d10f9edb9e043d56507dc928cd1",
+      "committedEquivalent": true
+    },
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.test.ts",
+      "rawSha256": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+      "expectedMatch": true,
+      "headBlob": "9123bbab5930abc98850b5e4bf7b09dfb95acc5a",
+      "currentFilteredBlob": "9123bbab5930abc98850b5e4bf7b09dfb95acc5a",
+      "committedEquivalent": true
+    }
+  ],
+  "sharedGates": {
+    "native-bot-compiler60-bot-types-receipt.json": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-bot-types-receipt.json",
+      "sha256": "e73d18b26110f4dfa244e7833f85066b66f52b2b0a534b28720416d75d61afed",
+      "ownExit": 0,
+      "pinCount": 89,
+      "currentMismatches": [],
+      "strictReuseQualified": false,
+      "limitation": "No fresh current environment equality certified here; actual command epoch retained. Verifier0 is vacuous only."
+    },
+    "u22-current-contracts-receipt.json": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-contracts-receipt.json",
+      "sha256": "099f62309f65fe58023db7243187b48cadb68e1979de352709a42c49664f54fc",
+      "ownExit": 0,
+      "pinCount": 21,
+      "currentMismatches": [],
+      "strictReuseQualified": false,
+      "limitation": "No fresh current environment equality certified here; actual command epoch retained. Verifier0 is vacuous only."
+    }
+  },
+  "blockers": [
+    "Historical reviewer actual usage and committed debits unreported; cannot invent0 or authorize fresh allocation over unknown cumulative charge.",
+    "Graph11 lacks executed HEAD and complete environment fingerprint. Component raw/Git equality authenticates code only; does not meet strict same-SHA/environment reuse. Root directs no graph11 repeat."
+  ],
+  "noRerunsRequested": true
+}

@@ -1,0 +1,29 @@
+{
+  "state": "SOURCE_FROZEN_SUBMITTED_ONE_MESSAGE_POSITIVE_FIRST",
+  "files": [
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566"
+    },
+    {
+      "path": "apps/api/src/ask/source-context.test.ts",
+      "sha256": "b8b49b6ab7569e67e090ce7e140d5e09b22a4314061dc6e51c93a2ad83e6f3c7"
+    },
+    {
+      "path": "apps/api/src/routes/ask/ask.ts",
+      "sha256": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566"
+    },
+    {
+      "path": "apps/api/src/routes/ask/ask.test.ts",
+      "sha256": "fb16223385974005e345db2f488b27215bd2bb408287915fcb8dcc3cf0789eb8"
+    }
+  ],
+  "priorFailuresPreserved": true,
+  "firstCheck": "actual message positive outer15s; remaining3 and focused checks gated positiveGREEN",
+  "scope": "Validated child proofs before combined immutable snapshot stamp; canonical publicAsk alwaysvectorless; no fake references or validator relaxation",
+  "historicalDiagnostic": {
+    "path": "qa/evidence/ask-graph-selection/legacy-http-diagnostic.test.ts",
+    "sha256": "356c1a7580d0974b3ef004fd2703c316c482c9bf945d9620ec105cacba0d0b9f"
+  },
+  "humanLiveGates": "Open; no parent closure"
+}

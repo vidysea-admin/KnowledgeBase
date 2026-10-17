@@ -1,0 +1,123 @@
+{
+  "request": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/broker-request.json",
+    "sha256": "3fdb35142ed7ae533642de3075a64af6d34d1dac545fe5983c460ecc99a6e6d6"
+  },
+  "candidate": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4.json",
+    "sha256": "d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4",
+    "count": 90
+  },
+  "prerequisiteReuse": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-final-seal.json",
+      "sha256": "b8ba6bc2c260cdf92bb3c98e5714c0a3c4ea03425fcf48efd40981d419bff5db"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-targeted-trace-helper-five-receipt.json",
+      "sha256": "ec59481d1e9e79e1c588c5b0668b21c50cc246214b2bf11251f3f655c569974d"
+    }
+  ],
+  "trace": {
+    "status": "COMPLETE",
+    "validScalarMonotonic": true,
+    "records": 12,
+    "last": {
+      "stageId": "node2-cleanup-complete",
+      "elapsedMs": 61254
+    },
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-trace.jsonl",
+    "sha256": "07bab4fce44682df0d036e15a9d8684a795bd4dd03a6eb50c480121f9885e014"
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-head-before-receipt.json",
+      "sha256": "051251ab754172398f0447a0eba0f3315dbdd6f45e1f2f791b0040305936130c",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.625,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-head-before.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-create-receipt.json",
+      "sha256": "0a5f1e50c067e5b46a32dc84c91245e401a606615095ba4e3f9eda52f94d2e04",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.0619999999980791,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-create.log",
+        "sha256": "86cfc158f22463b13da5aab54e47a5fd5de9ff3767a0bc87b6b273be35713a74"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-verify-receipt.json",
+      "sha256": "30ab619d9df1c6f942ad0b7be7082202d6d8ba79a4c31a62128bb532f3a7513b",
+      "exit": 0,
+      "counts": {},
+      "active_s": 2.0459999999984575,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-verify.log",
+        "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-original1-receipt.json",
+      "sha256": "26b5f81108123ca4f89feb73b930830492e817b447a7d998d497a4842533b0a0",
+      "exit": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 65.79699999999866,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-original1.log",
+        "sha256": "a8f4b9393c48fc37593c1e719a1dff73c919943d127a034889ee43ac7d773d7c"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-cleanup-receipt.json",
+      "sha256": "acfd1be01f90a918d586a90d660387d76dcf4262798797f8894ea46115e19cef",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.4530000000013388,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-cleanup.log",
+        "sha256": "3c4ba97aa3cfd0709827f565156829b0394981b3a0c640dc67d6fdbb72d96b9d"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-head-after-receipt.json",
+      "sha256": "f49165d8267a60302d54f6850c5c5a2931bb17252f3caf7623262e57ec8c5fcf",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.5940000000009604,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-head-after.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    }
+  ],
+  "failure": null,
+  "selectedTitle": "fair bounded pages, quota-before-allocation and interrupted journal refuse",
+  "traceElapsedCapMs": 75000,
+  "traceElapsedAtCapIsLowerBound": true,
+  "nodeTimeoutOverride": {
+    "packet": 140000,
+    "rootAuthorized": 145000
+  },
+  "elapsed_s": 75.57800000000134,
+  "allPinsFinalMatch": true,
+  "headAfter": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "ownedFixtureRemoved": true,
+  "accounting": "SHARED INTEGRATION only; not watched checker",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

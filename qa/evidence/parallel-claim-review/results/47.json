@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 47,
+  "originalIndex": 52,
+  "claimId": "2026-07-28-metrics-and-mingling-c03",
+  "inputHash": "0503b6da4700075ca707d10835a7cd224e29dfb6f3bca4940b009c094e44a504",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited speaker describes personally preparing a crisp 30-second pitch in advance to save others time. The exact context does not mention conference encounters or establish a recommendation by multiple participants.",
+    "missingReferences": [],
+    "caveats": [
+      "One citation reference with one match; no missing or duplicate references.",
+      "Stored speakerRef is unknown; the embedded Niraj label does not establish person identity.",
+      "Historical timing is 1716-1769 seconds; current timing is 2490-2494 seconds. The same turn ID has different text, speakerRef and timing.",
+      "Transcript support does not establish external factual truth. Historical artifact bytes were not independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "turnId": "2026-07-28-metrics-and-mingling-t059",
+        "contextVersion": "originalMigration",
+        "quote": "But I'll definitely try to get my 30-second pitch very ready, very crisp, very short, so that I don't take too much time explaining about me.",
+        "textSha256": "92bcdb52e175821be044163282d744eebf8ee9b876d97e4c0696a413d55a9b5c",
+        "contextSha256": "41365c4f2744c802ead57b1441da9407862422e2febba92d56e89403d52b1a8a",
+        "artifactSha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1716,
+        "tEnd": 1769,
+        "supports": "Supports a personally prepared brief 30-second pitch; does not establish conference setting or plural participant recommendation."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited record says doing an unspecified thing goes without saying. It supplies no identifiable 30-second pitch, preparation, conference setting, or participant recommendation.",
+    "missingReferences": [],
+    "caveats": [
+      "One citation reference with one match; no missing or duplicate references.",
+      "The referents of that and a different matter are absent from the supplied citation context.",
+      "Stored speakerRef is Anirudh; identity is not independently established.",
+      "Same turn ID has changed from the historical pitch discussion at 1716-1769 seconds to an ambiguous agreement at 2490-2494 seconds.",
+      "Provided current raw artifact SHA256 and normalized-LF SHA256 differ; neither artifact byte hash was independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "turnId": "2026-07-28-metrics-and-mingling-t059",
+        "contextVersion": "current",
+        "quote": "No, that's a different matter. Of course, you are supposed to do that, right? That goes without saying.",
+        "textSha256": "f186ec5a783ea89e1eb8a62a90d0b311d26aff68c2af1b08067b4ba5ffeb4ba5",
+        "contextSha256": "cdf931624b676a1e9811e8a170efb9f1d6477e2cfde59941cd1fbac3c7e615b5",
+        "artifactSha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+        "revision": null,
+        "speakerRef": "Anirudh",
+        "tStart": 2490,
+        "tEnd": 2494,
+        "supports": "Unspecified agreement; does not directly support any concrete component of the pitch claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original citation partly supports advance preparation of a brief pitch but omits the conference setting and plural recommendation. Current same-ID citation has changed and lacks pitch evidence. Both labels are preliminary; human adjudication remains open."
+}

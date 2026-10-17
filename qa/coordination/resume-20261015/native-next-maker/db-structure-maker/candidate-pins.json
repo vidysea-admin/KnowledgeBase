@@ -1,0 +1,80 @@
+[
+  {
+    "oldPath": "apps/api/src/indexing/speaker-suggest.test.ts",
+    "path": "apps/api/src/indexing/speaker-suggest.test.ts",
+    "bytes": 11081,
+    "sha256": "4934dfc74fd2406d64f183e2baabf5292f3504433ba81491fccb824d27acdee7"
+  },
+  {
+    "oldPath": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "bytes": 16177,
+    "sha256": "b3ee14401a27c106cdf25febce7bc2d7c76d56b4a9dc62e0a4230ba1ca06883c"
+  },
+  {
+    "oldPath": "apps/api/src/speaker-profiles/router.test.ts",
+    "path": "apps/api/src/speaker-profiles/router.test.ts",
+    "bytes": 9167,
+    "sha256": "7a01a0c227a72e4d64bc98a35981b31f62712afcc011b5a25ee02c03f0775a79"
+  },
+  {
+    "oldPath": "apps/api/src/speaker-profiles/store.test.ts",
+    "path": "apps/api/src/speaker-profiles/store.test.ts",
+    "bytes": 27914,
+    "sha256": "1f75614c58e37b4e92a4814c31f60f8d80f9c9f15c03ce2080a0a1603815e45b"
+  },
+  {
+    "oldPath": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+    "path": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+    "bytes": 9024,
+    "sha256": "7ffd6812a4997e8aca3a2eabf50b1d20aae1416cea81fba7e47ec36bcce1f7e5"
+  },
+  {
+    "oldPath": "apps/api/src/speaker-suggestions/router.ts",
+    "path": "apps/api/src/speaker-suggestions/router.ts",
+    "bytes": 4048,
+    "sha256": "8f6a261a7a679074b7ee09cb0402ed845ca47947e7906acdfeac6cb3c1050e9f"
+  },
+  {
+    "oldPath": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+    "path": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+    "bytes": 10814,
+    "sha256": "cb8e38bfff0eaebae977edbb85f6d8f83d661ac5fb99e4ac885e7436ef6747a2"
+  },
+  {
+    "oldPath": "apps/api/src/speaker-suggestions/store.ts",
+    "path": "apps/api/src/speaker-suggestions/store.ts",
+    "bytes": 1359,
+    "sha256": "eb3696c94243f7dad44e5ad93c2238a28677dbe3b297607708e791d9ca88ebbe"
+  },
+  {
+    "oldPath": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "path": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+    "bytes": 18953,
+    "sha256": "4671cf767f0a7705339c9997d64130f08106c3ac9785505cf8f2e44018cf46d9"
+  },
+  {
+    "oldPath": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "path": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+    "bytes": 4311,
+    "sha256": "c5ac29311c4fe2866cd679821af2a26f360a45f868a733a8620fbf0847915920"
+  },
+  {
+    "oldPath": "packages/db/src/collections/speaker-suggestions.ts",
+    "path": "packages/db/src/collections/speaker-suggestions/index.ts",
+    "bytes": 10614,
+    "sha256": "70c9efc7fdd8cb66598e1e4b309006ef40284dbeacd0f870bf8e70a367b7b3a7"
+  },
+  {
+    "oldPath": "packages/db/src/index.ts",
+    "path": "packages/db/src/index.ts",
+    "bytes": 2154,
+    "sha256": "725504b6753f39e8d13107c8542513ae010db8d34c509c4cc05ce206081a9bac"
+  },
+  {
+    "oldPath": "scripts/native-capture/production.test.ts",
+    "path": "scripts/native-capture/production.test.ts",
+    "bytes": 10071,
+    "sha256": "07a64eae0b169a2d318d555cd91f445a7de443bfd897c600a6f5e11de7b5cf45"
+  }
+]

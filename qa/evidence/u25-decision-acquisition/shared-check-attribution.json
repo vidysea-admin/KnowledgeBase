@@ -1,0 +1,55 @@
+{
+  "receipt": "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.json",
+  "receiptSha256": "57bccf47cb929ba448193bed0186e404b259fe0cd5dbade9911940492e6f244a",
+  "unitMap": "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six-units.json",
+  "unitMapSha256": "5bed18972feb608a9c08fa99fdc089525aa04fa77d909d9936ca734233395625",
+  "unitCandidate": "6cf6080a9f32b5b155f257496fa4d9cfd3353c7f31b5797bdd03684c745130b2",
+  "sharedCandidate": "d6ad4fc2172711a8651c39a64963f379a74b1668e0a07936d4e1c86ddd480ebe",
+  "sharedExitCode": 0,
+  "sharedElapsedMs": 6096.396,
+  "standaloneExitCode": null,
+  "standaloneElapsedMs": null,
+  "ownOutcomes": [
+    {
+      "name": "actual extractor routes decisions; real readback survives into independent measurement consumer",
+      "passed": true
+    },
+    {
+      "name": "fabricated citations remain in raw and parsed before actual filtering; degraded readback is skipped",
+      "passed": true
+    },
+    {
+      "name": "actual JSON and literal text remain distinct; no raw text is manufactured from JSON",
+      "passed": true
+    },
+    {
+      "name": "missing, inaccessible and malformed readback stay unknown; rows are never generated from proposals",
+      "passed": true
+    },
+    {
+      "name": "provider failures and malformed output never become clean empty measurements",
+      "passed": true
+    },
+    {
+      "name": "genuine provider empty remains distinct from empty source without a provider observation",
+      "passed": true
+    },
+    {
+      "name": "scope refusal precedes provider/readback; actual invalid-source extraction remains degraded",
+      "passed": true
+    },
+    {
+      "name": "captured stage snapshots resist later mutation and expose foreign storage citations",
+      "passed": true
+    }
+  ],
+  "currentComparedPins": 62,
+  "mismatches": [],
+  "runtime": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "environmentHash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+}

@@ -1,0 +1,105 @@
+{
+  "head": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "candidate": "d424b6d86c4f11b09dd9bed65f770f3f6231a123ea286302150dcc1be927eba2",
+  "candidateKind": "raw component overlay SHA256, NOT Git commit",
+  "sourceFiles": [
+    {
+      "path": "packages/meeting-bot/py/sb_join_register.py",
+      "rawSha256": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+      "expectedMatch": true,
+      "headBlob": "ca5f79befa617d4861e02934fbe605eb4e832b3c",
+      "currentFilteredBlob": "ca5f79befa617d4861e02934fbe605eb4e832b3c",
+      "committedEquivalent": true
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_registration_redirect.py",
+      "rawSha256": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+      "expectedMatch": true,
+      "headBlob": "358dcb68d671db3f1c62394a3b0862ff6997876c",
+      "currentFilteredBlob": "8e5b9f4678e828e8833e7b5c5f6a07cec02f3e3d",
+      "committedEquivalent": false
+    },
+    {
+      "path": "packages/meeting-bot/src/joiners/browser-joiner.ts",
+      "rawSha256": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+      "expectedMatch": true,
+      "headBlob": "8682dbde34a93534ab7ba452b20a887c677949c7",
+      "currentFilteredBlob": "8682dbde34a93534ab7ba452b20a887c677949c7",
+      "committedEquivalent": true
+    },
+    {
+      "path": "packages/meeting-bot/src/joiners/joiners.test.ts",
+      "rawSha256": "267cd00f7855679c0a9ff07265f1ad6db8a35c5482d66eb39d63968258a7321a",
+      "expectedMatch": true,
+      "headBlob": "96995674924dd929debe30f8da25577dabcd3cf9",
+      "currentFilteredBlob": "ad8693eeeb961bd2d52c3c890a2eb32174378200",
+      "committedEquivalent": false
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/registration-workflow.ts",
+      "rawSha256": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+      "expectedMatch": true,
+      "headBlob": "16aa0ccde14828b23c07fb3340f86c605c1b7330",
+      "currentFilteredBlob": "16aa0ccde14828b23c07fb3340f86c605c1b7330",
+      "committedEquivalent": true
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/registration-workflow.test.ts",
+      "rawSha256": "f859ab60fd01ea8900431f7eb8f4747edf05b005f9d3d232bd20f0f1da108cff",
+      "expectedMatch": true,
+      "headBlob": "faeb06d63c091f07f37214f849aca7199b389b20",
+      "currentFilteredBlob": "52a3b1978de97caa091acfd260975bfaa936a16c",
+      "committedEquivalent": false
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/auto-record-policy.ts",
+      "rawSha256": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+      "expectedMatch": true,
+      "headBlob": "d8cf8bd0786b463d6cfc22738865fac0d40b14bb",
+      "currentFilteredBlob": "d8cf8bd0786b463d6cfc22738865fac0d40b14bb",
+      "committedEquivalent": true
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+      "rawSha256": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+      "expectedMatch": true,
+      "headBlob": "7189e3463bb8cba55c0b09898d61a70d55fe2269",
+      "currentFilteredBlob": "7189e3463bb8cba55c0b09898d61a70d55fe2269",
+      "committedEquivalent": true
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/state/schedule-state.test.ts",
+      "rawSha256": "06dfe7814403a8232e6df4f4be0651580fdcaa86ea4ab54b34846acc130c7865",
+      "expectedMatch": true,
+      "headBlob": "61890878bc51810dda81357620bff70cc4a5071e",
+      "currentFilteredBlob": "61890878bc51810dda81357620bff70cc4a5071e",
+      "committedEquivalent": true
+    }
+  ],
+  "sharedGates": {
+    "native-bot-compiler60-bot-types-receipt.json": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-bot-types-receipt.json",
+      "sha256": "e73d18b26110f4dfa244e7833f85066b66f52b2b0a534b28720416d75d61afed",
+      "ownExit": 0,
+      "pinCount": 89,
+      "currentMismatches": [],
+      "strictReuseQualified": false,
+      "limitation": "No fresh current environment equality certified here; actual command epoch retained. Verifier0 is vacuous only."
+    },
+    "u22-current-contracts-receipt.json": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-contracts-receipt.json",
+      "sha256": "099f62309f65fe58023db7243187b48cadb68e1979de352709a42c49664f54fc",
+      "ownExit": 0,
+      "pinCount": 21,
+      "currentMismatches": [],
+      "strictReuseQualified": false,
+      "limitation": "No fresh current environment equality certified here; actual command epoch retained. Verifier0 is vacuous only."
+    }
+  },
+  "blockers": [
+    "Historical reviewer actual usage and committed debits unreported; cannot invent0 or authorize fresh allocation over unknown cumulative charge.",
+    "Admission cycle2 versus canonical manifest Fix cycle1 requires maker lifecycle reconciliation; three dirty test overlays cannot be called clean HEAD candidate.",
+    "Historical Node16/Python1 environment remains historical; root must qualify changed consumer coverage, not declare all old commands current."
+  ],
+  "noRerunsRequested": true
+}

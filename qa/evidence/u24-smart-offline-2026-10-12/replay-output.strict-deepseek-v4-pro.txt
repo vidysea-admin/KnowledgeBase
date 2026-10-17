@@ -1,0 +1,1 @@
+strict-deepseek-v4-pro: recorded entries=1574, given a synthetic quote=0; score with: node qa/evidence/u24-smart-offline-2026-10-12/05-score.mjs --tag strict-deepseek-v4-pro --raw-tag oc-deepseek-v4-pro

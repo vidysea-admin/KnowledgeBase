@@ -1,0 +1,36 @@
+{
+  "status": "AUTHOR_PHASE_COMPLETE_BROKER_WAIT",
+  "unit": "product-speaker-relation-workbench",
+  "cycle": 2,
+  "file": "apps/web/src/__checker_probes__/speaker-auth-session.test.tsx",
+  "sha256": "fe38f0337a9cc585b13aeff019817fd1ed1db938d7a4843f445d866d5ec4f1e6",
+  "command": "pnpm --filter @lkb/web test src/__checker_probes__/speaker-auth-session.test.tsx --testNamePattern 'same-key authSession change rejects late authorized source bootstrap'",
+  "test_name": "same-key authSession change rejects late authorized source bootstrap",
+  "gate_input": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-speaker-relation-workbench-actual-author-input.json",
+  "gate_result": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-speaker-relation-workbench-actual-author-result.json",
+  "actual": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "prior_prep_debit": {
+    "active_s": 40,
+    "tokens": 1000
+  },
+  "author_limits": {
+    "additional_actual_tokens": 100000,
+    "active_s": 50,
+    "output_tokens": 1200
+  },
+  "manual_final_reserve": {
+    "actual_tokens": 100000,
+    "active_s": 30,
+    "output_tokens": 800
+  },
+  "actual_total_baseline": 320912,
+  "maker_known_tokens": 2950647,
+  "token_target_already_missed_percent": 10.876,
+  "legacy_status": "legacy_unreserved",
+  "accounting": "Actual delta pending post-idle metadata; reserve untouched; no tests run; do not claim ratio success",
+  "verdict": null
+}

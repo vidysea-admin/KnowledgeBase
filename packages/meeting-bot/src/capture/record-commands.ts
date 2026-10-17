@@ -1,19 +1,26 @@
-import { createHash } from "node:crypto";
-import { spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readdirSync, statSync, writeFileSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { OBSWebSocket } from "obs-websocket-js";
 import { createBrowserJoiner } from "../joiners/browser-joiner.js";
 import { detectPlatform } from "../platform.js";
 import { selectJoinStrategy } from "../strategy.js";
+import { createAdmissionGate } from "./admission-gate.js";
 import { createAudioWatchdog, createRealLevelSource } from "./audio-watchdog.js";
 import { type ControllerRecoveryActions, type ControllerRecoveryContext, cleanupOwnedBrowserProfile, finalizeControllerRecording, getProcessStartTime, removeControllerState, writeControllerState } from "./controller-state.js";
-import { AUDIO_INPUT, createObsBrowserDeps, type ObsClientLike } from "./obs-windows.js";
-import { collectGapEvent, installCaptureControl, type GapWindow } from "./reconnect-gaps.js";
-import { createTelegramNotifier, type TelegramNotifier } from "./telegram-alerts.js";
-import { finalizeRecordingWith, normalizeCapture } from "./record-finalize.js";
+import { AUDIO_INPUT, createObsBrowserDeps, type ObsBrowserConfig, type ObsBrowserDepsOverrides, type ObsClientLike } from "./obs/obs-windows.js";
+import { leanRestorePath, restoreLeanVideoInObs } from "../lean-video-obs.js";
+import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
+import { createTelegramNotifier, type TelegramNotifier } from "./notify/telegram-alerts.js";
+import { normalizeCapture, processRecordingArtifacts, finalizeRecordingWith, type FinalizeRecordingOverrides } from "./record-finalize.js";
+import { finalizeRecording, finalizedCaptureVideo } from "./workspace/finalize-workspace-recording.js";
 import { createTabBrowserDeps } from "./tab-browser.js";
+import { tabReceiverGuardFromEnv } from "./tab-receiver-guard.js";
+import { createNativeCaptureRuntime, nativeCaptureSettings } from "./native/native-capture-runtime.js";
+import type { NativeCaptureClockQualifierOptions } from "./tiles/native-measurement.js";
+import type { NativeCaptureSealer } from "./native/native-archive-join-types.js";
+import { selectedBrowserProfile } from "./browser/browser-profile.js";
+import { assertCaptureWorkspaceVideo, claimCaptureSession, loginInCaptureWorkspace, prepareWorkspaceCaptureControls, selectTabCaptureWorkspace, slotCaptureSessionId } from "./workspace/tab-session-workspace.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
 const BOT_PROFILE_DIR = path.resolve(process.env.LKB_BOT_PROFILE_DIR ?? path.join(REPO_ROOT, "data", "bot-profile"));
@@ -46,40 +53,47 @@ function slugify(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 }
 export function shouldAutoClick(platform: string): boolean {
-  return platform === "zoho" || platform === "zoom";
+  return platform === "zoho" || platform === "zoom" || platform === "meet";
 }
 export async function runLogin(rest: string[]): Promise<void> {
-  const url = rest[0] ?? "https://accounts.google.com";
-  mkdirSync(RECORD_DIR, { recursive: true });
-  const stopFile = path.join(RECORD_DIR, ".stop-login");
-  console.log(`bot profile: ${BOT_PROFILE_DIR}\nSign in inside the window, then close it.`);
   const envFile = path.join(REPO_ROOT, ".env");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
-  const args = [JOIN_SCRIPT, url, "--profile", BOT_PROFILE_DIR, "--title", "LKB-BOT login", "--stop-file", stopFile, "--no-click"];
-  if (process.env.LKB_BROWSER_EXECUTABLE) args.push("--browser-executable", process.env.LKB_BROWSER_EXECUTABLE);
-  const child = spawn(process.env.LKB_PYTHON ?? "python", args, { stdio: "inherit" });
-  await new Promise((r) => child.on("exit", r));
+  await loginInCaptureWorkspace(rest, {profileDir: BOT_PROFILE_DIR, recordDir: RECORD_DIR, tenantId: captureTenant(rest)}, JOIN_SCRIPT);
 }
-export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = process.env): "obs" | "tab" {
+export function recordingBackend(rest: string[], env: NodeJS.ProcessEnv = process.env, platform: NodeJS.Platform = process.platform): "obs" | "tab" {
   const value = flag(rest, "--backend") ?? env.LKB_CAPTURE_BACKEND ?? "tab";
   if (value !== "obs" && value !== "tab") throw new Error("--backend must be tab or obs");
-  if (value === "obs" && process.platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
+  if (value === "obs" && platform !== "win32") throw new Error("OBS fallback is Windows-only; use --backend tab");
   return value;
 }
-export async function runRecord(rest: string[]): Promise<void> {
+export interface RecordInject {
+  nativeArchive?: NativeCaptureSealer;
+  nativeSamplerPath?: string;
+  nativeFinalizerOverrides?: Pick<FinalizeRecordingOverrides, "repoRoot" | "measureVolume" | "runTranscription" | "validateTranscription">;
+  nativeQualificationVerifier?:NativeCaptureClockQualifierOptions["verifyPlatformQualification"];
+  tab?: (onEvent: (handle: string, event: any) => void, config: Parameters<typeof createTabBrowserDeps>[0]) => ReturnType<typeof createTabBrowserDeps>;
+  finalize?: (...args:Parameters<typeof finalizeRecording>)=>Promise<string|void>; normalize?: typeof normalizeCapture; recordDir?: string; profileDir?: string; wait?: (ms: number) => Promise<void>;
+  obs?: ObsBrowserDepsOverrides & { config?: Partial<ObsBrowserConfig>; subscribeLevel?: Parameters<typeof createAudioWatchdog>[0]["subscribeLevel"] };
+  telegram?: TelegramNotifier;
+  platform?: NodeJS.Platform;
+}
+export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const url = rest[0];
   const untilArg = flag(rest, "--until");
   if (!url || !untilArg) {
     throw new Error("usage: lkb record <url> --until HH:MM [--end-not-before HH:MM] [--title T] " +
-      "[--session-id ID] [--transcribe]"
+      "[--session-id ID] [--capture-slot ID] [--backend tab|obs] [--native-tab-clock] [--lean-video] [--transcribe]"
     );
   }
   const envFile = path.join(REPO_ROOT, ".env");
   if (rest.includes("--index") && !rest.includes("--process-video")) throw new Error("--index requires --process-video");
   if (rest.includes("--process-video") && !rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
-  const backend = recordingBackend(rest);
+  const backend = recordingBackend(rest, process.env, inject.platform), nativeSettings = nativeCaptureSettings(rest, process.env, backend);
   const tenantId = captureTenant(rest);
+  const workspace = selectTabCaptureWorkspace(rest, {profileDir: inject.profileDir ?? BOT_PROFILE_DIR, recordDir: inject.recordDir ?? RECORD_DIR, tenantId}, "record", backend);
+  const {profileDir, recordDir} = workspace;
+  const profileDirectory = selectedBrowserProfile(rest, profileDir);
   const obsPassword = process.env.OBS_WS_PASSWORD ?? "";
   if (backend === "obs" && !obsPassword) throw new Error("OBS_WS_PASSWORD missing from .env");
   console.log(`[bot] capture backend: ${backend}`);
@@ -87,49 +101,62 @@ export async function runRecord(rest: string[]): Promise<void> {
   const endNotBefore = todayAt(flag(rest, "--end-not-before") ?? untilArg);
   const platform = detectPlatform(url);
   const title = flag(rest, "--title") ?? `${platform} webinar`;
-  const sessionId = flag(rest, "--session-id") ?? `${new Date().toISOString().slice(0, 10)}-${slugify(title)}`;
+  const sessionId = flag(rest, "--session-id") ?? slotCaptureSessionId(`${new Date().toISOString().slice(0, 10)}-${slugify(title)}`,workspace);
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid session-id; use a safe filename identifier");
   if (until.getTime() <= Date.now()) throw new Error("--until must be in the future");
   if (selectJoinStrategy(platform) === "vexa") {
     console.warn(`[bot] '${platform}' is Vexa-routed but no Vexa is deployed — using the local browser bot`);
   }
-  const startedAt = Date.now(), control = installCaptureControl({tenantId, sessionId, until: until.getTime(), startedAt});
+  const startedAt = Date.now(), consentControl = prepareWorkspaceCaptureControls(rest, {tenantId, sessionId, meetingUrl:url, until:until.getTime(), startedAt, platform, evidenceKind:inject.tab ? "fixture" : "browser"}, workspace, inject.recordDir ?? path.join(REPO_ROOT,"raw","webinars"));
+  const control = consentControl.captureControl;
   try {
   let endedAt: number | undefined;
-  const gaps: GapWindow[] = []; // T-029: filled from "gap" events on sb_join.py's stdout stream
-  const telegram = createTelegramNotifier();
+  const gaps: GapWindow[] = [];
+  const telegram = inject.telegram ?? createTelegramNotifier();
   let captureFailure: string | undefined;
+  let joinedNotified = false;
+  const gate = createAdmissionGate(); // ISS-CAPTUREFIX-001: the silence watchdog starts only after `admitted`
   const onEvent = (_h: string, ev: Parameters<typeof collectGapEvent>[1]) => {
+    consentControl.privacy.onCaptureEvent(ev);
+    consentControl.readiness.onCaptureEvent(ev);
+    const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
+    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
-    if (ev.event === "capture-error") captureFailure = String(ev.error ?? "capture failed");
+    if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
+    if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
+    if (ev.event === "capture-stopped" && (ev as {failed?: unknown}).failed !== false) captureFailure ??= "capture stopped with failure";
     collectGapEvent(gaps, ev);
     telegram.onBotEvent(ev);
   };
-  const tab = backend === "tab" ? createTabBrowserDeps({
+  const tabConfig: Parameters<typeof createTabBrowserDeps>[0] = {
     python: process.env.LKB_PYTHON ?? "python", joinScript: JOIN_SCRIPT,
-    profileDir: BOT_PROFILE_DIR, recordDir: RECORD_DIR, sessionId, tenantId,
-    browserExecutable: process.env.LKB_BROWSER_EXECUTABLE,
+    profileDir, recordDir, sessionId, tenantId,
+    browserExecutable: process.env.LKB_BROWSER_EXECUTABLE, profileDirectory,
     autoClick: shouldAutoClick(platform), onEvent,
-  }) : undefined;
+    ...(tabReceiverGuardFromEnv() ? {guard: tabReceiverGuardFromEnv()} : {}), // T-034: LKB_TAB_RECEIVER_GUARD=1; absent = unchanged
+  };
+  const nativeRuntime = nativeSettings ? createNativeCaptureRuntime({settings:nativeSettings,recordDir,tenantId,sessionId,platform,
+    extensionDir:path.join(path.dirname(JOIN_SCRIPT),"tab-capture"),verifyPlatformQualification:inject.nativeQualificationVerifier}) : undefined;
+  if(nativeRuntime){tabConfig.native=nativeRuntime.config;tabConfig.browserExecutable=nativeRuntime.browserExecutable;}
+  const tab = backend === "tab" ? (inject.tab ? inject.tab(onEvent, tabConfig) : createTabBrowserDeps(tabConfig)) : undefined;
   const bot = tab ?? createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
-    obsPassword,
-    obsExe: OBS_EXE,
-    python: "python",
-    joinScript: JOIN_SCRIPT,
-    profileDir: BOT_PROFILE_DIR,
-    recordDir: RECORD_DIR,
-    autoClick: shouldAutoClick(platform),
+    obsPassword, obsExe: OBS_EXE,
+    python: process.env.LKB_PYTHON ?? "python", joinScript: JOIN_SCRIPT,
+    profileDir, recordDir, autoClick: shouldAutoClick(platform),
+    browserExecutable: process.env.LKB_BROWSER_EXECUTABLE, profileDirectory,
+    leanVideo: {},
+    onRestoreFailure: (m) => telegram.notifyObsRestoreFailed?.(m), // ISS-LEANWIRE-003
     onEvent,
-  });
+    ...inject.obs?.config,
+  }, inject.obs);
   const joiner = createBrowserJoiner(bot.deps);
-  const { sessionHandle } = await joiner.join(url, { tenantId, consentNote: title });
-  telegram.notifyJoined(title, platform); // T-030
+  const { sessionHandle } = await joiner.join(url, { tenantId, consentNote: consentControl.receipt.consent.note });
   let gone = false;
   void bot.browserExited(sessionHandle)?.then(() => (gone = true));
   const audioWatchdog = createAudioWatchdog({
     now: () => Date.now(),
-    subscribeLevel: tab ? tab.subscribeLevel : createRealLevelSource({ obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455", obsPassword, inputName: AUDIO_INPUT }),
+    subscribeLevel: tab ? tab.subscribeLevel : inject.obs?.subscribeLevel ?? createRealLevelSource({ obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455", obsPassword, inputName: AUDIO_INPUT }),
     scheduleTick: (fn, ms) => {
       const id = setInterval(fn, ms);
       return () => clearInterval(id);
@@ -138,14 +165,14 @@ export async function runRecord(rest: string[]): Promise<void> {
     reconnect: () => bot.triggerReload(sessionHandle),
     log: (m) => console.log(`[bot] ${m}`),
   });
-  audioWatchdog.start();
-  writeControllerState(RECORD_DIR, {
+  gate.attach(audioWatchdog); // starts now only if `admitted` already arrived; never while in the lobby
+  writeControllerState(recordDir, {
     pid: process.pid,
     sessionId,
     title,
     platform,
     until: until.toISOString(),
-    obsOutputDir: RECORD_DIR,
+    obsOutputDir: recordDir,
     startedAt: new Date(startedAt).toISOString(),
     controllerStartedAt: getProcessStartTime(process.pid),
   });
@@ -155,6 +182,7 @@ export async function runRecord(rest: string[]): Promise<void> {
     try {
       for (;;) {
         const now = Date.now(), stop = control.request();
+        if (consentControl.failure()) throw new Error(consentControl.failure());
         if (stop) { const gap=control.gap()!; gaps.push(gap); tab?.persistControlGap(sessionHandle,gap); console.log(`[bot] capture-control: ${stop.reason}`); break; }
         if (captureFailure) throw new Error(captureFailure);
         if (now >= until.getTime()) { console.log("[bot] --until reached"); break; }
@@ -162,7 +190,7 @@ export async function runRecord(rest: string[]): Promise<void> {
         if (endedAt !== undefined && now >= endNotBefore.getTime() && now - endedAt > 60_000) {
           console.log("[bot] webinar reported ended"); break;
         }
-        await new Promise((r) => setTimeout(r, 5000));
+        await (inject.wait ?? ((ms) => new Promise<void>((r) => setTimeout(r, ms))))(5000);
       }
     } finally {
       audioWatchdog.stop(); // T-031: before joiner.stop — recording is ending, no more reconnects
@@ -170,94 +198,63 @@ export async function runRecord(rest: string[]): Promise<void> {
         await joiner.stop(sessionHandle);
       } catch (e) {
         console.error(`[bot] stop failed: ${e instanceof Error ? e.message : String(e)}`);
-        if (backend === "tab") throw e;
+        if (backend === "tab") throw gate.failure ? new Error(gate.failure) : e; // ISS-CAPTUREFIX-001: name the reload that killed it
       }
       await bot.disconnect().catch(() => {});
     }
     control.dispose();
     let video = bot.outputPath(sessionHandle);
     if (!video || !existsSync(video)) {
-      const newest = readdirSync(RECORD_DIR)
+      const newest = readdirSync(recordDir)
         .filter((f) => f.endsWith(backend === "tab" ? ".webm" : ".mkv"))
-        .map((f) => path.join(RECORD_DIR, f))
+        .map((f) => path.join(recordDir, f))
         .filter((f) => statSync(f).mtimeMs >= startedAt)
         .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs)[0];
-      if (newest) console.warn(`[bot] using newest recording in ${RECORD_DIR}: ${newest}`);
+      if (newest) console.warn(`[bot] using newest recording in ${recordDir}: ${newest}`);
       video = newest;
     }
     if (!video || !existsSync(video)) throw new Error(`no recording file produced (${video ?? "none"})`);
-    video = normalizeCapture(video);
-    await finalizeRecording(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
-      telegram, (Date.now() - startedAt) / 1000, tenantId);
-    processRecordingArtifacts(video, sessionId, rest);
+    consentControl.privacy.dispose();
+    const originalVideo=video;
+    const native = nativeRuntime ? await nativeRuntime.take(video) : undefined;
+    if(!native)video = (inject.normalize ?? normalizeCapture)(video, false);
+    const publicVideo=native&&!inject.finalize ? await finalizeRecordingWith({...inject.nativeFinalizerOverrides,tenantId,recordDir:workspace.recordDir,originalVideo,
+      nativeMedia:native.media,nativeMaxTotalBytes:native.maxTotalBytes,nativeCanonicalClock:native.canonicalClock,
+      nativeArchive:inject.nativeArchive,nativeSidecarPath:inject.nativeSamplerPath??process.env.LKB_TILE_CAPTURE_FILE},video,sessionId,title,platform,rest.includes("--transcribe"),gaps,telegram)
+      : await (inject.finalize ?? finalizeRecording)(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
+        telegram, (Date.now() - startedAt) / 1000, tenantId, workspace.recordDir, rest.includes("--lean-video"),originalVideo);
+    processRecordingArtifacts(finalizedCaptureVideo(publicVideo,video,!!inject.finalize), sessionId, rest);
   } finally {
     audioWatchdog.stop(); // idempotent — belt-and-suspenders if the inner finally was never reached
-    removeControllerState(RECORD_DIR);
+    removeControllerState(recordDir);
   }
-  } finally { control.dispose(); }
+  } catch(error) {consentControl.readiness.onCaptureEvent({event:"capture-error"});throw error;}
+  finally { consentControl.dispose(); }
 }
 export { normalizeCapture } from "./record-finalize.js";
-export function processRecordingArtifacts(video: string, sessionId: string, rest: string[]): void {
-  if (!rest.includes("--process-video")) return;
-  if (!rest.includes("--transcribe")) throw new Error("--process-video requires --transcribe");
-  const state = path.join(REPO_ROOT, "data", "toc-migrated", sessionId, "pipeline-state.json");
-  let stage = "screen";
-  let proof: Record<string, unknown> | undefined;
-  const report = (status: string, error?: string) => writeFileSync(state, JSON.stringify({ ...proof, sessionId, stage, status, error, updatedAt: new Date().toISOString() }) + "\n");
-  report("processing");
-  try {
-    const processed = spawnSync("node", [path.join(REPO_ROOT, "scripts", "webinar", "process-video.mjs"),
-      sessionId, "--recording", path.relative(REPO_ROOT, video)], { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
-    if (processed.status !== 0) throw new Error("screen processing failed; recording retained for retry");
-    if (rest.includes("--index")) {
-      stage = "index"; report("processing");
-      const indexed = spawnSync("node", [path.join(REPO_ROOT, "scripts", "webinar", "sync-session.mjs"),
-        sessionId, "--emit-files", "--index"], { cwd: REPO_ROOT, stdio: "inherit", timeout: 3_600_000 });
-      if (indexed.status !== 0) throw new Error("knowledge indexing failed; retry from retained artifacts");
-      proof = validateIndexProof(path.dirname(state), sessionId);
-    }
-    report("done");
-  } catch (error) { report("failed", String(error)); throw error; }
-}
-export function validateIndexProof(dir: string, sessionId: string): Record<string, unknown> {
-  const read = (name: string) => JSON.parse(readFileSync(path.join(dir, name), "utf8"));
-  const proof = read("index-proof.json"), source = read("source.json");
-  const inputHash = createHash("sha256").update(readFileSync(path.join(dir, "knowledge-turns.json"))).digest("hex");
-  if (proof.version !== 2 || proof.sessionId !== sessionId || proof.tenantId !== source.tenantId || proof.inputHash !== inputHash ||
-    !proof.generation || proof.strict !== true || proof.status !== "done" || proof.semanticSupport !== "passed" ||
-    !Number.isInteger(proof.turnCount) || proof.turnCount <= 0 || ["summary", "claims", "chunks", "tree"].some((key) => proof[key] !== "done")) {
-    throw new Error("required fresh strict index proof unavailable");
-  }
-  return proof;
-}
+export { processRecordingArtifacts, validateIndexProof } from "./record-finalize.js";
 export { isSilentCapture, finalizeRecordingWith, type FinalizeRecordingOverrides } from "./record-finalize.js";
-export async function finalizeRecording(
-  video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
-  gaps: GapWindow[] = [],
-  telegram: TelegramNotifier = createTelegramNotifier(),
-  durationSec?: number,
-  tenantId?: string,
-): Promise<void> {
-  return finalizeRecordingWith({ tenantId }, video, sessionId, title, platform, transcribe, gaps, telegram, durationSec);
-}
+export { finalizeRecording } from "./workspace/finalize-workspace-recording.js";
 export interface RunFinalizeOverrides extends Partial<Pick<ControllerRecoveryContext, "repoRoot" | "recordDir" | "profileDir">>, Partial<Omit<ControllerRecoveryActions, "finalize" | "processArtifacts">> {
   obs?: ObsClientLike;
-  finalize?: typeof finalizeRecording;
+  finalize?: (...args:Parameters<typeof finalizeRecording>)=>Promise<string|void>;
+  telegram?: TelegramNotifier; // restore-failure alert sink; defaults to the env-configured notifier
 }
 
 export async function runFinalize(rest: string[], overrides: RunFinalizeOverrides = {}): Promise<void> {
   const envFile = path.join(REPO_ROOT, ".env");
   if (existsSync(envFile)) process.loadEnvFile(envFile);
   const tenantId = captureTenant(rest);
+  const workspace = selectTabCaptureWorkspace(rest, {profileDir: overrides.profileDir ?? BOT_PROFILE_DIR, recordDir: overrides.recordDir ?? RECORD_DIR, tenantId}, "finalize", rest.includes("--stop-obs") ? "obs" : "tab");
   const sessionId = flag(rest, "--session-id");
   const title = flag(rest, "--title");
-  if (!sessionId || !title) throw new Error("usage: lkb finalize --session-id ID --title T [--platform P] [--stop-obs] [--video PATH] [--transcribe]");
+  if (!sessionId || !title) throw new Error("usage: lkb finalize --session-id ID --title T [--capture-slot ID] [--lean-video] [--platform P] [--stop-obs] [--video PATH] [--transcribe]");
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid session-id");
   const platform = flag(rest, "--platform") ?? "unknown";
   let video = flag(rest, "--video");
   const context: ControllerRecoveryContext = {
-    repoRoot: overrides.repoRoot ?? REPO_ROOT, recordDir: overrides.recordDir ?? RECORD_DIR,
-    profileDir: overrides.profileDir ?? BOT_PROFILE_DIR, sessionId, tenantId,
+    repoRoot: overrides.repoRoot ?? REPO_ROOT, recordDir: workspace.recordDir,
+    profileDir: workspace.profileDir, sessionId, tenantId,
     python: process.env.LKB_PYTHON ?? "python", joinScript: JOIN_SCRIPT,
   };
   if (rest.includes("--stop-obs")) {
@@ -285,14 +282,19 @@ export async function runFinalize(rest: string[], overrides: RunFinalizeOverride
         await obs.call("SetInputMute", { inputName: name, inputMuted: false }).catch(() => {});
       }
     }
+    await restoreLeanVideoInObs(obs, leanRestorePath(context.recordDir), (m) => console.log(`[bot] ${m}`),
+      (m) => (overrides.telegram ?? createTelegramNotifier()).notifyObsRestoreFailed?.(m));
     } finally { await obs.disconnect(); }
     const cleaned = cleanupOwnedBrowserProfile(path.resolve(context.profileDir), {...context, stopFile: path.join(RECORD_DIR, ".stop-obs-cleanup")}, overrides.cleanup);
     console.log(cleaned ? "[bot] OBS inputs unmuted, exact owned browser profile cleaned" : "[bot] OBS inputs unmuted; browser profile absent, cleanup skipped");
   }
   if (!video || !existsSync(video)) throw new Error(`no recording file (${video ?? "none"}) — pass --video`);
-  await finalizeControllerRecording(video, context, {
-    ...overrides, normalize: overrides.normalize ?? normalizeCapture,
-    finalize: (media, gaps) => (overrides.finalize ?? finalizeRecording)(media, sessionId, title, platform, rest.includes("--transcribe"), gaps, undefined, undefined, tenantId),
-    processArtifacts: (media) => processRecordingArtifacts(media, sessionId, rest),
-  });
+  assertCaptureWorkspaceVideo(workspace, video);
+  const originalVideo=video.endsWith(".playable.webm")?video.replace(/\.playable\.webm$/,".webm"):video;
+  let releaseSession=()=>{},publicVideo:string|void;
+  try { await finalizeControllerRecording(video, context, {
+    ...overrides, normalize: overrides.normalize ?? ((video) => normalizeCapture(video, false)),
+    finalize: async (media, gaps) => {releaseSession=claimCaptureSession(overrides.recordDir ?? path.join(overrides.repoRoot ?? REPO_ROOT,"raw","webinars"),tenantId,sessionId,true);publicVideo=await (overrides.finalize ?? finalizeRecording)(media, sessionId, title, platform, rest.includes("--transcribe"), gaps, undefined, undefined, tenantId, workspace.recordDir, rest.includes("--lean-video"),originalVideo);},
+    processArtifacts: (media) => processRecordingArtifacts(finalizedCaptureVideo(publicVideo,media,!!overrides.finalize), sessionId, rest),
+  }); } finally {releaseSession();}
 }

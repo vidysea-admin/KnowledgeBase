@@ -1,0 +1,10 @@
+{
+  "scope": "Read-only observed global integration pins; NOT imported by isolated API/UI harness; NOT ROUTE_FREEZE or runtime acceptance",
+  "pins": {
+    "apps/api/src/composition/integrations/answers.ts": "717fc89ed7f0d75bf453a4e31b0673574fb00d24fea7d7bc3fd575cf77f741e7",
+    "apps/api/src/composition/integrations/routes.ts": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+    "apps/web/src/App.tsx": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+    "apps/web/src/layout/NavSidebar.tsx": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+    "apps/api/src/server.ts": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2"
+  }
+}

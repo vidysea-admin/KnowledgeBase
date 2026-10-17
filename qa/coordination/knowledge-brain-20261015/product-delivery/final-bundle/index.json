@@ -1,0 +1,2243 @@
+{
+  "kind": "NINE_PRODUCT_SOURCE_FINAL_BUNDLE_NOT_REVIEWED_PASS",
+  "recorded_at": "2026-10-15T11:50:49.333Z",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "scope": "Metadata-only compact bundle for combined finisher; no tests/review admission/source/manifest/verdict changes.",
+  "counts": {
+    "SOURCE_READY_FOR_FINITE_REVIEW": 8,
+    "HOLD_MISSING_RECEIPT": 1,
+    "reviewed_PASS": 0
+  },
+  "units": [
+    {
+      "slug": "collections-bounded-choice-retention",
+      "cycle": 0,
+      "packet": "qa/coordination/knowledge-brain-20261015/product-delivery/collections-maker-packet.md",
+      "owned": [
+        "apps/web/src/pages/knowledge/CuratedCollections.tsx",
+        "apps/web/src/pages/knowledge/CuratedCollections.test.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/pages/knowledge/collectionsClient.ts",
+        "apps/api/src/knowledge/collections-router.ts",
+        "apps/api/src/knowledge/collections-store.ts"
+      ],
+      "probe": "apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+      "clauses": "qa/contracts/goal-t055.md C5,C7,C8,C9",
+      "behavior": "Merge available saved members into bounded chooser by kind+id; preserve order on rename and remove only explicit deselection. Unavailable members remain hidden/inert.",
+      "evidence": "UI composite collections6+client2; current independent guard1/1 ownexit0. Earlier independent URL failure and repair history remain retained.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "53f2c6c86ee9dd84b5d791df015b82c6f6d09f3e0f043f17703017e141879355",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "53f2c6c86ee9dd84b5d791df015b82c6f6d09f3e0f043f17703017e141879355",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/knowledge/CuratedCollections.tsx",
+          "sha256": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97"
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/CuratedCollections.test.tsx",
+          "sha256": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/knowledge/CuratedCollections.tsx",
+          "sha256": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+          "bytes": 6597,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/CuratedCollections.test.tsx",
+          "sha256": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3",
+          "bytes": 6139,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/collectionsClient.ts",
+          "sha256": "0eb4915dfed41ba944d17937cd1a4fcf64c972172edfc25134d19a61a8fe5602",
+          "bytes": 4326,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "0eb4915dfed41ba944d17937cd1a4fcf64c972172edfc25134d19a61a8fe5602",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/api/src/knowledge/collections-router.ts",
+          "sha256": "d54376aef9ec3289b2976269672be41fadb5b4afad69e826b751156c13491947",
+          "bytes": 14026,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/knowledge/collections-store.ts",
+          "sha256": "ba2c80800f94b556d69cee93a90cc4a06294ee93efbc797f9dbc93cb46c661a7",
+          "bytes": 7352,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+          "sha256": "d0df06948303104901d26ca9cbce5bc09b3832c9c8a7a803020b431a16ed7ff0",
+          "bytes": 2718,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/collections-bounded-choice-retention.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet."
+    },
+    {
+      "slug": "product-answer-trusted-reviewer",
+      "cycle": 0,
+      "packet": "qa/packets/product-answer-trusted-reviewer.md",
+      "owned": [
+        "apps/api/src/answer-policy/answer-router.ts",
+        "apps/api/src/answer-policy/answer-router.test.ts"
+      ],
+      "consumers": [
+        "apps/api/src/composition/integrations/reviews.ts",
+        "apps/api/src/answer-policy/types.ts",
+        "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+        "apps/web/src/pages/answer-policy/PolicyAskPage.tsx"
+      ],
+      "clauses": "qa/contracts/goal-t056.md C1,C3,C7,C8,C10,C11;C12 live remains open",
+      "behavior": "Server-injected trusted human authority required for approval, source preference and usefulness labels; absent authority refuses before durable write.",
+      "evidence": "Focused API union answer-router4 pass inside globalexit1; review-authority8 ownexit0; mounted refusal2 attribution passes inside UI12 globalexit1.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "207891bcff3ec1b4192eddcdf0fe7618225344dbd8cf03f7a7f8fe1ae6ed1495",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "207891bcff3ec1b4192eddcdf0fe7618225344dbd8cf03f7a7f8fe1ae6ed1495",
+      "owned_pins": [
+        {
+          "path": "apps/api/src/answer-policy/answer-router.ts",
+          "sha256": "fd11c33e891ed2ae6cc01548a6fdcfdc9587fbe960b95c0e47095dce04c5eff7"
+        },
+        {
+          "path": "apps/api/src/answer-policy/answer-router.test.ts",
+          "sha256": "da244c5da70ab85286d10dcd6bee985701f74fa7e7607b121231644f141be12d"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/api/src/answer-policy/answer-router.ts",
+          "sha256": "fd11c33e891ed2ae6cc01548a6fdcfdc9587fbe960b95c0e47095dce04c5eff7",
+          "bytes": 4935,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/answer-policy/answer-router.test.ts",
+          "sha256": "da244c5da70ab85286d10dcd6bee985701f74fa7e7607b121231644f141be12d",
+          "bytes": 10112,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/composition/integrations/reviews.ts",
+          "sha256": "9d2c2af92bc798bcd397bf4c99c610a726b25d5edb182e122ad1ef71a9ce026b",
+          "bytes": 2681,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R4",
+            "R9",
+            "R10",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/answer-policy/types.ts",
+          "sha256": "f12d49a6c9ebeaeb13ead1ffa6a4fb968e9e66fab5009dc1e87b7913f38872f6",
+          "bytes": 1471,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+          "sha256": "bccd4a98d004342a55f1b3fda954c12f855b86c43102cd05f92160e7b7d4483d",
+          "bytes": 6638,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "bccd4a98d004342a55f1b3fda954c12f855b86c43102cd05f92160e7b7d4483d",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+          "sha256": "46977064c63f011416a7218320facec8a20594f9ffba6526967a6f73d62e8a4c",
+          "bytes": 15218,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "46977064c63f011416a7218320facec8a20594f9ffba6526967a6f73d62e8a4c",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/product-answer-trusted-reviewer.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "BOUNDED_API4_TYPE_BUILD_MATCH_NO_GLOBAL_CLAIM",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet.",
+      "reconciliation_history": [
+        {
+          "at": "2026-10-15T11:50:49.329Z",
+          "prior_missing": [
+            "HOLD_SCOPED_REUSE_DECISION: API diagnostic-repairs ownexit0 is earlier repair epoch; later out-of-closure message-vertical.test.ts birth/diagnostic changes prevent a globally current API-project claim. Exact named owned/direct pins match that receipt, but policy-permitted scoped reuse still needs explicit independent decision."
+          ],
+          "reason": "Fresh bounded named API4/9 identity comparison shows zero drift against type/build repair epoch; no global API claim/policy verdict."
+        }
+      ],
+      "semantic_reuse_facts": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/semantic-api-reuse.json"
+    },
+    {
+      "slug": "t058-saved-summary-refresh",
+      "cycle": 0,
+      "packet": "qa/coordination/knowledge-brain-20261015/product-delivery/outputs-maker-packet.md",
+      "owned": [
+        "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+        "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/api/knowledge-outputs.ts"
+      ],
+      "clauses": "qa/contracts/goal-t058.md C6,C8,C12",
+      "behavior": "Authoritative show(next) updates only matching Saved drafts summary and sorts updatedAt after existing epoch guard; save/revalidate/open immediately show title/revision and reopen same id.",
+      "evidence": "verification-saved-output-workbench.json current ownexit0;1/1 synthetic HTTP/jsdom workflow.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "3b7d35f8801dd853b2898dd6302e5199ec8f2f4a8bd4bb8be4064f883876dc98",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "3b7d35f8801dd853b2898dd6302e5199ec8f2f4a8bd4bb8be4064f883876dc98",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+          "sha256": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080"
+        },
+        {
+          "path": "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+          "sha256": "5ec3d5f6568692749d2a0109b6037028e4877563b7ac849f8879420dcebc032f"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+          "sha256": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080",
+          "bytes": 11212,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R7"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+          "sha256": "5ec3d5f6568692749d2a0109b6037028e4877563b7ac849f8879420dcebc032f",
+          "bytes": 7160,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R7"
+          ]
+        },
+        {
+          "path": "apps/web/src/api/knowledge-outputs.ts",
+          "sha256": "40a2023787696bbafa67c91d78a8c356051800afa9beae467f79d1696a7af61d",
+          "bytes": 2581,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "40a2023787696bbafa67c91d78a8c356051800afa9beae467f79d1696a7af61d",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R7"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/t058-saved-summary-refresh.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet."
+    },
+    {
+      "slug": "product-transcript-refresh-warning",
+      "cycle": 1,
+      "packet": "qa/packets/product-transcript-refresh-warning.md",
+      "owned": [
+        "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+        "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+        "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+        "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+        "apps/web/src/api/transcriptReview.ts"
+      ],
+      "clauses": "qa/contracts/goal-T054.md clause10; AGENTS affected/downstream/validator",
+      "behavior": "Initial/reloaded pending or failed canonical refresh displays stale-answer warning; complete removes it. History fixture waits for terminal success rather than transient busy status.",
+      "evidence": "UI composite editor11 pass plus History3 ownexit0 repair; independent selected3 pass inside UI12 globalexit1.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "cfb521695c119fb407eb240ba11e6b07aa4b4edee40683e9eeac44ae25cd3173",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "cfb521695c119fb407eb240ba11e6b07aa4b4edee40683e9eeac44ae25cd3173",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+          "sha256": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca"
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+          "sha256": "cd93a30f56cb2302c779a5e4c2b89b4de0772d422ab62beec1840b959b4e1a55"
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx",
+          "sha256": "23e6b64a803228deebeeaa683db4375e7e8d358126e94220dd82bf337dffd4c5"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+          "sha256": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca",
+          "bytes": 10654,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+          "sha256": "cd93a30f56cb2302c779a5e4c2b89b4de0772d422ab62beec1840b959b4e1a55",
+          "bytes": 10427,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "cd93a30f56cb2302c779a5e4c2b89b4de0772d422ab62beec1840b959b4e1a55",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx",
+          "sha256": "23e6b64a803228deebeeaa683db4375e7e8d358126e94220dd82bf337dffd4c5",
+          "bytes": 2910,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "23e6b64a803228deebeeaa683db4375e7e8d358126e94220dd82bf337dffd4c5",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+          "sha256": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+          "bytes": 3256,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+          "sha256": "ea1f6f01d60f75cd43dde8c96725d46eb6a4fd1ad2b5f0753998e4a19299403e",
+          "bytes": 1145,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "ea1f6f01d60f75cd43dde8c96725d46eb6a4fd1ad2b5f0753998e4a19299403e",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/api/transcriptReview.ts",
+          "sha256": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7",
+          "bytes": 6369,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/product-transcript-refresh-warning.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet."
+    },
+    {
+      "slug": "product-setup-login-fencing",
+      "cycle": 0,
+      "packet": "qa/packets/product-setup-login-fencing.md",
+      "owned": [
+        "apps/web/src/pages/setup-wizard/SetupWizardPage.tsx",
+        "apps/web/src/pages/setup-wizard/setupModel.ts",
+        "apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/auth/AuthContext.tsx",
+        "apps/web/src/api/client.ts",
+        "apps/api/src/activity-health/setup-status.ts"
+      ],
+      "clauses": "qa/contracts/goal-t057.md C6,C7,C9;C8 browser remains open",
+      "behavior": "Checklist ownership includes same-key login epoch and clears stale display; optional provider absence receives truthful guidance without blocking unrelated setup.",
+      "evidence": "UI composite20 pass; independent selected4 pass/16deselected inside UI12 globalexit1.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/setup-wizard/SetupWizardPage.tsx",
+          "sha256": "8bba40ee375cc0310778d51a7f26db245ea498ab720f6104c418caf6693d3b46"
+        },
+        {
+          "path": "apps/web/src/pages/setup-wizard/setupModel.ts",
+          "sha256": "c30a66eadb0d02f9474e720b784947b18f44e7247b9a6407cc2c6ea02be86c87"
+        },
+        {
+          "path": "apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx",
+          "sha256": "27d74f4de4a0acc7552e970c160f8ad5ed608393fa462ee58d5010d6a04b2d81"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/setup-wizard/SetupWizardPage.tsx",
+          "sha256": "8bba40ee375cc0310778d51a7f26db245ea498ab720f6104c418caf6693d3b46",
+          "bytes": 4207,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "8bba40ee375cc0310778d51a7f26db245ea498ab720f6104c418caf6693d3b46",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/setup-wizard/setupModel.ts",
+          "sha256": "c30a66eadb0d02f9474e720b784947b18f44e7247b9a6407cc2c6ea02be86c87",
+          "bytes": 9045,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "c30a66eadb0d02f9474e720b784947b18f44e7247b9a6407cc2c6ea02be86c87",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx",
+          "sha256": "27d74f4de4a0acc7552e970c160f8ad5ed608393fa462ee58d5010d6a04b2d81",
+          "bytes": 14088,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "27d74f4de4a0acc7552e970c160f8ad5ed608393fa462ee58d5010d6a04b2d81",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/auth/AuthContext.tsx",
+          "sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "bytes": 3986,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R7",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/api/client.ts",
+          "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "bytes": 5438,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R7",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/api/src/activity-health/setup-status.ts",
+          "sha256": "200866b369e1c4f4157a420cddf25f142adc6a9c1d6b75b8fab6e087cb28fa99",
+          "bytes": 1919,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/product-setup-login-fencing.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet."
+    },
+    {
+      "slug": "product-speaker-relation-workbench",
+      "cycle": 2,
+      "packet": "qa/packets/product-speaker-relation-workbench.md",
+      "owned": [
+        "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.tsx",
+        "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+        "apps/api/src/speaker-relations/source-router.ts",
+        "apps/api/src/speaker-relations/types.ts"
+      ],
+      "probe": "apps/web/src/__checker_probes__/speaker-auth-session.test.tsx",
+      "clauses": "qa/contracts/goal-t055.md C4,C7,C8,C9; existing speaker-relations exact DTO/evidence/CAS contract",
+      "behavior": "Key mounted workbench by login/person/generation, fetch exact source authority, validate current digest/capabilities/evidence, disable absent authority and refresh source after accepted write.",
+      "evidence": "UI composite workbench8+profile7pass/1privateSKIP; independent late-auth-source1 passes inside UI12 globalexit1. API source/router producer evidence scoped separately.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "3de6e403fdc7bebcee8329f81c6544e1cd302dbb7c3a41b9e58714976149bf92",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "3de6e403fdc7bebcee8329f81c6544e1cd302dbb7c3a41b9e58714976149bf92",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.tsx",
+          "sha256": "84bdba270594482d9b96b52b0731cfb6d286210f54485a16533dc1b8ee0af0e5"
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+          "sha256": "402bb7b08ee1b72a9af886ffd8bb8bec5b03022eadc21b685b9d47cacf93f7e2"
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+          "sha256": "4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146"
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx",
+          "sha256": "580559708c9759a7f7b81b76a593f595d198da32b96955eacde188e5dcadead5"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.tsx",
+          "sha256": "84bdba270594482d9b96b52b0731cfb6d286210f54485a16533dc1b8ee0af0e5",
+          "bytes": 12700,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "84bdba270594482d9b96b52b0731cfb6d286210f54485a16533dc1b8ee0af0e5",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+          "sha256": "402bb7b08ee1b72a9af886ffd8bb8bec5b03022eadc21b685b9d47cacf93f7e2",
+          "bytes": 6375,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "402bb7b08ee1b72a9af886ffd8bb8bec5b03022eadc21b685b9d47cacf93f7e2",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+          "sha256": "4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146",
+          "bytes": 11458,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx",
+          "sha256": "580559708c9759a7f7b81b76a593f595d198da32b96955eacde188e5dcadead5",
+          "bytes": 15084,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "580559708c9759a7f7b81b76a593f595d198da32b96955eacde188e5dcadead5",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+          "sha256": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+          "bytes": 6462,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/api/src/speaker-relations/source-router.ts",
+          "sha256": "05ea37f6fb8d2934172fde3028648a2d1cdb5ee7e41e6eae3a35dc97195c0a16",
+          "bytes": 4375,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R9",
+            "R10",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/speaker-relations/types.ts",
+          "sha256": "dfda428c83a3469ec7eae93bf0877facfe018a686c13a3b1484b3ec18415748f",
+          "bytes": 2332,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R4",
+            "R8",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/web/src/__checker_probes__/speaker-auth-session.test.tsx",
+          "sha256": "fe38f0337a9cc585b13aeff019817fd1ed1db938d7a4843f445d866d5ec4f1e6",
+          "bytes": 2982,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/product-speaker-relation-workbench.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet."
+    },
+    {
+      "slug": "product-operations-evaluation",
+      "cycle": 0,
+      "packet": "qa/packets/product-operations-evaluation.md",
+      "owned": [
+        "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+        "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+        "apps/web/src/pages/operations/EvaluationFlywheelPanel.tsx",
+        "apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+        "apps/web/src/pages/operations/OperationsPage.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/api/client.ts",
+        "apps/web/src/auth/AuthContext.tsx",
+        "apps/api/src/evaluation-flywheel/router.ts",
+        "apps/api/src/evaluation-flywheel/workflow.ts",
+        "apps/api/src/evaluation-flywheel/store.ts",
+        "apps/api/src/composition/integrations/evaluation.ts"
+      ],
+      "probe": "apps/web/src/__checker_probes__/evaluation-child-lineage.test.tsx",
+      "clauses": "qa/contracts/goal-t059.md S3,S7,S10–S15; L1–L5 excluded",
+      "behavior": "Explicit inspect/open/retest via authenticated minimal bodies; strict gap/question/child lineage, safe stages/errors, current-context single flight, unscored/needs-review preserved. Test typing fix adds missing-call guard only.",
+      "evidence": "Historical composite model20+panel8+page13+integration2; independent child-lineage1 passes inside UI12 globalexit1. Current model-test0139404b typing guard differs from historical20 runtime fixture. Existing verification-quality-ui-and-typing-affected-thirteen.json ownexit0: exact authenticated client body case1passed/19deselected, shared13passed/0failed; current0139404b and model/auth/client pins match, no rerun.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "501290028dea2befc43b784ca18c703de4a349e4c9f02e43f289bb51df93db29",
+      "candidate_identity_kind": "Existing typefix packet aggregate, ordered exact five-file pins",
+      "bundle_owned_fingerprint": "c498f6e8455208d262d3a634b66a68aff7fea668139f4da0c6a90c92fe97185d",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+          "sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052"
+        },
+        {
+          "path": "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+          "sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2"
+        },
+        {
+          "path": "apps/web/src/pages/operations/EvaluationFlywheelPanel.tsx",
+          "sha256": "ede2a2f240d6f1482eaa8b0264a6393b93f04ffe2f47baabf6aabe87030cf506"
+        },
+        {
+          "path": "apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+          "sha256": "f098890d6d46e8bfb9bdc13a2df5d15cd74550bc2f8cc6249ac4b99d1cdcaa52"
+        },
+        {
+          "path": "apps/web/src/pages/operations/OperationsPage.tsx",
+          "sha256": "b413adeba679683f06d7d5eeb5dbf689275be2f30d2a033453dac2747709fa52"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+          "sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052",
+          "bytes": 6968,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+          "sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2",
+          "bytes": 5481,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": "184970179303ed4d8c998b8870f1ba084b415c0cbbcfb21cb57cc7e7fd94e579",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/operations/EvaluationFlywheelPanel.tsx",
+          "sha256": "ede2a2f240d6f1482eaa8b0264a6393b93f04ffe2f47baabf6aabe87030cf506",
+          "bytes": 7282,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "ede2a2f240d6f1482eaa8b0264a6393b93f04ffe2f47baabf6aabe87030cf506",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+          "sha256": "f098890d6d46e8bfb9bdc13a2df5d15cd74550bc2f8cc6249ac4b99d1cdcaa52",
+          "bytes": 9135,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "f098890d6d46e8bfb9bdc13a2df5d15cd74550bc2f8cc6249ac4b99d1cdcaa52",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/operations/OperationsPage.tsx",
+          "sha256": "b413adeba679683f06d7d5eeb5dbf689275be2f30d2a033453dac2747709fa52",
+          "bytes": 9169,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "b413adeba679683f06d7d5eeb5dbf689275be2f30d2a033453dac2747709fa52",
+          "matching_receipt_refs": [
+            "R2",
+            "R3"
+          ]
+        },
+        {
+          "path": "apps/web/src/api/client.ts",
+          "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "bytes": 5438,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R7",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/auth/AuthContext.tsx",
+          "sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "bytes": 3986,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R7",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/router.ts",
+          "sha256": "3556ffbcb10d11cd1be60199027fbad41d002123d2369d851eda35117041b279",
+          "bytes": 2085,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/workflow.ts",
+          "sha256": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+          "bytes": 13983,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/store.ts",
+          "sha256": "bc5896226b0dab2f27d2e808a3153d7fd8bd62109abd93ab575b25115104ea8a",
+          "bytes": 2824,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/composition/integrations/evaluation.ts",
+          "sha256": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28",
+          "bytes": 3997,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/web/src/__checker_probes__/evaluation-child-lineage.test.tsx",
+          "sha256": "184a06fe208f0f93224b0bab7d87f6b0b587778840f4bb3d50df84369336bf8a",
+          "bytes": 2585,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/product-operations-evaluation.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "CURRENT_AFFECTED_CLIENT_CASE_ALREADY_GREEN",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet.",
+      "reconciliation_history": [
+        {
+          "at": "2026-10-15T11:50:49.326Z",
+          "prior_missing": [
+            "Current evaluationFlywheelModel.test.ts SHA0139404b differs from runtime model20 fixture18497017. Current type/build pass and unchanged production/lineage probe do not manufacture a current affected exact-body case replay. Suggested existing case: authenticated client encodes original ID and sends exact minimal write bodies; broker profile node node_modules/vitest/vitest.mjs run --pool=forks --maxWorkers=1 --minWorkers=1 --no-file-parallelism src/pages/operations/evaluationFlywheelModel.test.ts -t \"authenticated client encodes original ID and sends exact minimal write bodies\". No execution requested here."
+          ],
+          "reason": "Existing affected13 ownexit0 current-case receipt authenticated; no rerun."
+        }
+      ],
+      "current_affected_case": {
+        "receipt": "qa/goal-vectorless-2026-10-15/verification-quality-ui-and-typing-affected-thirteen.json",
+        "own_exit": 0,
+        "case": "authenticated client encodes original ID and sends exact minimal write bodies",
+        "passed": 1,
+        "deselected": 19,
+        "total_shared_passed": 13,
+        "shared_failed": 0,
+        "pins": [
+          {
+            "path": "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+            "current_sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052",
+            "receipt_sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052",
+            "matches": true
+          },
+          {
+            "path": "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+            "current_sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2",
+            "receipt_sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2",
+            "matches": true
+          },
+          {
+            "path": "apps/web/src/api/client.ts",
+            "current_sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+            "receipt_sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+            "matches": true
+          },
+          {
+            "path": "apps/web/src/auth/AuthContext.tsx",
+            "current_sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+            "receipt_sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+            "matches": true
+          }
+        ]
+      }
+    },
+    {
+      "slug": "product-trusted-human-refusal-consumption",
+      "cycle": 0,
+      "packet": "qa/packets/product-trusted-human-refusal-consumption.md",
+      "owned": [
+        "apps/web/src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx"
+      ],
+      "consumers": [
+        "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+        "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+        "apps/web/src/pages/answer-policy/client.ts",
+        "apps/web/src/pages/answer-policy/AnswerSources.tsx",
+        "apps/web/src/api/client.ts"
+      ],
+      "clauses": "qa/contracts/goal-t056.md C3,C8,C11",
+      "behavior": "Mounted real clients consume human-authority503: candidate stays pending/history withheld and usefulness cannot claim saved. Exact payload/auth headers checked.",
+      "evidence": "Current-consumer selected2 pass in independent UI12 globalexit1; supersedes stale AnswerSources pin in original composite; no standalone process exit manufactured.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "1189acee7e1e5d2d868a5a5acef4e035cd792efff6354a59c85c222a47f954a3",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "1189acee7e1e5d2d868a5a5acef4e035cd792efff6354a59c85c222a47f954a3",
+      "owned_pins": [
+        {
+          "path": "apps/web/src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx",
+          "sha256": "9252807cae7ae843a6407def506ed81c97741a700817cd0ca411431933367d58"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/web/src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx",
+          "sha256": "9252807cae7ae843a6407def506ed81c97741a700817cd0ca411431933367d58",
+          "bytes": 5736,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "9252807cae7ae843a6407def506ed81c97741a700817cd0ca411431933367d58",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+          "sha256": "bccd4a98d004342a55f1b3fda954c12f855b86c43102cd05f92160e7b7d4483d",
+          "bytes": 6638,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "bccd4a98d004342a55f1b3fda954c12f855b86c43102cd05f92160e7b7d4483d",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+          "sha256": "46977064c63f011416a7218320facec8a20594f9ffba6526967a6f73d62e8a4c",
+          "bytes": 15218,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "46977064c63f011416a7218320facec8a20594f9ffba6526967a6f73d62e8a4c",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/answer-policy/client.ts",
+          "sha256": "fbe49c33181ba7ba06906d9b5bfea1bda35c4aeab8bb46c92448638028632f92",
+          "bytes": 9037,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "fbe49c33181ba7ba06906d9b5bfea1bda35c4aeab8bb46c92448638028632f92",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/answer-policy/AnswerSources.tsx",
+          "sha256": "66c479ba2f1d945e08ebb207df5d849073fdb627d938dec335e3bd2fa0067815",
+          "bytes": 3575,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": "0c92a27554f50b75da0f42ef6ec8849e4beaf221c67830ab53913f2a75ef8bd0",
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R11"
+          ]
+        },
+        {
+          "path": "apps/web/src/api/client.ts",
+          "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "bytes": 5438,
+          "original_ui_composite_matches": true,
+          "original_ui_composite_old_hash": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "matching_receipt_refs": [
+            "R1",
+            "R2",
+            "R3",
+            "R7",
+            "R11"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/product-trusted-human-refusal-consumption.md",
+      "status": "SOURCE_READY_FOR_FINITE_REVIEW",
+      "status_detail": "SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED",
+      "missing": [],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet."
+    },
+    {
+      "slug": "t059-read-head-deadlines",
+      "cycle": 0,
+      "packet": "qa/packets/t059-read-head-deadlines.md",
+      "owned": [
+        "apps/api/src/evaluation-flywheel/workflow.ts",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ],
+      "consumers": [
+        "apps/api/src/evaluation-flywheel/router.ts",
+        "apps/api/src/evaluation-flywheel/router.test.ts",
+        "apps/api/src/evaluation-flywheel/store.ts",
+        "apps/api/src/evaluation-flywheel/types.ts",
+        "apps/api/src/evaluation-flywheel/receipts.ts",
+        "apps/api/src/evaluation-flywheel/test-fixture.ts",
+        "apps/api/src/evaluation-flywheel/composition.test.ts"
+      ],
+      "clauses": "qa/contracts/goal-t059.md S3,S5,S7,S10,S12,S13,S15; L1–L5 HOLD",
+      "behavior": "Bound storage reads and terminal-head CAS only after immutable child persisted/read back. Read timeout prevents paid continuation/rebuild; ambiguous terminal timeout keeps lease and avoids recovery writes. Retry validates existing child and fences stale CAS.",
+      "evidence": "Current API attribution workflow18+router3 pass inside sharedexit1; original all-write deadlines/createRetest excluded. composition.test requested proof not supplied in mapped union.",
+      "root": "C:/Users/product/Desktop/KnowledgeBase",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "0e81bf7713caa66b9c99d7e918aec933e00e215b5126a1344d31592417c0868b",
+      "candidate_identity_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "bundle_owned_fingerprint": "0e81bf7713caa66b9c99d7e918aec933e00e215b5126a1344d31592417c0868b",
+      "owned_pins": [
+        {
+          "path": "apps/api/src/evaluation-flywheel/workflow.ts",
+          "sha256": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2"
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/workflow.test.ts",
+          "sha256": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8"
+        }
+      ],
+      "direct_consumer_and_receipt_identity": [
+        {
+          "path": "apps/api/src/evaluation-flywheel/workflow.ts",
+          "sha256": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+          "bytes": 13983,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/workflow.test.ts",
+          "sha256": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8",
+          "bytes": 17298,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/router.ts",
+          "sha256": "3556ffbcb10d11cd1be60199027fbad41d002123d2369d851eda35117041b279",
+          "bytes": 2085,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/router.test.ts",
+          "sha256": "1c894b6f4090b6158e0ce405bec831ddaab64546bcc02c55bd3e339871d311d5",
+          "bytes": 5839,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/store.ts",
+          "sha256": "bc5896226b0dab2f27d2e808a3153d7fd8bd62109abd93ab575b25115104ea8a",
+          "bytes": 2824,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/types.ts",
+          "sha256": "c1b031c9964dc26a835c410b3034760f6f2a307a73938015bc091e9c41b7003f",
+          "bytes": 3090,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/receipts.ts",
+          "sha256": "a6eb0492e8382288cf142c3848726d01bc3a3fc1ab93d90817c36e8d30ff38f3",
+          "bytes": 3392,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/test-fixture.ts",
+          "sha256": "6bd2229d3499ccb532a585a7325dcb8052250b22931978768e45f5608ffbd13f",
+          "bytes": 6542,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R9",
+            "R12"
+          ]
+        },
+        {
+          "path": "apps/api/src/evaluation-flywheel/composition.test.ts",
+          "sha256": "c58aff9cc1706df18bc9b2c8d2386a2cfb5fa77a57c3ea1001b5fbf8ead58c5d",
+          "bytes": 6616,
+          "original_ui_composite_matches": false,
+          "original_ui_composite_old_hash": null,
+          "matching_receipt_refs": [
+            "R2",
+            "R3",
+            "R4",
+            "R12"
+          ]
+        }
+      ],
+      "manifest": "qa/manifests/t059-read-head-deadlines.md",
+      "status": "HOLD_MISSING_RECEIPT",
+      "status_detail": "EXACT_DOWNSTREAM_COMPOSITION_CASE_RECEIPT_PENDING",
+      "missing": [
+        "Exact existing source-intake/index/hydration/askV2 immutable-child composition case has no current receipt in bounded inventory; root-approved one-case frozen spec sent to /root/verification_broker; no wait or duplicate run."
+      ],
+      "external_gates": [
+        "Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied.",
+        "Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies."
+      ],
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/t059-read-head-deadlines.diff",
+      "new_untracked_source_note": "When git diff omits a new file, exact owned source link plus raw-byte hash is authoritative; no base existed per packet.",
+      "reconciliation_history": [
+        {
+          "at": "2026-10-15T11:50:49.331Z",
+          "prior_missing": [
+            "HOLD_SCOPED_REUSE_DECISION: same earlier-epoch API semantic receipt; current direct pins match, but no globally current API-project proof/reuse decision.",
+            "Packet explicitly requires composition.test.ts affected/downstream execution; no current attributable composition receipt supplied among exact mapped evidence."
+          ],
+          "reason": "Fresh bounded named API4/9 identity comparison shows zero drift against type/build repair epoch; no global API claim/policy verdict."
+        }
+      ],
+      "semantic_reuse_facts": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/semantic-api-reuse.json",
+      "pending_exact_broker_spec": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/deadline-composition-one-broker-spec.json"
+    }
+  ],
+  "common_evidence": {
+    "receipt_metadata": [
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-collections-guard-one.json",
+        "exitCode": 0,
+        "scope": "Collections one-case replay after root mechanical missing-row narrowing; assertions unchanged",
+        "candidate_sha": "aa40da720e776baf6e87f93a19165f974065a127094bac87ede6395d0506c05a",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--pool=forks",
+          "--maxWorkers=1",
+          "--minWorkers=1",
+          "--no-file-parallelism",
+          "src/__checker_probes__/collections-kind-identity.test.tsx",
+          "--testNamePattern",
+          "checker collection kind identity"
+        ],
+        "testIDs": [
+          "checker collection kind identity"
+        ],
+        "elapsedMs": 3133.8793,
+        "hashesUnchanged": true,
+        "inputPinCount": 18,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-collections-guard-one.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-collections-guard-one.stderr.txt",
+        "id": "R1",
+        "fingerprint_ref": "FP1"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json",
+        "exitCode": 0,
+        "scope": "Current web compiler after four fixture-only diagnostics repaired plus frozen SearchPage mocks",
+        "candidate_sha": "30745c13a91cf68c0fbcfa654d30a7f997ede5f8a87cc5089d48d67b4c7268df",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+          "--filter",
+          "@lkb/web",
+          "typecheck"
+        ],
+        "testIDs": [
+          "web-types"
+        ],
+        "elapsedMs": 12311.6124,
+        "hashesUnchanged": true,
+        "inputPinCount": 1675,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.stderr.txt",
+        "id": "R2",
+        "fingerprint_ref": "FP2"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json",
+        "exitCode": 0,
+        "scope": "Current web build after current semantic compiler green",
+        "candidate_sha": "30745c13a91cf68c0fbcfa654d30a7f997ede5f8a87cc5089d48d67b4c7268df",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+          "--filter",
+          "@lkb/web",
+          "build"
+        ],
+        "testIDs": [
+          "web-build"
+        ],
+        "elapsedMs": 16720.4103,
+        "hashesUnchanged": true,
+        "inputPinCount": 1675,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.stderr.txt",
+        "id": "R3",
+        "fingerprint_ref": "FP2"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-api-types-final-public-epoch.json",
+        "exitCode": 2,
+        "scope": "Current API semantic typecheck after final shared public24 and WA frozen epoch",
+        "candidate_sha": "80a17b0f31b6deb415e04261051f09e0f199061aeebadc1557c55b84a395ae05",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+          "--filter",
+          "@lkb/api",
+          "typecheck"
+        ],
+        "testIDs": [
+          "api-types"
+        ],
+        "elapsedMs": 14765.362,
+        "hashesUnchanged": true,
+        "inputPinCount": 1243,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-api-types-final-public-epoch.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-api-types-final-public-epoch.stderr.txt",
+        "id": "R4",
+        "fingerprint_ref": "FP2"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.json",
+        "exitCode": 0,
+        "scope": "Shared frozen contracts validation after final public checkpoint",
+        "candidate_sha": "642fd3b34f3a17a94074bfe5b5c67911d90fea5ec49988eef8aa278bba9d451e",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+          "-B",
+          "contracts/verify_contracts.py"
+        ],
+        "testIDs": [
+          "current frozen contract verifier; empty registry vacuity disclosed"
+        ],
+        "elapsedMs": 192.95030000000003,
+        "hashesUnchanged": true,
+        "inputPinCount": 2,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.stderr.txt",
+        "id": "R5",
+        "fingerprint_ref": "FP3"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-review-authority-eight-20261015T1158.json",
+        "exitCode": 0,
+        "scope": "Review authority policy eight pure trusted-human action/configuration cases; actual runtime import closure excludes erased types",
+        "candidate_sha": "de8cd6e9050eb83c249a822f507c4ff68d8e087b84653a77ad8af8d1baa2634a",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "--test",
+          "--test-concurrency=1",
+          "--test-timeout=30000",
+          "--import",
+          "tsx",
+          "apps/api/src/review-authority/policy.test.ts"
+        ],
+        "testIDs": [
+          "review-authority/policy.test.ts all8"
+        ],
+        "elapsedMs": 615.3983,
+        "hashesUnchanged": true,
+        "inputPinCount": 8,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-review-authority-eight-20261015T1158.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-review-authority-eight-20261015T1158.stderr.txt",
+        "id": "R6",
+        "fingerprint_ref": "FP4"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.json",
+        "exitCode": 0,
+        "scope": "Saved outputs rename saved revision revalidate reopen export immediate consumer",
+        "candidate_sha": "90341c47a5befbbf2c52dc1a698149364c18fba82d24f27ea49a9704932a9324",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "--test",
+          "--test-isolation=none",
+          "--test-concurrency=1",
+          "--test-timeout=30000",
+          "--import",
+          "./.cache/coordination/safe-test-runtime/register.mjs",
+          "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx"
+        ],
+        "testIDs": [
+          "all saved-output workbench.ui focused cases"
+        ],
+        "elapsedMs": 2312.8462000000004,
+        "hashesUnchanged": true,
+        "inputPinCount": 17,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.stderr.txt",
+        "id": "R7",
+        "fingerprint_ref": "FP5"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-speaker-relations-twelve-20261015T1125.json",
+        "exitCode": 0,
+        "scope": "Speaker relationship12 offline service/store cases; runtime tenant scope plus canonical schema/type dependencies only",
+        "candidate_sha": "638fcc995bb8ebfffd520657c2170010e64dc63908c2cb1033695b112aac2264",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "--test",
+          "--test-timeout=60000",
+          "--test-concurrency=1",
+          "--import",
+          "tsx",
+          "apps/api/src/speaker-relations/service.test.ts",
+          "apps/api/src/speaker-relations/mongo-store.test.ts"
+        ],
+        "testIDs": [
+          "apps/api/src/speaker-relations/service.test.ts all declared nodes",
+          "apps/api/src/speaker-relations/mongo-store.test.ts all declared nodes"
+        ],
+        "elapsedMs": 976.0088000000001,
+        "hashesUnchanged": true,
+        "inputPinCount": 21,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-speaker-relations-twelve-20261015T1125.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-speaker-relations-twelve-20261015T1125.stderr.txt",
+        "id": "R8",
+        "fingerprint_ref": "FP6"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-authority-product-api-focused-union.json",
+        "exitCode": 1,
+        "scope": "Approved authority source router reviews factory trusted human answer HTTP and evaluation head deadlines focused mock units",
+        "candidate_sha": "c7145d4750755beae73bc9e7dfa1d2acf5c7dd2db51b28fc73978b30754d39f9",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "--test",
+          "--test-concurrency=1",
+          "--test-timeout=30000",
+          "--import",
+          "tsx",
+          "apps/api/src/speaker-relations/source-router.test.ts",
+          "apps/api/src/composition/integrations/reviews.test.ts",
+          "apps/api/src/answer-policy/answer-router.test.ts",
+          "apps/api/src/evaluation-flywheel/workflow.test.ts",
+          "apps/api/src/evaluation-flywheel/router.test.ts"
+        ],
+        "testIDs": [
+          "apps/api/src/speaker-relations/source-router.test.ts",
+          "apps/api/src/composition/integrations/reviews.test.ts",
+          "apps/api/src/answer-policy/answer-router.test.ts",
+          "apps/api/src/evaluation-flywheel/workflow.test.ts",
+          "apps/api/src/evaluation-flywheel/router.test.ts"
+        ],
+        "elapsedMs": 8885.4238,
+        "hashesUnchanged": true,
+        "inputPinCount": 396,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-authority-product-api-focused-union.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-authority-product-api-focused-union.stderr.txt",
+        "id": "R9",
+        "fingerprint_ref": "FP5"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-review-factory-affected-one.json",
+        "exitCode": 0,
+        "scope": "Only failed actual reviews factory automation source-snapshot expectation after accepted relation integration",
+        "candidate_sha": "6138f70d6a5f4869afe56cac89451e548712d078c941b55d52bcd56e6a490f4a",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "--test",
+          "--test-concurrency=1",
+          "--test-timeout=30000",
+          "--test-name-pattern=^configured automation reaches authorized proposal and source snapshots but cannot review$",
+          "--import",
+          "tsx",
+          "apps/api/src/composition/integrations/reviews.test.ts"
+        ],
+        "testIDs": [
+          "configured automation reaches authorized proposal and source snapshots but cannot review"
+        ],
+        "elapsedMs": 1228.5811,
+        "hashesUnchanged": true,
+        "inputPinCount": 103,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-review-factory-affected-one.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-review-factory-affected-one.stderr.txt",
+        "id": "R10",
+        "fingerprint_ref": "FP5"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.json",
+        "exitCode": 1,
+        "scope": "Three authored independent UI probes plus transcript3 setup4 and current503consumer2; compatible one-worker isolated files",
+        "candidate_sha": "b104d88d1826db95b8301f047864a2b0f7304cbc6f5e1c0cae678debaafd1892",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--pool=forks",
+          "--maxWorkers=1",
+          "--minWorkers=1",
+          "--no-file-parallelism",
+          "--testNamePattern",
+          "checker collection kind identity|same-key authSession change rejects late authorized source bootstrap|checker rejects same-gap changed-question child without evidence or refresh|a loaded .* refresh warns about stale answers until canonical reload completes|failed refresh exposes retry; successful refresh invokes canonical reload|old success cannot fill|old 401 cannot sign out|configured integrations:|missing integrations are optional|authority-unavailable approval keeps|authority-unavailable usefulness feedback reports",
+          "src/__checker_probes__/collections-kind-identity.test.tsx",
+          "src/__checker_probes__/speaker-auth-session.test.tsx",
+          "src/__checker_probes__/evaluation-child-lineage.test.tsx",
+          "src/pages/transcript-review/TranscriptReview.test.tsx",
+          "src/pages/transcript-review/ReviewHistory.test.tsx",
+          "src/pages/setup-wizard/SetupWizardPage.test.tsx",
+          "src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx"
+        ],
+        "testIDs": [
+          "collections independent1",
+          "speaker independent1",
+          "Ops independent1",
+          "transcript independently selected3",
+          "setup independently selected4",
+          "trusted503 current consumer2"
+        ],
+        "elapsedMs": 17575.0177,
+        "hashesUnchanged": true,
+        "inputPinCount": 53,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.stderr.txt",
+        "id": "R11",
+        "fingerprint_ref": "FP1"
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-api-types-diagnostic-repairs.json",
+        "exitCode": 0,
+        "scope": "Current API semantic compiler after nineteen diagnostic file repairs plus native policy fix",
+        "candidate_sha": "c245cbdf07a6bc1e28ebd7d3f98e446355e110a1172f57539c9eac41ebcce317",
+        "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+        "command": [
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+          "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+          "--filter",
+          "@lkb/api",
+          "typecheck"
+        ],
+        "testIDs": [
+          "api-types"
+        ],
+        "elapsedMs": 15736.195000000002,
+        "hashesUnchanged": true,
+        "inputPinCount": 1243,
+        "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-api-types-diagnostic-repairs.stdout.txt",
+        "stderrPath": "qa/goal-vectorless-2026-10-15/verification-api-types-diagnostic-repairs.stderr.txt",
+        "id": "R12",
+        "fingerprint_ref": "FP2"
+      }
+    ],
+    "ui_composite": {
+      "path": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json",
+      "kind": "TARGETED_COMPOSITE_EVIDENCE_NOT_GLOBALLY_GREEN_BATCH",
+      "status": "ATTRIBUTABLE_COMPOSITE_READY_FOR_INDEPENDENT_REUSE_DECISION",
+      "original_batch_exit": 1,
+      "perUnit": {
+        "collections": {
+          "files": [
+            "src/pages/knowledge/CuratedCollections.test.tsx",
+            "src/pages/knowledge/collectionsClient.test.ts"
+          ],
+          "results": [
+            {
+              "file": "src/pages/knowledge/CuratedCollections.test.tsx",
+              "passed": 6,
+              "total": 6,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/knowledge/collectionsClient.test.ts",
+              "passed": 2,
+              "total": 2,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        },
+        "transcriptWarning": {
+          "files": [
+            "src/pages/transcript-review/TranscriptReview.test.tsx",
+            "src/pages/transcript-review/ReviewHistory.test.tsx"
+          ],
+          "results": [
+            {
+              "file": "src/pages/transcript-review/TranscriptReview.test.tsx",
+              "passed": 11,
+              "total": 11,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/transcript-review/ReviewHistory.test.tsx",
+              "passed": 3,
+              "total": 3,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed-by-affected-file-rerun",
+              "batchExitCode": 1,
+              "standaloneExitCode": 0
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        },
+        "operations": {
+          "files": [
+            "src/pages/operations/evaluationFlywheelModel.test.ts",
+            "src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+            "src/pages/operations/OperationsPage.test.tsx",
+            "src/pages/operations/OperationsIntegration.test.tsx"
+          ],
+          "results": [
+            {
+              "file": "src/pages/operations/OperationsPage.test.tsx",
+              "passed": 13,
+              "total": 13,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+              "passed": 8,
+              "total": 8,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/operations/evaluationFlywheelModel.test.ts",
+              "passed": 20,
+              "total": 20,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/operations/OperationsIntegration.test.tsx",
+              "passed": 2,
+              "total": 2,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        },
+        "setup": {
+          "files": [
+            "src/pages/setup-wizard/SetupWizardPage.test.tsx"
+          ],
+          "results": [
+            {
+              "file": "src/pages/setup-wizard/SetupWizardPage.test.tsx",
+              "passed": 20,
+              "total": 20,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        },
+        "trustedRefusal": {
+          "files": [
+            "src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx"
+          ],
+          "results": [
+            {
+              "file": "src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx",
+              "passed": 2,
+              "total": 2,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        },
+        "humanTransfer": {
+          "files": [
+            "src/pages/calibration-review/offline-transfer.test.ts",
+            "src/pages/calibration-review/CalibrationReviewPage.test.tsx"
+          ],
+          "results": [
+            {
+              "file": "src/pages/calibration-review/CalibrationReviewPage.test.tsx",
+              "passed": 6,
+              "total": 6,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/calibration-review/offline-transfer.test.ts",
+              "passed": 3,
+              "total": 3,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        },
+        "speakerIntegration": {
+          "files": [
+            "src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+            "src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx"
+          ],
+          "results": [
+            {
+              "file": "src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx",
+              "passed": 7,
+              "total": 8,
+              "failed": 0,
+              "skipped": 1,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            },
+            {
+              "file": "src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+              "passed": 8,
+              "total": 8,
+              "failed": 0,
+              "skipped": 0,
+              "reporterStatus": "passed",
+              "batchExitCode": 1,
+              "standaloneExitCode": null
+            }
+          ],
+          "reuse": "Independent checker decides; no standalone exit manufactured"
+        }
+      },
+      "limits": "Original globalexit1 preserved; History3 repair has ownexit0; not globally green. Changed current AnswerSources covered only by independent UI consumer attribution."
+    },
+    "independent_ui_attribution": {
+      "path": "qa/goal-vectorless-2026-10-15/independent-ui-twelve-perunit-attribution.json",
+      "kind": "PER_FILE_ATTRIBUTION_FROM_FAILED_SHARED_BATCH_NOT_GLOBAL_PASS",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.json",
+      "batchExitCode": 1,
+      "selectedPassed": 11,
+      "selectedFailed": 1,
+      "deselected": 27,
+      "sharedUnhandledOrSetupFailuresObserved": false,
+      "sharedConsoleWarnings": [
+        "ReactRouter futureflags",
+        "collections React act warning"
+      ],
+      "sourceRuntimePinsUnchanged": true,
+      "rawImportIdentityLimitation": "App.tsx?raw supplementary pin captured duringrun only; not represented as prelaunch identity",
+      "rawIdentitySupplement": "independent-ui-probes-app-raw-supplement.json",
+      "perUnit": [
+        {
+          "unit": "setup",
+          "files": [
+            "SetupWizardPage.test.tsx"
+          ],
+          "selectedPassed": 4,
+          "deselected": 16,
+          "status": "attributable selected cases passed; no standalone process exit"
+        },
+        {
+          "unit": "transcript",
+          "files": [
+            "TranscriptReview.test.tsx",
+            "ReviewHistory.test.tsx"
+          ],
+          "selectedPassed": 3,
+          "deselected": 11,
+          "status": "attributable selected cases passed; no standalone process exit"
+        },
+        {
+          "unit": "speaker",
+          "files": [
+            "speaker-auth-session.test.tsx"
+          ],
+          "selectedPassed": 1,
+          "deselected": 0,
+          "status": "attributable independent case passed; no standalone process exit"
+        },
+        {
+          "unit": "operations",
+          "files": [
+            "evaluation-child-lineage.test.tsx"
+          ],
+          "selectedPassed": 1,
+          "deselected": 0,
+          "status": "attributable independent case passed; no standalone process exit"
+        },
+        {
+          "unit": "trusted-human503-current-consumer",
+          "files": [
+            "TrustedHumanRefusalConsumption.test.tsx"
+          ],
+          "selectedPassed": 2,
+          "deselected": 0,
+          "status": "attributable current affected consumer cases passed; no standalone process exit"
+        },
+        {
+          "unit": "collections",
+          "files": [
+            "collections-kind-identity.test.tsx"
+          ],
+          "selectedPassed": 0,
+          "selectedFailed": 1,
+          "status": "failed URL assertion before body assertion; body NOT proven"
+        }
+      ],
+      "sharedCommandElapsedMs": 17575.0177,
+      "sharedCostAccounting": "record once; no guessed perunit allocation or maker/checker ratio credit",
+      "independentReviewerReuseDecisionRequired": true
+    },
+    "api_attribution": {
+      "path": "qa/goal-vectorless-2026-10-15/authority-product-api-perunit-attribution.json",
+      "kind": "PER_UNIT_ATTRIBUTION_FROM_FAILED_SHARED_BATCH",
+      "receipt": "verification-authority-product-api-focused-union.json",
+      "overallExit": 1,
+      "sharedInputPins": 396,
+      "pinsUnchanged": true,
+      "sharedUnhandledSetupFailuresObserved": false,
+      "units": [
+        {
+          "name": "trusted-human-answer-router",
+          "passed": 4,
+          "failed": 0
+        },
+        {
+          "name": "evaluation-workflow",
+          "passed": 18,
+          "failed": 0
+        },
+        {
+          "name": "evaluation-router",
+          "passed": 3,
+          "failed": 0
+        },
+        {
+          "name": "speaker-source-router",
+          "passed": 8,
+          "failed": 0
+        },
+        {
+          "name": "reviews-factory",
+          "passed": 4,
+          "failed": 1
+        }
+      ],
+      "scopeLimit": "Per-test outcomes from isolated files, no standalone process exit or global green inferred",
+      "repairReceiptExpected": "verification-review-factory-affected-one.json"
+    },
+    "final_shared_public_checkpoint": {
+      "path": "qa/coordination/knowledge-brain-20261015/final-shared-public-checkpoint.json",
+      "state": "FINAL_SHARED_SOURCE_FROZEN_NOT_CHECKED",
+      "files": [
+        {
+          "path": "schema/index.json",
+          "sha256": "c949fe2697e3cf735601caee4372378e108e0bf3855079d299cb6cffda1483e8",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "schema/tree_index.schema.json",
+          "sha256": "2b03a2dfacb9c747725ff261e17b7139e418f13e1e9d165cf524a1dd876fe146",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "schema/speaker_attributes.schema.json",
+          "sha256": "784bbece740c2188adb20463880918845a5cbc6677fae9ba433bea386c09567a",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "schema/fixtures/speaker_attributes/valid.json",
+          "sha256": "91089bc53686abcdfe01860236d332254ad4bd106772c3966254ed3d1d3f2c8b",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "schema/fixtures/speaker_attributes/invalid.json",
+          "sha256": "3ef7cbde1bf4f274b93a4e9402a6e93802b6970b49460c8573f865ee96fdf255",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/core/src/index.ts",
+          "sha256": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/core/src/generated/speaker_attributes.ts",
+          "sha256": "d20d6b907f863839a004479ac525849cde3208c010797f4e7e14b57a33c7334d",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/core/src/generated/tree_index.ts",
+          "sha256": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/db/src/index.ts",
+          "sha256": "89b52eb2eb2032798b762d92c25e1381665858e49034317de1b92cb809e311f0",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/db/src/collections/speaker-attributes.ts",
+          "sha256": "90531ad79ca86b3d6ae8c799a0800ce792c7d8f6756da35de0ea23ee9a0a9497",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "migrations/20261015130000-speaker-attributes.cjs",
+          "sha256": "91d0bdf51fa528fff8dac6b21ec2b69e0970730a83d457547560d8c69fd291da",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "scripts/gen-types.mjs",
+          "sha256": "810c7994b1a571f6e18dea8d265a1e32df14d717d2e8aa76cf1e17d663e61d5d",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "structure.config.json",
+          "sha256": "6c99e5af935b72b83fa16b1a6d6a728860af3023c0dae1b4458977260fe06a29",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "schema/answer_runs.schema.json",
+          "sha256": "5b19d4d92b594926d6ea4521c36c3c94a3dc038eb278d016e673f6000e2d7af0",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/core/src/generated/answer_runs.ts",
+          "sha256": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/core/src/source-locator.ts",
+          "sha256": "2f8a0306dfa34236fc28360dd4a3a31ea4b1817460134651328b823141600063",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/ask/src/index.ts",
+          "sha256": "a33370d4ece5d00b401352bea43f0d7d861b269157ca36898cef3cb472ff24a4",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "packages/index/src/index.ts",
+          "sha256": "a2e87c0f7b6d86a5b7a1814969d6da368de0d8e6d084ddd576f54b71e8e39638",
+          "scope": "public-schema-export"
+        },
+        {
+          "path": "apps/api/src/routes/ask/ask.ts",
+          "sha256": "23f4f7463d92b22e5d9851b899bde43883fdfad1c1392586b935b7ba0878374b",
+          "scope": "selector-binding"
+        },
+        {
+          "path": "apps/api/src/routes/ask/ask.test.ts",
+          "sha256": "0d2d59299e5e5696ebf57f6b6bd80e485474a822d6aeccd401f0b487c5e55c03",
+          "scope": "selector-binding"
+        },
+        {
+          "path": "apps/api/src/answer-policy/routes.ts",
+          "sha256": "7c6707e0f965a61c27de88fde144328851d64f2e6b1e225ebe27ef7b5a105e82",
+          "scope": "selector-binding"
+        },
+        {
+          "path": "apps/api/src/answer-policy/routes.test.ts",
+          "sha256": "c9c272af3eabca2fe7e5883fd58c2afea47ce3f76c503be510a2248f04e6377a",
+          "scope": "selector-binding"
+        },
+        {
+          "path": "apps/api/src/answer-policy/answer-workflow.ts",
+          "sha256": "b652e5b38bea9e16327ee9bea6ec117d7a024b69e76e0d9148200f8b5fc51c7a",
+          "scope": "selector-binding"
+        },
+        {
+          "path": "apps/api/src/answer-policy/answer-workflow.test.ts",
+          "sha256": "3e4d0fe22a8de67812d04d8b5ebd8cecd6579f1623c56e342850c80cc1b09583",
+          "scope": "selector-binding"
+        }
+      ],
+      "limits": "Targeted generation exit0 only; current affected tests/API-web types still required. No parent completion or checker PASS implied."
+    },
+    "contracts": {
+      "qa/contracts/goal-t058.md": "ee75a3d73a2863d31c5f8d53f9e060af6e7ea7e286156a9c52d35eed84601cf7",
+      "qa/contracts/goal-t056.md": "c100da8c60316b12c910c85e02914ad335133c06741fe7f67a44213a533bb1e8",
+      "qa/contracts/goal-t057.md": "6c80e1986b28f886b9d19584c573e2cdff1e880f323e787c16ef6fecb49a7cfe",
+      "qa/contracts/goal-T054.md": "439b0b1fa5130309ab7599f56789749719a9e977bd4e8e28a27e8be4f60fa315",
+      "qa/contracts/goal-t055.md": "89dfb2b2ef66736b592544f19857a8d994174f565055ebb4799b50fad2eee394",
+      "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd"
+    },
+    "validator": "verification-final-frozen-contracts.json ownexit0; empty registry, PASS BY VACUITY only. Two named validator pins independently match current bytes.",
+    "web_semantic_build": "Current fixture-repairs type/build ownexit0, same30745c13 candidate,1675pins no-drift per receipt. Only61+exact ninth named files hashed by this bundler; no broad pin rescan.",
+    "api_semantic": "Fresh bounded named API4/9 owned/direct hashes match diagnostic-repair type/build ownexit0. No global API-project freshness claim: later root-identified out-of-closure fixture changes excluded. Independent reuse policy/verdict remains undecided; no specific named drift.",
+    "fingerprints": [
+      {
+        "id": "FP1",
+        "runtime_version": "v24.19.0",
+        "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "environment_hash": "e665a022fa0fefb3b2134896e4a46d2f46ed6b8fa36cd47a797c21cb939d2fb3",
+        "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web"
+      },
+      {
+        "id": "FP2",
+        "runtime_version": "v24.19.0",
+        "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+        "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+      },
+      {
+        "id": "FP3",
+        "runtime_version": "Python 3.12.10",
+        "runtime_executable_sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+        "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+        "import_root": "C:/Users/product/Desktop/KnowledgeBase"
+      },
+      {
+        "id": "FP4",
+        "runtime_version": "v24.19.0",
+        "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+        "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+      },
+      {
+        "id": "FP5",
+        "runtime_version": "v24.19.0",
+        "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+        "import_root": "C:/Users/product/Desktop/KnowledgeBase"
+      },
+      {
+        "id": "FP6",
+        "runtime_version": "v24.19.0",
+        "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "environment_hash": "1c84569ca4a508b42d8b1c71e1dcb76c259b9f05b50cca20ff8f057e299ab8e2",
+        "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+      }
+    ],
+    "semantic_api_reuse": {
+      "json": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/semantic-api-reuse.json",
+      "md": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/semantic-api-reuse.md",
+      "named_api_paths_match": 13,
+      "named_drift": 0,
+      "globally_current_api_claim": false,
+      "independent_policy_verdict": false
+    },
+    "operations_current_affected": {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-quality-ui-and-typing-affected-thirteen.json",
+      "own_exit": 0,
+      "elapsedMs": 7275.650900000001,
+      "candidate_sha": "6ff9889bff172cda4117e17530769d74ed6851eff8353e4e46aa9f2f050e8c4a",
+      "runtime_version": "v24.19.0",
+      "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "environment_hash": "e665a022fa0fefb3b2134896e4a46d2f46ed6b8fa36cd47a797c21cb939d2fb3",
+      "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+      "command": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--pool=forks",
+        "--maxWorkers=1",
+        "--minWorkers=1",
+        "--no-file-parallelism",
+        "--testNamePattern",
+        "uses existing authenticated read and authoritative export routes|sends one exact native option with current CAS and no tenant, actor or fabricated audit|propagates authority refusal without inventing saved state|shows exact source/candidate and native choices, initially unset with no writes|requires fresh affirmation and stores one native label against current revision/input|shows CAS/source refusal without advancing coverage or preserving affirmation|fails closed for trusted-human refusal and discards a previous tenant response|consumes authoritative evaluator export and discloses partial coverage with no gold or threshold promotion|refuses foreign or changed-source exports before constructing a download|checks actual packet bytes and returns only assertion fields, discarding local revisions|rejects foreign tenant, source drift, duplicate, provenance and dishonest assertions|refuses mismatched current item sets and unavailable secure hashing|authenticated client encodes original ID and sends exact minimal write bodies",
+        "src/pages/extraction-review/client.test.ts",
+        "src/pages/extraction-review/ExtractionReviewPage.test.tsx",
+        "src/pages/calibration-review/offline-transfer.test.ts",
+        "src/pages/operations/evaluationFlywheelModel.test.ts"
+      ],
+      "hashesUnchanged": true,
+      "pins": [
+        {
+          "path": "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+          "current_sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052",
+          "receipt_sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+          "current_sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2",
+          "receipt_sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/api/client.ts",
+          "current_sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "receipt_sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/auth/AuthContext.tsx",
+          "current_sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "receipt_sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "matches": true
+        }
+      ],
+      "shared_passed": 13,
+      "shared_deselected": 19,
+      "exact_operations_passed": 1,
+      "exact_operations_deselected": 19,
+      "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-quality-ui-and-typing-affected-thirteen.stdout.txt"
+    },
+    "api_build_repair": {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-build-diagnostic-repairs.json",
+      "own_exit": 0,
+      "elapsedMs": 1857.4766999999997,
+      "candidate_sha": "c245cbdf07a6bc1e28ebd7d3f98e446355e110a1172f57539c9eac41ebcce317",
+      "pinCount": 1243,
+      "globally_current_api_project": false
+    }
+  },
+  "accounting": {
+    "collections_all_checker_actual_total": 1399515,
+    "collections_original_maker_denominator": 3547712,
+    "collections_ratio": 0.3944838250681002,
+    "prior_children_debits_breaches": "All retained via telemetry/staged-admission artifacts; old850752 + fresh548763 includes LLM idle-loop calls.",
+    "latest_collection_telemetry": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/fresh-finisher-post-interrupt-2026-10-15T11-32-53-479Z.json",
+    "root_future_authority": "PENDING; no new grant/gate by bundle",
+    "speaker_observed_actual": 579850,
+    "operations_observed_actual": 770835,
+    "unknowns": "Current finer phase/full active/cost or later actual deltas unknown; preserve previous bounds. AllocatedOUTPUT separate from cumulative ACTUAL.",
+    "helper_cost": "Shared coordination resource separate; no maker denominator growth.",
+    "actual_10_percent_success_claim": false
+  },
+  "excluded": [
+    "t022-offline-transfer and speaker-source-bootstrap are outside exact nine-unit contract; no fabricated acceptance gap from unrelated shared consumers."
+  ]
+}

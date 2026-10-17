@@ -1,0 +1,11 @@
+{
+  "actor": "root acting on explicit user-authorized Ollama goal",
+  "scope": "remaining2 requests including metadata/inference",
+  "historicalUnknownUsagePreserved": true,
+  "maxTotalRequests": 3,
+  "outerProcessSeconds": 60,
+  "innerHttpMs": 20000,
+  "target": "glm-5.3-flash",
+  "modelAliases": false,
+  "source": "parent explicit bounded transport-execution repair grant"
+}

@@ -13,10 +13,9 @@
   Usage (U5 auto-record, fix cycle 2 / ISS-317): a Windows Scheduled Task built by
   task-scheduler.ts's scheduleOnce calls this script as -Job <jobKey> instead — a validated
   [a-z0-9-]{1,64} key, never raw title/url/sessionId text (those never reach the Task Scheduler
-  command line at all any more). This mode reads raw\webinars\scheduled\<jobKey>.json (written
-  by schedule-tick.ts's writeScheduledJob) for -Url/-Until/-Title/-SessionId, then falls straight
-  into the same code path below as a direct invocation. Any -Url/-Until/etc. passed alongside
-  -Job take precedence over the job file (so direct testing/overrides still work).
+  command line at all any more). This mode calls record-scheduled, which verifies saved source
+  identity, runtime/key/job tenant equality and current rules before the existing capture path.
+  Replacement capture arguments and replacement CLI entries are refused for -Job.
 
   Recovery if this machine's watchdog task also died: `pnpm --filter @lkb/meeting-bot cli watchdog`
   is idempotent and safe to run by hand any time — it no-ops when nothing is recording.
@@ -47,19 +46,13 @@ if ($Job) {
     Write-Error "invalid -Job '$Job' (must match ^[a-z0-9-]{1,64}$) - refusing to read a job file"
     exit 1
   }
-  $jobFile = Join-Path $logDir "scheduled\$Job.json"
-  if (-not (Test-Path $jobFile)) {
-    Write-Error "no job file found for -Job '$Job' at $jobFile"
+  if ($Url -or $Until -or $Title -or $SessionId -or $EndNotBefore -or $ExtraArgs -or $CliEntry) {
+    Write-Error "scheduled dispatch refuses replacement recording arguments"
     exit 1
   }
-  $jobData = Get-Content -Raw -Path $jobFile | ConvertFrom-Json
-  if (-not $Url) { $Url = $jobData.url }
-  if (-not $Until) { $Until = $jobData.until }
-  if (-not $Title) { $Title = $jobData.title }
-  if (-not $SessionId) { $SessionId = $jobData.sessionId }
 }
 
-if (-not $Url -or -not $Until) {
+if (-not $Job -and (-not $Url -or -not $Until)) {
   $usage = "usage: -Url <url> -Until <HH:MM|ISO datetime> [-Title T] [-SessionId ID] " +
     "[-EndNotBefore HH:MM] [-ExtraArgs '...'], OR -Job <jobKey> reading raw\webinars\scheduled\<jobKey>.json"
   Write-Error $usage
@@ -78,11 +71,15 @@ $errLog = Join-Path $logDir "record-$stamp.err.log"
 $node = (Get-Command node -ErrorAction Stop).Source
 if ($CliEntry) { $entry = $CliEntry } else { $entry = Join-Path $repoRoot "packages\meeting-bot\src\cli.ts" }
 
-$cliArgs = @("--import", "tsx", $entry, "record", $Url, "--until", $Until)
-if ($Title) { $cliArgs += @("--title", $Title) }
-if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
-if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
-if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
+if ($Job) {
+  $cliArgs = @("--import", "tsx", $entry, "record-scheduled", $Job)
+} else {
+  $cliArgs = @("--import", "tsx", $entry, "record", $Url, "--until", $Until)
+  if ($Title) { $cliArgs += @("--title", $Title) }
+  if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
+  if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
+  if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
+}
 
 # Quote every argument so neither PowerShell's argument joining nor any downstream re-parse can
 # split a URL on `&` or a title on spaces. Windows PowerShell 5.1's `Start-Process -ArgumentList`

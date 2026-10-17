@@ -1,0 +1,72 @@
+{
+  "status": "byte-only-checkpoint-awaiting-runtime-final-freeze",
+  "observedAt": "2026-10-14T22:33:25.1502019Z",
+  "sourceAcceptance": "HOLD",
+  "publicDiscoveryMounted": false,
+  "pins": [
+    {
+      "path": "packages/core/src/domain/sender-authentication.ts",
+      "sha256": "D2475FC7FE1D79C593993AFB069E8329052B9BC18469570F8A04C590D4A040E4"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "B8823BA189D4C92ED4BDC44E9F654D317FA699654E5B0832F1EA7EACC5CE7174"
+    },
+    {
+      "path": "apps/api/src/join-rules/calendar-link-extract.ts",
+      "sha256": "43DDF7F39953FD694CE024E325D9D97E01B905A85EFED92C8417C9AD823BA784"
+    },
+    {
+      "path": "apps/api/src/join-rules/youtube-live-extract.ts",
+      "sha256": "685DB2F72A456DA28E1555CB07CDD0B50551CE5161129B2C25E82CB85805C922"
+    },
+    {
+      "path": "apps/api/src/gws/gws-calendar.ts",
+      "sha256": "B5866AB4779F1CBE6E88AFA78C5FF6B027275E66932BAE678C052395DD507537"
+    },
+    {
+      "path": "packages/ingest/src/sources/guarded-fetch.ts",
+      "sha256": "9FA6EF04A97DB7096F30D1DE0F1F9EAD40FB54694F48A16071EAF387D7C9F914"
+    },
+    {
+      "path": "packages/ingest/src/index.ts",
+      "sha256": "E75924DB8F72B00E3C3BFB8FDB8C442B9E2592E162D5E1B6F399643E9DA63364"
+    },
+    {
+      "path": "apps/api/src/store.ts",
+      "sha256": "9D976378610A30D56AE12842F2D5024A1363206923DD56325F8E839BEAF45907"
+    },
+    {
+      "path": "apps/api/src/routes/meeting-candidates.ts",
+      "sha256": "10A5F6457B4405308F68D83B972F3D41DA0AE58EEF159CD749B96CB063125E21"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "sha256": "5730F4AEB2086999EBE08E81A729055DB118D9A42EFD3E425AE7572EAA2328D2"
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "FABF236621196871D176327BEA99D1C030FE5BEB888829490B10F8E6373C0B5E"
+    },
+    {
+      "path": "apps/api/src/index.ts",
+      "sha256": "3CCC28BBB24F2FDE4A0D36D1AD74430FDDB6453B6402F8EE2FA00D54540B3BF9"
+    },
+    {
+      "path": "packages/db/src/collections/meeting-candidates.ts",
+      "sha256": "F5DF62C1656F7733FFC280BE56260BFF4C49F18108BFD899E4BCB5AFF56775D9"
+    },
+    {
+      "path": "schema/meeting_candidates.schema.json",
+      "sha256": "9D3B6B5D6176C29BAD4BC7FC4C5C2AFC4EEE5F9227AF8D9E7B02BE399EA8203D"
+    },
+    {
+      "path": "packages/core/src/generated/meeting_candidates.ts",
+      "sha256": "D6A4F5BE963D022BBE07BF768AC20C59295DF4724279C92A2A9CA71E316AA626"
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/schedule-loaders.ts",
+      "sha256": "D87F073C1B78CF13630F063CDC897DE7F5E27294487E236A2AA49DE8830F8F35"
+    }
+  ]
+}

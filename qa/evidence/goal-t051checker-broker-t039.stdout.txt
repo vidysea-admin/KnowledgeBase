@@ -1,0 +1,24 @@
+✔ CLI sends/list/status/cancel use exact owning-key API routes and emit whitelisted metadata only (27.9368ms)
+✔ CLI rejects credential-bearing/untrusted API origin and invalid job id before issuing requests (2.6104ms)
+✔ durable history, cancellation intent and terminal acknowledgement survive a new store instance without secret disclosure (66.5485ms)
+✔ tenant ownership, traversal and forged worker nonce cannot read or mutate another job (11.1005ms)
+✔ restart with stale heartbeat or malformed state cannot erase ownership or allow a duplicate (24.4662ms)
+✔ one durable job can only claim one owner worker, and forged cancellation state is refused (20.4986ms)
+✔ stray or orphaned durable state is unavailable rather than an empty history (12.3818ms)
+✔ cancel before worker start records terminal cancellation without launching (35.2312ms)
+✔ cancel before recorder readiness waits, then owned ACK is distinct from actual terminal exit (55.7392ms)
+✔ recorder exit before readiness stores failure without fabricating admission or cancellation (27.9253ms)
+✔ in-flight ACK completes before final state and cannot overwrite terminal cancellation (42.349ms)
+✔ readiness callback storage error is contained and requests owned stop rather than throwing from EventEmitter (22.4376ms)
+✔ real API/managed host persists dispatch, restart denies duplicate, then same-key list/detail/cancel consume durable job (445.1001ms)
+✔ all durable routes require exact scope and owning tenant; forged body/query/path cannot control jobs (62.8617ms)
+✔ unsupported URLs do not start worker; malformed ownership state is unavailable rather than empty (50.1419ms)
+✔ API itself projects private host metadata out of list/detail/cancel responses (14.9098ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14975.6696

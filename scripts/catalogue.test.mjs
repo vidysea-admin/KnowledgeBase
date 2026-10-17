@@ -17,7 +17,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execFileSync } from "node:child_process";
 import {
-  scoreCatalogue, assertDenominator, hashProbes, expectedIds, POINTS, scaleDescription,
+  scoreCatalogue, scrapeRoutes, assertDenominator, hashProbes, expectedIds, POINTS, scaleDescription,
 } from "./lib/catalogue.mjs";
 import { loadCollectionCounts, trustOf, isTrustworthy, trustWarning, fingerprint } from "./lib/evidence.mjs";
 
@@ -274,5 +274,23 @@ test("a genuinely malformed preflight.json is reported, not silently skipped (IS
     assert.equal(unreadable.length, 1, "the unparseable candidate must be named, not silently continued past");
     assert.equal(unreadable[0].rel, "qa/evidence/live-bad/preflight.json");
     assert.match(unreadable[0].reason, /JSON/i);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("scrapeRoutes finds routes in feature subfolders, skips tests, reads only the top-level stubs.ts as stubs", () => {
+  const root = mkdtempSync(join(tmpdir(), "scrape-routes-"));
+  try {
+    const dir = join(root, "apps", "api", "src", "routes");
+    mkdirSync(join(dir, "ask"), { recursive: true });
+    const put = (p, text) => writeFileSync(p, text + "\n");
+    put(join(dir, "top.ts"), 'router.get("/top", h);');
+    put(join(dir, "ask", "ask.ts"), 'router.post("/ask", h);');
+    put(join(dir, "ask", "ask.test.ts"), 'router.post("/ghost", h);');
+    put(join(dir, "stubs.ts"), '{ method: "get", path: "/search", x: 1 }');
+    put(join(dir, "ask", "stubs.ts"), '{ method: "get", path: "/nested", x: 1 }');
+    const { live, stubs } = scrapeRoutes(root);
+    assert.ok(live.has("GET /top") && live.has("POST /ask"), "nested route file must be scraped");
+    assert.ok(!live.has("POST /ghost"), "test files are not routes");
+    assert.deepEqual([...stubs], ["GET /search"]);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });

@@ -1,0 +1,100 @@
+✔ auth and scopes: 401 without key, 403 for wrong scope or read-only writes; nothing is written (176.0228ms)
+✔ save/history/conflict/queue/resolve over HTTP, with tenant taken from the key only (104.8501ms)
+✔ cross-tenant over HTTP: B cannot read, resolve, retire or collide with A's policies (156.7628ms)
+✔ real Mongo adapter uses tenant-filtered durable identity; restart and review CAS retain immutable candidate (5.4007ms)
+✔ Mongo conflict identity deduplicates only same tenant/run/source pair and closes atomically (1.2605ms)
+✖ answer-record production guard stays closed by default; feedback cap is enforced in the actual Mongo update filter (3.2036ms)
+✔ canonical source verifier checks tenant, exact text/hash/byte/tuple/origin and missing metadata (4.4002ms)
+✔ WhatsApp current eligibility and trusted web proof are required; denied approval never falls back to raw turn equality (1.2414ms)
+✔ current committed effective transcript authorizes corrected evidence and invalidates raw or superseded quote hashes (1.8913ms)
+✔ actual history/answer-review endpoints separate candidate access, bind verified tenant and require review write scope (182.5677ms)
+✔ bounded YAML refuses executable structures, identity injection, weakened citations and duplicate keys; round trips version (5.7873ms)
+✔ effective policy cannot cross tenants, mismatch class, be stale or bypass a live contradiction (14.2344ms)
+✔ unsaved YAML simulation applies source/style/insufficiency to fresh actual Ask without writing policy or answer history (7.3979ms)
+✔ stored policy reaches the actual bounded Ask provider; filter suppresses foreign extra arms and both web paths (3.7937ms)
+✔ actual review candidate is held, fresh exact approval releases it, and concurrent/foreign reviews fail (8.1739ms)
+✔ changed evidence or policy cannot authorize stale candidate approval; refusal cannot be approved (6.9872ms)
+✔ reported evidence uses server-cited sources, holds original, resolves with attribution and reruns without losing provenance (6.9349ms)
+✔ all reported conflicts must be resolved and every rejected canonical source is excluded (7.9341ms)
+✔ a new conflict reported while a resolution rerun is pending prevents saving its candidate (4.5748ms)
+✔ two concurrent updates with the same expected version: exactly one wins, history stays contiguous (34.9259ms)
+✔ the winner is decided by the data, not by indexes: it holds with no indexes created (2.3575ms)
+✔ restart: a new store and service over the same database reload policies, history, conflicts and queue (15.6937ms)
+✔ cross-tenant: reads return nothing, same policy id is independent, resolve and retire cannot reach another tenant (2.6527ms)
+✔ history is append-only (revisions are only ever inserted) and items close once (2.0163ms)
+✔ concurrent saves of two policies do not duplicate the same conflict item (1.1125ms)
+✔ database guard: protected and unsafe names are refused unless explicitly production (0.5697ms)
+✔ ensureAnswerPolicyIndexes creates tenant-leading unique indexes (0.2239ms)
+✔ ISS-001: delimiter-bearing tenant ids cannot collide with, or be denied by, another tenant's rows (1.4332ms)
+✔ ISS-002: a crash between the revision write and the change-item write is repaired from history (2.022ms)
+✔ ISS-003 (mongo): closeItem cannot cross tenants; appendRevision refuses version gaps (0.6379ms)
+✔ ISS-003 (in-memory): closeItem cannot cross tenants; appendRevision refuses version gaps (0.5854ms)
+✔ simulation runs real Ask composition for each authenticated tenant and ignores submitted answer/tenant (98.7859ms)
+✔ missing credentials and missing Ask scope prevent all retrieval (22.5456ms)
+SyntaxError: Unexpected token 'n', "null" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at createStrictSyntaxError (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:137:10)
+    at parse (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:86:15)
+    at C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1736:12)
+✔ invalid drafts and query budget fail before retrieval (35.1018ms)
+✔ missing tenant tree and bounded source failures report honest errors (17.514ms)
+✔ actual createServer mounts simulation behind shared auth and existing Ask dependencies (28.8096ms)
+✔ versioned history records who, what and when; earlier rows never change (6.4964ms)
+✔ stale or missing expectedVersion is refused, never silently overwritten (1.227ms)
+✔ concurrent saves of the same version: exactly one wins (1.16ms)
+✔ policies cannot override grounded evidence: citation/evidence/source fields are refused (1.3105ms)
+✔ input validation (0.7618ms)
+✔ conflict detector explains contradictions for the same question class only (13.7146ms)
+✔ retired policies leave conflicts; open conflict items are superseded, resolved ones keep their record (1.7368ms)
+✔ review queue: every change and conflict is queued, deduped, and resolvable once with a note (1.7374ms)
+✔ tenant isolation: history, list, conflicts, queue and resolve never cross tenants (1.8215ms)
+✔ store refuses rows whose tenant differs from the call tenant (0.7151ms)
+✔ evaluation: citations stay mandatory whatever the policy says; policies only tighten (1.3839ms)
+✔ ISS-004: question classes fold case, separators and plurals; acknowledged conflicts survive a version bump (2.8102ms)
+ℹ tests 48
+ℹ suites 0
+ℹ pass 47
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6919.1509
+
+✖ failing tests:
+
+test at apps\api\src\answer-policy\answer-persistence.test.ts:1:4657
+✖ answer-record production guard stays closed by default; feedback cap is enforced in the actual Mongo update filter (3.2036ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /refuses database/. Input:
+  
+  'Error: answer records refuse database "lkb"'
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\answer-policy\answer-persistence.test.ts:56:77)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: answer records refuse database "lkb"
+        at createMongoAnswerRecordStore (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\answer-policy\answer-mongo-store.ts:13:67)
+        at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\answer-policy\answer-persistence.test.ts:56:90)
+        at getActual (node:assert:611:5)
+        at strict.throws (node:assert:759:24)
+        at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\answer-policy\answer-persistence.test.ts:56:77)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1382:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+        at Test.postRun (node:internal/test_runner/test:1522:19)
+        at Test.run (node:internal/test_runner/test:1447:12),
+    expected: /refuses database/,
+    operator: 'throws',
+    diff: 'simple'
+  }

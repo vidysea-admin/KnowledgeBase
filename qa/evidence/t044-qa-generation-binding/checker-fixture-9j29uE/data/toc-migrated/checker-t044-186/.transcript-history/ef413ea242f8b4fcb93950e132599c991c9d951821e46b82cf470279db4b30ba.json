@@ -1,0 +1,11 @@
+[
+  {
+    "_id": "checker-t044-186-t-1a1148c33a141f5219445d3f139100ada7e56da278023f33918ac4b055c06b6a",
+    "tenantId": "checker-tenant",
+    "sessionId": "checker-t044-186",
+    "speakerRef": "speaker:0",
+    "tStart": 0,
+    "tEnd": 186,
+    "text": "changed transcript with unchanged count"
+  }
+]

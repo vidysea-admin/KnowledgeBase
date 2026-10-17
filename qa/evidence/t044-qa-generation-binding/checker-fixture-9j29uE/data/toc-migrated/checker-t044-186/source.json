@@ -1,0 +1,10 @@
+{
+  "_id": "checker-t044-186-source",
+  "tenantId": "checker-tenant",
+  "title": "Independent synthetic QA boundary probe",
+  "createdAt": "2026-10-14T20:14:38Z",
+  "captureMode": "silent",
+  "audioLevel": {
+    "silent": false
+  }
+}

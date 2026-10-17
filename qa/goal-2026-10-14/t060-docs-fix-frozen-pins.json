@@ -1,0 +1,27 @@
+{
+  "authority": "Root finite T060 C3 docs and affected fixture correction",
+  "frozenAt": "2026-10-14T23:18:16.4252166Z",
+  "paths": [
+    {
+      "path": "apps/api/src/routes/stubs.ts",
+      "sha256": "5B998AED46507F04D2CF9728EAFA859D0CA82D04FD191508199EEF9B09B4DCFD"
+    },
+    {
+      "path": "apps/api/src/routes/pages.ts",
+      "sha256": "0A2C268A974B07CEC4329717FFA669C4AEB71C62507ADEEB8F212A05BACA1144"
+    },
+    {
+      "path": "apps/api/src/routes/pages.test.ts",
+      "sha256": "30F7AF74CB62AF2BA5AC74C42FF5078450BC122FC748C9302EC7C2225A51E8CF"
+    },
+    {
+      "path": "apps/api/src/server.test.ts",
+      "sha256": "9067C703E326E22E7D139BD915ACA8160AC566CE74632785164C19EAB8BE09A0"
+    }
+  ],
+  "qaContractEdits": false,
+  "runtimeAuthEdits": false,
+  "privateProviderOrDb": false,
+  "priorCheckpoint": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T225425Z.json",
+  "priorCheckpointCurrentForTheseBytes": false
+}

@@ -101,3 +101,152 @@ No actual runner invokes reconcileWebinarSources or supplies changedSince yet. N
 ## D-061 Gmail acquisition scope repair
 Existing query removes newer_than:30d and includes all seven classifier-positive forms, generic invitations and ICS filenames; unknown platform/attachment matches stay conservative candidates without invented join or time. Existing whole-acquisition pagination/content refusal retained. Root exact query-driven regression command node --test --import tsx --test-name-pattern 'each classifier-positive' apps/api/src/gws-gmail.test.ts exited1/pass0/fail1: Career seminar0vs1. Final affected Gmail/routes/policy/runner command from preceding checkpoint exits0/63passed; APItsc0. Independent checker63/63/APItypes0 and fresh read-only code review23/23 scoped Approve. Named senior spawn rejected agent-thread limit; do not mislabel generic read-only reviewer as named senior.
 Next required integration uses complete available primary Calendar baseline with terminal nextSyncToken, separate rolling recurrence materialization, native sync deltas, atomic tenant-owned operations/source/mirror/token envelope and explicit discontinuity on410. Unknown historical deletion reconstruction is unavailable, not fabricated complete history. Full implementation contract still requires independent plan approval before next edits. No new user scope gate inferred; no permanent blocked initial-launch design accepted. ISS013OPEN/fullNOTVERIFIED; canonical-schema approval rejection and real provider/index/Ask/Telegram/AV/restart/Ubuntu proofs remain.
+
+## Independent sustained capture criterion supplement — 2026-10-01
+Bounded Windows synthetic >=60min capture PASS only: actual production-sustained-result-1790799479728 terminalCLIexit0/ACKaccepted; independent audio3602.001/video3602.033/container3602.050s, AVdecodepeak-17.2dB,71880unique frames, durableownedcancelledgap/action_required and exactcleanup. Nullmux timestampwarnings retained. Commands/limits/outputs in existingverdict. This supplements duration/capture evidence; does not close C7/L1-L3 or establish realwebinar/Ubuntu/longheadedplayback/seek/fullknowledge/index/Ask/Telegram/serviceactivation. Historical checkpoint paragraphs above remain history. Overall manifest in_progress/fullNOTVERIFIED,ISS013OPEN.
+
+## Current operational prerequisite audit while protocol decision is pending
+Root read entire objective and ran `node scripts/webinar/setup.mjs --doctor`: session87496 terminalexit0, cached pinned Corepack pnpm10.33.0 accepted, Node>=24/ffmpeg/ffprobe/Python+libraries/CFT and managed driver version match OK; direct pnpm fallback missing/mismatched does not invalidate accepted pinned route. No dependencies installed. Secret-safe key presence check in project .env and inherited process environment finds no configured MONGO_WORK_DB, LKB_TENANT_ID or LKB_API_KEY, nor configured Gmail alias/label scopes in either source. Project .env Telegram token/chat keys absent-or-empty. This is concrete missing runner prerequisites for this execution environment, not a claim that no mailbox/credentials exist elsewhere. No token values printed, API/mail calls, external registration, production writes or service activation performed. Pending in-flight protocol/test ownership question does not convert elapsed time or automatic goal continuation into migration authorization. Full T051/T052/live Windows/Ubuntu/KB acceptance remains incomplete.
+Root current safe proof-file check additionally reports liveProofExists=false for data/webinar-release/live-proof.json. Existing validateRunGate requires this actual platform-specific media proof before unattended run; no fabricated proof file or activation performed.
+
+## Local product preview restored without live activation
+Root loopback reachability audit: API http://127.0.0.1:3300/health and web http://127.0.0.1:5173/ both URLError before startup. Existing web app started through `node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5173 --strictPort` from apps/web; owned unified exec session29309 reports Vite6.0.5 ready2316ms. Post-start HTTP200 with existing root element and Vite client proves local HTML delivery only; no rendered UI, backend, mail or production deployment claim. API remains unconnected and work-lane credentials/live-proof absent. No source change, package installation, production writes, outbound messages or unattended pipeline activation. Local preview gives a concrete review surface while protocol migration authorization is pending.
+
+## Actual rendered local product boundary
+Root current owned Vite session29309 polled live (no duplicate server). CUA in-app browser opened http://127.0.0.1:5173/ and returned actual AXWebArea title Vidysea Living Knowledge Base, heading Living Knowledge Base, visible text Paste your API key to continue, API key field and Continue button. This proves the existing app renders its authentication entry screen, not merely HTML200. Tab1 marked deliverable for operator review. No credentials entered, no authentication bypass/mock tenant, no Ask answer or connected backend claim. Missing authorized API key/backend remains the concrete next live-product boundary.
+
+## Original KnowledgeBase extraction baseline inspection (U2.2)
+While T052 in-flight test-ownership decision is pending, root reviewed dependency-ready original roadmap task U2.2 without implementing or bypassing higher-priority queue. Existing claims-write-targeting prerequisite independently checked-PASS; U2.2 still open. Fresh named ai-engineer spawn failed current runtime agent-thread limit; reused registration_resource_plan for equivalent read-only planning with ai-engineer skill, no claim of fresh named role or acceptance. Higher-priority ISS367 remains cycle2 ready-for-check with historical cycle1FAIL and duplicated handshake lines; no green release inference.
+Scoped local artifact inventory `data/toc-migrated` actual Python exit0:29 nonempty transcripts/3427turns,29claims files of which23nonempty,72claims/80evidence rows,zero claims without evidence. Evidence shape is turnId/sessionId only; all80 have no embedded tEnd. This is not classified as a defect: harness must resolve actual referenced turns for timestamps and semantic support, not mark absence of denormalized time as hallucination. The29dirs require provenance reconciliation to original23TOC and newer sources before coverage claims. No live model call, DB read/write, application/test edit, export or fabricated gold labels. U2.2 complete harness plan pending; no task completion claimed.
+
+
+## U2.2 measured local citation-integrity baseline (not semantic judgment)
+Root actual file-only audit:72claims/80evidence rows;66same-session references resolve to turns with start/end,14missingTurn across8 sessions;no missingSession/cross-session reference. No DB parity claim or fabricated repair. Corpus below is the reproducible floor to check before extraction quality claims; current-source hashes freeze both sides.
+```json
+{
+  "unresolvedReferences": [
+    {
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+      "turnId": "2026-05-20-telling-your-brand-story-better-t049"
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "turnId": "2026-05-29-decoding-ever-expanding-cast-t161"
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "turnId": "2026-05-29-decoding-ever-expanding-cast-t190"
+    },
+    {
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+      "turnId": "2026-06-03-dual-enrollment-pathway-t092"
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+      "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051"
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+      "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060"
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+      "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059"
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+      "turnId": "2026-06-30-exploring-identity-success-counseling-t085"
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+      "turnId": "2026-06-30-exploring-identity-success-counseling-t073"
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+      "turnId": "2026-08-03-uk-beyond-offer-letters-t061"
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+      "turnId": "2026-08-12-uniaccess-ashoka-university-t106"
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+      "turnId": "2026-08-12-uniaccess-ashoka-university-t084"
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+      "turnId": "2026-08-12-uniaccess-ashoka-university-t058"
+    },
+    {
+      "sessionId": "2026-08-27-in-focus-4",
+      "claimId": "2026-08-27-in-focus-4-c03",
+      "turnId": "2026-08-27-in-focus-4-t102"
+    }
+  ],
+  "inputHashes": {
+    "2026-05-20-telling-your-brand-story-better": {
+      "turnsSha256": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e",
+      "claimsSha256": "159e46f0c93ff279270b0b3f52ff2a28f04362cc1e5f87b0320adc2ff50ee486"
+    },
+    "2026-05-29-decoding-ever-expanding-cast": {
+      "turnsSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+      "claimsSha256": "479f7b6bb6a3f88ad11dcc043e9694d5c55edeed6aff3dd62b7ffecbca8d47e9"
+    },
+    "2026-06-03-dual-enrollment-pathway": {
+      "turnsSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+      "claimsSha256": "5bb0eeda41f1fadfbd49225f50827b88caa00a7a7662c5de50369e5ab8ac815a"
+    },
+    "2026-06-19-entrance-exams-pathways-india-part1": {
+      "turnsSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+      "claimsSha256": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a"
+    },
+    "2026-06-30-exploring-identity-success-counseling": {
+      "turnsSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+      "claimsSha256": "f446a1e98bf45d90cddc9080afaa8ccb62a71902941151366fa82a5e0fb421c5"
+    },
+    "2026-08-03-uk-beyond-offer-letters": {
+      "turnsSha256": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+      "claimsSha256": "a3246bf7e5e63030c485ac6e3c3177e2c9063037a2c555dc131fa23a8e74f421"
+    },
+    "2026-08-12-uniaccess-ashoka-university": {
+      "turnsSha256": "a0e8eabe5300cc91dd2cccf2b725c87200a4bfa86c23fb1106965f4d05bd0387",
+      "claimsSha256": "bc4d274d03b0a9ea788f293cd0ed4f14c295fcfb13d089faacc8b9156587e1a7"
+    },
+    "2026-08-27-in-focus-4": {
+      "turnsSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+      "claimsSha256": "b0797f2bbde03e7545b3a606e697eac9788b620da172c4a47e1f636f8dd05d05"
+    }
+  }
+}
+```
+
+## U2.2 concrete reviewed harness scope (not implementation authorization)
+Equivalent scoped AI-engineering plan returned WARNING: extraction contract absent docs/spec.md60; approved docs/plan.md36 requests fixed extraction corpus/harness and entity-promotion contractC8 additionally requires topic precision. Existing extractClaims67 filters invalid IDs, so final-output cited-ID metric alone hides raw hallucination and valid-ID unsupported claims. Minimum complete offline harness separately captures raw/parsed/filtered/degraded outputs; deterministic source/tenant/ID/span/attribution/time validation; independently reviewed semantic support/contradiction/omission labels; topic/person precision; strict per-case denominators/hashes/incomplete-case inventory and replay. No invented numeric release threshold, live writes, overload of answer eval_runs schema, or paid-model data export.
+Existing retrieval/calibration scripts must retain their independent purposes. Concrete cohesive proposed new files packages/index/src/eval/extraction.ts and scripts/eval-extraction.mjs, versioned corpus/report under data/eval; none created. Explicit new-file authorization required by project anti-drift constraint; initial extraction contract/independent label review and tier1 ISS367 resolution still pending. Existing claims/source/summary/topic seams and indexSession downstream remain the owners; no app/test/contract/data repair performed. Full original TOC/WhatsApp/new-webinar scope, original14unresolved-reference corpus, and explicit original23-vs29source reconciliation retained.
+
+## Original23 versus current29 local source reconciliation
+Actual file-only Python audit reads each nonempty turns/source/session artifact, excludes six synthetic directories, and joins original23 content filenames to source.path basename. {"original_assets": 23, "original_session_rows": 23, "additional_session_rows": 6, "real_sessions": 29, "turns": 3427, "existing_source_paths": 28, "missing_source_sessions": ["2026-09-24-zoho-next-european-study-destinations"], "retained_audio_exists": true}
+All23 original transcript source paths resolve. Six additionalSeptember sources are separate; 5of6 storedsourcepaths resolve. The Zoho source retains hash metadata for raw/webinars/2026-09-24 15-55-54.mkv, now absent; related named m4a exists, but no verified conversion/retention lineage links those bytes, so source substitution is not authorized. The two Aug03 UK assets remain separate records pending duplicate/version review, not two proven independent events. This proves local inventory/path coverage only, not Mongo/index parity, source-content equality, diarization quality or live cited Ask. No transcript/source/claim rows altered.
+
+## Zoho media lineage evidence refinement
+Historical raw/webinars/finalize-2026-09-24.log lines5-10 records stoppedMKV3599045544bytes, derivativeaudio named 2026-09-24-zoho-next-european-study-destinations.m4a and78.4min duration. Thus conversion is historically recorded, refining the preceding lack-of-lineage statement; it does not prove current missingMKV byteidentity or authorized deletion. Current originalaudio ffprobe exit0 duration4703.082s/42771432bytes SHA256d89bb3d4a46e298c7207964627b7f1580af79b937697cde39199f8c9671fdf37, not equal to stored sourcehash. Current trimmed derivative: {"audio_file": "2026-09-24-zoho-europe-trimmed.m4a", "audio_sha256": "a7a3356b33474dc4d5aae09718c094c9b8d3236361a556871b57f268c126412f", "probe_exit": 0, "duration_seconds": "3705.018000", "bytes": "42394012", "local_turn_count": 80, "max_turn_end": 3724}
+D028 historical decision describes singlecall80turn transcription over trimmed61.8min and missingeventtail; that history is not current DB readback or full-event completion proof. Preserve missing original/source hash and both derivatives separately; no path/hash/session/source/claim rewrite, model call or production write performed.
+
+## Zoho canonical-media timestamp boundary check
+Current trimmed audio ffprobe exit0: duration3705.018s,42394012bytes,SHA256a7a3356b33474dc4d5aae09718c094c9b8d3236361a556871b57f268c126412f. Legacy turn t080 spans3694..3724,18.982s beyond trimmed duration. Actual current process-video validateTurns over the same80rows refuses trimmed3705.018 but accepts originalaudio4703.082. Therefore validator behavior is already protective when the correct media duration is supplied; do not rebuild or weaken it. This is a canonical-media/time-origin lineage gap in the legacy artifact, not proof that all80turns lack support or that current capture validation is broken. D028 describes trimmedaudio80turn inference, while source.json still names missing originalMKV. Correct worklane repair needs explicit original/derivative binding, trim offsets and boundary disposition, preserving cited turn IDs and evidence. No row rewrite or guessed clipping performed; current liveDB parity remains unverified.
+## D107/D109 isolated runtime evidence
+Owned work container lkb-work-01a10ba6 (fa6b2875898f45c22e4b85e9489fbaa519bfc3d6777a323665c3f61b187f1a07), cachedmongo7, localhost27019 only, projectdata/mongo-work-01a10ba6,512MB/1CPU. Existing Docker engine29.6.1; no imagepull/othercontainers modified. Work database lkb_work_webinar_20261005, tenanttoc, operational owner authenticated umeshsugara@vidysea.com. Existing API production assembly localhost3300 owned execsession50464, processenvironment workURI/configdir/PATH/CORS only; original.env untouched. Raw API credential kept in userTEMP/lkb-work-01a10ba6.key, never printed. HealthHTTP200/dbok. Actual sync CalendarHTTP200/completebaseline209sourceevents/13windowmeetings; guard routes operations x-lkb-tenant=toc, candidates x-lkb-work-db=lkb_work_webinar_20261005. Readonly runPipelineTick preview succeeds13skipped, writesfalse/capturefalse; Gmail cached-empty is not complete mailbox proof. Complete mailbox listing1907IDs, acquisition timeout retained, no partial persistedscan.
+Sample2026-04-21-visa-blueprint-part2-italy-france-nz prechecked references, existingseed-toc inserts source1/session1/turns291/page1/claims6 then existingdeterministic treebuilder. Existing API sixcitationroutes200, sevenevidence rows7/7resolve actualturn+session. Searchvisa/k5HTTP200/5hits/5resolved, sessions200/count1. Modelcalls0. August27sample held because1of3references absent. D109 corrects D107 referencecount6 to7. This is isolated sample/downstream proof; remaining fullcorpus/index/realAsk/unattendedregistration/capture/restart/alerts/Ubuntu and independentacceptance obligations remain.

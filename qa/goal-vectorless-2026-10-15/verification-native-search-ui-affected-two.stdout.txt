@@ -1,0 +1,11 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/search/SearchPage.test.tsx (17 tests | 15 skipped) 637ms
+   ✓ SearchPage actual client/fake HTTP workflow > proposed real App/Nav seam mounts Search without querying and opens the actual transcript consumer 577ms
+
+ Test Files  1 passed (1)
+      Tests  2 passed | 15 skipped (17)
+   Start at  11:37:09
+   Duration  7.52s (transform 1.93s, setup 227ms, collect 5.33s, tests 637ms, environment 847ms, prepare 177ms)
+

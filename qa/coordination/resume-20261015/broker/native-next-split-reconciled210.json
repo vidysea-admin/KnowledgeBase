@@ -1,0 +1,3552 @@
+{
+  "originalCount": 206,
+  "currentTerminalCount": 210,
+  "originalCases": [
+    {
+      "original": {
+        "title": "authenticated review uses verified actor/current roles transaction; observed metadata excludes paths and credentials",
+        "outcome": "pass",
+        "durationMs": 109.7999,
+        "suffix": ""
+      },
+      "current": {
+        "title": "authenticated review uses verified actor/current roles transaction; observed metadata excludes paths and credentials",
+        "outcome": "pass",
+        "durationMs": 81.4215,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "missing scopes/auth/actor and body tenant/actor injection never issue acceptance; unrelated paths stay reachable",
+        "outcome": "pass",
+        "durationMs": 99.1243,
+        "suffix": ""
+      },
+      "current": {
+        "title": "missing scopes/auth/actor and body tenant/actor injection never issue acceptance; unrelated paths stay reachable",
+        "outcome": "pass",
+        "durationMs": 99.1972,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "authoritative role refusal and stale reviewer result cannot report acceptance or leak exceptions",
+        "outcome": "pass",
+        "durationMs": 16.0579,
+        "suffix": ""
+      },
+      "current": {
+        "title": "authoritative role refusal and stale reviewer result cannot report acceptance or leak exceptions",
+        "outcome": "pass",
+        "durationMs": 20.8789,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "host bridge is constructor-lazy and requires its authoritative transaction for mutations",
+        "outcome": "pass",
+        "durationMs": 2.7223,
+        "suffix": ""
+      },
+      "current": {
+        "title": "host bridge is constructor-lazy and requires its authoritative transaction for mutations",
+        "outcome": "pass",
+        "durationMs": 5.6762,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "real transcript factory is lazy and enforces D168 exact production database opt-in",
+        "outcome": "pass",
+        "durationMs": 2.9384,
+        "suffix": ""
+      },
+      "current": {
+        "title": "real transcript factory is lazy and enforces D168 exact production database opt-in",
+        "outcome": "pass",
+        "durationMs": 2.5141,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction",
+        "outcome": "pass",
+        "durationMs": 80.4188,
+        "suffix": ""
+      },
+      "current": {
+        "title": "actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction",
+        "outcome": "pass",
+        "durationMs": 69.7883,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers",
+        "outcome": "fail",
+        "durationMs": 1.8618,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unsupported transactions explicitly refuse refresh and retain committed correction/pending intent without derived knowledge or provider calls",
+        "outcome": "pass",
+        "durationMs": 2.571,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null,
+      "mapping": {
+        "authority": "root explicit latest adoption; atomic-api/stage3/packet.md T054clauses8/9",
+        "oldTitle": "unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers",
+        "newTitle": "unsupported transactions explicitly refuse refresh and retain committed correction/pending intent without derived knowledge or provider calls",
+        "reason": "Unsupported required joint transaction cannot durably write failed bookkeeping; explicit refusal retains committed correction/pending intent and zero derived/provider writes. Material approved expectation repair, not identical assertions."
+      }
+    },
+    {
+      "original": {
+        "title": "actual review factory judge outage retains the correction and rolls back all derived targets",
+        "outcome": "pass",
+        "durationMs": 9.998,
+        "suffix": ""
+      },
+      "current": {
+        "title": "actual review factory judge outage retains the correction and rolls back all derived targets",
+        "outcome": "pass",
+        "durationMs": 10.311,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "refresh notifies only after its outer commit and hook failure preserves completed knowledge",
+        "outcome": "pass",
+        "durationMs": 27.9737,
+        "suffix": ""
+      },
+      "current": {
+        "title": "refresh notifies only after its outer commit and hook failure preserves completed knowledge",
+        "outcome": "pass",
+        "durationMs": 16.6398,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "failed refresh never calls the archive hook",
+        "outcome": "pass",
+        "durationMs": 7.1803,
+        "suffix": ""
+      },
+      "current": {
+        "title": "failed refresh never calls the archive hook",
+        "outcome": "pass",
+        "durationMs": 5.901,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual index and post-commit readback join source/effective transcript/current capture",
+        "outcome": "pass",
+        "durationMs": 14.2845,
+        "suffix": ""
+      },
+      "current": {
+        "title": "actual index and post-commit readback join source/effective transcript/current capture",
+        "outcome": "pass",
+        "durationMs": 76.2814,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "missing source remains pending and changed receipt/generation never gains read authority",
+        "outcome": "pass",
+        "durationMs": 39.3463,
+        "suffix": ""
+      },
+      "current": {
+        "title": "missing source remains pending and changed receipt/generation never gains read authority",
+        "outcome": "pass",
+        "durationMs": 61.3534,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "capture readback race and incomplete review refuse after a valid index",
+        "outcome": "pass",
+        "durationMs": 9.1754,
+        "suffix": ""
+      },
+      "current": {
+        "title": "capture readback race and incomplete review refuse after a valid index",
+        "outcome": "pass",
+        "durationMs": 11.2256,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "real batch accessor commits a stamped suggestion and a real session increment; duplicate leaves row intact",
+        "outcome": "pass",
+        "durationMs": 14.2082,
+        "suffix": ""
+      },
+      "current": {
+        "title": "real batch accessor commits a stamped suggestion and a real session increment; duplicate leaves row intact",
+        "outcome": "pass",
+        "durationMs": 54.4706,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "concurrent actual first review insert wins; entire publication rolls back",
+        "outcome": "pass",
+        "durationMs": 8.2613,
+        "suffix": ""
+      },
+      "current": {
+        "title": "concurrent actual first review insert wins; entire publication rolls back",
+        "outcome": "pass",
+        "durationMs": 11.2868,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "replacement and every refresh state update participate in the same session fence",
+        "outcome": "pass",
+        "durationMs": 8.9382,
+        "suffix": ""
+      },
+      "current": {
+        "title": "replacement and every refresh state update participate in the same session fence",
+        "outcome": "pass",
+        "durationMs": 10.002,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "DB-first consent revocation conflicts with in-flight publication; callback failure restores prior source",
+        "outcome": "pass",
+        "durationMs": 11.6593,
+        "suffix": ""
+      },
+      "current": {
+        "title": "DB-first consent revocation conflicts with in-flight publication; callback failure restores prior source",
+        "outcome": "pass",
+        "durationMs": 9.5723,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "second batch insert failure, stale binding, malformed/overflow fence, shared owner and unsupported transaction refuse",
+        "outcome": "pass",
+        "durationMs": 13.7486,
+        "suffix": ""
+      },
+      "current": {
+        "title": "second batch insert failure, stale binding, malformed/overflow fence, shared owner and unsupported transaction refuse",
+        "outcome": "pass",
+        "durationMs": 19.2184,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "caller-forged reserved publication metadata is refused before insertion",
+        "outcome": "pass",
+        "durationMs": 10.8399,
+        "suffix": ""
+      },
+      "current": {
+        "title": "caller-forged reserved publication metadata is refused before insertion",
+        "outcome": "pass",
+        "durationMs": 10.3836,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "source swap refuses caller reset of server-owned revision and rolls back",
+        "outcome": "pass",
+        "durationMs": 5.7736,
+        "suffix": ""
+      },
+      "current": {
+        "title": "source swap refuses caller reset of server-owned revision and rolls back",
+        "outcome": "pass",
+        "durationMs": 10.7388,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unconfigured post-commit hook performs no persistence reads",
+        "outcome": "pass",
+        "durationMs": 0.2496,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unconfigured post-commit hook performs no persistence reads",
+        "outcome": "pass",
+        "durationMs": 1.3352,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "pending, missing and foreign index generations never notify archive consumers",
+        "outcome": "pass",
+        "durationMs": 1.2621,
+        "suffix": ""
+      },
+      "current": {
+        "title": "pending, missing and foreign index generations never notify archive consumers",
+        "outcome": "pass",
+        "durationMs": 2.0093,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "public exact T040 reviewed fee paraphrase survives actual grounded writer and current generation reader",
+        "outcome": "pass",
+        "durationMs": 5.0355,
+        "suffix": ""
+      },
+      "current": {
+        "title": "public exact T040 reviewed fee paraphrase survives actual grounded writer and current generation reader",
+        "outcome": "pass",
+        "durationMs": 58.2828,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "public current-bound invalid reviewed evidence refuses while a detached foreign row stays unconsumed",
+        "outcome": "pass",
+        "durationMs": 11.625,
+        "suffix": ""
+      },
+      "current": {
+        "title": "public current-bound invalid reviewed evidence refuses while a detached foreign row stays unconsumed",
+        "outcome": "pass",
+        "durationMs": 24.5838,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "public completed reviewed receipt refuses edited canonical digest and changed current source provenance",
+        "outcome": "pass",
+        "durationMs": 14.2363,
+        "suffix": ""
+      },
+      "current": {
+        "title": "public completed reviewed receipt refuses edited canonical digest and changed current source provenance",
+        "outcome": "pass",
+        "durationMs": 16.0634,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "public freshly generated fee paraphrase fails the extractive gate despite synthetic same judge",
+        "outcome": "pass",
+        "durationMs": 2.2709,
+        "suffix": ""
+      },
+      "current": {
+        "title": "public freshly generated fee paraphrase fails the extractive gate despite synthetic same judge",
+        "outcome": "pass",
+        "durationMs": 4.8397,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1",
+        "outcome": "pass",
+        "durationMs": 0.2452,
+        "suffix": ""
+      },
+      "current": {
+        "title": "flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1",
+        "outcome": "pass",
+        "durationMs": 1.4462,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "suggest writes a status=suggested row with its quote, and NEVER a speakers row",
+        "outcome": "pass",
+        "durationMs": 14.1679,
+        "suffix": ""
+      },
+      "current": {
+        "title": "suggest writes a status=suggested row with its quote, and NEVER a speakers row",
+        "outcome": "pass",
+        "durationMs": 19.9272,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a verifier that does not say yes yields no suggestion",
+        "outcome": "pass",
+        "durationMs": 2.0834,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a verifier that does not say yes yields no suggestion",
+        "outcome": "pass",
+        "durationMs": 2.5013,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "an ungrounded name (quote not in the transcript) is not suggested",
+        "outcome": "pass",
+        "durationMs": 0.4721,
+        "suffix": ""
+      },
+      "current": {
+        "title": "an ungrounded name (quote not in the transcript) is not suggested",
+        "outcome": "pass",
+        "durationMs": 0.6049,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched",
+        "outcome": "fail",
+        "durationMs": 5.3296,
+        "suffix": ""
+      },
+      "current": {
+        "title": "re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched",
+        "outcome": "pass",
+        "durationMs": 8.156,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a model that throws never throws out of the hook and writes nothing",
+        "outcome": "pass",
+        "durationMs": 0.5651,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a model that throws never throws out of the hook and writes nothing",
+        "outcome": "pass",
+        "durationMs": 0.6211,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key",
+        "outcome": "pass",
+        "durationMs": 10.0975,
+        "suffix": ""
+      },
+      "current": {
+        "title": "indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key",
+        "outcome": "pass",
+        "durationMs": 30.6151,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers`",
+        "outcome": "pass",
+        "durationMs": 5.7251,
+        "suffix": ""
+      },
+      "current": {
+        "title": "indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers`",
+        "outcome": "pass",
+        "durationMs": 6.936,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence)",
+        "outcome": "fail",
+        "durationMs": 3.6637,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence)",
+        "outcome": "pass",
+        "durationMs": 2.5273,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw",
+        "outcome": "pass",
+        "durationMs": 1.4821,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw",
+        "outcome": "pass",
+        "durationMs": 1.7263,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues",
+        "outcome": "pass",
+        "durationMs": 65.6893,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues",
+        "outcome": "pass",
+        "durationMs": 52.1404,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "indexSession still completes when the suggestion hook fails",
+        "outcome": "pass",
+        "durationMs": 3.5626,
+        "suffix": ""
+      },
+      "current": {
+        "title": "indexSession still completes when the suggestion hook fails",
+        "outcome": "pass",
+        "durationMs": 4.422,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins",
+        "outcome": "pass",
+        "durationMs": 0.242,
+        "suffix": ""
+      },
+      "current": {
+        "title": "production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins",
+        "outcome": "pass",
+        "durationMs": 0.2438,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "default/off performs no capture or database access; env opt-in is exact",
+        "outcome": "pass",
+        "durationMs": 1.067,
+        "suffix": ""
+      },
+      "current": {
+        "title": "default/off performs no capture or database access; env opt-in is exact",
+        "outcome": "pass",
+        "durationMs": 3.7268,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "four synthetic panelists: measured offset -> suggestions -> review -> explicit human confirmation",
+        "outcome": "pass",
+        "durationMs": 20.5724,
+        "suffix": ""
+      },
+      "current": {
+        "title": "four synthetic panelists: measured offset -> suggestions -> review -> explicit human confirmation",
+        "outcome": "pass",
+        "durationMs": 33.9943,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "tile/introduction agreement stays suggested; transcript text and timing unchanged",
+        "outcome": "pass",
+        "durationMs": 10.8772,
+        "suffix": ""
+      },
+      "current": {
+        "title": "tile/introduction agreement stays suggested; transcript text and timing unchanged",
+        "outcome": "pass",
+        "durationMs": 10.2068,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirmed and rejected decisions survive rerun; no new names for confirmed labels/people",
+        "outcome": "pass",
+        "durationMs": 7.0861,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirmed and rejected decisions survive rerun; no new names for confirmed labels/people",
+        "outcome": "pass",
+        "durationMs": 10.5148,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "foreign tenant/session/media/capture instance refuses sidecar before any writes",
+        "outcome": "pass",
+        "durationMs": 3.0019,
+        "suffix": ""
+      },
+      "current": {
+        "title": "foreign tenant/session/media/capture instance refuses sidecar before any writes",
+        "outcome": "pass",
+        "durationMs": 3.9318,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "populated foreign tenant with colliding session/label/person stays byte-identical",
+        "outcome": "fail",
+        "durationMs": 7.6162,
+        "suffix": ""
+      },
+      "current": {
+        "title": "populated foreign tenant with colliding session/label/person stays byte-identical",
+        "outcome": "pass",
+        "durationMs": 8.9916,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows",
+        "outcome": "fail",
+        "durationMs": 5.4425,
+        "suffix": ""
+      },
+      "current": {
+        "title": "second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows",
+        "outcome": "pass",
+        "durationMs": 24.7518,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unknown clock, bad origins and foreign turns refuse before loader/database access",
+        "outcome": "pass",
+        "durationMs": 1.0502,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unknown clock, bad origins and foreign turns refuse before loader/database access",
+        "outcome": "pass",
+        "durationMs": 2.0585,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "exact digest, sole first metadata, source, monotonic time and confidence validation",
+        "outcome": "pass",
+        "durationMs": 2.8161,
+        "suffix": ""
+      },
+      "current": {
+        "title": "exact digest, sole first metadata, source, monotonic time and confidence validation",
+        "outcome": "pass",
+        "durationMs": 4.1871,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "pre-recording samples clipped, confidence preserved, samples beyond recording discarded",
+        "outcome": "pass",
+        "durationMs": 0.3254,
+        "suffix": ""
+      },
+      "current": {
+        "title": "pre-recording samples clipped, confidence preserved, samples beyond recording discarded",
+        "outcome": "pass",
+        "durationMs": 0.686,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "low-confidence, no overlap, conflicting tiles and tile-intro disagreement do not guess names",
+        "outcome": "pass",
+        "durationMs": 10.0713,
+        "suffix": ""
+      },
+      "current": {
+        "title": "low-confidence, no overlap, conflicting tiles and tile-intro disagreement do not guess names",
+        "outcome": "pass",
+        "durationMs": 15.0404,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "loader cannot change trusted origins; thrown failures return fixed safe reasons",
+        "outcome": "pass",
+        "durationMs": 2.3818,
+        "suffix": ""
+      },
+      "current": {
+        "title": "loader cannot change trusted origins; thrown failures return fixed safe reasons",
+        "outcome": "pass",
+        "durationMs": 2.5491,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "native publication rechecks current registry after async lookups and inside writer",
+        "outcome": "pass",
+        "durationMs": 4.4459,
+        "suffix": ""
+      },
+      "current": {
+        "title": "native publication rechecks current registry after async lookups and inside writer",
+        "outcome": "pass",
+        "durationMs": 4.0293,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "native publication writes only through trusted transaction and leaves names unconfirmed",
+        "outcome": "pass",
+        "durationMs": 2.0235,
+        "suffix": ""
+      },
+      "current": {
+        "title": "native publication writes only through trusted transaction and leaves names unconfirmed",
+        "outcome": "pass",
+        "durationMs": 2.0432,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog",
+        "outcome": "pass",
+        "durationMs": 5.2975,
+        "suffix": ""
+      },
+      "current": {
+        "title": "strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog",
+        "outcome": "pass",
+        "durationMs": 40.3405,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ordinary source-bound publication refuses foreign evidence and forged supplied quotes",
+        "outcome": "pass",
+        "durationMs": 0.8771,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ordinary source-bound publication refuses foreign evidence and forged supplied quotes",
+        "outcome": "pass",
+        "durationMs": 1.0594,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "reviewed substring cannot bypass meaning verification of full negated source context",
+        "outcome": "pass",
+        "durationMs": 0.7271,
+        "suffix": ""
+      },
+      "current": {
+        "title": "reviewed substring cannot bypass meaning verification of full negated source context",
+        "outcome": "pass",
+        "durationMs": 1.2887,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory",
+        "outcome": "pass",
+        "durationMs": 7.3803,
+        "suffix": ""
+      },
+      "current": {
+        "title": "source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory",
+        "outcome": "pass",
+        "durationMs": 10.581,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "corrected effective source invalidates old receipt; reindex pins new source without vectors",
+        "outcome": "pass",
+        "durationMs": 9.6412,
+        "suffix": ""
+      },
+      "current": {
+        "title": "corrected effective source invalidates old receipt; reindex pins new source without vectors",
+        "outcome": "pass",
+        "durationMs": 14.3598,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts",
+        "outcome": "pass",
+        "durationMs": 7.6138,
+        "suffix": ""
+      },
+      "current": {
+        "title": "legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts",
+        "outcome": "pass",
+        "durationMs": 12.7845,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "native transaction boundary rolls back a mid-write failure and preserves the accepted generation",
+        "outcome": "pass",
+        "durationMs": 7.1085,
+        "suffix": ""
+      },
+      "current": {
+        "title": "native transaction boundary rolls back a mid-write failure and preserves the accepted generation",
+        "outcome": "pass",
+        "durationMs": 10.1836,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unsupported native transactions fail closed without a non-atomic retry",
+        "outcome": "pass",
+        "durationMs": 0.3903,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unsupported native transactions fail closed without a non-atomic retry",
+        "outcome": "pass",
+        "durationMs": 0.5133,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unknown commit retries cannot replay paid model calls or duplicate physical completion",
+        "outcome": "pass",
+        "durationMs": 8.6271,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unknown commit retries cannot replay paid model calls or duplicate physical completion",
+        "outcome": "pass",
+        "durationMs": 9.967,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "index hook runs after acknowledged commit and callback failure cannot replay publication",
+        "outcome": "pass",
+        "durationMs": 6.0721,
+        "suffix": ""
+      },
+      "current": {
+        "title": "index hook runs after acknowledged commit and callback failure cannot replay publication",
+        "outcome": "pass",
+        "durationMs": 10.0032,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "caller-owned index transaction does not notify before its outer commit",
+        "outcome": "pass",
+        "durationMs": 3.3856,
+        "suffix": ""
+      },
+      "current": {
+        "title": "caller-owned index transaction does not notify before its outer commit",
+        "outcome": "pass",
+        "durationMs": 4.9178,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "failed outer index commit never invokes post-commit work",
+        "outcome": "pass",
+        "durationMs": 4.0487,
+        "suffix": ""
+      },
+      "current": {
+        "title": "failed outer index commit never invokes post-commit work",
+        "outcome": "pass",
+        "durationMs": 4.9639,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set",
+        "outcome": "fail",
+        "durationMs": 2.516,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set",
+        "outcome": "pass",
+        "durationMs": 10.3001,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-274: buildProductionDeps constructs without throwing or requiring a live Mongo/network connection",
+        "outcome": "fail",
+        "durationMs": 1.2516,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-274: buildProductionDeps constructs without throwing or requiring a live Mongo/network connection",
+        "outcome": "pass",
+        "durationMs": 2.1522,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "production buildIndexer forwards trusted callback after acknowledged outer commit",
+        "outcome": "pass",
+        "durationMs": 8.0131,
+        "suffix": ""
+      },
+      "current": {
+        "title": "production buildIndexer forwards trusted callback after acknowledged outer commit",
+        "outcome": "pass",
+        "durationMs": 48.424,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "enqueue is immutable/durable/idempotent and cannot execute intake; tenant isolation survives reconstruction",
+        "outcome": "pass",
+        "durationMs": 131.535,
+        "suffix": ""
+      },
+      "current": {
+        "title": "enqueue is immutable/durable/idempotent and cannot execute intake; tenant isolation survives reconstruction",
+        "outcome": "pass",
+        "durationMs": 150.9698,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "claimed worker consumes actual complete fixture receipt before publishing; safe receipt survives restart",
+        "outcome": "pass",
+        "durationMs": 108.6081,
+        "suffix": ""
+      },
+      "current": {
+        "title": "claimed worker consumes actual complete fixture receipt before publishing; safe receipt survives restart",
+        "outcome": "pass",
+        "durationMs": 99.3333,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "two reconstructed workers cannot claim the same queued source concurrently",
+        "outcome": "pass",
+        "durationMs": 112.4259,
+        "suffix": ""
+      },
+      "current": {
+        "title": "two reconstructed workers cannot claim the same queued source concurrently",
+        "outcome": "pass",
+        "durationMs": 86.7954,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "incomplete downstream index never publishes success and never blindly retries",
+        "outcome": "pass",
+        "durationMs": 116.0928,
+        "suffix": ""
+      },
+      "current": {
+        "title": "incomplete downstream index never publishes success and never blindly retries",
+        "outcome": "pass",
+        "durationMs": 111.5819,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "expired/crashed attempt fences late writes and cannot be reclaimed by another worker",
+        "outcome": "pass",
+        "durationMs": 105.1944,
+        "suffix": ""
+      },
+      "current": {
+        "title": "expired/crashed attempt fences late writes and cannot be reclaimed by another worker",
+        "outcome": "pass",
+        "durationMs": 100.4734,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "current authorization refusal and thrown execution retain safe uncertainty with no diagnostic leakage",
+        "outcome": "pass",
+        "durationMs": 174.9412,
+        "suffix": ""
+      },
+      "current": {
+        "title": "current authorization refusal and thrown execution retain safe uncertainty with no diagnostic leakage",
+        "outcome": "pass",
+        "durationMs": 146.6775,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "secret/ambiguous URLs and absent approval refuse before journal persistence",
+        "outcome": "pass",
+        "durationMs": 7.8767,
+        "suffix": ""
+      },
+      "current": {
+        "title": "secret/ambiguous URLs and absent approval refuse before journal persistence",
+        "outcome": "pass",
+        "durationMs": 5.6416,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "abandoned journal lock fails closed; another process cannot ignore a crash lock",
+        "outcome": "pass",
+        "durationMs": 19.5793,
+        "suffix": ""
+      },
+      "current": {
+        "title": "abandoned journal lock fails closed; another process cannot ignore a crash lock",
+        "outcome": "pass",
+        "durationMs": 18.5437,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "production HTTP source wiring refuses configured inline SDK transcription without explicit worker composition",
+        "outcome": "pass",
+        "durationMs": 0.5987,
+        "suffix": ""
+      },
+      "current": {
+        "title": "production HTTP source wiring refuses configured inline SDK transcription without explicit worker composition",
+        "outcome": "pass",
+        "durationMs": 0.6566,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "API queue factory is lazy/pure and protects database, trusted tenants and private authority roots",
+        "outcome": "pass",
+        "durationMs": 2.9858,
+        "suffix": ""
+      },
+      "current": {
+        "title": "API queue factory is lazy/pure and protects database, trusted tenants and private authority roots",
+        "outcome": "pass",
+        "durationMs": 3.388,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "WINACL-ROOT-ALLOW-OTHER: On Windows, source spool root ACL owner=current identity, current identity FullControl, unrelated SID Allow Read; enqueue tenant-a/actor-a URL https://zoom.us/rec/share/fixturebearer with idempotencyKey windows-acl-root and server approval matching actor-a.",
+        "outcome": "pass",
+        "durationMs": 2.0115,
+        "suffix": ""
+      },
+      "current": {
+        "title": "WINACL-ROOT-ALLOW-OTHER: On Windows, source spool root ACL owner=current identity, current identity FullControl, unrelated SID Allow Read; enqueue tenant-a/actor-a URL https://zoom.us/rec/share/fixturebearer with idempotencyKey windows-acl-root and server approval matching actor-a.",
+        "outcome": "pass",
+        "durationMs": 5.3298,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "WINACL-TENANT-ALLOW-OTHER: Root privately owned; pre-existing hashed tenant-a directory permits unrelated SID Read. Same approved URL, idempotencyKey windows-acl-tenant.",
+        "outcome": "pass",
+        "durationMs": 6.8351,
+        "suffix": ""
+      },
+      "current": {
+        "title": "WINACL-TENANT-ALLOW-OTHER: Root privately owned; pre-existing hashed tenant-a directory permits unrelated SID Read. Same approved URL, idempotencyKey windows-acl-tenant.",
+        "outcome": "pass",
+        "durationMs": 8.9418,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "WINACL-FILE-ALLOW-OTHER: Root and hashed tenant directory private; existing audit.jsonl ACL permits unrelated SID Read. Poll/claim/next enqueue must not trust that journal.",
+        "outcome": "pass",
+        "durationMs": 18.2659,
+        "suffix": ""
+      },
+      "current": {
+        "title": "WINACL-FILE-ALLOW-OTHER: Root and hashed tenant directory private; existing audit.jsonl ACL permits unrelated SID Read. Poll/claim/next enqueue must not trust that journal.",
+        "outcome": "pass",
+        "durationMs": 6.431,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "WINACL-OWNER-OTHER: Spool or tenant artifact owner is unrelated SID even if only current identity has an explicit Allow rule.",
+        "outcome": "pass",
+        "durationMs": 3.0497,
+        "suffix": ""
+      },
+      "current": {
+        "title": "WINACL-OWNER-OTHER: Spool or tenant artifact owner is unrelated SID even if only current identity has an explicit Allow rule.",
+        "outcome": "pass",
+        "durationMs": 1.7167,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model)",
+        "outcome": "pass",
+        "durationMs": 32.2358,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model)",
+        "outcome": "pass",
+        "durationMs": 24.571,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ONAIR-FOREIGN-TENANT: Trusted worker tenants [tenant-a,tenant-b], global OnAir cookie representing account-a; tenant-b/actor-b submits https://cloudonair.withgoogle.com/events/account-a-only and receives ordinary server approval.",
+        "outcome": "pass",
+        "durationMs": 96.4985,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ONAIR-FOREIGN-TENANT: Trusted worker tenants [tenant-a,tenant-b], global OnAir cookie representing account-a; tenant-b/actor-b submits https://cloudonair.withgoogle.com/events/account-a-only and receives ordinary server approval.",
+        "outcome": "pass",
+        "durationMs": 81.3988,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ONAIR-UNBOUND-ACCOUNT: tenant-a valid ingest actor and event approval exist, but OnAir session account has no explicit trusted owner/binding.",
+        "outcome": "pass",
+        "durationMs": 115.9741,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ONAIR-UNBOUND-ACCOUNT: tenant-a valid ingest actor and event approval exist, but OnAir session account has no explicit trusted owner/binding.",
+        "outcome": "pass",
+        "durationMs": 71.1293,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ONAIR-UNAPPROVED-EVENT: OnAir session owner explicitly tenant-a, but request event is different from the immutable approved event set or event-specific approval.",
+        "outcome": "pass",
+        "durationMs": 84.0215,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ONAIR-UNAPPROVED-EVENT: OnAir session owner explicitly tenant-a, but request event is different from the immutable approved event set or event-specific approval.",
+        "outcome": "pass",
+        "durationMs": 81.9138,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ONAIR-BINDING-CHANGED: Queue approved under account-a/tenant-a/event-one binding; before execution trusted binding is removed, changes account/tenant or no longer authorizes event-one.",
+        "outcome": "pass",
+        "durationMs": 81.3748,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ONAIR-BINDING-CHANGED: Queue approved under account-a/tenant-a/event-one binding; before execution trusted binding is removed, changes account/tenant or no longer authorizes event-one.",
+        "outcome": "pass",
+        "durationMs": 70.0618,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls",
+        "outcome": "pass",
+        "durationMs": 379.976,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls",
+        "outcome": "pass",
+        "durationMs": 305.8042,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "OnAir owned-event/public-no-cookie controls and rotated session/event permission fences",
+        "outcome": "pass",
+        "durationMs": 71.3047,
+        "suffix": ""
+      },
+      "current": {
+        "title": "OnAir owned-event/public-no-cookie controls and rotated session/event permission fences",
+        "outcome": "pass",
+        "durationMs": 50.2902,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual native private-directory receipt prerequisite",
+        "outcome": "skip",
+        "durationMs": 0.1894,
+        "suffix": " # SKIP"
+      },
+      "current": {
+        "title": "actual native private-directory receipt prerequisite",
+        "outcome": "skip",
+        "durationMs": 0.1621,
+        "suffix": " # SKIP",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual POSIX private-root/tenant/artifact control",
+        "outcome": "skip",
+        "durationMs": 0.1401,
+        "suffix": " # SKIP"
+      },
+      "current": {
+        "title": "actual POSIX private-root/tenant/artifact control",
+        "outcome": "skip",
+        "durationMs": 0.1183,
+        "suffix": " # SKIP",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "permission loss after acquisition blocks each provider processing request while allowing scoped cleanup",
+        "outcome": "pass",
+        "durationMs": 0.6266,
+        "suffix": ""
+      },
+      "current": {
+        "title": "permission loss after acquisition blocks each provider processing request while allowing scoped cleanup",
+        "outcome": "pass",
+        "durationMs": 0.4811,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "route uses verified tenant, sessions scope, safe errors and private no-store",
+        "outcome": "pass",
+        "durationMs": 58.1282,
+        "suffix": ""
+      },
+      "current": {
+        "title": "route uses verified tenant, sessions scope, safe errors and private no-store",
+        "outcome": "pass",
+        "durationMs": 110.003,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "store errors hide credentials, transcript and raw exception",
+        "outcome": "pass",
+        "durationMs": 15.2653,
+        "suffix": ""
+      },
+      "current": {
+        "title": "store errors hide credentials, transcript and raw exception",
+        "outcome": "pass",
+        "durationMs": 18.6556,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "mounted knowledge route enforces scope, request bounds, tenant and safe DTO",
+        "outcome": "pass",
+        "durationMs": 55.2713,
+        "suffix": ""
+      },
+      "current": {
+        "title": "mounted knowledge route enforces scope, request bounds, tenant and safe DTO",
+        "outcome": "pass",
+        "durationMs": 29.2543,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual TOC deterministic persona traverses mounted API and produces a downstream response artifact",
+        "outcome": "skip",
+        "durationMs": 0.2432,
+        "suffix": " # HOLD: private authentic TOC input requires explicit KB_U24_PRIVATE_TOC_TESTS=1"
+      },
+      "current": {
+        "title": "actual TOC deterministic persona traverses mounted API and produces a downstream response artifact",
+        "outcome": "skip",
+        "durationMs": 0.3257,
+        "suffix": " # HOLD: private authentic TOC input requires explicit KB_U24_PRIVATE_TOC_TESTS=1",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "real scoped read predicates isolate identical person/session/turn ids across tenants",
+        "outcome": "pass",
+        "durationMs": 31.3018,
+        "suffix": ""
+      },
+      "current": {
+        "title": "real scoped read predicates isolate identical person/session/turn ids across tenants",
+        "outcome": "pass",
+        "durationMs": 28.1503,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "suggestions are not promoted and malformed tenant cannot reach a database read",
+        "outcome": "pass",
+        "durationMs": 7.7081,
+        "suffix": ""
+      },
+      "current": {
+        "title": "suggestions are not promoted and malformed tenant cannot reach a database read",
+        "outcome": "pass",
+        "durationMs": 5.6834,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "truncated transcript refuses the whole profile rather than changing block interpretation",
+        "outcome": "pass",
+        "durationMs": 32.4268,
+        "suffix": ""
+      },
+      "current": {
+        "title": "truncated transcript refuses the whole profile rather than changing block interpretation",
+        "outcome": "pass",
+        "durationMs": 24.7043,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "known-person profile and mounted API revoke source consent without a cached identity bypass",
+        "outcome": "pass",
+        "durationMs": 21.6447,
+        "suffix": ""
+      },
+      "current": {
+        "title": "known-person profile and mounted API revoke source consent without a cached identity bypass",
+        "outcome": "pass",
+        "durationMs": 80.5949,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unsupported snapshot capability cannot fall back to collection-only profile output",
+        "outcome": "pass",
+        "durationMs": 11.742,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unsupported snapshot capability cannot fall back to collection-only profile output",
+        "outcome": "pass",
+        "durationMs": 23.0387,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "cached topic names require every contributing source session to remain visible",
+        "outcome": "pass",
+        "durationMs": 16.1024,
+        "suffix": ""
+      },
+      "current": {
+        "title": "cached topic names require every contributing source session to remain visible",
+        "outcome": "pass",
+        "durationMs": 16.0786,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual suggestion producer -> durable confirm link -> profile consumes anchored scope",
+        "outcome": "fail",
+        "durationMs": 4.2743,
+        "suffix": ""
+      },
+      "current": {
+        "title": "actual suggestion producer -> durable confirm link -> profile consumes anchored scope",
+        "outcome": "pass",
+        "durationMs": 64.2244,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "speaker metadata eligibility permits empty optional evidence and all-visible attribute references",
+        "outcome": "pass",
+        "durationMs": 1.191,
+        "suffix": ""
+      },
+      "current": {
+        "title": "speaker metadata eligibility permits empty optional evidence and all-visible attribute references",
+        "outcome": "pass",
+        "durationMs": 2.8366,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "speaker metadata eligibility checks withdrawn independent attribute references despite absent values",
+        "outcome": "pass",
+        "durationMs": 1.5858,
+        "suffix": ""
+      },
+      "current": {
+        "title": "speaker metadata eligibility checks withdrawn independent attribute references despite absent values",
+        "outcome": "pass",
+        "durationMs": 4.6989,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "speaker metadata eligibility refuses malformed declared attribute references before source reads",
+        "outcome": "pass",
+        "durationMs": 1.2166,
+        "suffix": ""
+      },
+      "current": {
+        "title": "speaker metadata eligibility refuses malformed declared attribute references before source reads",
+        "outcome": "pass",
+        "durationMs": 4.6329,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads",
+        "outcome": "pass",
+        "durationMs": 1.4239,
+        "suffix": ""
+      },
+      "current": {
+        "title": "speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads",
+        "outcome": "pass",
+        "durationMs": 1.7373,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source",
+        "outcome": "pass",
+        "durationMs": 7.1971,
+        "suffix": ""
+      },
+      "current": {
+        "title": "speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source",
+        "outcome": "pass",
+        "durationMs": 18.7206,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "source-only authority is session-free and relation-independent with exact effective transcript hashes",
+        "outcome": "pass",
+        "durationMs": 2.7255,
+        "suffix": ""
+      },
+      "current": {
+        "title": "source-only authority is session-free and relation-independent with exact effective transcript hashes",
+        "outcome": "pass",
+        "durationMs": 33.9136,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "optional accepted relationship reader runs only inside existing source snapshot",
+        "outcome": "pass",
+        "durationMs": 3.8322,
+        "suffix": ""
+      },
+      "current": {
+        "title": "optional accepted relationship reader runs only inside existing source snapshot",
+        "outcome": "pass",
+        "durationMs": 32.4361,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "source-only attribute authority exposes exact confirmed blocks without recursive accepted attributes",
+        "outcome": "pass",
+        "durationMs": 3.1408,
+        "suffix": ""
+      },
+      "current": {
+        "title": "source-only attribute authority exposes exact confirmed blocks without recursive accepted attributes",
+        "outcome": "pass",
+        "durationMs": 6.9365,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "accepted attributes update profile and graph in the same source snapshot and clear revoked cached fields",
+        "outcome": "pass",
+        "durationMs": 8.3593,
+        "suffix": ""
+      },
+      "current": {
+        "title": "accepted attributes update profile and graph in the same source snapshot and clear revoked cached fields",
+        "outcome": "pass",
+        "durationMs": 21.0443,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "writeSpeakerDocs re-run after CONFIRM leaves the human-confirmed row untouched",
+        "outcome": "fail",
+        "durationMs": 6.6334,
+        "suffix": ""
+      },
+      "current": {
+        "title": "writeSpeakerDocs re-run after CONFIRM leaves the human-confirmed row untouched",
+        "outcome": "pass",
+        "durationMs": 21.0035,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "writeSpeakerDocs still replaces an ordinary (non-confirmed) row and writes new people",
+        "outcome": "pass",
+        "durationMs": 0.9161,
+        "suffix": ""
+      },
+      "current": {
+        "title": "writeSpeakerDocs still replaces an ordinary (non-confirmed) row and writes new people",
+        "outcome": "pass",
+        "durationMs": 0.5711,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "full extractor + writer re-run after CONFIRM: no re-suggestion, no second name for the label, confirmed row intact",
+        "outcome": "fail",
+        "durationMs": 2.4312,
+        "suffix": ""
+      },
+      "current": {
+        "title": "full extractor + writer re-run after CONFIRM: no re-suggestion, no second name for the label, confirmed row intact",
+        "outcome": "pass",
+        "durationMs": 6.1778,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a floor result for a confirmed label with a DIFFERENT person is dropped; the same person is kept",
+        "outcome": "pass",
+        "durationMs": 0.4256,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a floor result for a confirmed label with a DIFFERENT person is dropped; the same person is kept",
+        "outcome": "pass",
+        "durationMs": 0.4954,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "re-index after REJECT: writer, extractor and re-insert leave the tombstone and create no final row",
+        "outcome": "pass",
+        "durationMs": 3.2328,
+        "suffix": ""
+      },
+      "current": {
+        "title": "re-index after REJECT: writer, extractor and re-insert leave the tombstone and create no final row",
+        "outcome": "pass",
+        "durationMs": 3.3422,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "types: a confirmed suggestion row is still schema-shaped",
+        "outcome": "fail",
+        "durationMs": 1.4103,
+        "suffix": ""
+      },
+      "current": {
+        "title": "types: a confirmed suggestion row is still schema-shaped",
+        "outcome": "pass",
+        "durationMs": 1.1992,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirming a name that already had an AUTO row (no row-level provenance) is still protected from the writer",
+        "outcome": "fail",
+        "durationMs": 3.0227,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirming a name that already had an AUTO row (no row-level provenance) is still protected from the writer",
+        "outcome": "pass",
+        "durationMs": 1.5,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "auth: no key 401, wrong scope 403, and nothing is written",
+        "outcome": "pass",
+        "durationMs": 38.4961,
+        "suffix": ""
+      },
+      "current": {
+        "title": "auth: no key 401, wrong scope 403, and nothing is written",
+        "outcome": "pass",
+        "durationMs": 106.3868,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "GET lists the caller's suggestions with quote and kind, no-store, as `suggestedName` (not a speaker identity)",
+        "outcome": "pass",
+        "durationMs": 11.7932,
+        "suffix": ""
+      },
+      "current": {
+        "title": "GET lists the caller's suggestions with quote and kind, no-store, as `suggestedName` (not a speaker identity)",
+        "outcome": "pass",
+        "durationMs": 24.4907,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "tenant B cannot list, confirm or reject tenant A's suggestions",
+        "outcome": "pass",
+        "durationMs": 16.334,
+        "suffix": ""
+      },
+      "current": {
+        "title": "tenant B cannot list, confirm or reject tenant A's suggestions",
+        "outcome": "pass",
+        "durationMs": 25.2026,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a suggestion is bound to its session: right id under another session is 404",
+        "outcome": "pass",
+        "durationMs": 26.3888,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a suggestion is bound to its session: right id under another session is 404",
+        "outcome": "pass",
+        "durationMs": 29.1501,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirm makes the name final with human-confirmed provenance; a repeat is 200 changed:false and writes nothing more",
+        "outcome": "fail",
+        "durationMs": 9.254,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirm makes the name final with human-confirmed provenance; a repeat is 200 changed:false and writes nothing more",
+        "outcome": "pass",
+        "durationMs": 24.1739,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "reject stores the rejection (no final row), is idempotent, hides the row, and blocks a later confirm with 409",
+        "outcome": "pass",
+        "durationMs": 37.1337,
+        "suffix": ""
+      },
+      "current": {
+        "title": "reject stores the rejection (no final row), is idempotent, hides the row, and blocks a later confirm with 409",
+        "outcome": "pass",
+        "durationMs": 37.8348,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "reject after confirm is 409 and the confirmed name stays final",
+        "outcome": "fail",
+        "durationMs": 11.0637,
+        "suffix": ""
+      },
+      "current": {
+        "title": "reject after confirm is 409 and the confirmed name stays final",
+        "outcome": "pass",
+        "durationMs": 15.7994,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a SUGGESTION never appears as a final name: not in /sessions, /ask answer or sources, /search, nor with the final marker",
+        "outcome": "pass",
+        "durationMs": 33.9408,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a SUGGESTION never appears as a final name: not in /sessions, /ask answer or sources, /search, nor with the final marker",
+        "outcome": "pass",
+        "durationMs": 57.7819,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "malformed ids are 400 with no store access; an unavailable store is a generic 503",
+        "outcome": "pass",
+        "durationMs": 21.3817,
+        "suffix": ""
+      },
+      "current": {
+        "title": "malformed ids are 400 with no store access; an unavailable store is a generic 503",
+        "outcome": "pass",
+        "durationMs": 20.1108,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual source visibility denies every maintenance endpoint before raw/history/precondition/write access",
+        "outcome": "pass",
+        "durationMs": 18.1098,
+        "suffix": ""
+      },
+      "current": {
+        "title": "actual source visibility denies every maintenance endpoint before raw/history/precondition/write access",
+        "outcome": "pass",
+        "durationMs": 145.348,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "verified tenant controls eligibility; recording review remains accessible and source withdrawal is rechecked",
+        "outcome": "pass",
+        "durationMs": 7.9248,
+        "suffix": ""
+      },
+      "current": {
+        "title": "verified tenant controls eligibility; recording review remains accessible and source withdrawal is rechecked",
+        "outcome": "pass",
+        "durationMs": 24.2693,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "auth: no key 401, wrong scope 403, nothing written",
+        "outcome": "pass",
+        "durationMs": 49.6461,
+        "suffix": ""
+      },
+      "current": {
+        "title": "auth: no key 401, wrong scope 403, nothing written",
+        "outcome": "pass",
+        "durationMs": 128.2119,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "GET serves the effective transcript with a strong ETag = revision, no-store, no tenant field",
+        "outcome": "pass",
+        "durationMs": 7.3956,
+        "suffix": ""
+      },
+      "current": {
+        "title": "GET serves the effective transcript with a strong ETag = revision, no-store, no tenant field",
+        "outcome": "pass",
+        "durationMs": 13.1506,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "POST commits durably: receipt shape, new ETag, original turns untouched, overlay served, history row with before/after",
+        "outcome": "pass",
+        "durationMs": 36.0099,
+        "suffix": ""
+      },
+      "current": {
+        "title": "POST commits durably: receipt shape, new ETag, original turns untouched, overlay served, history row with before/after",
+        "outcome": "pass",
+        "durationMs": 27.6717,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "history is append-only across revisions and the chain links parent to child",
+        "outcome": "pass",
+        "durationMs": 30.4144,
+        "suffix": ""
+      },
+      "current": {
+        "title": "history is append-only across revisions and the chain links parent to child",
+        "outcome": "pass",
+        "durationMs": 34.6534,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "preconditions: missing If-Match 428; malformed or body-mismatched 400; stale 412; nothing written on any",
+        "outcome": "pass",
+        "durationMs": 63.5167,
+        "suffix": ""
+      },
+      "current": {
+        "title": "preconditions: missing If-Match 428; malformed or body-mismatched 400; stale 412; nothing written on any",
+        "outcome": "pass",
+        "durationMs": 55.9098,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "tenant isolation: cross-tenant read, write, history and refresh all answer 404; the owner's data is unchanged",
+        "outcome": "pass",
+        "durationMs": 46.2365,
+        "suffix": ""
+      },
+      "current": {
+        "title": "tenant isolation: cross-tenant read, write, history and refresh all answer 404; the owner's data is unchanged",
+        "outcome": "pass",
+        "durationMs": 27.9209,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "same session id in two tenants stays separate; a tenant cannot name A's turn ids or smuggle a tenant/actor/time",
+        "outcome": "pass",
+        "durationMs": 56.0822,
+        "suffix": ""
+      },
+      "current": {
+        "title": "same session id in two tenants stays separate; a tenant cannot name A's turn ids or smuggle a tenant/actor/time",
+        "outcome": "pass",
+        "durationMs": 82.616,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "invalid requests: bad body 400, unknown turn / no-op 422, bad session id 400; nothing written",
+        "outcome": "pass",
+        "durationMs": 26.1227,
+        "suffix": ""
+      },
+      "current": {
+        "title": "invalid requests: bad body 400, unknown turn / no-op 422, bad session id 400; nothing written",
+        "outcome": "pass",
+        "durationMs": 44.4225,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "atomic: two saves racing on one ETag - exactly one commits, the loser is 409/412, one head, no lost update",
+        "outcome": "pass",
+        "durationMs": 470.9896,
+        "suffix": ""
+      },
+      "current": {
+        "title": "atomic: two saves racing on one ETag - exactly one commits, the loser is 409/412, one head, no lost update",
+        "outcome": "pass",
+        "durationMs": 412.3348,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a failed history write does not turn a durable commit into an error, and the next commit heals the gap",
+        "outcome": "pass",
+        "durationMs": 17.1728,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a failed history write does not turn a durable commit into an error, and the next commit heals the gap",
+        "outcome": "pass",
+        "durationMs": 23.244,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision",
+        "outcome": "pass",
+        "durationMs": 38.8926,
+        "suffix": ""
+      },
+      "current": {
+        "title": "audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision",
+        "outcome": "pass",
+        "durationMs": 35.4199,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a store failure answers 503 with no internal message and no partial write",
+        "outcome": "pass",
+        "durationMs": 31.0152,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a store failure answers 503 with no internal message and no partial write",
+        "outcome": "pass",
+        "durationMs": 27.2166,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "sample sanity: helper turn() carries extra fields that survive, uncorrected, through an overlay",
+        "outcome": "pass",
+        "durationMs": 8.5343,
+        "suffix": ""
+      },
+      "current": {
+        "title": "sample sanity: helper turn() carries extra fields that survive, uncorrected, through an overlay",
+        "outcome": "pass",
+        "durationMs": 9.1894,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T054-PERSIST-001: both tenants commit on the SAME session id: two heads, two history rows, neither disturbs the other",
+        "outcome": "pass",
+        "durationMs": 21.887,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T054-PERSIST-001: both tenants commit on the SAME session id: two heads, two history rows, neither disturbs the other",
+        "outcome": "pass",
+        "durationMs": 26.2743,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T054-PERSIST-001: head and history ids differ per tenant for the same session/revision",
+        "outcome": "pass",
+        "durationMs": 0.3415,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T054-PERSIST-001: head and history ids differ per tenant for the same session/revision",
+        "outcome": "pass",
+        "durationMs": 0.5153,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T054-PERSIST-001: recording the same revision id for two tenants keeps both rows (store level)",
+        "outcome": "pass",
+        "durationMs": 3.1708,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T054-PERSIST-001: recording the same revision id for two tenants keeps both rows (store level)",
+        "outcome": "pass",
+        "durationMs": 5.4589,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T054-PERSIST-001: tenant comes from the key only - a ?tenantId= query never switches tenant",
+        "outcome": "pass",
+        "durationMs": 15.6527,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T054-PERSIST-001: tenant comes from the key only - a ?tenantId= query never switches tenant",
+        "outcome": "pass",
+        "durationMs": 20.9273,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "ISS-T054-PERSIST-002: history rows are insert-once: a second record of the same id does not overwrite the first",
+        "outcome": "pass",
+        "durationMs": 3.0576,
+        "suffix": ""
+      },
+      "current": {
+        "title": "ISS-T054-PERSIST-002: history rows are insert-once: a second record of the same id does not overwrite the first",
+        "outcome": "pass",
+        "durationMs": 4.5613,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals",
+        "outcome": "pass",
+        "durationMs": 10.1555,
+        "suffix": ""
+      },
+      "current": {
+        "title": "real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals",
+        "outcome": "pass",
+        "durationMs": 57.0788,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "superseding review before publication aborts every derived write and leaves newer refresh pending",
+        "outcome": "pass",
+        "durationMs": 8.2734,
+        "suffix": ""
+      },
+      "current": {
+        "title": "superseding review before publication aborts every derived write and leaves newer refresh pending",
+        "outcome": "pass",
+        "durationMs": 11.4453,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "correction publication never replays paid work on transient body or commit errors",
+        "outcome": "pass",
+        "durationMs": 29.2571,
+        "suffix": ""
+      },
+      "current": {
+        "title": "correction publication never replays paid work on transient body or commit errors",
+        "outcome": "pass",
+        "durationMs": 36.8612,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "correction unknown commit retries only commit with bounded uncertainty and paid work once",
+        "outcome": "pass",
+        "durationMs": 19.4082,
+        "suffix": ""
+      },
+      "current": {
+        "title": "correction unknown commit retries only commit with bounded uncertainty and paid work once",
+        "outcome": "pass",
+        "durationMs": 29.22,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "runRefresh reconciles unknown committed head without downgrade or superseded revision leakage",
+        "outcome": "fail",
+        "durationMs": 14.3697,
+        "suffix": ""
+      },
+      "current": {
+        "title": "runRefresh reconciles unknown committed head without downgrade or superseded revision leakage",
+        "outcome": "pass",
+        "durationMs": 17.8632,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "review refresh refuses legacy/vector completion and missing lexical or provenance proof",
+        "outcome": "pass",
+        "durationMs": 35.3967,
+        "suffix": ""
+      },
+      "current": {
+        "title": "review refresh refuses legacy/vector completion and missing lexical or provenance proof",
+        "outcome": "pass",
+        "durationMs": 28.1188,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge",
+        "outcome": "pass",
+        "durationMs": 4.5735,
+        "suffix": ""
+      },
+      "current": {
+        "title": "current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge",
+        "outcome": "pass",
+        "durationMs": 4.1423,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score",
+        "outcome": "pass",
+        "durationMs": 16.7524,
+        "suffix": ""
+      },
+      "current": {
+        "title": "text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score",
+        "outcome": "pass",
+        "durationMs": 16.4474,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth",
+        "outcome": "fail",
+        "durationMs": 0.7734,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth",
+        "outcome": "pass",
+        "durationMs": 2.4026,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "head audit remains readable after secondary history failure without another human correction",
+        "outcome": "pass",
+        "durationMs": 0.5976,
+        "suffix": ""
+      },
+      "current": {
+        "title": "head audit remains readable after secondary history failure without another human correction",
+        "outcome": "pass",
+        "durationMs": 1.6036,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation",
+        "outcome": "pass",
+        "durationMs": 1.3518,
+        "suffix": ""
+      },
+      "current": {
+        "title": "complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation",
+        "outcome": "pass",
+        "durationMs": 2.0397,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes",
+        "outcome": "pass",
+        "durationMs": 0.769,
+        "suffix": ""
+      },
+      "current": {
+        "title": "effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes",
+        "outcome": "pass",
+        "durationMs": 1.0437,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection",
+        "outcome": "skip",
+        "durationMs": 0.0904,
+        "suffix": " # SKIP"
+      },
+      "current": {
+        "title": "retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection",
+        "outcome": "skip",
+        "durationMs": 0.19,
+        "suffix": " # SKIP",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "no executor configured: 503 and the refresh stays pending (never reported complete)",
+        "outcome": "pass",
+        "durationMs": 35.5681,
+        "suffix": ""
+      },
+      "current": {
+        "title": "no executor configured: 503 and the refresh stays pending (never reported complete)",
+        "outcome": "pass",
+        "durationMs": 99.4782,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "success: every target runs once, in order, for the committed revision; state becomes complete",
+        "outcome": "pass",
+        "durationMs": 47.6945,
+        "suffix": ""
+      },
+      "current": {
+        "title": "success: every target runs once, in order, for the committed revision; state becomes complete",
+        "outcome": "pass",
+        "durationMs": 41.3743,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "failure is recorded (failed + failedTarget), earlier targets are kept, retry resumes at the failed target",
+        "outcome": "pass",
+        "durationMs": 47.9791,
+        "suffix": ""
+      },
+      "current": {
+        "title": "failure is recorded (failed + failedTarget), earlier targets are kept, retry resumes at the failed target",
+        "outcome": "pass",
+        "durationMs": 60.4822,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a newer correction supersedes an in-flight refresh: the old run cannot overwrite the new revision's state",
+        "outcome": "pass",
+        "durationMs": 70.4799,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a newer correction supersedes an in-flight refresh: the old run cannot overwrite the new revision's state",
+        "outcome": "pass",
+        "durationMs": 86.0909,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "cross-tenant refresh cannot run or observe another tenant's refresh",
+        "outcome": "pass",
+        "durationMs": 52.227,
+        "suffix": ""
+      },
+      "current": {
+        "title": "cross-tenant refresh cannot run or observe another tenant's refresh",
+        "outcome": "pass",
+        "durationMs": 20.0198,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "racing writers (insertHead unique _id): exactly one commit, the loser gets a conflict, no lost update",
+        "outcome": "pass",
+        "durationMs": 24.3969,
+        "suffix": ""
+      },
+      "current": {
+        "title": "racing writers (insertHead unique _id): exactly one commit, the loser gets a conflict, no lost update",
+        "outcome": "pass",
+        "durationMs": 38.0258,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "racing writers (replaceHead CAS): exactly one commit, the loser gets a conflict, no lost update",
+        "outcome": "pass",
+        "durationMs": 61.6766,
+        "suffix": ""
+      },
+      "current": {
+        "title": "racing writers (replaceHead CAS): exactly one commit, the loser gets a conflict, no lost update",
+        "outcome": "pass",
+        "durationMs": 60.7969,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "revision of an untouched transcript changes when the source turns change; a committed head no longer depends on them",
+        "outcome": "pass",
+        "durationMs": 3.2238,
+        "suffix": ""
+      },
+      "current": {
+        "title": "revision of an untouched transcript changes when the source turns change; a committed head no longer depends on them",
+        "outcome": "pass",
+        "durationMs": 3.4863,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "an overlay entry for a turn that no longer exists is ignored, not an error",
+        "outcome": "pass",
+        "durationMs": 1.6122,
+        "suffix": ""
+      },
+      "current": {
+        "title": "an overlay entry for a turn that no longer exists is ignored, not an error",
+        "outcome": "pass",
+        "durationMs": 2.408,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "snapshot/head re-read race (initial): stale writer cannot CAS a newer head",
+        "outcome": "pass",
+        "durationMs": 1.8277,
+        "suffix": ""
+      },
+      "current": {
+        "title": "snapshot/head re-read race (initial): stale writer cannot CAS a newer head",
+        "outcome": "pass",
+        "durationMs": 3.0262,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "snapshot/head re-read race (reviewed): stale writer cannot CAS a newer head",
+        "outcome": "pass",
+        "durationMs": 2.0884,
+        "suffix": ""
+      },
+      "current": {
+        "title": "snapshot/head re-read race (reviewed): stale writer cannot CAS a newer head",
+        "outcome": "pass",
+        "durationMs": 14.0752,
+        "suffix": "",
+        "group": "floor2",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "inserting a suggestion writes ONLY speaker_suggestions: nothing becomes a final speaker",
+        "outcome": "pass",
+        "durationMs": 0.4465,
+        "suffix": ""
+      },
+      "current": {
+        "title": "inserting a suggestion writes ONLY speaker_suggestions: nothing becomes a final speaker",
+        "outcome": "pass",
+        "durationMs": 3.8826,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "tenant B cannot list, confirm or reject tenant A's suggestion (same session id, same suggestion id)",
+        "outcome": "pass",
+        "durationMs": 0.476,
+        "suffix": ""
+      },
+      "current": {
+        "title": "tenant B cannot list, confirm or reject tenant A's suggestion (same session id, same suggestion id)",
+        "outcome": "pass",
+        "durationMs": 6.1178,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a suggestion belongs to its session: the right id under another session is not found",
+        "outcome": "pass",
+        "durationMs": 0.2547,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a suggestion belongs to its session: the right id under another session is not found",
+        "outcome": "pass",
+        "durationMs": 1.5643,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirm makes the name final with the human-confirmed provenance, in the caller's tenant only",
+        "outcome": "pass",
+        "durationMs": 0.8345,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirm makes the name final with the human-confirmed provenance, in the caller's tenant only",
+        "outcome": "pass",
+        "durationMs": 6.9409,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirm is idempotent: a repeat changes nothing and writes no duplicate final row",
+        "outcome": "pass",
+        "durationMs": 0.8458,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirm is idempotent: a repeat changes nothing and writes no duplicate final row",
+        "outcome": "pass",
+        "durationMs": 2.1865,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirm extends an existing final speaker instead of replacing it, and keeps its other evidence",
+        "outcome": "pass",
+        "durationMs": 0.6667,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirm extends an existing final speaker instead of replacing it, and keeps its other evidence",
+        "outcome": "pass",
+        "durationMs": 0.9614,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "reject stores the rejection, writes no final speaker, is idempotent, and is hidden from the list",
+        "outcome": "pass",
+        "durationMs": 0.686,
+        "suffix": ""
+      },
+      "current": {
+        "title": "reject stores the rejection, writes no final speaker, is idempotent, and is hidden from the list",
+        "outcome": "pass",
+        "durationMs": 1.4141,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a rejected name is not re-suggested: inserting the same suggestion again leaves the rejection untouched",
+        "outcome": "pass",
+        "durationMs": 0.5888,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a rejected name is not re-suggested: inserting the same suggestion again leaves the rejection untouched",
+        "outcome": "pass",
+        "durationMs": 0.8889,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "re-suggesting after a confirm does not reset it either",
+        "outcome": "pass",
+        "durationMs": 0.5742,
+        "suffix": ""
+      },
+      "current": {
+        "title": "re-suggesting after a confirm does not reset it either",
+        "outcome": "pass",
+        "durationMs": 1.1592,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "confirm after reject, and reject after confirm, are conflicts and change nothing",
+        "outcome": "pass",
+        "durationMs": 0.9297,
+        "suffix": ""
+      },
+      "current": {
+        "title": "confirm after reject, and reject after confirm, are conflicts and change nothing",
+        "outcome": "pass",
+        "durationMs": 2.1285,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a malformed id or tenant is refused without touching anything",
+        "outcome": "pass",
+        "durationMs": 0.3906,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a malformed id or tenant is refused without touching anything",
+        "outcome": "pass",
+        "durationMs": 1.0364,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "insertSuggestionsIfAbsent refuses a non-suggested row and a row of another session",
+        "outcome": "pass",
+        "durationMs": 0.2343,
+        "suffix": ""
+      },
+      "current": {
+        "title": "insertSuggestionsIfAbsent refuses a non-suggested row and a row of another session",
+        "outcome": "pass",
+        "durationMs": 0.2911,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "the view carries quote and kind, calls the name `suggestedName`, and has no speakers-shaped fields",
+        "outcome": "pass",
+        "durationMs": 0.1662,
+        "suffix": ""
+      },
+      "current": {
+        "title": "the view carries quote and kind, calls the name `suggestedName`, and has no speakers-shaped fields",
+        "outcome": "pass",
+        "durationMs": 0.2217,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "a kind=tile suggestion (T-042, D-160) is stored as suggested, writes no final speaker, and only a human confirm makes it final",
+        "outcome": "pass",
+        "durationMs": 0.9305,
+        "suffix": ""
+      },
+      "current": {
+        "title": "a kind=tile suggestion (T-042, D-160) is stored as suggested, writes no final speaker, and only a human confirm makes it final",
+        "outcome": "pass",
+        "durationMs": 1.5969,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "native pending and confirmed evidence fail closed after generation, capture, review or owner drift",
+        "outcome": "pass",
+        "durationMs": 4.136,
+        "suffix": ""
+      },
+      "current": {
+        "title": "native pending and confirmed evidence fail closed after generation, capture, review or owner drift",
+        "outcome": "pass",
+        "durationMs": 9.036,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "callers cannot supply a machine publication binding",
+        "outcome": "pass",
+        "durationMs": 0.3567,
+        "suffix": ""
+      },
+      "current": {
+        "title": "callers cannot supply a machine publication binding",
+        "outcome": "pass",
+        "durationMs": 0.9692,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "native final-write failure rolls back the decision and session fence",
+        "outcome": "pass",
+        "durationMs": 0.9647,
+        "suffix": ""
+      },
+      "current": {
+        "title": "native final-write failure rolls back the decision and session fence",
+        "outcome": "pass",
+        "durationMs": 2.5289,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "publication fence uses a real increment and refuses malformed/exhausted counters without changes",
+        "outcome": "pass",
+        "durationMs": 0.917,
+        "suffix": ""
+      },
+      "current": {
+        "title": "publication fence uses a real increment and refuses malformed/exhausted counters without changes",
+        "outcome": "pass",
+        "durationMs": 2.4592,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unknown commit retries only commit three times and never replays work or aborts",
+        "outcome": "pass",
+        "durationMs": 0.4064,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unknown commit retries only commit three times and never replays work or aborts",
+        "outcome": "pass",
+        "durationMs": 0.71,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "transaction view binds tenant/session, serializes operations and refuses nesting",
+        "outcome": "fail",
+        "durationMs": 0.41,
+        "suffix": ""
+      },
+      "current": {
+        "title": "transaction view binds tenant/session, serializes operations and refuses nesting",
+        "outcome": "pass",
+        "durationMs": 0.6629,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "stale native suggestions can be rejected, including after source or session deletion",
+        "outcome": "pass",
+        "durationMs": 1.3383,
+        "suffix": ""
+      },
+      "current": {
+        "title": "stale native suggestions can be rejected, including after source or session deletion",
+        "outcome": "pass",
+        "durationMs": 1.8965,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "historical confirmed native audit remains but stale confirmation repair adds no evidence",
+        "outcome": "pass",
+        "durationMs": 2.0149,
+        "suffix": ""
+      },
+      "current": {
+        "title": "historical confirmed native audit remains but stale confirmation repair adds no evidence",
+        "outcome": "pass",
+        "durationMs": 3.5607,
+        "suffix": "",
+        "group": "floor1",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "production refuses network/outside roots and enabled native writes without platform authority before I/O",
+        "outcome": "pass",
+        "durationMs": 0.8509,
+        "suffix": ""
+      },
+      "current": {
+        "title": "production refuses network/outside roots and enabled native writes without platform authority before I/O",
+        "outcome": "pass",
+        "durationMs": 2.621,
+        "suffix": "",
+        "group": "floor3b",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3b.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "real private empty store drains boundedly without DB/providers/host qualification",
+        "outcome": "pass",
+        "durationMs": 11421.996,
+        "suffix": ""
+      },
+      "current": {
+        "title": "real private empty store drains boundedly without DB/providers/host qualification",
+        "outcome": "pass",
+        "durationMs": 7396.6694,
+        "suffix": "",
+        "group": "floor3b",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3b.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "genuine live seal precedes source ingestion; retained public recovery does not invent a clock",
+        "outcome": "fail",
+        "durationMs": 26673.4381,
+        "suffix": ""
+      },
+      "current": {
+        "title": "genuine live seal precedes source ingestion; retained public recovery does not invent a clock",
+        "outcome": "pass",
+        "durationMs": 51730.21,
+        "suffix": "",
+        "group": "exact-genuine-reuse",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-original-positive.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "synthetic alignment unit joins actual index generation and concrete transaction factory to existing consumer",
+        "outcome": "pass",
+        "durationMs": 32.0655,
+        "suffix": ""
+      },
+      "current": {
+        "title": "synthetic alignment unit joins actual index generation and concrete transaction factory to existing consumer",
+        "outcome": "pass",
+        "durationMs": 81.2198,
+        "suffix": "",
+        "group": "floor3b",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3b.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "explicit capture binds actual sampler and refuses mismatch before effects",
+        "outcome": "pass",
+        "durationMs": 1.2553,
+        "suffix": ""
+      },
+      "current": {
+        "title": "explicit capture binds actual sampler and refuses mismatch before effects",
+        "outcome": "pass",
+        "durationMs": 2.4334,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "real runRecord injection surface receives trusted service and matching producer sampler",
+        "outcome": "pass",
+        "durationMs": 0.75,
+        "suffix": ""
+      },
+      "current": {
+        "title": "real runRecord injection surface receives trusted service and matching producer sampler",
+        "outcome": "pass",
+        "durationMs": 0.4508,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "unconfigured ordinary sync path does not open archive or require database",
+        "outcome": "pass",
+        "durationMs": 0.3136,
+        "suffix": ""
+      },
+      "current": {
+        "title": "unconfigured ordinary sync path does not open archive or require database",
+        "outcome": "pass",
+        "durationMs": 1.2647,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "native configuration refuses unbounded quota and missing configured decoder",
+        "outcome": "pass",
+        "durationMs": 0.3089,
+        "suffix": ""
+      },
+      "current": {
+        "title": "native configuration refuses unbounded quota and missing configured decoder",
+        "outcome": "pass",
+        "durationMs": 0.8073,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "startup performs exactly one bounded drain and preserves explicit resume cursor",
+        "outcome": "pass",
+        "durationMs": 0.3061,
+        "suffix": ""
+      },
+      "current": {
+        "title": "startup performs exactly one bounded drain and preserves explicit resume cursor",
+        "outcome": "pass",
+        "durationMs": 1.0723,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "actual bootstrap connects then drains before constructing listening server",
+        "outcome": "pass",
+        "durationMs": 1.1239,
+        "suffix": ""
+      },
+      "current": {
+        "title": "actual bootstrap connects then drains before constructing listening server",
+        "outcome": "pass",
+        "durationMs": 1.1684,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "failed bounded drain never reaches server readiness",
+        "outcome": "pass",
+        "durationMs": 0.5391,
+        "suffix": ""
+      },
+      "current": {
+        "title": "failed bounded drain never reaches server readiness",
+        "outcome": "pass",
+        "durationMs": 0.5102,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    },
+    {
+      "original": {
+        "title": "trusted root host adapter construction stays lazy; ordinary API requires explicit adapter",
+        "outcome": "pass",
+        "durationMs": 0.1963,
+        "suffix": ""
+      },
+      "current": {
+        "title": "trusted root host adapter construction stays lazy; ordinary API requires explicit adapter",
+        "outcome": "pass",
+        "durationMs": 0.2318,
+        "suffix": "",
+        "group": "floor3a",
+        "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor3a.log"
+      },
+      "incompleteReason": null
+    }
+  ],
+  "additionalCurrentCases": [
+    {
+      "title": "constructing real scoped readers is lazy and operations use the current Mongo receiver",
+      "outcome": "pass",
+      "durationMs": 7.5048,
+      "suffix": "",
+      "group": "floor1",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+    },
+    {
+      "title": "optional policy-gated properties evaluate actual current authority at access and never cache it",
+      "outcome": "pass",
+      "durationMs": 0.6164,
+      "suffix": "",
+      "group": "floor1",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+    },
+    {
+      "title": "production native/review readers bind before connection while DB-name policies remain deferred",
+      "outcome": "pass",
+      "durationMs": 1.7541,
+      "suffix": "",
+      "group": "floor1",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+    },
+    {
+      "title": "caught actual operation failure still poisons transaction and rolls back earlier writes",
+      "outcome": "pass",
+      "durationMs": 0.5539,
+      "suffix": "",
+      "group": "floor1",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor1.log"
+    }
+  ],
+  "missing": [],
+  "exactOriginalTitles": 205,
+  "explicitlyMappedOriginalTitles": 1,
+  "additionalNewTests": 4
+}

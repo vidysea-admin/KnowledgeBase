@@ -33,5 +33,13 @@ export interface Chunks {
    * Which model produced `vector`. Vectors from different models are not comparable, so this is what makes a mixed corpus diagnosable.
    */
   embeddingModel?: string;
+  indexArtifact?: ChunkIndexArtifact;
   [k: string]: unknown;
+}
+export interface ChunkIndexArtifact {
+  version: 1;
+  generation: string;
+  sessionId: string;
+  sourceId: string;
+  turnDigest: string;
 }

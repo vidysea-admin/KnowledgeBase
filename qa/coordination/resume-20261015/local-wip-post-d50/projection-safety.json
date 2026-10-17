@@ -1,0 +1,11 @@
+{
+  "schema": "projection-safety/1",
+  "paths": 9,
+  "findings": [],
+  "findingCount": 0,
+  "valuesPersisted": false,
+  "rawEvidenceMutations": 0,
+  "staging": 0,
+  "commit": 0,
+  "push": 0
+}

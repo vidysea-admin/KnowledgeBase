@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "dataClass": "synthetic-only",
+  "scriptedProvider": true,
+  "cases": [
+    {
+      "semanticMeasured": false,
+      "sourceCount": 3,
+      "sourceHash": "facfcb81620924231e35a94cd29facb05fff5b218ae354e629e20785b3adf66a",
+      "producerResult": {
+        "count": 1,
+        "degraded": null
+      },
+      "stored": {
+        "_id": "a47df6820ae8c385b8d72e90f68dd2fd14cbdd3950bdf1e773557b3ff472f487",
+        "text": "Ship Friday.",
+        "status": "proposed"
+      },
+      "response": {
+        "sessionId": "decision-session",
+        "decisions": [
+          {
+            "_id": "a47df6820ae8c385b8d72e90f68dd2fd14cbdd3950bdf1e773557b3ff472f487",
+            "text": "Ship Friday.",
+            "status": "proposed",
+            "owner": "expert",
+            "tStart": 3,
+            "tEnd": 7,
+            "evidence": [
+              {
+                "turnId": "agreement",
+                "sessionId": "decision-session",
+                "text": "Agreed.",
+                "speaker": "chair",
+                "tStart": 6,
+                "tEnd": 7,
+                "unit": "seconds"
+              },
+              {
+                "turnId": "choice",
+                "sessionId": "decision-session",
+                "text": "We will ship Friday.",
+                "speaker": "expert",
+                "tStart": 3,
+                "tEnd": 6,
+                "unit": "seconds"
+              }
+            ]
+          }
+        ]
+      },
+      "sessionResponse": {
+        "session": {
+          "_id": "decision-session",
+          "tenantId": "tenant-a",
+          "sourceId": "source-fixture",
+          "title": "Fixture session",
+          "date": "2026-10-14",
+          "status": {
+            "transcribe": "done",
+            "index": "done"
+          }
+        },
+        "page": null,
+        "claims": [],
+        "turns": [
+          {
+            "_id": "opening",
+            "tenantId": "tenant-a",
+            "sessionId": "decision-session",
+            "speakerRef": "expert",
+            "text": "Should we ship Friday?",
+            "tStart": 0,
+            "tEnd": 3
+          },
+          {
+            "_id": "choice",
+            "tenantId": "tenant-a",
+            "sessionId": "decision-session",
+            "speakerRef": "expert",
+            "text": "We will ship Friday.",
+            "tStart": 3,
+            "tEnd": 6
+          },
+          {
+            "_id": "agreement",
+            "tenantId": "tenant-a",
+            "sessionId": "decision-session",
+            "speakerRef": "chair",
+            "text": "Agreed.",
+            "tStart": 6,
+            "tEnd": 7
+          }
+        ]
+      }
+    }
+  ]
+}

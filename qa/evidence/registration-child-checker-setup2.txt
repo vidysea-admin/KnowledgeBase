@@ -1,0 +1,19 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase
+
+ ❯ data/registration-checker-probe.test.mjs (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  data/registration-checker-probe.test.mjs [ data/registration-checker-probe.test.mjs ]
+Error: Vitest cannot be imported in a CommonJS module using require(). Please use "import" instead.
+
+If you are using "import" in your source code, then it's possible it was bundled into require() automatically by your bundler. In that case, do not bundle CommonJS output since it will never work with Vitest, or use dynamic import() which is available in all CommonJS modules.
+ ❯ Object.<anonymous> node_modules/.pnpm/vitest@2.1.8_@types+node@24.13.3_jsdom@25.0.1/node_modules/vitest/index.cjs:1:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:30:23
+   Duration  557ms (transform 36ms, setup 0ms, collect 0ms, tests 0ms, environment 0ms, prepare 216ms)

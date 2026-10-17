@@ -1,8 +1,10 @@
 /**
- * apps/api/src/routes/health.ts — plan §10 U0.7 (first half). `GET /health`: db ping + real
- * per-collection document counts, for ops monitoring. Deliberately UNAUTHENTICATED (mounted
- * before `requireAuth`, same as the `*-page.ts` routes) — an uptime probe should not need a
- * scoped API key, and the response carries only aggregate counts, never tenant-scoped content.
+ * apps/api/src/routes/health.ts — plan §10 U0.7 (first half). `GET /health`: LIVENESS ONLY — a db
+ * ping and nothing else. Deliberately UNAUTHENTICATED (mounted before `requireAuth`) — an uptime
+ * probe should not need a scoped API key — which is exactly why the body is `{db}` and no more:
+ * ISS-T057SCREEN-001 (Approver ruling 2026-10-12) removed the all-tenant per-collection counts and
+ * the watcher-silence counts from this public body. Counts live on the authenticated, tenant-scoped
+ * `GET /system-status` and must never be re-added here.
  *
  * U4b/R2 (D-048) also makes this the WATCHER-SILENCE DETECTOR. That placement is deliberate: R2's
  * failure mode is that scripts/watch/run-watch.mjs stopped running at all, so the detector must live
@@ -14,14 +16,8 @@
 import { Router, type Request, type Response } from "express";
 
 export interface HealthReport {
+  /** Whether the db ping succeeded. The ONLY field on the public body. */
   db: "ok" | "error";
-  /** Real `countDocuments` per collection, keyed by name — empty when `db` is "error". */
-  collections: Record<string, number>;
-  /** U4b/R2: how many (tenant, sourceType) watchers were found silent on this probe. A COUNT only
-   * — this route is unauthenticated, so it must never name tenants or source types (the alert,
-   * which goes to an operator over a private channel, carries those). Absent when no
-   * `WatchSilenceDeps` is wired. */
-  watchSilent?: number;
 }
 
 /** One `watch_heartbeat` row, as the detector needs to see it. Structural on purpose: it matches
@@ -40,7 +36,7 @@ export interface HeartbeatRow {
  *  - `listHeartbeats` must be the tenant-scoped accessor (`listHeartbeats` in
  *    packages/db/src/collections/watch-heartbeat.ts), so each read is `withTenant`-merged.
  *  - `notifyWatchSilent` is structurally identical to `TelegramNotifier.notifyWatchSilent`
- *    (packages/meeting-bot/src/capture/telegram-alerts.ts), so a real notifier satisfies it with NO
+ *    (packages/meeting-bot/src/capture/notify/telegram-alerts.ts), so a real notifier satisfies it with NO
  *    import — `.dependency-cruiser.cjs` forbids `apps/* -> packages/meeting-bot`, so injection is the
  *    only way this route can reach that notifier at all. See the manifest's HUMAN_GATE section.
  */
@@ -125,22 +121,23 @@ export function heartbeatStatuses(
 
 /**
  * Checks every configured tenant's heartbeats and alerts once per silent (tenant, sourceType).
- * Returns the count for the response body. A row that is missing entirely is synthesised as
+ * Returns aggregate silent watchers and unreadable tenant counts. A missing row is synthesised as
  * `lastHeartbeatAt: null`, which `isHeartbeatStale` treats as maximally stale — "this watcher has
  * never proven it is alive" is the loudest version of R2's failure, not an exemption from it.
- * Never throws: a detector that can 503 the health probe by failing would take down the signal it
- * exists to provide.
+ * Failed tenant reads are reported as unknown liveness without fabricating silence alerts.
  */
-export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<number> {
+export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<{silent: number; unreadable: number}> {
   const now = deps.now ? deps.now() : new Date();
   const expected = deps.expectedSourceTypes ?? EXPECTED_WATCH_SOURCE_TYPES;
   let silent = 0;
+  let unreadable = 0;
   for (const tenantId of deps.tenantIds) {
     let rows: HeartbeatRow[];
     try {
       rows = await deps.listHeartbeats(tenantId);
     } catch {
-      continue; // an unreadable heartbeat collection is a db problem, already reported by `db`.
+      unreadable += 1;
+      continue;
     }
     for (const status of heartbeatStatuses(tenantId, rows, now, deps.intervalMs, expected).filter((s) => s.stale)) {
       silent += 1;
@@ -152,7 +149,7 @@ export async function detectSilentWatchers(deps: WatchSilenceDeps): Promise<numb
       }
     }
   }
-  return silent;
+  return {silent, unreadable};
 }
 
 export function createHealthRouter(deps: HealthDeps): Router {
@@ -160,17 +157,17 @@ export function createHealthRouter(deps: HealthDeps): Router {
 
   router.get("/health", async (_req: Request, res: Response) => {
     const report = await deps.checkHealth();
-    // R2: only probe watcher silence when the db itself is up — otherwise every watcher would look
-    // silent for the one reason that is already reported by `db: "error"`, alerting on the wrong bug.
-    // Spread rather than assign: `checkHealth` may hand back a shared/cached object (fixtures.ts
-    // does), and mutating it would leak this probe's count into the next one.
-    const body: HealthReport =
-      deps.watchSilence && report.db === "ok"
-        ? { ...report, watchSilent: await detectSilentWatchers(deps.watchSilence) }
-        : report;
-    // 503 (not 200) when the db ping failed — a health probe's whole job is to make an
-    // unhealthy backend visible to whatever is watching the HTTP status code, not just the body.
-    res.status(body.db === "ok" ? 200 : 503).json(body);
+    // Whitelist the body: never spread `report`, so a future field on HealthReport (or a fake that
+    // returns extra keys) cannot leak onto this unauthenticated route.
+    let unreadable = 0;
+    // R2: probe watcher silence only when the db is up (otherwise every watcher looks silent for
+    // the one reason `db: "error"` already reports). The detector still sends its operator alert
+    // over the private channel, but its counts are NOT in the body (tenant-fleet state, public
+    // route); the only public trace is the 503 status when a heartbeat read failed (a boolean).
+    if (deps.watchSilence && report.db === "ok") {
+      unreadable = (await detectSilentWatchers(deps.watchSilence)).unreadable;
+    }
+    res.status(report.db === "error" || unreadable > 0 ? 503 : 200).json({db: report.db === "ok" ? "ok" : "error"});
   });
 
   return router;

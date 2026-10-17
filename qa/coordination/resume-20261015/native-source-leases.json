@@ -1,0 +1,52 @@
+{
+  "authority": "root explicit delivery dispatch",
+  "status": "FROZEN_PRIMITIVES_SUPERSEDED_BY_NATIVE_CURRENT_WRITERS",
+  "sharedFrozen": {
+    "path": "packages/meeting-bot/src/capture/native-media-types.ts",
+    "sha256": "022057B6A629EEC111C3BAFC4D9FEFE39119DA55EE87A7F1F2EBA7C3EE7F1B77"
+  },
+  "leases": [
+    {
+      "owner": "native_codecledger_maker",
+      "paths": [
+        "packages/meeting-bot/src/capture/native-ivf.ts",
+        "packages/meeting-bot/src/capture/native-ivf.test.ts",
+        "packages/meeting-bot/src/capture/native-clock-ledger.ts",
+        "packages/meeting-bot/src/capture/native-clock-ledger.test.ts",
+        "packages/meeting-bot/src/capture/native-spool.ts",
+        "packages/meeting-bot/src/capture/native-spool.test.ts"
+      ]
+    },
+    {
+      "owner": "native_browserproducer_maker",
+      "paths": [
+        "packages/meeting-bot/py/tab-capture/recorder.js",
+        "packages/meeting-bot/py/tab-capture/native-video.js",
+        "packages/meeting-bot/py/tab-capture/native-video.test.mjs",
+        "packages/meeting-bot/py/tab-capture/native-audio-worklet.js",
+        "packages/meeting-bot/py/tab-capture/native-audio-worklet.test.mjs",
+        "packages/meeting-bot/py/tab-capture/native-recorder.js",
+        "packages/meeting-bot/py/tab-capture/native-recorder.test.mjs",
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/tab-browser.test.ts"
+      ]
+    },
+    {
+      "owner": "native_finalizer_maker",
+      "paths": [
+        "packages/meeting-bot/src/capture/native-media-finalize.ts",
+        "packages/meeting-bot/src/capture/native-media-finalize.test.ts",
+        "packages/meeting-bot/src/capture/native-media-probe.ts",
+        "packages/meeting-bot/src/capture/native-media-probe.test.ts",
+        "packages/meeting-bot/src/lean-video-ffmpeg.ts",
+        "packages/meeting-bot/src/lean-video-ffmpeg.test.ts",
+        "packages/meeting-bot/src/capture/tab-remux.ts",
+        "packages/meeting-bot/src/capture/tab-remux.test.ts",
+        "packages/meeting-bot/src/capture/record-finalize.ts",
+        "packages/meeting-bot/src/capture/record-finalize.test.ts",
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.test.ts"
+      ]
+    }
+  ]
+}

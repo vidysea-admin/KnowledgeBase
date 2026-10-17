@@ -1,0 +1,33 @@
+{
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=25000",
+    "--import",
+    "tsx",
+    "packages/index/src/eval/decisions-acquisition.test.ts"
+  ],
+  "environment": {
+    "KB_U25_PRIVATE_TOC_TESTS": "0"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/evidence/u25-decision-acquisition/maker",
+  "pins": {
+    "packages/index/src/eval/decisions-acquisition.ts": "512e079bf7b9e0d298d97c375c7bb8c0f109a6e1ac284266c995744cc57f8190",
+    "packages/index/src/eval/decisions-acquisition.test.ts": "828604b637b91dbcf0d00679b5e1f72fbeae94d8ded95780c77722ce6eb3240c",
+    "packages/index/src/eval/extraction.ts": "f61db7de33998eb2e9bf5d27904b22f625672df002f35101a86a80675be11430",
+    "packages/index/src/pipeline/notes/decisions.ts": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+    "packages/ai/src/json.ts": "2ebd19828037788b34ac6d512cee0cc1e9b8fd64df99537047baecc6133251df",
+    "packages/ai/src/provider.ts": "224011a106893ba8d42cecc5d9c43e4897df6d3d15e692f9e196d10aa050c4c1",
+    "packages/ai/src/index.ts": "3a881523bf31bd8568bc8badade370ba8d430bc2d756e961a82c23f21b30e9f1",
+    "packages/index/package.json": "cc3a73c55269cba38982ede806cd3cb6d545ef263413c86c987e2dfbbc2a4d2c",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "qa/contracts/goal-u25.md": "2bfc6cba429b36daf3ba7caa6a068a42d40dd82e9c344d277e7039bf35575f73",
+    "qa/contracts/goal-u22.md": "332da01480c36e2caf687dc3d332594c3e9a6e280665da373871eae2bb8e1b25",
+    "contracts/verify_contracts.py": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3"
+  },
+  "expectedAuthoredCounts": "8 synthetic software tests; actual output authoritative",
+  "authority": "Exclusive NEW adapter/test files; sole broker, no local tests/provider/DB/network/browser/build; public synthetic fixtures only"
+}

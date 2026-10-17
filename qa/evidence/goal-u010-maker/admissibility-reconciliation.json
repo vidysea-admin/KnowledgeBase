@@ -1,0 +1,1613 @@
+{
+  "format": "u010-metadata-admissibility-v1",
+  "status": "HOLD: metadata reconciliation, not approval/dispatch/model-quality verdict",
+  "capturedAt": "2026-10-15T00:18:37.4172020Z",
+  "maker": "/root/roadmap_status/maker_u010",
+  "task": "U0.10",
+  "sourceUtility": "checked-PASS cycle1, not repeated",
+  "execution": {
+    "providerCalls": 0,
+    "databaseAccess": false,
+    "browserAccess": false,
+    "testsRun": 0,
+    "privatePayloadExport": false,
+    "gitWrites": false
+  },
+  "canonicalMembershipAuthority": {
+    "path": "C:/Users/product/Documents/Codex/2026-10-09/what-is-the-current-update-and/work/toc-recovery-v1/packet.json",
+    "sha256": "268c94cc13d3c70def84ea2f959b9e0da1a22774f8fd7d74b5653866ef976205",
+    "requiredApprovedPacketSha256": "268c94cc13d3c70def84ea2f959b9e0da1a22774f8fd7d74b5653866ef976205",
+    "originalSessionIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-05-20-telling-your-brand-story-better",
+      "2026-05-22-uniaccess-xavier-university",
+      "2026-05-23-uniaccess-atlas-skilltech",
+      "2026-05-28-in-focus-1",
+      "2026-05-29-decoding-ever-expanding-cast",
+      "2026-06-03-dual-enrollment-pathway",
+      "2026-06-19-entrance-exams-pathways-india-part1",
+      "2026-06-25-in-focus-2",
+      "2026-06-30-exploring-identity-success-counseling",
+      "2026-07-03-inside-the-uc-session",
+      "2026-07-08-beyond-black-robes-law-careers",
+      "2026-07-15-creative-futures",
+      "2026-07-22-uniaccess-cept-university",
+      "2026-07-28-metrics-and-mingling",
+      "2026-07-30-in-focus-3",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload",
+      "2026-08-10-ucas-what-changed-what-matters",
+      "2026-08-12-uniaccess-ashoka-university",
+      "2026-08-24-uniaccess-leeds-arts-university",
+      "2026-08-27-in-focus-4"
+    ],
+    "septemberSessionIds": [
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations"
+    ],
+    "meaning": "original23/member source byte authority and scoped local recovery accepted; not per-input bulk AI egress permission"
+  },
+  "questions": {
+    "count": 92,
+    "ids": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq03",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq04",
+      "2026-05-08-funding-dreams-loans-forex-gq01",
+      "2026-05-20-telling-your-brand-story-better-gq01",
+      "2026-05-20-telling-your-brand-story-better-gq02",
+      "2026-05-22-uniaccess-xavier-university-gq01",
+      "2026-05-22-uniaccess-xavier-university-gq02",
+      "2026-05-22-uniaccess-xavier-university-gq03",
+      "2026-05-22-uniaccess-xavier-university-gq04",
+      "2026-05-23-uniaccess-atlas-skilltech-gq01",
+      "2026-05-23-uniaccess-atlas-skilltech-gq02",
+      "2026-05-23-uniaccess-atlas-skilltech-gq03",
+      "2026-05-28-in-focus-1-gq01",
+      "2026-05-28-in-focus-1-gq02",
+      "2026-05-28-in-focus-1-gq03",
+      "2026-05-28-in-focus-1-gq04",
+      "2026-05-29-decoding-ever-expanding-cast-gq01",
+      "2026-05-29-decoding-ever-expanding-cast-gq02",
+      "2026-05-29-decoding-ever-expanding-cast-gq03",
+      "2026-05-29-decoding-ever-expanding-cast-gq04",
+      "2026-06-03-dual-enrollment-pathway-gq01",
+      "2026-06-03-dual-enrollment-pathway-gq02",
+      "2026-06-03-dual-enrollment-pathway-gq03",
+      "2026-06-03-dual-enrollment-pathway-gq04",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq02",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq03",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq04",
+      "2026-06-25-in-focus-2-gq01",
+      "2026-06-25-in-focus-2-gq02",
+      "2026-06-25-in-focus-2-gq03",
+      "2026-06-25-in-focus-2-gq04",
+      "2026-06-30-exploring-identity-success-counseling-gq01",
+      "2026-06-30-exploring-identity-success-counseling-gq02",
+      "2026-06-30-exploring-identity-success-counseling-gq03",
+      "2026-06-30-exploring-identity-success-counseling-gq04",
+      "2026-07-03-inside-the-uc-session-gq01",
+      "2026-07-03-inside-the-uc-session-gq02",
+      "2026-07-08-beyond-black-robes-law-careers-gq01",
+      "2026-07-08-beyond-black-robes-law-careers-gq02",
+      "2026-07-15-creative-futures-gq01",
+      "2026-07-15-creative-futures-gq02",
+      "2026-07-15-creative-futures-gq03",
+      "2026-07-22-uniaccess-cept-university-gq01",
+      "2026-07-22-uniaccess-cept-university-gq02",
+      "2026-07-22-uniaccess-cept-university-gq03",
+      "2026-07-22-uniaccess-cept-university-gq04",
+      "2026-07-28-metrics-and-mingling-gq01",
+      "2026-07-28-metrics-and-mingling-gq02",
+      "2026-07-28-metrics-and-mingling-gq03",
+      "2026-07-30-in-focus-3-gq01",
+      "2026-07-30-in-focus-3-gq02",
+      "2026-07-30-in-focus-3-gq03",
+      "2026-07-30-in-focus-3-gq04",
+      "2026-08-03-uk-beyond-offer-letters-gq01",
+      "2026-08-03-uk-beyond-offer-letters-gq02",
+      "2026-08-03-uk-beyond-offer-letters-gq03",
+      "2026-08-03-uk-beyond-offer-letters-gq04",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq01",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq02",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq03",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq04",
+      "2026-08-10-ucas-what-changed-what-matters-gq01",
+      "2026-08-10-ucas-what-changed-what-matters-gq02",
+      "2026-08-12-uniaccess-ashoka-university-gq01",
+      "2026-08-12-uniaccess-ashoka-university-gq02",
+      "2026-08-12-uniaccess-ashoka-university-gq03",
+      "2026-08-24-uniaccess-leeds-arts-university-gq01",
+      "2026-08-24-uniaccess-leeds-arts-university-gq02",
+      "2026-08-24-uniaccess-leeds-arts-university-gq03",
+      "2026-08-24-uniaccess-leeds-arts-university-gq04",
+      "2026-08-27-in-focus-4-gq01",
+      "2026-08-27-in-focus-4-gq02",
+      "2026-05-08-funding-dreams-loans-forex-gq02",
+      "2026-05-08-funding-dreams-loans-forex-gq03",
+      "2026-05-08-funding-dreams-loans-forex-gq04",
+      "2026-05-20-telling-your-brand-story-better-gq03",
+      "2026-05-20-telling-your-brand-story-better-gq04",
+      "2026-05-23-uniaccess-atlas-skilltech-gq04",
+      "2026-07-03-inside-the-uc-session-gq03",
+      "2026-07-03-inside-the-uc-session-gq04",
+      "2026-07-08-beyond-black-robes-law-careers-gq03",
+      "2026-07-08-beyond-black-robes-law-careers-gq04",
+      "2026-07-15-creative-futures-gq04",
+      "2026-07-28-metrics-and-mingling-gq04",
+      "2026-08-10-ucas-what-changed-what-matters-gq03",
+      "2026-08-10-ucas-what-changed-what-matters-gq04",
+      "2026-08-12-uniaccess-ashoka-university-gq04",
+      "2026-08-27-in-focus-4-gq03",
+      "2026-08-27-in-focus-4-gq04"
+    ],
+    "expectedTargetIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-05-20-telling-your-brand-story-better",
+      "2026-05-22-uniaccess-xavier-university",
+      "2026-05-23-uniaccess-atlas-skilltech",
+      "2026-05-28-in-focus-1",
+      "2026-05-29-decoding-ever-expanding-cast",
+      "2026-06-03-dual-enrollment-pathway",
+      "2026-06-19-entrance-exams-pathways-india-part1",
+      "2026-06-25-in-focus-2",
+      "2026-06-30-exploring-identity-success-counseling",
+      "2026-07-03-inside-the-uc-session",
+      "2026-07-08-beyond-black-robes-law-careers",
+      "2026-07-15-creative-futures",
+      "2026-07-22-uniaccess-cept-university",
+      "2026-07-28-metrics-and-mingling",
+      "2026-07-30-in-focus-3",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload",
+      "2026-08-10-ucas-what-changed-what-matters",
+      "2026-08-12-uniaccess-ashoka-university",
+      "2026-08-24-uniaccess-leeds-arts-university",
+      "2026-08-27-in-focus-4"
+    ],
+    "outsideCanonicalOriginalIds": [],
+    "unresolvedBulkJudgeQueryIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq03",
+      "2026-04-21-visa-blueprint-part2-italy-france-nz-gq04",
+      "2026-05-08-funding-dreams-loans-forex-gq01",
+      "2026-05-20-telling-your-brand-story-better-gq01",
+      "2026-05-20-telling-your-brand-story-better-gq02",
+      "2026-05-22-uniaccess-xavier-university-gq01",
+      "2026-05-22-uniaccess-xavier-university-gq02",
+      "2026-05-22-uniaccess-xavier-university-gq03",
+      "2026-05-22-uniaccess-xavier-university-gq04",
+      "2026-05-23-uniaccess-atlas-skilltech-gq01",
+      "2026-05-23-uniaccess-atlas-skilltech-gq02",
+      "2026-05-23-uniaccess-atlas-skilltech-gq03",
+      "2026-05-28-in-focus-1-gq01",
+      "2026-05-28-in-focus-1-gq02",
+      "2026-05-28-in-focus-1-gq03",
+      "2026-05-28-in-focus-1-gq04",
+      "2026-05-29-decoding-ever-expanding-cast-gq01",
+      "2026-05-29-decoding-ever-expanding-cast-gq02",
+      "2026-05-29-decoding-ever-expanding-cast-gq03",
+      "2026-05-29-decoding-ever-expanding-cast-gq04",
+      "2026-06-03-dual-enrollment-pathway-gq01",
+      "2026-06-03-dual-enrollment-pathway-gq02",
+      "2026-06-03-dual-enrollment-pathway-gq03",
+      "2026-06-03-dual-enrollment-pathway-gq04",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq02",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq03",
+      "2026-06-19-entrance-exams-pathways-india-part1-gq04",
+      "2026-06-25-in-focus-2-gq01",
+      "2026-06-25-in-focus-2-gq02",
+      "2026-06-25-in-focus-2-gq03",
+      "2026-06-25-in-focus-2-gq04",
+      "2026-06-30-exploring-identity-success-counseling-gq01",
+      "2026-06-30-exploring-identity-success-counseling-gq02",
+      "2026-06-30-exploring-identity-success-counseling-gq03",
+      "2026-06-30-exploring-identity-success-counseling-gq04",
+      "2026-07-03-inside-the-uc-session-gq01",
+      "2026-07-03-inside-the-uc-session-gq02",
+      "2026-07-08-beyond-black-robes-law-careers-gq01",
+      "2026-07-08-beyond-black-robes-law-careers-gq02",
+      "2026-07-15-creative-futures-gq01",
+      "2026-07-15-creative-futures-gq02",
+      "2026-07-15-creative-futures-gq03",
+      "2026-07-22-uniaccess-cept-university-gq01",
+      "2026-07-22-uniaccess-cept-university-gq02",
+      "2026-07-22-uniaccess-cept-university-gq03",
+      "2026-07-22-uniaccess-cept-university-gq04",
+      "2026-07-28-metrics-and-mingling-gq01",
+      "2026-07-28-metrics-and-mingling-gq02",
+      "2026-07-28-metrics-and-mingling-gq03",
+      "2026-07-30-in-focus-3-gq01",
+      "2026-07-30-in-focus-3-gq02",
+      "2026-07-30-in-focus-3-gq03",
+      "2026-07-30-in-focus-3-gq04",
+      "2026-08-03-uk-beyond-offer-letters-gq01",
+      "2026-08-03-uk-beyond-offer-letters-gq02",
+      "2026-08-03-uk-beyond-offer-letters-gq03",
+      "2026-08-03-uk-beyond-offer-letters-gq04",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq01",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq02",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq03",
+      "2026-08-03-uk-beyond-offer-letters-reupload-gq04",
+      "2026-08-10-ucas-what-changed-what-matters-gq01",
+      "2026-08-10-ucas-what-changed-what-matters-gq02",
+      "2026-08-12-uniaccess-ashoka-university-gq01",
+      "2026-08-12-uniaccess-ashoka-university-gq02",
+      "2026-08-12-uniaccess-ashoka-university-gq03",
+      "2026-08-24-uniaccess-leeds-arts-university-gq01",
+      "2026-08-24-uniaccess-leeds-arts-university-gq02",
+      "2026-08-24-uniaccess-leeds-arts-university-gq03",
+      "2026-08-24-uniaccess-leeds-arts-university-gq04",
+      "2026-08-27-in-focus-4-gq01",
+      "2026-08-27-in-focus-4-gq02",
+      "2026-05-08-funding-dreams-loans-forex-gq02",
+      "2026-05-08-funding-dreams-loans-forex-gq03",
+      "2026-05-08-funding-dreams-loans-forex-gq04",
+      "2026-05-20-telling-your-brand-story-better-gq03",
+      "2026-05-20-telling-your-brand-story-better-gq04",
+      "2026-05-23-uniaccess-atlas-skilltech-gq04",
+      "2026-07-03-inside-the-uc-session-gq03",
+      "2026-07-03-inside-the-uc-session-gq04",
+      "2026-07-08-beyond-black-robes-law-careers-gq03",
+      "2026-07-08-beyond-black-robes-law-careers-gq04",
+      "2026-07-15-creative-futures-gq04",
+      "2026-07-28-metrics-and-mingling-gq04",
+      "2026-08-10-ucas-what-changed-what-matters-gq03",
+      "2026-08-10-ucas-what-changed-what-matters-gq04",
+      "2026-08-12-uniaccess-ashoka-university-gq04",
+      "2026-08-27-in-focus-4-gq03",
+      "2026-08-27-in-focus-4-gq04"
+    ],
+    "existingBoundedApproval": "92question JSON9920bytes SHA0e00f22840b14d2317fd81cbdddb4947f7448b5a035d9a1da4f98909042e5cf5 to Gemini embeddings; one separate Ask context under explicit workDB/no jobs",
+    "purposeExpansion": "Repeated question+allcandidate title/summary to three generative judges is distinct from one embedding payload"
+  },
+  "populations": {
+    "canonicalOriginal": 23,
+    "currentCandidates": 29,
+    "septemberAdditions": 6,
+    "goldenQuestions": 92,
+    "sourceMetadataConsentTrue": 29,
+    "admissibleLocalRecoveryIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-05-20-telling-your-brand-story-better",
+      "2026-05-22-uniaccess-xavier-university",
+      "2026-05-23-uniaccess-atlas-skilltech",
+      "2026-05-28-in-focus-1",
+      "2026-05-29-decoding-ever-expanding-cast",
+      "2026-06-03-dual-enrollment-pathway",
+      "2026-06-19-entrance-exams-pathways-india-part1",
+      "2026-06-25-in-focus-2",
+      "2026-06-30-exploring-identity-success-counseling",
+      "2026-07-03-inside-the-uc-session",
+      "2026-07-08-beyond-black-robes-law-careers",
+      "2026-07-15-creative-futures",
+      "2026-07-22-uniaccess-cept-university",
+      "2026-07-28-metrics-and-mingling",
+      "2026-07-30-in-focus-3",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload",
+      "2026-08-10-ucas-what-changed-what-matters",
+      "2026-08-12-uniaccess-ashoka-university",
+      "2026-08-24-uniaccess-leeds-arts-university",
+      "2026-08-27-in-focus-4",
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations"
+    ],
+    "independentlyEstablishedBulkJudgeIds": [],
+    "bulkJudgeStatus": "UNRESOLVED for all29, not a recorded deny",
+    "explicitDeniedIds": [],
+    "unresolvedBulkJudgeIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-05-20-telling-your-brand-story-better",
+      "2026-05-22-uniaccess-xavier-university",
+      "2026-05-23-uniaccess-atlas-skilltech",
+      "2026-05-28-in-focus-1",
+      "2026-05-29-decoding-ever-expanding-cast",
+      "2026-06-03-dual-enrollment-pathway",
+      "2026-06-19-entrance-exams-pathways-india-part1",
+      "2026-06-25-in-focus-2",
+      "2026-06-30-exploring-identity-success-counseling",
+      "2026-07-03-inside-the-uc-session",
+      "2026-07-08-beyond-black-robes-law-careers",
+      "2026-07-15-creative-futures",
+      "2026-07-22-uniaccess-cept-university",
+      "2026-07-28-metrics-and-mingling",
+      "2026-07-30-in-focus-3",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload",
+      "2026-08-10-ucas-what-changed-what-matters",
+      "2026-08-12-uniaccess-ashoka-university",
+      "2026-08-24-uniaccess-leeds-arts-university",
+      "2026-08-27-in-focus-4",
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations"
+    ],
+    "requiredCallsPerModel": 2668,
+    "fullThreeModelMinimum": 8004,
+    "originalPlanPreserved": true,
+    "newApprovedCallCeiling": null
+  },
+  "rows": [
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/21st-April-Visa-Blueprint-Part2-Italy-France-NZ.content.md",
+        "legacyHash": "564a642203fe4bcee0cc984a93dab8fc7bdf1c140621c9c33aa4f12d0e913cd5",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/source.json",
+          "sha256": "3a3ff05964ba1c7f294fb27aae2268f42bbcd9de9d4d2f6df4159903797a21da",
+          "retainedPacketParentKey": "original/2026-04-21-visa-blueprint-part2-italy-france-nz/source.json",
+          "retainedPacketParentSha256": "3a3ff05964ba1c7f294fb27aae2268f42bbcd9de9d4d2f6df4159903797a21da",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/session.json",
+          "sha256": "8173493e589652601c546bf4413db8f33ede95de9b3e278b13c0988e6617cbd0",
+          "retainedPacketParentKey": "original/2026-04-21-visa-blueprint-part2-italy-france-nz/session.json",
+          "retainedPacketParentSha256": "8173493e589652601c546bf4413db8f33ede95de9b3e278b13c0988e6617cbd0",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/session_page.json",
+          "sha256": "2076d4a2d33aeb41128d7a97983ee291e38f911e3d77f2e4c84f351dfaec43d2",
+          "retainedPacketParentKey": "original/2026-04-21-visa-blueprint-part2-italy-france-nz/session_page.json",
+          "retainedPacketParentSha256": "2076d4a2d33aeb41128d7a97983ee291e38f911e3d77f2e4c84f351dfaec43d2",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/8th-May-Funding-Dreams-Loans-Forex.content.md",
+        "legacyHash": "90a41cd8ac050f68455bc59aea2a06070a95f04f340870e6596548a0bb01b128",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/source.json",
+          "sha256": "246b2e477f2d7ec00664160963bf63f5cfd012bad4cf0b586f251bbe4c7a53ea",
+          "retainedPacketParentKey": "original/2026-05-08-funding-dreams-loans-forex/source.json",
+          "retainedPacketParentSha256": "246b2e477f2d7ec00664160963bf63f5cfd012bad4cf0b586f251bbe4c7a53ea",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/session.json",
+          "sha256": "97772c95d49746f238e92f99c78f59f885691e23e31f81775768c4c73676292e",
+          "retainedPacketParentKey": "original/2026-05-08-funding-dreams-loans-forex/session.json",
+          "retainedPacketParentSha256": "97772c95d49746f238e92f99c78f59f885691e23e31f81775768c4c73676292e",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/session_page.json",
+          "sha256": "bbea50dd11338f1e7d91ad1094de0d138658c6f005eed9cd3d1e30f9d265279e",
+          "retainedPacketParentKey": "original/2026-05-08-funding-dreams-loans-forex/session_page.json",
+          "retainedPacketParentSha256": "bbea50dd11338f1e7d91ad1094de0d138658c6f005eed9cd3d1e30f9d265279e",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/20th-May-Telling-Your-Brand-Story-Better.content.md",
+        "legacyHash": "869ec7f252f3f2f9bddb8898e15035c0a5656eb61e8ce86115a2bebc40df0f5c",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/source.json",
+          "sha256": "77fad7476f16949c520326e18e94f6c76dc4e49682f73e2308f3075dce50867f",
+          "retainedPacketParentKey": "original/2026-05-20-telling-your-brand-story-better/source.json",
+          "retainedPacketParentSha256": "77fad7476f16949c520326e18e94f6c76dc4e49682f73e2308f3075dce50867f",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/session.json",
+          "sha256": "5face5a01f5284f964549aa6af786fe3537e360abf16cf651e779969941c471c",
+          "retainedPacketParentKey": "original/2026-05-20-telling-your-brand-story-better/session.json",
+          "retainedPacketParentSha256": "5face5a01f5284f964549aa6af786fe3537e360abf16cf651e779969941c471c",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/session_page.json",
+          "sha256": "2bf6fb55dc584a5b422161a82e87e10623f34422a2ff1be19320fcd515d85b80",
+          "retainedPacketParentKey": "original/2026-05-20-telling-your-brand-story-better/session_page.json",
+          "retainedPacketParentSha256": "2bf6fb55dc584a5b422161a82e87e10623f34422a2ff1be19320fcd515d85b80",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/22nd-May-UniAccess-Xavier-University.content.md",
+        "legacyHash": "3ca1a663fafc2a5d1c4c0fa2d7aea2d5e47733ff24dccb0c2902e37bffaf166b",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/source.json",
+          "sha256": "93822574bb22135386854e9dcee95a8a704afdf751a62b5f38bfae4de9d67568",
+          "retainedPacketParentKey": "original/2026-05-22-uniaccess-xavier-university/source.json",
+          "retainedPacketParentSha256": "93822574bb22135386854e9dcee95a8a704afdf751a62b5f38bfae4de9d67568",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/session.json",
+          "sha256": "c2ad607870a60f9736d6b8094e006fe496e6e09603f7864e30bbe04637720de3",
+          "retainedPacketParentKey": "original/2026-05-22-uniaccess-xavier-university/session.json",
+          "retainedPacketParentSha256": "c2ad607870a60f9736d6b8094e006fe496e6e09603f7864e30bbe04637720de3",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/session_page.json",
+          "sha256": "3c1362da4cb3d6fc118d5aad1f0f53dff809c7ab5029064fb3528c05adc8f572",
+          "retainedPacketParentKey": "original/2026-05-22-uniaccess-xavier-university/session_page.json",
+          "retainedPacketParentSha256": "3c1362da4cb3d6fc118d5aad1f0f53dff809c7ab5029064fb3528c05adc8f572",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/23rd-May-UniAccess-ATLAS-Skilltech.content.md",
+        "legacyHash": "baa99efd6c32b29e0f060cdc8c7811987cfa8684fc03b8a6a8dbcab145039b23",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/source.json",
+          "sha256": "ae83c1ea0d1d1e68834a458d99f1170825834e2740aaeb1655a430edaa5e19f9",
+          "retainedPacketParentKey": "original/2026-05-23-uniaccess-atlas-skilltech/source.json",
+          "retainedPacketParentSha256": "ae83c1ea0d1d1e68834a458d99f1170825834e2740aaeb1655a430edaa5e19f9",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/session.json",
+          "sha256": "25dfc1a10d20688a2825f3db19c1a8c025c0991ea9d522888b026d0819c3ae19",
+          "retainedPacketParentKey": "original/2026-05-23-uniaccess-atlas-skilltech/session.json",
+          "retainedPacketParentSha256": "25dfc1a10d20688a2825f3db19c1a8c025c0991ea9d522888b026d0819c3ae19",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/session_page.json",
+          "sha256": "7f040d398224840b2eea644929a301ef873c7a2df7aef0c740364ae4004e1fe3",
+          "retainedPacketParentKey": "original/2026-05-23-uniaccess-atlas-skilltech/session_page.json",
+          "retainedPacketParentSha256": "7f040d398224840b2eea644929a301ef873c7a2df7aef0c740364ae4004e1fe3",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-05-28-in-focus-1",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/28th-May-In-Focus.content.md",
+        "legacyHash": "0e6be0c106ecc966a4dd37c353658ed9f362e280572ca657b6161967226ec3ed",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/source.json",
+          "sha256": "f8940589f2ac2588753e71b5fc1ad9b1d08dffe346d4f7ceb36e37b07e5a0c64",
+          "retainedPacketParentKey": "original/2026-05-28-in-focus-1/source.json",
+          "retainedPacketParentSha256": "f8940589f2ac2588753e71b5fc1ad9b1d08dffe346d4f7ceb36e37b07e5a0c64",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/session.json",
+          "sha256": "2be04cc901ddc93eec32a09ec4d06fa433e6c41e18681153019c9a6e8e5baefc",
+          "retainedPacketParentKey": "original/2026-05-28-in-focus-1/session.json",
+          "retainedPacketParentSha256": "2be04cc901ddc93eec32a09ec4d06fa433e6c41e18681153019c9a6e8e5baefc",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-28-in-focus-1/session_page.json",
+          "sha256": "6c8be92c0089ad4274967c5de7ce70f824fb0fa1a0d2a1af6dbb209589dbbcc6",
+          "retainedPacketParentKey": "original/2026-05-28-in-focus-1/session_page.json",
+          "retainedPacketParentSha256": "6c8be92c0089ad4274967c5de7ce70f824fb0fa1a0d2a1af6dbb209589dbbcc6",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/29th-May-Decoding-Ever-Expanding-Cast.content.md",
+        "legacyHash": "6060f616bccd24df86d77ec1b3a23fd24d6972467d5e5d85e2c5444e08790695",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/source.json",
+          "sha256": "3175186c1f6c516254e02112b3f94bd079465fb9aebdbff84c0a69cc977ef29e",
+          "retainedPacketParentKey": "original/2026-05-29-decoding-ever-expanding-cast/source.json",
+          "retainedPacketParentSha256": "3175186c1f6c516254e02112b3f94bd079465fb9aebdbff84c0a69cc977ef29e",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/session.json",
+          "sha256": "33bdcfbe7122a333eb73033ae37470e251cbc951e989a92d70e417cef93e70cb",
+          "retainedPacketParentKey": "original/2026-05-29-decoding-ever-expanding-cast/session.json",
+          "retainedPacketParentSha256": "33bdcfbe7122a333eb73033ae37470e251cbc951e989a92d70e417cef93e70cb",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/session_page.json",
+          "sha256": "c08ab7ae683f810333f1c51827252deb0e90f9c09f168fdc3a43ca017647c8d2",
+          "retainedPacketParentKey": "original/2026-05-29-decoding-ever-expanding-cast/session_page.json",
+          "retainedPacketParentSha256": "c08ab7ae683f810333f1c51827252deb0e90f9c09f168fdc3a43ca017647c8d2",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/3rd-June-Dual-Enrollment-Pathway.content.md",
+        "legacyHash": "4f5bb52af775b0c7232ba09d99cb2983922aea095ec8dcef78a183fc2353419d",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/source.json",
+          "sha256": "30fe566067798790b3a3710e15b29384892c9b35823132275712e995ac3d71a3",
+          "retainedPacketParentKey": "original/2026-06-03-dual-enrollment-pathway/source.json",
+          "retainedPacketParentSha256": "30fe566067798790b3a3710e15b29384892c9b35823132275712e995ac3d71a3",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/session.json",
+          "sha256": "efba67b814534fb995ce362479777a803c4cde124bf1532a94d8f87017a6ca58",
+          "retainedPacketParentKey": "original/2026-06-03-dual-enrollment-pathway/session.json",
+          "retainedPacketParentSha256": "efba67b814534fb995ce362479777a803c4cde124bf1532a94d8f87017a6ca58",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/session_page.json",
+          "sha256": "e3df87ed5b28e302e6f1f3bdff1810c2a74ee348cb553d5afdd8cda2cc127ddd",
+          "retainedPacketParentKey": "original/2026-06-03-dual-enrollment-pathway/session_page.json",
+          "retainedPacketParentSha256": "e3df87ed5b28e302e6f1f3bdff1810c2a74ee348cb553d5afdd8cda2cc127ddd",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-06-19-entrance-exams-pathways-india-part1",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/19th-June-Entrance-Exams-Pathways-India-Part1.content.md",
+        "legacyHash": "b8b2d60db4232eb325a2d1365c35424093768576a44bfac4d4f4d11102c2e9ac",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/source.json",
+          "sha256": "ff3c7d3580ad1399e19603c7d50def99b70ccce85faf201dd4b00d28c6eb3348",
+          "retainedPacketParentKey": "original/2026-06-19-entrance-exams-pathways-india-part1/source.json",
+          "retainedPacketParentSha256": "ff3c7d3580ad1399e19603c7d50def99b70ccce85faf201dd4b00d28c6eb3348",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/session.json",
+          "sha256": "a0f77a51ac568546cc7e2469fb9125ed8488c01d98d4ecba3dac72d979728a94",
+          "retainedPacketParentKey": "original/2026-06-19-entrance-exams-pathways-india-part1/session.json",
+          "retainedPacketParentSha256": "a0f77a51ac568546cc7e2469fb9125ed8488c01d98d4ecba3dac72d979728a94",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/session_page.json",
+          "sha256": "5c263891b7e7d348758150257f4f03b2d6a68abe28e76c84ba38aa8431bec59f",
+          "retainedPacketParentKey": "original/2026-06-19-entrance-exams-pathways-india-part1/session_page.json",
+          "retainedPacketParentSha256": "5c263891b7e7d348758150257f4f03b2d6a68abe28e76c84ba38aa8431bec59f",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-06-25-in-focus-2",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/25th-June-Infocus.content.md",
+        "legacyHash": "8bcf25db44f6f8b24eeda54e91d3839a65177bbd4003c80b95930c33c4009fa0",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-06-25-in-focus-2/source.json",
+          "sha256": "0a7f40166a46de25447e733c51c8ffca5a142b62040a144646c713be18a7e5db",
+          "retainedPacketParentKey": "original/2026-06-25-in-focus-2/source.json",
+          "retainedPacketParentSha256": "0a7f40166a46de25447e733c51c8ffca5a142b62040a144646c713be18a7e5db",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-25-in-focus-2/session.json",
+          "sha256": "c775881bee0def98cb9c8b8642bdb16843661a8fd233b7cc02de3fbc500c92f9",
+          "retainedPacketParentKey": "original/2026-06-25-in-focus-2/session.json",
+          "retainedPacketParentSha256": "c775881bee0def98cb9c8b8642bdb16843661a8fd233b7cc02de3fbc500c92f9",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-25-in-focus-2/session_page.json",
+          "sha256": "d6bfe403c57acd8e9ef035f5417be7436cd45d5087f6520a3df033e68a47512e",
+          "retainedPacketParentKey": "original/2026-06-25-in-focus-2/session_page.json",
+          "retainedPacketParentSha256": "d6bfe403c57acd8e9ef035f5417be7436cd45d5087f6520a3df033e68a47512e",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-06-30-exploring-identity-success-counseling",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/30th-June-Exploring-Identity-Success-Counseling.content.md",
+        "legacyHash": "76bf48e19ad2e560f682ab5a9b6a5a5d87b7da0d36ece93dc8dd73d4f50b85a0",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/source.json",
+          "sha256": "1c530330d7a3878e2973c7ac419fbacfc4fa7c6b9aa187199a96722681462add",
+          "retainedPacketParentKey": "original/2026-06-30-exploring-identity-success-counseling/source.json",
+          "retainedPacketParentSha256": "1c530330d7a3878e2973c7ac419fbacfc4fa7c6b9aa187199a96722681462add",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/session.json",
+          "sha256": "2b88ebe9ea899749de54c7d64eaff78aa4d713db43f38bfa6b01f052a5ced3a5",
+          "retainedPacketParentKey": "original/2026-06-30-exploring-identity-success-counseling/session.json",
+          "retainedPacketParentSha256": "2b88ebe9ea899749de54c7d64eaff78aa4d713db43f38bfa6b01f052a5ced3a5",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/session_page.json",
+          "sha256": "16d283259574f6e4b5bd5bdbdbdf0b4fbc1259b8de5d0b34531becaa0547533e",
+          "retainedPacketParentKey": "original/2026-06-30-exploring-identity-success-counseling/session_page.json",
+          "retainedPacketParentSha256": "16d283259574f6e4b5bd5bdbdbdf0b4fbc1259b8de5d0b34531becaa0547533e",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-07-03-inside-the-uc-session",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/3rd-July-Inside-the-UC-Session.content.md",
+        "legacyHash": "5c657bb1024e59d08056929d763a631e74a03e0381a07e1370865a5bd19e973f",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/source.json",
+          "sha256": "06cdff365b1916ab63ed7f4aab105bbe05d4b5a5170dbbe99bb5aa0340eb4154",
+          "retainedPacketParentKey": "original/2026-07-03-inside-the-uc-session/source.json",
+          "retainedPacketParentSha256": "06cdff365b1916ab63ed7f4aab105bbe05d4b5a5170dbbe99bb5aa0340eb4154",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/session.json",
+          "sha256": "e375fb0139fd48bfa364c2c2038fa12c59171c40e222b1ac7556fdddf9583068",
+          "retainedPacketParentKey": "original/2026-07-03-inside-the-uc-session/session.json",
+          "retainedPacketParentSha256": "e375fb0139fd48bfa364c2c2038fa12c59171c40e222b1ac7556fdddf9583068",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/session_page.json",
+          "sha256": "7fba04b518f0f600e8901f5f946569fb101f5427002d28dd0034f1746feee320",
+          "retainedPacketParentKey": "original/2026-07-03-inside-the-uc-session/session_page.json",
+          "retainedPacketParentSha256": "7fba04b518f0f600e8901f5f946569fb101f5427002d28dd0034f1746feee320",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-07-08-beyond-black-robes-law-careers",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/8th-July-Beyond-Black-Robes-Law-Careers.content.md",
+        "legacyHash": "9c01fe4cb898f66de2d0603d69220cb23617740ff6835b3ff8d1e4a5bc48df3c",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/source.json",
+          "sha256": "c821c70783ec25d38c863833e7092a65749b2820acf62f98e20a3e321228e311",
+          "retainedPacketParentKey": "original/2026-07-08-beyond-black-robes-law-careers/source.json",
+          "retainedPacketParentSha256": "c821c70783ec25d38c863833e7092a65749b2820acf62f98e20a3e321228e311",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/session.json",
+          "sha256": "effcf2a4c9e58f5a4faab460cbb862d182b1cb5737c01caa510b3359478b7a13",
+          "retainedPacketParentKey": "original/2026-07-08-beyond-black-robes-law-careers/session.json",
+          "retainedPacketParentSha256": "effcf2a4c9e58f5a4faab460cbb862d182b1cb5737c01caa510b3359478b7a13",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/session_page.json",
+          "sha256": "401400c770109662d2c027e1932a4135ebc1ba542af2234e324504572e618da4",
+          "retainedPacketParentKey": "original/2026-07-08-beyond-black-robes-law-careers/session_page.json",
+          "retainedPacketParentSha256": "401400c770109662d2c027e1932a4135ebc1ba542af2234e324504572e618da4",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-07-15-creative-futures",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/15th-July-Creative-Futures.content.md",
+        "legacyHash": "228431ee3c39a1556755c6e5feb63978bc5a6600f54f324ed4660dfc75101d89",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-07-15-creative-futures/source.json",
+          "sha256": "9b2db6003c9a572c439c9ae3b6c45111e803e2fbd1d4de9333757e576d067be2",
+          "retainedPacketParentKey": "original/2026-07-15-creative-futures/source.json",
+          "retainedPacketParentSha256": "9b2db6003c9a572c439c9ae3b6c45111e803e2fbd1d4de9333757e576d067be2",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-15-creative-futures/session.json",
+          "sha256": "44bb754579548203c514fc678c78e67f82d611deb8d8fabfe2698c1c55c7d325",
+          "retainedPacketParentKey": "original/2026-07-15-creative-futures/session.json",
+          "retainedPacketParentSha256": "44bb754579548203c514fc678c78e67f82d611deb8d8fabfe2698c1c55c7d325",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-15-creative-futures/session_page.json",
+          "sha256": "972d1a575a88dcbcfd4f03265745d95394a3b830ca0c527ecf5a9bd63d1167f3",
+          "retainedPacketParentKey": "original/2026-07-15-creative-futures/session_page.json",
+          "retainedPacketParentSha256": "972d1a575a88dcbcfd4f03265745d95394a3b830ca0c527ecf5a9bd63d1167f3",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-07-22-uniaccess-cept-university",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/22nd-July-UniAccess-CEPT-University.content.md",
+        "legacyHash": "7a81431581dffdbfd58a3af56ae09064f67149fbe00367650faefaeed7a12631",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/source.json",
+          "sha256": "d462a279b539023e7fd05830a3a6fb25c747263207300201bd5bb4d7bc354bc1",
+          "retainedPacketParentKey": "original/2026-07-22-uniaccess-cept-university/source.json",
+          "retainedPacketParentSha256": "d462a279b539023e7fd05830a3a6fb25c747263207300201bd5bb4d7bc354bc1",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/session.json",
+          "sha256": "8e7fdb7d989df12862bfce331f3b154889d352f5bb903e37c3021c59d240e43f",
+          "retainedPacketParentKey": "original/2026-07-22-uniaccess-cept-university/session.json",
+          "retainedPacketParentSha256": "8e7fdb7d989df12862bfce331f3b154889d352f5bb903e37c3021c59d240e43f",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/session_page.json",
+          "sha256": "11b675ccae9436436a5e7c77d6b6e091df5e2871cef17a3ee8618fbf70fc2c5c",
+          "retainedPacketParentKey": "original/2026-07-22-uniaccess-cept-university/session_page.json",
+          "retainedPacketParentSha256": "11b675ccae9436436a5e7c77d6b6e091df5e2871cef17a3ee8618fbf70fc2c5c",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-07-28-metrics-and-mingling",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/28th-July-Metrics-and-Mingling.content.md",
+        "legacyHash": "ad3d2be468b936ab8b0102c397d2ecf0e263bede44e895c5ae2e9023caeedc33",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/source.json",
+          "sha256": "a65353ef16064415c0a82f4eafdd4fbd4842b397dc3266da27e1b0027c95a4bb",
+          "retainedPacketParentKey": "original/2026-07-28-metrics-and-mingling/source.json",
+          "retainedPacketParentSha256": "a65353ef16064415c0a82f4eafdd4fbd4842b397dc3266da27e1b0027c95a4bb",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/session.json",
+          "sha256": "ce0072c74c0c362514daf8a8466cc8654a65341cde79debb86923ab8f573d191",
+          "retainedPacketParentKey": "original/2026-07-28-metrics-and-mingling/session.json",
+          "retainedPacketParentSha256": "ce0072c74c0c362514daf8a8466cc8654a65341cde79debb86923ab8f573d191",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/session_page.json",
+          "sha256": "a0a0fda26565e71f2f724ed8787c0b0843e1b029fd6ded0063fee8a8a8ee6972",
+          "retainedPacketParentKey": "original/2026-07-28-metrics-and-mingling/session_page.json",
+          "retainedPacketParentSha256": "a0a0fda26565e71f2f724ed8787c0b0843e1b029fd6ded0063fee8a8a8ee6972",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-07-30-in-focus-3",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/30th-July-In-Focus.content.md",
+        "legacyHash": "be55bd39ed2fe820701889805386a0b935f518c396b015da9d881623ee5240d9",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-07-30-in-focus-3/source.json",
+          "sha256": "5b27d16423c480430fa4ccd1cc2b597fcee6634518ec72fa657a864b271e007d",
+          "retainedPacketParentKey": "original/2026-07-30-in-focus-3/source.json",
+          "retainedPacketParentSha256": "5b27d16423c480430fa4ccd1cc2b597fcee6634518ec72fa657a864b271e007d",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-30-in-focus-3/session.json",
+          "sha256": "b9c9d462cb984fbfd0b9eef02161bad39d965b6b42a38c5b04aee0507f581ba5",
+          "retainedPacketParentKey": "original/2026-07-30-in-focus-3/session.json",
+          "retainedPacketParentSha256": "b9c9d462cb984fbfd0b9eef02161bad39d965b6b42a38c5b04aee0507f581ba5",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-07-30-in-focus-3/session_page.json",
+          "sha256": "634a4d4a34162e27a8fdf001ebf49e562a85f755b667024a76eb1fd016849a21",
+          "retainedPacketParentKey": "original/2026-07-30-in-focus-3/session_page.json",
+          "retainedPacketParentSha256": "634a4d4a34162e27a8fdf001ebf49e562a85f755b667024a76eb1fd016849a21",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-08-03-uk-beyond-offer-letters",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/03rd-August-UK-Beyond-Offer-Letters.content.md",
+        "legacyHash": "e8b93bbb1aaa5af7d6f454f786445e5559c7abb653eea050eedc59305f82e4d3",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/source.json",
+          "sha256": "056aa2e54b3004c4a695048b88e3c53f77e77111c45b741ce16d279807ce8dc6",
+          "retainedPacketParentKey": "original/2026-08-03-uk-beyond-offer-letters/source.json",
+          "retainedPacketParentSha256": "056aa2e54b3004c4a695048b88e3c53f77e77111c45b741ce16d279807ce8dc6",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/session.json",
+          "sha256": "68ef29bec8a388537c30aac7300bb2bf487e9d05f563f2cb2049555e6e369910",
+          "retainedPacketParentKey": "original/2026-08-03-uk-beyond-offer-letters/session.json",
+          "retainedPacketParentSha256": "68ef29bec8a388537c30aac7300bb2bf487e9d05f563f2cb2049555e6e369910",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/session_page.json",
+          "sha256": "ad807fb09ca168c2bc6f089649204b36ceb0451824ec260a063bc3b9f04fb2bf",
+          "retainedPacketParentKey": "original/2026-08-03-uk-beyond-offer-letters/session_page.json",
+          "retainedPacketParentSha256": "ad807fb09ca168c2bc6f089649204b36ceb0451824ec260a063bc3b9f04fb2bf",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/UK-Beyond-Offer-Letters.content.md",
+        "legacyHash": "2e69ef61d95ef23c0cf89d48886613cd54ae6afb0517090e01c60097ad2710ac",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/source.json",
+          "sha256": "3f7b8e499e66c718e760e6d1c083333189501674b28b61811baa7547973cfa95",
+          "retainedPacketParentKey": "original/2026-08-03-uk-beyond-offer-letters-reupload/source.json",
+          "retainedPacketParentSha256": "3f7b8e499e66c718e760e6d1c083333189501674b28b61811baa7547973cfa95",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/session.json",
+          "sha256": "56dd00887567ccd6c1e61eace3a43587ccfe4fb8efcfafbdc8a7b8a811986568",
+          "retainedPacketParentKey": "original/2026-08-03-uk-beyond-offer-letters-reupload/session.json",
+          "retainedPacketParentSha256": "56dd00887567ccd6c1e61eace3a43587ccfe4fb8efcfafbdc8a7b8a811986568",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/session_page.json",
+          "sha256": "25c7344d89e47a6754a9a1557dabdb77537120e928a85b0d5e3c25d021e3c243",
+          "retainedPacketParentKey": "original/2026-08-03-uk-beyond-offer-letters-reupload/session_page.json",
+          "retainedPacketParentSha256": "25c7344d89e47a6754a9a1557dabdb77537120e928a85b0d5e3c25d021e3c243",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/10th-August-What-Changed-What-Matters-–-Inside-the-New-UCAS-Application-.content.md",
+        "legacyHash": "f45f062f3dcac4f9a19c1c63f84404513802b2ecd06280f97d1c5d8c69145423",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/source.json",
+          "sha256": "1bca96027dcd369b110c40fb04b7fe405eb458e733591e6c11c5b858804ac4c2",
+          "retainedPacketParentKey": "original/2026-08-10-ucas-what-changed-what-matters/source.json",
+          "retainedPacketParentSha256": "1bca96027dcd369b110c40fb04b7fe405eb458e733591e6c11c5b858804ac4c2",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/session.json",
+          "sha256": "4385dd1bdf1ff41ef04feadc9f0c92dea49da0d4c022a91b470271776ef1977b",
+          "retainedPacketParentKey": "original/2026-08-10-ucas-what-changed-what-matters/session.json",
+          "retainedPacketParentSha256": "4385dd1bdf1ff41ef04feadc9f0c92dea49da0d4c022a91b470271776ef1977b",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/session_page.json",
+          "sha256": "12cc18a7d7950cae298d3f44cc6d3c9a2ee850695cca8bd081b35ed39c0daba1",
+          "retainedPacketParentKey": "original/2026-08-10-ucas-what-changed-what-matters/session_page.json",
+          "retainedPacketParentSha256": "12cc18a7d7950cae298d3f44cc6d3c9a2ee850695cca8bd081b35ed39c0daba1",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-08-12-uniaccess-ashoka-university",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/12th-August-UniAccess-Live-Meet-Ashoka-University.content.md",
+        "legacyHash": "65734c6015a828bf22dff0cffc291e954fafffdfd0bda204282f39f59013ce39",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/source.json",
+          "sha256": "d466f202adc3e31ba91a75612598c90e5311d2b4a32f1d38eb70a0a7d8258f62",
+          "retainedPacketParentKey": "original/2026-08-12-uniaccess-ashoka-university/source.json",
+          "retainedPacketParentSha256": "d466f202adc3e31ba91a75612598c90e5311d2b4a32f1d38eb70a0a7d8258f62",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/session.json",
+          "sha256": "138e5cf7eb4923210cc77ce0480b0246a16377f4a6a4c26236836a401a74f6d5",
+          "retainedPacketParentKey": "original/2026-08-12-uniaccess-ashoka-university/session.json",
+          "retainedPacketParentSha256": "138e5cf7eb4923210cc77ce0480b0246a16377f4a6a4c26236836a401a74f6d5",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/session_page.json",
+          "sha256": "7c6834701c82f1caabc4e24565c5b970e119464c2645bd89070b463657f6ef42",
+          "retainedPacketParentKey": "original/2026-08-12-uniaccess-ashoka-university/session_page.json",
+          "retainedPacketParentSha256": "7c6834701c82f1caabc4e24565c5b970e119464c2645bd89070b463657f6ef42",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-08-24-uniaccess-leeds-arts-university",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/24th-August-UniAccess-Live-Meet-Leeds-Art-University.content.md",
+        "legacyHash": "68cd77b8c7e2b2b01234121532d94e026832ed2910773e6b102e3cf742274b39",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/source.json",
+          "sha256": "5c2c5bf7cd46ac080df7eda88c0af248959fd314d5c9f39decd7538a8b1dfd36",
+          "retainedPacketParentKey": "original/2026-08-24-uniaccess-leeds-arts-university/source.json",
+          "retainedPacketParentSha256": "5c2c5bf7cd46ac080df7eda88c0af248959fd314d5c9f39decd7538a8b1dfd36",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/session.json",
+          "sha256": "99929ae2ce65ffda12698c8f7544d71c47b6ed07e174eb59f7fc58d2a11d0e1f",
+          "retainedPacketParentKey": "original/2026-08-24-uniaccess-leeds-arts-university/session.json",
+          "retainedPacketParentSha256": "99929ae2ce65ffda12698c8f7544d71c47b6ed07e174eb59f7fc58d2a11d0e1f",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/session_page.json",
+          "sha256": "13c772d6ff035b25c6dccb22ecdadecfc1ffaad3a5117a7940653f0ebcd1d4e3",
+          "retainedPacketParentKey": "original/2026-08-24-uniaccess-leeds-arts-university/session_page.json",
+          "retainedPacketParentSha256": "13c772d6ff035b25c6dccb22ecdadecfc1ffaad3a5117a7940653f0ebcd1d4e3",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-08-27-in-focus-4",
+      "family": "CANONICAL_ORIGINAL_23",
+      "goldenExpectedTarget": true,
+      "sourceMetadata": {
+        "kind": "document",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "transcript provided by TOC, not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/27th-August-In-Focus.content.md",
+        "legacyHash": "f99031087658eb08764e9b4dba2623ebc5a744420dbb7a4060d61762241a187c",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-08-27-in-focus-4/source.json",
+          "sha256": "f9ffbce0175fd1d7022800abbb2977d930bc0a49b63819c9082aeea72a7d556d",
+          "retainedPacketParentKey": "original/2026-08-27-in-focus-4/source.json",
+          "retainedPacketParentSha256": "f9ffbce0175fd1d7022800abbb2977d930bc0a49b63819c9082aeea72a7d556d",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-27-in-focus-4/session.json",
+          "sha256": "9f865e523c37261bd6c92dba149e86fa6693988631511e7005caad2e12a8dd8d",
+          "retainedPacketParentKey": "original/2026-08-27-in-focus-4/session.json",
+          "retainedPacketParentSha256": "9f865e523c37261bd6c92dba149e86fa6693988631511e7005caad2e12a8dd8d",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-08-27-in-focus-4/session_page.json",
+          "sha256": "fa11fedf4e5c7a25208390ea187cbd5455bea226701d5046483868f0c99a6060",
+          "retainedPacketParentKey": "original/2026-08-27-in-focus-4/session_page.json",
+          "retainedPacketParentSha256": "fa11fedf4e5c7a25208390ea187cbd5455bea226701d5046483868f0c99a6060",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-09-02-india-test-series-part2",
+      "family": "SEPTEMBER_ADDITION_6",
+      "goldenExpectedTarget": false,
+      "sourceMetadata": {
+        "kind": "recording",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "recording provided by TOC via members Drive folder (raw/TOC/TOC-Materials/Recordings/September/_drive-manifest.json), not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/2nd Sep- India Test Series – Part II- Navigating India’s Top Entrance Exams.mp4",
+        "legacyHash": "5b51ab3aa583c84fa3af10a3ea899ca5d538c782ded17a7834f63edc0b935d24",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-09-02-india-test-series-part2/source.json",
+          "sha256": "ee19ec60cba404e1ad69f5a2f8140e63951638b5759b0089c8984efe1ad70740",
+          "retainedPacketParentKey": "original/2026-09-02-india-test-series-part2/source.json",
+          "retainedPacketParentSha256": "ee19ec60cba404e1ad69f5a2f8140e63951638b5759b0089c8984efe1ad70740",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-02-india-test-series-part2/session.json",
+          "sha256": "f633d64477e30d0104f3eb37f6886c82e10b3b15c1bd508946c9f53d84375a5c",
+          "retainedPacketParentKey": "original/2026-09-02-india-test-series-part2/session.json",
+          "retainedPacketParentSha256": "f633d64477e30d0104f3eb37f6886c82e10b3b15c1bd508946c9f53d84375a5c",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-02-india-test-series-part2/session_page.json",
+          "sha256": "96cf01d11939eb31cc5745a90efd28a10fb9198ca58898fbf6f02c457b4818d0",
+          "retainedPacketParentKey": "original/2026-09-02-india-test-series-part2/session_page.json",
+          "retainedPacketParentSha256": "96cf01d11939eb31cc5745a90efd28a10fb9198ca58898fbf6f02c457b4818d0",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-09-09-global-test-prep-pathways",
+      "family": "SEPTEMBER_ADDITION_6",
+      "goldenExpectedTarget": false,
+      "sourceMetadata": {
+        "kind": "recording",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "recording provided by TOC via members Drive folder (raw/TOC/TOC-Materials/Recordings/September/_drive-manifest.json), not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/9th Sep- Mastering Global Test Pathways- Navigating GRE, GMAT & UK Admission Tests.mp4",
+        "legacyHash": "32e1b8b4ae1e99ad1464bc337a5ca16a0bba05d9b9f0c63b309a8815483bc078",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/source.json",
+          "sha256": "be0032e1f48973781488b1156d71ff480c5c69b1bf832889f07d650bc190ff70",
+          "retainedPacketParentKey": "original/2026-09-09-global-test-prep-pathways/source.json",
+          "retainedPacketParentSha256": "be0032e1f48973781488b1156d71ff480c5c69b1bf832889f07d650bc190ff70",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/session.json",
+          "sha256": "bd5af2f419de8c560ae4a0fe5611102ae5151c5893a9fc1d3cf60ef45d4b4adb",
+          "retainedPacketParentKey": "original/2026-09-09-global-test-prep-pathways/session.json",
+          "retainedPacketParentSha256": "bd5af2f419de8c560ae4a0fe5611102ae5151c5893a9fc1d3cf60ef45d4b4adb",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/session_page.json",
+          "sha256": "520c70b36291f9bbd2f247df9206b04358f974a8d2d3ae77ebdd971326ad9041",
+          "retainedPacketParentKey": "original/2026-09-09-global-test-prep-pathways/session_page.json",
+          "retainedPacketParentSha256": "520c70b36291f9bbd2f247df9206b04358f974a8d2d3ae77ebdd971326ad9041",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-09-16-pathways-in-psychology",
+      "family": "SEPTEMBER_ADDITION_6",
+      "goldenExpectedTarget": false,
+      "sourceMetadata": {
+        "kind": "recording",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "recording provided by TOC via members Drive folder (raw/TOC/TOC-Materials/Recordings/September/_drive-manifest.json), not captured by Vidysea",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/16th Sep- Dear Psychology, What Can't You Do-.mp4",
+        "legacyHash": "04ed67020735656c8e4a688aa1126f314c28434169f26c8cee487130969d15ed",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/source.json",
+          "sha256": "bfe14a369c02b37d84ec78cbea59f6f1708247e7d6f6b06de4346deb3ccb99e3",
+          "retainedPacketParentKey": "original/2026-09-16-pathways-in-psychology/source.json",
+          "retainedPacketParentSha256": "bfe14a369c02b37d84ec78cbea59f6f1708247e7d6f6b06de4346deb3ccb99e3",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/session.json",
+          "sha256": "6c048bf1cc42bcff20e1d4af75842e7a51cc4c7c00616efe15b25a11aab27623",
+          "retainedPacketParentKey": "original/2026-09-16-pathways-in-psychology/session.json",
+          "retainedPacketParentSha256": "6c048bf1cc42bcff20e1d4af75842e7a51cc4c7c00616efe15b25a11aab27623",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/session_page.json",
+          "sha256": "fca714176a74fe21c57eaf9500d9dac6cf4986f0386aaeaf4a3a0b7930fc7d5e",
+          "retainedPacketParentKey": "original/2026-09-16-pathways-in-psychology/session_page.json",
+          "retainedPacketParentSha256": "fca714176a74fe21c57eaf9500d9dac6cf4986f0386aaeaf4a3a0b7930fc7d5e",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-09-21-uniaccess-japan",
+      "family": "SEPTEMBER_ADDITION_6",
+      "goldenExpectedTarget": false,
+      "sourceMetadata": {
+        "kind": "recording",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "The Outreach Collective (TOC)",
+        "consentNote": "recording provided by TOC via members Drive folder (raw/TOC/TOC-Materials/Recordings/September/_drive-manifest.json, createdTime 2026-09-22T11:33:54.275Z; original filename video1968958572.mp4, uploaded unnamed). Identity confirmed from transcript content, not filename: 'Japan' appears 160x, 'Tokyo' 22x, 'Osaka' 3x, and the session opens with the presenter saying members of TOC went to Japan and that the session covers what studying in Japan looks like -- matches raw/TOC/TOC-Materials/_csv/calendar1.csv September row '21.0, UniAccess : Japan'. Checked against every other unassigned September row (24 In-Focus, 28 Scholarships 101, 30 Neurodivergent advocacy): zero hits in the transcript for 'in focus', 'neurodivergent', 'learning disabilit', 'adhd', 'autism', 'dyslexia'. 'scholarship' appears 47x but only in the context of Japanese-university scholarships, part of the Japan session's own stated agenda (universities, programs, courses, language requirements, pathways), not the separate Scholarships 101 session. Drive createdTime 2026-09-22 (the day after the 2026-09-21 18:00 IST event) is consistent with next-day upload.",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/video1968958572.mp4",
+        "legacyHash": "ae73657c5dfec60f8bc374288d72ded86fb797f0bc69552f7005102c256d558d",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-09-21-uniaccess-japan/source.json",
+          "sha256": "7686c63e80b0629ff59d58b6be9899db9476393a0b92485f8c2c98c3157748c9",
+          "retainedPacketParentKey": "original/2026-09-21-uniaccess-japan/source.json",
+          "retainedPacketParentSha256": "7686c63e80b0629ff59d58b6be9899db9476393a0b92485f8c2c98c3157748c9",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-21-uniaccess-japan/session.json",
+          "sha256": "e2bfc1d5bf849cc4fbf99e6debe675a4154687fa678ce98a0d4d8313367cf2a5",
+          "retainedPacketParentKey": "original/2026-09-21-uniaccess-japan/session.json",
+          "retainedPacketParentSha256": "e2bfc1d5bf849cc4fbf99e6debe675a4154687fa678ce98a0d4d8313367cf2a5",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-21-uniaccess-japan/session_page.json",
+          "sha256": "bbdbb88f7363e294e9d1ce1fb5f5eceb40706aaa5f5fbcf7528e3542423f39dd",
+          "retainedPacketParentKey": "original/2026-09-21-uniaccess-japan/session_page.json",
+          "retainedPacketParentSha256": "bbdbb88f7363e294e9d1ce1fb5f5eceb40706aaa5f5fbcf7528e3542423f39dd",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-09-24-in-focus",
+      "family": "SEPTEMBER_ADDITION_6",
+      "goldenExpectedTarget": false,
+      "sourceMetadata": {
+        "kind": "recording",
+        "captureMode": "provided",
+        "consentGiven": true,
+        "recordedBy": "u2-source-watcher",
+        "consentNote": "organizer-provided TOC Drive recording, auto-detected by scripts/watch/run-watch.mjs",
+        "sourcePath": "raw/TOC/TOC-Materials/Audio/24th Sep - InFocus.m4a",
+        "legacyHash": "gdrive-1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-09-24-in-focus/source.json",
+          "sha256": "b1e4a4f6f541509c9314253c958c39bf51d56a7bdb938ed4e78761c0b43482e9",
+          "retainedPacketParentKey": "original/2026-09-24-in-focus/source.json",
+          "retainedPacketParentSha256": "b1e4a4f6f541509c9314253c958c39bf51d56a7bdb938ed4e78761c0b43482e9",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-24-in-focus/session.json",
+          "sha256": "65b6da354ba892e6997984cc97658b34a14ff3951de51e569fc45d3a3279f37e",
+          "retainedPacketParentKey": "original/2026-09-24-in-focus/session.json",
+          "retainedPacketParentSha256": "65b6da354ba892e6997984cc97658b34a14ff3951de51e569fc45d3a3279f37e",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-24-in-focus/session_page.json",
+          "sha256": "a970f7fe596204be7a2725a5c4193cb5e70b1e9737dbd1ab3271b40e90c1ef77",
+          "retainedPacketParentKey": "original/2026-09-24-in-focus/session_page.json",
+          "retainedPacketParentSha256": "a970f7fe596204be7a2725a5c4193cb5e70b1e9737dbd1ab3271b40e90c1ef77",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    },
+    {
+      "id": "2026-09-24-zoho-next-european-study-destinations",
+      "family": "SEPTEMBER_ADDITION_6",
+      "goldenExpectedTarget": false,
+      "sourceMetadata": {
+        "kind": "recording",
+        "captureMode": "silent",
+        "consentGiven": true,
+        "recordedBy": "Umesh Sugara (registered attendee) via LKB bot",
+        "consentNote": "attendee-side capture for internal KB use; organizer recording not available to attendees",
+        "sourcePath": "raw/webinars/2026-09-24 15-55-54.mkv",
+        "legacyHash": "a7a3356b33474dc4d5aae09718c094c9b8d3236361a556871b57f268c126412f",
+        "legacyHashIsContentAuthority": false
+      },
+      "bindings": [
+        {
+          "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/source.json",
+          "sha256": "0638c57c7872c7c6e06d40ca01bd3dd1cbf1e8d5e8ff37a551e9308d46914af1",
+          "retainedPacketParentKey": "original/2026-09-24-zoho-next-european-study-destinations/source.json",
+          "retainedPacketParentSha256": "0638c57c7872c7c6e06d40ca01bd3dd1cbf1e8d5e8ff37a551e9308d46914af1",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/session.json",
+          "sha256": "166dc3d80875b3140831e9d24bedd3f82b8043eea61e7c0a32e97fbefebf481f",
+          "retainedPacketParentKey": "original/2026-09-24-zoho-next-european-study-destinations/session.json",
+          "retainedPacketParentSha256": "166dc3d80875b3140831e9d24bedd3f82b8043eea61e7c0a32e97fbefebf481f",
+          "matchesRetainedParent": true
+        },
+        {
+          "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/session_page.json",
+          "sha256": "ebede4a4df2115fad29873dfeb376a05ebda0322603165475859a7ea74f515cd",
+          "retainedPacketParentKey": "original/2026-09-24-zoho-next-european-study-destinations/session_page.json",
+          "retainedPacketParentSha256": "ebede4a4df2115fad29873dfeb376a05ebda0322603165475859a7ea74f515cd",
+          "matchesRetainedParent": true
+        }
+      ],
+      "sourceRecoveryScope": "29-member source-bound recovery/import and production reads previously accepted; providerCalls=0",
+      "captureConsentClassification": "RECORDED_TRUE: existing source metadata assertion, no new human verification",
+      "bulkGenerativeProviderEgress": "UNRESOLVED",
+      "bulkEgressEvidence": "D164 approves requested model spend/order; examined gates bind different payload/purpose. No per-member deny inferred; exact29 bulk judge dispatch not yet independently reconciled."
+    }
+  ],
+  "authoritativeEvidence": [
+    {
+      "path": "qa/gates/external-eval-data-egress.md",
+      "sha256": "8d7b543ae30d2304a2027f63bb837a482a5c811b86310d35555df81a0202a408"
+    },
+    {
+      "path": "qa/gates/golden-set-redesign.md",
+      "sha256": "d9079c330f38e9d48fb6a1e87984a54e9030e73ac74b53d61b5eaf180b2dc6e9"
+    },
+    {
+      "path": "qa/contracts/goal-u010.md",
+      "sha256": "8bb7c459f93885c05f42b6667929e87757422f3c54f98aa13f7a57733ab35ee8"
+    },
+    {
+      "path": "qa/manifests/golden-set-semantic-leg.md",
+      "sha256": "1d3270c4f39d8e4cc7368373ba8aa497627fe348f8cb99c3dbb954410fde4133"
+    },
+    {
+      "path": "qa/manifests/reviewed-toc-recovery.md",
+      "sha256": "e2143ea6df429dffbbbcf6d5f44c2d8efadadbfd98b07d3516e8ee298c83f3af"
+    },
+    {
+      "path": "qa/evidence/reviewed-toc-recovery-checker-2026-10-09.json",
+      "sha256": "2d354d39e79c0e02a08fede6172d0bf0eac2ffc2bc545e9e20dc50f6658fb158"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "sha256": "4bf14af9dccb1132ee558b56bce4c7172df480ca23357019ac36091bf5dc122b"
+    },
+    {
+      "path": "data/eval/golden-set-provenance.json",
+      "sha256": "a9523634083f4e154276153b4d94063c514083f3395b109ed2619d48cd9eb21e"
+    },
+    {
+      "path": "data/eval/golden-set.json",
+      "sha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be"
+    }
+  ],
+  "humanNeeded": [
+    "ROOT/deploy/checker reconcile or Approver explicitly binds current92questions and exact29candidate title-summary payloads, three providers/model order and bounded dispatch; no consent or byte authority substitution",
+    "ROOT explicit resource dispatch/caps/model selection after reconciliation; proposed caps are not approvals",
+    "Actual30 individual Umesh labels/rationales, authoritative authenticated export,30matching confirmations, independently checked verification receipt and trusted process digest for separate live calibration"
+  ]
+}

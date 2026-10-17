@@ -173,6 +173,7 @@ export function isBlockedAddress(address: string): boolean {
   if (g0 === 0x0064 && g1 === 0xff9b) return blockedIpv4(embeddedV4(g, 6)); // NAT64
 
   if (g0 === 0x2001 && g1 === 0x0000) return true;           // Teredo 2001::/32
+  if (g0 === 0x3fff && g1 < 0x1000) return true;             // RFC 9637 documentation 3fff::/20
   if ((g0 & 0xfe00) === 0xfc00) return true;                 // fc00::/7 unique-local
   if ((g0 & 0xffc0) === 0xfe80) return true;                 // fe80::/10 link-local
   if ((g0 & 0xffc0) === 0xfec0) return true;                 // fec0::/10 site-local (deprecated)

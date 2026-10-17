@@ -1,0 +1,29 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "identity": "working-tree-byte-pins",
+  "fix_cycle": 1,
+  "status": "frozen-awaiting-central-validation",
+  "token_metric": "actual_total",
+  "maker_actual_tokens": null,
+  "maker_actual_active_s": null,
+  "pins": [
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "sha256": "72B2E6BBA78BE2F3B5F0910006CE1148D4059C4299F77CDCDCAD6CEEC6634D19"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/materializer.ts",
+      "sha256": "6D5E6C39FC3125D5999C220CCCA2ED0D95A0E079392A5833EA65E2F5FC263A1B"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/invalidate.ts",
+      "sha256": "A64E5DC76E2D194213EB308B61450A0BF42D3A6279762ECF08592D8DA831223F"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/publication-contract.ts",
+      "sha256": "DBF8354BFFC1CB8A824103EE3EAE5D71C0B2A65C6CE48C747858ED28C1A07021"
+    }
+  ]
+}

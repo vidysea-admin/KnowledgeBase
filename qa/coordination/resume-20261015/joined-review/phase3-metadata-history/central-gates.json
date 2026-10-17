@@ -1,0 +1,231 @@
+{
+  "summary": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-gate-summary.json",
+    "sha256": "38c8b0762dc22370e67446a47b88c797730ba1d8790aa41f35f0e6273fd40590"
+  },
+  "results": [
+    {
+      "label": "integrated-freeze-preflight",
+      "exit": 0,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--input-type=module",
+        "-e",
+        "console.log(JSON.stringify({executable:process.execPath,version:process.version,typescript:import.meta.resolve('typescript'),tsx:import.meta.resolve('tsx')}))"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "active_s": 1.0470000000004802,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-preflight.log",
+        "sha256": "e6bd74014376146d4fc23684fff10775d19ca74799f76b1e392cbeb6d1bf023e"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-preflight-receipt.json",
+        "sha256": "21175938142130cc22558bc02d3f13ebd7637366e42fb9a5e3bc668227957427"
+      }
+    },
+    {
+      "label": "integrated-freeze-meeting-bot-typecheck",
+      "exit": 0,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+      "active_s": 11.811999999999898,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-meeting-bot-typecheck.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-meeting-bot-typecheck-receipt.json",
+        "sha256": "12a0dd30e11d73377447c4a954807bc64638e43c748e79a8013cf02ea64ed6b6"
+      }
+    },
+    {
+      "label": "integrated-freeze-api-typecheck",
+      "exit": 0,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api",
+      "active_s": 19.438000000000102,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-api-typecheck.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-api-typecheck-receipt.json",
+        "sha256": "bff2acdedcfab944a41bc9b739cebfe1a2556bae04824d6acd2056f5568ff525"
+      }
+    },
+    {
+      "label": "integrated-freeze-web-typecheck",
+      "exit": 0,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+      "active_s": 14.515000000001237,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-web-typecheck.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-web-typecheck-receipt.json",
+        "sha256": "21fbbeab777933caf98bd26fe02b790b8f3df16d5cfda62f1fa210aa81af85ac"
+      }
+    },
+    {
+      "label": "integrated-freeze-scoped-structure",
+      "exit": 1,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--input-type=module",
+        "-e",
+        "import {countLoc,loadConfig} from './scripts/lib/walk.mjs';import {check} from './scripts/lint-dirsize.mjs';import {readFileSync} from 'node:fs';import path from 'node:path';const c=loadConfig(process.cwd()),paths=JSON.parse(readFileSync(process.argv[1],'utf8'));const rows=paths.filter(p=>c.loc.extensions.some(e=>p.endsWith(e))).map(p=>{const n=countLoc(p),test=c.loc.testPatterns.some(r=>new RegExp(r).test(path.basename(p))),limit=test?c.loc.testMax:c.loc.max;return {path:p,nonblank:n,limit,ok:n<=limit}});const dirs=[...new Set(paths.map(p=>path.posix.dirname(p)))];c.roots=dirs.filter(d=>!dirs.some(p=>p!==d&&d.startsWith(p+'/')));const directory=check(process.cwd(),c);console.log(JSON.stringify({rows,directory,scopeRoots:c.roots},null,2));process.exitCode=rows.some(r=>!r.ok)||directory.violations.length?1:0;",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-structure-paths.json"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "active_s": 1.0310000000008586,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-scoped-structure.log",
+        "sha256": "03f169d4864c202e7bd659a764c3780751251680952a974d1402cc9ee539d97d"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-scoped-structure-receipt.json",
+        "sha256": "bd6d916f33e8d84dc45ce2aad34cdab78c6584773a56f77dcde10530395ae900"
+      }
+    },
+    {
+      "label": "integrated-freeze-import-cycles",
+      "exit": 0,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "node_modules/dependency-cruiser/bin/dependency-cruise.mjs",
+        "--config",
+        ".dependency-cruiser.cjs",
+        "apps/api/src/answer-policy/answer-workflow.ts",
+        "apps/api/src/composition/integrations/transcripts.ts",
+        "apps/api/src/indexing/persistence/decisions-persist.ts",
+        "apps/api/src/indexing/persistence/promote-entities.ts",
+        "apps/api/src/indexing/post-commit.ts",
+        "apps/api/src/indexing/session.ts",
+        "apps/api/src/indexing/types.ts",
+        "apps/api/src/visibility/knowledge.ts",
+        "apps/api/src/whatsapp/review/invalidate.ts",
+        "apps/api/src/whatsapp/review/materializer.ts",
+        "apps/api/src/whatsapp/review/publication-contract.ts",
+        "apps/web/src/pages/answer-policy/client.ts",
+        "packages/meeting-bot/src/capture/admission-gate.ts",
+        "packages/meeting-bot/src/capture/audio-watchdog.ts",
+        "packages/meeting-bot/src/capture/controller-state.ts",
+        "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+        "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+        "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+        "packages/meeting-bot/src/capture/native/native-capture-runtime.ts",
+        "packages/meeting-bot/src/capture/native/native-clock-ledger.ts",
+        "packages/meeting-bot/src/capture/native/native-ivf.ts",
+        "packages/meeting-bot/src/capture/native/native-media-finalize.ts",
+        "packages/meeting-bot/src/capture/native/native-media-probe.ts",
+        "packages/meeting-bot/src/capture/native/native-media-types.ts",
+        "packages/meeting-bot/src/capture/native/native-spool.ts",
+        "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+        "packages/meeting-bot/src/capture/reconnect-gaps.ts",
+        "packages/meeting-bot/src/capture/record-commands.ts",
+        "packages/meeting-bot/src/capture/record-consent/context.ts",
+        "packages/meeting-bot/src/capture/record-consent/controller-bridge.ts",
+        "packages/meeting-bot/src/capture/record-consent/controller-client.ts",
+        "packages/meeting-bot/src/capture/record-consent/controller-worker.fixture.ts",
+        "packages/meeting-bot/src/capture/record-consent/coverage.ts",
+        "packages/meeting-bot/src/capture/record-consent/downstream.ts",
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+        "packages/meeting-bot/src/capture/record-consent/privacy.ts",
+        "packages/meeting-bot/src/capture/record-consent/private-acl.ts",
+        "packages/meeting-bot/src/capture/record-consent/provider-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/receipt-store.ts",
+        "packages/meeting-bot/src/capture/record-consent/runtime.ts",
+        "packages/meeting-bot/src/capture/record-finalize.ts",
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/tab-receiver-guard.ts",
+        "packages/meeting-bot/src/capture/tab-remux.ts",
+        "packages/meeting-bot/src/capture/tab-silence-health.ts",
+        "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+        "packages/meeting-bot/src/capture/tiles/registry-types.ts",
+        "packages/meeting-bot/src/capture/tiles/registry.ts",
+        "packages/meeting-bot/src/capture/tiles/sampler-clock.ts",
+        "packages/meeting-bot/src/capture/watchdog.ts",
+        "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts",
+        "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts",
+        "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "active_s": 3.82799999999952,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-import-cycles.log",
+        "sha256": "f3182dfdfe326e756e7376489bc067e6a5da0decaef02ce151a9fd3114afa035"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-import-cycles-receipt.json",
+        "sha256": "d587b4375138804ef5fc8c1c1eaf5943c7235d25363cf4ce9b07ad56ad9747f7"
+      }
+    },
+    {
+      "label": "integrated-freeze-contracts",
+      "exit": 0,
+      "argv": [
+        "C:\\Program Files\\Python312\\python.exe",
+        "-B",
+        "contracts/verify_contracts.py"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "active_s": 0.9380000000001019,
+      "pins_unchanged": true,
+      "joined_source_mismatches": [],
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-contracts.log",
+        "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-contracts-receipt.json",
+        "sha256": "8a4e3e6ce953541fcc36ee43740684dd9ed59ecd7ab17b154a5089aeacb82ca6"
+      }
+    }
+  ],
+  "inventory_count": 1649,
+  "inventory_unchanged": true,
+  "contracts_vacuity": true,
+  "selected_LOC_rows_all_green": true,
+  "directory_violations": [
+    "scripts/qa: 33 files (budget 30)",
+    "scripts/webinar: 34 files (budget 30)"
+  ],
+  "scope": "Full bot/API/web typechecks green; import cycles green348modules1052dependencies. Structure own exit1: selected LOC rows green; broad scripts/qa33 and scripts/webinar34 inherited directory limits remain distinct, no whole-repo structural PASS.",
+  "shared_integration_active_s": 55.35900000000038,
+  "actual_total_tokens": null,
+  "independent_verdict": null
+}

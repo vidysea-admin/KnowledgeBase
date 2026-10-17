@@ -1,0 +1,15 @@
+{
+  "relativeModuleOccurrences": 35,
+  "counts": {
+    "persistence": 4,
+    "indexing": 30
+  },
+  "fixtureExists": true,
+  "fixtureOldResolved": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-27-in-focus-4\\turns.json",
+  "token_metric": "actual_total",
+  "missingTargets": [],
+  "actual_total_tokens": null,
+  "candidatePinsVerified": 7,
+  "status": "STATIC_CHECKED_NOT_RUNTIME_VERIFIED",
+  "fixtureNewResolved": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-27-in-focus-4\\turns.json"
+}

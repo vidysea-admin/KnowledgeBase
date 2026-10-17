@@ -136,7 +136,7 @@ test("session assets enforce auth, tenant ownership, confinement and frame hashe
     getSessionDetail: async (tenant, id) => {
       if (tenant !== "tenant-1") return null;
       const detail = await original.getSessionDetail(tenant, id);
-      if (detail) detail.turns[0]!.screenEvidence = { frameId: "f1", file: frame.file, hash };
+      if (detail) detail.turns[0]!.screenEvidence = { frameId: "f1", file: frame.file, hash, tStart: frame.tStart };
       return detail;
     },
     listSources: async (tenant) => tenant === "tenant-1" ? [{ _id: "source-1", tenantId: tenant, kind: "recording", captureMode: "silent", hash: "hash", createdAt: "2026-09-30", path: sourcePath, consent: { given: true, recordedBy: "test" } }] : [],
@@ -181,6 +181,13 @@ test('webinar operations enforce scope and exact tenant ownership with bounded r
     assert.equal(body.operations[0].attempts, 2); assert.equal(body.operations[0].reason, 'processing-failed');
     assert.ok(!JSON.stringify(body).includes('secret')); assert.ok(!JSON.stringify(body).includes('C:/private'));
     assert.deepEqual(await (await get('two')).json(), { operations: [], omitted: 0 });
+    for (const reason of ['no-join-link', 'past', 'untrusted-sender', 'needs-registration', 'duplicate-session', 'overlap-lost', 'not-webinar', 'needs-review', 'cancelled',
+      'invalid-time', 'unsafe-join-link', 'opted-out', 'rule-denied', 'rules-unevaluable']) { // every SkipReason (ISS-T037W1-003)
+      writeFileSync(file, JSON.stringify({version:1,tenantId:'tenant-1',operations:{webinar:{...rows.webinar,status:'action_required',reason}}}));
+      assert.equal(((await (await get('one')).json()) as any).operations[0].reason, reason, reason);
+    }
+    writeFileSync(file, JSON.stringify({version:1,tenantId:'tenant-1',operations:{webinar:{...rows.webinar,status:'action_required',reason:'brand-new-reason'}}}));
+    assert.equal(((await (await get('one')).json()) as any).operations[0].reason, 'processing-failed');
     for (const reason of ['no-join-link', 'source-discontinuity', 'unproven-calendar-history', 'rejected', 'rescheduled',
       'rescheduled-completed', 'controller-disconnected', 'coverage-review', 'recurring-series', 'unknown-tombstone', 'ambiguous-provider', 'contradictory-revision', 'missing-revision', 'ambiguous-identity']) {
       writeFileSync(file, JSON.stringify({version:1,tenantId:'tenant-1',operations:{webinar:{...rows.webinar,status:'action_required',reason}}}));

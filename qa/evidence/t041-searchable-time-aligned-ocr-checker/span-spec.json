@@ -1,0 +1,16 @@
+{
+  "label": "t041-current-independent-span-oracle",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": ["qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs"],
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "timeoutMs": 10000,
+  "outputPrefix": "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current",
+  "scope": "Prepared independent synthetic all-pairs timeline oracle, permutation and screen-mapper assertions only; two local pure MJS files, no native subprocess, network, provider, media, database or private payload. Single appointed ordinary coordinator execution; no duplicate maker suite.",
+  "hashAlgorithm": "SHA256 raw file bytes",
+  "pins": {
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs": "1c20b790d94789bb03af6843b9a83c2e469b112004f7ca4c2841cbf96560817c",
+    "scripts/webinar/slides/slide-knowledge.mjs": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef"
+  },
+  "prePostPinsRequired": true,
+  "publicOutput": "Synthetic probe and sanitized actual result only; dependency-only spec excluded from public whitelist. Whole T-041 L1-L3 remains HOLD."
+}

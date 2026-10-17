@@ -1,0 +1,11 @@
+Checkpoint vectorless capture recovery and watched-source cadence
+
+LOCAL WIP / HOLD checkpoint; parent acceptance remains incomplete. Parent: d50a25c200dcbcf574ecade0aa205f5fcb45c5f8.
+
+Current known-helper epoch: 28/28 checks pass; root types, full dependency graph and scoped structure pass (41.047s). Historical broker-library same-byte binding remains UNKNOWN; current evidence does not rewrite earlier proofs.
+
+Native floor retains 206 pass and 4 prerequisite skips, actual EXIT/fresh reopen and read-only evidence. Original failures and the unexplained intermittent recovered-unavailable result remain preserved.
+
+Known whitespace remains verbatim: git diff --cached --check reported 37 findings across 12 paths (three DB source EOF blank lines, two source byte preimages and seven raw logs). Root accepted this advisory style warning for this local WIP only; no source/evidence normalization or hook/config bypass.
+
+Replica cycle1 PASS covers offline source fixes only; original FAIL and runtime HOLD remain. Human evaluation authority, host/native/Mongo/privacy/downstream/release qualification and independent parent acceptance remain open. No deployment, activation or push.

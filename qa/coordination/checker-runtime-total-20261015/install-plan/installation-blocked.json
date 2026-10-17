@@ -1,0 +1,11 @@
+{
+  "status": "BLOCKED_AUTO_REVIEW",
+  "process_started": false,
+  "global_writes": false,
+  "targets": ["C:/Users/product/.agents/skills/checker/scripts/review_budget.py", "C:/Users/product/.agents/skills/checker/SKILL.md"],
+  "reason": "This persistently modifies global checker code and instructions affecting future reviews; although the system-wide fix is authorized in substance, the exact global targets and security-sensitive behavior change lack explicit user approval for this installation.",
+  "required_next_step": "Obtain explicit human approval for the exact two global targets and reviewed accounting/skill changes, or supply trusted existing exact authorization evidence for reassessment. Do not bypass with indirect execution.",
+  "quality_verdicts": "Independent PASS helpercycle4 and parsercycle1 remain valid; installation is separate.",
+  "postinstall_smoke": "NOT EXECUTED because no installation occurred. Prepared installed-smoke-input.json is local only.",
+  "accounting": "combined-final-accounting.json retains settled811348total and final9849total/715output overrun, shared once; no efficiency success."
+}

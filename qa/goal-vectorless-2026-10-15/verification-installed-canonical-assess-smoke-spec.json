@@ -1,0 +1,35 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "ONE user-approved installed canonical actual_total reserve assess smoke; no reviewer or extra tests",
+  "phase": "shared-verification-support",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-total-20261015\\install-plan\\installed-smoke-input.json"
+  ],
+  "testIDs": [
+    "combined admission only"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 20000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-installed-canonical-assess-smoke",
+  "pins": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "3f49980a13c5e7e5da76c7b7e376ef983bbd946c30209c648bd3bb3c2f80a7df",
+    "qa/coordination/checker-runtime-total-20261015/install-plan/installed-smoke-input.json": "ac78cad2efcd2af64dbfa5ba44103da8fdaea926df5e541ad19b89e929148054"
+  }
+}

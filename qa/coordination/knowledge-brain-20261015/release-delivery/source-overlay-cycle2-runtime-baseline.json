@@ -1,0 +1,31 @@
+{
+  "schema": "selected-runtime-baseline/v1",
+  "unit": "source-overlay",
+  "cycle": 2,
+  "phase": "final-review",
+  "boundary": "baseline",
+  "thread_id": "01a13f24-c5cc-7442-a8d9-0745f7d16095",
+  "agent_path": "/root/release_delivery_coordinator/source_overlay_checker",
+  "observed_at": "2026-10-15T12:00:48.5633453+00:00",
+  "usage_timestamp": "2026-10-15T10:48:23.549Z",
+  "cumulative_tokens": {
+    "input_tokens": 584163,
+    "cached_input_tokens": 531328,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 3471,
+    "reasoning_output_tokens": 356,
+    "total_tokens": 587634
+  },
+  "prior_total_tokens": 587634,
+  "counter_growth": 0,
+  "lifecycle": {
+    "type": "task_complete",
+    "timestamp": "2026-10-15T10:48:23.586Z"
+  },
+  "completion_confirmed": true,
+  "idle_attestation": "Coordinator confirms checker never resumed since prior task_complete; metadata-only refresh",
+  "actual_active_seconds": null,
+  "cost": null,
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-38-59-01a13f24-c5cc-7442-a8d9-0745f7d16095.jsonl",
+  "source_content_exported": false
+}

@@ -1,0 +1,27 @@
+{
+  "status": "READY_AWAIT_CPU_RELEASE",
+  "metadataPreflightMismatches": [],
+  "sourcePins": 140,
+  "candidate": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+  "authorizationSha256": "024460a030ae8552635963539a3e8c9f180d273e8ae938f990a61025c0651991",
+  "launcherSha256": "84e076c8c7abc76e9f5b2fbeda04ac2c1b940b7b781ffc21b7fd7093b081d79c",
+  "watchdogSha256": "267c1ead38581dc3242bed4927a6f08ce70b767bfa4ec080442af2fa1ce78f3a",
+  "auditDisposition": "No deletion, in-place redaction or overwrite; original checkpoints/audit/citations retained",
+  "rootHumanApproval": "root relayed explicit user approval of exact selected private question+retrieved evidence→existingOllamaCloud,2requests1024each,auditintact",
+  "providerRequestsDispatched": 0,
+  "cpuSlot": "T013 owns CPU; do not execute until root followup",
+  "priorAutoReviewRejectedPlanRetained": "approval-rejection.json",
+  "limits": {
+    "newRequests": 2,
+    "cumulativeIDs": [
+      4,
+      5
+    ],
+    "eachOutput": 1024,
+    "aggregateOutput": 2048,
+    "aggregateInputUtf8": 32000,
+    "httpSeconds": 25,
+    "evaluateSeconds": 60,
+    "outerJobSeconds": 90
+  }
+}

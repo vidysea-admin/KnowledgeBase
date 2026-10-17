@@ -1,0 +1,1 @@
+{"_id":"relationship-1","tenantId":"toc","revision":0,"status":"confirmed","type":"agrees_with","from":{"claimId":"claim-1","personId":"person-1"},"to":{"claimId":"claim-2","personId":"person-2"},"evidence":[],"createdBy":"reviewer-1","sourceRevisionDigest":"not-a-digest"}

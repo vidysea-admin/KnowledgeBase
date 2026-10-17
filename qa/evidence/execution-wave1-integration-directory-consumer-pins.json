@@ -1,0 +1,176 @@
+[
+  {
+    "Path": "apps/web/src/pages/knowledge/knowledgeDirectoryFixtures.ts",
+    "Expected": "f7fc349e2a9da6c15840e43eb2b52a55d0ae929d2b1695e9b3e45240baf2c9ef",
+    "Actual": "F7FC349E2A9DA6C15840E43EB2B52A55D0AE929D2B1695E9B3E45240BAF2C9EF",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/KnowledgeDirectoryIntegration.test.tsx",
+    "Expected": "d95a18dd410339b36e95e5c61d62edbcd40a60ff6844b34d60a6c7db158a2ce3",
+    "Actual": "D95A18DD410339B36E95E5C61D62EDBCD40A60FF6844B34D60A6C7DB158A2CE3",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/knowledgeDirectoryModel.test.ts",
+    "Expected": "1c66a2e08082a7d70cd0023f8cd0e78f55418af122a88e3ade9fccb43519b924",
+    "Actual": "1C66A2E08082A7D70CD0023F8CD0E78F55418AF122A88E3ADE9FCCB43519B924",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/knowledgeDirectoryModel.ts",
+    "Expected": "2d0e3b338fd64007175446cc9799eb51df604e5b00e9fe0c804b0d085e568d68",
+    "Actual": "2D0E3B338FD64007175446CC9799EB51DF604E5B00E9FE0C804B0D085E568D68",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/KnowledgeDirectoryPage.test.tsx",
+    "Expected": "c76ecde6dbc1d2a5d6c735e3e15eefa3e18d588aa58a420da42ee4c4b9741c20",
+    "Actual": "C76ECDE6DBC1D2A5D6C735E3E15EEFA3E18D588AA58A420DA42EE4C4B9741C20",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/knowledge/KnowledgeDirectoryPage.tsx",
+    "Expected": "f921a761c043bc328407aba85bbb78aa0f587eb44d7985d35227b8883fba5e00",
+    "Actual": "F921A761C043BC328407ABA85BBB78AA0F587EB44D7985D35227B8883FBA5E00",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/App.tsx",
+    "Expected": "edb636dd2dc837ace16103c2344949626f392bbec0c6efca55d06f1d0d0b45e9",
+    "Actual": "EDB636DD2DC837ACE16103C2344949626F392BBEC0C6EFCA55D06F1D0D0B45E9",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/layout/NavSidebar.tsx",
+    "Expected": "0d904014c0bdcac5bf5bb8323658eeb1a6689145bc81e9c42486b88f5f1e8132",
+    "Actual": "0D904014C0BDCAC5BF5BB8323658EEB1A6689145BC81E9C42486B88F5F1E8132",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/safe-url.ts",
+    "Expected": "607fcaf56d942752bd01a1c969457d97bda5f7b5560dd83c8ab4161f3f2875c9",
+    "Actual": "607FCAF56D942752BD01A1C969457D97BDA5F7B5560DD83C8AB4161F3F2875C9",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/api/client.ts",
+    "Expected": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "Actual": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/api/types.ts",
+    "Expected": "0c988730bd44a86a6674d8b92c8db642988db8a1bc54fc0db0e46daca7242547",
+    "Actual": "0C988730BD44A86A6674D8B92C8DB642988DB8A1BC54FC0DB0E46DACA7242547",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/api/sessions.ts",
+    "Expected": "362aeec56caa017b332283c7ad1a3fbed6ea94dc3c2b7723b4a34f97b300bde7",
+    "Actual": "362AEEC56CAA017B332283C7AD1A3FBED6EA94DC3C2B7723B4A34F97B300BDE7",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/api/sources.ts",
+    "Expected": "563286d85cbce258af998871a771e885b045595d51aca83be9b4b8621f72c91f",
+    "Actual": "563286D85CBCE258AF998871A771E885B045595D51ACA83BE9B4B8621F72C91F",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/api/graph.ts",
+    "Expected": "8242058de2150b020ccba5839a5161b9dd6e382e1cd2f56f7c7ec28291c1a92a",
+    "Actual": "8242058DE2150B020CCBA5839A5161B9DD6E382E1CD2F56F7C7EC28291C1A92A",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/auth/AuthContext.tsx",
+    "Expected": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+    "Actual": "196181DC165208A35CB23C9D7F9B7AE5E293A7EB40135A7CD90686DDB4EC3E1C",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/auth/LoginGate.tsx",
+    "Expected": "20e9965192b1428d1558456d3df1a25ebfab8b5aec66ac40c78c1bfd8ee4065a",
+    "Actual": "20E9965192B1428D1558456D3DF1A25EBFAB8B5AEC66AC40C78C1BFD8EE4065A",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/layout/AppShell.tsx",
+    "Expected": "74ead85d8f8a8077f4e5f9fbf0fc1a32839042b614125e14cd87938fc3ae92f9",
+    "Actual": "74EAD85D8F8A8077F4E5F9FBF0FC1A32839042B614125E14CD87938FC3AE92F9",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/sessions/SessionDetailPage.tsx",
+    "Expected": "ea92f5b3684c956a4378d61b159c405ada02f5b070f0734eebf8e8847bafe9a6",
+    "Actual": "EA92F5B3684C956A4378D61B159C405ADA02F5B070F0734EEBF8E8847BAFE9A6",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/sessions/SpeakerSuggestions.tsx",
+    "Expected": "e6fb801de86ce96e428941e2511c135367a4f78d2ec7b4801350c5cdff3cca7f",
+    "Actual": "E6FB801DE86CE96E428941E2511C135367A4F78D2EC7B4801350C5CDFF3CCA7F",
+    "Match": true
+  },
+  {
+    "Path": "packages/index/src/graph/build-graph.ts",
+    "Expected": "ed1fd31ae92e3be2046134d5ad172268cddda7475b04058d476c489a4ce6145e",
+    "Actual": "ED1FD31AE92E3BE2046134D5AD172268CDDDA7475B04058D476C489A4CE6145E",
+    "Match": true
+  },
+  {
+    "Path": "packages/index/src/graph/types.ts",
+    "Expected": "e6083d8251e1418a813e50ec53f3dc74e71aedb308526b29f8e395b911561811",
+    "Actual": "E6083D8251E1418A813E50EC53F3DC74E71AEDB308526B29F8E395B911561811",
+    "Match": true
+  },
+  {
+    "Path": "packages/index/src/tree/flatten-graph.ts",
+    "Expected": "230991fd1f08a783d846a69c3f36c535130e4e58e4ed7b48fadff8345b13233a",
+    "Actual": "230991FD1F08A783D846A69C3F36C535130E4E58E4ED7B48FADFF8345B13233A",
+    "Match": true
+  },
+  {
+    "Path": ".cache/coordination/safe-test-runtime/register.mjs",
+    "Expected": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+    "Actual": "FE80C5A2C766A6A20AD2532F434541D381E45EF77C90D9C7F485C939A11AF644",
+    "Match": true
+  },
+  {
+    "Path": ".cache/coordination/safe-test-runtime/register-react.mjs",
+    "Expected": "ded9f20f16c15fcdc82e1b355eb13fefba7989f0294966936ed3660ea7b85f82",
+    "Actual": "DED9F20F16C15FCDC82E1B355EB13FEFBA7989F0294966936ED3660EA7B85F82",
+    "Match": true
+  },
+  {
+    "Path": ".cache/coordination/safe-test-runtime/react-harness.mjs",
+    "Expected": "3e4b648688fb8a2d643158a4995a76d8235ced1033a6d4aefeae242d9c6f5068",
+    "Actual": "3E4B648688FB8A2D643158A4995A76D8235CED1033A6D4AEFEAE242D9C6F5068",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/tsconfig.json",
+    "Expected": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0",
+    "Actual": "F67D852A59376DC6D5A386F669D984D7B3133860B693CA00DFA59A3CAF3596E0",
+    "Match": true
+  },
+  {
+    "Path": "tsconfig.base.json",
+    "Expected": "6bc2d632c06e482b900c73f73dd6c703b3791bd5b02b05aaf7701cd9ba417c47",
+    "Actual": "6BC2D632C06E482B900C73F73DD6C703B3791BD5B02B05AAF7701CD9BA417C47",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/sessions/grounded/GroundedContentPanel.tsx",
+    "Expected": "6d12d70aa99ae82fcf841ac5cbd4bcb1b80ea9cb1ae3ebf8aa94b9271c761e0f",
+    "Actual": "6D12D70AA99AE82FCF841AC5CBD4BCB1B80EA9CB1AE3EBF8AA94B9271C761E0F",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/sessions/grounded/client.ts",
+    "Expected": "c9e34ab9bc854b6065a072b4eca74eae98e68958683ac05500cc3cd7a76be605",
+    "Actual": "C9E34AB9BC854B6065A072B4ECA74EAE98E68958683AC05500CC3CD7A76BE605",
+    "Match": true
+  }
+]

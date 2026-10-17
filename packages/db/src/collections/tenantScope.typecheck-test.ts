@@ -82,7 +82,21 @@ export const speakerWriteSurface = () => {
   const _count: (filter?: object) => Promise<number> = coll.countDocuments;
   const _delete: (filter: object) => Promise<{ deletedCount: number }> = coll.deleteMany;
   const _insert = coll.insertOne;
+  const _findOne = coll.findOne;   // D-141: writeSpeakerDocs reads a row before replacing it
   void _count;
   void _delete;
+  void _insert;
+  void _findOne;
+};
+
+/** T-057 D4. Same pin for `usage_events`: a tenant-less call must not compile. */
+export const usageEventsTenantPin = async () => {
+  const { usageEvents } = await import("./usage-events.js");
+  // @ts-expect-error - tenantId is required; calling coll() with no argument must not compile.
+  usageEvents();
+  const coll = usageEvents("toc");
+  const _find = coll.find;
+  const _insert = coll.insertOne;
+  void _find;
   void _insert;
 };

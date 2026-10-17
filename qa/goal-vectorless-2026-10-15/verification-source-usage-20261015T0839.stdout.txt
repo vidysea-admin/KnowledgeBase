@@ -1,0 +1,27 @@
+ISS-W045-001: 6/6 refused
+ISS-W045-002 (turns): sources0 media0 sessions0 turns0
+ISS-W045-002 (media): sources0 media0 sessions0 turns0
+✔ ISS-W045-001: recorded private/loopback/metadata targets are refused before anything is forwarded (4.2469ms)
+✔ ISS-W045-001: extra spellings, non-http schemes and credentials are refused (1.4433ms)
+✔ ISS-W045-001: hostnames resolving to private addresses (any one of several) or failing/empty DNS are refused (0.8391ms)
+✔ ISS-W045-001: a public host is forwarded; the guard wraps the default and an injected fetcher via buildSourceIntakeAdapters (3.2098ms)
+✔ ISS-W045-002: turns insertMany writes a prefix then throws -> zero rows left; other tenants untouched (1.8394ms)
+✔ ISS-W045-002: media insertMany writes a prefix then throws -> zero rows left; other tenants untouched (0.6317ms)
+✔ ISS-SOURCEREADER-001: never-resolving transport is bounded even if it ignores abort (23.2159ms)
+✔ ISS-SOURCEREADER-001: stalled response body is cancelled on deadline (14.706ms)
+✔ ISS-SOURCEREADER-001: chunked body above byte cap without content-length is refused (2.0202ms)
+✔ declared oversized body is refused before reading and errors hide provider secrets (4.6599ms)
+✔ bounded UTF-8 content survives guarded downstream fetch with manual redirects and scoped key (1.9598ms)
+✔ invalid or expanded resource limits cannot disable bounds (0.7852ms)
+✔ unknown price omits monetary field even when provider supplies a zero placeholder (2.1727ms)
+✔ reported free and positive calls survive while invalid prices are unknown (0.3509ms)
+✔ legacy finite audit shape remains compatible and invalid counts are omitted (0.3136ms)
+✔ Ask completion path emits persisted-safe unknown audit without changing result identity (1.8202ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1408.4079

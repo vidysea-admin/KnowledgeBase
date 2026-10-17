@@ -1,0 +1,16 @@
+✔ metadata preparation deterministic, content-free, exact downstream validation and no corpus mutations (419.279ms)
+✔ no current proof, withdrawn capture, source prohibition, foreign tenant and unverified claims never qualify (172.1435ms)
+✔ duplicate source, cited turn, and transitive explicit relations never cross split boundaries (179.4912ms)
+✔ generic D-170, request approved flag, absent/stale/revoked/expired/foreign/superseded canonical grants deny before output (972.1179ms)
+✔ exact approved synthetic local export consumed with count/hash parity; changed sources and export bytes refuse (559.7313ms)
+✔ invalid evidence and source generations reject; zero rows and fewer than three groups cannot export (83.0041ms)
+✔ training errors and missing artifacts retain failed receipt without claiming model/evaluation (1104.7434ms)
+✔ approved runner invokes exact private synthetic recipe, receives no heldout argument or secret env, and captures hashes only (1029.7878ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4566.4775

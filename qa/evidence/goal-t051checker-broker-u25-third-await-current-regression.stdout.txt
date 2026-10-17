@@ -1,0 +1,1 @@
+{"stage":"regression","exitCode":0,"counts":{"tests":2,"pass":2,"fail":0,"cancelled":0,"skipped":0,"todo":0},"elapsedMs":1302.9394,"hashChanges":[]}

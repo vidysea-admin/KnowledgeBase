@@ -1,0 +1,22 @@
+✖ actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child (39.457ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1279.6919
+
+✖ failing tests:
+
+test at apps\api\src\evaluation-flywheel\composition.test.ts:1:2214
+✖ actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child (39.457ms)
+  Error [FlywheelError]: unavailable
+      at Object.retest (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\evaluation-flywheel\workflow.ts:206:13)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\evaluation-flywheel\composition.test.ts:88:17)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    code: 'unavailable',
+    status: 503
+  }

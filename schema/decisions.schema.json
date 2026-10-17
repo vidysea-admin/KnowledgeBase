@@ -9,6 +9,8 @@
     "tenantId": { "type": "string", "minLength": 1 },
     "text": { "type": "string", "minLength": 1 },
     "owner": { "type": "string" },
+    "sourceEvidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "generationEvidenceDigest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
     "status": { "type": "string", "enum": ["proposed", "verified", "needs-review"] },
     "evidence": {
       "type": "array",

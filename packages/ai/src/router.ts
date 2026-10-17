@@ -7,6 +7,7 @@
 import type { CompleteResult, EmbedJob, EmbedResult, Job, Provider } from "./provider.js";
 import { canEmbed } from "./provider.js";
 import { recordJob, type WriteJobFn } from "./jobs.js";
+import { withTracing } from "./trace-registry.js";
 
 export interface RoutingConfig {
   /** jobKind -> ordered provider names, e.g. { transcribe: ["gemini", "ollama"] }. */
@@ -39,7 +40,8 @@ export function route(jobKind: string, config: Pick<RoutingConfig, "chains" | "p
   return names.map((name) => {
     const provider = config.providers[name];
     if (!provider) throw new Error(`router.route: unknown provider "${name}" in chain "${jobKind}"`);
-    return provider;
+    // T-049: the single point every routed model call passes through. Identity when tracing is off.
+    return withTracing(provider);
   });
 }
 
@@ -63,7 +65,10 @@ export async function complete(jobKind: string, job: Job, config: RoutingConfig)
           status: "done",
           provider: result.provider,
           model: result.model,
-          costUsd: result.costUsd,
+          ...(result.costUsd !== undefined ? { costUsd: result.costUsd } : {}),
+          costStatus: result.costStatus ?? (result.costUsd === undefined ? "unknown" : "reported"),
+          inputTokens: result.usage.inputTokens,
+          outputTokens: result.usage.outputTokens,
         },
         config.write,
       );

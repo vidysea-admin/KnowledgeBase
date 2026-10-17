@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "index": 57,
+  "originalIndex": 64,
+  "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+  "inputHash": "08426e2d46c26c8f97974845f53ab53ada0ccb83e01595b7b9b197747c64dd86",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The cited original turn reports roughly 43–44% of the Ashoka class on scholarships and an institutional vision/target of 50% scholarship students. Current is interpreted as session-time reporting.",
+    "missingReferences": [],
+    "caveats": [
+      "The source says 'usually'; no dated class census or externally verified current percentage is supplied.",
+      "The 50% share is a target/vision, not an achieved result.",
+      "speakerRef is 'unknown'; the name in transcript text does not establish speaker identity.",
+      "Support concerns transcript statements, not external factual truth; session metadata does not independently validate timing.",
+      "Original artifact SHA256 is supplied only; raw and normalized LF hashes are not interchangeable."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+        "contextVersion": "originalMigration",
+        "quote": "my target particularly is to ensure that the class at Ashoka has 50% students on scholarships and 50% students who are full-paying.",
+        "textSha256": "cd63e793402a12ce683aba0398f703baf5bfcb577fc832886ef2db095a85a781",
+        "contextSha256": "60843b6ff532a1522c7977f6fb416aebb9bdaf87fdb18aa99630d1c69ea616e6",
+        "artifactSha256": "fa620ed6dd48b3976bc00f0990772ba496c76f2817e1caf253a81238d81c9865",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2410,
+        "tEnd": 2464,
+        "supports": "Supports 50% scholarship target, explicitly a target rather than achieved outcome."
+      },
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+        "contextVersion": "originalMigration",
+        "quote": "We're at about 43–44% of our class usually at Ashoka is on scholarships.",
+        "textSha256": "cd63e793402a12ce683aba0398f703baf5bfcb577fc832886ef2db095a85a781",
+        "contextSha256": "60843b6ff532a1522c7977f6fb416aebb9bdaf87fdb18aa99630d1c69ea616e6",
+        "artifactSha256": "fa620ed6dd48b3976bc00f0990772ba496c76f2817e1caf253a81238d81c9865",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2410,
+        "tEnd": 2464,
+        "supports": "Supports roughly 43–44% scholarship share of the class as reported at the session; 'usually' qualifies the measurement."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The only cited turn t084 is absent from supplied current contexts, so neither the 43–44% scholarship share nor the 50% target can be assessed against current evidence.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+        "reason": "turn-absent: current context available=false with no matches"
+      }
+    ],
+    "caveats": [
+      "Original support cannot substitute for the missing current citation.",
+      "Current artifact raw SHA256 and normalizedLfSha256 are provided but no artifact bytes were verified."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original supplied evidence supports the scholarship share and institutional target, with session-time/usual-class caveats; the current cited turn is missing. No same-ID changed-content flag is recorded."
+}

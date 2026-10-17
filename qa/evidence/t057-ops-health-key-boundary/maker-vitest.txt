@@ -1,0 +1,28 @@
+Initial sandbox command (cwd apps/web):
+node node_modules/vitest/vitest.mjs run src/pages/ops-health/OpsHealthPage.test.tsx src/App.routes.test.tsx src/api/client.test.ts src/auth --pool=threads --maxWorkers=1 --minWorkers=1
+Exit1,0.926s: failed to load config; esbuild spawn EPERM. No tests ran.
+
+Same command with require_escalated after approval:
+RUN v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+src/pages/ops-health/OpsHealthPage.test.tsx (13 tests) 894ms
+src/auth/AuthContext.ordering.test.tsx (22 tests) 107ms
+src/auth/AuthContext.test.tsx (8 tests) 110ms
+src/api/client.test.ts (5 tests) 25ms
+src/auth/LoginGate.test.tsx (4 tests) 307ms
+src/auth/AuthContext.replay.test.tsx (2 tests) 299ms
+src/App.routes.test.tsx (3 tests) 126ms
+Test Files 7 passed (7)
+Tests 57 passed (57)
+Start at 09:11:21
+Duration 25.81s (transform1.43s,setup7.01s,collect6.07s,tests1.87s,environment6.83s,prepare2.15s)
+Exit0. Exec session20294 completed.
+Stderr: existing React Router v7 future-flag warnings from mounted route checks.
+
+Issue floors included unchanged:
+ISS-ISS260-001:1/1 exact original stateA/storageB/apiFetch(A)401 reproduction in AuthContext.test.tsx.
+ISS-WEBAUTH-002:2/2 recorded reproductions in AuthContext.replay.test.tsx;22 ordering tests additionally retained.
+
+Actual affected-stage and downstream consumer:
+OpsHealth13 tests exercise real public API clients,AuthProvider,committed DOM key/session boundaries,GET/bearer requests and independent source states.
+Its route test mounts actual App at /ops-health and checks its current sidebar/heading; App.routes3 checks preserve existing protected route consumers.
+No live browser,DB,provider or unattended acceptance is claimed.

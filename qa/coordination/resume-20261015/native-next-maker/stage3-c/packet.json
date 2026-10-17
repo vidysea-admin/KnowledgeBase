@@ -1,0 +1,72 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "stage3-c-lazy-production",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "status": "authored-not-executed",
+  "source_pins": [
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "86ec1d549ba0b0fa3c9017fae245c7237fde7cc3bcda90c4f534f3f0bc29f0fa",
+      "nonblank_lines": 294
+    },
+    {
+      "path": "apps/api/src/production.test.ts",
+      "sha256": "a53aaaed77d09dbd8eafc19c2a2e154f0d62dbe44ff6218c1bbb560a21aebc0b",
+      "nonblank_lines": 64
+    },
+    {
+      "path": "apps/api/src/composition/lazy-database.ts",
+      "sha256": "4a9e113192c08b5d137a558f3cb0f2b449620466b0563f6a15e4b80c70455e19",
+      "nonblank_lines": 29
+    },
+    {
+      "path": "apps/api/src/composition/lazy-database.test.ts",
+      "sha256": "6636d356881e79491f98457f96100037c2fa77edc27505b4b3e114d7056a37f1",
+      "nonblank_lines": 43
+    }
+  ],
+  "preimage_pins": [
+    {
+      "path": "backups/production.ts",
+      "sha256": "b65a397a19e631c8bd80ab1c0a105ea4cbba3330c95761a59a650e4fe0f675cd"
+    },
+    {
+      "path": "backups/production.test.ts",
+      "sha256": "ece3ceea666434d8f0a87a217fb4463416e130293d577f7673250c5003a3f06a"
+    }
+  ],
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "token_metric": "actual_total",
+    "tokens": null,
+    "cost": null
+  },
+  "required_replay": [
+    "Original apps/api/src/production.test.ts tests at original lines18 and30, unchanged assertions",
+    "All4 production.test.ts nodes including constructor/native binding and acknowledged-commit hook",
+    "Both composition/lazy-database.test.ts nodes: retained scoped reader/current receivers and no cached DB-name gate",
+    "API types plus applicable structure/import-cycle checks and real integration gate matrices"
+  ],
+  "evidence": {
+    "inherited_log": "../../broker/native-next-stage2-atomic-consumer-floor.log",
+    "initial_result": {
+      "skip": 4,
+      "tests": 206,
+      "fail": 18,
+      "pass": 184
+    },
+    "execution": "No tests/build/DB/provider/browser/ACL/decoder commands executed by C.",
+    "inherited_checkpoint": "../../broker/native-next-stage2-focused-checkpoint.md"
+  },
+  "native_fixture": "Unchanged. B diagnosed read-only spool chmod400->copyFile destination->open r+ EPERM and owns archive implementation fix.",
+  "remaining_gates": [
+    "Sole broker original-regression replay and combined type/structure/downstream floors",
+    "Independent checker only after required evidence complete; no PASS claim",
+    "Native fixture minimum replay production.test.ts original49 depends on B archive fix"
+  ]
+}

@@ -64,4 +64,12 @@ that the file is 59 lines over instead of 52, and a second unit has had to decla
 
 **Answer format (unchanged):** reply `obs-windows-loc-split: a` (or b / c).
 
-**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+
+## Ruling (recorded 2026-10-10)
+
+**Answered:** 2026-10-10 - (a) APPROVED - Umesh (Approver), answering a direct multiple-choice prompt in the orchestrating session; recorded by the orchestrating agent.
+**Ruled by:** Umesh (Approver).
+**Choice:** (a) Extract the bot-child launch + startup handshake into `packages/meeting-bot/src/capture/bot-child.ts` as a new file so `obs-windows.ts` returns under its 300-line budget. New file OK.
+**Limits:** no raise of the C1 budget (option b not chosen); option (c) not chosen. Only `bot-child.ts` is authorized as a new file.
+
+**Gate status:** ANSWERED - recorded inline: 2026-10-10 - option (a), new file ok, no budget raise - Umesh (Approver)

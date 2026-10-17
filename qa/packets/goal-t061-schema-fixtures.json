@@ -1,0 +1,46 @@
+{
+  "valid": [
+    {
+      "_id": "def-0123456789abcdef0123456789abcdef01234567",
+      "tenantId": "tenant-a",
+      "recordType": "definition",
+      "kind": "application-readiness",
+      "enabled": true,
+      "maxAttempts": 3,
+      "timeoutMs": 5000,
+      "version": 1,
+      "updatedAt": 1000,
+      "history": [{ "at": 1000, "actor": "key-admin", "action": "configured" }]
+    },
+    {
+      "_id": "run-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "tenantId": "tenant-a",
+      "recordType": "run",
+      "kind": "application-readiness",
+      "definitionId": "def-0123456789abcdef0123456789abcdef01234567",
+      "identityDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "payloadDigest": "ad0e34e143a1e12d037f6905c57b531b7f04f08d9f2f09af75fc4d0e37a38306",
+      "payload": { "applicationRef": "app-1", "requiredDocuments": ["identity"], "availableDocuments": [] },
+      "status": "queued",
+      "version": 1,
+      "createdAt": 1000,
+      "updatedAt": 1000,
+      "attempts": 0,
+      "maxAttempts": 3,
+      "timeoutMs": 5000,
+      "ownerToken": null,
+      "leaseUntil": null,
+      "incident": null,
+      "outcome": null,
+      "history": [{ "at": 1000, "actor": "key-admin", "action": "submitted" }]
+    }
+  ],
+  "invalidMutations": [
+    { "index": 0, "set": { "maxAttempts": 4 } },
+    { "index": 1, "set": { "kind": "shell" } },
+    { "index": 1, "set": { "status": "unknown" } },
+    { "index": 1, "set": { "payload": { "applicationRef": "https://private-host", "requiredDocuments": ["identity"], "availableDocuments": [] } } },
+    { "index": 1, "set": { "unexpected": "caller-controlled" } }
+  ],
+  "note": "Shape fixtures only. Run payload hash is canonical and valid; identity digest is a synthetic fixed fixture token. Definition identifier is synthetic. No live external application or submitted form data."
+}

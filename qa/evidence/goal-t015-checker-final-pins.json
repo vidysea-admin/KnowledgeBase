@@ -1,0 +1,60 @@
+{
+  "checkedAt": "2026-10-14T20:57:51.7523627Z",
+  "cycle": 0,
+  "sourcePins": [
+    {
+      "path": "scripts/training/plan.mjs",
+      "expected": "9022a92c6ca1bdbf9bb9f03464a6e415fdea0603c1b5ede882fc29ecdad73871",
+      "actual": "9022a92c6ca1bdbf9bb9f03464a6e415fdea0603c1b5ede882fc29ecdad73871"
+    },
+    {
+      "path": "scripts/training/prepare.mjs",
+      "expected": "512163b25449684030e4e0a45d8d53e1a9119fb1d2e36683173df85a928ad18b",
+      "actual": "512163b25449684030e4e0a45d8d53e1a9119fb1d2e36683173df85a928ad18b"
+    },
+    {
+      "path": "scripts/training/validate.mjs",
+      "expected": "eb5cd898eba524c3b1d7093dbd914b92eedf6c98ddb8f2e9f33ba66f33691869",
+      "actual": "eb5cd898eba524c3b1d7093dbd914b92eedf6c98ddb8f2e9f33ba66f33691869"
+    },
+    {
+      "path": "scripts/training/export.mjs",
+      "expected": "1b64ef97817e59702257ea53ba8530ddf7b7d8a1600c6dac711cf51d47fc20d9",
+      "actual": "1b64ef97817e59702257ea53ba8530ddf7b7d8a1600c6dac711cf51d47fc20d9"
+    },
+    {
+      "path": "scripts/training/train.mjs",
+      "expected": "2bda09076bdd17a60d4c6710eff684b4466e56a1e741c57d5ec9a51254807f64",
+      "actual": "2bda09076bdd17a60d4c6710eff684b4466e56a1e741c57d5ec9a51254807f64"
+    },
+    {
+      "path": "scripts/training/private-path.mjs",
+      "expected": "bd7692baf6175dcf5541b0184c8380631fe298d3f2bb0d8bef7335274b10ec4c",
+      "actual": "bd7692baf6175dcf5541b0184c8380631fe298d3f2bb0d8bef7335274b10ec4c"
+    },
+    {
+      "path": "scripts/training/file-hash.mjs",
+      "expected": "aa7a76c7395ee9ac9d588f5dd5de86c55f3c4564628fcae63f3458bd8ffef271",
+      "actual": "aa7a76c7395ee9ac9d588f5dd5de86c55f3c4564628fcae63f3458bd8ffef271"
+    },
+    {
+      "path": "scripts/training/prepare.test.mjs",
+      "expected": "ded868192986766792853e262c9d751329149b49b778c63c94e646d711b7568d",
+      "actual": "ded868192986766792853e262c9d751329149b49b778c63c94e646d711b7568d"
+    },
+    {
+      "path": "docs/own-model-training.md",
+      "expected": "9c463059aec474f5d03c8d0d2c112128c7f5583fe80efd5a7e36c598db560db7",
+      "actual": "9c463059aec474f5d03c8d0d2c112128c7f5583fe80efd5a7e36c598db560db7"
+    },
+    {
+      "path": "qa/evidence/goal-t015-real-config.json",
+      "expected": "feeacf2108125c304c53267066477d5e03209f2289f36cb8247af4ecd82f7f84",
+      "actual": "feeacf2108125c304c53267066477d5e03209f2289f36cb8247af4ecd82f7f84"
+    }
+  ],
+  "independentReceiptSHA256": "c0db423f445e43ebb7721ce85d4776309d7c9d9dccf54935aa8edf4cb5de814f",
+  "probeResultSHA256": "bff6c0da6d99df3102a4dcc6abe492cbcce41a9cc98bd2790f9c8110296e1485",
+  "currentSessionRowsSHA256": "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053",
+  "dependencyNote": "session-rows drift from packet pin; stricter combined knowledge-turns validation, separate current acceptance HOLD; isolated plan probe does not import it"
+}

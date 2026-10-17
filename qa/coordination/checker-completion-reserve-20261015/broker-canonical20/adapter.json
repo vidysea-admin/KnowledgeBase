@@ -1,0 +1,7 @@
+{
+  "original": "qa/coordination/checker-efficiency-20261015/canonical-candidate/test_review_budget.py",
+  "originalSha": "c46eabf72ab8a75b2214925430ae71f402d0618b0953e2cf13bb63ff5ac4cebc",
+  "adapter": "Exact original20test body; only EXPECTED_SHA f24→staged36b; sibling import preserved; staged helper copied byte-identical",
+  "stagedHelperSha": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+  "adaptedTestSha": "19b32f7fde950f692621aeb76565ee0a6dd5dc6bb6853ba7e86bebea2e59478f"
+}

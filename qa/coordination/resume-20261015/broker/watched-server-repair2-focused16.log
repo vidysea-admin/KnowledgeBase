@@ -1,0 +1,24 @@
+✔ disabled and nonexact opt-ins start no supervisor/timers or stored-key reads (4.2399ms)
+✔ actual imported supervisor starts only after listening and stop drains initialized auth/tick before HTTP close (2.0476ms)
+✔ actual stored-key failure logs only fixed supervisor outcome and shutdown still completes (0.7201ms)
+✔ task rejection and throwing logger cannot detach owned shutdown (0.686ms)
+✔ stop before listening aborts pending launch without starting a supervisor (0.6347ms)
+✔ enabled missing workflow refuses before listen; foreign server and shared Mongo are never disposed (1.0142ms)
+✔ explicit CLI coordinator is passive until signal and finishes only after successful drain (0.8266ms)
+✔ CLI deadline finishes nonzero without claiming to cancel a hung tick (0.3919ms)
+✔ CLI drain failures finish nonzero with fixed diagnostics and clear timer/listeners (0.4059ms)
+✔ second CLI signal forces its explicit nonzero code once and removes both handlers (0.3392ms)
+✔ unconfigured ordinary sync path does not open archive or require database (1.2536ms)
+✔ native configuration refuses unbounded quota and missing configured decoder (0.7548ms)
+✔ startup performs exactly one bounded drain and preserves explicit resume cursor (1.0769ms)
+✔ actual bootstrap connects then drains before constructing listening server (1.2889ms)
+✔ failed bounded drain never reaches server readiness (0.5468ms)
+✔ trusted root host adapter construction stays lazy; ordinary API requires explicit adapter (0.194ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12865.471

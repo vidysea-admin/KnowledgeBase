@@ -1,0 +1,13 @@
+{
+  "status": "HOLD",
+  "scope": "offline source review only",
+  "candidate_content_manifest_sha256": "1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "makerPacketComplete": true,
+  "runtimeStartupAdmission": "UNKNOWN",
+  "activationReady": false,
+  "independentReview": "NOT_DISPATCHED",
+  "actualMakerUsage": null,
+  "reviewHistoryReset": false,
+  "originalMetadataBackup": "metadata-before-repair1/",
+  "reason": "Source packet complete after passive checks; exact runtime startup/control bindings and independent review remain missing"
+}

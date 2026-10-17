@@ -1,0 +1,53 @@
+{
+  "next_phase": {
+    "cost": null,
+    "tokens": 800,
+    "active_s": 30,
+    "kind": "finalization"
+  },
+  "bootstrap_scope": "Source-reader cycle0 exact source plus current runtime transitive candidate; twelve scoped tests current; independent credential/resource boundary review",
+  "completion_reserve": true,
+  "completion_reserve_id": "source-connectors-vectorless/cycle0/6710b9aa265a472c7b6e172e2d632424b4e9beb0d5435dddcd3486d30751bb6c",
+  "reviewers": [
+    {
+      "cost": null,
+      "id": "vectorless_checker-wip-shared",
+      "budget_debit": {
+        "cost": null,
+        "tokens": 6000,
+        "active_s": 180
+      },
+      "tokens": null,
+      "active_s": null
+    },
+    {
+      "id": "source_reader_checker",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 90,
+        "cost": null,
+        "tokens": 2200
+      }
+    }
+  ],
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": {
+    "reason": "Mandatory source resource/credential boundary review; historical shared debit preserved and centrally deduplicated; ratio unverified",
+    "limits": {
+      "cost": null,
+      "tokens": 9000,
+      "active_s": 300
+    },
+    "authority": "Root explicit finite cumulative admission 2026-10-15"
+  }
+}

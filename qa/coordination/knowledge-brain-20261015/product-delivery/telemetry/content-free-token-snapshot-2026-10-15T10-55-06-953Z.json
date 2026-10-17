@@ -1,0 +1,586 @@
+{
+  "kind": "CONTENT_FREE_SESSION_TOKEN_TELEMETRY",
+  "captured_at": "2026-10-15T10:55:06.955Z",
+  "source_filter": "Read only session_meta and event_msg payload.type=token_count after rawline prefilter. No message bodies or environment fields parsed/output.",
+  "counter_semantics": "total_tokens is input plus output. cached_input_tokens is subset of input; reasoning_output_tokens is subset of output. Neither subset is additive. No cost or active-time inference.",
+  "root_scope_attestation": "Coordinator explicitly attests first six makers are single-unit lifetimes; operations/evaluation_ui distinct same-unit lifetimes may sum; API inventory and consumption fixtures are mixed surveys with UNKNOWN comparable denominator.",
+  "records": [
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-48-21-01a13ef6-6a6a-7061-a5dc-6ac7a4311694.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/collections_delivery",
+      "id": "01a13ef6-6a6a-7061-a5dc-6ac7a4311694",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:48:23.332Z",
+      "token_record_count": 51,
+      "first_token_timestamp": "2026-10-15T09:48:56.177Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:29:16.045Z",
+        "total_token_usage": {
+          "input_tokens": 3538513,
+          "cached_input_tokens": 3452672,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9199,
+          "reasoning_output_tokens": 817,
+          "total_tokens": 3547712
+        },
+        "last_token_usage": {
+          "input_tokens": 85373,
+          "cached_input_tokens": 84608,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 59,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 85432
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-48-32-01a13ef6-94f8-7de3-aeb7-23c892b8978d.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/reviews_delivery",
+      "id": "01a13ef6-94f8-7de3-aeb7-23c892b8978d",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:48:36.811Z",
+      "token_record_count": 43,
+      "first_token_timestamp": "2026-10-15T09:49:07.918Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:29:30.338Z",
+        "total_token_usage": {
+          "input_tokens": 3255686,
+          "cached_input_tokens": 3068416,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11682,
+          "reasoning_output_tokens": 1252,
+          "total_tokens": 3267368
+        },
+        "last_token_usage": {
+          "input_tokens": 99918,
+          "cached_input_tokens": 98816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 84,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 100002
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-48-48-01a13ef6-d197-7251-9c59-6c39928132d9.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/saved_outputs_delivery",
+      "id": "01a13ef6-d197-7251-9c59-6c39928132d9",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:48:52.142Z",
+      "token_record_count": 39,
+      "first_token_timestamp": "2026-10-15T09:49:33.870Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:29:25.114Z",
+        "total_token_usage": {
+          "input_tokens": 2518942,
+          "cached_input_tokens": 2425600,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6359,
+          "reasoning_output_tokens": 618,
+          "total_tokens": 2525301
+        },
+        "last_token_usage": {
+          "input_tokens": 85881,
+          "cached_input_tokens": 85248,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 68,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 85949
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-49-02-01a13ef7-0820-7101-a7d8-ae1635d45f2d.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/operations_delivery",
+      "id": "01a13ef7-0820-7101-a7d8-ae1635d45f2d",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:49:07.021Z",
+      "token_record_count": 74,
+      "first_token_timestamp": "2026-10-15T09:49:59.699Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:30:55.997Z",
+        "total_token_usage": {
+          "input_tokens": 6644253,
+          "cached_input_tokens": 6501888,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 16648,
+          "reasoning_output_tokens": 971,
+          "total_tokens": 6660901
+        },
+        "last_token_usage": {
+          "input_tokens": 130065,
+          "cached_input_tokens": 129792,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 76,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 130141
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-49-33-01a13ef7-81be-7151-a06f-e48bb643d136.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/product_api_inventory",
+      "id": "01a13ef7-81be-7151-a06f-e48bb643d136",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:49:38.515Z",
+      "token_record_count": 62,
+      "first_token_timestamp": "2026-10-15T09:50:20.134Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:29:59.387Z",
+        "total_token_usage": {
+          "input_tokens": 5695992,
+          "cached_input_tokens": 5552128,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 14641,
+          "reasoning_output_tokens": 2681,
+          "total_tokens": 5710633
+        },
+        "last_token_usage": {
+          "input_tokens": 122941,
+          "cached_input_tokens": 121600,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 97,
+          "reasoning_output_tokens": 28,
+          "total_tokens": 123038
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-51-14-01a13ef9-0425-7010-9dc0-af67fcd6ed56.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/t054_journey",
+      "id": "01a13ef9-0425-7010-9dc0-af67fcd6ed56",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:51:19.034Z",
+      "token_record_count": 53,
+      "first_token_timestamp": "2026-10-15T09:52:06.589Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:47:02.614Z",
+        "total_token_usage": {
+          "input_tokens": 3517304,
+          "cached_input_tokens": 3433728,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9708,
+          "reasoning_output_tokens": 677,
+          "total_tokens": 3527012
+        },
+        "last_token_usage": {
+          "input_tokens": 93076,
+          "cached_input_tokens": 92672,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 77,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 93153
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-52-30-01a13efa-2c9b-7aa0-957d-9d08009eacb4.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/t057_journey",
+      "id": "01a13efa-2c9b-7aa0-957d-9d08009eacb4",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:52:36.218Z",
+      "token_record_count": 52,
+      "first_token_timestamp": "2026-10-15T09:53:22.672Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:30:11.535Z",
+        "total_token_usage": {
+          "input_tokens": 3555074,
+          "cached_input_tokens": 3410816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 11744,
+          "reasoning_output_tokens": 1218,
+          "total_tokens": 3566818
+        },
+        "last_token_usage": {
+          "input_tokens": 96981,
+          "cached_input_tokens": 96640,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 65,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 97046
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-52-55-01a13efa-901a-7001-9ede-4878545b29a4.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/speaker_review_ui",
+      "id": "01a13efa-901a-7001-9ede-4878545b29a4",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:53:04.109Z",
+      "token_record_count": 48,
+      "first_token_timestamp": "2026-10-15T09:54:08.787Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:30:42.841Z",
+        "total_token_usage": {
+          "input_tokens": 2930637,
+          "cached_input_tokens": 2850816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 20010,
+          "reasoning_output_tokens": 1415,
+          "total_tokens": 2950647
+        },
+        "last_token_usage": {
+          "input_tokens": 93334,
+          "cached_input_tokens": 92928,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 178,
+          "reasoning_output_tokens": 111,
+          "total_tokens": 93512
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-54-24-01a13efb-dbb5-7a33-958b-735bb781f8a2.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/evaluation_ui_delivery",
+      "id": "01a13efb-dbb5-7a33-958b-735bb781f8a2",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:54:29.952Z",
+      "token_record_count": 36,
+      "first_token_timestamp": "2026-10-15T09:55:15.711Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:03:52.000Z",
+        "total_token_usage": {
+          "input_tokens": 1997305,
+          "cached_input_tokens": 1906560,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9991,
+          "reasoning_output_tokens": 509,
+          "total_tokens": 2007296
+        },
+        "last_token_usage": {
+          "input_tokens": 72531,
+          "cached_input_tokens": 72192,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 109,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 72640
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T09-54-53-01a13efc-5b60-7500-b02b-648049f7b3fb.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/product_consumption_fixtures",
+      "id": "01a13efc-5b60-7500-b02b-648049f7b3fb",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T09:54:59.299Z",
+      "token_record_count": 38,
+      "first_token_timestamp": "2026-10-15T09:55:48.185Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:29:53.883Z",
+        "total_token_usage": {
+          "input_tokens": 2690469,
+          "cached_input_tokens": 2621312,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 9355,
+          "reasoning_output_tokens": 563,
+          "total_tokens": 2699824
+        },
+        "last_token_usage": {
+          "input_tokens": 101107,
+          "cached_input_tokens": 100224,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 110,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 101217
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T10:48:35.605Z",
+      "token_record_count": 7,
+      "first_token_timestamp": "2026-10-15T10:48:42.609Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:49:36.117Z",
+        "total_token_usage": {
+          "input_tokens": 359851,
+          "cached_input_tokens": 330880,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1436,
+          "reasoning_output_tokens": 125,
+          "total_tokens": 361287
+        },
+        "last_token_usage": {
+          "input_tokens": 55157,
+          "cached_input_tokens": 54784,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 120,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 55277
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-45-01a13f2d-be39-7dc1-a4da-68fc574e8668.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/transcript_independent_checker",
+      "id": "01a13f2d-be39-7dc1-a4da-68fc574e8668",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T10:48:46.018Z",
+      "token_record_count": 6,
+      "first_token_timestamp": "2026-10-15T10:48:53.165Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:49:34.555Z",
+        "total_token_usage": {
+          "input_tokens": 293691,
+          "cached_input_tokens": 280064,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1158,
+          "reasoning_output_tokens": 63,
+          "total_tokens": 294849
+        },
+        "last_token_usage": {
+          "input_tokens": 53400,
+          "cached_input_tokens": 52224,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 139,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 53539
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+      "id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T10:48:55.747Z",
+      "token_record_count": 6,
+      "first_token_timestamp": "2026-10-15T10:49:02.912Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:49:43.677Z",
+        "total_token_usage": {
+          "input_tokens": 319555,
+          "cached_input_tokens": 298112,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1357,
+          "reasoning_output_tokens": 32,
+          "total_tokens": 320912
+        },
+        "last_token_usage": {
+          "input_tokens": 60948,
+          "cached_input_tokens": 60544,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 147,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 61095
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+      "id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T10:49:04.933Z",
+      "token_record_count": 8,
+      "first_token_timestamp": "2026-10-15T10:49:10.137Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:50:09.847Z",
+        "total_token_usage": {
+          "input_tokens": 475781,
+          "cached_input_tokens": 445312,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2073,
+          "reasoning_output_tokens": 86,
+          "total_tokens": 477854
+        },
+        "last_token_usage": {
+          "input_tokens": 69983,
+          "cached_input_tokens": 69632,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 163,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 70146
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    },
+    {
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-12-01a13f2e-28e5-7021-9d8a-46ec29ed627e.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/setup_independent_checker",
+      "id": "01a13f2e-28e5-7021-9d8a-46ec29ed627e",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "timestamp": "2026-10-15T10:49:13.644Z",
+      "token_record_count": 6,
+      "first_token_timestamp": "2026-10-15T10:49:19.751Z",
+      "latest": {
+        "timestamp": "2026-10-15T10:50:04.190Z",
+        "total_token_usage": {
+          "input_tokens": 318350,
+          "cached_input_tokens": 296320,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 1300,
+          "reasoning_output_tokens": 106,
+          "total_tokens": 319650
+        },
+        "last_token_usage": {
+          "input_tokens": 61859,
+          "cached_input_tokens": 61056,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 143,
+          "reasoning_output_tokens": 0,
+          "total_tokens": 62002
+        }
+      },
+      "decreases": [],
+      "inflight": "UNKNOWN: permitted telemetry does not establish completion",
+      "phase": "UNKNOWN: token counters are thread lifetime, not phase usage"
+    }
+  ],
+  "missing_mapping": [],
+  "comparisons": [
+    {
+      "unit": "collections",
+      "maker_threads": [
+        "01a13ef6-6a6a-7061-a5dc-6ac7a4311694"
+      ],
+      "checker_thread": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "maker_latest_total_tokens": 3547712,
+      "checker_latest_total_tokens_lower_bound": 361287,
+      "point_in_time_checker_over_maker_fraction": 0.10183662033445781,
+      "ten_percent_of_latest_maker_total_tokens": 354771.2,
+      "comparison_to_current_denominator": "ABOVE_CURRENT_10_PERCENT",
+      "scope_basis": "Coordinator attests maker lifetime is comparable single unit; operations sums two distinct same-unit threads. Checker dedicated prep lifetime lower bound. Final/inflight and phase boundaries unknown.",
+      "legacy_allocated_output_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000,
+        "actual_total_tokens_compliance": false,
+        "note": "Allocated OUTPUT debit is not measured cumulative input+output usage and is not added to actual counters."
+      }
+    },
+    {
+      "unit": "transcript",
+      "maker_threads": [
+        "01a13ef9-0425-7010-9dc0-af67fcd6ed56"
+      ],
+      "checker_thread": "01a13f2d-be39-7dc1-a4da-68fc574e8668",
+      "maker_latest_total_tokens": 3527012,
+      "checker_latest_total_tokens_lower_bound": 294849,
+      "point_in_time_checker_over_maker_fraction": 0.08359739065248431,
+      "ten_percent_of_latest_maker_total_tokens": 352701.2,
+      "comparison_to_current_denominator": "BELOW_CURRENT_10_PERCENT_NOT_FINAL_COMPLIANCE",
+      "scope_basis": "Coordinator attests maker lifetime is comparable single unit; operations sums two distinct same-unit threads. Checker dedicated prep lifetime lower bound. Final/inflight and phase boundaries unknown.",
+      "legacy_allocated_output_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000,
+        "actual_total_tokens_compliance": false,
+        "note": "Allocated OUTPUT debit is not measured cumulative input+output usage and is not added to actual counters."
+      }
+    },
+    {
+      "unit": "speaker",
+      "maker_threads": [
+        "01a13efa-901a-7001-9ede-4878545b29a4"
+      ],
+      "checker_thread": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+      "maker_latest_total_tokens": 2950647,
+      "checker_latest_total_tokens_lower_bound": 320912,
+      "point_in_time_checker_over_maker_fraction": 0.10875987537648522,
+      "ten_percent_of_latest_maker_total_tokens": 295064.7,
+      "comparison_to_current_denominator": "ABOVE_CURRENT_10_PERCENT",
+      "scope_basis": "Coordinator attests maker lifetime is comparable single unit; operations sums two distinct same-unit threads. Checker dedicated prep lifetime lower bound. Final/inflight and phase boundaries unknown.",
+      "legacy_allocated_output_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000,
+        "actual_total_tokens_compliance": false,
+        "note": "Allocated OUTPUT debit is not measured cumulative input+output usage and is not added to actual counters."
+      }
+    },
+    {
+      "unit": "operations",
+      "maker_threads": [
+        "01a13ef7-0820-7101-a7d8-ae1635d45f2d",
+        "01a13efb-dbb5-7a33-958b-735bb781f8a2"
+      ],
+      "checker_thread": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+      "maker_latest_total_tokens": 8668197,
+      "checker_latest_total_tokens_lower_bound": 477854,
+      "point_in_time_checker_over_maker_fraction": 0.05512726579702792,
+      "ten_percent_of_latest_maker_total_tokens": 866819.7,
+      "comparison_to_current_denominator": "BELOW_CURRENT_10_PERCENT_NOT_FINAL_COMPLIANCE",
+      "scope_basis": "Coordinator attests maker lifetime is comparable single unit; operations sums two distinct same-unit threads. Checker dedicated prep lifetime lower bound. Final/inflight and phase boundaries unknown.",
+      "legacy_allocated_output_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000,
+        "actual_total_tokens_compliance": false,
+        "note": "Allocated OUTPUT debit is not measured cumulative input+output usage and is not added to actual counters."
+      }
+    },
+    {
+      "unit": "setup",
+      "maker_threads": [
+        "01a13efa-2c9b-7aa0-957d-9d08009eacb4"
+      ],
+      "checker_thread": "01a13f2e-28e5-7021-9d8a-46ec29ed627e",
+      "maker_latest_total_tokens": 3566818,
+      "checker_latest_total_tokens_lower_bound": 319650,
+      "point_in_time_checker_over_maker_fraction": 0.08961769285677038,
+      "ten_percent_of_latest_maker_total_tokens": 356681.8,
+      "comparison_to_current_denominator": "BELOW_CURRENT_10_PERCENT_NOT_FINAL_COMPLIANCE",
+      "scope_basis": "Coordinator attests maker lifetime is comparable single unit; operations sums two distinct same-unit threads. Checker dedicated prep lifetime lower bound. Final/inflight and phase boundaries unknown.",
+      "legacy_allocated_output_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000,
+        "actual_total_tokens_compliance": false,
+        "note": "Allocated OUTPUT debit is not measured cumulative input+output usage and is not added to actual counters."
+      }
+    }
+  ],
+  "mixed_scope": [
+    {
+      "agent": "product_api_inventory",
+      "comparable_denominator": null,
+      "reason": "mixed surveys, even though raw lifetime totals known"
+    },
+    {
+      "agent": "product_consumption_fixtures",
+      "comparable_denominator": null,
+      "reason": "mixed surveys, even though raw lifetime totals known"
+    }
+  ],
+  "completion_and_phase": "UNKNOWN. All checker totals are current lifetime LOWER BOUNDS; final compliance not claimed. No review admission or budget gate is performed."
+}

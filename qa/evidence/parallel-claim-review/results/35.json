@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "index": 35,
+  "originalIndex": 37,
+  "claimId": "2026-07-03-inside-the-uc-session-c01",
+  "inputHash": "b55e3d84d91303b0a7eb242f04985d0cd8c9d20a1313eb7af2641a0c001d335c",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited turn explicitly states ten University of California campuses and only nine offering undergraduate programs, supporting every claim component.",
+    "missingReferences": [],
+    "caveats": [
+      "Original speakerRef is unknown; the embedded name does not establish speaker identity.",
+      "The same turn ID now has different text, speakerRef and timing: original 208-262 seconds; current 169-178 seconds.",
+      "No missing or duplicate supplied reference matches. Transcript support does not establish external factual truth; historical artifact bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t011",
+        "contextVersion": "originalMigration",
+        "quote": "because there are in fact 10 campuses. However, only nine of them offer undergraduate programs;",
+        "textSha256": "38f08da35d554f1efda9024097da8aad0fac6f9c5c1372a655bad57cfa25045c",
+        "contextSha256": "a09a1a2e4c1d371e7b5fda2fe59696d1217832b9af2436c86042022d7c050113",
+        "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 208,
+        "tEnd": 262,
+        "supports": "Both total-campus count of 10 and undergraduate-program campus count of 9."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn asks Bijoya to share poll results; it states neither ten UC campuses nor nine undergraduate campuses.",
+    "missingReferences": [],
+    "caveats": [
+      "Same-ID content changed; original support cannot substitute for current citation support.",
+      "Current speakerRef is Amrita, as stored; identity is not independently established.",
+      "No missing or duplicate supplied reference matches. Current raw artifact SHA256 is distinct from normalizedLfSha256; neither artifact-byte hash was verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "turnId": "2026-07-03-inside-the-uc-session-t011",
+        "contextVersion": "current",
+        "quote": "Bijoya, when you feel majority have responded, you could share the poll results.",
+        "textSha256": "9af853d40355d83168cf402b34ff5ad50e54710ee9e5f5418e27665c6a047fe7",
+        "contextSha256": "d08384ded6d4645bcfe870895ece30d3af0230f29043f421099f8c710a646b80",
+        "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+        "revision": null,
+        "speakerRef": "Amrita",
+        "tStart": 169,
+        "tEnd": 178,
+        "supports": "Unrelated poll-results request; supports neither campus-count component."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports both counts; current same-ID poll request supports neither. Text, speakerRef and timings changed. External truth and human approval remain open."
+}

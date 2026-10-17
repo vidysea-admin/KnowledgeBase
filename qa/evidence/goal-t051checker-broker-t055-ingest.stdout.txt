@@ -1,0 +1,18 @@
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: Indexing all PDF objects
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✔ actual PDF reader preserves two real page boundaries and quotes (1434.7349ms)
+✔ producer version/id are original-byte derived, repeatable and tenant separated (25.1507ms)
+✔ unavailable DOCX rendering and unsupported/malformed/oversized input fail (3.7497ms)
+✔ DOCX original bytes own version while renderer supplies genuine PDF pages (6.8385ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2672.2015

@@ -1,0 +1,34 @@
+{
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "baseCommit": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "startedAt": "2026-10-15T10:05:15.777Z",
+  "candidateAt": "2026-10-15T10:08:19.492Z",
+  "beforePins": {
+    "packages/meeting-bot/py/sb_join_register.py": "9d4c81008df95f5c0a15f94832070959de62dde25236c73c7669b8edd3160524",
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "4b9a1c2e307945611eb8f48c1a7560d2777739b6d25b17fe0ff7dc1b64b0e415",
+    "packages/meeting-bot/src/joiners/browser-joiner.ts": "9da7b3b23c30d3f8cf1cce400c448517014f2df2c3becb34963ae71d3db19f8d",
+    "packages/meeting-bot/src/joiners/joiners.test.ts": "9b0dfa6fd29b8c0539a1f4d68de25503437bd949604eaa4d3c7fae25a26362c7",
+    "packages/meeting-bot/src/calendar/registration-workflow.ts": "bf5b0e1afa1fe6cb81f3c56ddafe0c6eaa1119d3467c43b8188765d92d296c1a",
+    "packages/meeting-bot/src/calendar/registration-workflow.test.ts": "0f8531765b0d84b79f911b082aa6b8703d563f4bd65df6073a283fc6bf9bed0d",
+    "packages/meeting-bot/src/calendar/auto-record-policy.ts": "2172c66cf00ce07444d56043bf2422ce2d4b4963da6717d42e0bf886fea537a6",
+    "packages/meeting-bot/src/calendar/state/schedule-state.ts": "2ef302f1282e47efba7468b362b44ca5fdbecc1c2719dfb9cd4346f10c925619",
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts": "37db8e84af6fbdb75fe9c3b5abbd41b4d44b80d088661ca5ce00f5a10dc3c4d3"
+  },
+  "candidatePins": {
+    "packages/meeting-bot/py/sb_join_register.py": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+    "packages/meeting-bot/src/joiners/browser-joiner.ts": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+    "packages/meeting-bot/src/joiners/joiners.test.ts": "267cd00f7855679c0a9ff07265f1ad6db8a35c5482d66eb39d63968258a7321a",
+    "packages/meeting-bot/src/calendar/registration-workflow.ts": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+    "packages/meeting-bot/src/calendar/registration-workflow.test.ts": "f859ab60fd01ea8900431f7eb8f4747edf05b005f9d3d232bd20f0f1da108cff",
+    "packages/meeting-bot/src/calendar/auto-record-policy.ts": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+    "packages/meeting-bot/src/calendar/state/schedule-state.ts": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts": "41dd61db3c524845eff2c55436893a5e4e0f07e86e806fc5e6c7b74667315577"
+  },
+  "usage": {
+    "tokens": "unknown",
+    "cost": "unknown",
+    "activeSeconds": "unknown",
+    "wallSeconds": 184
+  }
+}

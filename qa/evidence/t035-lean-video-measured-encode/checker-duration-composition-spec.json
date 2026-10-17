@@ -1,0 +1,22 @@
+{
+  "scope": "New actual normalize-before-private-finalizer original-duration floor and two healthy ordinary synthetic controls; no external provider/browser/host/live acceptance",
+  "sourceFreeze": "Wait for central U24 source-freeze completion and owner ACK before execution",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "argv": ["node", "--import", "tsx", "qa/evidence/t035-lean-video-measured-encode/checker-duration-composition.mjs"],
+  "outerTimeoutMs": 120000,
+  "peakProbeTimeoutMs": 15000,
+  "threads": 1,
+  "pins": {
+    "packages/meeting-bot/src/capture/record-commands.ts": "83283b1cab59d738f0daae5e5ccd76ae29de3b6e21e2e9cf69394a701bd18552",
+    "packages/meeting-bot/src/capture/record-finalize.ts": "2a65dfc82940ec5ee461e089c1852158ac0dbae3ab46e5ed070a196a281237b8",
+    "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts": "933f943b04176bcb6047fc6044c77459d6291d94659afb620dd07a30dee3becb",
+    "packages/meeting-bot/src/capture/record-consent/context.ts": "19b232dc6163ff8fa54215313dab0a003579058470a9271af0b1851fc12d954c",
+    "packages/meeting-bot/src/capture/record-consent/receipt-store.ts": "9f07a805ef13895e72f3392071191e00759e2c58aa0a397aa709a16e832efd4c",
+    "packages/meeting-bot/src/capture/record-consent/coverage.ts": "f26a0f5f9f65f5aad39d1d29cbf1a86d5d72b3cf033f155cbe460c1c57aaf99e",
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "79b11336471e503b3e028ae4d865759c569a73b3782cd78858f39561e089cabc",
+    "qa/evidence/t035-lean-video-measured-encode/checker-duration-composition.mjs": "4783291e5a87333b2242c1d7d0b3ac876ce2cf0bf737cbd9278f347b7589e7b8",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/stale-duration-source.mkv": "d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7"
+  },
+  "classification": "RED only report status reproduced-normalization-duration-loss with actual published private-tail audio; script/tool/import/control failure is incomplete",
+  "timeoutCleanup": "Terminate only execution-owned descendants; preserve all synthetic media and reports"
+}

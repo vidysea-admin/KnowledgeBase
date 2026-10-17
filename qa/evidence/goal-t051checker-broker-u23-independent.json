@@ -1,0 +1,51 @@
+{
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "src/tree/topic-indexing.test.ts",
+    "src/tree/extract-topics-llm.test.ts",
+    "../../qa/evidence/goal-u23/checker-probe.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase/packages/index",
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T20:02:29.585Z",
+  "completedAt": "2026-10-14T20:02:30.085Z",
+  "elapsedMs": 495.5281,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/index/src/tree/topic-indexing.ts": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd",
+    "packages/index/src/tree/topic-indexing.test.ts": "c6f08a1a7b94988057b1f7efc247301ba22b27d2837eec7c5d5f3ec43ee9f5a9",
+    "packages/index/src/tree/extract-topics-llm.ts": "ebbbd23c802482b8b727440918baddc92c845507a7b639eb9bcb5434bdd64d5a",
+    "packages/index/src/tree/extract-topics-llm.test.ts": "02472679d787e8d6f9cbe1c6a118d8dade77b2ad5c5c44b403da21c05ea18d12",
+    "packages/index/src/tree/build.ts": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+    "packages/index/src/tree/regenerate.ts": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca",
+    "packages/index/src/tree/promote-entities.ts": "af7f42452a8e940b6a1850ce6479345041913a188d0e767a654561ca5deb082f",
+    "packages/index/src/tree/search.ts": "44dc55f5a88e29433faa7e33ae2af6d0f64f116d6c9574d7da9a866207874878",
+    "qa/evidence/goal-u23/checker-probe.test.ts": "57d8e7c644d7f010dd4dc09287d3318aecda8b940bf82c0d0604c330b6778215",
+    "packages/core/src/index.ts": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+    "packages/core/src/generated/tree_index.ts": "12befd6ab283ecf039aa65abfcb1babfab38b4894a8d29e4fba272fe99f5f17e"
+  },
+  "after": {
+    "packages/index/src/tree/topic-indexing.ts": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd",
+    "packages/index/src/tree/topic-indexing.test.ts": "c6f08a1a7b94988057b1f7efc247301ba22b27d2837eec7c5d5f3ec43ee9f5a9",
+    "packages/index/src/tree/extract-topics-llm.ts": "ebbbd23c802482b8b727440918baddc92c845507a7b639eb9bcb5434bdd64d5a",
+    "packages/index/src/tree/extract-topics-llm.test.ts": "02472679d787e8d6f9cbe1c6a118d8dade77b2ad5c5c44b403da21c05ea18d12",
+    "packages/index/src/tree/build.ts": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+    "packages/index/src/tree/regenerate.ts": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca",
+    "packages/index/src/tree/promote-entities.ts": "af7f42452a8e940b6a1850ce6479345041913a188d0e767a654561ca5deb082f",
+    "packages/index/src/tree/search.ts": "44dc55f5a88e29433faa7e33ae2af6d0f64f116d6c9574d7da9a866207874878",
+    "qa/evidence/goal-u23/checker-probe.test.ts": "57d8e7c644d7f010dd4dc09287d3318aecda8b940bf82c0d0604c330b6778215",
+    "packages/core/src/index.ts": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+    "packages/core/src/generated/tree_index.ts": "12befd6ab283ecf039aa65abfcb1babfab38b4894a8d29e4fba272fe99f5f17e"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-u23-independent.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-u23-independent.stderr.txt",
+  "hashesUnchanged": true
+}

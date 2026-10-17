@@ -1,0 +1,12 @@
+✔ actual history/answer-review endpoints separate candidate access, bind verified tenant and require review write scope (173.2871ms)
+✔ saved allowed and approved answers fail closed after policy revision, retirement or contradiction (99.8654ms)
+✔ new saved policy invalidates a default-policy answer and its pending review (4.3943ms)
+✔ stored candidate and evidence digest corruption cannot release or expose review content (9.5994ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2422.0644

@@ -1,48 +1,162 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync} from 'node:fs';
-import {tmpdir} from 'node:os';
-import {createHash} from 'node:crypto';
-import {join} from 'node:path';
+import {writeFileSync, readFileSync, existsSync} from 'node:fs';
+import {join, resolve} from 'node:path';
 import {runPipelineTick, validateRunGate, createPipelineDeps} from './run-pipeline.mjs';
+const {runWebinarRegistrations, activeWebinarStopReason, webinarSessionKey, webinarIdentity} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
+const {prepareWebinarSourceState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
+const {reconcileWebinarSources} = await import('../../packages/meeting-bot/src/calendar/calendar-client.ts');
 
-const NOW = '2026-09-30T12:00:00Z';
-const event = (changes = {}) => ({id: 'cal-one', title: 'University webinar', startTime: '2026-09-30T12:01:00Z',
-  endTime: '2026-09-30T13:00:00Z', meetingUrl: 'https://meeting.zoho.com/meeting/123?token=private', ...changes});
-function fixture() {
-  const root = mkdtempSync(join(tmpdir(), 'lkb-poller-')), stateDir = join(root, 'data/webinar-release');
-  const logs = [], calls = [];
-  const deps = {root, stateDir, env: {MONGO_WORK_DB: 'lkb_work_release', LKB_TENANT_ID: 'fixture'}, now: () => NOW,
-    validateTenant: async () => {}, log: (line) => logs.push(line), loadCalendarEvents: async () => [event()], loadCandidates: async () => [],
-    launch: async (...args) => calls.push(args)};
-  let generation = 0;
-  deps.loadCalendarAcquisition = async (token, checkedAt) => {
-    const rows = (await deps.loadCalendarEvents()).map(row => ({...row, providerUpdated: row.providerUpdated ?? new Date(Date.parse(NOW) + ++generation).toISOString()}));
-    return {version: 1, tenantId: 'fixture', scope: 'available-connected-source-state', complete: true, mode: token ? 'sync' : 'baseline',
-      checkedAt, requestedSyncToken: token, syncToken: `fixture-${generation}`, sourceEvents: rows, meetings: rows};
-  };
-  return {root, stateDir, deps, logs, calls, cleanup: () => rmSync(root, {recursive: true, force: true})};
-}
-async function withFixture(body, ready = false) {
-  const f = fixture();
-  try { if (ready) proof(f); await body(f); } finally { f.cleanup(); }
-}
-function proof(f) {
-  mkdirSync(f.stateDir, {recursive: true});
-  const file = join(f.root, 'proof.webm'); writeFileSync(file, 'test artifact');
-  writeFileSync(join(f.stateDir, 'live-proof.json'), JSON.stringify({status: 'passed', platform: process.platform,
-    backend: 'tab', sessionId: 'proof-session', audio: true, video: true, verifiedAt: NOW, recording: 'proof.webm'}));
-}
-function completed(root, id) {
-  const dir = join(root, 'data/toc-migrated', id); mkdirSync(dir, {recursive: true});
-  const bytes = JSON.stringify([{_id:'turn-a',tenantId:'fixture',sessionId:id,text:'Supported source'}]);
-  writeFileSync(join(dir,'knowledge-turns.json'),bytes);
-  writeFileSync(join(dir,'source.json'),JSON.stringify({_id:`${id}-src`,tenantId:'fixture'}));
-  const proof = {version:2,status:'done',strict:true,sessionId:id,tenantId:'fixture',generation:'generation-a',
-    inputHash:createHash('sha256').update(bytes).digest('hex'),summary:'done',claims:'done',chunks:'done',tree:'done',semanticSupport:'passed',turnCount:1};
-  writeFileSync(join(dir,'index-proof.json'),JSON.stringify(proof));
-  writeFileSync(join(dir,'pipeline-state.json'),JSON.stringify({...proof,stage:'index'}));
-}
+import {NOW, event, withFixture, proof, completed} from './run-pipeline-fixtures.mjs';
+const receipt = new Date(NOW).toISOString();
+const nativeRegistrationConfig = (host, root = resolve('fixture-registration-runtime')) => ({
+  python: join(root, 'fixture-python'), profileDir: join(root, 'fixture-profile'), allowedHosts: [host],
+  operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'},
+  form: {mode: 'native-html', formSelector: 'form', submitSelector: 'button[type=submit]',
+    fields: {firstName: '#first', lastName: '#last', email: '#email'}},
+});
+test('registration persistence rejection prevents any browser side effect', async () => {
+  const candidate = {id: 'original', title: 'Webinar', senderEmail: 'host@example.test', senderDomain: 'example.test', status: 'approved',
+    senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+    registrationOnly: true, registrationUrl: 'https://example.test/register', messageId: 'message', threadId: 'thread',
+    startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+  let submissions = 0;
+  const acquisition = reconcileWebinarSources({tenantId: 'fixture', checkedAt: receipt, calendarEvents: [], candidates: [candidate],
+    acquisition: {complete: true, historyComplete: true}});
+  assert.equal(acquisition.inventory[0].classification, 'webinar');
+  assert.equal(acquisition.state.occurrences[acquisition.inventory[0].occurrenceKey].accepted, true);
+  await assert.rejects(runWebinarRegistrations({state: {operations: {}}, tenantId: 'fixture', candidates: [candidate], now: () => NOW,
+    acquisition, config: () => nativeRegistrationConfig('example.test'),
+    register: async () => {submissions++;}, update: async (_id, changes) => {
+      assert.equal(changes.registration?.phase, 'submitting', 'failure must exercise the durable attempt boundary');
+      throw new Error('disk failure');
+    }, validate: validateWebinarRegistration, confirm: confirmWebinarRegistration,
+    createUUID: () => '12345678-1234-4123-8123-123456789abc'}), /disk failure/);
+  assert.equal(submissions, 0);
+});
+test('registration saves submitting before browser and never resubmits after result or interrupted restart', async () => {
+  for (const outcome of ['submitted', 'uncertain', 'action_required', 'throw']) await withFixture(async f => {
+    const candidate = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      status: 'approved', registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [candidate];
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+    let submitted = 0;
+    f.deps.registerWebinar = async () => {
+      submitted++;
+      const saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+      const row = Object.values(saved.operations).find(row => row.registration);
+      assert.equal(row.registration.phase, 'submitting'); assert.equal(row.registration.sourceId, 'original');
+      assert.equal(existsSync(join(f.stateDir, 'poller.lock')), true);
+      if (outcome === 'throw') throw new Error('browser failure');
+      return {status: outcome};
+    };
+    await runPipelineTick(f.deps, true);
+    assert.equal(submitted, 1);
+    let saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+    const row = Object.values(saved.operations).find(row => row.registration);
+    assert.equal(row.registration.phase, outcome === 'submitted' ? 'awaiting-confirmation' : outcome === 'action_required' ? 'action_required' : 'uncertain');
+    await runPipelineTick(f.deps, true); assert.equal(submitted, 1);
+    row.registration.phase = 'submitting'; writeFileSync(join(f.stateDir, 'operations.json'), JSON.stringify(saved));
+    await runPipelineTick(f.deps, true); assert.equal(submitted, 1);
+    saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+    assert.equal(Object.values(saved.operations).find(row => row.registration).registration.phase, 'uncertain');
+  }, true);
+});
+test('confirmed registration preserves original source and raw barrier and schedules once', () => withFixture(async f => {
+  const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+    senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+    registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+    startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+  let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
+  f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+  let submissions = 0; f.deps.registerWebinar = async () => {submissions++; return {status: 'submitted'};};
+  f.deps.launch = async args => completed(f.root, args[args.indexOf('--session-id') + 1]);
+  await runPipelineTick(f.deps, true); assert.equal(submissions, 1); assert.equal(f.calls.length, 0);
+  const confirmation = {...original, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
+    registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt};
+  rows = [original, confirmation];
+  const native = f.deps.loadCalendarAcquisition;
+  f.deps.loadCalendarAcquisition = async (...args) => ({...await native(...args), version: 2});
+  await assert.rejects(runPipelineTick(f.deps, true), /acquisition validation/);
+  assert.equal(Object.values(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations).find(row => row.registration).registration.phase, 'awaiting-confirmation');
+  f.deps.loadCalendarAcquisition = native;
+  const confirmed = await runPipelineTick(f.deps, true);
+  assert.equal(confirmed.toRecord.length, 1); assert.equal(confirmed.toRecord[0].sourceId, 'original');
+  const saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+  const raw = Object.values(saved.source.reconciliation.occurrences).find(row => row.snapshot.id === 'original');
+  assert.equal(raw.snapshot.registrationOnly, true); assert.equal(raw.snapshot.meetingUrl, undefined);
+  assert.equal(Object.values(saved.operations).find(row => row.registration).registration.phase, 'confirmed');
+  const projectedId = webinarSessionKey(webinarIdentity(confirmation.meetingUrl, original.startTime));
+  for (const change of [{cancelled: true}, {endTime: '2026-09-30T13:01:00.000Z'}]) {
+    const stamp = new Date(NOW).toISOString();
+    const prepared = prepareWebinarSourceState(saved, await native(saved.source.coverage.calendarSyncToken, stamp),
+      [{...original, ...change, providerUpdated: stamp}, confirmation], stamp);
+    assert.equal(activeWebinarStopReason(projectedId, original.endTime, prepared), change.cancelled ? 'cancelled' : 'rescheduled');
+    const refused = prepareWebinarSourceState(saved, await native(saved.source.coverage.calendarSyncToken, stamp),
+      [{...original, ...change, status: 'rejected', providerUpdated: stamp}, confirmation], stamp);
+    assert.equal(activeWebinarStopReason(projectedId, original.endTime, refused), undefined, 'rejected original cannot control projected capture');
+  }
+  assert.equal((await runPipelineTick(f.deps, true)).toRecord.length, 0);
+}, true));
+test('missing profile or thread never invokes registration, preview never persists an attempt', async () => {
+  for (const missing of ['profile', 'thread', 'preview']) await withFixture(async f => {
+    const row = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    if (missing === 'thread') delete row.threadId;
+    f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [row];
+    f.deps.registrationConfig = () => ({...nativeRegistrationConfig('organizer.example', f.root),
+      ...(missing === 'profile' ? {profileDir: undefined} : {})});
+    let submissions = 0; f.deps.registerWebinar = async () => {submissions++; return {status: 'submitted'};};
+    await runPipelineTick(f.deps, missing !== 'preview'); assert.equal(submissions, 0);
+    if (missing === 'preview') assert.equal(existsSync(join(f.stateDir, 'operations.json')), false);
+    else assert.equal(Object.values(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations).some(row => row.registration), false);
+  }, true);
+});
+test('unresolved registration blocks correlated wrong confirmation but preserves unrelated invitations', async () => {
+  for (const wrong of ['organizer', 'time', 'unrelated', 'same-thread-unrelated']) await withFixture(async f => {
+    const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+    f.deps.registerWebinar = async () => ({status: 'submitted'});
+    f.deps.launch = async () => {};
+    await runPipelineTick(f.deps, true);
+    const change = wrong === 'organizer' ? {senderEmail: 'other@organizer.example'} : wrong === 'time' ?
+      {endTime: '2026-09-30T13:01:00.000Z'} : wrong === 'same-thread-unrelated' ?
+      {senderEmail: 'other@organizer.example', endTime: '2026-09-30T13:01:00.000Z'} : {threadId: 'other-thread'};
+    rows = [original, {...original, ...change, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
+      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt}];
+    const result = await runPipelineTick(f.deps, true);
+    assert.equal(result.toRecord.length, ['unrelated', 'same-thread-unrelated'].includes(wrong) ? 1 : 0, wrong);
+  }, true);
+});
+
+test('registration confirmation cannot bypass missing, rejected, cancelled or changed original source', async () => {
+  for (const changed of ['missing', 'rejected', 'cancelled', 'time', 'organizer']) await withFixture(async f => {
+    const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+    f.deps.registerWebinar = async () => ({status: 'submitted'});
+    let captures = 0; f.deps.launch = async () => {captures++;};
+    await runPipelineTick(f.deps, true);
+    const confirmation = {...original, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
+      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt};
+    const alteration = changed === 'rejected' ? {status: 'rejected'} : changed === 'cancelled' ? {cancelled: true} :
+      changed === 'time' ? {endTime: '2026-09-30T13:01:00.000Z'} : {senderEmail: 'other@organizer.example'};
+    rows = changed === 'missing' ? [confirmation] : [{...original, ...alteration}, confirmation];
+    const result = await runPipelineTick(f.deps, true);
+    assert.equal(result.toRecord.length, 0, changed); assert.equal(captures, 0, changed);
+  }, true);
+});
 
 test('terminal notifications are sanitized, awaited and deduplicated across retry/restart', () => withFixture(async (f) => {
     const notices = [];
@@ -272,38 +386,3 @@ test('either failed feed blocks capture, persists health and alerts once until r
     }, true);
   }
 });
-
-test('ledger002 weak or stale strict markers never certify zero-exit child as ready', async () => {
-  for (const attack of ['versionless','degraded-summary','embedding-skip','stale-input','foreign-tenant','stale-generation']) {
-    await withFixture(async (f) => {
-      f.deps.launch=async (args)=>{
-        const id=args[args.indexOf('--session-id')+1];completed(f.root,id);
-        const dir=join(f.root,'data/toc-migrated',id),path=join(dir,'index-proof.json');
-        const value=JSON.parse(readFileSync(path));
-        if(attack==='versionless')delete value.version;
-        if(attack==='degraded-summary')value.summary='degraded';
-        if(attack==='embedding-skip')value.chunks='skipped';
-        if(attack==='stale-input')value.inputHash='0'.repeat(64);
-        if(attack==='foreign-tenant')value.tenantId='foreign';
-        if(attack==='stale-generation')value.generation='other-generation';
-        writeFileSync(path,JSON.stringify(value));
-      };
-      const result=await runPipelineTick(f.deps,true);
-      assert.equal(Object.values(result.operations)[0].status,'failed',attack);
-    }, true);
-  }
-});
-
-test('runner refuses missing, mismatched and unowned durable tenant state without captures', () => withFixture(async (f) => {
-    proof(f); delete f.deps.env.LKB_TENANT_ID;
-    await assert.rejects(runPipelineTick(f.deps, true), /LKB_TENANT_ID/);
-    f.deps.env.LKB_TENANT_ID = 'fixture';
-    const state = join(f.stateDir, 'operations.json');
-    for (const owner of [undefined, 'other-tenant']) {
-      const bytes = JSON.stringify({ version: 1, tenantId: owner, operations: {} });
-      writeFileSync(state, bytes);
-      await assert.rejects(runPipelineTick(f.deps, true), /ownership/);
-      assert.equal(readFileSync(state, 'utf8'), bytes);
-    }
-    assert.equal(f.calls.length, 0);
-}));

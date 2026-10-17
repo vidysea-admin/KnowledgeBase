@@ -1,0 +1,6 @@
+   × client rejects foreign session/evidence, invalid status/spans and malformed records before panel exposure 51ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  src/pages/sessions/decisions/SessionDecisionsPanel.test.tsx > client rejects foreign session/evidence, invalid status/spans and malformed records before panel exposure
+AssertionError: promise resolved "{ sessionId: 'decision-session', …(1) }" instead of rejecting
+ Test Files  1 failed (1)
+      Tests  1 failed | 9 passed | 1 skipped (11)

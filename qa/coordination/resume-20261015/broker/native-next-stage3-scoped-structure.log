@@ -1,0 +1,372 @@
+{
+  "rows": [
+    {
+      "path": "apps/api/src/capture-readiness/host-connector.ts",
+      "nonblank": 43,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/capture-readiness/types.ts",
+      "nonblank": 16,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/hosting.ts",
+      "nonblank": 115,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "nonblank": 120,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/composition/lazy-database.test.ts",
+      "nonblank": 43,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/composition/lazy-database.ts",
+      "nonblank": 29,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "nonblank": 294,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "nonblank": 124,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/native-archive/binding.test.ts",
+      "nonblank": 62,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/native-archive/binding.ts",
+      "nonblank": 65,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/native-archive/publication.mongo.test.ts",
+      "nonblank": 84,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/native-archive/publication.test.ts",
+      "nonblank": 108,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/native-archive/publication.ts",
+      "nonblank": 108,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/speaker-suggest.test.ts",
+      "nonblank": 179,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+      "nonblank": 243,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/indexing/tile-speaker-suggest.ts",
+      "nonblank": 130,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/production.test.ts",
+      "nonblank": 64,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/source-intake/jobs/entry.ts",
+      "nonblank": 59,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.test.ts",
+      "nonblank": 96,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "nonblank": 323,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+      "nonblank": 116,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/speaker-suggestions/router.ts",
+      "nonblank": 58,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+      "nonblank": 169,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/speaker-suggestions/store.ts",
+      "nonblank": 19,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/memdb.testsupport.ts",
+      "nonblank": 16,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/persist.testkit.ts",
+      "nonblank": 56,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.test.ts",
+      "nonblank": 295,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.ts",
+      "nonblank": 97,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+      "nonblank": 122,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "nonblank": 154,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/store.ts",
+      "nonblank": 102,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/core/src/generated/sessions.ts",
+      "nonblank": 79,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/core/src/generated/speaker_suggestions.ts",
+      "nonblank": 85,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+      "nonblank": 276,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "packages/db/src/collections/speaker-suggestions/index.ts",
+      "nonblank": 159,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+      "nonblank": 64,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "nonblank": 36,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/db/src/lib/native-publication.ts",
+      "nonblank": 141,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+      "nonblank": 89,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-capture.test.ts",
+      "nonblank": 25,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-capture.ts",
+      "nonblank": 95,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-join-types.ts",
+      "nonblank": 45,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+      "nonblank": 137,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+      "nonblank": 31,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-restart.testsupport.ts",
+      "nonblank": 184,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+      "nonblank": 199,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+      "nonblank": 143,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "nonblank": 299,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+      "nonblank": 154,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/private-directory.test.ts",
+      "nonblank": 23,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ts",
+      "nonblank": 32,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+      "nonblank": 295,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/production.test.ts",
+      "nonblank": 122,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/production.ts",
+      "nonblank": 152,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/record.test.ts",
+      "nonblank": 25,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/record.ts",
+      "nonblank": 46,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/server.test.ts",
+      "nonblank": 50,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/server.ts",
+      "nonblank": 100,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "scripts/webinar/sync-session.mjs",
+      "nonblank": 267,
+      "limit": 300,
+      "ok": true
+    }
+  ],
+  "directory": {
+    "violations": [
+      "scripts/webinar: 34 files (budget 30)"
+    ],
+    "scanned": 120
+  },
+  "scopeRoots": [
+    "apps/api/src",
+    "packages/db/src",
+    "packages/meeting-bot/src/capture",
+    "schema",
+    "scripts/native-capture",
+    "scripts/webinar"
+  ]
+}

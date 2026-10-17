@@ -1,0 +1,32 @@
+[
+  {
+    "path": "schema/jobs.schema.json",
+    "sha256": "D5BE6736CAA6F79795B393B80D8008A3C60EDB1ADA1C869298C0AB568AACB0B2",
+    "backup": "qa\\coordination\\knowledge-brain-20261015\\schema-baseline\\schema__jobs.schema.json"
+  },
+  {
+    "path": "schema/sessions.schema.json",
+    "sha256": "36E8396E57A796A85D66421E1144516407F1FE53CA89ABD922D1ABFA74027C51",
+    "backup": "qa\\coordination\\knowledge-brain-20261015\\schema-baseline\\schema__sessions.schema.json"
+  },
+  {
+    "path": "packages/core/src/generated/jobs.ts",
+    "sha256": "B1D05176E7A835682C2451E3711DB57FBB71DCC99AA9E4D3D74D03E933B7F02F",
+    "backup": "qa\\coordination\\knowledge-brain-20261015\\schema-baseline\\packages__core__src__generated__jobs.ts"
+  },
+  {
+    "path": "packages/core/src/generated/sessions.ts",
+    "sha256": "3977B5AAF6C516512974F727322F82751B19A2415B1A500B88A752AA54CE5516",
+    "backup": "qa\\coordination\\knowledge-brain-20261015\\schema-baseline\\packages__core__src__generated__sessions.ts"
+  },
+  {
+    "path": "schema/answer_runs.schema.json",
+    "sha256": "2784B0BF93AF81284A2AA2A93F98A8E90435DC1996B0154007D106740456AE89",
+    "backup": "qa\\coordination\\knowledge-brain-20261015\\schema-baseline\\schema__answer_runs.schema.json"
+  },
+  {
+    "path": "packages/core/src/generated/answer_runs.ts",
+    "sha256": "6ABCFAD1A8020E334C3C904E32EA4738D9CF0872F90A5E317D4EB7A7BB8EE7ED",
+    "backup": "qa\\coordination\\knowledge-brain-20261015\\schema-baseline\\packages__core__src__generated__answer_runs.ts"
+  }
+]

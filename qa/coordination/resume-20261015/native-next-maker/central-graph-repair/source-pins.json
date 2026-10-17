@@ -1,0 +1,47 @@
+[
+  {
+    "path": "apps/api/src/composition/integrations/hosting.ts",
+    "sha256": "9b97eeef07c50b1d9326bab9b80cb8e432db41b9cca2c3e679a31a1fdd4e26ed",
+    "nonblank": 115
+  },
+  {
+    "path": "apps/api/src/composition/integrations/source-jobs.ts",
+    "sha256": "8639249c059e322e09a2f81dc12e104e2ee97653dd87dc062a3c0bc3b902f423",
+    "nonblank": 120
+  },
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "b65a397a19e631c8bd80ab1c0a105ea4cbba3330c95761a59a650e4fe0f675cd",
+    "nonblank": 300
+  },
+  {
+    "path": "apps/api/src/source-intake/jobs/entry.ts",
+    "sha256": "435bdbfaaf16ab1b83a59f1c0876803dd16ebda43bf380334d54a1d7f4d99815",
+    "nonblank": 59
+  },
+  {
+    "path": "apps/api/src/capture-readiness/host-connector.ts",
+    "sha256": "4c39abdfb4a9030c5cba4dab217b7f5ff12a4e43fcfa18815d9d2ddc42212814",
+    "nonblank": 43
+  },
+  {
+    "path": "apps/api/src/capture-readiness/types.ts",
+    "sha256": "b9daa34d92a7d65bc455b025cbf1dc20112e8e57237c0bf0042683f759d50750",
+    "nonblank": 16
+  },
+  {
+    "path": "scripts/native-capture/server.ts",
+    "sha256": "f236a4c3d475c6c7f1d20e504c8a1825742b4435273432d00b0fdf5377c9a7c0",
+    "nonblank": 100
+  },
+  {
+    "path": "scripts/native-capture/server.test.ts",
+    "sha256": "c63790a5cd115bf8b474508e688495f880231927c8d62b946a78e4e6321ba531",
+    "nonblank": 50
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "sha256": "efa9e1b7d25639e23082a1f909e2e9c31ff66d55dea592439d680cc49f9afb9e",
+    "nonblank": 117
+  }
+]

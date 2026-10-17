@@ -1,0 +1,1448 @@
+{
+  "root_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+  "source": "state_5.sqlite readonly threads+spawn_edges; no session content read",
+  "observed_at": "2026-10-16T02:55:33.597703+00:00",
+  "coverage": "observed exact recursive SQLite descendant closure; not guaranteed complete",
+  "records": [
+    {
+      "thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-47-52-01a13e51-3417-7781-a3e2-75f087ff957b.jsonl",
+      "agent_path": null,
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e51-a6b8-7c20-85ea-1fabfd5eabb0",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-48-21-01a13e51-a6b8-7c20-85ea-1fabfd5eabb0.jsonl",
+      "agent_path": "/root/project_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e51-c6fa-7582-b588-d398672a8e19",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-48-29-01a13e51-c6fa-7582-b588-d398672a8e19.jsonl",
+      "agent_path": "/root/qa_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-1be1-72a2-a4b8-3c21154c0b34",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-48-51-01a13e52-1be1-72a2-a4b8-3c21154c0b34.jsonl",
+      "agent_path": "/root/apps_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-2e4b-74a2-933a-f7a8aac9c41b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-48-55-01a13e52-2e4b-74a2-933a-f7a8aac9c41b.jsonl",
+      "agent_path": "/root/packages_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-4360-7b10-b334-1eb720c09fe4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-01-01a13e52-4360-7b10-b334-1eb720c09fe4.jsonl",
+      "agent_path": "/root/workers_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-5b26-7f30-afa2-c588f769c3d4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-08-01a13e52-5b26-7f30-afa2-c588f769c3d4.jsonl",
+      "agent_path": "/root/scripts_pipeline",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-6415-7051-9cf2-543aef4a8564",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-10-01a13e52-6415-7051-9cf2-543aef4a8564.jsonl",
+      "agent_path": "/root/packages_status/ingest_db",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-7e2b-78e3-8d80-86178cb2ebcd",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-17-01a13e52-7e2b-78e3-8d80-86178cb2ebcd.jsonl",
+      "agent_path": "/root/scripts_governance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-7ef8-7ba1-98f4-6a106863b7b9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-17-01a13e52-7ef8-7ba1-98f4-6a106863b7b9.jsonl",
+      "agent_path": "/root/packages_status/meeting_bot",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-971d-7ea2-9573-275e4bd1b432",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-23-01a13e52-971d-7ea2-9573-275e4bd1b432.jsonl",
+      "agent_path": "/root/contracts_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-99f3-7062-be95-b685975a8e48",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-23-01a13e52-99f3-7062-be95-b685975a8e48.jsonl",
+      "agent_path": "/root/packages_status/index_ask",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-abcb-73a1-b44a-d34d388edae9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-28-01a13e52-abcb-73a1-b44a-d34d388edae9.jsonl",
+      "agent_path": "/root/scripts_pipeline/webinar_scripts",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-af9f-7e93-81fa-93da468b9101",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-30-01a13e52-af9f-7e93-81fa-93da468b9101.jsonl",
+      "agent_path": "/root/database_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-bdae-7670-be9f-1d4091783a5c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-33-01a13e52-bdae-7670-be9f-1d4091783a5c.jsonl",
+      "agent_path": "/root/scripts_pipeline/watch_upload_scripts",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-d1f5-7181-a68b-86d882fd4ef0",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-39-01a13e52-d1f5-7181-a68b-86d882fd4ef0.jsonl",
+      "agent_path": "/root/raw_toc_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-d2c9-7cc2-afd6-485a08094b37",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-39-01a13e52-d2c9-7cc2-afd6-485a08094b37.jsonl",
+      "agent_path": "/root/scripts_pipeline/training_eval_scripts",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e52-f1f2-7b72-8856-98cdc526bd8c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-47-01a13e52-f1f2-7b72-8856-98cdc526bd8c.jsonl",
+      "agent_path": "/root/sources_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e53-18d3-7002-96ef-44fa31f116a3",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-49-57-01a13e53-18d3-7002-96ef-44fa31f116a3.jsonl",
+      "agent_path": "/root/data_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e53-3c01-7910-abc5-620f14f4e4f5",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-50-07-01a13e53-3c01-7910-abc5-620f14f4e4f5.jsonl",
+      "agent_path": "/root/docs_delivery_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e53-6ff0-7540-bd61-a3e3e33cd101",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-50-20-01a13e53-6ff0-7540-bd61-a3e3e33cd101.jsonl",
+      "agent_path": "/root/runtime_deploy_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e53-a170-7c02-82c4-8082aa8c6071",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-50-33-01a13e53-a170-7c02-82c4-8082aa8c6071.jsonl",
+      "agent_path": "/root/handoffs_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e53-df9b-7790-8663-67e6c15a59fc",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-50-48-01a13e53-df9b-7790-8663-67e6c15a59fc.jsonl",
+      "agent_path": "/root/git_delivery_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e54-19d5-77f2-a71c-bc8e899b7158",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-51-04-01a13e54-19d5-77f2-a71c-bc8e899b7158.jsonl",
+      "agent_path": "/root/docs_delivery_status/runtime_delivery_docs",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e54-1e67-7832-95e6-6c93ebd963fd",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-51-06-01a13e54-1e67-7832-95e6-6c93ebd963fd.jsonl",
+      "agent_path": "/root/local_artifact_status",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e54-2d5a-7702-8ebb-68e1bc26c3fb",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-51-10-01a13e54-2d5a-7702-8ebb-68e1bc26c3fb.jsonl",
+      "agent_path": "/root/qa_status/live_blockers",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e54-4e7e-7692-b2c1-1387d27a8214",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-51-18-01a13e54-4e7e-7692-b2c1-1387d27a8214.jsonl",
+      "agent_path": "/root/docs_delivery_status/source_pipeline_docs",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e54-7e45-7051-9ca4-cc86708ac17f",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-51-30-01a13e54-7e45-7051-9ca4-cc86708ac17f.jsonl",
+      "agent_path": "/root/qa_status/gates_freshness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e54-dabb-7200-838d-8b1ec83e44be",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-51-56-01a13e54-dabb-7200-838d-8b1ec83e44be.jsonl",
+      "agent_path": "/root/apps_status/web_wiring",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e55-3c78-7262-9d3b-b3f59750cd28",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-52-19-01a13e55-3c78-7262-9d3b-b3f59750cd28.jsonl",
+      "agent_path": "/root/apps_status/api_runtime_gates",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e55-758f-7e20-b2df-87ac49868172",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-52-32-01a13e55-758f-7e20-b2df-87ac49868172.jsonl",
+      "agent_path": "/root/acceptance_reconcile",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e59-c3e6-7e42-a22f-e8e8fb4e75d3",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-12-01a13e59-c3e6-7e42-a22f-e8e8fb4e75d3.jsonl",
+      "agent_path": "/root/plan_readiness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e59-e1c7-73b3-9177-00f0e1ec5352",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-21-01a13e59-e1c7-73b3-9177-00f0e1ec5352.jsonl",
+      "agent_path": "/root/plan_runtime",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e59-f5ae-7e33-9ad3-b1df778a2488",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-26-01a13e59-f5ae-7e33-9ad3-b1df778a2488.jsonl",
+      "agent_path": "/root/plan_readiness/spec_gaps",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5a-02fa-7073-aabf-6eb5db9a5991",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-30-01a13e5a-02fa-7073-aabf-6eb5db9a5991.jsonl",
+      "agent_path": "/root/plan_quality",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5a-24ea-70b3-96a7-13e6fbc25ac1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-37-01a13e5a-24ea-70b3-96a7-13e6fbc25ac1.jsonl",
+      "agent_path": "/root/plan_runtime/runtime_gates",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5a-286f-7fc2-ab5f-935703188f93",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-38-01a13e5a-286f-7fc2-ab5f-935703188f93.jsonl",
+      "agent_path": "/root/plan_control",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5a-4106-7d32-811a-67cf26aa0886",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-45-01a13e5a-4106-7d32-811a-67cf26aa0886.jsonl",
+      "agent_path": "/root/plan_runtime/capture_shapes",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5a-7647-76d2-a472-912f77f2ad0d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-57-58-01a13e5a-7647-76d2-a472-912f77f2ad0d.jsonl",
+      "agent_path": "/root/plan_quality/product_outputs",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5a-8928-7e70-b498-f95805f97be3",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T06-58-03-01a13e5a-8928-7e70-b498-f95805f97be3.jsonl",
+      "agent_path": "/root/plan_quality/counsellor",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5e-8179-71a0-81d0-d331558a85c6",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-02-23-01a13e5e-8179-71a0-81d0-d331558a85c6.jsonl",
+      "agent_path": "/root/vectorless_design",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e5e-a1bc-7751-8672-fe71a41cc3d7",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-02-31-01a13e5e-a1bc-7751-8672-fe71a41cc3d7.jsonl",
+      "agent_path": "/root/vectorless_governance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e61-6247-72f2-8e1f-98b405440e5c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-05-32-01a13e61-6247-72f2-8e1f-98b405440e5c.jsonl",
+      "agent_path": "/root/ollama_capabilities",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e63-0a87-7190-a646-a3d7c93a9bbe",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-07-20-01a13e63-0a87-7190-a646-a3d7c93a9bbe.jsonl",
+      "agent_path": "/root/ollama_env_presence",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e68-7799-7ff0-9a9c-372c8583cfbd",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-13-16-01a13e68-7799-7ff0-9a9c-372c8583cfbd.jsonl",
+      "agent_path": "/root/integration_control",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e68-9cd3-7733-8ce1-45e904d15134",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-13-26-01a13e68-9cd3-7733-8ce1-45e904d15134.jsonl",
+      "agent_path": "/root/verification_broker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e68-e180-70a2-a985-c0274a9f0cc1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-13-43-01a13e68-e180-70a2-a985-c0274a9f0cc1.jsonl",
+      "agent_path": "/root/provider_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e69-1262-7102-9998-1fadffc9e057",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-13-56-01a13e69-1262-7102-9998-1fadffc9e057.jsonl",
+      "agent_path": "/root/retrieval_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e69-19af-77b2-b52b-34a9ce03d597",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-13-58-01a13e69-19af-77b2-b52b-34a9ce03d597.jsonl",
+      "agent_path": "/root/integration_control/delivery_matrix",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e69-3965-7fb1-b6c0-8a407f1d7b28",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-14-06-01a13e69-3965-7fb1-b6c0-8a407f1d7b28.jsonl",
+      "agent_path": "/root/indexing_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e69-6a37-73b2-be41-b62389bf8a9e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-14-19-01a13e69-6a37-73b2-be41-b62389bf8a9e.jsonl",
+      "agent_path": "/root/speaker_graph_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e69-e1af-7030-84a0-a3ef49bceb48",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-14-49-01a13e69-e1af-7030-84a0-a3ef49bceb48.jsonl",
+      "agent_path": "/root/candidate_provenance_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6a-067d-7bb1-bfda-38d9b8636409",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-14-58-01a13e6a-067d-7bb1-bfda-38d9b8636409.jsonl",
+      "agent_path": "/root/hosting_docs_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6a-318e-7452-9489-dcac4d51c4bf",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-15-10-01a13e6a-318e-7452-9489-dcac4d51c4bf.jsonl",
+      "agent_path": "/root/vectorless_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6a-ebc9-78d3-8067-2a87f731284c",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-15-57-01a13e6a-ebc9-78d3-8067-2a87f731284c.jsonl",
+      "agent_path": "/root/integration_control/schema_integration",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6a-edf4-7dd2-b22e-fe8fdc2c7b9f",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-15-58-01a13e6a-edf4-7dd2-b22e-fe8fdc2c7b9f.jsonl",
+      "agent_path": "/root/usage_cost_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6b-2942-7413-bf7d-d3d3008561c8",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-16-12-01a13e6b-2942-7413-bf7d-d3d3008561c8.jsonl",
+      "agent_path": "/root/capture_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6b-536a-7251-a664-a42c8ae61795",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-16-24-01a13e6b-536a-7251-a664-a42c8ae61795.jsonl",
+      "agent_path": "/root/scheduler_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6c-5f13-7f11-86af-b1bcee3847cc",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-17-33-01a13e6c-5f13-7f11-86af-b1bcee3847cc.jsonl",
+      "agent_path": "/root/source_connectors_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6c-962e-7211-81f4-d768311bd5f9",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-17-47-01a13e6c-962e-7211-81f4-d768311bd5f9.jsonl",
+      "agent_path": "/root/whatsapp_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6c-c202-7160-b4aa-fd17637e547c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-17-58-01a13e6c-c202-7160-b4aa-fd17637e547c.jsonl",
+      "agent_path": "/root/knowledge_profiles_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6d-09e7-70a2-ab6f-b35f634d6584",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-18-17-01a13e6d-09e7-70a2-ab6f-b35f634d6584.jsonl",
+      "agent_path": "/root/pipeline_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6d-6717-7b60-93b5-e4237764dc2b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-18-40-01a13e6d-6717-7b60-93b5-e4237764dc2b.jsonl",
+      "agent_path": "/root/transcript_review_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6e-7570-7a53-86e6-b5df5e69994d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-19-50-01a13e6e-7570-7a53-86e6-b5df5e69994d.jsonl",
+      "agent_path": "/root/retention_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6f-a9d9-7da1-9464-3f6acb1a4967",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-21-08-01a13e6f-a9d9-7da1-9464-3f6acb1a4967.jsonl",
+      "agent_path": "/root/manual_jobs_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e6f-e24c-7be3-ad9a-2b8b1c988068",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-21-23-01a13e6f-e24c-7be3-ad9a-2b8b1c988068.jsonl",
+      "agent_path": "/root/answer_policy_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e70-2ced-7c61-b950-4b5a59c6ca91",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-21-42-01a13e70-2ced-7c61-b950-4b5a59c6ca91.jsonl",
+      "agent_path": "/root/outputs_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e70-e451-7f51-8f76-8e8d1264c6d9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-22-28-01a13e70-e451-7f51-8f76-8e8d1264c6d9.jsonl",
+      "agent_path": "/root/whatsapp_maker/reviewer_preflight",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e71-4ea4-7a81-ab10-1620509a25e8",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-22-57-01a13e71-4ea4-7a81-ab10-1620509a25e8.jsonl",
+      "agent_path": "/root/capture_maker/cleanup_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e72-0c3a-7d00-ae00-f31009b1b055",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-23-45-01a13e72-0c3a-7d00-ae00-f31009b1b055.jsonl",
+      "agent_path": "/root/checker_efficiency_lead",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e72-953a-73a3-8d4a-0bfd4396adfc",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-24-20-01a13e72-953a-73a3-8d4a-0bfd4396adfc.jsonl",
+      "agent_path": "/root/checker_efficiency_lead/rule_entrypoints",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e72-b41e-72a1-920f-6489ae0c4b9c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-24-28-01a13e72-b41e-72a1-920f-6489ae0c4b9c.jsonl",
+      "agent_path": "/root/checker_efficiency_lead/runtime_budget",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e7c-32e3-7421-b966-12d2bb23899d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-34-49-01a13e7c-32e3-7421-b966-12d2bb23899d.jsonl",
+      "agent_path": "/root/canonical_adoption_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e8d-e7f4-7d90-be5f-362e575d557c",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T07-54-09-01a13e8d-e7f4-7d90-be5f-362e575d557c.jsonl",
+      "agent_path": "/root/quality_delivery_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13e94-b412-7cd1-8ca6-37d305100c5a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T08-01-35-01a13e94-b412-7cd1-8ca6-37d305100c5a.jsonl",
+      "agent_path": "/root/t038_delta_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13eaa-299b-7e93-b330-1e365152c56d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T08-25-01-01a13eaa-299b-7e93-b330-1e365152c56d.jsonl",
+      "agent_path": "/root/acceptance_preflight",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13eb8-063e-7172-96aa-3b728e8d1805",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T08-40-10-01a13eb8-063e-7172-96aa-3b728e8d1805.jsonl",
+      "agent_path": "/root/provider_http_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ebc-8497-7cb3-bb92-46d25c6bfc14",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T08-45-04-01a13ebc-8497-7cb3-bb92-46d25c6bfc14.jsonl",
+      "agent_path": "/root/answer_policy_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ec5-78b4-7c81-a09b-d0517709c916",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T08-54-51-01a13ec5-78b4-7c81-a09b-d0517709c916.jsonl",
+      "agent_path": "/root/publication_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ed0-a56a-7801-8603-5b4dd18eb71c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-07-03-01a13ed0-a56a-7801-8603-5b4dd18eb71c.jsonl",
+      "agent_path": "/root/completion_reserve_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13edb-146d-70c0-afa3-647832c7ab45",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-18-27-01a13edb-146d-70c0-afa3-647832c7ab45.jsonl",
+      "agent_path": "/root/reserve_rollout_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ede-84e0-73e2-8a29-19c97dd65286",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-22-13-01a13ede-84e0-73e2-8a29-19c97dd65286.jsonl",
+      "agent_path": "/root/parallelism_snapshot",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ee4-23b5-7720-9791-65af0adf48e0",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-28-21-01a13ee4-23b5-7720-9791-65af0adf48e0.jsonl",
+      "agent_path": "/root/integration_control/speaker_schema",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef1-525e-7613-a451-b53678a92ea7",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-42-45-01a13ef1-525e-7613-a451-b53678a92ea7.jsonl",
+      "agent_path": "/root/integration_control/relationship_router",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef4-fb82-7411-95fe-d3a67abe0d3f",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-46-47-01a13ef4-fb82-7411-95fe-d3a67abe0d3f.jsonl",
+      "agent_path": "/root/source_delivery_coordinator",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef5-40c5-7ba0-94eb-de5eeff48167",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-47-06-01a13ef5-40c5-7ba0-94eb-de5eeff48167.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef5-8f80-7e80-a33a-40ffe1d60303",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-47-25-01a13ef5-8f80-7e80-a33a-40ffe1d60303.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-47-39-01a13ef5-cdb9-7f50-8b51-43aa650d0527.jsonl",
+      "agent_path": "/root/product_delivery_coordinator",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef5-fa7e-7531-b4dc-31193668cae5",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-47-51-01a13ef5-fa7e-7531-b4dc-31193668cae5.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/source_operational_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-04e6-7310-8b64-e71b4a544a03",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-47-55-01a13ef6-04e6-7310-8b64-e71b4a544a03.jsonl",
+      "agent_path": "/root/release_delivery_coordinator",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-0bc4-7d61-80da-cc403c7b0756",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-47-57-01a13ef6-0bc4-7d61-80da-cc403c7b0756.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/quality_gap_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-19ce-7321-a170-757e4c0eb475",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-02-01a13ef6-19ce-7321-a170-757e4c0eb475.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/discovery_rules_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-35ad-7730-933e-69a3211db8df",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-09-01a13ef6-35ad-7730-933e-69a3211db8df.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/quality_review_tools_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-4a21-7541-899a-2ffb47e3207f",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-13-01a13ef6-4a21-7541-899a-2ffb47e3207f.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/registration_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-6a6a-7061-a5dc-6ac7a4311694",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-21-01a13ef6-6a6a-7061-a5dc-6ac7a4311694.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/collections_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-73e1-7c62-97aa-c234eca34b43",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-23-01a13ef6-73e1-7c62-97aa-c234eca34b43.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/search_handoff_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-7e84-7d60-a5f8-f133b056de8e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-28-01a13ef6-7e84-7d60-a5f8-f133b056de8e.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/capture_acceptance_gaps",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-94f8-7de3-aeb7-23c892b8978d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-32-01a13ef6-94f8-7de3-aeb7-23c892b8978d.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/reviews_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-99d6-7b12-aff3-6c1eb9917dc9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-34-01a13ef6-99d6-7b12-aff3-6c1eb9917dc9.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/quality_evidence_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-99c5-78c2-bfc9-151303e822fe",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-35-01a13ef6-99c5-78c2-bfc9-151303e822fe.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/delivery_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-ad50-7613-b443-ce42eb14b8a4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-41-01a13ef6-ad50-7613-b443-ce42eb14b8a4.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/products_ocr_gaps",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-d197-7251-9c59-6c39928132d9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-48-01a13ef6-d197-7251-9c59-6c39928132d9.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/saved_outputs_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-e7f9-70e0-968c-9ce2ba3a3c87",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-54-01a13ef6-e7f9-70e0-968c-9ce2ba3a3c87.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/hosting_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef6-ebb0-77e2-9618-744f3343bd7c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-48-55-01a13ef6-ebb0-77e2-9618-744f3343bd7c.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/clock_gaps",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-0820-7101-a7d8-ae1635d45f2d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-02-01a13ef7-0820-7101-a7d8-ae1635d45f2d.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/operations_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-1cb6-72e2-962d-f5987b736878",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-08-01a13ef7-1cb6-72e2-962d-f5987b736878.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/counsellor_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-1ed8-7961-b6ef-7540443a486c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-08-01a13ef7-1ed8-7961-b6ef-7540443a486c.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t007_acceptance_survey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-19bb-70c2-a2cd-cfc420ea8d65",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-07-01a13ef7-19bb-70c2-a2cd-cfc420ea8d65.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/capture_operations_gaps",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-4320-7720-afc8-694fe0947cbd",
+      "rollout_path": "\\\\?\\C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-19-01a13ef7-4320-7720-afc8-694fe0947cbd.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/product_ui_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-6440-7c91-a490-0d4cc5908097",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-27-01a13ef7-6440-7c91-a490-0d4cc5908097.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/t022_calibration",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-81be-7151-a06f-e48bb643d136",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-33-01a13ef7-81be-7151-a06f-e48bb643d136.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/product_api_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-9cc5-7b92-9d38-fc9563697c4c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-42-01a13ef7-9cc5-7b92-9d38-fc9563697c4c.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/portable_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-9e68-76c1-961c-47fc1806d7ac",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-44-01a13ef7-9e68-76c1-961c-47fc1806d7ac.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/u010_dataset",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-c46d-7b30-b4ff-dc034396bb64",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-54-01a13ef7-c46d-7b30-b4ff-dc034396bb64.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/delivery_contract_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-dc80-70e3-aa73-76583baa4714",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-49-57-01a13ef7-dc80-70e3-aa73-76583baa4714.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/hosting_security_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef7-fe5f-72c0-a34e-f4e2922387c3",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-08-01a13ef7-fe5f-72c0-a34e-f4e2922387c3.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/u22_extraction",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-192a-74a2-9a3d-d57bdeb428db",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-14-01a13ef8-192a-74a2-9a3d-d57bdeb428db.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/automation_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-2531-75e2-b542-2e8467be369b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-16-01a13ef8-2531-75e2-b542-2e8467be369b.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t045_transport_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-4385-7f82-8abc-f931f4c6e7c7",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-23-01a13ef8-4385-7f82-8abc-f931f4c6e7c7.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t011_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-5129-7f93-af0b-2f2b28f89223",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-28-01a13ef8-5129-7f93-af0b-2f2b28f89223.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/u23_quality",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-59cb-7272-93ae-caa62056f712",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-30-01a13ef8-59cb-7272-93ae-caa62056f712.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/championship_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-7152-7513-b932-0e83aa185cb7",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-36-01a13ef8-7152-7513-b932-0e83aa185cb7.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t053_watch_delta",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-8ec6-7bd3-81d6-4eb2bc5fb1c6",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-42-01a13ef8-8ec6-7bd3-81d6-4eb2bc5fb1c6.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/u24_quality",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-7903-7042-b9fe-7cfb97d3125d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-38-01a13ef8-7903-7042-b9fe-7cfb97d3125d.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t034_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-99f7-7472-b14d-4addc59212c9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-47-01a13ef8-99f7-7472-b14d-4addc59212c9.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/voice_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-c3da-78d2-b2a5-9826a2988a24",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-59-01a13ef8-c3da-78d2-b2a5-9826a2988a24.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t036_coverage_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-bcc8-7753-9d31-67b3f0b2f06d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-50-57-01a13ef8-bcc8-7753-9d31-67b3f0b2f06d.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t035_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef8-f833-7fe0-8e0d-750d099ad5ff",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-14-01a13ef8-f833-7fe0-8e0d-750d099ad5ff.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/u25_quality",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-0425-7010-9dc0-af67fcd6ed56",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-14-01a13ef9-0425-7010-9dc0-af67fcd6ed56.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/t054_journey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-0add-7731-b0d7-28a4f800704c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-17-01a13ef9-0add-7731-b0d7-28a4f800704c.jsonl",
+      "agent_path": "/root/vectorless_evaluator_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-1b93-7171-8908-2d5f002ba25e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-19-01a13ef9-1b93-7171-8908-2d5f002ba25e.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/account_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-23f2-7523-8bd1-fa94a613316c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-23-01a13ef9-23f2-7523-8bd1-fa94a613316c.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t037_rule_boundary_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-2e23-7382-aad7-47b6c1e6dfcb",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-27-01a13ef9-2e23-7382-aad7-47b6c1e6dfcb.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t038_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-5ebb-7aa0-9397-bafb9c2b21d0",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-39-01a13ef9-5ebb-7aa0-9397-bafb9c2b21d0.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/t055_journey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-7852-73c0-b723-dcaa545acbe2",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-46-01a13ef9-7852-73c0-b723-dcaa545acbe2.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/review_ui_accessibility",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-7e4b-7523-ae0f-1ad177db72c4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-49-01a13ef9-7e4b-7523-ae0f-1ad177db72c4.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/windows_recovery_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-9c09-7f60-97fb-6f7b4a79194b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-54-01a13ef9-9c09-7f60-97fb-6f7b4a79194b.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t008_vectorless_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-8b46-7fb2-9e89-1c35997dea27",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-51-49-01a13ef9-8b46-7fb2-9e89-1c35997dea27.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t039_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-bb1d-76c3-ad74-d10361da0ced",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-01-01a13ef9-bb1d-76c3-ad74-d10361da0ced.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/t056_journey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-e60f-7082-9473-22acfaea2577",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-12-01a13ef9-e60f-7082-9473-22acfaea2577.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/review_import_audit",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-e0b8-79b3-a2fd-2c16bd092edb",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-10-01a13ef9-e0b8-79b3-a2fd-2c16bd092edb.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t043_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13ef9-efc6-7c41-81c9-88f7c43c6100",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-18-01a13ef9-efc6-7c41-81c9-88f7c43c6100.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/ubuntu_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-11a7-76b0-a83a-4beb195bca02",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-23-01a13efa-11a7-76b0-a83a-4beb195bca02.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/u32_navigation_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-2c9b-7aa0-957d-9d08009eacb4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-30-01a13efa-2c9b-7aa0-957d-9d08009eacb4.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/t057_journey",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-2bf9-7d23-9c12-216aefa50fa1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-33-01a13efa-2bf9-7d23-9c12-216aefa50fa1.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t044_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-47a0-7a53-bb6a-8477637ca9c6",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-37-01a13efa-47a0-7a53-bb6a-8477637ca9c6.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/retention_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-5138-7ec1-a8f5-20e500c99062",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-41-01a13efa-5138-7ec1-a8f5-20e500c99062.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/citation_locator_audit",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-5f8e-72e2-8385-a510ac771592",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-47-01a13efa-5f8e-72e2-8385-a510ac771592.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t052_confirmation_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-901a-7001-9ede-4878545b29a4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-55-01a13efa-901a-7001-9ede-4878545b29a4.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/speaker_review_ui",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-8160-7be3-bc24-4cf4b4c0975a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-52-56-01a13efa-8160-7be3-bc24-4cf4b4c0975a.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t046_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-9b47-7fb0-b3c0-a9a646b9e78a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-01-01a13efa-9b47-7fb0-b3c0-a9a646b9e78a.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/webhook_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-bbea-7232-ad0a-aaa88c9e06ea",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-06-01a13efa-bbea-7232-ad0a-aaa88c9e06ea.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/quality_fixture_integration",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-bc21-79b3-b55e-d23130e2dcc7",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-07-01a13efa-bc21-79b3-b55e-d23130e2dcc7.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t007_review_receipt_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-d4f0-7f70-83c9-a78d327e1819",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-15-01a13efa-d4f0-7f70-83c9-a78d327e1819.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t048_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-f892-7303-b872-e5504f93a4d1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-22-01a13efa-f892-7303-b872-e5504f93a4d1.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/collection_api_integrity",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efa-f883-7ea1-964a-2ce495be1a33",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-27-01a13efa-f883-7ea1-964a-2ce495be1a33.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/counsellor_integration_acceptance",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-2640-7b00-9c5a-2f8823563b8c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-34-01a13efb-2640-7b00-9c5a-2f8823563b8c.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/quality_stage_receipts",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-2626-77e1-8581-ede89086b48d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-35-01a13efb-2626-77e1-8581-ede89086b48d.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t050_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-44e2-7c92-964c-131b7ed1014f",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-42-01a13efb-44e2-7c92-964c-131b7ed1014f.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/output_export_ui",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-5ea1-7ae0-9420-45a0ed166d8e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-55-01a13efb-5ea1-7ae0-9420-45a0ed166d8e.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/release_receipt_integrity",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-84b9-7a53-9b51-1ef9d6cc9d38",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-59-01a13efb-84b9-7a53-9b51-1ef9d6cc9d38.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/review_privacy_harness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-84fe-7783-8222-c47278e8c65d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-53-58-01a13efb-84fe-7783-8222-c47278e8c65d.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t040_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-dbb5-7a33-958b-735bb781f8a2",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-54-24-01a13efb-dbb5-7a33-958b-735bb781f8a2.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/evaluation_ui_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-d7bd-7e41-ad88-37fc50077430",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-54-24-01a13efb-d7bd-7e41-ad88-37fc50077430.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/lane_status_writer",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efb-eb8d-79f3-bbd6-a6de774c8913",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-54-29-01a13efb-eb8d-79f3-bbd6-a6de774c8913.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/t041_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efc-0de6-7323-ab87-ad8b66868b0a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-54-33-01a13efc-0de6-7323-ab87-ad8b66868b0a.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/quality_runtime_readiness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efc-5b60-7500-b02b-648049f7b3fb",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-54-53-01a13efc-5b60-7500-b02b-648049f7b3fb.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/product_consumption_fixtures",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efd-72a3-7ba2-8b6e-0c8a977524dd",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-56-06-01a13efd-72a3-7ba2-8b6e-0c8a977524dd.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t053_missing_receipt_cases",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13efe-0621-73c3-908a-f5cdcc6e66a7",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T09-56-45-01a13efe-0621-73c3-908a-f5cdcc6e66a7.jsonl",
+      "agent_path": "/root/source_delivery_coordinator/t008_source_locator_readiness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f17-cc4e-76b1-a777-8436cdc5f9ef",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-24-46-01a13f17-cc4e-76b1-a777-8436cdc5f9ef.jsonl",
+      "agent_path": "/root/manual_jobs_maker/checker_t039_authority",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f18-1c90-7263-bf17-dd79c58e136a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-25-07-01a13f18-1c90-7263-bf17-dd79c58e136a.jsonl",
+      "agent_path": "/root/source_connectors_maker/source_reader_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f18-cfd4-7ad2-b6a3-7a38050da76b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-25-53-01a13f18-cfd4-7ad2-b6a3-7a38050da76b.jsonl",
+      "agent_path": "/root/capture_delivery_coordinator/operations_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f1c-7a69-7f60-82b7-f38aac20ef01",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-29-53-01a13f1c-7a69-7f60-82b7-f38aac20ef01.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/t013_contextloss_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f24-c5cc-7442-a8d9-0745f7d16095",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-38-59-01a13f24-c5cc-7442-a8d9-0745f7d16095.jsonl",
+      "agent_path": "/root/release_delivery_coordinator/source_overlay_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f2d-be39-7dc1-a4da-68fc574e8668",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-48-45-01a13f2d-be39-7dc1-a4da-68fc574e8668.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/transcript_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f2e-28e5-7021-9d8a-46ec29ed627e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-49-12-01a13f2e-28e5-7021-9d8a-46ec29ed627e.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/setup_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f31-b753-7c23-bf3f-2be93582454d",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-53-05-01a13f31-b753-7c23-bf3f-2be93582454d.jsonl",
+      "agent_path": "/root/checker_token_metric_fix",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f32-e99c-7183-a6aa-3436fe3b5542",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl",
+      "agent_path": "/root/parallelism_snapshot/runtime_usage_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f41-8b04-7720-97a4-fc7d7430fa82",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T11-10-22-01a13f41-8b04-7720-97a4-fc7d7430fa82.jsonl",
+      "agent_path": "/root/checker_token_metric_fix/independent_runtime_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f5d-01ac-7a00-b7d0-dfd5d2157884",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T11-40-22-01a13f5d-01ac-7a00-b7d0-dfd5d2157884.jsonl",
+      "agent_path": "/root/checker_token_metric_fix/runtime_accounting_finisher",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f73-3230-7ee0-a2fd-51458aeffffa",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T12-04-36-01a13f73-3230-7ee0-a2fd-51458aeffffa.jsonl",
+      "agent_path": "/root/quality_delivery_coordinator/mjs_four_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a13f74-8363-7600-97e6-976d3b666409",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T12-06-03-01a13f74-8363-7600-97e6-976d3b666409.jsonl",
+      "agent_path": "/root/product_delivery_coordinator/ui_revision_batch_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14102-8ff7-7f32-97aa-fd823ff8bd23",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-20-49-01a14102-8ff7-7f32-97aa-fd823ff8bd23.jsonl",
+      "agent_path": "/root/checker_current_audit",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1410c-0e95-7c01-87d4-23359ffd1f47",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-31-11-01a1410c-0e95-7c01-87d4-23359ffd1f47.jsonl",
+      "agent_path": "/root/checker_runtime_validation",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1410c-2a7f-71f1-b95c-e316f6ef74f5",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-31-18-01a1410c-2a7f-71f1-b95c-e316f6ef74f5.jsonl",
+      "agent_path": "/root/resume_delivery_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1410c-44fa-7612-9aa3-37bb3cd79d32",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-31-25-01a1410c-44fa-7612-9aa3-37bb3cd79d32.jsonl",
+      "agent_path": "/root/runtime_telemetry_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1410c-7b5a-7fd1-9cf3-bc8da19b8605",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-31-39-01a1410c-7b5a-7fd1-9cf3-bc8da19b8605.jsonl",
+      "agent_path": "/root/deadline_repair_readiness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1410c-94a8-7e82-94bb-c9bd80269b60",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-31-46-01a1410c-94a8-7e82-94bb-c9bd80269b60.jsonl",
+      "agent_path": "/root/acceptance_resume_readiness",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1410e-d22e-7bb2-bd23-56030f097c68",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-34-13-01a1410e-d22e-7bb2-bd23-56030f097c68.jsonl",
+      "agent_path": "/root/checker_runtime_independent",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14110-533a-7ae2-9641-5a6b3794f03b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-35-51-01a14110-533a-7ae2-9641-5a6b3794f03b.jsonl",
+      "agent_path": "/root/resume_t052_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14110-76b4-7ed3-aa3d-b412d1575333",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-36-00-01a14110-76b4-7ed3-aa3d-b412d1575333.jsonl",
+      "agent_path": "/root/resume_t053_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14110-99d5-7c21-8e6c-f92f27cfb4e2",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-36-09-01a14110-99d5-7c21-8e6c-f92f27cfb4e2.jsonl",
+      "agent_path": "/root/resume_graph_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14110-bd53-7e51-b804-49ed7359d731",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-36-18-01a14110-bd53-7e51-b804-49ed7359d731.jsonl",
+      "agent_path": "/root/resume_profile_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14110-d842-7ea0-9ebf-76fbcce75788",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-36-25-01a14110-d842-7ea0-9ebf-76fbcce75788.jsonl",
+      "agent_path": "/root/resume_capture_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14112-bda4-7f72-9217-ec182d907487",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-38-29-01a14112-bda4-7f72-9217-ec182d907487.jsonl",
+      "agent_path": "/root/checker_hard_control_diagnosis",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14112-e3cc-73b1-b59e-e34a0829462b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-38-40-01a14112-e3cc-73b1-b59e-e34a0829462b.jsonl",
+      "agent_path": "/root/checker_bounded_runner_design",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14113-e9f1-7d81-8707-01cd9ad01109",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-39-46-01a14113-e9f1-7d81-8707-01cd9ad01109.jsonl",
+      "agent_path": "/root/checker_provider_hard_limit_research",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14114-1341-7183-81e9-aedd4f01acd6",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-39-57-01a14114-1341-7183-81e9-aedd4f01acd6.jsonl",
+      "agent_path": "/root/checker_scoped_runner_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14119-141f-7fc1-a6df-b2763c3c68b1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-45-25-01a14119-141f-7fc1-a6df-b2763c3c68b1.jsonl",
+      "agent_path": "/root/checker_token_transport_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1412d-b025-7162-8650-23a8c2742fdc",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-07-57-01a1412d-b025-7162-8650-23a8c2742fdc.jsonl",
+      "agent_path": "/root/resume_cpu_broker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14137-f2e0-70d3-a6fc-82de81950388",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-19-10-01a14137-f2e0-70d3-a6fc-82de81950388.jsonl",
+      "agent_path": "/root/capture_python_setup_repair",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14138-2cf7-7a12-9a61-162dc9412198",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-19-25-01a14138-2cf7-7a12-9a61-162dc9412198.jsonl",
+      "agent_path": "/root/decoded_clock_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1413c-f16e-7892-bb11-058d440c993a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-24-37-01a1413c-f16e-7892-bb11-058d440c993a.jsonl",
+      "agent_path": "/root/native_capture_producer_design",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14142-4288-7b31-b6aa-5a6ad9eb579f",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-30-24-01a14142-4288-7b31-b6aa-5a6ad9eb579f.jsonl",
+      "agent_path": "/root/native_codecledger_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14142-6e63-7ae0-b9f3-fd159e7ca16c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-30-35-01a14142-6e63-7ae0-b9f3-fd159e7ca16c.jsonl",
+      "agent_path": "/root/native_browserproducer_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14142-9fbb-7703-ae2c-f390e1c9e678",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T20-30-48-01a14142-9fbb-7703-ae2c-f390e1c9e678.jsonl",
+      "agent_path": "/root/native_finalizer_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14193-6b02-74f0-9b01-0b37373b3dcd",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T21-59-03-01a14193-6b02-74f0-9b01-0b37373b3dcd.jsonl",
+      "agent_path": "/root/native_privacy_audio_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14193-a3a3-71b3-8a9a-058f90b846be",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T21-59-17-01a14193-a3a3-71b3-8a9a-058f90b846be.jsonl",
+      "agent_path": "/root/native_measurement_maker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b0-cf79-7791-a0d7-383c194dbd08",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-31-09-01a141b0-cf79-7791-a0d7-383c194dbd08.jsonl",
+      "agent_path": "/root/integration_type_repairs",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b0-e8a4-7c70-a3e8-d66464c89b0c",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-31-15-01a141b0-e8a4-7c70-a3e8-d66464c89b0c.jsonl",
+      "agent_path": "/root/native_structure_plan",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b1-1b28-73e2-bb4d-b41feb1c5a37",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-31-28-01a141b1-1b28-73e2-bb4d-b41feb1c5a37.jsonl",
+      "agent_path": "/root/native_archive_phaseb_design",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b1-35b1-7793-a7a3-f2e00606bc02",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-31-35-01a141b1-35b1-7793-a7a3-f2e00606bc02.jsonl",
+      "agent_path": "/root/intake_next_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b1-4e86-7b21-8d65-601d3c1157c0",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-31-41-01a141b1-4e86-7b21-8d65-601d3c1157c0.jsonl",
+      "agent_path": "/root/product_next_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b1-6585-79e3-a28b-1de4ad66140a",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-31-47-01a141b1-6585-79e3-a28b-1de4ad66140a.jsonl",
+      "agent_path": "/root/operations_next_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b3-7435-79d0-a840-8c9a7c853099",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-34-02-01a141b3-7435-79d0-a840-8c9a7c853099.jsonl",
+      "agent_path": "/root/capture_other_next_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141b6-80e4-7720-b3c8-9fd5cf7cae7e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-37-22-01a141b6-80e4-7720-b3c8-9fd5cf7cae7e.jsonl",
+      "agent_path": "/root/local_commit_inventory",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141bd-9e62-7141-bd81-5bf0cdf23fc2",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-45-08-01a141bd-9e62-7141-bd81-5bf0cdf23fc2.jsonl",
+      "agent_path": "/root/joined_review_admission",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141c2-a53e-7c11-a68c-9ed4d51a8e7e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-50-38-01a141c2-a53e-7c11-a68c-9ed4d51a8e7e.jsonl",
+      "agent_path": "/root/api_cycle_repairs",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141c2-cb05-71e2-a19b-a478142347ca",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T22-50-48-01a141c2-cb05-71e2-a19b-a478142347ca.jsonl",
+      "agent_path": "/root/workspace_cycle_repair",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141d8-e3aa-7412-874e-3a3286a9cee6",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-14-55-01a141d8-e3aa-7412-874e-3a3286a9cee6.jsonl",
+      "agent_path": "/root/joined_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-23-55-01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7.jsonl",
+      "agent_path": "/root/native_vertical_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141e1-f089-7f62-98ef-1e9debbcf6f1",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-24-48-01a141e1-f089-7f62-98ef-1e9debbcf6f1.jsonl",
+      "agent_path": "/root/native_vertical_delivery/native_a",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141e2-121d-7dc0-a109-b44e67009c7b",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-24-57-01a141e2-121d-7dc0-a109-b44e67009c7b.jsonl",
+      "agent_path": "/root/native_vertical_delivery/native_b",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141e2-3767-7563-b775-563a704aab11",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-25-07-01a141e2-3767-7563-b775-563a704aab11.jsonl",
+      "agent_path": "/root/native_vertical_delivery/native_c",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141e4-a564-7533-83b7-50bbc2fe30cd",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-27-46-01a141e4-a564-7533-83b7-50bbc2fe30cd.jsonl",
+      "agent_path": "/root/native_atomic_fence_plan",
+      "exists": true
+    },
+    {
+      "thread_id": "01a141ea-65d6-78f3-aa86-c6b842047856",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-34-04-01a141ea-65d6-78f3-aa86-c6b842047856.jsonl",
+      "agent_path": "/root/native_atomic_fence_plan/db_native_fence",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14202-6807-7401-a567-80e8f04b5563",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-00-18-01a14202-6807-7401-a567-80e8f04b5563.jsonl",
+      "agent_path": "/root/isolated_replica_prepare",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1420a-072e-75e0-ad76-8f691c1c0963",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-08-36-01a1420a-072e-75e0-ad76-8f691c1c0963.jsonl",
+      "agent_path": "/root/acceptance_resume_readiness/survey_source_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1420a-1bc8-79b2-a372-389fb534233e",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-08-41-01a1420a-1bc8-79b2-a372-389fb534233e.jsonl",
+      "agent_path": "/root/acceptance_resume_readiness/survey_product_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1420a-3372-7c73-bb35-09bad53e8c70",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-08-47-01a1420a-3372-7c73-bb35-09bad53e8c70.jsonl",
+      "agent_path": "/root/acceptance_resume_readiness/survey_capture_gap",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1420c-490b-72f2-9b06-ed46b5a68da9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-11-04-01a1420c-490b-72f2-9b06-ed46b5a68da9.jsonl",
+      "agent_path": "/root/watched_cadence_delivery",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14215-e120-7783-84ff-1a2b54fbe3c4",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-21-32-01a14215-e120-7783-84ff-1a2b54fbe3c4.jsonl",
+      "agent_path": "/root/isolated_replica_source_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14233-f68f-7d13-8b96-f517d3453a34",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T00-54-24-01a14233-f68f-7d13-8b96-f517d3453a34.jsonl",
+      "agent_path": "/root/local_checkpoint_prepare",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14255-6e52-73c1-b4c3-c408020c10f9",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T01-30-58-01a14255-6e52-73c1-b4c3-c408020c10f9.jsonl",
+      "agent_path": "/root/watched_cadence_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a14282-28b6-7073-8ae3-adef44818444",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T02-19-49-01a14282-28b6-7073-8ae3-adef44818444.jsonl",
+      "agent_path": "/root/u22_resume_independent_checker",
+      "exists": true
+    },
+    {
+      "thread_id": "01a1429e-01d9-7c20-bdd3-c3ff73efe3db",
+      "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T02-50-14-01a1429e-01d9-7c20-bdd3-c3ff73efe3db.jsonl",
+      "agent_path": "/root/windows_qualification_design",
+      "exists": true
+    }
+  ]
+}

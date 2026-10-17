@@ -1,0 +1,11 @@
+{
+  "token_metric": "actual_total",
+  "status": "STATIC_CHECKED_NOT_RUNTIME_VERIFIED",
+  "missingTargets": [],
+  "candidateCount": 13,
+  "collectionsCount": 30,
+  "actual_total_tokens": null,
+  "packageMainUnchanged": true,
+  "subgroupCount": 3,
+  "relativeModuleOccurrences": 89
+}

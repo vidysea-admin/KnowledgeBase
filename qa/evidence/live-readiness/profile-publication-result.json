@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "completedAt": "2026-10-09T15:17:28.664920+00:00",
+  "branch": "codex/machine-migration-2026-10-09",
+  "commitSHA": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "localSHA": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "remoteSHA": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "remoteReadbackVerified": true,
+  "commitURL": "https://github.com/vidysea-admin/KnowledgeBase/commit/f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "parentSHA": "5453ef67c9b42db1900fb2fbad1e3bd5a9c398bf",
+  "treeSHA": "fb7fd36dd8c912d44ade7ea97764ed5d2bbb7fc5",
+  "committedPaths": 11,
+  "commitExit": 0,
+  "remoteAncestryExit": 0,
+  "pushExit": 0,
+  "forceUsed": false,
+  "configOrHookBypass": false,
+  "identityMethod": "same verified public GitHub account name and noreply email via per-command config only",
+  "remainingStagedPaths": [],
+  "remainingUnstagedTracked": [
+    "docs/DECISIONS.md",
+    "qa/contracts/gemini-audio-transcription.md",
+    "qa/issues.jsonl"
+  ],
+  "visibleUntrackedFilesBeforeThisReport": 230,
+  "statusPermissionWarningLines": 2,
+  "statusInventoryLimitation": "Any denied cache directories remain excluded; visible count is not complete private-cache inventory.",
+  "audit": {
+    "path": "qa/evidence/live-readiness/profile-independent-staged-audit.json",
+    "sha256": "560368ba145a0dd418f99c158a3428eef2e10dde4f0eaa44e2a9f46fe0a810b8",
+    "scope": "PASS-WIP-PUBLICATION-SAFETY source only"
+  },
+  "acceptanceScope": "Canonical source cycle2 PASS/CLOSED only. Actual Google/Meet account/capture, private received audio/video, attendance activation and full portable release UNVERIFIED. Structural record-commands304/300 plus baseline Python/OBS/global failures remain.",
+  "noSourceRuntimeDeploymentChanges": true
+}

@@ -1,0 +1,25 @@
+{
+  "constraints": [
+    "No secret reads",
+    "No live deployment or DB mutations",
+    "Broker required for heavy tests",
+    "Preserve preexisting dirty bytes"
+  ],
+  "state": "active",
+  "scope": [
+    "apps/api/src/composition/production.ts",
+    "config/ai-routing.yaml",
+    "docker-compose.yml",
+    "TASKS.md",
+    ".goal/goal.json",
+    "docs/DECISIONS.md",
+    "apps/api/src/composition/integrations/*",
+    "schema/*",
+    "migrations/*",
+    "packages/core/src/generated/*",
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
+  "owner": "/root/integration_control",
+  "recordedAt": "2026-10-15T07:14:34.0496480Z"
+}

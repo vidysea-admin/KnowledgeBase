@@ -1,0 +1,68 @@
+{
+  "authority": "root explicit PhaseA ALLNATIVEFROZEN dispatch supersedes stale native-active-writers-current entries",
+  "frozen_central_pins": {
+    "status": "SOURCE_FROZEN_NOT_CHECKED",
+    "recordedAt": "2026-10-15T22:25:47.3157226Z",
+    "files": [
+      {
+        "path": "packages/meeting-bot/src/capture/record-commands.ts",
+        "sha256": "9a89d7334396818831ed131c7ad48e7dc449da0fb62b382d8c94d655a6e8dc58",
+        "nonblank": 300
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/record-commands.test.ts",
+        "sha256": "1093bb0a7a5b1b1e05adb565880abc42504075ce8397192654d3f6f8481a9073",
+        "nonblank": 353
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+        "sha256": "ed3cfd934a8617d58c7d9d9181ff873bf5e1701aa97e75cf233e4c8f2bd3ae96",
+        "nonblank": 300
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+        "sha256": "6f7b14f6978c65b88a49edfaacd6cf23d9b9005f7bd6d8ca3a16d266ae8ed4c7",
+        "nonblank": 271
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+        "sha256": "a4ee1e681c17596380e1c1d39c33549fac80616ff1b7f65bec6bf6f1fa843aae",
+        "nonblank": 216
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+        "sha256": "96ee07ad9944d08a099188d8d4af729654d2bc6cb5e83724e48091010fb015c4",
+        "nonblank": 165
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/native-capture-runtime.test.ts",
+        "sha256": "efb684773a9341448943ae24b0b86e5df1cb50d14a7a3df8642a7689ccf8cf51",
+        "nonblank": 112
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/native-tab-receiver.ts",
+        "sha256": "c17626a69f951a5b7fd4114ce5806b1e39193d5ec2de15811eebc436589eef25",
+        "nonblank": 155
+      },
+      {
+        "path": "packages/meeting-bot/py/sb_join_tiles.py",
+        "sha256": "2c6e9593cc39fd8f714ac447a4669cb8dbdb97703b202a19e25be7ea11603236",
+        "nonblank": 160
+      },
+      {
+        "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+        "sha256": "88193970859c005fddea9f38b1440fdd598024e99d5a9afb32469e945919f6cd",
+        "nonblank": 157
+      }
+    ]
+  },
+  "active_actor_excluded": [
+    "scripts/eval/vectorless-production-eval.mjs",
+    "scripts/eval/vectorless-production-eval.test.mjs"
+  ],
+  "exclusion_check": "no vectorless-production-eval string/import references in inventoried apps/api and package sources",
+  "node_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "python": "C:\\Program Files\\Python312\\python.exe",
+  "python_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "inventory_count": 1281
+}

@@ -1,0 +1,24 @@
+✔ actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child (50.9723ms)
+✔ actual authenticated routes enforce all write scopes, tenant scope, body validation and gaps compatibility (157.835ms)
+✔ unconfigured flywheel answers safe503 after scope validation, with no writes (23.9789ms)
+✔ actual shared createServer mount invokes the flywheel using the verified tenant (24.5212ms)
+✔ stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers (17.9719ms)
+✔ tie/win/missing/malformed finite score and foreign loss never write gaps (2.4666ms)
+✔ original input drift cannot silently bind a previously accepted gap (1.6467ms)
+✔ received requires actual scoped transcript/consent/source/session; forged receipts never index (11.9539ms)
+✔ degraded/index mismatch/empty/incomplete output refuses Ask, while received remains honest (18.9764ms)
+✔ drift during indexing and foreign chunks cannot be mistaken for current capture (10.2089ms)
+✔ provider/index/Ask/child-write failures stay visible and valid retry reuses established capture/index (24.0287ms)
+✔ concurrent attempt CAS and expired restart lock preserve exactly one accepted child (8.1858ms)
+✔ crash after immutable child persistence resumes without repeating Ask (9.6726ms)
+✔ expired gap and source URL rebinding refuse; DB names remain bounded (5.4799ms)
+✔ provider deadline returns honest failure and retains lease until expiry; late callback cannot advance head (19.7115ms)
+✔ idempotent retry preserves a later explicit internal child score without copying it to the original (4.9027ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7055.2434

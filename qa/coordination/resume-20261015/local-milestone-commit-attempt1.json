@@ -1,0 +1,54 @@
+{
+  "schema": "local-milestone-commit/1",
+  "startedAt": "2026-10-15T23:20:27.3642441Z",
+  "authorization": "Explicit user local commit, root released LOCAL WIP milestone; no push",
+  "commands": [
+    {
+      "label": "head-before",
+      "stdout": "qa/coordination/resume-20261015/commit-head-before.stdout.txt",
+      "stderr": "qa/coordination/resume-20261015/commit-head-before.stderr.txt",
+      "ownExit": 0
+    },
+    {
+      "label": "branch-before",
+      "stdout": "qa/coordination/resume-20261015/commit-branch-before.stdout.txt",
+      "stderr": "qa/coordination/resume-20261015/commit-branch-before.stderr.txt",
+      "ownExit": 0
+    },
+    {
+      "label": "index-before",
+      "stdout": "qa/coordination/resume-20261015/commit-index-before.stdout.txt",
+      "stderr": "qa/coordination/resume-20261015/commit-index-before.stderr.txt",
+      "ownExit": 0
+    },
+    {
+      "label": "actual-repository-verdict-cycle-parser",
+      "ownExit": 0
+    },
+    {
+      "label": "add-exact-pathspec",
+      "stdout": "qa/coordination/resume-20261015/commit-add-exact-pathspec.stdout.txt",
+      "stderr": "qa/coordination/resume-20261015/commit-add-exact-pathspec.stderr.txt",
+      "ownExit": 128
+    }
+  ],
+  "status": "STOPPED_INDEX_PRESERVED",
+  "commitSha": null,
+  "pushes": 0,
+  "configMutations": 0,
+  "stageMutations": 0,
+  "allowlistSha256": "9044f3b893ae18d1c3acebd0e4f4cb685f8798549f7f78b8545d75c760f03bff",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "branch": "codex/machine-migration-2026-10-09",
+  "verdict": {
+    "path": "qa/verdicts/t013-t037-t056-joined-source-slices.md",
+    "status": "NEEDS_EXTRA_REVIEW",
+    "verdict": "HOLD",
+    "reviewedSha": "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+    "sha256": "aabce1a7b63c9e16e994d32bb5a3ecd0871c4f1f5ad43fc9c74b7bee2e8a61ba",
+    "cycle": 0
+  },
+  "rawShaDrift": [],
+  "failure": "Git operation failed: add-exact-pathspec (exit 128)",
+  "finishedAt": "2026-10-15T23:20:28.4236188Z"
+}

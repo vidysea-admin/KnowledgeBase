@@ -1,0 +1,42 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Sampler clock Python fake-driver fixture suite only",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+  "args": [
+    "-B",
+    "-m",
+    "pytest",
+    "packages/meeting-bot/py/test_sb_join_tiles.py",
+    "--basetemp",
+    "C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/clock-pytest-owned-temp",
+    "-q"
+  ],
+  "testIDs": [
+    "py/test_sb_join_tiles.py"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 45000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-sampler-clock-python",
+  "pins": {
+    "packages/meeting-bot/py/sb_join.py": "bae07ab1186319b62938d6d791b8ceaafba86394d55bc1d32fb8e65ceb556cba",
+    "packages/meeting-bot/py/sb_join_tiles.py": "1a7436579a6bfade1c9c6ad94f5e47e6c04cd8779a90baf8a993729a039fa7fd",
+    "packages/meeting-bot/py/sb_join_loop.py": "d21a821a343aea09b46d9d3c423ea4b47b74c591cd44938d5c5908d0b5fd65c1",
+    "packages/meeting-bot/py/test_sb_join_tiles.py": "8716a26c2f9c72a7cdba1057f39234d6486976f3359af95917d80ec234b5500e",
+    ".venv/Lib/site-packages/pytest/__init__.py": "ee37885c9583f843390684dfb496907f87a0905128e7a3cf4ad227f49ff34c2d",
+    "packages/meeting-bot/py/fixtures_tiles/meet_one_speaking.html": "c2bdbaedf26596b19cb2783dc3f4b41ca1ec0254c532254dc47cb1e542915d51",
+    "packages/meeting-bot/py/fixtures_tiles/meet_silent.html": "047c9224b6230ca2b9315be288147fdffaec6650468e61aed64291a40ee6a059",
+    "packages/meeting-bot/py/fixtures_tiles/meet_two_speaking.html": "778fcd9a73d85571eb4a5cf2b1edeaac071f5fb8e09c45e4626a634fc80c42d0"
+  }
+}

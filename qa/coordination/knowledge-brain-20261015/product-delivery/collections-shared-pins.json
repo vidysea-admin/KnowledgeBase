@@ -1,0 +1,54 @@
+[
+  {
+    "path": "qa/contracts/goal-t055.md",
+    "sha256": "89dfb2b2ef66736b592544f19857a8d994174f565055ebb4799b50fad2eee394"
+  },
+  {
+    "path": "apps/web/src/pages/knowledge/CuratedCollections.tsx",
+    "sha256": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97"
+  },
+  {
+    "path": "apps/web/src/pages/knowledge/CuratedCollections.test.tsx",
+    "sha256": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3"
+  },
+  {
+    "path": "apps/web/src/pages/knowledge/collectionsClient.ts",
+    "sha256": "0eb4915dfed41ba944d17937cd1a4fcf64c972172edfc25134d19a61a8fe5602"
+  },
+  {
+    "path": "apps/web/src/pages/knowledge/collectionsClient.test.ts",
+    "sha256": "359d0feef23e95d5bdc257bb3b2779a5eabaeec632af25a0959618f5cfaa6bcb"
+  },
+  {
+    "path": "apps/web/src/auth/AuthContext.tsx",
+    "sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c"
+  },
+  {
+    "path": "apps/web/src/api/client.ts",
+    "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802"
+  },
+  {
+    "path": "apps/api/src/knowledge/collections-router.ts",
+    "sha256": "2f34d72703acd45f65726c7d9eafc03783e8ce5bc7dc9672580711a83d392421"
+  },
+  {
+    "path": "apps/api/src/knowledge/collections-store.ts",
+    "sha256": "ba2c80800f94b556d69cee93a90cc4a06294ee93efbc797f9dbc93cb46c661a7"
+  },
+  {
+    "path": "apps/web/vitest.config.ts",
+    "sha256": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8"
+  },
+  {
+    "path": "apps/web/tsconfig.json",
+    "sha256": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0"
+  },
+  {
+    "path": "apps/web/package.json",
+    "sha256": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e"
+  },
+  {
+    "path": "pnpm-lock.yaml",
+    "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  }
+]

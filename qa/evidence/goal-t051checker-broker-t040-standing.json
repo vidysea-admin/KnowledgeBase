@@ -1,0 +1,35 @@
+{
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "scripts/qa/t040-acceptance.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T19:53:34.320Z",
+  "completedAt": "2026-10-14T19:53:34.533Z",
+  "elapsedMs": 206.1182,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "scripts/qa/t040-acceptance.mjs": "626619b2bfc7ce834116dcb5600618c549a2575f32a730891ed6739267c454d7",
+    "scripts/qa/t040-acceptance.test.mjs": "7c8cd020128d4d2515776e93c689cc67d9c78001c73a29ee272b84481970c505",
+    "packages/index/src/pipeline/quote/quote-token-rule.ts": "7a0c4a523eb078d48b639197e30311350ca6886cbea51d4149766a886c58ea49",
+    "qa/evidence/goal-t040-acceptance/checker-probes.mjs": "21a9c28181e2697adf831aa573283bbeb3d5ec37b92b7c55e219eefa98387109",
+    "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89"
+  },
+  "after": {
+    "scripts/qa/t040-acceptance.mjs": "626619b2bfc7ce834116dcb5600618c549a2575f32a730891ed6739267c454d7",
+    "scripts/qa/t040-acceptance.test.mjs": "7c8cd020128d4d2515776e93c689cc67d9c78001c73a29ee272b84481970c505",
+    "packages/index/src/pipeline/quote/quote-token-rule.ts": "7a0c4a523eb078d48b639197e30311350ca6886cbea51d4149766a886c58ea49",
+    "qa/evidence/goal-t040-acceptance/checker-probes.mjs": "21a9c28181e2697adf831aa573283bbeb3d5ec37b92b7c55e219eefa98387109",
+    "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t040-standing.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t040-standing.stderr.txt",
+  "hashesUnchanged": true
+}

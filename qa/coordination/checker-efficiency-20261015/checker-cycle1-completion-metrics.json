@@ -1,0 +1,14 @@
+{
+  "start_monotonic": 144079631073,
+  "end_monotonic": 145171697910,
+  "frequency": 10000000,
+  "active_s": 109.2066837,
+  "wait_s": 0,
+  "wait_intervals": [],
+  "tokens": null,
+  "cost": null,
+  "children": [],
+  "final_metrics_snapshot": "checker-cycle1-final-metrics.json",
+  "verdict": "HOLD",
+  "ratio_verified": false
+}

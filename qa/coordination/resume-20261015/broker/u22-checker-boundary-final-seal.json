@@ -1,0 +1,74 @@
+{
+  "candidateKind": "raw sorted-path inventory SHA256; NOT Git commit",
+  "rawInventorySha256": "c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+  "contextGitBefore": {
+    "python": "C:\\Program Files\\Python312\\python.exe",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "contractOrigin": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "head": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+    "status": ""
+  },
+  "contextGitAfter": {
+    "python": "C:\\Program Files\\Python312\\python.exe",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "contractOrigin": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "head": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+    "status": ""
+  },
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad.json",
+    "sha256": "8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad",
+    "count": 23
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-python-git-preflight-receipt.json",
+      "sha256": "b2e19aeb2c62aa507d635474bf989e0ca2029660dd3908366b3e4700a5fa6cf5",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.3440000000009604,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-python-git-preflight.log",
+        "sha256": "a76d9407d7586cf9e5f7006ff54bb00f2b41be5f45a5544f1aecf286dbf0c9d1"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-probe1-receipt.json",
+      "sha256": "22d0d3df8360ba0d5dc20d2cb09ab340c2750626a1f564bc580cc2a60f019f15",
+      "exit": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 0.7030000000013388,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-probe1.log",
+        "sha256": "c9f2b15861d3b5ee861ac33c466fd20d0070489a0094879a229193056eca5cdb"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-git-after-receipt.json",
+      "sha256": "94213951a32757dd6165c1b09af2a648481fd112ece485fb2626b6e80c0273dd",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.375,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-git-after.log",
+        "sha256": "a76d9407d7586cf9e5f7006ff54bb00f2b41be5f45a5544f1aecf286dbf0c9d1"
+      }
+    }
+  ],
+  "allPinsFinalMatch": true,
+  "contractVacuity": true,
+  "failure": null,
+  "elapsed_s": 2.0780000000013388,
+  "historicalReuse": false,
+  "accounting": "CHECKER u22 aggregate",
+  "expectedVsActualSkipNote": "Node actual terminal counts authoritative; filtered nodes are never PASS",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

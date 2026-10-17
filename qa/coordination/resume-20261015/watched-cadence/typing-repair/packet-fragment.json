@@ -1,0 +1,38 @@
+{
+  "policy_version": "managed-review/1",
+  "candidate_sha": null,
+  "independent_verdict": null,
+  "cycle": 0,
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "readiness": {
+    "complete": false
+  },
+  "changed_paths": [
+    "scripts/webinar/scheduler/service.d.mts"
+  ],
+  "metrics": {
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "token_metric": "actual_total"
+  },
+  "required_check": "Central original compiler-first replay on combined source; no local tests/build run",
+  "new_file_preimage": "absent confirmed before write",
+  "status": "FROZEN_AWAITING_CENTRAL_COMPILER_REPLAY",
+  "unit": "t053-watched-cadence-central-typing-repair",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "behavior": "Adjacent declarations match actual passive JS exports; no runtime code changed, no any or suppression",
+  "source_and_dependency_pins": [
+    {
+      "path": "scripts/webinar/scheduler/service.d.mts",
+      "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315"
+    },
+    {
+      "path": "scripts/webinar/scheduler/service.mjs",
+      "sha256": "6aa0bf1a4b037cae61e0c6c7a9a0edca4c8692d30d2997c334b3a41ee19f3797"
+    }
+  ]
+}

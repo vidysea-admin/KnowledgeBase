@@ -1,0 +1,26 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+    "sha256": "455423967184c512682c2aba09085090215e54967b2d4317ba705a7b5aed3c3f"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.test.ts",
+    "sha256": "94425314bc0fe363e61ca0eb905a35cc0ad4626e7443c7a6fe54393b79898526"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+    "sha256": "21cbd85205fbb218022e92fffba634214abdfda3af39d331c1d9ba12ae267ac6"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+    "sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "sha256": "1c5fd48a53db87f61596f5aaa9cc165fd6f22a11b9c70c4fb79dfb0bd22e9ffc"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+    "sha256": "469973ef3f4fd4ed5ba0aad45ba5107fc41efad8e4d5e7c40771f980f76133d6"
+  }
+]

@@ -1,47 +1,9 @@
 /** Calendar source seam and pure, tenant-bound webinar occurrence reconciliation. */
-import type { AutoRecordCandidateInput } from "./auto-join.js";
+import type { AutoRecordCandidateInput, CalendarEvent, ReconciliationCalendarEvent, WebinarReconciliationState, WebinarReconciliationResult, WebinarSnapshot as Snapshot, WebinarAlias as Alias, WebinarOccurrence as Occurrence } from "@lkb/core";
 import { classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
+import { reachesUnlinkedGmail, unknownTombstoneReach } from "./tombstone/unknown-tombstone-reach.js";
 
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  /** ISO datetime. */
-  startTime: string;
-  /** ISO datetime. */
-  endTime: string;
-  /** Absent when the event has no video-call link (nothing to auto-join). */
-  meetingUrl?: string;
-  organizer?: string;
-  cancelled?: boolean;
-  recurringEventId?: string;
-  originalStartTime?: { date?: string; dateTime?: string };
-  providerUpdated?: string;
-}
-
-export interface CalendarClient {
-  /** Events starting within the next `windowMinutes` (or already in progress). */
-  listUpcomingEvents(windowMinutes: number): Promise<CalendarEvent[]>;
-}
-
-export type ReconciliationCalendarEvent = Pick<CalendarEvent, "id"> & Partial<CalendarEvent>;
-type Snapshot = ReconciliationCalendarEvent & Partial<AutoRecordCandidateInput>;
-type Alias = { key: string; identity: string };
-type Occurrence = {
-  source: "calendar" | "gmail"; snapshot: Snapshot; providerIds: string[]; aliases: Alias[]; accepted: boolean;
-  revision?: string; linkedCalendar?: string; reviewReason?: "invalid-time" | "no-join-link" | "unsafe-join-link";
-  unresolved?: "unknown-tombstone" | "ambiguous-provider" | "contradictory-revision" | "missing-revision" | "ambiguous-identity" | "source-discontinuity";
-};
-export interface WebinarReconciliationState {
-  version: 1; tenantId: string; checkedAt: string; historyComplete: boolean;
-  coverageScope?: "available-connected-source-state";
-  occurrences: Record<string, Occurrence>;
-}
-export interface WebinarReconciliationResult {
-  state: WebinarReconciliationState; calendarEvents: CalendarEvent[]; candidates: AutoRecordCandidateInput[];
-  inventory: { occurrenceKey: string; reviewKey: string; sessionKey?: string; classification: string; snapshot: Snapshot; reason?: string }[];
-  transitions: { occurrenceKey: string; reason: "cancelled" | "rescheduled" | "unresolved"; aliases: string[]; currentKey?: string; boundaryChanged?: true }[];
-  newStartsBlocked: boolean;
-}
+export type { CalendarEvent, CalendarClient, ReconciliationCalendarEvent, WebinarReconciliationState, WebinarReconciliationResult } from "@lkb/core";
 const fail = (): never => { throw new Error("Invalid webinar reconciliation input or state"); };
 function shape(value: unknown, keys: string[]): asserts value is Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value)) ||
@@ -80,24 +42,48 @@ function stable(value: unknown): string {
   return JSON.stringify(value, (_key, item) => item && typeof item === "object" && !Array.isArray(item)
     ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item);
 }
+/** A present source other than "conference" (location, description, anything unknown). Absent = a legacy conference row = trusted. */
+const untrustedSnapshot = (snapshot: Snapshot): boolean => snapshot.meetingUrlSource !== undefined && snapshot.meetingUrlSource !== "conference";
 function semantic(row: Occurrence): string {
   const snapshot = {...row.snapshot}; delete snapshot.providerUpdated;
-  if (row.source === "gmail") { delete snapshot.status; delete snapshot.registrationOnly; }
+  // T-036 (ISS-T036CAL-006): provenance is not part of an event's identity or revision. A row persisted before the field existed
+  // must not conflict with the same event at the same revision; the accepted merge below stores the FRESH snapshot, so the
+  // stored source always equals the freshest Google data (and the url itself, still compared here, decides identity).
+  delete snapshot.meetingUrlSource;
+  if (row.source === "gmail") { delete snapshot.status; delete snapshot.registrationOnly; delete snapshot.receivedAt; delete snapshot.senderAuthenticated; }
   const key = identity(snapshot); if (key) snapshot.meetingUrl = key.slice(0, key.lastIndexOf("|"));
   return stable(snapshot);
 }
 function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occurrence {
   const common = ["id", "title", "startTime", "endTime", "meetingUrl", "cancelled", "providerUpdated"];
-  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime"] : ["senderEmail", "senderDomain", "status", "kind", "registrationOnly"])]);
+  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime", "meetingUrlSource"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"])]);
   text(input.id, 1024, true); text(input.title, 2000); text(input.meetingUrl, 8192);
   text(input.startTime, 128); text(input.endTime, 128); text(input.organizer, 320);
+  text(input.meetingUrlSource, 32); // any short string is kept as-is: auto-join.ts treats everything but "conference" as untrusted
   if (input.cancelled !== undefined && typeof input.cancelled !== "boolean") fail();
   if (source === "gmail" && (!["pending", "approved", "rejected", "auto_approved"].includes(input.status ?? "") ||
       (input.kind !== undefined && !["upcoming", "past-recording"].includes(input.kind)) ||
-      (input.registrationOnly !== undefined && typeof input.registrationOnly !== "boolean"))) fail();
+      (input.registrationOnly !== undefined && typeof input.registrationOnly !== "boolean") ||
+      (input.senderAuthenticated !== undefined && typeof input.senderAuthenticated !== "boolean"))) fail();
   if (source === "gmail") { text(input.senderEmail, 320, true); text(input.senderDomain, 320, true); }
+  if (source === "gmail") {
+    if (input.receivedAt !== undefined && time(input.receivedAt) !== input.receivedAt) fail();
+    if (input.youtubeWatchIssue !== undefined && input.youtubeWatchIssue !== 'ambiguous') fail();
+    if (input.meetingLinkIssue !== undefined && !['ambiguous', 'registration-only', 'host-start-link'].includes(input.meetingLinkIssue)) fail();
+    if (input.youtubeWatch !== undefined) {
+      shape(input.youtubeWatch, ['url', 'videoId', 'source']);
+      const watch = input.youtubeWatch;
+      if (typeof watch.videoId !== 'string' || !/^[A-Za-z0-9_-]{11}$/.test(watch.videoId) || watch.url !== `https://www.youtube.com/watch?v=${watch.videoId}` || !['body','snippet'].includes(String(watch.source))) fail();
+    }
+    text(input.registrationUrl, 8192);
+    for (const id of [input.messageId, input.threadId]) if (id !== undefined && (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(id))) fail();
+    if (input.registrationUrl !== undefined) {
+      let url: URL; try { url = new URL(input.registrationUrl); } catch { fail(); }
+      if (url!.protocol !== "https:" || url!.username || url!.password) fail();
+    }
+  }
   const snapshot: Snapshot = {id: input.id, title: input.title ?? "", cancelled: input.cancelled ?? false};
-  for (const key of source === "calendar" ? ["meetingUrl", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "status", "kind", "registrationOnly"]) {
+  for (const key of source === "calendar" ? ["meetingUrl", "meetingUrlSource", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"]) {
     const value = input[key as keyof Snapshot];
     if (value !== undefined) Object.assign(snapshot, {[key]: value});
   }
@@ -109,7 +95,10 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
   const key = identity(snapshot);
   const reviewReason = snapshot.cancelled ? undefined : !start || !end || end <= start ? "invalid-time"
     : !snapshot.meetingUrl ? "no-join-link" : !key ? "unsafe-join-link" : undefined;
-  return {source, snapshot, accepted: true, revision: snapshot.providerUpdated, providerIds: [snapshot.id], aliases: key ? [{key: webinarSessionKey(key), identity: key}] : [], reviewReason};
+  return {source, snapshot, accepted: true, revision: snapshot.providerUpdated, providerIds: [snapshot.id],
+    // ISS-T036CAL-010: a row whose link came from free text contributes NO identity aliases, so an outsider's invite repeating a real meeting's link
+    // can never make the conference event ambiguous, link to Gmail rows or share its session key. It stays a separate, visible, unschedulable row.
+    aliases: key && !untrustedSnapshot(snapshot) ? [{key: webinarSessionKey(key), identity: key}] : [], reviewReason};
 }
 function validateReconciliationState(previous: unknown, tenantId: string, checkedAt: string): WebinarReconciliationState {
   if (previous === undefined) return {version: 1, tenantId, checkedAt, historyComplete: false, occurrences: {}};
@@ -140,13 +129,15 @@ function validateReconciliationState(previous: unknown, tenantId: string, checke
     if (row.accepted ? normalized.aliases.some(alias => !aliasKeys.has(alias.key)) : row.aliases.length || !row.unresolved || row.linkedCalendar !== undefined) fail();
     if (row.linkedCalendar !== undefined) {
       const target = previous.occurrences[row.linkedCalendar] as Occurrence | undefined;
-      if (row.source !== "gmail" || target?.source !== "calendar" || !target.accepted || !row.accepted || !row.aliases.some(alias => target.aliases?.some(other => other.identity === alias.identity))) fail();
+      if (row.source !== "gmail" || target?.source !== "calendar" || !target.accepted || !row.accepted || (!untrustedSnapshot(target.snapshot) && !row.aliases.some(alias => target.aliases?.some(other => other.identity === alias.identity)))) fail();
     }
   }
   return JSON.parse(JSON.stringify(previous)) as WebinarReconciliationState;
 }
+/** 0 = absent or "conference"; 1 = any other source. Sorted last so, among same-revision copies, the LEAST trusted source wins. */
+const untrustedSource = (row: Occurrence): number => untrustedSnapshot(row.snapshot) ? 1 : 0;
 function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]): Occurrence {
-  incoming.sort((a, b) => (a.revision ?? "").localeCompare(b.revision ?? "") || semantic(a).localeCompare(semantic(b)) || stable(a.snapshot).localeCompare(stable(b.snapshot)));
+  incoming.sort((a, b) => (a.revision ?? "").localeCompare(b.revision ?? "") || semantic(a).localeCompare(semantic(b)) || untrustedSource(a) - untrustedSource(b) || stable(a.snapshot).localeCompare(stable(b.snapshot)));
   const revisions = new Map<string, Set<string>>();
   for (const next of incoming) revisions.set(next.revision ?? "", new Set([...(revisions.get(next.revision ?? "") ?? []), semantic(next)]));
   const disputed = new Set([...revisions].filter(([, values]) => values.size > 1).map(([revision]) => revision));
@@ -168,7 +159,10 @@ function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]):
     else if (row.snapshot.cancelled && !next.snapshot.cancelled && !newer) row.unresolved ??= "missing-revision";
     else {
       accepted = true;
-      const snapshot = minimalCancel ? {...row.snapshot, cancelled: true, providerUpdated: next.snapshot.providerUpdated ?? row.snapshot.providerUpdated} : next.snapshot;
+      // A copy that names no source never relaxes a stored free-text source for the same url (only a pre-unit mapper omits it).
+      const keepSource = !minimalCancel && next.snapshot.meetingUrlSource === undefined && Boolean(next.snapshot.meetingUrl) && untrustedSource(row) === 1 && next.snapshot.meetingUrl === row.snapshot.meetingUrl;
+      const snapshot = minimalCancel ? {...row.snapshot, cancelled: true, providerUpdated: next.snapshot.providerUpdated ?? row.snapshot.providerUpdated}
+        : keepSource ? {...next.snapshot, meetingUrlSource: row.snapshot.meetingUrlSource} : next.snapshot;
       row = {...row, snapshot, accepted: row.accepted || next.accepted, reviewReason: minimalCancel ? undefined : next.reviewReason, revision: snapshot.providerUpdated};
       if (row.unresolved === "source-discontinuity" && !next.snapshot.cancelled && (same || newer)) delete row.unresolved;
       if (newer && row.unresolved !== "unknown-tombstone" && row.unresolved !== "ambiguous-provider") delete row.unresolved;
@@ -179,6 +173,7 @@ function mergeOccurrence(prior: Occurrence | undefined, incoming: Occurrence[]):
     }
   }
   if (row.source === "gmail") { if (rejected) row.snapshot.status = "rejected"; if (registration) row.snapshot.registrationOnly = true; }
+  if (untrustedSnapshot(row.snapshot)) row.aliases = []; // a row that became free-text (conference data removed) drops the aliases it held
   return row;
 }
 /** Caller supplies complete acquisitions, never infers historyComplete from a bounded window.
@@ -217,6 +212,8 @@ export function reconcileWebinarSources(input: {
         if (matches.length <= 1 && (matches.length || children.length)) targets = [...new Set([...matches, ...children].map(([target]) => target))];
         else row.unresolved = matches.length ? "ambiguous-provider" : "unknown-tombstone";
       } else if (source === "calendar" && row.snapshot.cancelled && !previous.occurrences[key]?.accepted) row.unresolved = "unknown-tombstone";
+      // ISS-TOMBSTONE-004: a NEW unknown tombstone that Google sent no `updated` for is stamped with the first tick that saw it, so its hold can lapse (tombstone/unknown-tombstone-reach.ts).
+      if (row.unresolved === "unknown-tombstone" && row.snapshot.providerUpdated === undefined && !previous.occurrences[key]) { row.snapshot.providerUpdated = input.checkedAt; row.revision = input.checkedAt; }
       if (row.unresolved) { row.accepted = false; row.providerIds = []; row.aliases = []; }
       for (const target of targets) {
         const current = JSON.parse(JSON.stringify(row)) as Occurrence;
@@ -229,7 +226,7 @@ export function reconcileWebinarSources(input: {
   }
   for (const [key, rows] of [...groups].sort(([a], [b]) => a.localeCompare(b))) state.occurrences[key] = mergeOccurrence(state.occurrences[key], rows);
   const calendar = Object.entries(state.occurrences).filter(([, row]) => row.source === "calendar"), aliasOwners = new Map<string, string[]>();
-  for (const [key, row] of calendar) for (const alias of row.aliases) aliasOwners.set(alias.key, [...new Set([...(aliasOwners.get(alias.key) ?? []), key])]);
+  for (const [key, row] of calendar) if (!untrustedSnapshot(row.snapshot)) for (const alias of row.aliases) aliasOwners.set(alias.key, [...new Set([...(aliasOwners.get(alias.key) ?? []), key])]);
   for (const keys of aliasOwners.values()) if (keys.length > 1) keys.forEach(key => { state.occurrences[key]!.unresolved = "ambiguous-identity"; });
   for (const row of Object.values(state.occurrences)) {
     if (row.source !== "gmail") continue;
@@ -242,27 +239,29 @@ export function reconcileWebinarSources(input: {
   if (available) state.coverageScope = input.acquisition.scope; else delete state.coverageScope;
   state = validateReconciliationState(state, input.tenantId, input.checkedAt);
   const calendarEvents: CalendarEvent[] = [], candidates: AutoRecordCandidateInput[] = [], inventory: WebinarReconciliationResult["inventory"] = [], transitions: WebinarReconciliationResult["transitions"] = [];
-  const orphan = Object.values(state.occurrences).some(row => row.unresolved === "unknown-tombstone");
+  // ISS-T036CAL-011: an unknown tombstone is recorded and listed but scoped to what it can plausibly refer to (see tombstone/unknown-tombstone-reach.ts).
+  const reach = unknownTombstoneReach(Object.values(state.occurrences));
   for (const [key, row] of Object.entries(state.occurrences).sort(([a], [b]) => a.localeCompare(b))) {
     const linked = row.linkedCalendar ? state.occurrences[row.linkedCalendar] : undefined;
     const unresolved = row.unresolved ?? linked?.unresolved ??
-      (available && orphan && row.source === "gmail" && !linked ? "unproven-calendar-history" : undefined);
+      (row.source === "gmail" && !linked && reachesUnlinkedGmail(reach, row) ? "unproven-calendar-history" : undefined);
     const snapshot: Snapshot = linked ? {...row.snapshot, title: linked.snapshot.title, startTime: linked.snapshot.startTime, endTime: linked.snapshot.endTime,
-      meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled} : row.snapshot;
+      meetingUrl: linked.snapshot.meetingUrl, cancelled: linked.snapshot.cancelled,
+      ...(linked.snapshot.meetingUrlSource !== undefined ? {meetingUrlSource: linked.snapshot.meetingUrlSource} : {})} : row.snapshot;
     const current = row.accepted ? identity(snapshot) : undefined, prior = previous.occurrences[key];
     const priorIdentity = prior && identity(prior.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior.snapshot);
     const priorSnapshot = prior?.linkedCalendar ? previous.occurrences[prior.linkedCalendar]!.snapshot : prior?.snapshot;
     const boundaryChanged = row.accepted && prior?.accepted && !unresolved && Boolean(priorSnapshot?.endTime && snapshot.endTime && priorSnapshot.endTime !== snapshot.endTime);
     if (unresolved || snapshot.cancelled || boundaryChanged || (priorIdentity && current !== priorIdentity)) transitions.push({occurrenceKey: key,
       reason: unresolved ? "unresolved" : snapshot.cancelled ? "cancelled" : "rescheduled", aliases: row.aliases.map(alias => alias.key),
-      currentKey: current ? webinarSessionKey(current) : undefined, ...(boundaryChanged ? {boundaryChanged: true as const} : {})});
+      currentKey: current && !untrustedSnapshot(snapshot) ? webinarSessionKey(current) : undefined, ...(boundaryChanged ? {boundaryChanged: true as const} : {})});
     const classification = classifyWebinarInvite(snapshot.title ?? ""), future = !snapshot.endTime || snapshot.endTime > input.checkedAt;
     if ((classification !== "meeting" && future) || unresolved) inventory.push({occurrenceKey: key, reviewKey: webinarSessionKey(`source-review|${key}`),
-      sessionKey: current ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
-    if (available && unresolved) continue;
+      sessionKey: current && !untrustedSnapshot(snapshot) ? webinarSessionKey(current) : undefined, classification, snapshot, reason: unresolved ?? linked?.reviewReason ?? row.reviewReason ?? (snapshot.cancelled ? "cancelled" : undefined)});
+    if (unresolved) continue; // a legacy-scope block empties both feeds below anyway
     if (row.source === "calendar") calendarEvents.push({...snapshot, title: snapshot.title ?? "", startTime: snapshot.startTime ?? "", endTime: snapshot.endTime ?? ""} as CalendarEvent);
     else candidates.push(snapshot as AutoRecordCandidateInput);
   }
-  const newStartsBlocked = !available && (!state.historyComplete || Object.values(state.occurrences).some(row => Boolean(row.unresolved)));
+  const newStartsBlocked = !available && (!state.historyComplete || Object.values(state.occurrences).some(row => Boolean(row.unresolved) && row.unresolved !== "unknown-tombstone"));
   return {state, inventory, transitions, newStartsBlocked, calendarEvents: newStartsBlocked ? [] : calendarEvents, candidates: newStartsBlocked ? [] : candidates};
 }

@@ -1,0 +1,17 @@
+{
+  "sourceFrozen": true,
+  "candidate": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+  "files": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6ed14cd055a0701dfc689fdd173a142b535a95e205015779072a6e28024886b1"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "db70d69e7495eade222b2b736db10b062ca561c03464126870e04ee4df1ef0e7"
+    }
+  ],
+  "corpusSha256": "5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162",
+  "configSha256": "a0d4ad094c1043f83c211ec24edeb56a0ae8e040bd6ba4af299fbc386b68e08a",
+  "baselineLedgerSha256": "eded82c753e304ff453cce2905f39324a604c6a55fdc9c156c497924c4d083f6"
+}

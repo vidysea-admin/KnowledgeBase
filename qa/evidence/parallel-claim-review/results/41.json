@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "index": 41,
+  "originalIndex": 43,
+  "claimId": "2026-07-08-beyond-black-robes-law-careers-c03",
+  "inputHash": "f7cfa7c2df51892776dfd33990214ad580beead704306ec9ba3c789b1f944406",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Original t115 supports Claude for Legal by Anthropic and Harvey adoption by law firms, with case summaries among the discussed AI-suitable junior-lawyer tasks. Original t119 groups Manupatra, LexisNexis, Claude and Harvey as research tools, but its explicit traditional-platform usage concerns the speakers in law school; it does not directly establish law firms using those traditional platforms alongside Claude. That co-use component is unsupported.",
+    "missingReferences": [],
+    "caveats": [
+      "Both references resolve once; no missing or duplicate supplied references.",
+      "Both original speakerRef values are unknown; names embedded in transcript text do not establish person identity.",
+      "Original t119 distinguishes past law-school software use from current AI discussion; no exact observation date or firm-level simultaneous use is established.",
+      "Transcript support does not establish external factual truth; raw artifact SHA256 values are preserved separately from normalized-LF values and artifact bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+        "contextVersion": "originalMigration",
+        "quote": "followed by other law firms which also went on with Lucidity / Lucio AI for that matter, or Claude for Legal by Anthropic, they moved on to that.",
+        "textSha256": "86685998d3f1eee11db38145e16620ca4beacb2fa6c0fbf287fd7127b22f12d5",
+        "contextSha256": "9c7ed763b3921286af98f3d143a354292ba2a55effc7f3c1959c952507cb133a",
+        "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3643,
+        "tEnd": 3700,
+        "supports": "Supports law-firm adoption of Claude for Legal by Anthropic; the full record also names Harvey and describes case summaries among AI-suitable legal tasks."
+      },
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t119",
+        "contextVersion": "originalMigration",
+        "quote": "we had softwares like Manupatra, LexisNexis, where we could just put in a keyword about the problem which we are researching and there will be a list of cases relating to it.",
+        "textSha256": "5e29522c93272ae1bc80d4e4ff8417317b538718b684ae4a43ad8ab0b260b8e8",
+        "contextSha256": "327042a471ae383766cf38db24b38c01dac916199cc8210cf29739fae3c7ce39",
+        "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3750,
+        "tEnd": 3799,
+        "supports": "Supports traditional-platform research usage by the speakers during law school; the full record also groups Claude and Harvey, but does not explicitly establish the claimed law-firm co-use."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t115 discusses legal teams, consulting firms and IPO advisory work; current t119 merely acknowledges an answer. Neither supports Claude for Legal, Anthropic, Harvey, Manupatra, LexisNexis or case-summary usage. Original support cannot be substituted for these changed current contexts.",
+    "missingReferences": [],
+    "caveats": [
+      "Both references resolve once; no missing or duplicate supplied references.",
+      "Both IDs have changed content, speakerRef and timing: t115 3643-3700 originally versus 3852-3869 currently; t119 3750-3799 originally versus 4130-4147 currently.",
+      "Current stored speakerRefs are Harshwardhan Tiwari and Bhakti; identity accuracy is not independently verified.",
+      "Artifact bytes were not verified; provided raw and normalized-LF hashes remain distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t115",
+        "contextVersion": "current",
+        "quote": "Even that had a legal team. In fact, the one where I am working right now, has a legal team.",
+        "textSha256": "fad4f0293a4ce74beb5176a0cbc77b09781730a2777d2dd31499808653789eb7",
+        "contextSha256": "bd5a494e7858c40178e75487bf852886e20616429c761a0d2af8fda84772ec7a",
+        "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+        "revision": null,
+        "speakerRef": "Harshwardhan Tiwari",
+        "tStart": 3852,
+        "tEnd": 3869,
+        "supports": "Merely supports the speaker describing university legal teams; unrelated to the claimed AI and research-platform usage."
+      },
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "turnId": "2026-07-08-beyond-black-robes-law-careers-t119",
+        "contextVersion": "current",
+        "quote": "That answers my question.",
+        "textSha256": "d52006d72e450ea46cc38d3358b02ed9514bd04b839e3e001d373e950ba65e2a",
+        "contextSha256": "4a0a8fc8291a2cb7b17a3ebd133ebd8ca09f63cbb07a208d8a76a4998a8d0f18",
+        "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+        "revision": null,
+        "speakerRef": "Bhakti",
+        "tStart": 4130,
+        "tEnd": 4147,
+        "supports": "Acknowledges an answer; supports none of the claim components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence partially supports the AI adoption and task components but leaves law-firm co-use with traditional platforms unestablished. Both current citation IDs now contain unrelated text. All supplied hashes and identity bindings pass; external truth and human adjudication remain open."
+}

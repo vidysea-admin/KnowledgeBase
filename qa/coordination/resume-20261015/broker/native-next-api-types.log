@@ -1,0 +1,5 @@
+src/indexing/native-archive/publication.ts(62,76): error TS18046: 'doc' is of type 'unknown'.
+src/indexing/native-archive/publication.ts(62,109): error TS18046: 'doc' is of type 'unknown'.
+src/indexing/native-archive/publication.ts(63,30): error TS18046: 'doc' is of type 'unknown'.
+src/indexing/native-archive/publication.ts(63,63): error TS18046: 'doc' is of type 'unknown'.
+src/indexing/native-archive/publication.ts(64,59): error TS2698: Spread types may only be created from object types.

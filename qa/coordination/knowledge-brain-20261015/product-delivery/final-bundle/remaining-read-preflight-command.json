@@ -1,0 +1,16 @@
+{
+  "kind": "BROKER_READ_ONLY_VERIFICATION_SUPPORT_COMMAND_NOT_EXECUTED",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "script": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight.mjs",
+  "script_sha256": "f9717064aaa48a4cd512644001bd7a9310c722bbc079b27189e22b0113ca45b8",
+  "spec": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec.json",
+  "spec_sha256": "bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de",
+  "command": "& 'C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe' 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight.mjs' --root 'C:/Users/product/Desktop/KnowledgeBase' --spec 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec.json' --spec-sha 'bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de' --out 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-artifacts'",
+  "outer_timeout_ms": 120000,
+  "expected_own_exit": "0 only if complete=true and all exact fingerprint/range/env/identity checks match; otherwise2/STOP. Ownexit mechanics only, never independentPASS.",
+  "output_policy": "Print only bounded summary/counts/mismatches/complete/payloadSHA. No sources/maps/rawstdout/env values. Complete privateQA payload only stored if allchecks pass, within65000source/5000metadata limits.",
+  "accounting": "Verification-support once, separate from maker/checker denominators; unknown resource cost stays unknown.",
+  "local_execution_performed": false,
+  "queued_existing_work": "No duplicate composition/helper/workflow5 request.",
+  "pre_relay_authoring_note": "Literal escapes/source anchors inspected only; no execution, syntax check, or test performed. Composite effectivePins are also audited, not printed."
+}

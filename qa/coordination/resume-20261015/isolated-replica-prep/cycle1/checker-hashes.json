@@ -1,0 +1,112 @@
+[
+  {
+    "sha256": "1889112d1c0fb95d57faf75e3e3cf19756b8c5f6b024d747aa2a0af27d985e1e",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.gitignore"
+  },
+  {
+    "sha256": "6e7847ad137fab3b41c95963fe242bb2c4b96f22565fb691130022d13154530f",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\PLAN.md"
+  },
+  {
+    "sha256": "4f5efe44e0e402dea5c14c06cfeb661fb9a6b69ce10867b2f955cf1f3e186637",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\activate-proposal.py"
+  },
+  {
+    "sha256": "40d1ba774a05f1f6dd620d1ed2668c9c2ff492dd108aee6c957d6546f0fab334",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\init-and-smoke.py"
+  },
+  {
+    "sha256": "7111a5e1e0f20c889543394797d2016bc4235eec9efa80eaa030c28990279c4b",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\shutdown-owned.py"
+  },
+  {
+    "sha256": "7d7eb8a7342eca0fefe8e1df1e3a6698e968e1e661a20bf35069b23a5e5b3d4c",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\mongod.yml.template"
+  },
+  {
+    "sha256": "542d3fc1cfbc2e2f59f6f5c87519ba18850df445280d81e0c6038f88ed0b345a",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\download-verified.ps1"
+  },
+  {
+    "sha256": "18d99626326b7352fecbcd080147d74fef38bcb34a708054c1657efa919363b1",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\extract-passive.ps1"
+  },
+  {
+    "sha256": "28e3e7709b340e5b55b29d8086a5f9b8fc136e2975a8cfeffbb847e6e8d0e681",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\inspect-pe.py"
+  },
+  {
+    "sha256": "6a81c80b21faa371119768cd63e3d40ac063d3954bef11912f7690e346fc82d5",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\static_probe.py"
+  },
+  {
+    "sha256": "1c5786cd90b6e67fd85887eb3e0c0c1e8d79624ccb1c50bd1a689a32ca0e7551",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\parse-powershell.ps1"
+  },
+  {
+    "sha256": "0ef58b9946c0303389b5d1ca193520f628527ee3fe1a533342225cd31645c05e",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\owned_transport.py"
+  },
+  {
+    "sha256": "404fd1447217acd3b64d9fcbab370377863025e60d147deb7a8086380001692d",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\verify-owned-socket.ps1"
+  },
+  {
+    "sha256": "d77f6ed9f09e2d1598c10c23c26953755ad83c6447c8f336e35794765ee03c23",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cleanup_receipt.py"
+  },
+  {
+    "sha256": "0340c1d33b10ffcdcd50fcc03a32a5db2f4af31aa8a52f307960ea46256d8a73",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\fake_regressions.py"
+  },
+  {
+    "sha256": "be682d146a9fc447a4b8f5d2e82479a45dfc7020b142349fec1e4bf04b3ffaa2",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\static_checks.py"
+  },
+  {
+    "sha256": "54e57a4f3d02d85aec0e1cd2b42ac568e39f300edb7355e1c8f295c7835644fb",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\parse-ownership.ps1"
+  },
+  {
+    "sha256": "44783d89398fdbb933e5620d0dabfa893ef048880b5027f7d9a2ace2ebc5219a",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\environment.json"
+  },
+  {
+    "sha256": "8dac4e56deb4b82691a3ee5ee9aeb9f7f3eda5021cac95eee8bdc1be482af3c7",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-final-seal.json"
+  },
+  {
+    "sha256": "7d365f7a8a45b7255c4d42557b2dd3c907f9098462cad3d454e400d27b85c6bb",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-passive-ast-receipt.json"
+  },
+  {
+    "sha256": "7acada98f9622dc768f37d4a1e5780511dfb5a7610a354beed531b70ca253fbd",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-fake-regressions-receipt.json"
+  },
+  {
+    "sha256": "a5a98366856a32216036a1ec37b7f0a54316f1c3604a6d4ad9dc396d174fc2c9",
+    "matches": true,
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-passive-ownership-parser-receipt.json"
+  }
+]

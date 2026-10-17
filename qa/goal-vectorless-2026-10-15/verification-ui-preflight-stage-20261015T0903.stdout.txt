@@ -1,0 +1,11 @@
+{"phase":"module-start","name":"vitest"}
+{"phase":"module-ready","name":"vitest"}
+{"phase":"module-start","name":"vite"}
+{"phase":"module-ready","name":"vite"}
+{"phase":"module-start","name":"jsdom"}
+{"phase":"module-ready","name":"jsdom"}
+{"phase":"module-start","name":"react"}
+{"phase":"module-ready","name":"react"}
+{"phase":"module-start","name":"@testing-library/react"}
+{"phase":"module-ready","name":"@testing-library/react"}
+{"status":"PREFLIGHT_OK","node":"v24.19.0","executable":"C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe","importRoot":"C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web","modules":{"vitest":{"entry":"C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\vitest@2.1.8_@types+node@24.13.3_jsdom@25.0.1\\node_modules\\vitest\\index.cjs","version":"2.1.8"},"vite":{"entry":"C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\vite@6.0.5_@types+node@24.13.3_tsx@4.23.13\\node_modules\\vite\\dist\\node\\index.js","version":"6.0.5"},"jsdom":{"entry":"C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\jsdom@25.0.1\\node_modules\\jsdom\\lib\\api.js","version":"25.0.1"},"react":{"entry":"C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\react@18.3.1\\node_modules\\react\\index.js","version":"18.3.1"},"@testing-library/react":{"entry":"C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\@testing-library+react@16.1_83fd9cd055ae3f809a6a1cf3a9f38faf\\node_modules\\@testing-library\\react\\dist\\index.js","version":"16.1.0"}},"tempParent":"C:\\Users\\product\\AppData\\Local\\Temp","tempWritable":true,"network":false,"browser":false}

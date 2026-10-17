@@ -1,0 +1,12 @@
+{
+  "command": "python -B qa\\coordination\\checker-runtime-validation-20261015\\runtime_probe.py",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "exit_code": 0,
+  "stdout": "{\"passed\": 12, \"failed\": 0, \"canonical_unchanged\": true, \"phase_s\": 0.359000000000151}\n",
+  "stderr": "",
+  "exec_wall_s": 1.2754073,
+  "harness_monotonic_s": 0.359000000000151,
+  "agent_full_active_s": null,
+  "actual_total_tokens": null,
+  "provenance": "Persisted from exec_command return; includes the command's own exit code."
+}

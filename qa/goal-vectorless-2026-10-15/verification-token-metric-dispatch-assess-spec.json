@@ -1,0 +1,33 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Administrative canonical admission; actual-total units enforced externally not by legacy canonical helper",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "qa/coordination/checker-runtime-total-20261015/checker-dispatch-input.json"
+  ],
+  "testIDs": [
+    "admission only not independent verification"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 10000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-token-metric-dispatch-assess",
+  "pins": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-runtime-total-20261015/checker-dispatch-input.json": "4c980ab252444dc7f82e465d82dbb66d8219cb80a77f81b45849de919ba5d781"
+  }
+}

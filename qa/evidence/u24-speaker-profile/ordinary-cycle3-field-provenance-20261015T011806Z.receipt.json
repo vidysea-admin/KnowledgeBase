@@ -1,0 +1,56 @@
+{
+  "counts": {
+    "tests": 11,
+    "fail": 0,
+    "skipped": 0,
+    "pass": 11
+  },
+  "endedAt": "2026-10-15T01:18:09.2682928Z",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "stderrPath": "qa/evidence/u24-speaker-profile/ordinary-cycle3-field-provenance-20261015T011806Z.stderr.txt",
+  "pinCount": 11,
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "apps/api/src/speaker-profiles/store.test.ts"
+  ],
+  "pid": 25480,
+  "spec": "qa/evidence/u24-speaker-profile/ordinary-cycle3-field-provenance-spec.json",
+  "specSha256": "9f6b6300cda605562de0891b5c2758b0b979953ed97a5197f69048a9d16ff3bc",
+  "after": {
+    "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+    "apps/api/src/speaker-profiles/store.test.ts": "1993644948c2ce298d2f0ae267420154f72d6c18d58a8fd87605c2a7401f59f0",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+    "apps/api/src/knowledge/metadata-visibility.ts": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "bce0534f0fd474788e97774da274f8cfa186908a005876d7d1dabd8c95feb000"
+  },
+  "timedOut": false,
+  "stdoutPath": "qa/evidence/u24-speaker-profile/ordinary-cycle3-field-provenance-20261015T011806Z.stdout.txt",
+  "exit": 0,
+  "drift": 0,
+  "elapsedMs": 2613,
+  "before": {
+    "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+    "apps/api/src/speaker-profiles/store.test.ts": "1993644948c2ce298d2f0ae267420154f72d6c18d58a8fd87605c2a7401f59f0",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+    "apps/api/src/knowledge/metadata-visibility.ts": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "bce0534f0fd474788e97774da274f8cfa186908a005876d7d1dabd8c95feb000"
+  },
+  "startedAt": "2026-10-15T01:18:06.5907672Z",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+}

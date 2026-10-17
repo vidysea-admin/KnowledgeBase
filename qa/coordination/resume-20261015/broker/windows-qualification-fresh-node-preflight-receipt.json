@@ -1,0 +1,42 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--input-type=module",
+    "-e",
+    "console.log(JSON.stringify({node:process.execPath,version:process.version,tsx:import.meta.resolve('tsx/esm/api')}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\b68836f2a55ca26b181cc3973d96444e978b5b85f8530fbf6bf087d4e58b44f3.json",
+    "sha256": "b68836f2a55ca26b181cc3973d96444e978b5b85f8530fbf6bf087d4e58b44f3",
+    "count": 815
+  },
+  "environmentWhitelistSha256": "4b7d36687c1278aaee1903d0ab39a96f399d9b10c24031ed592c3dd6f1b42040",
+  "environmentNames": [
+    "KB_T022_PRIVATE_REVIEW_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "LKB_NATIVE_PUBLICATION_MONGO_RUN",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN",
+    "NODE_OPTIONS",
+    "PYTHONDONTWRITEBYTECODE",
+    "T054_AUTHENTIC_INPUT_OPT_IN",
+    "TEMP",
+    "TMP",
+    "TSX_TSCONFIG_PATH"
+  ],
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "SHARED INTEGRATION, not checker",
+  "pid": 22268,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.875,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-node-preflight.log",
+    "sha256": "801ba7d40e84531582767615d62f56dbf4c8637476c14dc59f0ed7c07011c9c7"
+  },
+  "counts": {}
+}

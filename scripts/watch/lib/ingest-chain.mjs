@@ -1,3 +1,5 @@
+import { bindDerivedArtifacts } from "../../lib/transcript-provenance.mjs";
+import { loadWebinarSession } from "../../webinar/session-rows.mjs";
 /**
  * scripts/watch/lib/ingest-chain.mjs — U2 source-watcher `--ingest`. The full auto-ingest chain
  * for ONE new Drive recording: download -> ffmpeg -> transcribe -> skeleton -> seed-toc -> index.
@@ -10,10 +12,11 @@
  * Throws on any failure; the caller (run-watch.mjs) records `watch_state` status "failed" with
  * the thrown message — this module never swallows an error or marks anything itself.
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { execFileSync } from "node:child_process";
 import { slugSessionId, buildAutoSessionSkeleton, deriveSessionDateAndTitle } from "./session-skeleton.mjs";
+import { SINGLE_CALL_FLAG, flagOn, planTranscriptionPath, selectTranscriber } from "../../lib/transcription-wiring.mjs";
 
 // ISS-304: was 55*60. transcribe-long-session.mjs's own DEFAULT_CHUNK_SECONDS is 2400 (40 min) —
 // its header names that as "headroom under the observed ~60min failure point" for a SINGLE
@@ -116,6 +119,24 @@ export function resolveSessionIdForIngest(sessionId, dirExists, existingDriveFil
   return `${sessionId}-${fileId.slice(0, 6).toLowerCase()}`;
 }
 
+/**
+ * Pure. T-044: picks the transcriber script for one ingest. With LKB_TRANSCRIPT_QA=1 EVERY recording,
+ * short ones included, must go through the long driver, because only it clamps and writes the
+ * generation-bound transcript-qa.json that validate-session then requires. When the QA flag is on and the
+ * duration probe failed there is nothing to clamp against, and the unchecked short driver would only fail at
+ * validation after the provider call was paid for, so this refuses BEFORE transcription. Flag off (anything
+ * but the exact string "1") is exactly the previous selectTranscriber rule.
+ */
+export function chooseIngestTranscriber({ env, durationSeconds, longThresholdSeconds, plan }) {
+  if (env?.LKB_TRANSCRIPT_QA === "1") {
+    if (!Number.isFinite(durationSeconds) || durationSeconds <= 0) {
+      throw new Error("ingest QA routing: LKB_TRANSCRIPT_QA=1 but the recording duration is unknown; refusing to transcribe without a QA path");
+    }
+    return "transcribe-long-session.mjs";
+  }
+  return selectTranscriber({ durationSeconds, longThresholdSeconds, plan });
+}
+
 function safeFileName(name) {
   return name.replace(/[<>:"/\\|?*]/g, "-").trim();
 }
@@ -134,9 +155,9 @@ export function computeStem(safeName) {
 
 /** ffprobe duration in seconds, or null if ffprobe fails/unavailable — caller falls back to the
  * short-session transcriber in that case (same default transcribe-toc-session.mjs always was). */
-function audioDurationSeconds(path) {
+function audioDurationSeconds(path, runCommand = execFileSync) {
   try {
-    const out = execFileSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path], {
+    const out = runCommand("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path], {
       encoding: "utf8",
       timeout: 30_000,
     });
@@ -154,6 +175,8 @@ function audioDurationSeconds(path) {
  */
 export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) {
   const { ROOT, RECORDINGS_DIR, AUDIO_DIR, TENANT, calendarEvents, programYearFirstYear } = deps;
+  const runCommand = deps.runCommand ?? execFileSync;
+  const env = deps.env ?? process.env;
   const safeName = safeFileName(file.name);
   const videoPath = join(RECORDINGS_DIR, monthName, safeName);
   mkdirSync(dirname(videoPath), { recursive: true });
@@ -171,7 +194,7 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
   mkdirSync(AUDIO_DIR, { recursive: true });
   // Same extraction shape U1 used (matched to an inspected existing file — see its manifest):
   // AAC, 48kHz, stereo, ~96k.
-  execFileSync("ffmpeg", ["-y", "-i", videoPath, "-vn", "-c:a", "aac", "-b:a", "96k", "-ar", "48000", "-ac", "2", audioPath], { timeout: 30 * 60 * 1000 });
+  await runCommand("ffmpeg", ["-y", "-i", videoPath, "-vn", "-c:a", "aac", "-b:a", "96k", "-ar", "48000", "-ac", "2", audioPath], { timeout: 30 * 60 * 1000 });
 
   // ISS-306 (part 2): date/title now come from `file.name` itself (the Drive title, e.g. "24th
   // Sep : InFocus"), cross-checked against the TOC calendar — NOT from `file.createdTime` (the
@@ -214,9 +237,21 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
   const stubSource = { _id: `gdrive-${file.id}`, tenantId: TENANT, kind: "recording", captureMode: "provided", audioPath: relAudioPath, hash: `gdrive-${file.id}`, consent: { given: true, recordedBy: "u2-source-watcher", note: "auto-detected" }, createdAt: new Date().toISOString() };
   writeFileSync(join(finalDataDir, "source.json"), JSON.stringify(stubSource, null, 2));
 
-  const durationSeconds = audioDurationSeconds(audioPath);
-  const transcriber = durationSeconds !== null && durationSeconds > LONG_SESSION_THRESHOLD_SECONDS ? "transcribe-long-session.mjs" : "transcribe-toc-session.mjs";
-  execFileSync("node", [join(ROOT, "scripts", transcriber), sessionId], { timeout: 2 * 60 * 60 * 1000, stdio: "inherit" });
+  const durationSeconds = audioDurationSeconds(audioPath, runCommand);
+  // T-048 (D-162, OFF unless LKB_SINGLE_CALL_PATH=1): let chooseTranscriptionPath decide. A "single" plan goes
+  // to the long driver, which sees the same flag in its inherited env and runs one call with chunked fallback.
+  let plan = null;
+  if (flagOn(env, SINGLE_CALL_FLAG) && durationSeconds !== null) {
+    const { chooseTranscriptionPath, T048_THRESHOLDS } = await import("../../../packages/ai/src/stt/transcription-plan.ts");
+    plan = planTranscriptionPath({
+      enabled: true, durationSeconds, fileBytes: statSync(audioPath).size, modelId: env.GEMINI_STT_MODEL || "",
+      choose: chooseTranscriptionPath, thresholds: T048_THRESHOLDS,
+    });
+  }
+  const transcriber = chooseIngestTranscriber({ env, durationSeconds, longThresholdSeconds: LONG_SESSION_THRESHOLD_SECONDS, plan });
+  await runCommand("node", [join(ROOT, "scripts", transcriber), sessionId], { timeout: 2 * 60 * 60 * 1000, stdio: "inherit", env });
+  const validate = () => runCommand('node', [join(ROOT, 'scripts', 'webinar', 'validate', 'validate-session.mjs'), sessionId, '--root', ROOT], {timeout:120000,stdio:'inherit',env});
+  await validate(); // Refuse suspicious transcripts before generating derived knowledge.
 
   const turns = JSON.parse(readFileSync(join(finalDataDir, "turns.json"), "utf8"));
   // ISS-304: refuse to report success on a transcript that stops well short of the real audio.
@@ -224,14 +259,20 @@ export async function ingestOneDriveFile(gdrive, gwsRun, file, monthName, deps) 
   assertCoverage(sessionId, lastTEnd, durationSeconds);
 
   const skeleton = buildAutoSessionSkeleton({ sessionId, tenantId: TENANT, title, date, driveFileId: file.id, audioPath: relAudioPath, turns });
-  writeFileSync(join(finalDataDir, "source.json"), JSON.stringify(skeleton.source, null, 2));
+  // Keep explicit audio resolution and the known Drive/calendar title in the final source.
+  const finalSource = { ...skeleton.source, title, audioPath: relAudioPath };
+  writeFileSync(join(finalDataDir, "source.json"), JSON.stringify(finalSource, null, 2));
   writeFileSync(join(finalDataDir, "session.json"), JSON.stringify(skeleton.session, null, 2));
   writeFileSync(join(finalDataDir, "session_page.json"), JSON.stringify(skeleton.sessionPage, null, 2));
   writeFileSync(join(finalDataDir, "claims.json"), JSON.stringify(skeleton.claims, null, 2));
+  // The first verdict binds the stub source bytes, which the skeleton just replaced.
+  await validate();
+  loadWebinarSession(finalDataDir, sessionId); // Require current validation at the write boundary.
+  bindDerivedArtifacts(finalDataDir);
 
-  execFileSync("node", [join(ROOT, "scripts", "seed-toc.mjs"), "--sessions", sessionId], { timeout: 5 * 60 * 1000, stdio: "inherit" });
+  await runCommand("node", [join(ROOT, "scripts", "seed-toc.mjs"), "--sessions", sessionId], { timeout: 5 * 60 * 1000, stdio: "inherit", env });
 
-  const { buildIndexer } = await import("../../../apps/api/src/production.ts");
+  const buildIndexer = deps.buildIndexer ?? (await import("../../../apps/api/src/composition/production.ts")).buildIndexer;
   const indexResult = await buildIndexer()(TENANT, sessionId);
   // ISS-305: refuse to report success on a session that indexed with zero searchable chunks.
   assertIndexed(sessionId, turns.length, indexResult.chunks);

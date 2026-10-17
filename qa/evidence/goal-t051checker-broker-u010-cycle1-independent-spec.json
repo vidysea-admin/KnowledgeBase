@@ -1,0 +1,23 @@
+{
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "qa/evidence/goal-u010-checker.test.mjs"
+  ],
+  "pins": {
+    "scripts/eval/u010-corpus.mjs": "02f6dfab40717e9a2c2aeabad4aea7afaa78218f8308fedb22f2dc54ef8d54cf",
+    "scripts/eval/u010-state.mjs": "04354bb707f57421a01568eab195418ed9178fe2be4ec9ed815e43f85b1d14d2",
+    "scripts/eval/u010-provider.mjs": "37ef3377b2c84e59e9fe82cdefc44e1a987420f437155028aa3133f53e32f391",
+    "scripts/eval/u010-baseline-run.mjs": "9e5050ce64ee4aa2b13725f497e7f9895e1f144bee41ee01d1a13e90713b232f",
+    "scripts/eval/u010-baseline-audit.mjs": "aaebeea07f09f1dc9aff31fcd61af930a1f00a6426dad996d351991f94b2d6ca",
+    "scripts/eval/u010-baseline-run.test.mjs": "3a175a8704ac737d848c2721d7aaf0afae9e22c14871fd72f1091d9762c23fde",
+    "scripts/eval/human-calibration.mjs": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf",
+    "apps/api/src/score.ts": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78",
+    "packages/ask/src/eval/calibration.ts": "d020cea126f1be037034c6cf7228958371defe2fa2ecf53985fbc4a167fa57d4",
+    "qa/evidence/goal-u010-checker.test.mjs": "db57b68d32ceddec06be25d4dde72e38da90080ab8cd95e80d4919ba0f96048d"
+  },
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-u010-cycle1-independent"
+}

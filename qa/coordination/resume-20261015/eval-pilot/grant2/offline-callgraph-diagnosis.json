@@ -1,0 +1,98 @@
+{
+  "status": "OFFLINE_DIAGNOSIS_ONLY",
+  "observedAt": "2026-10-15T22:41:43.962Z",
+  "actualGrant2": {
+    "reservedIds": [
+      4,
+      5
+    ],
+    "httpStatuses": [
+      200,
+      200
+    ],
+    "finishReasons": [
+      "stop",
+      "stop"
+    ],
+    "stageCounts": {
+      "nodeSelection": 2,
+      "relevanceScoring": 0,
+      "refinement": 0,
+      "answerGeneration": 0,
+      "answerGrounding": 0,
+      "sourceHydration": 0
+    },
+    "primaryFailure": "admission-budget",
+    "secondaryDiagnostic": "model-output-validation",
+    "newUsage": {
+      "inputTokens": 597,
+      "outputTokens": 590
+    },
+    "inputBytes": 2597,
+    "outerSeconds": 10.672,
+    "evaluateSeconds": 9.556,
+    "answer": false,
+    "citations": 0
+  },
+  "plannedLowerBoundForSupportedAnswer": {
+    "routingLevels": [
+      "year",
+      "month",
+      "session"
+    ],
+    "nodeSelection": 3,
+    "relevanceForAtLeastOneCandidate": 1,
+    "answerGeneration": 1,
+    "independentGrounding": 1,
+    "totalMinimum": 6,
+    "extraCalls": "Additional candidates/refinement/retries may require more; six is not a success guarantee; legitimate abstention remains possible"
+  },
+  "whyAdmitted": "validateConfig enforces positive finite maxima and tier authorization, but contains no minimum complete-answer feasibility/intent gate. The root-approved2-call pilot was admissible as bounded partial execution, not capable of completing the current hierarchical grounded-answer path.",
+  "evidence": [
+    {
+      "path": "packages/index/src/tree/build.ts",
+      "lines": "75,109-134",
+      "claim": "tenant/year/month/session hierarchy"
+    },
+    {
+      "path": "packages/ask/src/select-nodes.ts",
+      "lines": "70-93",
+      "claim": "one model call per offered level; three rounds; no skipped level"
+    },
+    {
+      "path": "packages/ask/src/tree-routing.ts",
+      "claim": "frontier ranking preserves node children/level; no flattening"
+    },
+    {
+      "path": "packages/ask/src/ask-graph.ts",
+      "lines": "119-125,159-193",
+      "claim": "scoring/refinement then answer pipeline"
+    },
+    {
+      "path": "packages/ask/src/answer.ts",
+      "lines": "41-61",
+      "claim": "answer and independent grounding completions"
+    }
+  ],
+  "proposedPreflight": {
+    "source": "scripts/eval/vectorless-production-eval.mjs",
+    "intent": "Require explicit diagnostic-only vs complete-grounded-answer intent in persisted authorization; compute minimum routing depth+mandatory scoring/answer/grounding stage lower bound on frozen tree, reject insufficient complete-answer call budget before credential/I/O. Do not infer semantic answerability or authorize new spend.",
+    "noAlgorithmChange": true
+  },
+  "existingFallback": "Lexical and blind results are comparison controls only in evaluate; they are not wired as production retrieval fallback. Switching to lexical/extraCandidateArmsFn would change the evaluated algorithm and requires separate explicit scope; no safe already-wired paid-free substitution exists here.",
+  "diagnosticFixCandidate": {
+    "files": [
+      "scripts/eval/vectorless-production-eval.mjs",
+      "scripts/eval/vectorless-production-eval.test.mjs"
+    ],
+    "change": "Known state.failure admission/deadline/authorization budget errors must take precedence over classifying the last successful provider output; preserve providerStep and safe HTTP/finish metadata.",
+    "regression": "Synthetic exact2-call/3-level production selector exhaustion asserts admission-budget-refusal instead of model-output-validation; retain actual malformed-output and source-guard distinctions.",
+    "lease": "AWAIT_ROOT; no source edit performed"
+  },
+  "cumulativeProviderRequests": 5,
+  "lifetimeUsage": null,
+  "historicalUnknownUsageAndOverrunPreserved": true,
+  "newProviderRequests": 0,
+  "newTests": 0,
+  "cpuSlotReturned": true
+}

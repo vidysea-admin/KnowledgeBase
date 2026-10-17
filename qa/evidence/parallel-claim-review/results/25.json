@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "index": 25,
+  "originalIndex": 27,
+  "claimId": "2026-06-03-dual-enrollment-pathway-c03",
+  "inputHash": "064971b65cc8c720d9053c7e81c7a1fed688a6f67803f807bcb98028b1a1ad2d",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The context supports an Ohio State classification rule based on enrolling in college classes after high-school graduation. The claim omits that institution qualifier and substitutes when credits were earned for enrollment timing; the broader statement is not fully supported.",
+    "missingReferences": [],
+    "caveats": [
+      "Original speakerRef is unknown; the embedded Steven Fu label does not establish identity.",
+      "The classification rule is explicitly scoped to Ohio State and distinguishes post-graduation enrollment, including a gap-year example.",
+      "No external factual truth or policy currency is established."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t087",
+        "contextVersion": "originalMigration",
+        "quote": "So for at Ohio State, our definition for a freshman or new first-year student versus a transfer student depends on if you have enrolled in any college classes after you have graduated high school, right?",
+        "textSha256": "982a27faedffa942dda02da3ca8ee1e7096a39b6bd53e0724b5fadfb875f6935",
+        "contextSha256": "3d3c482f83300c61637b655d6e5612c86de7e413efa492cbc32953705bccef6e",
+        "artifactSha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2173,
+        "tEnd": 2217,
+        "supports": "Supports only Ohio State freshman/transfer classification by post-graduation college enrollment, not the unqualified earned-credit formulation."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn discusses college-level course rigor, preparation and favorable application review. It supplies no freshman-versus-transfer classification rule or high-school credit timing criterion.",
+    "missingReferences": [],
+    "caveats": [
+      "The same turn ID now contains different text, speakerRef and timing: 3678-3721 rather than 2173-2217.",
+      "Stored speakerRef Michelle Prince Spetz is retained as metadata, not independently verified identity.",
+      "The session reports an invalid-time turn elsewhere; the cited record itself has increasing timestamps.",
+      "Provided artifact byte hashes and normalized-LF hashes are distinct; no on-disk artifact-byte verification was performed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t087",
+        "contextVersion": "current",
+        "quote": "when we're looking at their applications, we know that, um, you know, we know that they've challenged themselves with that additional rigor, and do look at that favorably.",
+        "textSha256": "330e6e548ca2b463082f8f1f76a24133c739a7a4b8613129b68e3293a5e3bd28",
+        "contextSha256": "aeead451c7c53a0e3793223ecd679c6a04590294ea62e64f2188ee610171f556",
+        "artifactSha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+        "revision": null,
+        "speakerRef": "Michelle Prince Spetz",
+        "tStart": 3678,
+        "tEnd": 3721,
+        "supports": "Supports favorable application consideration of additional rigor; unrelated to freshman/transfer classification."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence states a narrower Ohio State enrollment rule; current evidence concerns rigor and application review. The retained citation ID changed text, speaker and timing. Neither context fully entails the unqualified claim."
+}

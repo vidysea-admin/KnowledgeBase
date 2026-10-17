@@ -1,0 +1,18 @@
+{
+  "status": "NO_FORMAL_NUMERIC256_CLAUSE_FOUND",
+  "effectiveContractPath": "qa/contracts/goal-u010.md",
+  "clauseA8": "| A8 | Caps bind actual external calls and all retries; finite time bounds prevent an indefinite run. | Positive finite integer call cap, enforced before provider I/O; cancellation/deadline handling; attempted/success/failed/fallback counts and capReached/stopReason. Cost-only refusal stands while provider cost is reported as zero. Zero provider-reported cost is explicitly unpriced/unknown spend, not proof of free calls. |",
+  "clauseA15": "| A15 | Credentials, tenant isolation and production behavior remain safe. | No key values/auth headers/raw secret-bearing errors in logs, reports or packets; secret-safe tests. Provider configuration explicit to this eval process; no ambient cloud credential inheritance by local speaker path. No production Mongo/jobs writes, schema changes or default routing changes in this unit. Legitimate corpus egress is limited to D-164's existing authorized evaluation inputs. |",
+  "sourceCap": {
+    "path": "scripts/eval/vectorless-production-eval.mjs",
+    "constant": "PILOT",
+    "outputLimit": 256,
+    "maxKnownOutputTokens": 768,
+    "admission": "validateConfig requires every pilot limit<=PILOT"
+  },
+  "manifestScope": "qa/manifests/vectorless-production-evaluation.md line43 records implemented256 capability; it is maker description, not frozencontract authority",
+  "searchResult": "Bounded exact-word scan found no evaluator pilot256 output cap in qa/contracts or docs/DECISIONS.md; unrelated256 SHA/threadID matches excluded. No assertion of global governance completeness.",
+  "proposal": "Separate root source lease may add an exact grant-scoped higher-output tier with persisted config/source binding and cumulative requests; retain defaultPILOT and full92 ceilings unchanged. No code change authorized/performed by this note.",
+  "cpuSlot": "WAIT_ROOT_RELEASE",
+  "newGrant2RequestsConsumed": 0
+}

@@ -1,0 +1,8 @@
+{
+  "ready": [
+    "t060-maker",
+    "t036-guard",
+    "t037-node"
+  ],
+  "skipped": []
+}

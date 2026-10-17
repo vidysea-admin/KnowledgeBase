@@ -10,7 +10,8 @@
 import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
 import { spawn } from "node:child_process";
 import path from "node:path";
-import type { BotEvent } from "./obs-windows.js";
+import type { BotEvent } from "./obs/obs-windows.js";
+import { createRecordingPrivacyControl, type PrivateRecordingControl } from './record-consent/controller-client.js';
 
 export interface GapWindow {
   start: number; // epoch seconds, as sb_join.py's time.time() emits
@@ -85,7 +86,7 @@ export function collectGapEvent(gaps: GapWindow[], ev: BotEvent): void {
 
 type StopReason = "cancelled" | "rescheduled";
 type ControlRequest = {reason: StopReason | "controller-disconnected"; at: number};
-export interface RecordingControl {generation: string; stop: (reason: StopReason) => Promise<"accepted" | "unavailable">;}
+export interface RecordingControl extends Partial<PrivateRecordingControl> {generation: string; stop: (reason: StopReason) => Promise<"accepted" | "unavailable">;}
 const generationValid = (value: unknown): value is string => typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(value);
 function controlMatches(value: unknown, type: "stop" | "ack", tenantId: string, sessionId: string, generation: string, token: string): value is Record<string, any> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -130,6 +131,7 @@ export function launchControlledRecording(root: string, args: string[], env: Nod
   return new Promise((done, fail) => {
     const child = spawnLike(process.execPath, ["--import", "tsx", path.join(root, "packages/meeting-bot/src/cli.ts"), ...args],
       {cwd: root, env: childEnv, shell: false, windowsHide: true, stdio: managed ? ["ignore", "pipe", "pipe", "ipc"] : ["ignore", "pipe", "pipe"]});
+    const privacy = managed ? createRecordingPrivacyControl(child, {tenantId: tenantId!, sessionId: sessionId!, generation, token}) : undefined;
     let response: Promise<"accepted" | "unavailable"> | undefined;
     let closed = false, pending = "", requested: StopReason | undefined, acknowledged = false;
     let waiting: {resolve: (value: "accepted" | "unavailable") => void; timer: ReturnType<typeof setTimeout>} | undefined;
@@ -143,11 +145,11 @@ export function launchControlledRecording(root: string, args: string[], env: Nod
       const lines = pending.split("\n"); pending = lines.pop() ?? ""; for (const line of lines) onLine(line);
     });
     child.stderr!.on("data", () => {});
-    const cleanup = () => { closed = true; settle("unavailable"); child.off("message", message); };
+    const cleanup = () => { closed = true; settle("unavailable"); privacy?.dispose(); child.off("message", message); };
     child.once("disconnect", () => settle("unavailable"));
     child.once("error", () => {cleanup(); fail(new Error("Recording child could not start"));});
     child.once("close", code => {cleanup(); code === 0 ? done() : fail(new Error(`Recording pipeline exited ${code}`));});
-    if (managed && onControl) onControl({generation, stop: reason => {
+    if (managed && onControl) onControl({generation, privacy: privacy!.privacy, privacyStatus: privacy!.privacyStatus, stop: reason => {
       if (!["cancelled", "rescheduled"].includes(reason) || closed || !child.connected || (requested && requested !== reason)) return Promise.resolve("unavailable");
       if (acknowledged) return Promise.resolve("accepted");
       if (response) return response;

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "index": 63,
+  "originalIndex": 70,
+  "claimId": "2026-08-27-in-focus-4-c02",
+  "inputHash": "3cd408ffec294a0c6c62c4bd14d0b8b7e05a0b19af185894f26e4882dde584b0",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original context describes trying diagnostic tests for all exams and analysis before a personalized plan. It does not establish that every student actually receives a test, or identify Education & You as the organization behind the practice.",
+    "missingReferences": [],
+    "caveats": [
+      "The stored speakerRef is unknown; the name prefix in transcript text does not establish speaker identity or organizational affiliation.",
+      "The wording try to run is qualified intent/practice, not an exceptionless completed action for every student.",
+      "The same turn ID has different content, speakerRef, and timing in current context: original 357-416 seconds, current 1594-1722 seconds.",
+      "No duplicate reference or missing match is present in the supplied single citation. Transcript support does not establish external factual truth; artifact bytes were not checked."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "turnId": "2026-08-27-in-focus-4-t014",
+        "contextVersion": "originalMigration",
+        "quote": "So all our exams, be it the very basic IELTS, or be it any of the other exams, we try to run a diagnostic test for them.",
+        "textSha256": "c8094703f7288857ebe432771e5f252159f03e100cf479db93d55eeb02381465",
+        "contextSha256": "b120f916e98ef2c9c158ee7d92e655f0de274b9537d39bb9d3e6c08820ab55c6",
+        "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 357,
+        "tEnd": 416,
+        "supports": "Supports attempted diagnostic testing across exams, but does not support an actual test for every student or the Education & You attribution."
+      },
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "turnId": "2026-08-27-in-focus-4-t014",
+        "contextVersion": "originalMigration",
+        "quote": "there's a foundational error, a strategical error, what is required before we are able to make a personalized plan.",
+        "textSha256": "c8094703f7288857ebe432771e5f252159f03e100cf479db93d55eeb02381465",
+        "contextSha256": "b120f916e98ef2c9c158ee7d92e655f0de274b9537d39bb9d3e6c08820ab55c6",
+        "artifactSha256": "4ad967ba1a61b723719068868214ee5a18671bbc279beb29e43a6aea2579765f",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 357,
+        "tEnd": 416,
+        "supports": "Supports identifying needs before making a personalized plan; does not establish universal testing or organization identity."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn discusses college access, college success, and application preparation. It supplies no diagnostic-testing practice, every-student coverage, Education & You attribution, or diagnostic-before-study-plan sequence.",
+    "missingReferences": [],
+    "caveats": [
+      "The stored speakerRef is Parthosh; no person identity is independently established.",
+      "The same turn ID now addresses a different topic and has timing 1594-1722 seconds instead of original 357-416 seconds.",
+      "No duplicate reference or missing match is present in the supplied single citation. Artifact raw SHA256 and normalized-LF SHA256 remain distinct supplied metadata; neither was verified against bytes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "turnId": "2026-08-27-in-focus-4-t014",
+        "contextVersion": "current",
+        "quote": "this is a stage where students are preparing their applications, we want them to prepare great applications, and we want them to learn a lot while they prepare those applications.",
+        "textSha256": "63173db1f3a1512fcdcfb33b692d1c94cb234d446d12535ac44ae80d0ae84dc8",
+        "contextSha256": "95d16f40c7015bb57b5ebc20890dcee134a859f9c1e529a431f7267b65f790f0",
+        "artifactSha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+        "revision": null,
+        "speakerRef": "Parthosh",
+        "tStart": 1594,
+        "tEnd": 1722,
+        "supports": "Merely describes application preparation; unrelated to the claimed diagnostic testing and study-plan policy."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original provides partial support but overstates qualified testing as every-student policy and lacks organization attribution. Current same-ID context is unrelated; both are provisionally unsupported, not disproven."
+}

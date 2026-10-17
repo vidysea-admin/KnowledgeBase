@@ -1,0 +1,10 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [],
+  "next_phase": {"kind": "review", "active_s": 90, "tokens": 2200, "cost": null},
+  "completion_reserve": true,
+  "completion_reserve_id": "product-speaker-relation-workbench/cycle-1/6eddf4944a6835010284e3659916c4ea1d23b4381c9ab68fb34b13e73eda8363",
+  "bootstrap_scope": "One new speaker relationship UI component, eight focused broker cases and immediate server DTO consumers; readiness requires broker evidence before checker dispatch. Finalization reserve 30 seconds/800 tokens; no tests run by maker.",
+  "bootstrap": {"active_s": 120, "tokens": 3000},
+  "escalation": null
+}

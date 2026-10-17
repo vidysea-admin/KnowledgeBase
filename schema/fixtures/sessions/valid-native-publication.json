@@ -1,0 +1,12 @@
+{
+  "_id": "sess1",
+  "tenantId": "toc",
+  "sourceId": "src1",
+  "title": "27th-August-In-Focus",
+  "date": "2026-08-27",
+  "status": {
+    "transcribe": "done",
+    "index": "pending"
+  },
+  "nativePublicationRevision": 0
+}

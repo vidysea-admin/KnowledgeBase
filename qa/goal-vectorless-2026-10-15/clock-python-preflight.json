@@ -1,0 +1,14 @@
+{
+  "executable": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+  "version": "3.12.10",
+  "executableSha": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+  "pytest": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Lib\\site-packages\\pytest\\__init__.py",
+  "localModules": [
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join.py",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_tiles.py",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_loop.py"
+  ],
+  "temporaryWrite": true,
+  "elapsedSeconds": 0.5072382,
+  "queueWait": null
+}

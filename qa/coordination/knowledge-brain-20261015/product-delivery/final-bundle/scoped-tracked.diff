@@ -1,0 +1,691 @@
+diff --git a/apps/api/src/answer-policy/answer-router.test.ts b/apps/api/src/answer-policy/answer-router.test.ts
+index e8316b69..3a356aa0 100644
+--- a/apps/api/src/answer-policy/answer-router.test.ts
++++ b/apps/api/src/answer-policy/answer-router.test.ts
+@@ -5,17 +5,20 @@ import type { AddressInfo } from "node:net";
+ import type { AskV2Result } from "@lkb/ask";
+ import { requireAuth } from "../auth.js";
+ import { fakeKeyStore } from "../fixtures.js";
+-import { createAnswerHistoryRouter } from "./answer-router.js";
++import { createAnswerHistoryRouter, type AnswerReviewAuthority, type HumanReviewAction } from "./answer-router.js";
+ import { createAnswerWorkflow } from "./answer-workflow.js";
+ import { createAnswerPolicyService } from "./service.js";
+ import { createInMemoryAnswerPolicyStore } from "./store.js";
+ import { createInMemoryAnswerRecordStore } from "./answer-record-store.js";
+ import { answerEvidence, digest } from "./answer-evidence.js";
+ 
+-async function start() {
++// Synthetic HTTP fixture only; these identities never establish real human acceptance.
++const fixtureAuthority: AnswerReviewAuthority = { verifyHuman: async (req) => ({ kind: "human", tenantId: req.auth!.tenantId, subject: "fixture-reviewer" }) };
++async function start(authority?: AnswerReviewAuthority) {
+   const store = createInMemoryAnswerRecordStore(), service = createAnswerPolicyService(createInMemoryAnswerPolicyStore());
+   const candidate: AskV2Result = { answer: "Fee is 100.", verdict: "ambiguous", reason: "partial", scored: [], auditLog: [], web_used: false, insufficient_coverage: true,
+-    sources: { internal: [{ node_id: "n1", evidence: { sessionRef: "s1", sourceQuotes: [{ quote: "Fee is 100.", turnId: "t1", speakerRef: "spk:0", tStart: 0, tEnd: 10 }] } }], web: [] } };
++    sources: { internal: [{ node_id: "n1", evidence: { sessionRef: "s1", sourceQuotes: [{ quote: "Fee is 100.", turnId: "t1", speakerRef: "spk:0", tStart: 0, tEnd: 10 }] } },
++      { node_id: "n2", evidence: { sessionRef: "s2", sourceQuotes: [{ quote: "Fee is 200.", turnId: "t2", speakerRef: "spk:0", tStart: 0, tEnd: 10 }] } }], web: [] } };
+   const evidence = answerEvidence(candidate), candidateDigest = digest(candidate), evidenceDigest = digest(evidence);
+   await store.create("tenant-a", { id: "run-1", tenantId: "tenant-a", actor: { actor: "api-key:tenant-a" }, query: "Fee?", questionClass: "fees", createdAt: "2026-10-14T00:00:00.000Z",
+     filters: { sessionIds: [], sources: "internal" }, evidenceMode: true, state: "review", reason: "insufficient-coverage", candidate, candidateDigest, evidenceDigest, evidence, policy: null, feedback: [] });
+@@ -24,7 +27,7 @@ async function start() {
+     reviewer: { tenantId: "tenant-a", scopes: ["ask", "answer-policy:read", "answer-policy:write"] },
+     foreign: { tenantId: "tenant-b", scopes: ["ask", "answer-policy:read", "answer-policy:write"] },
+   })));
+-  app.use(createAnswerHistoryRouter(createAnswerWorkflow(service, store, async () => true)));
++  app.use(createAnswerHistoryRouter(createAnswerWorkflow(service, store, async () => true), authority));
+   const server = app.listen(0, "127.0.0.1"); await new Promise<void>((r) => server.once("listening", r));
+   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+   const call = async (path: string, key: string | null, body?: unknown) => {
+@@ -34,8 +37,8 @@ async function start() {
+   const close = async () => { server.closeAllConnections(); await new Promise<void>((r, j) => server.close((e) => e ? j(e) : r())); };
+   return { call, close, store, candidateDigest, evidenceDigest };
+ }
+-test("actual history/answer-review endpoints separate candidate access, bind verified tenant and require review write scope", async () => {
+-  const s = await start();
++test("human-authorized history/answer-review endpoints preserve scope, tenant, revision and duplicate boundaries", async () => {
++  const s = await start(fixtureAuthority);
+   try {
+     assert.equal((await s.call("/answer-history", null)).status, 401);
+     assert.equal((await s.call("/answer-reviews", "ask")).status, 403);
+@@ -48,11 +51,72 @@ test("actual history/answer-review endpoints separate candidate access, bind ver
+     assert.deepEqual((await s.call("/answer-history", "foreign")).json.history, []);
+     assert.equal((await s.call("/answer-reviews/run-1/resolve", "reviewer", { ...review, candidateDigest: "forged" })).status, 409);
+     assert.equal((await s.call("/answer-reviews/run-1/resolve", "reviewer", review)).status, 200);
++    assert.equal((await s.store.get("tenant-a", "run-1"))!.review!.by.actor, "human:fixture-reviewer");
+     assert.equal((await s.call("/answer-history/run-1", "ask")).json.result.answer, "Fee is 100.");
+     assert.equal((await s.call("/answer-reviews/run-1/resolve", "reviewer", review)).status, 409);
+     assert.equal((await s.call("/answer-history/run-1/feedback", "foreign", { rating: "helpful", note: "x" })).status, 404);
+     assert.equal((await s.call("/answer-history/run-1/feedback", "ask", { rating: "unhelpful", note: "Need context", tenantId: "tenant-b" })).status, 200);
+-    assert.equal((await s.store.get("tenant-a", "run-1"))!.feedback[0]!.by.actor, "api-key:tenant-a");
++    assert.equal((await s.store.get("tenant-a", "run-1"))!.feedback[0]!.by.actor, "human:fixture-reviewer");
+     assert.equal(await s.store.get("tenant-b", "run-1"), null);
+   } finally { await s.close(); }
+ });
++
++test("API-key scopes and claimed human labels cannot approve, prefer sources or label usefulness without trusted authority", async () => {
++  const s = await start();
++  try {
++    const forged = { kind: "human", actor: "human:Umesh", reviewer: { tenantId: "tenant-a", subject: "Umesh" },
++      decision: "approved", note: "claimed human", rating: "helpful", candidateDigest: s.candidateDigest, evidenceDigest: s.evidenceDigest };
++    for (const path of ["/answer-reviews/run-1/resolve", "/answer-evidence-conflicts/conflict-1/resolve", "/answer-history/run-1/feedback"]) {
++      const denied = await s.call(path, "reviewer", forged);
++      assert.equal(denied.status, 503); assert.equal(denied.json.error, "human_review_unavailable");
++    }
++    assert.equal((await s.call("/answer-reviews/run-1/resolve", "ask", forged)).status, 403);
++    assert.equal((await s.call("/answer-reviews", "reviewer")).status, 200);
++    assert.equal((await s.call("/answer-history", "ask")).status, 200);
++    const run = (await s.store.get("tenant-a", "run-1"))!;
++    assert.equal(run.state, "review"); assert.equal(run.review, undefined); assert.deepEqual(run.feedback, []);
++  } finally { await s.close(); }
++});
++
++test("human verification fails closed on absent, foreign, nonhuman, malformed and unavailable authority", async () => {
++  const deniedAuthorities: Array<{ authority: AnswerReviewAuthority; status: number }> = [
++    { authority: { verifyHuman: async () => null }, status: 403 },
++    { authority: { verifyHuman: async () => ({ kind: "human", tenantId: "tenant-b", subject: "foreign" }) }, status: 403 },
++    { authority: { verifyHuman: async () => ({ kind: "agent", tenantId: "tenant-a", subject: "agent" } as never) }, status: 403 },
++    { authority: { verifyHuman: async () => ({ kind: "human", tenantId: "tenant-a", subject: " " }) }, status: 403 },
++    { authority: { verifyHuman: async () => ({ kind: "human", tenantId: "tenant-a", subject: "bad\nactor" }) }, status: 403 },
++    { authority: { verifyHuman: async () => { throw new Error("private verifier details"); } }, status: 503 },
++  ];
++  for (const { authority, status } of deniedAuthorities) {
++    const s = await start(authority);
++    try {
++      for (const path of ["/answer-reviews/run-1/resolve", "/answer-evidence-conflicts/conflict-1/resolve", "/answer-history/run-1/feedback"]) {
++        const denied = await s.call(path, "reviewer", { decision: "approved", rating: "helpful", note: "reason" });
++        assert.equal(denied.status, status); assert.equal(JSON.stringify(denied.json).includes("private verifier details"), false);
++      }
++      const run = (await s.store.get("tenant-a", "run-1"))!;
++      assert.equal(run.state, "review"); assert.deepEqual(run.feedback, []);
++    } finally { await s.close(); }
++  }
++});
++
++test("trusted human authority receives each action and persists source preference attribution", async () => {
++  const actions: HumanReviewAction[] = [];
++  const s = await start({ verifyHuman: async (req, action) => {
++    actions.push(action); return { kind: "human", tenantId: req.auth!.tenantId, subject: "fixture-human" };
++  } });
++  try {
++    const run = (await s.store.get("tenant-a", "run-1"))!;
++    const reported = await s.call("/answer-history/run-1/conflicts", "ask", { a: run.evidence[0]!.id, b: run.evidence[1]!.id, explanation: "Different quoted fees" });
++    assert.equal(reported.status, 200); assert.deepEqual(actions, []);
++    const conflict = reported.json;
++    const resolved = await s.call(`/answer-evidence-conflicts/${String(conflict.id)}/resolve`, "reviewer", {
++      keepSourceId: run.evidence[0]!.id, evidenceDigest: s.evidenceDigest, note: "Prefer current published fee", actor: "forged" });
++    assert.equal(resolved.status, 200); assert.equal(resolved.json.resolution.by.actor, "human:fixture-human");
++    assert.equal((await s.store.getConflict("tenant-a", String(conflict.id)))!.resolution!.by.actor, "human:fixture-human");
++    assert.equal((await s.call("/answer-history/run-1/feedback", "ask", { rating: "helpful", note: "Source comparison is useful" })).status, 200);
++    // Existing source conflict guards still decide whether review may proceed.
++    assert.equal((await s.call("/answer-reviews/run-1/resolve", "reviewer", { decision: "approved", note: "Checked", candidateDigest: s.candidateDigest, evidenceDigest: s.evidenceDigest })).status, 409);
++    assert.deepEqual(actions, ["source-preference", "usefulness", "answer-review"]);
++  } finally { await s.close(); }
++});
+diff --git a/apps/api/src/answer-policy/answer-router.ts b/apps/api/src/answer-policy/answer-router.ts
+index 98bee259..a1e0db5b 100644
+--- a/apps/api/src/answer-policy/answer-router.ts
++++ b/apps/api/src/answer-policy/answer-router.ts
+@@ -4,6 +4,14 @@ import { requireScope } from "../auth.js";
+ import { AnswerWorkflowError, type AnswerWorkflow } from "./answer-workflow.js";
+ import { PolicyServiceError } from "./service.js";
+ import { PolicyInputError } from "./rules.js";
++import type { Actor } from "./types.js";
++
++export type HumanReviewAction = "answer-review" | "source-preference" | "usefulness";
++/** Server-owned identity verification, never a request's claimed actor or API-key scope. */
++export interface TrustedHumanReviewer { kind: "human"; tenantId: string; subject: string }
++export interface AnswerReviewAuthority {
++  verifyHuman(req: Request, action: HumanReviewAction): Promise<TrustedHumanReviewer | null>;
++}
+ 
+ export function answerWorkflowFailure(res: Response, error: unknown): void {
+   if (error instanceof AnswerWorkflowError) {
+@@ -17,21 +25,34 @@ export function answerWorkflowFailure(res: Response, error: unknown): void {
+   res.status(503).json({ error: "answer_history_unavailable", message: "Answer history or review is unavailable." });
+ }
+ 
+-export function createAnswerHistoryRouter(workflow: AnswerWorkflow): Router {
++export function createAnswerHistoryRouter(workflow: AnswerWorkflow, authority?: AnswerReviewAuthority): Router {
+   const router = Router();
+   const actor = (req: Request) => ({ actor: `api-key:${req.auth!.tenantId}` });
+   const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, res: Response) => {
+     res.setHeader("Cache-Control", "private, no-store");
+     try { res.json(await fn(req)); } catch (error) { answerWorkflowFailure(res, error); }
+   };
++  const human = (action: HumanReviewAction, fn: (req: Request, by: Actor) => Promise<unknown>) => async (req: Request, res: Response) => {
++    res.setHeader("Cache-Control", "private, no-store");
++    if (!authority) { res.status(503).json({ error: "human_review_unavailable", message: "Verified human review is not configured." }); return; }
++    let reviewer: TrustedHumanReviewer | null;
++    try { reviewer = await authority.verifyHuman(req, action); }
++    catch { res.status(503).json({ error: "human_review_unavailable", message: "Verified human review is unavailable." }); return; }
++    if (!reviewer || reviewer.kind !== "human" || reviewer.tenantId !== req.auth!.tenantId
++      || typeof reviewer.subject !== "string" || !reviewer.subject.trim() || reviewer.subject !== reviewer.subject.trim()
++      || reviewer.subject.length > 200 || /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/.test(reviewer.subject)) {
++      res.status(403).json({ error: "human_review_required", message: "This action requires an authorized human reviewer in this tenant." }); return;
++    }
++    try { res.json(await fn(req, { actor: `human:${reviewer.subject}` })); } catch (error) { answerWorkflowFailure(res, error); }
++  };
+   router.get("/answer-history", requireScope("ask"), handle(async (req) => ({ history: await workflow.history(req.auth!.tenantId) })));
+   router.get("/answer-history/suggestions", requireScope("ask"), handle(async (req) => ({ questions: await workflow.suggestions(req.auth!.tenantId) })));
+   router.get("/answer-history/:runId", requireScope("ask"), handle(async (req) => workflow.get(req.auth!.tenantId, String(req.params.runId))));
+-  router.post("/answer-history/:runId/feedback", requireScope("ask"), handle(async (req) => workflow.feedback(req.auth!.tenantId, String(req.params.runId), req.body, actor(req))));
++  router.post("/answer-history/:runId/feedback", requireScope("ask"), human("usefulness", async (req, by) => workflow.feedback(req.auth!.tenantId, String(req.params.runId), req.body, by)));
+   router.post("/answer-history/:runId/conflicts", requireScope("ask"), handle(async (req) => workflow.reportConflict(req.auth!.tenantId, String(req.params.runId), req.body, actor(req))));
+   router.get("/answer-reviews", requireScope("answer-policy:read"), handle(async (req) => ({ items: await workflow.queue(req.auth!.tenantId) })));
+-  router.post("/answer-reviews/:runId/resolve", requireScope("answer-policy:write"), handle(async (req) => workflow.review(req.auth!.tenantId, String(req.params.runId), req.body, actor(req))));
++  router.post("/answer-reviews/:runId/resolve", requireScope("answer-policy:write"), human("answer-review", async (req, by) => workflow.review(req.auth!.tenantId, String(req.params.runId), req.body, by)));
+   router.get("/answer-evidence-conflicts", requireScope("answer-policy:read"), handle(async (req) => ({ conflicts: await workflow.conflicts(req.auth!.tenantId) })));
+-  router.post("/answer-evidence-conflicts/:conflictId/resolve", requireScope("answer-policy:write"), handle(async (req) => workflow.resolveConflict(req.auth!.tenantId, String(req.params.conflictId), req.body, actor(req))));
++  router.post("/answer-evidence-conflicts/:conflictId/resolve", requireScope("answer-policy:write"), human("source-preference", async (req, by) => workflow.resolveConflict(req.auth!.tenantId, String(req.params.conflictId), req.body, by)));
+   return router;
+ }
+diff --git a/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx b/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx
+index 4f589e17..6f97867d 100644
+--- a/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx
++++ b/apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx
+@@ -29,7 +29,12 @@ export function KnowledgeOutputsPage(): React.ReactElement {
+       .finally(() => { if (stamp === generation.current) setLoading(false); });
+     return () => { generation.current++; };
+   }, [apiKey, sessionVersion]);
+-  function show(next: KnowledgeOutputDraft): void { setDraft(next); setEditTitle(next.title); setEdits({}); setEditing(false); }
++  function show(next: KnowledgeOutputDraft): void {
++    setDraft(next); setEditTitle(next.title); setEdits({}); setEditing(false);
++    setOutputs((saved) => saved.map((output) => output.id === next._id
++      ? { id: next._id, title: next.title, kind: next.kind, revision: next.revision, updatedAt: next.updatedAt }
++      : output).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)));
++  }
+   async function action(fn: () => Promise<void>): Promise<void> {
+     if (busy) return;
+     setBusy(true); setError(null);
+diff --git a/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx b/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx
+index 7fbbdeaf..bc3caa13 100644
+--- a/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx
++++ b/apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx
+@@ -52,14 +52,17 @@ test("UI creates, cites, saves, reopens, revalidates and exports through authent
+     assert.equal(screen.getByRole("link", { name: /speaker:1/u }).getAttribute("href"), "/sessions/s1#turn-t1");
+     assert.match(screen.getByText(/Model grounding assessment completed/u).textContent ?? "", /human review required/u);
+     fireEvent.click(screen.getByRole("button", { name: "Edit draft" }));
++    fireEvent.change(screen.getByLabelText("Draft title"), { target: { value: "Updated admissions FAQ" } });
+     fireEvent.change(screen.getByLabelText("Edit faq-1 (saved edits need revalidation)"), { target: { value: "Q: When do applications open?\nA: Applications open Monday." } });
+     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+     await screen.findByText("Item withheld — needs grounding review.");
++    assert.match(screen.getByRole("button", { name: "Updated admissions FAQ" }).closest("li")?.textContent ?? "", /revision 2/u);
+     assert.equal((screen.getByRole("button", { name: "Download Markdown" }) as HTMLButtonElement).disabled, true);
+     fireEvent.click(screen.getByRole("button", { name: "Revalidate grounding" }));
+     await waitFor(() => assert.equal((screen.getByRole("button", { name: "Download Markdown" }) as HTMLButtonElement).disabled, false));
++    assert.match(screen.getByRole("button", { name: "Updated admissions FAQ" }).closest("li")?.textContent ?? "", /revision 3/u);
+     fireEvent.click(screen.getByRole("button", { name: "Download Markdown" })); await waitFor(() => assert.equal(downloads, 1));
+-    fireEvent.click(screen.getByRole("button", { name: "Admissions FAQ" }));
++    fireEvent.click(screen.getByRole("button", { name: "Updated admissions FAQ" }));
+     await waitFor(() => assert.ok(requests.some((r) => r.url === "/knowledge-outputs/o1" && r.method === "GET")));
+     assert.ok(requests.some((r) => r.method === "PUT")); assert.ok(requests.some((r) => r.url.endsWith("/revalidate")));
+   } finally {
+diff --git a/apps/web/src/pages/knowledge/CuratedCollections.test.tsx b/apps/web/src/pages/knowledge/CuratedCollections.test.tsx
+index 14a987b8..bf7deea7 100644
+--- a/apps/web/src/pages/knowledge/CuratedCollections.test.tsx
++++ b/apps/web/src/pages/knowledge/CuratedCollections.test.tsx
+@@ -33,3 +33,26 @@ test("lost create response retries the same stable draft id instead of creating
+   expect(await screen.findByRole("alert")).toHaveTextContent("response lost"); fireEvent.click(screen.getByRole("button", { name: "Save collection" }));
+   await vi.waitFor(() => expect(paths.length).toBe(2)); expect(paths[0]).toBe(paths[1]);
+ });
++
++test.each([false, true])("editing preserves saved members outside bounded choices unless explicitly removed (remove=%s)", async remove => {
++  const id = "b".repeat(64);
++  const members = [{ kind: "document", id: "outside-window", available: true }, { kind: "topic", id: "visible-topic", available: true }];
++  fetchMock.mockImplementation((url: string, opts: RequestInit) => Promise.resolve(reply(opts.method === "PUT"
++    ? { ...JSON.parse(opts.body as string), id, revision: 5 }
++    : url.endsWith("/members") ? { members: [{ kind: "topic", id: "visible-topic", title: "Visible topic" }], truncated: true }
++      : { collections: [{ id, title: "Saved", revision: 4, updatedAt: "now", members }], truncated: false })));
++  mount(); await screen.findByRole("heading", { name: "Saved" });
++  fireEvent.click(screen.getByRole("button", { name: "Edit collection" }));
++  const outside = screen.getByRole("checkbox", { name: "outside-window · document" });
++  expect(outside).toBeChecked(); expect(screen.getByRole("checkbox", { name: "Visible topic · topic" })).toBeChecked();
++  expect(screen.getByText(/They remain selected unless you remove them/)).toBeInTheDocument();
++  if (remove) fireEvent.click(outside);
++  fireEvent.change(screen.getByLabelText("Collection title"), { target: { value: "Renamed" } });
++  fireEvent.click(screen.getByRole("button", { name: "Save collection" }));
++  await vi.waitFor(() => expect(fetchMock.mock.calls.some(([, opts]) => opts.method === "PUT")).toBe(true));
++  const [path, opts] = fetchMock.mock.calls.find(([, opts]) => opts.method === "PUT")!;
++  expect(path).toContain(`/knowledge/collections/${id}`);
++  expect(JSON.parse(opts.body)).toEqual({ title: "Renamed", expectedRevision: 4, members: remove
++    ? [{ kind: "topic", id: "visible-topic" }]
++    : [{ kind: "document", id: "outside-window" }, { kind: "topic", id: "visible-topic" }] });
++});
+diff --git a/apps/web/src/pages/knowledge/CuratedCollections.tsx b/apps/web/src/pages/knowledge/CuratedCollections.tsx
+index d47e18f8..efd5ba5c 100644
+--- a/apps/web/src/pages/knowledge/CuratedCollections.tsx
++++ b/apps/web/src/pages/knowledge/CuratedCollections.tsx
+@@ -24,7 +24,13 @@ export function CuratedCollections(): React.ReactElement {
+     catch (e) { if (viewRef.current === view) setAction({ key, authSession: sessionVersion, busy: false, error: e instanceof Error ? e.message : "The collection could not be saved." }); }
+   };
+   const busy = action?.key === apiKey && action.authSession === sessionVersion && action.busy;
+-  const choices = new Map(cur?.members.map(m => [memberKey(m), m]) ?? []);
++  const memberChoices: MemberChoice[] = [...(cur?.members ?? [])];
++  // The bounded chooser is not the saved membership authority. Keep available saved
++  // members editable even when they fall outside its returned window.
++  for (const m of editing?.members ?? []) {
++    if (m.available === true && !memberChoices.some(choice => memberKey(choice) === memberKey(m))) memberChoices.push({ ...m, title: m.id });
++  }
++  const choices = new Map(memberChoices.map(m => [memberKey(m), m]));
+   const selectedMembers = selected.map(k => choices.get(k)).filter((m): m is MemberChoice => Boolean(m));
+   return <div style={{ overflowWrap: "anywhere", maxWidth: "100%" }}><h1>Saved curated collections</h1><p>Choose the exact tenant-owned records to keep together. Saved membership is separate from derived month and topic filters.</p>
+     {!apiKey ? <p>Sign in to view collections.</p> : <>
+@@ -38,14 +44,14 @@ export function CuratedCollections(): React.ReactElement {
+           {c.unavailableMembers && <p>Some saved records are unavailable. Refresh before editing this collection.</p>}
+           <ul>{c.members.map(m => { const href = savedMemberHref(m); const label = choices.get(memberKey(m))?.title ?? m.id;
+             return <li key={memberKey(m)}>{href ? <Link to={href}>{label}</Link> : <span>{label}</span>} · {m.kind}{!m.available ? " · Record unavailable" : !href ? " · Profile mapping unavailable" : ""}</li>; })}</ul>
+-          <button type="button" disabled={busy || c.unavailableMembers} onClick={() => { edit(c); setTitle(c.title); select(c.members.filter(m => m.available && choices.has(memberKey(m))).map(memberKey)); }}>Edit collection</button>
++          <button type="button" disabled={busy || c.unavailableMembers} onClick={() => { edit(c); setTitle(c.title); select(c.members.filter(m => m.available).map(memberKey)); }}>Edit collection</button>
+           <button type="button" disabled={busy} onClick={() => void run(() => deleteSavedCollection(apiKey, c))}>Delete collection</button>
+         </article>)}
+         <form onSubmit={e => { e.preventDefault(); if (selectedMembers.length !== selected.length) return; const id = editing?.id ?? draftId.current; void run(() => writeSavedCollection(apiKey, id, title.trim(), selectedMembers, editing?.revision ?? 0)); }}>
+           <h2>{editing ? `Edit ${editing.title}` : "Create a collection"}</h2>
+-          {editing && editing.members.some(m => !m.available || !choices.has(memberKey(m))) && <p role="status">Some saved members are unavailable or outside the returned choices. Saving this edit removes those members.</p>}
++          {editing && editing.members.some(m => m.available === true && !cur.members.some(choice => memberKey(choice) === memberKey(m))) && <p role="status">Some saved members are outside the returned choices. They remain selected unless you remove them.</p>}
+           <label>Collection title <input required maxLength={200} value={title} onChange={e => setTitle(e.target.value)} style={{ maxWidth: "100%" }} /></label>
+-          <fieldset><legend>Members (up to 100)</legend>{cur.members.map(m => <label key={memberKey(m)} style={{ display: "block" }}>
++          <fieldset><legend>Members (up to 100)</legend>{memberChoices.map(m => <label key={memberKey(m)} style={{ display: "block" }}>
+             <input type="checkbox" checked={selected.includes(memberKey(m))} disabled={busy || (!selected.includes(memberKey(m)) && selected.length >= 100)} onChange={e => select(s => e.target.checked ? [...s, memberKey(m)] : s.filter(k => k !== memberKey(m)))} />{m.title} · {m.kind}</label>)}</fieldset>
+           <button disabled={busy || !title.trim() || selected.length > 100}>Save collection</button>
+           {editing && <button type="button" onClick={() => { edit(null); setTitle(""); select([]); draftId.current = crypto.randomUUID(); }}>Cancel edit</button>}
+diff --git a/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx b/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx
+index 7faf3ab6..002c5882 100644
+--- a/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx
++++ b/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx
+@@ -1,4 +1,4 @@
+-import { render, screen, cleanup } from "@testing-library/react";
++import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+ import { beforeEach, afterEach, expect, test, vi } from "vitest";
+ import { MemoryRouter, Routes, Route } from "react-router-dom";
+ import { AuthProvider } from "../../../auth/AuthContext.js";
+@@ -18,6 +18,52 @@ const profile = { personId: "person:anita", aliases: ["Anita"], identityStatus:
+   attribution: [{ sessionId: "s", speakerRef: "spk:0", startTurnIndex: 4, endTurnIndex: 4, turnIds: ["t"] }], withheld: { claims: 1, identityEvidence: 0, blocks: 1, profileFields: 2 } };
+ beforeEach(() => { mock.mockReset(); vi.stubGlobal("fetch", mock); localStorage.setItem("lkbApiKey", "k"); });
+ afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); });
++
++test("mounted speaker workbench consumes trusted source and submits a pending proposal with hashed evidence", async () => {
++  vi.stubGlobal("crypto", { randomUUID: () => "00000000-0000-4000-8000-000000000001" });
++  const revision = "a".repeat(64), evidence = { sessionId: "s", turnId: "t", quote: "First source", transcriptHash: "b".repeat(64) };
++  const source = { personId: profile.personId, capabilities: { canPropose: true, canReview: true, reviewerKind: "human" }, sourceRevisionDigest: revision,
++    statements: [{ id: "claim:a", text: "First claim", evidence: [evidence] }, { id: "claim:b", text: "Second claim", evidence: [{ ...evidence, turnId: "t2", quote: "Second source" }] }] };
++  mock.mockImplementation((url: string, options: RequestInit) => Promise.resolve({ ok: true, status: options.method === "POST" ? 201 : 200, json: async () =>
++    options.method === "POST" ? { relationship: { id: "rel:new", revision: 1, status: "suggested", replayed: false } } :
++    url.includes("/speaker-relations/source?") ? source : url.includes("/speaker-relations?") ? { relationships: [] } : url.includes("/speaker-profiles/") ? { profile } : { members: [], truncated: false } }));
++  render(<MemoryRouter initialEntries={["/knowledge/speakers/person%3Aanita"]}><AuthProvider><Routes><Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} /></Routes></AuthProvider></MemoryRouter>);
++  await screen.findAllByRole("option", { name: "First claim" });
++  expect(mock.mock.calls.some(([url]) => String(url).includes("/speaker-relations/source?personId=person%3Aanita"))).toBe(true);
++  fireEvent.change(screen.getByLabelText("From claim"), { target: { value: "claim:a" } }); fireEvent.change(screen.getByLabelText("To claim"), { target: { value: "claim:b" } });
++  fireEvent.click(screen.getByRole("checkbox", { name: "First source" })); fireEvent.click(screen.getByRole("button", { name: "Submit proposal for human review" }));
++  await screen.findByText("Proposal saved for human review. It is not an accepted relationship.");
++  const post = mock.mock.calls.find(([, options]) => options.method === "POST")!;
++  expect(JSON.parse(post[1].body)).toEqual({ id: "proposal:00000000-0000-4000-8000-000000000001", personId: profile.personId, fromClaimId: "claim:a", toClaimId: "claim:b", type: "agrees_with", evidence: [evidence], sourceRevisionDigest: revision });
++  expect(mock.mock.calls.filter(([url]) => String(url).includes("/speaker-relations/source?")).length).toBeGreaterThanOrEqual(2);
++});
++
++test.each([403, 503])("mounted speaker workbench refuses unavailable source bootstrap %s", async status => {
++  mock.mockImplementation((url: string) => Promise.resolve({ ok: !url.includes("/speaker-relations/source?"), status: url.includes("/speaker-relations/source?") ? status : 200, json: async () => url.includes("/speaker-relations/source?") ? { error: "speaker_relationship_unavailable" } : url.includes("/speaker-relations?") ? { relationships: [] } : url.includes("/speaker-profiles/") ? { profile } : { members: [], truncated: false } }));
++  render(<MemoryRouter initialEntries={["/knowledge/speakers/person%3Aanita"]}><AuthProvider><Routes><Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} /></Routes></AuthProvider></MemoryRouter>);
++  await screen.findByText(/Relationship actions unavailable:/); expect(screen.queryByRole("button", { name: "Submit proposal for human review" })).toBeNull(); expect(screen.queryByRole("button", { name: "Accept relationship" })).toBeNull();
++});
++
++test("mounted speaker workbench never infers review authority from profile identity or malformed capabilities", async () => {
++  mock.mockImplementation((url: string) => Promise.resolve({ ok: true, status: 200, json: async () => url.includes("/speaker-relations/source?") ? { personId: profile.personId, sourceRevisionDigest: "a".repeat(64), capabilities: { reviewerKind: "human" }, statements: [] } : url.includes("/speaker-relations?") ? { relationships: [] } : url.includes("/speaker-profiles/") ? { profile: { ...profile, identityStatus: "human-confirmed" } } : { members: [], truncated: false } }));
++  render(<MemoryRouter initialEntries={["/knowledge/speakers/person%3Aanita"]}><AuthProvider><Routes><Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} /></Routes></AuthProvider></MemoryRouter>);
++  await screen.findByText("Identity: human-confirmed"); await screen.findByText(/Relationship actions unavailable:/); expect(screen.getByText(/Human review unavailable/)).toBeInTheDocument(); expect(screen.queryByRole("button", { name: "Submit proposal for human review" })).toBeNull();
++});
++test("speaker UI requests bounded vectorless evidence on demand and links exact passage", async () => {
++  const revision = "a".repeat(64);
++  mock.mockImplementation((url: string) => Promise.resolve({ ok: true, status: 200, json: async () => url.includes("/knowledge?q=") ? {
++    knowledge: { personId: "person:anita", identityStatus: "human-confirmed", ambiguity: null, revision, nodes: [{ id: "session:s", kind: "session", label: "Source session" }], edges: [], statements: [{ id: "c", text: "Visa advice", topicIds: [], evidence: [cite] }], withheldRelationships: 0 },
++    retrieval: { revision, truncated: false, passages: [{ ...cite, quote: "Prepare visa documents early." }] },
++  } : url.includes("/speaker-profiles/") ? { profile } : { members: [], truncated: false } }));
++  render(<MemoryRouter initialEntries={["/knowledge/speakers/person%3Aanita"]}><AuthProvider><Routes><Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} /></Routes></AuthProvider></MemoryRouter>);
++  await screen.findByText("Identity: deterministic");
++  expect(mock.mock.calls.some(([url]) => String(url).includes("/knowledge?q="))).toBe(false);
++  fireEvent.change(screen.getByLabelText("Question or topic"), { target: { value: "visa ki advice" } });
++  fireEvent.click(screen.getByRole("button", { name: "Find source passages" }));
++  expect(await screen.findByText("Prepare visa documents early.")).toBeInTheDocument();
++  expect(screen.getByText("1 source-backed statements · 1 sessions · 0 topics")).toBeInTheDocument();
++  expect(mock.mock.calls.some(([url]) => String(url).includes("q=visa%20ki%20advice"))).toBe(true);
++});
+ test("actual speaker UI consumes U24 shape and displays conservative identity, ambiguity, confidence, field absence and exact block", async () => {
+   mock.mockImplementation((url: string) => Promise.resolve({ ok: true, status: 200, json: async () => url.includes("/speaker-profiles/") ? { profile } : { members: [{ kind: "speaker", id: "speaker-row", personId: "person:anita", title: "Recorded alias" }], truncated: false } }));
+   render(<MemoryRouter initialEntries={["/knowledge/speakers/person%3Aanita"]}><AuthProvider><Routes><Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} /></Routes></AuthProvider></MemoryRouter>);
+diff --git a/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx b/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx
+index 6b936c18..4d4776c8 100644
+--- a/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx
++++ b/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx
+@@ -2,10 +2,72 @@ import { useEffect, useState } from "react";
+ import { Link, useParams } from "react-router-dom";
+ import { useAuth } from "../../../auth/AuthContext.js";
+ import { getCollectionMembers, type MemberChoice } from "../collectionsClient.js";
+-import { loadCitedSpeakerProfile, type CitedSpeakerProfile, type SpeakerCitation } from "./speakerProfileClient.js";
++import { loadCitedSpeakerProfile, loadSpeakerKnowledge, type SpeakerKnowledgeResponse, type CitedSpeakerProfile, type SpeakerCitation } from "./speakerProfileClient.js";
++import { apiFetch, ApiError } from "../../../api/client.js";
++import { SpeakerRelationWorkbench, type SpeakerRelationAuthority } from "../speaker-relations/SpeakerRelationWorkbench.js";
++
++const relationObject = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
++const relationId = (v: unknown): v is string => typeof v === "string" && /^[A-Za-z0-9][A-Za-z0-9:._@-]{0,199}$/.test(v);
++const relationHash = (v: unknown): v is string => typeof v === "string" && /^[a-f0-9]{64}$/.test(v);
++/** Validate the authenticated bootstrap; profile confidence/identity never substitutes for capability. */
++function relationAuthority(value: unknown, personId: string): SpeakerRelationAuthority {
++  if (!relationObject(value) || value.personId !== personId || !relationObject(value.capabilities) ||
++    typeof value.capabilities.canPropose !== "boolean" || typeof value.capabilities.canReview !== "boolean" ||
++    !["human", "automation"].includes(value.capabilities.reviewerKind as string) || !relationHash(value.sourceRevisionDigest) ||
++    !Array.isArray(value.statements) || !value.statements.every(c => relationObject(c) && relationId(c.id) && typeof c.text === "string" &&
++      Array.isArray(c.evidence) && c.evidence.length > 0 && c.evidence.every(e => relationObject(e) && relationId(e.sessionId) && relationId(e.turnId) && typeof e.quote === "string" && !!e.quote.trim() && e.quote.length <= 12000 && relationHash(e.transcriptHash))) ||
++    new Set(value.statements.map(c => c.id)).size !== value.statements.length) throw new ApiError(503, "Invalid relationship source bootstrap.");
++  return { personId, canPropose: value.capabilities.canPropose, canReview: value.capabilities.canReview,
++    reviewerKind: value.capabilities.reviewerKind as "human" | "automation", sourceRevisionDigest: value.sourceRevisionDigest,
++    claims: value.statements as NonNullable<SpeakerRelationAuthority["claims"]> };
++}
++function SpeakerRelationships({ apiKey, personId, authSession }: { apiKey: string; personId: string; authSession: number }): React.ReactElement {
++  const [generation, refresh] = useState(0);
++  const [source, setSource] = useState<{ generation: number; authority: SpeakerRelationAuthority } | null>(null);
++  const [error, setError] = useState("");
++  const current = source?.generation === generation ? source.authority : null;
++  useEffect(() => {
++    let cancelled = false; setSource(null); setError("");
++    apiFetch<unknown>(`/speaker-relations/source?personId=${encodeURIComponent(personId)}`, apiKey)
++      .then(value => { const authority = relationAuthority(value, personId); if (!cancelled) setSource({ generation, authority }); })
++      .catch(e => { if (!cancelled) setError(e instanceof ApiError && e.status === 403 ? "Relationship actions unavailable: the server refused source access." : "Relationship actions unavailable: current source evidence or server capabilities could not be loaded."); });
++    return () => { cancelled = true; };
++  }, [apiKey, personId, authSession, generation]);
++  return <section aria-label="Speaker relationship source">
++    <button type="button" onClick={() => refresh(n => n + 1)}>Refresh relationship source</button>
++    {!current && !error && <p role="status">Loading current relationship source…</p>}{error && <p role="alert">{error}</p>}
++    <SpeakerRelationWorkbench apiKey={apiKey} personId={personId} authSession={authSession} authority={current} onChanged={() => refresh(n => n + 1)} />
++  </section>;
++}
+ function Evidence({ values }: { values: SpeakerCitation[] }): React.ReactElement {
+   return <ul>{values.map((c, i) => <li key={i}><blockquote>{c.quote}</blockquote><Link to={`/sessions/${encodeURIComponent(c.sessionId)}#turn-${encodeURIComponent(c.turnId)}`}>{c.sessionTitle} · {c.tStart}s</Link></li>)}</ul>;
+ }
++
++function SpeakerKnowledge({ apiKey, personId }: { apiKey: string; personId: string }): React.ReactElement {
++  const [query, setQuery] = useState(""); const [request, setRequest] = useState<{ query: string } | null>(null);
++  const [result, setResult] = useState<SpeakerKnowledgeResponse | null>(null); const [error, setError] = useState("");
++  const [loading, setLoading] = useState(false);
++  useEffect(() => {
++    if (request === null) return;
++    let cancelled = false; setLoading(true); setResult(null); setError("");
++    loadSpeakerKnowledge(apiKey, personId, request.query).then(value => { if (!cancelled) setResult(value); })
++      .catch(e => { if (!cancelled) setError(e instanceof Error ? e.message : "Speaker knowledge unavailable."); })
++      .finally(() => { if (!cancelled) setLoading(false); });
++    return () => { cancelled = true; };
++  }, [apiKey, personId, request]);
++  return <section aria-label="Speaker knowledge"><h3>Explore speaker knowledge</h3>
++    <p>Search this speaker’s source-backed statements and connected sessions/topics. Suggested identities do not establish speaker ownership.</p>
++    <form onSubmit={e => { e.preventDefault(); setRequest({ query }); }}><label>Question or topic <input value={query} maxLength={2000} onChange={e => setQuery(e.target.value)} /></label> <button type="submit">Find source passages</button></form>
++    {loading && <p role="status">Loading speaker knowledge…</p>}{error && <p role="alert">{error}</p>}
++    {result && <><p>{result.knowledge.statements.length} source-backed statements · {result.knowledge.nodes.filter(n => n.kind === "session").length} sessions · {result.knowledge.nodes.filter(n => n.kind === "topic").length} topics</p>
++      {result.knowledge.identityStatus === "unresolved" && <p>Identity unresolved; no trusted individual knowledge is available.</p>}
++      {result.knowledge.ambiguity && <p>Same-name ambiguity remains; these sessions may involve different people.</p>}
++      {!result.retrieval.passages.length && <p>No matching source passages.</p>}<Evidence values={result.retrieval.passages} />
++      {result.retrieval.truncated && <p>Results are bounded; refine the topic for more specific passages.</p>}
++      <p>Knowledge revision: <code>{result.knowledge.revision}</code></p>
++    </>}
++  </section>;
++}
+ type Data = { key: string; authSession: number; id?: string; generation: number; speakers: MemberChoice[]; profile?: CitedSpeakerProfile; truncated: boolean; error?: string };
+ export function KnowledgeSpeakerProfilePage(): React.ReactElement {
+   const { apiKey, sessionVersion } = useAuth(); const { personId } = useParams(); const [generation, refresh] = useState(0); const [data, setData] = useState<Data | null>(null);
+@@ -26,6 +88,8 @@ export function KnowledgeSpeakerProfilePage(): React.ReactElement {
+         {!cur.speakers.length && <p>No recorded speaker entries.</p>}
+         {p && <article aria-label="Cited speaker profile"><h2>{p.identityStatus === "unresolved" ? "Unresolved speaker" : p.aliases.join(" / ") || p.personId}</h2>
+           <p>Identity: {p.identityStatus}</p>{p.recordedConfidence !== null && <p>Recorded confidence: {p.recordedConfidence}</p>}
++          <SpeakerKnowledge key={`${sessionVersion}:${apiKey}:${generation}:${personId}`} apiKey={apiKey} personId={p.personId} />
++          <SpeakerRelationships key={JSON.stringify([sessionVersion, apiKey, generation, p.personId])} apiKey={apiKey} personId={p.personId} authSession={sessionVersion} />
+           {p.recordedConfidence !== null && p.recordedConfidence < 1 && <p>This recorded confidence is below certainty; it does not confirm identity.</p>}
+           {p.ambiguity && <p role="status">Same-name ambiguity across {p.ambiguity.sessionIds.length} sessions. This profile may combine people; do not treat it as a confirmed single identity.</p>}
+           <h3>Identity evidence</h3>{!p.identityEvidence.length && <p>No accepted identity evidence.</p>}<Evidence values={p.identityEvidence} />
+diff --git a/apps/web/src/pages/operations/OperationsPage.tsx b/apps/web/src/pages/operations/OperationsPage.tsx
+index d02783be..b747a5ff 100644
+--- a/apps/web/src/pages/operations/OperationsPage.tsx
++++ b/apps/web/src/pages/operations/OperationsPage.tsx
+@@ -9,6 +9,7 @@ import { loadNotifications, type NotificationsResponse } from "../notifications/
+ import { explorerUrl, operationUrl, operationViews, readOperationSessions, readOperationView, sessionsForView, viewLabels, type OperationSession, type OperationView } from "./operationsModel.js";
+ import { loadSavedViews, persistSavedViews } from "./savedViews.js";
+ import { SourceHealthPanel } from "./SourceHealthPanel.js";
++import { EvaluationFlywheelPanel } from "./EvaluationFlywheelPanel.js";
+ import { OperationsIntegrationsPanel } from "../operations-integrations/OperationsIntegrationsPanel.js";
+ type Panel<T> = { state: "loading" } | { state: "error"; message: string } | { state: "ok"; data: T };
+ const loading = { state: "loading" } as const;
+@@ -37,6 +38,7 @@ function OperationsSnapshot({ apiKey, view }: { apiKey: string; view: OperationV
+   return <>
+     <SourceHealthPanel apiKey={apiKey} />
+     <OperationsIntegrationsPanel apiKey={apiKey} />
++    <EvaluationFlywheelPanel apiKey={apiKey} />
+     <section className="card" aria-label="Session worklist"><h2>Session worklist</h2>
+       <p>Ready means transcription and index are both done. Needs attention means a failed stage or an unknown status. Processing means a known stage is processing; pending work stays in All sessions.</p>
+       <PanelBody panel={sessions}>{rows => {
+diff --git a/apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx b/apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx
+index 80f09a4b..bfe30d1f 100644
+--- a/apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx
++++ b/apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx
+@@ -1,7 +1,7 @@
+-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
++import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+ import { MemoryRouter } from "react-router-dom";
+ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+-import { AuthProvider } from "../../auth/AuthContext.js";
++import { AuthProvider, useAuth } from "../../auth/AuthContext.js";
+ import { NavSidebar } from "../../layout/NavSidebar.js";
+ import appSource from "../../App.tsx?raw";
+ import { SetupWizardPage } from "./SetupWizardPage.js";
+@@ -34,7 +34,7 @@ beforeEach(() => { localStorage.setItem("lkbApiKey", "k1"); fetchMock.mockReset(
+ afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); });
+ 
+ describe("Setup wizard: item states", () => {
+-  test("all healthy: every checkable item is Ready; scopes and Google stay Unknown with an action", async () => {
++  test("configured integrations: checkable items Ready; runtime readiness, scopes and Google remain Unknown", async () => {
+     route(); renderPage();
+     expect(screen.getByText("Running setup checks…")).toBeInTheDocument();
+     for (const id of ["api", "db", "key", "gemini", "tavily", "langfuse", "join-rules", "sources"]) expect((await item(id)).dataset.status).toBe("ok");
+@@ -46,6 +46,10 @@ describe("Setup wizard: item states", () => {
+     const google = await item("google");
+     expect(google.dataset.status).toBe("unknown");
+     expect(google.textContent).toContain("gws auth status");
++    const readiness = await item("ai-readiness");
++    expect(readiness.dataset.status).toBe("unknown");
++    expect(readiness.textContent).toContain("do not test model access");
++    expect((await item("gemini")).textContent).toContain("does not verify a working provider or model");
+   });
+ 
+   test("API unreachable: api is a Problem with a start command, db/key unknown, nothing claimed", async () => {
+@@ -85,12 +89,14 @@ describe("Setup wizard: item states", () => {
+     await screen.findByText("Sign in with an API key to run the setup checks.");
+   });
+ 
+-  test("integrations not configured: Gemini is a Problem, Tavily and Langfuse optional To do, each with an env action", async () => {
++  test("missing integrations are optional To do and cannot establish AI unavailability", async () => {
+     route({ "/setup/status": { status: 200, body: { configured: { gemini: false, tavily: false, langfuse: false } } } });
+     renderPage();
+     const g = await item("gemini");
+-    expect(g.dataset.status).toBe("problem");
++    expect(g.dataset.status).toBe("todo");
+     expect(g.textContent).toContain("GEMINI_API_KEY");
++    expect(g.textContent).toContain("Other configured providers may support AI jobs");
++    expect(g.textContent).not.toContain("summaries are unavailable");
+     expect((await item("tavily")).dataset.status).toBe("todo");
+     expect((await item("tavily")).textContent).toContain("TAVILY_API_KEY");
+     const lf = await item("langfuse");
+@@ -174,6 +180,83 @@ describe("Setup wizard: no secrets, only existing read endpoints", () => {
+   });
+ });
+ 
++function LoginControls(): React.ReactElement {
++  const auth = useAuth();
++  return <>
++    <button onClick={() => auth.setApiKey("k1")}>Same-key login</button>
++    <button onClick={() => { auth.clearApiKey(); auth.setApiKey("k1"); }}>Logout and login</button>
++    <button onClick={() => auth.clearApiKey()}>Logout</button>
++  </>;
++}
++
++// Hold only the status read; every snapshot still exercises all four real client reads.
++function holdStatusReads() {
++  route();
++  const normal = fetchMock.getMockImplementation()!;
++  const pending: Array<(reply: { status: number; body: unknown }) => void> = [];
++  fetchMock.mockImplementation((url: string, options: unknown) => {
++    if (!String(url).endsWith("/system-status")) return normal(url, options);
++    return new Promise((resolve) => pending.push(({ status, body }) => resolve({
++      ok: status < 400, status, headers: new Headers(), json: async () => body,
++    })));
++  });
++  return pending;
++}
++
++describe("Setup wizard: login and refresh ownership", () => {
++  const renderWithControls = () => render(<AuthProvider><LoginControls /><SetupWizardPage /></AuthProvider>);
++  const settle = async (resolve: (reply: { status: number; body: unknown }) => void, status: number, db = "ok") => {
++    await act(async () => { resolve({ status, body: { db } }); });
++  };
++
++  test("a completed checklist is immediately hidden on same-key login, then freshly read", async () => {
++    const pending = holdStatusReads(); renderWithControls();
++    await settle(pending[0]!, 200);
++    expect((await item("db")).dataset.status).toBe("ok");
++    fireEvent.click(screen.getByRole("button", { name: "Same-key login" }));
++    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
++    expect(screen.getByRole("status")).toHaveTextContent("Running setup checks");
++    expect(pending).toHaveLength(2);
++    await settle(pending[1]!, 200, "error");
++    expect((await item("db")).dataset.status).toBe("problem");
++    expect(fetchMock).toHaveBeenCalledTimes(8);
++  });
++
++  test("old success cannot fill a new same-key login's pending checklist", async () => {
++    const pending = holdStatusReads(); renderWithControls();
++    fireEvent.click(screen.getByRole("button", { name: "Logout and login" }));
++    expect(pending).toHaveLength(2);
++    await settle(pending[0]!, 200);
++    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
++    await settle(pending[1]!, 200, "error");
++    expect((await item("db")).dataset.status).toBe("problem");
++  });
++
++  test("old 401 cannot sign out or replace the later same-key login", async () => {
++    const pending = holdStatusReads(); renderWithControls();
++    fireEvent.click(screen.getByRole("button", { name: "Logout and login" }));
++    await settle(pending[1]!, 200);
++    expect((await item("db")).dataset.status).toBe("ok");
++    await settle(pending[0]!, 401);
++    expect(screen.getByTestId("item-db").dataset.status).toBe("ok");
++    expect(localStorage.getItem("lkbApiKey")).toBe("k1");
++    expect(screen.queryByText("Sign in with an API key to run the setup checks.")).not.toBeInTheDocument();
++  });
++
++  test("logout hides a loaded checklist and late responses cannot restore it", async () => {
++    const pending = holdStatusReads(); renderWithControls();
++    await settle(pending[0]!, 200);
++    await item("db");
++    fireEvent.click(screen.getByRole("button", { name: "Re-check" }));
++    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
++    fireEvent.click(screen.getByRole("button", { name: "Logout" }));
++    await settle(pending[1]!, 200);
++    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
++    expect(screen.getByText("Sign in with an API key to run the setup checks.")).toBeInTheDocument();
++    expect(fetchMock).toHaveBeenCalledTimes(8);
++  });
++});
++
+ describe("Setup wizard: route and nav", () => {
+   test("App registers /setup and the sidebar links to it", () => {
+     expect(appSource).toMatch(/path="\/setup" element=\{<SetupWizardPage \/>\}/);
+diff --git a/apps/web/src/pages/setup-wizard/SetupWizardPage.tsx b/apps/web/src/pages/setup-wizard/SetupWizardPage.tsx
+index 66fc8f68..58d73435 100644
+--- a/apps/web/src/pages/setup-wizard/SetupWizardPage.tsx
++++ b/apps/web/src/pages/setup-wizard/SetupWizardPage.tsx
+@@ -33,17 +33,17 @@ export async function loadProbes(apiKey: string): Promise<SetupProbes> {
+ const LABEL = { ok: "Ready", todo: "To do", problem: "Problem", unknown: "Unknown" } as const;
+ 
+ export function SetupWizardPage(): React.ReactElement {
+-  const { apiKey } = useAuth();
++  const { apiKey, sessionVersion } = useAuth();
+   const [generation, setGeneration] = useState(0);
+-  const [loaded, setLoaded] = useState<{ key: string; generation: number; probes: SetupProbes } | null>(null);
+-  const current = loaded && loaded.key === apiKey && loaded.generation === generation ? loaded : null;
++  const [loaded, setLoaded] = useState<{ key: string; version: number; generation: number; probes: SetupProbes } | null>(null);
++  const current = apiKey && loaded && loaded.key === apiKey && loaded.version === sessionVersion && loaded.generation === generation ? loaded : null;
+ 
+   useEffect(() => {
+     if (!apiKey) return;
+     let cancelled = false;
+-    void loadProbes(apiKey).then((probes) => { if (!cancelled) setLoaded({ key: apiKey, generation, probes }); });
++    void loadProbes(apiKey).then((probes) => { if (!cancelled) setLoaded({ key: apiKey, version: sessionVersion, generation, probes }); });
+     return () => { cancelled = true; };
+-  }, [apiKey, generation]);
++  }, [apiKey, sessionVersion, generation]);
+ 
+   const items = current ? buildItems(current.probes) : null;
+   return (
+diff --git a/apps/web/src/pages/setup-wizard/setupModel.ts b/apps/web/src/pages/setup-wizard/setupModel.ts
+index eb3ad9a8..dda9a51b 100644
+--- a/apps/web/src/pages/setup-wizard/setupModel.ts
++++ b/apps/web/src/pages/setup-wizard/setupModel.ts
+@@ -75,7 +75,13 @@ export function buildItems(p: SetupProbes): SetupItem[] {
+       ? { id, title, status: "ok", means: on, action: "Nothing to do.", source: "GET /setup/status" }
+       : { id, title, status: required ? "problem" : "todo", means: off, action, source: "GET /setup/status" };
+   };
+-  items.push(integ("gemini", "Gemini configured", "gemini", true, "A Gemini key is set (its value is never shown).", "No Gemini key is set: embeddings, transcription and summaries are unavailable.", "Set GEMINI_API_KEY in .env (see .env.example), restart the API, then Re-check."));
++  items.push(integ("gemini", "Gemini configured (optional)", "gemini", false, "A Gemini key is set (its value is never shown). This does not verify a working provider or model.", "No Gemini key is set. Other configured providers may support AI jobs; this check does not report their availability.", "If Gemini is needed, set GEMINI_API_KEY in .env (see .env.example), restart the API, then Re-check."));
++  items.push({
++    id: "ai-readiness", title: "AI provider and model readiness", status: "unknown",
++    means: "These checks report optional integration configuration only. They do not test model access, local provider runtime, job routing or successful AI output.",
++    action: "Confirm the provider and model configured for the intended job, then verify an authorized sample job. A configured key alone does not establish readiness.",
++    source: "not tested by these setup endpoints",
++  });
+   items.push(integ("tavily", "Tavily configured (optional)", "tavily", false, "A Tavily key is set (its value is never shown).", "No Tavily key: Ask cannot fall back to web search.", "Optional: set TAVILY_API_KEY in .env, restart the API, then Re-check."));
+   items.push(integ("langfuse", "Langfuse configured (optional)", "langfuse", false, "All Langfuse tracing variables are set (values never shown).", "Langfuse tracing is off.", "Optional: set LANGFUSE_BASE_URL, LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY in .env, restart the API, then Re-check."));
+ 
+diff --git a/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx b/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx
+index c881b548..669c24a0 100644
+--- a/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx
++++ b/apps/web/src/pages/transcript-review/ReviewHistory.test.tsx
+@@ -16,7 +16,7 @@ test("failed refresh exposes retry; successful refresh invokes canonical reload"
+   const refresh = vi.spyOn(api, "refreshTranscriptReview").mockResolvedValue("complete"), reload = vi.fn();
+   render(<ReviewHistory apiKey="k" sessionId="s1" revision="r1" refresh="failed" disabled={false} onRefreshed={reload} />);
+   fireEvent.click(screen.getByRole("button", { name: "Retry knowledge refresh" }));
+-  expect((await screen.findByRole("status")).textContent).toContain("Knowledge refresh complete");
++  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Knowledge refresh complete"));
+   await waitFor(() => expect(reload).toHaveBeenCalledTimes(1)); expect(refresh).toHaveBeenCalledWith("k", "s1", "r1");
+ });
+ test("late history and refresh cannot disclose old identity or trigger reload after unmount", async () => {
+diff --git a/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx b/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx
+index 73d02faa..199802cf 100644
+--- a/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx
++++ b/apps/web/src/pages/transcript-review/TranscriptReview.test.tsx
+@@ -14,6 +14,19 @@ const edit = async () => {
+   fireEvent.change(await screen.findByLabelText("Corrected text"), { target: { value: "Corrected" } });
+   fireEvent.change(screen.getByLabelText("Review reason"), { target: { value: "Checked recording" } });
+ };
++test.each(["pending", "failed"] as const)("a loaded %s refresh warns about stale answers until canonical reload completes", async (refresh) => {
++  vi.spyOn(api, "getTranscriptReview").mockResolvedValueOnce({ ...snapshot(), refresh }).mockResolvedValue(snapshot());
++  render(<TranscriptReview apiKey="k" sessionId="s1" />);
++  const warning = await screen.findByRole("note", { name: "Knowledge freshness warning" });
++  expect(warning.textContent).toContain(`Knowledge refresh ${refresh}; existing answers may be stale.`);
++  expect(warning.textContent).toContain(refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below");
++  expect(screen.getByRole("button", { name: refresh === "failed" ? "Retry knowledge refresh" : "Refresh knowledge" })).toBeEnabled();
++  fireEvent.click(screen.getByRole("button", { name: "Reload transcript" }));
++  await screen.findByLabelText("Corrected text");
++  expect(screen.queryByRole("note", { name: "Knowledge freshness warning" })).toBeNull();
++  expect(screen.getByText("Knowledge refresh: complete")).toBeInTheDocument();
++});
++
+ test("corrections require reason and use loaded revision; pending refresh is not completed", async () => {
+   vi.spyOn(api, "getTranscriptReview").mockResolvedValueOnce(snapshot()).mockResolvedValue({ ...snapshot(), revision: "r2", refresh: "pending" });
+   const save = vi.spyOn(api, "saveTranscriptReview").mockResolvedValue({ sessionId: "s1", revision: "r2", commit: "committed", refresh: "pending" });
+diff --git a/apps/web/src/pages/transcript-review/TranscriptReview.tsx b/apps/web/src/pages/transcript-review/TranscriptReview.tsx
+index 897d6fac..b3ea57dc 100644
+--- a/apps/web/src/pages/transcript-review/TranscriptReview.tsx
++++ b/apps/web/src/pages/transcript-review/TranscriptReview.tsx
+@@ -90,6 +90,9 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
+     <button onClick={() => void load()} disabled={busy && !!snapshot}>Reload transcript</button>
+     {!snapshot ? <p>{busy ? "Loading transcript review…" : "Transcript review unavailable."}</p> : <>
+       <p>Knowledge refresh: {snapshot.refresh}</p>
++      {snapshot.refresh !== "complete" && <p role="note" aria-label="Knowledge freshness warning">
++        Knowledge refresh {snapshot.refresh}; existing answers may be stale. {snapshot.refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below to update dependent knowledge."}
++      </p>}
+       {!!snapshot.orphanedTurnIds?.length && <p role="alert">Source passages changed after review. {snapshot.orphanedTurnIds.length} reviewed passage(s) no longer exist: {snapshot.orphanedTurnIds.join(", ")}. Their audit remains available; restore stable source passage identifiers before refreshing knowledge.</p>}
+       <ReviewHistory apiKey={apiKey} sessionId={sessionId} revision={snapshot.revision} refresh={snapshot.refresh} disabled={busy}
+         onRefreshed={reloadAfterRefresh} />

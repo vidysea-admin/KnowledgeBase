@@ -1,0 +1,9 @@
+import pathlib
+driver=pathlib.Path(__file__).with_name('finite_native_queue.py');prefix=driver.read_text(encoding='utf-8').split("\np=root/'qa/coordination/resume-20261015/native-codecledger/broker-request.json'")[0]
+prefix=prefix.replace("'qa/coordination/resume-20261015/native-current-writers.json'","'qa/coordination/resume-20261015/native-active-writers-current.json'").replace("leases=load(leasepath);active=","leases=load(leasepath);leases['sharedTypesSha256']='022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77';active=").replace("'finite-native-summary.json'","'pts-diagnostic-summary.json'").replace("'finite-native-preflight.log'","'pts-diagnostic-preflight.log'")
+exec(compile(prefix,str(driver),'exec'))
+pins=pins_from(load('qa/coordination/resume-20261015/native-finalizer-maker/fix-1/checkpoint.json')['files']);pins.update(pins_from(load('qa/coordination/resume-20261015/native-codecledger/candidate-pins.json')))
+probe='packages/meeting-bot/src/capture/native-media-probe.ts';old=pins[probe];pins[probe]='e59bf9df461e744abe1891ff6efe30550d97bdc3bd80f48664abd2b1562e3a90'
+bins=load('qa/coordination/resume-20261015/broker/native-binaries.json');b={j['Name']:j['Source'] for j in bins};known=load('qa/coordination/resume-20261015/broker/native-binary-hashes.json');assert all(sha(v)==known[k]['sha256'] for k,v in b.items())
+p=root/'qa/coordination/resume-20261015/native-finalizer-maker/fix-2-diagnostic/checkpoint.md';(out/'pts-diagnostic-pin-adoption.json').write_text(json.dumps({'authority':'root explicit diagnostic source freeze override','old_probe_sha256':old,'new_probe_sha256':pins[probe],'checkpoint_sha256':sha(p)},indent=2))
+run('native-finalizer-pts-diagnostic',['--test','--import','tsx','--test-name-pattern=broker-only','src/capture/native-media-finalize.test.ts'],root/'packages/meeting-bot',pins,45,p,envextra={'LKB_NATIVE_TEST_FFMPEG':b['ffmpeg.exe'],'LKB_NATIVE_TEST_FFPROBE':b['ffprobe.exe']})

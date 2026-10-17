@@ -1,0 +1,72 @@
+{
+  "format": "t022-provenance-focused-request-v1",
+  "status": "READY_FOR_ROOT_CPU_ADMISSION",
+  "unit": "t022-executed-provenance",
+  "cycle": 0,
+  "candidateSha256": "5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+  "sourcePins": [
+    {
+      "path": "scripts/eval/human-calibration.mjs",
+      "bytes": 22784,
+      "sha256": "bb91820014da89802e0641a4a232551c32d0fce498fee7f37f45c0798df6aa6c",
+      "gitBlobSha1": "1807792598a0d11d158513706aa16d0d787bdd6f"
+    },
+    {
+      "path": "scripts/eval/human-calibration.test.mjs",
+      "bytes": 16961,
+      "sha256": "6d9766ea7f67fdcf8530423f108d45ec2b9299c379e3064461df4dcf5045df63",
+      "gitBlobSha1": "5cbbec41735ad1cf8d7244ee965db51eac6e4dc8"
+    }
+  ],
+  "baseHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "soleExecutionOwner": "/root/resume_cpu_broker",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=^executed provenance ",
+    "scripts/eval/human-calibration.test.mjs"
+  ],
+  "selectedNodes": [
+    "executed provenance binds local router adapters parser barrel lock resolver and runtime",
+    "executed provenance predecessor consumer refuses stale missing runtime or after-run bindings"
+  ],
+  "expectedSelectedTests": 2,
+  "outerTimeoutSeconds": 45,
+  "environmentPolicy": {
+    "remove": [
+      "KB_T022_PRIVATE_REVIEW_TESTS",
+      "NODE_OPTIONS",
+      "NODE_ENV",
+      "TSX_TSCONFIG_PATH"
+    ],
+    "recordWhitelistHashOnly": true,
+    "neverReadEnvFile": true
+  },
+  "providerCallsAllowed": false,
+  "dbConnectionsAllowed": false,
+  "privateCorpusReadAllowed": false,
+  "scope": "Existing two source-inventory and immediate predecessor-consumer synthetic cases ONLY; other historical26cases not rerun",
+  "capture": {
+    "sourceDependencyPinsBeforeAfter": true,
+    "actualExecutableVersionHash": true,
+    "canonicalAiAndEsmTsxResolution": true,
+    "execArgvAndEnvironmentHashNoValues": true,
+    "wholeStdoutStderrAndOwnExit": true
+  },
+  "historicalEvidence": {
+    "shared62of62currentPins": true,
+    "collector47of47currentPins": true,
+    "reuseDisposition": "Historical successful receipts authenticated as byte-stable supporting evidence; fresh exact2-node command obtains current execution fingerprint instead of asserting ambient environment equality."
+  },
+  "mandatoryScope": {
+    "contract": "qa/contracts/goal-t022.md C5/C8/C9/C10 narrow executed-provenance portions only",
+    "affected": "implementationBindings actual local inventory and runtime resolver",
+    "immediateDownstream": "validateHumanProviderOrder GLM→DeepSeek→Gemini predecessor identity checks with fictional fixtures",
+    "repositoryVerifier": "Existing contracts/verify_contracts.py receipt may be reused only after exact source/interpreter/environment fingerprint authentication; no blanket green suite rerun authorized here",
+    "independentReview": "Required but not dispatched; managed packet/assess/startup/HOLD gates retained"
+  }
+}

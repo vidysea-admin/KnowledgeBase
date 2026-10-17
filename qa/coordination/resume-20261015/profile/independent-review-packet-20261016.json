@@ -1,0 +1,148 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "PREPARED_NOT_DISPATCH_READY",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "resume-speaker-profile",
+    "cycle": 0,
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "candidate_scope": "HEAD reference plus dirty file pins; must freeze exact combined candidate before dispatch",
+    "files": [
+      {
+        "path": "apps/api/src/speaker-profiles/store.ts",
+        "sha256": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+        "prior_sha256": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+        "matches_prior": true
+      },
+      {
+        "path": "apps/api/src/speaker-profiles/router.ts",
+        "sha256": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+        "prior_sha256": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+        "matches_prior": true
+      },
+      {
+        "path": "apps/api/src/speaker-profiles/store.test.ts",
+        "sha256": "194f127645a3529fbc316d049d0f29457175c12f082d1aa045945d07fe383e2f",
+        "prior_sha256": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+        "matches_prior": false
+      },
+      {
+        "path": "apps/api/src/speaker-profiles/router.test.ts",
+        "sha256": "7a01a0c227a72e4d64bc98a35981b31f62712afcc011b5a25ee02c03f0775a79",
+        "prior_sha256": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+        "matches_prior": false
+      },
+      {
+        "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+        "sha256": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+        "prior_sha256": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+        "matches_prior": true
+      },
+      {
+        "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+        "sha256": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+        "prior_sha256": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+        "matches_prior": true
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [
+      {
+        "token_metric": "actual_total",
+        "id": "not-started-profile-review",
+        "active_s": 0,
+        "tokens": 0,
+        "cost": null
+      }
+    ],
+    "next_phase": {
+      "token_metric": "actual_total",
+      "kind": "review",
+      "active_s": 120,
+      "tokens": 3500,
+      "cost": null
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "resume-speaker-profile/0/dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "completion_reserve_tokens": 1500,
+    "bootstrap_scope": "Independent six-file speaker profile security/consumer review; source snapshot revocation probe and exact receipt qualification; no full suite/provider/browser/native DB",
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 6000,
+      "cost": null
+    },
+    "escalation": null
+  },
+  "readiness": {
+    "complete": false,
+    "mutation_required": null,
+    "receipts": [
+      "qa/coordination/resume-20261015/broker/profile-repaired-api-uri-receipt.json",
+      "qa/coordination/resume-20261015/broker/profile-observability-receipt.json",
+      "qa/coordination/resume-20261015/profile/observability-evidence-audit-20261016.json"
+    ],
+    "remaining": [
+      "Exact candidate/base and graph/dependency match plus qualified reuse assessment",
+      "Combined typecheck/frozen verifier evidence",
+      "Root runtime release and managed-review/1 complete input validate",
+      "Checker determines applicable sabotage/mutation obligations before execution"
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "apps/api/src/speaker-profiles/store.test.ts::real scoped read predicates isolate identical person/session/turn ids across tenants",
+      "reason": "Source tenant collision and actual SDK snapshot capability binding",
+      "boundary": "tenancy"
+    },
+    {
+      "node": "apps/api/src/speaker-profiles/store.test.ts::speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source",
+      "reason": "Per-request authority and source withdrawal",
+      "boundary": "source visibility"
+    },
+    {
+      "node": "apps/api/src/speaker-profiles/store.test.ts::accepted attributes update profile and graph in the same source snapshot and clear revoked cached fields",
+      "reason": "Accepted evidence consumer and revision invalidation",
+      "boundary": "freshness"
+    },
+    {
+      "node": "apps/api/src/speaker-profiles/router.test.ts::mounted knowledge route enforces scope, request bounds, tenant and safe DTO",
+      "reason": "Mounted immediate API consumer with sessions scope/foreign tenant/bounds",
+      "boundary": "auth"
+    },
+    {
+      "node": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "reason": "Two focused downstream identity/revision/evidence/bounds tests",
+      "boundary": "consumer"
+    }
+  ],
+  "independent_risk_probe": {
+    "description": "Synthetic memory store: withdraw the source after positive live preflight but before final snapshot source validation; assert getKnowledge returns null and accepted relation/attribute readers are never invoked. Use existing store fixture/hook with isolated QA copy; preserve production bytes and execute only via sole broker.",
+    "reason": "Proves restrictive preflight cannot authorize stale final output or accepted-evidence hydration",
+    "required_before_verdict": true
+  },
+  "reuse_qualification": "API receipt 19pass/1private skip; client receipt2pass exit0. These remain historical maker evidence, not independently authenticated exact current-candidate reuse. Unrelated historical capture/native-media-types.ts guard missing; nested tracked file exists at capture/native/native-media-types.ts with different hash, so no whole-receipt match claimed.",
+  "contract": "qa/contracts/speaker-knowledge-vectorless.md clauses1-5; profile-specific contract absent, existing manifest explicitly references graph contract",
+  "consumers": [
+    "store getKnowledge -> buildSpeakerKnowledgeView final authorized snapshot",
+    "mounted router -> routeSpeakerKnowledge exact passages",
+    "speakerProfileClient validSpeakerKnowledge/loadSpeakerKnowledge response boundary",
+    "TSX page excluded from this lease; browser acceptance separate"
+  ],
+  "independent_verdict": null,
+  "assessment_paths": [
+    "review-metrics-20261016.json",
+    "review-assessment-20261016.json",
+    "review-metrics-20261016-v2.json",
+    "review-assessment-20261016-v2.json"
+  ]
+}

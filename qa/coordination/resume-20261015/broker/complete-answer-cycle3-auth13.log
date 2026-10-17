@@ -1,0 +1,21 @@
+✔ grant2 preserves legacy ceilings and rejects unbound scope, IDs and nonfinite limits (3.4379ms)
+✔ grant2 authorization binds canonical artifact, actor, scope and current source corpus config (152.0206ms)
+✔ grant2 cumulative ledger permits only two physical calls across fresh transport instances (72.8092ms)
+✔ grant2 byte reservations and crash debits cannot reset with new authorization or directory (74.2085ms)
+✔ preflight deep routing rejects insufficient complete-answer budget before any call (0.9536ms)
+✔ preflight actual complete-answer path refuses two calls before transport and checkpoint creation (4874.8137ms)
+✔ preflight sufficient lower bound admits but cannot promise a supported answer (46.8902ms)
+✔ preflight diagnostic-only two-call pilot remains allowed and admission failure overrides output labels (35.8386ms)
+✔ complete tier preserves legacy and grant2 ceilings and enforces every finite cap and exact identity (1.9547ms)
+✔ complete tier pending human approval refuses before credentials transport or checkpoint (50.568ms)
+✔ complete tier approval binds all identities population baseline and immutable artifact (258.9276ms)
+✔ complete tier durable IDs6 through17 count crashes and cannot replay reset or refund (229.9446ms)
+✔ complete tier aggregate input reservations cannot exceed320KiB across fresh admissions (111.5603ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6916.2685

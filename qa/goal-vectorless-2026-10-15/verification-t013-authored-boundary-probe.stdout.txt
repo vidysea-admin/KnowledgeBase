@@ -1,0 +1,1 @@
+PASS independent source-derived C2/C3/C4 handler and cleanup boundary; fixture only, not mounted React or GPU evidence

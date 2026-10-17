@@ -1,0 +1,67 @@
+[
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\server.ts",
+    "bytes": 13060,
+    "sha256": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\production.ts",
+    "bytes": 20869,
+    "sha256": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\integrations\\routes.ts",
+    "bytes": 5201,
+    "sha256": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\integrations\\types.ts",
+    "bytes": 304,
+    "sha256": "a03749ef65788b5b5893e70c518dacc51c8752c793023f090be59732149aea08"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\App.tsx",
+    "bytes": 7695,
+    "sha256": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\layout\\NavSidebar.tsx",
+    "bytes": 5091,
+    "sha256": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\auth.ts",
+    "bytes": 3618,
+    "sha256": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\llm-eval.mjs",
+    "bytes": 9787,
+    "sha256": "23b4bac82c841d13ef397794f680846690426a8771ed249a5a91498c1b50ef30"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\calibration-review.mjs",
+    "bytes": 9197,
+    "sha256": "5deab61e9d8606682a21e0044792997af7c4cc0abbac1e706d0e46f84c1de013"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\score.ts",
+    "bytes": 3776,
+    "sha256": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\ask\\src\\eval\\calibration.ts",
+    "bytes": 1793,
+    "sha256": "d020cea126f1be037034c6cf7228958371defe2fa2ecf53985fbc4a167fa57d4"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "bytes": 5292,
+    "sha256": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\contracts.json",
+    "bytes": 426,
+    "sha256": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940"
+  }
+]

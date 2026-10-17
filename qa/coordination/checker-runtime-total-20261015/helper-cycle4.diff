@@ -1,0 +1,87 @@
+diff --git "a/C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py" "b/C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-total-20261015\\review_budget.py"
+index 65019e20..f633f25e 100644
+--- "a/C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py"
++++ "b/C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-total-20261015\\review_budget.py"
+@@ -31,8 +31,11 @@ def metric(row, key):
+     return None if value is None else number(value)
+ 
+ 
+ def assess(data):
++    token_metric = data.get("token_metric", "legacy_allocation")
++    if token_metric not in ("actual_total", "legacy_allocation"):
++        raise ValueError("token_metric must be actual_total or legacy_allocation")
+     maker = data.get("maker", {})
+     rows = data.get("reviewers", [])
+     if not rows or any(not row.get("id") for row in rows):
+         raise ValueError("reviewers require unique nonempty ids")
+@@ -43,8 +46,23 @@ def assess(data):
+         raise ValueError("next phase requires explicit active_s allocation")
+     for row in rows:
+         if "budget_debit" in row and not isinstance(row["budget_debit"], dict):
+             raise ValueError("budget_debit must be a metric object")
++    token_objects = [maker, next_phase, data.get("bootstrap", {})]
++    token_objects.extend(rows)
++    token_objects.extend(row.get("budget_debit", {}) for row in rows)
++    token_objects.append((data.get("escalation") or {}).get("limits", {}))
++    for obj in token_objects:
++        declared = obj.get("token_metric")
++        if declared is not None and declared != token_metric:
++            raise ValueError("mixed token units require documented same-unit telemetry reconciliation")
++        if token_metric == "actual_total" and "tokens" in obj and declared != token_metric:
++            raise ValueError("actual_total requires explicit token_metric on every token-bearing object")
++    output_allocation = metric(next_phase, "output_tokens")
++    if output_allocation is not None:
++        total_allocation = metric(next_phase, "tokens")
++        if total_allocation is None or output_allocation > total_allocation:
++            raise ValueError("output_tokens allocation requires tokens allocation at least as large")
+     if "completion_reserve" in data and type(data["completion_reserve"]) is not bool:
+         raise ValueError("completion_reserve must be true or false")
+     reserved = data.get("completion_reserve", False)
+     reserve_id = data.get("completion_reserve_id")
+@@ -53,12 +71,22 @@ def assess(data):
+     phase_kind = next_phase.get("kind", "review")
+     if reserved and phase_kind not in ("review", "finalization"):
+         raise ValueError("reserved phase kind must be review or finalization")
+     reserve = {"active_s": 30, "tokens": 800}
++    if reserved and token_metric == "actual_total":
++        reserve_tokens = metric(data, "completion_reserve_tokens")
++        if reserve_tokens is None or reserve_tokens <= 0:
++            raise ValueError("actual_total requires positive completion_reserve_tokens")
++        reserve["tokens"] = reserve_tokens
+     finalization_committed = any(row.get("phase_kind") == "finalization"
+                                  and row.get("completion_reserve_id", reserve_id) == reserve_id
+                                  for row in rows)
+     result = {"ratios": {}, "totals": {}, "budget_debits": {}, "limits": {}, "unknown": []}
++    result["token_metric"] = token_metric
++    result["token_accounting_status"] = ("actual_total" if token_metric == "actual_total"
++                                          else "unverified_legacy_units")
++    result["output_token_allocation"] = output_allocation
++    result["ratio_verified_by_metric"] = {}
+     result["completion_reserve"] = {
+         "status": ("already_committed" if finalization_committed else "protected")
+                   if reserved else "legacy_unreserved",
+         "allocation": reserve if reserved else None,
+@@ -87,8 +115,11 @@ def assess(data):
+                                       "known_lower_bound": charged_known}
+         denominator = metric(maker, key)
+         result["totals"][key] = {"value": total, "known_lower_bound": known}
+         result["ratios"][key] = total / denominator if total is not None and denominator else None
++        result["ratio_verified_by_metric"][key] = bool(
++            total is not None and denominator
++            and (key != "tokens" or token_metric == "actual_total"))
+         if not denominator:
+             bootstrap = True
+             default = {"active_s": 180, "tokens": 6000, "cost": None}[key]
+             limit = data.get("bootstrap", {}).get(key, default)
+@@ -124,9 +155,10 @@ def assess(data):
+     if bootstrap and not data.get("bootstrap_scope"):
+         exceeded.append("missing_bootstrap_scope")
+     result["status"] = "NEEDS_EXTRA_REVIEW" if exceeded else (
+         "BOOTSTRAP_REVIEW" if bootstrap else "WITHIN_ALLOCATION")
+-    result["ratio_verified"] = not result["unknown"] and not bootstrap
++    result["ratio_verified"] = (not result["unknown"] and not bootstrap
++                                and token_metric == "actual_total")
+     result["exceeded"] = exceeded
+     result["escalated"] = bool(escalation)
+     result["target_missed"] = [key for key, value in result["ratios"].items()
+                                if value is not None and value > 0.1]

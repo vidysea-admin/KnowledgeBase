@@ -1,0 +1,87 @@
+{
+  "active_s": 0.5,
+  "actual_total_tokens": null,
+  "results": [
+    {
+      "label": "browserproducer-pure-seven",
+      "request": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-producer-design\\browserproducer-component.json",
+      "request_sha256": "b70dd986af870c2f75a4c13a10d8eaa157ef859f82901c81e8f2730aea8e7463",
+      "actual_total_tokens": null,
+      "independent_verdict": null,
+      "lease_sha256": "3e7f466a098df64dd9346b87fb347abc333f3cd419fe5baade0de9dfa9a85594",
+      "pins_before": {
+        "packages/meeting-bot/py/tab-capture/native-video.js": "c1eb0e2d22881f78537a9cfba4e6a2ef14f08a4f81557fd9977c9da286cba104",
+        "packages/meeting-bot/py/tab-capture/native-video.test.mjs": "0512619b67171d4ed2c9c48dc49be47be1cecf6244df0ab4d0da6d265bbc04e7",
+        "packages/meeting-bot/py/tab-capture/native-audio-worklet.js": "90f0d4166d756dfa3bbc7b5cb15f51cdbf04489fd9cac9f03c1a52a50b90916e",
+        "packages/meeting-bot/py/tab-capture/native-audio-worklet.test.mjs": "3655747f7b7fa89addfe0a97f4da5a4ae8451de1c5c55874c4bda4b337759b8f",
+        "packages/meeting-bot/py/tab-capture/native-recorder.js": "a22544227493cbf3f1f13b4b790bc3429cfe27095e2860912a987235194c819a",
+        "packages/meeting-bot/py/tab-capture/native-recorder.test.mjs": "b5dd394da34ce09a336c86457bbb2121358a24d7ab490f82680cc75435913e61",
+        "packages/meeting-bot/src/capture/native-media-types.ts": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77"
+      },
+      "writer_intersection": [],
+      "command": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test-isolation=none",
+        "--test-concurrency=1",
+        "--test",
+        "py/tab-capture/native-video.test.mjs",
+        "py/tab-capture/native-audio-worklet.test.mjs",
+        "py/tab-capture/native-recorder.test.mjs"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+      "environment": {
+        "KB_U24_PRIVATE_TOC_TESTS": "0",
+        "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+        "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+        "LKB_NATIVE_TEST_FFMPEG": null,
+        "LKB_NATIVE_TEST_FFPROBE": null,
+        "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp",
+        "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp"
+      },
+      "pid": 23832,
+      "started_utc": "2026-10-15T22:05:22Z",
+      "exit": 0,
+      "tree_close_completed": true,
+      "command_s": 0.1720000000004802,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\browserproducer-pure-seven.log",
+      "log_sha256": "2cefd999ee7150d0d805f3a097c04b943f32aacfc1d69e3e084e66ce1ef6fd56",
+      "tail": [
+        "\u2714 PCM uses contiguous render indices and explicit mono s16le clamping (4.0915ms)",
+        "\u2714 native preflight refuses missing APIs and unsupported VP8 without qualifying a platform (2.209ms)",
+        "\u2714 synthetic API harness reaches actual producer, ordered identical retry and drained close (8.5555ms)",
+        "\u2714 owned canvas bracket constructs and encodes the same frame and joins output timestamp (1.1775ms)",
+        "\u2714 missing/reordered outputs, non-key initial chunk and encoder backlog refuse (0.5768ms)",
+        "\u2139 tests 5",
+        "\u2139 suites 0",
+        "\u2139 pass 5",
+        "\u2139 fail 0",
+        "\u2139 cancelled 0",
+        "\u2139 skipped 0",
+        "\u2139 todo 0",
+        "\u2139 duration_ms 60.0929"
+      ],
+      "pins_after": {
+        "packages/meeting-bot/py/tab-capture/native-video.js": "c1eb0e2d22881f78537a9cfba4e6a2ef14f08a4f81557fd9977c9da286cba104",
+        "packages/meeting-bot/py/tab-capture/native-video.test.mjs": "0512619b67171d4ed2c9c48dc49be47be1cecf6244df0ab4d0da6d265bbc04e7",
+        "packages/meeting-bot/py/tab-capture/native-audio-worklet.js": "90f0d4166d756dfa3bbc7b5cb15f51cdbf04489fd9cac9f03c1a52a50b90916e",
+        "packages/meeting-bot/py/tab-capture/native-audio-worklet.test.mjs": "3655747f7b7fa89addfe0a97f4da5a4ae8451de1c5c55874c4bda4b337759b8f",
+        "packages/meeting-bot/py/tab-capture/native-recorder.js": "a22544227493cbf3f1f13b4b790bc3429cfe27095e2860912a987235194c819a",
+        "packages/meeting-bot/py/tab-capture/native-recorder.test.mjs": "b5dd394da34ce09a336c86457bbb2121358a24d7ab490f82680cc75435913e61",
+        "packages/meeting-bot/src/capture/native-media-types.ts": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77"
+      },
+      "pins_unchanged": true
+    }
+  ]
+}

@@ -1,0 +1,100 @@
+{
+  "version": 1,
+  "index": 9,
+  "originalIndex": 10,
+  "claimId": "2026-05-08-funding-dreams-loans-forex-c05",
+  "inputHash": "02c877390ca5f7bba11ba44cef4fc1e8a08f3fd01f9ea00b87bab1e7d2d59a1c",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Historical citations describe parents needing TCS clarity and anxiety about LRS/FEMA/TCS abbreviations, but do not directly support counselors being confused or the frequency generalization across both groups.",
+    "missingReferences": [],
+    "caveats": [
+      "Both stored speakerRef values are unknown; the Dev Mehta text prefix alone does not verify person identity.",
+      "Transcript statements and tax-rate examples do not establish external factual or legal truth.",
+      "The same turn IDs have different current text, speakers and timings."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t018",
+        "contextVersion": "originalMigration",
+        "quote": "the LRS rules, FEMA, TCS. These are all intimidating abbreviations. So a lot of this anxiety is caused by, you know, all these abbreviations.",
+        "textSha256": "4fdedb7771aa9a61dbee3fd24eaff7d5e8b55fc771d5c2fde0086a8a3959af2f",
+        "contextSha256": "187f1f5ab0e6e1f6d7f1e6ea2a2eb7a97fb26f4bf2e6ff63385bc8f85f688ac9",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 729,
+        "tEnd": 756,
+        "supports": "Supports anxiety over LRS, FEMA and TCS terminology; does not identify counselors or establish frequency across families and counselors."
+      },
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t030",
+        "contextVersion": "originalMigration",
+        "quote": "There is a lot of confusion around TCS because the government has a 2% slab for education",
+        "textSha256": "dbcef9ced723a21d9c83b69b4132ccdd957f4db8ae9ccd8236cc9429ebe547eb",
+        "contextSha256": "9691d2d90522b979265d263121f383831ec2618d88512cb4ea4b7cb916fad031",
+        "artifactSha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1226,
+        "tEnd": 1268,
+        "supports": "Supports parents being helped with confusion about TCS and its stated education category; does not establish counselors or the full generalization."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The cited current records concern screen sharing and an unspecified desire; neither supports the remittance-rule claim or its family/counselor population.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef Shweta is unverified metadata, not proof of identity.",
+      "Current timings differ from historical timings; no historical support is substituted for current evidence."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t018",
+        "contextVersion": "current",
+        "quote": "I'm trying to share my screen again.",
+        "textSha256": "4d8e4e09bdbf6dc6884d0bae5e20b77945f46ee2ce041918f35a20e73735f144",
+        "contextSha256": "cfa1c7475666e6d2a2e8b191c63db9c38fef1b9f27e4d7dab020e2553ead6590",
+        "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+        "revision": null,
+        "speakerRef": "Shweta",
+        "tStart": 1726,
+        "tEnd": 1741,
+        "supports": "Screen-sharing discussion is unrelated to confusion about overseas education remittance rules."
+      },
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "turnId": "2026-05-08-funding-dreams-loans-forex-t030",
+        "contextVersion": "current",
+        "quote": "Yes, I'm also wanting to, but I do not know.",
+        "textSha256": "9a5fcdf1fee07d60c004b54291bc33946fe03453808b1d66e2e27a6b8a609b63",
+        "contextSha256": "eb8225336a1346a7cff9e0c1dc11362fb12a8793974986846157f1f12622816a",
+        "artifactSha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+        "revision": null,
+        "speakerRef": "Shweta",
+        "tStart": 1805,
+        "tEnd": 1810,
+        "supports": "Unspecified wanting or not knowing does not identify families, counselors, LRS, TCS, FEMA, overseas remittances or education."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Both references resolve uniquely, but their same IDs carry changed content. Historical evidence partially supports parent confusion; counselor and frequency components remain unsupported. Current evidence is unrelated. AI preliminary review only; human adjudication remains open."
+}

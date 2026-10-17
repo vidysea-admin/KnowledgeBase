@@ -1,0 +1,27 @@
+✔ relationship router requires verified principal and sessions scope (335.8919ms)
+✔ relationship router trusts only injected policy and rejects foreign context (92.3841ms)
+SyntaxError: Unexpected token 'n', "null" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at createStrictSyntaxError (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:137:10)
+    at parse (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:86:15)
+    at C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1736:12)
+✔ relationship router rejects forged authority and invalid proposal shapes (145.9193ms)
+✔ relationship router refuses automation review and missing write permissions (65.6687ms)
+✔ relationship router bounds explicit review commands and strips receipt extras (357.654ms)
+✔ relationship router lists suggested by default with source-safe DTO and bounded filters (121.3402ms)
+✔ relationship router fails closed on missing policy and sanitized async failures (253.791ms)
+✔ relationship router refuses cross-tenant or mismatched list outputs (183.6905ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6872.5195

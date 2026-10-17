@@ -1,0 +1,3933 @@
+{
+  "schema": "local-commit-final-allowlist/1",
+  "recordedAt": "2026-10-15T23:04:43.5713293Z",
+  "head": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "branch": "codex/machine-migration-2026-10-09",
+  "sourceState": "ROOT_FROZEN_LATEST_QUOTA3_PYTHON1_PENDING_BROKER_AND_ROOT_RELEASE",
+  "authorization": "User authorized local commit; NO PUSH. This file is preparatory, not permission to stage/commit before root explicit release.",
+  "provenance": "Current intended user source dependencies, including preexisting work with unknown authorship. No claim all bytes authored in this turn.",
+  "allExistingCandidateEntries": [
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "ab266b7496f0b85c810a6c66cd3c5231598ea01e10acad741796e2c807e831f1",
+      "trackedAtHead": true,
+      "path": "apps/api/src/ai-transport.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "ec94116f478aadfbec8f4cf9968a9e2224858733e5f32e652188ab0ea9ba10c7",
+      "trackedAtHead": true,
+      "path": "apps/api/src/answer-policy/answer-evidence.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "d6739be8f1d76f6cf7946e287e51b1e292dc11cdaa3693df52489f77efd7a989",
+      "trackedAtHead": true,
+      "path": "apps/api/src/answer-policy/answer-router.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "fd11c33e891ed2ae6cc01548a6fdcfdc9587fbe960b95c0e47095dce04c5eff7",
+      "trackedAtHead": true,
+      "path": "apps/api/src/answer-policy/answer-router.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "22032514dcb6a61777f5dbbbc0cf428986e4127f82254416d685f9fd695f342d",
+      "trackedAtHead": true,
+      "path": "apps/api/src/answer-policy/answer-workflow.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb",
+      "trackedAtHead": true,
+      "path": "apps/api/src/answer-policy/answer-workflow.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "9474928553f111a3df0597898b1ac9ac8ca2385ac3c7fafa9cfd108cba832a92",
+      "trackedAtHead": false,
+      "path": "apps/api/src/answer-policy/native-evidence.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "94c876c7d2f04f19c6e3665e4f14d65a23002d2a97d8f539ea452434966b4654",
+      "trackedAtHead": false,
+      "path": "apps/api/src/ask/graph-context.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "64263bb8892a5aa4e5d3c9cb08742577b066b03631872fa3c42918d2a032ba0b",
+      "trackedAtHead": false,
+      "path": "apps/api/src/ask/native-source-context.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "31a22b953e52a3acc588aad14cc7beb97be922d5f7cbf3ec2a981a8c13b9b3ee",
+      "trackedAtHead": true,
+      "path": "apps/api/src/ask/passage-lexical.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566",
+      "trackedAtHead": true,
+      "path": "apps/api/src/ask/source-context.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "0185bbea8e021691d4d7eceee14f01783eefc6e429b35987840acc80c2f02e42",
+      "trackedAtHead": true,
+      "path": "apps/api/src/composition/integrations/answers.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "a16cacc13ebcc18e1ad959dcfbd7a28bf26ccc9a0c8ef2d3aeb5cd7e651f8698",
+      "trackedAtHead": false,
+      "path": "apps/api/src/composition/integrations/native-production.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "e3809141c5bf25c06e4026db3f41066ea6e67a502aff980911a5119c0016c12b",
+      "trackedAtHead": false,
+      "path": "apps/api/src/composition/integrations/native.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "9d2c2af92bc798bcd397bf4c99c610a726b25d5edb182e122ad1ef71a9ce026b",
+      "trackedAtHead": false,
+      "path": "apps/api/src/composition/integrations/reviews.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "761c72202df44320ad80fcc5d55aafea205cdd8da6f320e966fa38f6b5442775",
+      "trackedAtHead": true,
+      "path": "apps/api/src/composition/integrations/source-jobs.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "022a2c418777dadc1fe894b92e31a530541b94dd7f1ef7960f8ebe744d679a1c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/composition/integrations/transcripts.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc",
+      "trackedAtHead": true,
+      "path": "apps/api/src/composition/integrations/trusted-readers.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "b6b931c97ba3f39c5e7ee3007422f293a7f69ccb89a67e38c82a2658c7a326ce",
+      "trackedAtHead": true,
+      "path": "apps/api/src/composition/production.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "2010087154fc5be42f010efac272ad04a9540f6e9e834a93d344856ce1fbfcc4",
+      "trackedAtHead": true,
+      "path": "apps/api/src/connector-workflow/jobs.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "4f1c4bac38fbb8f2c7d0e4bbbf891a1dcaaa2b03d520e667c74f05e5c05c842c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/connector-workflow/mongo-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "03bbb742db2aedee7469cf28d8b60c75f332a7d43b4e0411816382c41f2791c8",
+      "trackedAtHead": true,
+      "path": "apps/api/src/connector-workflow/router.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "975da23ced2eeb414532fd965d7ca15d71ec931d3e15da3d15f20adf449bfc0a",
+      "trackedAtHead": false,
+      "path": "apps/api/src/connector-workflow/watched-job.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "1dafe811cfbf0520164555ef0586392a1dd4d90c69261bc3b49e9b025ae782e8",
+      "trackedAtHead": false,
+      "path": "apps/api/src/connector-workflow/watched-job.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "377addcbcbb8e2972a160ff4b2476cfe1c31683c2ce16570ea5403c85f72445d",
+      "trackedAtHead": true,
+      "path": "apps/api/src/connector-workflow/watched.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "d8ae7f3113b3dc9a57d6bf59c18fe4ecc8680a0ae0bc5d8b5974a93d84c7e295",
+      "trackedAtHead": true,
+      "path": "apps/api/src/connector-workflow/workflow.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+      "trackedAtHead": true,
+      "path": "apps/api/src/evaluation-flywheel/composition.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "2113251e2068552341ad50e267e64af62a864155dd1621289fd29220d9e8cc4c",
+      "trackedAtHead": false,
+      "path": "apps/api/src/evaluation-flywheel/receipts.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "770f3b7c14b60337a1f4fc64d86536b07b489af7938d9625ab01fb20672f5544",
+      "trackedAtHead": true,
+      "path": "apps/api/src/evaluation-flywheel/receipts.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "70b2f2df9fd63f0db36bcd4be4a9d3a6256dcfdc53e25c8607c90e5644e7c3ea",
+      "trackedAtHead": false,
+      "path": "apps/api/src/evaluation-flywheel/test-fixture.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "4715f0d803840bd5ea4a25de9efc59d3d71c98ec0a3919474270102ed7950175",
+      "trackedAtHead": true,
+      "path": "apps/api/src/evaluation-flywheel/test-fixture.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030",
+      "trackedAtHead": true,
+      "path": "apps/api/src/evaluation-flywheel/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "8a207d622caae38fb0635c81de28c2518729d6665840f19f4312fe42482d5f75",
+      "trackedAtHead": true,
+      "path": "apps/api/src/evaluation-flywheel/workflow.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "1b0689155c395d7c86cce4586207830471c2b5bbce05eb4f14cdcab0d6e3273c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/evaluation-flywheel/workflow.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "6171585703a990e59cebb96c544df64113b8d171894ec176957d1ac99061eaa7",
+      "trackedAtHead": false,
+      "path": "apps/api/src/extraction-review/file-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "dfd3ebd4ea3559743e71a4f7c0611308dd328bbab7881aac74f53dd3ea9267f9",
+      "trackedAtHead": false,
+      "path": "apps/api/src/extraction-review/seed.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "308ac00aadfde225ae2d8fe98a5ac1c5d92eee644a3884b7b0439cab9618b4db",
+      "trackedAtHead": false,
+      "path": "apps/api/src/extraction-review/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "trackedAtHead": true,
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "3294ced718f03a3f23b96c0392a4b5bf9cc9be9d23c2552f1952e9d698873cd9",
+      "trackedAtHead": false,
+      "path": "apps/api/src/gws/public-webinar-config.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/chunk-write.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "f03c53bf95eeb6bb440a483815a622b5e355313628385ede1a4c6ffddc42dd8b",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/generation.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "da19ef9198a47201bdf59dd2f5a484b009cf9af33099319c4e7940860d0380be",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/persistence/decisions-persist.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "9e3f10622b1c88210e166d277c57c952a88f4369608faf1a6efa7166e82dbeb2",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/persistence/decisions-persist.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "ee1c74fa878ece78d7564a154d7a48c6650209a7dd314e93ec827dbbcc3134ab",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/persistence/promote-entities.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "673ea06b2862b7d8d575c8a04e94b32181563405ea143524d439783f51842108",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/persistence/promote-entities.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "be0a8936d167c06262f15163abf70bf448a3ba04400e681d0257fddf77746473",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/post-commit.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "242bddeca752b595b2578a6e72648b5892e75be7b1117fbd1f276672477057db",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/post-commit.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a6713203fcbaa5cb79ce60d997543531b8e7b1086f80a5dbb5679140bb39129e",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/session.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "72eeb2bf990d562f3169fbb559b1afa0331c7a8d7b8d042255f1fd90eeb61309",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/testutils.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a975906c317a0ffd5641b7f9c237dd205c3fb1673b0efe16793354c34a0b330c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "61a4db794359c10c918de45862fff16a3c793033a2a6aa1595fb9820074c269c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/vector-gap.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "4d144fbaaff2ba44e6257f7dbf62ee1a39f5e51171727bf653fbac0dccb9410d",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/vectorless-grounding.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "7f2cde600af06d617595ec60ba346c631c141bc1575adf10b764df0f47f0b1a8",
+      "trackedAtHead": false,
+      "path": "apps/api/src/indexing/vectorless-publication.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "95e3e3d1e913bfe49bbc004bc46b61eaa6be692d32748548eb62aa05035db2ad",
+      "trackedAtHead": true,
+      "path": "apps/api/src/knowledge-outputs/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "514ab71cafb0627c8cadb713170e19d5f4b0b748b7c8d49ffecb7b88803fcb9e",
+      "trackedAtHead": true,
+      "path": "apps/api/src/knowledge-outputs/wiring.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+      "trackedAtHead": true,
+      "path": "apps/api/src/knowledge/metadata-visibility.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "6120918200a42d714f745650a0cb0c5fab4968e7b8874e2d3aa5a885ed4a91ab",
+      "trackedAtHead": false,
+      "path": "apps/api/src/native-evidence/head-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "9b8fbaca62136185ad60c5af1dd1ecf089e1cafb4a9d312cb193d783f1b1cbcb",
+      "trackedAtHead": false,
+      "path": "apps/api/src/native-evidence/message-publication.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "5e769520a06f753af3ab84e13c063e66d65577a080ed36265cd4ab4d16e68895",
+      "trackedAtHead": false,
+      "path": "apps/api/src/native-evidence/message-revision.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "a57808976ed7bf87623dee0b29556ca59b3654d492d615b2e40472172d9f8801",
+      "trackedAtHead": false,
+      "path": "apps/api/src/native-evidence/publication.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "75c39b52f8c8620bf28bf55133b63e3b3746d40236806127540a3f843bc4fe61",
+      "trackedAtHead": false,
+      "path": "apps/api/src/native-evidence/resolver.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "32dbcfe90c978c6050afdf0c8717c3937cd547d90b32542d4342bfe94af733cb",
+      "trackedAtHead": false,
+      "path": "apps/api/src/native-evidence/whatsapp-authority.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "efab2f3544c4877231be53703461f07aafd71db96b73713acb1c87783cad1a63",
+      "trackedAtHead": false,
+      "path": "apps/api/src/review-authority/policy.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566",
+      "trackedAtHead": true,
+      "path": "apps/api/src/routes/ask/ask.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "811a73fbb686ed3728897ecd2b2a0b03ae129231ae3953fb1b4a25d75b802464",
+      "trackedAtHead": true,
+      "path": "apps/api/src/routes/meeting-candidates.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "2b8833a4b9b73ce84449f2daabfee2a6a9433b2e46b9b2058e2d3f830ba8b4dc",
+      "trackedAtHead": true,
+      "path": "apps/api/src/routes/search.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "de3f123eaf8505c2e2a7231247a16cfd2cbb87ef26d26e00c9458172cd3958a4",
+      "trackedAtHead": true,
+      "path": "apps/api/src/search-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "d6d296e1affe2a8b7c8dff26786e169e42c95f43280e1183348a751b82a45fd9",
+      "trackedAtHead": true,
+      "path": "apps/api/src/session-decisions/reader.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "5ca9c9eb2e6822b9472d746845dfdfd529501ab50727baf1db886da0ffab0c7f",
+      "trackedAtHead": true,
+      "path": "apps/api/src/source-intake/jobs/entry.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "8528767d68149712edb3a1f00e88c6bc8de43fffa1ac2cf0ea896d9c3c8ec442",
+      "trackedAtHead": true,
+      "path": "apps/api/src/source-intake/jobs/input.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a8ec0080543078a6f9079a74bdaea81f261a1029c7c4e43d82e528657036088d",
+      "trackedAtHead": true,
+      "path": "apps/api/src/source-intake/jobs/store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "f95f1c283f111d35077e15346888c3dd4df3bcb43d527804fa647372e1ebc99c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/source-intake/jobs/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "a0e2279f2a2e81368de92a3bb750924f029fca8c49658ee7a5f5fa078e636680",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-attributes/mongo-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "e55154f04f650f441ebb12684dfb49737695224c0305d122fe5be1b1b9e7d809",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-attributes/service.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "f8b37eb2e9cd06dceb94a9d102294ad6e99eaa043b31383ca98b0595b16fb061",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-attributes/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "5c114999dce85ba83212c03946b5dedd7f6a86eef973bbc9a4cbdc3ec5b7753e",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-profiles/attribute-authority.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "489107e7f9caaf5625438342d47c9f037e0eee20e013fb84e4adee2315440b9f",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-profiles/relationship-reader.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+      "trackedAtHead": true,
+      "path": "apps/api/src/speaker-profiles/router.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+      "trackedAtHead": true,
+      "path": "apps/api/src/speaker-profiles/router.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+      "trackedAtHead": true,
+      "path": "apps/api/src/speaker-profiles/store.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+      "trackedAtHead": true,
+      "path": "apps/api/src/speaker-profiles/store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c41021e5a66ee9acb02c7c21a50439c5067430e5052f2d9693eec58a53ffe4db",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-relations/mongo-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "3a39c1981333d10d6cd8349225834839a6beef56670477e0ee902190464ce90a",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-relations/router.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "25c0f5ac26a530918071033f8a1e5f1958d19e5ad3190a7c5a5ccbcd266164e0",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-relations/service.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "dfda428c83a3469ec7eae93bf0877facfe018a686c13a3b1484b3ec18415748f",
+      "trackedAtHead": false,
+      "path": "apps/api/src/speaker-relations/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "33d089ebc5264274e577439b5380ff0c1cd0d7ffdc2416fe9cca337854bf1cd3",
+      "trackedAtHead": true,
+      "path": "apps/api/src/store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "564da5f635a47594f741cca447926db6d0bb3bea34b0e571713b946d7ca5bcd3",
+      "trackedAtHead": true,
+      "path": "apps/api/src/transcript-review/refresh-executor.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "4aec65f30c29278bd20167dfcad5d4cc91c87146f8e21f4ee12c7f5cc125ce66",
+      "trackedAtHead": true,
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "757b5298cde4c098016380749612db7ca324cb31d6e177d853dd60e4e44ed9d7",
+      "trackedAtHead": true,
+      "path": "apps/api/src/transcript-review/service.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "852b9b48e22367c42158f532a9ede5cfb2305cc625887e78d0ad0c9dc3f5893c",
+      "trackedAtHead": true,
+      "path": "apps/api/src/transcript-review/store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19",
+      "trackedAtHead": true,
+      "path": "apps/api/src/visibility/knowledge.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a64e5dc76e2d194213eb308b61450a0bf42d3a6279762ecf08592d8da831223f",
+      "trackedAtHead": true,
+      "path": "apps/api/src/whatsapp/review/invalidate.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "6d5e6c39fc3125d5999c220ccca2ed0d95a0e079392a5833ea65e2f5fc263a1b",
+      "trackedAtHead": true,
+      "path": "apps/api/src/whatsapp/review/materializer.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "dbf8354bffc1cb8a824103ee3eae5d71c0b2a65c6ce48c747858ed28c1a07021",
+      "trackedAtHead": false,
+      "path": "apps/api/src/whatsapp/review/publication-contract.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "ede283f9f87666a4f93ee146900a796704aeade851f784602573f08c4104be37",
+      "trackedAtHead": true,
+      "path": "apps/api/src/whatsapp/review/store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "75995f58961b2f5da3f2b39c5cf440fc0c726d6540d947fea79abaa0a8132882",
+      "trackedAtHead": true,
+      "path": "apps/api/src/whatsapp/store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "e8a813975e780357fae77613dbc98b1c28555aa3b6c73bfb98c7aa52fb1aee68",
+      "trackedAtHead": false,
+      "path": "apps/web/src/api/nativeEvidence.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "441a8a09b391acaec67365ec670665cb458bdaabf3bfc182dc8542f244aab7e4",
+      "trackedAtHead": true,
+      "path": "apps/web/src/api/types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "a105f18da929b3ce17bd713dbb56f892303954942b4302624a990f285f046cbb",
+      "trackedAtHead": false,
+      "path": "apps/web/src/components/AiUsageSummary.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c92505026418272fe6e17d6e811dcedb7169a408f920590e1504857fb2083ac2",
+      "trackedAtHead": false,
+      "path": "apps/web/src/components/NativeEvidence.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "253db568c9a3ebefaaab5e950fd89de4313ea0804750cb043376dd4adaf37ee2",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "66c479ba2f1d945e08ebb207df5d849073fdb627d938dec335e3bd2fa0067815",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/answer-policy/AnswerSources.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "2d4a49a56b63471452173428c779a1c63c0b64be5099c4932a690e3259f40bbd",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/answer-policy/client.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "9f9d82c7ae77ddfa12cd33610cc40f060369558b4f455990ed85c86ef418f6d9",
+      "trackedAtHead": false,
+      "path": "apps/web/src/pages/answer-policy/directAnswer.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c7ef0c78679d74d9e6476acb86b18710c4073edbaa6fb72aae1d30a3e7e98f8e",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "e4a4f648f6c20d195bae3156241c24ca176e108fb76c78f2e487124cfe849a6a",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "7221647db4d20a72fe600e1f20993a260f7dc44bb3f97fd881315e1069da138e",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.test.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "4b423684c18c67391b72a530952cc874084c83c65b96e98f38792f3823e0160b",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.tsx"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "95a89b6af32087445b368de9bf5dc81ffd044031db73fc20a365700edcbbbf6a",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/counsellor/voice.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "b3f7f92b676a2a4a9e3ab301ac361dd157c8a8ad4a679962b52753fd488b431d",
+      "trackedAtHead": true,
+      "path": "apps/web/src/pages/counsellor/voice.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "fe908f0ed6151396fd94f5b65a1dbc45ea88c74c3d2f88236d791c5aa9f0d3ca",
+      "trackedAtHead": true,
+      "path": "config/ai-routing.yaml"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "42fe251d75d1c491f198d6bd96673905703269987b7fc4404337157f3f943908",
+      "trackedAtHead": false,
+      "path": "migrations/20261015120000-speaker-relationships.cjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "91d0bdf51fa528fff8dac6b21ec2b69e0970730a83d457547560d8c69fd291da",
+      "trackedAtHead": false,
+      "path": "migrations/20261015130000-speaker-attributes.cjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "3a881523bf31bd8568bc8badade370ba8d430bc2d756e961a82c23f21b30e9f1",
+      "trackedAtHead": true,
+      "path": "packages/ai/src/index.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "ff1d14d504651e56d6bd88b82416bfc135ec951e4cacfca87a213756758fc180",
+      "trackedAtHead": true,
+      "path": "packages/ai/src/jobs.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "224011a106893ba8d42cecc5d9c43e4897df6d3d15e692f9e196d10aa050c4c1",
+      "trackedAtHead": true,
+      "path": "packages/ai/src/provider.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+      "trackedAtHead": false,
+      "path": "packages/ai/src/providers/ollama-cloud.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "111b0a7fb1d586b702d1fe5dd8d3f327e70069d46fd0c1dfc62dfccf692a7118",
+      "trackedAtHead": true,
+      "path": "packages/ai/src/router.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "fab2927b34be7e396bdb2baa65c63c5ae8d92b310a7808741cc8c432d35ca8f9",
+      "trackedAtHead": true,
+      "path": "packages/ask/src/ask-graph.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "85e958ce005197ebdcce8cd6de37bbf7d8755ba1f1cccce7a33728eeaadfca7d",
+      "trackedAtHead": true,
+      "path": "packages/ask/src/ask-shared.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "3337cffdb6ee47b8319ffc1fe4a09d792e35e2a7927b584fa3c35ca1a1d66bf3",
+      "trackedAtHead": true,
+      "path": "packages/ask/src/bounded-refine.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a33370d4ece5d00b401352bea43f0d7d861b269157ca36898cef3cb472ff24a4",
+      "trackedAtHead": true,
+      "path": "packages/ask/src/index.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "e974d1cd6640406c28dacfd9473e3519d137b712a14d06a248c072410600a692",
+      "trackedAtHead": true,
+      "path": "packages/ask/src/select-nodes.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "0aa7e4c8bdd19c2da4fdcb19a584b9968fc2023326f3c3d0d5fabbb30649e121",
+      "trackedAtHead": true,
+      "path": "packages/ask/src/source-context.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "506faae6c018e635eef9e34c5b339c0ec105999ba405cae34725dbabe11077cf",
+      "trackedAtHead": false,
+      "path": "packages/ask/src/tree-routing.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "63cd8b8a559e686935c2a70a6cd441d632e9a3f1ce5adf5219c7013f52063ce4",
+      "trackedAtHead": false,
+      "path": "packages/ask/src/usage-audit.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "b0d4489e833e2734f3034356add7d2f1c96714895db7f19888176160d4709760",
+      "trackedAtHead": true,
+      "path": "packages/core/src/domain/webinar-types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110",
+      "trackedAtHead": true,
+      "path": "packages/core/src/generated/answer_runs.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "1d9a9eeda71f974e9bd247ef6a81bb1dbb6c94c8a48bf897f43a585e5ff39f2e",
+      "trackedAtHead": true,
+      "path": "packages/core/src/generated/jobs.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "8405ad1db80ddf3cc95a7b62488486f05b85da1120d1fd8b48aaa93bb61115d6",
+      "trackedAtHead": true,
+      "path": "packages/core/src/generated/sessions.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "d20d6b907f863839a004479ac525849cde3208c010797f4e7e14b57a33c7334d",
+      "trackedAtHead": false,
+      "path": "packages/core/src/generated/speaker_attributes.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c595943527c6780c8a8635c618cc2a24a962af8c12f8b8b88477151e9ac7da8c",
+      "trackedAtHead": false,
+      "path": "packages/core/src/generated/speaker_relationships.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3",
+      "trackedAtHead": true,
+      "path": "packages/core/src/generated/tree_index.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231",
+      "trackedAtHead": true,
+      "path": "packages/core/src/index.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "2f8a0306dfa34236fc28360dd4a3a31ea4b1817460134651328b823141600063",
+      "trackedAtHead": false,
+      "path": "packages/core/src/source-locator.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+      "trackedAtHead": true,
+      "path": "packages/db/src/collections/meeting-candidates.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "90531ad79ca86b3d6ae8c799a0800ce792c7d8f6756da35de0ea23ee9a0a9497",
+      "trackedAtHead": false,
+      "path": "packages/db/src/collections/speaker-attributes.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c2c85d1dc6f40fd6de3d0471463b5e0c76d583e7e64f63aa713a3d88a73d161a",
+      "trackedAtHead": false,
+      "path": "packages/db/src/collections/speaker-relationships.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "89b52eb2eb2032798b762d92c25e1381665858e49034317de1b92cb809e311f0",
+      "trackedAtHead": true,
+      "path": "packages/db/src/index.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+      "trackedAtHead": true,
+      "path": "packages/db/src/lib/tenantScope.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "ac135c69cd57219d2c872a6c1774769c0443b6dc21cbc76142a30f2b53bb2217",
+      "trackedAtHead": false,
+      "path": "packages/index/src/graph/authorized-expansion.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+      "trackedAtHead": false,
+      "path": "packages/index/src/graph/speaker-knowledge.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "trackedAtHead": false,
+      "path": "packages/index/src/graph/speaker-knowledge.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "a2e87c0f7b6d86a5b7a1814969d6da368de0d8e6d084ddd576f54b71e8e39638",
+      "trackedAtHead": true,
+      "path": "packages/index/src/index.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c057af4895ab28f247a02c981c78aa28532006a184edb67d8e6e99f7202fe6c0",
+      "trackedAtHead": true,
+      "path": "packages/index/src/search/lexical.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "5e99c770b0ae63667cbe60fdd6c56b2e8c51b961809c05eab07e657894cd97a6",
+      "trackedAtHead": true,
+      "path": "packages/ingest/src/join-policy/join-rules-normalize.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "8490c8a0263b372009406b1aaeacbea80bcdd14646b07c5c7e958346adb29e2e",
+      "trackedAtHead": true,
+      "path": "packages/ingest/src/join-policy/join-rules-optout.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "59c6ab17e64654f257ddf7c216f83e98a7223b83e847953f112f21e27c9cd593",
+      "trackedAtHead": true,
+      "path": "packages/ingest/src/join-policy/join-rules-store.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "b3eec6aa2bc940ad641f1c3ff31bcdae4d137c188f573475e9a1921f9b5ef34b",
+      "trackedAtHead": true,
+      "path": "packages/ingest/src/join-policy/join-rules.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "969c240ab924778abddec49d1394b8506b6d8043cc39f0cdab9f1dd5ddb580be",
+      "trackedAtHead": false,
+      "path": "packages/ingest/src/sources/native-document-passages.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/sb_join_register.py"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "2c6e9593cc39fd8f714ac447a4669cb8dbdb97703b202a19e25be7ea11603236",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/sb_join_tiles.py"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "bae07ab1186319b62938d6d791b8ceaafba86394d55bc1d32fb8e65ceb556cba",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/sb_join.py"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "c181ca7fccee237405ee65eef6d9b36e100a302f88151a8bb2a5525534c1f28b",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/background.js"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "e817d0900a4beed2e6ce228d8bdc5681a0eb205e300ba97c972c93d92fb16fbf",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/background.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "b35852ee6a6d0796b081ccb867d45c5d8fd7175ea160cfbcdfaa1c244ac30d1d",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/manifest.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "90f0d4166d756dfa3bbc7b5cb15f51cdbf04489fd9cac9f03c1a52a50b90916e",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/py/tab-capture/native-audio-worklet.js"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "3655747f7b7fa89addfe0a97f4da5a4ae8451de1c5c55874c4bda4b337759b8f",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/py/tab-capture/native-audio-worklet.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "a22544227493cbf3f1f13b4b790bc3429cfe27095e2860912a987235194c819a",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/py/tab-capture/native-recorder.js"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "b5dd394da34ce09a336c86457bbb2121358a24d7ab490f82680cc75435913e61",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/py/tab-capture/native-recorder.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c1eb0e2d22881f78537a9cfba4e6a2ef14f08a4f81557fd9977c9da286cba104",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/py/tab-capture/native-video.js"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "0512619b67171d4ed2c9c48dc49be47be1cecf6244df0ab4d0da6d265bbc04e7",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/py/tab-capture/native-video.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "c26c7207caf3220602e2fec66b1c0db9ef3a809f829a8abf7cf4755dccadd91f",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/recorder-bitrate.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "395a4839b968dd6c294327ffc92ce8437fdad8a5eec47d73995ccd9cb1e98ac0",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/recorder-origin.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "327e32b493aa8a387c484164e9144b19f572d735a55291ff4475b4a0d1ad0c6d",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/recorder.html"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "cec060f57788fc9f9925005766a6b2eb35824be410ccd2f1cb03e88045ddae14",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/recorder.js"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "ab097f192c42f765b982b4317e8b7289030bdd3cf5aa9b050fa91df4bed99a8c",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/recorder.test.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "414a508c3d8c19598e2f098d21aa19dff27146f272e122288266d35ad20c357a",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/tab-capture/tab-capture-harness.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/py/test_sb_join_tiles.py"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "d8d00d63b4dfdceb59183546f23921c20926615ca4b14266dc07f24a3d96d970",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/autojoin/tick-wiring.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "f284aebd74bc3bf986bf641d196f3569a25d1068ff6e846e3006acaf038cc6c4",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/auto-join.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/auto-record-policy.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "abd04693720fff428029d4bf38269e55fcf89696020e354691ab517870e44fcb",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "6600c7483cbaffba7d4168f60d5cbf7ae06ca9ad107ad7880ec3dc8599bb2a92",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "653297e4ad37f3dc70ff70a49562c1dc6346de438967c5273544c326e468490c",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "cd609ef57f2618e7714f7cb55dfed33d5a745aaa42452e7dacec7c9d1b80add3",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "757f80bdda59390af0f71a81374f0534fb8a53084e0dacdac98c141ee303e6e5",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid-enforce.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "0fb4db1d412e6c67946dcdb856773b50872858f5c71a1808fccf415ed453120d",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "73fc0aeca0815f434daa11caa199b41583d1907aa1f55ffed4b4f57534694ca6",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-select.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "8b0bae439426bb3e358cde95c5cdd9426d21180f3a50987472bd543a84a03816",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/registration-link-resolver.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/registration-workflow.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "01d4de6be8ac721fa5c8909fa2795d72cec3cde03bbba8185dedeb3e51c041db",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "ac626b8dce5cc1f3a0cfa04f5ea333deb18c72e5a65ac0dd13f7b15f91a9155d",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/schedule-tick.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "6d6293f67d14706a003d1b9560e1df08841d0de95f7dd541ae2f13e6cba39ed9",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/schedule-tick.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "998bc21f690ad40b7874f2fe916b795b6b328e138ca817d806f20870787e2a19",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/calendar/scheduled-dispatch.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c8086d3d68e7303bb1be4c32cfec2513bc60c86816e5c17f45b83772dd50fca8",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/state/schedule-dedup-state.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "06dfe7814403a8232e6df4f4be0651580fdcaa86ea4ab54b34846acc130c7865",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/state/schedule-state.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "851748057fb96189069cec83f104faec16f417b578d906cb6d5f7e18bda97519",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/calendar/state/state-tenant-tag.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "9f2ed0cfb1f56efeb4e41b1d3e5f50487fdcceec8a3b2d25360c5f10de5b6c62",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/controller-state.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "21cbd85205fbb218022e92fffba634214abdfda3af39d331c1d9ba12ae267ac6",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "94425314bc0fe363e61ca0eb905a35cc0ad4626e7443c7a6fe54393b79898526",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-capture-archive.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "455423967184c512682c2aba09085090215e54967b2d4317ba705a7b5aed3c3f",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c13c747a75f768317f25ea2da556dbd70f2642912309079a8d4960654212cf2b",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "af219341f09d497c4e646be82420e91db338fb4c8e510c3f63890e4168d0035e",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-ivf.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-ivf.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-media-finalize.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "02e8949cdaaacf21450a12dd72f44668aa4ae454cd6f8ac3d5a73662a540fd91",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-media-finalize.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "4e6b12e89a7900253112d3e08aad3234a27b2fdc0018ddfd2a6d51c8fa8a9512",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-media-probe.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "569913b3bb1d2acc56b5c094015d15aab2f02d888315557571e929bffe8aa055",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-media-probe.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "3a33f1f0135ea131b2a1132cdef91abe7cad90530d152c82b3e2c73bfd6413d0",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-media-types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "4bf3ca520234980965f2507f591254b03bffabfff62971c5f45d49c3b2320b07",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-spool.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "896627b4f07e322b2e48ffc584e7309117d3e6938478d897a21cccf6a80ffa8c",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/record-commands.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "fe9059890b5a8c2a1b83dd9ecd756060f5f4ab0aacb88e75d482a3b6fae86490",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/record-commands.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "fde9b2e537179447f6fc38406ea8d98631c533a392e5b26af728d8d1519e4372",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c92ea9dc7cefcc6babbc45a1580458b304323d079793e68ab76d02571111c3f2",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "469973ef3f4fd4ed5ba0aad45ba5107fc41efad8e4d5e7c40771f980f76133d6",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "1c5fd48a53db87f61596f5aaa9cc165fd6f22a11b9c70c4fb79dfb0bd22e9ffc",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "b43270f60a3f2af98b3ba6dd64cfc947046878ec53835bbd441fcbc9c03efab0",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/record-consent/provider-input.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "b0f7f8d7ffc8baba33545fd38f08012255cdaaf3f2b17fb3ad864b5e911adaeb",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/record-finalize.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/tab-browser.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "f149985b40a7e991a19e0bbcb1a6a1904d67f7b12215c6acebd7068097901fec",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "ff3a8d64d6451d90164412004a9cfe02c8306cc8eea337029a60dfcfe7af74c9",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "0e31306c9dabfb3da1fa8e6cfcd5060358ddbb568415aa24ccc1b058d4cb13d7",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "bbf5fd274fdf5414b6ee8078b0c439882cd8840b516f04f3ce80e5ab11b02e61",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/tiles/registry-types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "90fcda7c5ad5e5e0e795b75ebc7907b558dcfc5d94819b8a30992d9be9d952cc",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/tiles/registry.test.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "be86f574b267e694d62fd469a385d317a2fd58b01400ae2c3f15be54a9e2f36a",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/tiles/registry.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "3f583a0b203a5a6358019d39f97b0773471be51f32a1cad536105528168c6480",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/tiles/sampler-clock.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "8085828e856598072ffcbda78fc5758bc629654acaef55999c2e9b8cf5221112",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "95ed772cce4ad76cba089f5cfa6a5208fa6dbf406884b065a29b8ff670c773aa",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "3cb277951b09602e0d794c8d23387a8cccdf38c6421001cf7b9da5d82a521f63",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "ac1d5eb40d775d1ab8678dc02f14e9fb5931b500f3bd519b2afbdfad9af609e8",
+      "trackedAtHead": false,
+      "path": "packages/meeting-bot/src/capture/workspace/original-capture.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "82477a51ae8a57fe3ec91b9610fb8e5b7c0580305002f85f823d494262a9f292",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/joiners/browser-joiner.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "02c18b7ae5e13deffac856ddfe0aed22a326a5d63d0d0bc07db8da0dc2f51c01",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/lean-video-obs.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "297d3bcace7907acdf3b2c56b9c877783aa22eda22bcd99e156476ecd93c484b",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/manual-jobs/worker.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "923e6604863f7bf3547f81b714bafc83f90b7c0f0838f570690f998f4dcb160c",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/src/workspace/index-proof-consumer.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": null,
+      "sha256": "e37d70f01dd85f180c1e3070dbed968acd2d610beb3ec9040a78259aa8ca1b03",
+      "trackedAtHead": true,
+      "path": "packages/meeting-bot/tsconfig.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "7802cf755ec8839814e320bffc36e4eef600294605911fb8e59f3930b901a827",
+      "trackedAtHead": false,
+      "path": "qa/evidence/t042-trusted-registry/fixture.ts"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "5b19d4d92b594926d6ea4521c36c3c94a3dc038eb278d016e673f6000e2d7af0",
+      "trackedAtHead": true,
+      "path": "schema/answer_runs.schema.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "c949fe2697e3cf735601caee4372378e108e0bf3855079d299cb6cffda1483e8",
+      "trackedAtHead": true,
+      "path": "schema/index.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "fad3e15ee6037bf64378aeca429e7f66787fcfb1e5c187711b7a961c4bb85f93",
+      "trackedAtHead": true,
+      "path": "schema/jobs.schema.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "872d9c0f457658d0ce5ca56bf689d6eff65ccfeac4e5db0b137014a198a22ba8",
+      "trackedAtHead": true,
+      "path": "schema/sessions.schema.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "784bbece740c2188adb20463880918845a5cbc6677fae9ba433bea386c09567a",
+      "trackedAtHead": false,
+      "path": "schema/speaker_attributes.schema.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "e993aa74524800bb66c31f37ebe6725aaffc15a25fad4f32f43ae58c047073a4",
+      "trackedAtHead": false,
+      "path": "schema/speaker_relationships.schema.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "2b03a2dfacb9c747725ff261e17b7139e418f13e1e9d165cf524a1dd876fe146",
+      "trackedAtHead": true,
+      "path": "schema/tree_index.schema.json"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": " M",
+      "sha256": "3be65f3c885d4eabc7285fa94fb81c9401e430d4db08a38885b883b1df6c03b7",
+      "trackedAtHead": true,
+      "path": "scripts/backfill.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "5b115f3a9f605cc1ff9544e6d933184a84f5bc2b900625be2bf945418a4183e4",
+      "trackedAtHead": false,
+      "path": "scripts/eval/extraction-authorized-import.mjs"
+    },
+    {
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze",
+      "status": "??",
+      "sha256": "c877644c102b4ea666ac2cfbcf6f15560144f2f41094c90d3e30bd930e0c118f",
+      "trackedAtHead": false,
+      "path": "scripts/eval/vectorless-production-eval.mjs"
+    }
+  ],
+  "mutations": [
+    {
+      "status": " M",
+      "path": "apps/api/src/ai-transport.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "ab266b7496f0b85c810a6c66cd3c5231598ea01e10acad741796e2c807e831f1",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/answer-policy/answer-evidence.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "ec94116f478aadfbec8f4cf9968a9e2224858733e5f32e652188ab0ea9ba10c7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/answer-policy/answer-router.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "d6739be8f1d76f6cf7946e287e51b1e292dc11cdaa3693df52489f77efd7a989",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/answer-policy/answer-router.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "fd11c33e891ed2ae6cc01548a6fdcfdc9587fbe960b95c0e47095dce04c5eff7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/answer-policy/answer-workflow.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "22032514dcb6a61777f5dbbbc0cf428986e4127f82254416d685f9fd695f342d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/answer-policy/answer-workflow.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/answer-policy/native-evidence.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "9474928553f111a3df0597898b1ac9ac8ca2385ac3c7fafa9cfd108cba832a92",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/ask/graph-context.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "94c876c7d2f04f19c6e3665e4f14d65a23002d2a97d8f539ea452434966b4654",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/ask/native-source-context.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "64263bb8892a5aa4e5d3c9cb08742577b066b03631872fa3c42918d2a032ba0b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/ask/passage-lexical.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "31a22b953e52a3acc588aad14cc7beb97be922d5f7cbf3ec2a981a8c13b9b3ee",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/ask/source-context.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/composition/integrations/answers.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "0185bbea8e021691d4d7eceee14f01783eefc6e429b35987840acc80c2f02e42",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/composition/integrations/native-production.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "a16cacc13ebcc18e1ad959dcfbd7a28bf26ccc9a0c8ef2d3aeb5cd7e651f8698",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/composition/integrations/native.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "e3809141c5bf25c06e4026db3f41066ea6e67a502aff980911a5119c0016c12b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/composition/integrations/reviews.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "9d2c2af92bc798bcd397bf4c99c610a726b25d5edb182e122ad1ef71a9ce026b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "761c72202df44320ad80fcc5d55aafea205cdd8da6f320e966fa38f6b5442775",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/composition/integrations/transcripts.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "022a2c418777dadc1fe894b92e31a530541b94dd7f1ef7960f8ebe744d679a1c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/composition/integrations/trusted-readers.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/composition/production.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "b6b931c97ba3f39c5e7ee3007422f293a7f69ccb89a67e38c82a2658c7a326ce",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/connector-workflow/jobs.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "2010087154fc5be42f010efac272ad04a9540f6e9e834a93d344856ce1fbfcc4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/connector-workflow/mongo-store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "4f1c4bac38fbb8f2c7d0e4bbbf891a1dcaaa2b03d520e667c74f05e5c05c842c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/connector-workflow/router.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "03bbb742db2aedee7469cf28d8b60c75f332a7d43b4e0411816382c41f2791c8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/connector-workflow/watched-job.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "975da23ced2eeb414532fd965d7ca15d71ec931d3e15da3d15f20adf449bfc0a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/connector-workflow/watched-job.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "1dafe811cfbf0520164555ef0586392a1dd4d90c69261bc3b49e9b025ae782e8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/connector-workflow/watched.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "377addcbcbb8e2972a160ff4b2476cfe1c31683c2ce16570ea5403c85f72445d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/connector-workflow/workflow.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "d8ae7f3113b3dc9a57d6bf59c18fe4ecc8680a0ae0bc5d8b5974a93d84c7e295",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/evaluation-flywheel/composition.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/evaluation-flywheel/receipts.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "2113251e2068552341ad50e267e64af62a864155dd1621289fd29220d9e8cc4c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/evaluation-flywheel/receipts.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "770f3b7c14b60337a1f4fc64d86536b07b489af7938d9625ab01fb20672f5544",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/evaluation-flywheel/test-fixture.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "70b2f2df9fd63f0db36bcd4be4a9d3a6256dcfdc53e25c8607c90e5644e7c3ea",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/evaluation-flywheel/test-fixture.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "4715f0d803840bd5ea4a25de9efc59d3d71c98ec0a3919474270102ed7950175",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/evaluation-flywheel/types.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/evaluation-flywheel/workflow.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "8a207d622caae38fb0635c81de28c2518729d6665840f19f4312fe42482d5f75",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/evaluation-flywheel/workflow.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "1b0689155c395d7c86cce4586207830471c2b5bbce05eb4f14cdcab0d6e3273c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/extraction-review/file-store.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "6171585703a990e59cebb96c544df64113b8d171894ec176957d1ac99061eaa7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/extraction-review/seed.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "dfd3ebd4ea3559743e71a4f7c0611308dd328bbab7881aac74f53dd3ea9267f9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/extraction-review/types.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "308ac00aadfde225ae2d8fe98a5ac1c5d92eee644a3884b7b0439cab9618b4db",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/gws/public-webinar-config.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "3294ced718f03a3f23b96c0392a4b5bf9cc9be9d23c2552f1952e9d698873cd9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/indexing/chunk-write.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/indexing/generation.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "f03c53bf95eeb6bb440a483815a622b5e355313628385ede1a4c6ffddc42dd8b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "da19ef9198a47201bdf59dd2f5a484b009cf9af33099319c4e7940860d0380be",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "9e3f10622b1c88210e166d277c57c952a88f4369608faf1a6efa7166e82dbeb2",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "ee1c74fa878ece78d7564a154d7a48c6650209a7dd314e93ec827dbbcc3134ab",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "673ea06b2862b7d8d575c8a04e94b32181563405ea143524d439783f51842108",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/post-commit.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "be0a8936d167c06262f15163abf70bf448a3ba04400e681d0257fddf77746473",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/post-commit.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "242bddeca752b595b2578a6e72648b5892e75be7b1117fbd1f276672477057db",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/indexing/session.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a6713203fcbaa5cb79ce60d997543531b8e7b1086f80a5dbb5679140bb39129e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/indexing/testutils.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "72eeb2bf990d562f3169fbb559b1afa0331c7a8d7b8d042255f1fd90eeb61309",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/indexing/types.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a975906c317a0ffd5641b7f9c237dd205c3fb1673b0efe16793354c34a0b330c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/indexing/vector-gap.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "61a4db794359c10c918de45862fff16a3c793033a2a6aa1595fb9820074c269c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/vectorless-grounding.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "4d144fbaaff2ba44e6257f7dbf62ee1a39f5e51171727bf653fbac0dccb9410d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/indexing/vectorless-publication.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "7f2cde600af06d617595ec60ba346c631c141bc1575adf10b764df0f47f0b1a8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/knowledge-outputs/types.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "95e3e3d1e913bfe49bbc004bc46b61eaa6be692d32748548eb62aa05035db2ad",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/knowledge-outputs/wiring.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "514ab71cafb0627c8cadb713170e19d5f4b0b748b7c8d49ffecb7b88803fcb9e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/knowledge/metadata-visibility.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/native-evidence/head-store.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "6120918200a42d714f745650a0cb0c5fab4968e7b8874e2d3aa5a885ed4a91ab",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/native-evidence/message-publication.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "9b8fbaca62136185ad60c5af1dd1ecf089e1cafb4a9d312cb193d783f1b1cbcb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/native-evidence/message-revision.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "5e769520a06f753af3ab84e13c063e66d65577a080ed36265cd4ab4d16e68895",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/native-evidence/publication.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "a57808976ed7bf87623dee0b29556ca59b3654d492d615b2e40472172d9f8801",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/native-evidence/resolver.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "75c39b52f8c8620bf28bf55133b63e3b3746d40236806127540a3f843bc4fe61",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/native-evidence/whatsapp-authority.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "32dbcfe90c978c6050afdf0c8717c3937cd547d90b32542d4342bfe94af733cb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/review-authority/policy.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "efab2f3544c4877231be53703461f07aafd71db96b73713acb1c87783cad1a63",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/routes/ask/ask.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/routes/meeting-candidates.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "811a73fbb686ed3728897ecd2b2a0b03ae129231ae3953fb1b4a25d75b802464",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/routes/search.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "2b8833a4b9b73ce84449f2daabfee2a6a9433b2e46b9b2058e2d3f830ba8b4dc",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/search-store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "de3f123eaf8505c2e2a7231247a16cfd2cbb87ef26d26e00c9458172cd3958a4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/session-decisions/reader.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "d6d296e1affe2a8b7c8dff26786e169e42c95f43280e1183348a751b82a45fd9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/source-intake/jobs/entry.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "5ca9c9eb2e6822b9472d746845dfdfd529501ab50727baf1db886da0ffab0c7f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/source-intake/jobs/input.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "8528767d68149712edb3a1f00e88c6bc8de43fffa1ac2cf0ea896d9c3c8ec442",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/source-intake/jobs/store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a8ec0080543078a6f9079a74bdaea81f261a1029c7c4e43d82e528657036088d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/source-intake/jobs/types.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "f95f1c283f111d35077e15346888c3dd4df3bcb43d527804fa647372e1ebc99c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-attributes/mongo-store.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "a0e2279f2a2e81368de92a3bb750924f029fca8c49658ee7a5f5fa078e636680",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-attributes/service.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "e55154f04f650f441ebb12684dfb49737695224c0305d122fe5be1b1b9e7d809",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-attributes/types.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "f8b37eb2e9cd06dceb94a9d102294ad6e99eaa043b31383ca98b0595b16fb061",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-profiles/attribute-authority.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "5c114999dce85ba83212c03946b5dedd7f6a86eef973bbc9a4cbdc3ec5b7753e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-profiles/relationship-reader.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "489107e7f9caaf5625438342d47c9f037e0eee20e013fb84e4adee2315440b9f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/speaker-profiles/router.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/speaker-profiles/router.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/speaker-profiles/store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-relations/mongo-store.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c41021e5a66ee9acb02c7c21a50439c5067430e5052f2d9693eec58a53ffe4db",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-relations/router.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "3a39c1981333d10d6cd8349225834839a6beef56670477e0ee902190464ce90a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-relations/service.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "25c0f5ac26a530918071033f8a1e5f1958d19e5ad3190a7c5a5ccbcd266164e0",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/speaker-relations/types.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "dfda428c83a3469ec7eae93bf0877facfe018a686c13a3b1484b3ec18415748f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "33d089ebc5264274e577439b5380ff0c1cd0d7ffdc2416fe9cca337854bf1cd3",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/transcript-review/refresh-executor.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "564da5f635a47594f741cca447926db6d0bb3bea34b0e571713b946d7ca5bcd3",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "4aec65f30c29278bd20167dfcad5d4cc91c87146f8e21f4ee12c7f5cc125ce66",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/transcript-review/service.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "757b5298cde4c098016380749612db7ca324cb31d6e177d853dd60e4e44ed9d7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/transcript-review/store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "852b9b48e22367c42158f532a9ede5cfb2305cc625887e78d0ad0c9dc3f5893c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/whatsapp/review/invalidate.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a64e5dc76e2d194213eb308b61450a0bf42d3a6279762ecf08592d8da831223f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/whatsapp/review/materializer.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "6d5e6c39fc3125d5999c220ccca2ed0d95a0e079392a5833ea65e2f5fc263a1b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/api/src/whatsapp/review/publication-contract.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "dbf8354bffc1cb8a824103ee3eae5d71c0b2a65c6ce48c747858ed28c1a07021",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/whatsapp/review/store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "ede283f9f87666a4f93ee146900a796704aeade851f784602573f08c4104be37",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/api/src/whatsapp/store.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "75995f58961b2f5da3f2b39c5cf440fc0c726d6540d947fea79abaa0a8132882",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/src/api/nativeEvidence.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "e8a813975e780357fae77613dbc98b1c28555aa3b6c73bfb98c7aa52fb1aee68",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/api/types.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "441a8a09b391acaec67365ec670665cb458bdaabf3bfc182dc8542f244aab7e4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/src/components/AiUsageSummary.tsx",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "a105f18da929b3ce17bd713dbb56f892303954942b4302624a990f285f046cbb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/src/components/NativeEvidence.tsx",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c92505026418272fe6e17d6e811dcedb7169a408f920590e1504857fb2083ac2",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "253db568c9a3ebefaaab5e950fd89de4313ea0804750cb043376dd4adaf37ee2",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/answer-policy/AnswerSources.tsx",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "66c479ba2f1d945e08ebb207df5d849073fdb627d938dec335e3bd2fa0067815",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/answer-policy/client.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "2d4a49a56b63471452173428c779a1c63c0b64be5099c4932a690e3259f40bbd",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "apps/web/src/pages/answer-policy/directAnswer.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "9f9d82c7ae77ddfa12cd33610cc40f060369558b4f455990ed85c86ef418f6d9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c7ef0c78679d74d9e6476acb86b18710c4073edbaa6fb72aae1d30a3e7e98f8e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "e4a4f648f6c20d195bae3156241c24ca176e108fb76c78f2e487124cfe849a6a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.test.tsx",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "7221647db4d20a72fe600e1f20993a260f7dc44bb3f97fd881315e1069da138e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.tsx",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "4b423684c18c67391b72a530952cc874084c83c65b96e98f38792f3823e0160b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/counsellor/voice.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "95a89b6af32087445b368de9bf5dc81ffd044031db73fc20a365700edcbbbf6a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "apps/web/src/pages/counsellor/voice.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "b3f7f92b676a2a4a9e3ab301ac361dd157c8a8ad4a679962b52753fd488b431d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "config/ai-routing.yaml",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "fe908f0ed6151396fd94f5b65a1dbc45ea88c74c3d2f88236d791c5aa9f0d3ca",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "migrations/20261015120000-speaker-relationships.cjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "42fe251d75d1c491f198d6bd96673905703269987b7fc4404337157f3f943908",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "migrations/20261015130000-speaker-attributes.cjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "91d0bdf51fa528fff8dac6b21ec2b69e0970730a83d457547560d8c69fd291da",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ai/src/index.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "3a881523bf31bd8568bc8badade370ba8d430bc2d756e961a82c23f21b30e9f1",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ai/src/jobs.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "ff1d14d504651e56d6bd88b82416bfc135ec951e4cacfca87a213756758fc180",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ai/src/provider.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "224011a106893ba8d42cecc5d9c43e4897df6d3d15e692f9e196d10aa050c4c1",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/ai/src/providers/ollama-cloud.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ai/src/router.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "111b0a7fb1d586b702d1fe5dd8d3f327e70069d46fd0c1dfc62dfccf692a7118",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ask/src/ask-graph.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "fab2927b34be7e396bdb2baa65c63c5ae8d92b310a7808741cc8c432d35ca8f9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ask/src/ask-shared.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "85e958ce005197ebdcce8cd6de37bbf7d8755ba1f1cccce7a33728eeaadfca7d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ask/src/bounded-refine.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "3337cffdb6ee47b8319ffc1fe4a09d792e35e2a7927b584fa3c35ca1a1d66bf3",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ask/src/index.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a33370d4ece5d00b401352bea43f0d7d861b269157ca36898cef3cb472ff24a4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ask/src/select-nodes.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "e974d1cd6640406c28dacfd9473e3519d137b712a14d06a248c072410600a692",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/ask/src/source-context.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "0aa7e4c8bdd19c2da4fdcb19a584b9968fc2023326f3c3d0d5fabbb30649e121",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/ask/src/tree-routing.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "506faae6c018e635eef9e34c5b339c0ec105999ba405cae34725dbabe11077cf",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/ask/src/usage-audit.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "63cd8b8a559e686935c2a70a6cd441d632e9a3f1ce5adf5219c7013f52063ce4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/core/src/generated/answer_runs.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/core/src/generated/jobs.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "1d9a9eeda71f974e9bd247ef6a81bb1dbb6c94c8a48bf897f43a585e5ff39f2e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/core/src/generated/sessions.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "8405ad1db80ddf3cc95a7b62488486f05b85da1120d1fd8b48aaa93bb61115d6",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/core/src/generated/speaker_attributes.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "d20d6b907f863839a004479ac525849cde3208c010797f4e7e14b57a33c7334d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/core/src/generated/speaker_relationships.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c595943527c6780c8a8635c618cc2a24a962af8c12f8b8b88477151e9ac7da8c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/core/src/generated/tree_index.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/core/src/index.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/core/src/source-locator.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "2f8a0306dfa34236fc28360dd4a3a31ea4b1817460134651328b823141600063",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/db/src/collections/meeting-candidates.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/db/src/collections/speaker-attributes.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "90531ad79ca86b3d6ae8c799a0800ce792c7d8f6756da35de0ea23ee9a0a9497",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/db/src/collections/speaker-relationships.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c2c85d1dc6f40fd6de3d0471463b5e0c76d583e7e64f63aa713a3d88a73d161a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/db/src/index.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "89b52eb2eb2032798b762d92c25e1381665858e49034317de1b92cb809e311f0",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/db/src/lib/tenantScope.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/index/src/graph/authorized-expansion.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "ac135c69cd57219d2c872a6c1774769c0443b6dc21cbc76142a30f2b53bb2217",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/index/src/graph/speaker-knowledge.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/index/src/graph/speaker-knowledge.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/index/src/index.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "a2e87c0f7b6d86a5b7a1814969d6da368de0d8e6d084ddd576f54b71e8e39638",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/index/src/search/lexical.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c057af4895ab28f247a02c981c78aa28532006a184edb67d8e6e99f7202fe6c0",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/ingest/src/sources/native-document-passages.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "969c240ab924778abddec49d1394b8506b6d8043cc39f0cdab9f1dd5ddb580be",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/py/sb_join_register.py",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/py/sb_join_tiles.py",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "2c6e9593cc39fd8f714ac447a4669cb8dbdb97703b202a19e25be7ea11603236",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/py/tab-capture/native-audio-worklet.js",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "90f0d4166d756dfa3bbc7b5cb15f51cdbf04489fd9cac9f03c1a52a50b90916e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/py/tab-capture/native-audio-worklet.test.mjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "3655747f7b7fa89addfe0a97f4da5a4ae8451de1c5c55874c4bda4b337759b8f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/py/tab-capture/native-recorder.js",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "a22544227493cbf3f1f13b4b790bc3429cfe27095e2860912a987235194c819a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/py/tab-capture/native-recorder.test.mjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "b5dd394da34ce09a336c86457bbb2121358a24d7ab490f82680cc75435913e61",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/py/tab-capture/native-video.js",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c1eb0e2d22881f78537a9cfba4e6a2ef14f08a4f81557fd9977c9da286cba104",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/py/tab-capture/native-video.test.mjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "0512619b67171d4ed2c9c48dc49be47be1cecf6244df0ab4d0da6d265bbc04e7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/py/tab-capture/recorder.js",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "cec060f57788fc9f9925005766a6b2eb35824be410ccd2f1cb03e88045ddae14",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/auto-join.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "f284aebd74bc3bf986bf641d196f3569a25d1068ff6e846e3006acaf038cc6c4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/auto-record-policy.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "abd04693720fff428029d4bf38269e55fcf89696020e354691ab517870e44fcb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "6600c7483cbaffba7d4168f60d5cbf7ae06ca9ad107ad7880ec3dc8599bb2a92",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "653297e4ad37f3dc70ff70a49562c1dc6346de438967c5273544c326e468490c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "cd609ef57f2618e7714f7cb55dfed33d5a745aaa42452e7dacec7c9d1b80add3",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/registration-link-resolver.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "8b0bae439426bb3e358cde95c5cdd9426d21180f3a50987472bd543a84a03816",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/registration-workflow.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/schedule-tick.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "6d6293f67d14706a003d1b9560e1df08841d0de95f7dd541ae2f13e6cba39ed9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/calendar/scheduled-dispatch.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "998bc21f690ad40b7874f2fe916b795b6b328e138ca817d806f20870787e2a19",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/state/schedule-dedup-state.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c8086d3d68e7303bb1be4c32cfec2513bc60c86816e5c17f45b83772dd50fca8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/state/schedule-state.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "06dfe7814403a8232e6df4f4be0651580fdcaa86ea4ab54b34846acc130c7865",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/controller-state.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "9f2ed0cfb1f56efeb4e41b1d3e5f50487fdcceec8a3b2d25360c5f10de5b6c62",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "21cbd85205fbb218022e92fffba634214abdfda3af39d331c1d9ba12ae267ac6",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-capture-archive.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "94425314bc0fe363e61ca0eb905a35cc0ad4626e7443c7a6fe54393b79898526",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "455423967184c512682c2aba09085090215e54967b2d4317ba705a7b5aed3c3f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c13c747a75f768317f25ea2da556dbd70f2642912309079a8d4960654212cf2b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "af219341f09d497c4e646be82420e91db338fb4c8e510c3f63890e4168d0035e",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-ivf.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-ivf.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-media-finalize.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-media-finalize.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "02e8949cdaaacf21450a12dd72f44668aa4ae454cd6f8ac3d5a73662a540fd91",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-media-probe.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "4e6b12e89a7900253112d3e08aad3234a27b2fdc0018ddfd2a6d51c8fa8a9512",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-media-probe.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "569913b3bb1d2acc56b5c094015d15aab2f02d888315557571e929bffe8aa055",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "3a33f1f0135ea131b2a1132cdef91abe7cad90530d152c82b3e2c73bfd6413d0",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-spool.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "4bf3ca520234980965f2507f591254b03bffabfff62971c5f45d49c3b2320b07",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/record-commands.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "896627b4f07e322b2e48ffc584e7309117d3e6938478d897a21cccf6a80ffa8c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "fe9059890b5a8c2a1b83dd9ecd756060f5f4ab0aacb88e75d482a3b6fae86490",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "fde9b2e537179447f6fc38406ea8d98631c533a392e5b26af728d8d1519e4372",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c92ea9dc7cefcc6babbc45a1580458b304323d079793e68ab76d02571111c3f2",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "469973ef3f4fd4ed5ba0aad45ba5107fc41efad8e4d5e7c40771f980f76133d6",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "1c5fd48a53db87f61596f5aaa9cc165fd6f22a11b9c70c4fb79dfb0bd22e9ffc",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/record-consent/provider-input.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "b43270f60a3f2af98b3ba6dd64cfc947046878ec53835bbd441fcbc9c03efab0",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "b0f7f8d7ffc8baba33545fd38f08012255cdaaf3f2b17fb3ad864b5e911adaeb",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "f149985b40a7e991a19e0bbcb1a6a1904d67f7b12215c6acebd7068097901fec",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "ff3a8d64d6451d90164412004a9cfe02c8306cc8eea337029a60dfcfe7af74c9",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "0e31306c9dabfb3da1fa8e6cfcd5060358ddbb568415aa24ccc1b058d4cb13d7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/tiles/registry-types.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "bbf5fd274fdf5414b6ee8078b0c439882cd8840b516f04f3ce80e5ab11b02e61",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/tiles/registry.test.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "90fcda7c5ad5e5e0e795b75ebc7907b558dcfc5d94819b8a30992d9be9d952cc",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/tiles/registry.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "be86f574b267e694d62fd469a385d317a2fd58b01400ae2c3f15be54a9e2f36a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/tiles/sampler-clock.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "3f583a0b203a5a6358019d39f97b0773471be51f32a1cad536105528168c6480",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "8085828e856598072ffcbda78fc5758bc629654acaef55999c2e9b8cf5221112",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "95ed772cce4ad76cba089f5cfa6a5208fa6dbf406884b065a29b8ff670c773aa",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "3cb277951b09602e0d794c8d23387a8cccdf38c6421001cf7b9da5d82a521f63",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "packages/meeting-bot/src/capture/workspace/original-capture.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "ac1d5eb40d775d1ab8678dc02f14e9fb5931b500f3bd519b2afbdfad9af609e8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "82477a51ae8a57fe3ec91b9610fb8e5b7c0580305002f85f823d494262a9f292",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/joiners/browser-joiner.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/lean-video-obs.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "02c18b7ae5e13deffac856ddfe0aed22a326a5d63d0d0bc07db8da0dc2f51c01",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/manual-jobs/worker.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "297d3bcace7907acdf3b2c56b9c877783aa22eda22bcd99e156476ecd93c484b",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "packages/meeting-bot/src/workspace/index-proof-consumer.ts",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "923e6604863f7bf3547f81b714bafc83f90b7c0f0838f570690f998f4dcb160c",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "qa/evidence/t042-trusted-registry/fixture.ts",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "7802cf755ec8839814e320bffc36e4eef600294605911fb8e59f3930b901a827",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "schema/answer_runs.schema.json",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "5b19d4d92b594926d6ea4521c36c3c94a3dc038eb278d016e673f6000e2d7af0",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "schema/index.json",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "c949fe2697e3cf735601caee4372378e108e0bf3855079d299cb6cffda1483e8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "schema/jobs.schema.json",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "fad3e15ee6037bf64378aeca429e7f66787fcfb1e5c187711b7a961c4bb85f93",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "schema/sessions.schema.json",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "872d9c0f457658d0ce5ca56bf689d6eff65ccfeac4e5db0b137014a198a22ba8",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "schema/speaker_attributes.schema.json",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "784bbece740c2188adb20463880918845a5cbc6677fae9ba433bea386c09567a",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "schema/speaker_relationships.schema.json",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "e993aa74524800bb66c31f37ebe6725aaffc15a25fad4f32f43ae58c047073a4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "schema/tree_index.schema.json",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "2b03a2dfacb9c747725ff261e17b7139e418f13e1e9d165cf524a1dd876fe146",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": " M",
+      "path": "scripts/backfill.mjs",
+      "mutation": "modify",
+      "trackedAtHead": true,
+      "sha256": "3be65f3c885d4eabc7285fa94fb81c9401e430d4db08a38885b883b1df6c03b7",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "scripts/eval/extraction-authorized-import.mjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "5b115f3a9f605cc1ff9544e6d933184a84f5bc2b900625be2bf945418a4183e4",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "status": "??",
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "mutation": "add",
+      "trackedAtHead": false,
+      "sha256": "c877644c102b4ea666ac2cfbcf6f15560144f2f41094c90d3e30bd930e0c118f",
+      "provenance": "Current intended user SOURCE/config work; preexisting changes and authorship unknown; inclusion requires final root freeze"
+    },
+    {
+      "reason": "Exact source relocation; old HEAD path removed",
+      "sha256": null,
+      "mutation": "delete",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/decisions-persist.ts",
+      "replacement": "apps/api/src/indexing/persistence/decisions-persist.ts"
+    },
+    {
+      "reason": "Exact source relocation; old HEAD path removed",
+      "sha256": null,
+      "mutation": "delete",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/decisions-persist.test.ts",
+      "replacement": "apps/api/src/indexing/persistence/decisions-persist.test.ts"
+    },
+    {
+      "reason": "Exact source relocation; old HEAD path removed",
+      "sha256": null,
+      "mutation": "delete",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/promote-entities.ts",
+      "replacement": "apps/api/src/indexing/persistence/promote-entities.ts"
+    },
+    {
+      "reason": "Exact source relocation; old HEAD path removed",
+      "sha256": null,
+      "mutation": "delete",
+      "trackedAtHead": true,
+      "path": "apps/api/src/indexing/promote-entities.test.ts",
+      "replacement": "apps/api/src/indexing/persistence/promote-entities.test.ts"
+    }
+  ],
+  "movePairs": [
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-capture-runtime.test.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-clock-ledger.test.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-clock-ledger.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-ivf.test.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-ivf.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-ivf.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-ivf.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-media-finalize.test.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-media-finalize.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-media-finalize.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-media-finalize.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-media-probe.test.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-media-probe.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-media-probe.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-media-probe.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-media-types.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-spool.test.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-spool.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-spool.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-spool.ts",
+      "newExists": true
+    },
+    {
+      "scope": "native-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": false,
+      "old": "packages/meeting-bot/src/capture/native-tab-receiver.ts",
+      "oldTrackedAtHead": false,
+      "new": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+      "newExists": true
+    },
+    {
+      "scope": "indexing-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": true,
+      "old": "apps/api/src/indexing/decisions-persist.ts",
+      "oldTrackedAtHead": true,
+      "new": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "newExists": true
+    },
+    {
+      "scope": "indexing-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": true,
+      "old": "apps/api/src/indexing/decisions-persist.test.ts",
+      "oldTrackedAtHead": true,
+      "new": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "newExists": true
+    },
+    {
+      "scope": "indexing-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": true,
+      "old": "apps/api/src/indexing/promote-entities.ts",
+      "oldTrackedAtHead": true,
+      "new": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "newExists": true
+    },
+    {
+      "scope": "indexing-structure-plan.json",
+      "oldExists": false,
+      "requiresTrackedDeletion": true,
+      "old": "apps/api/src/indexing/promote-entities.test.ts",
+      "oldTrackedAtHead": true,
+      "new": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "newExists": true
+    }
+  ],
+  "sourceMetadataFingerprints": [
+    {
+      "sourceReferences": [
+        "apps/api/src/visibility/knowledge.ts",
+        "apps/api/src/whatsapp/review/invalidate.ts",
+        "apps/api/src/whatsapp/review/materializer.ts",
+        "apps/api/src/whatsapp/review/publication-contract.ts"
+      ],
+      "sha256": "09caeac1ff0e3ef1d30fd142c026848df54e20432635cd36bcc38700351ee32f",
+      "path": "qa/coordination/resume-20261015/api-cycle-repairs/candidate-pins.json"
+    },
+    {
+      "sourceReferences": [
+        "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts",
+        "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts",
+        "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts"
+      ],
+      "sha256": "2b9553b9459cdba2a38ae87292e52771803fcb4835289b1a15a428adc720d125",
+      "path": "qa/coordination/resume-20261015/workspace-cycle-repair/pins.json"
+    },
+    {
+      "sourceReferences": [
+        "packages/meeting-bot/src/capture/native/native-media-types.ts",
+        "packages/meeting-bot/src/capture/native/native-spool.ts",
+        "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+        "packages/meeting-bot/src/capture/tiles/registry-types.ts",
+        "packages/meeting-bot/src/capture/tiles/registry.ts"
+      ],
+      "sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d",
+      "path": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json"
+    },
+    {
+      "sourceReferences": [
+        "apps/api/src/composition/integrations/transcripts.ts",
+        "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+        "apps/api/src/indexing/post-commit.test.ts",
+        "apps/api/src/indexing/post-commit.ts",
+        "apps/api/src/indexing/session.ts",
+        "apps/api/src/indexing/types.ts",
+        "apps/api/src/indexing/vectorless-publication.test.ts",
+        "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+        "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+        "packages/meeting-bot/src/capture/native/native-capture-archive.test.ts",
+        "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+        "packages/meeting-bot/src/capture/native/native-media-finalize.ts",
+        "packages/meeting-bot/src/capture/native/native-spool.ts"
+      ],
+      "sha256": "e338d4e243885200e031f158036d5d0b762d55d496a577d674ca282c94850356",
+      "path": "qa/coordination/resume-20261015/native-phaseb-maker/source-pins.json"
+    },
+    {
+      "sourceReferences": [
+        "apps/web/src/pages/counsellor/CounsellorPage.test.tsx",
+        "apps/web/src/pages/counsellor/CounsellorPage.tsx",
+        "apps/web/src/pages/counsellor/voice.test.ts",
+        "apps/web/src/pages/counsellor/voice.ts"
+      ],
+      "sha256": "cac209e982025a84527f9b84ac9a3187799ce0716256251f224b23bfbc926737",
+      "path": "qa/coordination/resume-20261015/t013-voice-conversation/candidate-pins.json"
+    },
+    {
+      "sourceReferences": [
+        "packages/core/src/domain/webinar-types.ts",
+        "packages/ingest/src/join-policy/join-rules-normalize.ts",
+        "packages/ingest/src/join-policy/join-rules-optout.ts",
+        "packages/ingest/src/join-policy/join-rules-store.ts",
+        "packages/ingest/src/join-policy/join-rules.ts",
+        "packages/meeting-bot/src/autojoin/tick-wiring.ts",
+        "packages/meeting-bot/src/calendar/auto-join.ts",
+        "packages/meeting-bot/src/calendar/auto-record-policy.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust.test.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid-enforce.test.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid.ts",
+        "packages/meeting-bot/src/calendar/join-rules/join-rules-select.ts",
+        "packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts",
+        "packages/meeting-bot/src/calendar/schedule-tick.test.ts",
+        "packages/meeting-bot/src/calendar/schedule-tick.ts",
+        "packages/meeting-bot/src/calendar/scheduled-dispatch.ts",
+        "packages/meeting-bot/src/calendar/state/schedule-dedup-state.ts",
+        "packages/meeting-bot/src/calendar/state/state-tenant-tag.ts",
+        "packages/meeting-bot/tsconfig.json",
+        "pnpm-lock.yaml",
+        "qa/contracts/goal-t037.md",
+        "tsconfig.base.json"
+      ],
+      "sha256": "1d9436be18ee250daa44c13f24eb60341c7641f1caef6bdde1375519b1ed896b",
+      "path": "qa/coordination/resume-20261015/t037-approved-trust/pins.json"
+    },
+    {
+      "sourceReferences": [
+        "apps/api/src/answer-policy/answer-router.test.ts",
+        "apps/api/src/answer-policy/answer-workflow.test.ts",
+        "apps/api/src/answer-policy/answer-workflow.ts",
+        "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+        "apps/web/src/pages/answer-policy/client.ts",
+        "apps/web/src/pages/answer-policy/directAnswer.test.ts",
+        "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+        "apps/web/src/pages/answer-policy/PolicyAskPage.tsx"
+      ],
+      "sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3",
+      "path": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json"
+    },
+    {
+      "sourceReferences": [
+        "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+        "apps/api/src/indexing/persistence/decisions-persist.ts",
+        "apps/api/src/indexing/persistence/promote-entities.test.ts",
+        "apps/api/src/indexing/persistence/promote-entities.ts",
+        "apps/api/src/indexing/session.ts",
+        "apps/api/src/session-decisions/reader.test.ts",
+        "scripts/backfill.mjs"
+      ],
+      "sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe",
+      "path": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json"
+    },
+    {
+      "sourceReferences": [
+        "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+        "apps/api/src/indexing/persistence/decisions-persist.ts",
+        "apps/api/src/indexing/persistence/promote-entities.test.ts",
+        "apps/api/src/indexing/persistence/promote-entities.ts",
+        "apps/api/src/indexing/session.ts",
+        "apps/api/src/session-decisions/reader.test.ts",
+        "qa/coordination/resume-20261015/broker/phase-b-authority.json",
+        "qa/coordination/resume-20261015/broker/phase-b-gate-summary.json",
+        "qa/coordination/resume-20261015/broker/phase-b-inventory-after.json",
+        "qa/coordination/resume-20261015/broker/phase-b-structure-paths.json",
+        "scripts/backfill.mjs"
+      ],
+      "sha256": "0fcc840dea820877e3b85bd9fb67e972c5d56495603abfc304901a77b543b039",
+      "path": "qa/coordination/resume-20261015/indexing-structure-maker/phase-b-adoption.json"
+    }
+  ],
+  "staleOldPathEntries": [],
+  "missingCandidateEntries": [],
+  "protectedPathsExcluded": true,
+  "protectedPathsPresent": [],
+  "syntheticFixtureReview": {
+    "basis": "Entire source reviewed: fixed synthetic tenants/UUIDs/panel labels, literal SYNTHETIC_AUDIO_BYTES and SYNTHETIC_MASKED_VIDEO_BYTES, generated temp artifacts. No actual capture/corpus/credentials present.",
+    "generatedRuntimeFilesExcluded": true,
+    "classification": "APPROVED_SYNTHETIC_TEST_SOURCE_ONLY",
+    "path": "qa/evidence/t042-trusted-registry/fixture.ts"
+  },
+  "packageLockStatus": [],
+  "gates": [
+    "Root explicit release only after broker full gates",
+    "Compare exact current raw SHA256 to these hashes and independent checker evidence before staging",
+    "Inspect exact staged diff and private content exclusions; never git add . or broad QA globs",
+    "Local commit only; no push"
+  ],
+  "exclusions": [
+    "keys/env/credentials",
+    "private recordings/audio/video/corpus",
+    "generated raw QA evidence/receipts and backups",
+    "governance/contracts/enforcement absent separate root approval"
+  ],
+  "actions": {
+    "pushed": 0,
+    "builds": 0,
+    "committed": 0,
+    "tests": 0,
+    "staged": 0
+  },
+  "latestFreezeRefresh": {
+    "missingFromAllowlist": [],
+    "changed": [
+      {
+        "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+        "oldSha256": "eb80e828c2e4246b4fdd8bc769d983ce718ceed26e6a051ed4de040d849eba7a",
+        "newSha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb"
+      },
+      {
+        "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+        "oldSha256": "88193970859c005fddea9f38b1440fdd598024e99d5a9afb32469e945919f6cd",
+        "newSha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde"
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+        "oldSha256": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64",
+        "newSha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c"
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+        "oldSha256": "a67793310befb5cfb3372ef7f4866afb07f97df471c370655d9e0ecc112f2f9b",
+        "newSha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d"
+      }
+    ],
+    "expectedPins": [
+      {
+        "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+        "expectedMatch": true,
+        "expectedSha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+        "sha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+        "nulBytes": false
+      },
+      {
+        "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+        "expectedMatch": true,
+        "expectedSha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+        "sha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+        "nulBytes": false
+      },
+      {
+        "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+        "expectedMatch": true,
+        "expectedSha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+        "sha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+        "nulBytes": false
+      },
+      {
+        "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+        "expectedMatch": true,
+        "expectedSha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+        "sha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+        "nulBytes": false
+      }
+    ],
+    "unexpectedDrift": [],
+    "priorSnapshot": "qa/coordination/resume-20261015/local-commit-final-allowlist.pre-quota-20261015T230442Z.json"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "sources": [
+    {
+      "sha256": "7f8e3b57b7b8265fa3f01fadf2cd0a653eb6bb0738d2d453fd4d8e421732b95d",
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts"
+    },
+    {
+      "sha256": "995c343bcf2b007db6e219ea1acc9451e0843ce69040348edda94313ce20234a",
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts"
+    },
+    {
+      "sha256": "b43270f60a3f2af98b3ba6dd64cfc947046878ec53835bbd441fcbc9c03efab0",
+      "path": "packages/meeting-bot/src/capture/record-consent/provider-input.ts"
+    },
+    {
+      "sha256": "83d661282aa845662fb34a4e5279ba15afa06ea022c4594758e6c8131388e73c",
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts"
+    }
+  ],
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "token_metric": "actual_total",
+  "candidateSha": null,
+  "policy": "managed-review/1",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "cycle": 0,
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "status": "SOURCE_FROZEN_BROKER_PENDING"
+}

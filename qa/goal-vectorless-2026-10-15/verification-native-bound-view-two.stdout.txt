@@ -1,0 +1,26 @@
+✔ actual native tree read binds message authority to the outer view while later resolver checks stay fresh (52.874ms)
+✖ native read-view document getter stays tenant scoped on the supplied view without base DB fallback (0.9596ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1890.0815
+
+✖ failing tests:
+
+test at apps\api\src\composition\integrations\native-read-view-binding.test.ts:1:3124
+✖ native read-view document getter stays tenant scoped on the supplied view without base DB fallback (0.9596ms)
+  Error: base DB must not be used by read view
+      at Object.collection (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-read-view-binding.test.ts:69:75)
+      at scopedCollection (C:\Users\product\Desktop\KnowledgeBase\packages\db\src\lib\tenantScope.ts:70:33)
+      at createNativePassageIndex (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\publication.ts:94:22)
+      at buildNativeIntegrations (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native.ts:22:23)
+      at buildNativeProductionIntegrations (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-production.ts:11:18)
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-read-view-binding.test.ts:69:18)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)

@@ -1,0 +1,19 @@
+{
+  "phase": "web-build",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/web",
+    "build"
+  ],
+  "pid": 25324,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-15T01:01:59.441Z",
+  "endedAt": "2026-10-15T01:02:13.597Z",
+  "elapsedMs": 14156,
+  "stdout": "\n> @lkb/web@0.0.0 build C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\n> tsc -b && vite build\n\nvite v6.0.5 building for production...\ntransforming...\n✓ 192 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                   0.41 kB │ gzip:   0.28 kB\ndist/assets/index-DB_xtvnB.css    6.39 kB │ gzip:   1.81 kB\ndist/assets/index-By_cI3Rk.js   592.29 kB │ gzip: 172.52 kB\n✓ built in 2.18s\n",
+  "stderr": "\n(!) Some chunks are larger than 500 kB after minification. Consider:\n- Using dynamic import() to code-split the application\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\n"
+}

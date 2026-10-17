@@ -1,0 +1,14 @@
+{
+  "name": "T043 frozen v3 consumer repair replay and focused identity guards",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "program": "C:/Program Files/nodejs/node.exe",
+  "args": ["--test", "--import", "tsx", "--test-isolation=none", "--test-concurrency=1", "--test-timeout=30000", "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs", "packages/meeting-bot/src/workspace/index-proof-identity.test.mjs"],
+  "timeoutMs": 60000,
+  "costUsd": 0,
+  "expectedOutcome": "Replay the unchanged six-case original producer floor after narrow repair plus four focused identity/gate cases. Preserve actual outcome; no assumed PASS.",
+  "scope": "Local synthetic filesystem fixtures with actual current sync producer block and actual finalizer/typed consumer; no provider, database, browser, native app or external call. Original red-spec/source-pins/receipt and original six-case test remain unchanged. No parent live acceptance implied.",
+  "sourcePinsPath": "qa/evidence/goal-t043/v3-consumer-cycle1/replay-source-pins.json",
+  "stdoutPath": "qa/evidence/goal-t043/v3-consumer-cycle1/repair-replay.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t043/v3-consumer-cycle1/repair-replay.stderr.txt",
+  "receiptPath": "qa/evidence/goal-t043/v3-consumer-cycle1/repair-replay.receipt.json"
+}

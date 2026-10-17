@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-consent\\native-acl-fixture.ps1",
+    "-Action",
+    "Create"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4.json",
+    "sha256": "d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4",
+    "count": 90
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 15,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 27696,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 1.0619999999980791,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-acl-create.log",
+    "sha256": "86cfc158f22463b13da5aab54e47a5fd5de9ff3767a0bc87b6b273be35713a74"
+  },
+  "counts": {}
+}

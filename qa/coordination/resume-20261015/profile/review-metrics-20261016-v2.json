@@ -1,0 +1,36 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "token_metric": "actual_total",
+      "id": "not-started-profile-review",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "token_metric": "actual_total",
+    "kind": "review",
+    "active_s": 120,
+    "tokens": 3500,
+    "cost": null
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "resume-speaker-profile/0/dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "completion_reserve_tokens": 1500,
+  "bootstrap_scope": "Independent six-file speaker profile security/consumer review; source snapshot revocation probe and exact receipt qualification; no full suite/provider/browser/native DB",
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "tokens": 6000,
+    "cost": null
+  },
+  "escalation": null
+}

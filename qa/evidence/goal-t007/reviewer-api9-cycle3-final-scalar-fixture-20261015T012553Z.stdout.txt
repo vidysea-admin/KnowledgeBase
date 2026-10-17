@@ -1,0 +1,17 @@
+✔ pending reviewer source is exact projected evidence, not raw session/siblings or trusted authorization (15.3726ms)
+✔ real repository approval/materialization permits current reviewer evidence; withdrawn claim refuses (11.2247ms)
+✔ foreign tenant, invalid identity and rejected candidate disclose no source (1.5685ms)
+✔ source/raw/effective changes, upstream deletion and pending invalidation refuse old evidence (9.3572ms)
+✔ attachment source exposes bound metadata and message evidence only, not file bytes (2.9086ms)
+✔ effective redaction during the last candidate consistency lookup refuses unchanged candidate JSON (2.7633ms)
+✔ authoritative reviewer proof pins every read to one required snapshot transaction and ends its session (3.1615ms)
+✔ collection-only reader cannot return evidence without a snapshot capability (1.8607ms)
+✔ actual authenticated HTTP source route uses whatsapp scope and fixed private errors (112.1968ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1153.3129

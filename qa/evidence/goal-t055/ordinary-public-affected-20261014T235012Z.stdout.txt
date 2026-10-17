@@ -1,0 +1,12 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx (3 tests | 1 skipped) 221ms
+ ✓ src/pages/knowledge/GoalT055ProducerArtifact.test.tsx (1 test) 162ms
+
+ Test Files  2 passed (2)
+      Tests  3 passed | 1 skipped (4)
+   Start at  23:50:13
+   Duration  4.94s (transform 268ms, setup 509ms, collect 1.11s, tests 383ms, environment 2.05s, prepare 349ms)
+
+

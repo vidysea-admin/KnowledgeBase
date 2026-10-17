@@ -1,0 +1,163 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+    "sha256": "c13c747a75f768317f25ea2da556dbd70f2642912309079a8d4960654212cf2b",
+    "bytes": 12830,
+    "oldPath": "packages/meeting-bot/src/capture/native-capture-runtime.test.ts",
+    "nonblank": 112
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts",
+    "sha256": "af219341f09d497c4e646be82420e91db338fb4c8e510c3f63890e4168d0035e",
+    "bytes": 14957,
+    "oldPath": "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+    "nonblank": 165
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts",
+    "sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+    "bytes": 2535,
+    "oldPath": "packages/meeting-bot/src/capture/native-clock-ledger.test.ts",
+    "nonblank": 22
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts",
+    "sha256": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+    "bytes": 6129,
+    "oldPath": "packages/meeting-bot/src/capture/native-clock-ledger.ts",
+    "nonblank": 73
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-ivf.test.ts",
+    "sha256": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+    "bytes": 1582,
+    "oldPath": "packages/meeting-bot/src/capture/native-ivf.test.ts",
+    "nonblank": 19
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-ivf.ts",
+    "sha256": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+    "bytes": 3222,
+    "oldPath": "packages/meeting-bot/src/capture/native-ivf.ts",
+    "nonblank": 42
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.test.ts",
+    "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+    "bytes": 8508,
+    "oldPath": "packages/meeting-bot/src/capture/native-media-finalize.test.ts",
+    "nonblank": 58
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.ts",
+    "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+    "bytes": 14286,
+    "oldPath": "packages/meeting-bot/src/capture/native-media-finalize.ts",
+    "nonblank": 131
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-media-probe.test.ts",
+    "sha256": "4e6b12e89a7900253112d3e08aad3234a27b2fdc0018ddfd2a6d51c8fa8a9512",
+    "bytes": 7418,
+    "oldPath": "packages/meeting-bot/src/capture/native-media-probe.test.ts",
+    "nonblank": 71
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-media-probe.ts",
+    "sha256": "569913b3bb1d2acc56b5c094015d15aab2f02d888315557571e929bffe8aa055",
+    "bytes": 17209,
+    "oldPath": "packages/meeting-bot/src/capture/native-media-probe.ts",
+    "nonblank": 187
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+    "sha256": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77",
+    "bytes": 5261,
+    "oldPath": "packages/meeting-bot/src/capture/native-media-types.ts",
+    "nonblank": 143
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts",
+    "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+    "bytes": 6240,
+    "oldPath": "packages/meeting-bot/src/capture/native-spool.test.ts",
+    "nonblank": 65
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-spool.ts",
+    "sha256": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+    "bytes": 21869,
+    "oldPath": "packages/meeting-bot/src/capture/native-spool.ts",
+    "nonblank": 281
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+    "sha256": "6483b4d14357cd86f8e10301e5f1d0e7377b551b32e2fe131bd9a4690a05f826",
+    "bytes": 10536,
+    "oldPath": "packages/meeting-bot/src/capture/native-tab-receiver.ts",
+    "nonblank": 155
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-commands.ts",
+    "sha256": "fe9059890b5a8c2a1b83dd9ecd756060f5f4ab0aacb88e75d482a3b6fae86490",
+    "bytes": 20749,
+    "oldPath": "packages/meeting-bot/src/capture/record-commands.ts",
+    "nonblank": 300
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+    "sha256": "c92ea9dc7cefcc6babbc45a1580458b304323d079793e68ab76d02571111c3f2",
+    "bytes": 9231,
+    "oldPath": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+    "nonblank": 94
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+    "sha256": "469973ef3f4fd4ed5ba0aad45ba5107fc41efad8e4d5e7c40771f980f76133d6",
+    "bytes": 11306,
+    "oldPath": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+    "nonblank": 88
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "sha256": "1c5fd48a53db87f61596f5aaa9cc165fd6f22a11b9c70c4fb79dfb0bd22e9ffc",
+    "bytes": 15039,
+    "oldPath": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "nonblank": 132
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+    "sha256": "b0f7f8d7ffc8baba33545fd38f08012255cdaaf3f2b17fb3ad864b5e911adaeb",
+    "bytes": 21574,
+    "oldPath": "packages/meeting-bot/src/capture/record-finalize.ts",
+    "nonblank": 299
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+    "sha256": "a67793310befb5cfb3372ef7f4866afb07f97df471c370655d9e0ecc112f2f9b",
+    "bytes": 19046,
+    "oldPath": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+    "nonblank": 216
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+    "sha256": "4f40c233295ed2113c884034410534da2af36bb0cc4675cb9ed1bb5ed5d46048",
+    "bytes": 19725,
+    "oldPath": "packages/meeting-bot/src/capture/tab-browser.ts",
+    "nonblank": 271
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "sha256": "ff3a8d64d6451d90164412004a9cfe02c8306cc8eea337029a60dfcfe7af74c9",
+    "bytes": 5683,
+    "oldPath": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "nonblank": 55
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "sha256": "bfa4111f41bd5e9406f0c6d162eeb1413483ff8551d6f3be662f924d4b5fea2e",
+    "bytes": 15824,
+    "oldPath": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "nonblank": 171
+  }
+]

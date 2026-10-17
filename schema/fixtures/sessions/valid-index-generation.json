@@ -1,0 +1,39 @@
+{
+  "_id": "sess1",
+  "tenantId": "toc",
+  "sourceId": "src1",
+  "title": "27th-August-In-Focus",
+  "date": "2026-08-27",
+  "status": {
+    "transcribe": "done",
+    "index": "pending"
+  },
+  "indexAttempt": {
+    "version": 1,
+    "generation": "11111111-1111-4111-8111-111111111111",
+    "sessionId": "sess1",
+    "sourceId": "src1",
+    "turnDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "strict": true,
+    "state": "complete",
+    "phase": "writing",
+    "startedAt": "2026-10-14T00:00:00Z",
+    "finishedAt": "2026-10-14T00:01:00Z",
+    "turnCount": 1,
+    "manifest": {
+      "page": {
+        "id": "page1",
+        "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      },
+      "chunks": [
+        {
+          "id": "chunk1",
+          "digest": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      ],
+      "claims": [],
+      "preservedClaims": [],
+      "treeRevision": 1
+    }
+  }
+}

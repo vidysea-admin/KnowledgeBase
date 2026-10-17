@@ -1,0 +1,35 @@
+✔ flagOn is true only for the exact string 1 (1.427ms)
+✔ applyTranscriptQa disabled: same array object, no report, clamp never called (0.2808ms)
+✔ applyTranscriptQa enabled: the recorded 223 s of turns on 186 s of audio never exceeds the audio (1.5231ms)
+✔ applyTranscriptQa enabled: a clamp that returns an out-of-range turn, or an invalid duration, throws (0.6509ms)
+✔ planTranscriptionPath: disabled is null; enabled follows the T-048 chooser (0.6347ms)
+✔ boundariesForPlan: single -> one whole-file span, otherwise the chunked list untouched (0.9914ms)
+✔ isSingleCallComplete: needs turns, no gaps, tail within the shortfall (0.2359ms)
+✔ selectTranscriber: no plan reproduces the existing duration rule exactly; a single plan uses the long driver (0.2845ms)
+✔ driver, flags off: 223 s of turns on 186 s of audio is refused exactly as before and nothing is written (216.0874ms)
+✔ driver, LKB_TRANSCRIPT_QA=1: the same drift is clamped, no turn ends past 186 s, report written (218.8859ms)
+✔ driver, flags off: output is identical with or without the new code paths (chunked 3600 s, 2 calls) (468.7267ms)
+✔ driver, LKB_SINGLE_CALL_PATH=1 + gemini-3.8-flash on 3600 s: exactly one provider call, whole-file span (235.0929ms)
+✔ driver, single call fails: falls back to the chunked plan (1 failed + 2 chunk calls) (232.6838ms)
+✔ driver, incomplete initial single makes exactly one call then discards it before chunks (239.8293ms)
+✔ driver, empty/malformed/gapped/invalid initial results go straight to chunk fallback (1480.0932ms)
+✔ driver, fallback transient errors retry within the existing bound and redact provider details (281.122ms)
+✔ driver, recursive chunk recovery retains only the selected prefix and tail attempt evidence (306.8557ms)
+✔ driver, both paths failing preserve prior turns and QA/path bytes (288.2922ms)
+✔ driver, changed source audio after provider return refuses before publication (281.1584ms)
+✔ driver, same turns with newly suspicious accepted QA invalidate prior passed validation (524.3094ms)
+✔ driver, QA publication failure preserves prior sidecar bytes and leaves validation refused (266.4981ms)
+✔ driver, 90-minute inclusive boundary is one real initial transcription request (234.4524ms)
+✔ driver, LKB_SINGLE_CALL_PATH=1 but model unset or over 90 min: chunked exactly as today (512.6405ms)
+✔ accepted single makes one attempt and no chunks (2.0797ms)
+✔ incomplete or failed single is discarded before offset chunk consumption (0.8025ms)
+✔ chunk provider failure propagates without a partial successful result (0.7398ms)
+✔ unknown, empty or invalid fallback boundaries cannot become success (0.3765ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6083.083

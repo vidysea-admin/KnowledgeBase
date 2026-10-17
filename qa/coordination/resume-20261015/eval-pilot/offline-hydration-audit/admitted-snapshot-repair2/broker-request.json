@@ -1,0 +1,130 @@
+{
+  "format": "offline-hydration-repair2-request-v1",
+  "status": "FROZEN_WAITING_ROOT_CPU_RELEASE_AND_ADMISSION",
+  "soleExecutionOwner": "/root/resume_cpu_broker",
+  "candidate": "a666f51df7ed8b49d54e5e9b6076468ac7f430eb6ec45cb8a06673e5911b5a3e",
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "changedFiles": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "4c3661b659c4dfacfdcd07144b8de659a406b0b657166f6e1d3dcfb5142a9851"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "sha256": "a0cc779e50ed05a9361aa36500a68ccc42c86b7f21ad318d767321770f02c2a0"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs",
+      "sha256": "1ced3773c03ad443e3396a7983a1c09d729c39902f91ae4d28140c93ce7973c4"
+    }
+  ],
+  "pinsFile": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/pins.json",
+  "pinsSha256": "45cee2d894976615e8f38c55fc14e81801180a3a899ee4807a95045208e35d81",
+  "staticClosureEvidence": {
+    "owner": "/root/resume_cpu_broker",
+    "reportPath": "qa/coordination/resume-20261015/broker/hydration-static-binding-report.json",
+    "reportSha256": "3aac116018c1ceda6c8ef17186b355dbe78a8ab8a61f71636ccb67a9f0ddbc1e",
+    "closurePath": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/broker/pin-manifests/b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48.json",
+    "closureSha256": "b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48",
+    "closureCount": 208,
+    "missingBindingCountBeforeRepair": 1,
+    "byteDriftCount": 0,
+    "unsupportedStaticPackageSpecifiers": [],
+    "reason": "Previous inventory omitted a statically imported schema; actual bytes unchanged. Sole CPU broker208file closure selected;202file report preserved separately, not unioned.",
+    "computedAndExternalImportsCompleteClaim": false
+  },
+  "newProductionImports": "Existing readEffectiveTurns/knowledge visibility already actual transitive hydrator imports; explicit QA invocation added, no production code edits",
+  "commands": [
+    {
+      "phase": "synthetic-negative-helper",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs"
+      ],
+      "expectedTests": 2,
+      "outerTimeoutSeconds": 10
+    },
+    {
+      "phase": "actual-focused4",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--max-old-space-size=256",
+        "--import",
+        "tsx",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+        "--focus"
+      ],
+      "hardJobObjectSeconds": 60,
+      "finalizationReserveSeconds": 5,
+      "outputFile": "result.focus-repair2.json",
+      "questionIds": [
+        "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+        "2026-06-03-dual-enrollment-pathway-gq01",
+        "2026-08-10-ucas-what-changed-what-matters-gq01",
+        "2026-05-08-funding-dreams-loans-forex-gq01"
+      ],
+      "requiredOutcome": "ownexit0 +all4hydrated-source-verified +allreturnedSHA===independentExpectedSHA +raw3427/admitted3424 +exact3DATAQUALITYOPEN +all8tripwires0 +stablepins"
+    },
+    {
+      "phase": "actual-all92-conditional",
+      "onlyAfter": "synthetic2/2 andfocused4 actualGREEN ownexit0/stableepoch; root CPU release/admission required",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--max-old-space-size=256",
+        "--import",
+        "tsx",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs"
+      ],
+      "hardJobObjectSeconds": 60,
+      "finalizationReserveSeconds": 5,
+      "outputFile": "result.all92-repair2.json",
+      "requiresFocusedReceiptValidatedByAdapter": true
+    }
+  ],
+  "watchdog": "Sole broker must use verified scripts/qa/scoped-check-runner.py#Tree for each actual audit; existing audit watchdog.py is unchanged and its old immutable output filenames must NOT be reused.",
+  "sourceReaderPins": [
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566"
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "sha256": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "sha256": "c30821512924a77420ad5917aa7df2575c9e32d234b0ad829394471f8d8eef87"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    }
+  ],
+  "expected": {
+    "acceptedQuestionPopulation": 92,
+    "candidateInventory": 29,
+    "questionReferencedSessions": 23,
+    "unreferencedInventoryOnly": 6,
+    "rawTurns": 3427,
+    "admittedTurnsByStaticSpec": 3424,
+    "dataQualityOpen": 3,
+    "focused": 4,
+    "full92": 92
+  },
+  "providerOrEmbeddingAllowed": false,
+  "credentialReadsAllowed": false,
+  "networkTripwiresRequiredZero": true,
+  "dbConnectionsAllowed": false,
+  "noAutoRetry": true,
+  "preserveOriginalResult": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.json",
+  "originalResultSha256": "bb009a95474c7d555f4025e4c601649f1411147e42551402296bd2388e44725f",
+  "primaryNavigationPASS": false,
+  "answerAccuracyPASS": false,
+  "humanLabelsCreated": false
+}

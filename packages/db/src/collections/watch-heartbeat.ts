@@ -9,11 +9,13 @@
 // the `raw` escape hatch and none is added back here) — a cross-tenant read of watcher liveness
 // would be the ISS-078 class, which this repo never round-caps.
 import type { WatchHeartbeat } from "@lkb/core";
+import type { Db } from "mongodb";
 import { getDb } from "../client.js";
 import { scopedCollection } from "../lib/tenantScope.js";
 
-export function watchHeartbeat(tenantId: string) {
-  return scopedCollection<WatchHeartbeat>(getDb(), "watch_heartbeat")(tenantId);
+// Db injection exercises this exact accessor offline; normal callers keep the connected database.
+export function watchHeartbeat(tenantId: string, db: Db = getDb()) {
+  return scopedCollection<WatchHeartbeat>(db, "watch_heartbeat")(tenantId);
 }
 
 /** The two-part composite id — `(tenantId, sourceType)`, ONE row per source TYPE run-watch.mjs
@@ -27,8 +29,8 @@ export function watchHeartbeatId(tenantId: string, sourceType: string): string {
 /** Every heartbeat row this tenant has — the detector's input. Tenant-scoped by construction: the
  * `find` below is `withTenant`-merged, so a caller cannot read another tenant's liveness rows even
  * by passing a crafted filter, and there is no overload that omits the tenantId. */
-export async function listHeartbeats(tenantId: string): Promise<WatchHeartbeat[]> {
-  return watchHeartbeat(tenantId).find({}).toArray();
+export async function listHeartbeats(tenantId: string, db: Db = getDb()): Promise<WatchHeartbeat[]> {
+  return watchHeartbeat(tenantId, db).find({}).toArray();
 }
 
 /** One row for one (tenantId, sourceType), or `null` when that source type has never completed a
@@ -38,8 +40,9 @@ export async function listHeartbeats(tenantId: string): Promise<WatchHeartbeat[]
 export async function findHeartbeat(
   tenantId: string,
   sourceType: WatchHeartbeat["sourceType"],
+  db: Db = getDb(),
 ): Promise<WatchHeartbeat | null> {
-  return watchHeartbeat(tenantId).findOne({ _id: watchHeartbeatId(tenantId, sourceType) });
+  return watchHeartbeat(tenantId, db).findOne({ _id: watchHeartbeatId(tenantId, sourceType) });
 }
 
 /** Upserts one heartbeat row — safe to call on every run: the second call just refreshes
@@ -53,11 +56,11 @@ export async function findHeartbeat(
  * separate, session/config-derived first argument, and the filter this write lands on is
  * `withTenant`-merged from it, so a `doc` carrying someone else's `_id` prefix still cannot write
  * into another tenant's row. */
-export async function markHeartbeat(tenantId: string, doc: WatchHeartbeat): Promise<void> {
+export async function markHeartbeat(tenantId: string, doc: WatchHeartbeat, db: Db = getDb()): Promise<void> {
   const { sourceType, lastHeartbeatAt } = doc;
   // `doc._id` is deliberately NOT used: the id is recomputed here from the scoped `tenantId`, so a
   // doc built with the wrong prefix lands on this tenant's row or nowhere, never on another's.
-  await watchHeartbeat(tenantId).updateOne(
+  await watchHeartbeat(tenantId, db).updateOne(
     { _id: watchHeartbeatId(tenantId, sourceType) },
     { $set: { sourceType, lastHeartbeatAt } },
     { upsert: true },

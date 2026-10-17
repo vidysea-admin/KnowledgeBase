@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 18,
+  "originalIndex": 20,
+  "claimId": "2026-05-28-in-focus-1-c02",
+  "inputHash": "c56fbb2415b7b60990af02973d32e001681d416190bf28a0c825e04aabe2dbf4",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original turn describes securing a Government of India copyright certificate for passion projects benefiting the student and MSME. It does not identify 'we' as Innovique or explicitly characterize the projects as inventions, so the entire persisted claim is not directly supported.",
+    "missingReferences": [],
+    "caveats": [
+      "The single supplied reference has exactly one original match; no duplicate or missing reference is apparent.",
+      "speakerRef is 'unknown'; the inline name Makrand Rajadhyaksha does not independently establish speaker identity or organizational affiliation.",
+      "Original timing is 1095–1128 seconds; current content at the same ID is different and timed 2476–2478 seconds.",
+      "Transcript support for the certificate statement does not establish external factual truth, legal status, or human semantic approval.",
+      "Artifact hashes are provided raw-byte hashes; no on-disk artifact verification or substitution with normalized-LF hashes was performed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "turnId": "2026-05-28-in-focus-1-t041",
+        "contextVersion": "originalMigration",
+        "quote": "And what we do in terms of passion projects is actually secure a copyright certificate from the Government of India that favors the student and the MSME.",
+        "textSha256": "5a4f84219273491d4044acbea4cf02edd20ded4d522d409e233529751bde9eb3",
+        "contextSha256": "bd929c93c48531ec851f2f93e570f5bf3d10ed4027175b83e100661172c4e167",
+        "artifactSha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1095,
+        "tEnd": 1128,
+        "supports": "Supports the stated copyright-certificate source and student/MSME passion-project benefit, but not the Innovique attribution or explicit invention characterization."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current turn is a handover to Pranav Patel and contains no statement about Innovique, copyright certificates, the Government of India, or student passion-project inventions.",
+    "missingReferences": [],
+    "caveats": [
+      "The single supplied reference has exactly one current match; no duplicate or missing reference is apparent.",
+      "The same turn ID now contains unrelated text with different timing and speakerRef; original support cannot be silently substituted for this current citation.",
+      "speakerRef 'Makrand' is stored attribution only; neither it nor the named handover establishes organizational identity or factual truth.",
+      "Provided current raw-byte artifact hash was not independently verified on disk; normalized-LF hash is distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "turnId": "2026-05-28-in-focus-1-t041",
+        "contextVersion": "current",
+        "quote": "I will hand over to Pranav Patel.",
+        "textSha256": "a93d7b0050ad39afcfae1e72bb10b64507bd4ca986943cfe48b0bc5aa84f8563",
+        "contextSha256": "19e3a132e0d4b46a42405d4a77b52fe98ff4dfabadad4fad0b4e0454ba70788c",
+        "artifactSha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+        "revision": null,
+        "speakerRef": "Makrand",
+        "tStart": 2476,
+        "tEnd": 2478,
+        "supports": "Unrelated handover; supports no factual component of the persisted claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence partially supports the certificate statement but not its Innovique attribution or invention wording; current same-ID evidence is unrelated. All required supplied-data hashes and identity bindings match. Both unsupported labels are provisional, do not imply falsity, and confer no human gold or external truth."
+}

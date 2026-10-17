@@ -1,0 +1,25 @@
+{
+  "args": [
+    "qa/evidence/goal-u25-consumer/run-third-await.mjs",
+    "regression"
+  ],
+  "pins": {
+    "apps/api/src/session-decisions/reader.ts": "5c6e9dda7e94610aea21ebf01508364a19a285d342cd826a9a05950b740878d5",
+    "apps/api/src/session-decisions/provenance.ts": "e677c6e1ad767cdd622c6e37bbfe32d1307c7570581a43a089c741452f3e4580",
+    "apps/api/src/session-decisions/fixture.testsupport.ts": "5dd58be81441ea143ab7aac35df5e173f5f9038a90d6e3548048c4f3084fac68",
+    "apps/api/src/indexing/decisions-persist.ts": "82c6b6379f1c40e43b07e29584575f4463bed8f41bb9fb2c32e87a3e6aecf532",
+    "packages/index/src/pipeline/notes/decisions.ts": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/composition/integrations/trusted-readers.ts": "d1afa507ba6d1f426d1da2c14f65178fb9d930e592cca0ee4b8d61e493727042",
+    "apps/api/src/transcript-review/effective-reader.ts": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+    "apps/api/src/transcript-review/service.ts": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+    "apps/api/src/transcript-review/store.ts": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+    "qa/evidence/goal-u25-consumer/third-await.test.ts": "731e373b59ede7a2e362459b3639c5e62079cfcc3d82941b0c0491d489cc5743",
+    "qa/evidence/goal-u25-consumer/reader-before-third-await-fix.ts.txt": "2a21418901b6d7d88f84e1b583192ab962b29ba74c11810ed7069beb4f7e0d57",
+    "qa/evidence/goal-u25-consumer/run-third-await.mjs": "f2ebfe400acc1c83fd67375f265c09b6126d189c254d25bc4a5dbbbcd41de73a",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf"
+  },
+  "timeoutMs": 65000,
+  "output": "qa/evidence/goal-t051checker-broker-u25-third-await-current-regression"
+}

@@ -1,0 +1,87 @@
+✔ flagOn is true only for the exact string 1 (1.5265ms)
+✔ applyTranscriptQa disabled: same array object, no report, clamp never called (0.3129ms)
+✔ applyTranscriptQa enabled: the recorded 223 s of turns on 186 s of audio never exceeds the audio (1.515ms)
+✔ applyTranscriptQa enabled: a clamp that returns an out-of-range turn, or an invalid duration, throws (0.6438ms)
+✔ planTranscriptionPath: disabled is null; enabled follows the T-048 chooser (0.6829ms)
+✔ boundariesForPlan: single -> one whole-file span, otherwise the chunked list untouched (0.9827ms)
+✔ isSingleCallComplete: needs turns, no gaps, tail within the shortfall (0.2494ms)
+✔ selectTranscriber: no plan reproduces the existing duration rule exactly; a single plan uses the long driver (0.3334ms)
+✔ driver, flags off: 223 s of turns on 186 s of audio is refused exactly as before and nothing is written (538.7069ms)
+✔ driver, LKB_TRANSCRIPT_QA=1: the same drift is clamped, no turn ends past 186 s, report written (353.0069ms)
+✔ driver, flags off: output is identical with or without the new code paths (chunked 3600 s, 2 calls) (720.7609ms)
+✔ driver, LKB_SINGLE_CALL_PATH=1 + gemini-3.8-flash on 3600 s: exactly one provider call, whole-file span (330.1436ms)
+✔ driver, single call fails: falls back to the chunked plan (1 failed + 2 chunk calls) (331.5167ms)
+✔ driver, incomplete initial single makes exactly one call then discards it before chunks (368.8585ms)
+✔ driver, empty/malformed/gapped/invalid initial results go straight to chunk fallback (2170.4316ms)
+✔ driver, fallback transient errors retry within the existing bound and redact provider details (350.9835ms)
+✔ driver, recursive chunk recovery retains only the selected prefix and tail attempt evidence (403.1259ms)
+✔ driver, both paths failing preserve prior turns and QA/path bytes (379.6265ms)
+✔ driver, changed source audio after provider return refuses before publication (323.8255ms)
+✔ driver, same turns with newly suspicious accepted QA invalidate prior passed validation (528.0348ms)
+✔ driver, QA publication failure preserves prior sidecar bytes and leaves validation refused (332.3325ms)
+✔ driver, 90-minute inclusive boundary is one real initial transcription request (319.0744ms)
+✔ driver, LKB_SINGLE_CALL_PATH=1 but model unset or over 90 min: chunked exactly as today (666.3153ms)
+✖ actual child consumes sealed public bytes, excludes private turns before QA, ignores intentional silence (210.618ms)
+✔ actual recovery child refuses missing seal, foreign owner/raw reselection and captured QA-off with zero uploads (761.2457ms)
+✔ actual child source/audio/receipt mutation after snapshot makes zero provider uploads (567.7815ms)
+✔ actual durable receipt/current media guard invokes only bound public audio (594.651ms)
+✔ missing sealed input refuses actual captured provider, provided legacy source stays public (112.8402ms)
+✔ foreign owner, raw selection, forged locator/digest/generation make zero provider calls (502.1677ms)
+✔ changed source/receipt/audio/video after guard construction refuse before provider (373.3251ms)
+✔ privacy removes whole guarded overlaps while invalid/past-end timing stays in QA domain (85.0063ms)
+✔ intentional silence excludes guard margins, genuine public gaps keep accumulated thresholds (1.297ms)
+✔ sealed envelope parser bounds payload, exact fields and owner without echoing payload (44.7633ms)
+✔ synchronous actual admission rejects bound but contradictory QA duration/count summaries (225.5194ms)
+✔ accepted single makes one attempt and no chunks (2.241ms)
+✔ incomplete or failed single is discarded before offset chunk consumption (0.8406ms)
+✔ chunk provider failure propagates without a partial successful result (0.6996ms)
+✔ unknown, empty or invalid fallback boundaries cannot become success (1.5451ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 37
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 13346.1772
+
+✖ failing tests:
+
+test at scripts\lib\transcription\private-recording-driver.test.mjs:57:1
+✖ actual child consumes sealed public bytes, excludes private turns before QA, ignores intentional silence (210.618ms)
+  AssertionError [ERR_ASSERTION]: node:internal/modules/run_main:107
+      triggerUncaughtException(
+      ^
+  
+  Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'tsx' imported from C:\Users\product\AppData\Local\Temp\t048-private-proof-A7KhZx\scripts\transcribe-long-session.mjs
+  Did you mean to import "tsx/dist/esm/api/index.cjs"?
+      at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
+      at packageResolve (node:internal/modules/esm/resolve:768:81)
+      at moduleResolve (node:internal/modules/esm/resolve:859:18)
+      at defaultResolve (node:internal/modules/esm/resolve:992:11)
+      at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+      at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+      at nextStep (node:internal/modules/customization_hooks:189:26)
+      at resolve (file:///C:/Users/product/AppData/Local/Temp/t048-private-proof-A7KhZx/hook.mjs:14:9)
+      at nextStep (node:internal/modules/customization_hooks:189:26)
+      at resolveWithHooks (node:internal/modules/customization_hooks:417:10) {
+    code: 'ERR_MODULE_NOT_FOUND'
+  }
+  
+  Node.js v24.19.0
+  
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/lib/transcription/private-recording-driver.test.mjs:60:48)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

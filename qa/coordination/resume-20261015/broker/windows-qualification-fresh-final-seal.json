@@ -1,0 +1,71 @@
+{
+  "request": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\windows-qualification-integration\\broker-request.json",
+    "sha256": "ce4e054c33094c4fc7e3267ac889ed31bbe1f08b2208485b02bc5a3ce0c72ffd"
+  },
+  "candidate": "495154403c783b78eff8d30120487ebb8cb9c11cefe9eee423acb7da69fcf275",
+  "candidateIdentityKind": "Declared baselineGitSHA plus exact rawpins",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\b68836f2a55ca26b181cc3973d96444e978b5b85f8530fbf6bf087d4e58b44f3.json",
+    "sha256": "b68836f2a55ca26b181cc3973d96444e978b5b85f8530fbf6bf087d4e58b44f3",
+    "count": 815
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-head-before-receipt.json",
+      "sha256": "84d0a0a9bccd454024649d2fa6dd4290a50d8d3dd96c3c79fb66919c74c6ad08",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.7809999999990396,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-head-before.log",
+        "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-node-preflight-receipt.json",
+      "sha256": "3ebde16ecf4747485e5378c1f491ea52d5cd1f7e30f8be0df44d100404dc10ea",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.875,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-node-preflight.log",
+        "sha256": "801ba7d40e84531582767615d62f56dbf4c8637476c14dc59f0ed7c07011c9c7"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-bot-types-receipt.json",
+      "sha256": "8b5118b29711f2d96dfcbf6c91927eb591dba02d9d58eed038dd7275a4850df9",
+      "exit": 2,
+      "counts": {},
+      "active_s": 8.218999999997322,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-bot-types.log",
+        "sha256": "4597adf10d5f18bfe61680517df8c9f42c20aa4564cf60726e6fea7440474a27"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-head-after-receipt.json",
+      "sha256": "66ccd12896e1547f9c0217019edfdd5bb1a3341bf8a78d58ccde2c9698e582f3",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.7809999999990396,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\windows-qualification-fresh-head-after.log",
+        "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+      }
+    }
+  ],
+  "failure": "AssertionError: command failure/drift",
+  "beforeHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "afterHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "allPinsFinalMatch": true,
+  "ownedTempRemoved": true,
+  "ownedProtectedFixtureRemoved": true,
+  "toolchainBuild": "NOT_RUN: no existing cmake/cl toolchain metadata found; no installation or helper execution",
+  "existingBinaryIdentitiesMatch": false,
+  "elapsed_s": 16.07800000000134,
+  "accounting": "SHARED INTEGRATION",
+  "independentVerdict": null,
+  "actual_total_tokens": null
+}

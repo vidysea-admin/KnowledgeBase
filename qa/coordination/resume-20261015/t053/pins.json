@@ -1,0 +1,94 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "cbbacea0338163b35553cececabf773ebff05d6168c9e3eef07e3ad683ece138",
+  "candidate_kind": "uncommitted exact ordered path+raw-byte SHA256 map; not git commit",
+  "source_writes_this_phase": [],
+  "files": [
+    {
+      "path": "apps/api/src/source-intake/jobs/types.ts",
+      "sha256": "f95f1c283f111d35077e15346888c3dd4df3bcb43d527804fa647372e1ebc99c",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/source-intake/jobs/input.ts",
+      "sha256": "8528767d68149712edb3a1f00e88c6bc8de43fffa1ac2cf0ea896d9c3c8ec442",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/source-intake/jobs/store.ts",
+      "sha256": "a8ec0080543078a6f9079a74bdaea81f261a1029c7c4e43d82e528657036088d",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/source-intake/jobs/entry.ts",
+      "sha256": "5ca9c9eb2e6822b9472d746845dfdfd529501ab50727baf1db886da0ffab0c7f",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/connector-workflow/watched.ts",
+      "sha256": "377addcbcbb8e2972a160ff4b2476cfe1c31683c2ce16570ea5403c85f72445d",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/connector-workflow/jobs.ts",
+      "sha256": "2010087154fc5be42f010efac272ad04a9540f6e9e834a93d344856ce1fbfcc4",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/connector-workflow/router.ts",
+      "sha256": "03bbb742db2aedee7469cf28d8b60c75f332a7d43b4e0411816382c41f2791c8",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/connector-workflow/workflow.test.ts",
+      "sha256": "d8ae7f3113b3dc9a57d6bf59c18fe4ecc8680a0ae0bc5d8b5974a93d84c7e295",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/connector-workflow/watched-job.ts",
+      "sha256": "1dafe811cfbf0520164555ef0586392a1dd4d90c69261bc3b49e9b025ae782e8",
+      "matches_previous_candidate": true
+    },
+    {
+      "path": "apps/api/src/connector-workflow/watched-job.test.ts",
+      "sha256": "975da23ced2eeb414532fd965d7ca15d71ec931d3e15da3d15f20adf449bfc0a",
+      "matches_previous_candidate": true
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "sha256": "761c72202df44320ad80fcc5d55aafea205cdd8da6f320e966fa38f6b5442775"
+    },
+    {
+      "path": "apps/api/src/connector-workflow/types.ts",
+      "sha256": "339bd8ed5e54b8975512fefc9d95bbcbe9950cac340f2926cd74322057334af8"
+    },
+    {
+      "path": "apps/api/src/connector-workflow/mongo-store.ts",
+      "sha256": "4f1c4bac38fbb8f2c7d0e4bbbf891a1dcaaa2b03d520e667c74f05e5c05c842c"
+    },
+    {
+      "path": "apps/api/src/connector-workflow/fixtures.ts",
+      "sha256": "7e3cc8ca59a3091e4c678d282ba69bb70947e137c238e432c84b674ef18d70c7"
+    },
+    {
+      "path": "apps/api/src/source-intake/jobs/worker.ts",
+      "sha256": "5760cfc5a6026ee38bb3d9e41b5eda6e349d4ddff04cd814e6a47356b1737fed"
+    },
+    {
+      "path": "apps/api/src/source-intake/jobs/receipt.ts",
+      "sha256": "c95ed1ae1943a27311cdb99181566c0b39f00cd6c5824b1e748f9868ab8e373f"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": "qa/contracts/goal-t053.md",
+      "sha256": "8de51421af2c76cbbee113ee5ac035fe7e4b54b426202ca9ca316a31f2d6bb21"
+    }
+  ],
+  "recorded_at": "2026-10-15T19:37:31.6479959Z"
+}

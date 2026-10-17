@@ -1,0 +1,91 @@
+{
+  "candidate_manifest": "combined-source-pins-genuine-phase-observer.json",
+  "candidate_sha256": "3c96de3e41b36c9839ff52a03ccce763df665ae6d19fb7096ce37484627139b1",
+  "global_active_seconds": 300,
+  "per_command_job_seconds": 75,
+  "node_timeout_ms": 70000,
+  "default_file_isolation": true,
+  "concurrency": 1,
+  "groups": [
+    {
+      "id": "floor1",
+      "paths": [
+        "apps/api/src/production.test.ts",
+        "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+        "apps/api/src/indexing/post-commit.test.ts",
+        "apps/api/src/indexing/public-preserved-review.test.ts",
+        "apps/api/src/indexing/vectorless-publication.test.ts",
+        "apps/api/src/indexing/native-archive/binding.test.ts",
+        "apps/api/src/indexing/native-archive/publication.test.ts",
+        "packages/db/src/collections/speaker-suggestions/index.test.ts",
+        "apps/api/src/composition/lazy-database.test.ts"
+      ]
+    },
+    {
+      "id": "floor2",
+      "paths": [
+        "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+        "apps/api/src/transcript-review/persist.test.ts",
+        "apps/api/src/transcript-review/service.test.ts",
+        "apps/api/src/transcript-review/refresh.test.ts",
+        "apps/api/src/transcript-review/refresh-executor.test.ts",
+        "apps/api/src/transcript-review/authorization.test.ts",
+        "apps/api/src/indexing/speaker-suggest.test.ts",
+        "apps/api/src/speaker-profiles/router.test.ts",
+        "apps/api/src/speaker-profiles/store.test.ts",
+        "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+        "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts"
+      ]
+    },
+    {
+      "id": "floor3a",
+      "paths": [
+        "scripts/native-capture/server.test.ts",
+        "scripts/native-capture/record.test.ts",
+        "apps/api/src/capture-readiness/router.test.ts",
+        "apps/api/src/source-intake/jobs/jobs.test.ts",
+        "apps/api/src/source-intake/jobs/privacy.test.ts"
+      ]
+    },
+    {
+      "id": "floor3b",
+      "paths": [
+        "scripts/native-capture/production.test.ts"
+      ],
+      "positive_pattern": "^(?:production refuses network/outside roots and enabled native writes without platform authority before I/O|real private empty store drains boundedly without DB/providers/host qualification|synthetic alignment unit joins actual index generation and concrete transaction factory to existing consumer)$",
+      "required_selected": 3,
+      "shares_75s_with": "floor3a"
+    }
+  ],
+  "original_paths": [
+    "apps/api/src/production.test.ts",
+    "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "apps/api/src/indexing/post-commit.test.ts",
+    "apps/api/src/indexing/public-preserved-review.test.ts",
+    "apps/api/src/indexing/vectorless-publication.test.ts",
+    "apps/api/src/indexing/native-archive/binding.test.ts",
+    "apps/api/src/indexing/native-archive/publication.test.ts",
+    "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+    "apps/api/src/transcript-review/persist.test.ts",
+    "apps/api/src/transcript-review/service.test.ts",
+    "apps/api/src/transcript-review/refresh.test.ts",
+    "apps/api/src/transcript-review/refresh-executor.test.ts",
+    "apps/api/src/transcript-review/authorization.test.ts",
+    "packages/db/src/collections/speaker-suggestions/index.test.ts",
+    "scripts/native-capture/server.test.ts",
+    "scripts/native-capture/record.test.ts",
+    "scripts/native-capture/production.test.ts",
+    "apps/api/src/capture-readiness/router.test.ts",
+    "apps/api/src/source-intake/jobs/jobs.test.ts",
+    "apps/api/src/source-intake/jobs/privacy.test.ts",
+    "apps/api/src/indexing/speaker-suggest.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+    "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts"
+  ],
+  "original_path_count": 25,
+  "new_lazy_path_count": 1,
+  "reused_genuine_receipt": "broker/genuine-phase-observer-original-positive-receipt.json",
+  "reused_genuine_log_sha256": "3959af50396e05b73e09f4f9aa33d49d6e04252be13143e4a4f4bfe26aab239d"
+}

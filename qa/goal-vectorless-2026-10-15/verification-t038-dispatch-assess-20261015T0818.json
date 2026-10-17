@@ -1,0 +1,40 @@
+{
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "qa/evidence/t038-cycle1-review-budget.json"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 10000,
+  "startedAt": "2026-10-15T08:01:07.739Z",
+  "completedAt": "2026-10-15T08:01:07.923Z",
+  "elapsedMs": 180.0857,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/evidence/t038-cycle1-review-budget.json": "8ab5e7cb9e9a17a0f67bd158706a070410d15cf3e111c0ba6acc46befd810e86",
+    "qa/manifests/t038-atomic-lifecycle-outbox.md": "f8c6356634e8e8af6d8658e516990529d3ea6cce1e8c52865d4ecfc171f2079d",
+    "qa/packets/t038-atomic-lifecycle-outbox.md": "834d4be2242def26def9099de515ced9e23cb402833deec2354cbbbedb6179d2",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "78d5da6bedda2c8aade9cb4de6d193dbad4419376313c444f0c49b5abf5af95f",
+    "qa/goal-vectorless-2026-10-15/verification-t038-literal-floor-20261015T0811.json": "6cbfb1bff702801b1695fa265d64ccbdf1c46c0039f1ed1467117eb40d6f1adb",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  },
+  "after": {
+    "qa/evidence/t038-cycle1-review-budget.json": "8ab5e7cb9e9a17a0f67bd158706a070410d15cf3e111c0ba6acc46befd810e86",
+    "qa/manifests/t038-atomic-lifecycle-outbox.md": "f8c6356634e8e8af6d8658e516990529d3ea6cce1e8c52865d4ecfc171f2079d",
+    "qa/packets/t038-atomic-lifecycle-outbox.md": "834d4be2242def26def9099de515ced9e23cb402833deec2354cbbbedb6179d2",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "78d5da6bedda2c8aade9cb4de6d193dbad4419376313c444f0c49b5abf5af95f",
+    "qa/goal-vectorless-2026-10-15/verification-t038-literal-floor-20261015T0811.json": "6cbfb1bff702801b1695fa265d64ccbdf1c46c0039f1ed1467117eb40d6f1adb",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-t038-dispatch-assess-20261015T0818.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-t038-dispatch-assess-20261015T0818.stderr.txt",
+  "hashesUnchanged": true
+}

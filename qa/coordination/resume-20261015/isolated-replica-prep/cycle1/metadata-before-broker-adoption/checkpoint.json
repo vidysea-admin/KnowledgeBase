@@ -1,0 +1,15 @@
+{
+  "status": "FROZEN_AWAITING_BROKER",
+  "cycle": 1,
+  "candidate_content_manifest_sha256": "eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+  "readyForActivation": false,
+  "independentReview": "PENDING",
+  "broker_request": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\broker-request.json",
+  "expectedFakeTestMethods": 11,
+  "expectedActualDiscovery": "Must be emitted by runner, not yet measured",
+  "makerActualUsage": null,
+  "cycle0AllocatedActiveSeconds": 150,
+  "cycle0AllocatedTotalTokens": 20000,
+  "nextReviewBudget": "Requires explicit finite cumulative root authority; prior limit preserved",
+  "priorVerdict": "FAIL untouched"
+}

@@ -1,0 +1,188 @@
+{
+  "kind": "READ_ONLY_REMAINING_READ_MECHANICS_PREFLIGHT_NOT_INDEPENDENT_PASS",
+  "complete": false,
+  "source_clause_diff_bytes": 27336,
+  "metadata_bytes": 11240,
+  "selected_payload_bytes": 38593,
+  "estimated_tokens": 12865,
+  "payload_sha256": "c25921260cbf7d43f63e21f359d5be12aefd111b78b606630ac1d17dc231b6e6",
+  "spec_sha256": "bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de",
+  "script_sha256": "f9717064aaa48a4cd512644001bd7a9310c722bbc079b27189e22b0113ca45b8",
+  "counts": {
+    "declared_pin_entries": 3647,
+    "unique_pin_files": 1695,
+    "receipt_count": 6,
+    "identity_fields": 8947,
+    "source_blocks": 6,
+    "clause_blocks": 5
+  },
+  "mismatch_count": 27,
+  "mismatches": [
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-ui-history-three-repair.json env hash KB_U24_PRIVATE_TOC_TESTS",
+      "expected": null,
+      "actual": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-ui-history-three-repair.json env aggregate",
+      "expected": "e665a022fa0fefb3b2134896e4a46d2f46ed6b8fa36cd47a797c21cb939d2fb3",
+      "actual": "38dfbf884bdb864e87f6ea8e34e9edca6a7129c1e9b461f2c07d5ce317901db1"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.json current apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+      "expected": "49e5a98da85ebe3e3b67a30fa8127e85e89f8428c5c46f0511c705f5ad2b2179",
+      "actual": "d0df06948303104901d26ca9cbce5bc09b3832c9c8a7a803020b431a16ed7ff0"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.json env hash KB_U24_PRIVATE_TOC_TESTS",
+      "expected": null,
+      "actual": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.json env aggregate",
+      "expected": "e665a022fa0fefb3b2134896e4a46d2f46ed6b8fa36cd47a797c21cb939d2fb3",
+      "actual": "38dfbf884bdb864e87f6ea8e34e9edca6a7129c1e9b461f2c07d5ce317901db1"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/ask/source-context.test.ts",
+      "expected": "a0e8cbeb59aca3de9ec5a62086ce32c6187f82e51399c478fee7b5951086849f",
+      "actual": "a29005475d8284127be92c4404747c9b8956d5234c8216629d846924eaa0de03"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/ask/source-context.ts",
+      "expected": "0ee19b5d02cb894d838c16a3723f554f464fefc6a879613ad9476a7c539bf565",
+      "actual": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/composition/integrations/trusted-readers.ts",
+      "expected": "22bdffc19a9871f5b3819e566410a332243c0116b3475539c95eae101d1eb732",
+      "actual": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/evaluation-flywheel/composition.test.ts",
+      "expected": "c58aff9cc1706df18bc9b2c8d2386a2cfb5fa77a57c3ea1001b5fbf8ead58c5d",
+      "actual": "284080e7e2a0c2abd573982c1d589bf4603eb5f7bdf03e2bbfd34a3926abfe10"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/evaluation-flywheel/test-fixture.ts",
+      "expected": "6bd2229d3499ccb532a585a7325dcb8052250b22931978768e45f5608ffbd13f",
+      "actual": "4fd0bcbdd3f054c20e5e444f87900609ffb63d306c68b5a5fdaf5c84c4379cee"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/routes/ask/ask.test.ts",
+      "expected": "0d2d59299e5e5696ebf57f6b6bd80e485474a822d6aeccd401f0b487c5e55c03",
+      "actual": "85cbfd2e73901f59d0e9113c38093abbf7fd8d7bbebd235a3436127007220408"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json current apps/api/src/routes/ask/ask.ts",
+      "expected": "23f4f7463d92b22e5d9851b899bde43883fdfad1c1392586b935b7ba0878374b",
+      "actual": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/ask/source-context.test.ts",
+      "expected": "a0e8cbeb59aca3de9ec5a62086ce32c6187f82e51399c478fee7b5951086849f",
+      "actual": "a29005475d8284127be92c4404747c9b8956d5234c8216629d846924eaa0de03"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/ask/source-context.ts",
+      "expected": "0ee19b5d02cb894d838c16a3723f554f464fefc6a879613ad9476a7c539bf565",
+      "actual": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/composition/integrations/trusted-readers.ts",
+      "expected": "22bdffc19a9871f5b3819e566410a332243c0116b3475539c95eae101d1eb732",
+      "actual": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/evaluation-flywheel/composition.test.ts",
+      "expected": "c58aff9cc1706df18bc9b2c8d2386a2cfb5fa77a57c3ea1001b5fbf8ead58c5d",
+      "actual": "284080e7e2a0c2abd573982c1d589bf4603eb5f7bdf03e2bbfd34a3926abfe10"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/evaluation-flywheel/test-fixture.ts",
+      "expected": "6bd2229d3499ccb532a585a7325dcb8052250b22931978768e45f5608ffbd13f",
+      "actual": "4fd0bcbdd3f054c20e5e444f87900609ffb63d306c68b5a5fdaf5c84c4379cee"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/routes/ask/ask.test.ts",
+      "expected": "0d2d59299e5e5696ebf57f6b6bd80e485474a822d6aeccd401f0b487c5e55c03",
+      "actual": "85cbfd2e73901f59d0e9113c38093abbf7fd8d7bbebd235a3436127007220408"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json current apps/api/src/routes/ask/ask.ts",
+      "expected": "23f4f7463d92b22e5d9851b899bde43883fdfad1c1392586b935b7ba0878374b",
+      "actual": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.json runtime version",
+      "expected": "Python 3.12.10",
+      "actual": "v24.19.0"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json effective current apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+      "expected": "184970179303ed4d8c998b8870f1ba084b415c0cbbcfb21cb57cc7e7fd94e579",
+      "actual": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json effective current apps/web/src/App.tsx",
+      "expected": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+      "actual": "5e547f5dc5fe736111c8347b497f66130ad16a286f71b01b2933b774ca6284b3"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json effective current apps/web/src/pages/answer-policy/AnswerSources.tsx",
+      "expected": "0c92a27554f50b75da0f42ef6ec8849e4beaf221c67830ab53913f2a75ef8bd0",
+      "actual": "66c479ba2f1d945e08ebb207df5d849073fdb627d938dec335e3bd2fa0067815"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json effective current apps/web/src/pages/search/SearchPage.tsx",
+      "expected": "8ab469c8cd787378574d52b1ea508d10a219d299115a68f47b40123869cbd93c",
+      "actual": "8543801e1969372d04831a21ec031c176c972896d7e2e887badacaf335ede25c"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json effective current apps/web/src/api/search/client.ts",
+      "expected": "d24bc4ad5e25a4709efc777f66b787c93a3ea606b12e97ecddc950ba1909bedd",
+      "actual": "49e069172b73997976f28f28aa1e3e0a62f5d5c9d9b8ad6386828d169f7ec17d"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json effective current apps/web/src/pages/calibration-review/offline-transfer.test.ts",
+      "expected": "71fdbc1323505a292ff99a56ac1c324d55d9a85d43a67102680d59c03b980c32",
+      "actual": "790c0ce587815af09d429776dc8e69c6b168b9e174802b58537da4eb2d832f4a"
+    },
+    {
+      "kind": "metadata_bound",
+      "label": "metadata UTF8 bytes",
+      "expected": 5000,
+      "actual": 11240
+    }
+  ],
+  "review_admission": false,
+  "tests_run": false,
+  "production_writes": false,
+  "support_accounting": "Count this verification-support run once, separately; not maker denominator padding."
+}

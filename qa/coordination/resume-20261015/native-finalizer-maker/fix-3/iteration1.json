@@ -1,0 +1,58 @@
+{
+  "kind": "MAKER_SELFTEST_NOT_INDEPENDENT",
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+    "src/capture/native-media-probe.test.ts",
+    "src/capture/native-media-finalize.test.ts"
+  ],
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "LKB_NATIVE_TEST_FFMPEG": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffmpeg.exe",
+    "LKB_NATIVE_TEST_FFPROBE": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+    "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp",
+    "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp"
+  },
+  "pins_before": {
+    "packages/meeting-bot/src/capture/native-media-probe.ts": "77997c641b87aa2a71cca35ad19cec91855cc19dca81e515d656e23fe790afd5",
+    "packages/meeting-bot/src/capture/native-media-probe.test.ts": "8053ebdfc127613572e44dcddde24cb39a480c14b96cf7465ccd636946798491",
+    "packages/meeting-bot/src/capture/native-media-finalize.ts": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+    "packages/meeting-bot/src/capture/native-media-finalize.test.ts": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+    "packages/meeting-bot/src/capture/native-ivf.ts": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+    "packages/meeting-bot/src/capture/native-ivf.test.ts": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+    "packages/meeting-bot/src/capture/native-clock-ledger.ts": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+    "packages/meeting-bot/src/capture/native-clock-ledger.test.ts": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+    "packages/meeting-bot/src/capture/native-spool.ts": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+    "packages/meeting-bot/src/capture/native-spool.test.ts": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+    "packages/meeting-bot/src/capture/native-media-types.ts": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77"
+  },
+  "tokens": null,
+  "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+  "pid": 25416,
+  "exit": 1,
+  "tree_closed": true,
+  "active_s": 5.5,
+  "pins_after": {
+    "packages/meeting-bot/src/capture/native-media-probe.ts": "77997c641b87aa2a71cca35ad19cec91855cc19dca81e515d656e23fe790afd5",
+    "packages/meeting-bot/src/capture/native-media-probe.test.ts": "8053ebdfc127613572e44dcddde24cb39a480c14b96cf7465ccd636946798491",
+    "packages/meeting-bot/src/capture/native-media-finalize.ts": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+    "packages/meeting-bot/src/capture/native-media-finalize.test.ts": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+    "packages/meeting-bot/src/capture/native-ivf.ts": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+    "packages/meeting-bot/src/capture/native-ivf.test.ts": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+    "packages/meeting-bot/src/capture/native-clock-ledger.ts": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+    "packages/meeting-bot/src/capture/native-clock-ledger.test.ts": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+    "packages/meeting-bot/src/capture/native-spool.ts": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+    "packages/meeting-bot/src/capture/native-spool.test.ts": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+    "packages/meeting-bot/src/capture/native-media-types.ts": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77"
+  },
+  "pins_unchanged": true,
+  "log_sha256": "e5559ba67b0fcc1bdbbdf546a1f50bee99ed51fa6fb61bf5eba38452129d7e89"
+}

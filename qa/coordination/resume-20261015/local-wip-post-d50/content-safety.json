@@ -1,0 +1,21 @@
+{
+  "schema": "post-d50-content-safety/1",
+  "recordedAt": "2026-10-16T00:57:17.0590808Z",
+  "helper": "qa/coordination/resume-20261015/create-local-milestone.ps1",
+  "helperSha256": "17ffdafcc7f0c5c2c3a7e936fd71a9dcc949df257d0e8bd394b3a6287a639ee4",
+  "method": "Extract existing helper scanner pattern assignment only; inspect exact raw candidate bytes without invoking staging/commit helper",
+  "files": 420,
+  "bytes": 75631774,
+  "findings": [],
+  "findingCount": 0,
+  "valuesPersisted": false,
+  "limitation": "Heuristic patterns; arbitrary private prose and unknown formats not certified; findings require safe path-only disposition",
+  "actions": {
+    "provider": 0,
+    "commit": 0,
+    "push": 0,
+    "staging": 0,
+    "tests": 0,
+    "database": 0
+  }
+}

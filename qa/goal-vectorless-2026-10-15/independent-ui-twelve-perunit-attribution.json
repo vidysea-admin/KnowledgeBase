@@ -1,0 +1,76 @@
+{
+  "kind": "PER_FILE_ATTRIBUTION_FROM_FAILED_SHARED_BATCH_NOT_GLOBAL_PASS",
+  "receipt": "qa/goal-vectorless-2026-10-15/verification-independent-ui-probes-twelve.json",
+  "batchExitCode": 1,
+  "selectedPassed": 11,
+  "selectedFailed": 1,
+  "deselected": 27,
+  "sharedUnhandledOrSetupFailuresObserved": false,
+  "sharedConsoleWarnings": [
+    "ReactRouter futureflags",
+    "collections React act warning"
+  ],
+  "sourceRuntimePinsUnchanged": true,
+  "rawImportIdentityLimitation": "App.tsx?raw supplementary pin captured duringrun only; not represented as prelaunch identity",
+  "rawIdentitySupplement": "independent-ui-probes-app-raw-supplement.json",
+  "perUnit": [
+    {
+      "unit": "setup",
+      "files": [
+        "SetupWizardPage.test.tsx"
+      ],
+      "selectedPassed": 4,
+      "deselected": 16,
+      "status": "attributable selected cases passed; no standalone process exit"
+    },
+    {
+      "unit": "transcript",
+      "files": [
+        "TranscriptReview.test.tsx",
+        "ReviewHistory.test.tsx"
+      ],
+      "selectedPassed": 3,
+      "deselected": 11,
+      "status": "attributable selected cases passed; no standalone process exit"
+    },
+    {
+      "unit": "speaker",
+      "files": [
+        "speaker-auth-session.test.tsx"
+      ],
+      "selectedPassed": 1,
+      "deselected": 0,
+      "status": "attributable independent case passed; no standalone process exit"
+    },
+    {
+      "unit": "operations",
+      "files": [
+        "evaluation-child-lineage.test.tsx"
+      ],
+      "selectedPassed": 1,
+      "deselected": 0,
+      "status": "attributable independent case passed; no standalone process exit"
+    },
+    {
+      "unit": "trusted-human503-current-consumer",
+      "files": [
+        "TrustedHumanRefusalConsumption.test.tsx"
+      ],
+      "selectedPassed": 2,
+      "deselected": 0,
+      "status": "attributable current affected consumer cases passed; no standalone process exit"
+    },
+    {
+      "unit": "collections",
+      "files": [
+        "collections-kind-identity.test.tsx"
+      ],
+      "selectedPassed": 0,
+      "selectedFailed": 1,
+      "status": "failed URL assertion before body assertion; body NOT proven"
+    }
+  ],
+  "sharedCommandElapsedMs": 17575.0177,
+  "sharedCostAccounting": "record once; no guessed perunit allocation or maker/checker ratio credit",
+  "independentReviewerReuseDecisionRequired": true
+}

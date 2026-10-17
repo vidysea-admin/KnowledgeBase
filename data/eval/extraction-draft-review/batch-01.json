@@ -1,0 +1,1306 @@
+{
+  "version": 1,
+  "batch": 1,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "tenantId": "toc",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "sourceBinding": {
+        "caseId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "tenantId": "toc",
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/claims.json",
+            "sha256": "40b13b59f5134853affa90ab87392b3d23466484cac7286ef7c34b6d6d554a69",
+            "normalizedLfSha256": "7b3736e2bed1435fde763405a3cbcbb544a3c5fa296165a3a2b86999be1b977e",
+            "bytes": 3087
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+            "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "bytes": 175267
+          }
+        }
+      },
+      "sourceTurns": 291,
+      "sourceClaims": 6,
+      "invalidTimeTurnIds": [
+        "2026-04-21-visa-blueprint-part2-italy-france-nz-t141"
+      ],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+          "bytes": 125818
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "7b3736e2bed1435fde763405a3cbcbb544a3c5fa296165a3a2b86999be1b977e",
+          "bytes": 3004
+        }
+      }
+    },
+    {
+      "caseId": "2026-05-08-funding-dreams-loans-forex",
+      "tenantId": "toc",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "sourceBinding": {
+        "caseId": "2026-05-08-funding-dreams-loans-forex",
+        "tenantId": "toc",
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/claims.json",
+            "sha256": "d8fbcae25bc5aee0f0753be88a335cdd38ccfdfafadff530c8cf7f73cf339061",
+            "normalizedLfSha256": "994caa059c44902441c79d44b11b1d48bb0e739b40dbfc269f817f143836808e",
+            "bytes": 2382
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+            "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+            "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+            "bytes": 76746
+          }
+        }
+      },
+      "sourceTurns": 83,
+      "sourceClaims": 5,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+          "bytes": 92616
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "994caa059c44902441c79d44b11b1d48bb0e739b40dbfc269f817f143836808e",
+          "bytes": 2312
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 1,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "6e64c35e9dd943a5d5a19a6906c23009dfd7b35caa4ae042df249d686aca7152",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "persistedClaim": {
+        "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+        "tenantId": "toc",
+        "text": "76% of Indian students who applied for a New Zealand student visa in 2025 (Jan-Dec) were approved, and Immigration New Zealand's target is 27,000 Indian students by 2030.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "spk:0",
+                  "tStart": 99,
+                  "tEnd": 106,
+                  "text": "And to our guest, a very warm welcome and thank you for being here to share your insights with this community."
+                },
+                "textSha256": "1f16a07fca02363d7aad54ea2bc5298f3d9dea90f87fa0b59e292b606dfc64d5"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 594,
+                  "tEnd": 660,
+                  "text": "Kshitij Garg: Moving on, talking about India and New Zealand. There's a lot happening on the diplomacy side. India and New Zealand have finalized their Free Trade Agreement, and just yesterday the legal verifications have also been completed, so I can officially tell you that the India-New Zealand FTA is getting signed on Monday in New Delhi, where a big ministerial delegation is coming from New Zealand, and there'll be a lot of Indian and New Zealand businesses who will be witnessing this landmark FTA. These are very latest numbers from Immigration New Zealand; I got hold of these just a week ago. So as per the 2025 data—this is from January to December this year—76% of students who applied for a New Zealand visa were approved, and this number is more than 8,000 students. Pre-COVID, the number was 17,000, and during COVID New Zealand had a hard stop on the borders, the numbers fell, and now we are looking at increasing those numbers to 27,000 by 2030."
+                },
+                "textSha256": "5e5899569b643b0f7599454252673b080841589ecc32fc48531be4056985fa7c"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation welcomes a guest; it supplies neither visa approval statistics nor a 2030 student target.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 2,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c02",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "f2fe676794ed2919df69dc7d7d71fea562581cef5ab1795ee4d7c993a138ec57",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "persistedClaim": {
+        "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-c02",
+        "tenantId": "toc",
+        "text": "New Zealand Master's tuition ranges from INR 18 lakhs to INR 50 lakhs depending on the university.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "spk:0",
+                  "tStart": 188,
+                  "tEnd": 201,
+                  "text": "But additionally, he walks the walks and talks the talk. Do you know why? Because he's also been a graduate student at the University of Auckland, having lived there and studied in the global top 100 university"
+                },
+                "textSha256": "c9b03c4e7af66f705ad0f5720ea20f285d6f14ab23df9d642917e829240b413d"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 1166,
+                  "tEnd": 1210,
+                  "text": "Kshitij Garg: In terms of the commercials, if you're looking at the tuition fee, a Master's degree will range between 18 lakhs to INR 50 lakhs depending upon the university you are looking at studying in. And for a Bachelor's degree, you're looking at INR 30 lakhs to 75 lakhs for the entire three-year duration. In case of New Zealand, our Master's degrees are either one year, one and a half year, or two years. So if a student is looking at doing a PhD at a later stage, then they can study a two-year Master's degree, which is one year taught and one year research. While if a student is not looking at doing a PhD and they're looking at a program that can take them into the job market, then they're free to do a one-year Master's only."
+                },
+                "textSha256": "12f2529e72e7e5223a918ba4d1897d6ec77a46427f6051249d426d4abcb9aa77"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": {
+        "source": {
+          "path": "data/eval/extraction-reconciliation-reviewed.json",
+          "sha256": "8aa7ce9c90ae2b83107fdf815e90491194ac4fea830ae79a4b957d52dc5ea0e5",
+          "normalizedLfSha256": "f8f62587cc140e64941af8a7f651712be5a317758816804b012cd3ab12ece35d",
+          "bytes": 14288
+        },
+        "record": {
+          "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c02",
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "tenantId": "toc",
+          "claimText": "New Zealand Master's tuition ranges from INR 18 lakhs to INR 50 lakhs depending on the university.",
+          "claimTextSha256": "f7139b109783da5808c7299b2d8e925b5c03c1f5070c4d60d1cf81375e1e7b7a",
+          "currentTurnsSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+          "originalClaimsSha256": "40b13b59f5134853affa90ab87392b3d23466484cac7286ef7c34b6d6d554a69",
+          "originalEvidence": [
+            {
+              "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t022",
+              "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+            }
+          ],
+          "proposedEvidence": [
+            {
+              "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+              "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t088",
+              "turnTextSha256": "c78e1ded563698e59aaeac65bc65f547277fbd582e839760a8192cdb9cfc0de6",
+              "tStart": 1166,
+              "tEnd": 1186,
+              "speakerRef": "spk:1",
+              "reviewRole": "assertion support"
+            },
+            {
+              "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+              "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t089",
+              "turnTextSha256": "f9975c21729b60a51600c61fdcddcfc08aa14f58c7e6ca87141aa00dce078429",
+              "tStart": 1186,
+              "tEnd": 1199,
+              "speakerRef": "spk:1",
+              "reviewRole": "country context"
+            }
+          ],
+          "reviewStatus": "INDEPENDENTLY_REVIEWED_REPLACEMENT_PROPOSAL",
+          "rationale": "Directly inspected the complete current cited turn(s). Assertion is supported as presented in the transcript; external factual truth and speaker identity remain separate gates. The t089 context is required to bind the t088 numerical assertion to New Zealand in a mixed-country session."
+        },
+        "currentCitationContexts": [
+          {
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t088",
+            "current": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+                "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+                "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+                "bytes": 175267
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t088",
+                    "tenantId": "toc",
+                    "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                    "speakerRef": "spk:1",
+                    "tStart": 1166,
+                    "tEnd": 1186,
+                    "text": "In terms of the commercials, if you're looking at the tuition fee, a master's degree will range between 18 lakhs to INR 50 lakhs depending upon the university you are looking at studying in, and for a bachelor degree, you're looking at INR 30 lakhs to 75 lakhs for the entire three year duration."
+                  },
+                  "textSha256": "c78e1ded563698e59aaeac65bc65f547277fbd582e839760a8192cdb9cfc0de6"
+                }
+              ]
+            },
+            "originalMigration": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "available": true,
+                "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+                "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+                "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+                "bytes": 125818
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t088",
+                    "tenantId": "toc",
+                    "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                    "speakerRef": "unknown",
+                    "tStart": 5153,
+                    "tEnd": 5180,
+                    "text": "Dr. Rashi Ahuja Dixit: Thank you, Ruby, for doing such a fabulous job of explaining this really complicated process to us in such depth. And before we open the questions up for our audience, I'll request them to raise their hands as and when they want to ask a question to our esteemed panelists. And I have a question for you here, Ruby, in the chat box: \"How to apply for an apostille?\" I think that you've answered well, but are there any registered agent for this service?"
+                  },
+                  "textSha256": "b76cdae2b199164e8eeb638b509fb22cfb27511d4e1bb5164ffcd19b4a89184e"
+                }
+              ]
+            },
+            "sameIdContentChanged": true
+          },
+          {
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t089",
+            "current": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+                "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+                "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+                "bytes": 175267
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t089",
+                    "tenantId": "toc",
+                    "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                    "speakerRef": "spk:1",
+                    "tStart": 1186,
+                    "tEnd": 1199,
+                    "text": "In case of New Zealand, our master's degrees are either one year, one and a half year, or two years. So, if a student is looking at doing a PhD at a later stage, then they can study a two year master's degree, which is one year taught and one year research."
+                  },
+                  "textSha256": "f9975c21729b60a51600c61fdcddcfc08aa14f58c7e6ca87141aa00dce078429"
+                }
+              ]
+            },
+            "originalMigration": {
+              "available": true,
+              "reason": null,
+              "artifact": {
+                "available": true,
+                "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+                "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+                "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+                "bytes": 125818
+              },
+              "matches": [
+                {
+                  "record": {
+                    "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t089",
+                    "tenantId": "toc",
+                    "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                    "speakerRef": "unknown",
+                    "tStart": 5180,
+                    "tEnd": 5221,
+                    "text": "Ruby Thomas: Yes. So the Ministry of External Affairs has also designated a few agencies. One I can tell you is IVS Global, IVS Global. They are the Ministry of External Affairs registered agencies, and they have an office here in Delhi itself. I also usually suggest the same agency to students. They will get you done the apostille within 2 to 3 working days. So that is one agency that all students can contact, and they're pretty reliable, pretty efficient as well. I have not faced any problems with students complaining or anything. So there is this government agency that students can take up."
+                  },
+                  "textSha256": "587a9018e58f224733f6f1a36bbeef875144afd70285e0fa574edde8fd8d94f8"
+                }
+              ]
+            },
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation describes the guest's University of Auckland education without tuition figures.",
+        "replacementCitationSupport": "supported",
+        "replacementRationale": "Replacement t088 states the master's tuition range and university dependency; t089 supplies New Zealand country context.",
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 3,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "ac1631803b24e0bf76ed41a5572a0cc13be7adc23e7df3afac1e884bcb2d6f86",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "persistedClaim": {
+        "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+        "tenantId": "toc",
+        "text": "New Zealand's Classes Internationales-equivalent French pathway program (the 1-year foundation year) is capped at EUR 5,500 in tuition.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "Kshitij",
+                  "tStart": 462,
+                  "tEnd": 472,
+                  "text": "We've got 15 branches of engineering under the skill shortage list. IT and computer science is our fastest growing industry, with the industry growing 75% year-on-year."
+                },
+                "textSha256": "fc9aa8cfdc919c906ea7b4e853c9a0aed4060af2ca53e4215cd46f911b329d5b"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 2396,
+                  "tEnd": 2463,
+                  "text": "Shagun Handa: Coming to costs and scholarships. These are costs estimated for a decent student life, keeping in mind subsidies, discounts, basic student necessities like transportation, phone, Wi-Fi, etc. Public universities are very affordable in France, and when I say affordable, I don't mean cheap; I definitely mean affordable, because when you go to a public university, you're actually studying in an environment where a lot of Nobel laureates, Fields medals have been awarded or in an environment where industry and academia come together. Public education in France for UG is about €2,895 per annum, which is roughly 3 lakhs as per the current exchange rate, and private education is obviously more expensive—it can be upwards of €15,000 a year. This is an estimated figure. The Classes Internationales pathway program, the foundation year, is capped at €5,500 a year because it was an initiative that was launched between India and France, so the joint commission between the two countries has capped it still for €5,500 a year. And after that, the national fees will apply for the Bachelor's program."
+                },
+                "textSha256": "8d87fb1765e963f37a75e4f3443efd2c2432c170ac219d17415dea902279d4f9"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation concerns engineering shortages and IT industry growth; it supplies no pathway program or tuition cap.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 4,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "747c51ff746b2edc864ed84f52f37715dccda4b4a4cc331fb7e940a18b3aeaba",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "persistedClaim": {
+        "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+        "tenantId": "toc",
+        "text": "Italy offers more than 700 degree courses taught entirely in English.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "Kshitij",
+                  "tStart": 777,
+                  "tEnd": 794,
+                  "text": "Because of these, a lot of companies are now moving into New Zealand. We have got companies like TCS, Infosys, Tech Mahindra who have set up bases in New Zealand. And because these companies are coming into New Zealand, the demand for, you know, new employees is very, very high."
+                },
+                "textSha256": "d764c3e77915120c77d3cda2d552df2873eac2f5e6e986d5479baab5cc423213"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 3458,
+                  "tEnd": 3520,
+                  "text": "Ruby Thomas: When I mean affordable, I do not mean—just to again reiterate what Shagun also mentioned—I do not mean cheap. These are universities which have legacy of education. So a student who wants to look into having a future, a European kind of a vision, this is a country that you go ahead and have your life about. It is not only about just academics, it's a country that places a lot of value on you as a human being. So this is one country that I can give you. One big misconception about Italy is you need to know Italian before going to Italy for your studies. We are one of the few countries—if not, I won't say the top ones, but we are one country in Europe which offers more than 700+ courses entirely taught in the English language, as it's already mentioned. A student does not require to have a prior knowledge of Italian."
+                },
+                "textSha256": "4c420892a94051ae0a945e478d6a0cd27002433d3ad046a6998bef2dc5c628b5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation concerns companies establishing New Zealand bases and employee demand, not Italian English-taught courses.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 5,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "dded45f9c925c2e0bbefef2e1a456f1df6b5fda477f9ebdc4ae122914ce2bc70",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "persistedClaim": {
+        "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+        "tenantId": "toc",
+        "text": "Bachelor's and Master's graduates in New Zealand are guaranteed a three-year open Post-Study Work Visa.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "spk:0",
+                  "tStart": 217,
+                  "tEnd": 229,
+                  "text": "they represent not just the country, but they are representing the embassy with which they are working directly to bring together for you"
+                },
+                "textSha256": "391949147ea5065296174840f0693be2258d6b1aa985ce86515c8238b537e450"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 1341,
+                  "tEnd": 1407,
+                  "text": "Kshitij Garg: Once the student finishes the program, be it a Bachelors or a Masters, they are guaranteed a three-year post-study work visa. So like UK, New Zealand also offers a one-year Masters, and a one-year Masters will lead towards a three-year post-study work visa. The student does not require any employer to sponsor them; this is a visa that is given to every single student who's finishing a Bachelors or a Masters in the country. During the period of three years, as soon as a student finds a job meeting the median wage, they are eligible to apply for a resident visa. And for a Bachelor degree student, they have to work for minimum one year, meet the median wage requirement to apply for a resident visa. This is the new policy that is being launched from August 2026. So at the moment, the student has to work for minimum one year if they're doing a Masters, and they have to work for minimum three years if they're doing a Bachelors, but from August 2026, a Master's degree student does not have a minimum work experience duration to apply for residence, and a Bachelor degree student has to work for only one year."
+                },
+                "textSha256": "b84219354c03b0bc564dd7656971283f11dfe90f4682b12fc068426fae357fca"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation describes embassy representation without graduate visa duration, openness, or guarantees.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 6,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "c0dd6ec9839e5bacc698adb16aa111ea0a46d697d654635738a5155b84cf741b",
+      "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+      "persistedClaim": {
+        "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+        "tenantId": "toc",
+        "text": "An SDM (Sub-Divisional Magistrate) officer's stamp is not accepted for Italian document attestation/apostille; only designated state officers can complete that step.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          },
+          {
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+            "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "Kshitij",
+                  "tStart": 916,
+                  "tEnd": 938,
+                  "text": "If you're looking at a master's degree to study at one of the top ranking eight universities of New Zealand, you need a CGPA of minimum 6.3. Backlogs are accepted in case of New Zealand if these backlogs are only in year one and year two, and we require an IELTS of 6.5, no band less than six, or equivalent in PTE, TOEFL, or Duolingo."
+                },
+                "textSha256": "84dab2536a639815a71b8617229d9a8cd777f947569fda082e1e540cfb22298f"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 3998,
+                  "tEnd": 4184,
+                  "text": "Ruby Thomas: Step three is basically where you then start doing certain procedures related to your academic certifications. Now, for Italy, we require that your previous academic documentations have certain stamps. This is very vital, and this has to be done on the original documentations. What is the first stamp? You have to get the first signature from the school, from the university—the principal, the registrar, whoever is the highest authority puts a stamp, their official stamp on the back side of the documentations. Number two: you get the state verification, HRD, from the state that you have graduated. Ministry of External Affairs has designated certain officers in each of the state. So it's not like any state officer, you just randomly go, they can do it. No, and definitely not an SDM officer. No SDM officer is allowed to put their stamp on the educational documentations. There are certain officers in each state which have been authorized to put a stamp on the back side of the educational documentation. This happens on the back side of the original documentations, not on photocopies. Once the state officer has put a stamp, you send your documents to the Ministry of External Affairs, who then put their stamp. So if you see the picture that's here, the colorful box that you can see, that is the Ministry of External Affairs stamp, the Apostille, and there is also a big square-like stamp which is done by the state officers also. These three levels of verification can be done only after a student has received an acceptance, not before it, because when you go to the state officer, they will ask for what purpose are you getting it done, so you have to proceed and show them the offer letter that needs to be presented. So please be very careful about this. Like I had said, an SDM officer cannot put a stamp. There are agencies who actually do this procedure, and they inform the students like it's very easy to get the SDM officer stamp, so why not just go ahead with it? We will not accept it. The student will face a lot of problem when he or she is applying for the visa. There is also one thing: certain universities will be like, \"It's fine, we do not require these stamps, you can just come without them.\" Even if they say that, no, you require this as per the visa protocol; you have to get it done. It doesn't matter if you're going for like a semester exchange, a short-term program, for a long-term program; you still have to get it on the educational documentations, which is finally completed. So this is the third step that a student has to go. The faster you start this process the better, because the state-level verification takes time. There are some of the states that actually take even one month. So so as to not waste time and apply for your visa on time, it is important that you follow these steps as soon as you're able to get it done."
+                },
+                "textSha256": "d37cb0220edf00b53985544ef4aba714e6f6580e4d74b92278f20b4fc1ddd6b5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+              "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+              "bytes": 175267
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "spk:1",
+                  "tStart": 1104,
+                  "tEnd": 1110,
+                  "text": "You don't even submit your passport because in case of New Zealand, you get an e-visa copy."
+                },
+                "textSha256": "32cd87437a5383e310fec7fd786834d132ce4661c50c9442021adae45a68ec11"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+              "bytes": 125818
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+                  "tenantId": "toc",
+                  "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+                  "speakerRef": "unknown",
+                  "tStart": 4863,
+                  "tEnd": 4933,
+                  "text": "Ruby Thomas: Like I had said, you cannot get the attestation and apostille done from an SDM officer. There are certain designated officers in each state. So it's not like in every state it will be the educational officer. In Karnataka, for example, in Mysore specifically, the designated office is the land-related commissioner. It's not even an education office, but as per the Ministry, that is the designated office, so you have to go there. So this is also very important. Main important thing: the students will have to be sponsored either by themselves if they're working professionals, or by their parents, or you can take up an educational loan as well. You can show additional documents, FD, which will be considered an asset mostly, not like a main sponsor. Wrong jurisdiction is one of the most recurring mistakes and the things that are overlooked. You are from Rajasthan, you have been living in Mumbai for 6 months, you come back to Delhi and apply for the visa—no, you will have to apply from Mumbai. This is very important: you have to ensure that the students are correctly matching to their jurisdiction consulates and the Embassy."
+                },
+                "textSha256": "671847bdc72939905a1387b925a0b2339316809d1c97e886e7273e71a2697fcd"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citations concern New Zealand admission requirements and electronic visas; neither addresses Italian document attestation or designated officers.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 7,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c01",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "44c3ae292498e65142a8a278a8729f0a367675648a7ca47445aaf10e60dfd71f",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "persistedClaim": {
+        "_id": "2026-05-08-funding-dreams-loans-forex-c01",
+        "tenantId": "toc",
+        "text": "FRR Forex's currency-conversion markup is about 1%, versus roughly 2-2.5% charged by banks and platforms like Flywire.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t037",
+            "sessionId": "2026-05-08-funding-dreams-loans-forex"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-08-funding-dreams-loans-forex",
+          "turnId": "2026-05-08-funding-dreams-loans-forex-t037",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+              "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+              "bytes": 76746
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t037",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "Nikhil",
+                  "tStart": 1902,
+                  "tEnd": 1905,
+                  "text": "Sure. Sure. Absolutely. So Shweta, I think, you know, most of the counselors are there. I think you know some of them anyways. So, why don't we keep it more interactive, you know, talk about."
+                },
+                "textSha256": "b2a37ba69ce2ea3411c7f9e9e6c61188bf09856914526908ff1981b039d616c5"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+              "bytes": 92616
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t037",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "unknown",
+                  "tStart": 1448,
+                  "tEnd": 1486,
+                  "text": "Dev Mehta: So all rates are benchmarked against the Google rate or the interbank rate. It is all dependent on the markup. So our markup would be about 1%. Flywire is about 2% to 2.5%, and so is a bank. So clearly there's a 1% to 1.5% saving, which in today's day and age is about a rupee on the dollar or more. So if you're if for undergraduate parents, you know, cost of education and living is about $60,000 to $80,000, the way I like to put it, you're saving a Bombay–New York ticket, one-way ticket, you know, if you make the right choice."
+                },
+                "textSha256": "6671c1f668f493a03bdc16b5523885d6c44f4f8d65447577325477cdfdcb1eb9"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation invites an interactive discussion without currency markup figures or provider comparisons.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 8,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c02",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "07cd7091f499781de065709fcf599a4da309cc14f3b20c45fcbe66756694ff52",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "persistedClaim": {
+        "_id": "2026-05-08-funding-dreams-loans-forex-c02",
+        "tenantId": "toc",
+        "text": "Under FEMA rules, only the mother, father, sibling, and spouse of a student are permitted to remit money abroad for that student's education.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t029",
+            "sessionId": "2026-05-08-funding-dreams-loans-forex"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-08-funding-dreams-loans-forex",
+          "turnId": "2026-05-08-funding-dreams-loans-forex-t029",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+              "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+              "bytes": 76746
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t029",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "Nikhil",
+                  "tStart": 1798,
+                  "tEnd": 1805,
+                  "text": "You can, uh, switch off the screen share. I think switch off the screen share, I guess."
+                },
+                "textSha256": "70b6142c9faf6f96daf8e63ab17f6b34b07167f57528cc09bf655757654f2ed8"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+              "bytes": 92616
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t029",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "unknown",
+                  "tStart": 1173,
+                  "tEnd": 1226,
+                  "text": "Dev Mehta: Third is parents get really confused by what is LRS, what is TCS, what is FEMA, all of that. There's certain I don't want to get into the details because this probably doesn't affect you, but we kind of break this down, we simplify it as much as possible for the parent so that they are not stressing. Because parents come and tell us, \"Oh, are my payments going under the LRS scheme?\" What parents don't know is any foreign exchange purchase that an Indian resident makes is under the LRS scheme, whether you buy currency, forex cards, or do an outward remittance. Many parents come to us and say, \"Oh, the student's grandfather will be transferring money.\" That is not allowed by FEMA. Only the mother, father, sibling, and spouse of the student is allowed to transfer money."
+                },
+                "textSha256": "4324ed5508a330c545f12ce5a93e8e69e9df984271fb456991f84378bb936675"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation requests stopping screen sharing; it supplies no FEMA remittance restrictions.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 9,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c03",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "5ad86aa5a26cfc0d294c50df0cfd396dd4aee99dd0961d8bbc67aec2e6f4b706",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "persistedClaim": {
+        "_id": "2026-05-08-funding-dreams-loans-forex-c03",
+        "tenantId": "toc",
+        "text": "Section 80E allows the interest paid on an education loan to be claimed as a tax benefit.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+            "sessionId": "2026-05-08-funding-dreams-loans-forex"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-08-funding-dreams-loans-forex",
+          "turnId": "2026-05-08-funding-dreams-loans-forex-t074",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+              "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+              "bytes": 76746
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t074",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "Kanchan",
+                  "tStart": 3783,
+                  "tEnd": 3792,
+                  "text": "And, these can be done even after the the student has completed their education and started paying EMI, again, that will also be done?"
+                },
+                "textSha256": "67bffca0176040a2694d9a0626a0da255ab418266fe1515d55993212ea79c7e4"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+              "bytes": 92616
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t074",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "unknown",
+                  "tStart": 2118,
+                  "tEnd": 2167,
+                  "text": "Shweta Jain: Now when you go ahead and speak about this to the parents, they will immediately come back and say, \"Hey, if I'm taking a loan, it is a cost to me, right?\" While the processing charges are one time, the interest is recurring cost. And in case customer has opted for moratorium, then there is a bulk payment that needs the loan value kind of gets added, right? It is not the same loan value towards the end. So what are the benefits of taking a loan? I think we heard Dev recently when he talked about TCS in detail, right? Education loan from lenders like Credila—and we are an NBFC, we are a non-banking financial company, but given we are the pioneers and the leaders in education loan—a loan from Credila ensures 0% TCS, right? It ensures all interest benefit under Section 80E."
+                },
+                "textSha256": "ccfa8f05b9cd03447dc52bedc2ce62dbec21f2a65b2959b58088079b1701ddf9"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation asks an unspecified question about actions after education and EMI payments; it identifies neither Section 80E nor interest tax benefits.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 10,
+      "claimId": "2026-05-08-funding-dreams-loans-forex-c04",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "2c37963c4c9ef68d0322d4f1fe4a98360eb64f4f8639abdbeef9c071c27b0eba",
+      "sourceBindingSha256": "d087970f152481d0781ff3083059b6317aab89f0b81e82f11a5add4a036f3496",
+      "persistedClaim": {
+        "_id": "2026-05-08-funding-dreams-loans-forex-c04",
+        "tenantId": "toc",
+        "text": "HDFC Credila offers unsecured education loans up to INR 1.5 crore with a maximum tenure of 20 years.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+            "sessionId": "2026-05-08-funding-dreams-loans-forex"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-05-08-funding-dreams-loans-forex",
+          "turnId": "2026-05-08-funding-dreams-loans-forex-t080",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+              "normalizedLfSha256": "7eb208da98a4ccdf3caef6266c016bebdd04efe9a2452b6a40b282e2db7c172a",
+              "bytes": 76746
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t080",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "Nikhil",
+                  "tStart": 3845,
+                  "tEnd": 3940,
+                  "text": "Yeah. Yes, Kanchan. And I'm actually scared to log off and log in again, what if it just locks me. All right. Okay, yes, so everyone's here. Okay, okay, don't be shy. But, with which, I think, many of the esteemed members today who have joined are still not connected with Credila. So, can you please That's my responsibility. Yeah. That's why I was just saying. Can you please take up this additional charge and help us all connect, and we should look at maybe a physical meeting next with everybody. Is it pan-India or is it a Delhi chapter that we are addressing? No, we are addressing pan-India chapter. Unfortunately, lot of people know Credila that way, but, yes, we are having, I think, Bombay meet-up, right, in August, where everyone from TOC would be there, I think. Last year, 150 folks came in. So, I'll keep you posted on the event. Do check it out. But, yes, thank you, Payal, thank you, Shweta, for taking out time for this. And, all the TOC members, now, if you have any questions, route it to Shweta directly, she is anyway approachable that way very well. But, you need to share my email ID and number with them. I will, I will. And, yeah, absolutely. Anything about financing, you can always ask me, or, you know, you have the right for folks that way. Okay? Perfect, guys, thank you for joining on this evening. And, thank you, Shweta, again. Thank you, Payal."
+                },
+                "textSha256": "eb69be51ec21d575487aaf14b81640a85d5a585d71ddb23af0783a4c0445d5fd"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "76c7375e6360602795790b3a7c6987c9b099555c3cb85d21ce2d079417d52a06",
+              "bytes": 92616
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-05-08-funding-dreams-loans-forex-t080",
+                  "tenantId": "toc",
+                  "sessionId": "2026-05-08-funding-dreams-loans-forex",
+                  "speakerRef": "unknown",
+                  "tStart": 2370,
+                  "tEnd": 2418,
+                  "text": "Shweta Jain: Plus, the biggest advantage for undergraduate loan, which is a clear winner as compared to the market, that we offer 20-year tenure, right? As the market is at 15-year, we offer 20 years. The market offers maybe ₹75 lakhs to ₹1 Crore of unsecured loans; we offer ₹1.5 Crores of unsecured loans. Okay, you would not see us talking too much about it, right, but in practice we have been sanctioning these loans and this is our So maybe these four things put together: the TCS, the tax advantage, 20 years of tenure—20 years of tenure definitely increases the eligibility on the loan, right—and the fourth was this ₹1.5 CR of loan amount. These are some clear advantages that we have."
+                },
+                "textSha256": "f813cf2ac00a4274ca5a663c2972623c5733fffd8659850cd078dda9d7485775"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation discusses connecting counselors with Credila and closing the session; it gives no unsecured lending limit or tenure.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+{"status":"FOCUSED_AUDIT_COMPLETED","ownExit":0,"questions":4,"acceptedPopulation":92,"candidates":29,"rawTurns":3427,"admittedTurns":3424,"dataQualityOpen":3,"expectedSessions":23,"coverage":{"hydrated":4,"noExcerpts":0,"refused":0},"tripwires":{"fetch":0,"http":0,"socket":0,"dns":0,"udp":0,"credentialFile":0,"provider":0,"embedding":0},"primaryPipelinePASS":false}

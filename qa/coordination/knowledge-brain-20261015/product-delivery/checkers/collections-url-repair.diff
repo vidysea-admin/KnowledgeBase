@@ -1,0 +1,2 @@
+-expect(puts[0][0]).toBe(`/api/knowledge/collections/${id}`);
++expect(new URL(puts[0][0], window.location.origin).pathname).toBe(`/knowledge/collections/${id}`);

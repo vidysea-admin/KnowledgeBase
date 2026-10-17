@@ -1,0 +1,24 @@
+{
+  "_id": "doc-fixture",
+  "tenantId": "schema-fixture",
+  "sourceId": "doc-fixture",
+  "version": "0000000000000000000000000000000000000000000000000000000000000000",
+  "title": "Synthetic document",
+  "format": "pdf",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "Literal fixture evidence"
+    }
+  ],
+  "highlights": [
+    {
+      "id": "highlight-fixture",
+      "pageNumber": 1,
+      "quote": "Literal fixture evidence",
+      "text": "Literal fixture evidence",
+      "verification": "unverified"
+    }
+  ],
+  "createdAt": "2026-10-14T00:00:00.000Z"
+}

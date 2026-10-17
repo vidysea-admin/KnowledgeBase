@@ -1,0 +1,31 @@
+{
+  "args": [
+    "--import",
+    "tsx",
+    "qa/evidence/goal-live-toc/strict-claims-sample.mjs",
+    "--preflight"
+  ],
+  "pins": {
+    "qa/evidence/goal-live-toc/strict-claims-sample.mjs": "8c9ec0710029f4731d57fb4094033ac8aba50d521341ab545819293648d670cf",
+    "qa/evidence/goal-live-toc/one-call-receipt.json": "548a0b1de6e380849028811658c42a127823741e981fdc40ea9e917d2e701d9d",
+    "qa/evidence/goal-live-toc/one-call-sample.mjs": "2c2e814d8d755f7e334d03783d38e19fa89f5002df7c585f09e540f1f2e810cc",
+    "packages/ai/src/providers/gemini.ts": "49fe4fe8b50c79c46bbd3ea446e96b61d8d5f32490b55045e671e2a5c371367b",
+    "packages/ai/src/provider.ts": "4f22738b7c72883948ac2544a71709c360c57ca7b39b3eb437dc74b82b9aa493",
+    "packages/ai/src/gemini-quota.ts": "6b7c4d9ac7d7c56ef1a24f7e112cded7b5b681e5344f640470dc3cc949190949",
+    "packages/ai/src/json.ts": "2ebd19828037788b34ac6d512cee0cc1e9b8fd64df99537047baecc6133251df",
+    "packages/index/src/pipeline/claims.ts": "08c5bec39767b8773ccc2f10ce9b948b87e12ec4bad9e5a20d7396801c808c67",
+    "packages/index/src/pipeline/grounded.ts": "db88f62c5cee03fcb930fbee5efeb2af177fb0435a284602c3522c5edad0f91c",
+    "packages/index/src/pipeline/notes/evidence.ts": "d7590d14a71a16539be98e3dc47b39370be52cff592f4489fbb044d28e4ab07f",
+    "packages/index/src/pipeline/notes/judge.ts": "ca8dfbd7c5390e7289a1f1557732f796b05a2dfa44a8b20a3eec0f430ab005fd",
+    "packages/index/src/pipeline/notes/drop-mode.ts": "4170bbddd5b10b22c91479fc4613d063bf6690927a33bee2dbb7009eff094308",
+    "apps/api/src/indexing/evidence-tuples.ts": "d5b705274bfb535af848d1bc15167663c132c6a78f0fd7d2d2f6aebfc5287f1f",
+    "schema/claims.schema.json": "fbee54668a189ead1336967b37b0ec27b610401385a933e89670260cb0e72c92",
+    "scripts/lib/transcript-provenance.mjs": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301",
+    "scripts/lib/turn-timing.mjs": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e",
+    "scripts/webinar/session-rows.mjs": "684a6d3c5e6fafdd9879ce232d5b0703d6a1e7d667415e2be2b0543b70de8081",
+    "qa/evidence/goal-live-toc/strict-claims-pins.json": "4e141301c325f39dfb100b6cd57d8b9fc535667152416d5707da20492182155d",
+    "qa/evidence/goal-live-toc/ordinary-argv-run.mjs": "195242ad1b9fdfdf33b2d5580faa185e3fd21de23c75a6125017910fa276823b"
+  },
+  "timeoutMs": 110000,
+  "output": "qa/evidence/goal-live-toc/ordinary-strict-preflight-20261015T020527Z"
+}

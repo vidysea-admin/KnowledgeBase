@@ -1,0 +1,18 @@
+[
+  {
+    "path": "scripts/webinar/send-now-host.ts",
+    "sha256": "AC7564EBA70180A64D2EA79F28092749D89DBE92C233DDD88F63F56B2F946DB1"
+  },
+  {
+    "path": "scripts/webinar/send-now-host.test.ts",
+    "sha256": "2561D521B2C5B38BF52CE5ADAAB9EEC19B8DF8E8EF2A7CCCF9B0CBBA8BDB080C"
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now-command.ts",
+    "sha256": "71C51F7304A2866A39DFC5B6F01E4ACB57F96466938861A47C738861B24539A3"
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now-command.test.ts",
+    "sha256": "6C1E0A9BF4080998394BC8134B246F73AAC61CF7FB21976DC0608C6E2BAFA7D5"
+  }
+]

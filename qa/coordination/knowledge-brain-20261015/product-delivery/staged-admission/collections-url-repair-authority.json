@@ -1,0 +1,36 @@
+{
+  "kind": "ROOT_COLLECTIONS_QA_URL_REPAIR_ONLY",
+  "authority": "Root explicit current dispatch",
+  "baseline_total_tokens": 599787,
+  "maker_comparable_total_tokens": 3547712,
+  "known_ratio": 0.16906304683130988,
+  "repair_additional_actual_token_cap": 200000,
+  "repair_cumulative_ceiling": 799787,
+  "repair_active_s": 30,
+  "repair_allocated_output_tokens": 1200,
+  "scope": "SAME checker only; exact NEW independent probe URL expectation correction to configured API_BASE plus correct endpoint. Body assertions UNCHANGED. One-case broker execution requires its separate dispatch; this gate performs no source change/test/launch.",
+  "prior_breaches_preserved": {
+    "author_delta": 238500,
+    "author_cap": 100000,
+    "prior_cumulative_ceiling": 561287,
+    "prior_cumulative_overrun": 38500
+  },
+  "historical_time_allocations": {
+    "prep": 40,
+    "author": 50,
+    "total": 90,
+    "actual_full_active_time": null,
+    "instrumented_call_s": 0.189,
+    "instrumented_call_is_full_active": false
+  },
+  "future_final_not_admitted": {
+    "requires": "GREEN plus mandatory receipts and later fresh baseline",
+    "additional_actual_tokens_at_most": 200000,
+    "active_s": 30,
+    "allocated_output_tokens": 1800,
+    "combined_repair_plus_final_increment_at_most": 400000,
+    "overall_ceiling": 999787
+  },
+  "cost_accounting": "Shared coordination helper separate; not added to maker denominator.",
+  "legacy_output_debits_preserved_separately": true
+}

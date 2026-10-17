@@ -3,28 +3,282 @@
   "$id": "kb://session_pages",
   "title": "session_pages",
   "type": "object",
-  "required": ["_id", "tenantId", "sessionId", "summary", "evidence"],
+  "required": [
+    "_id",
+    "tenantId",
+    "sessionId",
+    "summary",
+    "evidence"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "sessionId": { "type": "string" },
-    "summary": { "type": "string", "minLength": 1 },
-    "keyInsights": { "type": "array", "items": { "type": "string" } },
-    "decisions": { "type": "array", "items": { "type": "string" } },
-    "actionItems": { "type": "array", "items": { "type": "string" } },
-    "numericFacts": { "type": "array", "items": { "type": "object" } },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sessionId": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keyInsights": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "actionItems": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "numericFacts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "citedItems": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CitedItem"
+      },
+      "description": "optional grounded notes (T-040); legacy summary/keyInsights/decisions/actionItems stay valid and are derived from these"
+    },
+    "qa": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/QaEntry"
+      },
+      "description": "optional grounded question/answer pairs (T-040)"
+    },
     "evidence": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["turnId", "sessionId"],
+        "required": [
+          "turnId",
+          "sessionId"
+        ],
         "properties": {
-          "turnId": { "type": "string" },
-          "sessionId": { "type": "string" }
+          "turnId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          }
         }
       }
+    },
+    "indexArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "generation",
+        "sessionId",
+        "sourceId",
+        "turnDigest"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "generation": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "turnDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "title": "SessionPageIndexArtifact"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "$defs": {
+    "QuotedEvidence": {
+      "title": "QuotedEvidence",
+      "type": "object",
+      "required": [
+        "turnId",
+        "sessionId",
+        "quote"
+      ],
+      "properties": {
+        "turnId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1,
+          "description": "literal contiguous substring of the cited turn's text"
+        }
+      }
+    },
+    "CitedItem": {
+      "title": "CitedItem",
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "text",
+        "origin",
+        "verification",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "stable id (digest of the quoted evidence)"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "insight",
+            "decision",
+            "action"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "extractive: equals the quoted evidence, adds no facts"
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "speaker-statement",
+            "screen-ocr",
+            "visual-observation"
+          ],
+          "description": "source of the cited turns; screen origins are never presented as speech"
+        },
+        "verification": {
+          "type": "string",
+          "const": "unverified"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/QuotedEvidence"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "QaEntry": {
+      "title": "QaEntry",
+      "type": "object",
+      "required": [
+        "id",
+        "question",
+        "questionEvidence",
+        "answer",
+        "answerEvidence",
+        "status"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "description": "extractive"
+        },
+        "questionEvidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/QuotedEvidence"
+          }
+        },
+        "answer": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "null exactly when status is unanswered"
+        },
+        "answerEvidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/QuotedEvidence"
+          },
+          "description": "separate from questionEvidence; empty exactly when unanswered"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "answered",
+            "unanswered"
+          ]
+        }
+      },
+      "if": {
+        "properties": {
+          "status": {
+            "const": "unanswered"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "answer": {
+            "type": "null"
+          },
+          "answerEvidence": {
+            "maxItems": 0
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "answerEvidence": {
+            "minItems": 1
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
 }

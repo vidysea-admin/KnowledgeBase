@@ -5,10 +5,8 @@
  * accessor while other collections use their tenant-scoped accessors.
  */
 import { randomUUID, randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import {
-  getDb, createEvalRun, recordScore as recordEvalRunScore,
+  getDb, assertValidTenantId, scopedCollection, jobs as jobsColl, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
   claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl, graphEdges as graphEdgesColl,
   listAll as listAllMeetingCandidates, createIfNew as createMeetingCandidateIfNew,
@@ -18,8 +16,8 @@ import type { ApiKeys, Jobs, TreeIndexNode, TreeIndexRootDocument } from "@lkb/c
 import type { WriteJobFn } from "@lkb/ai";
 import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
-import type { TreeStore } from "./routes/ask.js";
-import type { EvalRunStore } from "./routes/compete.js";
+import type { TreeStore } from "./routes/ask/ask.js";
+import type { EvalRunStore } from "./routes/compete/compete.js";
 import { createHash } from "node:crypto";
 import { createWatchedSource, listActive as listActiveWatchedSources, recordFetch as recordWatchedFetch } from "@lkb/db";
 import { createGuardedFetcher, resolveAll, httpRequest, runWatchedSources, type WatchedRunDeps } from "@lkb/ingest";
@@ -31,36 +29,35 @@ import { probeMongoHealth } from "./health-probe.js";
 import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
 import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
-import { scanGmailForMeetingCandidates } from "./gws-gmail.js";
+import { scanGmailForMeetingCandidates } from "./gws/gws-gmail.js";
+import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
+import { trustedBrainReads, trustedCitationReads, trustedTreeReads, trustedGraphReads } from './composition/integrations/trusted-readers.js';
 
 /** `schema/index.json`'s top-level keys ARE the canonical list of real Mongo collections (its
  * own comment excludes `features_event` deliberately — a JSONL-file schema, not a collection) —
  * reused here instead of a second hand-maintained list that could drift from it. */
-const SCHEMA_INDEX_PATH = fileURLToPath(new URL("../../../schema/index.json", import.meta.url));
+
+/** `tree_index` roots through the shared tenant scope (ISS-AUTHTENANT-002): the accessor validates the
+ * tenant and merges it into every filter, so a root can no longer be read for an unvalidated or missing tenant. */
+type TreeRoot = TreeIndexRootDocument & { _id: string };
+const treeIndexColl = (tenantId: string) => scopedCollection<TreeRoot>(getDb(), "tree_index")(tenantId);
+const apiKeysColl = (tenantId: string) => scopedCollection<ApiKeys>(getDb(), "api_keys")(tenantId);
 
 export function createMongoApiKeyStore(): ApiKeyStore {
   return {
     async verify(key: string): Promise<VerifiedKey | null> {
       const doc = await getDb().collection<ApiKeys>("api_keys").findOne({ keyHash: sha256Hex(key) });
       if (!doc || doc.revokedAt) return null;
-      return { tenantId: doc.tenantId, scopes: doc.scopes ?? [] };
+      return { tenantId: doc.tenantId, scopes: doc.scopes ?? [], keyId: doc._id };
     },
   };
 }
 
 /** One root node per tenant, `level: "tenant"`, `node_id` == tenantId (buildTree's output shape). */
-export function createMongoTreeStore(): TreeStore {
-  return {
-    async load(tenantId: string): Promise<TreeIndexNode | null> {
-      // treeIndexRootFilter (ISS-063) is the single source of the `tenant:<id>` convention this
-      // query used to hand-write -- that hand-written copy was the exact query that got the
-      // node_id shape wrong once, live, on 2026-09-04, before this file matched what buildTree
-      // actually produces. It now also matches on the real `tenantId` field (ISS-062) --
-      // TreeIndexRootDocument satisfies TreeStore's TreeIndexNode return type (it's a superset).
-      return getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
-    },
-  };
+export function createMongoTreeStore(nativeEvidence?: Parameters<typeof trustedTreeReads>[1]): TreeStore {
+  const guarded = trustedTreeReads(getDb, nativeEvidence);
+  return { async load(tenantId) { try { assertValidTenantId(tenantId, 'treeStore.load'); } catch { return null; } return guarded.load(tenantId); } };
 }
 
 /** Mongo-backed `EvalRunStore` (T-012 C3) — thin wrapper over `@lkb/db`'s `eval-runs.ts`
@@ -76,7 +73,8 @@ export function createMongoEvalRunStore(): EvalRunStore {
  * per-attempt writes in `production.ts`; both land in the same collection. */
 export function createMongoJobWriter(): WriteJobFn {
   return async (entry) => {
-    await getDb().collection<Jobs>("jobs").insertOne({ _id: randomUUID(), ...entry });
+    assertValidTenantId(entry?.tenantId, "jobWriter");
+    await jobsColl(entry.tenantId).insertOne({ _id: randomUUID(), ...entry });
   };
 }
 
@@ -85,7 +83,7 @@ export function createMongoJobWriter(): WriteJobFn {
  * field (claims relate via `evidence[].sessionId`; turns via their own `sessionId`), so the
  * session-detail join queries each accordingly rather than assuming a shared shape. */
 export function createMongoBrainReadDeps(): BrainReadDeps {
-  return {
+  return trustedBrainReads({
     async listSessions(tenantId) {
       return sessionsColl(tenantId).find({}).toArray();
     },
@@ -105,7 +103,7 @@ export function createMongoBrainReadDeps(): BrainReadDeps {
     async listGaps(tenantId) {
       return gapsColl(tenantId).find({}).toArray();
     },
-  };
+  }, getDb);
 }
 
 /** Real `CitationsDeps` (routes/citations.ts) — same composition-root pattern as the brain deps
@@ -113,22 +111,7 @@ export function createMongoBrainReadDeps(): BrainReadDeps {
  * thousands of rows), so resolving each turn/session in parallel is the right shape — no batching
  * layer needed at this scale. */
 export function createMongoCitationsDeps(): CitationsDeps {
-  return {
-    async getCitation(tenantId, claimId): Promise<Citation | null> {
-      const claim = await claimsColl(tenantId).findOne({ _id: claimId });
-      if (!claim) return null;
-      const evidence = await Promise.all(
-        claim.evidence.map(async (e): Promise<CitationEvidence> => {
-          const [turn, session] = await Promise.all([
-            turnsColl(tenantId).findOne({ _id: e.turnId }),
-            sessionsColl(tenantId).findOne({ _id: e.sessionId }),
-          ]);
-          return { turnId: e.turnId, sessionId: e.sessionId, turn: turn ?? null, session: session ?? null };
-        }),
-      );
-      return { claim, evidence };
-    },
-  };
+  return trustedCitationReads(getDb);
 }
 
 /** Real `GraphReadDeps` — unions the `tree_index` root (same `treeIndexRootFilter` as
@@ -136,17 +119,10 @@ export function createMongoCitationsDeps(): CitationsDeps {
  * `buildKnowledgeGraph`. Both new reads use `packages/db` `coll(tenantId)`, so [I1] holds by
  * construction; full disclosure of what is and is not read lives in `routes/graph.ts`. */
 export function createMongoGraphReadDeps(): GraphReadDeps {
-  return {
-    async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
-      const treeRootP = getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
-      const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
-      if (!treeRoot && entityEdges.length === 0) return null;
-      return buildKnowledgeGraph({ treeRoot, entityEdges, sessions: sessionDocs });
-    },
-  };
+  return trustedGraphReads(getDb);
 }
 
-export { createGwsCalendarReadDeps } from "./gws-calendar.js";
+export { createGwsCalendarReadDeps } from "./gws/gws-calendar.js";
 
 /** Real `MeetingCandidatesDeps` (routes/meeting-candidates.ts) — wraps the already-real
  * `@lkb/db` `meeting-candidates`/`trusted-senders` accessors plus the `gws`-backed Gmail scan.
@@ -154,24 +130,26 @@ export { createGwsCalendarReadDeps } from "./gws-calendar.js";
  * than in the route: a candidate whose sender already crossed `AUTO_APPROVE_THRESHOLD` is filed
  * straight in as `auto_approved`, never sitting in the pending review queue Umesh has to clear
  * by hand for a sender he's already trusted three times over. */
-export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName): MeetingCandidatesDeps {
+export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName,
+  persistence = {getTrustedSender, createMeetingCandidateIfNew}): MeetingCandidatesDeps {
   return {
     getWorkDatabase(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
       const work = process.env.MONGO_WORK_DB?.trim(), actual = databaseName();
-      return work && !["lkb", "global_university_db"].includes(work) && actual === work ? actual : undefined;
+      return work && !isRefusedWorkDb(work) && actual === work ? actual : undefined;
     },
     async scanGmail(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Gmail owner mismatch");
       const found = await scan();
       let created = 0, autoApproved = 0;
       // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
-      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly"] as const;
+      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId", "senderAuthenticated", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] as const;
       for (const candidate of found) {
-        const trusted = await getTrustedSender(tenantId, candidate.senderDomain);
+        // ISS-322/333: a From header is not trust. Only an authenticated sender can reach auto_approved; the rest wait for a human.
+        const trusted = candidate.senderAuthenticated === true ? await persistence.getTrustedSender(tenantId, candidate.senderDomain) : undefined;
         const status = trusted?.autoApprove ? "auto_approved" : "pending";
         const extra = Object.fromEntries(OPTIONAL_CANDIDATE_FIELDS.filter((k) => candidate[k] !== undefined).map((k) => [k, candidate[k]]));
-        const wrote = await createMeetingCandidateIfNew(tenantId, {
+        const wrote = await persistence.createMeetingCandidateIfNew(tenantId, {
           _id: randomUUID(),
           messageId: candidate.messageId,
           subject: candidate.subject,
@@ -201,11 +179,10 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
  * relies on the caller to remember not to serialize it) so a masked list can never accidentally
  * leak the one thing that must never leave this function. */
 export function createMongoKeysDeps(): KeysDeps {
-  const coll = () => getDb().collection<ApiKeys>("api_keys");
-
   return {
     async listKeys(tenantId): Promise<ApiKeySummary[]> {
-      const docs = await coll().find({ tenantId }).toArray();
+      assertValidTenantId(tenantId, "apiKeys.list");
+      const docs = await apiKeysColl(tenantId).find({}).toArray();
       return docs.map((d) => ({
         _id: d._id,
         label: d.label ?? "(unlabeled)",
@@ -215,11 +192,11 @@ export function createMongoKeysDeps(): KeysDeps {
       }));
     },
     async createKey(tenantId, label, scopes) {
+      assertValidTenantId(tenantId, "apiKeys.create");
       const id = randomUUID();
       const rawKey = `lkb_${randomBytes(24).toString("hex")}`;
-      await coll().insertOne({
+      await apiKeysColl(tenantId).insertOne({
         _id: id,
-        tenantId,
         keyHash: sha256Hex(rawKey),
         label,
         scopes,
@@ -229,8 +206,9 @@ export function createMongoKeysDeps(): KeysDeps {
       return { id, rawKey };
     },
     async revokeKey(tenantId, id) {
-      const result = await coll().updateOne(
-        { _id: id, tenantId, revokedAt: null },
+      assertValidTenantId(tenantId, "apiKeys.revoke");
+      const result = await apiKeysColl(tenantId).updateOne(
+        { _id: id, revokedAt: null },
         { $set: { revokedAt: new Date().toISOString() } },
       );
       return result.matchedCount > 0;
@@ -239,30 +217,11 @@ export function createMongoKeysDeps(): KeysDeps {
 }
 
 /** Real `HealthDeps` (routes/health.ts). `db.command({ping: 1})` is the standard MongoDB
- * liveness probe — cheaper than a real query and works even against an empty database. Counts
- * are ACROSS ALL TENANTS deliberately (this is an ops signal, not a tenant-scoped read — the
- * route is unauthenticated for exactly that reason, so it must never leak tenant-scoped content,
- * only aggregate numbers). A ping failure returns `db: "error"` and empty counts rather than
- * throwing — the route's whole job is to report an unhealthy backend, not crash reporting it. */
+ * liveness probe. LIVENESS ONLY: no countDocuments here (ISS-T057SCREEN-001) — the route is
+ * unauthenticated, so it reports reachability and nothing about data. A ping failure returns
+ * `db: "error"` rather than throwing. */
 export function createMongoHealthDeps(): HealthDeps {
-  return {
-    checkHealth: () =>
-      probeMongoHealth(
-        () => getDb().command({ ping: 1 }),
-        async () => {
-          const db = getDb();
-          const index = JSON.parse(readFileSync(SCHEMA_INDEX_PATH, "utf8")) as Record<string, unknown>;
-          const names = Object.keys(index).filter((k) => !k.startsWith("$"));
-          const collections: Record<string, number> = {};
-          await Promise.all(
-            names.map(async (name) => {
-              collections[name] = await db.collection(name).countDocuments();
-            }),
-          );
-          return collections;
-        },
-      ),
-  };
+  return { checkHealth: () => probeMongoHealth(() => getDb().command({ ping: 1 })) };
 }
 
 /**

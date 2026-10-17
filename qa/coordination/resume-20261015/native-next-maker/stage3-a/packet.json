@@ -1,0 +1,48 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "candidate_sha": null,
+  "initial_receipt": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+  "usage": {
+    "active_seconds": null,
+    "token_metric": "actual_total",
+    "actual_total": null
+  },
+  "initial_counts": {
+    "tests": 206,
+    "fail": 18,
+    "pass": 184,
+    "skip": 4
+  },
+  "token_metric": "actual_total",
+  "test_executions": [],
+  "policy_version": "managed-review/1",
+  "unit": "native-next-stage3-a",
+  "role": "maker-repair-fragment",
+  "remaining_gates": [
+    "sole broker exact five failing nodes replay",
+    "API typecheck combined candidate",
+    "combined affected consumer regressions",
+    "independent verdict"
+  ],
+  "changed_paths": [
+    {
+      "sha256": "c6bb85e2c152c1d91584870b9bfab4478886f7b3c0e1adf154d77b4362f6eece",
+      "path": "apps/api/src/indexing/speaker-suggest.test.ts",
+      "preimage_path": "qa\\coordination\\resume-20261015\\native-next-maker\\stage3-a\\backups\\apps__api__src__indexing__speaker-suggest.test.ts",
+      "preimage_sha256": "4934dfc74fd2406d64f183e2baabf5292f3504433ba81491fccb824d27acdee7"
+    },
+    {
+      "sha256": "48e773860714013f7adf8a1a92e5fd759a4a778d9e6ce12936cefa48c97e2960",
+      "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+      "preimage_path": "qa\\coordination\\resume-20261015\\native-next-maker\\stage3-a\\backups\\apps__api__src__indexing__tile-speaker-suggest.test.ts",
+      "preimage_sha256": "b3ee14401a27c106cdf25febce7bc2d7c76d56b4a9dc62e0a4230ba1ca06883c"
+    },
+    {
+      "sha256": "194f127645a3529fbc316d049d0f29457175c12f082d1aa045945d07fe383e2f",
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "preimage_path": "qa\\coordination\\resume-20261015\\native-next-maker\\stage3-a\\backups\\apps__api__src__speaker-profiles__store.test.ts",
+      "preimage_sha256": "1f75614c58e37b4e92a4814c31f60f8d80f9c9f15c03ce2080a0a1603815e45b"
+    }
+  ],
+  "fix_cycle": 1
+}

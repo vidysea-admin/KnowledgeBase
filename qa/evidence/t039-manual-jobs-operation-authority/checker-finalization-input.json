@@ -1,0 +1,34 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "id": "/root/manual_jobs_maker/checker_t039_authority",
+      "active_s": null,
+      "tokens": null,
+      "budget_debit": {
+        "tokens": 5200,
+        "active_s": 150
+      }
+    }
+  ],
+  "next_phase": {
+    "kind": "finalization",
+    "tokens": 800,
+    "active_s": 30,
+    "cost": null
+  },
+  "bootstrap_scope": "t039-manual-jobs-operation-authority cycle1 exact four-file authority repair; source identity/reuse authentication plus one broker orphan-recording refusal probe; no whole-parent acceptance",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "t039-manual-jobs-operation-authority/c1/4815a0c0a70c8dfdc92e02a3468a31123ebd1cfab01b919b0a660fc31de6e650",
+  "escalation": null,
+  "notes": "No prior independent checker was dispatched for this slug/candidate; historical manual-jobs lifecycle reviewers belong to a distinct unit and no receipts/debits are reset or discarded. Maker unknown overhead remains null. Reserve30s800 stays inside total180s6000."
+}

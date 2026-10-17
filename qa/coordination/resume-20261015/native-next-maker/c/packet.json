@@ -1,0 +1,56 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "unit": "native-next-c",
+  "fix_cycle": 1,
+  "status": "authored-not-executed",
+  "changed_paths": [
+    "apps/api/src/indexing/native-archive/binding.ts",
+    "apps/api/src/indexing/native-archive/binding.test.ts",
+    "scripts/native-capture/production.ts",
+    "scripts/native-capture/production.test.ts"
+  ],
+  "source_pins": [
+    {
+      "path": "apps/api/src/indexing/native-archive/binding.ts",
+      "sha256": "1c65a170e4e713e1a8cc57d35a52ea6fb81c288c3f8675621f7369dc10ab5f40",
+      "nonblank_lines": 65
+    },
+    {
+      "path": "apps/api/src/indexing/native-archive/binding.test.ts",
+      "sha256": "adf2d059b675b84d04377900bb1aff55601e9461c75ffb7016282b7236ed5ce9",
+      "nonblank_lines": 62
+    },
+    {
+      "path": "scripts/native-capture/production.ts",
+      "sha256": "bd302b8f3fc35c127092b7b4fcef66385ba0d3810e94870186bee6f40b543f07",
+      "nonblank_lines": 151
+    },
+    {
+      "path": "scripts/native-capture/production.test.ts",
+      "sha256": "26a5b0c569c5fa0942e84459d313c1572b7b651dd5bc69ee1d3cc495235d5dfd",
+      "nonblank_lines": 75
+    }
+  ],
+  "token_metric": "actual_total",
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null,
+    "token_metric": "actual_total"
+  },
+  "evidence": {
+    "execution": "No tests/build/browser/DB/provider/ACL/decoder commands executed.",
+    "preimages": "backups/preimages.txt",
+    "transfer": "lease-transfer.md"
+  },
+  "gaps": [
+    "Combined broker typechecks, structure, mandatory tests and downstream evidence outstanding",
+    "Native tile publication lacks approved atomic DB generation/review fence; publicationFor injection is not proof",
+    "Real host qualification and native Mongo transactions remain separate gates",
+    "Genuine capture before-ingestion and retained recovery test authored; full restart/committed-hook/registry/suggestion chain belongs to combined unit"
+  ]
+}

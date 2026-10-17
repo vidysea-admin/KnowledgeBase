@@ -1,0 +1,47 @@
+{
+  "kind": "ROOT_FINITE_FINISH_AUTHORITY_COMPANION",
+  "baseline": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z.json",
+  "authority": "Explicit root authorization in this dispatch; applies to SAME three existing checker threads only.",
+  "preserves_all_prior_grants_and_charges": true,
+  "scope": "Same-checker finite finish; checker materializes own isolated probes. This file performs no review, gate, probe, source change or launch.",
+  "per_checker_additional_actual_total_tokens_limit": 200000,
+  "stages": [
+    {
+      "kind": "review_author_isolated_probe",
+      "additional_actual_total_tokens_limit": 100000,
+      "active_seconds_limit": 50,
+      "allocated_output_tokens": 1200
+    },
+    {
+      "kind": "manual_reserved_finalization",
+      "additional_actual_total_tokens_limit": 100000,
+      "active_seconds_limit": 30,
+      "allocated_output_tokens": 800
+    }
+  ],
+  "operations_additional_constraint": {
+    "cumulative_actual_total_tokens_limit": 850000
+  },
+  "agents": [
+    {
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "thread_id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "fresh_baseline_total_tokens": 361287,
+      "counter_stable": true
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+      "thread_id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+      "fresh_baseline_total_tokens": 320912,
+      "counter_stable": true
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+      "thread_id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+      "fresh_baseline_total_tokens": 477854,
+      "counter_stable": true
+    }
+  ],
+  "accounting": "Additional ACTUAL means new cumulative input+output minus fresh baseline. Allocated output budgets are separate. Accounting helper excluded from unit denominator. No 10-percent success inferred.",
+  "completion_unknown_preserved": true
+}

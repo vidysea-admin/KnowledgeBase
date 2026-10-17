@@ -1,0 +1,417 @@
+{
+  "owner": "/root/verification_broker",
+  "authority": "Root delegated sole local CPU-heavy broker",
+  "updatedAt": "2026-10-15T10:03:10.039Z",
+  "active": null,
+  "pending": [
+    {
+      "state": "HOLD staging Mongo standalone; writes0; Docker CLI not found in PATH; no activation authorized",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-native-readonly-20261015T0947.json",
+      "scope": "native transaction durability"
+    },
+    {
+      "state": "Inspect-only92questions29candidates completed; paid full92 and human/operational gates remain unexecuted",
+      "scope": "full92 question evaluation and human/live acceptance"
+    },
+    {
+      "state": "No pending authorized command; await root",
+      "scope": "new local CPU commands"
+    }
+  ],
+  "completed": [
+    {
+      "scope": "provider-mocks",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-provider-mocks-escalated-20261015T0719.json",
+      "exitCode": 0,
+      "elapsedMs": 47278.7655,
+      "hashesUnchanged": true,
+      "tests": 19,
+      "pass": 19
+    },
+    {
+      "scope": "T036",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-t036-20261015T0721.json",
+      "exitCode": 0,
+      "elapsedMs": 52196.559700000005,
+      "hashesUnchanged": true,
+      "tests": 46,
+      "pass": 46
+    },
+    {
+      "scope": "T038 owed15",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-t038-owed15-20261015T0723.json",
+      "exitCode": 1,
+      "elapsedMs": 63130.3362,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "pipeline-proof",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-pipeline-proof-20261015T0802.json",
+      "tests": 10,
+      "pass": 10,
+      "exitCode": 0
+    },
+    {
+      "scope": "pure-retrieval-graph",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-pure-retrieval-graph-20261015T0804.json",
+      "tests": 67,
+      "pass": 67,
+      "exitCode": 0
+    },
+    {
+      "scope": "T038repair+consumer",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-t038-consumer-fix-20261015T0807.json",
+      "originalTests": 15,
+      "originalPass": 15,
+      "extraConsumerCollectionFailure": 1,
+      "exitCode": 1
+    },
+    {
+      "phase": "checker-independent-command",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 173.64659999999998,
+      "receipt": "qa/coordination/checker-completion-reserve-20261015/independent-probe.json",
+      "scope": "Independent completion reserve refusal probe: protect 30s/800tokens from review allocation"
+    },
+    {
+      "phase": "shared-integration-verification",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 1631.3639999999998,
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-t054-retry-six-typed-20261015T1045.json",
+      "scope": "T054 six retry nodes after type-safe readConcern fixture guard"
+    },
+    {
+      "phase": "shared-integration-verification",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 17895.2178,
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-types-t054-typed-20261015T1050.json",
+      "scope": "T054 corrected readConcern fixture and retry-fix API typecheck after current six-node PASS"
+    },
+    {
+      "phase": "shared-integration-verification",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 3589.0161,
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-build-t054-typed-20261015T1052.json",
+      "scope": "T054 corrected retry-fix current API bundle after six-node and typecheck PASS"
+    },
+    {
+      "phase": "shared-integration-verification",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 1128.9270000000001,
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-evaluator-eight-refine-20261015T1100.json",
+      "scope": "Evaluator eight offline production graph fixtures with separate correct and ambiguous refinement paths"
+    },
+    {
+      "phase": "shared-integration-verification",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 201.86599999999999,
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-evaluator-inspect-20261015T1101.json",
+      "scope": "Evaluator inspect-only accepted corpus inventory: counts/hash only no model dispatch"
+    },
+    {
+      "phase": "checker-independent-command",
+      "exitCode": 0,
+      "hashesUnchanged": true,
+      "elapsedMs": 1284.9139,
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-publication-cycle7-independent-two-20261015T1103.json",
+      "scope": "Cycle7 independent original paid replay reproduction and ambiguous-commit service boundary"
+    }
+  ],
+  "constraints": [
+    "One local test process at a time",
+    "No browsers or full suites during live Chrome worker restrictions",
+    "No provider calls or DB writes without explicit authorization",
+    "No test launch before frozen exact input list and scoped root grant"
+  ],
+  "historicalQueue": "qa/goal-2026-10-14/test-queue.json",
+  "state": "All authorized local type/build/maker and scoped independent commands completed; native transaction gate HOLD; live model availability UNKNOWN after single default-sandbox attempt",
+  "successfulScopedReceipts": [
+    {
+      "scope": "Vectorless webinar publication proof maker verification",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-pipeline-proof-20261015T0802.json",
+      "exitCode": 0,
+      "elapsedMs": 465.26520000000005,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Seven frozen pure retrieval and speaker graph affected-stage/downstream maker tests; no global mutation scan matches",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-pure-retrieval-graph-20261015T0804.json",
+      "exitCode": 0,
+      "elapsedMs": 1790.3127,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "ISS-SCHEDULERRESUME-001 mandatory literal recorded reproduction; repaired fixture; no added files",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-t038-literal-floor-20261015T0811.json",
+      "exitCode": 0,
+      "elapsedMs": 11407.9428,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Capture v4 consumer9 plus owned startup-cleanup2; originaltsx runtime after safe-loader bareexport collectionfailure",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-capture-consumer-startup-20261015T0815.json",
+      "exitCode": 0,
+      "elapsedMs": 11487.7102,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "WhatsApp consent persistence and tenant source identity security regressions; issue001 and003 literal test corpora plus prior foundation tests",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-whatsapp59-20261015T0824.json",
+      "exitCode": 0,
+      "elapsedMs": 11183.7536,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Original source identity confinement and actual record/recovery lean forwarding six-case maker verification",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-capture-original-six-20261015T0828.json",
+      "exitCode": 0,
+      "elapsedMs": 16892.8706,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Five exact private EOF finalizer regressions; four retained12s corpus variants plus unknown-clock refusal; sole CPU lease, no known measurement hold in existing coordination",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-capture-eof-five-20261015T0832.json",
+      "exitCode": 0,
+      "elapsedMs": 11634.588199999998,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Retention10 dedicated successful scope receipt; mandatory policy reuse cannot use previous overall107batch exit1 despite retentioncases green",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-retention-ten-20261015T0835.json",
+      "exitCode": 0,
+      "elapsedMs": 4206.819799999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Source-reader hardening literal security cases plus usageaudit; dedicated exit0 scope required because prior shared107batch exit1 cannot satisfy reuse",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-source-usage-20261015T0839.json",
+      "exitCode": 0,
+      "elapsedMs": 1522.8962999999999,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Central provider routing/accounting and HTTP transport plus grounded output repository/workbench; composition test deferred active index writer",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-central-provider-outputs-20261015T0847.json",
+      "exitCode": 0,
+      "elapsedMs": 9352.703500000001,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Exactly5 UI files: speaker profile client/page and usage summary Ask/policy; verified installed Vitest2.1.8/Vite6/jsdom25; no browser",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-ui-five-files-20261015T0905.json",
+      "exitCode": 0,
+      "elapsedMs": 24776.2095,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Shared read-only schema43-compatible using existing compatible runtime; frozen contracts empty means vacuity only",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-schema43-compatible-20261015T0914.json",
+      "exitCode": 0,
+      "elapsedMs": 1564.0914,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Shared read-only frozen-contracts using existing compatible runtime; frozen contracts empty means vacuity only",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-frozen-contracts-20261015T0914.json",
+      "exitCode": 0,
+      "elapsedMs": 162.8908,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Shared read-only generated-types-check using existing compatible runtime; frozen contracts empty means vacuity only",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-generated-types-check-20261015T0914.json",
+      "exitCode": 0,
+      "elapsedMs": 2938.582,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Current27 exact corrected selection; seeded actual p1 pruning fixture; renamed judge-refusal case explicitly included; no product changes since precedingrun",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-publication-current27-final-20261015T0922.json",
+      "exitCode": 0,
+      "elapsedMs": 11714.2129,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Remaining49 selected API/profile/transcript/composition/speaker cases and one actualHTTP AbortSignal probe; currentpublication27 excluded after ownexit0; two authentic/private skips expected",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-remaining49-20261015T0925.json",
+      "exitCode": 0,
+      "elapsedMs": 14664.7966,
+      "hashesUnchanged": true
+    }
+  ],
+  "latestSuccessfulScopes": [
+    {
+      "scope": "Current27 exact corrected selection; seeded actual p1 pruning fixture; renamed judge-refusal case explicitly included; no product changes since precedingrun",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-publication-current27-final-20261015T0922.json",
+      "exitCode": 0,
+      "elapsedMs": 11714.2129,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Remaining49 selected API/profile/transcript/composition/speaker cases and one actualHTTP AbortSignal probe; currentpublication27 excluded after ownexit0; two authentic/private skips expected",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-remaining49-20261015T0925.json",
+      "exitCode": 0,
+      "elapsedMs": 14664.7966,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Exactly10 runtime fixture nodes affected by canonical generated-model type annotations; no product/runtime edits",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-type-fixtures-ten-20261015T0938.json",
+      "exitCode": 0,
+      "elapsedMs": 3483.9013999999997,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Frozen typed-fixture correction candidate integrated api-types; Node/pnpm preflight unchanged",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-types-20261015T0940.json",
+      "exitCode": 0,
+      "elapsedMs": 13997.3617,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Frozen typed-fixture correction candidate integrated web-types; Node/pnpm preflight unchanged",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-types-20261015T0940.json",
+      "exitCode": 0,
+      "elapsedMs": 14553.9657,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Frozen typed-fixture correction candidate integrated api-build; Node/pnpm preflight unchanged",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-build-20261015T0940.json",
+      "exitCode": 0,
+      "elapsedMs": 2606.3508,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Frozen typed-fixture correction candidate integrated web-build; Node/pnpm preflight unchanged",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-build-20261015T0940.json",
+      "exitCode": 0,
+      "elapsedMs": 17873.7561,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Root-authorized current4 production composition and real localHTTP abort proof after typedfixture fingerprint epoch; no49 rerun",
+      "phase": "shared-integration-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-current-composition-four-20261015T0944.json",
+      "exitCode": 0,
+      "elapsedMs": 2335.8469999999998,
+      "hashesUnchanged": true
+    },
+    {
+      "scope": "Root-authorized answer-policy current3 freshness security regressions plus one immediate authenticated HTTP consumer; previously unexecuted nodes",
+      "phase": "maker-verification",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-answer-policy-four-20261015T0950.json",
+      "exitCode": 0,
+      "elapsedMs": 2533.8524,
+      "hashesUnchanged": true
+    }
+  ],
+  "modelAvailabilityCheckpoint": {
+    "state": "DeepSeek smoke success; GLM diagnostic HTTP200 success; no further paid calls authorized",
+    "exactModelsAvailable": true,
+    "metadataReceipt": "qa/goal-vectorless-2026-10-15/verification-ollama-live-tags-20261015T1020.json",
+    "glmDiagnosticReceipt": "qa/goal-vectorless-2026-10-15/verification-glm-diagnostic-one-20261015T1036.json",
+    "twoSmokeReceipt": "qa/goal-vectorless-2026-10-15/verification-ollama-two-paid-smoke-20261015T1026.json"
+  },
+  "coordinatorAuthorizedPending": [
+    {
+      "scope": "profile accepted reader4",
+      "state": "prepared current501 dependency closure;await central server freeze confirmation"
+    },
+    {
+      "scope": "T013 Avatar context-loss1file",
+      "state": "rootauthorized"
+    },
+    {
+      "scope": "T060 pages5",
+      "state": "rootauthorized"
+    },
+    {
+      "scope": "T061 backend21/UI4",
+      "state": "rootauthorized",
+      "specs": [
+        "qa/packets/goal-t061-ordinary-backend-spec.json",
+        "qa/packets/goal-t061-ordinary-ui-spec.json"
+      ]
+    },
+    {
+      "scope": "answer-route trusted human4",
+      "state": "coordinatorauthorized",
+      "source": "apps/api/src/answer-policy/answer-router.ts",
+      "test": "apps/api/src/answer-policy/answer-router.test.ts"
+    },
+    {
+      "scope": "T035 OBS single fixture",
+      "state": "coordinatorauthorized",
+      "packet": "qa/coordination/knowledge-brain-20261015/capture-delivery/obs-maker.md"
+    },
+    {
+      "scope": "capture operations acceptance parser",
+      "state": "coordinatorauthorized",
+      "packet": "qa/coordination/knowledge-brain-20261015/capture-delivery/operations.md"
+    },
+    {
+      "scope": "collections UI2files",
+      "state": "coordinatorauthorized",
+      "packet": "qa/coordination/knowledge-brain-20261015/product-delivery/collections-maker-packet.md"
+    },
+    {
+      "scope": "saved outputs UI1",
+      "state": "coordinatorauthorized",
+      "packet": "qa/coordination/knowledge-brain-20261015/product-delivery/outputs-maker-packet.md"
+    },
+    {
+      "scope": "transcript warning UI2files",
+      "state": "coordinatorauthorized",
+      "packet": "qa/packets/product-transcript-refresh-warning.md"
+    },
+    {
+      "scope": "QD1 extraction resume3",
+      "state": "coordinatorauthorized",
+      "packet": "qa/packets/u22-extraction-review-resume.md"
+    },
+    {
+      "scope": "T022 offline transfer9",
+      "state": "coordinatorauthorized",
+      "spec": "qa/evidence/t022-offline-transfer-request.json"
+    },
+    {
+      "scope": "T036 public webinar config4",
+      "state": "coordinatorauthorized",
+      "packet": "qa/packets/source-delivery-public-webinar-config.md"
+    }
+  ]
+}

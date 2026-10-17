@@ -1,0 +1,83 @@
+{
+  "response": {
+    "jobs": [
+      {
+        "id": "bd29c8150ece9221f6689fb8de70c7b035ef96f97760a77263ae4abe8aca56e2",
+        "status": "done",
+        "createdAt": "2026-10-12T12:37:27.642Z",
+        "updatedAt": "2026-10-09T12:01:00.000Z",
+        "deadlineAt": "2026-10-12T12:37:37.642Z",
+        "attempts": 2,
+        "maxAttempts": 2,
+        "automaticRetryCount": 1,
+        "errorClass": null
+      },
+      {
+        "id": "0000000000000000000000000000000000000000000000000000000000000005",
+        "status": "pending",
+        "createdAt": "2026-10-12T12:37:27.642Z",
+        "updatedAt": "2026-10-09T12:01:00.000Z",
+        "deadlineAt": "2026-10-12T12:37:37.642Z",
+        "attempts": 0,
+        "maxAttempts": 2,
+        "automaticRetryCount": 0,
+        "errorClass": null
+      },
+      {
+        "id": "0000000000000000000000000000000000000000000000000000000000000004",
+        "status": "failed",
+        "createdAt": "2026-10-12T12:37:27.642Z",
+        "updatedAt": "2026-10-09T12:01:00.000Z",
+        "deadlineAt": "2026-10-12T12:37:37.642Z",
+        "attempts": 1,
+        "maxAttempts": 1,
+        "automaticRetryCount": 0,
+        "errorClass": "deadline-or-attempts-exhausted"
+      },
+      {
+        "id": "0000000000000000000000000000000000000000000000000000000000000003",
+        "status": "failed",
+        "createdAt": "2026-10-12T12:37:27.642Z",
+        "updatedAt": "2026-10-09T12:01:00.000Z",
+        "deadlineAt": "2026-10-12T12:37:37.642Z",
+        "attempts": 1,
+        "maxAttempts": 2,
+        "automaticRetryCount": 0,
+        "errorClass": "operation-failed"
+      },
+      {
+        "id": "0000000000000000000000000000000000000000000000000000000000000002",
+        "status": "failed",
+        "createdAt": "2026-10-12T12:37:27.642Z",
+        "updatedAt": "2026-10-09T12:01:00.000Z",
+        "deadlineAt": "2026-10-12T12:37:27.641Z",
+        "attempts": 0,
+        "maxAttempts": 2,
+        "automaticRetryCount": 0,
+        "errorClass": "deadline-or-attempts-exhausted"
+      },
+      {
+        "id": "0000000000000000000000000000000000000000000000000000000000000001",
+        "status": "failed",
+        "createdAt": "2026-10-12T12:37:27.642Z",
+        "updatedAt": "2026-10-09T12:01:00.000Z",
+        "deadlineAt": "2026-10-12T12:37:37.642Z",
+        "attempts": 2,
+        "maxAttempts": 2,
+        "automaticRetryCount": 1,
+        "errorClass": "deadline-or-attempts-exhausted"
+      }
+    ],
+    "limit": 50,
+    "truncated": false,
+    "observedAt": "2026-10-12T12:37:28.890Z"
+  },
+  "producerWorkerProof": {
+    "firstAttempts": 1,
+    "reclaimedAttempts": 2,
+    "staleOwnerFenced": true,
+    "terminalDeadlineCancelExhaustionFenced": true
+  },
+  "selectedDatabase": "upload_queue_fixture01",
+  "httpStatus": 200
+}

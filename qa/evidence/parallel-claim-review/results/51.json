@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "index": 51,
+  "originalIndex": 56,
+  "claimId": "2026-08-03-uk-beyond-offer-letters-c01",
+  "inputHash": "64a43d8c6104947a8e4457e5c2ee9520ced06f6f4119f81c21372b99701b64df",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The contexts support 131,000 Indian students leaving in 2005 and an increase to 1.3 million in 2025, 20 years later. They do not support over 1.3 million or clearly establish the total population studying abroad rather than outbound students.",
+    "missingReferences": [],
+    "caveats": [
+      "Both references have one supplied match; no missing or duplicate references.",
+      "Original speakerRef is unknown in both records; embedded speaker names do not establish identity.",
+      "The original context explicitly dates the later figure to 2025 and says 2026 statistics are unavailable; session metadata cannot substitute for this qualifier.",
+      "Reported ministry statistics are transcript statements; external factual truth is unverified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t013",
+        "contextVersion": "originalMigration",
+        "quote": "131,000 Indian students left India to study abroad in that year.",
+        "textSha256": "e7952fbf898e641152447d1109f641ea36b1c83d0e50e589cc9fb970d6d6b283",
+        "contextSha256": "0fd815dab11fccad74ddbc8d8267d845ba82a51613d838354a5b34c82042b3cc",
+        "artifactSha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 288,
+        "tEnd": 330,
+        "supports": "Supports the 131,000 outbound Indian-student count associated with 2005; describes students leaving in that year rather than a total stock studying abroad."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t015",
+        "contextVersion": "originalMigration",
+        "quote": "that number from 131,000 has gone up to 1.3 million in 20 years' time.",
+        "textSha256": "fd6de0ccc3c3833937450518d7866dac3da4eaf27e38276d508f447c8b4fa2a3",
+        "contextSha256": "9360e158d284d11bf1754551045c48da32d1a667f3674d53b32df2889b0dc725",
+        "artifactSha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 358,
+        "tEnd": 375,
+        "supports": "Supports an increase to 1.3 million over 20 years and explicitly specifies 2025; does not support the claim qualifier over 1.3 million."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Both current records are unrelated counselor questions about financing and compliance. Neither supports either student count, 2005, the growth, or the 20-year interval.",
+    "missingReferences": [],
+    "caveats": [
+      "Both references have one supplied match; no missing or duplicate references.",
+      "Both same-ID records changed content and timings: t013 288-330 to 1967-2013; t015 358-375 to 2261-2311. Original support cannot be substituted for current evidence.",
+      "Current speakerRef Bhavya differs from original unknown; stored labels do not verify personal identity.",
+      "Provided raw artifact SHA256 and normalized-LF SHA256 are distinct; artifact bytes were not checked."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t013",
+        "contextVersion": "current",
+        "quote": "the struggles of Indian students and parents when it comes to finances and financing their education.",
+        "textSha256": "d8553c8358b65c2110dc0b12547e3de3e5b6c0935edc424dd4e793dd304832fa",
+        "contextSha256": "66747fdacc32631ea7d0d69d034f655d89fcdab507dfebb98dcd444e877d47f1",
+        "artifactSha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+        "revision": null,
+        "speakerRef": "Bhavya",
+        "tStart": 1967,
+        "tEnd": 2013,
+        "supports": "Unrelated question about Indian students and education financing; no 2005 count or 20-year increase."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t015",
+        "contextVersion": "current",
+        "quote": "what is the one thing, you know, counselors need to change this cycle?",
+        "textSha256": "c78d1040d1dbe8ded7df553eb3d6b696c1798606f4db8c462902da6cb78020a2",
+        "contextSha256": "4d669d21d5db5975ade777f2bd417cfb8a430dea58f23622b5f57d5938f67982",
+        "artifactSha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+        "revision": null,
+        "speakerRef": "Bhavya",
+        "tStart": 2261,
+        "tEnd": 2311,
+        "supports": "Unrelated request for counselors recommendations; no numerical growth evidence."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original supports a related numerical increase but not over 1.3 million and leaves a flow-versus-stock limitation. Current same-ID records discuss different subjects and contain no growth statistics. AI preliminary only; human review and external truth remain open."
+}

@@ -1,0 +1,44 @@
+✔ assertCoverage: this unit's own ISS-304 reproduction (2485s of 2939.6s = 84.5%) throws (2.004ms)
+✔ assertCoverage: exactly at the 97% floor passes (boundary, inclusive) (0.2991ms)
+✔ assertCoverage: just under the 97% floor throws (boundary) (0.2482ms)
+✔ assertCoverage: full/over coverage passes (0.2304ms)
+✔ assertCoverage: ffprobe-unavailable (null duration) never blocks — nothing to judge against (0.2598ms)
+✔ assertIndexed: this unit's own ISS-305 reproduction (27 turns, 0 chunks, no-chunkable-turns) throws (0.276ms)
+✔ assertIndexed: embedding-failed on a real session also throws (not just no-chunkable-turns) (0.2058ms)
+✔ assertIndexed: a session with real chunks passes (0.1803ms)
+✔ assertIndexed: zero turns never blocks (nothing to index in the first place) (0.2844ms)
+✔ assertIndexed: no-embedder is the one legitimate zero-chunk outcome and never blocks (0.2866ms)
+✔ computeStem: this unit's own ISS-306 reproduction — a dot-less Drive title keeps its last character (0.2917ms)
+✔ computeStem: a real extension is still stripped normally (0.3912ms)
+✔ computeStem: a leading-dot name (dotIdx === 0) is left whole, not stripped to empty (0.206ms)
+✔ decideReingestAction: ISS-314's own reproduction (same id, 41 turns, 0 chunks) -> reindex-only, NOT reingest (0.2191ms)
+✔ decideReingestAction: same id, chunks already > 0 -> already-repaired (no-op) — unchanged prior behavior (0.1304ms)
+✔ decideReingestAction: different old/correct id, 0 chunks under a NEW correct id -> reingest (delete-and-reingest path, unchanged) (0.1742ms)
+✔ decideReingestAction: different old/correct id, but the CORRECT id's dir already has 0-chunk turns too -> reingest (falls through, does not misfire reindex-only for the wrong session) (0.1456ms)
+✔ decideReingestAction: no prior row at all (oldSessionId null), correct id has no turns.json -> reingest (unchanged first-time-ingest path) (0.1509ms)
+✔ resolveSessionIdForIngest: dir doesn't exist -> id unchanged (the common case) (0.2099ms)
+✔ resolveSessionIdForIngest: dir exists for a GENUINELY DIFFERENT Drive file sharing date+title -> forks the id (unchanged prior behavior) (0.1233ms)
+✔ resolveSessionIdForIngest: dir exists for THIS SAME Drive file (ISS-314 collision) -> refuses, does not fork (0.1644ms)
+✔ resolveSessionIdForIngest: dir exists but existing source.json is unreadable/unknown (existingDriveFileId null) -> falls through to fork, never silently succeeds (0.1037ms)
+✔ watcher validates finalized source before seed and real consumer accepts it (112.6493ms)
+✔ watcher stale final validation prevents seed and index (44.0594ms)
+✔ watcher final validation failure prevents seed and index (60.8358ms)
+✔ visibility uses half-open overlap, crossing/zero-length turns and finite final coverage (14.5608ms)
+✔ retry/backoff then fallback, malformed replies retry, and blank is a definitive success (2.3712ms)
+✔ explicit failed-observation boundaries exclude gap speech and bound trailing gaps (0.5134ms)
+✔ actual wired stage preserves A/B/blank/A, persisted OCR spans and original speech; reader and chunker consume it (113.8668ms)
+✔ never-resolving primary and fallback time out and abort every attempt without late rejection leaks (45.0858ms)
+✔ direct Gemini and routed backend receive the attempt abort signal (17.2164ms)
+✔ exhausted frame is omitted with typed counted gaps; reuse retries it instead of hiding data loss (129.4215ms)
+✔ A then exhausted B then A resumes original OCR after the failed interval (63.3872ms)
+✔ production speaker mapper preserves OCR against a screen alias, then actual scoped hydrator returns screen/time citations (74.1356ms)
+✔ legacy evidence keeps its point timestamps; unsupported versions and foreign tenant fail closed (0.9842ms)
+✔ shared ingestion refuses digest-resealed missing, foreign, duplicate and misassigned speech attachments (156.5973ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 36
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2196.0262

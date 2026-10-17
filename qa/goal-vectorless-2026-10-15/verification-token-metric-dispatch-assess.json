@@ -1,0 +1,61 @@
+{
+  "phase": "maker-verification",
+  "scope": "Administrative canonical admission; actual-total units enforced externally not by legacy canonical helper",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "d0d5dbd66ad1ec153480d828ad5fabe6db237b914babf4b1f080212e2aa64762",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "qa/coordination/checker-runtime-total-20261015/checker-dispatch-input.json"
+  ],
+  "program": "C:/Program Files/Python312/python.exe",
+  "runtime_version": "Python 3.12.10",
+  "runtime_executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "runtime_identity": {
+    "executable": "C:/Program Files/Python312/python.exe",
+    "version": "Python 3.12.10",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "admission only not independent verification"
+  ],
+  "timeoutMs": 10000,
+  "startedAt": "2026-10-15T11:09:45.271Z",
+  "completedAt": "2026-10-15T11:09:45.460Z",
+  "elapsedMs": 186.15810000000002,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-runtime-total-20261015/checker-dispatch-input.json": "4c980ab252444dc7f82e465d82dbb66d8219cb80a77f81b45849de919ba5d781"
+  },
+  "after": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-runtime-total-20261015/checker-dispatch-input.json": "4c980ab252444dc7f82e465d82dbb66d8219cb80a77f81b45849de919ba5d781"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-token-metric-dispatch-assess.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-token-metric-dispatch-assess.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

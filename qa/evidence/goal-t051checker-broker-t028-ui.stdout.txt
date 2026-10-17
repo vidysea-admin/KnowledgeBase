@@ -1,0 +1,11 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/accounts/CounsellorAccountsPage.test.tsx (3 tests) 556ms
+   ✓ accounts workflow > creates linked profile, grants current revision, deactivates with live refresh and reads both audits 393ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  20:06:03
+   Duration  30.78s (transform 164ms, setup 5.85s, collect 7.14s, tests 556ms, environment 15.57s, prepare 1.03s)
+

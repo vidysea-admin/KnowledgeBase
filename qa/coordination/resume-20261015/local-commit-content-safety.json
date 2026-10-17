@@ -1,0 +1,51 @@
+{
+  "schema": "local-commit-content-safety/1",
+  "recordedAt": "2026-10-15T22:55:13.4736173Z",
+  "scope": "Exact allExistingCandidateEntries from final allowlist only; list not broadened",
+  "allowlistPath": "qa/coordination/resume-20261015/local-commit-final-allowlist.json",
+  "allowlistSha256": "f9096ca4a798365231d4926b4f7f5fed005aa54ea3704b6e12c4494ccc40d01f",
+  "fileCount": 245,
+  "bytesInspected": 2080349,
+  "findings": [
+    {
+      "line": 68,
+      "path": "apps/api/src/connector-workflow/workflow.test.ts",
+      "type": "credential-bearing-uri",
+      "confidence": "high",
+      "disposition": "SYNTHETIC_UNSAFE_URL_REJECTION_TEST",
+      "basis": "Inline unsafe URL rejection corpus; obvious placeholder username/password literals"
+    },
+    {
+      "line": 159,
+      "path": "apps/api/src/connector-workflow/workflow.test.ts",
+      "type": "credential-bearing-uri",
+      "confidence": "high",
+      "disposition": "SYNTHETIC_UNSAFE_URL_REJECTION_TEST",
+      "basis": "Inline unsafe URL rejection corpus; reserved synthetic host and short fixture credentials"
+    }
+  ],
+  "pathFindings": [],
+  "binaryFindings": [],
+  "missing": [],
+  "shaDrift": [],
+  "valuesPersisted": false,
+  "limits": "Exact 245 text files only. Checked PEM/private keys, known provider key shapes, bearer/JWT literals, secret assignments, credential URIs, embedded media/base64 and forbidden artifact paths. Two URI findings safely classified as synthetic rejection tests. Does not prove absence of arbitrary private prose or every unknown secret format.",
+  "actions": {
+    "tests": 0,
+    "network": 0,
+    "push": 0,
+    "commit": 0,
+    "builds": 0,
+    "staging": 0
+  },
+  "pathClassificationNotes": [
+    {
+      "path": "packages/ingest/src/sources/native-document-passages.ts",
+      "basis": "src/sources is an application source directory; .ts module, no binary payload",
+      "disposition": "SOURCE_MODULE_NOT_PRIVATE_CORPUS"
+    }
+  ],
+  "result": "NO_ACTUAL_SECRET_OR_PRIVATE_MEDIA_PAYLOAD_DETECTED_IN_SCOPED_SCAN",
+  "unresolvedFindings": [],
+  "credentialValueOutput": 0
+}

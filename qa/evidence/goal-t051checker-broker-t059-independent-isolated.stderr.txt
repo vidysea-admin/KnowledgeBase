@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: replaying a completed historical request must not regress the current head to an older accepted child
++ actual - expected
+
++ 'eval-retest-5f4ad2fb96a1e8d2680aef8ecb63a4218144703dd0b6782f0d51fe2766b4be1f'
+- 'eval-retest-c7c0c0fed45d145e86b0e09a2665c7c07bc7a4e0cbac46f22e30509d9df99f1b'
+
+    at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\qa\evidence\goal-t059-checker-probe.ts:77:10) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: 'eval-retest-5f4ad2fb96a1e8d2680aef8ecb63a4218144703dd0b6782f0d51fe2766b4be1f',
+  expected: 'eval-retest-c7c0c0fed45d145e86b0e09a2665c7c07bc7a4e0cbac46f22e30509d9df99f1b',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

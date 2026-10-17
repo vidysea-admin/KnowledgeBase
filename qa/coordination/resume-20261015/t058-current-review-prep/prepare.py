@@ -1,0 +1,24 @@
+import hashlib,json,os,pathlib,subprocess,datetime
+R=pathlib.Path('C:/Users/product/Desktop/KnowledgeBase'); D=pathlib.Path(__file__).parent
+def sha(b): return hashlib.sha256(b).hexdigest()
+def pin(p): return sha((R/p).read_bytes())
+def save(name,x): (D/name).write_text(json.dumps(x,indent=2)+'\n',encoding='utf-8')
+head=subprocess.check_output(['git','rev-parse','HEAD'],cwd=R,text=True).strip()
+owned=['apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx','apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx']
+save('lease.json',{'owner':'/root/t058_current_review_prep','scope':str(D),'source_write_lease':False,'live_tree_checked':True,'overlapping_active_writers_observed':False,'authority':'root delegated metadata-only preparation','recorded_at':datetime.datetime.now(datetime.timezone.utc).isoformat()})
+records=[]
+for stem in ['verification-saved-output-workbench','verification-ui2-output-independent-command']:
+ p='qa/goal-vectorless-2026-10-15/'+stem+'.json'; x=json.loads((R/p).read_text()); checks=[]
+ for f,h in x['before'].items():
+  try: current=pin(f); checks.append({'path':f,'expected':h,'current':current,'matches':h==current==x['after'][f]})
+  except OSError as e: checks.append({'path':f,'matches':False,'error':type(e).__name__})
+ env={}
+ spec=json.loads((R/('qa/goal-vectorless-2026-10-15/'+stem+'-spec.json')).read_text())
+ for k,h in x['environmentWhitelistHashes'].items():
+  v=spec.get('env',{}).get(k,os.environ.get(k)); now=None if v is None else sha(v.encode()); env[k]={'expected':h,'current':now,'matches':h==now}
+ records.append({'receipt':p,'receipt_sha256':pin(p),'receipt_base_git_sha':x['base_sha'],'receipt_manifest_sha256':x['candidate_sha'],'receipt_identity_recomputed':sha(json.dumps(x['before'],separators=(',',':')).encode())==x['candidate_sha'],'current_head_matches_receipt_base':head==x['base_sha'],'command':x['command'],'exit':x['exitCode'],'duration_ms':x['elapsedMs'],'pins':checks,'all_pins_match':all(i['matches'] for i in checks),'runtime_executable_matches':sha(pathlib.Path(x['program']).read_bytes())==x['runtime_executable_sha256'],'environment':env,'environment_matches':all(i['matches'] for i in env.values()),'logs':[{'path':x[k],'sha256':pin(x[k])} for k in ['stdoutPath','stderrPath']]})
+save('receipt-authentication.json',{'recorded_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'current_git_head':head,'receipts':records,'no_test_or_build_run':True,'scope':'raw-byte/provenance/environment metadata authentication, not an independent verdict'})
+files=[{'path':p,'sha256':pin(p)} for p in owned]
+identity=sha(''.join(f['path']+'\t'+f['sha256']+'\n' for f in files).encode())
+save('candidate-packet.json',{'policy_version':'managed-review/1','packet_kind':'candidate preparation fragment; not a validated launch envelope','unit':{'root':str(R),'slug':'t058-saved-summary-refresh','cycle':0,'base_git_sha':'5c4cbade2d1a8aa4815de13d587db8de3b01cc4a','current_git_head':head,'candidate_content_manifest_sha256':identity,'candidate_identity_kind':'SHA256(path TAB raw-file SHA256 LF) over owned paths; not Git SHA','files':files},'readiness':{'complete':False,'mutation_required':False},'token_metric':'actual_total','maker':{'token_metric':'actual_total','active_s':None,'tokens':None,'cost':None},'bootstrap_proposal':{'token_metric':'actual_total','active_s':180,'tokens':6000,'authority':'proposal only; cannot reset historical UI2 charges'},'historical_accounting':['qa/coordination/knowledge-brain-20261015/product-delivery/outputs-review-assess-input.json','qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-actual-manual-ledger-30-30.json','qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/ui2-current-independent-receipts-metadata.json'],'historical_ui2_actual_total':519546,'historical_ui2_status':'NEEDS_EXTRA_REVIEW','usage_reconciliation':'Shared UI2 scope includes transcript; preserve complete immutable history and unknowns; do not charge all519546 exclusively to this tiny unit or reset it to zero.','dispatch_allowed':False,'blockers':['manifest remains building, not ready-for-check','receipt base differs from current HEAD; explicit same-content execution-base reconciliation required','shared UI2 accounting/admission unresolved; finite future authority and runtime/startup bindings required','contract-derived epoch/refusal probe and independent source review remain required','validate and assess final complete managed-review/1 envelope before any launch']})
+print(json.dumps({'head':head,'candidate_content_manifest_sha256':identity,'receipts':[{'path':r['receipt'],'all_pins_match':r['all_pins_match'],'runtime_matches':r['runtime_executable_matches'],'environment_matches':r['environment_matches'],'identity_recomputed':r['receipt_identity_recomputed']} for r in records]}))

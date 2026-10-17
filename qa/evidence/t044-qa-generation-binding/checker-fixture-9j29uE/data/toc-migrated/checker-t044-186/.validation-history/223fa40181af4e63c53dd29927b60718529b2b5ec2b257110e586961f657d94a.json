@@ -1,0 +1,35 @@
+{
+  "stage": "transcript",
+  "status": "failed",
+  "transcriptValidated": false,
+  "error": "QA accepted span selected: turn(s) past the audio end (possible hallucination)",
+  "reasons": [
+    "QA accepted span selected: turn(s) past the audio end (possible hallucination)"
+  ],
+  "durationSec": 186,
+  "turnCount": 1,
+  "lastTEnd": 186,
+  "coverage": 1,
+  "partial": false,
+  "shortfallSec": 0,
+  "gaps": [],
+  "qa": {
+    "version": 1,
+    "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+    "durationValid": true,
+    "inputCount": 1,
+    "outputCount": 1,
+    "clampedCount": 0,
+    "dropped": 0,
+    "overshootSec": 0,
+    "pastEnd": 0,
+    "repeatedRuns": 0,
+    "nonMonotonic": 0,
+    "acceptedSpans": 1,
+    "rejectedAttempts": 0
+  },
+  "qaSha256": "2ebbb8fc6558878cc8d6fcb1292c7163eedf0413bc2a75fdd1ed2e8ad7817726",
+  "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+  "validatedAt": "2026-10-14T20:43:23.453Z",
+  "validator": "scripts/webinar/validate/validate-session.mjs"
+}

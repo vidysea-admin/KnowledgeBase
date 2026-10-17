@@ -1,0 +1,164 @@
+{
+  "validation_contract": "managed-review/1",
+  "status": "CYCLE2_BROKER_REQUESTED_NO_TESTS_EXECUTED",
+  "slug": "t059-deadline-fixture-multikey",
+  "fix_cycle": 2,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "candidate_identity": "working-tree SHA256 map; no commit created",
+  "changed_paths": [
+    "apps/api/src/evaluation-flywheel/test-fixture.ts",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts"
+  ],
+  "untracked_paths": [
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts"
+  ],
+  "preserved_dirty_path": "apps/api/src/evaluation-flywheel/composition.test.ts",
+  "hashes": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "4715f0d803840bd5ea4a25de9efc59d3d71c98ec0a3919474270102ed7950175",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "b173a8fc29efae214ca06a2e7f97a0f99b73cd11036d1ef4b6e8961ddd98180a",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "node_executable_exists": true,
+  "temp_parent": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\tmp",
+  "temp_writability_probe": "PASS temporary byte probe created/read/deleted; no test executed",
+  "environment_names": [
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "T054_AUTHENTIC_INPUT_OPT_IN",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN"
+  ],
+  "broker_safe_env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "preflight_required": [
+    "Use existing compatible bundled runtime; record executable/version/hash and tsx import containment before test execution",
+    "Set TMP/TEMP to provided writable temp parent; retain exact cwd, safe environment fingerprint, lock/import hashes",
+    "Execute only serial broker commands with external timeout; preserve original historical rows before composition and restore/byte-compare on every exit",
+    "Fingerprint all pins before/after; keep original failure receipts immutable; save attributable full stdout/stderr, exit/count/time and restoration receipts"
+  ],
+  "requests": [
+    {
+      "label": "fixture-regressions",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(memory fixture replaceOne reports insert match no-op miss and duplicate outcomes|memory fixture nin prunes stale scoped rows and preserves missing array and operator semantics|memory fixture traverses claim evidence arrays with tenant scoped dotted filters)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/test-fixture.test.ts"
+      ],
+      "testIDs": [
+        "memory fixture replaceOne reports insert match no-op miss and duplicate outcomes",
+        "memory fixture nin prunes stale scoped rows and preserves missing array and operator semantics",
+        "memory fixture traverses claim evidence arrays with tenant scoped dotted filters"
+      ],
+      "expectedSelected": 3,
+      "outerTimeoutMs": 45000
+    },
+    {
+      "label": "original-composition",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/composition.test.ts"
+      ],
+      "testIDs": [
+        "actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child"
+      ],
+      "expectedSelected": 1,
+      "outerTimeoutMs": 45000
+    },
+    {
+      "label": "immediate-consumers-and-ledger-floor",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers|concurrent attempt CAS and expired restart lock preserve exactly one accepted child|terminal CAS deadline preserves committed completion or fences a late CAS after recovery|ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ],
+      "testIDs": [
+        "stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers",
+        "concurrent attempt CAS and expired restart lock preserve exactly one accepted child",
+        "terminal CAS deadline preserves committed completion or fences a late CAS after recovery",
+        "ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head"
+      ],
+      "expectedSelected": 4,
+      "outerTimeoutMs": 45000
+    }
+  ],
+  "contract_path": "qa/contracts/goal-t059.md",
+  "clauses": [
+    "S3 tenant isolation",
+    "S5 failure-safe CAS/idempotency",
+    "S7 honest state",
+    "S10 immutable child",
+    "S12 observable bounded failure",
+    "S13 affected producer/immediate consumers",
+    "S15 exact evidence/handshake"
+  ],
+  "effective_policy": "Existing active T059 policy retained; targeted broker request does not waive original packet mandatory checks, contracts validator, central typecheck or integration/release gates. No checker dispatch/retry authorized by parent.",
+  "seam_cap": {
+    "direct_named_fixture_seam_passes": 0,
+    "historical_goal_t059_passes": 1,
+    "decision": "Below 2-PASS cap; no security/production guard edits"
+  },
+  "ledger": {
+    "union_scanned": "qa/issues.jsonl and qa/issues.*.jsonl",
+    "issue": "ISS-T059REPLAY-001",
+    "recorded_cases": 1,
+    "executed": 0,
+    "reason": "Not an issue-fix claim; standing exact recorded-replay node requested as fixture consumer regression. Broker execution pending."
+  },
+  "risk_boundaries": [
+    "TESTONLY replaceOne upsertedCount matches actual insertion/match/miss; no fake acknowledgement",
+    "TESTONLY $nin handles scalar/array/missing values for current string-ID operations; operators conjunctive; unsupported operator and malformed nin fail closed",
+    "Composition diagnostic dirty bytes preserved exactly; no production edits",
+    "Does not claim complete Mongo query emulation, live providers or native Mongo acceptance"
+  ],
+  "maker_usage": {
+    "token_metric": "actual_total",
+    "actual_total_tokens": null,
+    "actual_active_seconds": null,
+    "actual_cost": null,
+    "phase_metrics": "edit-phase-metrics.json and packet-phase-metrics.json",
+    "children": []
+  },
+  "remaining_gates": [
+    "Requested broker receipts",
+    "Current mandatory original T059 scope and validator evidence",
+    "Independent checker HOLD unresolved; no dispatch authorized",
+    "Full T059 live/human acceptance remains HOLD"
+  ],
+  "previous_receipts_reusable": false,
+  "reuse_reason": "Fixture dependency changed; fresh helper/original/consumer receipts required. Prior helper2 and workflow4 green retained as historical.",
+  "behavior": "Dotted array traversal; scalararray containment; conjunctive exists/in/nin/ne; null equality includes absent; unknown operators fail closed. Sort get unchanged.",
+  "limitations": "Scoped primitive evidence/session-ID matcher; no claim arbitrary object/regex/numeric-array-path equivalence.",
+  "raw_before_backups": [
+    "cycle2-test-fixture.ts.before.bytes",
+    "cycle2-test-fixture.test.ts.before.bytes"
+  ],
+  "failed_edit_attempt": "Initial byte-anchor assertion stopped before source writes due original mixed newline shape; repaired anchor without newline normalization. No test run."
+}

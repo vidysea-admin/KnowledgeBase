@@ -1,0 +1,23 @@
+from broker_lib import *
+import os
+phase=time.monotonic();packet=load('qa/coordination/resume-20261015/native-next-maker/combined-source-pins-stage3-api-repair1.json');assert len(packet)==66;assert all(sha(ROOT/p['path'])==p['sha256'] for p in packet);pins=load('qa/coordination/resume-20261015/broker/native-next-stage3-repair1-final-sealed-inventory.json');assert all(sha(ROOT/p)==h for p,h in pins.items())
+fixture=None;results=[];title='genuine live seal precedes source ingestion; retained public recovery does not invent a clock';testfile='scripts/native-capture/production.test.ts';assert (ROOT/testfile).read_text().count('test("'+title+'"')==1
+adapter=ROOT/'qa/coordination/resume-20261015/runtime-alias-repair/register.mjs';helper=ROOT/'packages/meeting-bot/src/capture/record-consent/native-acl-fixture.ps1';os.environ.update(LKB_NATIVE_PUBLICATION_MONGO_RUN='0',KB_U24_PRIVATE_TOC_TESTS='0',T054_AUTHENTIC_INPUT_OPT_IN='0')
+def checked(label,argv,limit):
+ r=run('genuine-seal-isolated-'+label,argv,ROOT,limit,pins);results.append(r);return r
+try:
+ powershell=pathlib.Path(os.environ.get('SystemRoot','C:/Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe';os.environ['PSModulePath']=str(powershell.parent/'Modules')
+ r=checked('acl-create',[str(powershell),'-NoProfile','-NonInteractive','-File',str(helper),'-Action','Create'],15);assert r.get('exit')==0
+ data=json.loads(pathlib.Path(r['log']).read_text(encoding='utf-8-sig'));fixture=pathlib.Path(data['fixtureDirectory']);assert fixture.resolve().parent==(ROOT/'qa/evidence/native-acl-fixtures').resolve() and fixture.resolve().is_relative_to(ROOT.resolve()) and re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}',fixture.name)
+ os.environ.update(TMP=str(fixture),TEMP=str(fixture),LKB_NATIVE_TEST_PRIVATE_DIR=str(fixture));bins={j['Name']:j['Source'] for j in load('qa/coordination/resume-20261015/broker/native-binaries.json')};known=load('qa/coordination/resume-20261015/broker/native-binary-hashes.json');assert all(sha(v)==known[k]['sha256'] for k,v in bins.items());os.environ.update(LKB_NATIVE_TEST_FFMPEG=bins['ffmpeg.exe'],LKB_NATIVE_TEST_FFPROBE=bins['ffprobe.exe'],LKB_NATIVE_TEST_BROWSER='C:/Program Files/Google/Chrome/Application/chrome.exe')
+ r=checked('acl-verify',[NODE,'--input-type=module','--import',adapter.as_uri(),'-e',"const {verifyPrivateDirectory}=await import(process.argv[1]);verifyPrivateDirectory(process.argv[2]);console.log('verified owned protected UUID');",(ROOT/'packages/meeting-bot/src/capture/record-consent/private-acl.ts').as_uri(),str(fixture)],15);assert r.get('exit')==0
+ # Use Node's default per-file isolation so the runner applies the exact positive
+ # selection in its child. The previous isolation=none batch's negative filter did
+ # not exclude the real node; this environment/vector difference is explicit.
+ argv=[NODE,'--test','--test-concurrency=1','--test-timeout=120000','--test-name-pattern=^'+re.escape(title)+'$','--import',adapter.as_uri(),testfile]
+ (OUT/'genuine-seal-isolated-admission.json').write_text(json.dumps({'title':title,'matchingOriginalDeclarations':1,'argv':argv,'oldVectorFlags':['--test-isolation=none','--test-timeout=65000'],'newVectorFlags':['default per-file process isolation','--test-timeout=120000','positive anchored exact name'],'authority':'root one diagnostic original genuine test;125s incl close; no whole-floor rerun','accounting':'shared maker/integration; not checker'},indent=2))
+ checked('original-positive',argv,120)
+except BaseException as e:results.append({'checkpoint':type(e).__name__+': '+str(e)});print(type(e).__name__,str(e),flush=True)
+finally:
+ if fixture is not None:results.append(run('genuine-seal-isolated-acl-cleanup',[str(powershell),'-NoProfile','-NonInteractive','-File',str(helper),'-Action','Cleanup','-FixtureDirectory',str(fixture)],ROOT,15,pins))
+ after={p:sha(ROOT/p) for p in pins};(OUT/'genuine-seal-isolated-final-inventory.json').write_text(json.dumps(after,indent=2));summary={'results':results,'elapsed_s':time.monotonic()-phase,'pinsUnchanged':pins==after,'pinCount':len(pins),'fixtureRemoved':fixture is not None and not fixture.exists(),'environment':{k:os.environ.get(k) for k in ['LKB_NATIVE_TEST_FFMPEG','LKB_NATIVE_TEST_FFPROBE','LKB_NATIVE_TEST_BROWSER','LKB_NATIVE_TEST_PRIVATE_DIR']},'accounting':'shared maker/integration, not checker','wholeFloorPASS':False,'actual_total_tokens':None,'independent_verdict':None};(OUT/'genuine-seal-isolated-final-seal.json').write_text(json.dumps(summary,indent=2));print(json.dumps({k:v for k,v in summary.items() if k not in ['results','environment']}))

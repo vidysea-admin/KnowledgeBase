@@ -72,7 +72,7 @@ const TRUSTED: TrustedSenderConfig = {
 function candidate(overrides: Partial<AutoRecordCandidateInput> = {}): AutoRecordCandidateInput {
   return {
     id: "c1", title: "TOC webinar", senderEmail: "ops@theoutreachcollective.in",
-    senderDomain: "theoutreachcollective.in", status: "auto_approved",
+    senderDomain: "theoutreachcollective.in", senderAuthenticated: true, status: "auto_approved",
     meetingUrl: "https://zoho.com/meeting/abc?tk=SECRET123",
     startTime: "2026-09-28T12:30:00Z", endTime: "2026-09-28T13:30:00Z",
     kind: "upcoming",
@@ -82,6 +82,54 @@ function candidate(overrides: Partial<AutoRecordCandidateInput> = {}): AutoRecor
 
 const TICK_NOW = "2026-09-28T12:26:00Z"; // 4 min before candidate() start, lead=5
 const LEAD5 = 5;
+
+test("T036 refreshed source refusals veto retained approved links in both selection modes", () => {
+  for (const everyWebinar of [false, true]) {
+    for (const issue of [{ meetingLinkIssue: "ambiguous" }, { meetingLinkIssue: "registration-only" },
+      { meetingLinkIssue: "host-start-link" }, { youtubeWatchIssue: "ambiguous" }] as const) {
+      const row = candidate({ status: "approved", meetingUrl: "https://zoom.us/j/1234567890", ...issue });
+      const before = structuredClone(row);
+      const result = selectAutoRecordItems({ calendarEvents: [], candidates: [row], now: TICK_NOW,
+        leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [], everyWebinar });
+      assert.equal(result.toSchedule.length, 0, JSON.stringify({ everyWebinar, issue }));
+      assert.deepEqual(result.skipped.map(item => item.reason), ["needs-review"]);
+      assert.deepEqual(row, before, "selection must not rewrite approval or registration lineage");
+      assert.equal(result.skipped[0]!.detail, undefined, "do not expose a retained join token");
+    }
+  }
+});
+
+test("T036 malformed present refusal fields fail closed at the JSON boundary", () => {
+  for (const field of ["meetingLinkIssue", "youtubeWatchIssue"]) {
+    for (const value of [null, false, 0, "", {}, []]) {
+      const row = { ...candidate({ status: "approved" }), [field]: value } as AutoRecordCandidateInput;
+      const result = selectAutoRecordItems({ calendarEvents: [], candidates: [row], now: TICK_NOW,
+        leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [] });
+      assert.equal(result.toSchedule.length, 0, `${field}:${JSON.stringify(value)}`);
+      assert.equal(result.skipped[0]!.reason, "needs-review");
+    }
+  }
+});
+
+test("T036 every-webinar canonical copies cannot bypass a refreshed Gmail source refusal", () => {
+  const refused = candidate({ status: "approved", meetingUrl: "https://zoom.us/j/1234567890", meetingLinkIssue: "ambiguous" });
+  const calendarCopy = event({ id: "same-session", title: refused.title, meetingUrl: refused.meetingUrl,
+    meetingUrlSource: "conference", startTime: refused.startTime!, endTime: refused.endTime! });
+  const healthy = candidate({ id: "independent", status: "approved", meetingUrl: "https://zoom.us/j/9876543210" });
+  const result = selectAutoRecordItems({ calendarEvents: [calendarCopy], candidates: [refused, healthy], now: TICK_NOW,
+    leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [], everyWebinar: true }, { parallel: true });
+  assert.deepEqual(result.toSchedule.map(item => item.sourceId), ["independent"]);
+  assert.deepEqual(result.skipped.map(item => [item.sourceId, item.reason]), [["same-session", "needs-review"], ["c1", "needs-review"]]);
+});
+
+test("T036 retained rejection and registration barriers keep their existing outcomes", () => {
+  for (const [extra, reason] of [[{ status: "rejected" }, "untrusted-sender"], [{ registrationOnly: true }, "needs-registration"]] as const) {
+    const result = selectAutoRecordItems({ calendarEvents: [], candidates: [candidate({ meetingLinkIssue: "ambiguous", ...extra })],
+      now: TICK_NOW, leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [] });
+    assert.equal(result.toSchedule.length, 0);
+    assert.equal(result.skipped[0]!.reason, reason);
+  }
+});
 
 test("isTrustedSender: exact email match", () => {
   assert.equal(isTrustedSender("karunn@vidysea.com", undefined, TRUSTED), true);
@@ -93,8 +141,12 @@ test("isTrustedSender: domain match, derived from email when no separate domain 
   assert.equal(isTrustedSender("someone@unknown.example", undefined, TRUSTED), false);
 });
 
-test("isTrustedSender: explicit domain wins even if email itself isn't in the list", () => {
-  assert.equal(isTrustedSender("random@random.example", "ashoka.edu.in", TRUSTED), true);
+// ISS-CAPTURE-001: this test previously asserted `true` for a supplied domain that disagrees with the
+// email's own domain ("explicit domain wins"). That expectation was the unsafe behaviour: a caller-
+// supplied domain must never grant trust on its own. Now: mismatch -> not trusted; agreeing -> trusted.
+test("isTrustedSender: a supplied domain that disagrees with the email's domain never grants trust (ISS-CAPTURE-001)", () => {
+  assert.equal(isTrustedSender("random@random.example", "ashoka.edu.in", TRUSTED), false);
+  assert.equal(isTrustedSender("random@ashoka.edu.in", "ashoka.edu.in", TRUSTED), true);
 });
 
 test("isTrustedSender: neither email nor domain given -> false", () => {
@@ -314,4 +366,85 @@ test("selectAutoRecordItems: a candidate with no parseable startTime is silently
   });
   assert.equal(result.toSchedule.length, 0);
   assert.equal(result.skipped.length, 0);
+});
+
+// ---- T-036 fix cycle 1: link provenance (ISS-T036CAL-001) ----------------------------------------------------------
+import { describeSkip } from "./state/skip-describe.js";
+import { reconcileWebinarSources } from "./calendar-client.js";
+
+const P_NOW = "2026-10-11T11:58:00Z";
+const ZOOM_URL = "https://zoom.us/j/123456789?pwd=zz";
+const probe = (extra: Record<string, unknown>, everyWebinar: boolean, organizer = "attacker@evil.com") => selectAutoRecordItems({
+  calendarEvents: [{ id: "p1", title: "Free Webinar: Win a prize", startTime: "2026-10-11T12:00:00Z", endTime: "2026-10-11T13:00:00Z",
+    meetingUrl: ZOOM_URL, organizer, ...extra } as CalendarEvent],
+  candidates: [], now: P_NOW, leadMinutes: 5, trustedSenders: { emails: ["boss@trusted.example"], domains: [] }, alreadyScheduled: [], everyWebinar,
+});
+
+test("ISS-T036CAL-001 recorded probe: an outsider's description/location link is NOT scheduled in either mode; skipped with the new reason", () => {
+  let held = 0;
+  for (const everyWebinar of [true, false]) {
+    for (const meetingUrlSource of ["description", "location"]) {
+      const r = probe({ meetingUrlSource }, everyWebinar);
+      assert.equal(r.toSchedule.length, 0, `${meetingUrlSource}/${everyWebinar}`);
+      assert.deepEqual(r.skipped.map((s) => s.reason), ["unverified-link-source"]);
+      held++;
+    }
+  }
+  // the pre-change shape (no link at all) is still the old reason
+  assert.equal(probe({ meetingUrl: undefined }, true).skipped[0]!.reason, "no-join-link");
+  console.log(`ISS-T036CAL-001: ${held}/4 free-text probes not scheduled (everyWebinar true+false x description+location), skipped unverified-link-source`);
+  assert.equal(held, 4);
+});
+
+test("T-036: same event with Google conference data is scheduled as before; a trusted organizer's free-text link is still not", () => {
+  assert.equal(probe({ meetingUrlSource: "conference" }, true).toSchedule.length, 1);
+  assert.equal(probe({ meetingUrlSource: "conference" }, false, "boss@trusted.example").toSchedule.length, 1);
+  assert.equal(probe({}, true).toSchedule.length, 1, "absent source = row from before the field existed = conference data");
+  const r = probe({ meetingUrlSource: "description" }, false, "boss@trusted.example");
+  assert.equal(r.toSchedule.length, 0); assert.equal(r.skipped[0]!.reason, "unverified-link-source");
+});
+
+test("T-036: an unknown or malformed source value is untrusted, never defaulted to conference", () => {
+  for (const bad of ["calendar", "", "CONFERENCE", "conference ", null, 0, 5, true, {}, ["conference"]]) {
+    for (const everyWebinar of [true, false]) {
+      const r = probe({ meetingUrlSource: bad }, everyWebinar, "boss@trusted.example");
+      assert.equal(r.toSchedule.length, 0, JSON.stringify(bad));
+      assert.equal(r.skipped[0]!.reason, "unverified-link-source", JSON.stringify(bad));
+    }
+  }
+});
+
+test("T-036: no existing approval path applies to a calendar event; an approved Gmail candidate carrying a free-text source is not scheduled either", () => {
+  const r = selectAutoRecordItems({ calendarEvents: [], now: P_NOW, leadMinutes: 5, trustedSenders: { emails: [], domains: [] }, alreadyScheduled: [],
+    candidates: [candidate({ status: "approved", meetingUrl: ZOOM_URL, meetingUrlSource: "description", startTime: "2026-10-11T12:00:00Z", endTime: "2026-10-11T13:00:00Z" })] });
+  assert.equal(r.toSchedule.length, 0); assert.equal(r.skipped[0]!.reason, "unverified-link-source");
+});
+
+test("T-036: the operator text says what to do and never echoes the link; the detail field is empty", () => {
+  const s = probe({ meetingUrlSource: "description" }, true).skipped[0]!;
+  assert.equal(s.detail, undefined);
+  const line = describeSkip(s);
+  assert.ok(/invite text/.test(line) && /not verified/.test(line) && /send-now/.test(line), line);
+  assert.ok(!line.includes("zoom.us") && !line.includes("123456789"), line);
+});
+
+test("T-036: the source survives reconciliation (calendar allow-list), a linked Gmail row inherits it, a bad value is refused", () => {
+  const base = { tenantId: "lane", checkedAt: "2026-10-11T10:00:00.000Z", acquisition: { complete: true, historyComplete: true } };
+  const cal = (src: unknown) => ({ id: "c9", title: "Webinar", startTime: "2026-10-11T12:00:00.000Z", endTime: "2026-10-11T13:00:00.000Z", organizer: "o@x.org",
+    meetingUrl: ZOOM_URL, meetingUrlSource: src as "description" });
+  const out = reconcileWebinarSources({ ...base, candidates: [], calendarEvents: [cal("description")] });
+  assert.equal(out.calendarEvents[0]!.meetingUrlSource, "description");
+  assert.equal(reconcileWebinarSources({ ...base, candidates: [], calendarEvents: [{ ...cal("x"), meetingUrlSource: undefined }] }).calendarEvents[0]!.meetingUrlSource, undefined);
+  assert.equal("meetingUrlSource" in reconcileWebinarSources({ ...base, candidates: [], calendarEvents: [{ ...cal("x"), meetingUrlSource: undefined }] }).calendarEvents[0]!, false);
+  for (const bad of [5, null, "x".repeat(33), "a\nb"]) assert.throws(() => reconcileWebinarSources({ ...base, candidates: [], calendarEvents: [cal(bad)] }), Error, String(bad));
+  const g = { id: "g9", title: "Webinar", senderEmail: "a@ashoka.edu.in", senderDomain: "ashoka.edu.in", status: "approved" as const, meetingUrl: "https://zoom.us/j/123456789",
+    startTime: "2026-10-11T12:00:00.000Z", endTime: "2026-10-11T13:00:00.000Z", kind: "upcoming" as const };
+  assert.throws(() => reconcileWebinarSources({ ...base, calendarEvents: [], candidates: [{ ...g, meetingUrlSource: "conference" } as never] }), Error, "gmail rows cannot self-declare a source");
+  const linked = reconcileWebinarSources({ ...base, calendarEvents: [cal("description")], candidates: [g] });
+  const gm = linked.candidates.find((c) => c.id === "g9");
+  // cycle 3 (ISS-T036CAL-010): a free-text calendar row holds no aliases, so the Gmail row is NOT linked to it and does not inherit its provenance;
+  // the Gmail row keeps its own (authenticated, approved) trust and the free-text calendar row is skipped separately.
+  assert.equal(gm?.meetingUrlSource, undefined);
+  const sel = selectAutoRecordItems({ calendarEvents: linked.calendarEvents, candidates: [gm!], now: P_NOW, leadMinutes: 5, trustedSenders: { emails: [], domains: [] }, alreadyScheduled: [] });
+  assert.deepEqual(sel.toSchedule.map((i) => i.sourceId), ["g9"]); assert.deepEqual(sel.skipped.map((x) => `${x.sourceId}:${x.reason}`), ["c9:unverified-link-source"]);
 });

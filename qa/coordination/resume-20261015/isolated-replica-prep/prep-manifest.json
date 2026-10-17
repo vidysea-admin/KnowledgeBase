@@ -1,0 +1,77 @@
+[
+  {
+    "file": ".gitignore.proposed",
+    "bytes": 205,
+    "sha256": "fa4bc2d437354d5b181406010ca7794a647aa0bbbe18a50c8cab15b91ed7af71"
+  },
+  {
+    "file": "activate-proposal.py",
+    "bytes": 12599,
+    "sha256": "a6d82c6b373fc96ffc3c673a0428ffb4807230c67da2b3825b67a380f69f36a8"
+  },
+  {
+    "file": "download-verified.ps1",
+    "bytes": 3443,
+    "sha256": "542d3fc1cfbc2e2f59f6f5c87519ba18850df445280d81e0c6038f88ed0b345a"
+  },
+  {
+    "file": "extract-passive.ps1",
+    "bytes": 3775,
+    "sha256": "18d99626326b7352fecbcd080147d74fef38bcb34a708054c1657efa919363b1"
+  },
+  {
+    "file": "init-and-smoke.py",
+    "bytes": 4945,
+    "sha256": "dc1eccabd6c6adce88771eff738f1b34e4fa73beec9c1fdafe6fa8bd720b1c73"
+  },
+  {
+    "file": "inspect-pe.py",
+    "bytes": 1249,
+    "sha256": "28e3e7709b340e5b55b29d8086a5f9b8fc136e2975a8cfeffbb847e6e8d0e681"
+  },
+  {
+    "file": "mongod.yml.template",
+    "bytes": 478,
+    "sha256": "7d7eb8a7342eca0fefe8e1df1e3a6698e968e1e661a20bf35069b23a5e5b3d4c"
+  },
+  {
+    "file": "PLAN.md",
+    "bytes": 11493,
+    "sha256": "b457d4c2189595eb335e39946c9d883393ec69aedf9860d43ffd2a428bf535a9"
+  },
+  {
+    "file": "shutdown-owned.py",
+    "bytes": 948,
+    "sha256": "30303c95fab193f4d8c4c33ee239b345e206f4d2599fbba6e9714d27351eb3bf"
+  },
+  {
+    "file": "vendor-download.json",
+    "bytes": 409,
+    "sha256": "ab17dcfa34cfe075b30b681beed906461b915ec5de7f26ba523f5ce371d41fb8"
+  },
+  {
+    "file": "vendor-extraction.json",
+    "bytes": 236,
+    "sha256": "02eee9adf2d1959db20fdff5b786587bce2b62eaede65e6e09c6cb7c191a2fea"
+  },
+  {
+    "file": "vendor-head.json",
+    "bytes": 331,
+    "sha256": "0abfbb3187621e97b86eb3aafb559ff31daa81b37d375a24f8a069f58270c4d9"
+  },
+  {
+    "file": "vendor-pe.json",
+    "bytes": 505,
+    "sha256": "d979b0a2d50dd26865a06bf278a74a808cafa8cf3cd71760d33e02b7dc5fc1b3"
+  },
+  {
+    "file": "vendor-preparation.json",
+    "bytes": 1555,
+    "sha256": "2473a3e81d4b4385336eb073575602431909f7d844e817ad268e9d6155f8f816"
+  },
+  {
+    "file": "vendor-signature-stop.json",
+    "bytes": 1785,
+    "sha256": "6eb60385ee1fb25245bfb90d95f2847eed1600a477688b13fc275dbecb895159"
+  }
+]

@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import { assertPreservedClaimMeaning } from '../../apps/api/src/indexing/vectorless-grounding.ts';
+const turn={_id:'ind-turn',tenantId:'ind-tenant',sessionId:'ind-session',speakerRef:'ind-speaker',tStart:0,tEnd:1,text:'A student may apply without mathematics; mathematics is not compulsory.'};
+const claim={_id:'ind-reviewed',tenantId:'ind-tenant',text:'Mathematics is compulsory.',status:'verified',evidence:[{turnId:turn._id,sessionId:turn.sessionId,quote:'mathematics is not compulsory'}]};
+await assert.rejects(assertPreservedClaimMeaning([claim],[turn]),/requires current-source meaning verification/);
+let called=0;
+await assert.rejects(assertPreservedClaimMeaning([claim],[turn],async batch=>{called++;assert.equal(batch[0].sources[0].text,turn.text);return {verdicts:[{id:'foreign-claim',verdict:'same'}]};}),/not supported by its current source/);
+assert.equal(called,1);
+await assert.rejects(assertPreservedClaimMeaning([claim],[turn],async()=>{throw new Error('must not call judge');},0),/budget unavailable/);
+console.log('Independent C4 fail-closed probes: no judge, foreign judge ID, exhausted budget: 3/3 PASS; no database/provider calls.');

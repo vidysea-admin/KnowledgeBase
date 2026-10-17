@@ -1,0 +1,38 @@
+{
+  "owner": "/root/verification_broker",
+  "observedAt": "2026-10-15T10:28:34.544Z",
+  "state": "ACCEPTED_FOR_IMMEDIATE_DISPATCH",
+  "activeCpuProcess": null,
+  "acceptedProbe": {
+    "script": "qa/goal-vectorless-2026-10-15/source-reader-independent-probe-resume1.mts",
+    "sha256": "e694ac3df8be7e693f392b6be03fe3ec7719308111f48dec422721844dff304a",
+    "spec": "qa/goal-vectorless-2026-10-15/verification-source-reader-independent-resume1-spec.json",
+    "acceptedAt": "2026-10-15T10:29:14.100Z",
+    "gate": "qa/coordination/knowledge-brain-20261015/source-reader-independent-resume1-result.json",
+    "epoch": "source-reader9cabef/current6710b9"
+  },
+  "acceptanceRequires": [
+    "exact command/script path and frozen script SHA256",
+    "selected test IDs/scope and bounded watchdog",
+    "current actual import/source pins and explicit epoch",
+    "root/coordinator authorization plus current canonical review-phase gate",
+    "reviewer work budget stopped while queued; finalization reserve untouched"
+  ],
+  "requests": [
+    {
+      "unit": "source-reader",
+      "state": "AWAITING_EXACT_SCRIPT_AND_CURRENT_GATE",
+      "acceptedAt": null,
+      "queueWaitMs": null,
+      "sourcePin": "9cabefdd4747fb7c868e44feec18006bf05bf9e7090392f8f16201a60c955293"
+    },
+    {
+      "unit": "capture-operations",
+      "state": "CANCELLED_BY_CHECKER_FINALIZATION",
+      "script": "qa/coordination/knowledge-brain-20261015/capture-delivery/operations-review/probe.mjs",
+      "acceptedAt": null,
+      "executed": false
+    }
+  ],
+  "accounting": "No invented waits/active/token totals. Queue wait is separate; command elapsed charged once to independent phase. Reviewer may resume only after accepted slot and fresh phase gate."
+}

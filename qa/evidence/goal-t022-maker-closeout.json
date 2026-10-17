@@ -1,0 +1,361 @@
+{
+  "closedAt": "2026-10-14T21:30:25.4263307Z",
+  "cycle": 0,
+  "scope": "C1-C6 and scoped C10 source/API mount only",
+  "verdictSha256": "9e627dc16a87b34d2bdf2d498b3fa7fdd40a4cde55ba0eebbd55285dd402dd96",
+  "reviewSha256": "6c44882b8081a4787477e4271f3251454c84e062b3d3d8d06febdeb1cb0f7ebb",
+  "preCloseManifestSha256": "7fe0cd6659a656d0eb240bf1fbab1a8bc5802048bddd217e9272cc728f9f6b82",
+  "preClosePacketSha256": "ef0020bae13946ac483610ee83881cf18e3c77313187fe9202d1c3997952dfbb",
+  "expandedPinsCurrent": 68,
+  "freezePinsCurrent": 7,
+  "consumerPinsCurrent": 13,
+  "ownCandidatePinsCurrent": 14,
+  "independentMountAssertions": 46,
+  "realHumanReviews": 0,
+  "realProviderCalls": 0,
+  "fullTask": "HOLD",
+  "finalCoherentCompilerBuild": "PENDING",
+  "providerRouterLiveProvenance": "HOLD",
+  "pins": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\file-store.ts",
+      "expected": "c0fd3ec5b75a8be3f2e1635c3e677f042ad1e57010d4dc6dac2fa8797d7d0ff3",
+      "current": "c0fd3ec5b75a8be3f2e1635c3e677f042ad1e57010d4dc6dac2fa8797d7d0ff3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\persistence.ts",
+      "expected": "21940ec318aeae31190520ca9f8d94c60923b08b0d52695be5074695f8e7dc40",
+      "current": "21940ec318aeae31190520ca9f8d94c60923b08b0d52695be5074695f8e7dc40"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\README.md",
+      "expected": "f94e1c7bf4049661220da287389ff2d32223a51f711c5ae38706f38e688ad2c5",
+      "current": "f94e1c7bf4049661220da287389ff2d32223a51f711c5ae38706f38e688ad2c5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\router.test.ts",
+      "expected": "451135a42ef9c9468b3e3d21b89d363b4d666253be81e5a8a7baa624fba424cd",
+      "current": "451135a42ef9c9468b3e3d21b89d363b4d666253be81e5a8a7baa624fba424cd"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\router.ts",
+      "expected": "09a5c167cfea810e542633861e399b24034075cc16fdc299d70610352aa84283",
+      "current": "09a5c167cfea810e542633861e399b24034075cc16fdc299d70610352aa84283"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\seed.ts",
+      "expected": "6d003368b0f6ea7739812cf62fc2d8593235305d7dab1f278db44084b1e09ef9",
+      "current": "6d003368b0f6ea7739812cf62fc2d8593235305d7dab1f278db44084b1e09ef9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\types.ts",
+      "expected": "41b6c165da56f7f77a27d135ebf3c2690318ab8707ee48b160587cd952a3e277",
+      "current": "41b6c165da56f7f77a27d135ebf3c2690318ab8707ee48b160587cd952a3e277"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\CalibrationReviewPage.test.tsx",
+      "expected": "2e987823262345288a6516b54d790b8db1b01ca32e5be43a6abf106bc5e36f4b",
+      "current": "2e987823262345288a6516b54d790b8db1b01ca32e5be43a6abf106bc5e36f4b"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\CalibrationReviewPage.tsx",
+      "expected": "0f46b49e67e7a79379ddc96e1531bf2c44f115584bcc7a4da193a935144f8001",
+      "current": "0f46b49e67e7a79379ddc96e1531bf2c44f115584bcc7a4da193a935144f8001"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\client.ts",
+      "expected": "09f37e72727492df554d72854acf1600012609cc27d6dd556e7eba8f01596b3a",
+      "current": "09f37e72727492df554d72854acf1600012609cc27d6dd556e7eba8f01596b3a"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\human-calibration.mjs",
+      "expected": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf",
+      "current": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\human-calibration.test.mjs",
+      "expected": "c904299b6cd55522bd3f527ba945d4f072183f575200ba90414e74173898b9db",
+      "current": "c904299b6cd55522bd3f527ba945d4f072183f575200ba90414e74173898b9db"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\t022-review-package.html",
+      "expected": "931e0a88ea74b6fe420eb4176c280b32a00b82f71e8e674b63d3fbbdef84e335",
+      "current": "931e0a88ea74b6fe420eb4176c280b32a00b82f71e8e674b63d3fbbdef84e335"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\integrations\\evaluation.ts",
+      "expected": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28",
+      "current": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\manifests\\goal-t022.md",
+      "expected": "7fe0cd6659a656d0eb240bf1fbab1a8bc5802048bddd217e9272cc728f9f6b82",
+      "current": "7fe0cd6659a656d0eb240bf1fbab1a8bc5802048bddd217e9272cc728f9f6b82"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\packets\\goal-t022.md",
+      "expected": "ef0020bae13946ac483610ee83881cf18e3c77313187fe9202d1c3997952dfbb",
+      "current": "ef0020bae13946ac483610ee83881cf18e3c77313187fe9202d1c3997952dfbb"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t022.md",
+      "expected": "2e56571308345202479b3c1bbd0b772016cebfc5737b0b78487777737d2acac4",
+      "current": "2e56571308345202479b3c1bbd0b772016cebfc5737b0b78487777737d2acac4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\server.ts",
+      "expected": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+      "current": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\fixtures.ts",
+      "expected": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b",
+      "current": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\auth.ts",
+      "expected": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+      "current": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\integrations\\routes.ts",
+      "expected": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+      "current": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\App.tsx",
+      "expected": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+      "current": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\layout\\NavSidebar.tsx",
+      "expected": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+      "current": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\calibration-human-review.json",
+      "expected": "392086efc282a21bb62ea04e20f9e0893fb6e6a5aa48451092ba19768c225288",
+      "current": "392086efc282a21bb62ea04e20f9e0893fb6e6a5aa48451092ba19768c225288"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\score.ts",
+      "expected": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78",
+      "current": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\golden-set-sibling-semantic.json",
+      "expected": "ad4179f1d2c2b6a97de0a2adccd01b5887525ad03f180104be4b05b8c5fd63d3",
+      "current": "ad4179f1d2c2b6a97de0a2adccd01b5887525ad03f180104be4b05b8c5fd63d3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\golden-set.json",
+      "expected": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+      "current": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-04-21-visa-blueprint-part2-italy-france-nz\\session_page.json",
+      "expected": "2076d4a2d33aeb41128d7a97983ee291e38f911e3d77f2e4c84f351dfaec43d2",
+      "current": "2076d4a2d33aeb41128d7a97983ee291e38f911e3d77f2e4c84f351dfaec43d2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-04-21-visa-blueprint-part2-italy-france-nz\\session.json",
+      "expected": "8173493e589652601c546bf4413db8f33ede95de9b3e278b13c0988e6617cbd0",
+      "current": "8173493e589652601c546bf4413db8f33ede95de9b3e278b13c0988e6617cbd0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-08-funding-dreams-loans-forex\\session_page.json",
+      "expected": "bbea50dd11338f1e7d91ad1094de0d138658c6f005eed9cd3d1e30f9d265279e",
+      "current": "bbea50dd11338f1e7d91ad1094de0d138658c6f005eed9cd3d1e30f9d265279e"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-08-funding-dreams-loans-forex\\session.json",
+      "expected": "97772c95d49746f238e92f99c78f59f885691e23e31f81775768c4c73676292e",
+      "current": "97772c95d49746f238e92f99c78f59f885691e23e31f81775768c4c73676292e"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-20-telling-your-brand-story-better\\session_page.json",
+      "expected": "2bf6fb55dc584a5b422161a82e87e10623f34422a2ff1be19320fcd515d85b80",
+      "current": "2bf6fb55dc584a5b422161a82e87e10623f34422a2ff1be19320fcd515d85b80"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-20-telling-your-brand-story-better\\session.json",
+      "expected": "5face5a01f5284f964549aa6af786fe3537e360abf16cf651e779969941c471c",
+      "current": "5face5a01f5284f964549aa6af786fe3537e360abf16cf651e779969941c471c"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-22-uniaccess-xavier-university\\session_page.json",
+      "expected": "3c1362da4cb3d6fc118d5aad1f0f53dff809c7ab5029064fb3528c05adc8f572",
+      "current": "3c1362da4cb3d6fc118d5aad1f0f53dff809c7ab5029064fb3528c05adc8f572"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-22-uniaccess-xavier-university\\session.json",
+      "expected": "c2ad607870a60f9736d6b8094e006fe496e6e09603f7864e30bbe04637720de3",
+      "current": "c2ad607870a60f9736d6b8094e006fe496e6e09603f7864e30bbe04637720de3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-23-uniaccess-atlas-skilltech\\session_page.json",
+      "expected": "7f040d398224840b2eea644929a301ef873c7a2df7aef0c740364ae4004e1fe3",
+      "current": "7f040d398224840b2eea644929a301ef873c7a2df7aef0c740364ae4004e1fe3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-23-uniaccess-atlas-skilltech\\session.json",
+      "expected": "25dfc1a10d20688a2825f3db19c1a8c025c0991ea9d522888b026d0819c3ae19",
+      "current": "25dfc1a10d20688a2825f3db19c1a8c025c0991ea9d522888b026d0819c3ae19"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-28-in-focus-1\\session_page.json",
+      "expected": "6c8be92c0089ad4274967c5de7ce70f824fb0fa1a0d2a1af6dbb209589dbbcc6",
+      "current": "6c8be92c0089ad4274967c5de7ce70f824fb0fa1a0d2a1af6dbb209589dbbcc6"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-28-in-focus-1\\session.json",
+      "expected": "2be04cc901ddc93eec32a09ec4d06fa433e6c41e18681153019c9a6e8e5baefc",
+      "current": "2be04cc901ddc93eec32a09ec4d06fa433e6c41e18681153019c9a6e8e5baefc"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-29-decoding-ever-expanding-cast\\session_page.json",
+      "expected": "c08ab7ae683f810333f1c51827252deb0e90f9c09f168fdc3a43ca017647c8d2",
+      "current": "c08ab7ae683f810333f1c51827252deb0e90f9c09f168fdc3a43ca017647c8d2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-29-decoding-ever-expanding-cast\\session.json",
+      "expected": "33bdcfbe7122a333eb73033ae37470e251cbc951e989a92d70e417cef93e70cb",
+      "current": "33bdcfbe7122a333eb73033ae37470e251cbc951e989a92d70e417cef93e70cb"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-03-dual-enrollment-pathway\\session_page.json",
+      "expected": "e3df87ed5b28e302e6f1f3bdff1810c2a74ee348cb553d5afdd8cda2cc127ddd",
+      "current": "e3df87ed5b28e302e6f1f3bdff1810c2a74ee348cb553d5afdd8cda2cc127ddd"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-03-dual-enrollment-pathway\\session.json",
+      "expected": "efba67b814534fb995ce362479777a803c4cde124bf1532a94d8f87017a6ca58",
+      "current": "efba67b814534fb995ce362479777a803c4cde124bf1532a94d8f87017a6ca58"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-19-entrance-exams-pathways-india-part1\\session_page.json",
+      "expected": "5c263891b7e7d348758150257f4f03b2d6a68abe28e76c84ba38aa8431bec59f",
+      "current": "5c263891b7e7d348758150257f4f03b2d6a68abe28e76c84ba38aa8431bec59f"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-19-entrance-exams-pathways-india-part1\\session.json",
+      "expected": "a0f77a51ac568546cc7e2469fb9125ed8488c01d98d4ecba3dac72d979728a94",
+      "current": "a0f77a51ac568546cc7e2469fb9125ed8488c01d98d4ecba3dac72d979728a94"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-25-in-focus-2\\session_page.json",
+      "expected": "d6bfe403c57acd8e9ef035f5417be7436cd45d5087f6520a3df033e68a47512e",
+      "current": "d6bfe403c57acd8e9ef035f5417be7436cd45d5087f6520a3df033e68a47512e"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-25-in-focus-2\\session.json",
+      "expected": "c775881bee0def98cb9c8b8642bdb16843661a8fd233b7cc02de3fbc500c92f9",
+      "current": "c775881bee0def98cb9c8b8642bdb16843661a8fd233b7cc02de3fbc500c92f9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-03-inside-the-uc-session\\session_page.json",
+      "expected": "7fba04b518f0f600e8901f5f946569fb101f5427002d28dd0034f1746feee320",
+      "current": "7fba04b518f0f600e8901f5f946569fb101f5427002d28dd0034f1746feee320"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-03-inside-the-uc-session\\session.json",
+      "expected": "e375fb0139fd48bfa364c2c2038fa12c59171c40e222b1ac7556fdddf9583068",
+      "current": "e375fb0139fd48bfa364c2c2038fa12c59171c40e222b1ac7556fdddf9583068"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-08-beyond-black-robes-law-careers\\session_page.json",
+      "expected": "401400c770109662d2c027e1932a4135ebc1ba542af2234e324504572e618da4",
+      "current": "401400c770109662d2c027e1932a4135ebc1ba542af2234e324504572e618da4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-08-beyond-black-robes-law-careers\\session.json",
+      "expected": "effcf2a4c9e58f5a4faab460cbb862d182b1cb5737c01caa510b3359478b7a13",
+      "current": "effcf2a4c9e58f5a4faab460cbb862d182b1cb5737c01caa510b3359478b7a13"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-15-creative-futures\\session_page.json",
+      "expected": "972d1a575a88dcbcfd4f03265745d95394a3b830ca0c527ecf5a9bd63d1167f3",
+      "current": "972d1a575a88dcbcfd4f03265745d95394a3b830ca0c527ecf5a9bd63d1167f3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-15-creative-futures\\session.json",
+      "expected": "44bb754579548203c514fc678c78e67f82d611deb8d8fabfe2698c1c55c7d325",
+      "current": "44bb754579548203c514fc678c78e67f82d611deb8d8fabfe2698c1c55c7d325"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-22-uniaccess-cept-university\\session_page.json",
+      "expected": "11b675ccae9436436a5e7c77d6b6e091df5e2871cef17a3ee8618fbf70fc2c5c",
+      "current": "11b675ccae9436436a5e7c77d6b6e091df5e2871cef17a3ee8618fbf70fc2c5c"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-22-uniaccess-cept-university\\session.json",
+      "expected": "8e7fdb7d989df12862bfce331f3b154889d352f5bb903e37c3021c59d240e43f",
+      "current": "8e7fdb7d989df12862bfce331f3b154889d352f5bb903e37c3021c59d240e43f"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-30-in-focus-3\\session_page.json",
+      "expected": "634a4d4a34162e27a8fdf001ebf49e562a85f755b667024a76eb1fd016849a21",
+      "current": "634a4d4a34162e27a8fdf001ebf49e562a85f755b667024a76eb1fd016849a21"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-30-in-focus-3\\session.json",
+      "expected": "b9c9d462cb984fbfd0b9eef02161bad39d965b6b42a38c5b04aee0507f581ba5",
+      "current": "b9c9d462cb984fbfd0b9eef02161bad39d965b6b42a38c5b04aee0507f581ba5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters-reupload\\session_page.json",
+      "expected": "25c7344d89e47a6754a9a1557dabdb77537120e928a85b0d5e3c25d021e3c243",
+      "current": "25c7344d89e47a6754a9a1557dabdb77537120e928a85b0d5e3c25d021e3c243"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters-reupload\\session.json",
+      "expected": "56dd00887567ccd6c1e61eace3a43587ccfe4fb8efcfafbdc8a7b8a811986568",
+      "current": "56dd00887567ccd6c1e61eace3a43587ccfe4fb8efcfafbdc8a7b8a811986568"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters\\session_page.json",
+      "expected": "ad807fb09ca168c2bc6f089649204b36ceb0451824ec260a063bc3b9f04fb2bf",
+      "current": "ad807fb09ca168c2bc6f089649204b36ceb0451824ec260a063bc3b9f04fb2bf"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters\\session.json",
+      "expected": "68ef29bec8a388537c30aac7300bb2bf487e9d05f563f2cb2049555e6e369910",
+      "current": "68ef29bec8a388537c30aac7300bb2bf487e9d05f563f2cb2049555e6e369910"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-10-ucas-what-changed-what-matters\\session_page.json",
+      "expected": "12cc18a7d7950cae298d3f44cc6d3c9a2ee850695cca8bd081b35ed39c0daba1",
+      "current": "12cc18a7d7950cae298d3f44cc6d3c9a2ee850695cca8bd081b35ed39c0daba1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-10-ucas-what-changed-what-matters\\session.json",
+      "expected": "4385dd1bdf1ff41ef04feadc9f0c92dea49da0d4c022a91b470271776ef1977b",
+      "current": "4385dd1bdf1ff41ef04feadc9f0c92dea49da0d4c022a91b470271776ef1977b"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-24-uniaccess-leeds-arts-university\\session_page.json",
+      "expected": "13c772d6ff035b25c6dccb22ecdadecfc1ffaad3a5117a7940653f0ebcd1d4e3",
+      "current": "13c772d6ff035b25c6dccb22ecdadecfc1ffaad3a5117a7940653f0ebcd1d4e3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-24-uniaccess-leeds-arts-university\\session.json",
+      "expected": "99929ae2ce65ffda12698c8f7544d71c47b6ed07e174eb59f7fc58d2a11d0e1f",
+      "current": "99929ae2ce65ffda12698c8f7544d71c47b6ed07e174eb59f7fc58d2a11d0e1f"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-27-in-focus-4\\session_page.json",
+      "expected": "fa11fedf4e5c7a25208390ea187cbd5455bea226701d5046483868f0c99a6060",
+      "current": "fa11fedf4e5c7a25208390ea187cbd5455bea226701d5046483868f0c99a6060"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-27-in-focus-4\\session.json",
+      "expected": "9f865e523c37261bd6c92dba149e86fa6693988631511e7005caad2e12a8dd8d",
+      "current": "9f865e523c37261bd6c92dba149e86fa6693988631511e7005caad2e12a8dd8d"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\tree\\build.ts",
+      "expected": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+      "current": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+[
+  {
+    "lines": 300,
+    "path": "packages/meeting-bot/src/capture/record-commands.ts",
+    "sha256": "531bda060e6b723cc6adbe14abef900dbc390e33c3cda3e4a0b33b55c0dc76e0"
+  },
+  {
+    "lines": 176,
+    "path": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+    "sha256": "0fbc8bc37ee6987115d4b4151508b19fe8444f1b372a4843b94d5b70906e92b1"
+  },
+  {
+    "lines": 93,
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts",
+    "sha256": "e574fdb1899f3d74b0a9e03f3a042786d2c014c5f1513285861750acc5631b34"
+  },
+  {
+    "lines": 176,
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "sha256": "d2dc2113d963cda1119499f5d144d5cec7d5ad41912266578388b59794f7ceaa"
+  },
+  {
+    "lines": 165,
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+    "sha256": "920869ac4d70b49be13ef31eec12ea6491062b60600ec20f46547e5705eec148"
+  },
+  {
+    "lines": 85,
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts",
+    "sha256": "c595f5bbb74910f9aa7f8f6bef4deb8bcd8ce9def5479e86eb21c738612873c9"
+  },
+  {
+    "lines": 95,
+    "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts",
+    "sha256": "4c9e734ce02505a7bef030f6443ef2bda9637164e9eb807ec41685a5c8959b20"
+  },
+  {
+    "lines": 75,
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "sha256": "cc63d871043c33a4048c0fccd61265b335ae6b8c3f91511efc763442c01a1915"
+  },
+  {
+    "lines": 195,
+    "path": "packages/meeting-bot/src/capture/native/windows-capture-clock.ts",
+    "sha256": "53db8b430cdc8772a1e07c738413d19c725b430cd6c5ec93049a61c5c30e62ad"
+  },
+  {
+    "lines": 40,
+    "path": "packages/meeting-bot/src/capture/native/windows-capture-clock.test.ts",
+    "sha256": "c424c63b28fe4bd28dec741b569551c021f5f7f85a0c129bc664ce6737f5abcb"
+  },
+  {
+    "lines": 143,
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/main.cpp",
+    "sha256": "8ef466165bec10872b51e2715e6294e63b2a85f64b13c060f56a35e019d0c383"
+  },
+  {
+    "lines": 13,
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/CMakeLists.txt",
+    "sha256": "6ebad3cc9c06d14a380082c6d748fb3e7aa0cc3d083fe0a2305d2319cae54698"
+  },
+  {
+    "lines": 35,
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/README.md",
+    "sha256": "a5f45f6bfb81af34118fa27ed12132846090fc6d8490d562071e8836fb506be2"
+  }
+]

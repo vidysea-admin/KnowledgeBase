@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-consent\\native-acl-fixture.ps1",
+    "-Action",
+    "Cleanup",
+    "-FixtureDirectory",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acl-fixtures\\f10dfc2d-f7e5-4e24-814c-05bb8d78f06f"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630.json",
+    "sha256": "d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630",
+    "count": 90
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 15,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 30596,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 1.639999999999418,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node1-acl-cleanup.log",
+    "sha256": "9af4684f1b35195354b989467ecaae33bdd0ba735425eeddb16278b140839ee5"
+  },
+  "counts": {}
+}

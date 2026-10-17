@@ -1,0 +1,18 @@
+{
+  "format": "bounded-broker-request-release-v1",
+  "status": "RELEASED_FOR_BROKER_ENGINEERING_ONLY",
+  "unit": "vectorless-production-evaluation",
+  "cycle": 1,
+  "candidateSha256": "40852e5ea0cec9550f3600fe9bf7e6992aa1a5db96f30a6d4d837467d8629d65",
+  "stagedRequest": "qa/goal-vectorless-2026-10-15/evaluator-recording-scope-request-cycle1.json",
+  "stagedRequestSha256": "a122fa769997f575ed62bb1e76080fe38ce231d61b59e0e3324dc78c702826c5",
+  "preserveStagedRequestUnchanged": true,
+  "authority": "Root released exact two tests plus inspect through verification broker and quality_delivery_coordinator: final four-file source-context/Ask epoch FROZEN.",
+  "executionAuthorizedNow": true,
+  "releaseOverrides": "Only the staged request's historical executionAuthorizedNow=false precondition. All argv, scope, sequencing, bounds and other prohibitions remain binding.",
+  "currentResolvedClosure": "Broker captures actual resolved source/runtime/public pins before and after dispatch against the final named-fix freeze. No historical215 set or guessed current hashes are asserted in this release.",
+  "commandsAllowed": ["two-recording-visibility-citation-nodes", "current92-input-inspection after both selected nodes PASS with zero relevant drift"],
+  "engineeringScope": "Exactly two named synthetic recording visibility/current-citation/forged-offset nodes, then authorized read-only real input inspect. No blanket eleven repeat.",
+  "prohibited": ["paid/provider calls", "native DB or browser", "corpus text copy to QA", "maker executing tests or corpus inspection", "helper admission", "checker dispatch", "human labels or parent acceptance"],
+  "outcome": "No execution result is asserted here. Actual current-pin receipts must be authenticated before metadata readiness; root finite actual_total review admission remains separate."
+}

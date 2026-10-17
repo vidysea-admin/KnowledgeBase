@@ -1,0 +1,61 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "checker-pending-dispatch",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 40,
+    "tokens": 1000,
+    "cost": null
+  },
+  "bootstrap_scope": "product-transcript-refresh-warning cycle1 exact pinned JSX, two regressions and immediate-consumer terminal-status assertion; source/consumer review and broker-evidence check only; whole T054 remains open",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "product-transcript-refresh-warning/1/23E6B64A803228DE",
+  "escalation": null,
+  "staged_admission": {
+    "status": "PREDISPATCH_PREPARATION_ONLY",
+    "source_input": "qa/coordination/knowledge-brain-20261015/product-delivery/t054-review-dispatch-cycle1-input.json",
+    "unit": "product-transcript-refresh-warning",
+    "cycle": 1,
+    "total": {
+      "active_s": 120,
+      "tokens": 3000
+    },
+    "next_review": {
+      "active_s": 40,
+      "tokens": 1000
+    },
+    "remaining_review": {
+      "active_s": 50,
+      "tokens": 1200
+    },
+    "protected_finalization": {
+      "active_s": 30,
+      "tokens": 800
+    },
+    "authority": "Root approved staged40s1000 + remaining50s1200 + final30s800 WITHIN same120s3000; no extra allocation.",
+    "prior_charges": "Existing reviewer rows preserved exactly; no reviewer launched. Unknown maker/cost values unchanged.",
+    "dispatch_authorized_by_this_file": false
+  },
+  "protected_finalization": {
+    "kind": "finalization",
+    "active_s": 30,
+    "tokens": 800,
+    "cost": null,
+    "note": "Protected inside same total120s3000; retain prior actual metrics/debits and assess before finalization."
+  }
+}

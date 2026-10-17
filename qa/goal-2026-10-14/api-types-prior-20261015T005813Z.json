@@ -1,0 +1,19 @@
+{
+  "phase": "api-types",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/api",
+    "typecheck"
+  ],
+  "pid": 16188,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-15T00:46:29.004Z",
+  "endedAt": "2026-10-15T00:46:41.288Z",
+  "elapsedMs": 12284,
+  "stdout": "\n> @lkb/api@0.0.0 typecheck C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\n> tsc --noEmit -p tsconfig.json\n\n",
+  "stderr": ""
+}

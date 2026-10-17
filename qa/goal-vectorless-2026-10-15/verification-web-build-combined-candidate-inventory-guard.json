@@ -1,0 +1,14 @@
+{
+  "beforeCount": 1573,
+  "afterCount": 1573,
+  "sentinels": [
+    "apps/api/src/evaluation-flywheel/composition.test.ts",
+    "apps/api/src/native-evidence/message-vertical.test.ts",
+    "apps/api/src/ask/source-context.ts",
+    "apps/api/src/composition/integrations/native-production.ts"
+  ],
+  "unchangedMembership": true,
+  "issue": null,
+  "commandExit": 0,
+  "error": null
+}

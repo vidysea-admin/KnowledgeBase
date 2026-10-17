@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "index": 44,
+  "originalIndex": 49,
+  "claimId": "2026-07-22-uniaccess-cept-university-c03",
+  "inputHash": "74b1c6f02d0f85ba8d4f7f56ae017c46dc319d159b843f7b138ca807f653e274",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original context explicitly says no student portfolio submission is required for CEPT admissions and that CEPT design programs do not require a portfolio, supporting the B.Des admission claim.",
+    "missingReferences": [],
+    "caveats": [
+      "The excerpt says design programs rather than explicitly spelling out B.Des.",
+      "Stored speakerRef is unknown; the embedded Nilesh Gotecha label does not independently establish identity.",
+      "This is transcript support only; external admission policy and its effective date remain unverified.",
+      "The sole reference has one match in each version, with no missing or duplicate reference. Same turn ID now has different content, timing and speakerRef."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "turnId": "2026-07-22-uniaccess-cept-university-t033",
+        "contextVersion": "originalMigration",
+        "quote": "So yes, CEPT admission doesn't require portfolio for design programs.",
+        "textSha256": "3da001f07ecc162ca303701a7bada6b74e99c21b261b9fcd22c2d53b4da72114",
+        "contextSha256": "781f6c4088dbf77658d4699b35e03f907daa50726c67e0ab11223cf853fa79fe",
+        "artifactSha256": "f41764fd45c53cabc8c4bd9ca04c16091da302e66ecd5eea253a9fd50f736d05",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1079,
+        "tEnd": 1129,
+        "supports": "Supports the absence of a portfolio requirement for CEPT design admission."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current t033 concerns applicants viewing merit rank on a dashboard. It supplies no portfolio requirement or B.Des admission evidence.",
+    "missingReferences": [],
+    "caveats": [
+      "The same turn ID changed from portfolio discussion at 1079-1129 seconds (speakerRef unknown) to merit-rank discussion at 1370-1378 seconds (speakerRef Nilesh).",
+      "Stored speakerRef Nilesh does not independently establish a person identity.",
+      "One current match exists, with no missing or duplicate reference. Original support cannot be substituted for the changed current citation.",
+      "Unsupported does not establish that the claim is false; external policy and date remain unverified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "turnId": "2026-07-22-uniaccess-cept-university-t033",
+        "contextVersion": "current",
+        "quote": "We don't declare, but a student will know their merit rank from their dashboard. So, every applicant will know their merit number.",
+        "textSha256": "461124b6b8a0cb1d852cc9817426960baf97f9524aa1ccdc6b898c917dd90c7c",
+        "contextSha256": "5ed5203a480915664aebe3cdd2f714795d244e9f891b448c3005bd1cd5c2c8d6",
+        "artifactSha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+        "revision": null,
+        "speakerRef": "Nilesh",
+        "tStart": 1370,
+        "tEnd": 1378,
+        "supports": "Unrelated merit-rank availability; does not support the portfolio or B.Des admission claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original portfolio discussion supports the claim; the current same-ID merit-rank passage does not. All supplied hashes and bindings passed. Raw and normalized-LF artifact hashes are distinct provided metadata; artifact bytes were not verified."
+}

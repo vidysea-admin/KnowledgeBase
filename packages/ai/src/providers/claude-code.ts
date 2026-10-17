@@ -37,21 +37,30 @@ export async function runClaudeCodePrompt(
   const res = await transport({
     kind: "cli",
     command: "claude",
-    args: ["-p", "--model", model, "--output-format", "json"],
+    args: ["-p", "--model", model, "--output-format", "json",
+      "--safe-mode", "--restricted", "--no-chrome", "--tools", "",
+      "--disable-slash-commands", "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}',
+      "--setting-sources", "", "--no-session-persistence", "--permission-prompts", "none"],
     stdin: prompt,
   });
 
   if (res.status !== 0) {
-    throw new Error(`claude-code CLI exited ${res.status}: ${res.text ?? ""}`);
+    throw new Error(`claude-code CLI exited ${res.status}`);
   }
 
   const body = (res.body ?? {}) as {
+    is_error?: boolean;
+    subtype?: string;
     result?: string;
     text?: string;
     usage?: { input_tokens?: number; output_tokens?: number };
     total_cost_usd?: number;
   };
-  const text = body.result ?? body.text ?? res.text ?? "";
+  if (body.is_error || (body.subtype && body.subtype !== "success")) {
+    throw new Error("claude-code CLI reported an unsuccessful result");
+  }
+  const text = body.result ?? body.text;
+  if (typeof text !== "string" || !text.trim()) throw new Error("claude-code CLI returned no valid result");
 
   return {
     text,

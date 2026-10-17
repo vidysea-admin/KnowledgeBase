@@ -1,0 +1,17 @@
+{
+  "observed_at": "2026-10-16T01:45:31.418324+00:00",
+  "seal_sha256": "88cecf58722913b5ad2097576dbd1736250334a63a154dc0b5ac61a2885eb677",
+  "all_receipt_log_source_request_hashes_match": true,
+  "independent_boundaries": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "contracts_exit": 0,
+  "contracts_vacuous": true,
+  "broker_aggregate_actual_active_s": 10.234000000000378,
+  "prior_semantic_reuse": "cycle1 independent source proof unchanged; current8raw/Git and helper/runtime/lock sealed; no broader recertification"
+}

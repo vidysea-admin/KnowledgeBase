@@ -1489,3 +1489,850 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Result:** At46fad01 cachedorigin0/169behind; recentD058-D066tail9commits withinlargerhistory. Fourunmerged branches have2QAonly/13speakerFAILpaused/2vector-gapmediumreadyunchecked/5hookQAFAIL commits. Directvectorbranch snapshot removes currentstrictWebinarguards; notmergeablewholesale. Independentchecker recorded sameboundedfacts, no selectedfeature readyPASS branch identified. Thirtyregisteredworktree statusread: initialroot4entries, oneinternalalert-sink lane2modifiedfiles39/86adds,28othersclean; rootlaterdirtycountchangesduecurrentdocs/QA. Elevensiblingstatusreads usedcommand-local safe.directory onexactresolvednamedpaths aftersandboxownershipguard, no globalconfigchange. Cachedoriginlackrunner/process-video/setup/tabbrowser; oldcapture/calendarAPIseams present;9tailselfcontainedbuildnotproved. No merge/rebase/delete/cleanup/resume/push/deploy. Samecapture88512liveauthoritativepoll and124678451bytefilewriting02:19:33IST, nohourPASS/kill/restart. Canonicalschema/Geminikeytransmissionapproval, connectedlane, realwebinar/Ask/service/Ubuntu gates unchanged; fullgoalactive/inprogress.
 **Links:** T-051; D-066; docs/webinar-release.md; qa/verdicts/webinar-portable-release.md; qa/gates/unmerged-worktree-inventory.md
 **Changes-authorized:** Release runbook reconciliation/evidence and handoff only; no architecture/contracts/schema/enforcement/code edits.
+
+## D-068 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Consolidated original Knowledge Base and automated-webinar objective into ten delivery groups and three release milestones in existing trackers.
+**Why:** User requires related work delivered together without omitting the old goal. T-051 was absent from goal tracker; auto-registration and broad catalogue residuals lacked explicit actionable rows.
+**Result:** Independent read-only plan APPROVE before edits. Preserved original north star and every existing task status/evidence; added existing T-051 plus T-052 registration and T-053..061 residual catalogue tasks. All 57 features mapped exactly once; 95 unique tasks and referenced dependencies resolve. Tracker audit G1/G4 drops seven to six pre-existing ambiguous QA references; no new G1 finding. No catalogue score upgrade, code changes, live activation or production writes. Current presence-only readiness confirms isolated DB/tenant/API/vision/Telegram settings and live-proof marker missing; Mongo URL and Gemini key presence alone does not prove connectivity. Independent final tracker audit pending. Full goal remains active and release unverified.
+**Links:** T-051; T-052; T-053; T-054; T-055; T-056; T-057; T-058; T-059; T-060; T-061; TASKS.md; .goal/goal.json
+**Changes-authorized:** Existing TASKS.md and .goal/goal.json grouped roadmap metadata and task reconciliation only. No architecture, schemas, contracts or enforcement paths.
+
+## D-069 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Queue tier1 ISS-367/371 release-verification runner repair in existing files.
+**Why:** Original ten-stage && chain hides later failures and mjs test classification miscounts source budget. Full objective requires honest complete release verification.
+**Result:** Independent plan APPROVE before code edits. Existing lint-loc --all executes all ten shell-free bounded stages and aggregates exits/signals/errors; package script invokes it; config adds anchored mjs test pattern without raising budgets. Three focused regression tests pass. Removing pattern and reintroducing early return both fail bounded mutation checks; exact byte restoration confirmed. Actual ten-stage run exits1/seven failures, revealing dependencies exit8 and lint-test timeout beyond existing LOC/dir/root/snapshot/tracker red. Senior review no code findings, warning existing suite opener/contract conflict. Fresh checker dispatched cycle1; no repair PASS claimed pending verdict. Full live/counsellor goal remains incomplete; no activation, external registration, deployment or production write.
+**Links:** T-051; ISS-367; ISS-371; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; scripts/lint-loc.mjs; scripts/lint.test.mjs
+**Changes-authorized:** Existing package.json, structure.config.json, scripts/lint-loc.mjs and scripts/lint.test.mjs approved bounded gate repair; QA manifest/evidence and tracker closeout after independent verdict only. No architecture, schemas or enforcement paths.
+
+## D-070 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Repair existing OS-opener test hang exposed by complete release gate.
+**Why:** Real Windows browser launcher in ISS245 test hung full lint-suite; synthetic capture does not waive green verification requirements.
+**Result:** Independent plan approved in-place openPages injection and bounded timeout before edits. Existing demo-live.mjs defaults keep real browser behavior, timeout10000; existing tests use deterministic callbacks. Maker and fresh senior independently17/17 exit0. Aggregate now reaches allten with sixfailing stages; lint-tests now0, dependency violations and LOC/dir/root/snapshot/tracker remain. Prior fullcontract checker FAIL preserved; cycle2 request recorded, fullgoal unverified. No browser activation, service, database write or deployment.
+**Links:** T-051; ISS-367; ISS-371; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; scripts/demo-live.mjs; scripts/lint.test.mjs
+**Changes-authorized:** Existing scripts/demo-live.mjs openPages and scripts/lint.test.mjs ISS245 tests; existing QA cycle evidence only. No architecture/enforcement/schema changes.
+
+## D-071 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Group1 T-036 existing-inbox plus alias/label acquisition implemented in existing Gmail scanner; generated snapshot refreshed.
+**Why:** Updated objective requires alias and normal inbox both to feed server discovery without relying on known subject vocabulary or implicit Gmail alias expansion.
+**Result:** Fresh independent plan APPROVE before code. Scanner accepts validated server-local LKB_GMAIL_ALIASES/LKB_GMAIL_LABEL_IDS, broad query OR alias deliveredto and independent labelIds scopes, unions message IDs and requires each scope complete. Controls/approval/registrationOnly preserved; no schema. Tests25/25/APItypes0; control-character negative initially caught trim issue and rerun passes after guard. No added LOC breach. docs/SNAPSHOT generator wrote126lines and check0. Fresh senior and independent checker dispatched, verdict pending. T036/R1 not complete; public discovery/registration/live connected mail/alias creation/server remain pending. No external registration/Gmail/model/capture/database writes or activation.
+**Links:** T-036; T-051; T-052; qa/manifests/t036-alias-label-intake.md; docs/webinar-release.md; docs/SNAPSHOT.md
+**Changes-authorized:** Existing apps/api/src/gws-gmail.ts scanner and existing tests, release runbook, generated snapshot via generator, T036 progress metadata only. No architecture/schema/enforcement changes.
+
+## D-072 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Close matching cycle1 alias-label acquisition handshake after independent checker PASS.
+**Why:** File handshake requires maker close-out after cycle-matched independent verdict; scope verification must remain distinct from full operational release.
+**Result:** Verdict inspected on disk: 4/4 scoped criteria and 2/2 invariants; independent 65 tests and API typecheck pass. Manifest changed ready-for-check to checked-PASS. Actual node scripts/tracker-audit.mjs --gate g1 exits0, tracker-audit OK. T-036 remains pending and T-051 in_progress; alias setup, live Gmail, registration and full release not certified. Registration schema still explicitly forbids auto-submit; user-requested policy change needs prior decision and approved implementation plan before persistence edits.
+**Links:** T-036; T-051; T-052; qa/manifests/t036-alias-label-intake.md; qa/verdicts/t036-alias-label-intake.md
+**Changes-authorized:** Cycle-matched manifest closeout only; no architecture, schema, enforcement or production changes.
+
+## D-073 | 2026-10-05 | type: session | status: ACTIVE
+**What:** T-052 registration acquisition preparation in existing Gmail scanner.
+**Why:** Automatic registration needs distinct literal registration URL and thread evidence; a registration page must not masquerade as a join URL.
+**Result:** Independent in-place plan APPROVE before edits. Scanner-only optional registrationUrl/threadId, validated literal thread identifiers, direct-join priority and subsequent non-registration platform matches implemented. Existing storage whitelist unchanged; fields not persisted. Actual Gmail suite26/26 exit0 and direct API compiler exit0. Source comment compression preserves300LOC budget. Fresh senior review pending; no completion verdict claimed. Full submission, durable confirmation correlation and real organizer acceptance remain pending.
+**Links:** T-052; T-036; apps/api/src/gws-gmail.ts; apps/api/src/gws-gmail.test.ts
+**Changes-authorized:** Existing Gmail scanner interfaces/fetchOne and tests acquisition preparation only; no schema, architecture, enforcement, persistence or external submission.
+
+## D-074 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Align registration acquisition direct-link precedence across body and snippet; request independent acceptance.
+**Why:** Fresh senior probe identified generic body link selected before literal direct snippet join, creating false registration-only barrier.
+**Result:** Independent amendment APPROVE before edits. Standing regression failed on old behavior then passed after fetchOne repair. Expanded malformed thread cases; actual combined Gmail/route/selection67/67 tests pass and API typecheck0. LOC has four pre-existing violations, none Gmail. Cycle1 registration-acquisition manifest ready-for-check, fresh reviewer/checker dispatched. No persisted scanner fields or automatic submission/confirmation/live completion claimed.
+**Links:** T-052; qa/manifests/t052-registration-acquisition.md; apps/api/src/gws-gmail.ts; apps/api/src/gws-gmail.test.ts
+**Changes-authorized:** Existing fetchOne/tests and standard QA evidence only; no schema/architecture/enforcement/storage/external actions.
+
+## D-075 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize T-052 canonical registration acquisition-evidence persistence and clarify legacy human-only registration wording.
+**Why:** User explicitly requests automated webinar registration; preserving literal URL/thread evidence is prerequisite to durable confirmation correlation. Blanket never-auto-submit wording describes prior scope, not current requested product. This unit still submits nothing and does not clear registration scheduling barriers.
+**Result:** Fresh independent plan APPROVE: optional schema registrationUrl/threadId identifier constraints, regenerate existing types, actual store whitelist and injected persistence regression in existing route tests. Scanner slice cycle1 PASS inspected and closed; full T-052 remains pending. No production writes or live registration authorized by this code unit.
+**Links:** T-052; D-073; D-074; qa/verdicts/t052-registration-acquisition.md
+**Changes-authorized:** schema/meeting_candidates.schema.json acquisition fields and registrationOnly description; existing generated meeting_candidates.ts via generator; apps/api/src/store.ts createMeetingCandidatesDeps optional persistence seam/whitelist; existing routes/meeting-candidates.test.ts and schema fixtures tests. No frozen contracts, architecture or enforcement edits.
+
+## D-076 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Authorize generator preservation of existing D-053 alert exports exposed by T-052 regeneration.
+**Why:** Existing gen-types indexFile deletes required alert-sink barrel export, breaking production API compilation. Last-good barrel restored before repair.
+**Result:** Independent minimal repair plan APPROVE: existing discovery helper supports alerts subtree, deterministic exports and original explanatory comment; import-safe indexFile regression in existing lint.test.mjs. Current persistence35tests/schema27/API0; generator parity currently FAIL1. Independent final verification remains required.
+**Links:** T-052; D-075; scripts/gen-types.mjs; scripts/lint.test.mjs; qa/manifests/t052-registration-persistence.md
+**Changes-authorized:** Existing gen-types discovery/indexFile/CLI guard and existing lint.test.mjs regression; regenerated existing barrel via generator. No architecture, enforcement or dependency relaxation.
+
+## D-077 | 2026-10-05 | type: session | status: ACTIVE
+**What:** T-052 persistence ready-for-check and supported executable registration implementation dispatched.
+**Why:** Full goal needs real form submission/confirmation flow rather than acquisition-only completion. Persistence mapping needs falsification and generator stability proof before closeout.
+**Result:** Both new whitelist field removal mutations rejected under30s bounded processes, exactbyte restoration in finally verified. API/core typechecks exit0. Existing generator repaired per D076, twice0writes/check0/lint18pass; manifest ready-for-check. Fresh independent executor plan APPROVE: explicit real operator profile/host/form selectors, local actual submit proof, pre-submit durable attempt/uncertain no-resubmit and same-thread organizer/time/direct-link correlation; arbitraryforms remain future scope. Worker dispatched existing browser-joiner.ts/sb_join.py ownership only; root owns runner/state integration next. No external registration or live release claimed.
+**Links:** T-052; D-075; D-076; qa/manifests/t052-registration-persistence.md; packages/meeting-bot/src/joiners/browser-joiner.ts; packages/meeting-bot/py/sb_join.py
+**Changes-authorized:** Existing browser registration instruction/dispatch seams and existing tests per independent approved executable plan; subsequent runner/state integration requires precise pre-edit review. No new code files, production writes, live activation or enforcement changes.
+
+## D-078 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Close cycle1 T-052 acquisition persistence after independent checker PASS; executable integration continues.
+**Why:** Matching disk verdict and manifest handshake required; metadata persistence must not masquerade as full registration completion.
+**Result:** Inspected verdict PASS3/3criteria2/2invariants; independent68downstream22lint/snapshot/schema27/APIcore/generatorchecks pass. Manifest checked-PASS. Actual tracker-audit G1 exit0. Executor worker now has exact approved operator/host/formselector/JSONstdin mapping; root durable state/correlation precise plan requested. Full T052 pending; no actualMongo durability,externalregistration,confirmation or live release proof.
+**Links:** T-052; D-075; D-076; D-077; qa/manifests/t052-registration-persistence.md; qa/verdicts/t052-registration-persistence.md
+**Changes-authorized:** Matching manifest closeout/evidence only; executable browser amendment perD077 unchanged; runner/state precise plan pending.
+
+## D-079 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize precise T-052 durable registration and proof-bound confirmation integration in existing source pipeline.
+**Why:** Scanner evidence alone cannot submit or correlate; existing scheduler mapping drops evidence and reconciliation correctly retains registration barrier without explicit verified proof. User requests actual automated registration, not manual-only acquisition.
+**Result:** Independent release_gate_plan APPROVE for existing candidate types/mapping/normalization, runPipelineTick submitting-before-executor state under existing lock, no uncertain resubmit, validated owner/source/UUID phase state, same-thread distinct-message exact-organizer/time/direct-join confirmation and explicit per-source barrier resolution. Preserve source IDs/provenance/rejected/cancelled/rescheduled controls. Actual local browser fixture plus runner tests required before bounded PASS; external real organizer and arbitrary forms remain pending.
+**Links:** T-052; D-075; D-077; scripts/webinar/run-pipeline.mjs; packages/meeting-bot/src/calendar/schedule-state.ts
+**Changes-authorized:** Existing run-pipeline.mjs and calendar schedule-state.ts/schedule-tick.ts/calendar-client.ts/auto-join.ts types/functions, existing respective tests and standard QA manifest only. No new code files, architecture/frozencontracts/enforcement/budget increases or production/external writes.
+
+## D-080 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Executable registration local browser proof and strict confirmation review continue.
+**Why:** Full T052 needs actual form POST and safe confirmed join projection, not acquisition-only assertions. Known-platform webinar identity does not prove a direct join URL.
+**Result:** Root independently6joiner tests pass. Worker authoritative browserfixture89544 terminal0,1passed32.20s, exactserverPOSTonce/sixDOMblocks/wronghostzeroPOST reported; fresh senior review dispatched, root actualbrowser rerun pending. Root actual confirmation probe accepts Zoom registration URL as confirmed (registrationPageAcceptedAsConfirmed:true); durableworker notified to repair with standing red-green genuine-directjoin guard. Independent resolution-sidecar plan APPROVE: preserve raw native snapshots, fullconfirmedattempt bound originalsource, freshsource+distinctconfirmation exactidentity/thread/email/time/directURL and completeacq, reject/cancel/reschedule replay gates. No arbitraryboolean or fabricatedID workaround. Full product/live not proved.
+**Links:** T-052; D-079; packages/meeting-bot/src/calendar/schedule-state.ts; packages/meeting-bot/py/test_sb_join_iframe.py
+**Changes-authorized:** D079 existing schedule-state prepare/projection validation and tests sidecar clarification per independent review; originalrawsource/provenance immutable. No architecture/frozencontract/enforcement/budgetincrease/externalwrites.
+
+## D-081 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Registration adapter safety amendment for ISS-373: verified pre-navigation page-script isolation and native HTML forms.
+**Why:** Fresh senior BLOCK: DOM handlers can mutate destination/consent after validation; event suppression alone does not prevent page polling/prototype exfiltration. Independent plan rejected event-removal-only approach.
+**Result:** APPROVE stronger first supported adapter: disable pageJavaScript BEFORE navigation with verified browser enforcement; validate host/action/submitter overrides/method/target/encoding/exactcontrols before fill and after; native submit with explicit data. Never populate identity without verified isolation. CustomJSforms remain action_required and fullgoal pending, not dropped. Local malicious polling/setter/action fixtures zeroexfil plus native exactPOSTonce required; no external registrations. Root originalconfirmationbug4/4 nowrefused, broaderdurable integration continues.
+**Links:** T-052; ISS-373; D-077; D-079; packages/meeting-bot/py/sb_join.py; packages/meeting-bot/src/joiners/browser-joiner.ts
+**Changes-authorized:** Existing browser registration instructions/driver and existing localtests safetyrepair perindependentplan only; no newfiles,budgetincreases,architecture/enforcement edits or externalwrites.
+
+## D-082 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Root independently verifies new durable registration state/runner behavior; full executable gate remains open.
+**Why:** Worker assertions and local browser fixture before ISS373 repair do not prove current integrated operational safety.
+**Result:** Actual root schedule-state18/18 and run-pipeline19/19 pass, BOTcompiler0. Covers presubmit durable save, restartnoresubmit, confirmedoriginalsource scheduling and preview/missingprofile paths. Existingdriver scriptisolation/nativeadapter amendment implemented but new maliciousbrowser proof pending. LOC fails5: three other baseline plus driver789/budget300 and runner334/budget300; no greenstructure claim. Worker refuses compression and proposes cohesive lifecycle extraction into existingmodule; independentdependency-safe plan requested before extrafile edit. Fullgoalactive; externalregistration/deployment/Askchain unverified.
+**Links:** T-052; ISS-373; D-079; D-081; packages/meeting-bot/src/calendar/schedule-state.test.ts; scripts/webinar/run-pipeline.test.mjs
+**Changes-authorized:** Evidence record only; additional lifecycle extraction not yet authorized. Existing D079/D081 units continue.
+
+## D-083 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize cohesive existing-module registration lifecycle extraction and correlated-confirmation bypass prevention.
+**Why:** Runner334 exceeds300 budget; compression would obscure behavior. Existing policy has capacity, but schedule-state runtime import would create cycle. Confirmation freshmessage must not evade rejection or changed original source.
+**Result:** Independent plan APPROVE runWebinarRegistrations in existing auto-record-policy with injected validateAttempt/confirmAttempt/createAttemptId callbacks and durable update awaited before executor. No runtime schedule-state import. Preserve original lifecycle, prove save failure zeroexecutor/restart noresubmit/configfailure/confirmedproof. Suppress narrowly correlated confirmation scheduling when proof-bound original cannot revalidate; preserve raw snapshots, no unrelated invitation suppression. This authorizes proposed D082 work through new entry rather than rewriting history.
+**Links:** T-052; D-079; D-082; scripts/webinar/run-pipeline.mjs; packages/meeting-bot/src/calendar/auto-record-policy.ts
+**Changes-authorized:** Existing auto-record-policy lifecycle helper, run-pipeline delegation and existing tests; existing schedule-state correlated eligible-projection correction. No newfiles/budgetincrease/architecture/enforcement/externalwrites.
+
+## D-084 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize unchanged direct-join predicate move to existing policy module.
+**Why:** State module exceeds LOC after necessary confirmation projection; pure URL predicate belongs beside webinarIdentity. Avoid compression or newfile/cycle.
+**Result:** Fresh senior independent PLAN APPROVED exact unchanged directJoin guards/calls exported isDirectWebinarJoin in auto-record-policy, existing schedule-state import direction retained. State tests/typecheck required; plan approval not completion. Browser optionalcheckedconsent and ownedtimeoutcleanup still review warnings; maliciousactualproof pending.
+**Links:** T-052; D-083; packages/meeting-bot/src/calendar/auto-record-policy.ts; packages/meeting-bot/src/calendar/schedule-state.ts
+**Changes-authorized:** Existing directJoin predicate moved unchanged into existing policy module and state import/calls only; no schema/architecture/enforcement/budget/external changes.
+
+## D-085 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Root verifies confirmation bypass regressions and records remaining safety/review gates.
+**Why:** Passing lifecycle fixtures do not establish actual post-submission confirmation freshness or owned-browser cleanup.
+**Result:** Actual root latestrunner20/20pass including missing/rejected/cancelled/changedoriginalsource bypassrefusal. DirectBOTtypes0; LOC5fail driver794 and runner312 plus3baselineothers; statepredicate approvedD084 move nowunderbudget. Browser realchildtimeout exposes owned_cleanup_failed underpsutilAccessDenied; nofalsecleanupsuccess. Root inspected stdinerror path resolves withoutcleanup, worker repair notified. Proposed existingbrowserfactory extraction and baseline-acquiredmessage exclusion need freshindependentplan. Both reviewerfollowup and freshspawn dispatch fail agentthreadlimit; no implementation approval invented. Existing authorizedworkers continue tests. Fullgoalactive, operational release unproved.
+**Links:** T-052; ISS-373; D-083; D-084; scripts/webinar/run-pipeline.test.mjs; packages/meeting-bot/src/joiners/browser-joiner.ts
+**Changes-authorized:** Evidence record only; factory/baseline changes not yet authorized. Existing approvedunits continue.
+
+## D-086 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize fresh-reviewed remaining registration baseline, narrow suppression, cancellation lineage and browser factory seams.
+**Why:** Current attempts can confirm preexisting messages; unresolved wrongconfirmation may independentlyschedule; projectedcaptures lack acceptedoriginalstoplineage; runner exceedsLOC.
+**Result:** registration_gate_review PLAN APPROVED existingfiles only: boundedvalidunique baselineIDs beforedurablesubmit; legacy absentbaseline nonconfirmable/noresubmit; narrowly correlated invalidconfirmation suppression with inventoryreason; accepted originalcancel/reschedule aliases onto verifiedprojection only; browserfactory config/dispatch in existingowner no reverseimports. Actualbrowser currentstartupFAIL remains separategate. Planapproval not completion.
+**Links:** T-052; D-079; D-083; D-084; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing auto-record-policy lifecycle, schedule-state attemptvalidation/confirm/projection, browser-joiner factory and run-pipeline delegation; existing respective tests only. No newcodefiles,architecture/enforcement/budget/externalwrites.
+
+## D-087 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record current Windows cleanup diagnosis, independent containment-plan rejection and confirmation-boundary regression.
+**Why:** Unrelated inaccessible Chrome processes block current global cleanup; a post-bootstrap PID ledger leaves a crash window and cannot authorize safe timeout success.
+**Result:** Read-only process diagnosis Chrome38, cmdline AccessDenied35, no name denial. Full cleanup-only invocation exits1. Independent cleanup_ownership_plan rejects post-SB ledger and requires launch-time containment. No cleanup guard weakened. D-086 standing unresolved-confirmation test now includes same-thread different-organizer AND different-time positive alongside single-mismatch refusals; root focused node test1/1 exit0. Follow-up reviewer assesses pre-launch Windows self Job Object containment and independently verifies this test. Policy runtime drift observed and reread: proportional-verification/2026-10-05.2 targets4 drift0. No executable-registration PASS, external submission or live release claimed.
+**Links:** T-052; ISS-373; D-086; qa/manifests/t052-executable-registration.md; scripts/webinar/run-pipeline.test.mjs
+**Changes-authorized:** Evidence only. Existing D-086 remains authorization for its existing-file boundaries; proposed containment is not yet approved for implementation.
+
+## D-088 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently reviewed Windows pre-launch owned Job containment and exact-profile cleanup.
+**Why:** Global Chrome inspection fails on unrelated inaccessible processes; post-bootstrap PID persistence leaves a launch crash window. Actual independent nested Windows Job probes contain Python, ordinary Chrome and detached Chrome with zero surviving recorded descendants after owner death.
+**Result:** cleanup_ownership_plan revised Windows plan APPROVED after actual inline probes exit0. main acquires exact-profile lock and establishes noninheritable named kill-on-close Job before SB launch; atomically records bounded canonical ownership evidence before Chrome; verifies browser identity and job membership before navigation. kill_orphans uses exact ownership evidence/job accounting only, refuses malformed/redirected/incomplete/legacy occupied profiles, verifies active count zero before repairs. registerInBrowser awaits bounded parent termination then independent cleanup; failure remains uncertain. Linux equivalent containment and full release remain pending; approval is not PASS.
+**Links:** T-052; ISS-373; D-087; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/sb_join.py main and kill_orphans and packages/meeting-bot/src/joiners/browser-joiner.ts registerInBrowser only. Existing tests amended only by independent checker under current policy floor. No new application files, installed dependency edits, budget increases, architecture/enforcement edits or external registration.
+
+## D-089 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved cohesive registration policy extraction in existing state, runner and policy files.
+**Why:** Registration introduced state311, runner306 and runner-tests434 LOC violations; existing policy221 has cohesive lifecycle capacity. No budget increase, new files, compression or assertion removal.
+**Result:** cleanup_ownership_plan APPROVE: move unchanged proof projection from schedule-state.prepareWebinarSourceState into policy.projectWebinarRegistrations with injected validator/confirmation and explicit prior/raw inputs. Move runner refresh draft/confirmation-only/prepare/persist/commit into policy.reconcileWebinarRegistrationState with injected prepare/persist and await-beforecommit, preserve enclosing catch/assignment. No runtime policy reverse import. Checker-only intact relocation of persistence failure, missing profile/thread/preview, HTTP discovery failure tests into existing policy/tick suites after harness fidelity check. Plan approval not unit PASS. Root current meeting-bot TSsuite330/330, actual childtimeout1/1, pycompile0; full Python independent proof and fullrelease remain incomplete.
+**Links:** T-052; D-083; D-084; D-086; D-088; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/src/calendar/schedule-state.ts prepareWebinarSourceState, auto-record-policy.ts cohesive projection/reconciliation helpers and scripts/webinar/run-pipeline.mjs refresh delegation; existing tests relocated by independent checker only. No architecture, schema, enforcement, budget, newcodefiles or external writes.
+
+## D-090 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Restore last working registration layout after D-089 extraction introduced dependency-gate cycles.
+**Why:** Runtime-only independent approval missed committed dependency-cruiser no-circular counting type imports. Actual extracted tree showed11violations; exact in-place reversal to prior layout showed8. Existing Windows D-088 ownership fix untouched.
+**Result:** D-089 extraction initially root73/73affected/typecheck0; dependency gate11errors includes3new policy-to-state type cycles. Root restored only own3application edits in state/policy/runner; dependency gate now8baselineerrors,387modules1285dependencies. Independent reviewer notified to revise without reverse type imports, no rule weakening. Scope LOC gate remains red; no extracted-code completion claimed. Windows actualtimeout and TS330 remain separate partial evidence.
+**Supersedes:** D-089 -- Actual committed dependency gate rejects the new reverse type import cycles despite runtime-only approval; restore prior layout and require revised gate-compliant plan.
+**Links:** T-052; D-088; D-089; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence and exact rollback of this sessions D-089 application extraction only; revised extraction requires fresh independent plan approval. No Windows ownership rollback, dependency-rule edits, new files or external writes.
+
+## D-091 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved gate-aware replacement registration extraction.
+**Why:** D-089 reverse type import caused three additional committed dependency cycles and was rolled back by D-090. Revised plan introduces no new module edges while retaining canonical types and exact behavior.
+**Result:** cleanup_ownership_plan APPROVE: move unchanged canonical WebinarRegistrationAttempt interface from state into existing policy, state import/reexport preserves API; policy projection uses unknown raw attempts validated into canonical typed proof and existing reconciliation type, no policy-to-state import. Generic typed reconciliation derives callbacks from existing lifecycle input and awaits persist-beforecommit. Move pure output link-redaction projection into policy and update both runner calls; UUID injection retained. Require actual same8baseline dependency errors/no extras, compiler, affected tests and measured unchanged budgets before completion. Current real local-form fixture failed renderer startup before assertions; separate Windows proof remains incomplete.
+**Links:** T-052; D-088; D-090; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing schedule-state.ts canonical type move/reexport and prepareWebinarSourceState delegation; auto-record-policy.ts canonical type/typed projection/reconciliation/output projection; run-pipeline.mjs refresh/output delegation and duplicate-import consolidation only. Checker owns test relocation. No newfiles, dependency rules, schema, architecture, enforcement, budgets or external writes.
+
+## D-092 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Establish actual native local-form safety proof without weakening Chrome sandbox or standing assertions.
+**Why:** Repeated SessionNotCreated occurred before assertions; controlled contained subprocess diagnostic isolates command sandbox renderer restriction rather than form behavior.
+**Result:** Same installed CFT/headless flags default sandbox crashes; diagnostic no-sandbox rendererreadytrue. No production flag changes. Existing local registration fixture run with approved require_escalated outside command sandbox retains normalChrome sandbox:1passed14deselected6.75s exit0. Original fixture asserts one exact native POST, zero-POST refusal cases and malicious script isolation. Independent rerun dispatched. Full main ownership crash/concurrency,307/308redirect confinement,durable end-to-end/liveUbuntu remain incomplete. D091 extractionworker continues, fullgoal retained.
+**Links:** T-052; D-088; D-091; qa/manifests/t052-executable-registration.md; packages/meeting-bot/py/test_sb_join_iframe.py
+**Changes-authorized:** Evidence only; no Chrome production flag, test assertion, schema, architecture, enforcement, budget or externalwrite changes.
+
+## D-093 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record independently approved D091 extraction and actual full registration-main local submission/cleanup proof.
+**Why:** Standalone form safety and passing behavior tests do not establish main ownership/navigation integration or whole live goal.
+**Result:** Independent reviewer73/73/type0/dependency same8baseline/noextras and helpercommit/redaction checks green; appLOCpolicy291/state268/runner300. Root corrected inlinefixture HTMLContentType after firstform_mismatch(noPOST); fullnormalChrome main exits0 submitted awaitingconfirmation, exactonefixturePOST, browserownershipledgerphasebrowser and independentcleanup0phasecleaned. No production flags/assertions changed. Independent standing race/concurrency/identity,server307/308,fullPython/checker,testLOC/baselinegates and actualmailregistration-to-KB/Ubuntu remain incomplete; no unitPASS.
+**Links:** T-052; D-088; D-091; D-092; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence only; no schema, architecture, enforcement, budgets, newapplicationfiles or externalwrites.
+
+## D-094 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record independently reproduced HTTP redirect disclosure and actual Windows ownership isolation criteria.
+**Why:** DOM host checks/page-script isolation cannot constrain native HTTP redirect forwarding; browser success alone is not operator-data confinement. Ownership requires real OS lock and descendant behavior, not mock success.
+**Result:** Independent reviewer filedHIGH ISS-374 with307/308identicalbodyunapprovedlocalhost POST reproductions; finalnative-browser request-stage policy/service-worker bypass plan pending, no implementationapproval invented. Root actualboundedWindowsJob probeexit0: sameprofileduplicate+busycleanup refuse, ownerdeath allowsindependentcleanup0/containeddescendantexit, otherprofileowner survives, bothfinalcleanup0. No production/externaldata used; actualSBbootstrapstandingcriteria stillpending.
+**Links:** T-052; ISS-374; D-088; D-093; qa/manifests/t052-executable-registration.md; qa/issues.jsonl
+**Changes-authorized:** Evidence only; no browser networkguard implementation until independent finalplan approval. No newcodefiles,testassertion changes,productionflags,architecture,enforcement,budget or externalwrites.
+
+## D-095 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record native CSP redirect proof and falsified service-worker bypass assumption.
+**Why:** Data confinement must survive native redirects and alreadyinstalled workers; CDP acknowledgements do not prove browser request behavior.
+**Result:** Root normalChromeCSP4/4 distinctcases blockunapproved307/308 resends and preserveapprovednativePOST+hiddenCSRF. Root actuallegacySW positivecontrol observesbody; acknowledged prenavigationNetwork.setBypassServiceWorkertrue still observesbody, probeexit1. Independent reviewer independently reports identicalfailure. No implementationapproved; Networkactivation/postnavigationvariations next. Fullgoal/ISS374remainactive/open.
+**Links:** T-052; ISS-374; D-094; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence only; no newapplicationfiles, browserguardimplementation, productionflags, schema, architecture, enforcement,budget or externalwrites.
+
+## D-096 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved native CSP and activated service-worker bypass containment during registration build.
+**Why:** ISS-374 actual307/308 redirect reproductions disclose operator POST bodies. Independent six-case CSP probes block unapproved redirects while preserving approved native POST and CSRF. Actual installed-worker controls identify missing Network.enable as the cause of ineffective bypass acknowledgements.
+**Result:** cleanup_ownership_plan independently APPROVE intermediate implementation in existing main/register_form, not final security PASS. Acknowledge Network.enable then bypass and script disable on owned page target before navigation; reassert bypass before operator values/submission. Install additive safely constructed host/protocol form-action CSP before values, preserve native submit/cookies/hidden fields and policy lifetime. Remaining request-stage resource/redirect guard, target replacement and transport-loss confinement stay mandatory; ISS-374 remains open. Current policy .3 reread/check0 drift0; in-flight protocol provenance still requires attributable reconciliation, no invented pin or completion.
+**Links:** T-052; ISS-374; D-095; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/sb_join.py main and register_form only for demonstrated intermediate guard; no new application files, external submission, architecture, enforcement, budgets or test weakening. Unproven transport-loss behavior cannot be claimed contained.
+
+## D-097 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record D096 maker containment results and actual remaining reflected-resource disclosure.
+**Why:** Redirect refusal and service-worker bypass do not cover operator values reflected by an approved server into a new response document. Full goal requires complete data confinement and downstream acceptance, not a narrower passing form test.
+**Result:** Worker sourcefreeze compile0, existingactualChromefixture1pass,17input/ordercasespass; originalISS374307/308zero-unapprovedPOST2/2, approvedredirects preserveidenticalnativebodies+hiddenCSRF; installedcontrollingworker baselineobserves1, guardednativePOST1/workerobserves0, probeexit0 withreportedidleHTTPresetduringteardown. Root currentcode actualnormalChrome fixture proves approvedPOST response image URL leaks fixtureemail to unapprovedlocalhost GET, resultsubmitted; exactownedprofile cleanup-onlyexit0 cleanup-complete. Fresh registration_resource_plan successfully dispatched for read-only implementation plan, not acceptancecheck; prior threadquota no longer blocks this dispatch. ISS374 and fullT052 remainopen.
+**Links:** T-052; ISS-374; D-096; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence only. No additional guardimplementation until concrete independent planapproval; no newapplicationfiles, testweakening, externalregistration, architecture, enforcement orbudget edits.
+
+## D-098 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize bounded isolated capability proofs for independently reviewed persistent browser-side registration containment.
+**Why:** Actual D097 response image disclosure bypasses form-action policy; exactinstalledChromium interceptor detach resumes requests, so CDP kill-on-error is not an atomic safety boundary. Independent registration_resource_plan proposes native DNR plus persistent JavaScript contentsettings without changing native submission semantics.
+**Result:** Independent conditionalplan APPROVE names existing tab-capture manifest/background and sb_join main/register_form for futureimplementation only after actualcapabilityproof. DNRexclusivebrowser exactanchoredscheme/host/currentports networkdenyallow survivesnewtargets/control-loss; contentsettingsblock must independentlyprevent installedSWbodyobservation at approved /observed. APIack/source isnotbehaviorproof. Current authorization permits temporaryreproductioncopies/fixtureprofiles only for positive/negative actualnormalChrome tests, controlleddetach/reload/newtarget and nativecookie/CSRF positives. Shippedapplication implementation remains gated by measuredcapability and concretefinalauthorization; selectiveSWremoval/profilecookiewipe notauthorized.
+**Links:** T-052; ISS-374; D-096; D-097; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence and isolatedtemporary reproduction copies only, no trackedapplication/test/contract edits, no newshippedfiles, externalregistration, architecture, enforcement, budget orpermissionpolicy changes. Futureexistingextension applicationpermissions require separate precise decision after successfulproof; applicationmanifest isnotCodexenforcement.
+
+## D-099 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved persistent browser-side native registration confinement in existing extension and driver files.
+**Why:** D097 demonstrates actual post-submit reflected-resource disclosure; D098 isolated capability proof now demonstrates browser-side DNR plus JavaScript contentsetting blocks legacyworker observation and unapprovedresponseimage after newtarget/reload/controldetach while preserving nativecookie/CSRF submission. CDP-only enforcement cannot provide this lifetime boundary.
+**Result:** Fresh registration_resource_plan final implementation APPROVE after probe69291 terminalexit0 normalChrome154, baselineworker/body/image positive; guardedzeroadditionalworker/image leaks, exactnativePOSTcookie/CSRF preserved withbrowseralive afterCDPclose. Exactowned22212creation1791205106.7272303 teardown and cleanup-onlyexit0. Implement privilegedinstall/read/clear APIs, exactextensionpathIDworker ownership, independentlycomparedattempt/browser/profile/config receipt, browserwideexactanchoredscheme/host/currentport denyallow, persistentJSblock, blanktarget beforeallowlistchange. Retain policy through uncertainty, refuse identity on missingpermission/readback/transport mismatch. Recording clear onlyownnamespace afterpriorregistrationtargetsprovedgone. Relaunch/workerrestart/failure/pausedFetch/delayedredirect/recordingrestore builderproofs mandatorybeforefeature-ready; no finalsecurityPASS.
+**Links:** T-052; ISS-374; D-096; D-097; D-098; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/tab-capture/manifest.json add contentSettings/declarativeNetRequest only; existing background.js installRegistrationPolicy/readRegistrationPolicy/clearRegistrationPolicy preservingrecorderhandler; existing sb_join.py main ownedextensionbridge/lifetime and register_form receiptchecks only. No newshippedapplicationfiles, blanketstorage/cookiewipe, contracts/enforcement/budgets, externalregistration or productionwrites. Preserve nativePOST/currentallowedport semantics/customJSfuturegoal.
+
+## D-100 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved production-only canonical transport-type relocation to remove three calendar import cycles.
+**Why:** Actual dependency gate reports three cycles and five API-test boundary violations. Shared noncollection transport/reconciliation types currently create reverse type imports across runtime modules; one canonical public type home eliminates those cycles without duplicating fields, weakening validation, changing schema or masking imports. Existing core index has measured capacity.
+**Result:** Independent registration_resource_plan APPROVE: move eleven canonical declarations and their helper-type closure once from calendar-client5-44 and auto-join41-94 into existing core/src/index.ts, domain-specific names for formerly private Snapshot/Alias/Occurrence helpers with local aliases. Former public module exports reexport exact canonical types. Policy, auto-join and calendar-client import shared types from core while runtime decision/reconciliation functions remain in place. Expected three cycles removed, five existing API-test imports still fail; no full gate PASS. Existing standing assertions and application runtime behavior preserved. Test relocation remains separately gated by lawful ownership/capacity, not hidden inside this authorization.
+**Links:** T-051; ISS-367; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; D-091
+**Changes-authorized:** Existing packages/core/src/index.ts canonical noncollection transport types; existing packages/meeting-bot/src/calendar/calendar-client.ts, auto-join.ts and auto-record-policy.ts type import/reexport/declaration relocation only. No new files, test edits, contracts, schema collection changes, architecture/enforcement/budgets, production writes or T-052 Python/extension changes. Retain existing feature provenance/counters; no silent .3 test entitlement adoption.
+
+## D-101 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Revert the scoped D100 transport-type relocation because it violates the generated-core-barrel invariant.
+**Why:** Actual node scripts/gen-types.mjs --check exits1 with exactly core/src/index.ts drift. Existing generator explicitly owns the entire barrel and regenerates schema/domain/alert exports only, so handwritten transport declarations would disappear. The D100 plan incorrectly treated this generated file as a handwritten public type home. Typechecks/runtime identity cannot substitute for generator conformance.
+**Result:** Exact four-file pre-D100 byte restoration dispatched after matching frozen current hashes, preserving all unrelated edits. No generator exception, new schema, budget relaxation or stacked fix authorized. Actual restoration/byte comparison, gencheck and original eight dependency violations to be recorded on terminal output; not yet claimed completed. Proper cohesive core domain transport module and source-discovery test owner require explicit new-file authorization. Full release remains unverified; D100 three-cycle repair claim retracted pending rollback completion.
+**Supersedes:** D-100 -- measured generated-barrel regression makes the approved in-place relocation unsafe and nonpersistent under regeneration.
+**Links:** T-051; ISS-367; D-100; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; scripts/gen-types.mjs
+**Changes-authorized:** Restore only the four D100 application files from matching prechange byte backups. No other edits, production writes, contracts, generator/schema/enforcement changes, tests or new files.
+
+## D-102 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Authorize existing-file ISS368 heartbeat read-failure observability feature under current .3 protocol.
+**Why:** Current detectSilentWatchers catch skips unreadable tenants and returns healthy-looking zero; independent next-action audit identifies this priority-tier1 high defect as unblocked while registration gates remain pending.
+**Result:** Independent registration_resource_plan APPROVE: return silent and unreadable counts; expose only aggregate watchUnreadable, return HTTP503 for unreadable probes, retain successful tenant evaluation and existing known-stale behavior. Strengthen recorded reproduction with mixed broken and stale tenants, HTTP unknown/fresh distinction, recovery and no sensitive data disclosure. No completion claim before checker acceptance.
+**Links:** ISS-368; qa/QUEUE.md; D-048; T-051
+**Changes-authorized:** Existing apps/api/src/routes/health.ts HealthReport, detectSilentWatchers and createHealthRouter; existing health.test.ts affected assertions and unreadable/recovery cases only. No new application files, contracts, architecture, enforcement, credentials, production writes or migration of T052 protocol.
+
+## D-103 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Authorize independently approved duplicate-ID refusal at the existing ledger union reader.
+**Why:** D055 keeps the queued guard independent of the now-completed canonical-ID repair; current union has 464 rows and no duplicate IDs, but the reader still permits conflicting identities to become usable rows. Guarding the shared reader preserves attributable issue evidence for the complete KB goal.
+**Result:** Independent registration_resource_plan APPROVE: detect repeated string IDs across canonical and sorted shard files, fail with ID and both one-based file locations, preserve parsing-error accounting and exact ordering; do not select a winner or rewrite ledger rows. Existing tests cover identical/conflicting samefile and crossfile collisions, positive qualified IDs, and nonzero CLI behavior. ISS368 cycle0 CONTRACT_MISMATCH is held separately; no code regression or PASS claim.
+**Links:** D-055; qa/QUEUE.md; qa/gates/iss-360-duplicate-id-collision.md; qa/manifests/iss-368-heartbeat-read-failure-is-not-health.md
+**Changes-authorized:** Existing scripts/lib/tracker-audit.mjs readLedgerRows and existing scripts/lib/ledger-union.test.mjs only. Required QA evidence artifacts permitted. No new application files, ledger rewrite, contracts, architecture, hooks/enforcement, budgets, production writes or T052 changes.
+
+## D-104 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Resume authorized full-goal implementation, explicitly migrate T-052 to the current complete .3 maker/checker protocol and authorize the four reviewed new code files.
+**Why:** Umesh responded to the enumerated Gmail configuration, T-052 migration/test repair and four-file approval gates: 'system se lee lee there is my gws credentails ... so continue and dont stop'. This directly authorizes the presented development scope and read-only use of existing system credentials; repeated permission requests are unnecessary.
+**Result:** Existing system authenticated GWS discovered by read-only agent; no credentials exported/copied or external write performed. Current installed policy synchronized through the existing tick tool, subsequent policy-check targets=2 drift=0. T-052 transitions at the current BUILDING safe boundary to full .3 with existing prior protocol provenance and counters preserved as history; original .1 provenance is not retroactively guessed. Independent repair-plan review precedes standing test adaptation. Full ten groups and three releases remain the objective, not a narrow fixture success.
+**Links:** T-051; T-052; D-101; qa/manifests/t052-executable-registration.md; docs/webinar-release.md
+**Approved-by:** Umesh
+**Changes-authorized:** T-052 manifest migration and independently reviewed existing-file Python test repairs preserving safety oracles. Create packages/core/src/domain/webinar-types.ts, scripts/webinar/source-discovery.test.mjs, packages/index/src/eval/extraction.ts and scripts/eval-extraction.mjs for their previously reviewed purposes after applicable plan review. Read existing system GWS authentication and perform authorized source discovery without exposing secrets. No contract weakening, architecture/enforcement edit, production promotion, sending, registration submission to external organizers, publishing, paid model run or training export is implied.
+
+## D-105 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Implement D104-approved canonical webinar transport module and cohesive source-discovery integration test ownership.
+**Why:** D101 proved handwritten generated-barrel types unsafe; generator already discovers handwritten domain modules. Independent system_gws_discovery corrects five forbidden import edges to seven complete integration tests, so all seven must relocate to eliminate cross-layer imports without weakening coverage.
+**Result:** Independent PLAN APPROVE: canonical eleven calendar/auto-join exports plus Snapshot/Alias/Occurrence and TrustedSenderConfig closure move once into domain/webinar-types.ts. Preserve original public type paths through reexports and leave runtime in place; regenerate index only through existing generator. Move Gmail tests starting89/108 and Calendar tests47/98/143/213/249 intact into source-discovery.test.mjs, retaining titles/assertions/fixture values/loops; remove only TypeScript syntax. Check generator parity, dependency8-to0, count/assertion parity, affected tests, API/bot types and unchanged LOC/directory limits. No acceptance PASS implied.
+**Links:** D-104; D-101; ISS-367; T-051; qa/manifests/iss-367-lint-structure-no-shortcircuit.md
+**Changes-authorized:** New packages/core/src/domain/webinar-types.ts and scripts/webinar/source-discovery.test.mjs, existing calendar-client.ts/auto-join.ts/auto-record-policy.ts type ownership, existing apps/api/src/gws-gmail.test.ts and routes/calendar.test.ts whole-test removal with equal relocation, generated packages/core/src/index.ts via existing generator. No runtime policy change, generator edit, contract/rule/budget relaxation, new other code files or production/external writes.
+
+## D-106 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize one cohesive Python ownership-test file to preserve all T052 safety assertions within existing LOC limits.
+**Why:** Reviewed existing-file repairs exceed test_sb_join.py400-line ceiling; removing sufficient lines would require assertion loss or code compression. Umesh explicitly answered 'Haan, new test file create karo' to the exact proposed packages/meeting-bot/py/test_sb_join_ownership.py path.
+**Result:** Concrete maker proposal relocates Linux orphan identity/refusal, Windows exact Job ledger cleanup and cleanup-only tests intact; mocked registration-main owned-browser/blank-target/receipt ordering test also belongs this owner. Builtin fixtures and nested mocks move with functions, no shared fixture copying. Independent system_gws_discovery plan review requested; implementation occurs only after approval. Prior test safety intent retained, no acceptance PASS implied.
+**Links:** D-104; T-052; qa/manifests/t052-executable-registration.md
+**Approved-by:** Umesh
+**Changes-authorized:** Create packages/meeting-bot/py/test_sb_join_ownership.py and relocate the independently approved whole ownership/cleanup test cases from existing test_sb_join.py/test_sb_join_iframe.py. Add only their required imports and existing canonical sb_join module path setup; no duplicate functions, assertion weakening/skips, application changes, budgets, contracts or external writes.
+
+## D-107 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Establish isolated localhost work runtime and verify connected Calendar and deterministic KB downstream reads.
+**Why:** Existing system GWS credentials work, while configured remote Mongo repeatedly fails server selection. Cached local Docker mongo7 is available, so independent work can continue without production writes or image download.
+**Result:** Project-labelled container lkb-work-01a10ba6 id fa6b2875898f45c22e4b85e9489fbaa519bfc3d6777a323665c3f61b187f1a07 uses localhost27019 only and project data/mongo-work-01a10ba6,512MB/1CPU; ping ok1. Existing production API assembled on localhost3300 with exact isolated database lkb_work_webinar_20261005 and tenant toc, GWS authenticated operator umeshsugara@vidysea.com. Work credential stored privately without printing. Health200/dbok; actual Calendar acquisition209sources/13meetings complete; operations owner toc and candidate work-DB header match. Read-only runner preview succeeds13skips, no recording/registration/writes. Existing seed pipeline inserts one source/session/page,291turns,6claims with all6 references present, and deterministic tree; paid model calls0. August27 sample rejected from setup because1of3citations absent. This is bounded work evidence, not production/live-webinar/Ubuntu/Ask completion.
+**Links:** T-051; D-104; docs/webinar-release.md; qa/manifests/webinar-portable-release.md
+**Changes-authorized:** Project-local work runtime/evidence and isolated local work-data setup through existing scripts only. Existing .env/production credentials and databases not modified. Preserve full original goal and actual failed mail-body acquisition evidence.
+
+## D-108 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Implement the D104-authorized offline extraction measurement harness before later LLM enrichment.
+**Why:** Current extractClaims filters invalid citations before output, so filtered-only evaluation hides raw fabrication. Independent ai-engineer equivalent plan review by system_gws_discovery approves separate raw/effective/filtered/persisted measurement without invented semantic support or release thresholds.
+**Result:** PLAN APPROVE pure evaluateExtractionCase and aggregateExtractionReports, explicit versioned artifact formats, citation identity/time/optional attribution checks, summed numerator/denominator rates and null unavailable measurements. CLI replays bounded local artifact manifests with exact SHA256 identities and no providers/database/credentials. Optional reviewed labels require matching case/artifact hashes; no labels means semantic support unmeasured. Existing pipeline/claims.test.ts is cohesive test owner. Real72claim/14unresolvedreference corpus must replay with drift reported; absent raw stages remain absent. This permits building measurement only; initial checker-owned extraction contract/gold labels and release thresholds remain completion gates.
+**Links:** U2.2; D-104; docs/plan.md; docs/spec.md; qa/manifests/webinar-portable-release.md
+**Changes-authorized:** New packages/index/src/eval/extraction.ts and scripts/eval-extraction.mjs, existing packages/index/src/pipeline/claims.test.ts additive evaluator integration tests, generated local corpus/report evidence. No production extractor changes, other new codefiles, qa contracts, paid model calls, semantic gold fabrication, production/backfill writes or activation/export.
+
+## D-109 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record exact downstream work-KB citation and search evidence and correct D107 reference-count prose.
+**Why:** D107 counted six claims as six references before the actual route reconciliation; the six sample claims contain seven evidence references. Preserve immutable history and append the measured correction.
+**Result:** Existing authenticated work API returns HTTP200 for all six claims; evidence7/resolved7 with both actual turn and session. Lexical search visa k5 returns HTTP200/hits5/resolved5; sessionsHTTP200/count1; modelcalls0. D107 count six references is retracted, replaced by seven. No full-corpus semantic quality, real webinar, Ask model, production or Ubuntu completion follows.
+**Links:** D-107; T-051; U2.2; docs/webinar-release.md
+**Changes-authorized:** Evidence and existing task/manifest runtime notes only; no additional application, production, source artifact, contract or enforcement changes.
+
+## D-110 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Repair independently evidenced native registration origin-port confinement and watcher credential-safe observability.
+**Why:** Fresh senior t052_full_readiness_plan static source-derived regex accepts default443 organizer on444/8443 because CSP wildcard and DNR optional-anyport exceed D098/D099 currentport scope. Independently executed synthetic watcher prints raw registration and join tokens by serializing returned durable operations. Both are security-class blockers, not capped polish or obsolete-fixture failures.
+**Result:** Independent PLAN APPROVE ports: derive each approved host origin from currentregistration URL scheme/effectiveport; reject currentpage/action mismatches before values, exactCSP and anchoredDNR defaultcanonical/customport rules; preserve fullpersistentdeny/resource/JSblock/fingerprint/readback/receipt lifecycle and strictclear. Native secondserver307/308 and reflectedimage must have zero secondport traffic, wrongactionzero values/POST, allowedcurrentport cookieCSRF positive. Watcher projection plan is under independent final test-owner review before implementation; never strip private durable state to mask logs.
+**Links:** T-052; D-098; D-099; D-104; D-106; qa/manifests/t052-executable-registration.md; qa/feedback-inbox.md
+**Changes-authorized:** Existing packages/meeting-bot/py/sb_join.py register_form/main origin-policy blocks and existing authorized test_sb_join_ownership.py exactport/browser cases. Watcher existing scripts/webinar/run-pipeline.mjs runPipelineWatch and existing scripts/webinar/source-discovery.test.mjs privacy cases only after independent concrete plan approval. No other newcodefiles, blankethost/networkallow, skipped/assertionweakened tests, contracts/rules/budgets, architecture/enforcement, realexternalregistration or productionwrites.
+
+## D-111 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Repair the controlled native registration alias fixture host-only cookie oracle after independent protected-test review.
+**Why:** The local fixture sets auth=fixture without Domain on 127.0.0.1 and redirects positive-alias to localhost on the same approved port. RFC6265 host-only cookie matching requires identical request host; expecting this cookie on localhost is incorrect and would reward credential disclosure.
+**Result:** Fresh senior port_alias_cookie_review independently inspected test lines253/260/299/300 and PLAN APPROVE exact expected cookies [auth=fixture, None] only for positive-alias, while same-origin requires auth=fixture for every POST. Preserve both exact native POST bodies and CSRF, foreign traffic empty, wrong-page/action zero-values and zero-POST, all outcome and owned cleanup assertions. Prior normal Chrome run exit1 with6passed1failed remains recorded; it is not acceptance PASS.
+**Links:** T-052; D-106; D-110; qa/manifests/t052-executable-registration.md; https://www.rfc-editor.org/rfc/rfc6265
+**Changes-authorized:** Existing packages/meeting-bot/py/test_sb_join_ownership.py exact positive-alias cookie expectation only and evidence/task notes. No application behavior, other weakened assertions, new files, contract/budget changes, production writes or external submission.
+
+## D-112 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Preserve the native browser fixture host-mismatch oracle under the D110 localhost-only HTTP origin policy.
+**Why:** Existing different.example allowedHosts on an HTTP local fixture now fails earlier with request_policy_refused. Replacing its expected reason alone would lose the original host-mismatch coverage. Fresh senior native_fixture_failure_plan inspected actual127.0.0.1 URL and exact source policy ordering.
+**Result:** PLAN APPROVE existing test_registration_actual_local_form_and_safety_exceptions: use localhost as mismatched allowed host for the unchanged redirect_host assertion and add a separate original different.example request_policy_refused plus zero-POST assertion. All script isolation, exact native body, cookie, CSRF and redirect assertions remain intact. Full Python prior result89passed2failed91collected is retained; owned-process timeout has no established causal repair and remains open.
+**Links:** T-052; D-104; D-110; D-111; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/test_sb_join_iframe.py test_registration_actual_local_form_and_safety_exceptions only for this reviewed additive/refined fixture mapping and evidence/task notes. No application source, weakened assertions, timeouts, new files, contracts, budgets or external/production actions.
+
+## D-113 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Exercise existing strict owned-Job cleanup before the browser-death precondition in the controlled port fixture.
+**Why:** The fixture waits10seconds for browser death before invoking production cleanup, so a live verified owned Job cannot reach the safe termination path. Fresh senior native_fixture_failure_plan independently reviewed source502-530: exact identity/membership and containment before termination, ActiveProcesses zero, and refusal for missing Job with live browser.
+**Result:** PLAN APPROVE observe exact recorded PID/creation/executable before cleanup; invoke unchanged cleanup-only with unchanged15second refusal retry rule; require exit0 and cleaned ledger; then preserve exact recorded process death proof with original10second wait if present. No timeout increase or guessed transient cause. Focused real browser state/timing/attempt evidence and final current-identity suite required before completion. Prior89passed2failed and incomplete action-port restored floor remain retained.
+**Links:** T-052; D-106; D-110; D-111; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/test_sb_join_ownership.py test_registration_native_same_host_other_port_confinement cleanup ordering and bounded fixture-only diagnostic counters/evidence. No application source, weaker identity/death/cleanup assertions, timeout increase, skips, unrelated process kills, new shipped files or contract/budget changes.
+
+## D-114 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record the completed user-approved ownership test-file and reviewed T052 fixture-repair checkpoint.
+**Why:** User explicitly approved test_sb_join_ownership.py. D111/D112 preserve distinct cookie/host refusal oracles and D113 exercises strict existing owned cleanup before requiring death, without changing production source or extending deadlines. Exact verification must remain distinct from final feature acceptance and live deployment.
+**Result:** Ownership332, iframe374, base311 nonblank lines, each below400. Focused D112 native fixture1pass; D113 wrong-action1pass with strictcleanup1attempt2.641seconds/cleaned/death proof. Action-port isolated floor90490 green1 -> intended empty-values AssertionError red1 -> byte-restored green1, all exact ledgers cleaned. New-identity full Python84175 terminalexit0:91passed102.55seconds, no failfast/skips; prior8483 89passed2failed retained. Watcher affected Node union95583 terminal0:393passed, five completed isolated green/red/restored claims. Contract validator explicitly PASS by vacuity/no frozen contracts; not a quality gate. T052 remains in_progress; full contract/dual independent acceptance, global structure and actual live operational gates remain. No commit/push/deployment/production or external submission. App goal controller readback remains paused while repo tracker remains active; no tool resume capability is available.
+**Links:** T-052; D-106; D-110; D-111; D-112; D-113; TASKS.md; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence and existing task/checkpoint notes only. No architecture, contracts, enforcement, source, timeout/budget or production changes.
+
+## D-115 | 2026-10-08 | type: session | status: ACTIVE
+**What:** Migrate the committed KnowledgeBase master and future default pushes to vidysea-admin/KnowledgeBase at Umesh's request.
+**Why:** Use the Vidysea-owned repository as the destination for future work and DevOps integration. Preserve the unrelated existing working changes and the independent whatsapp_msg source repository.
+**Result:** Source master and destination master are 614d78b8966428296f394b8bf3e6c547d41beca5, tree 1989e1bcee1c35b7ecf03675fd5b5ad508e1ea2d; all 170 commits ahead of the former origin/master copied. Reachable-history audit covered 962 commits, 3777 blobs, 1513 tracked leaves, two configured secret values and eight credential patterns; zero matches, eight positive and eight negative controls passed. The 215 tracked raw/processed data paths require the user's explicit public-data choice: destination is PRIVATE pending that answer. Root origin fetch/push is https://github.com/vidysea-admin/KnowledgeBase.git and remote.pushDefault is origin; prior origin retained as legacy. Existing 48 modified tracked files and untracked feature/runtime files were not committed or published. Exact command ".venv/Scripts/python.exe contracts/verify_contracts.py" returned "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity"; this is not product acceptance. GitHub CI run 37734830843 on the copied SHA passed typecheck but FAILED meeting-bot unit tests at record-backend.test.ts:23 (ffmpeg spawn status null versus expected 0); missing FFmpeg is a hypothesis, not a confirmed diagnosis. No deployment or DevOps private access grant was configured. This append remains local with pre-existing uncommitted D068-D114; those peer entries must not be broadly committed to close this migration.
+**Links:** https://github.com/vidysea-admin/KnowledgeBase; https://github.com/vidysea-admin/KnowledgeBase/actions/runs/37734830843; .handoffs/knowledgebase-repo-migration-latest.md
+**Changes-authorized:** Git remote and push-default configuration plus operational migration evidence only. No application, contracts, architecture, enforcement, production data, source-submodule visibility or live activation changes.
+
+## D-116 | 2026-10-08 | type: session | status: ACTIVE
+**What:** Make vidysea-admin/KnowledgeBase public after Umesh explicitly answered the pending visibility choice.
+**Why:** Umesh requested "knowledgebase ko bhi public ... admin one" after being told that tracked transcripts and processed data become public with this repository. The private staging condition recorded in D115 is now resolved.
+**Result:** Exact command "gh repo edit vidysea-admin/KnowledgeBase --visibility public --accept-visibility-change-consequences" exited 0. Readback "gh repo view vidysea-admin/KnowledgeBase --json nameWithOwner,url,isPrivate,visibility,defaultBranchRef" returned nameWithOwner vidysea-admin/KnowledgeBase, isPrivate false, visibility PUBLIC, default branch master. Pre-change branch readback remained the audited 614d78b8966428296f394b8bf3e6c547d41beca5. This changes repository visibility only; existing dirty local feature work, CI failure, independent private whatsapp source and unconfigured deployment remain as recorded in D115. Future default pushes already target this repository.
+**Links:** D-115; https://github.com/vidysea-admin/KnowledgeBase; .handoffs/knowledgebase-repo-migration-latest.md
+**Changes-authorized:** Repository visibility and local migration handoff evidence only.
+
+## D-117 | 2026-10-09 | type: session | status: ACTIVE
+**What:** Umesh explicitly requested publication of all current KnowledgeBase work so development can continue on another machine. Preserve the current root working tree on codex/machine-migration-2026-10-09, the separate alert edits on codex/machine-migration-alerts-2026-10-09, all unique unmerged histories and a portable session handoff. Existing release master is not promoted by this backup.
+**Why:** This machine has RAM/runtime constraints; a Git-backed checkpoint must retain in-progress code, QA, goals, corpus artifacts and branch identities without misrepresenting unverified work as an accepted release.
+**Result:** Derived inventory: 30 worktrees, 42 original branch refs, root 48 modified tracked paths plus 20 new code/QA paths, one peer worktree with 2 modified alert files, 4 unmerged histories with 22 unique commits, and 8 additional corpus/source artifacts. Derived publication scan: 3838 history blobs, 78 working files, 2 configured secret values and 8 credential patterns; 8 positive/8 negative controls pass and zero findings. verify_contracts exits 0 by vacuity; fresh offline extraction replay exits 2 with 29 cases/3427 turns/72 claims/14 invalid references of 80 and no semantic labels. Existing U2.2/T-051/T-052 acceptance and CI/structure failures remain open. Remote publication and independent clone readback are pending until completed in the handoff evidence.
+**Approved-by:** Umesh
+**Changes-authorized:** Machine-migration Git checkpoint/ref publication and portable documentation/evidence only; existing HANDOFF.md and TASKS.md notes, append-only decision history and selected data artifacts. Preserve all existing working source/QA changes without behavioral edits or acceptance-status upgrades. No architecture, contract or enforcement edits, source-submodule visibility change, secret/cookie publication, production writes, paid model calls or scheduler activation.
+**Links:** U2.2, U2.4, U3.1, T-051, T-052; D-115, D-116; HANDOFF.md; .handoffs/machine-migration-inventory-2026-10-09.json; .handoffs/machine-migration-public-audit.json; parent 614d78b8966428296f394b8bf3e6c547d41beca5.
+
+## D-118 | 2026-10-09 | type: decision | status: ACTIVE
+
+**Approved-by:** Umesh
+**What:** Add explicit, verified-account Calendar meeting attendance for umeshsugara@vidysea.com on the interim Windows server, preserving the default webinar-only mode.
+**Why:** Umesh directly requested: "tu tho git repo mai push krr dee live mai khud krr lungaa aur iske alawa kyuki ye current system bhi windows server mai run ho rha hai tho 24*7 run hoga hi tho jabtakk vha run nhi ho rha tho jo koi bhi meeting hogi umeshsugara@vidysea.com prr tho vhaa ki meeting attend krni hai and also like join them". This is an additive account-specific selection exception to D-056, not a replacement of its existing release and safety requirements.
+**Result:** Implementation and scoped Git publication authorized. Actual account credentials, real meeting attendance, playable media/processing and Windows continuous operation remain to be verified; code changes alone provide no live acceptance.
+**Changes-authorized:** Explicit account opt-in in the existing portable runner, a focused policy/source adapter reusing existing Calendar acquisition, a Windows launcher, affected tests and new unit QA evidence. Preserve default webinar behavior, source/account/tenant refusal, declined/cancelled/unsafe-link barriers, serialized capture, native source controls, poller lock and real live-proof/isolated work database gates. No registration forms or organizer messages, fabricated credentials or proof, frozen architecture/contracts/schema changes, enforcement-path edits, production database writes or unrelated working-tree changes.
+**Links:** D-056; T-051; qa/contracts/umesh-calendar-attendance.md; qa/manifests/umesh-calendar-attendance.md; user authorization in current chat.
+
+## D-119 | 2026-10-09 | type: decision | status: ACTIVE
+
+**What:** Umesh approves the bounded final inferred STT duration correction and upload duration wiring despite the non-security two-PASS seam cap; retain U4.1/T-051/T-052 whole-task HOLD until independent and actual end-to-end evidence.
+**Why:** The captured 172-byte provider transcript is rejected because its inferred final end 30 seconds exceeds actual locally measured short media duration. The scoped correction preserves raw provider bytes, text, speaker labels and intermediate boundaries.
+**Result:** Explicit human approval verified directly in local coordinator chat 01a120a7-b6e2-7780-9f2d-6e7cb6829365, question call_afeaca7d54464d2e8cb8b8316fea9e2b. Reply 01a120d2-228f-74c3-8487-1ea14820e849: "Approve the scoped fix and independent check". Reply 01a120d2-499e-72f3-8ec3-fd36aaca98b5: "Done in the managed profile", answering dedicated umeshsugara@vidysea.com login/window-closed question. Reply 01a120d2-86a5-73b0-b818-182297fea082: "Safe to run the private proof now", answering permission for one private Meet capture proof outside hei-sweep A/B window. Maker build remains provider/browser-free; coordinated actual proof follows scoped ready-for-check evidence.
+**Approved-by:** Umesh
+**Changes-authorized:** packages/ai/src/stt/gemini-file-upload.ts; packages/ai/src/stt/gemini-file-upload.test.ts; scripts/transcribe-long-session.mjs; scripts/lib/transcript-provenance.test.mjs; scripts/upload/submit.mjs; scripts/upload/queue.test.mjs; scripts/upload/real-proof.mjs; qa/manifests/u4.1-recording-upload-worker.md; qa/packets/u4.1-recording-upload-worker* (maker handshake/immutable source inventory and evidence); .cache/coordination/u4.1-duration-* (bounded maker evidence).
+**Links:** T-051; T-052; U4.1; .cache/webinar/downstream-test-744a8c79-c671-4915-bc1c-804a2b079b99/duration-fix-proposal.md; qa/contracts/upload-transcribe-worker.md C9/C10; qa/contracts/gemini-audio-transcription.md; source chat and human reply IDs above.
+
+## D-120 | 2026-10-10 | type: session | status: ACTIVE
+
+**What:** Land the work committed since D-119 (57c6584) through e12c324 on branch codex/machine-migration-2026-10-09: (1) T-037 unit 1, a pure auto-join rules engine (bd2aa47), fail-closed on invalid rule data after fix cycle 2 (af90e13); (2) the ISS-CAPTURE-001 fix for trusted-sender spoofing via a supplied domain and multi-@ addresses (451edce); (3) T-043 proofs, namely a hermetic Ask citation proof over webinar sessions (86c69e1) and two-tenant isolation tests for apps/api Ask seams (8cac7b9); (4) T-044 pure transcript QA clamp and hallucination spot-check (cb91310); (5) web/API page and data work from the t057 line: session-scoped Knowledge Explorer (d334c6c), edge-confidence graph (8f5018e), read-only knowledge gaps dashboard (7f4b85d), six meeting-capture TypeScript fixes (ce04ddd), verified checker packet snapshot helper (54cbb93), real index corpus stage classification with tenant guards (f60f9a1), and activity-health wiring plus ISS-004 fixture fix (ae41401); (6) merges 197f754 (codex/t057-b8-knowledge-explorer, content already present, keeps ISS-004 ledger row), ece3d08 (lane/transcript) and 3c1b5d4 (lane/capture); (7) evidence commit e12c324: U2.2/T-021 human-review preparation packets (data/eval/extraction-adjudication-packet.json, data/eval/golden-set-human-review.json, qa/evidence/parallel-claim-review/), marked HUMAN_ADJUDICATION_PREPARATION_ONLY / HUMAN_REVIEW_REQUIRED; (8) tracker reconciliation 5eb4f67: T-037, T-043 and T-044 moved from open to in_progress in TASKS.md, and .goal/goal.json status synced for those three plus T-021 and U0.10 (progress now 51 done, 10 in_progress, 34 pending).
+**Why:** The work was committed and merged but not recorded under the Lab Protocol landplane step, leaving DECISIONS.md without an entry covering it. This entry records what exists and its checker status; it grants nothing new.
+**Result:** Checker verdict files with VERDICT: PASS: t037-auto-join-rules-engine (cycle 2; cycle 1 was FAIL, 9c3a9e2), t043-ask-webinar-citation-proof (cycle 1), t043-api-ask-tenant-scope-proof (cycle 1), t044-transcript-qa-clamp (cycle 1), iss-capture-001-trusted-sender-domain-spoof (cycle 1). These PASSes cover the named units only; no whole-task completion of T-037, T-043 or T-044 is claimed. The U2.2/T-021 packets are preparation only: they grant no gold labels and no task acceptance, and human adjudication remains required. The t057 page/data commits in item 5 have no verdict files added in this range; their status is whatever their existing qa/verdicts files record and is not asserted here. U4.1/T-051/T-052 HOLD from D-119 is unchanged. Nothing was pushed; the remote is public (D-116) and any push needs Umesh's explicit approval.
+**Changes-authorized:** none
+**Links:** T-037; T-043; T-044; T-021; U2.2; T-057; ISS-CAPTURE-001; ISS-004; D-116; D-119; qa/verdicts/t037-auto-join-rules-engine.md; qa/verdicts/t043-ask-webinar-citation-proof.md; qa/verdicts/t043-api-ask-tenant-scope-proof.md; qa/verdicts/t044-transcript-qa-clamp.md; qa/verdicts/iss-capture-001-trusted-sender-domain-spoof.md; qa/verdicts/t057-b7-confidence-graph.md; qa/verdicts/t057-b8-knowledge-explorer.md; qa/verdicts/t057-d3-knowledge-gaps.md; commits 57c6584..5eb4f67.
+
+## D-121 | 2026-10-10 | type: session | status: ACTIVE
+
+**What:** Land the work committed after D-120 (2942796) through bbd9c81 on branch codex/machine-migration-2026-10-09: (1) unit sweep-reports-unmerged-worktrees (176dbd4), from the qa/QUEUE.md TODO row: tracker-audit now reports commits ahead of master per registered worktree, report only, never a gate; closed out in 219a659; (2) ledger bookkeeping 67850f6: ISS-375 and ISS-U4BHB-001 set to verified, each citing the PASS verdict that replayed its own recorded reproduction; (3) unit t037-join-rules-persistence (1e3e911), backlog tier 3, task T-037: a tenant-scoped, atomic, fail-closed file store for the auto-join rule set and state, called by nothing yet; closed out in bbd9c81 with a TASKS.md note.
+**Why:** Session of 2026-10-10 following the status review. With queue rows either round-capped (speaker-name-rules seam, 2 PASSes) or blocked (ledger-duplicate-id-guard, CONTRACT_MISMATCH), and an audit of the 51 open critical/high rows finding none buildable without an Approver ruling, a browser or a live service except ISS-367, the next unit came from the roadmap as the backlog order requires.
+**Result:** Checker verdicts with VERDICT: PASS, both cycle 0, ISSUES-WRITTEN: none: sweep-reports-unmerged-worktrees (9d960bf; 21/21 targeted tests, 3/3 mutations killed) and t037-join-rules-persistence (a8a698d; 12/12, 24/24 and 18/18 targeted tests, 5/5 mutations killed, 42 hostile tenant ids refused, package tsc exit 0). T-037 stays in_progress: the edit API/UI and scheduler switch-over remain, the editor must load before save so approvals and opt-outs are kept, and wiring needs a single writer or a lock. ISS-227, ISS-228, ISS-229 and ISS-205 were NOT closed: their fix lives in D:/ai_os hooks and D:/ai_os does not exist on this machine, so the fix could not be confirmed in place. Open ledger counts after this session: critical 4, high 45, medium 98, low 54. No full test suite, build or browser run was made (shared-CPU constraint). Nothing was pushed; the branch is 49 commits ahead of its public remote and any push needs Umesh's explicit approval.
+**Changes-authorized:** none
+**Links:** T-037; ISS-375; ISS-U4BHB-001; ISS-227; ISS-228; ISS-229; ISS-205; ISS-367; D-116; D-119; D-120; qa/verdicts/sweep-reports-unmerged-worktrees.md; qa/verdicts/t037-join-rules-persistence.md; qa/contracts/t037-join-rules-persistence.md; qa/verdicts/u4.1-recording-upload-worker.md; qa/verdicts/parallel-heartbeat-tenancy.md; qa/gates/ai-os-enforcement-hooks-uncommitted.md; commits 2942796..bbd9c81.
+
+## D-122 | 2026-10-10 | type: decision | status: ACTIVE
+
+**What:** Umesh (Approver) ruled on 2026-10-10, answering a direct multiple-choice prompt in the orchestrating session: (1) iss-322-multifile-shape option (a): fix all three spoof routes in one unit, enforcing sender authentication where the unauthenticated header becomes trust; new file `sender-authentication.ts` explicitly OK; covers ISS-322 and ISS-333. (2) unmerged-worktree-inventory: resume `wave/u2-4-phase3-fix` (13 commits, behind critical ISS-282) through maker-checker with a fresh independent checker, merge on PASS; the other four branches are audited first and brought back with a recommendation, NOT approved for merge or retirement. (3) obs-windows-loc-split option (a): extract `bot-child.ts`, new file OK, no budget raise. (4) handshake-liveness-contract-start option A: start the contract with a canonical stamp format. (5) ui-surfaces-test-file-exclusion: approved, exclude `*.test.*` from the D-024 live-browser trigger. Also: Umesh approved pushing the branch, done as a fast-forward to 62a625d with an independent clone readback passing, discharging the publication/readback D-117 left pending; and for the U2.2/T-021 human adjudication he chose "draft for my sign-off": the agent prepares proposed rulings that become gold labels only when Umesh signs.
+**Why:** These gates blocked high-severity work (ISS-322/333 spoofing, critical ISS-282, a red LOC gate, nine-issue parser class ISS-196/199). Rulings were given first-hand and are recorded so the log, not chat, is the source.
+**Result:** Gate files updated with ruling sections (gates 1, 3, 4, 5; commit 1b52517). Gate 2's file was not updated: it dates from 2026-09-28 and lists `worktree-agent-a3d4ea73632cda74e` and `worktree-agent-a779f0b3b445697af`, while the remote on 2026-10-10 shows `worktree-agent-a035913864247fa58` and `codex/machine-migration-alerts-2026-10-09` beside `wave/u2-4-phase3-fix`, `wave/vector-gap-durability` and `lane/a-speakers`. Ruling 2 stands as recorded here for `wave/u2-4-phase3-fix`; a read-only audit of the current remote branches is in progress and the gate file is reconciled after it. Each ruling unblocks a unit; no gold label, merge or enforcement-path change has been made by this entry. The D-024 trigger lives in the machine-wide hook `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`, absent on this machine, so ruling 5 is not yet applied.
+**Changes-authorized:** none
+**Approved-by:** Umesh
+**Links:** qa/gates/iss-322-multifile-shape.md; qa/gates/unmerged-worktree-inventory.md; qa/gates/obs-windows-loc-split.md; qa/gates/handshake-liveness-contract-start.md; qa/gates/ui-surfaces-test-file-exclusion.md; ISS-322; ISS-333; ISS-282; ISS-196; ISS-199; D-117; D-119; D-121.
+
+## D-123 | 2026-10-10 | type: session | status: ACTIVE
+
+**What:** Land the parallel-lane wave committed after D-122 (af22d27) through 77a9f27 on branch codex/machine-migration-2026-10-09. Each unit was built in its own git worktree under KnowledgeBase-lanes/, checked by an independent checker in that worktree, merged with --no-ff on PASS, and closed out. Units merged, with the checker cycle that passed: iss-322-333-sender-authentication (0; D-122 ruling 1); machine-migration-hardcoded-paths (0); handshake-liveness contract (checker-authored; D-122 ruling 4); t049-ai-call-tracer (0); iss-260-retro-web-auth-review (0); t045-youtube-source-adapter (0); t044-transcript-qa-report (1); t057-analytics-page (0, source scope); obs-windows-bot-child-extraction (0; D-122 ruling 3); t039-send-bot-now-planner (2); medium-fix-batch-2026-10-10 (2; ISS-155, ISS-171, ISS-145, ISS-146); small-fix-batch-2026-10-10 (0, source scope; ISS-335); iss-367-structure-stages-green-c2 (2, partial); t046-retention-sweep-planner (1); structure-dupes-and-record-commands-loc (0); t037-join-rules-edit-api (1); web-auth-key-clear-and-href-scheme (1, source scope); medium-fix-batch-2-2026-10-10 (0; six fixes); record-commands-finalize-extraction (0). Two ledger close-out passes (5bc0342, cf34906) set 29 rows to verified from PASS verdicts. One design choice was made by the orchestrator without an Approver ruling and is recorded here for review: the three write routes of the join-rules edit API require a new dedicated scope `join-rules` (GET stays on `calendar`), following the existing convention that mutating routes carry their own scope; no existing key holds it and scripts/mint-key.mjs ALL_SCOPES was deliberately not changed.
+**Why:** With the Approver's instruction to proceed with maximum parallelism, work that did not need an Approver ruling, a browser, a live service or gold labels was fanned out across lanes. Independent checking was kept per unit because it is what caught the defects: six of the merged units FAILed at least one cycle before passing, and two more are still failing in their lanes.
+**Result:** An integration check on the merged branch (tsc exit 0 in core, meeting-bot, ai, ingest, api, web; 753 targeted tests across those packages and scripts, 0 failures, 1 skipped; no cross-lane symbol or import conflict) judged the branch internally consistent. Checker FAILs that changed the outcome: t046 (two inputs made a recording wrongly purge-eligible), t039 (wrong duplicate-meeting key and non-meeting pages planned; three cycles), t037 API (write routes on the read scope; tenant-source tests too weak), web-auth (a late 401 could log out a tab holding a newer key), t044 (an aliased output path replaced the input file), medium-fix batch 1 (a wrong status mapping; that commit was reverted and ISS-369 stays open). Issues filed by checkers and still open include ISS-376 (high: production runs in every-webinar mode, which skips the sender trust check by design, so the D-122 ruling 1 fix does not constrain production recording until the Approver decides that mode), ISS-T037API-003, ISS-T046-004, ISS-MEDFIX-001, ISS-MEDFIX2-001/002. Open ledger after this wave: critical 4, high 42, medium 74, low 57. lint:structure still red on three stages (loc: speakers-llm.ts, sb_join.py, run-watch.mjs; root: 18 loose files against 15; tracker: G4 bare-id citations), down from five; ISS-367 stays open. NOT landed here, still in lanes: u2-4-phase3-resume-c2 (lane/ph3; FAILed cycle 2 because the lane accepted 432 name links the base refused; cycle 3 is being checked; its live gate has not run) and iss-298-ledger-id-allocator (lane/alloc; FAILed cycle 0; cycle 1 is being checked). Not done anywhere: live-browser validation under D-024 for the analytics page, the web-auth fixes and the /ask route change; production wiring of the join-rules routes (they answer 503); any live run. T-037, T-039, T-044, T-045, T-046, T-049 and T-057 remain in progress: each merged unit is a slice. No full test suite, build or browser was run (shared-CPU constraint). The C: drive reached 0 bytes free during the wave and commits failed until space was recovered; a read-only survey attributed most usage to another project's evidence folder and to session scratch directories, not to these lanes (about 41 MB each).
+**Changes-authorized:** none
+**Links:** D-116; D-119; D-122; T-037; T-039; T-044; T-045; T-046; T-049; T-057; ISS-322; ISS-333; ISS-260; ISS-367; ISS-369; ISS-376; ISS-282; ISS-298; qa/contracts/handshake-liveness.md; qa/verdicts/iss-322-333-sender-authentication.md; qa/verdicts/t046-retention-sweep-planner.md; qa/verdicts/t039-send-bot-now-planner.md; qa/verdicts/t037-join-rules-edit-api.md; qa/verdicts/web-auth-key-clear-and-href-scheme.md; qa/verdicts/t044-transcript-qa-report.md; qa/verdicts/medium-fix-batch-2026-10-10.md; commits af22d27..77a9f27.
+
+## D-124 | 2026-10-11 | type: session | status: ACTIVE
+
+**What:** Land the second parallel-lane wave, commits 77a9f27..ebf58fe on branch codex/machine-migration-2026-10-09. Each unit was built in its own git worktree under KnowledgeBase-lanes/, checked by an independent checker, merged with --no-ff on PASS and closed out. Units merged, with the checker cycle that passed: iss-298-ledger-id-allocator (1; cycle 0 FAILed because the reader rejected D-019/D-055 ids on the real ledger); test-gaps-t046-004-t037api-003 (0; ISS-T046-004, ISS-T037API-003); t037-join-rules-editor-page (0, source scope only); t037-join-rules-veto-select (0; veto-only layer, not wired); ci-ffmpeg-and-env-example (1; cycle 0 FAILed because the encoder guard passed if either libvpx or libopus matched, ISS-CI-001; includes .env.example completion); t039-send-now-command (0; first caller of planSendNow); run-watch-loc-split (0; run-watch.mjs split into watch-* modules, 556 to 275 loc); t049-tracer-wiring (1; every ai provider routed through the tracer, off unless TELEMETRY_ENABLED; cycle 0 FAILed on an unbounded sink queue, ISS-T049WIRE-001); auth-require-scope-exact-match (0; requireScope exact array-element match, ISS-TESTGAPS-001; checker filed ISS-AUTHSCOPE-001: a tenantless key authenticates); t037-join-rules-store-lock (0; per-tenant cross-process lock); t037-join-rules-api-host (1; cycle 0 FAILed on a stale pid lock after a crash, ISS-T037HOST-001). Items listed in the dispatch brief that are not in this range and are not claimed: strict-record extraction (strict-webinar-runtime-extraction predates 77a9f27), tracker-audit advisory changes, and a third ledger close-out pass.
+**Why:** Continue maximum-parallelism work that needs no Approver ruling, browser, live service or gold label, keeping independent per-unit checking because it caught defects in four of these eleven units before merge.
+**Result:** Integration check on ebf58fe: tsc exit 0 in meeting-bot, ai, ingest, api, web. Targeted tests: meeting-bot 277/280 (2 environmental failures in record-backend.test.ts: no ffmpeg, symlink EPERM; 1 skipped), ai 102/102, ingest 41/41, core 13/13, api 159/159, web 230/230, scripts 257/259 in the combined run (two child-process crashes under memory pressure; both files pass when re-run alone). No cross-lane import or symbol conflict. lint:structure is still red on three stages (loc: speakers-llm.ts 313 and sb_join.py 1142; root: 18 loose files against 15; tracker: G4 on five manifests); dirsize, dupes, migrations, codex-hooks and dependencies are green; five directories sit exactly at their file budget. ledger-alloc verify: rows=509 findings=0. verify_contracts.py exits 0 by vacuity (no frozen contracts). docs/SNAPSHOT.md is current. Known follow-ups: a `locked` store error returns the same HTTP 500 as a permission failure instead of a retryable status; a stale comment at apps/api/src/join-rules/router.ts:14. Open ledger across qa/issues.jsonl and qa/issues.*.jsonl (status not fixed/verified/closed*/wontfix): critical 4, high 44, medium 83, low 59 (190 rows). NOT landed, still in lanes: u2-4 phase-3 speaker fix (lane/ph3; FAILed cycles 2 to 4, cycle 5 in progress, live gate never run); attention alerts (lane/r1alerts; FAILed cycles 0 and 1 because passcodes can leak into alert titles, cycle 2 in progress); tenant-on-key and accessor guard (lane/authtenant; cycle 0 FAILed on a weakened isolation test, cycle 1 being checked); join-rules veto skip reasons (lane/t037w1, being checked); lane/trackerg4 abandoned after a FAIL (branch kept, unmerged). Not done anywhere: any live run, any live-browser check under D-024 (web units pass at source scope only), production wiring of join-rules into the scheduler (needs an Approver ruling), production deployment. T-037, T-039, T-049 and the other touched tasks stay in_progress; each merged unit is a slice. No full test suite, build or browser was run (shared-CPU constraint).
+**Changes-authorized:** none
+**Links:** D-122; D-123; T-037; T-039; T-049; ISS-298; ISS-CI-001; ISS-T049WIRE-001; ISS-T037HOST-001; ISS-T046-004; ISS-T037API-003; ISS-TESTGAPS-001; ISS-AUTHSCOPE-001; qa/verdicts/iss-298-ledger-id-allocator.md; qa/verdicts/ci-ffmpeg-and-env-example.md; qa/verdicts/t049-tracer-wiring.md; qa/verdicts/t037-join-rules-api-host.md; commits 77a9f27..ebf58fe.
+
+## D-125 | 2026-10-11 | type: session | status: ACTIVE
+
+**What:** Land the third parallel-lane wave, commits ebf58fe..3ee94a2 on branch codex/machine-migration-2026-10-09. Each unit was built in its own git worktree under KnowledgeBase-lanes/, checked by an independent checker, merged with --no-ff on PASS and closed out. 38 units merged, with the checker cycle that passed and the scope qualifier of the verdict: t037-veto-skip-reasons-and-optout-identity (0); auth-require-tenant-on-key (2; cycles 0 and 1 FAILed on a weakened or vacuous isolation test, the tree store was a test replica); r1-attention-alerts (2, stated scope: unwired formatter that redacts by deny-list; ISS-R1ALERTS-009 stays open and gates wiring; cycles 0 and 1 FAILed because passcodes leaked into alert titles); skip-reason-vocabularies (0); t035-lean-video-settings-builder (0, pure and unwired); t037-join-rules-busy-status (0, web at source scope); ai-transport-cleanup-masks-timeout (0); tenant-filter-guards-outside-db (0); t037-optout-meeting-identity-store (1; library, store, API and host adapter, not end to end; the cycle-0 verdict passed a narrower scope); u2-4-phase3-resume-c2 (6, OFFLINE scope only: deterministic rules and offline replay; the live gate of 2,340 model calls was not run; cycles 2 to 5 FAILed; merged on the checker's merge recommendation); t035-lean-video-over-target-report (0); t045-onair-source-adapter (0, URL recognition only, unregistered); r1-alert-title-policy-and-reasons (1, unwired formatter, default title policy omit; cycle 0 FAILed because an inherited "masked" property switched the policy, ISS-ALERTFIX-002); t037-join-rules-page-hints-and-busy-code (0, source scope); t037-join-rules-un-opt (0); t040-strict-quote-verifier-and-windowing (2, pure helpers, unwired; cycles 0 and 1 FAILed because a quote cut at a punctuation joint inside a number or token verified, ISS-T040QUOTE-001/002/003); t057-system-status-page (0, source scope); t041-slide-turn-alignment (0, pure helper, unwired, no OCR); iss-pipefix-pipeline-dirsize (0); r1-alert-id-resolver (1, local read-only operator tool, security class; cycle 0 FAILed on ISS-ALERTID-003; the W8 and W11 sender gates stand); t045-zoom-recording-source-adapter (1, URL recognition only, unregistered; cycle 0 FAILed because current behaviour could mislead a downstream consumer); t048-transcription-path-chooser (0, pure, unwired); t050-resumable-pipeline-planner (0, pure planner, provisional stage list, unwired); t037-calendar-page-opt-out-with-hint (1, source scope; cycle 0 FAILed because the page copy asserted enforcement that does not exist, ISS-CALOPT-001); t037-scheduler-wiring-behind-flag (0; wiring present, DISABLED by default); u3-2-global-search-bar (0, source scope); t034-tab-capture-extension-logic-tests (0, logic tests with fakes, no real browser); t046-meeting-bot-page-sections (0, source scope); t049-langfuse-trace-sink (0, safety verified against a fake fetch, wire format unverified, off by default); t037-wiring-enable-preconditions (0, enforcement still disabled); t042-speaker-tile-alignment (1, pure alignment on synthetic data, unwired, thresholds uncalibrated); t037-join-rules-stale-lock-takeover (1; cycle 0 FAILed because a hard-linked takeover tombstone could let two holders exist, ISS-LOCKTAKE-004; merge condition ISS-LOCKTAKE-009 met by a pure move); t034-capture-failure-not-success (2, logic verified with fakes, not run in a real browser; cycle 1 FAILed on flaky new record-commands tests); t046-retention-dry-run-report (3, report-only; cycles 0 to 2 FAILed on paths that could mark a recording wrongly purge-eligible); t037-tick-verifies-key-tenant (0; enforcement still disabled; verified against a fake API); t036-calendar-description-link-scan (3, fixtures only, free-text links never auto-joined; cycle 0 FAILed on outsider-chosen text becoming joinable with no provenance, ISS-T036CAL-001, cycle 1 on a regression in persisted state, ISS-T036CAL-006/007, cycle 2 also FAILed; a post-merge edit made the alert-who production test cover the 15th skip reason); iss-scorefix-catalogue-check-and-ledger-union-fixture (0); iss-dupesfix-duplicate-export-names (0, rename only). Units needing more than one cycle (passing cycle in brackets): auth-require-tenant-on-key (2), r1-attention-alerts (2), u2-4-phase3-resume-c2 (6), r1-alert-title-policy-and-reasons (1), t040-strict-quote-verifier-and-windowing (2), r1-alert-id-resolver (1), t045-zoom-recording-source-adapter (1), t037-calendar-page-opt-out-with-hint (1), t037-join-rules-stale-lock-takeover (1), t042-speaker-tile-alignment (1), t034-capture-failure-not-success (2), t046-retention-dry-run-report (3), t036-calendar-description-link-scan (3); t037-optout-meeting-identity-store is recorded as cycle 1 but its cycle-0 verdict was a PASS at narrower scope. One ledger close-out pass (82fb980) set rows to verified from PASS verdicts.
+**Why:** Continue maximum-parallelism work that needs no Approver ruling, live service, browser or gold label, keeping independent per-unit checking because it caught defects in 13 of these 38 units before merge, several of them security class (tenant isolation, secret leakage into alerts, a wrongly purge-eligible recording, an outsider-controlled join link, a lock allowing two holders).
+**Result:** Integration check on a8c3872, then re-verified after three follow-up fixes: tsc exit 0 in core, db, ai, ingest, index, meeting-bot, api and web. Tests: core 125/125, ai 199/199, ingest 232/232, index 499/499, api 614/614, meeting-bot 540/558 in a combined run (10 files failed under memory pressure and each passes alone; the remaining failures are the known ffmpeg and symlink environmental ones; one joiners test fails because an untracked data directory is missing), web 591/592 (one activity-health integration test, environmental), scripts 470/479. Three checks were red on the merged tree and were fixed and re-verified green before this entry: the dupes lint stage (five duplicate export names introduced by parallel units; root cause: merges were followed by a directory-size run but not a dupes run), the catalogue score check (the route scraper did not look into route subfolders after a file move on 2026-10-10; no catalogue verdict was changed) and a stale ledger test fixture. Earlier in the wave one merge left packages/index/src/pipeline over its file budget (34 against 30); it was fixed by a checked pure move. Still red and waiting on the Approver: loc (packages/meeting-bot/py/sb_join.py, whose split was stopped because most of its tests need a real browser), root (18 loose files against 15) and tracker G4 (run once on 3ee94a2 with `node scripts/tracker-audit.mjs --gate g4`: 9 findings, all ambiguous bare issue ids in these manifests: medium-fix-batch-2-2026-10-10, r1-attention-alerts, t-031-audio-watchdog, t-033-bot-tests, t034-tab-capture-extension-logic-tests, t036-calendar-description-link-scan, t037-join-rules-stale-lock-takeover, u3-notify-channels, u4b-heartbeat-collection). `node scripts/catalogue-score.mjs --check` prints: "OK: docs/PROGRESS.md is current (28.1% of 57 features)". Open ledger rows across qa/issues.jsonl and qa/issues.*.jsonl (status not fixed, verified, closed*, wontfix): critical 8, high 50, medium 112, low 81 (251 rows), against critical 4, high 44, medium 83, low 59 (190 rows) in D-124. The count rose in this wave because checkers filed many new issues; filing is not fixing, and none of these were triaged here.
+**What is NOT true:** No production deployment exists. Nothing from this session has been pushed; `git rev-list --count origin/codex/machine-migration-2026-10-09..HEAD` is 288 before this entry. No roadmap task moved to done in this wave: every merged unit is a slice, a fix or an unwired component. Join-rules enforcement in the scheduler is present but DISABLED by default (LKB_JOIN_RULES_ENFORCE) and must not be enabled until the before-enable list in qa/contracts/t037-join-rules-veto-select.md holds; the items open there are: W3 (the Approver records fail-closed or fail-open in DECISIONS), tenant agreement in deployment (the tick's key must hold the `sessions` scope or GET /meeting-candidates must set X-LKB-Tenant; ISS-TENANTSIG-001, ISS-TENANTSIG-002), W6 (series ids), W7 gate (b) and Approver acceptance, the web flag JOIN_RULES_ENFORCED flipped in the same change, a live tick with enforcement on in a non-production tenant, and ISS-376. Alerts are not wired to any sender; the open wiring gates in qa/contracts/r1-attention-alerts.md are W8 (no sender until the Approver rules on ISS-R1ALERTS-009; only the default omit policy until then) and W11 (alert ids are an unsalted hash prefix and must become a per-tenant HMAC, or the gate be otherwise ruled on, before any sender), with W9 met only for a single-tenant operator machine and not validated against the real poller. There was no live run, no live-browser check under D-024 (web units pass at source scope only) and no live model run for the speaker fix; ISS-104 and ISS-282 stay open. The retention report cannot delete and no purge executor exists. The Langfuse sink's wire format is unverified against a real instance. One unit is still in a lane and being checked: calendar-unknown-tombstone-non-interference (lane/tombstone, security class: an outsider's cancelled invite can block recordings, ISS-T036CAL-011). No full test suite, build or browser was run for this entry. T-034, T-035, T-036, T-037, T-040, T-041, T-042, T-045, T-046, T-048, T-049, T-050, T-057, U2.4 and U3.2 are not done.
+**Process incidents (facts and corrective action):** (1) Parallel agents shared mutation-harness scripts in a common scratch folder and one ran another's script against a different lane's worktree; it was restored, hashes were verified and nothing shipped; briefs now require a lane-local harness. (2) A maker temporarily re-pointed a shared node_modules/@lkb/core link to its own lane, which made another lane's and one main-tree type-check fail until it was restored; briefs now forbid touching node_modules and a temporary tsconfig paths mapping is used instead. (3) A maker ran browser-launching Python tests for about three and a half minutes although browsers are not to run while the shared production worker is active; the unit was stopped unchanged.
+**Orchestrator design choice made without an Approver ruling, recorded for review:** scheduler wiring for join rules (t037-scheduler-wiring-behind-flag) was built ahead of the W3 ruling, behind a setting that defaults to off, with both policies (fail-closed and fail-open) implemented so the ruling is a configuration choice; nothing was enabled. Approver instructions actually given in this wave: for the speaker-fix lane, "go with the best possible recommendations" (the orchestrator then merged it at offline scope on the checker's merge recommendation); and the user ran/approved the GitHub login refresh being started by the orchestrator, which timed out twice without browser approval, so the push did not happen. No other approval is attributed to the Approver.
+**Changes-authorized:** none
+**Links:** D-119; D-122; D-123; D-124; T-034; T-035; T-036; T-037; T-040; T-041; T-042; T-045; T-046; T-048; T-049; T-050; T-057; U2.4; U3.2; ISS-104; ISS-282; ISS-376; ISS-T036CAL-011; ISS-R1ALERTS-009; ISS-TENANTSIG-001; qa/verdicts/auth-require-tenant-on-key.md; qa/verdicts/r1-attention-alerts.md; qa/verdicts/u2-4-phase3-resume-c2.md; qa/verdicts/r1-alert-title-policy-and-reasons.md; qa/verdicts/t040-strict-quote-verifier-and-windowing.md; qa/verdicts/r1-alert-id-resolver.md; qa/verdicts/t045-zoom-recording-source-adapter.md; qa/verdicts/t037-calendar-page-opt-out-with-hint.md; qa/verdicts/t037-join-rules-stale-lock-takeover.md; qa/verdicts/t042-speaker-tile-alignment.md; qa/verdicts/t034-capture-failure-not-success.md; qa/verdicts/t046-retention-dry-run-report.md; qa/verdicts/t036-calendar-description-link-scan.md; qa/contracts/t037-join-rules-veto-select.md; qa/contracts/r1-attention-alerts.md; commits ebf58fe..3ee94a2.
+
+## D-126 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12: live runs, merges, send-now scope, schema edit, push. Umesh answered in-session with these selections. (1) Live runs authorised on this machine now: "U2.4 speaker live gate" (local Ollama qwen3:8b, about 2,340 calls); "Browser page checks" (Playwright on localhost for U3.1 Ask, U3.2 Search, T-046 meeting-bot page, T-037 editor; D-024); "T-043 local work-DB run" (index a webinar session into the LOCAL work DB and get a cited /ask answer; production DB untouched; Gemini embedding calls allowed). (2) Merge: "alerttenant"; "send-now scope" = create a new dedicated API key scope `send-now` for the T-039 send-now endpoint; "rulesapi + rulesweb" = accepts amending contract qa/contracts/t037-join-rules-editor-page.md C1 (the single shared-code change in api/client.ts must be type-only) to allow the additive runtime options added to apiFetch, and criterion 11 of qa/contracts/t037-join-rules-edit-api.md (every other store code -> 500) so that `precondition-failed` maps to 412 and a missing precondition to 428; "regsafe abhi" = merge the registration redirect/consent fix now, accepting that sites answering a successful POST with a 302 now yield `uncertain` and approved-host redirects are refused until a CDP interceptor exists. (3) Canonical-schema edit: "Approve, aage badho" - the previously rejected canonical-schema edit that blocks T-040 (grounded notes/Q&A with timestamp citations) and T-051 is approved. No single concrete edit is named in the repo; this records the approval of "the canonical-schema edits referenced at qa/manifests/webinar-portable-release.md:64" (rejected twice by automatic approval review; narrow Umesh approval requested; also TASKS.md:141 T-051 and HANDOFF.md:115). (4) Push: "Wave ke baad push karo" - after this wave's merges, push the current branch codex/machine-migration-2026-10-09 to its upstream (not master).
+**Why:** These were open Approver gates: live runs and browser checks were withheld pending approval, the listed merges awaited rulings, and the schema edit was the stated blocker for full grounded knowledge/Q&A.
+**Result:** Rulings recorded; contract amendments folded by the checker role in the same commit (t037-join-rules-editor-page.md C1; t037-join-rules-edit-api.md criterion 11). Nothing else is attributed to the Approver. Authorisation is scoped to the items listed; the schema approval does not itself edit schema/ or ARCHITECTURE.md and the exact edit must still be named when made. Nothing has been run, merged or pushed by this entry.
+**Changes-authorized:** qa/contracts/t037-join-rules-editor-page.md C1; qa/contracts/t037-join-rules-edit-api.md criterion 11
+**Approved-by:** Umesh
+**Links:** U2.4; U3.1; U3.2; T-046; T-037; T-043; T-039; T-052; T-040; T-051; ISS-T037UI-001; ISS-UNOPTLOCK-002; ISS-373; ISS-374; ISS-ALERTID-006; D-024; D-125; qa/manifests/webinar-portable-release.md
+
+## D-127 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 phase-3 gate model: API model instead of local qwen3:8b. The documented model (qwen3:8b via local Ollama) is not installed (Ollama runs with no models). Asked whether to download it, Umesh answered verbatim: "kyu download krna hai use api keys . api wale models se kaam nhi ho skta hai kyaa, ollama models? if not gemini models". Ruling: do not download any model; run the U2.4 phase-3 live precision gate on an API model, preferring the model production routes speaker resolution to per config/ai-routing.yaml, else another Gemini model.
+**Why:** Avoids a large local model download on a CPU-constrained shared machine; an API model that matches production routing is arguably the more meaningful measurement.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED; only the model changes. Results are recorded as measured on the API model (model id stated in the evidence) and are not claimed as qwen3:8b results. A checker, not the runner, rules on ISS-104 / ISS-282. Nothing has been run by this entry.
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-126
+
+## D-128 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (2): job-queue retention 30 d, usage_events collection, send-now cap and lean default. Umesh answered in-session with these selections. (1) Job-queue retention: "30 din" - terminal jobs in the T-050 file job queue are pruned after 30 days; this resolves ISS-JOBQPRUNE-001 (the pruneTerminalAfterMs option exists and is currently off by default). (2) usage_events: "Haan, banao" - create a new tenant-scoped `usage_events` collection (schema + migration) recording /ask and /search usage for T-057 D4 usage analytics; no query text is stored. (3) Defaults: "Dono rakho" - keep the send-now `until` cap at 24 h ahead, and keep lean video (720p, 5 fps) ON by default for OBS recordings.
+**Why:** These were open Approver questions: the queue retention period blocked enabling pruning, the usage analytics needed a sanctioned collection, and the two defaults needed confirmation.
+**Result:** Rulings recorded only. Nothing has been built, enabled or changed by this entry; the 30-day pruning default, the usage_events schema/migration and any schema edit must still be made through their own units, with the exact edit named when made. No query text may be stored in usage_events.
+**Approved-by:** Umesh
+**Links:** T-050; T-057; T-039; T-035; ISS-JOBQPRUNE-001; ISS-JOBQLOST-001; ISS-T057OPS-001; ISS-SENDNOWAPI-005; ISS-LEANWIRE; D-126
+
+## D-129 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (3). Umesh answered in-session. (1) /health: "Counts hatao, sirf liveness" - the public, unauthenticated GET /health stops returning all-tenant collection counts and keeps only liveness (API up, DB reachable); tenant-scoped counts remain on authenticated GET /system-status. This amends qa/contracts/health-route.md C2 ("Counts are aggregate only ... countDocuments() with no filter") and every criterion requiring `collections` in the /health body (C1, C3, C6, I1 wording); C5 (unauthenticated, mounted before requireAuth) stays. Closes the open part of ISS-T057SCREEN-001. (2) Tombstone (calendar cancelled-invite handling, lane/tombstone): "Amend + live check allow". (a) The D-060 acceptance floor is amended for the changed webinar-policy assertion: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), which is the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), is relaxed for a proven pair only; this satisfies merge condition 4 ("Approver-recorded amendment of the D-060 floor for the changed webinar-policy assertion"). (b) An agent may run ONE read-only live check against Umesh's Google Calendar to confirm the shape of a cancelled event resource, satisfying merge condition 5 ("Live confirmation of Google's cancelled-resource shape (id-only vs start/conferenceData)").
+**Why:** /health exposed coarse business-volume counts to any caller; liveness is all an ops probe needs. The tombstone unit's proven-pair relaxation is semantically right but changed a floor assertion that only an Approver entry may amend; the live check removes the remaining doubt about Google's cancelled-resource shape.
+**Result:** Rulings recorded only. No code built or changed here: the /health route/store/fixture/test edits, the tombstone merge and the live check each still need their own unit. Only the /health amendment is folded into qa/contracts/health-route.md. Merge conditions 4 (and 5 once the single read-only check is run and its result recorded) remain for the tombstone unit's checker to verify; ISS-TOMBSTONE-008 (medium) and the sender-binding question stay open. No other D-060 assertion is amended.
+**Supersedes:** D-060 -- amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; every other D-060 acceptance floor item stands and D-060 stays otherwise in force.
+**Approved-by:** Umesh
+**Links:** T-057; T-036; ISS-T057SCREEN-001; ISS-T036CAL-011; ISS-TOMBSTONE-008; D-060; D-128
+
+## D-130 | 2026-10-12 | type: fix | status: ACTIVE
+
+**What:** Corrective clarification of D-129's `**Supersedes:** D-060` field, which was over-broad. D-060 remains in force IN FULL except the single assertion D-129 amended: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), i.e. the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), relaxed for a proven pair only. Every other D-060 assertion and acceptance-floor item stands unchanged.
+**Why:** The computed-status resolver (.claude/hooks/lab-session-start.ps1) treats any D-ids before ' -- ' in a Supersedes field as a full supersession and offers no partial/amends relation, so D-129 made D-060 compute as SUPERSEDED (by D-129) although D-129's own reasoning text says it "amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; ... D-060 stays otherwise in force." Umesh's 2026-10-12 ruling "Amend + live check allow" authorised only that one amendment, not retirement of D-060.
+**Result:** Record only; no code or enforcement path changed. No partial-supersession syntax exists in append_decision.ps1 or the resolver, and a later entry cannot un-supersede, so the computed index may still print D-060 as SUPERSEDED (by D-129); readers must apply this entry: D-060 is ACTIVE except the one amended assertion. Adding an amends relation to the resolver would be an enforcement-path change needing its own Approved-by entry.
+**Approved-by:** Umesh (ruling 2026-10-12 "Amend + live check allow", which authorised only the single D-060 webinar-policy tombstone assertion amendment and one read-only live Google Calendar check)
+**Links:** D-060; D-129; T-051; T-036; ISS-TOMBSTONE-008
+
+## D-131 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 speaker model: Ollama Cloud via Umesh's paid Ollama API key instead of local qwen3:8b. Umesh ruled in-session 2026-10-12, verbatim: "ollama paid api key and we can use more advance model too . via api key. thik hai . tere paas hai naa ye key C:\Users\product\Desktop\KnowledgeBase\.env". Speaker naming (U2.4) may use an Ollama Cloud model (POST https://ollama.com/api/chat, bearer key read from .env) and a more capable model than qwen3:8b is acceptable. Transcript windows may be sent to ollama.com for this gate measurement.
+**Why:** qwen3:8b is not installed locally and is not offered on Ollama Cloud; D-127 ruled out downloading models and allowed an API model. Umesh has a paid Ollama key, so a more capable cloud model is available at known cost.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED. Production config/ai-routing.yaml speakers routing is switched ONLY after a model passes the gate, in a separate unit. Results are recorded as measured on the named cloud model. A checker, not the runner, rules on ISS-104 / ISS-282. D-127 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-127
+
+## D-132 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction: speaker naming moves from rule-only evidence to model-judged attribution. Umesh ruled in chat 2026-10-12, verbatim: "use model intelligence. like agar vo khud nhi btaynge tho ... vo voice tho phchaan legaa and overall session record hoga tho khi naa khi se mil hi jayega. make it intelligent instead of rule based". The model reads the whole session per diarized voice label (diarization already clusters voices) and may name a label from any contextual evidence: being called on, address-adjacent, handover, thanks, role continuity, or self-introduction. Each accepted name must carry a verbatim transcript quote that is verified to exist in the transcript (grounding), and that quote is stored as provenance.
+**Why:** The phase-3 Ollama Cloud gate (D-131) failed bar 5 because acceptance requires self-naming evidence (speakers-llm.ts evidence gate, namingTurns; handover and thanks routes are OFF), and only 2 of 144 gold named blocks are self-naming. A rule-only evidence gate cannot reach the gold set.
+**Result:** Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) stay unchanged as the safety floor; the floor is not contradicted. Next: a maker unit implements this, it is scored offline on the recorded D-131 proposals first, then re-gated on deepseek-v4-pro within the existing Ollama Cloud budget. D-131 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; D-131
+
+## D-133 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-REGCDP-004: Umesh approves updating the D-110/D-111 protected positive-alias control from 2 POSTs to 1 POST (approved-alias 307 no longer re-sends the body to a second POST). The owner-approved positive behaviour "alias 307 re-sends body, 2 POSTs" is retired; the same-host-only 307/308 rule of T-052 is ratified.
+**Why:** regsafe 87df0d1f had already made the 2-POST path unreachable (redirect:'error'), and the checker (lane regcdp, cycle 1 verdict) judged the 1-POST expectation stricter, not a leak.
+**Result:** The protected positive-alias fixture asserts ONE POST and uncertain. No Supersedes field is used: D-110/D-111 remain in force in full except this single positive-alias 2-POST assertion, and the session-start resolver offers no partial relation (see D-130). ISS-REGCDP-004 is closed as resolved by this decision.
+**Approved-by:** Umesh
+**Links:** ISS-REGCDP-004; T-052; D-110; D-111
+
+## D-134 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-001: skipped-session records for `lkb alert-who` resolution are persisted as one tenant-tagged record per skipped item: {sessionKey, startTime, source, tenantId}, with NO join URL. Records accumulate keyed by sessionKey, and rows whose start time is older than 30 days are dropped (the same window as job-queue retention, D-128). Alert-id computation is unchanged; ISS-ALERTID-002 remains a separate open item. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** alert-who needs to resolve an alert id back to a skipped session without storing join URLs, and the record store must stay tenant-scoped and bounded.
+**Result:** One record per skipped item, keyed by sessionKey, pruned at 30 days by start time. No change to alert-id computation.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-001; ISS-ALERTID-007; D-128
+
+## D-135 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-045 re-ingest policy: re-ingesting media that is already ingested (same content-hash source _id) is idempotent. It returns the existing session id with an "already ingested" indication, and creates and deletes nothing. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A content-hash source _id identifies the media, so a repeat ingest must not duplicate or destroy existing data.
+**Result:** Re-ingest of the same content hash is a no-op that reports the existing session id as already ingested.
+**Approved-by:** Umesh
+**Links:** T-045
+
+## D-136 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Source identity is tenant-scoped for ALL ingest adapters (url, recording, document, whatsapp, as already done for youtube/onair/zoom): source `_id` = tenantSourceId(tenant, contentHash), with contentHash kept as its own field. Existing stored data gets a migrate-mongo migration that rewrites old bare-hash ids and every reference to them. The migration is built and tested locally only, and is run against any real database ONLY with Umesh's explicit approval at that time. Reads must accept both the old and new id forms until the migration has run. This also clarifies D-135: "content-hash source _id" means the tenant-scoped content-hash id, and the within-tenant idempotency policy is unchanged. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A bare content hash lets two tenants collide on one source id; tenant scoping closes ISS-T045TENANTID-001 consistently across every adapter.
+**Result:** All adapters use the tenant-scoped id; a local-only migration plus dual-form reads cover existing data; no real-database run without explicit approval.
+**Approved-by:** Umesh
+**Links:** ISS-T045TENANTID-001; ISS-T045INTAKE-001; T-045; D-135
+
+## D-137 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-041 OCR failure handling (assumption A5 in qa/manifests/t041-ocr-stage-alignment.md): when OCR fails on a keyframe, retry it a bounded number of times with backoff, then try a configured fallback OCR function if one is injected. Only if every attempt fails, omit the frame from alignment and report it in ocrErrors with its attempt count. A failed frame is never silently treated as blank text. Decided by Umesh (Approver) in chat 2026-10-12: "there must be a fallback or retry mechanism".
+**Why:** Silently treating a failed OCR frame as blank text would hide data loss and corrupt alignment; retry and fallback recover transient failures and the rest are reported.
+**Result:** Bounded retry with backoff, then optional injected fallback, then omit and report in ocrErrors with attempt count.
+**Approved-by:** Umesh
+**Links:** T-041; A5 (qa/manifests/t041-ocr-stage-alignment.md)
+
+## D-138 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** A WhatsApp owner may be mapped to exactly ONE tenant. Owner configuration that maps the same owner to two or more tenants is rejected at load with a clear error. WhatsApp session and turn ids stay as they are: no id change and no migration. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The only way the bare WhatsApp session id (hash of groupJid and ownerUserId) can collide across tenants is one owner under two tenants; forbidding that closes the collision without rewriting citation-bearing ids.
+**Result:** Owner-to-tenant is one-to-one at config load; session and turn ids and stored data are untouched.
+**Approved-by:** Umesh
+**Links:** ISS-TENANTSRCID-001; D-136
+
+## D-139 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** When a pipeline run fails terminally (retries exhausted), its queue job is marked FAILED, not done, so /system-status and notifications see it. A resubmit of the same runKey creates a new attempt. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Marking an exhausted run done would hide the failure from status and notifications; failed must be visible, and a resubmit must be able to retry without reusing the dead attempt.
+**Result:** Terminal failure maps to a FAILED queue job; resubmitting the same runKey starts a new attempt.
+**Approved-by:** Umesh
+**Links:** T-050; ISS-T050ADAPTER; qa/manifests/t050-runner-adapter.md
+
+## D-140 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh (Approver) approves amending the job-queue contract (qa/contracts/t050-job-queue.md) criterion 13 to: "13. `LeaseRef.tenantId` and `claim` `opts.tenantId` are REQUIRED. A missing, empty or malformed tenant returns `invalid-input` and writes nothing. A well-formed tenant that differs from the job's tenant makes heartbeat/complete/fail return `not-found`, deep-equal to the answer for a missing id, in every job state, writing nothing. A claim returns only the named tenant's jobs. (ISS-JOBQTENANT-001)". A tenant outside the queue charset (ASCII letters, digits, dot, underscore, hyphen) gets invalid-input. Decided in chat 2026-10-12.
+**Why:** The old wording made the tenant optional and let an omitted tenant match any tenant's job; the checker PASSed the fix that enforces it, so the contract must match.
+**Result:** Criterion 13 now requires the tenant on every owner-checked queue operation; no wildcard.
+**Approved-by:** Umesh
+**Links:** ISS-JOBQTENANT-001
+
+## D-141 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction after the cycle-2 live gate. Model-proposed speaker names that pass deterministic grounding (verbatim quote containing the name, multi-name abstain, floor not contradicted), plus a verifier "yes" with single evidence, are shown as SUGGESTED. Each carries its quote and is never final until a human confirms it in the UI. Confirmed names become final with provenance "human-confirmed". Auto-final naming (no human) stays limited to the deterministic floor plus the independent-pair rule. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The live gate (lane u24gate2, 2e621ece) showed 0 wrong and 0 additions in pair mode, so model proposals are useful as suggestions but not safe to finalize without a human.
+**Result:** Suggested names carry their quote and need human confirmation; auto-final stays at floor plus independent-pair.
+**Links:** U2.4; D-132; ISS-U24SMART-005
+
+## D-142 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-050 /ask graph shape. The /ask graph uses 4 coarse nodes: retrieve (selectNodes, candidate arms, rrfMerge, tree resolve, source hydrate) -> evaluate (ask() evaluation + web/tavily fallback + score audit) -> refine -> answer. It must be output-identical to runAskV2, unexported and off by default. Nodes may be split later. Umesh (Approver) delegated the choice in chat 2026-10-12 ("whatever is the best one").
+**Why:** Coarse nodes keep the graph a thin wrapper that can be proven output-identical to runAskV2; finer splits can follow once that is shown.
+**Result:** 4-node graph, unexported, off by default, output-identical to runAskV2.
+**Links:** T-050
+
+## D-143 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live and staging writes go to the Mongo server in .env MONGODB_URL, using a SEPARATE database named `lkb_staging`. The production database `lkb` is never written by agents. Every write path must set the database name explicitly and assert that it is not `lkb`. Migrations, including tenant-scoped-source-ids and speaker-suggestions, may run against lkb_staging only. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A separate staging database lets live runs and migrations be exercised on the real server without any risk to production data.
+**Result:** All agent writes target lkb_staging with an explicit database name and a guard against `lkb`; migrations run on lkb_staging only.
+**Approved-by:** Umesh
+**Links:** D-117; T-043; D-136; D-141
+
+## D-144 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Negation safety in generated notes moves from rule-based detection to an LLM JUDGE. A second model checks each generated note or claim against its cited source sentence(s), and drops or flags any note whose meaning differs, including polarity and negation. Deterministic grounding stays: the citation must exist. The judge is injectable and fakeable, and its cost per session is recorded. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Rule-based negation detection cannot cover the ways meaning flips; a second model comparing note to cited source catches polarity and negation errors while citation existence stays deterministic.
+**Result:** An injectable LLM judge gates generated notes against their cited sentences; per-session judge cost is recorded.
+**Approved-by:** Umesh
+**Links:** T-040; ISS-T040GEN-012
+
+## D-145 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Retention: raw media (video and audio recordings and their derived media files) is purged 90 days after capture. Transcripts, notes, claims and citations are kept forever. The purge executor honours the existing dry-run vetoes, and logs what it deletes. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Raw media is large and costly to keep, while the text artifacts carry the durable knowledge and the citations that reference it.
+**Result:** Media is purged at 90 days after capture; text artifacts are retained indefinitely; the executor respects dry-run vetoes and logs deletions.
+**Approved-by:** Umesh
+**Links:** T-046; Q6
+
+## D-146 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live runs are approved: (1) T-043 indexing plus cited /ask against lkb_staging, with Gemini embeddings; (2) live browser checks for U3.1, U3.2, T-046 and the T-037 editor, using real local Chrome, up to 15 concurrent browsers on this machine; (3) the T-049 Langfuse live check; (4) a 60-minute live capture for T-034 and T-035, once Umesh provides a meeting link. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** These items cannot be proven by local fakes alone; approving them against the staging database bounds the risk to production.
+**Result:** Agents may run the listed live checks, writing only to lkb_staging (D-143); the T-034/T-035 capture waits for a meeting link from Umesh.
+**Approved-by:** Umesh
+**Links:** D-024; T-043; T-049; T-034; T-035; U3.1; U3.2; T-046; T-037
+
+## D-147 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh approved raising the lint-dirsize budget for schema/ from 30 to 40 (2026-10-12). Schema files are one per collection and all tooling (gen-types, validate.py, kb:// resolver, CI) reads schema/ flat; relocation was rejected.
+**Why:** Splitting or relocating schema/ would break every tool that reads it flat, so the directory-size budget is raised instead.
+**Result:** lint-dirsize budget for schema/ is 40.
+**Approved-by:** Umesh
+**Links:** U2.4; D-141; lane u24suggest
+
+## D-148 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: Umesh chose to rebuild real derivation provenance by running the repo's own knowledge pipeline over raw/TOC/TOC-Materials (the 23 sessions), then seed and index lkb_staging (per D-143). Integrity checks (validation.json / derivation-provenance.json guards) stay in force; no forged or bypassed provenance. Model spend cap USD 10.
+**Why:** Provenance must be real, so staging data is derived by the repo's own pipeline rather than forged or the guards bypassed.
+**Result:** Staging is rebuilt from the 23 sessions with guards on and a USD 10 model spend cap.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146
+
+## D-149 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: TOC audio is not on this machine (raw/TOC/TOC-Materials/Audio absent), so provenance cannot be regenerated by the pipeline (D-148 infeasible). Umesh chose: seed the 23 existing data/toc-migrated transcript sessions into lkb_staging labelled provenance status 'legacy-unbound' via an explicit --legacy-unbound flag plus LKB_ALLOW_STAGING=lkb_staging opt-in; never `lkb`; no manual bindDerivedArtifacts (no forged provenance); integrity checks stay on for all other data.
+**Why:** Without the audio the pipeline cannot produce real provenance, so the existing sessions are seeded with an honest legacy-unbound label rather than forged provenance.
+**Result:** 23 sessions seeded into lkb_staging as legacy-unbound behind an explicit flag and env opt-in; production lkb untouched.
+**Supersedes:** D-148 -- D-148 required regenerating provenance by running the pipeline over the TOC audio, which is absent on this machine, so that method is infeasible; this entry replaces it in full with the legacy-unbound seeding.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146; D-148
+
+## D-150 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Umesh ruled (2026-10-13) that scripts/mint-key.mjs and the scripts/watch watcher (ingest/reingest) MAY write the production database lkb, but only with the explicit --i-know-this-is-production flag plus an exact MONGODB_DB=lkb; with no DB they refuse; otherwise limited to work/staging DBs.
+**Why:** These scripts legitimately need production access, but production writes must be a deliberate, explicit act rather than a default.
+**Result:** mint-key and the watch ingest/reingest scripts write lkb only with --i-know-this-is-production and MONGODB_DB=lkb; no DB set means refuse; otherwise work/staging DBs only.
+**Approved-by:** Umesh
+**Links:** ISS-LEGACYSEED-002; ISS-LEGACYSEED-003; D-143
+
+## D-151 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-040: Umesh ruled (2026-10-13) that when the note judge (D-144) is enabled, the rule-based lexical negation checks ALSO run (defense in depth): a note is dropped if either the judge or the rules reject it. Resolves ISS-T040JUDGE-002.
+**Why:** Running both layers means a note must pass the judge and the rules, so a judge miss is still caught by the lexical checks.
+**Result:** With the judge enabled, a note ships only if both the judge and the rule-based negation checks accept it.
+**Approved-by:** Umesh
+**Links:** T-040; D-144; ISS-T040JUDGE-002
+
+## D-152 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-002: Umesh ruled (2026-10-13) to keep alert ids as they are (unsalted hash); the offline-guessing risk is accepted. ISS-ALERTID-002 is closed as accepted-risk (ledger status wontfix).
+**Why:** The risk of offline guessing of alert ids was weighed and accepted by the Approver, so no change to the id scheme is made.
+**Result:** Alert ids stay an unsalted hash; ISS-ALERTID-002 closed as accepted-risk.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-002
+
+## D-153 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /ask with invalid source rows: Umesh chose (2026-10-13) to exclude invalid turns per-turn (e.g. tEnd<tStart legacy rows), record them in a warning, and answer from the remaining sessions; an excluded turn is never cited; if all rows are invalid the request is refused; foreign-tenant/foreign-session rows still refuse the whole request. New invalid timing is refused at write time.
+**Why:** A few bad legacy turns should not take down /ask (503) for every session, but cross-tenant rows remain a hard refusal and bad data must not be cited or newly written.
+**Result:** /ask answers from valid turns with a warning listing excluded ones; all-invalid or foreign rows refuse; new invalid timing is rejected at write.
+**Approved-by:** Umesh
+**Links:** T-043; lane badturns
+
+## D-154 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants confirmed: cancelled-meeting tombstones retained 14 days, match window +/-24 h (Umesh, 2026-10-13). Resolves the owner question in ISS-TOMBSTONE-001/-007 and ISS-T036CAL-011.
+**Why:** The retention and match-window constants were an open owner question on the tombstone issues; the Approver has now fixed them.
+**Result:** Tombstone retention is 14 days and the match window is +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; D-130
+
+## D-155 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Langfuse: hosted Langfuse Cloud (cloud.langfuse.com) Hobby free tier is allowed; traces carry metadata only (model, tokens, cost, tenant tag), no transcript text. If usage would exceed the free tier, switch to self-hosted rather than paying. This amends ONLY the self-hosted-only assertion for T-049: the 'Langfuse self-hosted' wording in the TASKS.md T-049 row and the self-hosted clause of criterion 3 (TENANT ID ruling) in qa/contracts/t049-langfuse-trace-sink.md. No DECISIONS entry required self-hosting, so nothing is superseded and no other part of T-049 changes.
+**Why:** T-049 live evidence ran against a hosted free tier; the Approver allows it provided traces stay metadata-only and the project never pays for overage.
+**Result:** T-049 may use Langfuse Cloud Hobby with metadata-only traces; exceeding the free tier means self-hosting, not paying.
+**Approved-by:** Umesh
+**Links:** T-049; qa/contracts/t049-langfuse-trace-sink.md criterion 3
+
+## D-156 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-021: Umesh ratifies gate condition 4 -- U1.4/U1.5 baselines re-point to the redesigned golden set (semantic leg recall@5 0.935, qa/verdicts/golden-set-semantic-leg.md).
+**Why:** Gate condition 4 required an Approver decision to move the U1.4/U1.5 baselines onto the redesigned golden set.
+**Result:** U1.4/U1.5 baselines now measure against the redesigned golden set; T-021 gate condition 4 is ratified.
+**Approved-by:** Umesh
+**Links:** T-021; qa/gates/golden-set-redesign.md
+
+## D-157 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U3.1: Umesh accepts the real-Chrome CDP browser proof (qa/verdicts/web-ask-page.md PASS 8/8, qa/evidence/u31-ask-proof-20260921/) in place of a literal Playwright run.
+**Why:** A real Chrome run over CDP exercised the actual page 8 of 8, which the Approver accepts as equivalent proof.
+**Result:** U3.1 browser proof is satisfied by the CDP real-Chrome evidence.
+**Approved-by:** Umesh
+**Links:** U3.1
+
+## D-158 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /system-status contract (qa/contracts/t057-d2-activity-health.md C1/C4) amended: the DTO may include a `source` field (upload-queue | job-queue) and job-queue failures map to a fixed error-class allow-list; D-139 dead jobs appear tenant-scoped.
+**Why:** D-139 makes terminally failed runs dead jobs in the file job queue, which /system-status must be able to show without leaking raw error text or other tenants' jobs.
+**Result:** Contract C1 and C4 are amended accordingly; the source field and the fixed error-class allow-list are permitted.
+**Approved-by:** Umesh
+**Links:** D-139; ISS-FAILEDJOB-001; T-057
+
+## D-159 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants corrected: retention is 30 days (code MATCHED_HORIZON_MS, unchanged) and match window +/-24 h. D-154 stated 14 days because the owner question quoted the wrong current value; Umesh confirmed 30 days (2026-10-13).
+**Why:** D-154 recorded 14 days from a mis-quoted current value; the owner chose to keep the shipped 30-day horizon, so the record must match.
+**Result:** Tombstone retention is 30 days and the match window is +/-24 h; no code change.
+**Supersedes:** D-154 -- D-154's only assertion was the retention and window constants, and its 14-day figure was wrong; this entry replaces it in full with 30 days and +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; ISS-TOMBSTONE-001; ISS-TOMBSTONE-007; ISS-T036CAL-011
+
+## D-160 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-042: build active-speaker tile capture in the meeting bot; tile-derived names (including tile+intro 'agree') are shown as SUGGESTED only and confirmed by a human, exactly like D-141 model suggestions; tile names never become auto-final. Capture is behind a flag, default off.
+**Why:** Tile names can be wrong or spoofed, so they get the same human-confirmation gate as model suggestions rather than being auto-final.
+**Result:** Tile capture is built behind a default-off flag; tile-derived names are SUGGESTED only until a human confirms.
+**Approved-by:** Umesh
+**Links:** T-042; D-141; ISS-T042FUSION-001
+
+## D-161 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-050: Umesh chose (2026-10-13) to use the real LangGraph library (official @langchain/langgraph, JS 1.x, exact pinned version) for the pipeline graph, replacing the minimal typed executor; behaviour, tests and the LKB_PIPELINE_GRAPH flag stay the same. The /ask graph (D-142) follows in a later unit.
+**Why:** The Approver prefers the official library over a hand-rolled executor, with identical behaviour, tests and flag so the swap is a pure replacement.
+**Result:** The pipeline graph moves to @langchain/langgraph (JS 1.x, exact pinned); the /ask graph follows in a later unit.
+**Approved-by:** Umesh
+**Links:** T-050; D-142
+
+## D-162 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Lift the D-119 driver-file hold so T-044 (drift-clamp/QA wiring), T-048 (single-call chooser wiring) and T-040 (grounded notes and Q&A wiring) can be built. The hold covered scripts/transcribe-long-session.mjs, sync-session.mjs, scripts/ingest-chain.mjs, scripts/lib/transcript-provenance*, scripts/upload/* and gemini-file-upload.ts. Each of the three wirings must sit behind a flag that is OFF by default.
+**Why:** D-119 reserved those files until real end-to-end evidence existed. qa/verdicts/u4.1-recording-upload-worker.md now records "Effective U4.1 unit VERDICT: PASS", which supplies that evidence. Umesh approved the lift explicitly on 2026-10-13.
+**Result:** The hold on the listed driver files is lifted for T-044, T-048 and T-040 work only, with default-off flags. The rest of D-119 is unchanged.
+**Supersedes:** D-119 -- only D-119's hold on the listed driver files is superseded, because the U4.1 PASS verdict now provides the end-to-end evidence the hold was waiting for; the remainder of D-119 stands.
+**Approved-by:** Umesh
+**Links:** T-044; T-048; T-040; U4.1; D-119; qa/verdicts/u4.1-recording-upload-worker.md
+
+## D-163 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U2.2 golden labels: an agent may pre-fill the U2.2 adjudication fields in data/eval/extraction-adjudication-packet.json and data/eval/golden-set-human-review.json, clearly marked as AI drafts and never as humanGold. Each draft becomes gold only after Umesh reviews and approves it individually.
+**Why:** Pre-filling drafts reduces the human adjudication workload while keeping the human as the sole source of gold labels. Umesh gave this answer explicitly on 2026-10-13.
+**Result:** AI-drafted adjudication values are permitted but are not gold; no label counts as humanGold until Umesh approves that item.
+**Approved-by:** Umesh
+**Links:** U2.2; U2.3; U2.5; T-055
+
+## D-164 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U0.10 real-LLM baseline: spend approved. Run it on Ollama Cloud models first (Umesh: "ollama glm 5.3 flash, deepseek 4.1 flash"), then Gemini at the end, using the keys already in .env.
+**Why:** The real-LLM baseline needs paid model calls; Umesh approved the spend and the run order explicitly on 2026-10-13.
+**Result:** U0.10 may run against Ollama Cloud models first and Gemini last, using existing .env keys.
+**Approved-by:** Umesh
+**Links:** U0.10; T-022; D-156
+
+## D-165 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Enable automatic meeting discovery and auto-join (T-036, T-037, T-038). The bot joins webinars automatically. Career counselling and career guidance content has the highest priority, including on scheduling conflicts. Other webinars, e.g. Google Cloud OnAir, are test data and go to staging. Alerts go by email to umeshsugara@vidysea.com via gws AND appear on the web dashboard. This authorizes enabling the T-038 scheduler consent gate, and setting the relevant default flags ON for this deployment.
+**Why:** Umesh answered directly on 2026-10-14. Q: "Should the bot join meetings on its own? Which ones?" A: "webinars and all . most high priority should be given to career counselling, career guidance and all these kind of data . humko ussi ka knowlege base bnnana hai . ye google wala tho for testing and all hai". Q: "When the scheduler finds a meeting, how should it tell you?" A: "email, and web dashbaord both".
+**Result:** Auto-discovery and auto-join are authorized for this deployment, with career counselling and guidance webinars first, other webinars staged as test data, and alerts sent by email and shown on the dashboard.
+**Approved-by:** Umesh
+**Links:** T-036; T-037; T-038
+
+## D-166 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Umesh approved the execution plan's T-037 `last-valid` join-rules policy by asking to implement that plan. Only a successfully validated, actually present complete primary rules/state document may refresh the tenant-bound integrity-checked snapshot. On primary failure, fallback is allowed only for the currently verified equal configured/API-key tenant and only while snapshot age is nonnegative and strictly below one hour. Missing, expired, future, corrupt, foreign or invalid snapshots refuse joins. Fallback never renews its validation time; cached deny and opt-out rules remain effective.
+**Why:** A bounded last-valid policy maintains previously validated controls during transient rules failures while preventing unrestricted continuation or cross-tenant attribution. This settles the execution plan's policy choice without weakening independent cancellation, registration, rejection, identity or tenant safeguards.
+**Result:** The explicit `last-valid` mode and one-hour exclusive expiry are authorized. Degradation immediately records durable dashboard state and attempts email to umeshsugara@vidysea.com through the authorized gws channel; delivery failure stays visible and cannot widen selection. Recovery clears degradation only after successful primary validation, evaluation and snapshot persistence. The source unit's PASS does not prove delivered alerts or live deployment: real scheduler forwarding, verified tenant/key signal, truthful UI, notification delivery and nonproduction live enforcement evidence must pass before enabling. Existing ISS-376 sender-policy and recurring/id-only opt-out gates remain separate. D-165 career priority/staging/auto-discovery authorization remains unchanged.
+**Approved-by:** Umesh
+**Links:** D-165; T-037; T-038; qa/contracts/t037-last-valid.md; qa/manifests/t037-last-valid.md; qa/verdicts/t037-last-valid.md; ISS-TENANTSIG-001; ISS-WIREPRE-001; ISS-376
+
+## D-167 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Umesh explicitly confirmed D-166's `last-valid` join-rules policy on 2026-10-14. The orchestrator asked him in this session: "Do you approve D-166? It covers join-rules: if the rules fail to load or become invalid, the bot keeps using the last valid rules for 1 hour, then stops." His verbatim answer: "hnn bot ko try krna hai kese bhi krkee best posible manner mai meeting join krre. rules should be in this way". Interpretation: he confirms D-166's last-valid policy (one-hour bound, then stop) and states the governing intent that the bot should try its best, by any means, to join meetings. Future join-rule choices should favour attempting the join over skipping, within D-166's bounds.
+**Why:** D-166 recorded Approved-by: Umesh on the basis of an inferred approval (he asked to implement the plan), which ISS-CODEXWAVE1-001 flagged as self-asserted. This entry supplies the explicit, quoted confirmation without editing D-166.
+**Result:** D-166 stands as written and is now explicitly approved. Join-rule design leans toward attempting a join over skipping, but never beyond D-166's bounds: one-hour exclusive expiry, tenant-bound verified snapshots, cached deny and opt-out rules still effective, and ISS-376 gates unchanged. ISS-CODEXWAVE1-001 is closed by this entry.
+**Approved-by:** Umesh
+**Links:** D-166; T-037; ISS-CODEXWAVE1-001 (Supersedes: none, this entry confirms D-166)
+
+## D-168 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Extend the D-150 deliberate production opt-in to the T-054 transcript-review store and the T-056 answer-policy store. They may write to `lkb` only when MONGODB_DB=lkb AND LKB_I_KNOW_THIS_IS_PRODUCTION=1. docker-compose's api service sets that opt-in. Without the opt-in, these stores keep refusing `lkb`, with a 503.
+**Why:** Umesh was asked on 2026-10-14: "Transcript corrections (T-054) and answer policies (T-056) return 503 on the production database (lkb), so they won't work live. The other stores write to lkb. Should these be allowed to write to production too?" He selected "Yes, with the opt-in (Recommended)": same pattern as D-150, writing to lkb only when the API has MONGODB_DB=lkb and LKB_I_KNOW_THIS_IS_PRODUCTION=1 set, with that env added to docker-compose's api service.
+**Result:** T-054 and T-056 stores can work live on lkb under the explicit opt-in; the default remains a 503 refusal.
+**Approved-by:** Umesh
+**Links:** D-150; D-143; T-054; T-056; ISS-WAVE2MOUNT-002
+
+## D-169 | 2026-10-14 | type: decision | status: ACTIVE
+**What:** Authorize the user-requested root Docker/DevOps packaging unit: a root Dockerfile consumed by docker-compose.yml, focused deployment documentation and remote container CI. Set structure.config.json root.maxLooseFiles from 15 to 16 solely to accommodate the additional root Dockerfile.
+**Why:** The explicit rootDocker execution request selects deployable application packaging ahead of unrelated backlog. A root image entry point makes the Compose build discoverable from the repository root; its added root file must fit a reasoned declared budget instead of silently bypassing structure checks. This is a new packaging behavior and is not another polish round on previously capped lint or deployment seams.
+**Result:** The packaging source unit may proceed under maker/checker discipline. Existing test and structure gates remain binding; actual remote full CI and independent checker evidence are required for scoped PASS. This entry does not close T-051 or authorize enforcement changes, frozen-contract changes, live production deployment, host activation, additional data writes or secret disclosure. Local Windows ignore-probe behavior must be reported, with the root budget checked against the clean CI checkout.
+**Changes-authorized:** Dockerfile; docker-compose.yml; docs/docker-deployment.md; .github/workflows/docker.yml; structure.config.json root.maxLooseFiles only; qa/manifests/root-docker-devops.md. Checker-owned qa/contracts/root-docker-devops.md and qa/verdicts/root-docker-devops.md follow their independent workflow.
+**Links:** T-051; qa/manifests/root-docker-devops.md; docs/docker-deployment.md; D-003; D-168
+
+## D-170 | 2026-10-14 | type: session | status: ACTIVE
+
+**What:** Continue the explicitly requested implementation of all forty remaining catalogue tasks: T-022, T-007, T-008, T-011, T-013, T-014, T-028, T-015, U0.10, U2.2, U2.3, U2.4, U2.5, U3.2, T-034, T-035, T-036, T-037, T-038, T-039, T-040, T-041, T-042, T-043, T-044, T-045, T-046, T-050, T-048, T-051, T-052, T-053, T-054, T-055, T-056, T-057, T-058, T-059, T-060 and T-061. Use independent makers and checkers with exclusive source-file leases and one central integration writer.
+**Why:** Live TASKS.md and goal task counts agree on 55 done, 28 in_progress and 12 open across 95 tasks. The user selected the complete remaining implementation goal after the root Docker packaging unit, rather than treating that packaging foundation or earlier scoped PASS units as whole-product delivery. Concurrent work must preserve source ownership, citation/tenant safety and current human/host acceptance gates.
+**Result:** Unblocked application implementations, immediate downstream wiring, focused tests and deployment interfaces may proceed across the forty tasks. Makers propose their scoped source paths before writing; central integration owns shared API/web composition, dependency/lock/schema/generated/migration integration, append-only decisions, trackers and publication. Checker-owned contracts/verdicts remain independent. Individual task status becomes done only after its complete acceptance passes; human semantic approvals, counsellor judges, guarded exports, real credentials/accounts, production writes/promotion, supervisor activation and real Windows/Ubuntu/live/seven-day proofs remain separate existing gates. No evidence is inferred or manufactured and no old decision or historical verdict is rewritten.
+**Changes-authorized:** Application source modules under apps/ and packages/; workers/ source interfaces; scripts/ feature and deployment modules; ordinary schema/ and migrations/ plus generated-type integration; package.json and pnpm-lock.yaml only for required task dependencies; focused tests; feature/deployment documentation; qa/ manifests, packets, evidence, feedback and issue shards under the maker/checker ownership rules; TASKS.md and .goal/goal.json factual progress updates. Frozen contracts and architecture sections, project governance and enforcement paths are excluded from this authorization.
+**Links:** TASKS.md; .goal/goal.json; qa/QUEUE.md; D-169; T-051; full remaining-task list in What.
+
+## D-171 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Set only structure.config.json dirsize.overrides.schema from 40 to 43 for all-forty-task canonical schema integration: forty-one collection schemas plus index.json and validate.py.
+**Why:** D-170 authorizes ordinary schema-first implementation. The existing thirty-two collections and nine necessary durable collections for documents, collections, outputs, championship, automation and answer policies require one canonical schema file each. A precise directory override preserves the established one-schema-per-collection convention without weakening global file or source-length limits. The orchestrator explicitly approved this exact 40-to-43 source budget adjustment after the roadmap was delivered.
+**Result:** The central integration writer may add the six outstanding collection schemas, generated types and unapplied migration interfaces. This is a source directory budget only; no enforcement paths, frozen architecture/contracts, production writes, migration execution, deployment or acceptance gates change.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only.
+**Links:** D-170; T-014; T-055; T-056; T-058; T-061; schema/index.json.
+
+## D-172 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Set only structure.config.json dirsize.overrides.schema from 43 to 45 for forty-three canonical collection schemas plus index.json and validate.py.
+**Supersedes:** D-171 -- The verified T-061 form operation producer requires application_operations distinct from readiness runs, and the verified T-057 audited scheduling producer requires operations_schedules; the earlier nine-collection projection omitted these two concrete durable consumers.
+**Why:** The root orchestrator explicitly approved the necessary 44 or 45 file budget after inspecting actual producer definitions and synthetic fixture shapes. Form submission must not masquerade as read-only readiness; audited digest/Sheets schedules must persist independently of browser preferences. Both shapes are now documented by their real typed producers, with tenant scope and durable CAS/audit requirements. This exact directory-only adjustment preserves every other source and global budget.
+**Result:** The central writer may author these two canonical schemas, generated types, tenant-scoped accessors and unapplied migrations. No live form submission, email/Sheets dispatch, production write, deployment or acceptance proof is authorized by this source adjustment.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only.
+**Links:** D-170; D-171; T-057; T-061; apps/api/src/automation/form-types.ts; qa/packets/goal-t061-form-schema-fixtures.json; apps/api/src/operations-integrations/model.ts.
+
+## D-173 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Implement Umesh's explicitly approved Complete the Knowledge Brain with Vectorless RAG plan. All active source types use provenance-bound trees, keyword retrieval, graph relationships and bounded LLM navigation; no model training or fine-tuning. T-015 is not required and excluded from active scope, preserving its history without claiming completion. Text routing uses existing Ollama Cloud credentials, GLM 5.3 Flash primary and DeepSeek 4.1 Flash independent verifier/fallback. Audio remains on an explicitly audio-capable adapter. Preserve tenant scope, human-confirmed speaker identities, cited evidence and derived-revision invalidation.
+**Why:** Umesh explicitly requested vectorless RAG and individual speaker/session knowledge, rejected model training, authorized the existing Ollama key, and then pasted this full plan with PLEASE IMPLEMENT THIS PLAN. This replaces the old vector/embedding product direction and training work with one source-grounded knowledge brain while retaining historical implementation evidence.
+**Result:** The 39 included unfinished parents may proceed through exclusive maker leases, central integration, independent checker and broker-serialized verification. T-008 and U3.2 now target vectorless unstructured/global search, not active vector search. Existing scoped PASS is reused only when applicable. No parent is done without complete acceptance; human calibration, gold labels, actual capture/alerts, host acceptance and seven actual days remain real gates. Existing production, external-effect and enforcement approval boundaries remain unchanged. Unknown provider price is recorded as unknown with actual token counts, never as free.
+**Supersedes:** D-000, D-005, D-008, D-170 -- Only their active vector-index/training direction and default text-provider ordering are replaced by the user's explicit all-source vectorless, no-training and Ollama Cloud-first plan; their other provenance, provider-seam, governance, capture and acceptance requirements stand.
+**Approved-by:** Umesh
+**Changes-authorized:** Application modules and focused tests; config/ai-routing.yaml; root Docker/Compose staging configuration; ordinary schema and generated-type integration; TASKS.md and .goal/goal.json factual scope/progress; qa coordination, manifests, packets and evidence under maker/checker ownership. This entry does not authorize editing frozen architecture/contracts, governance/enforcement paths, production promotion, host activation or fabricated human/live evidence.
+**Links:** T-015; T-008; U3.2; D-170; D-164; TASKS.md; .goal/goal.json; qa/coordination/knowledge-brain-20261015/delivery-matrix.md.
+
+## D-174 | 2026-10-15 | type: fix | status: ACTIVE
+
+**What:** Correct D-173's over-broad Supersedes field. D-000, D-005, D-008 and D-170 remain authoritative in full except the narrowly approved changes stated here: active retrieval for all sources becomes vectorless rather than vector/embedding based; T-015 training is excluded as not required without claiming done; text-generation chains become Ollama Cloud GLM primary and DeepSeek verifier/fallback. All other requirements of those entries remain in force, including D-170's 39 included parent-task execution authority and complete independent human/live acceptance gates.
+**Why:** D-130 documents that the resolver treats every Supersedes target as a complete retirement and offers no partial/amends relation. D-173's prose intended only a narrow amendment but its field incorrectly made whole entries compute as superseded. Umesh approved the specific plan, not retirement of earlier governance, provenance, capture, provider capability, tenancy or acceptance requirements. This corrective record restores the intended authoritative interpretation without editing history or enforcement.
+**Result:** Readers must apply D-000, D-005, D-008 and D-170 as active except the three explicitly amended clauses above. The computed index may still print SUPERSEDED because the resolver cannot un-supersede; that limitation is disclosed and is not an authorization to change enforcement. D-173 remains historical proof of the approved plan and carries no broader retirement authority. No architecture, frozen contract or enforcement file is changed. Existing human/host/production/external-effect approvals and previously approved speaker gate requirements remain binding.
+**Approved-by:** Umesh (explicit PLEASE IMPLEMENT THIS PLAN request authorizes the three narrow changes; this record corrects the agent's over-broad representation).
+**Links:** D-173; D-130; D-000; D-005; D-008; D-170; T-015; T-008; U3.2; qa/coordination/knowledge-brain-20261015/decision-entry.md.
+
+## D-175 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Prioritize the user's systemwide checker-efficiency fix before further Knowledge Brain implementation. Build a focused checker-admission and review-budget mechanism, independently validate it once from a frozen minimal-context packet, then install the same validated skill for subsequent checks. Knowledge Brain source work and tests remain frozen until root explicitly resumes; the goal is not cancelled or falsely completed.
+**Why:** Umesh's latest priority mandate was relayed by the root orchestrator: freeze Knowledge Brain until the systemwide checker efficiency fix. The root explicitly approved this exact recording scope and a single bounded independent check, avoiding parallel duplicate contract-only reviewers. This is a distinct admission/budget mechanism, not another capped documentation-polish round. Design, maker and independent-review costs must be reported honestly, without reclassification to manufacture a target ratio.
+**Result:** The maker may implement and prepare one frozen review packet. A minimal-context independent checker later verifies user requirements and applicable contracts and may add the dedicated acceptance contract within the same bounded review. Global installation requires normal sandbox approval for paths outside the writable workspace, and only validated identical files may be installed. No hooks, settings, repository AGENTS.md, production state or protected enforcement path is changed. No earlier decision is superseded.
+**Approved-by:** Umesh (latest systemwide checker-efficiency-first mandate, relayed and exact scope confirmed by the root orchestrator).
+**Changes-authorized:** skills/checker-efficient/SKILL.md; skills/checker-efficient/scripts/checker-admission.mjs; skills/checker-efficient/scripts/checker-admission.test.mjs; qa/manifests/checker-efficiency-admission.md; qa/packets/checker-efficiency-admission.md; qa/coordination/checker-efficiency-20261015/*; checker-owned qa/contracts/checker-efficiency-admission.md and qa/verdicts/checker-efficiency-admission.md; append checker-efficiency rule only to C:\Users\product\.codex\AGENTS.md; install same independently validated files only under new C:\Users\product\.codex\skills\checker-efficient/*. Out-of-workspace writes retain normal approval requirements.
+**Links:** qa/manifests/checker-efficiency-admission.md; qa/packets/checker-efficiency-admission.md; qa/coordination/knowledge-brain-20261015/freeze-checkpoint.json; D-173; D-174.
+
+## D-176 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Increase only structure.config.json dirsize.overrides.schema from45 to46 for the already authorized speaker_relationships canonical collection:44collection schemas plus index.json and validate.py. Its explanatory comment may reflect that exact count. No other budget changes.
+**Why:** Umesh's approved Knowledge Brain architecture includes provenance-bound reviewed speaker relationships. The separate canonical collection keeps suggested/rejected/revoked proposals outside graph_edges, whose existing readers expose every row. The root orchestrator explicitly approved this precise one-file routine source/config increase after checking its location. structure.config.json is ordinary source configuration, not frozen contracts, checker-owned acceptance, project AGENTS or a protected hook/settings/append-script path. This retains one-schema-per-collection rather than bypassing structural checks.
+**Result:** Central integration may apply the exact45-to46 ordinary config change and author the separately approved schema/generated/accessor/unapplied-migration seam. No activation, migration execution, database write, frozen contract/architecture, governance or enforcement change is authorized. Native transaction acceptance and complete parent delivery remain open. D-172's other boundaries stand; this entry amends only its schema count and uses no broad Supersedes relation.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only, plus its count explanation; all other budgets unchanged.
+**Links:** D-172; D-173; D-174; T-055; qa/coordination/knowledge-brain-20261015/delivery-matrix.md; proposed schema/speaker_relationships.schema.json.
+
+## D-177 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Increase only structure.config.json dirsize.overrides.schema from46 to47 for the approved canonical speaker_attributes collection, with its exact count explanation.
+**Why:** The approved Knowledge Brain plan includes source-backed, human-reviewed organization and role attributes. A separate collection keeps unreviewed proposals outside accepted speaker profile and graph reads. The root orchestrator confirmed this exact ordinary source/config increase after approving the isolated U2.4 implementation. This is not permission to alter protected enforcement paths or frozen contracts.
+**Result:** Central integration may author the corresponding canonical schema, generated types, accessor and unapplied migration source, and apply only this one-count ordinary budget adjustment. No migration execution, host activation, native database writes, unrelated budget changes, frozen architecture or checker-owned acceptance edits are authorized. Earlier decisions and full parent acceptance gates remain intact.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only, plus its count explanation; separate canonical schema/generated/accessor/unapplied migration source follows the approved U2.4 implementation scope.
+**Links:** D-176; D-173; D-174; U2.4; qa/coordination/knowledge-brain-20261015/delivery-matrix.md; proposed schema/speaker_attributes.schema.json.

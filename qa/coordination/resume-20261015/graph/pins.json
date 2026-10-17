@@ -1,0 +1,13 @@
+{
+  "packages/index/src/graph/speaker-knowledge.ts": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+  "packages/index/src/graph/speaker-knowledge.test.ts": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+  "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+  "apps/api/src/speaker-profiles/store.ts": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+  "apps/api/src/speaker-profiles/store.test.ts": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+  "apps/api/src/speaker-profiles/router.ts": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+  "apps/api/src/speaker-profiles/router.test.ts": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+  "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+  "qa/contracts/speaker-knowledge-vectorless.md": "5a382665547cf53b48dcca32c0f91f50b08376d49f395b2953b551f6bb02d90e",
+  "qa/contracts/goal-U24.md": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f"
+}

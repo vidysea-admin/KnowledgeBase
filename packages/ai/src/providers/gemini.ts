@@ -4,6 +4,7 @@
  * `generateContent` REST endpoint through the injected `transport`; no real network call in
  * tests (C2).
  */
+import { detectGeminiFreeTier } from "../gemini-quota.js";
 import type { CompleteResult, EmbedJob, EmbedResult, Job, ModelInfo, Provider, Transport } from "../provider.js";
 
 /** Static-but-labeled manifest (C3) — refresh via https://ai.google.dev/gemini-api/docs/models. */
@@ -36,7 +37,14 @@ export class GeminiProvider implements Provider {
     private readonly config: GeminiConfig,
   ) {}
 
+  private requireCredentials(): void {
+    if (typeof this.config.apiKey !== "string" || !this.config.apiKey.trim()) {
+      throw new Error("gemini credentials unavailable");
+    }
+  }
+
   async complete(job: Job): Promise<CompleteResult> {
+    this.requireCredentials();
     const model = this.config.model ?? DEFAULT_MODEL;
     const systemMessages = job.messages.filter((m) => m.role === "system");
     const turnMessages = job.messages.filter((m) => m.role !== "system");
@@ -58,6 +66,8 @@ export class GeminiProvider implements Provider {
     });
 
     if (res.status < 200 || res.status >= 300) {
+      const quota = detectGeminiFreeTier(res.status, res.body, `gemini API error ${res.status}`);
+      if (quota) throw quota;
       throw new Error(`gemini API error ${res.status}: ${JSON.stringify(res.body)}`);
     }
 
@@ -94,6 +104,7 @@ export class GeminiProvider implements Provider {
   async embed(job: EmbedJob): Promise<EmbedResult> {
     const model = this.config.embedModel ?? DEFAULT_EMBED_MODEL;
     if (job.texts.length === 0) return { vectors: [], dims: 0, provider: this.name, model };
+    this.requireCredentials();
 
     // MEASURED, not anticipated (U1.0 backfill, 2026-09-08): the API rejects a batch of more than
     // 100 with `400 ... BatchEmbedContentsRequest.requests: at most 100 requests can be in one

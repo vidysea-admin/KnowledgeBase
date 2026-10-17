@@ -1,0 +1,10 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/transcript-review/ReviewHistory.test.tsx (3 tests) 159ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  10:30:28
+   Duration  2.25s (transform 127ms, setup 213ms, collect 415ms, tests 159ms, environment 878ms, prepare 252ms)
+

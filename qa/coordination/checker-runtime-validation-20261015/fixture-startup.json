@@ -1,0 +1,10 @@
+{
+  "provider": "claude",
+  "executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "runtime_identity": {
+    "model": "offline-fixture",
+    "policy": "fixture"
+  },
+  "fingerprints": [],
+  "observed_input_tokens_floor": 3000
+}

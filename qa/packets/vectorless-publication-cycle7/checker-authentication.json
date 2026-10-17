@@ -1,0 +1,54 @@
+{
+  "currentPinDrift": [],
+  "candidate": "59316179f26032191c6c11cbf7d87e540a66d1722bb9379f3b1eca2f64629066",
+  "receipts": [
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-t054-retry-six-typed-20261015T1045.json",
+      "rawHashMatches": true,
+      "scopedCandidateMatch": true,
+      "runtimeMatch": true,
+      "lockMatch": true,
+      "environmentIndexMatch": true,
+      "commandIndexMatch": true,
+      "exit": 0,
+      "stable": true,
+      "pinMismatch": [],
+      "absentPins": [
+        "qa/contracts/vectorless-publication.md"
+      ],
+      "importRoot": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+    },
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-types-t054-typed-20261015T1050.json",
+      "rawHashMatches": true,
+      "scopedCandidateMatch": true,
+      "runtimeMatch": true,
+      "lockMatch": true,
+      "environmentIndexMatch": true,
+      "commandIndexMatch": true,
+      "exit": 0,
+      "stable": true,
+      "pinMismatch": [],
+      "absentPins": [
+        "qa/contracts/vectorless-publication.md"
+      ],
+      "importRoot": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+    },
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-build-t054-typed-20261015T1052.json",
+      "rawHashMatches": true,
+      "scopedCandidateMatch": true,
+      "runtimeMatch": true,
+      "lockMatch": true,
+      "environmentIndexMatch": true,
+      "commandIndexMatch": true,
+      "exit": 0,
+      "stable": true,
+      "pinMismatch": [],
+      "absentPins": [
+        "qa/contracts/vectorless-publication.md"
+      ],
+      "importRoot": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+    }
+  ]
+}

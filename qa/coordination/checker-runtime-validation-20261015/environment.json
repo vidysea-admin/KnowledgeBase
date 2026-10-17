@@ -1,0 +1,11 @@
+{
+  "python": "C:\\Program Files\\Python312\\python.exe",
+  "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "import_origins": {
+    "budget": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+    "contract": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_contract.py",
+    "launcher": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\managed_review.py"
+  },
+  "provider_execution": false,
+  "temp_parent_writable": true
+}

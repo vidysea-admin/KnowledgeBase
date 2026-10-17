@@ -1,0 +1,223 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "slug": "isolated-replica-prep",
+    "cycle": 1,
+    "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.gitignore",
+        "sha256": "1889112d1c0fb95d57faf75e3e3cf19756b8c5f6b024d747aa2a0af27d985e1e"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\PLAN.md",
+        "sha256": "6e7847ad137fab3b41c95963fe242bb2c4b96f22565fb691130022d13154530f"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\activate-proposal.py",
+        "sha256": "4f5efe44e0e402dea5c14c06cfeb661fb9a6b69ce10867b2f955cf1f3e186637"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\init-and-smoke.py",
+        "sha256": "40d1ba774a05f1f6dd620d1ed2668c9c2ff492dd108aee6c957d6546f0fab334"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\shutdown-owned.py",
+        "sha256": "7111a5e1e0f20c889543394797d2016bc4235eec9efa80eaa030c28990279c4b"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\mongod.yml.template",
+        "sha256": "7d7eb8a7342eca0fefe8e1df1e3a6698e968e1e661a20bf35069b23a5e5b3d4c"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\download-verified.ps1",
+        "sha256": "542d3fc1cfbc2e2f59f6f5c87519ba18850df445280d81e0c6038f88ed0b345a"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\extract-passive.ps1",
+        "sha256": "18d99626326b7352fecbcd080147d74fef38bcb34a708054c1657efa919363b1"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\inspect-pe.py",
+        "sha256": "28e3e7709b340e5b55b29d8086a5f9b8fc136e2975a8cfeffbb847e6e8d0e681"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\static_probe.py",
+        "sha256": "6a81c80b21faa371119768cd63e3d40ac063d3954bef11912f7690e346fc82d5"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\parse-powershell.ps1",
+        "sha256": "1c5786cd90b6e67fd85887eb3e0c0c1e8d79624ccb1c50bd1a689a32ca0e7551"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\owned_transport.py",
+        "sha256": "0ef58b9946c0303389b5d1ca193520f628527ee3fe1a533342225cd31645c05e"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\verify-owned-socket.ps1",
+        "sha256": "404fd1447217acd3b64d9fcbab370377863025e60d147deb7a8086380001692d"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cleanup_receipt.py",
+        "sha256": "d77f6ed9f09e2d1598c10c23c26953755ad83c6447c8f336e35794765ee03c23"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\fake_regressions.py",
+        "sha256": "0340c1d33b10ffcdcd50fcc03a32a5db2f4af31aa8a52f307960ea46256d8a73"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\static_checks.py",
+        "sha256": "be682d146a9fc447a4b8f5d2e82479a45dfc7020b142349fec1e4bf04b3ffaa2"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\parse-ownership.ps1",
+        "sha256": "54e57a4f3d02d85aec0e1cd2b42ac568e39f300edb7355e1c8f295c7835644fb"
+      }
+    ],
+    "candidate_sha": "eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37"
+  },
+  "metrics": {
+    "escalation": {
+      "authority": "Root explicit cycle1 manual source-only continuation grant2026-10-16",
+      "limits": {
+        "active_s": 270,
+        "tokens": 36000,
+        "cost": null,
+        "token_metric": "actual_total"
+      },
+      "reason": "Actual security fix cycle1: additional120active seconds/16000allocated actual-total tokens INCLUDING30s/4000completion; preserve cycle0 conservative150s/20000debits and unknown actuals. Prior180s/24000was ceiling, never consumption."
+    },
+    "bootstrap_scope": "Exact offline launcher/config/ignore safety review; no activation or vendor execution",
+    "completion_reserve": true,
+    "next_phase": {
+      "active_s": 90,
+      "tokens": 12000,
+      "kind": "review",
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "completion_reserve_tokens": 4000,
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "cost": null,
+      "tokens": null
+    },
+    "completion_reserve_id": "isolated-replica-prep/1/eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+    "reviewers": [
+      {
+        "budget_debit": {
+          "token_metric": "actual_total",
+          "tokens": 16000,
+          "active_s": 120
+        },
+        "id": "isolated_replica_source_checker",
+        "active_s": null,
+        "token_metric": "actual_total",
+        "tokens": null,
+        "cost": null
+      },
+      {
+        "cost": null,
+        "active_s": null,
+        "tokens": null,
+        "completion_reserve_id": "isolated-replica-prep/0/1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+        "token_metric": "actual_total",
+        "phase_kind": "finalization",
+        "id": "isolated_replica_source_checker-cycle0-finalization",
+        "budget_debit": {
+          "tokens": 4000,
+          "active_s": 30,
+          "cost": null,
+          "token_metric": "actual_total"
+        }
+      }
+    ],
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "cost": null,
+      "tokens": 6000
+    },
+    "token_metric": "actual_total"
+  },
+  "worker": {
+    "executable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+    "max_turns": 8,
+    "phase_id": "isolated_replica_source_checker-cycle1-review",
+    "runtime_identity": {
+      "model": "not substituted; root retains configured runtime",
+      "startup_allowance": "UNKNOWN",
+      "tool_controls": "UNKNOWN"
+    },
+    "prompt": {
+      "sha256": "b59af71f23b7b02f1213a60c24ef50f527e7e5f331e20960f87a5064c19e93ae",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\review-prompt.txt"
+    },
+    "provider": "codex",
+    "timeout_s": 90
+  },
+  "readiness": {
+    "complete": true,
+    "mutation_required": false,
+    "receipts": [
+      {
+        "role": "environment",
+        "sha256": "44783d89398fdbb933e5620d0dabfa893ef048880b5027f7d9a2ace2ebc5219a",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\environment.json"
+      },
+      {
+        "role": "isolated-replica-cycle1-final-seal",
+        "sha256": "8dac4e56deb4b82691a3ee5ee9aeb9f7f3eda5021cac95eee8bdc1be482af3c7",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-final-seal.json"
+      },
+      {
+        "role": "isolated-replica-cycle1-passive-ast-receipt",
+        "sha256": "7d365f7a8a45b7255c4d42557b2dd3c907f9098462cad3d454e400d27b85c6bb",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-passive-ast-receipt.json"
+      },
+      {
+        "role": "isolated-replica-cycle1-fake-regressions-receipt",
+        "sha256": "7acada98f9622dc768f37d4a1e5780511dfb5a7610a354beed531b70ca253fbd",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-fake-regressions-receipt.json"
+      },
+      {
+        "role": "isolated-replica-cycle1-passive-ownership-parser-receipt",
+        "sha256": "a5a98366856a32216036a1ec37b7f0a54316f1c3604a6d4ad9dc396d174fc2c9",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-passive-ownership-parser-receipt.json"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "reason": "AST7, driver guard-before-import2, preactivation durable pending record and readiness transport refusal",
+      "node": "cycle1/static_checks.py",
+      "boundary": "no-host/syntax"
+    },
+    {
+      "reason": "Exact checker competitor/replacement/missingowner floor plus IPv6 listener and retainedtuple send guards",
+      "node": "cycle1/fake_regressions.py/Ownership",
+      "boundary": "credential-disclosure/TOCTOU"
+    },
+    {
+      "reason": "Exact ownerwrite/read/JSON/rmtree/jobclose failures, primary/fallback writes and safeerror redaction",
+      "node": "cycle1/fake_regressions.py/Receipts",
+      "boundary": "durable-receipt/private-remnants"
+    },
+    {
+      "reason": "Passive parser of OSownership observer without executing it",
+      "node": "cycle1/parse-ownership.ps1",
+      "boundary": "syntax/no-native"
+    },
+    {
+      "reason": "Inspect actual guards/cleanup and caller order plus preserved priorFAIL/accounting",
+      "node": "independent-source-security-review",
+      "boundary": "auth/process-lifetime/data-writes"
+    }
+  ],
+  "previous_receipt": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\prior-review-history.json",
+    "sha256": "ad3e8c09f7dbca805b7825acab397c59f7dce315d938de5dd6d47cd649a52f21"
+  }
+}

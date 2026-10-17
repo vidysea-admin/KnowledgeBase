@@ -10,6 +10,7 @@
 import { Link } from "react-router-dom";
 import type { SessionSummary, UpcomingMeeting } from "../../api/types.js";
 import { ExternalLinkIcon } from "../../components/icons.js";
+import { safeHttpUrl } from "../../safe-url.js";
 
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -69,9 +70,13 @@ export function AgendaView(props: AgendaViewProps): React.ReactElement {
                 {m.meetingUrl && (
                   <>
                     {" · "}
-                    <a href={m.meetingUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-                      Join <ExternalLinkIcon className="row-meta" />
-                    </a>
+                    {safeHttpUrl(m.meetingUrl) ? (
+                      <a href={m.meetingUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                        Join <ExternalLinkIcon className="row-meta" />
+                      </a>
+                    ) : (
+                      <span data-testid="agenda-join-text">{m.meetingUrl}</span>
+                    )}
                   </>
                 )}
               </div>

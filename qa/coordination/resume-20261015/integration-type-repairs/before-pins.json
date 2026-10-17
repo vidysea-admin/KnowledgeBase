@@ -1,0 +1,27 @@
+[
+  {
+    "path": "packages/meeting-bot/src/calendar/registration-link-resolver.ts",
+    "before_sha256": "6D316EB3862A1611D27EDD3180A61E628E43BFC1A678198D6DF99D6C44798F81",
+    "backup": "qa\\coordination\\resume-20261015\\integration-type-repairs\\before-packages__meeting-bot__src__calendar__registration-link-resolver.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/controller-state.test.ts",
+    "before_sha256": "92219849DD1C07FED5637D680BF99A0181573A0AD606A159966392FD7E854DAE",
+    "backup": "qa\\coordination\\resume-20261015\\integration-type-repairs\\before-packages__meeting-bot__src__capture__controller-state.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts",
+    "before_sha256": "72118F3A47B3EE843C55D935A6867CEE2F667F168EB29DE73CFF9E5948512BF4",
+    "backup": "qa\\coordination\\resume-20261015\\integration-type-repairs\\before-packages__meeting-bot__src__capture__record-consent__controller-bridge.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/manual-jobs/worker.ts",
+    "before_sha256": "80BFB70E0AA56723CB28921558552BE47B9A20FC4DEA2D96D5CF08A1D3AEA117",
+    "backup": "qa\\coordination\\resume-20261015\\integration-type-repairs\\before-packages__meeting-bot__src__manual-jobs__worker.ts"
+  },
+  {
+    "path": "apps/api/src/evaluation-flywheel/test-fixture.test.ts",
+    "before_sha256": "B173A8FC29EFAE214CA06A2E7F97A0F99B73CD11036D1EF4B6E8961DDD98180A",
+    "backup": "qa\\coordination\\resume-20261015\\integration-type-repairs\\before-apps__api__src__evaluation-flywheel__test-fixture.test.ts"
+  }
+]

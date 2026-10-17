@@ -29,5 +29,84 @@ export interface Gaps {
    * Optional link to the sources/_id this gap resolved into once received.
    */
   sourceRef?: string;
+  watchedSourceRef?: string;
+  flywheel?: {
+    version: 1;
+    originalEvalRunId: string;
+    inputFingerprint: string;
+    loss: {
+      question: string;
+      counsellor: {
+        name: string;
+        org?: string;
+        [k: string]: unknown;
+      };
+      aiAnswer: {
+        text: string;
+        sources?: {
+          [k: string]: unknown;
+        };
+        [k: string]: unknown;
+      };
+      counsellorAnswer: {
+        text: string;
+        [k: string]: unknown;
+      };
+      score: {
+        ai: number;
+        counsellor: number;
+        notes?: string;
+        [k: string]: unknown;
+      };
+      credibility: "internal" | "independent-human" | "calibrated-llm";
+      createdAt: string;
+    };
+    revision: number;
+    stage: "awaiting-source" | "captured" | "indexed" | "retested";
+    lock?: {
+      token: string;
+      requestId: string;
+      expiresAt: string;
+    };
+    sourceUrlFingerprint?: string;
+    capture?: {
+      sourceId: string;
+      sessionId: string;
+      sourceDigest: string;
+      transcriptDigest: string;
+      turnCount: number;
+      /**
+       * @minItems 1
+       */
+      turnIds: [string, ...string[]];
+    };
+    index?: {
+      sourceId: string;
+      sessionId: string;
+      sourceDigest: string;
+      transcriptDigest: string;
+      turnCount: number;
+      /**
+       * @minItems 1
+       */
+      turnIds: [string, ...string[]];
+      generation: string;
+      treeDigest: string;
+      chunksDigest: string;
+      completedAt: string;
+    };
+    lastRetestId?: string;
+    failure?: {
+      stage: "capture" | "index" | "retest" | "persist";
+      requestId: string;
+      at: string;
+    };
+    failureHistory?: {
+      stage: "capture" | "index" | "retest" | "persist";
+      requestId: string;
+      at: string;
+    }[];
+  };
+  sourceUrlHash?: string;
   [k: string]: unknown;
 }

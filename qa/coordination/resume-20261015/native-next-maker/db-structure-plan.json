@@ -1,0 +1,230 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "assetResolutionUpdates": [],
+  "token_metric": "actual_total",
+  "publicExports": {
+    "packageJsonEditRequired": false,
+    "old": "./collections/speaker-suggestions.js",
+    "packageMainUnchanged": "./src/index.ts",
+    "new": "./collections/speaker-suggestions/index.js",
+    "barrel": "packages/db/src/index.ts"
+  },
+  "importUpdates": [
+    {
+      "afterMove": "apps/api/src/indexing/speaker-suggest.test.ts",
+      "file": "apps/api/src/indexing/speaker-suggest.test.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.js"
+        },
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/testdb.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+      "file": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.js"
+        },
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/testdb.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/speaker-profiles/router.test.ts",
+      "file": "apps/api/src/speaker-profiles/router.test.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/testdb.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/speaker-profiles/store.test.ts",
+      "file": "apps/api/src/speaker-profiles/store.test.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.js"
+        },
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/testdb.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+      "file": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.js"
+        },
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/testdb.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/speaker-suggestions/router.ts",
+      "file": "apps/api/src/speaker-suggestions/router.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+      "file": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/testdb.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "apps/api/src/speaker-suggestions/store.ts",
+      "file": "apps/api/src/speaker-suggestions/store.ts",
+      "replacements": [
+        {
+          "new": "../../../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../../../packages/db/src/collections/speaker-suggestions.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+      "file": "packages/db/src/collections/speaker-suggestions.test.ts",
+      "replacements": [
+        {
+          "new": "../../lib/native-publication.js",
+          "old": "../lib/native-publication.js"
+        },
+        {
+          "new": "./index.js",
+          "old": "./speaker-suggestions.js"
+        },
+        {
+          "new": "./testdb.js",
+          "old": "./speaker-suggestions.testdb.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "packages/db/src/collections/speaker-suggestions/index.ts",
+      "file": "packages/db/src/collections/speaker-suggestions.ts",
+      "replacements": [
+        {
+          "new": "../../client.js",
+          "old": "../client.js"
+        },
+        {
+          "new": "../../lib/native-publication.js",
+          "old": "../lib/native-publication.js"
+        },
+        {
+          "new": "../../lib/tenantScope.js",
+          "old": "../lib/tenantScope.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "packages/db/src/index.ts",
+      "file": "packages/db/src/index.ts",
+      "replacements": [
+        {
+          "new": "./collections/speaker-suggestions/index.js",
+          "old": "./collections/speaker-suggestions.js"
+        }
+      ]
+    },
+    {
+      "afterMove": "scripts/native-capture/production.test.ts",
+      "file": "scripts/native-capture/production.test.ts",
+      "replacements": [
+        {
+          "new": "../../packages/db/src/collections/speaker-suggestions/index.js",
+          "old": "../../packages/db/src/collections/speaker-suggestions.js"
+        }
+      ]
+    }
+  ],
+  "actual_total_tokens": null,
+  "consumerLease": [
+    "apps/api/src/indexing/speaker-suggest.test.ts",
+    "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+    "apps/api/src/speaker-suggestions/router.ts",
+    "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+    "apps/api/src/speaker-suggestions/store.ts",
+    "packages/db/src/collections/speaker-suggestions.test.ts",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "packages/db/src/collections/speaker-suggestions.ts",
+    "packages/db/src/index.ts",
+    "scripts/native-capture/production.test.ts"
+  ],
+  "brokerPathMapping": [
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.test.ts"
+    },
+    {
+      "new": "src/collections/speaker-suggestions/index.test.ts",
+      "old": "src/collections/speaker-suggestions.test.ts"
+    }
+  ],
+  "status": "READ_ONLY_PROPOSED_AWAITING_ROOT_TRANSFER_AFTER_ATOMIC_DB_FIXTURE_OWNER_FROZEN",
+  "requiredVerification": [
+    "Byte backups and old/new existence mapping before move.",
+    "Actual directory checker unchanged30 policy; DB/API/index type checks as appropriate to exact combined candidate.",
+    "Broker new src/collections/speaker-suggestions/index.test.ts plus affected API speaker/indexing/profile tests and production consumer existing required gates; no real DB/network for relocation proof.",
+    "Static module target checks including package barrel; retain mandatory transaction/write/tenant boundaries."
+  ],
+  "fixtureURLs": "No import.meta.url/new URL/__dirname relative asset sites found in moved3 files at planning snapshot; recheck after owner freezes.",
+  "preserve": [
+    "Current package DB test src/**/*.test.ts includes index.test.ts.",
+    "Distinct packages/index/src/pipeline/speaker-suggestions modules remain unchanged.",
+    "Unrelated scripts/webinar structure failure outside unit; generated45 root-ignore artifact not refactored.",
+    "Historical receipts/pins immutable; next additive adoption uses current final fixture-owner bytes, exact new path map and new hashes."
+  ],
+  "scope": "Exactly three loose collection files moved into speaker-suggestions/{index.ts,index.test.ts,testdb.ts}. Import specifiers only; no compatibility wrapper, DB behavior change, new exports config or structure policy change.",
+  "sourceEdits": false,
+  "moves": [
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/index.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.ts"
+    },
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.test.ts"
+    },
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.testdb.ts"
+    }
+  ],
+  "schema": "db-speaker-suggestions-structure-plan/1",
+  "counts": {
+    "currentImmediateSubdirectories": 0,
+    "collectionsAfter": 30,
+    "collectionsBefore": 33,
+    "speakerSuggestionsAfter": 3,
+    "newDirectories": 1
+  }
+}

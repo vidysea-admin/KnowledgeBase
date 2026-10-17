@@ -1,0 +1,193 @@
+{
+  "slug": "goal-t014",
+  "cycle": 0,
+  "source": [
+    {
+      "path": "apps/api/src/championship/model.ts",
+      "sha256": "7186304211f989df79c0dcf5a705a173b5d8fbc95f7895e752b6c83f39dcd190",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/api/src/championship/runtime.ts",
+      "sha256": "e5f00441c246e1c34c6af4d380a67c39b528164031c9a1dfa5f8a03a4fbd293d",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/api/src/championship/mongo-store.ts",
+      "sha256": "bbfa10fc5b5f0ddcdee0be70239cde441bde8285073ae86cabcc8544646d396a",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/api/src/championship/runtime.test.ts",
+      "sha256": "557c3f8eb28f700bda456f5aaaedbf4394248f9f230b195fa64fd3596313195a",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/api/src/championship/mongo-store.test.ts",
+      "sha256": "46d3631956c6fd4a563144316dbedcbc9b99d1ad24afc49dcb3e19726ee1e7d8",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/api/src/routes/championship/championship.ts",
+      "sha256": "88cc87b254f7c7defd5204d30667b01b5e3625673f123f67a9ce59f62aceb022",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/api/src/routes/championship/championship.test.ts",
+      "sha256": "e80a7dc2ec9fb62be8dec15327b4ce73491e63d8ee6ead7c0f47f6b0ecdfaa8b",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/web/src/pages/championship/client.ts",
+      "sha256": "e139fe67c383b4e7ffe9c498a210cf3eece5d9f488a6b0f337df9280498a1383",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/web/src/pages/championship/ChampionshipPage.tsx",
+      "sha256": "e76a0f0730d56c8b30a8ccc0e0e038b4c7340a5f3dd967d2ab08e06a16bd3809",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/web/src/pages/championship/ChampionshipPlanForm.tsx",
+      "sha256": "05c20b40c741f8d87846be809333ba3460596c23cd11581581581ed1595d99ec",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/web/src/pages/championship/client.test.ts",
+      "sha256": "c5fb9be67d391df21b55e59b716f8bb4008a10512a485afba153847d4545df86",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "apps/web/src/pages/championship/ChampionshipPage.test.tsx",
+      "sha256": "169ca58f3cd6c00f6416aaf6a4ab911fa56bb13bb5f7f48a9a0f26732d29cf3c",
+      "base": "no file existed at maker start"
+    },
+    {
+      "path": "docs/championship-workflow.md",
+      "sha256": "31301cf49ae563b1c4b3255e87591eddc94a8bd7e58116dfe71d59352e9bc1cf",
+      "base": "no file existed at maker start"
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "qa/contracts/goal-t014.md",
+      "sha256": "c70cdb8555ee59261907fd0319d380fa1143666e7d82453aa89accb3e364353f",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "schema/championship_events.schema.json",
+      "sha256": "79a6b85e3fc65713894047c70c9a214989ee65ac561bd4d0d284c634a3831797",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "schema/index.json",
+      "sha256": "846b3d698c7d16f58e00fcc4497600390c277c8095d811b8132c2f4ae2d170a3",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "packages/core/src/generated/championship_events.ts",
+      "sha256": "bc5844d6e03f40e40a69c0885a25e27552a7a0997705b5af8014844448649f18",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "migrations/20261014200000-knowledge-workflows.cjs",
+      "sha256": "f6841818a631749aa39a3b499c8a0ca8ced5dc8709734eb91e6d698b3edf62b2",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/evaluation.ts",
+      "sha256": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/routes.ts",
+      "sha256": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/types.ts",
+      "sha256": "a03749ef65788b5b5893e70c518dacc51c8752c793023f090be59732149aea08",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "sha256": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/api/src/auth.ts",
+      "sha256": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "apps/web/src/layout/NavSidebar.tsx",
+      "sha256": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "contracts/verify_contracts.py",
+      "sha256": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3",
+      "ownership": "read-only dependency; not maker edit"
+    },
+    {
+      "path": "contracts/contracts.json",
+      "sha256": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940",
+      "ownership": "read-only dependency; not maker edit"
+    }
+  ],
+  "evidence": [
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t014-api.json",
+      "sha256": "64b04c78f10a174e565b12dd789c62727dc21621324188f5751dc5bd0c5dc0ec"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t014-api.stdout.txt",
+      "sha256": "ce6fbdfa2e950671490ce2d7e9305f248d1f9379079d86de14f772b41616266f"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t014-api.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t014-web.json",
+      "sha256": "9cc7a8f897d321a0fc0daaf558b098bcbb25e4b159a3272615590307f223ffec"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t014-web.stdout.txt",
+      "sha256": "86296c1e147570dba76bae7a968c5623cc549f756136d274f02050b2efb29993"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t014-web.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-validator.json",
+      "sha256": "53ef35f5204aea32db0a4701dd60ebeee10cbbf24ae5af9287f16eb7eed0d6db"
+    },
+    {
+      "path": "qa/evidence/goal-t014/ready-cycle0-api-types-snapshot.json",
+      "sha256": "28cde10c6a2fdbab4b84fcbb168bbd8150ef98cac81995373ab9cfef8255eda3"
+    },
+    {
+      "path": "qa/evidence/goal-t014/ready-cycle0-web-types-snapshot.json",
+      "sha256": "2fd4b5fab37429c3a3f89b4f71f4cecf5c7992d84a77a048fab38520918553fe"
+    }
+  ],
+  "scope": "source software candidate only; full human/T013/public event gates remain open",
+  "globalCoherence": "API typecheck exit2/39 diagnostics; web exit2/5 diagnostics; unrelated repairs pending, no global green claim"
+}

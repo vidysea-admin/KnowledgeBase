@@ -1,0 +1,18 @@
+✔ U0.10: no apiKey -> complete/embed headers are exactly the original content-type pair (2.7939ms)
+✔ U0.10: apiKey set -> authorization Bearer header on complete and embed, localhost default kept (0.4262ms)
+✔ U0.10: the key is never read from the environment implicitly (0.3039ms)
+✔ Embedding uses actual CPU option and refuses silent truncation (2.5183ms)
+✔ Embedding refuses corrupt batch [[null],[1]] (0.4854ms)
+✔ Embedding refuses corrupt batch [[null],[1]] (0.1892ms)
+✔ Embedding refuses corrupt batch [[1],[1,2]] (0.1478ms)
+✔ Embedding refuses corrupt batch [[1]] (0.2318ms)
+✔ Nomic query uses the matching task prefix while literal prefix-looking text remains literal (0.2412ms)
+✔ Non-Nomic models retain raw input and absent purpose defaults to document for Nomic (0.3663ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 802.678

@@ -1,0 +1,46 @@
+✔ authenticated review uses verified actor/current roles transaction; observed metadata excludes paths and credentials (81.4215ms)
+✔ missing scopes/auth/actor and body tenant/actor injection never issue acceptance; unrelated paths stay reachable (99.1972ms)
+✔ authoritative role refusal and stale reviewer result cannot report acceptance or leak exceptions (20.8789ms)
+✔ host bridge is constructor-lazy and requires its authoritative transaction for mutations (5.6762ms)
+✔ enqueue is immutable/durable/idempotent and cannot execute intake; tenant isolation survives reconstruction (150.9698ms)
+✔ claimed worker consumes actual complete fixture receipt before publishing; safe receipt survives restart (99.3333ms)
+✔ two reconstructed workers cannot claim the same queued source concurrently (86.7954ms)
+✔ incomplete downstream index never publishes success and never blindly retries (111.5819ms)
+✔ expired/crashed attempt fences late writes and cannot be reclaimed by another worker (100.4734ms)
+✔ current authorization refusal and thrown execution retain safe uncertainty with no diagnostic leakage (146.6775ms)
+✔ secret/ambiguous URLs and absent approval refuse before journal persistence (5.6416ms)
+✔ abandoned journal lock fails closed; another process cannot ignore a crash lock (18.5437ms)
+✔ production HTTP source wiring refuses configured inline SDK transcription without explicit worker composition (0.6566ms)
+✔ API queue factory is lazy/pure and protects database, trusted tenants and private authority roots (3.388ms)
+▶ ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model)
+  ✔ WINACL-ROOT-ALLOW-OTHER: On Windows, source spool root ACL owner=current identity, current identity FullControl, unrelated SID Allow Read; enqueue tenant-a/actor-a URL https://zoom.us/rec/share/fixturebearer with idempotencyKey windows-acl-root and server approval matching actor-a. (5.3298ms)
+  ✔ WINACL-TENANT-ALLOW-OTHER: Root privately owned; pre-existing hashed tenant-a directory permits unrelated SID Read. Same approved URL, idempotencyKey windows-acl-tenant. (8.9418ms)
+  ✔ WINACL-FILE-ALLOW-OTHER: Root and hashed tenant directory private; existing audit.jsonl ACL permits unrelated SID Read. Poll/claim/next enqueue must not trust that journal. (6.431ms)
+  ✔ WINACL-OWNER-OTHER: Spool or tenant artifact owner is unrelated SID even if only current identity has an explicit Allow rule. (1.7167ms)
+✔ ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model) (24.571ms)
+▶ ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls
+  ✔ ONAIR-FOREIGN-TENANT: Trusted worker tenants [tenant-a,tenant-b], global OnAir cookie representing account-a; tenant-b/actor-b submits https://cloudonair.withgoogle.com/events/account-a-only and receives ordinary server approval. (81.3988ms)
+  ✔ ONAIR-UNBOUND-ACCOUNT: tenant-a valid ingest actor and event approval exist, but OnAir session account has no explicit trusted owner/binding. (71.1293ms)
+  ✔ ONAIR-UNAPPROVED-EVENT: OnAir session owner explicitly tenant-a, but request event is different from the immutable approved event set or event-specific approval. (81.9138ms)
+  ✔ ONAIR-BINDING-CHANGED: Queue approved under account-a/tenant-a/event-one binding; before execution trusted binding is removed, changes account/tenant or no longer authorizes event-one. (70.0618ms)
+✔ ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls (305.8042ms)
+✔ OnAir owned-event/public-no-cookie controls and rotated session/event permission fences (50.2902ms)
+﹣ actual native private-directory receipt prerequisite (0.1621ms) # SKIP
+﹣ actual POSIX private-root/tenant/artifact control (0.1183ms) # SKIP
+✔ permission loss after acquisition blocks each provider processing request while allowing scoped cleanup (0.4811ms)
+✔ explicit capture binds actual sampler and refuses mismatch before effects (2.4334ms)
+✔ real runRecord injection surface receives trusted service and matching producer sampler (0.4508ms)
+✔ unconfigured ordinary sync path does not open archive or require database (1.2647ms)
+✔ native configuration refuses unbounded quota and missing configured decoder (0.8073ms)
+✔ startup performs exactly one bounded drain and preserves explicit resume cursor (1.0723ms)
+✔ actual bootstrap connects then drains before constructing listening server (1.1684ms)
+✔ failed bounded drain never reaches server readiness (0.5102ms)
+✔ trusted root host adapter construction stays lazy; ordinary API requires explicit adapter (0.2318ms)
+ℹ tests 36
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 20101.8948

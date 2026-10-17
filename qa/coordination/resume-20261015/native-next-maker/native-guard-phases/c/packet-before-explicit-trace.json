@@ -1,0 +1,79 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "native-guard-phases",
+  "fix_cycle": 0,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "37e51f95c367594bddb422c39c11415674ecf001",
+  "candidate_sha": null,
+  "status": "source-frozen-not-executed",
+  "source_path": "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts",
+  "source_sha256": "cc5fc4fa844cc51aa160dd3f3fc4381e929a25d9993f251c69d0b77159ae8815",
+  "total_lines": 63,
+  "preimage": "ABSENT; preimages.txt",
+  "source_owner": "C only NEW helper; B only existing recovery.test.ts",
+  "stage_catalog": [
+    "root",
+    "fixture-seal",
+    "recovery",
+    "provider",
+    "binding",
+    "revocation",
+    "artifact",
+    "alias",
+    "eof",
+    "copied",
+    "orphan",
+    "decoder",
+    "pages",
+    "quota",
+    "journal",
+    "cleanup"
+  ],
+  "events": [
+    "start",
+    "complete"
+  ],
+  "record_schema": {
+    "stageId": "node1(tamper)|node2(fair)-WHITELISTSTAGE-EVENT[-ORDINAL0..10]",
+    "elapsedMs": "integer monotonic relative moduleowned sink firstopen, clamped0..75000"
+  },
+  "limits": {
+    "held_fd": "ONE lazy wx0600 shared by both nodes until process exit; testguard reset seam only",
+    "flush": "writeSync/fsyncSync every record",
+    "max_bytes": 65536,
+    "max_records": 256
+  },
+  "environment": {
+    "file": "native-guard-phases.jsonl",
+    "root": "LKB_NATIVE_TEST_PRIVATE_DIR exact approved NEW protected UUID supplied/validated by broker",
+    "optional_path": "LKB_NATIVE_GUARD_PHASE_LOG must resolve exact same file"
+  },
+  "status_values": [
+    "disabled",
+    "active",
+    "refused",
+    "failed",
+    "limited"
+  ],
+  "guard_proposals": [
+    "Absence nofiles/nooutputs",
+    "Mismatched optionalpath refuses beforeopen",
+    "Existing or symlink sink refuses beforeopen",
+    "Success exact twofield boundedrecords; delete sink→mark nonthrow failed"
+  ],
+  "required_checks": [
+    "Solebroker bot types + B targeted helperguards first",
+    "Freshchild exact originaltwo guardnodes <=75s external bound with fixedsidecar admission",
+    "Broker snapshot/parse/hash sidecar before ownUUIDcleanup; trace incomplete is DIAGNOSTIC_INCOMPLETE neverPASS"
+  ],
+  "token_metric": "actual_total",
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "token_metric": "actual_total",
+    "cost": null
+  },
+  "execution": "No tests/build/DB/provider/decoder/ACL/browser/broker calls executed.",
+  "preserved": "All guard/security assertions, producers/contracts/enforcement, earlier124timeout/70.594s emptylog history and closed watched8unit retained."
+}

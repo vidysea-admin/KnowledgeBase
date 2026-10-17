@@ -1,0 +1,333 @@
+{
+  "kind": "recall",
+  "date": "2026-10-13",
+  "generatedAt": "2026-10-13T15:50:39.508Z",
+  "model": "glm-5.3-flash",
+  "provider": "ollama",
+  "baseUrl": "https://ollama.com",
+  "jobKind": "evaluator",
+  "k": 5,
+  "questionsSelected": 92,
+  "questionsScored": 75,
+  "questionsNotScored": 17,
+  "questionsWithHeuristicFallback": 1,
+  "limitQuestions": null,
+  "summary": {
+    "recallAtK": 0.7466666666666667,
+    "hits": 56,
+    "total": 75,
+    "misses": 19,
+    "controlRecallAtK": 0.18666666666666668,
+    "chanceFloor": 0.1724137931034483,
+    "verdict": "informative",
+    "reason": "0.747 vs a 0.187 question-blind control (+0.560), with 19 miss(es) left to move"
+  },
+  "goldenSetProvenance": {
+    "generatedAt": "2026-09-08T09:01:27.115Z",
+    "recordedAfterTheFact": true,
+    "generator": "scripts/gen-golden-set.mjs",
+    "source": "data/toc-migrated/<sessionId>/turns.json (raw transcript)",
+    "model": "gemini-2.5-pro",
+    "summarizerModel": "gemini-2.5-flash",
+    "independence": "different model from the summarizer (gemini-2.5-flash), but the SAME vendor and family, so same-source vocabulary leakage is reduced less than a cross-vendor run would",
+    "promptStrategy": "real student questions, near-neighbour sessions named so wording must fit them too",
+    "postFilter": "rejects a candidate carrying a token unique to its own session in the turns (raw transcripts, ~218k words) corpus AND present in that session's page text, or overlapping the transcript past 0.5",
+    "postFilterBiasWarning": "no candidate was rejected, so the kept set IS the candidate set and the filter introduces no selection bias on this run",
+    "kept": 92,
+    "rejected": 0,
+    "sessions": 23
+  },
+  "calls": {
+    "made": 2200,
+    "ok": 2200,
+    "failed": 0,
+    "heuristicFallbacks": 1,
+    "capReached": true,
+    "maxCalls": 2200,
+    "maxCostUsd": null,
+    "costUsd": 0,
+    "inputTokens": 591716,
+    "outputTokens": 462658,
+    "latency": {
+      "n": 2200,
+      "meanMs": 3618,
+      "p50Ms": 3243,
+      "p95Ms": 6159,
+      "maxMs": 32822
+    },
+    "firstErrors": []
+  },
+  "report": {
+    "generatedAt": "2026-10-13T15:50:39.508Z",
+    "k": 5,
+    "retriever": "llm (ollama/glm-5.3-flash, jobKind evaluator, rank all 29 sessions per question)",
+    "recallAtK": 0.7466666666666667,
+    "total": 75,
+    "hits": 56,
+    "misses": [
+      {
+        "id": "2026-05-22-uniaccess-xavier-university-gq03",
+        "question": "Beyond what happens in the classroom, how does the university's location connect students with practical opportunities like internships or jobs?",
+        "expectedSessionId": "2026-05-22-uniaccess-xavier-university",
+        "got": [
+          "2026-07-30-in-focus-3",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-07-15-creative-futures",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-09-24-zoho-next-european-study-destinations"
+        ]
+      },
+      {
+        "id": "2026-05-23-uniaccess-atlas-skilltech-gq01",
+        "question": "What kind of support is available for students looking for internships?",
+        "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "got": [
+          "2026-05-28-in-focus-1",
+          "2026-07-15-creative-futures",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-09-24-zoho-next-european-study-destinations",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz"
+        ]
+      },
+      {
+        "id": "2026-05-23-uniaccess-atlas-skilltech-gq03",
+        "question": "Does the teaching style follow an international model or is it more traditional for the region?",
+        "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "got": [
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-08-27-in-focus-4",
+          "2026-05-28-in-focus-1",
+          "2026-07-15-creative-futures",
+          "2026-07-22-uniaccess-cept-university"
+        ]
+      },
+      {
+        "id": "2026-05-28-in-focus-1-gq03",
+        "question": "My family lives in a smaller town, not a major city. Are there options for students to participate remotely or is everything on-site?",
+        "expectedSessionId": "2026-05-28-in-focus-1",
+        "got": [
+          "2026-06-25-in-focus-2",
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-04-21-visa-blueprint-part2-italy-france-nz"
+        ]
+      },
+      {
+        "id": "2026-05-29-decoding-ever-expanding-cast-gq03",
+        "question": "How is getting career guidance different now compared to in the past?",
+        "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "got": [
+          "2026-06-30-exploring-identity-success-counseling",
+          "2026-06-19-entrance-exams-pathways-india-part1",
+          "2026-05-28-in-focus-1",
+          "2026-06-25-in-focus-2",
+          "2026-07-08-beyond-black-robes-law-careers"
+        ]
+      },
+      {
+        "id": "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+        "question": "Is it better to pick a top-ranked college even if it's for a less popular course, or should I prioritize the course I want at a lower-ranked institution?",
+        "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "got": [
+          "2026-06-30-exploring-identity-success-counseling",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-07-15-creative-futures",
+          "2026-05-28-in-focus-1",
+          "2026-06-03-dual-enrollment-pathway"
+        ]
+      },
+      {
+        "id": "2026-06-19-entrance-exams-pathways-india-part1-gq04",
+        "question": "What are my options if I don't get into one of the top government universities?",
+        "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "got": [
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-07-30-in-focus-3",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-06-30-exploring-identity-success-counseling"
+        ]
+      },
+      {
+        "id": "2026-06-25-in-focus-2-gq01",
+        "question": "What are the expectations for student participation during the online workshops?",
+        "expectedSessionId": "2026-06-25-in-focus-2",
+        "got": [
+          "2026-05-28-in-focus-1",
+          "2026-05-29-decoding-ever-expanding-cast",
+          "2026-07-28-metrics-and-mingling",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-08-27-in-focus-4"
+        ]
+      },
+      {
+        "id": "2026-06-25-in-focus-2-gq04",
+        "question": "Do you offer any support for humanities subjects like foreign languages or design?",
+        "expectedSessionId": "2026-06-25-in-focus-2",
+        "got": [
+          "2026-07-22-uniaccess-cept-university",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-05-28-in-focus-1",
+          "2026-07-15-creative-futures",
+          "2026-08-24-uniaccess-leeds-arts-university"
+        ]
+      },
+      {
+        "id": "2026-07-03-inside-the-uc-session-gq01",
+        "question": "Is there a single application deadline or do they review applications as they come in?",
+        "expectedSessionId": "2026-07-03-inside-the-uc-session",
+        "got": [
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-07-22-uniaccess-cept-university",
+          "2026-07-30-in-focus-3",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-08-03-uk-beyond-offer-letters-reupload"
+        ]
+      },
+      {
+        "id": "2026-07-15-creative-futures-gq02",
+        "question": "What if my student isn't sure exactly what they want to major in? Can they explore different options before committing?",
+        "expectedSessionId": "2026-07-15-creative-futures",
+        "got": [
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-06-30-exploring-identity-success-counseling",
+          "2026-06-25-in-focus-2",
+          "2026-08-27-in-focus-4",
+          "2026-05-22-uniaccess-xavier-university"
+        ]
+      },
+      {
+        "id": "2026-07-22-uniaccess-cept-university-gq02",
+        "question": "How much flexibility is there in the curriculum for students to choose their own courses versus following a set path?",
+        "expectedSessionId": "2026-07-22-uniaccess-cept-university",
+        "got": [
+          "2026-06-25-in-focus-2",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-08-27-in-focus-4",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-05-28-in-focus-1"
+        ]
+      },
+      {
+        "id": "2026-07-30-in-focus-3-gq03",
+        "question": "How does the education system over there prepare students for the workforce compared to other English-speaking destinations?",
+        "expectedSessionId": "2026-07-30-in-focus-3",
+        "got": [
+          "2026-07-15-creative-futures",
+          "2026-09-24-zoho-next-european-study-destinations",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-06-03-dual-enrollment-pathway",
+          "2026-06-19-entrance-exams-pathways-india-part1"
+        ]
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-gq04",
+        "question": "How can I be sure I'll find a good job after graduating?",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters",
+        "got": [
+          "2026-07-15-creative-futures",
+          "2026-08-12-uniaccess-ashoka-university",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-07-30-in-focus-3",
+          "2026-05-23-uniaccess-atlas-skilltech"
+        ]
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq02",
+        "question": "What can my child do during their studies to increase their chances of finding a job after they graduate?",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "got": [
+          "2026-07-15-creative-futures",
+          "2026-05-28-in-focus-1",
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-06-25-in-focus-2"
+        ]
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq04",
+        "question": "How can I best prepare for the financial checks and visa interview to show that I'm a genuine student?",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "got": [
+          "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-05-08-funding-dreams-loans-forex",
+          "2026-05-22-uniaccess-xavier-university",
+          "2026-07-03-inside-the-uc-session"
+        ]
+      },
+      {
+        "id": "2026-08-12-uniaccess-ashoka-university-gq01",
+        "question": "What are you looking for in a student besides their test scores and grades?",
+        "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+        "got": [
+          "2026-06-30-exploring-identity-success-counseling",
+          "2026-07-15-creative-futures",
+          "2026-08-03-uk-beyond-offer-letters",
+          "2026-08-24-uniaccess-leeds-arts-university",
+          "2026-05-28-in-focus-1"
+        ]
+      },
+      {
+        "id": "2026-08-12-uniaccess-ashoka-university-gq03",
+        "question": "What's the best way to approach the personal essays for the application?",
+        "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+        "got": [
+          "2026-08-10-ucas-what-changed-what-matters",
+          "2026-05-20-telling-your-brand-story-better",
+          "2026-09-21-uniaccess-japan",
+          "2026-05-28-in-focus-1",
+          "2026-06-30-exploring-identity-success-counseling"
+        ]
+      },
+      {
+        "id": "2026-08-24-uniaccess-leeds-arts-university-gq03",
+        "question": "Are creative jobs safe from being replaced by AI?",
+        "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "got": [
+          "2026-07-08-beyond-black-robes-law-careers",
+          "2026-05-20-telling-your-brand-story-better",
+          "2026-07-15-creative-futures",
+          "2026-05-23-uniaccess-atlas-skilltech",
+          "2026-05-28-in-focus-1"
+        ]
+      }
+    ],
+    "control": {
+      "retriever": "null (question-blind)",
+      "recallAtK": 0.18666666666666668,
+      "hits": 14
+    },
+    "assessment": {
+      "k": 5,
+      "sessionCount": 29,
+      "chanceFloor": 0.1724137931034483,
+      "measuredRecall": 0.7466666666666667,
+      "controlRecall": 0.18666666666666668,
+      "liftOverControl": 0.56,
+      "saturated": false,
+      "verdict": "informative",
+      "reason": "0.747 vs a 0.187 question-blind control (+0.560), with 19 miss(es) left to move"
+    },
+    "goldenSetProvenance": {
+      "generatedAt": "2026-09-08T09:01:27.115Z",
+      "recordedAfterTheFact": true,
+      "generator": "scripts/gen-golden-set.mjs",
+      "source": "data/toc-migrated/<sessionId>/turns.json (raw transcript)",
+      "model": "gemini-2.5-pro",
+      "summarizerModel": "gemini-2.5-flash",
+      "independence": "different model from the summarizer (gemini-2.5-flash), but the SAME vendor and family, so same-source vocabulary leakage is reduced less than a cross-vendor run would",
+      "promptStrategy": "real student questions, near-neighbour sessions named so wording must fit them too",
+      "postFilter": "rejects a candidate carrying a token unique to its own session in the turns (raw transcripts, ~218k words) corpus AND present in that session's page text, or overlapping the transcript past 0.5",
+      "postFilterBiasWarning": "no candidate was rejected, so the kept set IS the candidate set and the filter introduces no selection bias on this run",
+      "kept": 92,
+      "rejected": 0,
+      "sessions": 23
+    },
+    "filterBias": {
+      "measured": false,
+      "note": "NOT MEASURED — data/eval/golden-set-rejected.json is absent, so the ISS-092 filter-bias check did not run on this report. This is not a claim of zero bias; re-run scripts/gen-golden-set.mjs to produce the rejected-candidates file, then re-run this script to measure it."
+    }
+  }
+}

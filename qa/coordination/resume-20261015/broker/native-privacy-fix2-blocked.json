@@ -1,0 +1,5 @@
+{
+  "state": "not executed",
+  "reason": "new finalizer real integration failure; no duplicate dependent failure run",
+  "upstream_receipt": "native-finalizer-fix2-receipt.json"
+}

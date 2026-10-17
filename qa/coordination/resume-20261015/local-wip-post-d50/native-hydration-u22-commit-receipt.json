@@ -1,0 +1,45 @@
+{
+  "schema": "native-hydration-u22-local-wip-commit/1",
+  "status": "LOCAL_WIP_COMMITTED_NO_PUSH",
+  "base": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "actions": {
+    "stage": 1,
+    "commit": 1,
+    "config": 0,
+    "push": 0,
+    "tests": 0
+  },
+  "failures": [],
+  "scan": {
+    "valuesPersisted": false,
+    "findings": [],
+    "bytes": 771776,
+    "files": 134
+  },
+  "manifest": {
+    "sha256": "83b4de99bd8def7de0e482d2544dd127cf4d28574dd7993c9ae2275b5a620627",
+    "path": "qa/coordination/resume-20261015/local-wip-post-d50/native-hydration-u22-final-allowlist.json",
+    "paths": 134,
+    "bytes": 771776
+  },
+  "stagedScan": {
+    "valuesPersisted": false,
+    "findings": [],
+    "files": 134
+  },
+  "whitespaceExit": 0,
+  "whitespaceDisposition": "Exact raw proof/EOF preserved; recorded advisory only; no source normalization or configuration/hook bypass",
+  "commitExit": 0,
+  "commit": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "unrelatedDirtyStatusDrift": [],
+  "remainingDirty": {
+    "total": 5272,
+    "untracked": 5132,
+    "tracked": 140
+  },
+  "committedPaths": 134,
+  "nativeSource2Verified": true,
+  "watch8U22source2Unchanged": true,
+  "indexEmpty": true,
+  "independentBroaderNativeHydrationPASS": false
+}

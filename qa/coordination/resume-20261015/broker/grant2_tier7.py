@@ -1,0 +1,8 @@
+import pathlib
+driver=pathlib.Path(__file__).with_name('finite_native_queue.py');prefix=driver.read_text(encoding='utf-8').split("\np=root/'qa/coordination/resume-20261015/native-codecledger/broker-request.json'")[0]
+prefix=prefix.replace("'qa/coordination/resume-20261015/native-current-writers.json'","'qa/coordination/resume-20261015/native-active-writers-current.json'").replace("leases=load(leasepath);active=","leases=load(leasepath);leases['sharedTypesSha256']='022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77';active=")
+prefix=prefix.replace("'finite-native-summary.json'","'grant2-tier7-summary.json'").replace("'finite-native-preflight.log'","'grant2-tier7-preflight.log'").replace('>190','>10').replace('220-(time.monotonic()-start)','50-(time.monotonic()-start)')
+exec(compile(prefix,str(driver),'exec'))
+p=root/'qa/coordination/resume-20261015/eval-pilot/grant2/tier-cycle1/broker-request.json';r=load(p);c=root/'qa/coordination/resume-20261015/eval-pilot/grant2/corpus-clarification.json';clar=load(c);assert clar['status']=='RECONCILED_NO_DATASET_CHANGE';assert sha(pathlib.Path(clar['rawCorpusPath']))==clar['rawGoldenSha256']
+(out/'grant2-tier7-corpus-binding.json').write_text(json.dumps({'clarification_sha256':sha(c),'raw_golden_sha256':clar['rawGoldenSha256'],'questions':clar['questions'],'candidates':clar['candidates'],'sorted_id_set_sha256':clar['sortedIDSetSha256'],'derived_hash':'5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162','candidate':r['candidate'],'provider_calls_authorized':False,'execution':'selected pure fixtures only; no real corpus92 evaluation'},indent=2))
+run('grant2-tier7',r['command'][1:],root,pins_from(r['pins']),45,p)

@@ -1,0 +1,8 @@
+{
+  "started": "2026-10-16T00:08:00.9532906Z",
+  "binaryExecuted": false,
+  "ok": false,
+  "errorType": "RuntimeException",
+  "errorMessage": "vendor-signature-not-valid-mongodb",
+  "completed": "2026-10-16T00:08:09.8171564Z"
+}

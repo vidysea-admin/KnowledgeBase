@@ -1,0 +1,55 @@
+[T011 known-clock] publish native ACL and sealed readiness begin +11ms
+[T011 known-clock] publish native ACL and sealed readiness complete +2942ms
+[T011 known-clock] list actual owner begin +2954ms
+[T011 known-clock] list actual owner complete +7134ms
+[T011 known-clock] list foreign owner begin +7134ms
+[T011 known-clock] list foreign owner complete +7897ms
+[T011 known-clock] reject foreign generation begin +7898ms
+[T011 known-clock] reject foreign generation complete +9484ms
+[T011 known-clock] persist private-start ACK begin +9484ms
+[T011 known-clock] persist private-start ACK complete +11854ms
+[T011 known-clock] restarted API durable private state begin +11861ms
+[T011 known-clock] restarted API durable private state complete +16524ms
+[T011 known-clock] persist private-end ACK begin +16524ms
+[T011 known-clock] persist private-end ACK complete +19299ms
+[T011 known-clock] reject forged HMAC begin +19309ms
+[T011 known-clock] reject forged HMAC complete +19320ms
+[T011 known-clock] reject foreign descriptor host begin +19321ms
+[T011 known-clock] reject foreign descriptor host complete +23616ms
+[T011 known-clock] revoke owned bridge begin +23616ms
+[T011 known-clock] revoke owned bridge complete +23621ms
+[T011 known-clock] revoked descriptor unavailable begin +23621ms
+[T011 known-clock] revoked descriptor unavailable complete +25121ms
+[T011 known-clock] cleanup child graceful exit begin +25122ms
+[T011 known-clock] child exit code=0 signal=null +25137ms
+[T011 known-clock] graceful close missed deadline; connected=false exitCode=0 signalCode=null
+[T011 known-clock] cleanup owned child termination begin +27622ms
+✖ actual Node child + private API host bridge known-clock (30131.2377ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30581.7652
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:1:1146
+✖ actual Node child + private API host bridge known-clock (30131.2377ms)
+  Error [AggregateError]: Fixture failed and child cleanup did not settle
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:76:35)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    [errors]: [
+      Error: Fixture deadline: child disconnect
+          at Timeout._onTimeout (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:17:75)
+          at listOnTimeout (node:internal/timers:635:17)
+          at process.processTimers (node:internal/timers:571:7),
+      Error: Fixture deadline: owned child termination
+          at Timeout._onTimeout (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:17:75)
+          at listOnTimeout (node:internal/timers:635:17)
+          at process.processTimers (node:internal/timers:571:7)
+    ]
+  }

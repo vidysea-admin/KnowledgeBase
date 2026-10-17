@@ -1,0 +1,34 @@
+diff --git "a/qa\\coordination\\resume-20261015\\native-quota-vectorless-maker\\backups\\apps__api__src__grounded-postprocessing__transcripts.test.ts" b/apps/api/src/grounded-postprocessing/transcripts.test.ts
+index 974a086d..790d2ab5 100644
+--- "a/qa\\coordination\\resume-20261015\\native-quota-vectorless-maker\\backups\\apps__api__src__grounded-postprocessing__transcripts.test.ts"
++++ b/apps/api/src/grounded-postprocessing/transcripts.test.ts
+@@ -6,6 +6,7 @@ import { headId } from "../transcript-review/store.js";
+ import { runRefresh } from "../transcript-review/service.js";
+ import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
+ import { createGroundedContentDeps } from "../grounded-content/reader.js";
++import { verifyIndexGeneration } from "../indexing/generation.js";
+ import { routedFixture, turns, session, source, FACT, ACTION, ANSWER } from "./fixture.testsupport.js";
+ 
+ function context({ name = "lkb_t054_composition", env = {} as NodeJS.ProcessEnv, judgeFails = false } = {}) {
+@@ -54,7 +55,20 @@ test("actual factory refresh consumes corrected view and publishes canonical cit
+   const result = await runRefresh(deps.store, deps.refresh!, "t", "s1");
+   assert.equal(result?.status, "complete"); assert.equal(result?.completed.length, 5);
+   assert.deepEqual(state.transaction.rows("turns"), originals);
+-  assert.ok(state.provider.kinds.includes("note-judge")); assert.ok(state.provider.kinds.includes("embedding"));
++  assert.ok(state.provider.kinds.includes("note-judge"));
++  assert.equal(state.provider.kinds.filter(kind => kind === "embedding").length, 0);
++  assert.equal(state.provider.jobs.filter(job => job.kind === "embedding").length, 0);
++  const indexed = state.transaction.rows("sessions")[0]!;
++  assert.equal(indexed.status.index, "done"); assert.equal(indexed.indexAttempt.state, "complete");
++  assert.equal(indexed.indexAttempt.manifest.retrievalMode, "vectorless");
++  const lexical = state.transaction.rows("chunks");
++  assert.ok(lexical.length > 0); assert.ok(state.transaction.rows("tree_index").length > 0);
++  for (const chunk of lexical) {
++    assert.equal(chunk.vector, undefined); assert.equal(chunk.dims, undefined); assert.equal(chunk.embeddingModel, undefined);
++    assert.equal(chunk.indexArtifact.generation, indexed.indexAttempt.generation);
++    assert.ok(chunk.turnRefs.length > 0);
++  }
++  assert.ok(await verifyIndexGeneration(state.transaction.db, "t", "s1", indexed.indexAttempt.generation));
+   assert.ok(state.provider.jobs.length > 0 && state.provider.jobs.every((job) => job.tenantId === "t"));
+   const page = state.transaction.rows("session_pages")[0]!;
+   assert.ok(page.summary.includes(FACT)); assert.deepEqual(page.actionItems, [ACTION]); assert.equal(page.qa[0].answer, ANSWER);

@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "recordedAt": "2026-10-15T20:10:48.2985429Z",
+  "state": "ACTIVE_SOURCE_MAKERS_SHARED_SOURCES_FROZEN",
+  "authority": "Root current explicit resumption",
+  "leases": "qa/coordination/resume-20261015/leases.json",
+  "makerCount": 6,
+  "cpuBroker": "sole resume_cpu_broker; six queued jobs reported by root",
+  "sourceWritesByCoordinator": 0,
+  "sharedSources": "FROZEN, no tracker/schema/contracts/global writes authorized",
+  "acceptance": "39 included parents remain unfinished; no new PASS or acceptance",
+  "nextCandidate": {
+    "task": "T-042",
+    "classification": "DOCUMENTED_IMPLEMENTATION_GAP_NEEDS_EXACT_DISPATCH_CLEARANCE",
+    "proposedLease": [
+      "packages/meeting-bot/src/capture/tiles/native-clock-calibrator.ts",
+      "packages/meeting-bot/src/capture/tiles/native-clock-calibrator.test.ts"
+    ],
+    "behavior": "Independent decoded media-zero/transform/clock authority producer missing in current T042 manifest and sampler clock packet; sampler witnesses alone do not certify decoded sample zero",
+    "evidence": [
+      "qa/manifests/t042-trusted-registry.md remaining mounted gates",
+      "qa/coordination/knowledge-brain-20261015/capture-delivery/clock.md"
+    ],
+    "limits": "Proposed new paths, not granted; registry/sampler held by active maker. Producer implementation may be isolated; registry/finalizer mounting requires later explicit lease/freeze release. No native calibration or live acceptance inferred"
+  },
+  "otherRemainders": [
+    {
+      "task": "T-007",
+      "classification": "INTERNAL_SHARED_PROTOCOL_HOLD",
+      "behavior": "ISS-WAVECTORLESS-002 shared consent authorization revision/CAS protocol; independent concurrent native proof unavailable",
+      "limits": "Central schema/integration currently frozen; not unblocked"
+    },
+    {
+      "task": "transactional acceptance",
+      "classification": "EXTERNAL_HOST_AUTHORIZATION_GATE",
+      "behavior": "Existing staging Mongo standalone; separate replica-set activation not authorized"
+    },
+    {
+      "task": "T-022/operational parents",
+      "classification": "GENUINE_HUMAN_PROVIDER_HOST_ELAPSED_GATES",
+      "behavior": "0/30 human judgments, real provider/media, actual captures, Ubuntu and seven-day proof retain gates"
+    }
+  ],
+  "surveyLimits": "No new defects asserted from obsolete owner summaries. T052/T053 implemented; native UI/search extended and fixture repairs pending replay. T060 docs repaired with actual current receipt. No broad QA sweep/tests/providers/children."
+}

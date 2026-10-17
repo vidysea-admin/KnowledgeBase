@@ -1,0 +1,28 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx (8 tests | 1 skipped) 1094ms
+   ✓ mounted speaker workbench consumes trusted source and submits a pending proposal with hashed evidence 673ms
+ ✓ src/pages/setup-wizard/SetupWizardPage.test.tsx (20 tests) 699ms
+ ✓ src/pages/operations/OperationsPage.test.tsx (13 tests) 1178ms
+   ✓ real clients power triage, saved replay, back navigation and encoded Explorer actions 449ms
+ ✓ src/pages/transcript-review/TranscriptReview.test.tsx (11 tests) 748ms
+ ✓ src/pages/operations/EvaluationFlywheelPanel.test.tsx (8 tests) 679ms
+ ✓ src/pages/calibration-review/CalibrationReviewPage.test.tsx (6 tests) 588ms
+ ✓ src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx (8 tests) 518ms
+ ✓ src/pages/knowledge/CuratedCollections.test.tsx (6 tests) 478ms
+ ✓ src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx (2 tests) 421ms
+ ✓ src/pages/operations/evaluationFlywheelModel.test.ts (20 tests) 22ms
+ ✓ src/pages/calibration-review/offline-transfer.test.ts (3 tests) 21ms
+ ❯ src/pages/transcript-review/ReviewHistory.test.tsx (3 tests | 1 failed) 177ms
+   × failed refresh exposes retry; successful refresh invokes canonical reload 27ms
+     → expected 'Loading review operation…' to contain 'Knowledge refresh complete'
+ ✓ src/pages/operations/OperationsIntegration.test.tsx (2 tests) 858ms
+   ✓ actual protected App/sidebar consumes workspace and navigates to scoped Explorer 844ms
+ ✓ src/pages/knowledge/collectionsClient.test.ts (2 tests) 6ms
+
+ Test Files  1 failed | 13 passed (14)
+      Tests  1 failed | 110 passed | 1 skipped (112)
+   Start at  10:18:01
+   Duration  41.54s (transform 2.65s, setup 3.35s, collect 10.86s, tests 7.49s, environment 13.72s, prepare 2.31s)
+

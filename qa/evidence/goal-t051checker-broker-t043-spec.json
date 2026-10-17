@@ -1,0 +1,9 @@
+{
+  "args": ["--test", "--test-isolation=none", "--test-concurrency=1", "--test-timeout=30000", "scripts/webinar/index-proof.test.mjs"],
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-t043",
+  "pins": {
+    "scripts/webinar/index-proof.mjs": "7e548f2c2f643d6d3f6afba6c2360aaf225a7b531b6dc7e2d0fb2439283843eb",
+    "scripts/webinar/index-proof.test.mjs": "a047145bb417e9acea61d25105d9e4c0fa59ff67adfd0975c75e3256f3da38fb"
+  }
+}

@@ -1,0 +1,48 @@
+import type { TreeIndexNode } from "@lkb/core";
+import type { IndexSessionResult } from "../indexing/types.js";
+import { tenantSourceId } from "@lkb/ingest";
+import { fingerprint, FlywheelError, type CaptureReceipt, type SourceRows, type IndexedRows } from "./types.js";
+
+const present = (x: unknown): x is string => typeof x === "string" && x.trim().length > 0;
+export function captureReceipt(t: string, sourceId: string, sessionId: string, rows: SourceRows): CaptureReceipt {
+  const { source, session, turns } = rows;
+  if (!source || !session || source.tenantId !== t || session.tenantId !== t || source._id !== sourceId
+    || session._id !== sessionId || session.sourceId !== sourceId || !present(source.hash) || source._id !== tenantSourceId(t, source.hash)
+    || !["provided", "public", "notes"].includes(source.captureMode) || source.consent?.given !== true
+    || !present(source.consent.recordedBy) || session.status.transcribe !== "done" || !turns.length)
+    throw new FlywheelError("unavailable", 503);
+  const ids = new Set<string>();
+  for (const turn of turns) {
+    if (turn.tenantId !== t || turn.sessionId !== sessionId || !present(turn._id) || ids.has(turn._id)
+      || !present(turn.text) || !present(turn.speakerRef) || !Number.isFinite(turn.tStart) || !Number.isFinite(turn.tEnd)
+      || turn.tStart < 0 || turn.tEnd < turn.tStart) throw new FlywheelError("unavailable", 503);
+    ids.add(turn._id);
+  }
+  const ordered = [...turns].sort((a, b) => a.tStart - b.tStart || (a._id < b._id ? -1 : a._id > b._id ? 1 : 0));
+  return { sourceId, sessionId, sourceDigest: source.hash, transcriptDigest: fingerprint(ordered), turnCount: turns.length,
+    turnIds: [ordered[0]!._id, ...ordered.slice(1).map((r) => r._id)] };
+}
+export function indexedDigests(t: string, receipt: CaptureReceipt, rows: IndexedRows): { treeDigest: string; chunksDigest: string } {
+  const { tree, chunks } = rows;
+  const matches = (n: TreeIndexNode): boolean => n.level === "session" && n.evidence?.sessionRef === receipt.sessionId
+    || n.children.some(matches);
+  if (!tree || tree.tenantId !== t || tree.node_id !== `tenant:${t}` || !matches(tree) || !chunks.length)
+    throw new FlywheelError("unavailable", 503);
+  const ids = new Set<string>();
+  for (const c of chunks) {
+    if (c.tenantId !== t || c.sourceRef !== receipt.sessionId || !present(c._id) || ids.has(c._id)
+      || !Array.isArray(c.turnRefs) || !c.turnRefs.length || c.turnRefs.some((id) => !receipt.turnIds.includes(id)) || !Array.isArray(c.vector) || !c.vector.length
+      || c.vector.some((v) => !Number.isFinite(v)) || c.dims !== c.vector.length || !present(c.embeddingModel))
+      throw new FlywheelError("unavailable", 503);
+    ids.add(c._id);
+  }
+  return { treeDigest: fingerprint(tree), chunksDigest: fingerprint(chunks) };
+}
+export function assertIndexResult(result: IndexSessionResult, receipt: CaptureReceipt): void {
+  const c = result?.completion;
+  if (result?.sessionId !== receipt.sessionId || !c || c.version !== 2 || c.complete !== true || c.treeWritten !== true
+    || !present(c.generation) || c.turnCount !== receipt.turnCount || c.turnCount < 1
+    || !result.chunks || result.chunks.skipped !== null || result.chunks.written < 1
+    || !result.summary || result.summary.degraded !== null || !result.claims || result.claims.degraded !== null)
+    throw new FlywheelError("unavailable", 503);
+}

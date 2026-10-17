@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "index": 42,
+  "originalIndex": 45,
+  "claimId": "2026-07-15-creative-futures-c02",
+  "inputHash": "8cfcc191b4ea3676fd8bd4b22038630d6d47dabe1759d9398eba9f183a8f9f45",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original supports about 63% of total SCAD degree programs being STEM and a three-year OPT benefit after graduation, but does not identify international graduates as the eligible population. It also states an approximate percentage, while the claim states 63% without that qualifier.",
+    "missingReferences": [],
+    "caveats": [
+      "The original speakerRef is unknown; person identity is not established.",
+      "The source says about 63%, and eligibility details for international graduates are absent from this exact context.",
+      "The same turn ID has changed content, speakerRef and timing: original 649-688 seconds, current 805-831 seconds.",
+      "One supplied reference has one match in each version; no missing or duplicate reference observed.",
+      "Transcript support does not establish external OPT rules, factual truth or date validity.",
+      "Artifact byte hashes are supplied only; raw current sha256 and normalizedLfSha256 are distinct and were not verified on disk."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-15-creative-futures",
+        "turnId": "2026-07-15-creative-futures-t019",
+        "contextVersion": "originalMigration",
+        "quote": "So at SCAD, we offer 29 STEM programs, which accounts about 63% of the SCAD total degree programs.",
+        "textSha256": "3c8d5a68b8de2a361b865e4f5c18efbc369aa2caefdfa80bfa79a61f8b0075bd",
+        "contextSha256": "9299d71eb9ffe7288deca1fda37be16aef68340fbd93ac1a3fd8a27dbe22778e",
+        "artifactSha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 649,
+        "tEnd": 688,
+        "supports": "Supports approximately 63% of total SCAD degree programs being STEM."
+      },
+      {
+        "sessionId": "2026-07-15-creative-futures",
+        "turnId": "2026-07-15-creative-futures-t019",
+        "contextVersion": "originalMigration",
+        "quote": "In a more practical field means student get to study after SCAD education, they got to receive a 3-year of OPT post-graduation to help them to work in the US",
+        "textSha256": "3c8d5a68b8de2a361b865e4f5c18efbc369aa2caefdfa80bfa79a61f8b0075bd",
+        "contextSha256": "9299d71eb9ffe7288deca1fda37be16aef68340fbd93ac1a3fd8a27dbe22778e",
+        "artifactSha256": "53ff3b19e362cce7e8caa46e68495236da55ca289067028700649d68939554ea",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 649,
+        "tEnd": 688,
+        "supports": "Supports a three-year OPT benefit after graduation in the STEM discussion; does not explicitly identify international graduates."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn discusses Google/Meta AI summits and teaching creatives to master AI; it supplies no STEM-program percentage, international-graduate eligibility or OPT duration.",
+    "missingReferences": [],
+    "caveats": [
+      "The retained turn ID now points to unrelated content with different timing and stored speakerRef Emily Lee; stored speakerRef does not independently establish identity.",
+      "One supplied reference has one current match; no missing or duplicate reference observed.",
+      "The current raw artifact sha256 differs from its normalizedLfSha256; neither on-disk artifact byte hash was verified.",
+      "Original support was not substituted for current evidence."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-15-creative-futures",
+        "turnId": "2026-07-15-creative-futures-t019",
+        "contextVersion": "current",
+        "quote": "And Google also, along with Meta, hosts these AI Summit, um, just a great example",
+        "textSha256": "50d278db088a7a5858ffd0903cff2e021104a5df787cfcc206c64ef148aaddcc",
+        "contextSha256": "2680b857dcf29775afbb98b163187e0123b01a00d248645e8c619a147619433b",
+        "artifactSha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+        "revision": null,
+        "speakerRef": "Emily Lee",
+        "tStart": 805,
+        "tEnd": 831,
+        "supports": "Unrelated AI summit discussion; supports none of the STEM-percentage or OPT components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original evidence partially supports the percentage and OPT duration, with an approximate percentage and unspecified eligible population; current same-ID evidence is unrelated. Hash and identity checks pass, but artifact bytes, external truth and human adjudication remain unverified."
+}

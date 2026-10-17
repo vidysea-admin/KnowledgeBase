@@ -1,0 +1,28 @@
+{
+  "status": "queued-root-sole-broker",
+  "cycle": 0,
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+  "command": "node --test --import tsx src/capture/native/native-ivf.test.ts src/capture/native/native-clock-ledger.test.ts src/capture/native/native-spool.test.ts",
+  "timeout_s": 60,
+  "source_pins": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-codecledger\\candidate-pins.json",
+  "checks": [
+    {
+      "node": "src/capture/native/native-ivf.test.ts",
+      "reason": "microsecond byte roundtrip, strict codec/dimension/count/overflow",
+      "boundary": "failure"
+    },
+    {
+      "node": "src/capture/native/native-clock-ledger.test.ts",
+      "reason": "one-to-one lineage, contiguous PCM, foreign clock and epoch step",
+      "boundary": "security"
+    },
+    {
+      "node": "src/capture/native/native-spool.test.ts",
+      "reason": "opaque issuer, raw hashes, retry poison, quotas, private link checks, server-bound resume",
+      "boundary": "security"
+    }
+  ],
+  "tests_executed": false,
+  "required_followup": "Combined package typecheck and browser/finalizer downstream integration on exact combined root candidate; mandatory repository checks remain root gate.",
+  "native_structure_adoption": "qa/coordination/resume-20261015/native-codecledger/native-structure-adoption.json"
+}

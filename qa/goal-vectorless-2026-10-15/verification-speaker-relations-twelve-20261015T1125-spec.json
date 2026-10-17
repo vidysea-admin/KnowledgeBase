@@ -1,0 +1,54 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "scope": "Speaker relationship12 offline service/store cases; runtime tenant scope plus canonical schema/type dependencies only",
+  "phase": "shared-integration-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "apps/api/src/speaker-relations/service.test.ts",
+    "apps/api/src/speaker-relations/mongo-store.test.ts"
+  ],
+  "testIDs": [
+    "apps/api/src/speaker-relations/service.test.ts all declared nodes",
+    "apps/api/src/speaker-relations/mongo-store.test.ts all declared nodes"
+  ],
+  "expectedSelectedNames": 12,
+  "expectedPrivateSkips": 0,
+  "env": {
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "KB_U24_PRIVATE_TOC_TESTS": "0"
+  },
+  "timeoutMs": 90000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-speaker-relations-twelve-20261015T1125",
+  "pins": {
+    "apps/api/src/speaker-relations/types.ts": "dfda428c83a3469ec7eae93bf0877facfe018a686c13a3b1484b3ec18415748f",
+    "apps/api/src/speaker-relations/service.ts": "25c0f5ac26a530918071033f8a1e5f1958d19e5ad3190a7c5a5ccbcd266164e0",
+    "apps/api/src/speaker-relations/mongo-store.ts": "c41021e5a66ee9acb02c7c21a50439c5067430e5052f2d9693eec58a53ffe4db",
+    "apps/api/src/speaker-relations/service.test.ts": "e930ac8883b60d25f6df989ffd84ca456d170fec49a8ddf2493d99ced98917b0",
+    "apps/api/src/speaker-relations/mongo-store.test.ts": "061ff4d7309776a212c1d80c149a22f295ab3145fa113fca26df51bd94adb853",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/core/src/index.ts": "a2713a4d68dc9c8419a081e952ae2b17a456b9409618ada299c25176ffb581cf",
+    "packages/core/src/generated/speaker_relationships.ts": "c595943527c6780c8a8635c618cc2a24a962af8c12f8b8b88477151e9ac7da8c",
+    "schema/speaker_relationships.schema.json": "e993aa74524800bb66c31f37ebe6725aaffc15a25fad4f32f43ae58c047073a4",
+    "packages/index/src/graph/speaker-knowledge.ts": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "apps/api/package.json": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede",
+    "apps/api/tsconfig.json": "e37d70f01dd85f180c1e3070dbed968acd2d610beb3ec9040a78259aa8ca1b03",
+    "packages/core/package.json": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+    "packages/db/package.json": "77f9a2f02b29062d3272b633e0a6cf583a48a653c2441956a1785dd5aee83e24",
+    "packages/index/package.json": "cc3a73c55269cba38982ede806cd3cb6d545ef263413c86c987e2dfbbc2a4d2c",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297"
+  }
+}

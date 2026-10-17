@@ -1,0 +1,66 @@
+{
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "receipts": [
+    {
+      "hashesUnchanged": true,
+      "receipt": "verification-publication-current27-final-20261015T0922.json",
+      "candidate_sha": "e4e64a3e9ce7eb0ecb87ee5c37199c655ed0e4de7121560012e43eab258ad00d",
+      "environment_hash": "1c84569ca4a508b42d8b1c71e1dcb76c259b9f05b50cca20ff8f057e299ab8e2",
+      "unitPinDrift": [
+        "apps/api/src/indexing/vectorless-publication.test.ts",
+        "apps/api/src/indexing/promote-entities.test.ts"
+      ],
+      "elapsedMs": 11714.2129,
+      "exitCode": 0
+    },
+    {
+      "hashesUnchanged": true,
+      "receipt": "verification-type-fixtures-ten-20261015T0938.json",
+      "candidate_sha": "460831bc747ddb5da48abde71c9f0824735f391efee6d41cb88d818480c3f95e",
+      "environment_hash": "1c84569ca4a508b42d8b1c71e1dcb76c259b9f05b50cca20ff8f057e299ab8e2",
+      "unitPinDrift": [],
+      "elapsedMs": 3483.9013999999997,
+      "exitCode": 0
+    },
+    {
+      "hashesUnchanged": true,
+      "receipt": "verification-api-types-20261015T0940.json",
+      "candidate_sha": "13e812c883b0c0c81d9c21ffb7d73fc3b3d229a2f4eb22f05e71f3784e6bf47e",
+      "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+      "unitPinDrift": [],
+      "elapsedMs": 13997.3617,
+      "exitCode": 0
+    },
+    {
+      "hashesUnchanged": true,
+      "receipt": "verification-api-build-20261015T0940.json",
+      "candidate_sha": "13e812c883b0c0c81d9c21ffb7d73fc3b3d229a2f4eb22f05e71f3784e6bf47e",
+      "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+      "unitPinDrift": [],
+      "elapsedMs": 2606.3508,
+      "exitCode": 0
+    },
+    {
+      "hashesUnchanged": true,
+      "receipt": "verification-api-remaining49-20261015T0925.json",
+      "candidate_sha": "e4e64a3e9ce7eb0ecb87ee5c37199c655ed0e4de7121560012e43eab258ad00d",
+      "environment_hash": "1c84569ca4a508b42d8b1c71e1dcb76c259b9f05b50cca20ff8f057e299ab8e2",
+      "unitPinDrift": [
+        "apps/api/src/indexing/vectorless-publication.test.ts",
+        "apps/api/src/indexing/promote-entities.test.ts"
+      ],
+      "elapsedMs": 14664.7966,
+      "exitCode": 0
+    },
+    {
+      "hashesUnchanged": true,
+      "receipt": "verification-frozen-contracts-20261015T0914.json",
+      "candidate_sha": "663f665dacfb20d583f92765923caa40d8041c640bcb1245407af849e01794c6",
+      "environment_hash": "45d6e44ed6caba84c6ae1b149a644e661a567026bbac5c815b85328393c43ff7",
+      "unitPinDrift": [],
+      "elapsedMs": 162.8908,
+      "exitCode": 0
+    }
+  ],
+  "candidate_sha": "8398a420331cd135944f727df98b0f25377f1c9bec1ffc9538574a5f1d894d06"
+}

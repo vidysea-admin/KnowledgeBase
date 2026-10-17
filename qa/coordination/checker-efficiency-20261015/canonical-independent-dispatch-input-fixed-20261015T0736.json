@@ -1,0 +1,26 @@
+{
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "reviewers": [
+    {
+      "id": "canonical-adoption-checker",
+      "active_s": 0,
+      "tokens": null,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "cost": null,
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "bootstrap_scope": "Fresh independent commissioning review of canonical checker-efficiency adoption only: exact changed policy/helper identity, reuse hashidentical fifteen-test and smoke receipts, contract-derived bounded probe as required; no KnowledgeBrain review or full suites; required gates remain binding",
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": null
+}

@@ -1,0 +1,64 @@
+{
+  "phase": "checker-budget-helper",
+  "scope": "T039 protected HOLD finalization admission helper only",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "b4853f20a5d8bc8aa5e508603710c278290e82e339342726c0eb8f1dfb00e74a",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "qa/evidence/t039-manual-jobs-operation-authority/checker-finalization-input.json"
+  ],
+  "program": "C:/Program Files/Python312/python.exe",
+  "runtime_version": "Python 3.12.10",
+  "runtime_executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "runtime_identity": {
+    "executable": "C:/Program Files/Python312/python.exe",
+    "version": "Python 3.12.10",
+    "sandbox": "workspace sandbox; Python-B pure function, no fixtures/network/global writes"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment_hash": "dc5041dd1ed1d4f36ee6a4f06ba7955e598cd0e5b1885d72f8d9cbf2ab089cff",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "LKB_RETRIEVAL_MODE": null,
+    "PYTHONDONTWRITEBYTECODE": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "canonical assess T039 finalization input"
+  ],
+  "timeoutMs": 10000,
+  "startedAt": "2026-10-15T10:27:32.425Z",
+  "completedAt": "2026-10-15T10:27:32.899Z",
+  "elapsedMs": 470.5935,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/evidence/t039-manual-jobs-operation-authority/checker-finalization-input.json": "320b2bf78e6f5e8c8a763fffce512cd5fad859c59659e354431fdb3d955f93a4",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "after": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/evidence/t039-manual-jobs-operation-authority/checker-finalization-input.json": "320b2bf78e6f5e8c8a763fffce512cd5fad859c59659e354431fdb3d955f93a4",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "stdoutPath": "qa/evidence/t039-manual-jobs-operation-authority/checker-finalization-assess-receipt.stdout.txt",
+  "stderrPath": "qa/evidence/t039-manual-jobs-operation-authority/checker-finalization-assess-receipt.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "workspace sandbox; Python-B pure function, no fixtures/network/global writes"
+}

@@ -1,0 +1,12 @@
+{
+  "observedAt": "2026-10-14T21:45:26.5396690Z",
+  "sourceReceipt": "qa/goal-2026-10-14/api-types-receipt.json",
+  "sourceReceiptHash": "28CDE10C6A2FDBAB4B84FCBB168BBD8150EF98CAC81995373AB9CFEF8255EDA3",
+  "phase": "api-types",
+  "exit": 2,
+  "elapsedMs": 18553,
+  "ownedDiagnostics": [],
+  "claim": "No owned diagnostics; shared compiler failed, not a passing compile",
+  "apiSourceMap": "FC64EF2B2A6EE2F1D276910181D1301F064506D7264AA788DF67CC2CD1F6A943",
+  "uiSourceMap": "F3433CB78F297A814F78832F1B5D358C064F801B1FD650D494BEF32BEA3F7B0E"
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "review-runtime-usage/v1",
+  "unit": "windows_qualification_design-postbaseline",
+  "cycle": 0,
+  "phase": "maker-postbaseline",
+  "boundary": "baseline",
+  "agent_prefix": "/root/windows_qualification_design",
+  "observed_at": "2026-10-16T02:57:07.922Z",
+  "coverage": "explicit_session_files_only",
+  "records": [
+    {
+      "identity": {
+        "thread_id": "01a1429e-01d9-7c20-bdd3-c3ff73efe3db",
+        "parent_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+        "agent_path": "/root/windows_qualification_design"
+      },
+      "usage_timestamp": "2026-10-16T02:56:04.774Z",
+      "lifecycle": {
+        "type": "task_started",
+        "timestamp": "2026-10-16T02:55:18.529Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 991574,
+        "cached_input_tokens": 940800,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2853,
+        "reasoning_output_tokens": 444,
+        "total_tokens": 994427
+      },
+      "status": "unknown",
+      "reasons": [
+        "inflight_or_unconfirmed_completion"
+      ]
+    }
+  ],
+  "active_seconds": null,
+  "monetary_cost": null
+}

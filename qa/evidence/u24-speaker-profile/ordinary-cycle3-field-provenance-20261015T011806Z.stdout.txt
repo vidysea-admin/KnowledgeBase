@@ -1,0 +1,19 @@
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (33.8111ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (7.042ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (70.6653ms)
+✔ known-person profile and mounted API revoke source consent without a cached identity bypass (101.6742ms)
+✔ unsupported snapshot capability cannot fall back to collection-only profile output (29.8001ms)
+✔ cached topic names require every contributing source session to remain visible (27.6203ms)
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (63.6448ms)
+✔ speaker metadata eligibility permits empty optional evidence and all-visible attribute references (4.3602ms)
+✔ speaker metadata eligibility checks withdrawn independent attribute references despite absent values (2.7211ms)
+✔ speaker metadata eligibility refuses malformed declared attribute references before source reads (1.8046ms)
+✔ speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads (1.5992ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2500.1975

@@ -1,0 +1,25 @@
+WIP: checkpoint vectorless knowledge and native capture integration
+
+Preserve current source integration, required dependencies, canonical schemas,
+source-only migrations, browser assets, and focused regression fixtures.
+
+Broker evidence records postcommit/vectorless/transcript 20/20, workspace
+12/12, and genuine synthetic native joins 2/2 green after the final fixture
+overlays. Earlier frozen bot/API/web types, dependency-cycle checks, affected
+structure budgets, archive/spool/finalizer FFmpeg tests, and focused
+voice/answer/scheduling checks remain separately attributed evidence.
+No full-suite or whole-repository structure PASS is claimed.
+
+Canonical independent review remains HOLD / NEEDS_EXTRA_REVIEW, cycle 0,
+reviewed content SHA eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de.
+Receipt-schema authentication and the independent boundary probe are incomplete;
+that checkpoint found no proven product violation and supplies no PASS.
+
+Remaining gates include file-symlink host security coverage, production secure
+private-root provisioning, fresh-process archive rehydration, complete native
+PhaseB production wiring, platform/host qualification, real provider/media/DB
+and human judgments, elapsed live proof, independent review and release.
+This local WIP checkpoint does not accept or complete the 39 parent tasks.
+Private captures, corpus, credentials and raw QA receipts are excluded.
+
+Local checkpoint only; no push, land, promotion or release.

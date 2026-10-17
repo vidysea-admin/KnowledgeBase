@@ -1,0 +1,309 @@
+{
+  "interpreter": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+  "schema": [
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_policy_review_items.schema.json",
+      "Hash": "DF39C962ABA86E4770EDFA28B4F2EAAD46E10F4A120BEA20F89D2C0CC4091E6E"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_policy_revisions.schema.json",
+      "Hash": "482C2D2D6501AEE17FBF195664407B338A3127568A1583FF4AD20DCD0BE90FFC"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_runs.schema.json",
+      "Hash": "2784B0BF93AF81284A2AA2A93F98A8E90435DC1996B0154007D106740456AE89"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_source_conflicts.schema.json",
+      "Hash": "51AC52176EF40C182A462F4E26790F4128CC72220DBE1B6A9181D3CCBE7E572E"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\api_keys.schema.json",
+      "Hash": "12772F62D25329FA0BE0291CBD8C1CE67A8CB6F264AA64C21A0510D757ADC594"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\application_operations.schema.json",
+      "Hash": "7AC6CD02C5CA1479664376839878761357D0422BFFF63DC0FA0D4818A103454E"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\automation_runs.schema.json",
+      "Hash": "50AC695CD5E7A9E0803101B8D98CFA7F6E92AD5DFE57AF21B904E653E00865A2"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\championship_events.schema.json",
+      "Hash": "79A6B85E3FC65713894047C70C9A214989EE65AC561BD4D0D284C634A3831797"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\chunks.schema.json",
+      "Hash": "C1100EA5A5B545F205C6DBB2578CE35D7A433794888706A3525CD83FE68AFDA5"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\claims.schema.json",
+      "Hash": "C7C03F15AC105B678C690CA01373092DD248F00A08E9FD9A9D433995101E79BE"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\consent_policies.schema.json",
+      "Hash": "2AB78ECE32EEF3A7679F4938758BC4C9D33FBA2DC9A30B56541CBD4F56C42E9C"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\decisions.schema.json",
+      "Hash": "F02702B771C152C1B93EA311A3419F1F8FB6DD03E5E55005BD9A4782839B7110"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\document_documents.schema.json",
+      "Hash": "37E3CFD33156145523409966F4D78122D45F7CA116800213C5395F8CF7DD4FEC"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\eval_runs.schema.json",
+      "Hash": "0401D26C2E7D0F68C9B998769D40BFD25B6728AF36416B0F0438FA82866E9742"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\features_event.schema.json",
+      "Hash": "3539798CF55E4CF7159BAF315797DA1B4A1E242AFC74E04980AFD23F4026230E"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\gaps.schema.json",
+      "Hash": "DC5792E0F1778D2DA7724592C14FA1F702B58CD816CF74D9B52B4D3B4FC80563"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\graph_edges.schema.json",
+      "Hash": "7127142AC5CDC65B2D952EE0DC646509C34FBE6466CA3E4EF349C6D40D241E23"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\jobs.schema.json",
+      "Hash": "D5BE6736CAA6F79795B393B80D8008A3C60EDB1ADA1C869298C0AB568AACB0B2"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\knowledge_collections.schema.json",
+      "Hash": "079DC764E4B769B79A6EC866B8663D98A54CB770FB0DD412CA4E5F874D354633"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\knowledge_outputs.schema.json",
+      "Hash": "353992A62A88CE6855AAD64DD86C3E669B436FF770FBCF8E08C263F462C238E9"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\media.schema.json",
+      "Hash": "364BAC0CD3F6D644942417E3E4B67FAD28FE0405892C37CAD8223145B9972EF7"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\meeting_candidates.schema.json",
+      "Hash": "9D3B6B5D6176C29BAD4BC7FC4C5C2AFC4EEE5F9227AF8D9E7B02BE399EA8203D"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\operations_schedules.schema.json",
+      "Hash": "182DD658099957AEB641A2CC6418B94428452D0C0E5D8AD36CEB9C6058F3F5C9"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\orgs.schema.json",
+      "Hash": "E867BDEA46D08F8E06B444512CA0BA64D887A163CB7D6255823F70FD7C711D0D"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\programs.schema.json",
+      "Hash": "F8AA949EE609445981010C23FCE00CD1AEB5E7F63BEC4D9A137CF3F9A05510E2"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\session_pages.schema.json",
+      "Hash": "F7A15DDFD309AC1311D72871F8539EC536CBB4CE1E2F1943092F4CF9034DAC86"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\sessions.schema.json",
+      "Hash": "E58A6AB3BA4EDD45F99D3F1C0B36CD0A65B257FF31FFE198D27A0390E7BF17CC"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\sources.schema.json",
+      "Hash": "98D8AFC59B405A6E6115BE9E864C653E73D799DFED33D68DE078C8C836978D62"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\speaker_suggestions.schema.json",
+      "Hash": "36D6F778C116E72B00D4336A885FD10897F95F94E4C8C68F00962FA5A0947237"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\speakers.schema.json",
+      "Hash": "4517527931B596071FC61568BEBA608C7DE20CCE5733C2DF7857E3FBFA72A064"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\tenants.schema.json",
+      "Hash": "4609C0C6B321C4512238E32048750E814B8D949F42722AC9005B74756BDD232B"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\topics.schema.json",
+      "Hash": "D39485734E248BB6593480CCEEF60D317855BDAE56E3522665970E02E97F03AD"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\transcript_review_revisions.schema.json",
+      "Hash": "7903474FF1B5EF08B0D20034F970258C0BDE6253F960C6A25D773C0DADD95E51"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\transcript_reviews.schema.json",
+      "Hash": "5EF9AB1B7B8E4AF400CC178384A1294F75E8FDB0397309C24A0E2CDE4EF72EB7"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\tree_index.schema.json",
+      "Hash": "622F640928A5B64579E7E193D9250A18065F88F7DC77572C294843DC8C1AC95C"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\trusted_senders.schema.json",
+      "Hash": "68588ADE9FBD157F225BF4E222408783B53DA90DA29B4CA69F3676285DB22120"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\turns.schema.json",
+      "Hash": "367D41C4A0D8C92CA4C8007731B07BC713C30A34BD01BB63DF14842E00397709"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\usage_events.schema.json",
+      "Hash": "342BAB5FA055D837CBF7CE717836A12F70B761987A14D981BF07D53F7968361C"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watch_heartbeat.schema.json",
+      "Hash": "4F199F633F4398142593C991FE0A224AF24C030FDF794AEB1AD39F7E9FB674A5"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watch_reports.schema.json",
+      "Hash": "328E7E5FC8E5A725D26A182E625B2719017C4524CB097126504CBF9BFE5580E0"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watch_state.schema.json",
+      "Hash": "B1B29AE7299071A727741FAC4F18428DEA637454042D7211484D209CC66BEAAE"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watched_sources.schema.json",
+      "Hash": "0DAABC83E6F5901326AABC8BA8784947F7CDB9B8EC6B106153E797FC5D83298D"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\whatsapp_candidates.schema.json",
+      "Hash": "6CAF632D53474472485713A9C89BB598F011F1236D8E49942D1EE9DBB335BF16"
+    }
+  ],
+  "generatedBefore": [
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\api_keys.ts",
+      "Hash": "3588D2FD73607CD84B9FC441AB922D15BFEF955C8B746ECA372AE8032A7F9CD7"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\chunks.ts",
+      "Hash": "BADA40CF96D687D98D5A047EE02E23F4F49D00267D0A2BF7FC3FD4FD738A9A0A"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\claims.ts",
+      "Hash": "7F0EC43C94C0140FDFB220B311D775653FF9D25B2E492C80796F766CE70B2A5C"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\consent_policies.ts",
+      "Hash": "4506F6ACFA7DCEE62C10BD52054074E7543E62B09B03E7B033D9B4107451B1F0"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\decisions.ts",
+      "Hash": "468C1F43A9920E7E61ED22EC50ADBA90E9318FB3D16323943A52F0BD044775FE"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\eval_runs.ts",
+      "Hash": "601FD35B6B162C5C2E1190A388793B37729289D48D7A740A419C26C7879E7927"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\features_event.ts",
+      "Hash": "A84BF0E4FD03F5BA23A79A5A7ABDD07CE0ABBACE4F6642AD5DAB2F1A03EAAD47"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\gaps.ts",
+      "Hash": "8F239DD12EDB7FD7FC646201923D6E8E08CC8DDC056D055BD145E2CA2FF0FD22"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\graph_edges.ts",
+      "Hash": "D96806A152B4391D0B22923DA0498106123FE45E26383608F05FCC910BED2EB1"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\jobs.ts",
+      "Hash": "B1D05176E7A835682C2451E3711DB57FBB71DCC99AA9E4D3D74D03E933B7F02F"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\media.ts",
+      "Hash": "4A5FA3F34BFA5DD45E54F1B0AA1570A041550A66E46C3CD4FFC5374D60324790"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\meeting_candidates.ts",
+      "Hash": "8A05A789C30E283081A4E27E597A7222947DC59400C59104F1E94167C1C4FA7F"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\orgs.ts",
+      "Hash": "3004D78A69265B6B1D383B6574302E88127897DEAEC3A7028485CBE39557782C"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\programs.ts",
+      "Hash": "DB127214E9933088E0A2C6B7048E17F0BC139DCD8C14CA4C10C336ACA99DAF2F"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\session_pages.ts",
+      "Hash": "EF50F0DF33F8F72FEC333D71C61660380344C3ECA6A7D9C3C438AB549BCD22AA"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\sessions.ts",
+      "Hash": "FE53A0A4EA7B989257F6BD3377415807CCFBB4C939794FEBE85AA8F456102B11"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\sources.ts",
+      "Hash": "150830E71957B84D06DF2E6F98541333E577DBB714ECB958AEC2066700A73F03"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\speaker_suggestions.ts",
+      "Hash": "4FE1B0658B9611D0F57AFA6C756EE922DAAD0C946580FDE052F04B211FF336D1"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\speakers.ts",
+      "Hash": "A0247A1CD1FA64B33AA19AF10FCE0A797E01B796EC57E7C5B799719AE5819C34"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\tenants.ts",
+      "Hash": "856BB46DD43CEB7D9921185D52FEE7C5427925F0B51802577E9ADE8EEFECF67F"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\topics.ts",
+      "Hash": "91BC3DBEEF3C3D8BF61B5F28313FBE04CBF2A6372D65F912CC01A4A73963D282"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\transcript_review_revisions.ts",
+      "Hash": "D0782E8D91DE973DCDB4D08F6B395C154FA1B146F82AB0A4704EA45ECF9473EF"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\transcript_reviews.ts",
+      "Hash": "3A6C03D92F548719E6676341948D2C826555B0BCACCC9AD5661C7965F52DAEF4"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\tree_index.ts",
+      "Hash": "12BEFD6AB283ECF039AA65ABFCB1BABFAB38B4894A8D29E4FBA272FE99F5F17E"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\trusted_senders.ts",
+      "Hash": "E68E34D04E128561EE285A21A25CDDB62CB3B8E791C1125D6B1811C93EB68328"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\turns.ts",
+      "Hash": "B4969CB780F97AC1579D753F271C4E4F7A69F95FCAC9FD76BA8D792F082D0205"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\usage_events.ts",
+      "Hash": "4F674FC250B3C11E51C993171FEEFBB0B2E4B1FF8E1A7C40888F9C8A77F6F964"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watch_heartbeat.ts",
+      "Hash": "A44AF8EEE4BEB8161EC45FFE388B9EB0A97AEEFF882198F437346863C289DD1C"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watch_reports.ts",
+      "Hash": "A22F68D7D0BC49CF5CA7EC2B720014E52FACD92604FAB26CA16FB7EA34822D05"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watch_state.ts",
+      "Hash": "11C2502B044EF680A26B413C2BDD2CEAF55C96CA9B025E7569BE1F6B8680F887"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watched_sources.ts",
+      "Hash": "EAAAC7577DBA32573FD2A79BB59024228D7DCC548459D293DE57641E8576B35E"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\whatsapp_candidates.ts",
+      "Hash": "C57B95AE7BA54BF73A8B6F295E38CA6E06338CEF3091BD8DC2847AFD5E1F668E"
+    }
+  ],
+  "modulePath": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Lib\\site-packages\\jsonschema",
+  "jsonschemaPin": "4.26.0"
+}

@@ -1,0 +1,21 @@
+{
+  "program": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "args": [
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-consent\\private-acl.ps1",
+    "-TargetPath",
+    "C:\\Users\\product\\AppData\\Local\\Temp\\t011-broker-acl-aOu3AQ"
+  ],
+  "pins": {
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ts": "073bfa2de3471ca812c1957c72d7eb0a0683f05344090d2293cbdefe266c1239",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ps1": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.test.ts": "f3f7c92ed3826fe3d27d5b3e1e0b2d3e5a5937324e9fe32e0cddd110a048359a"
+  },
+  "timeoutMs": 5000,
+  "output": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-experiment",
+  "env": {
+    "PSModulePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\Modules"
+  }
+}

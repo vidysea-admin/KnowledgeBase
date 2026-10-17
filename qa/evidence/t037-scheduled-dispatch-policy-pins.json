@@ -1,0 +1,10 @@
+{
+  "packages/meeting-bot/src/calendar/scheduled-dispatch.ts": "998BC21F690AD40B7874F2FE916B795B6B328E138CA817D806F20870787E2A19",
+  "packages/meeting-bot/src/calendar/scheduled-dispatch.test.ts": "8C35278F9E75B5EC1C5A6571A3F6EC1674117386ABC941D2289C16C8338909BD",
+  "packages/meeting-bot/src/calendar/schedule-tick.ts": "989E82E46A537BCBA8B7BFEC7D690147FAFFF54EA58E5FF918F1EF4406D6F202",
+  "packages/meeting-bot/src/calendar/state/schedule-dedup-state.ts": "C8086D3D68E7303BB1BE4C32CFEC2513BC60C86816E5C17F45B83772DD50FCA8",
+  "scripts/webinar/start-record-detached.ps1": "381064C65C745DDB41BC7758A9603EF333FF283B2B0148D2256262B549EC4B8E",
+  "scripts/webinar/start-record-detached.test.mjs": "D30C5ABE9A9EA2CC357A71E405C5FDD9F5CD9577D90FD23DB3C985D3C742BA62",
+  "packages/meeting-bot/src/cli.ts": "72C7BC4D22CCCB6B0DFF17959E9F63524411C03C4B49B9B8A60E3BB0ED575B7D",
+  "packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts": "01D4DE6BE8AC721FA5C8909FA2795D72CEC3CDE03BBBA8185DEDEB3E51C041DB"
+}

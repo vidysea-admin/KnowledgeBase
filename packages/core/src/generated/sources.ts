@@ -25,5 +25,17 @@ export interface Sources {
     [k: string]: unknown;
   };
   createdAt: string;
+  sourceMeta?: {
+    connectorIndex?: {
+      version: 2;
+      strict: boolean;
+      complete: true;
+      generation: string;
+      turnCount: number;
+      treeWritten: true;
+      sessionId: string;
+    };
+    [k: string]: unknown;
+  };
   [k: string]: unknown;
 }

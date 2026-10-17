@@ -1,0 +1,31 @@
+{
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T19:45:29.315Z",
+  "completedAt": "2026-10-14T19:45:30.487Z",
+  "elapsedMs": 1167.9741999999999,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "dfe3591e452f4f9c40427d41eaa334060ef37b986f943040ca3b97868535e1a5",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "65ef4e9cd36c6202af72e0f5d4bef35d6a3658f7f7fa1fac80a4f340d6182db7"
+  },
+  "after": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "dfe3591e452f4f9c40427d41eaa334060ef37b986f943040ca3b97868535e1a5",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "65ef4e9cd36c6202af72e0f5d4bef35d6a3658f7f7fa1fac80a4f340d6182db7"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t035-fake.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t035-fake.stderr.txt",
+  "hashesUnchanged": true
+}

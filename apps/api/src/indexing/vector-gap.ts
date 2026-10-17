@@ -8,7 +8,7 @@
 import type { Db } from "mongodb";
 import { scopedCollection } from "@lkb/db";
 import type { Gaps } from "@lkb/core";
-import type { ChunkWriteResult } from "./types.js";
+import type { ChunkWriteResult, IndexRetrievalMode } from "./types.js";
 
 /**
  * The DURABLE record that a session has no vectors (ISS-118).
@@ -49,6 +49,7 @@ export async function recordVectorGap(
   sessionId: string,
   chunks: ChunkWriteResult,
   db: Pick<Db, "collection">,
+  retrievalMode: IndexRetrievalMode = "vector",
 ): Promise<void> {
   const gapsColl = scopedCollection<Gaps>(db as never, "gaps");
   const _id = vectorGapId(tenantId, sessionId);
@@ -60,7 +61,7 @@ export async function recordVectorGap(
   // degrade-safe stance `writeSessionChunks` already takes. Fixing only the id would have left the
   // next unforeseen write error with the same power to strand a session.
   try {
-    if (chunks.skipped) {
+    if (retrievalMode === "vector" && chunks.skipped) {
       await gapsColl(tenantId).updateOne(
         { _id } as never,
         {

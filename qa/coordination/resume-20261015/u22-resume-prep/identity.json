@@ -1,0 +1,43 @@
+{
+  "head": "37e51f95c367594bddb422c39c11415674ecf001",
+  "historical_base": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_kind": "raw sorted-path inventory SHA256; NOT Git commit",
+  "candidate_sha": "c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+  "status": "?? scripts/eval/extraction-review-resume.mjs\n?? scripts/eval/extraction-review-resume.test.mjs\n",
+  "owned_untracked": true,
+  "pins": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\extraction-review-resume.mjs",
+      "sha256": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\extraction-review-resume.test.mjs",
+      "sha256": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\extraction-review.mjs",
+      "sha256": "0eae318240d991b626ada193aa39fe9f213de068b50d2db22c5fed7358f08a44"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval-extraction.mjs",
+      "sha256": "8f586efb874071895b9508403e2d0ff1aa7f272ceee1e87b8d6d0da9fa872741"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-u22.md",
+      "sha256": "332da01480c36e2caf687dc3d332594c3e9a6e280665da373871eae2bb8e1b25"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+      "sha256": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\contracts.json",
+      "sha256": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940"
+    }
+  ],
+  "maker_actual_usage": null
+}

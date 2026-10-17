@@ -1,0 +1,12 @@
+[
+  {
+    "total_lines": 267,
+    "sha256": "aa1de5248f25f941890cb64ff9e89ab61dc4d58f2f3fb3044029aa8ad1869925",
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  },
+  {
+    "total_lines": 63,
+    "sha256": "099b181cf1178182dfb4c81563d662b37dbeded36c8e40aa3fd879592c3b8fad",
+    "path": "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts"
+  }
+]

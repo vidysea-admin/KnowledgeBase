@@ -1,0 +1,6 @@
+{
+  "actual_repository_cycle_parser": "scripts/qa/dispatch-state.mjs:verdictCycle",
+  "cycle": 0,
+  "verdict": "HOLD",
+  "sha": "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de"
+}

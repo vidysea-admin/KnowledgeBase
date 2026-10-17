@@ -1,0 +1,37 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Telemetry actual sanitized timestamp ordinal type payload envelope RED original source",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-name-pattern=actual sanitized runtime metadata",
+    "scripts/qa/review-runtime-usage.test.mjs"
+  ],
+  "testIDs": [
+    "actual sanitized runtime metadata"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 15000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-red",
+  "pins": {
+    "scripts/qa/review-runtime-usage.test.mjs": "33c7d38c74c310bf7cde82e64277a5155eafe713f74b943b3e82c20d89ba5a9f",
+    "scripts/qa/review-runtime-usage.mjs": "a4ac3716872f5d5490c01157500994c5524ab8f68b97376d758b730c206607c7",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "qa/fixtures/review-runtime-usage-ordinal.jsonl": "6dca42de2cb7e706102eae9463d8ca540558ffc831d085b82e0af71b8941f2e9"
+  }
+}

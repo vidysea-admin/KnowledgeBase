@@ -1,0 +1,20 @@
+{
+  "args": [
+    "--import",
+    "tsx",
+    "--input-type=module",
+    "-e",
+    "import assert from 'node:assert/strict'; import {isBlockedAddress} from './packages/ingest/src/sources/guarded-fetch.ts'; import {discoverPublicWebinars} from './apps/api/src/gws/public-webinars.ts'; for (const [ip, expected] of [['3fff:0fff::',true],['3fff:1000::',false],['3fff:ffff::1',false]]) assert.equal(isBlockedAddress(ip),expected,ip); let lookups=0, requests=0; const r=await discoverPublicWebinars([{id:'owned',url:'https://publisher.example/events'}],{lookup:async()=>++lookups===1?['93.184.216.34']:['93.184.216.34','3FFF:0FFF::1'],request:async()=>{requests++;return {status:302,location:'/next',body:''};}},new Date('2026-10-14T12:00:00Z')); assert.equal(requests,1); assert.equal(lookups,2); assert.equal(r.complete,false); assert.deepEqual(r.candidates,[]); assert.deepEqual(r.gaps,[{sourceId:'owned',reason:'unavailable'}]); process.stdout.write('T036 independent: address boundary3/3; actual public caller redirected mixed-DNS refusal1/1; no second transport\\n');"
+  ],
+  "pins": {
+    "packages/ingest/src/sources/guarded-fetch.ts": "9FA6EF04A97DB7096F30D1DE0F1F9EAD40FB54694F48A16071EAF387D7C9F914",
+    "packages/ingest/src/sources/guarded-fetch.test.ts": "2D7B6B9DD1797EDD647C990D376755C287B01D4051F5236CD0DD4EA9568B5BEA",
+    "qa/issues.T036GUARD.jsonl": "2189A1B0CF4A0ADAE86046A9DF30D00FF87BEB544E6EFFDB974CF5F1A99A562E",
+    "apps/api/src/gws/public-webinars.ts": "7D2DCA798771C2D5CBFBBE3A30B6117C213F53F70AECF51D6F7BBB6BECC2B170",
+    "packages/ingest/src/sources/node-transport.ts": "61D0C702BEAFC166B8111F53C5E6B639B55B48642C863854B2CEE8A97B2BEA10",
+    "packages/ingest/src/source-acquisition/onair.ts": "7418A4757F6BEC15EDD016C76D69553F26000C2BEC88504F0ACB3F2A798E7033",
+    "packages/ingest/src/index.ts": "BD6EFF48332D6A650610A2F097F8FE30801B8668D002EC3060689A41105A43A6"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/evidence/goal-t051checker-broker-t036-independent"
+}

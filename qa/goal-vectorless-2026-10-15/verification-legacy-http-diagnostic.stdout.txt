@@ -1,0 +1,30 @@
+✖ legacy vector opt-in HTTP composition gives request factory sole ownership of arms and shared embed (153.3632ms)
+ℹ {"status":503,"errorCode":"source_context_unavailable","embedCalls":1,"vectorReads":1,"legacyFactoryCalls":0}
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2394.5938
+
+✖ failing tests:
+
+test at qa\evidence\ask-graph-selection\legacy-http-diagnostic.test.ts:1:404
+✖ legacy vector opt-in HTTP composition gives request factory sole ownership of arms and shared embed (153.3632ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  503 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\qa\evidence\ask-graph-selection\legacy-http-diagnostic.test.ts:58:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

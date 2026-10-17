@@ -1,0 +1,37 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "genuine-seal-fixed-reason-diagnostic",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "changed_paths": [
+    "scripts/native-capture/production.test.ts"
+  ],
+  "preimage_sha256": "07a64eae0b169a2d318d555cd91f445a7de443bfd897c600a6f5e11de7b5cf45",
+  "source_sha256": "1725dad0b25a67bb393b0b3cf7087361208532c27131f8188e9f5e9a390d620e",
+  "nonblank_lines": 133,
+  "status": "diagnostic-authored-not-executed",
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "token_metric": "actual_total",
+    "tokens": null,
+    "cost": null
+  },
+  "minimum_replay": {
+    "exact_positive_title": "genuine live seal precedes source ingestion; retained public recovery does not invent a clock",
+    "isolation": "default per-file, preserve admitted positive anchored exact selection and assert exactly one actual test",
+    "external_job_timeout_s": 125,
+    "guard": "Fresh root admission required; sole broker only. No broad retry.",
+    "node_timeout_ms": 120000,
+    "file": "scripts/native-capture/production.test.ts"
+  },
+  "evidence": "broker/genuine-seal-isolated-original-positive.log/-receipt.json and genuine-seal-isolated-checkpoint.md",
+  "gaps": [
+    "Actual unavailable fixed reason not yet observed",
+    "If reproof-unavailable next primitive guard-stage diagnosis needs separate root lease/admission",
+    "Actual EXIT/fresh-process chain remains unrun"
+  ]
+}

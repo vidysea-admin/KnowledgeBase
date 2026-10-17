@@ -1,0 +1,14 @@
+
+Algorithm : SHA256
+Hash      : 2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD
+Path      : C:\Users\product\Desktop\KnowledgeBase\pnpm-lock.yaml
+
+Algorithm : SHA256
+Hash      : DF657C35FF929F98BBA82399F616C5B201A02A2C07C66D71905CA55CB720528E
+Path      : C:\Users\product\Desktop\KnowledgeBase\apps\web\package.json
+
+Algorithm : SHA256
+Hash      : F67D852A59376DC6D5A386F669D984D7B3133860B693CA00DFA59A3CAF3596E0
+Path      : C:\Users\product\Desktop\KnowledgeBase\apps\web\tsconfig.json
+
+

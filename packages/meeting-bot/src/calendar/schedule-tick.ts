@@ -1,31 +1,4 @@
-/**
- * packages/meeting-bot/src/calendar/schedule-tick.ts — U5 (u5-auto-record-scheduler), backs
- * `cli schedule-tick [--dry-run]`. Loads calendar events + meeting candidates, runs them through
- * `selectAutoRecordItems` (auto-join.ts), and in non-dry-run mode hands each to-schedule item to
- * `scripts/webinar/start-record-detached.ps1` through a one-off Windows Scheduled Task
- * (task-scheduler.ts), recording what it scheduled in `schedule-state.ts`'s dedup state.
- *
- * Candidate loading over HTTP, not `@lkb/db` (dependency-cruiser: `meeting-bot -> ingest, core`
- * only, ARCHITECTURE.md §5 — same reason `cli.ts`'s `defaultTranscribe` hits the whisper worker's
- * wire shape over `fetch` instead of importing `@lkb/ai`). New env keys, documented rather than
- * silently invented (no existing generic-CLI API-key env var was found — see the manifest):
- * `LKB_API_URL` (default `http://localhost:3300`), `LKB_API_KEY` (required for a real, non-empty
- * candidate list — a missing key degrades to "0 candidates" rather than throwing, matching this
- * codebase's "never crash a poller tick" convention, e.g. `gws-gmail.ts`/`gws-calendar.ts`).
- *
- * Calendar events: always `[]` today — `qa/contracts/calendar-auto-join.md`'s own disclosed
- * non-goal is "no live wiring into a scheduled job… blocked on missing [Google OAuth]
- * credentials," which still holds. `loadCalendarEvents` is the seam a real `CalendarClient`
- * plugs into once those credentials exist; nothing here needs to change to wire it up then.
- *
- * Fix cycle 2 (checker FAIL, 2026-09-27): the real-schedule loop below no longer builds the
- * Windows Scheduled Task's `/tr` from title/url/sessionId (ISS-317 — command injection). It
- * derives a validated `jobKey` from the item's `sessionKey`, persists the sensitive fields to a
- * per-job JSON file (`schedule-state.ts`'s `writeScheduledJob`), and passes only `jobKey` +
- * the fixed launcher path to `task-scheduler.ts`'s `scheduleOnce`. It also now writes the item's
- * FULL ISO `endTime` into that job file rather than a bare local `HH:mm` (ISS-319 — a session
- * crossing midnight used to get a stop time ~24h in the past).
- */
+/** Scheduling and HTTP acquisition with explicit ownership and persistent job identity. */
 import { existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -33,10 +6,23 @@ import { fileURLToPath } from "node:url";
 import type { CalendarEvent } from "./calendar-client.js";
 import {
   selectAutoRecordItems, loadTrustedSenderConfig, redactJoinLink,
-  type AutoRecordCandidateInput, type AutoRecordItem, type SkippedItem,
+  type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
-import { readScheduledKeys, recordScheduled, writeScheduledJob, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./schedule-state.js";
+import { describeSkip } from "./state/skip-describe.js";
+import { requireStateTenant } from "./state/state-tenant-tag.js";
+import { recordSkipped } from "./state/skipped-state.js";
+import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
+import { scheduledDispatchIdentity } from "./scheduled-dispatch.js";
+import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules/join-rules-enforce.js";
+import { projectApprovedSenderTrust, type ApprovedTrustContext } from "./join-rules/join-rules-approved-trust.js";
+import { classifyWebinarInvite } from "./auto-record-policy.js";
+import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
+import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
+import { announceScheduled, buildAutojoinTickDeps, createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, type AutojoinTickDeps } from "../autojoin/tick-wiring.js";
+export {
+  createHttpCandidateLoader, createHttpCalendarLoader, loadNoCalendarEvents, loadWebinarSourcesWithHealth, type WebinarFeedHealth,
+} from "./schedule-loaders.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(HERE, "..", "..", "..", "..");
@@ -44,170 +30,28 @@ const DEFAULT_STATE_DIR = path.join(REPO_ROOT, "raw", "webinars");
 const DEFAULT_LEAD_MINUTES = 5;
 const RECORD_LAUNCHER = path.join(REPO_ROOT, "scripts", "webinar", "start-record-detached.ps1");
 
-/** The narrow shape this module needs from a real `GET /meeting-candidates` response row —
- * matches the generated `MeetingCandidates` type's field names so mapping is a straight pick. */
-interface MeetingCandidateApiRow {
-  _id: string;
-  subject: string;
-  senderEmail: string;
-  senderDomain: string;
-  status: "pending" | "approved" | "rejected" | "auto_approved";
-  meetingUrl?: string;
-  startTime?: string;
-  endTime?: string;
-  kind?: "past-recording" | "upcoming";
-  registrationOnly?: boolean;
-}
-
 export interface ScheduleTickDeps {
   loadCalendarEvents: () => Promise<CalendarEvent[]>;
   loadCalendarAcquisition?: (syncToken?: string, requestStartedAt?: string) => Promise<WebinarCalendarAcquisition>;
   loadCandidates: (refresh?: boolean) => Promise<AutoRecordCandidateInput[]>;
   now: () => string;
   stateDir: string;
+  /** Tenant that owns the dedup/job state files under stateDir (LKB_TENANT_ID). Absent or invalid = the tick refuses, before anything is read or scheduled (ISS-ALERTID-006). */
+  stateTenantId?: string;
   scheduler: TaskScheduler;
   log: (msg: string) => void;
   everyWebinar?: boolean;
-}
-
-function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput {
-  return {
-    id: row._id,
-    title: row.subject,
-    senderEmail: row.senderEmail,
-    senderDomain: row.senderDomain,
-    status: row.status,
-    meetingUrl: row.meetingUrl,
-    startTime: row.startTime,
-    endTime: row.endTime,
-    kind: row.kind,
-    registrationOnly: row.registrationOnly,
-  };
-}
-
-/** Real candidate loader: `GET /meeting-candidates` (existing route, gmail-meeting-candidates-
- * approval.md), filtered client-side to approved/auto_approved (defensive — never assume the
- * server already filtered). Never throws: a missing key, an unreachable API, or a non-2xx all
- * degrade to an empty list with a logged reason, so one tick's networking problem can't crash a
- * poller loop (same failure contract as `gws-gmail.ts`/`gws-calendar.ts`). */
-export function createHttpCandidateLoader(
-  apiUrl: string, apiKey: string | undefined, log: (msg: string) => void,
-  everyWebinar = false,
-): () => Promise<AutoRecordCandidateInput[]> {
-  return async () => {
-    if (!apiKey) {
-      log("schedule-tick: LKB_API_KEY not set — skipping Gmail candidates this tick (0 candidates)");
-      return [];
-    }
-    try {
-      const res = await fetch(`${apiUrl}/meeting-candidates`, {
-        headers: { authorization: `Bearer ${apiKey}` }, redirect: "error",
-        signal: AbortSignal.timeout(30_000),
-      });
-      if (!res.ok) {
-        log(`schedule-tick: GET /meeting-candidates -> ${res.status} — skipping this tick (0 candidates)`);
-        return [];
-      }
-      const body = (await res.json()) as { candidates?: MeetingCandidateApiRow[] } | MeetingCandidateApiRow[];
-      const rows = Array.isArray(body) ? body : body?.candidates;
-      if (!Array.isArray(rows)) throw new Error("Invalid Gmail candidate response");
-      return rows
-        .filter((r) => everyWebinar || r.status === "approved" || r.status === "auto_approved")
-        .map(toCandidateInput);
-    } catch (err) {
-      log(`schedule-tick: /meeting-candidates fetch failed (${err instanceof Error ? err.message : String(err)}) ` +
-        "— skipping this tick (0 candidates)");
-      return [];
-    }
-  };
-}
-
-/** No real Google Calendar credentials exist yet (calendar-auto-join.md's own disclosed
- * non-goal) — this is the seam a real `CalendarClient.listUpcomingEvents(...)` call plugs into. */
-export async function loadNoCalendarEvents(): Promise<CalendarEvent[]> {
-  return [];
-}
-
-export interface WebinarFeedHealth {
-  status: "healthy" | "failed";
-  checkedAt: string;
-  lastSuccessAt?: string;
-  notification?: { acknowledged?: string; fingerprint?: string; status?: string; retryable?: boolean; updatedAt?: string };
-}
-/** Load both connected feeds without converting a failed source into a healthy empty schedule. */
-export async function loadWebinarSourcesWithHealth(
-  deps: Pick<ScheduleTickDeps, "loadCalendarEvents" | "loadCandidates" | "loadCalendarAcquisition">,
-  checkedAt: string,
-  previous?: Partial<Record<"calendar" | "gmail", WebinarFeedHealth>>,
-  refresh = false,
-  native?: {syncToken?: string},
-) {
-  if (previous !== undefined && (!previous || typeof previous !== "object" || Array.isArray(previous) ||
-    Object.keys(previous).some((key) => !["calendar", "gmail"].includes(key)))) throw new Error("Invalid discovery health state");
-  for (const row of Object.values(previous ?? {})) {
-    if (!row || !["healthy", "failed"].includes(row.status) || typeof row.checkedAt !== "string" || !Number.isFinite(Date.parse(row.checkedAt)) ||
-      (row.lastSuccessAt !== undefined && (typeof row.lastSuccessAt !== "string" || !Number.isFinite(Date.parse(row.lastSuccessAt))))) throw new Error("Invalid discovery health state");
-  }
-  const results = await Promise.allSettled([Promise.resolve().then(async (): Promise<CalendarEvent[] | WebinarCalendarAcquisition> => {
-    if (!native) return deps.loadCalendarEvents();
-    if (!deps.loadCalendarAcquisition) throw new Error("Native Calendar acquisition required");
-    return deps.loadCalendarAcquisition(native.syncToken, checkedAt);
-  }), Promise.resolve().then(() => deps.loadCandidates(refresh))]);
-  const calendarValue = results[0]!.status === "fulfilled" ? results[0]!.value : undefined;
-  const calendarAcquisition = native && calendarValue ? calendarValue as WebinarCalendarAcquisition : undefined;
-  const health = Object.fromEntries((["calendar", "gmail"] as const).map((feed, i) => [feed, {
-    status: results[i]!.status === "fulfilled" ? "healthy" : "failed", checkedAt,
-    lastSuccessAt: results[i]!.status === "fulfilled" ? checkedAt : previous?.[feed]?.lastSuccessAt,
-    notification: previous?.[feed]?.notification,
-  }])) as Record<"calendar" | "gmail", WebinarFeedHealth>;
-  return { health, failed: results.some((result) => result.status === "rejected"),
-    calendarAcquisition,
-    calendarEvents: calendarAcquisition ? calendarAcquisition.meetings : calendarValue as CalendarEvent[] ?? [],
-    candidates: results[1]!.status === "fulfilled" ? results[1]!.value as AutoRecordCandidateInput[] : [] };
-}
-
-/** Reuses the authenticated Calendar route; failed discovery never looks like a healthy empty feed. */
-export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint?: () => string | undefined): () => Promise<CalendarEvent[]>;
-export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint: undefined, native: {tenantId: string}): (syncToken?: string, requestStartedAt?: string) => Promise<WebinarCalendarAcquisition>;
-export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefined, checkpoint?: () => string | undefined, native?: {tenantId: string}): (syncToken?: string, requestStartedAt?: string) => Promise<CalendarEvent[] | WebinarCalendarAcquisition> {
-  return async (syncToken, requestStartedAt) => {
-    if (!apiKey) throw new Error("Calendar discovery requires LKB_API_KEY");
-    const query = new URLSearchParams({ discovery: "1" });
-    const startedAt = requestStartedAt ?? new Date().toISOString();
-    if (native) {
-      if (checkpoint || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(native.tenantId) ||
-          (syncToken !== undefined && (typeof syncToken !== "string" || !/^[A-Za-z0-9._~+/=-]+$/.test(syncToken) || syncToken.length > 2048)) ||
-          typeof startedAt !== "string" || !Number.isFinite(Date.parse(startedAt)) || new Date(startedAt).toISOString() !== startedAt) throw new Error("Invalid native Calendar request");
-      query.set("sync", "1"); if (syncToken !== undefined) query.set("syncToken", syncToken);
-    }
-    const changedSince = checkpoint?.();
-    if (changedSince !== undefined) {
-      if (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
-          !Number.isFinite(Date.parse(changedSince)) || new Date(changedSince).toISOString() !== changedSince) throw new Error("Invalid calendar change checkpoint");
-      query.set("changedSince", changedSince);
-    }
-    const res = await fetch(`${apiUrl}/calendar/upcoming?${query}`, {
-      headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
-    });
-    if (!res.ok) { if (native) await res.body?.cancel(); throw new Error(`Calendar discovery failed: HTTP ${res.status}`); }
-    if (native) {
-      if (!res.body) throw new Error("Native Calendar response requires a stream");
-      const reader = res.body.getReader(), chunks: Uint8Array[] = []; let bytes = 0;
-      try {
-        for (;;) {
-          const {done, value} = await reader.read(); if (done) break;
-          bytes += value.byteLength; if (bytes > 5 * 1024 * 1024) throw new Error("Native Calendar response exceeds byte budget");
-          chunks.push(value);
-        }
-        const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-        return validateWebinarCalendarAcquisition(body, native.tenantId, syncToken, startedAt);
-      } catch (error) { await reader.cancel().catch(() => {}); throw error; }
-      finally { reader.releaseLock(); }
-    }
-    const body = await res.json() as { meetings?: CalendarEvent[] };
-    if (!Array.isArray(body.meetings)) throw new Error("Calendar discovery returned an invalid response");
-    return body.meetings;
-  };
+  /** RAW value of LKB_JOIN_RULES_ENFORCE (parsed only in join-rules-enforce.ts; absent/unknown = `off` = today's behaviour). */
+  joinRulesEnforce?: unknown;
+  /** This tick's own tenant (LKB_TENANT_ID); join rules are loaded for this tenant only. */
+  joinRulesTenantId?: string;
+  /** The API key's tenant when already known (test seam); `null` = could not be verified. */
+  joinRulesKeyTenantId?: unknown;
+  /** Production: verifies the key's tenant (one `GET /webinar-operations`, header `X-LKB-Tenant`); called ONLY when enforcement is enabled. */
+  loadKeyTenant?: () => Promise<string | null>;
+  joinRulesIo?: JoinRulesEnforceIo;
+  /** Autojoin (decision 2026-10-14): topic priority, extended webinar detection, test-data tags and alerts. Absent = today's behaviour exactly. */
+  autojoin?: AutojoinTickDeps;
 }
 
 export function buildRealScheduleTickDeps(): ScheduleTickDeps {
@@ -215,10 +59,17 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
   if (existsSync(envFile)) process.loadEnvFile(envFile);
   const apiUrl = (process.env.LKB_API_URL ?? "http://localhost:3300").replace(/\/$/, "");
   const log = (msg: string) => console.log(`[bot] ${msg}`);
+  const autojoin = buildAutojoinTickDeps(REPO_ROOT, DEFAULT_STATE_DIR, process.env, log);
+  const discoveryOff = autojoin !== undefined && !autojoin.cfg.discovery; // config says discovery is off: the tick sees no events and schedules nothing
   return {
-    loadCalendarEvents: createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
-    loadCandidates: createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+    autojoin,
+    loadCalendarEvents: discoveryOff ? async () => [] : createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
+    loadCandidates: discoveryOff ? async () => [] : createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
     everyWebinar: true,
+    joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
+    joinRulesTenantId: process.env.LKB_TENANT_ID,
+    stateTenantId: process.env.LKB_TENANT_ID,
+    loadKeyTenant: createKeyTenantLoader(apiUrl, process.env.LKB_API_KEY, log),
     now: () => new Date().toISOString(),
     stateDir: DEFAULT_STATE_DIR,
     scheduler: createWindowsTaskScheduler(),
@@ -229,11 +80,6 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
 // taskNameFor was removed in fix cycle 2 (ISS-317): the Scheduled Task name is now derived
 // inside task-scheduler.ts's scheduleOnce, from the already-validated jobKey (buildTaskName),
 // never built here from an unvalidated sessionKey.
-
-function describeSkip(s: SkippedItem): string {
-  const detail = s.detail ? ` (${s.detail})` : "";
-  return `  skip [${s.reason}]${detail} — ${s.source}:${s.sourceId} "${s.title}"`;
-}
 
 function describeToSchedule(item: AutoRecordItem): string {
   return `  schedule — ${item.source}:${item.sourceId} "${item.title}" ${item.startTime} -> ${item.endTime} ` +
@@ -246,14 +92,36 @@ function describeToSchedule(item: AutoRecordItem): string {
  * can assert on it without re-parsing log lines.
  */
 export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolean) {
-  const [calendarEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
+  const [loadedEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
+  const aj = deps.autojoin, calendarEvents = aj ? dropOwnMarkerEvents(loadedEvents) : loadedEvents;
+  const lookup = aj ? createTopicLookup(aj, calendarEvents, candidates) : undefined;
   const now = deps.now();
   const trustedSenders = loadTrustedSenderConfig();
-  const alreadyScheduled = readScheduledKeys(deps.stateDir);
+  // Fail closed (ISS-ALERTID-006): no valid tenant, or an untagged / other-tenant state file, stops the tick before anything is scheduled.
+  const stateTenant = requireStateTenant(deps.stateTenantId);
+  // ISS-ALERTWHOFIX-001: a corrupt dedup file must not stop joining. Quarantine it (kept), warn loudly, proceed with an empty set.
+  const alreadyScheduled = loadScheduledKeysForTick(deps.stateDir, stateTenant, {
+    readOnly: dryRun,
+    onQuarantine: (name) => deps.log(`  WARNING: schedule-state.json was corrupt; moved aside as ${name} (dedup history in it is NOT merged back; sessions still in the join window may be re-scheduled, which is idempotent; inspect it)`),
+    onCorruptUnmoved: (why) => deps.log(`  WARNING: schedule-state.json is corrupt and could not be moved aside (${why}); proceeding with EMPTY dedup state so meetings are still joined`),
+  });
 
-  const result = selectAutoRecordItems({
+  const select = (authority?: ApprovedTrustContext) => selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
-    everyWebinar: deps.everyWebinar,
+    everyWebinar: deps.everyWebinar, ...lookup?.hooks,
+  }, { trustedSendersForCandidate: authority?.configuredTenantId === stateTenant ? candidate => projectApprovedSenderTrust({context: authority,
+    candidate, base: trustedSenders, classification: lookup?.hooks.classifyInvite?.({title: candidate.title,
+      meetingUrl: candidate.meetingUrl, sender: candidate.senderEmail}) ?? classifyWebinarInvite(candidate.title),
+    leadMinutes: DEFAULT_LEAD_MINUTES}) : undefined });
+  const selected = select();
+  // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
+  // Key tenant (ISS-T037WIRE-001): fetched per tick, only when enforcing; a throwing loader means "unverified" (null).
+  const keyTenantId = deps.joinRulesKeyTenantId === undefined && deps.loadKeyTenant && parseJoinRulesEnforce(deps.joinRulesEnforce) !== "off"
+    ? await deps.loadKeyTenant().catch(() => null) : deps.joinRulesKeyTenantId;
+  const result = await enforceJoinRules(selected, {
+    mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
+    now: () => Date.parse(now), readOnly: dryRun, onDegraded: aj?.rulesDegraded, onHealthy: aj?.rulesHealthy,
+    selectWithRules: deps.everyWebinar ? undefined : select,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +
@@ -265,6 +133,13 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
     deps.log("schedule-tick: --dry-run — nothing scheduled, nothing written to state");
     return result;
   }
+
+  // ISS-ALERTID-001/-007 (D-134): remember skipped sessions (key + start + source only) so `lkb alert-who` can resolve their alert ids.
+  try {
+    recordSkipped(deps.stateDir, stateTenant, result.skipped, now, (s) =>
+      s.source === "calendar" ? calendarEvents.find((e) => e.id === s.sourceId)?.startTime : candidates.find((c) => c.id === s.sourceId)?.startTime,
+      { onQuarantine: (name) => deps.log(`  WARNING: skipped-sessions.json was corrupt; moved aside as ${name} (history in it is NOT merged back; inspect it)`) });
+  } catch (err) { deps.log(`  could not record skipped sessions: ${err instanceof Error ? err.message : String(err)}`); }
 
   for (const item of result.toSchedule) {
     // ISS-317 fix: no title/url/sessionId ever reaches the Task Scheduler command line. The
@@ -278,8 +153,10 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
       deps.log(`  refused to schedule ${item.sessionKey}: sessionKey does not derive a safe job key — skipped`);
       continue;
     }
+    const tags = lookup?.tagsFor(item) ?? {};
     try {
       writeScheduledJob(deps.stateDir, jobKey, {
+        ...(aj ? { startTime: item.startTime, ...tags } : {}),
         url: item.meetingUrl,
         // ISS-319 fix: the FULL ISO end datetime, not a bare local HH:mm — so a session that
         // crosses midnight doesn't resolve to a stop time ~24h in the past (record-commands.ts's
@@ -287,7 +164,8 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
         until: item.endTime,
         title: item.title,
         sessionId: item.sessionKey,
-      });
+        dispatchPolicyV1: scheduledDispatchIdentity(item),
+      }, stateTenant);
     } catch (err) {
       // ISS-321: writeScheduledJob refuses (throws) when jobKey already belongs to a different
       // session — never silently overwrite another session's scheduled recording. Skip only this
@@ -297,14 +175,23 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
         `${err instanceof Error ? err.message : String(err)}`);
       continue;
     }
+    if (aj) writeCaptureTags(aj.tagsDir, item.sessionKey, tags, deps.log);
     await deps.scheduler.scheduleOnce({
       jobKey,
       launcherPath: RECORD_LAUNCHER,
       runAtIso: item.startTime,
     });
-    recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now });
+    try {
+      recordScheduled(deps.stateDir, { sessionKey: item.sessionKey, title: item.title, scheduledAt: now }, stateTenant,
+        { onQuarantine: (name) => deps.log(`  WARNING: schedule-state.json was corrupt; moved aside as ${name} (dedup history in it is NOT merged back; inspect it)`) });
+    } catch (err) {
+      // The one-off task is already created; a failed dedup write must not abort the remaining items' scheduling.
+      deps.log(`  WARNING: scheduled ${item.sessionKey} but could not record it in schedule-state.json: ${err instanceof Error ? err.message : String(err)}`);
+    }
     deps.log(`  scheduled: ${item.sessionKey} via one-off Windows task (job ${jobKey})`);
+    await announceScheduled(aj, item, tags, deps.log);
   }
+  if (aj?.watchCaptures) await aj.watchCaptures().catch((e: unknown) => deps.log(`  autojoin: capture watch failed: ${e instanceof Error ? e.message : String(e)}`));
 
   return result;
 }
@@ -315,5 +202,8 @@ export function parseScheduleTickArgs(rest: string[]): { dryRun: boolean } {
 
 export async function runScheduleTick(rest: string[]): Promise<void> {
   const { dryRun } = parseScheduleTickArgs(rest);
-  await runScheduleTickOnce(buildRealScheduleTickDeps(), dryRun);
+  const deps = buildRealScheduleTickDeps();
+  const autojoinOff = deps.autojoin !== undefined && !deps.autojoin.cfg.webinarAutoJoin;
+  if (autojoinOff && !dryRun) deps.log("schedule-tick: autojoin config has webinarAutoJoin off - running as --dry-run (nothing scheduled)");
+  await runScheduleTickOnce(deps, dryRun || autojoinOff);
 }

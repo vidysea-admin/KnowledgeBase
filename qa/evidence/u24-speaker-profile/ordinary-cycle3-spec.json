@@ -1,0 +1,71 @@
+{
+  "unit": "u24-speaker-profile",
+  "fixCycle": 3,
+  "issue": "ISS-U24PROFILECHECK-001",
+  "scope": "Finite snapshot-capability source-privacy repair affected public authored synthetic store cases only; no authentic/private inputs",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "apps/api/src/speaker-profiles/store.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "U24_EVIDENCE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\u24-speaker-profile\\ordinary-cycle3"
+  },
+  "timeoutMs": 60000,
+  "expected": {
+    "total": 7,
+    "pass": 7,
+    "fail": 0,
+    "skip": 0
+  },
+  "prospective": true,
+  "sourceFreezeAck": true,
+  "executedByMaker": false,
+  "driverFixture": {
+    "actualMongoSdkClientSession": true,
+    "connectCalled": false,
+    "syntheticCollections": true,
+    "mvccSimulation": false,
+    "realMongoMvccProof": false,
+    "note": "A disconnected real MongoClient supplies actual SDK ClientSession lifecycle/options; data collection methods are authored in-memory predicates. No live database or snapshot-server semantics claim."
+  },
+  "beforeAfterPins": {
+    "apps/api/src/speaker-profiles/store.ts": "A75C3E9950505830E58C4C35F95508281F604028F303E4B1B87470F77EA59204",
+    "apps/api/src/speaker-profiles/store.test.ts": "BEA7B569E7F1C19A3167026224D01CC1545E9EB660BB8D833313FD21D9D6D5DC",
+    "apps/api/src/visibility/read-snapshot.ts": "1B97FF09D53B7C0F7FE10F13C23803290864E2F5D43C6F57568876AB281030CF",
+    "apps/api/src/knowledge/metadata-visibility.ts": "200262B9B6DB1E609A275FA920FBA8C96811B7AE59B6094B599C179A665FF8D1",
+    "packages/db/src/lib/tenantScope.ts": "C596FE4C7815A8C44AF31B7590988D3B9C011874991C19B7D2F0DEAEE8FCF443",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6BE5B7EDE88B2887FE4C7A5E1ADB4B573B2303A8422B2185F64080CF8D873386",
+    "apps/api/src/indexing/speaker-suggest.ts": "2B58A82039C070F0BE158FED4DF349E31E485E37893A7F578F2BD4A1C4B16667",
+    "apps/api/src/speaker-profiles/router.ts": "18BAC45B3D9316CBD9FE7866AD79D8FE8148FEA4CC6DEA3D351F23883BFF37F7",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500",
+    "apps/api/src/visibility/knowledge.ts": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "BCE0534F0FD474788E97774DA274F8CFA186908A005876D7D1DABD8C95FEB000"
+  },
+  "originalRecordedFloor": {
+    "path": "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts",
+    "sha256": "32B9CC8C0285612B4A3866C4488DE9624354F4580A0369043839C113DFFF1886",
+    "baseline": "5PASS/1FAIL/0SKIP,935ms; preserved unchanged. Authoritative client-capability fixture adaptation only is checker/root-owned; case assertions and attack/latches stay unchanged."
+  },
+  "executionBoundaries": {
+    "provider": false,
+    "browser": false,
+    "liveDatabase": false,
+    "privateInput": false,
+    "git": false,
+    "publication": false,
+    "newFeatures": false
+  },
+  "nextGates": [
+    "Recorded six-case issue floor actual replay via checker-approved authoritative Db/client capability adapter, no oracle/trigger changes",
+    "Fresh current types/build/coherence after passes, rootruntime-owned",
+    "Matching independent cycle3 verdict before handshake closure",
+    "Full parent and real server Mongo MVCC/private/live/persona acceptance remain HOLD"
+  ]
+}

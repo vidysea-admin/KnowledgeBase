@@ -24,11 +24,14 @@
 import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import { existsSync, readFileSync, realpathSync } from "node:fs";
-import { join, relative, isAbsolute } from "node:path";
+import { join, relative, isAbsolute, resolve } from "node:path";
+import { verifyTrustedRecordingPrivacyAdmission } from '../lib/transcription/private-recording.mjs';
 import { screenEvidenceTurns } from "./process-video.mjs";
+import { assertTurnTimings } from "../lib/turn-timing.mjs";
+import { slideFrameSpans } from "./slides/slide-knowledge.mjs";
 
 /** Resolve validated speech/screen generation and safe metadata for unattended recordings. */
-export function loadWebinarSession(dir, sessionId) {
+export function loadWebinarSession(dir, sessionId, readBytes = readFileSync) {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid sessionId");
   dir = realpathSync(dir);
   const file = (name) => {
@@ -37,31 +40,65 @@ export function loadWebinarSession(dir, sessionId) {
     return actual;
   };
   const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
-  const read = (name) => JSON.parse(readFileSync(file(name), "utf8"));
-  const source = read("source.json");
+  const read = (name) => JSON.parse(readBytes(file(name), "utf8"));
+  const sourceBytes = readBytes(file('source.json'));
+  const source = JSON.parse(sourceBytes.toString('utf8'));
   if (!source.tenantId || !source._id || !source.title || source.audioLevel?.silent) throw new Error("invalid/silent webinar source");
   const validation = existsSync(join(dir, "validation.json")) ? read("validation.json") : undefined;
+  if (validation && Object.hasOwn(validation, 'sourceSha256') &&
+      (typeof validation.sourceSha256 !== 'string' || !/^[0-9a-f]{64}$/.test(validation.sourceSha256) || validation.sourceSha256 !== sha(sourceBytes))) {
+    throw new Error('Webinar validation source snapshot is stale or invalid');
+  }
+  if (source.captureConsent && !validation?.sourceSha256) throw new Error('Capture requires current source-bound privacy validation');
   if (validation && (validation.status !== "passed" || !validation.transcriptValidated)) throw new Error("webinar validation has not passed");
   const captured = source.captureMode === "silent";
   if (captured && (!validation || !Number.isFinite(validation.durationSec) || validation.durationSec <= 0)) {
     throw new Error("captured webinar requires passed media and transcript validation");
   }
-  let rawTurns = read("turns.json");
+  const speechBytes = readBytes(file("turns.json"));
+  let rawTurns = JSON.parse(speechBytes.toString("utf8"));
+  if (source.captureConsent || source.captureMode === 'silent' || source.privateWindows !== undefined || source.guardedPrivateWindows !== undefined) verifyTrustedRecordingPrivacyAdmission({ root: resolve(dir, '../../..'), sessionId,
+    source, durationSeconds: validation.durationSec, validation, turns: rawTurns });
+  if (validation && Object.hasOwn(validation, "turnsSha256") &&
+      (typeof validation.turnsSha256 !== "string" || !/^[0-9a-f]{64}$/.test(validation.turnsSha256) || validation.turnsSha256 !== sha(speechBytes))) {
+    throw new Error("webinar validation transcript hash is stale or invalid");
+  }
+  const qaExists = existsSync(join(dir, "transcript-qa.json"));
+  const qaBytes = qaExists ? readBytes(file("transcript-qa.json")) : undefined;
+  if (validation && Object.hasOwn(validation, "qaSha256")) {
+    const bound = validation.qaSha256;
+    if ((bound === null && qaExists) || (bound !== null &&
+        (typeof bound !== "string" || !/^[0-9a-f]{64}$/.test(bound) || !qaBytes || sha(qaBytes) !== bound))) {
+      throw new Error("webinar validation QA generation is stale or invalid");
+    }
+  } else if (qaBytes && JSON.parse(qaBytes.toString("utf8"))?.version === 1) {
+    throw new Error("hash-bound QA requires current webinar validation");
+  }
+  if (source.captureConsent && (!qaBytes || JSON.parse(qaBytes.toString('utf8'))?.version !== 1 || !validation?.qaSha256)) {
+    throw new Error('Capture requires current generation-bound raw-anomaly QA');
+  }
   const originalSpeech = rawTurns;
   let screenEvidence, notes;
   if (existsSync(join(dir, "video-stage.json"))) {
     const stage = read("video-stage.json");
     if (stage.status !== "done") throw new Error("screen stage incomplete; refusing partial knowledge ingestion");
     for (const name of ["knowledge-turns.json", "screen-evidence.json", "notes.json"]) {
-      const bytes = readFileSync(file(name));
+      const bytes = readBytes(file(name));
       if (sha(bytes) !== stage.outputs?.[name]) throw new Error(`screen artifact hash mismatch: ${name}`);
     }
     rawTurns = read("knowledge-turns.json");
     screenEvidence = read("screen-evidence.json"); notes = read("notes.json");
     if (screenEvidence.sessionId !== sessionId || notes.sessionId !== sessionId) throw new Error("screen session identity mismatch");
+    if (screenEvidence.version === 3) {
+      for (const { frame, turnIds } of slideFrameSpans(screenEvidence.frames, screenEvidence.duration, originalSpeech)) {
+        if (!Array.isArray(frame.turnIds) || !isDeepStrictEqual(frame.turnIds, turnIds)) {
+          throw new Error("screen frame speech attachment turnIds mismatch");
+        }
+      }
+    }
     const expected = screenEvidenceTurns(sessionId, source.tenantId, screenEvidence);
     for (const frame of screenEvidence.frames) {
-      if (sha(readFileSync(file(frame.file))) !== frame.hash) throw new Error("screen frame byte hash mismatch");
+      if (sha(readBytes(file(frame.file))) !== frame.hash) throw new Error("screen frame byte hash mismatch");
       if (frame.id !== `${sessionId}-frame-${sha(`${frame.hash}|${frame.tStart}`).slice(0, 32)}`) throw new Error("screen frame identity mismatch");
     }
     if (!Array.isArray(rawTurns)) throw new Error("invalid screen knowledge turns");
@@ -85,6 +122,7 @@ export function loadWebinarSession(dir, sessionId) {
       consumed.add(turn._id);
     }
   }
+  if (Array.isArray(rawTurns)) assertTurnTimings(rawTurns, sessionId); // names the session and turn; the generic check below stays
   if (!Array.isArray(rawTurns) || !rawTurns.length || new Set(rawTurns.map((t) => t._id)).size !== rawTurns.length ||
     rawTurns.some((t) => t.sessionId !== sessionId ||
     t.tenantId !== source.tenantId || typeof t._id !== "string" || !t._id.trim() || !t.speakerRef || !Number.isFinite(t.tStart) ||
@@ -133,7 +171,7 @@ export function buildSessionFiles({ sessionId, tenantId, sessionDoc, meta, turns
   const who = (p) => `${p.label} (${p.role}${p.org ? `, ${orgName.get(p.org) ?? p.org}` : ""})`;
   const hosts = meta.orgs.filter((o) => !o.partnerOf);
   const countries = [...new Set(hosts.flatMap((o) => o.countries))].map((c) => c.replace("country:", ""));
-  const firstTurn = (p) => turns.find((t) => t.speakerRef === p.personId || t.speakerRef === p.label);
+  const firstTurn = (p) => turns.find((t) => t.speakerRef !== 'screen' && !t.screenEvidence && (t.speakerRef === p.personId || t.speakerRef === p.label));
   const speaking = meta.people.filter((p) => firstTurn(p));
   const summary =
     `${meta.title} — ${meta.hostOrg}, ${meta.date}, captured by ${meta.capturedBy.via}. ` +

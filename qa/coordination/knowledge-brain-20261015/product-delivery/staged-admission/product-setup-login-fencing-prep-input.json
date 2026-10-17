@@ -1,0 +1,86 @@
+{
+  "unit": "product-setup-login-fencing",
+  "cycle": 0,
+  "candidate_sha": "236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+  "candidate_identity": "SHA256 of ordered path TAB lowercase raw-file SHA256 LF records for the three exact source/test pins; not a Git commit",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_pins": [
+    {
+      "path": "apps/web/src/pages/setup-wizard/SetupWizardPage.tsx",
+      "sha256": "8bba40ee375cc0310778d51a7f26db245ea498ab720f6104c418caf6693d3b46"
+    },
+    {
+      "path": "apps/web/src/pages/setup-wizard/setupModel.ts",
+      "sha256": "c30a66eadb0d02f9474e720b784947b18f44e7247b9a6407cc2c6ea02be86c87"
+    },
+    {
+      "path": "apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx",
+      "sha256": "27d74f4de4a0acc7552e970c160f8ad5ed608393fa462ee58d5010d6a04b2d81"
+    }
+  ],
+  "completion_reserve": true,
+  "completion_reserve_id": "product-setup-login-fencing/cycle0/236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "product-setup-login-fencing-cycle0-pre-dispatch",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null,
+      "note": "No checker launched or historical checker charges for this unique unit. Zero time/tokens describe pre-dispatch only; replace with actual phase metrics or positive conservative committed debit when dispatched."
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 40,
+    "tokens": 1000,
+    "cost": null
+  },
+  "bootstrap_scope": "Only product-setup-login-fencing cycle0 exact candidate: three setup files, immediate AuthContext/shared client/booleans producer, broker source/environment receipt validation and required independent contract-derived auth/display probe. No whole-task acceptance. Source remains BUILDING until broker receipts.",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000,
+    "cost": null
+  },
+  "escalation": null,
+  "protected_finalization": {
+    "kind": "finalization",
+    "active_s": 30,
+    "tokens": 800,
+    "cost": null,
+    "note": "Protected inside same total120s3000; retain prior actual metrics/debits and assess before finalization."
+  },
+  "ratio_claim": "UNVERIFIED: maker actual usage/cost unknown. Allocation is finite; no measured efficiency claim.",
+  "packet": "qa/packets/product-setup-login-fencing.md",
+  "historical_checker_charges": "none for this unique unit",
+  "authority": "product_delivery_coordinator explicit finite120s3000 protected review90s2200 final30s800 on 2026-10-15",
+  "staged_admission": {
+    "status": "PREDISPATCH_PREPARATION_ONLY",
+    "source_input": "qa/coordination/knowledge-brain-20261015/product-delivery/t057-setup-assess-input.json",
+    "unit": "product-setup-login-fencing",
+    "cycle": 0,
+    "total": {
+      "active_s": 120,
+      "tokens": 3000
+    },
+    "next_review": {
+      "active_s": 40,
+      "tokens": 1000
+    },
+    "remaining_review": {
+      "active_s": 50,
+      "tokens": 1200
+    },
+    "protected_finalization": {
+      "active_s": 30,
+      "tokens": 800
+    },
+    "authority": "Root approved staged40s1000 + remaining50s1200 + final30s800 WITHIN same120s3000; no extra allocation.",
+    "prior_charges": "All existing reviewer rows preserved exactly; no reviewer launched. Unknown maker/cost values unchanged.",
+    "dispatch_authorized_by_this_file": false
+  }
+}

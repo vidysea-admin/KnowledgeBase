@@ -1,0 +1,54 @@
+✔ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (70.4964ms)
+✔ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (43.273ms)
+✔ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (12.2935ms)
+✔ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (17.9637ms)
+✔ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (31.5688ms)
+✔ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (32.3579ms)
+✔ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (6.9943ms)
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (42.6224ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (6.1216ms)
+✔ flag ON via env var (5.2579ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (5.586ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (4.7833ms)
+✔ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (34.9673ms)
+✖ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (48.5874ms)
+✔ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (27.5739ms)
+✔ ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids (4.1671ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (42.3705ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (0.9206ms)
+✔ reviewed substring cannot bypass meaning verification of full negated source context (1.1845ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (8.731ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (13.8646ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (12.574ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (11.7947ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.4589ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (16.655ms)
+✔ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (93.5234ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 25
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12312.1173
+
+✖ failing tests:
+
+test at apps\api\src\indexing\session-grounded-wire.test.ts:1:4750
+✖ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (48.5874ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-grounded-wire.test.ts:90:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

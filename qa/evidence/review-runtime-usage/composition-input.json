@@ -1,0 +1,56 @@
+{
+  "bootstrap_scope": "ROOT explicit receipt composition authorization, cycle0 unchanged; SAMEchecker metadata-only oneexec receiptchain,currentpins,canonicalverdict+parser/readback. No code reread/retests/newreviewer; priorHOLD/outputoverrun preserved.",
+  "reviewers": [
+    {
+      "tokens": 475758,
+      "budget_debit": {
+        "tokens": 475758,
+        "active_s": 210
+      },
+      "id": "same-checker-all-prior",
+      "cost": null,
+      "active_s": null
+    }
+  ],
+  "manual_completion_reserve": {
+    "tokens": 180000,
+    "units": "actual_total_input_plus_output",
+    "active_s": 30
+  },
+  "completion_reserve": false,
+  "ratio_verified": false,
+  "maker": {
+    "tokens": null,
+    "cost": null,
+    "active_s": null
+  },
+  "escalation": {
+    "authority": "Root explicit receipt-composition finite exception",
+    "reason": "Independent probe consumes TOOL not makerTEST, so compose two authenticated receipts bound to unchanged source/test/probe instead of demand pin of unconsumed test",
+    "limits": {
+      "tokens": 655758,
+      "cost": null,
+      "active_s": 240
+    }
+  },
+  "prior_probe_stage_overrun": {
+    "actual_total": 130960,
+    "allocation": 100000
+  },
+  "next_phase": {
+    "tokens": 180000,
+    "kind": "finalization",
+    "cost": null,
+    "active_s": 30
+  },
+  "prior_actual_output_tokens": 2914,
+  "allocated_output_budget": 1800,
+  "prior_output_overrun": {
+    "allocation": 800,
+    "actual": 1232
+  },
+  "bootstrap": {
+    "tokens": 655758,
+    "active_s": 240
+  }
+}

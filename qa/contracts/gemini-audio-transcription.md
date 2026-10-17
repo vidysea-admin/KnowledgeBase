@@ -36,6 +36,18 @@ so a human stays in the loop on real recurring API cost before the whole batch r
    pure helper — `tStart` from the parsed `[MM:SS]`, `tEnd` = the NEXT turn's `tStart`, and the
    LAST turn's `tEnd` = its own `tStart + 30` seconds, a documented fallback since the true end
    isn't known from timestamps alone). No real network call required by the test suite.
+   **D-119 clarification (2026-10-09, approved by Umesh):** an optional verified positive finite
+   media duration may bound only that inferred final end to `min(tStart + 30, duration)`, and
+   only when `tStart < duration`. Unknown, omitted, nonpositive or nonfinite duration preserves
+   the pure parser's legacy fallback; a start equal to or beyond duration remains invalid for
+   the existing downstream timing guard. Intermediate ends, explicit provider boundaries,
+   raw provider bytes, transcript text and speaker labels are preserved. Internal long-session,
+   upload-submission and real-proof callers obtain the actual trusted local `ffprobe` duration
+   and reject an invalid measurement before provider requests or transcript publication;
+   supplied invalid duration at the provider-call entry also refuses before transport use.
+   This narrow approved exception does not stretch incomplete long transcripts to media end
+   or weaken existing timing/completeness validation. The prior 172-byte production response
+   is the regression floor, replayed at 15s recording and 12.650958s extracted-audio durations.
 2. **`scripts/transcribe-toc-session.mjs <sessionId>`** (new, real CLI tool, same `tsx/esm/api`
    pattern as `scripts/seed-toc.mjs`): resolves `<sessionId>` to its real audio file under
    `raw/TOC/TOC-Materials/Audio/`, uploads it via criterion 1's real functions (real transport

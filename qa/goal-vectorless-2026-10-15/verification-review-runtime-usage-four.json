@@ -1,0 +1,62 @@
+{
+  "phase": "maker-verification",
+  "scope": "Review-runtime usage metadata tool four synthetic redaction/delta/output guard fixtures; no live runtime audit",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "5f409c1c9cc2c5bcc46ebb3d8ed2b2c33d1831479b9dc7354eca88279badb399",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "scripts/qa/review-runtime-usage.test.mjs"
+  ],
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "runtime_version": "v24.19.0",
+  "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "runtime_identity": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "scripts/qa/review-runtime-usage.test.mjs all4"
+  ],
+  "timeoutMs": 30000,
+  "startedAt": "2026-10-15T10:45:49.916Z",
+  "completedAt": "2026-10-15T10:45:50.382Z",
+  "elapsedMs": 464.6155,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "scripts/qa/review-runtime-usage.mjs": "a4ac3716872f5d5490c01157500994c5524ab8f68b97376d758b730c206607c7",
+    "scripts/qa/review-runtime-usage.test.mjs": "52da208d9a7fefe39be7b563ca75aa40c1b9ecb50ae1d5efc319b05bd8feacfc",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297"
+  },
+  "after": {
+    "scripts/qa/review-runtime-usage.mjs": "a4ac3716872f5d5490c01157500994c5524ab8f68b97376d758b730c206607c7",
+    "scripts/qa/review-runtime-usage.test.mjs": "52da208d9a7fefe39be7b563ca75aa40c1b9ecb50ae1d5efc319b05bd8feacfc",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-review-runtime-usage-four.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-review-runtime-usage-four.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

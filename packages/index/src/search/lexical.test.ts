@@ -11,6 +11,14 @@ const TURNS = [
   { _id: "t3", sessionId: "s1", text: "Completely unrelated small talk about the weather today." },
 ];
 
+test("Hindi vowel signs and mixed Hinglish terms survive the lexical prefilter", () => {
+  const turns = [{ _id: "hi", sessionId: "s", text: "करियर सलाह aur admission counselling" },
+    { _id: "other", sessionId: "s", text: "असंबंधित मौसम" }];
+  assert.deepEqual(lexicalQueryTokens("करियर सलाह"), ["करियर", "सलाह"]);
+  assert.deepEqual(lexicalSearchTurns("करियर counselling", turns, 5).map((h) => h.turnId), ["hi"]);
+  assert.ok(lexicalQueryTokens("करियर counselling").every((token) => turns[0]!.text.includes(token)));
+});
+
 test("ranks a matching turn above a non-matching one", () => {
   const hits = lexicalSearchTurns("visa approval rates", TURNS, 10);
   assert.equal(hits[0]?.turnId, "t1");

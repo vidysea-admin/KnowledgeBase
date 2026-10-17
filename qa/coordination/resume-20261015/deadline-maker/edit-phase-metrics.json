@@ -1,0 +1,12 @@
+{
+  "phase": "byte-backup-and-test-only-repair",
+  "monotonic_start_ns": 1619085425500,
+  "monotonic_end_ns": 1619090191400,
+  "active_seconds": 0.0047659,
+  "wait_seconds": 0,
+  "maker_total_actual_active_seconds": null,
+  "maker_actual_total_tokens": null,
+  "maker_actual_cost": null,
+  "token_metric": "actual_total",
+  "note": "Measured script phase only; preceding reasoning/tool/read phases uninstrumented, total remains unknown."
+}

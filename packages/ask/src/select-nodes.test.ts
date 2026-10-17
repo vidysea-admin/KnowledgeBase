@@ -30,8 +30,8 @@ test("selectNodes parses node_ids from the completion and resolves them via tree
   assert.equal(nodes[0]!.summary, "about apples");
 
   assert.equal(complete.calls.length, 1);
-  assert.match(complete.calls[0]!.messages[0]!.content, /what about apples\?/);
-  assert.match(complete.calls[0]!.messages[0]!.content, /tenant:t1\/session:a \| A \| about apples/);
+  assert.match(complete.calls[0]!.messages[1]!.content, /what about apples\?/);
+  assert.match(complete.calls[0]!.messages[1]!.content, /tenant:t1\/session:a \| "A" \| "about apples"/);
 });
 
 test("selectNodes falls back to parsing node_ids out of plain text JSON", async () => {

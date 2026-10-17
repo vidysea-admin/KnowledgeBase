@@ -1,0 +1,6 @@
+{
+  "exit_code": 0,
+  "duration_s": 0.4133302,
+  "required_permission": "require_escalated",
+  "outer_timeout_s": 20
+}

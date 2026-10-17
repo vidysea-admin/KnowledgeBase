@@ -1,0 +1,13 @@
+import pathlib,json
+out=pathlib.Path(__file__).parent
+raw=json.loads((out/'native-next-split-repaired-original206-title-map.json').read_text(encoding='utf8'))
+old='unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers'
+new='unsupported transactions explicitly refuse refresh and retain committed correction/pending intent without derived knowledge or provider calls'
+original=next(r for r in raw['originalCases'] if r['original']['title']==old);match=next(r for r in raw['additionalCurrentCases'] if r['title']==new)
+original['current']=match;original['incompleteReason']=None;original['mapping']={'authority':'root explicit latest adoption; atomic-api/stage3/packet.md T054clauses8/9','oldTitle':old,'newTitle':new,'reason':'Unsupported required joint transaction cannot durably write failed bookkeeping; explicit refusal retains committed correction/pending intent and zero derived/provider writes. Material approved expectation repair, not identical assertions.'}
+raw['additionalCurrentCases']=[r for r in raw['additionalCurrentCases'] if r['title']!=new];raw['missing']=[];raw['exactOriginalTitles']=205;raw['explicitlyMappedOriginalTitles']=1;raw['additionalNewTests']=4;assert all(r['current'] is not None for r in raw['originalCases']);(out/'native-next-split-reconciled210.json').write_text(json.dumps(raw,indent=2),encoding='utf8')
+p=out/'genuine-seal-isolated-diagnostic.py';code=p.read_text(encoding='utf8').replace('combined-source-pins-stage3-api-repair1.json','combined-source-pins-genuine-phase-observer.json').replace('broker/native-next-stage3-repair1-final-sealed-inventory.json','broker/native-next-split-repaired-final-inventory.json')
+code=code.replace('genuine-seal-isolated','native-next-split-exit').replace('genuine live seal precedes source ingestion; retained public recovery does not invent a clock','actual runRecord sealing child EXIT precedes fresh-process retained WAV/provider reproof').replace("testfile='scripts/native-capture/production.test.ts'","testfile='packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts'")
+code=code.replace(" r=run('native-next-split-exit-'+label,argv,ROOT,limit,pins)","\n if label=='original-positive':assert 300-125.063-(time.monotonic()-phase)>=140,'remaining global allowance insufficient for first EXIT plus cleanup'\n r=run('native-next-split-exit-'+label,argv,ROOT,limit,pins)")
+code=code.replace("'elapsed_s':time.monotonic()-phase,'pinsUnchanged'","'elapsed_s':time.monotonic()-phase,'priorSplitSetupAndFloor_s':125.063,'totalGlobalIncludingPrior_s':125.063+time.monotonic()-phase,'pinsUnchanged'")
+exec(compile(code,str(p),'exec'))

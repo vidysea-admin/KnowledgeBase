@@ -1,0 +1,8 @@
+{
+  "testCommandMs": 976.0088000000001,
+  "earlierSourceReviewSetupMs": null,
+  "runnerFingerprintRuntimeIdentityReceiptOverheadMs": 289.77819999999997,
+  "specSetupMs": 179.3265,
+  "runnerWallMs": 1265.787,
+  "note": "Aggregate runner overhead separately measured from child command; phase subdivisions unavailable"
+}

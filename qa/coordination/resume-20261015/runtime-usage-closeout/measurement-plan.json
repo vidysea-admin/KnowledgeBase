@@ -1,0 +1,242 @@
+{
+  "schema": "prospective-metadata-measurement-plan/1",
+  "plans": [
+    {
+      "unit": "native_vertical_delivery-postbaseline",
+      "cycle": 0,
+      "phase": "maker-postbaseline",
+      "agent_prefix": "/root/native_vertical_delivery",
+      "baseline_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-usage-closeout\\native_vertical_delivery-baseline.json",
+      "invoked_at": "2026-10-16T02:57:07.457126+00:00",
+      "observed_at": "2026-10-16T02:57:07.798Z",
+      "records": [
+        {
+          "identity": {
+            "thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+            "parent_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+            "agent_path": "/root/native_vertical_delivery"
+          },
+          "status": "unknown",
+          "reasons": [
+            "inflight_or_unconfirmed_completion"
+          ],
+          "usage_timestamp": "2026-10-16T02:57:02.915Z",
+          "lifecycle": {
+            "type": "task_started",
+            "timestamp": "2026-10-16T02:55:08.021Z"
+          },
+          "cumulative_tokens": {
+            "input_tokens": 70307146,
+            "cached_input_tokens": 69684352,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 169886,
+            "reasoning_output_tokens": 56425,
+            "total_tokens": 70477032
+          }
+        },
+        {
+          "identity": {
+            "thread_id": "01a141e1-f089-7f62-98ef-1e9debbcf6f1",
+            "parent_thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+            "agent_path": "/root/native_vertical_delivery/native_a"
+          },
+          "status": "known",
+          "reasons": [],
+          "usage_timestamp": "2026-10-16T00:11:17.730Z",
+          "lifecycle": {
+            "type": "task_complete",
+            "timestamp": "2026-10-16T00:11:17.795Z"
+          },
+          "cumulative_tokens": {
+            "input_tokens": 6110954,
+            "cached_input_tokens": 5971328,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 22980,
+            "reasoning_output_tokens": 3922,
+            "total_tokens": 6133934
+          }
+        },
+        {
+          "identity": {
+            "thread_id": "01a141e2-121d-7dc0-a109-b44e67009c7b",
+            "parent_thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+            "agent_path": "/root/native_vertical_delivery/native_b"
+          },
+          "status": "unknown",
+          "reasons": [
+            "inflight_or_unconfirmed_completion"
+          ],
+          "usage_timestamp": "2026-10-16T02:52:15.126Z",
+          "lifecycle": {
+            "type": "task_started",
+            "timestamp": "2026-10-16T02:57:02.781Z"
+          },
+          "cumulative_tokens": {
+            "input_tokens": 23986489,
+            "cached_input_tokens": 23720064,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 57405,
+            "reasoning_output_tokens": 12449,
+            "total_tokens": 24043894
+          }
+        },
+        {
+          "identity": {
+            "thread_id": "01a141e2-3767-7563-b775-563a704aab11",
+            "parent_thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+            "agent_path": "/root/native_vertical_delivery/native_c"
+          },
+          "status": "known",
+          "reasons": [],
+          "usage_timestamp": "2026-10-16T02:52:40.848Z",
+          "lifecycle": {
+            "type": "task_complete",
+            "timestamp": "2026-10-16T02:52:40.884Z"
+          },
+          "cumulative_tokens": {
+            "input_tokens": 27315456,
+            "cached_input_tokens": 27026944,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 76928,
+            "reasoning_output_tokens": 21516,
+            "total_tokens": 27392384
+          }
+        }
+      ],
+      "explicit_nodes": [
+        {
+          "thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+          "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-23-55-01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7.jsonl",
+          "agent_path": "/root/native_vertical_delivery",
+          "exists": true
+        },
+        {
+          "thread_id": "01a141e1-f089-7f62-98ef-1e9debbcf6f1",
+          "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-24-48-01a141e1-f089-7f62-98ef-1e9debbcf6f1.jsonl",
+          "agent_path": "/root/native_vertical_delivery/native_a",
+          "exists": true
+        },
+        {
+          "thread_id": "01a141e2-121d-7dc0-a109-b44e67009c7b",
+          "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-24-57-01a141e2-121d-7dc0-a109-b44e67009c7b.jsonl",
+          "agent_path": "/root/native_vertical_delivery/native_b",
+          "exists": true
+        },
+        {
+          "thread_id": "01a141e2-3767-7563-b775-563a704aab11",
+          "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-25-07-01a141e2-3767-7563-b775-563a704aab11.jsonl",
+          "agent_path": "/root/native_vertical_delivery/native_c",
+          "exists": true
+        }
+      ],
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\review-runtime-usage.mjs",
+        "snapshot",
+        "--unit",
+        "native_vertical_delivery-postbaseline",
+        "--cycle",
+        "0",
+        "--phase",
+        "maker-postbaseline",
+        "--boundary",
+        "baseline",
+        "--agent-prefix",
+        "/root/native_vertical_delivery",
+        "--workspace",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase",
+        "--output",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-usage-closeout\\native_vertical_delivery-baseline.json",
+        "--session",
+        "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-23-55-01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7.jsonl",
+        "--session",
+        "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-24-48-01a141e1-f089-7f62-98ef-1e9debbcf6f1.jsonl",
+        "--session",
+        "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-24-57-01a141e2-121d-7dc0-a109-b44e67009c7b.jsonl",
+        "--session",
+        "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T23-25-07-01a141e2-3767-7563-b775-563a704aab11.jsonl"
+      ],
+      "parser_sha256": "694c7971c24abf1d0534808fa77772acae3d9b49ddc08ee03ddacbcad75582cb",
+      "limitations": [
+        "Baseline starts partway through existing maker work: not whole-maker denominator.",
+        "Unknown/inflight baseline cannot establish measured delta; wait for an independently authorized fresh complete boundary, never invent counters.",
+        "Explicit files only; metadata descendant mapping must be reconciled at end; late children without baseline stay unknown.",
+        "Checker must receive own fresh attributable baseline before scoped checker work; no checker baseline/run requested here.",
+        "Only defined comparable postbaseline scope may support a ratio; prior charges/closed budgets remain untouched."
+      ]
+    },
+    {
+      "unit": "windows_qualification_design-postbaseline",
+      "cycle": 0,
+      "phase": "maker-postbaseline",
+      "agent_prefix": "/root/windows_qualification_design",
+      "baseline_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-usage-closeout\\windows_qualification_design-baseline.json",
+      "invoked_at": "2026-10-16T02:57:07.825422+00:00",
+      "observed_at": "2026-10-16T02:57:07.922Z",
+      "records": [
+        {
+          "identity": {
+            "thread_id": "01a1429e-01d9-7c20-bdd3-c3ff73efe3db",
+            "parent_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+            "agent_path": "/root/windows_qualification_design"
+          },
+          "status": "unknown",
+          "reasons": [
+            "inflight_or_unconfirmed_completion"
+          ],
+          "usage_timestamp": "2026-10-16T02:56:04.774Z",
+          "lifecycle": {
+            "type": "task_started",
+            "timestamp": "2026-10-16T02:55:18.529Z"
+          },
+          "cumulative_tokens": {
+            "input_tokens": 991574,
+            "cached_input_tokens": 940800,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 2853,
+            "reasoning_output_tokens": 444,
+            "total_tokens": 994427
+          }
+        }
+      ],
+      "explicit_nodes": [
+        {
+          "thread_id": "01a1429e-01d9-7c20-bdd3-c3ff73efe3db",
+          "rollout_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T02-50-14-01a1429e-01d9-7c20-bdd3-c3ff73efe3db.jsonl",
+          "agent_path": "/root/windows_qualification_design",
+          "exists": true
+        }
+      ],
+      "command": [
+        "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\review-runtime-usage.mjs",
+        "snapshot",
+        "--unit",
+        "windows_qualification_design-postbaseline",
+        "--cycle",
+        "0",
+        "--phase",
+        "maker-postbaseline",
+        "--boundary",
+        "baseline",
+        "--agent-prefix",
+        "/root/windows_qualification_design",
+        "--workspace",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase",
+        "--output",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-usage-closeout\\windows_qualification_design-baseline.json",
+        "--session",
+        "C:\\Users\\product\\.codex\\sessions\\2026\\10\\16\\rollout-2026-10-16T02-50-14-01a1429e-01d9-7c20-bdd3-c3ff73efe3db.jsonl"
+      ],
+      "parser_sha256": "694c7971c24abf1d0534808fa77772acae3d9b49ddc08ee03ddacbcad75582cb",
+      "limitations": [
+        "Baseline starts partway through existing maker work: not whole-maker denominator.",
+        "Unknown/inflight baseline cannot establish measured delta; wait for an independently authorized fresh complete boundary, never invent counters.",
+        "Explicit files only; metadata descendant mapping must be reconciled at end; late children without baseline stay unknown.",
+        "Checker must receive own fresh attributable baseline before scoped checker work; no checker baseline/run requested here.",
+        "Only defined comparable postbaseline scope may support a ratio; prior charges/closed budgets remain untouched."
+      ]
+    }
+  ],
+  "scope": "metadata-only existing allowlisted parser; no provider or test execution; no ratio claim"
+}

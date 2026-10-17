@@ -1,0 +1,81 @@
+name: docker
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Install host dependencies for root-budget fixture tests
+        run: timeout 300 pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Check root budget from the clean checkout
+        run: |
+          timeout 30 node scripts/lint-root.mjs
+          timeout 60 node --test --test-timeout=30000 --test-name-pattern='^lint-root:' scripts/lint.test.mjs
+
+      - name: Verify frozen contracts
+        run: timeout 30 python3 contracts/verify_contracts.py
+
+      - name: Build images and check isolated mounted workflows
+        shell: bash
+        run: timeout --signal=TERM --kill-after=180 3300 bash scripts/qa/container-workflows/run.sh
+
+      - name: Upload isolated smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: docker-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  build-targets:
+    # Build-only check of the default (api) and web targets; nothing is pushed and no
+    # registry or secret is used.
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: api
+            target: ""
+          - name: web
+            target: web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build ${{ matrix.name }} image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          target: ${{ matrix.target }}
+          push: false
+          tags: lkb-${{ matrix.name }}:ci
+          cache-from: type=gha,scope=${{ matrix.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.name }}

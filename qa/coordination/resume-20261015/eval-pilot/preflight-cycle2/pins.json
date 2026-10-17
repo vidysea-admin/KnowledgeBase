@@ -1,0 +1,16 @@
+{
+  "fixCycle": 2,
+  "sourceFrozen": true,
+  "candidate": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+  "files": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "c877644c102b4ea666ac2cfbcf6f15560144f2f41094c90d3e30bd930e0c118f"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "3fe4d4cc5b8e3a9174bb64e5d45dcdf139ebd482e67d6c301c78975bec1a9ab9"
+    }
+  ],
+  "checkerSkillSha256": "956b28aada9f51a723de1027d5c86f11d4dc6927a55b80ba7c4a086d8849aa99"
+}

@@ -1,0 +1,217 @@
+{
+  "version": 1,
+  "review": "independent-u41-QA-only-staged-publication-audit",
+  "state": "COMPLETE-FROZEN-STAGED-AUDIT",
+  "baseHEAD": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "inventorySHA256": "7d22dffc1f809a2a1f27a00398efa92c1c0f0d0d3018fa0f7558a7c71e5922d8",
+  "approvedInventorySHA256": "7d22dffc1f809a2a1f27a00398efa92c1c0f0d0d3018fa0f7558a7c71e5922d8",
+  "selectedPaths": 4,
+  "sourcePathsToStage": 0,
+  "candidateHashChecks": [
+    {
+      "path": "qa/manifests/u4.1-recording-upload-worker.md",
+      "sha256": "29dd8dbdb6ee7010b204aaf04ff2e8b075a48e5d4e4c09bd6fc8d27f39eb3266",
+      "matchesApproved": true
+    },
+    {
+      "path": "qa/verdicts/u4.1-recording-upload-worker.md",
+      "sha256": "6d614d1bdd59e7fbb9319d3f1d2bdc814eac4e36081cf95c5eb4c30307429503",
+      "matchesApproved": true
+    },
+    {
+      "path": "qa/contracts/upload-transcribe-worker.md",
+      "sha256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d",
+      "matchesApproved": true
+    },
+    {
+      "path": "qa/contracts/gemini-audio-transcription.md",
+      "sha256": "13f94c9a28e2a19dd30c00a8d6199becd67ba994ac0f780dc765a2cc3b71fa94",
+      "matchesApproved": true
+    }
+  ],
+  "privacyReportSHA256": "33112407e91247441ae48320e708988f98cac826347475cdc6b6715ce24ef5a1",
+  "independentPrivacyPASSBoundToExactCandidates": true,
+  "canonicalCycle3PASSCloseout": true,
+  "manifestVerdictInventoryHashBinding": true,
+  "sourcePinsMatchedLiveAndHEAD": 18,
+  "sourcePinChecks": [
+    {
+      "path": "scripts/upload/security.mjs",
+      "approvedWorkingSHA256": "0980cafb333d7025703330619e4bd0041728751877898de829ce8d302e0030fc",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "scripts/upload/queue.mjs",
+      "approvedWorkingSHA256": "267de11f43bfdb0b6294dd37699e7a60a08c504dfc49adc5fbac608a0d56f3d7",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "scripts/upload/submit.mjs",
+      "approvedWorkingSHA256": "be7e7cad736a9faba4361811d886a3f4b17148e3e864c824150941122f69b611",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "scripts/upload/real-proof.mjs",
+      "approvedWorkingSHA256": "e92bdea500c16d0203495faf1cdb3e4d819c7d5d50daae955ca6b2e15db5f221",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "scripts/upload/queue.test.mjs",
+      "approvedWorkingSHA256": "d8d6dc281561cf0f81ad6f372dd40f00af54654b88337c48bc4096fe3152a4ff",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/src/google_transport.py",
+      "approvedWorkingSHA256": "d3cb7906deeeb50069a986131d15351b8bbbaf23b2ab77ec5168d4dd7243a54d",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/src/job_queue.py",
+      "approvedWorkingSHA256": "5fe8a65123a65198f4a2ba05fe09ee7cce1d4499b56647d51ca5cf5932c65f91",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/src/schema_check.py",
+      "approvedWorkingSHA256": "a90f42a4bca1016935f6512907b2615db38f44f069fb09410a87449f28cf0e34",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/src/worker.py",
+      "approvedWorkingSHA256": "d90037d38f9b8434f634de7721861cc4103edc5f998892a040c6b6eeaeb92f1c",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/src/test_worker.py",
+      "approvedWorkingSHA256": "013c82f8d2af7b9aaf79dba940c141231c7d29ff91677f1ef8589c04252e77f2",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/src/index.ts",
+      "approvedWorkingSHA256": "69a8aa46f47edda7c998e89af0237d985b34a857d34de7a2cc6ddc63f2636584",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/package.json",
+      "approvedWorkingSHA256": "ee84905a0c5f3665184f2886f59ed88ef381b7687e0b7081fa71c36c9b3dfc9c",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/requirements.txt",
+      "approvedWorkingSHA256": "82a952467cd4672ecf83402d10928d8064cf9dc7580db92acc6e942cb2fae4f9",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "workers/transcribe/README.md",
+      "approvedWorkingSHA256": "d82e65bba9c05eace9472d690859f7a54dbccd4265ab7cb1e6357dea52bd402f",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.ts",
+      "approvedWorkingSHA256": "00eb58ec23a0caf4401526622b4ce67cb037d64eeec1bf5e470c87132eadabf8",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.test.ts",
+      "approvedWorkingSHA256": "9beaddeea40a80c55ed300470b4e7ca5d4f7f2a0ad2dd2572355cafe79e5606d",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "scripts/transcribe-long-session.mjs",
+      "approvedWorkingSHA256": "58ebc6438bab1a28a733b4e4c61348c08ae962d98d5649bb4cb820870a070d94",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    },
+    {
+      "path": "scripts/lib/transcript-provenance.test.mjs",
+      "approvedWorkingSHA256": "b1744d9e091ff4f07e0cd4ca180a9d305fbb666554008efcd65499d30dbbc663",
+      "liveMatches": true,
+      "HEADMatchesExactOrGitLF": true
+    }
+  ],
+  "sourceInventorySHA256Verified": true,
+  "historicalHOLDSuffixByteIdentical": true,
+  "historicalHOLDSuffixSHA256": "2210cd3a92c50ed5c4b85e231f40ec364d12865992acf59c695c7ee1f99cc5d4",
+  "geminiAdditions": 12,
+  "geminiDeletions": 0,
+  "D119ApprovedByUmeshConfirmedFromHEAD": false,
+  "wholeTaskHoldsPreserved": true,
+  "preparationBlockers": [],
+  "stagedIndexReview": "independent exact4 path/blob/hash/index-tree comparison; no source/private proof/governance path selected",
+  "verdict": "PASS-QA-ONLY-WIP-PUBLICATION-SAFETY",
+  "limitations": [
+    "Main Ask remains BUILDING/HOLD; experimental ranking excluded.",
+    "Actual Meet received private AV, account authentication, attendance activation, T051/T052/Meet/full portable release remain unverified.",
+    "Existing baseline and new LOC/global directory-budget failures remain; no broad acceptance.",
+    "QA-only WIP status reconciliation; no underlying actual-provider evidence rerun or new behavior/release PASS.",
+    "No stage/index edits, tests, source/contracts edits, services/provider/DB/browser, commit or push."
+  ],
+  "indexTree": "53a1bbcf2fae7f675c3e9f742eb4faf8f0987144",
+  "indexStageListingSHA256": "89fb92f9a5a420583993565aad94be644164f7ee9adaebffd4ddf0f19d64d200",
+  "stagerReportSHA256": "0fbcf8711d0b3545ad9c57429764c9297cf8bb48db884d20fff165447725dfac",
+  "stagedPaths": 4,
+  "stagedSourcePaths": 0,
+  "allowlistExact": true,
+  "indexMatchesFrozenTree": true,
+  "stagedBlobChecks": [
+    {
+      "path": "qa/manifests/u4.1-recording-upload-worker.md",
+      "approvedWorkingSHA256": "29dd8dbdb6ee7010b204aaf04ff2e8b075a48e5d4e4c09bd6fc8d27f39eb3266",
+      "stagedSHA256": "bf936effa5eab6f15e0af0ef14bfb76e3ba9cc3936efb995bfa3fb9eaa977b6e",
+      "gitBlobOid": "c11af60c1e560bc81b29a2bda8ada29077d74411",
+      "pinMatch": true,
+      "byteRelation": "GitCRLFtoLFOnly"
+    },
+    {
+      "path": "qa/verdicts/u4.1-recording-upload-worker.md",
+      "approvedWorkingSHA256": "6d614d1bdd59e7fbb9319d3f1d2bdc814eac4e36081cf95c5eb4c30307429503",
+      "stagedSHA256": "2d8b9a97f01e770fbd731134a62b3cdc335bcc46c7ee7ae8ac39f2aea746485f",
+      "gitBlobOid": "5b6d2322121d8c37e753005a5ffdbf05096e1abf",
+      "pinMatch": true,
+      "byteRelation": "GitCRLFtoLFOnly"
+    },
+    {
+      "path": "qa/contracts/upload-transcribe-worker.md",
+      "approvedWorkingSHA256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d",
+      "stagedSHA256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d",
+      "gitBlobOid": "4ed3ccdad8df611dda6470b30cd392e428dd8073",
+      "pinMatch": true,
+      "byteRelation": "exact"
+    },
+    {
+      "path": "qa/contracts/gemini-audio-transcription.md",
+      "approvedWorkingSHA256": "13f94c9a28e2a19dd30c00a8d6199becd67ba994ac0f780dc765a2cc3b71fa94",
+      "stagedSHA256": "16697ed68764d3c1def144df473b3359328e49a6cae471e888a0e054e872d92e",
+      "gitBlobOid": "38459829a3765955943dc2e8811133abf87fa157",
+      "pinMatch": true,
+      "byteRelation": "GitCRLFtoLFOnly"
+    }
+  ],
+  "exactBlobCount": 1,
+  "CRLFtoLFOnlyBlobCount": 3,
+  "forbiddenOrExtraStagedPaths": [],
+  "geminiGitNumstat": "12\t0\tqa/contracts/gemini-audio-transcription.md",
+  "historicalHOLDSuffixStagedExactModuloGitLF": true,
+  "stagedDiffCheckExit": 0,
+  "blockers": [],
+  "indexStillFrozen": true,
+  "sourcePublicationAcceptanceIssued": false,
+  "behaviorAcceptanceIssued": false,
+  "D119ApprovedByUmeshConfirmedFromWorkingAppendOnlyLog": true,
+  "D119AuthorityRecordPublication": "Approved-by Umesh verified in current append-only decision log and root exact4 approval; governance bytes intentionally not staged. HEAD presence is not claimed."
+}

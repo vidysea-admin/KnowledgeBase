@@ -2,5 +2,5 @@
   "name": "@lkb/transcribe",
   "version": "0.0.0",
   "private": true,
-  "description": "Python ML worker (Whisper/diarization) — talks to the TS packages via the job queue only. No TS code; package.json exists so pnpm sees the workspace member."
+  "description": "Isolated Python Gemini transcription transport worker — communicates through tenant-scoped jobs only; see README.md for worker and file-submission commands."
 }

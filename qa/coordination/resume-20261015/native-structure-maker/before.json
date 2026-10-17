@@ -1,0 +1,196 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native-capture-runtime.test.ts",
+    "sha256": "efb684773a9341448943ae24b0b86e5df1cb50d14a7a3df8642a7689ccf8cf51",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-capture-runtime.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+    "sha256": "96ee07ad9944d08a099188d8d4af729654d2bc6cb5e83724e48091010fb015c4",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-capture-runtime.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-clock-ledger.test.ts",
+    "sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-clock-ledger.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-clock-ledger.ts",
+    "sha256": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-clock-ledger.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-ivf.test.ts",
+    "sha256": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-ivf.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-ivf.ts",
+    "sha256": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-ivf.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-media-finalize.test.ts",
+    "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-media-finalize.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-media-finalize.ts",
+    "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-media-finalize.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-media-probe.test.ts",
+    "sha256": "4e6b12e89a7900253112d3e08aad3234a27b2fdc0018ddfd2a6d51c8fa8a9512",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-media-probe.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-media-probe.ts",
+    "sha256": "569913b3bb1d2acc56b5c094015d15aab2f02d888315557571e929bffe8aa055",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-media-probe.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-media-types.ts",
+    "sha256": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-media-types.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-spool.test.ts",
+    "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-spool.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-spool.ts",
+    "sha256": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-spool.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native-tab-receiver.ts",
+    "sha256": "c17626a69f951a5b7fd4114ce5806b1e39193d5ec2de15811eebc436589eef25",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__native-tab-receiver.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-commands.ts",
+    "sha256": "9a89d7334396818831ed131c7ad48e7dc449da0fb62b382d8c94d655a6e8dc58",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__record-commands.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+    "sha256": "83d661282aa845662fb34a4e5279ba15afa06ea022c4594758e6c8131388e73c",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__record-consent__finalizer-input.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+    "sha256": "d23856afa2ddc319113f6cfe328e5be26c7a13b70100cc46b1a5b1cd29f5db39",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__record-consent__native-provider-audio.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "sha256": "7f8e3b57b7b8265fa3f01fadf2cd0a653eb6bb0738d2d453fd4d8e421732b95d",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__record-consent__native-provider-audio.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+    "sha256": "facdfe356bcca0ecda77a0f30d07abcbe20b68ff18749a173f331800df56c841",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__record-finalize.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+    "sha256": "a4ee1e681c17596380e1c1d39c33549fac80616ff1b7f65bec6bf6f1fa843aae",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__tab-browser.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+    "sha256": "6f7b14f6978c65b88a49edfaacd6cf23d9b9005f7bd6d8ca3a16d266ae8ed4c7",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__tab-browser.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "sha256": "6ff2cb357f588bb0609ead2e26f6be24bd87382a4ac6312c8e39b00fb9bfad59",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__tiles__native-measurement.test.ts"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "sha256": "9e0dc2ff51d6b0bf5b775f2f98381ece1e12a82085d9099f6e54696fb3f70384",
+    "exists": true,
+    "backup": "qa/coordination/resume-20261015/native-structure-maker/before-packages__meeting-bot__src__capture__tiles__native-measurement.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-ivf.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-ivf.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-media-probe.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-media-probe.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-media-types.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-spool.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts"
+  }
+]

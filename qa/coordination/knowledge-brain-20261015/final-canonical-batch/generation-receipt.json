@@ -1,0 +1,84 @@
+{
+  "kind": "APPROVED_TWO_SOURCE_OUTPUT_MATERIALIZATION_NOT_TEST",
+  "startedAt": "2026-10-15T10:40:50.929Z",
+  "completedAt": "2026-10-15T10:40:51.831Z",
+  "elapsedMs": 898.3249,
+  "command": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "qa/coordination/knowledge-brain-20261015/final-canonical-batch/generate-targets.mjs"
+  ],
+  "runtime": "v24.19.0",
+  "runtimeSha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "inputs": [
+    {
+      "sha256": "C949FE2697E3CF735601CAEE4372378E108E0BF3855079D299CB6CFFDA1483E8",
+      "path": "schema/index.json"
+    },
+    {
+      "sha256": "2B03A2DFACB9C747725FF261E17B7139E418F13E1E9D165CF524A1DD876FE146",
+      "path": "schema/tree_index.schema.json"
+    },
+    {
+      "sha256": "784BBECE740C2188ADB20463880918845A5CBC6677FAE9BA433BEA386C09567A",
+      "path": "schema/speaker_attributes.schema.json"
+    },
+    {
+      "sha256": "42A3854C5E15B297EE93BEAE7F840BB3976A114FD1C25EF6216502E3C905F231",
+      "path": "packages/core/src/index.ts"
+    },
+    {
+      "sha256": "89B52EB2EB2032798B762D92C25E1381665858E49034317DE1B92CB809E311F0",
+      "path": "packages/db/src/index.ts"
+    },
+    {
+      "sha256": "810C7994B1A571F6E18DEA8D265A1E32DF14D717D2E8AA76CF1E17D663E61D5D",
+      "path": "scripts/gen-types.mjs"
+    },
+    {
+      "path": "qa/coordination/knowledge-brain-20261015/final-canonical-batch/generate-targets.mjs",
+      "sha256": "b95bb02186edeff05dbc754f1a48a0e8d985e83182077144c64411c1abc57997"
+    }
+  ],
+  "before": {
+    "packages/core/src/generated/speaker_attributes.ts": {
+      "exists": false,
+      "sha256": null
+    },
+    "packages/core/src/generated/tree_index.ts": {
+      "exists": true,
+      "sha256": "47f4514ba063718df6c7d1e05f0ebc09854b211ad536ab0d3d7a48c54e47f361",
+      "bytes": 2041
+    }
+  },
+  "after": {
+    "packages/core/src/generated/speaker_attributes.ts": {
+      "exists": true,
+      "sha256": "d20d6b907f863839a004479ac525849cde3208c010797f4e7e14b57a33c7334d",
+      "bytes": 74620
+    },
+    "packages/core/src/generated/tree_index.ts": {
+      "exists": true,
+      "sha256": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3",
+      "bytes": 3228
+    }
+  },
+  "unexpectedGeneratedWrites": [],
+  "inputsStable": true,
+  "exitCode": 0,
+  "error": null,
+  "signal": null,
+  "success": true,
+  "ownOutputsRestoredOnFailure": false,
+  "onlyAllowedSourceOutputs": [
+    "packages/core/src/generated/speaker_attributes.ts",
+    "packages/core/src/generated/tree_index.ts"
+  ],
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a"
+  }
+}

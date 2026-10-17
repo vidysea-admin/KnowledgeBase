@@ -53,9 +53,13 @@ export interface TelegramAlertSinkDeps {
    * live send is an outward-facing action that gates to the human). */
   send?: (token: string, chatId: string, text: string) => Promise<void>;
   log?: (msg: string) => void;
+  /** Per tenant/source attempt backstop; matches the bot notifier's 60s default. */
+  throttleMs?: number;
+  now?: () => number;
 }
 
 const SEND_TIMEOUT_MS = 8_000;
+const DEFAULT_THROTTLE_MS = 60_000;
 
 /** Replaces every occurrence of `token` in `s` — mirrors telegram-channel.ts's own `redact`, the
  * one thing standing between a thrown network error and a token landing in a log line. */
@@ -111,6 +115,9 @@ export function createTelegramAlertSink(deps: TelegramAlertSinkDeps = {}): Alert
   const chatId = deps.chatId ?? process.env.TELEGRAM_CHAT_ID;
   const log = deps.log ?? ((m: string) => console.log(m));
   const send = deps.send ?? defaultTelegramAlertSend;
+  const now = deps.now ?? Date.now;
+  const throttleMs = deps.throttleMs ?? DEFAULT_THROTTLE_MS;
+  const lastAttemptAt = new Map<string, number>();
 
   return {
     notifyWatchSilent(tenantId, sourceType, lastHeartbeatAt, intervalMs) {
@@ -118,6 +125,13 @@ export function createTelegramAlertSink(deps: TelegramAlertSinkDeps = {}): Alert
         log("[alert-sink] disabled — TELEGRAM_BOT_TOKEN/TELEGRAM_CHAT_ID not set");
         return;
       }
+      // Tuple encoding keeps distinct tenant/source pairs separate even when they contain colons.
+      const key = JSON.stringify([tenantId, sourceType]);
+      const time = now();
+      const lastAttempt = lastAttemptAt.get(key);
+      if (lastAttempt !== undefined && time - lastAttempt < throttleMs) return;
+      // Reserve before invoking transport: failed/in-flight sends must not create a probe storm.
+      lastAttemptAt.set(key, time);
       const last = lastHeartbeatAt ? `last completed run: ${lastHeartbeatAt}` : "no run has ever completed";
       const text =
         `🔕 Watch gone quiet: ${sourceType} (tenant ${tenantId}) — ${last}, expected within ` +
@@ -125,7 +139,7 @@ export function createTelegramAlertSink(deps: TelegramAlertSinkDeps = {}): Alert
         `poll failed — check the watcher process/task, not the credential.`;
       // Fire-and-forget: notifyWatchSilent is void and must never throw into detectSilentWatchers,
       // which already wraps its call in try/catch as a second backstop (health.ts:113-118).
-      void send(token, chatId, text).catch((err: unknown) => {
+      void Promise.resolve().then(() => send(token, chatId, text)).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         log(`[alert-sink] send failed: ${redact(msg, token)}`);
       });

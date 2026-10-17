@@ -1,0 +1,63 @@
+{
+  "phase": "verification-support",
+  "scope": "ONE root-authorized current receipts bounded read-only mechanics preflight; no reviewer or PASS",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "ab04f3ca3f7bc3369be424a3ef16685fd0372a7bd3fb8e76954fabd98ae76fa8",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-preflight-v3.mjs",
+    "--root",
+    "C:/Users/product/Desktop/KnowledgeBase",
+    "--spec",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-spec-current-receipts.json",
+    "--spec-sha",
+    "0af4f0fdc3dcc299730957cec17eb7cb1e113a9499d7731288b503b5e47087b1",
+    "--out",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-mechanics-current-receipts"
+  ],
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "runtime_version": "v24.19.0",
+  "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "runtime_identity": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [],
+  "timeoutMs": 120000,
+  "startedAt": "2026-10-15T12:44:09.739Z",
+  "completedAt": "2026-10-15T12:44:13.398Z",
+  "elapsedMs": 3656.9035,
+  "exitCode": 2,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v3.mjs": "f5d3d0171341d83f7a36997200daff213d44fcc8dd7148cbfca4f8543fb789c6",
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec-current-receipts.json": "0af4f0fdc3dcc299730957cec17eb7cb1e113a9499d7731288b503b5e47087b1"
+  },
+  "after": {
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v3.mjs": "f5d3d0171341d83f7a36997200daff213d44fcc8dd7148cbfca4f8543fb789c6",
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec-current-receipts.json": "0af4f0fdc3dcc299730957cec17eb7cb1e113a9499d7731288b503b5e47087b1"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-product-current-receipts-preflight.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-product-current-receipts-preflight.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

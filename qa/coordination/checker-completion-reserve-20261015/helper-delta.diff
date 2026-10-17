@@ -1,0 +1,41 @@
+--- canonical-base-f24a
++++ staged-reserve
+@@ -45,5 +45,25 @@
+         if "budget_debit" in row and not isinstance(row["budget_debit"], dict):
+             raise ValueError("budget_debit must be a metric object")
++    if "completion_reserve" in data and type(data["completion_reserve"]) is not bool:
++        raise ValueError("completion_reserve must be true or false")
++    reserved = data.get("completion_reserve", False)
++    reserve_id = data.get("completion_reserve_id")
++    if reserved and (not isinstance(reserve_id, str) or not reserve_id.strip() or len(reserve_id) > 160):
++        raise ValueError("completion_reserve_id requires exact unit/cycle/candidate identity")
++    phase_kind = next_phase.get("kind", "review")
++    if reserved and phase_kind not in ("review", "finalization"):
++        raise ValueError("reserved phase kind must be review or finalization")
++    reserve = {"active_s": 30, "tokens": 800}
++    finalization_committed = any(row.get("phase_kind") == "finalization"
++                                 and row.get("completion_reserve_id", reserve_id) == reserve_id
++                                 for row in rows)
+     result = {"ratios": {}, "totals": {}, "budget_debits": {}, "limits": {}, "unknown": []}
++    result["completion_reserve"] = {
++        "status": ("already_committed" if finalization_committed else "protected")
++                  if reserved else "legacy_unreserved",
++        "allocation": reserve if reserved else None,
++        "id": reserve_id if reserved else None,
++        "phase_kind": phase_kind if reserved else None,
++    }
+     exceeded = []
+     bootstrap = False
+@@ -91,4 +111,12 @@
+         if limit is not None and charged_known + (allocation or 0) > limit:
+             exceeded.append(key)
++        if reserved and key in reserve:
++            if phase_kind == "review" and not finalization_committed:
++                if limit is not None and charged_known + (allocation or 0) + reserve[key] > limit:
++                    exceeded.append("completion_reserve_" + key)
++            elif phase_kind == "finalization" and (allocation or 0) > reserve[key]:
++                exceeded.append("finalization_allocation_" + key)
++            if finalization_committed and (allocation or 0) > 0:
++                exceeded.append("finalization_already_committed_" + key)
+         if charged_total is None and (key == "active_s" or limit is not None):
+             exceeded.append("unknown_active_time" if key == "active_s"

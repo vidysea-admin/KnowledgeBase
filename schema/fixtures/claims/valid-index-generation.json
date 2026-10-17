@@ -1,0 +1,19 @@
+{
+  "_id": "cl1",
+  "tenantId": "toc",
+  "text": "NZ target 27000 Indian students by 2030.",
+  "status": "verified",
+  "evidence": [
+    {
+      "turnId": "t1",
+      "sessionId": "sess1"
+    }
+  ],
+  "indexArtifact": {
+    "version": 1,
+    "generation": "11111111-1111-4111-8111-111111111111",
+    "sessionId": "sess1",
+    "sourceId": "src1",
+    "turnDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

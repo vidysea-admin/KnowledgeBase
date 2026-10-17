@@ -1,0 +1,38 @@
+{
+  "archiveBytes": 807616685,
+  "archiveSha256": "6b021a0864494e4decf278b36477a29eb36072432773e4e62c2f42c302630db0",
+  "selectedFiles": [
+    {
+      "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\LICENSE-Community.txt",
+      "bytes": 30608,
+      "sha256": "09d99ca61eb07873d5334077acba22c33e7f7d0a9fa08c92734e0ac8430d6e27"
+    },
+    {
+      "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\MPL-2",
+      "bytes": 16726,
+      "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+    },
+    {
+      "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\THIRD-PARTY-NOTICES",
+      "bytes": 146330,
+      "sha256": "c3c1219b8c71583c33b372d2b4eae0978d27d6854f5306dd25d4bd0a4fe8844c"
+    },
+    {
+      "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\bin\\mongod.exe",
+      "bytes": 77756416,
+      "sha256": "4c9e9764cbac5be8eb92733e23ce7f70b52f8ae84b6879b4d5cc010c90ec6082"
+    }
+  ],
+  "selectedBytes": 77950080,
+  "combinedBytes": 885566765,
+  "dllEntries": 0,
+  "excluded": "mongos, PDB debug symbols, vc_redist.x64.exe installer, Install-Compass.ps1",
+  "authenticode": "mongod.exe NotSigned; official ZIP SHA256 is provenance gate; root accepted passive preparation with explicit limitation",
+  "pe": "AMD64 0x8664, asInvoker manifest; startup privilege NOT proven",
+  "downloadedBinaryExecutions": 0,
+  "dbActions": 0,
+  "hostActivations": 0,
+  "secretsGenerated": 0,
+  "gitIgnoreProven": false,
+  "activationReady": false
+}

@@ -11,6 +11,7 @@ import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
+import { assertTranscriptReplacementSafe, requireWorkDatabase } from "./lib/transcript-provenance.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = join(ROOT, "data", "toc-migrated");
@@ -26,8 +27,10 @@ function classify(sessionId) {
   const turnsPath = join(DATA_DIR, sessionId, "turns.json");
   if (!existsSync(turnsPath)) return null;
   const turns = loadJson(turnsPath);
+  const source = loadJson(join(DATA_DIR, sessionId, "source.json"));
+  if (!source.tenantId || !Array.isArray(turns) || turns.some(t => t.tenantId !== source.tenantId || t.sessionId !== sessionId)) throw new Error("transcript source identity mismatch");
   const isPlaceholder = turns.length > 0 && turns.every((t) => t.speakerRef === "unknown");
-  return { turns, isPlaceholder };
+  return { turns, isPlaceholder, tenantId: source.tenantId };
 }
 
 async function main() {
@@ -39,7 +42,7 @@ async function main() {
   const realSessions = [];
   for (const sid of sessionIds) {
     const result = classify(sid);
-    if (result && !result.isPlaceholder) realSessions.push({ sessionId: sid, turns: result.turns });
+    if (result && !result.isPlaceholder) realSessions.push({ sessionId: sid, turns: result.turns, tenantId: result.tenantId });
   }
 
   console.log(`${realSessions.length} real session(s) to sync:`);
@@ -50,16 +53,18 @@ async function main() {
     return;
   }
 
-  console.log("\nConnecting to Mongo for a live sync (no --dry-run flag given)...");
+  const {url, dbName} = requireWorkDatabase(process.env);
+  console.log("\nConnecting to isolated Mongo for a live sync...");
   const { connect, close } = await import("../packages/db/src/client.js");
   const { turns } = await import("../packages/db/src/collections/turns.js");
+  const { claims } = await import("../packages/db/src/collections/claims.js");
+  const { sessionPages } = await import("../packages/db/src/collections/session-pages.js");
 
-  const url = process.env.MONGODB_URL || "mongodb://localhost:27017";
-  const dbName = process.env.MONGODB_DB || "lkb";
   await connect(url, dbName);
   try {
-    const tenantId = "toc";
+    for (const s of realSessions) await assertTranscriptReplacementSafe({turns, claims, sessionPages}, s.tenantId, s.sessionId, s.turns);
     for (const s of realSessions) {
+      const tenantId = s.tenantId;
       const before = await turns(tenantId).countDocuments({ sessionId: s.sessionId });
       const deleteResult = await turns(tenantId).deleteMany({ sessionId: s.sessionId });
       let inserted = 0;

@@ -1,0 +1,54 @@
+{
+  "results": [
+    {
+      "check": "rw: Add rule + edit enables Save",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "rw: Save succeeds with If-Match/ETag and persists after reload",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "rw: no read-only notice",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "check": "ro: before any write, no read-only notice (page cannot know yet)",
+      "pass": true,
+      "detail": "notice present before write=false"
+    },
+    {
+      "check": "ro: edit a rule and click Save -> 403 -> read-only alert, inputs and Save disabled",
+      "pass": true,
+      "detail": "PUT 403; alert=This key can view rules but cannot change them. Use a key with the join-rules scope to edi"
+    },
+    {
+      "check": "phone 375px: no horizontal overflow, Save and Add rule reachable",
+      "pass": true,
+      "detail": "scrollWidth=375 clientWidth=375"
+    },
+    {
+      "check": "503: unavailable state shown as an alert, no editor",
+      "pass": true,
+      "detail": "Rule editing is not available on this server yet."
+    },
+    {
+      "check": "screenshots are distinct (ro-after-403 differs from rw-after-reload; the cycle-0 bug was byte-identical files)",
+      "pass": true,
+      "detail": "{\"rw_edited\":\"d9fafbcf1906\",\"rw_reloaded\":\"fc66efa819c3\",\"ro_after403\":\"8ba73a4eb9f7\",\"phone\":\"9e30b56d8178\",\"s503\":\"35acf270c7c9\"}"
+    }
+  ],
+  "consoleErrors": [
+    {
+      "ctx": "rw",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "ctx": "ro",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+    }
+  ]
+}

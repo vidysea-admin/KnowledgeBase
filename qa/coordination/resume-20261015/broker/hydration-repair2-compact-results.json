@@ -1,0 +1,59 @@
+{
+  "headAfter": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "headBeforeNotSeparatelyExecutedForThisHydrationPhase": true,
+  "allPinsFinalMatch": true,
+  "all92Unique": true,
+  "all92SnapshotMatchesIndependentExpected": true,
+  "totalVerifiedQuotes": 238,
+  "actualImportedSources": 202,
+  "focusedCoverage": {
+    "hydrated": 4,
+    "noExcerpts": 0,
+    "refused": 0
+  },
+  "focusedTripwires": {
+    "fetch": 0,
+    "http": 0,
+    "socket": 0,
+    "dns": 0,
+    "udp": 0,
+    "credentialFile": 0,
+    "provider": 0,
+    "embedding": 0
+  },
+  "fullCoverage": {
+    "hydrated": 92,
+    "noExcerpts": 0,
+    "refused": 0
+  },
+  "fullTripwires": {
+    "fetch": 0,
+    "http": 0,
+    "socket": 0,
+    "dns": 0,
+    "udp": 0,
+    "credentialFile": 0,
+    "provider": 0,
+    "embedding": 0
+  },
+  "jobs": [
+    [
+      "hydration-repair2-synthetic2-receipt.json",
+      0,
+      0.2970000000022992
+    ],
+    [
+      "hydration-repair2-focused4-receipt.json",
+      0,
+      21.5
+    ],
+    [
+      "hydration-repair2-all92-receipt.json",
+      0,
+      29.06199999999808
+    ]
+  ],
+  "priorResultSha256": "bb009a95474c7d555f4025e4c601649f1411147e42551402296bd2388e44725f",
+  "focusedResultSha256": "8dff0e9d9baa22c30c8826722a45e879b6ca15f339812d031078393041cd650e",
+  "all92ResultSha256": "23af593a011b2c4e537069c993ec728e62e6c0b0787fa5ac448f7837f08aa51f"
+}

@@ -1,0 +1,9 @@
+# Deadline composition cause audit — read-only source diagnosis
+
+Original evidence remains FAIL: `qa/goal-vectorless-2026-10-15/verification-deadline-composition-one.json` and `.stdout.txt` (0/1,exit1,1240.6133ms;269pins stable). Historical rows restoration remains attributed solely to `verification-deadline-composition-sideeffect.json`. No source edit, test, build, checker or rerun occurred in this audit.
+
+Classification: **fixture missing current canonical index authority semantics**, with a concrete source-level incompatibility; the original underlying exception was sanitized, so this is not a newly executed reproduction. `workflow.ts:206` wraps non-FlywheelError as unavailable503; it does not identify a storage deadline. The test body failed in29.2788ms with its unchanged default120000ms stage deadline.
+
+`composition.test.ts:15,56–61` injects `memoryDb` into actual vectorless `indexSession`. Its current authority prerequisite is `indexing/session.ts:115` → `generation.ts:61–77`: acquisition uses `indexAttempt:{$exists:false}`, then requires `acknowledged===true` and `matchedCount===1`. `test-fixture.ts:29–38` supports `$in`/`$ne` but not `$exists`; `:66–70` returns matchedCount without acknowledged. Thus this fixture cannot establish the required canonical claim, independent of the deadline patch. No production-logic defect is demonstrated by this receipt. Additional composition prerequisites remain unverified.
+
+Minimal proposed repair lease: `apps/api/src/evaluation-flywheel/test-fixture.ts` for faithful filter/write-result semantics; `apps/api/src/evaluation-flywheel/composition.test.ts` only for explicit current-authority fixture setup/assertions if needed. Preserve actual generation guards and successful child/citation expectations. No production source/schema/guard change. Repair and subsequent broker rerun require coordinator authorization; no lease exercised here.

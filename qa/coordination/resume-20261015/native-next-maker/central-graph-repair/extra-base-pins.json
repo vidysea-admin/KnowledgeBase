@@ -1,0 +1,14 @@
+[
+  {
+    "path": "apps/api/src/source-intake/jobs/entry.ts",
+    "sha256": "5ca9c9eb2e6822b9472d746845dfdfd529501ab50727baf1db886da0ffab0c7f"
+  },
+  {
+    "path": "apps/api/src/capture-readiness/types.ts",
+    "sha256": "edd4cb47501596ced7f6245d445753f1ed26c5e18e5c2fd02f6ba065a973de6c"
+  },
+  {
+    "path": "scripts/native-capture/server.test.ts",
+    "sha256": "9f16e4285f1f85ac7916350e89c6a053bfb517b56c48e2c67b507854c2f91e35"
+  }
+]

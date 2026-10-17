@@ -1,0 +1,4 @@
+PASS independent resume identity/date/pending/export and strict refusal
+PASS independent predecessor before/after runtime refusal
+PASS independent stage request refusal and honest coverage
+PASS independent actual-control async restore/save race and dirty export/navigation

@@ -1,0 +1,32 @@
+{
+  "classificationRequest": "ordinary jsdom validation only; no execution by maker",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/answer-policy/PolicyAskPage.test.tsx",
+    "src/pages/answer-policy/AnswerPolicySimulator.test.tsx",
+    "--maxWorkers=1",
+    "--minWorkers=1"
+  ],
+  "pins": {
+    "apps/web/src/pages/answer-policy/AnswerPolicySimulator.test.tsx": "41C8093D88295AE1261965ADC3D42E7183A45CAEC07F1547566E07A0ED95CC0F",
+    "apps/web/src/pages/answer-policy/AnswerPolicySimulator.tsx": "04ED2E50A57C9B5947CE51A4FD2E9AD793AA9A1B1E436EC1E4AAF6A42FA7CD5C",
+    "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx": "BCCD4A98D004342A55F1B3FDA954C12F855B86C43102CD05F92160E7B7D4483D",
+    "apps/web/src/pages/answer-policy/AnswerSources.tsx": "0C92A27554F50B75DA0F42EF6EC8849E4BEAF221C67830AB53913F2A75EF8BD0",
+    "apps/web/src/pages/answer-policy/client.ts": "FBE49C33181BA7BA06906D9B5BFEA1BDA35C4AEAB8BB46C92448638028632F92",
+    "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx": "0D426C3155B1EA088636F4D733BAACB09942D21929321DA5A11237CE363FE90F",
+    "apps/web/src/pages/answer-policy/PolicyAskPage.tsx": "9CC996B3E3D174067C32686781CECE9790EBE0CEEE374581DEF23AB296C5DBC1",
+    "apps/web/src/pages/answer-policy/PolicyManager.tsx": "78046E563870AAC5A926A4CF7C2BC0E14767FC1D97AA44F25C044A724AFE4B57",
+    "apps/web/src/pages/answer-policy/question.ts": "04E2FCA6E278C0D3FF8DC83469B8353C7EA44B570A40C556C230D2B18A56DA4C",
+    "apps/web/src/pages/search/AskHandoff.tsx": "E695F45700A1D067B04C66ADF68D6186E9D7F4B13D6AF572D17EF6B84E985418",
+    "apps/web/src/pages/search/query.ts": "14CE1BF8D9A784065D7307F20951F11A7A4AFBBC2F48CB96685BF204437C05C8",
+    "apps/web/src/App.tsx": "EEF7AF89EB3C3C261678AED701F309D9399E0F77921B73E3B9CE97B1055571EA",
+    "apps/web/src/auth/AuthContext.tsx": "196181DC165208A35CB23C9D7F9B7AE5E293A7EB40135A7CD90686DDB4EC3E1C",
+    "apps/web/src/api/client.ts": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802",
+    "apps/web/src/api/types.ts": "0C988730BD44A86A6674D8B92C8DB642988DB8A1BC54FC0DB0E46DACA7242547"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/evidence/goal-t056/ui-owned-current",
+  "fixtureBoundary": "Actual page and shared U32 hook in jsdom with mocked policy/provider endpoint adapters; no native/browser/provider/DB calls. Includes explicit submission, full4000 draft/history boundary, auth/draft/URL/context invalidation, YAML/review/feedback consumption. Actual mounted App downstream tracked separately by U32 coordinator; no duplicate green requested."
+}

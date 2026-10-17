@@ -1,0 +1,19 @@
+✔ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (1135.7721ms)
+✔ three physical attempts stop before answer, sticky across repeated graph/scorer calls and resume (44.9122ms)
+✔ source drift/forged citation offsets fail through actual hydration validation (26.6789ms)
+✔ byte, token admission and unknown usage refuse before further physical calls (4.7617ms)
+✔ deadline cancels hanging transport without admitting another attempt (68.8224ms)
+✔ checkpoint integrity/config/candidate binding refuses tampering and collisions (36.3857ms)
+✔ question-blind same-population control ignores query and offline reader refuses foreign scope (31.9364ms)
+✔ live disabled by default; pilot expansion refused and full92 needs distinct finite mode/grant (1.6228ms)
+✔ all92 production-graph rows execute after clean pause/resume; same controls, verifier model and lifetime usage retained (939.7741ms)
+✔ persisted finite authorization binds exact code/corpus/config/usage semantics and expiry without executing transport (26.2853ms)
+✔ inflight output reservations and prior elapsed runtime prevent cumulative budget reset (1.0092ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2426.176

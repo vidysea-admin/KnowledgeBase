@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 1,
+  "unit": "parallel-compete-bounded-context",
+  "cycle": 0,
+  "reviewType": "independent-checker",
+  "humanAdjudication": null,
+  "scope": "Bounded offline and ephemeral-local test coverage; no deployed/provider/live-DB acceptance.",
+  "sourceHashes": [
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\routes\\compete.ts",
+      "Hash": "86FB7A0EF5155A4472486044BB5270CAD8F9043D7527C6A7ECEEF77B50E21558"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\routes\\compete.test.ts",
+      "Hash": "354BD4B8DADAEABA88E3B9D62671A02FBB84339AD5F4CB4C9854C6F76D4610F6"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\routes\\ask.ts",
+      "Hash": "B9CEA1CD3570651F8354C3FCC7607A5AC6E9194CECE52987A2032CD126EC42E2"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\server.ts",
+      "Hash": "FA4129A968966C6CCEB1C9ADC6443F42BC9F584AC7CB2FEB698C07DA2218BEF5"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\auth.ts",
+      "Hash": "532380D18856D0D00BF8DB879E8C0F5CFEE50C46FB2B7898074F748EB1FA9C37"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\ask\\source-context.ts",
+      "Hash": "E7516BB1133282431CBCB13B3DBC76E2FE50A1B178DC6CBC0B0D6D873CCFAE98"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\ask\\src\\ask-v2.ts",
+      "Hash": "2A795CF8B0CB45AC6F3C5CC7298C66CF14A7B3DB2F89AF31080D8EC896B56629"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\ask\\src\\answer.ts",
+      "Hash": "482132FF75520F58EBCE7E99ED3D15E56089DA3F28A999FAF46E8E675D2FABB4"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\ask\\src\\source-context.ts",
+      "Hash": "27402B3E0F23AA74E79AFD2A296A6A9F4C88E43C210B52375F2603F46A8267DC"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\ask\\src\\bounded-refine.ts",
+      "Hash": "8957FA3CC8A4514DB13020683A6D7516031BC4C29938A4DFF2FA1B8570524189"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-compete-bounded-context\\repro.ts",
+      "Hash": "1A2889E6025F5AEC4E7C13F5C998BA9ED1C468280E5288B0DD5621CF7344977A"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-compete-bounded-context\\checker-recorded-corpus.ts",
+      "Hash": "99104E52CBC1851CEF5FB3D120D6BA482624C8FC97923FBA581C2B2955CCAB52"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-compete-bounded-context\\checker-factory-refusals.ts",
+      "Hash": "72CCC04207FC72D8B5B72C4337F8A7EF8695FEB6B9819718CB86550157832740"
+    },
+    {
+      "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-compete-bounded-context\\checker-bounded-concurrency.ts",
+      "Hash": "496320841707F3D37F7789225F6D86CD8D44873C78919B79501C11FF145788C9"
+    }
+  ],
+  "ownedRouteAndTestHashesMatchFrozenManifestAndUnchanged": true,
+  "originalCorpusHashUnchanged": true,
+  "originalCorpus": {
+    "hash": "1a2889e6025f5aec4e7c13f5c998ba9ed1c468280e5288b0dd5621cf7344977a",
+    "fixtureInputsUnchanged": true,
+    "adaptation": "Only expected postrepair assertions changed, with original full script preserved and replayed unchanged separately.",
+    "measured": 5,
+    "total": 5,
+    "omitted": []
+  },
+  "checks": [
+    {
+      "kind": "affected-suite",
+      "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --test --test-concurrency=1 --test-timeout=20000 --experimental-test-isolation=none --import tsx apps/api/src/routes/compete.test.ts",
+      "chunk_id": "d0761c",
+      "wall_time_seconds": 2.5434525,
+      "exit_code": 0,
+      "original_token_count": 246,
+      "output": "✔ POST /compete/start produces an eval_runs row with credibility 'internal' (152.5805ms)\n✔ POST /compete/start with a missing question returns 400 (25.9796ms)\n✔ POST /compete/:id/score updates the existing row, not a new one (24.2281ms)\n✔ POST /compete/start without the compete scope returns 403 (20.2082ms)\n✔ POST /compete/:id/score with a nonexistent id returns 404 (19.5755ms)\n✔ GET /compete serves the plain HTML form (16.7879ms)\n✔ compete replays recorded five-case context-bypass floor and factory failures without eval writes (30.9581ms)\n✔ compete denied missing/invalid/revoked keys do no tree/factory/completion/eval work (9.0287ms)\n✔ compete actual bounded factory preserves source grounding and concurrent tenant/query isolation (26.9694ms)\n✔ POST /compete/:id/score confines an existing evaluation to its authenticated owner (36.4ms)\nℹ tests 10\nℹ suites 0\nℹ pass 10\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1802.4182\n"
+    },
+    {
+      "kind": "API-typecheck",
+      "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe node_modules/typescript/bin/tsc --noEmit -p apps/api/tsconfig.json",
+      "chunk_id": "8822d0",
+      "wall_time_seconds": 5.4856974,
+      "exit_code": 0,
+      "original_token_count": 0,
+      "output": ""
+    },
+    {
+      "kind": "recorded-corpus-and-independent-factory-refusals",
+      "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --test --test-concurrency=1 --test-timeout=20000 --experimental-test-isolation=none --import tsx qa/evidence/parallel-compete-bounded-context/checker-recorded-corpus.ts qa/evidence/parallel-compete-bounded-context/checker-factory-refusals.ts",
+      "sandbox_permissions": "require_escalated",
+      "cases": {
+        "recorded": 5,
+        "independentFactoryRefusals": 10
+      },
+      "chunk_id": "89fb30",
+      "wall_time_seconds": 1.6645897,
+      "exit_code": 0,
+      "original_token_count": 794,
+      "output": "{\"name\":\"null\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"undefined\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"empty-object\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"array\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"promised-null\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"throws\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"rejects\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"missing-source-context\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"nonfunction-hydrate\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\n{\"name\":\"nonfunction-arms\",\"status\":503,\"factories\":1,\"legacyCompletions\":0,\"evalWrites\":0}\nIndependent malformed/thrown/rejected factory refusals 10/10; no shared rescue or eval persistence.\n{\"kind\":\"binding\",\"routePath\":\"apps/api/src/routes/compete.ts\",\"sha256\":\"86fb7a0ef5155a4472486044bb5270cad8f9043d7527c6a7eceef77b50e21558\",\"mode\":\"mounted-handler offline; not HTTP runtime proof\"}\n{\"name\":\"sync-refusing-factory-bypassed\",\"authenticatedTenant\":\"tenant-a\",\"treeTenants\":[\"tenant-a\"],\"factoryCalls\":1,\"hydrationCalls\":1,\"legacyArms\":0,\"completionKinds\":[\"ask.select_nodes\"],\"status\":503,\"evalWrites\":0,\"evalTenant\":null,\"credibility\":null,\"answer\":null,\"jobsTenants\":[\"tenant-a\"],\"refusedAudit\":true}\n{\"name\":\"async-factory-bypassed-outside-current-type\",\"authenticatedTenant\":\"tenant-a\",\"treeTenants\":[\"tenant-a\"],\"factoryCalls\":1,\"hydrationCalls\":1,\"legacyArms\":0,\"completionKinds\":[\"ask.select_nodes\"],\"status\":503,\"evalWrites\":0,\"evalTenant\":null,\"credibility\":null,\"answer\":null,\"jobsTenants\":[\"tenant-a\"],\"refusedAudit\":true}\n{\"name\":\"legacy-no-factory-preserved\",\"authenticatedTenant\":\"tenant-a\",\"treeTenants\":[\"tenant-a\"],\"factoryCalls\":0,\"hydrationCalls\":0,\"legacyArms\":0,\"completionKinds\":[\"ask.select_nodes\",\"ask.answer\"],\"status\":200,\"evalWrites\":1,\"evalTenant\":\"tenant-a\",\"credibility\":\"internal\",\"answer\":\"The grant is guaranteed.\",\"jobsTenants\":[\"tenant-a\"],\"refusedAudit\":false}\n{\"name\":\"direct-bounded-refusal-no-eval-write\",\"authenticatedTenant\":\"tenant-a\",\"treeTenants\":[\"tenant-a\"],\"factoryCalls\":0,\"hydrationCalls\":1,\"legacyArms\":0,\"completionKinds\":[\"ask.select_nodes\"],\"status\":503,\"evalWrites\":0,\"evalTenant\":null,\"credibility\":null,\"answer\":null,\"jobsTenants\":[\"tenant-a\"],\"refusedAudit\":true}\n{\"name\":\"missing-compete-scope\",\"authenticatedTenant\":\"tenant-a\",\"treeTenants\":[],\"factoryCalls\":0,\"hydrationCalls\":0,\"legacyArms\":0,\"completionKinds\":[],\"status\":403,\"evalWrites\":0,\"evalTenant\":null,\"credibility\":null,\"answer\":null,\"jobsTenants\":[],\"refusedAudit\":false}\nREPAIRED 5/5 recorded offline mounted-handler cases; no implementation edits, provider calls, DB or sockets.\n✔ qa\\evidence\\parallel-compete-bounded-context\\checker-factory-refusals.ts (2.308ms)\n✔ qa\\evidence\\parallel-compete-bounded-context\\checker-recorded-corpus.ts (0.3163ms)\nℹ tests 2\nℹ suites 0\nℹ pass 2\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1084.1585\n"
+    },
+    {
+      "kind": "unchanged-original-exploit-assertions",
+      "command": "C:/Program Files/WindowsApps/OpenAI.Codex_26.1002.7124.0_x64__2p2nqsd0c76g0/app/resources/cua_node/bin/node.exe --test --test-isolation=none --test-timeout=20000 --import tsx qa/evidence/parallel-compete-bounded-context/repro.ts",
+      "sandbox_permissions": "require_escalated",
+      "expectedExit": 1,
+      "expectedReason": "Original assertion demands ignored factoryCalls=0; repaired route invokes factory once (actual1), so original exploit-success assertion fails. This script stops at first old assertion and is not the full repaired corpus measure.",
+      "chunk_id": "000397",
+      "wall_time_seconds": 1.3008962,
+      "exit_code": 1,
+      "original_token_count": 252,
+      "output": "{\"kind\":\"binding\",\"routePath\":\"apps/api/src/routes/compete.ts\",\"sha256\":\"86fb7a0ef5155a4472486044bb5270cad8f9043d7527c6a7eceef77b50e21558\",\"mode\":\"mounted-handler offline; not HTTP runtime proof\"}\n✖ qa\\evidence\\parallel-compete-bounded-context\\repro.ts (1.2254ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 791.8646\n\n✖ failing tests:\n\ntest at qa\\evidence\\parallel-compete-bounded-context\\repro.ts:1:1\n✖ qa\\evidence\\parallel-compete-bounded-context\\repro.ts (1.2254ms)\n  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n  \n  1 !== 0\n  \n      at run (C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-compete-bounded-context\\repro.ts:68:17)\n      at async <anonymous> (C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\parallel-compete-bounded-context\\repro.ts:72:1) {\n    generatedMessage: true,\n    code: 'ERR_ASSERTION',\n    actual: 1,\n    expected: 0,\n    operator: 'strictEqual',\n    diff: 'simple'\n  }\n"
+    },
+    {
+      "kind": "independent-actual-factory-literal-grounding-and-concurrency",
+      "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --test --test-concurrency=1 --test-timeout=20000 --experimental-test-isolation=none --import tsx qa/evidence/parallel-compete-bounded-context/checker-bounded-concurrency.ts",
+      "sandbox_permissions": "require_escalated",
+      "cases": {
+        "ownerPositives": 2
+      },
+      "chunk_id": "eb8b3a",
+      "wall_time_seconds": 1.5197566,
+      "exit_code": 0,
+      "original_token_count": 143,
+      "output": "{\"actualFactory\":\"createSourceRequestDepsFor\",\"groundedOwnerPositives\":2,\"completionOrder\":[\"B\",\"A\"],\"factoryTenants\":[\"A\",\"B\"],\"perQueryEmbeddings\":[\"Aid October A\",\"Aid October B\"],\"verifiedFinalTenantOverride\":true,\"sourceReads\":8,\"auditJobs\":8}\nIndependent literal grounding/concurrent request-local tenant/query isolation 2/2 passed; offline mounted handlers.\n✔ qa\\evidence\\parallel-compete-bounded-context\\checker-bounded-concurrency.ts (1.6622ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1066.6388\n"
+    },
+    {
+      "kind": "frozen-contract-verifier",
+      "command": "python contracts/verify_contracts.py",
+      "chunk_id": "d19ae6",
+      "wall_time_seconds": 0.5270047,
+      "exit_code": 0,
+      "original_token_count": 20,
+      "output": "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity\r\n",
+      "limitation": "No frozen contracts; PASS by vacuity is not product-quality proof."
+    }
+  ],
+  "initialInfrastructureAttempts": [
+    {
+      "kind": "recorded-corpus",
+      "chunk_id": "53d370",
+      "wall_time_seconds": 1.1249594,
+      "exit_code": 1,
+      "original_token_count": 346,
+      "output": "✖ qa\\evidence\\parallel-compete-bounded-context\\checker-recorded-corpus.ts (1.4061ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 306.2986\n\n✖ failing tests:\n\ntest at qa\\evidence\\parallel-compete-bounded-context\\checker-recorded-corpus.ts:1:1\n✖ qa\\evidence\\parallel-compete-bounded-context\\checker-recorded-corpus.ts (1.4061ms)\n  Error: spawn EPERM\n      at ChildProcess.spawn (node:internal/child_process:458:11)\n      at Object.spawn (node:child_process:813:9)\n      at ensureServiceIsRunning (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2272:29)\n      at startSyncServiceWorker (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2478:19)\n      at Object.<anonymous> (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2519:3)\n      at Module._compile (node:internal/modules/cjs/loader:1872:14)\n      at Object..js (node:internal/modules/cjs/loader:2003:10)\n      at Module.load (node:internal/modules/cjs/loader:1594:32)\n      at Module._load (node:internal/modules/cjs/loader:1396:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19) {\n    errno: -4048,\n    code: 'EPERM',\n    syscall: 'spawn',\n    name: 'TransformError'\n  }\n",
+      "classification": "EPERM before assertions; not behavioral evidence. Narrow local-transform escalation permitted and final execution recorded above."
+    },
+    {
+      "kind": "factory-refusals",
+      "chunk_id": "27e06f",
+      "wall_time_seconds": 1.0714795,
+      "exit_code": 1,
+      "original_token_count": 347,
+      "output": "✖ qa\\evidence\\parallel-compete-bounded-context\\checker-factory-refusals.ts (1.4762ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 256.9463\n\n✖ failing tests:\n\ntest at qa\\evidence\\parallel-compete-bounded-context\\checker-factory-refusals.ts:1:1\n✖ qa\\evidence\\parallel-compete-bounded-context\\checker-factory-refusals.ts (1.4762ms)\n  Error: spawn EPERM\n      at ChildProcess.spawn (node:internal/child_process:458:11)\n      at Object.spawn (node:child_process:813:9)\n      at ensureServiceIsRunning (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2272:29)\n      at startSyncServiceWorker (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2478:19)\n      at Object.<anonymous> (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2519:3)\n      at Module._compile (node:internal/modules/cjs/loader:1872:14)\n      at Object..js (node:internal/modules/cjs/loader:2003:10)\n      at Module.load (node:internal/modules/cjs/loader:1594:32)\n      at Module._load (node:internal/modules/cjs/loader:1396:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:255:19) {\n    errno: -4048,\n    code: 'EPERM',\n    syscall: 'spawn',\n    name: 'TransformError'\n  }\n",
+      "classification": "EPERM before assertions; not behavioral evidence. Narrow local-transform escalation permitted and final execution recorded above."
+    },
+    {
+      "kind": "original-exploit-script",
+      "chunk_id": "9c3614",
+      "wall_time_seconds": 1.2159037,
+      "exit_code": 1,
+      "original_token_count": 333,
+      "output": "✖ qa\\evidence\\parallel-compete-bounded-context\\repro.ts (1.6292ms)\nℹ tests 1\nℹ suites 0\nℹ pass 0\nℹ fail 1\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 452.0486\n\n✖ failing tests:\n\ntest at qa\\evidence\\parallel-compete-bounded-context\\repro.ts:1:1\n✖ qa\\evidence\\parallel-compete-bounded-context\\repro.ts (1.6292ms)\n  Error: spawn EPERM\n      at ChildProcess.spawn (node:internal/child_process:458:11)\n      at Object.spawn (node:child_process:813:9)\n      at ensureServiceIsRunning (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2272:29)\n      at startSyncServiceWorker (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2478:19)\n      at Object.<anonymous> (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.28.2\\node_modules\\esbuild\\lib\\main.js:2519:3)\n      at Module._compile (node:internal/modules/cjs/loader:1929:14)\n      at Object..js (node:internal/modules/cjs/loader:2060:10)\n      at Module.load (node:internal/modules/cjs/loader:1651:32)\n      at Module._load (node:internal/modules/cjs/loader:1443:12)\n      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19) {\n    errno: -4048,\n    code: 'EPERM',\n    syscall: 'spawn',\n    name: 'TransformError'\n  }\n",
+      "classification": "EPERM before assertions; not behavioral evidence. Narrow local-transform escalation permitted and final execution recorded above."
+    }
+  ],
+  "limitations": [
+    "No raw provider/network/DB calls in new independent probes.",
+    "Existing baseline tests include ephemeral local HTTP; new probes use actual createServer-mounted handlers offline without sockets.",
+    "Semantic grounding decisions from offline dispatch demonstrate wiring and refusal handling, not external factual truth or human approval.",
+    "No source, ledger, task, runtime/deployment or shared governance mutation by checker.",
+    "No full Ask/Compete feature or release acceptance."
+  ]
+}

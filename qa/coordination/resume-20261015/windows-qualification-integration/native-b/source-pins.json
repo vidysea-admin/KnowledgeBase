@@ -1,0 +1,12 @@
+[
+  {
+    "total_lines": 387,
+    "sha256": "896627b4f07e322b2e48ffc584e7309117d3e6938478d897a21cccf6a80ffa8c",
+    "path": "packages/meeting-bot/src/capture/record-commands.test.ts"
+  },
+  {
+    "total_lines": 165,
+    "sha256": "920869ac4d70b49be13ef31eec12ea6491062b60600ec20f46547e5705eec148",
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts"
+  }
+]

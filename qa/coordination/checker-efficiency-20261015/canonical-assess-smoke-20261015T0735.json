@@ -1,0 +1,38 @@
+{
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "C:/Users/product/.agents/skills/checker/references/metrics.json"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 20000,
+  "startedAt": "2026-10-15T07:32:14.349Z",
+  "completedAt": "2026-10-15T07:32:14.540Z",
+  "elapsedMs": 186.82119999999998,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/coordination/checker-efficiency-20261015/test_review_budget.py": "49ce5d332003485fe54afc91fed73029e576117c1f91c7b252c4fe126486958f",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "fcc545eba99bff2da3ea7c88dcd0c2ffb7f0f7ce3470f7221fc5e2e6e297f8db",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "d433f379c3aeaa6baa0eed504e4509b93a1b0d8d000e75696ad365b4406d8e6b",
+    "C:/Users/product/.agents/skills/checker/references/metrics.json": "c1921faf0e338464e7de8dc2d7c3a73b115f3c4047c3a5106abc85eab5992686",
+    "C:/Users/product/.codex/AGENTS.md": "5135f571e81efb4b37c21e9e2b42305eeb6dd40167462ac0615a6a25482a700b",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  },
+  "after": {
+    "qa/coordination/checker-efficiency-20261015/test_review_budget.py": "49ce5d332003485fe54afc91fed73029e576117c1f91c7b252c4fe126486958f",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "fcc545eba99bff2da3ea7c88dcd0c2ffb7f0f7ce3470f7221fc5e2e6e297f8db",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "d433f379c3aeaa6baa0eed504e4509b93a1b0d8d000e75696ad365b4406d8e6b",
+    "C:/Users/product/.agents/skills/checker/references/metrics.json": "c1921faf0e338464e7de8dc2d7c3a73b115f3c4047c3a5106abc85eab5992686",
+    "C:/Users/product/.codex/AGENTS.md": "5135f571e81efb4b37c21e9e2b42305eeb6dd40167462ac0615a6a25482a700b",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  },
+  "stdoutPath": "qa/coordination/checker-efficiency-20261015/canonical-assess-smoke-20261015T0735.stdout.txt",
+  "stderrPath": "qa/coordination/checker-efficiency-20261015/canonical-assess-smoke-20261015T0735.stderr.txt",
+  "hashesUnchanged": true
+}

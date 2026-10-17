@@ -1,0 +1,99 @@
+/** Production read perimeter: immutable originals stay stored; consumers see current eligible evidence. */
+import type { Db } from 'mongodb';
+import type { Claims, Sessions, Turns, TreeIndexRootDocument, GraphEdges } from '@lkb/core';
+import { scopedCollection } from '@lkb/db';
+import { buildKnowledgeGraph, treeIndexRootFilter } from '@lkb/index';
+import type { BrainReadDeps } from '../../routes/brain.js';
+import type { CitationsDeps, CitationEvidence } from '../../routes/citations.js';
+import type { GraphReadDeps } from '../../routes/graph.js';
+import type { TreeStore } from '../../routes/ask/ask.js';
+import { createKnowledgeVisibility } from '../../visibility/knowledge.js';
+import { readEffectiveTurns } from '../../transcript-review/effective-reader.js';
+
+function publicSession(session: Sessions): Sessions {
+  const { indexAttempt, indexArtifact, indexRevision, captureConsent, operationalApproval, organizerConsent,
+    privateWindows, guardedPrivateWindows, mediaStartedAt, captureGeneration, controlToken, controller, token, requestId, ...metadata } = session;
+  return metadata;
+}
+
+export function trustedBrainReads(base: BrainReadDeps, database: () => Db): BrainReadDeps {
+  return {
+    ...base,
+    async listSessions(tenant) {
+      const visibility = createKnowledgeVisibility(database());
+      const rows = await base.listSessions(tenant);
+      const safe = await Promise.all(rows.map(row => visibility.safeCitationSession(tenant, row._id)));
+      return safe.filter((row): row is Sessions => row !== null).map(publicSession);
+    },
+    async listSources(tenant) {
+      const visibility = createKnowledgeVisibility(database());
+      const rows = await base.listSources(tenant);
+      const allowed = await Promise.all(rows.map(row => visibility.sourceVisible(tenant, row._id)));
+      return rows.filter((_, i) => allowed[i]).map(row => {
+        const { captureConsent, operationalApproval, organizerConsent, privateWindows, guardedPrivateWindows,
+          mediaStartedAt, captureGeneration, controlToken, controller, token, requestId, indexAttempt, indexArtifact, ...publicSource } = row;
+        // The consent projection carries a boolean and recording attribution, never the private capability/proof.
+        return { ...publicSource, consent: { given: row.consent.given, recordedBy: row.consent.recordedBy } };
+      });
+    },
+    async getSessionDetail(tenant, sessionId) {
+      const db = database(), visibility = createKnowledgeVisibility(db);
+      // Aggregate pages, participants and media contain unreviewed siblings in chat sessions.
+      const aggregateVisible = await visibility.sessionVisible(tenant, sessionId);
+      const safeSession = await visibility.safeCitationSession(tenant, sessionId);
+      if (!safeSession) return null;
+      const detail = await base.getSessionDetail(tenant, sessionId);
+      if (!detail || detail.session.tenantId !== tenant) return null;
+      const claims = await Promise.all(detail.claims.map(row => visibility.claimVisible(tenant, row)));
+      return { ...(aggregateVisible ? detail : { session: safeSession, page: null }), session: publicSession(safeSession), claims: detail.claims.filter((_, i) => claims[i]),
+        turns: await visibility.filterTurns(tenant, await readEffectiveTurns(db, tenant, detail.turns, sessionId)) };
+    },
+  };
+}
+
+export function trustedCitationReads(database: () => Db): CitationsDeps {
+  return { async getCitation(tenant, claimId) {
+    const db = database(), visibility = createKnowledgeVisibility(db);
+    const claim = await scopedCollection<Claims>(db, 'claims')(tenant).findOne({ _id: claimId });
+    if (!claim || !await visibility.claimVisible(tenant, claim)) return null;
+    const evidence: CitationEvidence[] = await Promise.all(claim.evidence.map(async item => {
+      const raw = await scopedCollection<Turns>(db, 'turns')(tenant).findOne({ _id: item.turnId, sessionId: item.sessionId });
+      const effective = raw ? (await readEffectiveTurns(db, tenant, [raw], item.sessionId))[0] : undefined;
+      const permitted = effective && typeof item.quote === 'string' && await visibility.eligibleTurn(tenant, item.sessionId, item.turnId, item.quote);
+      // An approved message excerpt cannot disclose unreviewed sibling text in the original turn.
+      const turn = permitted ? claim.source === 'whatsapp' ? { ...effective, text: item.quote!, citationExcerpt: true } : effective : null;
+      return { turnId: item.turnId, sessionId: item.sessionId, turn,
+        session: turn ? await visibility.safeCitationSession(tenant, item.sessionId) : null };
+    }));
+    return { claim, evidence };
+  } };
+}
+
+export function trustedTreeReads(database: () => Db): TreeStore {
+  return { async load(tenant) {
+    const db = database();
+    const root = await scopedCollection<TreeIndexRootDocument & { _id: string }>(db, 'tree_index')(tenant).findOne(treeIndexRootFilter(tenant));
+    return createKnowledgeVisibility(db).trustedTree(tenant, root);
+  } };
+}
+
+export function trustedGraphReads(database: () => Db): GraphReadDeps {
+  return { async loadGraph(tenant) {
+    const db = database(), visibility = createKnowledgeVisibility(db);
+    const [rawRoot, edges, sessions] = await Promise.all([
+      scopedCollection<TreeIndexRootDocument & { _id: string }>(db, 'tree_index')(tenant).findOne(treeIndexRootFilter(tenant)),
+      scopedCollection<GraphEdges>(db, 'graph_edges')(tenant).find({}).toArray(),
+      scopedCollection<Sessions>(db, 'sessions')(tenant).find({}).toArray(),
+    ]);
+    const allowed = new Set<string>();
+    for (const session of sessions) if (await visibility.sessionVisible(tenant, session._id)) allowed.add(session._id);
+    const safeEdges = edges.filter(edge => {
+      const refs = [edge.sessionRef, ...(Array.isArray(edge.evidence) ? edge.evidence.map(item =>
+        item && typeof item === 'object' && 'sessionId' in item ? item.sessionId : undefined) : [])];
+      return refs.length > 0 && refs.every(ref => typeof ref === 'string' && allowed.has(ref));
+    });
+    const treeRoot = await visibility.trustedTree(tenant, rawRoot);
+    if (!treeRoot && !safeEdges.length) return null;
+    return buildKnowledgeGraph({ treeRoot, entityEdges: safeEdges, sessions: sessions.filter(row => allowed.has(row._id)) });
+  } };
+}

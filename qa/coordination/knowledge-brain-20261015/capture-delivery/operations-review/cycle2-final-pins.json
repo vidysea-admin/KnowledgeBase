@@ -1,0 +1,17 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "574B2DAD2838C2A115398888BDAC041FA8ED6F3776527B5F819C8E68B0D29F18",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\capture-operations-acceptance.mjs"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "28B86F190F0A3473EB7F5BD189015B6B35EDCFCE77DAF17ABF5B18D26599699D",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\capture-operations-acceptance.test.mjs"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "B4ADBFB08254B9FD2E45BE0C4831F2EA5699DBAA84F81AD4AAB4E49E863C38B1",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\capture-operations-evidence.mjs"
+  }
+]

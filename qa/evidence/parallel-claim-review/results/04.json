@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "index": 4,
+  "originalIndex": 5,
+  "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+  "inputHash": "4ecaa1800af3f88167c2e7fe9a41f9c72ae25240c1a20cc8fa7f9ad1996784e7",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The historical t072 sets the Italy educational-document stamp context and requires designated state officers; t083 explicitly refuses SDM attestation/apostille and repeats designated officers in each state.",
+    "missingReferences": [],
+    "caveats": [
+      "Historical speakerRef is unknown; the Ruby Thomas prefix in transcript text does not independently verify identity.",
+      "Support concerns the designated state-verification step in a longer stamping chain; t072 separately describes the Ministry of External Affairs apostille step.",
+      "Historical times 3998-4184s and 4863-4933s differ from current same-ID times; no media alignment was checked.",
+      "Source quotation support does not verify current legal rules, external factual truth or human semantic approval.",
+      "Raw artifact SHA256 and normalized-LF hashes are distinct; only supplied record/text bindings were recomputed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+        "contextVersion": "originalMigration",
+        "quote": "Now, for Italy, we require that your previous academic documentations have certain stamps.",
+        "textSha256": "d37cb0220edf00b53985544ef4aba714e6f6580e4d74b92278f20b4fc1ddd6b5",
+        "contextSha256": "1b3ca60df112ff45201494a6eba89f094b2ef1fafad6ba91e5a0f0773b8180ac",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3998,
+        "tEnd": 4184,
+        "supports": "Italy educational-document stamp scope; full source also explicitly specifies designated state officers and SDM refusal."
+      },
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+        "contextVersion": "originalMigration",
+        "quote": "you cannot get the attestation and apostille done from an SDM officer. There are certain designated officers in each state.",
+        "textSha256": "671847bdc72939905a1387b925a0b2339316809d1c97e886e7273e71a2697fcd",
+        "contextSha256": "8369ae5f5e0cb656f1b8a732d791057ae8d0a01db0284d1247e4cd7c267234c0",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 4863,
+        "tEnd": 4933,
+        "supports": "Explicit SDM refusal and requirement for designated state officers."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t072 discusses New Zealand admission/backlog/language requirements and t083 discusses a New Zealand e-visa; neither supports Italian attestation, SDM refusal or designated state officers.",
+    "missingReferences": [],
+    "caveats": [
+      "Both cited IDs exist but their contents changed; historical support cannot authorize these current citations.",
+      "Current t083 speakerRef spk:1 is unresolved; Kshitij on t072 is a stored label, not independently verified identity.",
+      "Current times 916-938s and 1104-1110s differ from historical timings; media alignment remains unverified.",
+      "Unsupported here means the current citations do not support the claim, not that the claim is false.",
+      "Artifact bytes were not verified; normalized-LF values were not substituted for raw artifact hashes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+        "contextVersion": "current",
+        "quote": "If you're looking at a master's degree to study at one of the top ranking eight universities of New Zealand, you need a CGPA of minimum 6.3.",
+        "textSha256": "84dab2536a639815a71b8617229d9a8cd777f947569fda082e1e540cfb22298f",
+        "contextSha256": "3e0db64bcbac27d0261f343aad3dbd9de16ddabddf7d8f141fe9a36de725619e",
+        "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+        "revision": null,
+        "speakerRef": "Kshitij",
+        "tStart": 916,
+        "tEnd": 938,
+        "supports": "Unrelated New Zealand admission requirements; no Italian attestation/SDM/designated-officer support."
+      },
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+        "contextVersion": "current",
+        "quote": "You don't even submit your passport because in case of New Zealand, you get an e-visa copy.",
+        "textSha256": "32cd87437a5383e310fec7fd786834d132ce4661c50c9442021adae45a68ec11",
+        "contextSha256": "2c3d5ef3b8267b4c054358ef6eeb341e48215dcfebb8cee62b1352383c663d39",
+        "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+        "revision": null,
+        "speakerRef": "spk:1",
+        "tStart": 1104,
+        "tEnd": 1110,
+        "supports": "Unrelated New Zealand e-visa statement; no Italian attestation/SDM/designated-officer support."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Historical quotations support the Italy state-verification requirement, while same-ID current quotations concern New Zealand. No replacement mapping, legal-truth judgment, speaker verification or human gold is established."
+}

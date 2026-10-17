@@ -1,0 +1,41 @@
+{
+  "scope": "T037 exact native missing/foreign saved-tenant floor only",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "command": [
+    "node",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=120000",
+    "--test-name-pattern=^ISS-ALERTTENANT-001:",
+    "scripts/webinar/start-record-detached.test.mjs"
+  ],
+  "outer_timeout_ms": 150000,
+  "selected_node_count": 1,
+  "literal_issue_cases": [
+    "Saved scheduled job missing tenantId",
+    "Saved scheduled job tagged for foreign tenant"
+  ],
+  "issue": "ISS-ALERTTENANT-001",
+  "fixture": "Actual copied PowerShell launches tiny fixture CLI calling actual scheduled-dispatch.ts with injected tenant/rules; record callback only writes marker, which must remain absent",
+  "expected": [
+    "Both child refusals reach fixed authorization unavailable message",
+    "No capture marker",
+    "Saved job bytes unchanged"
+  ],
+  "own_source_pins": "qa/evidence/t037-scheduled-dispatch-policy-pins.json",
+  "resolved_closure_receipt": "qa/goal-vectorless-2026-10-15/verification-t037-current-neighbour-four.json",
+  "native_identity_requirements": [
+    "Resolve/hash native powershell.exe actually called by test",
+    "Resolve/version/hash node.exe Get-Command chooses inside actual PowerShell",
+    "Pin actual tsx package/import root, shared core lean-video and obs msgpack entry",
+    "Preserve compatible inherited environment; whitelist hashes only, no key values"
+  ],
+  "exclusions": [
+    "No realcapture/join",
+    "No external API/provider/DB",
+    "No hostactivation/service",
+    "No7/4/suite repeats",
+    "No reviewer dispatch"
+  ],
+  "status": "REQUESTED_NOT_EXECUTED"
+}

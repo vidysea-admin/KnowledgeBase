@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://whatsapp_candidates",
+  "title": "whatsapp_candidates",
+  "description": "Quarantined WhatsApp review candidates. Only an explicit reviewed approval committed with per-candidate materialisation may make content trusted; collection presence never establishes trust.",
+  "type": "object",
+  "required": ["_id", "tenantId", "sourceId", "groupJid", "sessionId", "kind", "text", "contentHash", "evidence", "flags", "status", "createdAt"],
+  "properties": {
+    "_id": { "type": "string", "pattern": "^wa-review:[a-f0-9]{64}$" },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "sourceId": { "type": "string", "minLength": 1 },
+    "groupJid": { "type": "string", "minLength": 1 },
+    "sessionId": { "type": "string", "minLength": 1 },
+    "kind": { "type": "string", "enum": ["claim", "topic", "decision", "attachment"] },
+    "text": { "type": "string", "minLength": 1 },
+    "contentHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "attachment": {
+      "type": "object",
+      "required": ["name"],
+      "properties": { "name": { "type": "string", "minLength": 1 }, "mimeType": { "type": "string", "minLength": 1 } },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "required": ["turnId", "sessionId", "speakerRef", "quote", "occurredAt"],
+        "properties": {
+          "turnId": { "type": "string", "minLength": 1 }, "sessionId": { "type": "string", "minLength": 1 },
+          "speakerRef": { "type": "string", "minLength": 1 }, "speakerLabel": { "type": "string", "minLength": 1 },
+          "quote": { "type": "string", "minLength": 1 }, "occurredAt": { "type": "string", "format": "date-time" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "object", "required": ["kind", "reason", "turnId"],
+        "properties": {
+          "kind": { "type": "string", "enum": ["sensitive", "duplicate", "personal-excluded"] },
+          "reason": { "type": "string", "minLength": 1 }, "turnId": { "type": "string", "minLength": 1 },
+          "duplicateOf": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "status": { "type": "string", "enum": ["needs-review", "approved", "rejected"] },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "decision": {
+      "type": "object", "required": ["action", "actor", "at"],
+      "properties": {
+        "action": { "type": "string", "enum": ["approved", "rejected"] },
+        "actor": { "type": "string", "minLength": 1 }, "at": { "type": "string", "format": "date-time" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "status": { "const": "needs-review" } } }, "then": { "not": { "required": ["decision"] } } },
+    { "if": { "properties": { "status": { "const": "approved" } } }, "then": { "required": ["decision"], "properties": { "decision": { "properties": { "action": { "const": "approved" } } }, "flags": { "not": { "contains": { "properties": { "kind": { "const": "personal-excluded" } }, "required": ["kind"] } } } } } },
+    { "if": { "properties": { "status": { "const": "rejected" } } }, "then": { "required": ["decision"], "properties": { "decision": { "properties": { "action": { "const": "rejected" } } } } } },
+    { "if": { "properties": { "kind": { "const": "attachment" } } }, "then": { "required": ["attachment"] }, "else": { "not": { "required": ["attachment"] } } }
+  ],
+  "additionalProperties": false
+}

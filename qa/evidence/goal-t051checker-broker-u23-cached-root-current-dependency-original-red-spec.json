@@ -1,0 +1,41 @@
+{
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "qa/evidence/goal-u23/cached-root-taint-original.test.ts"
+  ],
+  "pins": {
+    "apps/api/src/indexing/eligible-tree.ts": "040dc797ce8ccf404eb1d5b4c68eb629cdb6f58298491da5d9f2c00091fc454e",
+    "qa/evidence/goal-u23/cached-root-original/apps__api__src__indexing__eligible-tree.ts.txt": "040dc797ce8ccf404eb1d5b4c68eb629cdb6f58298491da5d9f2c00091fc454e",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "qa/evidence/goal-u23/cached-root-original/apps__api__src__visibility__knowledge.ts.txt": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada",
+    "apps/api/src/indexing/session.ts": "6734738ce50f493bc27c9db7b4170ed4db590f3dba6bda47f47dcbaa6e2709f5",
+    "qa/evidence/goal-u23/cached-root-original/apps__api__src__indexing__session.ts.txt": "b48ebb3a0e5e2d65ce2004d939e8c3bac11610cdcd410ebf5ee936851102de79",
+    "packages/index/src/tree/topic-indexing.ts": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd",
+    "qa/evidence/goal-u23/cached-root-original/packages__index__src__tree__topic-indexing.ts.txt": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd",
+    "packages/index/src/tree/build.ts": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+    "qa/evidence/goal-u23/cached-root-original/packages__index__src__tree__build.ts.txt": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+    "packages/index/src/tree/regenerate.ts": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca",
+    "qa/evidence/goal-u23/cached-root-original/packages__index__src__tree__regenerate.ts.txt": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca",
+    "apps/api/src/composition/integrations/trusted-readers.ts": "d1afa507ba6d1f426d1da2c14f65178fb9d930e592cca0ee4b8d61e493727042",
+    "qa/evidence/goal-u23/cached-root-taint-original.test.ts": "022da5db68294a6020409f8bd3e18c4606b2f1b72b35e1a8d478518a5e96b64e",
+    "packages/index/src/tree/search.ts": "44dc55f5a88e29433faa7e33ae2af6d0f64f116d6c9574d7da9a866207874878",
+    "apps/api/src/transcript-review/effective-reader.ts": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+    "packages/index/src/index.ts": "db0a05d657e0929b766cbd7acf6a9d64cc1226d4fbfdffab2ca26ef62cba0ff0",
+    "packages/core/src/index.ts": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "apps/api/src/indexing/generation.ts": "a065b6d9215de387190d8c374b1aa527bc001971fa0b5d4dd9868d749eb441a6"
+  },
+  "timeoutMs": 60000,
+  "reviewedRepins": {
+    "knowledge": "Two explicit false-consent guards only, checker-reviewed positive consent fixture",
+    "session": "Actual index-generation write/CAS body changed; this original reproduction never calls indexSession",
+    "trustedReaders": "Public session projection strips generation/private metadata; trustedTreeReads function still directly loads root and calls same visibility.trustedTree",
+    "eligibleTree": "Original vulnerable040dc bytes remain held. Original snapshots separately preserved and pinned."
+  },
+  "output": "qa/evidence/goal-t051checker-broker-u23-cached-root-current-dependency-original-red"
+}

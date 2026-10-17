@@ -1,0 +1,49 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "t038-cycle0-checker-historical",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 180,
+        "tokens": 6000
+      }
+    },
+    {
+      "id": "t038-cycle1-independent-checker",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 180,
+        "tokens": 6000
+      }
+    }
+  ],
+  "next_phase": {
+    "active_s": 0,
+    "tokens": 0,
+    "cost": null
+  },
+  "bootstrap_scope": "Same t038 atomic outbox unit cycle1; review deterministic shutdown fixture delta, immediate abort consumer and exact literal15 receipt; retain original11 historical checked scope without claiming exact-runtime fresh reuse. Root dispatches fresh independent checker, no duplicated behavioral suites.",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "escalation": {
+    "authority": "Root explicit message 2026-10-15 authorizes historical debit180s6000 and cumulative360s12000 for current durable-write candidate",
+    "reason": "Prior cycle reviewer actual time/tokens unknown remain null. Conservative budget debit preserves history; current high-risk consumer criteria and fixture repair require independent review; ratios remain UNVERIFIED.",
+    "limits": {
+      "active_s": 360,
+      "tokens": 12000,
+      "cost": null
+    }
+  },
+  "accounting_note": "No children. 180s/6000-token full allocation charged conservatively; actual active monotonic duration unavailable: wall clock checkpoints alone are not actual active-time measurement. Two failed tempfile readiness attempts retained; no test command launched because canonical candidate identity fails."
+}

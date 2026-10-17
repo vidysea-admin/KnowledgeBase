@@ -1,0 +1,16 @@
+{
+  "unit": "product-operations-evaluation",
+  "cycle": 0,
+  "title": "same-gap changed-question child is refused",
+  "contract": [
+    "S10",
+    "S11",
+    "S15"
+  ],
+  "harness": "apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+  "isolatedOnly": true,
+  "method": "Use a byte-identical isolated harness copy with its existing vi.mock/model fixtures; append the test below. No source edits. Run only named test with compatible broker grouped probe; retain per-file attribution and all before/after hashes.",
+  "test": "test(\"checker rejects same-gap changed-question child without evidence or refresh\", async () => {\n vi.mocked(openFlywheel).mockResolvedValue(head);\n vi.mocked(retestFlywheel).mockResolvedValue({ ...result, question: \"FOREIGN_QUESTION\", answer: \"FOREIGN_ANSWER\" });\n mount(); chooseId(); fireEvent.click(screen.getByRole(\"button\", { name: \"Record loss gap\" }));\n await screen.findByText(\"captured\");\n fireEvent.change(screen.getByLabelText(\"Provided source URL\"), { target: { value: \"https://example.test/notes\" } });\n fireEvent.change(screen.getByLabelText(\"Recovery request ID\"), { target: { value: \"try-1\" } });\n fireEvent.click(screen.getByRole(\"button\", { name: \"Capture source and retest\" }));\n await screen.findByRole(\"alert\");\n expect(retestFlywheel).toHaveBeenCalledWith(\"key-a\", \"eval-1\", \"https://example.test/notes\", \"try-1\");\n expect(document.body.textContent).not.toContain(\"FOREIGN_ANSWER\");\n expect(document.body.textContent).not.toContain(\"FOREIGN_QUESTION\");\n expect(screen.queryByLabelText(\"Retest evidence\")).not.toBeInTheDocument();\n expect(loadFlywheel).not.toHaveBeenCalled();\n});",
+  "command": "pnpm --filter @lkb/web exec vitest run <isolated compatible harness path> -t \"checker rejects same-gap changed-question child without evidence or refresh\"",
+  "requiredReceipt": "exact runtime/environment/candidate source and harness hashes; command own exit/stdout/stderr; named test attribution. No local execution."
+}

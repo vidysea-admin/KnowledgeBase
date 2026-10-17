@@ -1,0 +1,1062 @@
+{
+  "kind": "METADATA_ONLY_STATIC_CLOSURE_NO_PRODUCTION_IMPORT_OR_EXECUTION",
+  "createdAt": "2026-10-16T02:15:05.492261+00:00",
+  "seeds": [
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+    "scripts/eval/vectorless-production-eval.mjs",
+    "apps/api/src/ask/source-context.ts",
+    "packages/db/src/index.ts",
+    "packages/index/src/index.ts",
+    "packages/ask/src/index.ts",
+    "packages/core/src/index.ts",
+    "packages/ai/src/index.ts",
+    "packages/ai/src/providers/ollama-cloud.ts"
+  ],
+  "walker": {
+    "path": "qa/coordination/resume-20261015/broker/broker_lib.py",
+    "sha256": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+    "passes": 1,
+    "scope": "existing relative-import static walker; explicit core/db/index/ask/ai barrel seeds cover adapter runtime aliases; no production import execution",
+    "limitation": "conditional computed imports/external dependency completeness not proven"
+  },
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "counts": {
+    "staticClosure": 202,
+    "existingInventory": 1319,
+    "missing": 1,
+    "drift": 0
+  },
+  "closure": [
+    {
+      "path": "apps/api/src/ask/ask-arms.ts",
+      "sha256": "c0933d9267040e3567faa2ebe8ba3cb6b4fd912870156267e8646328ac0ed2b0",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/ask/graph-context.ts",
+      "sha256": "94c876c7d2f04f19c6e3665e4f14d65a23002d2a97d8f539ea452434966b4654",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/ask/passage-lexical.ts",
+      "sha256": "31a22b953e52a3acc588aad14cc7beb97be922d5f7cbf3ec2a981a8c13b9b3ee",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/auth.ts",
+      "sha256": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/hash.ts",
+      "sha256": "f9ce2723a65913cf808e12623bfae1f8a9f2ffee6eac404c7429698122bfa49a",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/indexing/chunk-integrity.ts",
+      "sha256": "e984e228e4b5873b7009c08d91b7b8491eb7a514887a70a725b2ddb4ee6547f0",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/indexing/generation.ts",
+      "sha256": "f03c53bf95eeb6bb440a483815a622b5e355313628385ede1a4c6ffddc42dd8b",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/knowledge/metadata-visibility.ts",
+      "sha256": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/native-evidence/resolver.ts",
+      "sha256": "75c39b52f8c8620bf28bf55133b63e3b3746d40236806127540a3f843bc4fe61",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/score.ts",
+      "sha256": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/attribute-authority.ts",
+      "sha256": "5c114999dce85ba83212c03946b5dedd7f6a86eef973bbc9a4cbdc3ec5b7753e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.ts",
+      "sha256": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "sha256": "9d56eb0a585c78faaa945e47ca5a4d6fbaea16fbe95f3e975d5b3f8bbfe09ade",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "sha256": "c30821512924a77420ad5917aa7df2575c9e32d234b0ad829394471f8d8eef87",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/transcript-review/store.ts",
+      "sha256": "260cab66dbff29bfd6ad3805eccd715e585f22bd14bca5e50921eff357bdac33",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "sha256": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/visibility/read-snapshot.ts",
+      "sha256": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/detection.ts",
+      "sha256": "61e135ad831895c210ed387f94a2d55327fef25091efb7364aff34f422cecdd8",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/publication-contract.ts",
+      "sha256": "dbf8354bffc1cb8a824103ee3eae5d71c0b2a65c6ce48c747858ed28c1a07021",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/store.ts",
+      "sha256": "ede283f9f87666a4f93ee146900a796704aeade851f784602573f08c4104be37",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/validation.ts",
+      "sha256": "84f0f3117473952d1255e730d8256714eea9f697b2b84874ee552874246570b2",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/gemini-quota.ts",
+      "sha256": "6b7c4d9ac7d7c56ef1a24f7e112cded7b5b681e5344f640470dc3cc949190949",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/index.ts",
+      "sha256": "3a881523bf31bd8568bc8badade370ba8d430bc2d756e961a82c23f21b30e9f1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/jobs.ts",
+      "sha256": "ff1d14d504651e56d6bd88b82416bfc135ec951e4cacfca87a213756758fc180",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/json.ts",
+      "sha256": "2ebd19828037788b34ac6d512cee0cc1e9b8fd64df99537047baecc6133251df",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/provider.ts",
+      "sha256": "224011a106893ba8d42cecc5d9c43e4897df6d3d15e692f9e196d10aa050c4c1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/providers/anthropic.ts",
+      "sha256": "b4f6f8adad25b4fa1a751baf57062a3bc233819767d253ca50c8828f930435c4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/providers/claude-code.ts",
+      "sha256": "53318dedcfe106f41c26b5275af8af4a1926119118f14d0f546fa3eafd73831d",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/providers/gemini.ts",
+      "sha256": "49fe4fe8b50c79c46bbd3ea446e96b61d8d5f32490b55045e671e2a5c371367b",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/providers/ollama-cloud.ts",
+      "sha256": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/providers/ollama.ts",
+      "sha256": "2d41fb3e3a3a00528eb5a472df5469c836a1ed99750550a233b0b3c11ba5c9fd",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/providers/openai.ts",
+      "sha256": "0a39945652fa145567ea5f6136cabd9cbc6f436755c1366306604156e79770dc",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/router.ts",
+      "sha256": "111b0a7fb1d586b702d1fe5dd8d3f327e70069d46fd0c1dfc62dfccf692a7118",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/routing-config.ts",
+      "sha256": "94eef57019f5f06921a7ddf78edcba876414718c9bfeaff2b8d37819dd1e2584",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/stt/chunk-audio.ts",
+      "sha256": "d85f0413ba027506bcc9d45a4499a365ec80db64175dbe3d722eb042d453f997",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.ts",
+      "sha256": "a6c5442acf81723127ab1b14ce88c05792cd8a372844fdd139ac417b05076065",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/stt/gemini.ts",
+      "sha256": "cae71571422f801d1e2ca6d829c15c47e0cde495dca530ff3b38a2c9261bd782",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/stt/transcribe.ts",
+      "sha256": "41ee41f5173db81220a9fc31125c9a67dbb3b24414a6d3f06b4c3256eee6d8c1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/stt/whisper.ts",
+      "sha256": "ca863d6723eeaebbf60383ab7b2ad4aaec5f849ea9c2af24a94d6ebb685e814d",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/trace-file-sink.ts",
+      "sha256": "741730a7d5ae03015dfb2e9d2f4b567f006dcb6b2d182b47dfc2e454d64fa634",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/trace-langfuse/ingestion-response.ts",
+      "sha256": "303e9888283d81a41238f49682502652c6b6fc166248e7061953b56e28de5aab",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/trace-langfuse/payload.ts",
+      "sha256": "5a41f58acfe1c31595a481147b70dead190e30a7414696d39b15c38d340433f4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/trace-langfuse/sink.ts",
+      "sha256": "ac2459c19dbd6474cf075b2c028ac16dc8639e75f248d22edc1246cdb8f570fe",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/trace-registry.ts",
+      "sha256": "a4855f0c493687133ae6645bd96989f6d35c2d6a3dc67f519b5363f51d196909",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/trace.ts",
+      "sha256": "f975351f58ca197de4c45deedbf7a12ba6daeec288b1ba4ae58097c82050ef41",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ai/src/vision/chain.ts",
+      "sha256": "ba53fd4b457f382a405af6caa474383ec7760e993d9bdd8c9b54285cdc6c7dd9",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/answer.ts",
+      "sha256": "ba178ee1cf4cccea76c501676ee438c3b57abbe06aaefa793f075cc1b3685b0b",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/ask-graph.ts",
+      "sha256": "fab2927b34be7e396bdb2baa65c63c5ae8d92b310a7808741cc8c432d35ca8f9",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/ask-v2.ts",
+      "sha256": "f21440832de515cb0b97a481530f8f872d4872f66a87122642f1194c0a7b5f8c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/bounded-refine.ts",
+      "sha256": "3337cffdb6ee47b8319ffc1fe4a09d792e35e2a7927b584fa3c35ca1a1d66bf3",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/eval/calibration.ts",
+      "sha256": "d020cea126f1be037034c6cf7228958371defe2fa2ecf53985fbc4a167fa57d4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/eval/heuristic-scorer.ts",
+      "sha256": "92af01cd8666572d439c1c126afff0540fbfa0869f4a59e65854877764f06dc5",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/evaluator.ts",
+      "sha256": "02069c0be1aa416d80d90439d2906c2bd93d3f2ae69bc8d09aba0dc3709f2d67",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/index.ts",
+      "sha256": "a33370d4ece5d00b401352bea43f0d7d861b269157ca36898cef3cb472ff24a4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/merge.ts",
+      "sha256": "797ba2c11b59cab35324ce0b98a77ea39d98e0dddf046ab79d2962c2c67549d9",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/refine.ts",
+      "sha256": "67600ce072e3f6795be1338d3b85f7e25938c6759e5cfe99cbc842bd30dac2ec",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/router.ts",
+      "sha256": "c69120e648ae1d901b02c2d9d09eb914cc857d2131701aab997c76c6bee7d817",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/select-nodes.ts",
+      "sha256": "e974d1cd6640406c28dacfd9473e3519d137b712a14d06a248c072410600a692",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/source-context.ts",
+      "sha256": "0aa7e4c8bdd19c2da4fdcb19a584b9968fc2023326f3c3d0d5fabbb30649e121",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/tree-routing.ts",
+      "sha256": "506faae6c018e635eef9e34c5b339c0ec105999ba405cae34725dbabe11077cf",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/ask/src/usage-audit.ts",
+      "sha256": "63cd8b8a559e686935c2a70a6cd441d632e9a3f1ce5adf5219c7013f52063ce4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/alerts/alert-sink.ts",
+      "sha256": "780f1687dbfec9962c64befe2e807d0aaa5788b35d2306d81e3c568a5b1b88c4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/automation-monitor.ts",
+      "sha256": "578f47726bc36ba50c67da95e3496d152d5cb9976a4637fe42f7a7bf01d8935d",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/keyframe-dedupe-validate.ts",
+      "sha256": "1fdf456cc435168c13e2b5b7c8c55ef30b5201e8e034f1903d2a878c1149d3c1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/keyframe-dedupe.ts",
+      "sha256": "6b5df134568955378ed6e5c799668085bb607017d641095a9b05890cd9568d04",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/lean-video.ts",
+      "sha256": "6cd05771849a03f7462015ecf636a5775d17958c6643b816d2d6a69aec453d94",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/pipeline-workflow-reduce.ts",
+      "sha256": "b2ef97dd5940307c6f9b9037f8f41e06a676c3207b25e9b207228491758ad53e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/pipeline-workflow.ts",
+      "sha256": "56414c375b815038d74c71995d18e237bf4eb7219683e95d97baddc4365e8fef",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/purge-policy.ts",
+      "sha256": "b9f6d388c23299fb918694f88ec51db0e1d471ac63cf145f0e9bfd5fbde18e01",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/sender-authentication.ts",
+      "sha256": "d2475fc7fe1d79c593993afb069e8329052b9bc18469570f8a04c590d4a040e4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/slide-turn-alignment.ts",
+      "sha256": "dd1b3a90103f858ca04b53a98839049cf5e5a75461d809c96bc9386acdf65be0",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/speaker-tile-alignment.ts",
+      "sha256": "3a8a28c448c59c11e25d47267616fc1c2f81729861af28de6494bfe7ada5d8ba",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/speaker-tile-names.ts",
+      "sha256": "74cb25ea1dfe5fcdd906e1900709e477612a36517d8eac92e84f3bfdc258c4bb",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/speaker-tile-scan.ts",
+      "sha256": "6ff4554f0fd0c8638a98fd9b34331408d6fdc5a0431fcee12661bac24f44ff51",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/domain/webinar-types.ts",
+      "sha256": "b0d4489e833e2734f3034356add7d2f1c96714895db7f19888176160d4709760",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/answer_policy_review_items.ts",
+      "sha256": "fef7b5008e5ea1fef7645162eddedc5c3064e7a95032b5930231c86e233883bc",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/answer_policy_revisions.ts",
+      "sha256": "4c803c5f292cc2decace630bd04b9740666c6a9d67177dcce660a8617cb78c33",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/answer_runs.ts",
+      "sha256": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/answer_source_conflicts.ts",
+      "sha256": "76944c909cfbed5b62ce40b34f9c93fac2b8d361c31f854575cbf1c63a83e5d1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/api_keys.ts",
+      "sha256": "3588d2fd73607cd84b9fc441ab922d15bfef955c8b746eca372ae8032a7f9cd7",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/application_operations.ts",
+      "sha256": "d0330564f31b749d15eeb6f425dedbaf088e61f7f527ea709ad6999d8c8e18b3",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/automation_runs.ts",
+      "sha256": "719c138af82a056a31a4ad5a11d3d2c3a42fedd2c5fb844da66c218cc3f1a473",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/championship_events.ts",
+      "sha256": "bc5844d6e03f40e40a69c0885a25e27552a7a0997705b5af8014844448649f18",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/chunks.ts",
+      "sha256": "3b7ded2ba630f293231b3af76ea8e8e40136e7de186af52efdbdcdd4f69e1561",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/claims.ts",
+      "sha256": "d0f28938b51a3c92fcd8ac1a8c3eb28d6b00e474f5c652dfeb84cfd09efd36c2",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/consent_policies.ts",
+      "sha256": "4506f6acfa7dcee62c10bd52054074e7543e62b09b03e7b033d9b4107451b1f0",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/decisions.ts",
+      "sha256": "04212e855d206584ab60513b3028c4e8997dec66e2add83950d948381b0166ff",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/document_documents.ts",
+      "sha256": "f2edb876662bf15c29093553034300cfbf50fd0585ff1d1b138ba343c12ae853",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/eval_runs.ts",
+      "sha256": "c6392ee60821c797ce773e37f8060d01282adb8234354aa80fcf307b8c16fd97",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/features_event.ts",
+      "sha256": "a84bf0e4fd03f5ba23a79a5a7abdd07ce0abbace4f6642ad5dab2f1a03eaad47",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/gaps.ts",
+      "sha256": "8ef8cb321c0198068a4d4642b817d69421108a7b9d33f0a0ebb742ec9a9eefbf",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/graph_edges.ts",
+      "sha256": "d96806a152b4391d0b22923da0498106123fe45e26383608f05fcc910bed2eb1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/jobs.ts",
+      "sha256": "1d9a9eeda71f974e9bd247ef6a81bb1dbb6c94c8a48bf897f43a585e5ff39f2e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/knowledge_collections.ts",
+      "sha256": "6645d6505ed1827af2b984ff9f86a5ccf46939926f8fb1a0b949a8cf4aca1485",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/knowledge_outputs.ts",
+      "sha256": "a167d36fb0831e12ba81fb0dc3e94387edd55dc036966f8c1ee70b50f4eedb7c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/media.ts",
+      "sha256": "4a5fa3f34bfa5dd45e54f1b0aa1570a041550a66e46c3cd4ffc5374d60324790",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/meeting_candidates.ts",
+      "sha256": "d6a4f5be963d022bbe07bf768ac20c59295df4724279c92a2a9ca71e316aa626",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/operations_schedules.ts",
+      "sha256": "64d5f5aef47c67133af97f8f3cbd4e7d10ac82d131ec0769329507d268b0ce2c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/orgs.ts",
+      "sha256": "3004d78a69265b6b1d383b6574302e88127897deaec3a7028485cbe39557782c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/programs.ts",
+      "sha256": "db127214e9933088e0a2c6b7048e17f0bc139dcd8c14ca4c10c336aca99daf2f",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/session_pages.ts",
+      "sha256": "9093b3d7ff480c149aadee4aa2625bf29afb57e3785646dbefc99cf3b6b7428b",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/sessions.ts",
+      "sha256": "67705753e1db14f35c2a0701e751396f155afaccb2b03353518943a3bc573637",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/sources.ts",
+      "sha256": "f50549030c7e363baea6b9855dc74422ea46a1132b1831f62a2ed4d5092b3993",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_attributes.ts",
+      "sha256": "d20d6b907f863839a004479ac525849cde3208c010797f4e7e14b57a33c7334d",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_relationships.ts",
+      "sha256": "c595943527c6780c8a8635c618cc2a24a962af8c12f8b8b88477151e9ac7da8c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_suggestions.ts",
+      "sha256": "cca58f06dfdd3509bf6184488b68846a214c10d727a951781aced5556dc1d2ac",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/speakers.ts",
+      "sha256": "a0247a1cd1fa64b33aa19af10fce0a797e01b796ec57e7c5b799719ae5819c34",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/tenants.ts",
+      "sha256": "856bb46dd43ceb7d9921185d52fee7c5427925f0b51802577e9ade8eefecf67f",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/topics.ts",
+      "sha256": "91bc3dbeef3c3d8bf61b5f28313fbe04cbf2a6372d65f912cc01a4a73963d282",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/transcript_review_revisions.ts",
+      "sha256": "d0782e8d91de973dcdb4d08f6b395c154fa1b146f82ab0a4704ea45ecf9473ef",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/transcript_reviews.ts",
+      "sha256": "3a6c03d92f548719e6676341948d2c826555b0bcaccc9ad5661c7965f52daef4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/tree_index.ts",
+      "sha256": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/trusted_senders.ts",
+      "sha256": "e68e34d04e128561ee285a21a25cddb62cb3b8e791c1125d6b1811c93eb68328",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/turns.ts",
+      "sha256": "b4969cb780f97ac1579d753f271c4e4f7a69f95fcac9fd76ba8d792f082d0205",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/usage_events.ts",
+      "sha256": "4f674fc250b3c11e51c993171feefbb0b2e4b1ff8e1a7c40888f9c8a77f6f964",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/watch_heartbeat.ts",
+      "sha256": "a44af8eee4beb8161ec45ffe388b9eb0a97aeeff882198f437346863c289dd1c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/watch_reports.ts",
+      "sha256": "a22f68d7d0bc49cf5ca7ec2b720014e52facd92604fab26ca16fb7ea34822d05",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/watch_state.ts",
+      "sha256": "11c2502b044ef680a26b413c2bdd2ceaf55c96ca9b025e7569be1f6b8680f887",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/watched_sources.ts",
+      "sha256": "2bc9af8ff8e63fa219fde1a6c873f397d809061b981435567807a3f3fa4f36ec",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/generated/whatsapp_candidates.ts",
+      "sha256": "c57b95ae7ba54bf73a8b6f295e38ca6e06338cef3091bd8dc2847afd5e1f668e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/client.ts",
+      "sha256": "eb83337493ace4486c03847bac59ac478b4c6bf84862ec5c9ea7d48b463ba5eb",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/application-operations.ts",
+      "sha256": "adb19d34792b46b17aed4918fd112b052459c8b4e4c5c499ebb9144373ea8e0c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/automation-runs.ts",
+      "sha256": "12ce3872809b6ecd70c4f5f037a8c6c17bbfdd68fbd196e59b4ded4f3a86091f",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/claims.ts",
+      "sha256": "b6f17b2126875204f76d909f560ba6ce7840b7408c2fd9637a596e657d0961b4",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/eval-runs.ts",
+      "sha256": "ccb9524a6c19a3619c4eb5baa640d7cba0178876face1e316bc1e77741a5b0b1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/gaps.ts",
+      "sha256": "40718a1b6e2261dd3fe0b8c348caeda21466630b3e56c726c5dfba442d7b33fd",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/graph-edges.ts",
+      "sha256": "78f2f012d04da840c6f64921c2132977177d271f795e4320125edfc8291f1ac2",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/jobs.ts",
+      "sha256": "039cd7ef2e966be9cdd22eff8a7c0f55ebbba9f3fbf1bbcf50192473acb38440",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/meeting-candidates.ts",
+      "sha256": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/operations-schedules.ts",
+      "sha256": "a3b3733ed138ff9f1c44e579094e91a407c7c486f3ee7757f8f808b6f7aab0a6",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/session-pages.ts",
+      "sha256": "58757e3c1fb833c34585264e3b7515717b8e742745695850b1efa341aad10bc9",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/sessions.ts",
+      "sha256": "49024c25285c717f27401b3009fe3afa39618830a26e217b2fc70fd4c7477111",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/sources.ts",
+      "sha256": "b3e9712a291aefb0ae6008d0b504ed9209626311a241d7b26073288231bec274",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-attributes.ts",
+      "sha256": "90531ad79ca86b3d6ae8c799a0800ce792c7d8f6756da35de0ea23ee9a0a9497",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-relationships.ts",
+      "sha256": "c2c85d1dc6f40fd6de3d0471463b5e0c76d583e7e64f63aa713a3d88a73d161a",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-suggestions/index.ts",
+      "sha256": "70c9efc7fdd8cb66598e1e4b309006ef40284dbeacd0f870bf8e70a367b7b3a7",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/trusted-senders.ts",
+      "sha256": "ccf6121bbf11c23a987145eb3f5c0302dc88a2e9c83a29c3eb1c01e87b95d8d6",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/turns.ts",
+      "sha256": "f87e5c2364f3c12c5c2d8208d5e8422a0fb6c46a71b30a79ac1e6c0849cf7334",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/usage-events.ts",
+      "sha256": "03f7f91c31aa87484a36aaa5fe2a075cd144f34d56e4841a74408d84e6e88250",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/watch-heartbeat.ts",
+      "sha256": "dbf6fd00fb670094f92beb0f8fceef1d8c1246041e80c31e80d320da0084d667",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/watch-reports.ts",
+      "sha256": "285838291ef2738414d92f4e1c5ebf45d79a02f402d4d3e464979322900ef317",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/watch-state.ts",
+      "sha256": "ad60894024352cea38bb43a3b93008c0283aefb1ce89b1bfef089fbd4401a786",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/collections/watched-sources.ts",
+      "sha256": "fc4876254e97da4000dc5e9f55b6e0806d8fb3a82b82e021005beac512b66a06",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "sha256": "725504b6753f39e8d13107c8542513ae010db8d34c509c4cc05ce206081a9bac",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/lib/native-publication.ts",
+      "sha256": "c352fe74f2c96dbc92f240641e57ce854a1c7d0c542d73dec799b197e674524b",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/db/src/lib/tenantScope.ts",
+      "sha256": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/chunk/build-chunks.ts",
+      "sha256": "62ccb8c44843ea153e88a21134b3f1c06c42dc6255d763a1d3eb412296487922",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.ts",
+      "sha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/eval/baseline.ts",
+      "sha256": "958f9f9185d66aaf2909fb83f883c83c6e150207bcb5de94b4e946b114c67525",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/eval/heuristic-retriever.ts",
+      "sha256": "0198dbfab8c09ad19eea50e945bfb0cc131e0fec1dae73412dee4f1912938d85",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/eval/recall.ts",
+      "sha256": "12bc60913d03f60c8961ee5ba49057c17db6979794bfca69b8fee9202f1a4f4e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/graph/authorized-expansion.ts",
+      "sha256": "ac135c69cd57219d2c872a6c1774769c0443b6dc21cbc76142a30f2b53bb2217",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/graph/build-graph.ts",
+      "sha256": "ed1fd31ae92e3be2046134d5ad172268cddda7475b04058d476c489a4ce6145e",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.ts",
+      "sha256": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "sha256": "a2e87c0f7b6d86a5b7a1814969d6da368de0d8e6d084ddd576f54b71e8e39638",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/claims.ts",
+      "sha256": "08c5bec39767b8773ccc2f10ce9b948b87e12ec4bad9e5a20d7396801c808c67",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/grounded-summary.ts",
+      "sha256": "58a92a2d4040b40874567dda6d0f132be46196f3c176e1eda92ee8c99a7230a8",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/grounded.ts",
+      "sha256": "db88f62c5cee03fcb930fbee5efeb2af177fb0435a284602c3522c5edad0f91c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/decisions.ts",
+      "sha256": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/drop-mode.ts",
+      "sha256": "4170bbddd5b10b22c91479fc4613d063bf6690927a33bee2dbb7009eff094308",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/evidence.ts",
+      "sha256": "d7590d14a71a16539be98e3dc47b39370be52cff592f4489fbb044d28e4ab07f",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/judge.ts",
+      "sha256": "ca8dfbd7c5390e7289a1f1557732f796b05a2dfa44a8b20a3eec0f430ab005fd",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/sentence-span.ts",
+      "sha256": "03663a7257836089df99aed6992fe49f53569ce8324173ecb077da884c6f7884",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/quote/quote-token-rule.ts",
+      "sha256": "7a0c4a523eb078d48b639197e30311350ca6886cbea51d4149766a886c58ea49",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/quote/quote-verify.ts",
+      "sha256": "b0039602e1ba4b26fd2c917118b95c83e8c7b6ce1cc82bd2aaacb004d2e32c01",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/quote/transcript-windows.ts",
+      "sha256": "e88dda3f42a4b2d6a67c55b366eeccde047b76589f263aa4add696fb3d3c2fc2",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-docs.ts",
+      "sha256": "ac8357f435422c1a8799b33d2d447bcca58dfc3cd72c5e5e2646d4d00f15f0b1",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-name-rules.ts",
+      "sha256": "7c97b352b115c6317d412053b52047d1e84edcb8103f750fb84564ce9ce1ba98",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-profiles/profile.ts",
+      "sha256": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-relation-rules.ts",
+      "sha256": "1b6c012774f256f2ee3af796cc049dc9e4b56f995d6d79cebb00f4404e32583c",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-rules/speaker-name-data.ts",
+      "sha256": "d52b01beb3386a73a6fb0ce148b22f74f36c855ccbdbfdf05529ed5ea700a4d6",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-rules/speaker-reported-rules.ts",
+      "sha256": "168d3fa8a30554cb293404fcf063cdc6416f909cc037c566629b3085ce4aa10a",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-rules/speaker-selfid-rules.ts",
+      "sha256": "a27ae08b384a3d82384e6adfa1ccda8236d43e9db73205049630493824b74377",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-rules/speaker-tile-fusion.ts",
+      "sha256": "5ea93427af55a60b5606d8427639a4664b7544782c96ab7bcd8ba76309bf5958",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-rules/speakers-grounding.ts",
+      "sha256": "5cb04f04bd7a5287ffe0def48b401dbcbd41f7c7a949ca04e2b01b40f9349326",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-rules/speakers-llm-prompt.ts",
+      "sha256": "272a02eef60c55aadd1e5d34336ba658a77c5fb0904b67dd82a046fe8fb816ef",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-suggestions.ts",
+      "sha256": "cfaa84bb8c640adbf9ff7dafef4d88a10385e55d98209647e4cb4f7c22a2eb18",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-tile-suggestions.ts",
+      "sha256": "14425c1410d234c0839184443b3fa1075f1374a6b253048d93d7982f8a45eeaf",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speakers-grounded.ts",
+      "sha256": "1ae7d0d0f2264066defcc16a5c0c4106c836f9f551276e63b2bcd20a8c7cd5f3",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speakers-llm.ts",
+      "sha256": "9699ea3e0bac77458589a97d08037da65a4b63d07d1ee33d9727958ec86d0a1b",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speakers-verifier.ts",
+      "sha256": "ad23ef506bf0a5d4beb66f60c53b355e89eef11e2027a792eebe4da117adccb6",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/speakers.ts",
+      "sha256": "233a92bb6b766f7ef381564cae2cd27353fab520d1564f319ceda2144fea4b65",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/pipeline/summarize.ts",
+      "sha256": "4784fa7abedb94d44a223f64d32470d0d0d14fbf84fd755405bc9379969d81ad",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/search/lexical.ts",
+      "sha256": "c057af4895ab28f247a02c981c78aa28532006a184edb67d8e6e99f7202fe6c0",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/build.ts",
+      "sha256": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/extract-topics-llm.ts",
+      "sha256": "ebbbd23c802482b8b727440918baddc92c845507a7b639eb9bcb5434bdd64d5a",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/extract-topics.ts",
+      "sha256": "cbf6979098295aaf1cbf2a48ddc1b362900d7d3e967c3a3dca9a71988ffd36f6",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/flatten-graph.ts",
+      "sha256": "230991fd1f08a783d846a69c3f36c535130e4e58e4ed7b48fadff8345b13233a",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/promote-entities.ts",
+      "sha256": "af7f42452a8e940b6a1850ce6479345041913a188d0e767a654561ca5deb082f",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/regenerate.ts",
+      "sha256": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/search.ts",
+      "sha256": "44dc55f5a88e29433faa7e33ae2af6d0f64f116d6c9574d7da9a866207874878",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/tree/topic-indexing.ts",
+      "sha256": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/vector/chunk-evidence.ts",
+      "sha256": "73b8aa75d192b918302b8758b4d1cfc73a5993cdbb491b4e568b7bf4c44308f7",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/vector/cosine.ts",
+      "sha256": "63264e571db70bdadf359494c155b31dc003036850ebc310f33542f1b3bebfac",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "packages/index/src/vector/retriever.ts",
+      "sha256": "479b5180b958d134abdfdc60eace4ebf7fa9c61ad51177893e190fb92b3fd4d7",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "8a236481011fad43fd570583cb2d1d16f641eae30cacd1f7adac8bdc68b534a8",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "sha256": "ae5a6a4f32653799b4e24ffefa6504901bd9991e16144cadd5c02228c329f84d",
+      "classification": "existing-inventory"
+    },
+    {
+      "path": "schema/whatsapp_candidates.schema.json",
+      "sha256": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16",
+      "classification": "missing-inventory"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa",
+      "classification": "existing-inventory"
+    }
+  ],
+  "missing": [
+    {
+      "path": "schema/whatsapp_candidates.schema.json",
+      "sha256": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16",
+      "classification": "missing-imported-schema"
+    }
+  ],
+  "drift": [],
+  "inputPins": {
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/pins.json": "4a51ef591b9875bbfd310902d0cea9a727b8f204489824ebba5daefab59fba7d",
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/broker-request.json": "cb3faa8327c0ec0d40689c005afb7330d623d6ece1172866184d806caca9af98",
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs": "8a236481011fad43fd570583cb2d1d16f641eae30cacd1f7adac8bdc68b534a8",
+    "qa/coordination/resume-20261015/broker/broker_lib.py": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f"
+  },
+  "inputsUnchanged": true,
+  "auditExecuted": false,
+  "modelCalls": 0,
+  "dbConnections": 0,
+  "holdPreserved": true
+}

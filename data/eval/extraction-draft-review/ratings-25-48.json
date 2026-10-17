@@ -1,0 +1,194 @@
+[
+  {
+    "ordinal": 25,
+    "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match; historical text does not substitute for current evidence.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 26,
+    "claimId": "2026-06-03-dual-enrollment-pathway-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn asks which students benefit from dual enrollment; it provides no access percentage.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 27,
+    "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 28,
+    "claimId": "2026-06-03-dual-enrollment-pathway-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn discusses college-course rigor and favorable application assessment, without freshman-versus-transfer classification rules.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 29,
+    "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turns contain an incomplete prompt and a postgraduate-admissions question, without engineering-seat or JEE-candidate figures.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 30,
+    "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 31,
+    "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 32,
+    "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 33,
+    "claimId": "2026-06-25-in-focus-2-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turns praise projects and a masterclass; they establish none of the claimed course duration, instructors, publication, or certification.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 34,
+    "claimId": "2026-06-25-in-focus-2-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn contains introductory thanks and a pause, without course content or software names.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 35,
+    "claimId": "2026-06-25-in-focus-2-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn says goodbye and provides no mentor-training requirement.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 36,
+    "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 37,
+    "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+    "literalSupport": "unavailable",
+    "rationale": "Current citation has no literal match.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 38,
+    "claimId": "2026-07-03-inside-the-uc-session-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn requests poll results without stating campus or undergraduate-program counts.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 39,
+    "claimId": "2026-07-03-inside-the-uc-session-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn requests poll results without any enrollment figure.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 40,
+    "claimId": "2026-07-03-inside-the-uc-session-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn introduces a UC Merced representative without discussing admissions testing policy.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 41,
+    "claimId": "2026-07-03-inside-the-uc-session-c04",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn introduces the session agenda without Riverside scholarship eligibility, amount, or duration.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 42,
+    "claimId": "2026-07-08-beyond-black-robes-law-careers-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn summarizes law-career opportunities and wraps the discussion; it states no foreign-degree bridge-course requirement.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 43,
+    "claimId": "2026-07-08-beyond-black-robes-law-careers-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn describes legal teams and consulting firms, without Harvey AI, the named law firm, or an adoption date.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 44,
+    "claimId": "2026-07-08-beyond-black-robes-law-careers-c03",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turns discuss institutional legal teams and acknowledge an answer; none mention AI tools, research platforms, or case summaries.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 45,
+    "claimId": "2026-07-15-creative-futures-c01",
+    "literalSupport": "unsupported",
+    "rationale": "Literal citation discusses SCAD schools and rankings, without career-success skill percentages.",
+    "replacementSupport": "supported",
+    "replacementRationale": "Replacement explicitly attributes almost 85% of career success to soft skills and 15 to technical skills within SCAD's presentation."
+  },
+  {
+    "ordinal": 46,
+    "claimId": "2026-07-15-creative-futures-c02",
+    "literalSupport": "unsupported",
+    "rationale": "Cited turn discusses AI summits and teaching technology, without STEM designation percentages or OPT eligibility.",
+    "replacementSupport": null,
+    "replacementRationale": null
+  },
+  {
+    "ordinal": 47,
+    "claimId": "2026-07-15-creative-futures-c03",
+    "literalSupport": "partially_supported",
+    "rationale": "Literal citation supports SCADpro student collaboration with Google and real business challenges, but does not define its institutional innovation-studio role.",
+    "replacementSupport": "supported",
+    "replacementRationale": "Replacement defines SCADpro as SCAD's collaborative innovation studio pairing students with Fortune 500 companies on real industry projects."
+  },
+  {
+    "ordinal": 48,
+    "claimId": "2026-07-22-uniaccess-cept-university-c01",
+    "literalSupport": "supported",
+    "rationale": "Current cited turn explicitly states CEPT was established in 1962 by B. V. Doshi, an architect.",
+    "replacementSupport": "supported",
+    "replacementRationale": "Replacement cites the same current turn, which explicitly states establishment in 1962 by architect B. V. Doshi."
+  }
+]

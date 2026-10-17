@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "status": "stale",
+  "tenantId": "checker-tenant",
+  "sessionId": "checker-t044-186",
+  "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+  "previousTurnsSha256": "871218c44a223a8cefa6493decf66aa7d4735bd4c3d830071b4d1a7870ce7b35",
+  "reason": "transcript-replaced"
+}

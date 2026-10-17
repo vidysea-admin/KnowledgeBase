@@ -1,0 +1,25 @@
+✔ current neutral corpus has30items,15pairedquestions,44bindings and pending export (323.7077ms)
+✔ real auth/scope/foreign routes refuse without exposing or writing labels (396.8505ms)
+✔ fractional submission commits attributable revision/audit and survives a fresh store (437.5365ms)
+✔ invalid numeric/rationale/reviewer/time/body submissions never add approvals (1029.5357ms)
+✔ cross-process stores cannot overwrite one item with a competing stale revision (247.4114ms)
+✔ every single missing approval blocks export; all30 synthetic assertions export their original audit (8055.6723ms)
+✔ changed source and seed input invalidate effective approvals, preserve audit bytes (300.7507ms)
+✔ audit corruption and occupied write lock fail closed without state changes (255.9533ms)
+✔ real filesystem write and rename failures preserve existing accepted state/audit bytes (295.2748ms)
+✔ real neutral packet has no labels and cannot reach a live judge (128.6535ms)
+✔ explicit synthetic authenticated references feed real asynchronous MAE without changing scores (332.5715ms)
+✔ each missing human confirmation, forged score, audit actor, source and typed humanGold is refused (1789.2232ms)
+✔ fallback and unscored results never become final calibration (114.2063ms)
+✔ typed confirmations cannot reach live calibration without independently operator-bound proof (257.9615ms)
+✔ existing evidence path is refused before any provider module or key access (5.0237ms)
+✔ physical transport refuses other origins and caps retries without forwarding credentials (1.0127ms)
+✔ D164 model ordering requires full same-human-corpus predecessor receipts, never legacy proxies (111.2203ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14745.6223

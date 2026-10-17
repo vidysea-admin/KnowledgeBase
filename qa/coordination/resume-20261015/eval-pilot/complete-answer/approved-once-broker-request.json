@@ -1,0 +1,163 @@
+{
+  "format": "approved-complete-answer-once-request-v1",
+  "status": "READY_FOR_ROOT_SOLE_CPU_BROKER_ADMISSION",
+  "soleExecutionOwner": "/root/resume_cpu_broker",
+  "humanApprovalReceived": true,
+  "authorizationArtifact": "qa/coordination/resume-20261015/eval-pilot/complete-answer/authorization.approved.json",
+  "authorizationSha256": "76df9ba7281e2bd1874818df4a7fc1db85c018b55cf485cc1644d180047d6965",
+  "approvalEvidence": "qa/coordination/resume-20261015/eval-pilot/complete-answer/human-approval-received.json",
+  "approvalEvidenceSha256": "bfed595203f9d6d2a97b504ddf169b5c60d1680591746988bd8436a01cbdd4af",
+  "approvedAt": "2026-10-16T03:59:01.126Z",
+  "expiresAt": "2026-10-16T07:59:01.126Z",
+  "command": [
+    "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+    "qa/coordination/resume-20261015/eval-pilot/complete-answer/watchdog.py"
+  ],
+  "hardProcessSeconds": 240,
+  "innerEvaluationSeconds": 210,
+  "httpDeadlineSeconds": 20,
+  "limits": {
+    "maxAttempts": 12,
+    "maxSeconds": 210,
+    "callTimeoutMs": 20000,
+    "maxInputBytes": 327680,
+    "maxRequestBytes": 65536,
+    "maxResponseBytes": 1048576,
+    "outputLimit": 768,
+    "maxKnownInputTokens": 131072,
+    "maxKnownOutputTokens": 9216
+  },
+  "oneInvocationOnly": true,
+  "noAutomaticRetry": true,
+  "noCatalogOrMetadataRequest": true,
+  "baselineReservedIds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "allowedNewReservationIds": [
+    6,
+    17
+  ],
+  "oldUnknownUsageAnd82SecondOverrunPreserved": true,
+  "launchOnceMarkerMustBeAbsent": true,
+  "newGrantLedgerMustBeAbsentBeforeFirstLaunch": true,
+  "preexistingState": {
+    "authorization.approved.json": false,
+    "launch-once.json": false,
+    "provider-request-reservations.jsonl": false,
+    "actual-receipt.json": false
+  },
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "sourcePins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1"
+    }
+  ],
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "rawGoldenSha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "acceptedIdsSha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "candidateIdsSha256": "033745a6e7b31dd23300281355fc87d57a156885fd0b4e65918e32b1cd53752c",
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "questionSha256": "484335769f0957e252b9ae16e6372953344f0b951845b1598abcc51be83611c1",
+  "endpoint": "https://ollama.com/api/chat",
+  "model": "glm-5.3-flash",
+  "questionCount": 92,
+  "candidates": 29,
+  "dispatchRealFull92": false,
+  "paidOperationScope": "Human-approved same private question plus bounded retrieved private passages to existing OllamaCloud GLM only; no raw corpus/prompts/modeloutputs/error bodies/keys printed; original audit/citations retained.",
+  "networkEscalationJustification": "The human explicitly approved this one bounded same-question/private-evidence OllamaCloud pilot. Use existing local OLLAMA_API_KEY without printing it, exactly fixed endpoint/model and max12inference requests IDs6–17 with listed output/input/time limits, preserving audit/citations. No new credentials/provider/question or further invocation authorized.",
+  "files": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/authorization.approved.json",
+      "sha256": "76df9ba7281e2bd1874818df4a7fc1db85c018b55cf485cc1644d180047d6965"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/human-approval-received.json",
+      "sha256": "bfed595203f9d6d2a97b504ddf169b5c60d1680591746988bd8436a01cbdd4af"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/config.pending.json",
+      "sha256": "675b694667476bd4db76731cef18642300bbf578238aa142979963f23b0eec66"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/authorization.pending.json",
+      "sha256": "e300b8773b2e088f859f5a7f52af73d1df7e3c8f4387b211143c6b76c95b8bf9"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/launch-pins.json",
+      "sha256": "b95a844c58c49c34edd5abbd1a910b527722f7f1d6e83ebe0f2add957907b2bd"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/run.mjs",
+      "sha256": "17d579f5894a6e0dbfd68d5f0666aeccb2947154b363fd68b76adff81949ed1d"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/watchdog.py",
+      "sha256": "8bd422c748043fc0682954b78537d87d4efbbd016b170bf028ddb933c7d61c73"
+    }
+  ],
+  "launchPinCount": 150,
+  "launchPinsAllMatchedAtPreparation": true,
+  "baselineLedgerHashes": [
+    "a26d1609f4cfbde96638578529a96054799bff90b0de4bab396829b0a01beb3b",
+    "eded82c753e304ff453cce2905f39324a604c6a55fdc9c156c497924c4d083f6",
+    "c255070a6b4030537cf4276845f874d1657abb6741439874fa9ccdff9ac19dc7",
+    "5036012ac7670a680eee7a68762ae98dfc4709d51e02a82d88c58e8ddc37c394"
+  ],
+  "existingSuccessfulChecks": {
+    "authorization": {
+      "exit": 0,
+      "counts": {
+        "tests": 13,
+        "pass": 13,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "pinsUnchanged": true,
+      "receiptPath": "qa/coordination/resume-20261015/broker/complete-answer-cycle3-auth13-receipt.json",
+      "receiptSha256": "b236fd19394ab78ea5224bbc41d7dbd1b3bcd0f8e8ff60301e32acddca6e9702",
+      "sealPath": "qa/coordination/resume-20261015/broker/complete-answer-cycle3-final-seal.json",
+      "sealSha256": "eae91e56350b1d362a0590bbbae5ef8240c0904c34a698493093c1c7688ccc51"
+    },
+    "launcher": {
+      "exit": 0,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "syntaxExit": 0,
+      "sealPath": "qa/coordination/resume-20261015/broker/complete-launcher-offline-final-seal.json",
+      "sealSha256": "a19da5b025de2e36b641ffb45e55f25713110f4b861181bc13639ba340a8856f"
+    }
+  },
+  "sourceChanges": false,
+  "verifyBeforeCredential": [
+    "canonical approved artifact/root actor/human reference/expiry/current source/config/corpus/population",
+    "actual complete-answer lower-bound preflight on current production tree (not success guarantee)",
+    "immutable old ledger IDs1–5; no new grant ledger or launch-once marker;150launchpins and helper SHA",
+    "broker capture actual resolved production/runtime/helper closure before/after; no broad historical1691map reuse"
+  ],
+  "requiredFinalEvidence": [
+    "own process exit and JobObject240s including cold imports/finalization",
+    "actual HTTP sends versus reservations including crashes; IDs6–17 only; no refund/rerun",
+    "actual usage null if absent/unknown; aggregate lifetime remains unknown",
+    "actual stage/code/finish/retrieval/citations/answer-present hash or legitimate refusal",
+    "all92 rows retained, source/data/oldledger pins unchanged; original audits intact"
+  ],
+  "noPrimaryOrHumanQualityPASS": true,
+  "noReviewerDispatch": true
+}

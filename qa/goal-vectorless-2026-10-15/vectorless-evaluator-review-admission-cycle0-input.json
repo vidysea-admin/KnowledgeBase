@@ -1,0 +1,21 @@
+{
+  "unit": "vectorless-production-evaluation",
+  "cycle": 0,
+  "candidate_sha": "4de31247efc975f1f103fb4afe7ab768f874e4d60665960cc881e7715f819f65",
+  "maker": { "active_s": null, "tokens": null, "cost": null },
+  "reviewers": [{
+    "id": "historical-shared-checker-allocation-root-centrally-deduplicated",
+    "active_s": null, "tokens": null, "cost": null,
+    "budget_debit": { "active_s": 180, "tokens": 6000 },
+    "accounting": "Root supplied one centrally de-duplicated historical shared allocation. Not measured actual usage; do not add duplicate child rows for this allocation."
+  }],
+  "next_phase": { "active_s": 120, "tokens": 3000, "cost": null },
+  "completion_reserve_within_next_phase": { "active_s": 40, "core_review_active_s": 80 },
+  "bootstrap_scope": "One source-pinned offline vectorless evaluator engineering unit: independently inspect changed logic, exact runtime consumers, authenticated eight-test/92-input receipts and bounded security probes; no live calls, full paid corpus, human labels or parent acceptance. Forty of the next120seconds are reserved for verdict finalization.",
+  "bootstrap": { "active_s": 180, "tokens": 6000 },
+  "escalation": {
+    "authority": "Root explicit finite cumulative allocation in quality_delivery_maker task messages, 2026-10-15",
+    "reason": "Required independent review of new tenant/private-checkpoint/credential-budget boundaries after real production graph engineering checks; preserve historical unknown usage debit and unknown ratios.",
+    "limits": { "active_s": 300, "tokens": 9000, "cost": null }
+  }
+}

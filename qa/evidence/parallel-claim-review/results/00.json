@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "index": 0,
+  "originalIndex": 0,
+  "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+  "inputHash": "54ca1c5f2eca687ba59374307696a74379493036807ac4da5dc85b8eba9b5730",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited text supports 76% New Zealand visa approval in Jan-Dec 2025 and a stated 27,000-by-2030 aspiration, but does not explicitly bind either population to Indian students, identify the visa category as student visa, or identify Immigration New Zealand as the target owner. Whole compound claim exceeds direct support.",
+    "missingReferences": [],
+    "caveats": [
+      "Single supplied citation reference has one match; no missing or duplicate references.",
+      "2025 data is followed by January to December this year, while session metadata dates the session to April 2026; temporal wording is inconsistent/ambiguous.",
+      "Stored speakerRef is unknown; the textual speaker-name prefix does not establish identity.",
+      "Source-bound transcript support does not establish external factual truth."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+        "contextVersion": "originalMigration",
+        "quote": "So as per the 2025 data—this is from January to December this year—76% of students who applied for a New Zealand visa were approved",
+        "textSha256": "5e5899569b643b0f7599454252673b080841589ecc32fc48531be4056985fa7c",
+        "contextSha256": "689fc2236876457d34776f238b0c0675a87d25965eac4f3c430f97ddbe1fe9ee",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 594,
+        "tEnd": 660,
+        "supports": "Supports percentage, approval denominator and reported year; Indian population and student-visa category are not explicit."
+      },
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+        "contextVersion": "originalMigration",
+        "quote": "now we are looking at increasing those numbers to 27,000 by 2030.",
+        "textSha256": "5e5899569b643b0f7599454252673b080841589ecc32fc48531be4056985fa7c",
+        "contextSha256": "689fc2236876457d34776f238b0c0675a87d25965eac4f3c430f97ddbe1fe9ee",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 594,
+        "tEnd": 660,
+        "supports": "Supports an aspiration of 27,000 by 2030; Indian population and target ownership remain unstated."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The existing cited current turn only welcomes the guest and contains none of the approval-rate, visa-population, date or target assertions.",
+    "missingReferences": [],
+    "caveats": [
+      "Single supplied citation reference has one match; no missing or duplicate references.",
+      "The same turn ID now has different text and timing: 99-106 seconds rather than original 594-660 seconds.",
+      "Stored speakerRef spk:0 is an unresolved label, not a verified identity.",
+      "Unsupported citation does not establish that the claim is false."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+        "contextVersion": "current",
+        "quote": "And to our guest, a very warm welcome and thank you for being here to share your insights with this community.",
+        "textSha256": "1f16a07fca02363d7aad54ea2bc5298f3d9dea90f87fa0b59e292b606dfc64d5",
+        "contextSha256": "1664835bc5c07355698d472e9e983e0643e300b6f997b4eb0f6100d4f6aeb545",
+        "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 99,
+        "tEnd": 106,
+        "supports": "Unrelated guest welcome; supports none of the persisted statistical/target components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Same ID repoints from partially supportive historical statistics to an unrelated welcome. Original claim includes unstated population/category/target-owner qualifiers; current citation supports no claim component. Human approval and external truth remain open."
+}

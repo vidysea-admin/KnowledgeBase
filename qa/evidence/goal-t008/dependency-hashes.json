@@ -1,0 +1,38 @@
+[
+  {
+    "path": "apps/api/src/ask/ask-arms.ts",
+    "sha256": "C0933D9267040E3567FAA2EBE8BA3CB6B4FD912870156267E8646328AC0ED2B0"
+  },
+  {
+    "path": "apps/api/src/ask/source-context.ts",
+    "sha256": "1F084B8F14764A097D4D826AB3AD431945FC35563C67D1EB9EDAB2B75009FB8F"
+  },
+  {
+    "path": "apps/api/src/visibility/knowledge.ts",
+    "sha256": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04"
+  },
+  {
+    "path": "apps/api/src/transcript-review/effective-reader.ts",
+    "sha256": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500"
+  },
+  {
+    "path": "apps/api/src/indexing/eligible-tree.ts",
+    "sha256": "0DFC6E5CDC067C176E50EB44189D9EF860E14CDDAF8F8B537F7B5E3A71A88E8F"
+  },
+  {
+    "path": "apps/api/src/indexing/session.ts",
+    "sha256": "6734738CE50F493BC27C9DB7B4170ED4DB590F3DBA6BDA47F47DCBAA6E2709F5"
+  },
+  {
+    "path": "apps/api/src/indexing/generation.ts",
+    "sha256": "443B969A218A4AD9716F5E9E9FB04C284BFD276A8633F5F26A82284674646D0D"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/trusted-readers.ts",
+    "sha256": "1BCB64D9551D4E6EE915B32B060400DA2D1F1FEE52EEA75882D0D60E7FC6911A"
+  },
+  {
+    "path": "apps/api/src/visibility/read-snapshot.ts",
+    "sha256": "1B97FF09D53B7C0F7FE10F13C23803290864E2F5D43C6F57568876AB281030CF"
+  }
+]

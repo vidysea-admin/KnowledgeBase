@@ -1,0 +1,64 @@
+{
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "note": "One shared historical review across four initial scopes; charge once, preserve unknown actuals, not a fresh reset.",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180,
+        "cost": null
+      },
+      "id": "vectorless_checker-wip-shared",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    {
+      "id": "provider_http_checker-cycle1-checkpoint",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "tokens": 6000,
+        "cost": null,
+        "active_s": 180
+      },
+      "note": "Persisted cycle1 HOLD after bounded review; preserve committed allocation and unknown actual usage, no reset."
+    },
+    {
+      "cost": null,
+      "budget_debit": {
+        "cost": null,
+        "active_s": 120.6872055,
+        "tokens": 3000
+      },
+      "active_s": 120.6872055,
+      "id": "provider_http_checker-continuation",
+      "tokens": null
+    }
+  ],
+  "next_phase": {
+    "cost": null,
+    "active_s": 30,
+    "tokens": 1000
+  },
+  "bootstrap_scope": "Continuation of same cycle1 provider+HTTP checker only: identity/reuse authentication + mandatory remaining evidence + independent injected probe + final readback; no provider reread, all required receipts available before resumption.",
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": {
+    "authority": "Root explicit closing-only approval 2026-10-15",
+    "reason": "Technical review complete; previous final write exceeded120s by0.6872055s. Closing-only finite30s1000tokens, preserve overrun and historical unknowns.",
+    "limits": {
+      "tokens": 16000,
+      "cost": null,
+      "active_s": 511
+    }
+  },
+  "ratio_claim": "UNVERIFIED; unknown maker/reviewer actual tokens and historical time"
+}

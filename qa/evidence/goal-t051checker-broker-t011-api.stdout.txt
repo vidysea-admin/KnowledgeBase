@@ -1,0 +1,12 @@
+✔ actual authenticated HTTP control derives tenant and projects no private handle credentials (93.7915ms)
+✔ tenant injection and missing scopes/auth fail before touching a recorder (38.7932ms)
+✔ no active handle, stale generation, durability error or unknown result never reports accepted (53.1621ms)
+✔ foreign registry rows fail closed without disclosing capture status (16.6556ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 983.654

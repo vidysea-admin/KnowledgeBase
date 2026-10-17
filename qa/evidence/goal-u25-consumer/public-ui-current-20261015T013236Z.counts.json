@@ -1,0 +1,10 @@
+{
+  "tests": 1,
+  "skipped": 1,
+  "fail": 0,
+  "reason": "Actual Vitest output discovered one skipped test; expected ten public cases were not executed. Exit zero is not downstream acceptance.",
+  "expectedPublicCasesNotExecuted": true,
+  "pass": 0,
+  "stdoutSha256": "78cb0ae15431c9607b888aa31d142c7bbc5b820b411b8adc4283828deb49e6f7",
+  "originalReceiptSha256": "e977dd7a68c6a4e808317edb8091cb719da43dff3b6ad590f61789125f900d4d"
+}

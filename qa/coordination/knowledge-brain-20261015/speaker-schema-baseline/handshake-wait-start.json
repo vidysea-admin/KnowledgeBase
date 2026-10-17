@@ -1,0 +1,8 @@
+{
+  "note": "Build ended; awaiting maker optional-field reply; no command execution planned.",
+  "startMonotonic": 208399220008,
+  "phase": "schema-handshake-wait",
+  "startUtc": "2026-10-15T09:32:30.0274185Z",
+  "tokensActual": null,
+  "frequency": 10000000
+}

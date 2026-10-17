@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "index": 3,
+  "originalIndex": 4,
+  "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+  "inputHash": "46b6cf920958c63707a8b9527fa397d52a34d72f4e040f453975238086c7c83b",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited text explicitly guarantees three-year post-study work visas for Bachelors or Masters graduates in the New Zealand discussion and states no employer sponsorship is required, supporting the claim's open-visa wording as transcript entailment.",
+    "missingReferences": [],
+    "caveats": [
+      "Transcript assertion only; external immigration eligibility and the universal guarantee are not fact-checked.",
+      "Stored speakerRef is unknown; the name prefix in text does not establish verified identity.",
+      "The August 2026 temporal distinction concerns residence eligibility, not the stated three-year post-study visa; no current-policy conclusion is made.",
+      "Same turn ID changed content and timing: original1341-1407seconds versus current217-229seconds."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+        "contextVersion": "originalMigration",
+        "quote": "Once the student finishes the program, be it a Bachelors or a Masters, they are guaranteed a three-year post-study work visa.",
+        "textSha256": "b84219354c03b0bc564dd7656971283f11dfe90f4682b12fc068426fae357fca",
+        "contextSha256": "aefcf96b7669ca1f21064e2ae1db170b17f4fd0ca5e3ca0f24c13045e268638e",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1341,
+        "tEnd": 1407,
+        "supports": "Graduates of both degree levels, guarantee, and three-year post-study work-visa duration."
+      },
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+        "contextVersion": "originalMigration",
+        "quote": "The student does not require any employer to sponsor them;",
+        "textSha256": "b84219354c03b0bc564dd7656971283f11dfe90f4682b12fc068426fae357fca",
+        "contextSha256": "aefcf96b7669ca1f21064e2ae1db170b17f4fd0ca5e3ca0f24c13045e268638e",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1341,
+        "tEnd": 1407,
+        "supports": "Open/no employer-sponsorship component within the New Zealand discussion."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The exact current t025 text concerns country/embassy representation and supports none of the degree eligibility, New Zealand work-visa guarantee, three-year duration or open/no-sponsor components. It does not contradict them.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef spk:0 does not establish a person identity.",
+      "Original historical support cannot substitute for the unchanged current citation.",
+      "Same ID now has unrelated content and different timing; no replacement citation is proposed."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+        "contextVersion": "current",
+        "quote": "they represent not just the country, but they are representing the embassy with which they are working directly to bring together for you",
+        "textSha256": "391949147ea5065296174840f0693be2258d6b1aa985ce86515c8238b537e450",
+        "contextSha256": "b4fd06abb976e636b6eba63b48bb03171f77c22a99fa74de8740020c60e31eed",
+        "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+        "revision": null,
+        "speakerRef": "spk:0",
+        "tStart": 217,
+        "tEnd": 229,
+        "supports": "Unrelated embassy representation; none of the persisted visa claim components supported."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original quoted context supports the visa claim as a transcript assertion; current identical-ID evidence is unrelated. No external truth, speaker identity, human gold or source repair is established."
+}

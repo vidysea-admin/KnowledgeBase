@@ -1,0 +1,14 @@
+{
+  "requester": "/root/watched_cadence_independent_checker",
+  "candidate_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "cycle": 1,
+  "label": "watched-independent-auth-inventory-boundary",
+  "scope": "Independent checker selected C2 boundaries: key revocation between ticks plus out-of-batch tenant contamination must refuse with zero acquisition. Existing fixtures only; no provider/network/DB.",
+  "test_file": "scripts/watched-sources/host.test.ts",
+  "test_name_pattern": "^(whole result tenant/ID corruption refuses before acquisition, even past batch boundary|host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap)$",
+  "test_concurrency": 1,
+  "max_execution_s": 30,
+  "required_identity": "current eight Git/raw pins, all1691canonical pins, runtime/lock, three actual helpers before/after; receipt/log digest; no reuse",
+  "accounting": "checker child actual active seconds and null unknown runtime tokens/cost; no retry authorized",
+  "return_to": "/root/watched_cadence_independent_checker"
+}

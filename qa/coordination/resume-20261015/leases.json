@@ -1,0 +1,164 @@
+{
+  "version": 1,
+  "date": "2026-10-15",
+  "owner": "/root/resume_delivery_inventory",
+  "authority": "Root explicitly resumed Knowledge Brain; five source scope makers active, separate deadline fixture maker active; sole CPU broker executes checks",
+  "status": "ACTIVE_ROOT_RESUMED",
+  "deadlineSeparateReservation": {
+    "owner": "root-assigned deadline fixture maker",
+    "state": "ACTIVE_ROOT_ASSIGNED_DEADLINE_MAKER",
+    "paths": [
+      "apps/api/src/evaluation-flywheel/test-fixture.ts",
+      "apps/api/src/evaluation-flywheel/test-fixture.test.ts",
+      "apps/api/src/evaluation-flywheel/composition.test.ts"
+    ],
+    "limit": "Fixture upsertedCount/$nin semantics and regression coverage only; no production weakening"
+  },
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "liveReconciliation": {
+    "source": "collaboration.list_agents current snapshot",
+    "historicalOwners": "inactive; historical leases do not establish live writers",
+    "activeOtherOwners": [
+      "/root/quality_delivery_coordinator"
+    ],
+    "pendingOtherOwners": [
+      "/root/quality_delivery_coordinator/quality_gap_survey"
+    ],
+    "qualification": "Recheck live tree immediately before dispatch"
+  },
+  "centralReserved": [
+    "schema/**",
+    "migrations/**",
+    "packages/core/src/generated/**",
+    "packages/core/src/index.ts",
+    "packages/db/src/index.ts",
+    "packages/db/src/collections/speaker-relationships.ts",
+    "packages/ai/src/index.ts",
+    "packages/index/src/index.ts",
+    "apps/api/src/composition/**",
+    "apps/api/src/server.ts",
+    "apps/web/src/App.tsx",
+    "**/package.json",
+    "pnpm-lock.yaml",
+    "config/ai-routing.yaml",
+    "structure.config.json",
+    "Dockerfile",
+    "docker-compose.yml",
+    "TASKS.md",
+    ".goal/**",
+    "docs/DECISIONS.md",
+    "packages/meeting-bot/src/cli.ts"
+  ],
+  "protected": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "contracts/**",
+    ".codex/hooks/**",
+    ".codex/settings.json",
+    "scripts/append_decision.ps1",
+    "qa/contracts/**",
+    "qa/verdicts/**"
+  ],
+  "rules": [
+    "No source writes or dispatch authorized by this metadata",
+    "Preserve dirty bytes; fingerprint exact leased files before any change",
+    "Current effective contracts and union-ledger required; historical owner reports are not defects",
+    "One CPU broker; no browsers/full suites/providers/native DB mutations/host activation",
+    "Changed behavior and actual execution receipts required before READY; checker independently issues verdict",
+    "No parent completion, human labels, transaction proof or live acceptance inferred",
+    "Security/data-write classes uncapped; any nonsecurity refinement requires actual seam PASS count before opening; unknown cap means HOLD",
+    "No checker work until root runtime release; explicitly load checker skill for subsequent maker/checker dispatch"
+  ],
+  "candidates": [
+    {
+      "id": "resume-t052-pre-submit-recovery",
+      "tier": 3,
+      "class": "external-data-write/security",
+      "state": "ACTIVE_ROOT_ASSIGNED_MAKER",
+      "paths": [
+        "packages/meeting-bot/py/sb_join_register.py",
+        "packages/meeting-bot/py/test_sb_join_registration_redirect.py",
+        "packages/meeting-bot/src/joiners/browser-joiner.ts",
+        "packages/meeting-bot/src/joiners/joiners.test.ts",
+        "packages/meeting-bot/src/calendar/registration-workflow.ts",
+        "packages/meeting-bot/src/calendar/registration-workflow.test.ts",
+        "packages/meeting-bot/src/calendar/auto-record-policy.ts",
+        "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+        "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+      ],
+      "source": "qa/coordination/knowledge-brain-20261015/source-delivery/t052-retry-design.md",
+      "contract": "qa/contracts/goal-t052.md; verify exact spelling/current effective clauses before edit",
+      "brief": "Root C:/Users/product/Desktop/KnowledgeBase. Own only paths in this lease. Load AGENTS and current T052 contract; compare current bytes to t052-retry-design.md before changing anything. Implement only still-missing authenticated pre-submit outcome/recovery semantics. Preserve action_required after uncertain submission; fresh mail never authorizes resubmission. No browser, real registration or provider. Ask sole CPU broker for existing registration redirect/joiner/workflow/schedule-state tests covering pre-submit receipt, post-entry uncertainty, durable restart and unchanged polling. Record original issue reproductions if any. Data-write/security class is uncapped. Preserve dirty bytes and produce current pins plus scoped maker packet. Whole-parent real confirmation/account/host evidence remains open."
+    },
+    {
+      "id": "resume-t053-watched-receipt",
+      "tier": 3,
+      "class": "source-authority/data-write",
+      "state": "ACTIVE_ROOT_ASSIGNED_MAKER",
+      "paths": [
+        "apps/api/src/source-intake/jobs/types.ts",
+        "apps/api/src/source-intake/jobs/input.ts",
+        "apps/api/src/source-intake/jobs/store.ts",
+        "apps/api/src/source-intake/jobs/entry.ts",
+        "apps/api/src/connector-workflow/watched.ts",
+        "apps/api/src/connector-workflow/jobs.ts",
+        "apps/api/src/connector-workflow/router.ts",
+        "apps/api/src/connector-workflow/workflow.test.ts",
+        "apps/api/src/connector-workflow/watched-job.ts",
+        "apps/api/src/connector-workflow/watched-job.test.ts"
+      ],
+      "source": "qa/manifests/goal-t053.md",
+      "contract": "qa/contracts/goal-t053.md; effective clauses must be inspected",
+      "brief": "Root C:/Users/product/Desktop/KnowledgeBase. Own listed lease paths only; entry.ts allowance is media-provider optional startup only. Read current T053 manifest/contract and watch survey; distinguish implemented pending verification from missing behavior. Complete only demonstrable gaps in durable watched snapshot/change consumption, source authority and recording receipt handling. Central owns production composition. No live connector, database or notifications. Broker focused workflow.test.ts and watched-job.test.ts with persisted changed/unchanged/retry/refusal cases, then immediate existing source-job consumer checks selected from contract. Preserve dirty state and security regression corpus. Supply exact pins, receipt paths and scoped maker packet; real transports/scheduler cadence/native persistence remain unaccepted."
+    },
+    {
+      "id": "resume-speaker-graph",
+      "tier": 3,
+      "class": "tenant/source-visibility-security-read",
+      "state": "ACTIVE_ROOT_ASSIGNED_MAKER",
+      "paths": [
+        "packages/index/src/graph/speaker-knowledge.ts",
+        "packages/index/src/graph/speaker-knowledge.test.ts"
+      ],
+      "source": "qa/manifests/speaker-knowledge-vectorless.md",
+      "contract": "qa/contracts/speaker-knowledge-vectorless.md",
+      "brief": "Root C:/Users/product/Desktop/KnowledgeBase. Own only listed graph source/test. Read effective contract and current manifest. Existing graph implementation has nine authored cases, not a proven defect. Reconcile current code and exact visibility/identity clauses; request missing broker execution before making changes unless static evidence establishes a security gap. Broker only focused graph test then profile consumer checks after profile freeze. Preserve zero embeddings/provider/I/O, exact evidence, withdrawal/deletion and Unicode bounds. Shared exports remain central. Security read class uncapped; do not open nonsecurity polish without seam-cap count. Produce hashes and compact actual evidence packet; no full graph persistence, identity or parent acceptance."
+    },
+    {
+      "id": "resume-speaker-profile",
+      "tier": 3,
+      "class": "tenant/source-visibility-security-read",
+      "state": "ACTIVE_ROOT_ASSIGNED_MAKER",
+      "paths": [
+        "apps/api/src/speaker-profiles/store.ts",
+        "apps/api/src/speaker-profiles/router.ts",
+        "apps/api/src/speaker-profiles/store.test.ts",
+        "apps/api/src/speaker-profiles/router.test.ts",
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts"
+      ],
+      "source": "qa/manifests/speaker-profile-vectorless-consumer.md",
+      "contract": "qa/contracts/speaker-profile-vectorless-consumer.md; resolve referenced current contract if absent",
+      "brief": "Root C:/Users/product/Desktop/KnowledgeBase. Own listed API/profile-client files only; page TSX/test stay reserved until root reconciles historical transfer. Read current manifest and effective contract; existing implementation is awaiting proof, not a known bug. Verify graph consumption uses final authorized snapshot with tenant/session/generation freshness; repair only evidenced missing clauses. Coordinate read dependency freeze with graph owner. Broker API store/router tests plus focused profile-client test, then central-selected typecheck/validator. No private TOC opt-in, native DB, provider or browser. Exact boundaries/security regression floors and current pins go in packet. Do not claim graph/UI/native/human parent acceptance."
+    },
+    {
+      "id": "resume-capture-sampler-clock",
+      "tier": 3,
+      "class": "privacy/authority-security-read",
+      "state": "ACTIVE_ROOT_ASSIGNED_MAKER",
+      "paths": [
+        "packages/meeting-bot/py/sb_join_tiles.py",
+        "packages/meeting-bot/py/test_sb_join_tiles.py",
+        "packages/meeting-bot/src/capture/tiles/sampler-clock.ts",
+        "packages/meeting-bot/src/capture/tiles/sampler-clock.test.ts",
+        "packages/meeting-bot/src/capture/tiles/registry.ts",
+        "qa/evidence/t042-trusted-registry/fixture.ts"
+      ],
+      "source": "qa/coordination/knowledge-brain-20261015/capture-delivery/clock.md",
+      "contract": "qa/contracts/t042-trusted-registry-integration.md R2/R3/R4/R8/R11/R14",
+      "brief": "Root C:/Users/product/Desktop/KnowledgeBase. Own exact sampler/clock/registry/fixture lease only. Read effective T042 integration contract and clock packet; sampler witness and registry integration already exist. Verify current authority/privacy clauses before edits; do not rebuild completed candidate from old report. Broker preflights compatible Python/import containment and writable temp, runs existing Python sampler test plus Node clock/registry/downstream probe in bounded grant. Require monotonic/epoch poisoning, missing/foreign identity refusal and privacy protection. No browser/native calibration/media/provider. Preserve raw private data and dirty state. Produce exact pin/evidence packet; independent decoded sample-zero authority, production mounting, actual panelists and parent acceptance remain open."
+    }
+  ],
+  "limits": "Effective contract content and seam PASS counts were not exhaustively authenticated in bounded planning. Thus five disjoint source scopes are reserved provisionally, not certified unblocked implementation defects. First maker phase must resolve this gate without editing unrelated files.",
+  "sharedSourceFreeze": "FROZEN: no shared source writes in this epoch; root must release exact paths before integration edits"
+}

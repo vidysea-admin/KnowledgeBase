@@ -84,4 +84,12 @@ paths). One line is enough.
 
 _(unanswered)_
 
-**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+
+## Ruling (recorded 2026-10-10)
+
+**Answered:** 2026-10-10 - A APPROVED - Umesh (Approver), answering a direct multiple-choice prompt in the orchestrating session; recorded by the orchestrating agent.
+**Ruled by:** Umesh (Approver).
+**Choice:** A - approve START: the checker may author `qa/contracts/handshake-liveness.md` to the scope above, with a canonical stamp format as a criterion.
+**Limits:** START of the contract only; ISS-199 waits on that contract rather than a fourth stripper. No enforcement-path change is authorized by this ruling.
+
+**Gate status:** ANSWERED - recorded inline: 2026-10-10 - option A - Umesh (Approver)

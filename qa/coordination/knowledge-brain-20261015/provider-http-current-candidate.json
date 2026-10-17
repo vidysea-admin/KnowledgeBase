@@ -1,0 +1,57 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "2b54637880a71839675df39113ab9754e6b0357d8f3925396b3996022ffffaca",
+  "candidateIdentityKind": "SHA256 UTF8 compressed ordered12pathpins; not Gitcommit",
+  "pins": [
+    {
+      "path": "packages/ai/src/providers/ollama-cloud.ts",
+      "sha256": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809"
+    },
+    {
+      "path": "packages/ai/src/providers/ollama-cloud.test.ts",
+      "sha256": "3254bccafc0836b377a4d5d654030cf2f11d0aa87cf1269841760641a85736ea"
+    },
+    {
+      "path": "apps/api/src/ai-transport.ts",
+      "sha256": "ab266b7496f0b85c810a6c66cd3c5231598ea01e10acad741796e2c807e831f1"
+    },
+    {
+      "path": "apps/api/src/ai-http-transport.test.ts",
+      "sha256": "bdf4808d08f072185aebe730ed0e7dc7095ab1d887f0c1d6e99c6838d1f73a3d"
+    },
+    {
+      "path": "packages/ai/src/provider.ts",
+      "sha256": "224011a106893ba8d42cecc5d9c43e4897df6d3d15e692f9e196d10aa050c4c1"
+    },
+    {
+      "path": "packages/ai/src/router.ts",
+      "sha256": "111b0a7fb1d586b702d1fe5dd8d3f327e70069d46fd0c1dfc62dfccf692a7118"
+    },
+    {
+      "path": "packages/ai/src/jobs.ts",
+      "sha256": "ff1d14d504651e56d6bd88b82416bfc135ec951e4cacfca87a213756758fc180"
+    },
+    {
+      "path": "packages/ai/src/index.ts",
+      "sha256": "3a881523bf31bd8568bc8badade370ba8d430bc2d756e961a82c23f21b30e9f1"
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "f9b22d7dcf169a0b27040d0e84411a0b6a5a5fd8b229edbe79d84b79cc9cb328"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/answers.ts",
+      "sha256": "14e0aebdb481c4dd258a921ef850ab7973c5bc4e65f62a9239af3b4b816eaca8"
+    },
+    {
+      "path": "apps/api/src/composition/vectorless-routing.test.ts",
+      "sha256": "957f1279dfaadecf262cbc357b102f783b6b249a1fd67ba138bcaeec33ac95c8"
+    },
+    {
+      "path": "config/ai-routing.yaml",
+      "sha256": "fe908f0ed6151396fd94f5b65a1dbc45ea88c74c3d2f88236d791c5aa9f0d3ca"
+    }
+  ],
+  "frozen": true
+}

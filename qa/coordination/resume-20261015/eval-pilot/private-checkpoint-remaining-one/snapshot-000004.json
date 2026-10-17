@@ -1,0 +1,3714 @@
+{
+  "sha256": "a3e7f0a20c22b52d4d4d7415511f05468445aa6e83be22f04e582f9b08a3887f",
+  "state": {
+    "format": "vectorless-eval-v2",
+    "binding": "5c180d750a417f8ca60e0bcc484661d4270936f260c83961c45899a1e55ae88a",
+    "corpusSha256": "cbd1c84d1caf3b2f4a0c07808e10705411196aa93e19b875a0f66ccc39c19ebe",
+    "authorization": null,
+    "elapsedRunMs": 19938.283300000003,
+    "candidateIds": [
+      "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-05-20-telling-your-brand-story-better",
+      "2026-05-22-uniaccess-xavier-university",
+      "2026-05-23-uniaccess-atlas-skilltech",
+      "2026-05-28-in-focus-1",
+      "2026-05-29-decoding-ever-expanding-cast",
+      "2026-06-03-dual-enrollment-pathway",
+      "2026-06-19-entrance-exams-pathways-india-part1",
+      "2026-06-25-in-focus-2",
+      "2026-06-30-exploring-identity-success-counseling",
+      "2026-07-03-inside-the-uc-session",
+      "2026-07-08-beyond-black-robes-law-careers",
+      "2026-07-15-creative-futures",
+      "2026-07-22-uniaccess-cept-university",
+      "2026-07-28-metrics-and-mingling",
+      "2026-07-30-in-focus-3",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload",
+      "2026-08-10-ucas-what-changed-what-matters",
+      "2026-08-12-uniaccess-ashoka-university",
+      "2026-08-24-uniaccess-leeds-arts-university",
+      "2026-08-27-in-focus-4",
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations"
+    ],
+    "config": {
+      "execution": "real-provider",
+      "mode": "pilot",
+      "dispatchReal": true,
+      "model": "glm-5.3-flash",
+      "questionIds": [
+        "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01"
+      ],
+      "grant": {
+        "scope": "single-question-pilot",
+        "id": "root-remaining-one-actual-production-inference-20261015"
+      },
+      "limits": {
+        "maxAttempts": 1,
+        "maxSeconds": 53,
+        "callTimeoutMs": 20000,
+        "maxInputBytes": 31276,
+        "maxRequestBytes": 31276,
+        "maxResponseBytes": 262144,
+        "outputLimit": 256,
+        "maxKnownInputTokens": 32768,
+        "maxKnownOutputTokens": 256
+      }
+    },
+    "attempts": [
+      {
+        "id": 1,
+        "model": "glm-5.3-flash",
+        "status": "returned",
+        "inputBytes": 724,
+        "requestSha256": "09b2417adaae61537223c318fc059ce26827cf70e1f88d162c05821715e199e0",
+        "inputTokens": 151,
+        "outputTokens": 256,
+        "startedAt": "2026-10-15T20:35:08.639Z",
+        "elapsedMs": 3589
+      }
+    ],
+    "invocations": [
+      {
+        "startedAt": "2026-10-15T20:35:08.281Z",
+        "execution": "real-provider",
+        "endedAt": "2026-10-15T20:35:25.885Z",
+        "elapsedMs": 19938.283300000003
+      }
+    ],
+    "rows": [
+      {
+        "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+        "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "status": "source-or-graph-refusal",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": 3739.314000000001,
+        "usage": {
+          "inputTokens": 151,
+          "outputTokens": 256
+        },
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-25-in-focus-2",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        },
+        "attemptIds": [
+          1
+        ],
+        "retrievalHit": false
+      },
+      {
+        "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02",
+        "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-06-03-dual-enrollment-pathway"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq03",
+        "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-07-28-metrics-and-mingling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq04",
+        "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-03-inside-the-uc-session",
+            "2026-07-30-in-focus-3",
+            "2026-05-20-telling-your-brand-story-better"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-08-funding-dreams-loans-forex-gq01",
+        "expectedSessionId": "2026-05-08-funding-dreams-loans-forex",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-07-03-inside-the-uc-session"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-20-telling-your-brand-story-better-gq01",
+        "expectedSessionId": "2026-05-20-telling-your-brand-story-better",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-20-telling-your-brand-story-better-gq02",
+        "expectedSessionId": "2026-05-20-telling-your-brand-story-better",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-22-uniaccess-xavier-university-gq01",
+        "expectedSessionId": "2026-05-22-uniaccess-xavier-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-27-in-focus-4",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-12-uniaccess-ashoka-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-22-uniaccess-xavier-university-gq02",
+        "expectedSessionId": "2026-05-22-uniaccess-xavier-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-03-inside-the-uc-session",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-23-uniaccess-atlas-skilltech",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-22-uniaccess-xavier-university-gq03",
+        "expectedSessionId": "2026-05-22-uniaccess-xavier-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-05-28-in-focus-1",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload",
+            "2026-07-08-beyond-black-robes-law-careers"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-22-uniaccess-xavier-university-gq04",
+        "expectedSessionId": "2026-05-22-uniaccess-xavier-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-03-inside-the-uc-session",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-08-12-uniaccess-ashoka-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-23-uniaccess-atlas-skilltech-gq01",
+        "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload",
+            "2026-07-08-beyond-black-robes-law-careers",
+            "2026-07-30-in-focus-3",
+            "2026-08-12-uniaccess-ashoka-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-23-uniaccess-atlas-skilltech-gq02",
+        "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-23-uniaccess-atlas-skilltech",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-23-uniaccess-atlas-skilltech-gq03",
+        "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-25-in-focus-2",
+            "2026-05-23-uniaccess-atlas-skilltech",
+            "2026-07-03-inside-the-uc-session",
+            "2026-07-28-metrics-and-mingling",
+            "2026-08-27-in-focus-4"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-28-in-focus-1-gq01",
+        "expectedSessionId": "2026-05-28-in-focus-1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-28-in-focus-1-gq02",
+        "expectedSessionId": "2026-05-28-in-focus-1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-28-in-focus-1-gq03",
+        "expectedSessionId": "2026-05-28-in-focus-1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-06-30-exploring-identity-success-counseling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-28-in-focus-1-gq04",
+        "expectedSessionId": "2026-05-28-in-focus-1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3",
+            "2026-08-27-in-focus-4",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-29-decoding-ever-expanding-cast-gq01",
+        "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-27-in-focus-4",
+            "2026-09-24-in-focus",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-29-decoding-ever-expanding-cast-gq02",
+        "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-30-in-focus-3",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-29-decoding-ever-expanding-cast-gq03",
+        "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-30-in-focus-3",
+            "2026-08-03-uk-beyond-offer-letters"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-29-decoding-ever-expanding-cast-gq04",
+        "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-03-dual-enrollment-pathway-gq01",
+        "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-03-dual-enrollment-pathway-gq02",
+        "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-27-in-focus-4",
+            "2026-09-02-india-test-series-part2",
+            "2026-09-24-in-focus"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-03-dual-enrollment-pathway-gq03",
+        "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-27-in-focus-4"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-03-dual-enrollment-pathway-gq04",
+        "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-24-in-focus",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-03-dual-enrollment-pathway",
+            "2026-06-25-in-focus-2",
+            "2026-06-30-exploring-identity-success-counseling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+        "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-28-metrics-and-mingling",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-19-entrance-exams-pathways-india-part1-gq02",
+        "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-27-in-focus-4",
+            "2026-09-24-in-focus",
+            "2026-07-08-beyond-black-robes-law-careers"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-19-entrance-exams-pathways-india-part1-gq03",
+        "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-05-28-in-focus-1",
+            "2026-06-25-in-focus-2",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-19-entrance-exams-pathways-india-part1-gq04",
+        "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-07-28-metrics-and-mingling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-25-in-focus-2-gq01",
+        "expectedSessionId": "2026-06-25-in-focus-2",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-25-in-focus-2",
+            "2026-07-03-inside-the-uc-session",
+            "2026-07-22-uniaccess-cept-university",
+            "2026-07-30-in-focus-3",
+            "2026-08-12-uniaccess-ashoka-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-25-in-focus-2-gq02",
+        "expectedSessionId": "2026-06-25-in-focus-2",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-27-in-focus-4",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-03-dual-enrollment-pathway",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-25-in-focus-2-gq03",
+        "expectedSessionId": "2026-06-25-in-focus-2",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-25-in-focus-2",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-25-in-focus-2-gq04",
+        "expectedSessionId": "2026-06-25-in-focus-2",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-27-in-focus-4",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-30-exploring-identity-success-counseling-gq01",
+        "expectedSessionId": "2026-06-30-exploring-identity-success-counseling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-08-27-in-focus-4",
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-08-beyond-black-robes-law-careers"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-30-exploring-identity-success-counseling-gq02",
+        "expectedSessionId": "2026-06-30-exploring-identity-success-counseling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-06-30-exploring-identity-success-counseling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-30-exploring-identity-success-counseling-gq03",
+        "expectedSessionId": "2026-06-30-exploring-identity-success-counseling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-06-30-exploring-identity-success-counseling-gq04",
+        "expectedSessionId": "2026-06-30-exploring-identity-success-counseling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-15-creative-futures"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-03-inside-the-uc-session-gq01",
+        "expectedSessionId": "2026-07-03-inside-the-uc-session",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-10-ucas-what-changed-what-matters",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-27-in-focus-4",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-03-inside-the-uc-session-gq02",
+        "expectedSessionId": "2026-07-03-inside-the-uc-session",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-27-in-focus-4"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-08-beyond-black-robes-law-careers-gq01",
+        "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-30-in-focus-3",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-09-02-india-test-series-part2",
+            "2026-07-08-beyond-black-robes-law-careers",
+            "2026-08-24-uniaccess-leeds-arts-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-08-beyond-black-robes-law-careers-gq02",
+        "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-30-in-focus-3",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-28-in-focus-1",
+            "2026-08-27-in-focus-4",
+            "2026-05-08-funding-dreams-loans-forex"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-15-creative-futures-gq01",
+        "expectedSessionId": "2026-07-15-creative-futures",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-15-creative-futures-gq02",
+        "expectedSessionId": "2026-07-15-creative-futures",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-15-creative-futures-gq03",
+        "expectedSessionId": "2026-07-15-creative-futures",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-07-30-in-focus-3",
+            "2026-06-25-in-focus-2",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-03-uk-beyond-offer-letters"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-22-uniaccess-cept-university-gq01",
+        "expectedSessionId": "2026-07-22-uniaccess-cept-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-22-uniaccess-cept-university-gq02",
+        "expectedSessionId": "2026-07-22-uniaccess-cept-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-28-in-focus-1",
+            "2026-06-03-dual-enrollment-pathway",
+            "2026-08-12-uniaccess-ashoka-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-22-uniaccess-cept-university-gq03",
+        "expectedSessionId": "2026-07-22-uniaccess-cept-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-25-in-focus-2",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-22-uniaccess-cept-university-gq04",
+        "expectedSessionId": "2026-07-22-uniaccess-cept-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-25-in-focus-2",
+            "2026-05-28-in-focus-1",
+            "2026-07-08-beyond-black-robes-law-careers",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-28-metrics-and-mingling-gq01",
+        "expectedSessionId": "2026-07-28-metrics-and-mingling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-28-metrics-and-mingling-gq02",
+        "expectedSessionId": "2026-07-28-metrics-and-mingling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-28-metrics-and-mingling-gq03",
+        "expectedSessionId": "2026-07-28-metrics-and-mingling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-28-metrics-and-mingling",
+            "2026-08-27-in-focus-4",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-09-24-in-focus"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-30-in-focus-3-gq01",
+        "expectedSessionId": "2026-07-30-in-focus-3",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-30-in-focus-3",
+            "2026-06-25-in-focus-2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-30-in-focus-3-gq02",
+        "expectedSessionId": "2026-07-30-in-focus-3",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-30-in-focus-3-gq03",
+        "expectedSessionId": "2026-07-30-in-focus-3",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-24-in-focus",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-30-in-focus-3",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-30-in-focus-3-gq04",
+        "expectedSessionId": "2026-07-30-in-focus-3",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-25-in-focus-2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-gq01",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-27-in-focus-4",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-08-funding-dreams-loans-forex"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-gq02",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-gq03",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-30-in-focus-3",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-09-24-in-focus"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-gq04",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-28-metrics-and-mingling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq01",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-07-30-in-focus-3",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq02",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq03",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq04",
+        "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-24-in-focus",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-10-ucas-what-changed-what-matters-gq01",
+        "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-25-in-focus-2",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-28-in-focus-1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-10-ucas-what-changed-what-matters-gq02",
+        "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3",
+            "2026-09-02-india-test-series-part2",
+            "2026-07-03-inside-the-uc-session"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-12-uniaccess-ashoka-university-gq01",
+        "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-25-in-focus-2",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-27-in-focus-4"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-12-uniaccess-ashoka-university-gq02",
+        "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-27-in-focus-4",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-12-uniaccess-ashoka-university-gq03",
+        "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-08-27-in-focus-4",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-24-uniaccess-leeds-arts-university-gq01",
+        "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-25-in-focus-2",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-24-uniaccess-leeds-arts-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-24-uniaccess-leeds-arts-university-gq02",
+        "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-24-uniaccess-leeds-arts-university-gq03",
+        "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-25-in-focus-2",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-05-28-in-focus-1",
+            "2026-07-08-beyond-black-robes-law-careers",
+            "2026-08-03-uk-beyond-offer-letters"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-24-uniaccess-leeds-arts-university-gq04",
+        "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-05-23-uniaccess-atlas-skilltech",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-24-uniaccess-leeds-arts-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-27-in-focus-4-gq01",
+        "expectedSessionId": "2026-08-27-in-focus-4",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-25-in-focus-2",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-27-in-focus-4-gq02",
+        "expectedSessionId": "2026-08-27-in-focus-4",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-05-28-in-focus-1",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-05-08-funding-dreams-loans-forex-gq02",
+        "expectedSessionId": "2026-05-08-funding-dreams-loans-forex",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-24-uniaccess-leeds-arts-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-08-funding-dreams-loans-forex-gq03",
+        "expectedSessionId": "2026-05-08-funding-dreams-loans-forex",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-03-dual-enrollment-pathway"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-08-funding-dreams-loans-forex-gq04",
+        "expectedSessionId": "2026-05-08-funding-dreams-loans-forex",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-08-24-uniaccess-leeds-arts-university",
+            "2026-09-24-in-focus",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-19-entrance-exams-pathways-india-part1"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-20-telling-your-brand-story-better-gq03",
+        "expectedSessionId": "2026-05-20-telling-your-brand-story-better",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-30-in-focus-3",
+            "2026-06-25-in-focus-2",
+            "2026-07-03-inside-the-uc-session"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-20-telling-your-brand-story-better-gq04",
+        "expectedSessionId": "2026-05-20-telling-your-brand-story-better",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-06-30-exploring-identity-success-counseling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-05-23-uniaccess-atlas-skilltech-gq04",
+        "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-22-uniaccess-xavier-university"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": true
+        }
+      },
+      {
+        "id": "2026-07-03-inside-the-uc-session-gq03",
+        "expectedSessionId": "2026-07-03-inside-the-uc-session",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-09-09-global-test-prep-pathways"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-03-inside-the-uc-session-gq04",
+        "expectedSessionId": "2026-07-03-inside-the-uc-session",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-03-inside-the-uc-session",
+            "2026-07-22-uniaccess-cept-university",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-08-beyond-black-robes-law-careers-gq03",
+        "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-08-beyond-black-robes-law-careers",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-03-dual-enrollment-pathway",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-08-beyond-black-robes-law-careers-gq04",
+        "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-05-28-in-focus-1",
+            "2026-06-03-dual-enrollment-pathway",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-07-08-beyond-black-robes-law-careers"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-15-creative-futures-gq04",
+        "expectedSessionId": "2026-07-15-creative-futures",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-30-in-focus-3",
+            "2026-09-02-india-test-series-part2",
+            "2026-05-28-in-focus-1",
+            "2026-08-03-uk-beyond-offer-letters",
+            "2026-08-03-uk-beyond-offer-letters-reupload"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-07-28-metrics-and-mingling-gq04",
+        "expectedSessionId": "2026-07-28-metrics-and-mingling",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-07-28-metrics-and-mingling",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-09-02-india-test-series-part2",
+            "2026-06-25-in-focus-2",
+            "2026-08-03-uk-beyond-offer-letters"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-10-ucas-what-changed-what-matters-gq03",
+        "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-06-25-in-focus-2",
+            "2026-06-30-exploring-identity-success-counseling"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-10-ucas-what-changed-what-matters-gq04",
+        "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-06-25-in-focus-2",
+            "2026-05-28-in-focus-1",
+            "2026-06-19-entrance-exams-pathways-india-part1",
+            "2026-07-03-inside-the-uc-session",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": false,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-12-uniaccess-ashoka-university-gq04",
+        "expectedSessionId": "2026-08-12-uniaccess-ashoka-university",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-09-02-india-test-series-part2",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-08-27-in-focus-4",
+            "2026-07-28-metrics-and-mingling",
+            "2026-09-09-global-test-prep-pathways"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-27-in-focus-4-gq03",
+        "expectedSessionId": "2026-08-27-in-focus-4",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-08-27-in-focus-4",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-06-30-exploring-identity-success-counseling",
+            "2026-08-12-uniaccess-ashoka-university",
+            "2026-09-02-india-test-series-part2"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      },
+      {
+        "id": "2026-08-27-in-focus-4-gq04",
+        "expectedSessionId": "2026-08-27-in-focus-4",
+        "status": "not-run",
+        "selectedSessionIds": [],
+        "passages": [],
+        "citations": [],
+        "answer": null,
+        "latencyMs": null,
+        "usage": null,
+        "semanticCorrectness": null,
+        "controls": {
+          "lexical": [
+            "2026-05-28-in-focus-1",
+            "2026-08-27-in-focus-4",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-06-25-in-focus-2",
+            "2026-07-30-in-focus-3"
+          ],
+          "blind": [
+            "2026-04-21-visa-blueprint-part2-italy-france-nz",
+            "2026-05-08-funding-dreams-loans-forex",
+            "2026-05-20-telling-your-brand-story-better",
+            "2026-05-22-uniaccess-xavier-university",
+            "2026-05-23-uniaccess-atlas-skilltech"
+          ],
+          "lexicalHit": true,
+          "blindHit": false
+        }
+      }
+    ],
+    "totals": {
+      "inputBytes": 724,
+      "knownInputTokens": 151,
+      "knownOutputTokens": 256,
+      "unknownUsageAttempts": 0
+    },
+    "failure": null,
+    "costStatus": "unknown",
+    "strictInputTokenCap": false,
+    "fullPopulationAttempted": false,
+    "comparison": {
+      "k": 5,
+      "population": 92,
+      "attempted": 1,
+      "retrievalRecallAt5": null,
+      "lexicalRecallAt5": 0.5652173913043478,
+      "blindRecallAt5": 0.21739130434782608,
+      "misses": [
+        {
+          "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+          "status": "source-or-graph-refusal"
+        },
+        {
+          "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-08-funding-dreams-loans-forex-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-20-telling-your-brand-story-better-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-20-telling-your-brand-story-better-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-22-uniaccess-xavier-university-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-22-uniaccess-xavier-university-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-22-uniaccess-xavier-university-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-22-uniaccess-xavier-university-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-23-uniaccess-atlas-skilltech-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-23-uniaccess-atlas-skilltech-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-23-uniaccess-atlas-skilltech-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-28-in-focus-1-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-28-in-focus-1-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-28-in-focus-1-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-28-in-focus-1-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-29-decoding-ever-expanding-cast-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-29-decoding-ever-expanding-cast-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-29-decoding-ever-expanding-cast-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-29-decoding-ever-expanding-cast-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-03-dual-enrollment-pathway-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-03-dual-enrollment-pathway-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-03-dual-enrollment-pathway-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-03-dual-enrollment-pathway-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-19-entrance-exams-pathways-india-part1-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-19-entrance-exams-pathways-india-part1-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-19-entrance-exams-pathways-india-part1-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-25-in-focus-2-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-25-in-focus-2-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-25-in-focus-2-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-25-in-focus-2-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-30-exploring-identity-success-counseling-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-30-exploring-identity-success-counseling-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-30-exploring-identity-success-counseling-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-06-30-exploring-identity-success-counseling-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-03-inside-the-uc-session-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-03-inside-the-uc-session-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-08-beyond-black-robes-law-careers-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-08-beyond-black-robes-law-careers-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-15-creative-futures-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-15-creative-futures-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-15-creative-futures-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-22-uniaccess-cept-university-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-22-uniaccess-cept-university-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-22-uniaccess-cept-university-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-22-uniaccess-cept-university-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-28-metrics-and-mingling-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-28-metrics-and-mingling-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-28-metrics-and-mingling-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-30-in-focus-3-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-30-in-focus-3-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-30-in-focus-3-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-30-in-focus-3-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-10-ucas-what-changed-what-matters-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-10-ucas-what-changed-what-matters-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-12-uniaccess-ashoka-university-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-12-uniaccess-ashoka-university-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-12-uniaccess-ashoka-university-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-24-uniaccess-leeds-arts-university-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-24-uniaccess-leeds-arts-university-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-24-uniaccess-leeds-arts-university-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-24-uniaccess-leeds-arts-university-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-27-in-focus-4-gq01",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-27-in-focus-4-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-08-funding-dreams-loans-forex-gq02",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-08-funding-dreams-loans-forex-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-08-funding-dreams-loans-forex-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-20-telling-your-brand-story-better-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-20-telling-your-brand-story-better-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-05-23-uniaccess-atlas-skilltech-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-03-inside-the-uc-session-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-03-inside-the-uc-session-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-08-beyond-black-robes-law-careers-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-08-beyond-black-robes-law-careers-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-15-creative-futures-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-07-28-metrics-and-mingling-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-10-ucas-what-changed-what-matters-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-10-ucas-what-changed-what-matters-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-12-uniaccess-ashoka-university-gq04",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-27-in-focus-4-gq03",
+          "status": "not-run"
+        },
+        {
+          "id": "2026-08-27-in-focus-4-gq04",
+          "status": "not-run"
+        }
+      ],
+      "semantics": "unmeasured; no human labels synthesized",
+      "arms": {
+        "production": null,
+        "lexical": {
+          "k": 5,
+          "total": 92,
+          "hits": 52,
+          "recallAtK": 0.5652173913043478,
+          "misses": [
+            {
+              "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+              "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+            },
+            {
+              "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq03",
+              "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+            },
+            {
+              "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq04",
+              "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+            },
+            {
+              "id": "2026-05-20-telling-your-brand-story-better-gq02",
+              "expectedSessionId": "2026-05-20-telling-your-brand-story-better"
+            },
+            {
+              "id": "2026-05-22-uniaccess-xavier-university-gq01",
+              "expectedSessionId": "2026-05-22-uniaccess-xavier-university"
+            },
+            {
+              "id": "2026-05-22-uniaccess-xavier-university-gq03",
+              "expectedSessionId": "2026-05-22-uniaccess-xavier-university"
+            },
+            {
+              "id": "2026-05-23-uniaccess-atlas-skilltech-gq01",
+              "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq01",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq02",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq03",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq04",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq01",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq02",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq03",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-25-in-focus-2-gq02",
+              "expectedSessionId": "2026-06-25-in-focus-2"
+            },
+            {
+              "id": "2026-06-25-in-focus-2-gq04",
+              "expectedSessionId": "2026-06-25-in-focus-2"
+            },
+            {
+              "id": "2026-07-03-inside-the-uc-session-gq01",
+              "expectedSessionId": "2026-07-03-inside-the-uc-session"
+            },
+            {
+              "id": "2026-07-08-beyond-black-robes-law-careers-gq02",
+              "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq01",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq02",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq03",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq01",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq02",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq03",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq04",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-28-metrics-and-mingling-gq01",
+              "expectedSessionId": "2026-07-28-metrics-and-mingling"
+            },
+            {
+              "id": "2026-07-28-metrics-and-mingling-gq02",
+              "expectedSessionId": "2026-07-28-metrics-and-mingling"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq01",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq03",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq04",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq03",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq01",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq02",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-27-in-focus-4-gq01",
+              "expectedSessionId": "2026-08-27-in-focus-4"
+            },
+            {
+              "id": "2026-08-27-in-focus-4-gq02",
+              "expectedSessionId": "2026-08-27-in-focus-4"
+            },
+            {
+              "id": "2026-05-08-funding-dreams-loans-forex-gq02",
+              "expectedSessionId": "2026-05-08-funding-dreams-loans-forex"
+            },
+            {
+              "id": "2026-05-23-uniaccess-atlas-skilltech-gq04",
+              "expectedSessionId": "2026-05-23-uniaccess-atlas-skilltech"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq04",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq03",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq04",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            }
+          ]
+        },
+        "blind": {
+          "k": 5,
+          "total": 92,
+          "hits": 20,
+          "recallAtK": 0.21739130434782608,
+          "misses": [
+            {
+              "id": "2026-05-28-in-focus-1-gq01",
+              "expectedSessionId": "2026-05-28-in-focus-1"
+            },
+            {
+              "id": "2026-05-28-in-focus-1-gq02",
+              "expectedSessionId": "2026-05-28-in-focus-1"
+            },
+            {
+              "id": "2026-05-28-in-focus-1-gq03",
+              "expectedSessionId": "2026-05-28-in-focus-1"
+            },
+            {
+              "id": "2026-05-28-in-focus-1-gq04",
+              "expectedSessionId": "2026-05-28-in-focus-1"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq01",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq02",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq03",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-05-29-decoding-ever-expanding-cast-gq04",
+              "expectedSessionId": "2026-05-29-decoding-ever-expanding-cast"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq01",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq02",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq03",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-03-dual-enrollment-pathway-gq04",
+              "expectedSessionId": "2026-06-03-dual-enrollment-pathway"
+            },
+            {
+              "id": "2026-06-19-entrance-exams-pathways-india-part1-gq01",
+              "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            },
+            {
+              "id": "2026-06-19-entrance-exams-pathways-india-part1-gq02",
+              "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            },
+            {
+              "id": "2026-06-19-entrance-exams-pathways-india-part1-gq03",
+              "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            },
+            {
+              "id": "2026-06-19-entrance-exams-pathways-india-part1-gq04",
+              "expectedSessionId": "2026-06-19-entrance-exams-pathways-india-part1"
+            },
+            {
+              "id": "2026-06-25-in-focus-2-gq01",
+              "expectedSessionId": "2026-06-25-in-focus-2"
+            },
+            {
+              "id": "2026-06-25-in-focus-2-gq02",
+              "expectedSessionId": "2026-06-25-in-focus-2"
+            },
+            {
+              "id": "2026-06-25-in-focus-2-gq03",
+              "expectedSessionId": "2026-06-25-in-focus-2"
+            },
+            {
+              "id": "2026-06-25-in-focus-2-gq04",
+              "expectedSessionId": "2026-06-25-in-focus-2"
+            },
+            {
+              "id": "2026-06-30-exploring-identity-success-counseling-gq01",
+              "expectedSessionId": "2026-06-30-exploring-identity-success-counseling"
+            },
+            {
+              "id": "2026-06-30-exploring-identity-success-counseling-gq02",
+              "expectedSessionId": "2026-06-30-exploring-identity-success-counseling"
+            },
+            {
+              "id": "2026-06-30-exploring-identity-success-counseling-gq03",
+              "expectedSessionId": "2026-06-30-exploring-identity-success-counseling"
+            },
+            {
+              "id": "2026-06-30-exploring-identity-success-counseling-gq04",
+              "expectedSessionId": "2026-06-30-exploring-identity-success-counseling"
+            },
+            {
+              "id": "2026-07-03-inside-the-uc-session-gq01",
+              "expectedSessionId": "2026-07-03-inside-the-uc-session"
+            },
+            {
+              "id": "2026-07-03-inside-the-uc-session-gq02",
+              "expectedSessionId": "2026-07-03-inside-the-uc-session"
+            },
+            {
+              "id": "2026-07-08-beyond-black-robes-law-careers-gq01",
+              "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers"
+            },
+            {
+              "id": "2026-07-08-beyond-black-robes-law-careers-gq02",
+              "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq01",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq02",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq03",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq01",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq02",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq03",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-22-uniaccess-cept-university-gq04",
+              "expectedSessionId": "2026-07-22-uniaccess-cept-university"
+            },
+            {
+              "id": "2026-07-28-metrics-and-mingling-gq01",
+              "expectedSessionId": "2026-07-28-metrics-and-mingling"
+            },
+            {
+              "id": "2026-07-28-metrics-and-mingling-gq02",
+              "expectedSessionId": "2026-07-28-metrics-and-mingling"
+            },
+            {
+              "id": "2026-07-28-metrics-and-mingling-gq03",
+              "expectedSessionId": "2026-07-28-metrics-and-mingling"
+            },
+            {
+              "id": "2026-07-30-in-focus-3-gq01",
+              "expectedSessionId": "2026-07-30-in-focus-3"
+            },
+            {
+              "id": "2026-07-30-in-focus-3-gq02",
+              "expectedSessionId": "2026-07-30-in-focus-3"
+            },
+            {
+              "id": "2026-07-30-in-focus-3-gq03",
+              "expectedSessionId": "2026-07-30-in-focus-3"
+            },
+            {
+              "id": "2026-07-30-in-focus-3-gq04",
+              "expectedSessionId": "2026-07-30-in-focus-3"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq01",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq02",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq03",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-gq04",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq01",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq02",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq03",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+            },
+            {
+              "id": "2026-08-03-uk-beyond-offer-letters-reupload-gq04",
+              "expectedSessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq01",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq02",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-12-uniaccess-ashoka-university-gq01",
+              "expectedSessionId": "2026-08-12-uniaccess-ashoka-university"
+            },
+            {
+              "id": "2026-08-12-uniaccess-ashoka-university-gq02",
+              "expectedSessionId": "2026-08-12-uniaccess-ashoka-university"
+            },
+            {
+              "id": "2026-08-12-uniaccess-ashoka-university-gq03",
+              "expectedSessionId": "2026-08-12-uniaccess-ashoka-university"
+            },
+            {
+              "id": "2026-08-24-uniaccess-leeds-arts-university-gq01",
+              "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university"
+            },
+            {
+              "id": "2026-08-24-uniaccess-leeds-arts-university-gq02",
+              "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university"
+            },
+            {
+              "id": "2026-08-24-uniaccess-leeds-arts-university-gq03",
+              "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university"
+            },
+            {
+              "id": "2026-08-24-uniaccess-leeds-arts-university-gq04",
+              "expectedSessionId": "2026-08-24-uniaccess-leeds-arts-university"
+            },
+            {
+              "id": "2026-08-27-in-focus-4-gq01",
+              "expectedSessionId": "2026-08-27-in-focus-4"
+            },
+            {
+              "id": "2026-08-27-in-focus-4-gq02",
+              "expectedSessionId": "2026-08-27-in-focus-4"
+            },
+            {
+              "id": "2026-07-03-inside-the-uc-session-gq03",
+              "expectedSessionId": "2026-07-03-inside-the-uc-session"
+            },
+            {
+              "id": "2026-07-03-inside-the-uc-session-gq04",
+              "expectedSessionId": "2026-07-03-inside-the-uc-session"
+            },
+            {
+              "id": "2026-07-08-beyond-black-robes-law-careers-gq03",
+              "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers"
+            },
+            {
+              "id": "2026-07-08-beyond-black-robes-law-careers-gq04",
+              "expectedSessionId": "2026-07-08-beyond-black-robes-law-careers"
+            },
+            {
+              "id": "2026-07-15-creative-futures-gq04",
+              "expectedSessionId": "2026-07-15-creative-futures"
+            },
+            {
+              "id": "2026-07-28-metrics-and-mingling-gq04",
+              "expectedSessionId": "2026-07-28-metrics-and-mingling"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq03",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-10-ucas-what-changed-what-matters-gq04",
+              "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters"
+            },
+            {
+              "id": "2026-08-12-uniaccess-ashoka-university-gq04",
+              "expectedSessionId": "2026-08-12-uniaccess-ashoka-university"
+            },
+            {
+              "id": "2026-08-27-in-focus-4-gq03",
+              "expectedSessionId": "2026-08-27-in-focus-4"
+            },
+            {
+              "id": "2026-08-27-in-focus-4-gq04",
+              "expectedSessionId": "2026-08-27-in-focus-4"
+            }
+          ]
+        }
+      },
+      "assessment": null
+    },
+    "algorithm": "production askV2 -> askGraphV2 -> selectNodes -> exact source hydration -> evaluate/refine/answer; no embeddings",
+    "acceptance": "HOLD: execution coverage and retrieval are not independently reviewed semantic answer quality"
+  }
+}

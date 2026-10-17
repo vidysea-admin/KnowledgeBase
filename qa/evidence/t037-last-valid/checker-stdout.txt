@@ -1,0 +1,12 @@
+✔ checker: cache-write failure cannot claim recovery or alter authoritative policy bytes (40.5724ms)
+✔ checker: stale save refuses after intervening primary opt-out; previous complete cache remains (54.368ms)
+✔ checker: restarted cached full-state denial cannot be edited into permissive state (35.5979ms)
+✔ checker: unevaluable current primary refuses and signals degradation without recovery (31.981ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 964.4487

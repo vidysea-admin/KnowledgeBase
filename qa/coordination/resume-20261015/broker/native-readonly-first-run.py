@@ -1,0 +1,8 @@
+import pathlib
+p=pathlib.Path(__file__).with_name('genuine-seal-isolated-diagnostic.py');code=p.read_text(encoding='utf8').replace('combined-source-pins-stage3-api-repair1.json','combined-source-pins-genuine-phase-observer.json').replace('broker/native-next-stage3-repair1-final-sealed-inventory.json','broker/native-next-split-exit-final-inventory.json')
+code=code.replace('genuine-seal-isolated','native-next-readonly').replace('genuine live seal precedes source ingestion; retained public recovery does not invent a clock','genuine read-only closed spool seals without changing source mode or bytes').replace("testfile='scripts/native-capture/production.test.ts'","testfile='packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts'")
+code=code.replace(" r=run('native-next-readonly-'+label,argv,ROOT,limit,pins)","\n if label=='original-positive':assert 300-194.032-(time.monotonic()-phase)>=90,'remaining global allowance insufficient for readonly plus cleanup'\n r=run('native-next-readonly-'+label,argv,ROOT,limit,pins)")
+code=code.replace('--test-timeout=120000','--test-timeout=70000').replace("checked('original-positive',argv,120)","checked('original-positive',argv,70)")
+code=code.replace("'elapsed_s':time.monotonic()-phase,'pinsUnchanged'","'elapsed_s':time.monotonic()-phase,'priorGlobal_s':194.032,'totalGlobalIncludingPrior_s':194.032+time.monotonic()-phase,'pinsUnchanged'")
+code=code.replace('root one diagnostic original genuine test;125s incl close; no whole-floor rerun','root next-split remaining readonly priority;75s incl close,300s global; no repeat')
+exec(compile(code,str(p),'exec'))

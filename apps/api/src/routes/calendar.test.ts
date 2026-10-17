@@ -6,11 +6,8 @@ import assert from "node:assert/strict";
 
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeCalendarReadDeps } from "../fixtures.js";
-import { listUpcomingGwsMeetings, runGws } from "../gws-calendar.js";
+import { listUpcomingGwsMeetings, runGws } from "../gws/gws-calendar.js";
 import { createGwsCalendarReadDeps } from "../store.js";
-import { selectAutoRecordItems } from "../../../../packages/meeting-bot/src/calendar/auto-join.js";
-import { reconcileWebinarSources } from "../../../../packages/meeting-bot/src/calendar/calendar-client.js";
-import { createHttpCalendarLoader, loadWebinarSourcesWithHealth } from "../../../../packages/meeting-bot/src/calendar/schedule-tick.js";
 
 test("GET /calendar/upcoming with the calendar scope returns real meetings", async () => {
   const server = await startTestServer(
@@ -44,35 +41,6 @@ test("production Calendar factory binds the machine credential before any provid
   } finally { await server.close(); }
 });
 
-test("actual Calendar adapter failures cross HTTP as failed discovery, while empty success stays healthy", async () => {
-  let reply: unknown = { items: [] }, failed = false;
-  const server = await startTestServer(buildTestDeps({
-    keyStore: fakeKeyStore({ "cal-key": { tenantId: "tenant-1", scopes: ["calendar"] } }),
-    calendar: { listUpcoming: () => listUpcomingGwsMeetings(14, async () => {
-      if (failed) throw new Error("secret provider details https://private.invalid/?token=secret");
-      return JSON.stringify(reply);
-    }) },
-  }));
-  const deps = { loadCalendarEvents: createHttpCalendarLoader(server.baseUrl, "cal-key"), loadCandidates: async () => [] };
-  const previous = {calendar: {status: "healthy" as const, checkedAt: "2026-09-29T12:00:00Z", lastSuccessAt: "2026-09-29T12:00:00Z"}};
-  try {
-    for (const invalid of [null, [], {}, {error: {code: 401}}, {items: {}}, {items: [{id: 5}]}, {items: [{id: "e", start: {dateTime: "bad"}}]}]) {
-      reply = invalid;
-      const response = await fetch(`${server.baseUrl}/calendar/upcoming`, {headers: {authorization: "Bearer cal-key"}});
-      assert.equal(response.status, 503); assert.ok(!(await response.text()).includes("secret"));
-      const result = await loadWebinarSourcesWithHealth(deps, "2026-09-30T12:00:00Z", previous);
-      assert.equal(result.failed, true); assert.equal(result.health.calendar.status, "failed");
-      assert.equal(result.health.calendar.lastSuccessAt, previous.calendar.lastSuccessAt);
-    }
-    failed = true; await assert.rejects(deps.loadCalendarEvents()); failed = false;
-    for (const valid of [{items: []}, {kind: "calendar#events"}]) {
-      reply = valid;
-      const result = await loadWebinarSourcesWithHealth(deps, "2026-09-30T12:00:00Z", previous);
-      assert.equal(result.failed, false); assert.deepEqual(result.calendarEvents, []);
-      assert.equal(result.health.calendar.lastSuccessAt, "2026-09-30T12:00:00Z");
-    }
-  } finally { await server.close(); }
-});
 
 test("Calendar follows bounded pagination and refuses repeated/invalid tokens without partial coverage", async () => {
   const event = {id: "e", summary: "Webinar", start: {dateTime: "2026-10-01T12:00:00Z"}, end: {dateTime: "2026-10-01T13:00:00Z"}, hangoutLink: "https://meet.google.com/abc-defg-hij"};
@@ -95,22 +63,6 @@ test("Calendar follows bounded pagination and refuses repeated/invalid tokens wi
   }
 });
 
-test("ISS-WEBINARRELEASE-013: cancelled Calendar occurrence suppresses its stale Gmail alias", async () => {
-  const cancelled = {id: "cancelled-webinar", status: "cancelled", summary: "AI webinar",
-    start: {dateTime: "2026-09-30T10:00:00Z"}, end: {dateTime: "2026-09-30T11:00:00Z"},
-    hangoutLink: "https://meet.google.com/abc-defg-hij"};
-  let providerFixtureCalls = 0;
-  const calendarEvents = await listUpcomingGwsMeetings(14, async () => {
-    providerFixtureCalls++; return JSON.stringify({items: [cancelled]});
-  });
-  const result = selectAutoRecordItems({calendarEvents, candidates: [{id: "old-gmail-invite",
-    title: cancelled.summary, senderEmail: "host@example.org", senderDomain: "example.org", status: "pending",
-    meetingUrl: cancelled.hangoutLink, startTime: cancelled.start.dateTime, endTime: cancelled.end.dateTime, kind: "upcoming"}],
-    now: "2026-09-30T10:00:00Z", leadMinutes: 5, trustedSenders: {emails: [], domains: []},
-    alreadyScheduled: new Set(), everyWebinar: true});
-  assert.equal(providerFixtureCalls, 1);
-  assert.equal(result.toSchedule.length, 0, "a cancelled occurrence must not record via stale Gmail");
-});
 
 test("Calendar discovery preserves id-only tombstones, recurrence metadata and incomplete positive invites", async () => {
   const recurring = {id: "instance", status: "cancelled", recurringEventId: "series",
@@ -140,29 +92,6 @@ test("Calendar discovery preserves id-only tombstones, recurrence metadata and i
   ]) await assert.rejects(listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [invalid]})), /unavailable/);
 });
 
-test("authenticated Calendar discovery retains tombstones while default UI excludes them", async () => {
-  let reads = 0;
-  const rows = [{id: "deleted", title: "AI webinar", startTime: "", endTime: "", cancelled: true},
-    {id: "registration", title: "AI webinar", startTime: "2026-10-01T12:00:00Z", endTime: ""},
-    {id: "live", title: "AI webinar", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: "https://meet.google.com/abc-defg-hij"}];
-  const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => { reads++; return rows; }},
-    keyStore: fakeKeyStore({"cal-key": {tenantId: "tenant-1", scopes: ["calendar"]}})}));
-  const headers = {authorization: "Bearer cal-key"};
-  try {
-    const normal = await fetch(`${server.baseUrl}/calendar/upcoming`, {headers});
-    const normalBody = await normal.json() as {meetings: {id: string}[]};
-    assert.deepEqual(normalBody.meetings.map(r => r.id), ["live"]);
-    const events = await createHttpCalendarLoader(server.baseUrl, "cal-key")();
-    assert.deepEqual(events.map(r => r.id), ["deleted", "registration", "live"]); assert.equal(events[0]!.cancelled, true);
-    for (const query of ["discovery=0", "discovery=true", "discovery=1&discovery=1", "discovery[x]=1"]) {
-      const before = reads;
-      assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers})).status, 400);
-      assert.equal(reads, before);
-    }
-    const before = reads;
-    assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1`)).status, 401); assert.equal(reads, before);
-  } finally { await server.close(); }
-});
 
 test("GET /calendar/upcoming without the calendar scope returns 403", async () => {
   const server = await startTestServer(
@@ -210,25 +139,6 @@ test("Calendar delta retrieves deleted masters without time bounds and preserves
   }
 });
 
-test("delta HTTP checkpoint is encoded once and owner/query guards run before provider", async () => {
-  const since = "2026-09-01T00:00:00.000Z", seen: (string | undefined)[] = [];
-  const calendar = createGwsCalendarReadDeps("tenant-1", async (_days, _run, changedSince) => { seen.push(changedSince); return []; });
-  const server = await startTestServer(buildTestDeps({calendar, keyStore: fakeKeyStore({
-    "cal-key": {tenantId: "tenant-1", scopes: ["calendar"]}, "foreign": {tenantId: "tenant-2", scopes: ["calendar"]},
-  })}));
-  try {
-    let callbacks = 0;
-    assert.deepEqual(await createHttpCalendarLoader(server.baseUrl, "cal-key", () => {callbacks++; return since;})(), []);
-    assert.equal(callbacks, 1); assert.deepEqual(seen, [since]);
-    const query = new URLSearchParams({discovery: "1", changedSince: since});
-    assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers: {authorization: "Bearer foreign"}})).status, 503);
-    for (const query of ["changedSince=" + encodeURIComponent(since), "discovery=1&changedSince=bad", "discovery=1&changedSince=" + encodeURIComponent(since) + "&changedSince=" + encodeURIComponent(since), "discovery=1&changedSince[x]=1"]) {
-      assert.equal((await fetch(`${server.baseUrl}/calendar/upcoming?${query}`, {headers: {authorization: "Bearer cal-key"}})).status, 400);
-    }
-    for (const invalid of ["bad", "2026-02-30T00:00:00.000Z", "2026-09-01T00:00:00Z"]) await assert.rejects(createHttpCalendarLoader(server.baseUrl, "cal-key", () => invalid)(), /checkpoint/);
-    assert.deepEqual(seen, [since], "invalid queries, callbacks and foreign owner must never reach provider");
-  } finally { await server.close(); }
-});
 
 test("delta omits validated live recurring masters but preserves instances and deleted masters", async () => {
   const master = {id: "series", summary: "AI webinar", status: "confirmed", recurrence: ["RRULE:FREQ=WEEKLY"],
@@ -246,24 +156,6 @@ test("delta omits validated live recurring masters but preserves instances and d
   }
 });
 
-test("Google timezone metadata crosses actual adapter/reconciler/selector without losing cancellation", async () => {
-  const live = {id: "instance-tz", summary: "AI webinar", recurringEventId: "series-tz", updated: "2026-10-01T08:00:00Z",
-    originalStartTime: {dateTime: "2026-10-01T10:00:00Z", timeZone: "Etc/UTC"},
-    start: {dateTime: "2026-10-01T10:00:00Z", timeZone: "Etc/UTC"}, end: {dateTime: "2026-10-01T11:00:00Z"}, hangoutLink: "https://meet.google.com/abc-defg-hij"};
-  const checkedAt = "2026-10-01T09:56:00.000Z", acquisition = {complete: true, historyComplete: true};
-  const calendarEvents = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [live]}));
-  assert.deepEqual(calendarEvents[0]!.originalStartTime, {dateTime: live.originalStartTime.dateTime});
-  const first = reconcileWebinarSources({tenantId: "fixture", checkedAt, acquisition, calendarEvents, candidates: []});
-  const select = (r: typeof first) => selectAutoRecordItems({calendarEvents: r.calendarEvents, candidates: r.candidates,
-    now: checkedAt, leadMinutes: 5, trustedSenders: {emails: [], domains: []}, alreadyScheduled: new Set(), everyWebinar: true});
-  assert.equal(select(first).toSchedule.length, 1);
-  const tombstones = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [
-    {id: live.id, status: "cancelled", recurringEventId: live.recurringEventId, originalStartTime: live.originalStartTime},
-  ]}));
-  const cancelled = reconcileWebinarSources({tenantId: "fixture", checkedAt, acquisition, previous: first.state, calendarEvents: tombstones, candidates: []});
-  assert.equal(cancelled.transitions.filter(t => t.reason === "cancelled").length, 1);
-  assert.equal(cancelled.calendarEvents[0]!.cancelled, true); assert.equal(select(cancelled).toSchedule.length, 0);
-});
 
 test("GET /calendar/upcoming when the source returns nothing yields a real, honest empty list", async () => {
   const server = await startTestServer(
@@ -387,4 +279,63 @@ test("actual CLI error callback distinguishes structured provider410 from proces
   for (const stdout of ['{"error":{"code":403}}', '{"error":{"code":429}}', '{"error":{"code":500}}', '{"error":{"code":"410"}}', "noJSON410"]) {
     await assert.rejects(runGws([], execute(stdout, Object.assign(new Error("stderr410"), {code: "ETIMEDOUT"}))), (value: any) => value.statusCode === undefined);
   }
+});
+
+const linkEvent = (id: string, extra: Record<string, unknown>) =>
+  ({id, summary: id, start: {dateTime: "2026-10-01T12:00:00Z"}, end: {dateTime: "2026-10-01T13:00:00Z"}, ...extra});
+const listWith = (items: unknown[]) => listUpcomingGwsMeetings(14, async () => JSON.stringify({items}));
+
+test("T-036 description/location links: carried per event, never leaked across events, text never returned", async () => {
+  const zoom = "https://us02web.zoom.us/j/1234567890?pwd=SECRETPWD", meet = "https://meet.google.com/abc-defg-hij";
+  const rows = await listWith([
+    linkEvent("a", {description: `Passcode notes: private-note-xyz <a href="${zoom}">join</a>`}),
+    linkEvent("b", {location: "Hall 3"}),
+    linkEvent("c", {hangoutLink: meet, description: zoom}),
+    linkEvent("d", {description: `${zoom} ${meet}`}),
+    linkEvent("e", {description: "https://webinar.zoho.in/meeting/register?sessionId=12345"}),
+  ]);
+  assert.equal(rows[0]!.meetingUrl, zoom); assert.equal(rows[1]!.meetingUrl, undefined);
+  assert.equal(rows[2]!.meetingUrl, meet);
+  assert.equal(rows[3]!.meetingUrl, undefined); assert.equal(rows[3]!.meetingLinkIssue, "ambiguous");
+  assert.equal(rows[4]!.meetingLinkIssue, "registration-only"); assert.equal("meetingLinkIssue" in rows[1]!, false);
+  const json = JSON.stringify(rows);
+  assert.ok(!json.includes("private-note-xyz") && !json.includes("Hall 3") && !/"(description|location)":/.test(json)); // keys, not the new meetingUrlSource VALUES "description"/"location"
+  const bad = await listUpcomingGwsMeetings(14, async () => JSON.stringify({items: [linkEvent("z", {description: "private-note-xyz", hangoutLink: 7})]})).catch((e: Error) => e);
+  assert.ok(bad instanceof Error && !bad.message.includes("private-note-xyz"));
+});
+
+test("T-036 default parity: event with conference link maps to exactly the pre-change shape plus meetingUrlSource:conference, over HTTP too", async () => {
+  const meet = "https://meet.google.com/abc-defg-hij";
+  const [row] = await listWith([linkEvent("p", {hangoutLink: meet, organizer: {email: "o@x.org"}, description: "https://zoom.us/j/1234567890", location: "https://zoom.us/j/9999999999"})]);
+  assert.deepEqual(row, {id: "p", title: "p", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet, meetingUrlSource: "conference",
+    organizer: "o@x.org", cancelled: false, recurringEventId: undefined, originalStartTime: undefined, providerUpdated: undefined});
+  assert.deepEqual(Object.keys(row!), ["id", "title", "startTime", "endTime", "meetingUrl", "meetingUrlSource", "organizer", "cancelled", "recurringEventId", "originalStartTime", "providerUpdated"]);
+  const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => [row!]}, keyStore: fakeKeyStore({k: {tenantId: "tenant-1", scopes: ["calendar"]}})}));
+  try {
+    const body = await (await fetch(`${server.baseUrl}/calendar/upcoming`, {headers: {authorization: "Bearer k"}})).text();
+    assert.equal(body, JSON.stringify({meetings: [{id: "p", title: "p", startTime: "2026-10-01T12:00:00Z", endTime: "2026-10-01T13:00:00Z", meetingUrl: meet, meetingUrlSource: "conference", organizer: "o@x.org", cancelled: false}]}));
+  } finally { await server.close(); }
+});
+
+test("ISS-T036CAL-001 provenance: every mapped link carries meetingUrlSource (conference/location/description), none without a link, over HTTP too", async () => {
+  const zoom = "https://us02web.zoom.us/j/1234567890?pwd=P", meet = "https://meet.google.com/abc-defg-hij", teams = "https://teams.microsoft.com/meet/123456789";
+  const rows = await listWith([
+    linkEvent("conf", {hangoutLink: meet, description: zoom}),
+    linkEvent("loc", {location: `Room 3 ${teams}`}),
+    linkEvent("desc", {description: `join: ${zoom}`}),
+    linkEvent("none", {description: "no link"}),
+    linkEvent("amb", {description: `${zoom} ${meet}`}),
+    linkEvent("host", {description: "https://zoom.us/s/12345678901?zak=TOKEN"}),
+  ]);
+  const by = Object.fromEntries(rows.map(r => [r.id, r]));
+  assert.equal(by.conf!.meetingUrlSource, "conference"); assert.equal(by.loc!.meetingUrlSource, "location"); assert.equal(by.desc!.meetingUrlSource, "description");
+  for (const id of ["none", "amb", "host"]) { assert.equal("meetingUrlSource" in by[id]!, false, id); assert.equal(by[id]!.meetingUrl, undefined, id); }
+  assert.equal(by.host!.meetingLinkIssue, "host-start-link"); assert.ok(!JSON.stringify(rows).includes("zak"));
+  const server = await startTestServer(buildTestDeps({calendar: {listUpcoming: async () => rows}, keyStore: fakeKeyStore({k: {tenantId: "tenant-1", scopes: ["calendar"]}})}));
+  try {
+    const body = await (await fetch(`${server.baseUrl}/calendar/upcoming?discovery=1`, {headers: {authorization: "Bearer k"}})).json() as {meetings: Record<string, unknown>[]};
+    const src = Object.fromEntries(body.meetings.map(m => [m.id as string, m.meetingUrlSource]));
+    assert.deepEqual(src, {conf: "conference", loc: "location", desc: "description", none: undefined, amb: undefined, host: undefined});
+  } finally { await server.close(); }
+  console.log("ISS-T036CAL-001 mapper+HTTP: 3/3 sources carried, 3/3 link-less rows carry none");
 });

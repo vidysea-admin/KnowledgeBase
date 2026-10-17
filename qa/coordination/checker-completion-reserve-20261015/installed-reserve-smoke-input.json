@@ -1,0 +1,8 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [{"id": "installed-smoke-unused", "active_s": 0, "tokens": 0, "cost": null}],
+  "next_phase": {"kind": "review", "active_s": 151, "tokens": 5200, "cost": null},
+  "bootstrap_scope": "One CLI refusal smoke only, zero model review usage; enforce reserve inside180seconds6000tokens",
+  "completion_reserve": true,
+  "completion_reserve_id": "installed-smoke-cycle0-36b1650cf7d65d0c"
+}

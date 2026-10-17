@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "C:\\Program Files\\Git\\cmd\\git.EXE",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4.json",
+    "sha256": "d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4",
+    "count": 90
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 7,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 29580,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.5940000000009604,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-head-after.log",
+    "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+  },
+  "counts": {}
+}

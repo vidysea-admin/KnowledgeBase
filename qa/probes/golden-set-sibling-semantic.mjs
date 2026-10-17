@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 // qa/probes/golden-set-sibling-semantic.mjs — T-021 condition-4 semantic sibling pass.
 // The lexical probe (golden-set-ambiguity.mjs) explicitly failed the gate's own known-positive and
 // named the next step: a question-to-session EMBEDDING pass. The egress gate was answered A
@@ -57,7 +57,7 @@ if (isMain) {
   const questions = JSON.parse(readFileSync(SET_PATH, "utf8"));
   const { connect, close, getDb, scopedCollection } = await import("../../packages/db/src/index.ts");
   const { embed: routeEmbed } = await import("../../packages/ai/src/index.ts");
-  const { buildRouting } = await import("../../apps/api/src/production.ts");
+  const { buildRouting } = await import("../../apps/api/src/composition/production.ts");
 
   const DB = process.env.MONGO_WORK_DB || "lkb_codex_work_20260909";
   await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", DB);

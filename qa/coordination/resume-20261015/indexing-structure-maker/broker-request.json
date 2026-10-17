@@ -1,0 +1,66 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "schema": "indexing-structure-broker-request/1",
+  "readiness": "Source frozen only; independent checker packet validation/assess follows attributable broker receipts. No PASS.",
+  "unit": "indexing-structure",
+  "cycle": 0,
+  "candidateSha": null,
+  "owner": "/root/native_structure_plan",
+  "token_metric": "actual_total",
+  "sourcePins": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+  "actual_total_tokens": null,
+  "pathMapping": [
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "old": "apps/api/src/indexing/decisions-persist.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "old": "apps/api/src/indexing/decisions-persist.test.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "old": "apps/api/src/indexing/promote-entities.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "old": "apps/api/src/indexing/promote-entities.test.ts"
+    }
+  ],
+  "adoption": "qa/coordination/resume-20261015/indexing-structure-maker/phase-b-adoption.json",
+  "status": "REQUESTED_NOT_EXECUTED",
+  "requiredChecks": [
+    {
+      "argv": [
+        "tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "reason": "Relocation/import consumer compile",
+      "cwd": "apps/api"
+    },
+    {
+      "command": "Actual exported lint-dirsize.check using unchanged structure.config.json; include apps/api/src/indexing/persistence in scope",
+      "cwd": ".",
+      "reason": "Indexing30/persistence4 under30 policy"
+    },
+    {
+      "argv": [
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "src/indexing/persistence/decisions-persist.test.ts",
+        "src/indexing/persistence/promote-entities.test.ts",
+        "src/session-decisions/reader.test.ts",
+        "src/indexing/session.test.ts"
+      ],
+      "reason": "Moved decision/entity persistence and immediate session/reader tenancy/write consumers",
+      "cwd": "apps/api",
+      "requires": "Bounded broker grant and existing environment preflight"
+    }
+  ]
+}

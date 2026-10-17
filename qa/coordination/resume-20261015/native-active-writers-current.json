@@ -1,0 +1,35 @@
+{
+  "authority": "root latest exact writer reconciliation",
+  "supersedes": [
+    "native-source-leases.json",
+    "native-current-writers.json"
+  ],
+  "activeWriters": [
+    {
+      "owner": "resume_delivery_inventory",
+      "paths": [
+        "packages/meeting-bot/src/capture/record-commands.ts",
+        "packages/meeting-bot/src/capture/record-commands.test.ts",
+        "packages/meeting-bot/src/capture/record-finalize.ts",
+        "packages/meeting-bot/src/capture/record-finalize.test.ts",
+        "packages/meeting-bot/src/capture/lean-finalize-alert.test.ts",
+        "packages/meeting-bot/src/capture/finalize-original-eof.test.mjs",
+        "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+        "packages/meeting-bot/src/capture/native-capture-runtime.test.ts",
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/tab-browser.test.ts",
+        "packages/meeting-bot/py/sb_join_tiles.py",
+        "packages/meeting-bot/py/test_sb_join_tiles.py"
+      ]
+    }
+  ],
+  "frozenOwners": [
+    "native_codecledger_maker",
+    "native_browserproducer_maker",
+    "native_finalizer_maker",
+    "native_privacy_audio_maker",
+    "native_measurement_maker",
+    "deadline_repair_readiness",
+    "quality_delivery_coordinator"
+  ]
+}

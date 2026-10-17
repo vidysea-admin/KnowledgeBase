@@ -1,0 +1,72 @@
+{
+  "startedAt": "2026-10-14T22:33:03.075Z",
+  "completedAt": "2026-10-14T22:33:10.320Z",
+  "elapsedMs": 7243.5195,
+  "slug": "t044-trusted-private-windows",
+  "fixCycle": 0,
+  "integrationVersion": 1,
+  "tests": 13,
+  "passed": 13,
+  "failed": 0,
+  "syntheticMediaOnly": true,
+  "actualConstructorStoreHelperValidatorConsumer": true,
+  "realNetworkProviderCalls": 0,
+  "realCodecCalls": 0,
+  "realDbCalls": 0,
+  "scope": "Trusted privacy source/caller/consumer integration; injected duration and synthetic bytes.",
+  "fullParentVerdict": "HOLD: actual audio/provider spot checks and live watcher/finalizer/privacy proofs remain required",
+  "outcomes": [
+    {
+      "name": "trusted capture public output traverses actual validator and consumer with public QA flag off",
+      "outcome": "PASS"
+    },
+    {
+      "name": "no sealed context, foreign generation and raw reselection make zero callback dispatches",
+      "outcome": "PASS"
+    },
+    {
+      "name": "caller supplied private windows cannot waive deficits even with acceptPartial",
+      "outcome": "PASS"
+    },
+    {
+      "name": "unprotected public time is aggregated across many protected windows",
+      "outcome": "PASS"
+    },
+    {
+      "name": "mixed protected and missing public deficit refuses actual validation",
+      "outcome": "PASS"
+    },
+    {
+      "name": "protected canonical speech cannot be promoted",
+      "outcome": "PASS"
+    },
+    {
+      "name": "accepted raw past-end provider anomaly survives public filtering and refuses",
+      "outcome": "PASS"
+    },
+    {
+      "name": "discarded raw anomaly stays auditable without rejecting a later clean accepted attempt",
+      "outcome": "PASS"
+    },
+    {
+      "name": "privacy exclusion ledger cannot hide a provider-dropped index",
+      "outcome": "PASS"
+    },
+    {
+      "name": "missing bound raw QA fails trusted capture even with public flag off",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same speech plus changed source cannot reuse accepted generation",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same source and speech plus changed durable receipt cannot reuse acceptance",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same source, receipt and speech plus changed public media cannot reuse acceptance",
+      "outcome": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "checker": "/root/roadmap_status/checker_t015",
+  "cycle": 1,
+  "verdict": "PASS",
+  "scope": "source/guard interfaces",
+  "launchUtc": "2026-10-14T21:14:15Z",
+  "persistedAt": "2026-10-14T21:17:19.3240098Z",
+  "launchToPersistSeconds": 184.3240098,
+  "verdictSHA256": "da9ccaac50c8b8d7e7a48aa7449e431c82f50b94374be90302e55818d1971a7f",
+  "unknownIntervals": "Prereview start/end, request/grant response, active/wait phase durations",
+  "fullTask": "HOLD"
+}

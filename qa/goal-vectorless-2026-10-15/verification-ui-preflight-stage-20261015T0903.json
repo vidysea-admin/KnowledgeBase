@@ -1,0 +1,73 @@
+{
+  "phase": "shared-integration-preflight",
+  "scope": "One stage-instrumented UI preflight after prior20s timeout; identify exact slow module without reinstall or environment change",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "728621d98ca00965edee2fbb6883cdfb8c29f1afcf23ec89f3caa1a9059229d8",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "../../qa/goal-vectorless-2026-10-15/ui-preflight-v2.mjs"
+  ],
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "runtime_version": "v24.19.0",
+  "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "runtime_identity": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review approved; Windows host; temporary probe only"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "environment_hash": "45d6e44ed6caba84c6ae1b149a644e661a567026bbac5c815b85328393c43ff7",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "LKB_RETRIEVAL_MODE": null
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "runtime/module-import/temp-writability"
+  ],
+  "timeoutMs": 45000,
+  "startedAt": "2026-10-15T08:21:11.995Z",
+  "completedAt": "2026-10-15T08:21:16.203Z",
+  "elapsedMs": 4205.2804,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/goal-vectorless-2026-10-15/ui-preflight.mjs": "c7b343997287d9db2f2deecc590ce7e1c9c12e0614a87c53a502c62c70fb788d",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/node_modules/vitest/package.json": "f05ffa7018dadfad8ab2ca184b0b33fc4cb4be97b7bd93cddaef29d4d955df3c",
+    "apps/web/node_modules/vite/package.json": "59da0b2ed89adbcf6488810159915984f25338d5ce3c1b8534b3c493b8dcbd99",
+    "apps/web/node_modules/jsdom/package.json": "a6c20d5b30fe842827dcad2866ba234d5c98e9f901d84ea35939f14167e2ea27",
+    "apps/web/node_modules/react/package.json": "d4e68a5c96babb20cad1daafea8b78822eae45b341552cf5418d06a5304fa64c",
+    "apps/web/node_modules/@testing-library/react/package.json": "ea0085c08e11190e85ad706d64c145645c1aba18c63b1e920cfaf415d9bab31d",
+    "qa/goal-vectorless-2026-10-15/ui-preflight-v2.mjs": "51ee75f72c1ff88be26ccfe692471cac38a7bcf3ce742a9c668aeae7b8f965f5"
+  },
+  "after": {
+    "qa/goal-vectorless-2026-10-15/ui-preflight.mjs": "c7b343997287d9db2f2deecc590ce7e1c9c12e0614a87c53a502c62c70fb788d",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/node_modules/vitest/package.json": "f05ffa7018dadfad8ab2ca184b0b33fc4cb4be97b7bd93cddaef29d4d955df3c",
+    "apps/web/node_modules/vite/package.json": "59da0b2ed89adbcf6488810159915984f25338d5ce3c1b8534b3c493b8dcbd99",
+    "apps/web/node_modules/jsdom/package.json": "a6c20d5b30fe842827dcad2866ba234d5c98e9f901d84ea35939f14167e2ea27",
+    "apps/web/node_modules/react/package.json": "d4e68a5c96babb20cad1daafea8b78822eae45b341552cf5418d06a5304fa64c",
+    "apps/web/node_modules/@testing-library/react/package.json": "ea0085c08e11190e85ad706d64c145645c1aba18c63b1e920cfaf415d9bab31d",
+    "qa/goal-vectorless-2026-10-15/ui-preflight-v2.mjs": "51ee75f72c1ff88be26ccfe692471cac38a7bcf3ce742a9c668aeae7b8f965f5"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-ui-preflight-stage-20261015T0903.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-ui-preflight-stage-20261015T0903.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; temporary probe only"
+}

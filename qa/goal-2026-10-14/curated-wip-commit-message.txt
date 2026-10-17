@@ -1,0 +1,7 @@
+wip: integrate forty-task source foundation and Docker validation
+
+Integrate the current API, web, source-worker, provenance, privacy and governance changes on the existing branch.
+
+Current local API/web typechecks and API/source-worker/web builds passed with 1,940 unchanged inputs. Preserve explicit default-off private fixture gates, actual failure history and pending maker/checker verdicts.
+
+Full forty-task acceptance, native/live-host validation, human review and deployment remain pending. No production deployment or migration is performed by this commit.

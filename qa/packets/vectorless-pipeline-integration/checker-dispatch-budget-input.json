@@ -1,0 +1,31 @@
+{
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "active_s": 0,
+      "tokens": 0,
+      "id": "pipeline-cycle1-dispatch"
+    }
+  ],
+  "next_phase": {
+    "cost": null,
+    "kind": "review",
+    "tokens": 5200,
+    "active_s": 150
+  },
+  "bootstrap_scope": "vectorless-pipeline-integration cycle1 exact three-file candidate; source identity, clauses, permitted successful receipt reuse and one independent contract-derived probe; real parent acceptance remains open",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "vectorless-pipeline-integration/c1/5348cca44bf3004dc335748ea7f6403ad3b4f20f456cb31182c8acdad47c9f7d",
+  "escalation": null,
+  "unknown_prior_checker_overhead": null,
+  "prior_review_note": "No checker dispatched for this unit; maker readiness work is not reviewer measurement. Token/monotonic maker actuals unavailable."
+}

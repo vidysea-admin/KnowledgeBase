@@ -1,0 +1,11 @@
+{
+  "capturedUtc": "2026-10-15T00:22:04.3174589+00:00",
+  "cycle": 1,
+  "verdict": "qa/verdicts/t054-review-completion.md",
+  "verdictSha256": "FADE23F08EDC87624A43E920A39677DE71BC423560263A5D7456B0C878BD1188",
+  "checkedPins": 69,
+  "sourceDriftAfterPersistence": [],
+  "status": "scoped-verdict-persisted-and-final-bytes-confirmed",
+  "fullParent": "HOLD",
+  "activeHandles": []
+}

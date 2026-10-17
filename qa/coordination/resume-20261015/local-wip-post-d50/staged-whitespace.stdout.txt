@@ -1,0 +1,64 @@
+packages/db/src/collections/speaker-suggestions/index.ts:174: new blank line at EOF.
+packages/db/src/collections/speaker-suggestions/testdb.ts:68: new blank line at EOF.
+packages/db/src/lib/native-publication.ts:149: new blank line at EOF.
+qa/coordination/resume-20261015/broker/genuine-seal-isolated-original-positive.log:17: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/genuine-seal-isolated-original-positive.log:20: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log:2: trailing whitespace.
++  error no-circular: apps/api/src/composition/integrations/source-jobs.ts → 
+qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log:5: trailing whitespace.
++  error no-circular: apps/api/src/composition/integrations/routes.ts → 
+qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log:10: trailing whitespace.
++  error no-circular: apps/api/src/composition/integrations/hosting.ts → 
+qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log:18: new blank line at EOF.
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:286: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:294: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:309: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:311: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:326: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:328: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:385: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:387: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:403: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:405: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:422: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:450: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:467: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:474: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:491: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:497: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:513: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:515: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:531: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:533: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:549: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log:551: trailing whitespace.
++  
+qa/coordination/resume-20261015/broker/native-next-stage2-dependency-cycles.log:3: new blank line at EOF.
+qa/coordination/resume-20261015/broker/native-next-stage3-dependency-cycles.log:3: new blank line at EOF.
+qa/coordination/resume-20261015/broker/watched-current-helper-full-graph.log:3: new blank line at EOF.
+qa/coordination/resume-20261015/broker/watched-server-repair2-full-graph.log:3: new blank line at EOF.
+qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.testdb.ts:68: new blank line at EOF.
+qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.ts:174: new blank line at EOF.

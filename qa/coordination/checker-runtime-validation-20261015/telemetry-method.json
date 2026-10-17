@@ -1,0 +1,36 @@
+{
+  "schema": "telemetry-method/1",
+  "agent_path": "/root/checker_runtime_validation",
+  "observed_at": "2026-10-15T19:33:33.632Z",
+  "bounded_files": 30,
+  "matches": [
+    {
+      "path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-31-11-01a1410c-0e95-7c01-87d4-23359ffd1f47.jsonl",
+      "identity": {
+        "thread_id": "01a1410c-0e95-7c01-87d4-23359ffd1f47",
+        "parent_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+        "agent_path": "/root/checker_runtime_validation"
+      },
+      "usage_timestamp": "2026-10-15T19:33:10.472Z",
+      "lifecycle": {
+        "type": "task_complete",
+        "timestamp": "2026-10-15T19:33:10.521Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 515616,
+        "cached_input_tokens": 488832,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4194,
+        "reasoning_output_tokens": 316,
+        "total_tokens": 519810
+      },
+      "status": "known",
+      "reasons": []
+    }
+  ],
+  "actual_active_seconds": null,
+  "minimum_observed_fresh_startup_input_tokens": null,
+  "startup_reason": "Cumulative terminal usage does not establish first-request input; startup unknown pending allowlisted first token_count metadata extraction.",
+  "native_hard_total_token_cap_established": false,
+  "accounting": "input_tokens includes cached input; output_tokens includes reasoning output; do not add subsets. Support overhead separate."
+}

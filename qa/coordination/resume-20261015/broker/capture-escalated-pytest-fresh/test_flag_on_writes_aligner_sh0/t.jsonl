@@ -1,0 +1,7 @@
+{"kind": "meta", "startedAtEpoch": 1000.0, "source": "meet-dom", "samplerClock": {"version": 1, "captureGeneration": "11111111-1111-4111-8111-111111111111", "hostId": "5b283c111f5215eeaeeaabef756e325fdab5b32f2502d591806559166765d0b6", "samplerInstance": "d029bc5d-e045-447f-9b11-da59139ed878", "epochBeforeSec": 1000.0, "epochAfterSec": 1000.0, "monotonicSec": 100.0}}
+{"tSec": 0.0, "displayName": "Priya Nair", "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1000.0, "epochAfterSec": 1000.0, "monotonicSec": 100.0}}
+{"tSec": 4.0, "displayName": "Priya Nair", "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1004.0, "epochAfterSec": 1004.0, "monotonicSec": 104.0}}
+{"tSec": 8.0, "displayName": "Priya Nair", "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1008.0, "epochAfterSec": 1008.0, "monotonicSec": 108.0}}
+{"tSec": 10.0, "displayName": null, "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1010.0, "epochAfterSec": 1010.0, "monotonicSec": 110.0}}
+{"tSec": 14.0, "displayName": null, "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1014.0, "epochAfterSec": 1014.0, "monotonicSec": 114.0}}
+{"tSec": 18.0, "displayName": null, "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1018.0, "epochAfterSec": 1018.0, "monotonicSec": 118.0}}

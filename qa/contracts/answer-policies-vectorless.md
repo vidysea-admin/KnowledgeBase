@@ -1,0 +1,8 @@
+# Scoped stored-answer release guard — checker adoption
+
+Adopted by independent checker, 2026-10-15, unit answer-policies-vectorless cycle 0. Authority: D-173 as corrected by D-174; derived-revision invalidation and retained tenant/source governance. This applies only to the workflow release guard, not whole T-056 durable policy acceptance. It supplements the transient simulator contract without changing it or frozen contracts.
+
+1. Stored get/history content releases only when candidate/evidence digests match, the trusted evidence verifier accepts, and the tenant-bound current saved policy still matches the stored selection/version. A default-policy run becomes stale when a saved effective policy appears. Revision, retirement and contradiction withhold answer and source content.
+2. Pending review content follows the same checks, including ancestor conflict lineage. Stale or unavailable dependencies yield sanitized candidates and empty evidence; approval fails before store CAS and cannot change review state.
+3. Existing verified-tenant HTTP scope boundaries, source separation and actual Ask execution remain in force. No client-selected tenant or replacement retrieval path is introduced.
+4. Required evidence: focused sample regression nodes for policy revision/default/digest, immediate authenticated HTTP consumer, independent verifier/policy failure probe, and existing conflict-lineage checks. Frozen-validator vacuity must be disclosed. Durable adapter transactions, full integration/release checks, live providers, UI and human calibration remain separate parent gates; this scoped contract supplies no certification for them.

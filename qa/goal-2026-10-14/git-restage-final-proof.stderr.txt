@@ -1,0 +1,8 @@
+warning: in the working copy of 'apps/web/src/pages/knowledge/GoalT055ProducerArtifact.test.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/evidence/goal-t055/ordinary-public-affected-20261014T235012Z.stderr.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/evidence/goal-t055/ordinary-public-affected-20261014T235012Z.stdout.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/goal-2026-10-14/api-build-ordinary-20261014T235052Z.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/goal-2026-10-14/api-types-ordinary-20261014T235052Z.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/goal-2026-10-14/web-build-ordinary-20261014T235052Z.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/goal-2026-10-14/web-types-ordinary-20261014T235052Z.json', LF will be replaced by CRLF the next time Git touches it

@@ -556,3 +556,6 @@ TICK 2026-09-28T19:26:43+05:30 ADVANCED wave=3 concurrent-peak=3 serial=[]
   dispatched: watch-detector-robustness (tier 2, ISS-U4BHB-001 security-class + ISS-368 high)
   all three file-independent: packages/core/src/alerts | scripts/watch | apps/api/src/routes/health.ts+packages/db
   open gate unchanged: qa/gates/ai-os-enforcement-hooks-uncommitted.md (aios-hooks: a|b|c|d) -- 3 verified fixes parked behind it
+2026-10-05T17:13:58+05:30 "CONTINUE tier2 ISS-373/T-052 riskL policy proportional-verification/2026-10-05.1 check0; worker lifecycle72tests reported; mandatory browser cleanup/proof/checker outstanding; no live activation"
+2026-10-05T20:09:41+05:30 --help
+2026-10-05T21:15:21+05:30 ADVANCED D104-D109: goal active; system GWS authenticated; local work API/Mongo and Calendar/source/search/citation proof; T052 48Python/47TS maker green; deps8to0; U2.2 BUILDING; no release PASS

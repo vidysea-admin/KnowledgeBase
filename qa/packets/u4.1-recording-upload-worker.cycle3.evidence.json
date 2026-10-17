@@ -1,0 +1,141 @@
+{
+  "decision": "D-119",
+  "results": [
+    {
+      "label": "stt",
+      "command": [
+        "C:/Users/product/AppData/Local/OpenAI/Codex/runtimes/cua_node/3dd31cfff853001c/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--import",
+        "tsx",
+        "packages/ai/src/stt/gemini-file-upload.test.ts"
+      ],
+      "startUtc": "2026-10-09T13:34:35.920886+00:00",
+      "endUtc": "2026-10-09T13:34:36.427711+00:00",
+      "wallSeconds": 0.5072516000363976,
+      "exitCode": 0,
+      "stdout": "\u2714 measured final fallback replays both exact 172-byte captures without changing text, labels or default request (3.7676ms)\n\u2714 duration fallback changes only final inferred EOF and leaves unknown or invalid starts visible (0.4439ms)\n\u2714 invalid supplied STT measurements refuse before the provider transport runs (1.4843ms)\n\u2714 uploadFile posts a resumable-upload start, then PUTs bytes to the returned upload URL (0.746ms)\n\u2714 uploadFile throws when the start response carries no upload URL header (0.3194ms)\n\u2714 uploadFile throws on a non-2xx status at either step (0.3894ms)\n\u2714 pollFileState maps the response state field to ACTIVE/PROCESSING/FAILED (0.6281ms)\n\u2714 pollFileState throws on an unexpected state value (0.3772ms)\n\u2714 parseDiarizedTranscript parses [MM:SS] Speaker: text lines, computes tEnd from the next turn (0.463ms)\n\u2714 parseDiarizedTranscript drops preamble before the first marker; text between two markers belongs to the first speaker (0.3923ms)\n\u2714 parseDiarizedTranscript real bug repro: many turns arriving with NO newline between markers are still split correctly (0.4322ms)\n\u2714 parseDiarizedTranscript real bug repro: an implausibly long speaker capture is recovered as text, not kept as a fake speakerRef (0.5019ms)\n\u2714 parseDiarizedTranscript real bug repro (u1-toc-sept-catchup, 2026-09-25): a speaker capture of EXACTLY MAX_PLAUSIBLE_SPEAKER_LABEL_LENGTH (60) chars is still recovered as text, not kept as a fake speakerRef (0.322ms)\n\u2714 parseDiarizedTranscript: a normal short speaker label right after the first marker is unaffected by the length guard (0.2369ms)\n\u2714 parseDiarizedTranscript parses [H:MM:SS] timestamps (real bug: Gemini switches format past 60 minutes) (0.2662ms)\n\u2714 parseDiarizedTranscript handles a mix of [MM:SS] and [H:MM:SS] in the same transcript (0.2213ms)\n\u2714 parseDiarizedTranscript on empty text returns an empty array (0.1691ms)\n\u2714 transcribeUploadedAudio calls generateContent with fileData and parses the response (0.3412ms)\n\u2714 transcribeUploadedAudio disables the model's extended-thinking budget in the request (0.2255ms)\n\u2714 transcribeUploadedAudio throws on a non-2xx status (0.3125ms)\n\u2714 transcribeUploadedAudio throws (never silently returns 0 turns) on an empty/blocked completion (1.4374ms)\n\u2714 transcribeUploadedAudio throws on a totally empty candidates array too (0.2433ms)\n\u2139 tests 22\n\u2139 suites 0\n\u2139 pass 22\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 400.3199\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "label": "cli-duration-and-provenance",
+      "command": [
+        "C:/Users/product/AppData/Local/OpenAI/Codex/runtimes/cua_node/3dd31cfff853001c/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-name-pattern=duration-bound|both actual transcription CLIs",
+        "scripts/lib/transcript-provenance.test.mjs"
+      ],
+      "startUtc": "2026-10-09T13:34:36.428674+00:00",
+      "endUtc": "2026-10-09T13:34:40.760298+00:00",
+      "wallSeconds": 4.331464200047776,
+      "exitCode": 0,
+      "stdout": "\u2714 duration-bound actual long-session CLI probes original and extracted media and preserves provenance (876.2579ms)\n\u2714 duration-bound CLI refuses invalid original or span probes and late starts without transcript writes (2766.5467ms)\n\u2714 both actual transcription CLIs invalidate prior derivations and preserve original bytes on stubbed provider path (446.9015ms)\n\u2139 tests 3\n\u2139 suites 0\n\u2139 pass 3\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 4227.7912\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "label": "upload-caller-and-consumer",
+      "command": [
+        "C:/Users/product/AppData/Local/OpenAI/Codex/runtimes/cua_node/3dd31cfff853001c/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "scripts/upload/queue.test.mjs"
+      ],
+      "startUtc": "2026-10-09T13:34:40.760298+00:00",
+      "endUtc": "2026-10-09T13:34:46.194411+00:00",
+      "wallSeconds": 5.433963300078176,
+      "exitCode": 0,
+      "stdout": "\u2714 actual recording submission passes measured duration through production STT and downstream publication (2715.0682ms)\n\u2714 provider operation boundary removes key and rejects SSRF and credential headers (2.0582ms)\n\u2714 shared jobs schema rejects missing tenant, unknown status, invalid date and nonfinite number (2.4326ms)\n\u2714 input pinning refuses traversal, hard links, escaping link and parent link (30.0449ms)\n\u2714 existing consumer validates schema-valid publication; invalid bounds preserve prior bytes (491.5982ms)\n\u2714 actual Python background worker consumes real Mongo operation; missing key fails without outbound call (1245.7199ms)\n\u2714 producer cancellation and timeout are durable; foreign tenant result cannot be read (323.4405ms)\n\u2139 tests 7\n\u2139 suites 0\n\u2139 pass 7\n\u2139 fail 0\n\u2139 cancelled 0\n\u2139 skipped 0\n\u2139 todo 0\n\u2139 duration_ms 5328.8693\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "label": "frozen-contracts",
+      "command": [
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+        "-B",
+        "contracts/verify_contracts.py"
+      ],
+      "startUtc": "2026-10-09T13:34:46.194411+00:00",
+      "endUtc": "2026-10-09T13:34:46.333578+00:00",
+      "wallSeconds": 0.13906050007790327,
+      "exitCode": 0,
+      "stdout": "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "label": "actual-audio-duration",
+      "command": [
+        ".cache/tools/ffmpeg-9.0.2/bin/ffprobe.exe",
+        "-v",
+        "error",
+        "-show_entries",
+        "format=duration",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
+        ".cache/webinar/downstream-test-744a8c79-c671-4915-bc1c-804a2b079b99/production-audio.m4a"
+      ],
+      "startUtc": "2026-10-09T13:34:46.333938+00:00",
+      "endUtc": "2026-10-09T13:34:46.383412+00:00",
+      "wallSeconds": 0.05020249995868653,
+      "exitCode": 0,
+      "stdout": "12.650958\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "label": "actual-av-duration",
+      "command": [
+        ".cache/tools/ffmpeg-9.0.2/bin/ffprobe.exe",
+        "-v",
+        "error",
+        "-show_entries",
+        "format=duration",
+        "-of",
+        "default=noprint_wrappers=1:nokey=1",
+        ".cache/webinar/downstream-test-744a8c79-c671-4915-bc1c-804a2b079b99/controlled-av.mp4"
+      ],
+      "startUtc": "2026-10-09T13:34:46.383412+00:00",
+      "endUtc": "2026-10-09T13:34:46.438322+00:00",
+      "wallSeconds": 0.05414040002506226,
+      "exitCode": 0,
+      "stdout": "15.000000\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "label": "proof-syntax",
+      "command": [
+        "C:/Users/product/AppData/Local/OpenAI/Codex/runtimes/cua_node/3dd31cfff853001c/bin/node.exe",
+        "--check",
+        "scripts/upload/real-proof.mjs"
+      ],
+      "startUtc": "2026-10-09T13:34:46.438322+00:00",
+      "endUtc": "2026-10-09T13:34:46.525577+00:00",
+      "wallSeconds": 0.08742430002894253,
+      "exitCode": 0,
+      "stdout": "",
+      "stderr": "",
+      "timeoutSeconds": 45
+    },
+    {
+      "command": [
+        "C:/Users/product/AppData/Local/OpenAI/Codex/runtimes/cua_node/3dd31cfff853001c/bin/node.exe",
+        "--import",
+        "tsx",
+        ".cache/coordination/u4.1-duration-replay.mjs"
+      ],
+      "startUtc": "2026-10-09T13:36:26.417783+00:00",
+      "endUtc": "2026-10-09T13:36:28.123626+00:00",
+      "wallSeconds": 1.706301199970767,
+      "exitCode": 0,
+      "stdout": "{\"decision\":\"D-119\",\"mode\":\"captured provider response replay; no new provider call\",\"rows\":[{\"filename\":\"production-audio.m4a\",\"duration\":12.650958,\"interval\":[0,12.650958],\"speaker\":\"spk:0\",\"captureHash\":\"3aba227dfbe45c60a5ff67f09ee43574da4233f2a6c266c11fb54b064b78fb82\",\"captureBytes\":172,\"fixtureProviderCalls\":1,\"path\":\"C:\\\\Users\\\\product\\\\Desktop\\\\KnowledgeBase\\\\.cache\\\\coordination\\\\u4.1-duration-replay-6ff7a6cf-6916-4a5a-bed1-db8cd2af7634\\\\bf1bf42cdf8d7ee54a6b2770e6f75f360344800cf3bdfdd2f7bf04c75ff3a6c6\\\\actual-audio\\\\turns.json\",\"downstreamConsumed\":true},{\"filename\":\"controlled-av.mp4\",\"duration\":15,\"interval\":[0,15],\"speaker\":\"spk:0\",\"captureHash\":\"3aba227dfbe45c60a5ff67f09ee43574da4233f2a6c266c11fb54b064b78fb82\",\"captureBytes\":172,\"fixtureProviderCalls\":1,\"path\":\"C:\\\\Users\\\\product\\\\Desktop\\\\KnowledgeBase\\\\.cache\\\\coordination\\\\u4.1-duration-replay-6ff7a6cf-6916-4a5a-bed1-db8cd2af7634\\\\bf1bf42cdf8d7ee54a6b2770e6f75f360344800cf3bdfdd2f7bf04c75ff3a6c6\\\\actual-av\\\\turns.json\",\"downstreamConsumed\":true}]}\n",
+      "stderr": "",
+      "timeoutSeconds": 45
+    }
+  ]
+}

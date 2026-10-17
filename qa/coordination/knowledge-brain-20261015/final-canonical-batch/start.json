@@ -1,0 +1,28 @@
+{
+  "tokensActual": null,
+  "startUtc": "2026-10-15T10:36:44.7794180Z",
+  "startMonotonic": 246946750902,
+  "files": [
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\final-canonical-batch\\schema__index.json.bytes",
+      "sha256": "A24A176D74C06891AA18547CBA4B3FA0E09F7662F7383E8A989F20FE4D061391",
+      "path": "schema/index.json"
+    },
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\final-canonical-batch\\schema__tree_index.schema.json.bytes",
+      "sha256": "D2845FBA39077D15CA6DF2A8F52CFF4C3BD55DDFA5BDD94D32E628CC81823CE9",
+      "path": "schema/tree_index.schema.json"
+    },
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\final-canonical-batch\\packages__core__src__index.ts.bytes",
+      "sha256": "559AB33648FD5C145EA6E8F179C67210F893A78F557F4F679673BF6806B0EA07",
+      "path": "packages/core/src/index.ts"
+    },
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\final-canonical-batch\\packages__db__src__index.ts.bytes",
+      "sha256": "7745B14F3323F6B587312BFCA2E76B107C31C47D4B05F5B6F42FD52CEEBE767B",
+      "path": "packages/db/src/index.ts"
+    }
+  ],
+  "frequency": 10000000
+}

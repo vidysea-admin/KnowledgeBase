@@ -1,0 +1,136 @@
+{
+  "unit": "isolated-replica-prep",
+  "cycle": 0,
+  "candidate_content_manifest_sha256": "1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "status": "QUEUED_SOLE_BROKER",
+  "pins": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.gitignore",
+      "sha256": "1889112d1c0fb95d57faf75e3e3cf19756b8c5f6b024d747aa2a0af27d985e1e"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\PLAN.md",
+      "sha256": "6e7847ad137fab3b41c95963fe242bb2c4b96f22565fb691130022d13154530f"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\activate-proposal.py",
+      "sha256": "a6d82c6b373fc96ffc3c673a0428ffb4807230c67da2b3825b67a380f69f36a8"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\init-and-smoke.py",
+      "sha256": "dc1eccabd6c6adce88771eff738f1b34e4fa73beec9c1fdafe6fa8bd720b1c73"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\shutdown-owned.py",
+      "sha256": "30303c95fab193f4d8c4c33ee239b345e206f4d2599fbba6e9714d27351eb3bf"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\mongod.yml.template",
+      "sha256": "7d7eb8a7342eca0fefe8e1df1e3a6698e968e1e661a20bf35069b23a5e5b3d4c"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\download-verified.ps1",
+      "sha256": "542d3fc1cfbc2e2f59f6f5c87519ba18850df445280d81e0c6038f88ed0b345a"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\extract-passive.ps1",
+      "sha256": "18d99626326b7352fecbcd080147d74fef38bcb34a708054c1657efa919363b1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\inspect-pe.py",
+      "sha256": "28e3e7709b340e5b55b29d8086a5f9b8fc136e2975a8cfeffbb847e6e8d0e681"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\static_probe.py",
+      "sha256": "6a81c80b21faa371119768cd63e3d40ac063d3954bef11912f7690e346fc82d5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\parse-powershell.ps1",
+      "sha256": "1c5786cd90b6e67fd85887eb3e0c0c1e8d79624ccb1c50bd1a689a32ca0e7551"
+    },
+    {
+      "sha256": "1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\source-manifest.json"
+    },
+    {
+      "sha256": "6a81c80b21faa371119768cd63e3d40ac063d3954bef11912f7690e346fc82d5",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\static_probe.py"
+    },
+    {
+      "sha256": "1c5786cd90b6e67fd85887eb3e0c0c1e8d79624ccb1c50bd1a689a32ca0e7551",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\parse-powershell.ps1"
+    },
+    {
+      "sha256": "8394df5b4da36384090b6e536d60696703a905751770a3e7e3d5092a8dd1a3b1",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\managed-review-request.json"
+    },
+    {
+      "sha256": "93f2b813886b91976e69bd57e603ae0d7d0c086f4317d1769e8bb7b6b84ef695",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\review-metrics.json"
+    },
+    {
+      "sha256": "44783d89398fdbb933e5620d0dabfa893ef048880b5027f7d9a2ace2ebc5219a",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\environment.json"
+    },
+    {
+      "sha256": "449b295b7332f147f1e476c1e25837b84cf264b1fb25bafd5d49342789f74135",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\.gitignore.before.bin"
+    },
+    {
+      "sha256": "e08a33e4a1e09571d0e750f7bba70e3e4c3e504c2ba9c7637295cfdc7111933d",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\.gitignore.proposed"
+    }
+  ],
+  "requiredRuntimeSha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+  "phases": [
+    {
+      "expected_exit": 0,
+      "argv": [
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\static_probe.py"
+      ],
+      "label": "passive-source-ignore",
+      "timeout_s": 15
+    },
+    {
+      "expected_exit": 0,
+      "argv": [
+        "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\parse-powershell.ps1"
+      ],
+      "label": "passive-powershell-parse",
+      "timeout_s": 15
+    },
+    {
+      "expected_exit": 0,
+      "argv": [
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+        "assess",
+        "--input",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\review-metrics.json"
+      ],
+      "label": "review-budget-assess",
+      "timeout_s": 10
+    },
+    {
+      "expected_exit": 1,
+      "argv": [
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+        "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+        "validate",
+        "--input",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\managed-review-request.json"
+      ],
+      "expected_named_hold": "maker packet incomplete: repair before dispatch",
+      "label": "review-contract-validation-hold",
+      "timeout_s": 10
+    }
+  ],
+  "safety": "Exact passive AST/parser/ignore/metadata only. Do not import launcher/init/shutdown, execute vendor, run --version, create secrets, mutate ACL, bind/connect27029, contact DB/provider/network, activate host, or broaden suites. Expected validation HOLD must not be relabelled READY. No native reviewer dispatch. Record own full outputs/exit/timeout/Job closure and raw pins before/after.",
+  "evidenceOutputDirectory": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\broker-evidence"
+}

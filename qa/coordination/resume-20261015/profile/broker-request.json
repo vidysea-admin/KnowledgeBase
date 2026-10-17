@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "status": "QUEUED_ROOT_SOLE_BROKER",
+  "unit": "resume-speaker-profile",
+  "cycle": 0,
+  "tier": 3,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "policy_version": "managed-review/1",
+  "authority": "User resumes goal; root assigned source freeze and sole-broker execution. Native runtime 10% cap remains unresolved; no reviewer dispatch authorized by this request.",
+  "source_frozen": true,
+  "product_changes_this_phase": [],
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "source_pins": [
+    {
+      "path": "apps/api/src/speaker-profiles/store.ts",
+      "sha256": "21ABD05E64A137F4BD444270CD03DE1FC897988A74E446E40AD8616CCD8A7FCA",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__store.ts",
+      "backup_sha256": "21ABD05E64A137F4BD444270CD03DE1FC897988A74E446E40AD8616CCD8A7FCA"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.ts",
+      "sha256": "CB58852A388F065A7B8DB1D7BD502587A73F737F0421AC1759C78E7C9E4EEE6B",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__router.ts",
+      "backup_sha256": "CB58852A388F065A7B8DB1D7BD502587A73F737F0421AC1759C78E7C9E4EEE6B"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "sha256": "75421C9896E4056B826FDEFBF38C29DAD9FBE57C119666284ABA5A27DDBE38EF",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__store.test.ts",
+      "backup_sha256": "75421C9896E4056B826FDEFBF38C29DAD9FBE57C119666284ABA5A27DDBE38EF"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.test.ts",
+      "sha256": "0CB275C6769C36FA127D9D52C6FCCDA714B2AD4C941A86A2AD3CE61EAAC3530D",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__api__src__speaker-profiles__router.test.ts",
+      "backup_sha256": "0CB275C6769C36FA127D9D52C6FCCDA714B2AD4C941A86A2AD3CE61EAAC3530D"
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+      "sha256": "C2F285E16E35C91F9C198558C1D1E1641D820DB229B266C979BB28835006439A",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__web__src__pages__knowledge__speakers__speakerProfileClient.ts",
+      "backup_sha256": "C2F285E16E35C91F9C198558C1D1E1641D820DB229B266C979BB28835006439A"
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "sha256": "0592805B111B1DC29DA2C333B451875A4CF05BE8C454A9A93776EEA011E5CE3E",
+      "backup": "qa\\coordination\\resume-20261015\\profile\\raw-backup\\apps__web__src__pages__knowledge__speakers__speakerProfileClient.test.ts",
+      "backup_sha256": "0592805B111B1DC29DA2C333B451875A4CF05BE8C454A9A93776EEA011E5CE3E"
+    }
+  ],
+  "graph_dependency": {
+    "path": "packages/index/src/graph/speaker-knowledge.ts",
+    "sha256": "0A275D04C2807FBFE707FF0D9DAE430C5A4E3566E9AAFD94D79A8E6415AEA33D",
+    "state": "root-declared frozen source; graph owner may add security tests only"
+  },
+  "receipt_reuse": {
+    "selected": false,
+    "reason": "No authenticated receipt matching current exact source/dependency/runtime fingerprints available to this maker."
+  },
+  "commands": [
+    {
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "command": "node --import tsx --test apps/api/src/speaker-profiles/store.test.ts apps/api/src/speaker-profiles/router.test.ts",
+      "timeout_s": 120,
+      "coverage": "Mounted API scope/tenant/DTO and safe failures; source snapshot, transcript freshness, consent revocation; accepted relationship and attribute authority/revocation; immediate graph consumer."
+    },
+    {
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+      "command": "node ../../node_modules/vitest/vitest.mjs run src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "timeout_s": 120,
+      "coverage": "Focused downstream client identity/revision/evidence and passage bounds."
+    }
+  ],
+  "environment_constraints": [
+    "Leave KB_U24_PRIVATE_TOC_TESTS unset; private TOC test remains skipped",
+    "Synthetic in-memory data only; no database connection/provider/browser",
+    "Use installed compatible runtime; persist executable/version, import/dependency/lock fingerprints",
+    "Root retains sole CPU slot and command timeout; capture complete output plus command exit code",
+    "Recheck frozen source and dependency pins before attributable receipt"
+  ],
+  "remaining_gates": [
+    "Root broker receipts",
+    "Central-selected typechecks/frozen contract validator on combined final candidate",
+    "Independent checker only under separately released runtime",
+    "No mounted browser/private corpus/native transaction/full parent acceptance inferred"
+  ],
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  }
+}

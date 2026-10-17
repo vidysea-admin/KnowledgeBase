@@ -1,0 +1,79 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/native-next-split-exit-final-seal.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "dee8aabe84257072b1084b224ec59bf9a1dbab24acefbf3c591100a7218d9d47",
+    "bytes": 1939382
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "elapsed_s": 68.96900000000096,
+    "priorSplitSetupAndFloor_s": 125.063,
+    "totalGlobalIncludingPrior_s": 194.03199999999924,
+    "pinsUnchanged": true,
+    "pinCount": 1890,
+    "fixtureRemoved": true,
+    "environment": {
+      "LKB_NATIVE_TEST_FFMPEG": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffmpeg.exe",
+      "LKB_NATIVE_TEST_FFPROBE": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+      "LKB_NATIVE_TEST_BROWSER": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+      "LKB_NATIVE_TEST_PRIVATE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acl-fixtures\\3f8da3a1-4174-4d91-a984-bc2170a853bc"
+    },
+    "accounting": "shared maker/integration, not checker",
+    "wholeFloorPASS": false,
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "14427d70c81c0afa010ae88eb0fa90d4aa86632793acb21667058117f4cf2ee1",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-exit-acl-create-receipt.json",
+        "rawBytes": 469117,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "f386abfdbb6651769750b62fd36ee55e7048a162482e956e0cf687b976d30931"
+      },
+      "logSha256": "499265917a12b41be46d18b127b10ad68bb2beb9907bcb57747bb579f1008402",
+      "label": "native-next-split-exit-acl-create",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-exit-acl-create.log"
+    },
+    {
+      "canonicalJsonSha256": "625b4f2959fbad3d1c730639abe4a498e54f0d86413cf291c2935321afd332a5",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-exit-acl-verify-receipt.json",
+        "rawBytes": 469320,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "4c70565d12e173f9d457490d4904384b03223ea402f2205eee5df747ae28afe4"
+      },
+      "logSha256": "c66b6389bccb32c81c29944a178c896b4f2a3af5a2450d6f49ea70c4a57ede20",
+      "label": "native-next-split-exit-acl-verify",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-exit-acl-verify.log"
+    },
+    {
+      "canonicalJsonSha256": "49baf7b94edf3e211e25cd2be37c25bfc10f52d88fce94a335d83f1dec44ee68",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-exit-original-positive-receipt.json",
+        "rawBytes": 469581,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "1bba50364b7bfc30167eaccee0911586b8645e2fc20744013c86df1235e94dbc"
+      },
+      "logSha256": "9d1a61967b2549351b2d0caae34a409e5978d1e7a475c14e0afe58bc648604d5",
+      "label": "native-next-split-exit-original-positive",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-exit-original-positive.log"
+    },
+    {
+      "canonicalJsonSha256": "494cc7099171abad0226afedd193cbd4c939057dd03366c54a40421801849e5d",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-exit-acl-cleanup-receipt.json",
+        "rawBytes": 469205,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "971f73c485eb0a638415879a57cc57249b412af9b29db4ea248824cca0edb56d"
+      },
+      "logSha256": "1131dc40e41a68ee75cb9775681c410bc9fed2c14039dddbd59efceff64baba8",
+      "label": "native-next-split-exit-acl-cleanup",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-exit-acl-cleanup.log"
+    }
+  ]
+}

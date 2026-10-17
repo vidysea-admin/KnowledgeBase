@@ -1,0 +1,40 @@
+{
+  "selectedJoin": "Native transaction acceptance for vectorless publication and correction consumers",
+  "status": "Software proposal already present; host-readiness evidence missing, activation not ready",
+  "existingArtifacts": [
+    "qa/coordination/knowledge-brain-20261015/staging-replica-proposal/compose.yml",
+    "qa/coordination/knowledge-brain-20261015/staging-replica-proposal/replica-init.js",
+    "qa/coordination/knowledge-brain-20261015/staging-replica-proposal/README.md",
+    "qa/goal-vectorless-2026-10-15/verification-staging-readiness-20261015T1030.json"
+  ],
+  "confirmedByRead": "Proposal defines dedicated loopback endpoint 127.0.0.1:27029, separate project/network/two owned volumes, immutable local image guard, private file references, bounded initialization, restricted fixture identity and explicit staging guards. No duplicate configuration needed.",
+  "existingReadiness": {
+    "receiptStartedAt": "2026-10-15T09:02:55.0174740Z",
+    "dockerCliAvailableFromPath": false,
+    "daemon": "unknown",
+    "immutableImage": "unknown",
+    "projectAndVolumes": "unknown",
+    "port27029": "unknown",
+    "freshHostProbePerformed": false
+  },
+  "missingArtifact": "One current read-only host-readiness receipt proving Docker CLI and daemon availability, approved immutable image already local and required binaries compatible, expected project/volume ownership and port27029 unused, private credential file existence without values, and a nonmeasurement execution window.",
+  "handoffChecklist": [
+    "Host operator supplies the usable Docker CLI path/daemon context OR an already approved dedicated transaction-capable staging endpoint privately. Do not install/start/pull as part of this handoff.",
+    "In a nonmeasurement window, broker records read-only Docker/version/image/project/volume/port readiness. Unknown or unexpected existing state remains blocking; never delete it.",
+    "Record only private-file availability and distinct staging/root fixture identities; never log credentials, file contents or connection strings.",
+    "Only after complete readiness, request Umesh approval for the narrow D-143 exception: new dedicated project/volumes/key copy/root bootstrap/replica metadata/restricted user and bounded lkb_staging fixtures. Use required append-only decision path.",
+    "After separate activation approval and actual initialization, use restricted readWrite:lkb_staging identity with MONGODB_DB=lkb_staging and LKB_ALLOW_STAGING=lkb_staging; broker must prove transaction commit/abort and downstream approved/withdrawn visibility with current pins. This is future work, not executed evidence."
+  ],
+  "preciseOwnerInput": "Provide usable Docker host context with approved local immutable Mongo image and private credential files, or privately designate an already approved isolated staging replica-set endpoint. No activation approval should be requested until read-only readiness is proven.",
+  "execution": {
+    "configurationReadOnly": true,
+    "tests": 0,
+    "providerCalls": 0,
+    "browserActions": 0,
+    "databaseActions": 0,
+    "activationActions": 0,
+    "parentClosures": 0,
+    "reviewerVerdictIssued": false
+  },
+  "scopeNote": "Only this acceptance-next.json was written; existing 30-item human package and 92-question proposal were not rebuilt."
+}

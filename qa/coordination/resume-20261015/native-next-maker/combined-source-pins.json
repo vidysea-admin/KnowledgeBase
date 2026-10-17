@@ -1,0 +1,206 @@
+[
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "8c3efcf144c1307fa0c8b19a79fc7cff8e2ecf4d1aad5b2cd13c5f77b218a357"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/binding.test.ts",
+    "sha256": "adf2d059b675b84d04377900bb1aff55601e9461c75ffb7016282b7236ed5ce9"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/binding.ts",
+    "sha256": "1c65a170e4e713e1a8cc57d35a52ea6fb81c288c3f8675621f7369dc10ab5f40"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/publication.mongo.test.ts",
+    "sha256": "ced01e0a9d59f79a84f319a37699d1c07a77d02dae93304a6049c58ee47b4c6b"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/publication.test.ts",
+    "sha256": "d535e0d24f1b8d6a99c3017a9404111051b2800a11f0e04da51dcb855398ad00"
+  },
+  {
+    "path": "apps/api/src/indexing/native-archive/publication.ts",
+    "sha256": "9427a84a843331520df08850bfa29c5d5deadd33554aa79045607ae1a5615331"
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "sha256": "c50352247b1b151d6c49a8ae441675e75f684382a4467920043871ce90143855"
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.ts",
+    "sha256": "2b483ff6c58004ba0aff583a3c9a3de512e8071e753740c4438e54ae7e81b46d"
+  },
+  {
+    "path": "apps/api/src/production.test.ts",
+    "sha256": "ece3ceea666434d8f0a87a217fb4463416e130293d577f7673250c5003a3f06a"
+  },
+  {
+    "path": "apps/api/src/transcript-review/memdb.testsupport.ts",
+    "sha256": "a5c1f3f13530529b390977ca097beb23ffbd574ed4d83c049bd0c07bc9633c86"
+  },
+  {
+    "path": "apps/api/src/transcript-review/persist.testkit.ts",
+    "sha256": "def8da88cdedacf59918e4789a3c0df377e26d85cb86bf5987eab38cdad09363"
+  },
+  {
+    "path": "apps/api/src/transcript-review/refresh-executor.test.ts",
+    "sha256": "e06e9e24e79ae1077e9ace6c575bc633726771ebfcbe4ac484c7d0714db9851f"
+  },
+  {
+    "path": "apps/api/src/transcript-review/refresh-executor.ts",
+    "sha256": "56b8d536c7628d043df7815b9acbbb36de4dbf6b56cad5492f99ff7baf8800a8"
+  },
+  {
+    "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+    "sha256": "ce6ec9a10b4790e32be25286fff3304c478df96737e518eae1605e3cde02c2ed"
+  },
+  {
+    "path": "apps/api/src/transcript-review/service.ts",
+    "sha256": "36594fb713dc007aa55d5f333ba9ab7482850eadf2370e354b4770c3514dee53"
+  },
+  {
+    "path": "apps/api/src/transcript-review/store.ts",
+    "sha256": "260cab66dbff29bfd6ad3805eccd715e585f22bd14bca5e50921eff357bdac33"
+  },
+  {
+    "path": "packages/core/src/generated/sessions.ts",
+    "sha256": "67705753e1db14f35c2a0701e751396f155afaccb2b03353518943a3bc573637"
+  },
+  {
+    "path": "packages/core/src/generated/speaker_suggestions.ts",
+    "sha256": "cca58f06dfdd3509bf6184488b68846a214c10d727a951781aced5556dc1d2ac"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "sha256": "5058a9dbaa4a780c521cf43fa90eba5224b266b703d06a4146cc4d7c82b4012a"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "sha256": "c5ac29311c4fe2866cd679821af2a26f360a45f868a733a8620fbf0847915920"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.ts",
+    "sha256": "7c74c981c49c740d454a831a246b09c87c753dc7a9d46a962f50f53fd8e67a8b"
+  },
+  {
+    "path": "packages/db/src/index.ts",
+    "sha256": "2fa3d1aa5b4efacbfe9f4b33f8f211fb464d003285eea5c35e24531ef3572a32"
+  },
+  {
+    "path": "packages/db/src/lib/native-publication.ts",
+    "sha256": "1ea1debf845eff86f4f170a8dbaecdba7e97b44b42d74472d411386262a2fcdb"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+    "sha256": "947df1788801021e8a32932597bc01df8639c62ac851f024b9a63f07a30a8cda"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-capture.test.ts",
+    "sha256": "02fb26095ab977482b9e87e758b6214b289cd2e69602397999feacb95f1f6a5c"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-capture.ts",
+    "sha256": "bd32bc89a7d3fbd428a4abbfd9559b69be012c0533dee5dc4c6bf3fe6584f002"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-join-types.ts",
+    "sha256": "6c8e2318cfca5a103501c8b88bb106bdc5d1ef3fc7687f97a865e022c24262e7"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "sha256": "fa27995652e4b6b07ea7f30d7dca5ec84eaa20887ea34599d9422134912e83a3"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+    "sha256": "f504a9587920b4dd811aa1015b571c3bed494cad7db014153687461117606312"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-restart.testsupport.ts",
+    "sha256": "cf3ecebb4b3fe37c52b70776bdab4cb20d6c08fc02150dea91fa8bdd3df4f7c2"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+    "sha256": "835a1b49531e88782bbab01325e166d92dd3d1804909208765528f8f172ac3e3"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+    "sha256": "033454814c587afcfafd4edc0a46e66a5d612f3ae0e10a3458dc8a49f1f2c2a9"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-commands.ts",
+    "sha256": "1dafe3074f70ec5440dc51326f392a58dfbf55ea8b33f9ef18ea59cefd185d3e"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "sha256": "6349f52a186c0ec4c484e4a3b7d1ecfbb81a98e35e1298fc9029d822ca2dc0ff"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ps1",
+    "sha256": "48ec95f14880c235dd8812f7ef68d4afbdf11b9c2beb9a1421151aa4d50178ca"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/private-directory.test.ts",
+    "sha256": "22b44c4fdd5da97ded4bb539e629b9bed435ad4c5d4675e5c2c863f0c1486987"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ts",
+    "sha256": "1c430142519ed7f9ad8bf1ff82b561578cd7c36b0e9346424f339f599403f59d"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+    "sha256": "8ac3798f063c0bb9a06405d10cb274b33dd169cda9d59bf99b610e31e531e927"
+  },
+  {
+    "path": "schema/fixtures/sessions/invalid-native-publication.json",
+    "sha256": "9d14b633c431cf2cc400965329e329590526aa6d4f701eb79131c4fd9f08981f"
+  },
+  {
+    "path": "schema/fixtures/sessions/valid-native-publication.json",
+    "sha256": "86ab9e5efa018c537ff519dc23e5eef1f7a8fbe902a2e97cc7a4ca7e633ab7f2"
+  },
+  {
+    "path": "schema/fixtures/speaker_suggestions/invalid-native-publication.json",
+    "sha256": "e2805947b79063e47c677bf4bccc7a4ff9e62efce3b26a9abcf15863d3a818a8"
+  },
+  {
+    "path": "schema/fixtures/speaker_suggestions/valid-native-publication.json",
+    "sha256": "374070897e03f80be8de940c1fe4fde8bc4bfba0d785e39f90d3427759c86bf3"
+  },
+  {
+    "path": "schema/sessions.schema.json",
+    "sha256": "0591af585e542564c774b1f5154d7d34605752a09638e8fb529424d37a956a72"
+  },
+  {
+    "path": "schema/speaker_suggestions.schema.json",
+    "sha256": "a6a074dd628d193169209ce7356d6348e5c5bbcf86f09c9c6283efd2da0a4ad7"
+  },
+  {
+    "path": "scripts/native-capture/production.test.ts",
+    "sha256": "33997f08cf4ba2447b87f368922a32c16848c2d1bb634e26b856b64a172ea278"
+  },
+  {
+    "path": "scripts/native-capture/production.ts",
+    "sha256": "dd713b146c48892e298d8f22714a0d0b8e264d0522b33c0d029cb9c62ee0e31a"
+  },
+  {
+    "path": "scripts/native-capture/record.test.ts",
+    "sha256": "eaed76a22342a5502523613aa355071a8f8161d1af9c1e9523afce906b6b9487"
+  },
+  {
+    "path": "scripts/native-capture/record.ts",
+    "sha256": "ce44c0f7ccb58a0e0cb31f50a4aeaa3aa75ec31e7c249518d768c17a81ec5b56"
+  },
+  {
+    "path": "scripts/native-capture/server.test.ts",
+    "sha256": "9f16e4285f1f85ac7916350e89c6a053bfb517b56c48e2c67b507854c2f91e35"
+  },
+  {
+    "path": "scripts/native-capture/server.ts",
+    "sha256": "7348dc7fc760571ef89c4279f34f8ba48c33c4451c7b681bfeff8c95a493aec9"
+  },
+  {
+    "path": "scripts/webinar/sync-session.mjs",
+    "sha256": "8c23f05d7eacf349478797cd82379ddce55a3da51b331357583699d62b2d9ed0"
+  }
+]

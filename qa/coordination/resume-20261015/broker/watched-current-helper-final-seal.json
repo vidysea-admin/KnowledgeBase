@@ -1,0 +1,73 @@
+{
+  "status": "CURRENT_EPOCH_COMPLETE",
+  "unitManifest": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-watched-server-join-repair2.json",
+    "sha256": "1ad28fd36efe8eb92c454949ed2305a29dac8c6760f51d0e4dbea2dfabb4c797",
+    "count": 73
+  },
+  "canonicalManifest": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac.json",
+    "sha256": "bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac",
+    "sourceCount": 1691,
+    "runtimeCount": 2
+  },
+  "requiredHelperPins": {
+    "qa/coordination/resume-20261015/broker/broker_lib.py": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+    "scripts/qa/scoped-check-runner.py": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "qa/coordination/resume-20261015/runtime-alias-repair/register.mjs": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d"
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-preflight-receipt.json",
+      "sha256": "5b0fa4756e2a5fdb6714b0270fc32a46a4989c32ba233129f6a7ca2e33f79ed1",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.5
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-root-types-receipt.json",
+      "sha256": "2ff0c1e3bc22f657bd580e32a38afb0809c5bc960d17e6b73b656ce1b162b67c",
+      "exit": 0,
+      "counts": {},
+      "active_s": 10.406999999999243
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-full-graph-receipt.json",
+      "sha256": "4e8d8c71201f301bd3ace1e16dea73fe30481be04bb9ef21e3af408e76e7997c",
+      "exit": 0,
+      "counts": {},
+      "active_s": 8.139999999999418
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-scoped-structure-receipt.json",
+      "sha256": "aac2964b6072bc7bd825d4c33b9fe024be4a8c1ef55155805cce08a9998c28c8",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.5
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-all28-receipt.json",
+      "sha256": "ea33c924fee8e838cdac4b5ac667f58b48cd985f216df12d7694b5d78d70f092",
+      "exit": 0,
+      "counts": {
+        "tests": 28,
+        "pass": 28,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 18.062999999998283
+    }
+  ],
+  "failure": null,
+  "allPinsFinalMatch": true,
+  "unit73PinsFinalMatch": true,
+  "elapsed_s": 41.0470000000023,
+  "historicalSameByteBrokerLibraryBinding": "UNKNOWN; no retrospective identity claim or old-proof rewrite",
+  "historicalReceiptReuseUsed": false,
+  "sourceFreezeReleased": true,
+  "noRealDbProviderNetworkBrowserHostOrDecoder": true,
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

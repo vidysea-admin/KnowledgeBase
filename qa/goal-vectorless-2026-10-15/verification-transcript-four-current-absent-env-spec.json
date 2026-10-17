@@ -1,0 +1,52 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "scope": "Exactly four prior transcript/history cases refreshed for explicit current preflight flag absence",
+  "phase": "shared-verification-command-only-expired-review-not-reopened",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; Vitest jsdom ONEforkworker; mocked API only",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "--pool=forks",
+    "--maxWorkers=1",
+    "--minWorkers=1",
+    "--no-file-parallelism",
+    "--testNamePattern",
+    "a loaded .* refresh warns about stale answers until canonical reload completes|failed refresh exposes retry; successful refresh invokes canonical reload|late history and refresh cannot disclose old identity or trigger reload after unmount",
+    "src/pages/transcript-review/TranscriptReview.test.tsx",
+    "src/pages/transcript-review/ReviewHistory.test.tsx"
+  ],
+  "testIDs": [
+    "editor2 warning boundaries",
+    "history terminal retry+late identity/unmount2"
+  ],
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "timeoutMs": 60000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-transcript-four-current-absent-env",
+  "pins": {
+    "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx": "cd93a30f56cb2302c779a5e4c2b89b4de0772d422ab62beec1840b959b4e1a55",
+    "apps/web/src/pages/transcript-review/TranscriptReview.tsx": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/src/api/transcriptReview.ts": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7",
+    "apps/web/src/pages/transcript-review/ReviewHistory.tsx": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+    "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx": "23e6b64a803228deebeeaa683db4375e7e8d358126e94220dd82bf337dffd4c5",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\@testing-library+react@16.1_83fd9cd055ae3f809a6a1cf3a9f38faf\\node_modules\\@testing-library\\react\\dist\\index.js": "41e78e4a9bb806f2bb167bde3084489fa001f4fc8d9670f13d9a236da98f8cf6",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\vitest@2.1.8_@types+node@24.13.3_jsdom@25.0.1\\node_modules\\vitest\\index.cjs": "15a78ebcf7fc24ea0a829448d770ca486b7506fcf8fd696a2cbf8e17d25dc02b",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\react@18.3.1\\node_modules\\react\\index.js": "a216c390bf956cbb906c66d29fdb2e2ad6999464a5ca83e476533a6f25ad0ef3",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/src/setupTests.ts": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/node_modules/vitest/vitest.mjs": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6"
+  },
+  "expectedSelectedNames": 4
+}

@@ -1,0 +1,147 @@
+{
+  "schema": "indexing-structure-plan/1",
+  "moves": [
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "old": "apps/api/src/indexing/decisions-persist.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "old": "apps/api/src/indexing/decisions-persist.test.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "old": "apps/api/src/indexing/promote-entities.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "old": "apps/api/src/indexing/promote-entities.test.ts"
+    }
+  ],
+  "requiredVerification": [
+    "Raw byte backup and exact mapping manifest before writes.",
+    "Refresh final inventory and candidate hashes following root transfer of these7 source paths.",
+    "Actual lint-dirsize.check with unchanged structure.config.json, API typecheck.",
+    "Broker bounded moved decisions-persist/promote-entities tests, session-decisions/reader.test.ts and indexing/session.test.ts; relevant downstream extraction/tenancy/write consumers retain mandatory gates.",
+    "Static resolution of backfill dynamic TS import, relocated extraction.js import and fixture URL."
+  ],
+  "leaseNeeded": [
+    "apps/api/src/indexing/decisions-persist.ts",
+    "apps/api/src/indexing/decisions-persist.test.ts",
+    "apps/api/src/indexing/promote-entities.ts",
+    "apps/api/src/indexing/promote-entities.test.ts",
+    "apps/api/src/indexing/session.ts",
+    "apps/api/src/session-decisions/reader.test.ts",
+    "scripts/backfill.mjs"
+  ],
+  "token_metric": "actual_total",
+  "unchanged": [
+    "Within-group imports in both moved tests retain ./ module specifiers.",
+    "No existing subdirectories in indexing; no package test glob change needed.",
+    "packages/index/src/tree/promote-entities.ts and its consumers are a distinct module and must not change."
+  ],
+  "actual_total_tokens": null,
+  "status": "PROPOSED_AWAITING_ROOT_GRANT_AFTER_BROKER_FINAL_INVENTORY",
+  "importUpdates": [
+    {
+      "replacements": [
+        {
+          "new": "./persistence/decisions-persist.js",
+          "old": "./decisions-persist.js"
+        },
+        {
+          "new": "./persistence/promote-entities.js",
+          "old": "./promote-entities.js"
+        }
+      ],
+      "file": "apps/api/src/indexing/session.ts",
+      "afterMove": "apps/api/src/indexing/session.ts"
+    },
+    {
+      "replacements": [
+        {
+          "new": "../indexing/persistence/decisions-persist.js",
+          "old": "../indexing/decisions-persist.js"
+        }
+      ],
+      "file": "apps/api/src/session-decisions/reader.test.ts",
+      "afterMove": "apps/api/src/session-decisions/reader.test.ts"
+    },
+    {
+      "replacements": [
+        {
+          "new": "../apps/api/src/indexing/persistence/promote-entities.ts",
+          "old": "../apps/api/src/indexing/promote-entities.ts"
+        }
+      ],
+      "file": "scripts/backfill.mjs",
+      "afterMove": "scripts/backfill.mjs"
+    },
+    {
+      "replacements": [
+        {
+          "new": "../../session-decisions/provenance.js",
+          "old": "../session-decisions/provenance.js"
+        }
+      ],
+      "file": "apps/api/src/indexing/decisions-persist.ts",
+      "afterMove": "apps/api/src/indexing/persistence/decisions-persist.ts"
+    },
+    {
+      "replacements": [
+        {
+          "new": "../../../../../packages/index/src/eval/extraction.js",
+          "old": "../../../../packages/index/src/eval/extraction.js"
+        }
+      ],
+      "file": "apps/api/src/indexing/decisions-persist.test.ts",
+      "afterMove": "apps/api/src/indexing/persistence/decisions-persist.test.ts"
+    },
+    {
+      "replacements": [
+        {
+          "new": "../session.js",
+          "old": "./session.js"
+        },
+        {
+          "new": "../testutils.js",
+          "old": "./testutils.js"
+        }
+      ],
+      "file": "apps/api/src/indexing/promote-entities.test.ts",
+      "afterMove": "apps/api/src/indexing/persistence/promote-entities.test.ts"
+    }
+  ],
+  "noSourceChanges": true,
+  "scope": "Relocate extracted-decision and promoted-entity persistence implementations with their colocated tests. Exactly four moves; module and fixture URL rewrites only; preserve30 policy.",
+  "counts": {
+    "indexingAfter": 30,
+    "indexingTreeDirectoriesBefore": 1,
+    "indexingTreeDirectoriesAfter": 2,
+    "indexingBefore": 34,
+    "persistenceAfter": 4,
+    "newDirectories": 1
+  },
+  "assetResolutionUpdates": [
+    {
+      "old": "../../../../data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+      "file": "apps/api/src/indexing/decisions-persist.test.ts",
+      "afterMove": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "new": "../../../../../data/toc-migrated/2026-08-27-in-focus-4/turns.json"
+    }
+  ],
+  "discovery": {
+    "externalConsumers": [
+      "apps/api/src/indexing/session.ts",
+      "apps/api/src/session-decisions/reader.test.ts",
+      "scripts/backfill.mjs"
+    ],
+    "assetURLs": "One import.meta.url fixture in decisions-persist.test.ts",
+    "codeSearchRoots": [
+      "packages",
+      "apps",
+      "scripts"
+    ],
+    "alternative": "chunk-integrity+chunk-write with tests also moves four, but requires10 unmoved consumers versus3 here, so persistence is narrower."
+  }
+}

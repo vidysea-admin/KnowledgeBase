@@ -1,0 +1,14 @@
+{
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "metadata": {
+    "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+    "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz"
+  },
+  "availableMetadataKeys": [
+    "id",
+    "expectedSessionId"
+  ],
+  "answerabilityDeclarationPresent": false,
+  "intendedOutcome": "No explicit expected-answerability declaration found; source retrieval expectation only. Preserve actual answer/abstention/refusal; no success assumed.",
+  "rawQuestionOrAnswerPrinted": false
+}

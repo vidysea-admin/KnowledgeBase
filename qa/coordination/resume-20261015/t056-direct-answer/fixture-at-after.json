@@ -1,0 +1,9 @@
+{
+  "status": "FROZEN",
+  "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+  "sha256": "C7EF0C78679D74D9E6476ACB86B18710C4073EDBAA6FB72AAE1D30A3E7E98F8E",
+  "scoped_candidate_sha": "2ca22a90c161fc2c9e043940dbaa26d4b5da53cedcdb641d9738d64f689dbc01",
+  "change": "fixed synthetic resolution.at fixture field only",
+  "tests_run": false,
+  "build_run": false
+}

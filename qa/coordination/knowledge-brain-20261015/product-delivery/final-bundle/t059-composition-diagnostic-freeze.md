@@ -1,0 +1,11 @@
+# T059 composition typing + safe callback diagnostic freeze
+
+Central ACK received through coordinator for exact TESTONLY `apps/api/src/evaluation-flywheel/composition.test.ts`. Final SHA256 `99287540c2fe5ed3d3f35bcca3bbf53aa73e17b61b4d82a38d541d6a396e3f07`, superseding typing-only `284080e7e2a0c2abd573982c1d589bf4603eb5f7bdf03e2bbfd34a3926abfe10` as current bytes; typing-only snapshot remains historical. `test-fixture.ts` unchanged SHA256 `4fd0bcbdd3f054c20e5e444f87900609ffb63d306c68b5a5fdaf5c84c4379cee`. Other product source stays frozen.
+
+The local string-ID fixture generic remains. New TESTONLY wrappers surround actual intake, actual indexSession and actual Ask callbacks. On failure they print only fixed phase(intake/index/ask), allowlisted error.name(or Other), allowlisted observed operation names and unique allowlisted filter-operator names. No collection/field names, IDs, row values, error messages, stacks, source content or history are emitted by these wrappers. The exact original error is rethrown unchanged. All original assertions, model/provider settings, default production120000ms deadline and test20000ms timeout remain unchanged. No fixture functionality, production write or guard changes.
+
+No local tests/builds/reruns. Original503 receipts remain immutable and unresolved; helper/CAS4/4 receipts establish their scoped current mock behavior only. Source is now frozen for central ONE current API compile after all owner freezes and sole-broker ONE original diagnostic case:
+
+`node --test --test-concurrency=1 --test-timeout=30000 --test-name-pattern="^actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child$" --import tsx apps/api/src/evaluation-flywheel/composition.test.ts`
+
+Expected selected count1, not a success claim. Use broker's pinned runtime and existing30-second ceiling without timeout increases. Capture separate stdout/stderr/new current pins; preserve original failed receipts and historical rows with the same byte-preserving side-effect/restoration protocol. No further fixture/production repair follows without a concrete observed cause and new authorization. Prior18-config-pin collector closure incomplete/full1245supplement pending; no broad current-freshness claim.

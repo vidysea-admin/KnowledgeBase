@@ -229,7 +229,7 @@ Measured on the tree at `0cf1b17`, **before** any edit:
 | `lint-migrations` | OK (1390 files) | OK (1395 files) | still OK |
 | `snapshot.mjs --check` | drift (stale `docs/SNAPSHOT.md`) | drift | unchanged |
 | `node --test scripts/lint.test.mjs` | 14/14 pass | 14/14 pass | unchanged |
-| `tracker-audit --gate g1,g4` | 5 findings (all G4 "ambiguous issue ref", ISS-001/002) | 5 findings, identical | unchanged |
+| `tracker-audit --gate g1,g4` | 5 findings (all G4 "ambiguous issue ref", 001/002) | 5 findings, identical | unchanged |
 | `depcruise` | ✔ no violations (374 modules) | ✔ no violations (376 modules) | still clean |
 | `pnpm run test:lint` | *(not measured at baseline)* | 105/106, 1 fail | see below |
 | `python schema/validate.py` | green (inferred: after the change, all 26 old collections print `OK` and only `watch_heartbeat` fails) | **FAIL** | **the one regression — §6** |

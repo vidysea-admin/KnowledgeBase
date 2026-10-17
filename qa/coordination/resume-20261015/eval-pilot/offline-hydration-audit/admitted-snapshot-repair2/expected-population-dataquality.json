@@ -1,0 +1,52 @@
+{
+  "rawTurns": 3427,
+  "admittedByStaticCurrentTurnSpec": 3424,
+  "invalidTimestampTurnCount": 3,
+  "excluded": [
+    {
+      "status": "DATAQUALITYOPEN",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t141",
+      "turnSha256": "6ddbb08f4e8a53abccd968915a44980d6fbf64e267091a62855356c7c7752685",
+      "turnTextSha256": "0eaa47a84b1ac58b48f1db13093477b6d0b8881d89fd26d36aaa08248e31f6d7",
+      "fields": [
+        "tStart",
+        "tEnd"
+      ],
+      "endBeforeStart": true,
+      "rawPreserved": true,
+      "humanDispositionRequired": true
+    },
+    {
+      "status": "DATAQUALITYOPEN",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "turnId": "2026-06-03-dual-enrollment-pathway-t026",
+      "turnSha256": "dded7aef83ecb5ec09ea971d186174b364c7d2dbfcad5b8d8fe5f33c7ef68201",
+      "turnTextSha256": "c68586f4bb8056dca8d333dcb86a43945d0357bc629add4472477e0274787ff8",
+      "fields": [
+        "tStart",
+        "tEnd"
+      ],
+      "endBeforeStart": true,
+      "rawPreserved": true,
+      "humanDispositionRequired": true
+    },
+    {
+      "status": "DATAQUALITYOPEN",
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "turnId": "2026-08-10-ucas-what-changed-what-matters-t114",
+      "turnSha256": "9e4c67b98ed16a34a880058030ee29f9eea16d80813129ab12d92e8c4a246cfe",
+      "turnTextSha256": "14d99cfe606cb52e4e2338e6a0a5ac46b0e62624d355612e0b0f835893f84921",
+      "fields": [
+        "tStart",
+        "tEnd"
+      ],
+      "endBeforeStart": true,
+      "rawPreserved": true,
+      "humanDispositionRequired": true
+    }
+  ],
+  "productionReaderRuntimeConfirmationPending": true,
+  "sourceDataChanged": false,
+  "labelsCreated": false
+}

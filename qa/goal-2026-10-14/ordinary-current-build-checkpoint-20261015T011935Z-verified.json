@@ -1,0 +1,80 @@
+{
+  "stages": [
+    {
+      "sha256": "c477e5bdd7adb8a0963e6ad2bc20e4fbfa2d7b1dfdbd9d26ed4295fe41752fcc",
+      "receipt": "qa/goal-2026-10-14/api-types-ordinary-20261015T011935Z.json",
+      "exit": 0,
+      "phase": "api-types",
+      "elapsedMs": 15331,
+      "pid": 23852
+    },
+    {
+      "sha256": "e6bc0657f9d6b6d7d75016f5ebb9d26e6bbd2c8146c2b6e3cd3a433c425bce91",
+      "receipt": "qa/goal-2026-10-14/web-types-ordinary-20261015T011935Z.json",
+      "exit": 0,
+      "phase": "web-types",
+      "elapsedMs": 11107,
+      "pid": 25128
+    },
+    {
+      "sha256": "d29e8116c29e175c11a595923a129a4f89ce12dfcb28ea1d385d17406012b606",
+      "receipt": "qa/goal-2026-10-14/api-build-ordinary-20261015T011935Z.json",
+      "exit": 0,
+      "phase": "api-build",
+      "elapsedMs": 1814,
+      "pid": 16636
+    },
+    {
+      "sha256": "7fa9149e970ef0249719696199abae1a9d6e8cef0939df5c461e6f2d9a4f93ab",
+      "receipt": "qa/goal-2026-10-14/web-build-ordinary-20261015T011935Z.json",
+      "exit": 0,
+      "phase": "web-build",
+      "elapsedMs": 13730,
+      "pid": 14884
+    }
+  ],
+  "handles": "NONE",
+  "requiredGraphPowerShellAssetsMatchSource": true,
+  "outputs": [
+    {
+      "path": "apps/api/dist/server.js",
+      "bytes": 1309437,
+      "sha256": "363f5eabe295bac0f92dcc81ec38c3f6bce4472445f92488d54f756dc054fb70"
+    },
+    {
+      "path": "apps/api/dist/source-worker.js",
+      "bytes": 490775,
+      "sha256": "2c7ab5bb292a9b4e495d95790986d4bc7fb90d72d6b257f800f16ea249b45ce9"
+    },
+    {
+      "path": "apps/api/dist/runtime-externals.json",
+      "bytes": 150,
+      "sha256": "41fee98983c7f7312927688e407f17bb92b853acd2c7b353d6c4d9595027f302"
+    },
+    {
+      "path": "apps/api/dist/runtime-assets/8c3a5ba63746-private-acl.ps1",
+      "bytes": 764,
+      "sha256": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd"
+    },
+    {
+      "path": "apps/api/dist/runtime-assets/36a8f761a9d9-capture-authority-acl.ps1",
+      "bytes": 800,
+      "sha256": "998821b05b5f85ccd80dc1cc71d4e9508456b7346e00e046960ad82b789fe3e6"
+    },
+    {
+      "path": "apps/web/dist/index.html",
+      "bytes": 406,
+      "sha256": "34c86803caaada0d9ded19e25ce2b1794e196af6461f8d28ae7b1495d95eff19"
+    }
+  ],
+  "workerRealEntryGuardVerified": true,
+  "after": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+  "at": "2026-10-15T01:21:51.6186921Z",
+  "inputFiles": 1951,
+  "before": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+  "scope": "Current API/web typechecks and server/separate-worker/web builds after frozen U24 contributor repair; scoped synthetic privacy proof remains distinct from real-server/live acceptance",
+  "externalImportsExecuted": false,
+  "nativeAclExecuted": false,
+  "containerExecuted": false,
+  "inputDrift": 0
+}

@@ -1,0 +1,27 @@
+{
+  "qpcFrequency": 10000000,
+  "active_seconds": null,
+  "qpcStart": 123947669822,
+  "actual_total_tokens": null,
+  "pins": [
+    {
+      "sha256": "A9B6D5C4CD4FEB13E3E428778E7E0143AA687AF09ECCBCCACE8203B230AC3023",
+      "path": "packages/meeting-bot/src/calendar/auto-join.ts"
+    },
+    {
+      "sha256": "989E82E46A537BCBA8B7BFEC7D690147FAFFF54EA58E5FF918F1EF4406D6F202",
+      "path": "packages/meeting-bot/src/calendar/schedule-tick.ts"
+    },
+    {
+      "sha256": "DE752442003B219C088E082978AD1561CCAA679A8324D8E4CCF28545634E8FD7",
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts"
+    },
+    {
+      "sha256": "01D4DE6BE8AC721FA5C8909FA2795D72CEC3CDE03BBBA8185DEDEB3E51C041DB",
+      "path": "packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts"
+    }
+  ],
+  "cost": null,
+  "token_metric": "actual_total",
+  "startedAt": "2026-10-15T22:36:40.8833311Z"
+}

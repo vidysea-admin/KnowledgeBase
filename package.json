@@ -8,21 +8,22 @@
     "node": ">=24"
   },
   "scripts": {
+    "test:webinar": "node --test --import tsx scripts/webinar/*.test.mjs scripts/webinar/*/*.test.mjs scripts/webinar/*.test.ts scripts/webinar/send-now/*.test.ts scripts/webinar/registration/*.test.ts",
     "webinar:setup": "node scripts/webinar/setup.mjs",
     "webinar:run": "node scripts/webinar/run-pipeline.mjs",
     "webinar:record": "node --import tsx packages/meeting-bot/src/cli.ts record",
     "webinar:process": "node scripts/webinar/process-video.mjs",
     "webinar:sync": "node scripts/webinar/sync-session.mjs",
-    "demo:live": "node scripts/demo-live.mjs",
-    "demo:up": "node scripts/demo-live.mjs --up",
+    "demo:live": "node scripts/demo/demo-live.mjs",
+    "demo:up": "node scripts/demo/demo-live.mjs --up",
     "gen:types": "node scripts/gen-types.mjs",
     "audit:trackers": "node scripts/tracker-audit.mjs",
     "progress": "node scripts/catalogue-score.mjs",
     "verify:live": "node scripts/live-verify.mjs",
-    "lint:structure": "node scripts/lint-loc.mjs && node scripts/lint-dirsize.mjs && node scripts/lint-root.mjs && node scripts/lint-dupes.mjs && node scripts/lint-migrations.mjs && node scripts/lib/lint-codex-hooks.mjs && node scripts/snapshot.mjs --check && node --test scripts/lint.test.mjs && node scripts/tracker-audit.mjs --gate g1,g4 && depcruise --config .dependency-cruiser.cjs packages apps workers",
+    "lint:structure": "node scripts/lint-loc.mjs --all",
     "lint:score": "node scripts/catalogue-score.mjs --check",
     "test": "pnpm -r test",
-    "test:lint": "node --test scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs scripts/lib/eval-recall.test.mjs scripts/lib/lint-codex-hooks.test.mjs scripts/watch/lib/heartbeat.test.mjs scripts/webinar/session-rows.test.mjs scripts/webinar/start-record-detached.test.mjs",
+    "test:lint": "node --test --import tsx scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/qa/unmerged-worktrees.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs scripts/eval/eval-recall.test.mjs scripts/lib/lint-codex-hooks.test.mjs scripts/watch/lib/heartbeat.test.mjs scripts/webinar/session-rows.test.mjs scripts/webinar/start-record-detached.test.mjs scripts/qa/calendar-link-differential.test.ts scripts/qa/join-rules-edit-api.test.ts scripts/qa/join-rules-single-writer.test.ts scripts/qa/calendar-optout-id-space.test.ts",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {

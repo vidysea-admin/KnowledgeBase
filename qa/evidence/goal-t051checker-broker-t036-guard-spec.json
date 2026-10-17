@@ -1,0 +1,18 @@
+{
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/ingest/src/sources/guarded-fetch.test.ts"
+  ],
+  "pins": {
+    "packages/ingest/src/sources/guarded-fetch.ts": "9FA6EF04A97DB7096F30D1DE0F1F9EAD40FB54694F48A16071EAF387D7C9F914",
+    "packages/ingest/src/sources/guarded-fetch.test.ts": "2D7B6B9DD1797EDD647C990D376755C287B01D4051F5236CD0DD4EA9568B5BEA",
+    "qa/issues.T036GUARD.jsonl": "2189A1B0CF4A0ADAE86046A9DF30D00FF87BEB544E6EFFDB974CF5F1A99A562E"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/evidence/goal-t051checker-broker-t036-guard",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+}

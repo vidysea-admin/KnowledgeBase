@@ -1,0 +1,27 @@
+✔ U0.10: no apiKey -> complete/embed headers are exactly the original content-type pair (10.0349ms)
+✔ U0.10: apiKey set -> authorization Bearer header on complete and embed, localhost default kept (0.7702ms)
+✔ U0.10: the key is never read from the environment implicitly (0.6893ms)
+✔ Embedding uses actual CPU option and refuses silent truncation (3.552ms)
+✔ Embedding refuses corrupt batch [[null],[1]] (0.6695ms)
+✔ Embedding refuses corrupt batch [[null],[1]] (0.2294ms)
+✔ Embedding refuses corrupt batch [[1],[1,2]] (0.2076ms)
+✔ Embedding refuses corrupt batch [[1]] (0.254ms)
+✔ Nomic query uses the matching task prefix while literal prefix-looking text remains literal (0.3012ms)
+✔ Non-Nomic models retain raw input and absent purpose defaults to document for Nomic (0.459ms)
+✔ cloud defaults use native direct endpoint, explicit bearer credentials, accurate usage and unknown cost (5.7856ms)
+✔ cloud key is required explicitly and refused before transport (1.5066ms)
+✔ credentials cannot be routed to a third-party, cleartext, URL credential, or query endpoint (1.4771ms)
+✔ router falls back from GLM to DeepSeek, records each attempt and never calls vectors (3.7928ms)
+✔ independent verifier directly selects distinct configured model without calling primary (1.1168ms)
+✔ HTTP and transport errors cannot leak secrets or source text through fallback logs (6.4622ms)
+✔ cloud structured output is prompt guidance only; sampling options preserved, tools refused (1.6774ms)
+✔ malformed content or token usage cannot silently succeed with invented zero counts (2.4344ms)
+✔ cloud deadline aborts the request even when transport never resolves (46.056ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 46166.21

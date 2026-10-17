@@ -1,0 +1,88 @@
+{
+  "date": "2026-10-16",
+  "scope": "Light maker evidence audit only; checker skill explicitly loaded; no test rerun",
+  "status": "PROFILE_CLIENT_EXECUTION_EVIDENCE_FOUND",
+  "receipt": "qa/coordination/resume-20261015/broker/profile-observability-receipt.json",
+  "receipt_sha256": "173EB69C6ABE0BC5F9359617DE47B558BCCE639735A178F77967A82486639375",
+  "log": "qa/coordination/resume-20261015/broker/profile-observability.log",
+  "log_sha256_actual": "83265a3005560facd97675e4522ce825be7e04ba2efe5c0ad165709780dc0638",
+  "log_sha256_recorded": "83265a3005560facd97675e4522ce825be7e04ba2efe5c0ad165709780dc0638",
+  "recorded_exit": 0,
+  "recorded_tree_close_completed": true,
+  "recorded_command_s": 4.04700000000048,
+  "tests": 2,
+  "passed": 2,
+  "failed": 0,
+  "summary_parser_note": "Receipt counts object is empty because generic parser did not extract Vitest summary; complete raw log and lifecycle task-update/finished independently show both pass",
+  "current_pins": [
+    {
+      "path": "apps/web/vitest.config.ts",
+      "recorded_sha256": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+      "current_sha256": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "apps/web/src/setupTests.ts",
+      "recorded_sha256": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+      "current_sha256": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "recorded_sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+      "current_sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+      "recorded_sha256": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+      "current_sha256": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "recorded_sha256": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+      "current_sha256": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "qa/coordination/resume-20261015/profile/collection-reporter.mjs",
+      "recorded_sha256": "f473f2cd94902cc35661c6fe3300f03dec042e1b6e13de45ab4384784368f3d9",
+      "current_sha256": "f473f2cd94902cc35661c6fe3300f03dec042e1b6e13de45ab4384784368f3d9",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "qa/coordination/resume-20261015/profile/worker-trace.cjs",
+      "recorded_sha256": "33dff582beaa453fb3e94452c75913b0ddce2d5d8e4741514d74cc7c73700e5a",
+      "current_sha256": "33dff582beaa453fb3e94452c75913b0ddce2d5d8e4741514d74cc7c73700e5a",
+      "exists": true,
+      "matches": true,
+      "relevant_to_profile": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native-media-types.ts",
+      "recorded_sha256": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77",
+      "current_sha256": null,
+      "exists": false,
+      "matches": false,
+      "relevant_to_profile": false
+    }
+  ],
+  "diagnosis": "Later bounded instrumented execution completed config/setup/collection/test/teardown successfully. Earlier stall root cause remains unproven; no product repair justified.",
+  "next_step": "Attach receipt/log/current pin audit to maker packet and retire pending client execution request. No broker rerun needed while exact relevant fingerprints remain valid; independent checker and central combined gates remain separate.",
+  "actual_total_tokens": null,
+  "independent_verdict": null,
+  "reuse_limit": "All seven profile/config/setup/probe pins match. Unrelated native-media-types.ts historical guard pin is now absent; therefore whole broker-receipt inventory does not match and must not be called exact full-receipt reuse. Root must scope profile evidence reuse explicitly."
+}

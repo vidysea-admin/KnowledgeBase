@@ -1,0 +1,34 @@
+[
+  {
+    "path": "apps/api/src/connector-workflow/watched.ts",
+    "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0"
+  },
+  {
+    "path": "scripts/native-capture/server-watched.test.ts",
+    "sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910"
+  },
+  {
+    "path": "scripts/native-capture/server.ts",
+    "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389"
+  },
+  {
+    "path": "scripts/watched-sources/host.test.ts",
+    "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae"
+  },
+  {
+    "path": "scripts/watched-sources/host.ts",
+    "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa"
+  },
+  {
+    "path": "scripts/watched-sources/README.md",
+    "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8"
+  },
+  {
+    "path": "scripts/watched-sources/supervisor.ts",
+    "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583"
+  },
+  {
+    "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+    "path": "scripts/webinar/scheduler/service.d.mts"
+  }
+]

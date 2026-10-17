@@ -22,7 +22,7 @@
  * none was sufficient.
  */
 
-import { DEMONSTRATIVE_CUES, LOCATIVE_GOVERNORS, NEVER_A_PERSON } from "./speaker-name-data.js";
+import { DEMONSTRATIVE_CUES, LOCATIVE_GOVERNORS, NEVER_A_PERSON } from "./speaker-rules/speaker-name-data.js";
 
 /**
  * Name particles that are legitimately lowercase INSIDE a name ("van der Berg", "de Souza").
@@ -137,7 +137,7 @@ const NAMING_CUES_BEFORE = [
  * (after-cues like `from`/`here`/`speaking`, greetings, demonstratives, address) is refused for
  * that occurrence.
  */
-const HANDOVER_MARKERS = [
+export const HANDOVER_MARKERS = [
   "invite", "invited", "inviting", "welcome our next speaker", "next speaker",
   // ISS-104: "Coming up next, Mumbai from the west zone." was read as a place bypass for six
   // rounds. It is a handover — the person-valid twin "Coming up next, Nilesh from the west zone."
@@ -146,7 +146,7 @@ const HANDOVER_MARKERS = [
   "take us forward", "to take us through", "to take us into", "pass the mic",
 ];
 /** Cues whose subject is the SPEAKER THEMSELF — the only ones that survive a handover context. */
-const SELF_NAMING_CUES = ["my name is", "my name's", "i am", "i'm", "call me"];
+export const SELF_NAMING_CUES = ["my name is", "my name's", "i am", "i'm", "call me"];
 /** Address greetings: only a cue when the name is followed by address punctuation (see below). */
 const ADDRESS_GREETINGS = ["good morning", "good afternoon", "good evening", "welcome", "hi", "hello", "hey", "thank you", "thanks"];
 const NAMING_CUES_AFTER = ["here", "speaking", "from", "with us", "joining us"];
@@ -162,7 +162,7 @@ const ADDRESS_FOLLOWERS = ["what", "how", "would", "could", "do you", "can you",
  * Stated as the complement on purpose: the first attempt allowlisted what may follow and refused
  * the rest, which is the opposite rule and cost ten recorded introductions.
  */
-const FUNCTION_FOLLOWERS = new Set([
+export const FUNCTION_FOLLOWERS = new Set([
   "from", "on", "at", "for", "with", "to", "in", "of", "about", "as", "over", "after", "before",
   "during", "via", "by", "into", "through", "under", "across", "per", "behalf", "alongside",
   "and", "or", "but", "so", "yet", "then",
@@ -198,7 +198,7 @@ function endsTheClause(tail: string): boolean {
  * "Mumbai Sharma" is a person whatever the turn says about Mumbai. And a possessive occurrence is
  * not a place ("at Priya's desk" is a person's desk), so it is skipped.
  */
-function readsAsAPlaceOrOrg(text: string, name: string): boolean {
+export function readsAsAPlaceOrOrg(text: string, name: string): boolean {
   if (name.trim().split(/\s+/).filter(Boolean).length > 1) return false;
   const governed = new RegExp(`(?:^|\\s)(?:${LOCATIVE_GOVERNORS.join("|")})$`, "iu");
   return nameOccurrences(text, name).some((at) => {
@@ -268,7 +268,7 @@ function hasNamingCue(text: string, name: string, at: number, place: boolean): b
 }
 
 /** Every whole-name occurrence of `name` in `text`, as start offsets. */
-function nameOccurrences(text: string, name: string): number[] {
+export function nameOccurrences(text: string, name: string): number[] {
   const isNameChar = (ch: string | undefined): boolean =>
     ch !== undefined && (/[\p{L}\p{N}]/u.test(ch) || NAME_JOINERS.has(ch));
   const out: number[] = [];
@@ -284,4 +284,9 @@ function nameOccurrences(text: string, name: string): number[] {
 export function citesNameAsAnIntroduction(text: string, name: string): boolean {
   const place = readsAsAPlaceOrOrg(text, name);
   return nameOccurrences(text, name).some((at) => hasNamingCue(text, name, at, place));
+}
+
+/** The naming-cue predicate at ONE occurrence, with the place-vs-person signal applied (relation rules). */
+export function hasNamingCueAt(text: string, name: string, at: number): boolean {
+  return hasNamingCue(text, name, at, readsAsAPlaceOrOrg(text, name));
 }

@@ -1,0 +1,48 @@
+✔ watched snapshot validation binds exact Unicode bytes, provenance and legacy media identity (106.9166ms)
+✔ durable snapshot reopens, consumes exact guarded bytes without refetch and publishes once (332.3425ms)
+✔ tampering, foreign/current-source mismatch and stale previous hash refuse before ingest (78.3309ms)
+✔ partial index, missing physical proof and revoked actor never advance watched health (584.7067ms)
+✔ reachable durable watched route queues one guarded snapshot and requires authenticated ingestion (269.8782ms)
+✔ durable caller enqueue survives spool reopen, worker consumes once, and recording receipt waits for physical proof (2313.7603ms)
+✔ durable jobs refuse unsafe inputs and bypasses before any direct intake; watched snapshot enqueues without inline indexing (165.3367ms)
+✔ durable worker indexing uncertainty creates one visible action gap and never confirms recording or retries providers (457.8219ms)
+✔ nonthrowing incomplete worker receipt cannot publish succeeded even after actual strict consumer writes (410.7369ms)
+✔ authenticated caller intake reaches real source/turn planner, Mongo sink and indexing consumer (82.9721ms)
+✔ cached receipt refuses partial chunk turn coverage or foreign claim evidence after real consumption (14.7508ms)
+✔ auth, scope, body tenancy and unsafe URLs cannot bypass caller boundaries (2.9829ms)
+✔ owner gap inventory pagination keeps all requests reachable and excludes other tenants (3.7836ms)
+✔ public indexing degradation is a source-linked gap and successful retry resolves it (102.5692ms)
+✔ production-shaped intake reuses successful receipt and never double-indexes (13.9798ms)
+✔ production-shaped intake failure is visible; deduped retry consumes once after recovery (12.7112ms)
+✔ producer done status without receipt cannot trigger success or seed a consumption proof (47.4354ms)
+✔ missing recording has durable owner/SLA and refuses nonexistent or unconsumed receipt (16.6806ms)
+✔ expiration requires overdue SLA and CAS loss is an explicit conflict (2.2009ms)
+✔ recording receipt URL cannot fabricate recording success from a generic page (2.2229ms)
+✔ hosted recording fixture receipt selects adapter, stores media and consumes indexed transcript (111.6438ms)
+✔ watched snapshot preserves provenance, indexes changes, and skips unchanged consumption (30.3459ms)
+✔ index failure leaves watched hash due; retry consumes deduped stored content before success (69.4125ms)
+✔ positive consumer receipt is required; legacy and contradictory chunk receipts are refused (1.2156ms)
+✔ nonthrowing partial watched consumer writes cannot create hash or cached consumption success (23.4689ms)
+✔ nonthrowing legacy public consumer result cannot skip the required retry (11.5768ms)
+✔ legacy hash-only watched check is not mistaken for a consumed source (8.5986ms)
+✔ guarded HTML snapshot supplies visible paragraphs and each watched URL keeps receipt provenance (10.6613ms)
+✔ CAS/no persistence, gap-write failure, resource cap and corrupt tenant never fabricate success (95.4891ms)
+✔ disabled wiring, protected DBs and unguarded fetcher fail closed (1.8563ms)
+✔ protected database refusal precedes external intake, downstream writes and watched fetch (1.1338ms)
+✔ unacknowledged gap insertion is not reported as a durable request creation (1.9927ms)
+✔ accepted session routing summaries are source-derived and truncated on UTF8 codepoint boundaries (48.2319ms)
+✔ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (215.0647ms)
+✔ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (118.3971ms)
+✔ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (139.4414ms)
+✔ durable session CAS admits one same-session owner, allows preflight retry, and never takes over uncertain writes (12.662ms)
+✔ tree revision CAS preserves a legacy root id and refuses a stale expected root without upsert (2.1343ms)
+✔ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (16.5235ms)
+✔ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (266.5626ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 34548.4504

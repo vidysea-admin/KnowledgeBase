@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-14T22:48:24.1157451Z",
+  "authority": "Root finite current-source compiler/build checkpoint",
+  "productionFrozen": true,
+  "prePinsRequirement": "Capture AFTER writer ACKs; any changed input makes result diagnostic-only, not a coherent candidate",
+  "ordinaryValidationCoordinator": "/root/docker_governance_review",
+  "safetyGatedRetries": "prohibited",
+  "remainingTestOnlyWriters": [
+    "/root/docker_context_review one existing v3 chain regression",
+    "/root/qa_status/maker_t057 one existing terminal-CAS/restart regression"
+  ],
+  "criticalPaths": [
+    "apps/api/src/composition/integrations/trusted-readers.ts",
+    "apps/api/src/ask/source-context.ts",
+    "apps/api/src/indexing/eligible-tree.ts",
+    "apps/api/src/visibility/read-snapshot.ts",
+    "apps/api/src/indexing/generation.ts",
+    "apps/api/src/indexing/session.ts",
+    "apps/api/src/transcript-review/planner.ts",
+    "apps/api/src/transcript-review/effective-reader.ts",
+    "packages/meeting-bot/src/capture/record-finalize.ts",
+    "scripts/webinar/run-pipeline.mjs"
+  ],
+  "parentsDone": false
+}

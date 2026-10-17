@@ -1,0 +1,10 @@
+ RUN v2.1.8 C:/Users/product/Desktop/KnowledgeBase
+(!) Some chunks are larger than 500 kB after minification.
+✓ qa/evidence/execution-wave1-integration-web-build.test.mjs (1 test) 4953ms
+✓ actual production Vite build emits the App entry and integration consumer assets 4951ms
+Test Files 1 passed (1)
+Tests 1 passed (1)
+Start at 09:32:18
+Duration 5.91s (transform 40ms, setup 0ms, collect 418ms, tests 4.95s, environment 0ms, prepare 171ms)
+
+Captured from exec_command chunk 3d8a3d; chunk-size advice omitted here. Full tool output preserved in conversation. Exit0, command wall7.7681223s. Actual five integration consumer strings include the newly mounted Grounded notes and Q&A panel.

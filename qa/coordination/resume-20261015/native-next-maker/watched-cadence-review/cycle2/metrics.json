@@ -1,0 +1,66 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null,
+    "token_metric": "actual_total"
+  },
+  "reviewers": [
+    {
+      "id": "/root/watched_cadence_independent_checker",
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 150,
+        "tokens": 20000,
+        "token_metric": "actual_total"
+      },
+      "status": "Review allocation charged conservatively; startup/whole-review actual telemetry unavailable. Includes no claimed measured runtime cap success."
+    },
+    {
+      "id": "/root/watched_cadence_independent_checker/finalization-cycle1",
+      "status": "Actual telemetry unknown; committed completion allocation retained from cycle1 completion-accounting, not measured usage",
+      "active_s": null,
+      "budget_debit": {
+        "active_s": 30,
+        "tokens": 4000,
+        "token_metric": "actual_total"
+      },
+      "cost": null,
+      "completion_reserve_id": "watched-cadence-launcher/1/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+      "phase_kind": "finalization",
+      "tokens": null,
+      "token_metric": "actual_total"
+    }
+  ],
+  "next_phase": {
+    "active_s": 60,
+    "tokens": 8000,
+    "token_metric": "actual_total",
+    "cost": null,
+    "kind": "review"
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "watched-cadence-launcher/2/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "completion_reserve_tokens": 4000,
+  "bootstrap_scope": "Cycle2 actualevidence-planrepair only; exact2boundary tests+contracts.py and reconcile unchanged prior independent sourceproof",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000,
+    "token_metric": "actual_total",
+    "cost": null
+  },
+  "escalation": {
+    "reason": "Cycle1 HOLD missing2probes+contracts; real executablepacket repair allocates identity10+commands45+reconcile5 before final30; preserve allpriorcharges and unusedlate60",
+    "limits": {
+      "active_s": 270,
+      "tokens": 36000,
+      "token_metric": "actual_total",
+      "cost": null
+    },
+    "authority": "Root once additional90s/12000 incl30s/4000completion; cumulative270s/36000, no reset"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "agent": "/root/product_delivery_coordinator/ui_revision_batch_checker",
+  "status": "NEEDS_EXTRA_REVIEW",
+  "scope": ["t058-saved-summary-refresh/cycle0", "product-transcript-refresh-warning/cycle1"],
+  "batch_candidate": "0524e144cda950caee549c2ee824fc960e1bef71edcf319fa97171843dfd9404",
+  "authenticated": ["nine raw source pins", "both unit content IDs and batch identity", "LOCAL helper rawSHA and persisted cycle4 packet/PASS candidate", "both prior gate receipts ownexit0"],
+  "incomplete": ["receipt/source output was excessive and truncated", "receipt provenance and complete fingerprints", "saved-output epoch consumer context", "exact contract coverage"],
+  "actual_phase_tokens": null,
+  "actual_phase_active_s": null,
+  "actual_phase_cost": null,
+  "prior_transcript_actual_tokens_retained": 294849,
+  "prior_transcript_allocated_output_debit_retained": 1000,
+  "prior_active_debit_retained_s": 40,
+  "review_limit": {"actual_total_tokens": 120000, "active_s": 30, "output_tokens": 1100},
+  "reserved_final_unadmitted": {"actual_total_tokens": 80000, "active_s": 30, "output_tokens": 700},
+  "new_total_limit": {"actual_total_tokens": 200000, "active_s": 60, "output_tokens": 1800},
+  "broker_selected_probes": ["existing authenticated output create/cite/save/reopen/revalidate/export case", "two loaded pending/failed freshness-to-canonical-reload cases", "history retry and late identity/unmount refusal cases"],
+  "no_verdict": true,
+  "no_local_tests_or_builds": true,
+  "ended_turn": true,
+  "accounting": "Shared batch actuals counted once; no guessed per-unit allocation or efficiency success. All prior charges remain; telemetry measurement pending."
+}

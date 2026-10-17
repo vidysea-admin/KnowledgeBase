@@ -1,0 +1,34 @@
+{
+  "label": "t037-t056-preflight",
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "console.log(JSON.stringify({executable:process.execPath,version:process.version,tsx:import.meta.resolve('tsx')}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "actual_total_tokens": null,
+  "independent_verdict": null,
+  "pins_before": {
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "active_intersection": [],
+  "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "pid": 25024,
+  "started_utc": "2026-10-15T22:43:24Z",
+  "exit": 0,
+  "tree_close_completed": true,
+  "counts": {},
+  "tail": [
+    "{\"executable\":\"C:\\\\Users\\\\product\\\\.cache\\\\codex-runtimes\\\\codex-primary-runtime\\\\dependencies\\\\node\\\\bin\\\\node.exe\",\"version\":\"v24.19.0\",\"tsx\":\"file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/loader.mjs\"}"
+  ],
+  "pins_after": {
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "pins_unchanged": true,
+  "active_s": 0.8130000000001019,
+  "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t037-t056-preflight.log",
+  "log_sha256": "7a5b218dcdad53a63296dcda498d231557f5525df22e07203d2a76cc16ea6740"
+}

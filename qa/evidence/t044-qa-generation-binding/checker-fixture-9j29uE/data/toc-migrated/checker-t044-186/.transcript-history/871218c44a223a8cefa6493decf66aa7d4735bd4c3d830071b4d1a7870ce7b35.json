@@ -1,0 +1,20 @@
+[
+  {
+    "_id": "checker-t044-186-t-8e5cbd63a23f12a2575540cfe3a55966b02fc0bd264a0ac4c1f7f65d40441d68",
+    "tenantId": "checker-tenant",
+    "sessionId": "checker-t044-186",
+    "speakerRef": "speaker:0",
+    "tStart": 100,
+    "tEnd": 186,
+    "text": "career counselling evidence"
+  },
+  {
+    "_id": "checker-t044-186-t-93154601150df21ab67f15973555da51a46f495baa313e68e323e7e68f228f31",
+    "tenantId": "checker-tenant",
+    "sessionId": "checker-t044-186",
+    "speakerRef": "speaker:0",
+    "tStart": 0,
+    "tEnd": 99,
+    "text": "earlier turn"
+  }
+]

@@ -1,0 +1,51 @@
+{
+  "testsRun": false,
+  "tokensActual": null,
+  "phase": "source-build",
+  "generation": "one canonical output, exact scripts/gen-types.mjs compile options",
+  "startUtc": "2026-10-15T09:29:33.1121412Z",
+  "hashes": [
+    {
+      "path": "schema/speaker_relationships.schema.json",
+      "sha256": "CB3E85C1087C4B4828F309401F6085106AAB6BFD8023131B2951FF42563BD6F8"
+    },
+    {
+      "path": "schema/fixtures/speaker_relationships/valid.json",
+      "sha256": "7ED837B51E39311DC7DD696FF5736066455288DE7C9796EF4CE7957918BD08B9"
+    },
+    {
+      "path": "schema/fixtures/speaker_relationships/invalid.json",
+      "sha256": "704F55D81271CB6B018282DE94621822CFD154EE21B8EB627976B2455707CFC6"
+    },
+    {
+      "path": "schema/index.json",
+      "sha256": "A24A176D74C06891AA18547CBA4B3FA0E09F7662F7383E8A989F20FE4D061391"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_relationships.ts",
+      "sha256": "1CCC2E398F88600F1B666ED970825835C79F578810B2C48483323B5E09E9948A"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "A2713A4D68DC9C8419A081E952AE2B17A456B9409618ADA299C25176FFB581CF"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-relationships.ts",
+      "sha256": "C2C85D1DC6F40FD6DE3D0471463B5E0C76D583E7E64F63AA713A3D88A73D161A"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "sha256": "7745B14F3323F6B587312BFCA2E76B107C31C47D4B05F5B6F42FD52CEEBE767B"
+    },
+    {
+      "path": "migrations/20261015120000-speaker-relationships.cjs",
+      "sha256": "42FE251D75D1C491F198D6BD96673905703269987B7FC4404337157F3F943908"
+    }
+  ],
+  "endUtc": "2026-10-15T09:31:51.5786011Z",
+  "databaseExecution": false,
+  "startMonotonic": 206629993030,
+  "elapsedSeconds": 138.4591696,
+  "endMonotonic": 208014584726,
+  "frequency": 10000000
+}

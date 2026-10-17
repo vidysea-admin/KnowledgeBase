@@ -1,0 +1,17 @@
+{
+  "phase": "web-types",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules\\pnpm\\bin\\pnpm.mjs",
+    "--filter",
+    "@lkb/web",
+    "typecheck"
+  ],
+  "pid": 11620,
+  "exit": 2,
+  "signal": null,
+  "timedOut": false,
+  "elapsedMs": 13813,
+  "stdout": "\n> @lkb/web@0.0.0 typecheck C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\n> tsc --noEmit -p tsconfig.json\n\nsrc/pages/explorer/KnowledgeExplorerPage.tsx(44,22): error TS2304: Cannot find name 'setTab'.\r\nsrc/pages/explorer/KnowledgeExplorerPage.tsx(44,42): error TS2552: Cannot find name 'setSelectedId'. Did you mean 'selectedId'?\r\nC:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web:\r\n ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/web@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`\nExit status 2\n",
+  "stderr": ""
+}

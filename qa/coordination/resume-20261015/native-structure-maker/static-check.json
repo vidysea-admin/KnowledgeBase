@@ -1,0 +1,11 @@
+{
+  "status": "STATIC_TARGETS_RESOLVED_NO_RUNTIME_EXECUTION",
+  "captureLooseFiles": 29,
+  "actual_total_tokens": null,
+  "nativeLooseFiles": 14,
+  "missingTargets": [],
+  "assetPath": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\tab-capture",
+  "token_metric": "actual_total",
+  "candidatePinsVerified": 23,
+  "relativeModuleOccurrences": 120
+}

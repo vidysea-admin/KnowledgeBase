@@ -1,0 +1,65 @@
+{
+  "budget_debits": {
+    "active_s": {
+      "known_lower_bound": 40,
+      "value": 40
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 320912,
+      "value": 320912
+    }
+  },
+  "completion_reserve": {
+    "allocation": null,
+    "id": null,
+    "phase_kind": null,
+    "status": "legacy_unreserved"
+  },
+  "escalated": true,
+  "exceeded": [],
+  "limits": {
+    "active_s": 120,
+    "cost": null,
+    "tokens": 520912
+  },
+  "observed_at": "2026-10-15T11:10:43.102765+00:00",
+  "ratio_verified": false,
+  "ratios": {
+    "active_s": null,
+    "cost": null,
+    "tokens": 0.10875987537648522
+  },
+  "status": "BOOTSTRAP_REVIEW",
+  "target_missed": [
+    "tokens"
+  ],
+  "totals": {
+    "active_s": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 320912,
+      "value": 320912
+    }
+  },
+  "unknown": [
+    "active_s",
+    "cost"
+  ],
+  "execution": {
+    "exitCode": 0,
+    "wallTimeSeconds": 0.5296183,
+    "stdout": "{\"budget_debits\": {\"active_s\": {\"known_lower_bound\": 40, \"value\": 40}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 320912, \"value\": 320912}}, \"completion_reserve\": {\"allocation\": null, \"id\": null, \"phase_kind\": null, \"status\": \"legacy_unreserved\"}, \"escalated\": true, \"exceeded\": [], \"limits\": {\"active_s\": 120, \"cost\": null, \"tokens\": 520912}, \"observed_at\": \"2026-10-15T11:10:43.102765+00:00\", \"ratio_verified\": false, \"ratios\": {\"active_s\": null, \"cost\": null, \"tokens\": 0.10875987537648522}, \"status\": \"BOOTSTRAP_REVIEW\", \"target_missed\": [\"tokens\"], \"totals\": {\"active_s\": {\"known_lower_bound\": 0, \"value\": null}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 320912, \"value\": 320912}}, \"unknown\": [\"active_s\", \"cost\"]}\r\n"
+  },
+  "manualLedger": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/actual-author-manual-ledger-2026-10-15T11-10-37-008Z.json",
+  "scope": "PREDISPATCH AUTHOR QA PROBE ONLY; STOP BEFORE EXECUTION. No review launched by this helper."
+}

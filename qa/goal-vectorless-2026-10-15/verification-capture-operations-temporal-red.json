@@ -1,0 +1,66 @@
+{
+  "phase": "maker-regression-red-baseline",
+  "scope": "Operations cycle2 RED original signed future/before/end/reversed temporal corpus against unchanged product",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "51cfbc233c37e7b48e06db71ec53cbaa21ea151a57b1f14d953fa270ebc55060",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "scripts/qa/capture-operations-acceptance.test.mjs"
+  ],
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "runtime_version": "v24.19.0",
+  "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "runtime_identity": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "all expanded signed temporal acceptance regression nodes"
+  ],
+  "timeoutMs": 30000,
+  "startedAt": "2026-10-15T10:32:37.933Z",
+  "completedAt": "2026-10-15T10:32:38.292Z",
+  "elapsedMs": 356.7063,
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "before": {
+    "scripts/qa/capture-operations-acceptance.mjs": "28e44a4af803a66237187f08951d1933334d1f379a679c46e693673c9cd1574f",
+    "scripts/qa/capture-operations-evidence.mjs": "b4adbfb08254b9fd2e45be0c4831f2ea5699dbaa84f81ad4aab4e49e863c38b1",
+    "scripts/qa/capture-operations-acceptance.test.mjs": "28b86f190f0a3473eb7f5bd189015b6b35edcfce77daf17abf5b18d26599699d",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297"
+  },
+  "after": {
+    "scripts/qa/capture-operations-acceptance.mjs": "28e44a4af803a66237187f08951d1933334d1f379a679c46e693673c9cd1574f",
+    "scripts/qa/capture-operations-evidence.mjs": "b4adbfb08254b9fd2e45be0c4831f2ea5699dbaa84f81ad4aab4e49e863c38b1",
+    "scripts/qa/capture-operations-acceptance.test.mjs": "28b86f190f0a3473eb7f5bd189015b6b35edcfce77daf17abf5b18d26599699d",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-capture-operations-temporal-red.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-capture-operations-temporal-red.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "owner": "/root/native_measurement_maker",
+  "tier": 3,
+  "unit": "native-measurement-registry",
+  "cycle": 0,
+  "state": "REQUESTED",
+  "packet": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-measurement\\packet.json",
+  "maximum_outer_seconds": 90,
+  "commands": [
+    {
+      "executable": "node",
+      "args": [
+        "--import",
+        "tsx",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "src/capture/tiles/native-measurement.test.ts",
+        "src/capture/tiles/registry.test.ts",
+        "src/capture/tiles/sampler-clock.test.ts"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+      "timeout_seconds": 75,
+      "reason": "New synthetic numeric bounds/refusals, native JSON forgery guard, unchanged synthetic registry privacy/current-identity consumers"
+    }
+  ],
+  "safeguards": [
+    "Sole broker grant only; serial CPU",
+    "No browser/provider/DB or actual capture",
+    "Before/after pins plus full exit/output",
+    "Do not silently convert synthetic qualification to native acceptance",
+    "Stop once on dependency/collection failure; return narrow repair"
+  ],
+  "required_followup": "Final combined opaque finalizer/qualifier/private mask/provider/actual commit/registry chain under root scoped broker grant after shared joins freeze.",
+  "native_structure_adoption": "qa/coordination/resume-20261015/native-measurement/native-structure-adoption.json"
+}

@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "index": 54,
+  "originalIndex": 59,
+  "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c02",
+  "inputHash": "22fcc06d3a65d15418a02290bff9ff814c70c0932ca67972c0d4d76124a3a268",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original text prefix names Wai Wah Tsang, and the same turn explicitly connects an accepted university offer to gym membership and returns dependent on use and effort.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown; attribution is supported only by the literal text prefix, not independently verified identity.",
+      "Original timing is 645–1177 seconds; current timing is 645–1176 seconds.",
+      "Supplied transcript support does not establish external factual truth; historical artifact bytes were not inspected."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+        "contextVersion": "originalMigration",
+        "quote": "Wai Wah Tsang: Um thank you so much for the question.",
+        "textSha256": "5dd7c5ab14d9aae19b21b43f3f5c9108b5ef826ad8f371d06f4e41c1a9f53668",
+        "contextSha256": "036b3bdd6fd259aeb7a7288c3bcf9a51059f4d5a6b2d147afa14d2e2bf19d381",
+        "artifactSha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 645,
+        "tEnd": 1177,
+        "supports": "Text prefix attributes this turn to Wai Wah Tsang; stored speakerRef is unknown."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+        "contextVersion": "originalMigration",
+        "quote": "if students get an offer and they have been accepted, I always use this gym analogy",
+        "textSha256": "5dd7c5ab14d9aae19b21b43f3f5c9108b5ef826ad8f371d06f4e41c1a9f53668",
+        "contextSha256": "036b3bdd6fd259aeb7a7288c3bcf9a51059f4d5a6b2d147afa14d2e2bf19d381",
+        "artifactSha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 645,
+        "tEnd": 1177,
+        "supports": "Explicitly links accepted university offers to a gym analogy."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+        "contextVersion": "originalMigration",
+        "quote": "And if you don't put in the work, you're not going to get the returns and you're not going to achieve the goals that you're particularly looking for.",
+        "textSha256": "5dd7c5ab14d9aae19b21b43f3f5c9108b5ef826ad8f371d06f4e41c1a9f53668",
+        "contextSha256": "036b3bdd6fd259aeb7a7288c3bcf9a51059f4d5a6b2d147afa14d2e2bf19d381",
+        "artifactSha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 645,
+        "tEnd": 1177,
+        "supports": "Supports dependence of returns and goals on student effort and use of opportunities."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current turn supports the gym analogy and dependence of outcomes on effort, but does not identify Wai Wah Tsang; its stored speakerRef is Y.Y. Song, whose equivalence to the claimed person is not established.",
+    "missingReferences": [],
+    "caveats": [
+      "Current speakerRef Y.Y. Song differs from original unknown and the original text prefix Wai Wah Tsang; do not assume these names identify the same person.",
+      "Same turn ID has changed text, attribution and ending time from 1177 to 1176 seconds.",
+      "Current artifact raw SHA256 and normalized-LF SHA256 are distinct; neither was verified against on-disk bytes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+        "contextVersion": "current",
+        "quote": "if students get an offer, and they have been accepted, I always use this gym analogy",
+        "textSha256": "37c10c900b92ebcc701620c9aa7f201ce0cc66ae723ba1277ff75c0be6f4bc96",
+        "contextSha256": "79d72f8263c56d254883a5f18a0f6e4eb766f32868ede6cd6f2eaf5fdc1dbaf7",
+        "artifactSha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+        "revision": null,
+        "speakerRef": "Y.Y. Song",
+        "tStart": 645,
+        "tEnd": 1176,
+        "supports": "Supports university-offer gym analogy, but does not name Wai Wah Tsang."
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+        "contextVersion": "current",
+        "quote": "And if you don't put in the work, you're not going to get the returns, and you're not going to achieve the goals that you're particularly looking for.",
+        "textSha256": "37c10c900b92ebcc701620c9aa7f201ce0cc66ae723ba1277ff75c0be6f4bc96",
+        "contextSha256": "79d72f8263c56d254883a5f18a0f6e4eb766f32868ede6cd6f2eaf5fdc1dbaf7",
+        "artifactSha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+        "revision": null,
+        "speakerRef": "Y.Y. Song",
+        "tStart": 645,
+        "tEnd": 1176,
+        "supports": "Supports dependence of outcomes on effort; current stored attribution is Y.Y. Song."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context supports every claim component with a textual identity caveat. Current context retains the analogy but lacks the claimed name and stores a different speaker label; same-ID content changed. No missing or duplicate matches were supplied."
+}

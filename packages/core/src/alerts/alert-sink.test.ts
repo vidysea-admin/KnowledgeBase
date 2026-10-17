@@ -102,3 +102,74 @@ test("notifyWatchSilent never returns a Promise the caller could await/throw on"
   const result = sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
   assert.equal(result, undefined);
 });
+
+test("default throttle suppresses repeated attempts until the exact 60-second boundary", async () => {
+  let time = 0;
+  const { calls, send } = fakeTransport();
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => time }));
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  time = 59_999;
+  sink.notifyWatchSilent("toc", "drive", "2026-10-09T00:00:00Z", 3_600_000);
+  await flush();
+  assert.equal(calls.length, 1);
+  time = 60_000;
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 2);
+});
+
+test("throttle is independent for each tenant/source tuple including delimiter-containing IDs", async () => {
+  const { calls, send } = fakeTransport();
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => 0 }));
+  for (const [tenant, source] of [["toc", "drive"], ["toc", "gmail"], ["other", "drive"], ["a:b", "c"], ["a", "b:c"]]) {
+    sink.notifyWatchSilent(tenant!, source!, null, 3_600_000);
+    sink.notifyWatchSilent(tenant!, source!, null, 3_600_000);
+  }
+  await flush();
+  assert.equal(calls.length, 5);
+});
+
+test("failed transport attempts remain throttled and later failures are still redacted", async () => {
+  let time = 0;
+  const { calls, send } = fakeTransport("reject");
+  const { lines, log } = logCapture();
+  const sink = createTelegramAlertSink(sinkDeps({ send, log, now: () => time }));
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 1);
+  assert.equal(lines.length, 1);
+  time = 60_000;
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 2);
+  assert.equal(lines.length, 2);
+  assert.ok(lines.every((line) => line.includes("[REDACTED]") && !line.includes("T-TOKEN-SECRET")));
+});
+
+test("explicit throttle interval remains injectable for deterministic consumers", async () => {
+  let time = 0;
+  const { calls, send } = fakeTransport();
+  const sink = createTelegramAlertSink(sinkDeps({ send, now: () => time, throttleMs: 500 }));
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  time = 499;
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  time = 500;
+  sink.notifyWatchSilent("toc", "drive", null, 3_600_000);
+  await flush();
+  assert.equal(calls.length, 2);
+});
+
+test("synchronous transport throws remain fire-and-forget, throttled and redacted", async () => {
+  let attempts = 0;
+  const { lines, log } = logCapture();
+  const sink = createTelegramAlertSink(sinkDeps({
+    now: () => 0, log, send: () => { attempts++; throw new Error("sync T-TOKEN-SECRET"); },
+  }));
+  assert.equal(sink.notifyWatchSilent("toc", "drive", null, 3_600_000), undefined);
+  assert.doesNotThrow(() => sink.notifyWatchSilent("toc", "drive", null, 3_600_000));
+  await flush();
+  assert.equal(attempts, 1);
+  assert.deepEqual(lines, ["[alert-sink] send failed: sync [REDACTED]"]);
+});

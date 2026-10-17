@@ -1,0 +1,69 @@
+{
+  "kind": "independent-t059-prerequisite-metadata-review",
+  "reviewedAt": "2026-10-15T00:24:21.7282010Z",
+  "checker": "/root/roadmap_status/checker_t059",
+  "scope": "Truthfulness and source bindings of saved prerequisite metadata only; no new source, semantic or live certification",
+  "result": "CONSISTENT; full T059 L1-L5 HOLD",
+  "map": {
+    "path": "qa/evidence/goal-t059-maker/live-prerequisites-20261015.json",
+    "sha256": "1c8f6c0b7d63808b588a7535975a407bf219218058d3d52d86b0a84ef0359f12"
+  },
+  "doc": {
+    "path": "docs/t059-evaluation-flywheel.md",
+    "sha256": "864534fd9953fa3b9d8689345874808ddf3e34e719258623c8446b3f879f2396"
+  },
+  "citedMetadataDrift": [],
+  "sourceAcceptance": {
+    "originalReplayFAIL": "preserved",
+    "cycle": 1,
+    "verdictSHA256": "dfa70e983bade1ecbf1f9bd4dcddcb80dc5348bdf8bb35dadd8a6510ba761176",
+    "behavioralProof": "1 exact floor +18 standing +31 mounted +3valid/2invalid, preserved without rerun",
+    "status": "checked-PASS source/API only, unchanged",
+    "manifestSHA256": "9c2be2aa94baa993550301d251454d3d8500d2ff135fb5a638f37cc1103f2e62"
+  },
+  "humanCalibration": {
+    "savedScores": 0,
+    "genuineJudgments": "0/30 per independent T022 verdict",
+    "savedItems": 30,
+    "realProviderProxy": "30/30 Ollama pairs scored against explicit DERIVED own-session1/other0 references",
+    "savedApprovalTimestamps": 0,
+    "actualCurrentHumanReferenceCalibration": "not established",
+    "answerComparisonCalibration": "retrieval relevance MAE cannot substitute AI-vs-counsellor answer judgment"
+  },
+  "historicalT043": {
+    "seededSessions": 21,
+    "realStagingCitedAsk": "documented genuine historical attempts",
+    "temporaryTreeSessions": 19,
+    "database": "lkb_staging",
+    "embeddedChunks": 751,
+    "embeddedSessions": 9,
+    "plannedChunks": 1905,
+    "provenance": "legacy-unbound",
+    "limitations": "Historical incomplete indexing, query-embedding quota/tree-only fallback, temporary tree and omitted malformed sessions; no complete current strict supported sync/index/vector/Ask/idempotency acceptance",
+    "fullAcceptedIndexAsk": false
+  },
+  "candidateSourceRecovery": {
+    "scope": "candidate content only; semantic/index status pending; no current DB/runtime readback",
+    "source": "dated docs/HANDOFF.md recovery metadata",
+    "realSessions": 29,
+    "validTurns": 3424
+  },
+  "L1": "HOLD: genuine30 human references/final calibration and full accepted T043",
+  "L2": "UNVERIFIED: actual comparable tenant loss and exact lineage/capture receipt; exact authorized lkb_t059_* namespace/tenant required, prior staging authorization not interchangeable",
+  "L3": "UNVERIFIED: same captured source actual reindex, healthy output digests and downstream Ask",
+  "L4": "UNVERIFIED: unchanged question/distinct child/genuine comparable before-after judge/rubric/provenance; no inferred win",
+  "L5": "UNVERIFIED: actual bounded interrupted recovery/no duplicate or foreign effects; uncancellable provider and unrelated writer limits explicit",
+  "newExecution": {
+    "privateExports": 0,
+    "git": 0,
+    "sourceChanges": 0,
+    "db": 0,
+    "verdictChanges": 0,
+    "providers": 0,
+    "browser": 0,
+    "contractChanges": 0,
+    "tests": 0
+  },
+  "currentAvailability": "not inferred from dated metadata",
+  "acceptanceLimits": "No proxy labels become human gold; no real historical subset becomes full accepted T043; no existing corpus becomes same-capture flywheel proof; no received/generated answer becomes improvement; no source PASS completes parent"
+}

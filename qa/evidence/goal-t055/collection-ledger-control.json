@@ -1,0 +1,46 @@
+{
+  "issueId": "ISS-T055COLLECTIONS-001",
+  "proofClass": "actual-mounted-api-concrete-store-filter-enforcing-fake-db",
+  "caseId": "C",
+  "status": 200,
+  "target": {
+    "_id": "272082f150151ff6230b35726e51cf6663425e745df4e129f505a272e2653979",
+    "tenantId": "a",
+    "title": "Updated",
+    "members": [
+      {
+        "kind": "session",
+        "id": "shared"
+      }
+    ],
+    "revision": 2,
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  "siblingBefore": {
+    "_id": "dc20093b96ad6e8403ea4463d025cad26135b740c3a79e8e6563303386a9b171",
+    "tenantId": "a",
+    "title": "Sibling",
+    "members": [
+      {
+        "kind": "session",
+        "id": "shared"
+      }
+    ],
+    "revision": 1,
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  "siblingAfter": {
+    "_id": "dc20093b96ad6e8403ea4463d025cad26135b740c3a79e8e6563303386a9b171",
+    "tenantId": "a",
+    "title": "Sibling",
+    "members": [
+      {
+        "kind": "session",
+        "id": "shared"
+      }
+    ],
+    "revision": 1,
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  "siblingUnchanged": true
+}

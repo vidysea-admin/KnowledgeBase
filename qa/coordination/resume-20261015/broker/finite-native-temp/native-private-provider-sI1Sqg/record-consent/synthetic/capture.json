@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "tenantId": "synthetic",
+  "sessionId": "capture",
+  "meetingHash": "fb87eff862e348c169ea5c95ba09fb510d68bd725c134df729351b31cf1ca7b3",
+  "captureMode": "silent",
+  "operationalApproval": {
+    "approvedBy": "fixture",
+    "reference": "fixture",
+    "appliedAt": "1970-01-01T00:00:01.000Z"
+  },
+  "organizerConsent": "unknown",
+  "consent": {
+    "given": false,
+    "recordedBy": "fixture"
+  },
+  "privateWindows": [
+    {
+      "tStart": 0.8,
+      "tEnd": 1
+    }
+  ],
+  "generation": "f04dbe51-aa1d-46b5-a51f-27771467df70",
+  "mediaStartedAt": 11000
+}

@@ -1,0 +1,28 @@
+{
+  "format": "broker-focused-request-v1",
+  "candidate": "e3274599a31c171b7eaf002b0a02f3df7b50aaafe77e00021e16a308414d41ce",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "e2f2444552d9daf26220eb9c6a476e7383afebe078d701486fc6eed6841b7131"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "0dfed0b0dbb5be40b05c6913ffbb02ceb4296009cbd7c111c9d84dc7889c43f1"
+    }
+  ],
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-name-pattern=diagnostics |actual production graph selects|source drift/forged citation",
+    "scripts/eval/vectorless-production-eval.test.mjs"
+  ],
+  "outerTimeoutSeconds": 45,
+  "expectedSelectedTests": 6,
+  "scope": "4newdiagnostics +existing correct/ambiguous productiongraph and forged-source guards; filtered tests remain historical not newPASS",
+  "providerCallsAllowed": false,
+  "cpuOnlyThroughBroker": true
+}

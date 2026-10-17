@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "index": 45,
+  "originalIndex": 50,
+  "claimId": "2026-07-28-metrics-and-mingling-c01",
+  "inputHash": "cef337e84aaf7dbb6506262149786afff7053938e51175c9183786cdfd049110",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited record explicitly describes networking/conference sessions and says 80% of the room calls itself introverted; the claim preserves the room denominator and approximate wording.",
+    "missingReferences": [],
+    "caveats": [
+      "The percentage is a speaker observation qualified by \"I think\" and described as a recurring pattern, not a measured survey or externally verified result.",
+      "Stored speakerRef is unknown; the embedded Bhakti Shah name does not verify speaker identity.",
+      "The same turn ID now has different text, speakerRef and timing: original 1286-1318 versus current 2237-2244.",
+      "No missing or duplicate citation references in the supplied contexts.",
+      "Historical artifact hash is provided only; current raw byte and normalized-LF hashes are distinct and neither was verified against disk."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "turnId": "2026-07-28-metrics-and-mingling-t046",
+        "contextVersion": "originalMigration",
+        "quote": "I think 80% of the room—and it's an interesting find, it's a pattern—80% of the room says, \"We are introverts.\"",
+        "textSha256": "0b6ff3f9b5ba528a40c2aa120071125eefd3408856855942574361baaa6a801f",
+        "contextSha256": "da107d248532b40da7c638467e636fc544983e688afc5ecaef40df8ef8f731be",
+        "artifactSha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1286,
+        "tEnd": 1318,
+        "supports": "Supports the approximate 80% room self-identification as introverts; the same record supplies networking/conference context."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited turn gives advice to ask a talkative person to summarize; it contains no 80% figure, room self-identification as introverts, or conference-networking context.",
+    "missingReferences": [],
+    "caveats": [
+      "The same turn ID has changed content, speakerRef and timing relative to originalMigration.",
+      "Stored speakerRef Niraj is a source label, not independently verified identity.",
+      "No missing or duplicate citation references in the supplied contexts.",
+      "Current artifact raw byte and normalized-LF hashes differ; artifact bytes were not independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "turnId": "2026-07-28-metrics-and-mingling-t046",
+        "contextVersion": "current",
+        "quote": "I, I, I have a great tip. Just ask that person who is not shutting up to summarize.",
+        "textSha256": "851312230fed1daf46878ee0cfab11ccbdc415f655b0be85a4b14194f1e397ea",
+        "contextSha256": "822f1bd84489c4bc6256c0762338e71589d57c3a9c14f9b3856edbfcbce5743c",
+        "artifactSha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+        "revision": null,
+        "speakerRef": "Niraj",
+        "tStart": 2237,
+        "tEnd": 2244,
+        "supports": "Unrelated advice; does not support any factual component of the persisted claim."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original citation supports the approximate room percentage as a qualified speaker observation; the changed current citation is unrelated. Hash and identity-binding checks pass; artifact bytes and external truth remain unverified."
+}

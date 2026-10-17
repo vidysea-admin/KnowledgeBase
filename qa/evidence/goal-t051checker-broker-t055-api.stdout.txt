@@ -1,0 +1,23 @@
+✔ actual catalog store matches exact tenant-namespaced topic ref and resolves only owned exact evidence (8.0395ms)
+✔ recorded programs/resources retain unverified state, safe URLs and owned sessions with no path/private extras (1.8835ms)
+✔ public links refuse unsafe protocols, credentials, whitespace and controls (0.3974ms)
+✔ raw WhatsApp and mixed cached metadata cannot leak through catalogs or resources (27.5724ms)
+✔ actual storage/router collections CRUD persists reload, dedupes and requires exact tenant membership/revision (401.2724ms)
+✔ revoked/read-only credentials cannot write; document highlights refuse wrong source/version/page/quote (115.2141ms)
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✔ actual PDF producer flows through durable store and source-page/highlight API without DTO fixture substitution (539.6435ms)
+✔ actual topic/resource routes preserve exact topic identity, own source references and existing sources scope (26.8384ms)
+✔ collections refuse raw WhatsApp members and cached names with a mixed unsafe source (39.9447ms)
+✔ missing DOCX binary is an explicitly unavailable capability; relative binary configuration refuses (1.9543ms)
+✔ canonical schema resolution works from the API package working directory without configured override (103.5716ms)
+✔ canonical schema and crossfield guards refuse malformed collection/page provenance before storage (45.4691ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5617.7839

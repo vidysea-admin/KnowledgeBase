@@ -1,0 +1,20 @@
+{
+  "status": "PENDING_BROKER_RECEIPTS",
+  "cycle": 2,
+  "candidate_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "observed_at": "2026-10-16T01:43:35.488747+00:00",
+  "completion_reserve_committed": false,
+  "bounded_wait_s": 30,
+  "independent_reconciliation": "complete exact source/helper/prior proof hashes match",
+  "missing": [
+    "actual2boundarytests receipt",
+    "actualcontracts.py receipt"
+  ],
+  "no_poll_loop": true,
+  "actual_usage": {
+    "tokens": null,
+    "cost": null,
+    "whole_active_s": null
+  },
+  "broker_request": "probe-contract-request.json"
+}

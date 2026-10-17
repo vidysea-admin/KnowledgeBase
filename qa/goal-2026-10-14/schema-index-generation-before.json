@@ -1,0 +1,877 @@
+{
+  "at": "2026-10-14T22:08:43.6420904Z",
+  "files": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_policy_review_items.schema.json",
+      "sha256": "DF39C962ABA86E4770EDFA28B4F2EAAD46E10F4A120BEA20F89D2C0CC4091E6E"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_policy_revisions.schema.json",
+      "sha256": "482C2D2D6501AEE17FBF195664407B338A3127568A1583FF4AD20DCD0BE90FFC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_runs.schema.json",
+      "sha256": "2784B0BF93AF81284A2AA2A93F98A8E90435DC1996B0154007D106740456AE89"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\answer_source_conflicts.schema.json",
+      "sha256": "51AC52176EF40C182A462F4E26790F4128CC72220DBE1B6A9181D3CCBE7E572E"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\api_keys.schema.json",
+      "sha256": "12772F62D25329FA0BE0291CBD8C1CE67A8CB6F264AA64C21A0510D757ADC594"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\application_operations.schema.json",
+      "sha256": "F3A07F2905F62A12A776732E04A26BFEB45E21B67454112B213FBECDC9B90787"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\automation_runs.schema.json",
+      "sha256": "50AC695CD5E7A9E0803101B8D98CFA7F6E92AD5DFE57AF21B904E653E00865A2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\championship_events.schema.json",
+      "sha256": "79A6B85E3FC65713894047C70C9A214989EE65AC561BD4D0D284C634A3831797"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\chunks.schema.json",
+      "sha256": "A9B4A36289C63A67CE72C6BB9A9CBAE9FEBA4D59412DAA0B4B83D2C8B2B467B9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\claims.schema.json",
+      "sha256": "FBEE54668A189EAD1336967B37B0EC27B610401385A933E89670260CB0E72C92"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\consent_policies.schema.json",
+      "sha256": "2AB78ECE32EEF3A7679F4938758BC4C9D33FBA2DC9A30B56541CBD4F56C42E9C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\decisions.schema.json",
+      "sha256": "7CE38A33026BBC4194B69B78DE190A10C89225726AAAFDFEE70E1178942FBE22"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\document_documents.schema.json",
+      "sha256": "37E3CFD33156145523409966F4D78122D45F7CA116800213C5395F8CF7DD4FEC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\eval_runs.schema.json",
+      "sha256": "0401D26C2E7D0F68C9B998769D40BFD25B6728AF36416B0F0438FA82866E9742"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\features_event.schema.json",
+      "sha256": "3539798CF55E4CF7159BAF315797DA1B4A1E242AFC74E04980AFD23F4026230E"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\gaps.schema.json",
+      "sha256": "DC5792E0F1778D2DA7724592C14FA1F702B58CD816CF74D9B52B4D3B4FC80563"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\graph_edges.schema.json",
+      "sha256": "7127142AC5CDC65B2D952EE0DC646509C34FBE6466CA3E4EF349C6D40D241E23"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\index.json",
+      "sha256": "846B3D698C7D16F58E00FCC4497600390C277C8095D811B8132C2F4AE2D170A3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\jobs.schema.json",
+      "sha256": "D5BE6736CAA6F79795B393B80D8008A3C60EDB1ADA1C869298C0AB568AACB0B2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\knowledge_collections.schema.json",
+      "sha256": "079DC764E4B769B79A6EC866B8663D98A54CB770FB0DD412CA4E5F874D354633"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\knowledge_outputs.schema.json",
+      "sha256": "ABADC5330BD0F189E6FB064C4BBB315C78B0405455358394C70E202CC02434A1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\media.schema.json",
+      "sha256": "364BAC0CD3F6D644942417E3E4B67FAD28FE0405892C37CAD8223145B9972EF7"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\meeting_candidates.schema.json",
+      "sha256": "9D3B6B5D6176C29BAD4BC7FC4C5C2AFC4EEE5F9227AF8D9E7B02BE399EA8203D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\operations_schedules.schema.json",
+      "sha256": "182DD658099957AEB641A2CC6418B94428452D0C0E5D8AD36CEB9C6058F3F5C9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\orgs.schema.json",
+      "sha256": "E867BDEA46D08F8E06B444512CA0BA64D887A163CB7D6255823F70FD7C711D0D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\programs.schema.json",
+      "sha256": "F8AA949EE609445981010C23FCE00CD1AEB5E7F63BEC4D9A137CF3F9A05510E2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\session_pages.schema.json",
+      "sha256": "0E89BB80D3CB87AD729CB0BAEBCE081BAB45B9B9CFF1CEB6F49917A10EC48E54"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\sessions.schema.json",
+      "sha256": "36E8396E57A796A85D66421E1144516407F1FE53CA89ABD922D1ABFA74027C51"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\sources.schema.json",
+      "sha256": "98D8AFC59B405A6E6115BE9E864C653E73D799DFED33D68DE078C8C836978D62"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\speaker_suggestions.schema.json",
+      "sha256": "36D6F778C116E72B00D4336A885FD10897F95F94E4C8C68F00962FA5A0947237"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\speakers.schema.json",
+      "sha256": "4517527931B596071FC61568BEBA608C7DE20CCE5733C2DF7857E3FBFA72A064"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\tenants.schema.json",
+      "sha256": "4609C0C6B321C4512238E32048750E814B8D949F42722AC9005B74756BDD232B"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\topics.schema.json",
+      "sha256": "D39485734E248BB6593480CCEEF60D317855BDAE56E3522665970E02E97F03AD"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\transcript_review_revisions.schema.json",
+      "sha256": "7903474FF1B5EF08B0D20034F970258C0BDE6253F960C6A25D773C0DADD95E51"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\transcript_reviews.schema.json",
+      "sha256": "5EF9AB1B7B8E4AF400CC178384A1294F75E8FDB0397309C24A0E2CDE4EF72EB7"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\tree_index.schema.json",
+      "sha256": "D2845FBA39077D15CA6DF2A8F52CFF4C3BD55DDFA5BDD94D32E628CC81823CE9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\trusted_senders.schema.json",
+      "sha256": "68588ADE9FBD157F225BF4E222408783B53DA90DA29B4CA69F3676285DB22120"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\turns.schema.json",
+      "sha256": "367D41C4A0D8C92CA4C8007731B07BC713C30A34BD01BB63DF14842E00397709"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\usage_events.schema.json",
+      "sha256": "342BAB5FA055D837CBF7CE717836A12F70B761987A14D981BF07D53F7968361C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watch_heartbeat.schema.json",
+      "sha256": "4F199F633F4398142593C991FE0A224AF24C030FDF794AEB1AD39F7E9FB674A5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watch_reports.schema.json",
+      "sha256": "328E7E5FC8E5A725D26A182E625B2719017C4524CB097126504CBF9BFE5580E0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watch_state.schema.json",
+      "sha256": "B1B29AE7299071A727741FAC4F18428DEA637454042D7211484D209CC66BEAAE"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\watched_sources.schema.json",
+      "sha256": "0DAABC83E6F5901326AABC8BA8784947F7CDB9B8EC6B106153E797FC5D83298D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\whatsapp_candidates.schema.json",
+      "sha256": "6CAF632D53474472485713A9C89BB598F011F1236D8E49942D1EE9DBB335BF16"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_policy_review_items\\invalid.json",
+      "sha256": "9EDB8E775BBAA0658F89C1A780D60DE108E0B3A0C8053F8E3CA82C47C71A2BB5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_policy_review_items\\valid.json",
+      "sha256": "47F39A666FBDC17DA3A4C239DF64629422D1229CB8A717C18D6773F6AE86A618"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_policy_revisions\\invalid.json",
+      "sha256": "DA3FC04D83631298D0FE85C0CD5721B7A34CF0CCAD54FAB5A5D325E5236E2380"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_policy_revisions\\valid.json",
+      "sha256": "0A7096DE49EB6A9786AA7FA901F631194FD9C7548AEF3C8F19FD2738370BDEA5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_runs\\invalid-tenant.json",
+      "sha256": "7A60985EF10A0E6ADDAD4365874BE9CC20EDE8F3FD75C9974E232671D13929F1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_runs\\invalid.json",
+      "sha256": "0F0DFBA7C5EB7DE1F6417E439F9830AA468F7E4CEB738C242CE3127A97D68C61"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_runs\\valid-allowed.json",
+      "sha256": "4EFB55EDE05798BBAA0303A2EC17D40BC110F8655B63BB5408AE9B47F88CE373"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_runs\\valid-approved.json",
+      "sha256": "531CC3217E54FF0CA7557DC0951CCEA0669383DE5ECDA64A88B7EDD7CF5A2395"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_runs\\valid-rejected.json",
+      "sha256": "8AB71AB7F658E220F293435EE0CDCA849A1BD6F179C5F140FAE3EFC117C97FDC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_runs\\valid.json",
+      "sha256": "ADDCF278314F1649A697984197C3D04FDB514BBD51B96A12B2EBDE5BD09251CA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_source_conflicts\\invalid.json",
+      "sha256": "69E1F4197EA54649427CEF6CD61B95AECDE8FC671EC0F4851F694429FC4886F3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_source_conflicts\\valid-resolved.json",
+      "sha256": "E9517D27447FE55536306434180135E53734D03B542FB9B91A6BF5CA8F2652F5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\answer_source_conflicts\\valid.json",
+      "sha256": "E82901F20937BC5DE4B6AB5D3FAF4F6FD07EF0DBF669D589DB7886A4EDCFA2BB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\api_keys\\invalid.json",
+      "sha256": "77AFABB83CD6B2F3535D61103116896B1360B6EF04FC721076DF6490608F25EB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\api_keys\\valid.json",
+      "sha256": "9925B9BAC95B6444026245BED2CD6580622274E632E592ACED9C4A2F89241119"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\invalid-case-0.json",
+      "sha256": "1A65FA3922D0BD48AB185C09FAF3BDFE0DDA7FB9812FED8EAFD7641A03418D26"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\invalid-case-1.json",
+      "sha256": "00AD2D885B562F544080266E2A04D6F09A8FFE3C95739DD3C0F22BF0B6F327AA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\invalid-case-2.json",
+      "sha256": "62A3AB30D3D8987C468564D423A13040E9215ECB3416CDDAD1E93937AB5582B9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\invalid-case-3.json",
+      "sha256": "E31CA5C4566E7A70DCBECEE195CE3A9900107A5CBBCD53ECA67D81ADEC98176A"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\invalid-document-whitespace.json",
+      "sha256": "2DB399D095CD70B907FC6F19D5F13A5CB495A7600E30BA705707025C717982D1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\invalid.json",
+      "sha256": "1A65FA3922D0BD48AB185C09FAF3BDFE0DDA7FB9812FED8EAFD7641A03418D26"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\valid-canonical-document.json",
+      "sha256": "B219690B541ADC2044ABA1D591FD37573F86808B9085809035CC400CF28D7216"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\valid-operation.json",
+      "sha256": "1CA470B57BF03F33C89961975B484CC8028B8D061A10EAB77FB1890BE9A814BE"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\application_operations\\valid.json",
+      "sha256": "8B05FED2D6B6038971E92B7336880F814EBB3C8D6ECAF6F57B30C556750407A0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\invalid-case-0.json",
+      "sha256": "7D555B6927A5048608F93C4C9C6259E62E2D6103959CBCF794DBC2B567A86435"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\invalid-case-1.json",
+      "sha256": "6EB9A0C157866535F74ED73A9A1890CE4B25B0BF519A0014BE25328E58DF1AE2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\invalid-case-2.json",
+      "sha256": "308C9C8DB093C5167C8A7ABB82CFAC6F80411A5AB3E4F77700CA19530B7D6F94"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\invalid-case-3.json",
+      "sha256": "B51F8AB6BBD825EE7FE93C9AFBE617560CB8AD31A0F1DE31FC30BD542B5ACAF4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\invalid-case-4.json",
+      "sha256": "3AD7F6C904F3548A0BFBD97868F7FC8A85E1A8391D96AC390EE8652642B49DCA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\invalid.json",
+      "sha256": "7D555B6927A5048608F93C4C9C6259E62E2D6103959CBCF794DBC2B567A86435"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\valid-run.json",
+      "sha256": "524B1A665B408A59D35390DB469C4DCF2098D7A41061F67006B785E49E9285DF"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\automation_runs\\valid.json",
+      "sha256": "771E360F8B5737AAD2E09C7903936D53F9DF8E1805B73F7351430EC51C9933CC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\championship_events\\invalid.json",
+      "sha256": "FA233F86EBBA79E39DBD36A6AA298A2879B90E8214CBABAFC4364C29C9BD24E4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\championship_events\\valid.json",
+      "sha256": "0BF2EF5851BA83D790D53393F123BF27D703F25352CEBE7D2E493CEC238514A3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\chunks\\invalid-index-generation.json",
+      "sha256": "28A94B05CB98256898701E038046874158693C68F9B7FA096E2B306B8DB3648F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\chunks\\invalid.json",
+      "sha256": "29E945B48DD311CDD5024953D5B7E7B8508B43EE889E89EDC2BE16C7CA75AFDB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\chunks\\valid-index-generation.json",
+      "sha256": "3F81CE1ECC430920DB7F725ADC4D845D99F0C812187A8FD846F6A92EFD6578EA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\chunks\\valid.json",
+      "sha256": "148440AEDF6320439B60F12DE66612E4C62AED768612745F283149344036A785"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\claims\\invalid-index-generation.json",
+      "sha256": "E07D4CE9CAAE6807FC1040273881C6843E1ACADEB7501019751B3BA25B032AB4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\claims\\invalid-origin.json",
+      "sha256": "090D30F4D980CF68BFA11F6DFB5EF9AF6F6793E8EF0F775A2F95B56FD997EC76"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\claims\\invalid.json",
+      "sha256": "BC1756D9AC76EA355401A30ABE9242D40DE6D697FA06EA776FCB7E84D062F02E"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\claims\\valid-index-generation.json",
+      "sha256": "BA6BD250EFC02EF1641E0A2BCE85D6D96FA125356AE793A81FE0DF208DDF3D74"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\claims\\valid-quoted.json",
+      "sha256": "ECE991B9F172F0427378274DEA37AE806C5F27B493D84AA6E2CB881EAB565524"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\claims\\valid.json",
+      "sha256": "C77AE92233268BE5435F663CDDC23F17DFCE46DFD54DCAC7D1AE10ABD1A49980"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\consent_policies\\invalid.json",
+      "sha256": "81FD7C77A8EC8FBBF299793407B13684BAA9C0F00AFDF482113E6B3802A8ACFB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\consent_policies\\valid.json",
+      "sha256": "343DB6BD02A713E1C9A316F5BF32C9C1B583BDF84A75BEE825C7DB0A095FC423"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\decisions\\invalid-generationEvidenceDigest.json",
+      "sha256": "CAAE911DD0A77422AE941EE4BFD6A00FD65421A3C4AAD1AAEF7073AB5A3BF613"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\decisions\\invalid-sourceEvidenceDigest.json",
+      "sha256": "C4D75198C823246241ECA5D841E6E5667B8E10BB92F0BACCD91F538D2366DC6C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\decisions\\invalid.json",
+      "sha256": "CED0DF862971D4A0863303CDE809DB231F42347642403B4272B896903A7E1935"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\decisions\\valid-bound-generation.json",
+      "sha256": "A0938B100D5954297CC27DADDAD709B278F7880EC9F239C88B5B969198018D40"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\decisions\\valid.json",
+      "sha256": "CEDC878F42BE43DE167B3B5E965E94F8142F34D40272CFF4381CFCE20C0CAEA6"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\document_documents\\invalid.json",
+      "sha256": "1482EEB38E7FC3A14BC64E3D36BBE104DDADD2D292659645D4194329ED95EE4D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\document_documents\\valid.json",
+      "sha256": "34C77BE6D4172161F15C7FA81D77819F6F70ED9E0F8572DA6544B08FF384B4B0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\eval_runs\\invalid.json",
+      "sha256": "E78D89EC460FCEFC42E12FC76CD6B389F9571962CCF8E17F34A81ADEFDC405B2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\eval_runs\\valid.json",
+      "sha256": "F573EB986974BE893F2507FF4E5C4705C22B0B1B4796E9DE5F64F0F05742139B"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\features_event\\invalid.json",
+      "sha256": "11D1B5787E8A266AC4A77473CF608B3E60BDD56CCBDB9D548E9A2865421C6FE7"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\features_event\\valid.json",
+      "sha256": "41C888A1ACCCD4E993775E7EB1B3BB190F721DB6F670EC72AD2E802E3C913A95"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\gaps\\invalid.json",
+      "sha256": "603B6E32F96013F0F31580A17CBCDF1CCB70B0840AF5613686A8322A6243CCC6"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\gaps\\valid.json",
+      "sha256": "363D91AD45D9A4A514B400DFEC815907BBE94DE40DA4DB10E98D6AD1FF25789D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\graph_edges\\invalid.json",
+      "sha256": "2DBC0C2644615BD34373CE574BBF2DC3042FD5639ACE9125AD450EB56B7E4A20"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\graph_edges\\valid.json",
+      "sha256": "4F1119863F29F6E28657616C38CBB09DDB9735518A79601636E2ECC81AF9343C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\jobs\\invalid.json",
+      "sha256": "A97107A45D4F3511D9931201427583B1361639AADAA70E9B537B91CCBF974B85"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\jobs\\valid.json",
+      "sha256": "A951D7FCBEAB8112B25A4BA0241A9EE47B4FADD71B97C62044E976E83CE1394C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\knowledge_collections\\invalid.json",
+      "sha256": "B5C5D55639827EE9F8BAA2A6DA9A1D2DE2260E00CE88C7861CE7D2A53912A896"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\knowledge_collections\\valid.json",
+      "sha256": "D40779342ED474AF031F56373F03AE895D914FD3DA2A4FB5833F5D763593D44F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\knowledge_outputs\\invalid.json",
+      "sha256": "CBD724F0BB89452039FF8A462080051F0C57EA61E8B5FA0927D822A2ABD00471"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\knowledge_outputs\\valid.json",
+      "sha256": "568B8B466B0F01B5974CBBD6884FAD354240A657A4A86B4A028C188DC4269C98"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\media\\invalid.json",
+      "sha256": "8AC11AA76718EDC35A292C4DD7D3B16BE2A59D10052CA64575D28D67F40730D4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\media\\valid.json",
+      "sha256": "CAA92DD42CBEEBCFCE254891363B0458E2FB272E37E4207C0B44BDC482FE60F3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\meeting_candidates\\invalid.json",
+      "sha256": "3CB771C944C6CF6C85E0714AEF2A6ED57F7C65BC8E1D3B378BF4C217A451450A"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\meeting_candidates\\valid.json",
+      "sha256": "AFB87764CF9191FA745A4E1A46B72DEF5C133D6536D0AF08B115B3A1A9AD0F8C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\operations_schedules\\invalid-interval.json",
+      "sha256": "583AC4D97380048AF1A3163A3CF58CF9CFF2B7ED42E6D654AC26061CEE653A19"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\operations_schedules\\invalid.json",
+      "sha256": "39E79F521D21DB9CDE359B1294CA9E3A0CE181CCB70F88A7FC3CC83B4C739AB0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\operations_schedules\\valid.json",
+      "sha256": "DC69DA99C76A4FD869F8BE0E335F144BFB8F06CA84221872FF74EB7A2E5B3354"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\orgs\\invalid.json",
+      "sha256": "7F61E59C82CB9F272C541407F115DDC6021D3115E6DB419DC361094278C5941D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\orgs\\valid.json",
+      "sha256": "D8AA79D1C79054035E9D996C60C39A683D8F6EF9BFDE6761382329C3CE6852DC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\programs\\invalid.json",
+      "sha256": "A81801EE6A5DD68150DB0BE1CC029ACFBE5389231F542A629B174B27DE545C94"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\programs\\valid.json",
+      "sha256": "36389AAE25565F72F4305CCD197F51CB8BB96EA07975DBD8BFE448A83F771434"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\sessions\\invalid-index-generation.json",
+      "sha256": "649BA45AABACCB42E61B5A17EF253BB56D8076EAC73073FE53673C265E6E48D3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\sessions\\invalid.json",
+      "sha256": "61A21AB0EAB3399B18307EE3FEAD71D523E61C7DC55E040003984EEB45E387EB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\sessions\\valid-index-generation.json",
+      "sha256": "4B915449424104A3C206F8DA9256054F50AAE17E951AEE6E18C5942953DE0089"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\sessions\\valid.json",
+      "sha256": "FA95D9604416D2ECA284CFEE57128C5DD6C367C8BB73767507BF73DFF7E85B59"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\invalid-grounded-answered-without-evidence.json",
+      "sha256": "64AAFD8A31E3635E3351684FDAA4BCE65F1583FAE9B59AF5875F015ACDDE7FB5"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\invalid-grounded-item-bad-origin.json",
+      "sha256": "EC071C680C1C53773E5332EAE09D0A2F60E6E7C834EF9F3D6158DEAEF4B13102"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\invalid-grounded-item-missing-quote.json",
+      "sha256": "14CBCA628070C3536A442A7098303F71B302CA299E317B6942410C3DCA5814FA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\invalid-grounded-unanswered-with-answer.json",
+      "sha256": "86014A74D78BABE9F4718FED79C2B2D25769FDC7570BA45D7BD637A04BD79C03"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\invalid-index-generation.json",
+      "sha256": "80E517ECB1CB0851D7A5DE00677CAE95F058D4226D1F6E6422C7354DE9A8132F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\invalid.json",
+      "sha256": "44B8C969A8A5F0FD0DEE7993688327D202C4E3CBEDDFDD8A0B912508FAEEEA3B"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\valid-grounded.json",
+      "sha256": "BECF0A228430A75609288F66AF061C9901700F73BDAE5C22D346F415BE4472A9"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\valid-index-generation.json",
+      "sha256": "E60920EA94BFFA1AD58158B48460642C6614DA4B0A1D5265B47E469AC7493AA0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\session_pages\\valid.json",
+      "sha256": "3A80CF4C9785C1DA011381D917538B834216A83D772860534E6E7E835D7DBC64"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\sources\\invalid.json",
+      "sha256": "2EA13F291E981060D8392DE7E34029F41684E76A4A68E9FF68BE1089BD65EB0A"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\sources\\valid.json",
+      "sha256": "BACF4961A5F695A43CB26647FAEDA757C33D2159E0B3E60E652E1CC9D0D1DA93"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\speakers\\invalid.json",
+      "sha256": "339D91845159284CEEFE6C20144E69ECCC1072AE1B4161B075A436CBA08EC0CD"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\speakers\\valid.json",
+      "sha256": "7CD74C6A0F47EF3D9014A89858A8C0AD65A378B73BAA105C68323E67D2357B45"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\speaker_suggestions\\invalid.json",
+      "sha256": "887A20F706CBF2D7E03975C1B29DC47ABAA7D03FA91B47DBCFBE87EF39578453"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\speaker_suggestions\\valid.json",
+      "sha256": "CA955CAA3B862F989A5CC62A0FBA3550F7476F3A423F5526B63BE4F60CE18460"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\tenants\\invalid.json",
+      "sha256": "65074CA4E3FD08491AA2F5D1DC87F80207AA9FDA3CC997B60010596F460E3653"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\tenants\\valid.json",
+      "sha256": "6AF812D2AB7B7C1513A980856EC365690AC03BE29FB9322F710FBDBFA826444E"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\topics\\invalid.json",
+      "sha256": "E692236684EDE7ABB1A77A5A5E5D9FC9527AAD653718EEFF8C1AF5A84FD3A26B"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\topics\\valid.json",
+      "sha256": "8F7D650553BFB9044AB759F8451C9E3470FB34E5A5EECAED9CDE9716A7421896"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\transcript_reviews\\invalid.json",
+      "sha256": "9A3A285B5F46DA7A38A15CD1DFB3DE1DEA33C310F800D7C252B37E6E23948B98"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\transcript_reviews\\valid.json",
+      "sha256": "ADC9EE676D3C04DE843F28D9EA2605DC42A5CC1FC5F837C7F579F75A9EC59F8C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\transcript_review_revisions\\invalid.json",
+      "sha256": "7E6FB8385ADB6D9B0A9943175B9822E9D285E508C431DAEB5568360C9028DE27"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\transcript_review_revisions\\valid.json",
+      "sha256": "5A7C70E29FEA7B5712521EA33C6D6F5F3760B904885CB95B511CD7883B3FF66F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\tree_index\\invalid-index-generation.json",
+      "sha256": "3DD5DBC40FDAAC545B8DA2035E90B234FF9EA9388A4C27E1A8E15ED7252F86A0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\tree_index\\invalid.json",
+      "sha256": "ECE325C710F608D9AFCAD66C42026A527C25432BE8D8306D13FB5E7379D9E116"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\tree_index\\valid-index-generation.json",
+      "sha256": "67EB518A5E102250F2EB10246C6BEB0EF3901F6D6F2C6B90EFE637E397BA8EAC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\tree_index\\valid.json",
+      "sha256": "70DCC0C43CB825A689DF0C16D9180291CCF46F69AE48BEE506A10102AB3AB5F1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\trusted_senders\\invalid.json",
+      "sha256": "1E91E125D206543CD940C71E7E3857EBC4EDDC8AAAFCD107C7E910397E2D90F0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\trusted_senders\\valid.json",
+      "sha256": "497C5AB822DA0E9BC8B260C1E8E2EFA346B6EF567AC9855DD58071FAA89553EA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\turns\\invalid-screen-missing-hash.json",
+      "sha256": "AD9BF8E79617FE14A9BE7E3649C66E6552F580B4BA90934F5D0404BE83AFD955"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\turns\\invalid-screen-path-traversal.json",
+      "sha256": "61583602967026077E0B3CE931B9A1F5008075941921411F48F8B0056AE1A83B"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\turns\\invalid.json",
+      "sha256": "08C07DF8A32864E28DB17D1A9EB4F4E229A2751EF3F23402E543F204BAA14000"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\turns\\valid-screen.json",
+      "sha256": "BEDD7E2DD9BE54C81B8800BA34090091D479FA48E799A6D540E4E8836F665851"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\turns\\valid.json",
+      "sha256": "B1A6BB84C6FE04BE70DFE0D959A741C4A4AB9F7EFCE93F96FB57C837015D8109"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\usage_events\\invalid-day-outcome.json",
+      "sha256": "8DE2BC1CC2298C544D809F1AEE84F63CF648CB5B30BB0CEFC46D7ECF6477C85D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\usage_events\\invalid-key-ip.json",
+      "sha256": "316207D339BC3184697393FF306DEAA7B9C55B1369395A039D58CE427932A24D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\usage_events\\invalid-kind.json",
+      "sha256": "D193C99D396E909CEBC6358829FE1CECFF054F97EC5FE27F8272F179AB1027AE"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\usage_events\\invalid.json",
+      "sha256": "4E8845BDA69BB2FEC12587BDEE9B08B9C6323962076FA858DFE6DD6064BFA50D"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\usage_events\\valid.json",
+      "sha256": "227CE47CD474B7E4BB3E005429063EF1C92B80F90394BA65ADD7B76D1225D2CB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watched_sources\\invalid.json",
+      "sha256": "BAEDA83500BFD3D557ACBB739BEF37DC3E3542C20B437D272B60913EE897E795"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watched_sources\\valid.json",
+      "sha256": "A99F00AE419DF56C8E1946862E659C9347F86D536ED5F5B3884D2AE58B345D04"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watch_heartbeat\\invalid.json",
+      "sha256": "5661FFCE7A2D7987DEC4BC4D47407B7861C8AC27F80E912AE7EEF844DBEC161F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watch_heartbeat\\valid.json",
+      "sha256": "704FAF123087E828B9A3A71A68849E387A130FAA12472C71406A64AF0E5F9098"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watch_reports\\invalid.json",
+      "sha256": "CDC0CD5424129387B6FE96851AF352E16B446FA2E62BF18B7C38B4DBA792DD55"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watch_reports\\valid.json",
+      "sha256": "68DF0C481D5D0FF118A11DB9785EDAEA1BD1A0C1F791C156451768B9964CF495"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watch_state\\invalid.json",
+      "sha256": "29C3C28003BDA1F096DCC24904630B169EE69B361A00D95262D46A30D3F4B662"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\watch_state\\valid.json",
+      "sha256": "798DB7A44D9A3B4EA56DCDAD10700EE80DE4C20FC3A8F9130274BFEC2CDF1BA2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\whatsapp_candidates\\invalid.json",
+      "sha256": "EF1F453456CEDE1A0B57E2BF55877B95036B3E4D2A5D7C8B28316988493819A0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\schema\\fixtures\\whatsapp_candidates\\valid.json",
+      "sha256": "D16E53A620130A376FCAED717D06DEC19B767CC1A1BC526AD4DCCBA9799E0224"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\answer_policy_review_items.ts",
+      "sha256": "FEF7B5008E5EA1FEF7645162EDDEDC5C3064E7A95032B5930231C86E233883BC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\answer_policy_revisions.ts",
+      "sha256": "4C803C5F292CC2DECACE630BD04B9740666C6A9D67177DCCE660A8617CB78C33"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\answer_runs.ts",
+      "sha256": "6ABCFAD1A8020E334C3C904E32EA4738D9CF0872F90A5E317D4EB7A7BB8EE7ED"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\answer_source_conflicts.ts",
+      "sha256": "76944C909CFBED5B62CE40B34F9C93FAC2B8D361C31F854575CBF1C63A83E5D1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\api_keys.ts",
+      "sha256": "3588D2FD73607CD84B9FC441AB922D15BFEF955C8B746ECA372AE8032A7F9CD7"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\application_operations.ts",
+      "sha256": "D0330564F31B749D15EEB6F425DEDBAF088E61F7F527EA709AD6999D8C8E18B3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\automation_runs.ts",
+      "sha256": "719C138AF82A056A31A4AD5A11D3D2C3A42FEDD2C5FB844DA66C218CC3F1A473"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\championship_events.ts",
+      "sha256": "BC5844D6E03F40E40A69C0885A25E27552A7A0997705B5AF8014844448649F18"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\chunks.ts",
+      "sha256": "BADA40CF96D687D98D5A047EE02E23F4F49D00267D0A2BF7FC3FD4FD738A9A0A"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\claims.ts",
+      "sha256": "7F0EC43C94C0140FDFB220B311D775653FF9D25B2E492C80796F766CE70B2A5C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\consent_policies.ts",
+      "sha256": "4506F6ACFA7DCEE62C10BD52054074E7543E62B09B03E7B033D9B4107451B1F0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\decisions.ts",
+      "sha256": "04212E855D206584AB60513B3028C4E8997DEC66E2ADD83950D948381B0166FF"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\document_documents.ts",
+      "sha256": "F2EDB876662BF15C29093553034300CFBF50FD0585FF1D1B138BA343C12AE853"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\eval_runs.ts",
+      "sha256": "C6392EE60821C797CE773E37F8060D01282ADB8234354AA80FCF307B8C16FD97"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\features_event.ts",
+      "sha256": "A84BF0E4FD03F5BA23A79A5A7ABDD07CE0ABBACE4F6642AD5DAB2F1A03EAAD47"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\gaps.ts",
+      "sha256": "8EF8CB321C0198068A4D4642B817D69421108A7B9D33F0A0EBB742EC9A9EEFBF"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\graph_edges.ts",
+      "sha256": "D96806A152B4391D0B22923DA0498106123FE45E26383608F05FCC910BED2EB1"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\jobs.ts",
+      "sha256": "B1D05176E7A835682C2451E3711DB57FBB71DCC99AA9E4D3D74D03E933B7F02F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\knowledge_collections.ts",
+      "sha256": "6645D6505ED1827AF2B984FF9F86A5CCF46939926F8FB1A0B949A8CF4ACA1485"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\knowledge_outputs.ts",
+      "sha256": "A167D36FB0831E12BA81FB0DC3E94387EDD55DC036966F8C1EE70B50F4EEDB7C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\media.ts",
+      "sha256": "4A5FA3F34BFA5DD45E54F1B0AA1570A041550A66E46C3CD4FFC5374D60324790"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\meeting_candidates.ts",
+      "sha256": "D6A4F5BE963D022BBE07BF768AC20C59295DF4724279C92A2A9CA71E316AA626"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\operations_schedules.ts",
+      "sha256": "64D5F5AEF47C67133AF97F8F3CBD4E7D10AC82D131EC0769329507D268B0CE2C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\orgs.ts",
+      "sha256": "3004D78A69265B6B1D383B6574302E88127897DEAEC3A7028485CBE39557782C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\programs.ts",
+      "sha256": "DB127214E9933088E0A2C6B7048E17F0BC139DCD8C14CA4C10C336ACA99DAF2F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\session_pages.ts",
+      "sha256": "EF50F0DF33F8F72FEC333D71C61660380344C3ECA6A7D9C3C438AB549BCD22AA"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\sessions.ts",
+      "sha256": "FE53A0A4EA7B989257F6BD3377415807CCFBB4C939794FEBE85AA8F456102B11"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\sources.ts",
+      "sha256": "F50549030C7E363BAEA6B9855DC74422EA46A1132B1831F62A2ED4D5092B3993"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\speaker_suggestions.ts",
+      "sha256": "311A6484B448971ABBB30B61528361E4F5001F2A1EEC0E029EB2144D9BA9D09F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\speakers.ts",
+      "sha256": "A0247A1CD1FA64B33AA19AF10FCE0A797E01B796EC57E7C5B799719AE5819C34"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\tenants.ts",
+      "sha256": "856BB46DD43CEB7D9921185D52FEE7C5427925F0B51802577E9ADE8EEFECF67F"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\topics.ts",
+      "sha256": "91BC3DBEEF3C3D8BF61B5F28313FBE04CBF2A6372D65F912CC01A4A73963D282"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\transcript_review_revisions.ts",
+      "sha256": "D0782E8D91DE973DCDB4D08F6B395C154FA1B146F82AB0A4704EA45ECF9473EF"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\transcript_reviews.ts",
+      "sha256": "3A6C03D92F548719E6676341948D2C826555B0BCACCC9AD5661C7965F52DAEF4"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\tree_index.ts",
+      "sha256": "12BEFD6AB283ECF039AA65ABFCB1BABFAB38B4894A8D29E4FBA272FE99F5F17E"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\trusted_senders.ts",
+      "sha256": "E68E34D04E128561EE285A21A25CDDB62CB3B8E791C1125D6B1811C93EB68328"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\turns.ts",
+      "sha256": "B4969CB780F97AC1579D753F271C4E4F7A69F95FCAC9FD76BA8D792F082D0205"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\usage_events.ts",
+      "sha256": "4F674FC250B3C11E51C993171FEEFBB0B2E4B1FF8E1A7C40888F9C8A77F6F964"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watch_heartbeat.ts",
+      "sha256": "A44AF8EEE4BEB8161EC45FFE388B9EB0A97AEEFF882198F437346863C289DD1C"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watch_reports.ts",
+      "sha256": "A22F68D7D0BC49CF5CA7EC2B720014E52FACD92604FAB26CA16FB7EA34822D05"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watch_state.ts",
+      "sha256": "11C2502B044EF680A26B413C2BDD2CEAF55C96CA9B025E7569BE1F6B8680F887"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\watched_sources.ts",
+      "sha256": "2BC9AF8FF8E63FA219FDE1A6C873F397D809061B981435567807A3F3FA4F36EC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\generated\\whatsapp_candidates.ts",
+      "sha256": "C57B95AE7BA54BF73A8B6F295E38CA6E06338CEF3091BD8DC2847AFD5E1F668E"
+    }
+  ]
+}

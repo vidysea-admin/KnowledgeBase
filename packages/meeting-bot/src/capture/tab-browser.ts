@@ -3,16 +3,33 @@
  * A controller crash leaves a recoverable WebM and status file; the extension fails closed
  * when its loopback receiver disappears. OBS remains a separate fallback adapter. */
 import { spawn, type ChildProcess } from "node:child_process";
-import { randomBytes, randomUUID, createHash, timingSafeEqual } from "node:crypto";
-import { createServer, type IncomingMessage } from "node:http";
+import { randomBytes, randomUUID, createHash } from "node:crypto";
+import { createTabCaptureReceiver } from "./native/native-tab-receiver.js";
+export { createTabCaptureReceiver } from "./native/native-tab-receiver.js";
 import { closeSync, copyFileSync, existsSync, lstatSync, fsyncSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync, writeSync, statSync, renameSync } from "node:fs";
 import path from "node:path";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
 import { getProcessStartTime } from "./controller-state.js";
-import type { BotEvent } from "./obs-windows.js";
+import { browserProfileArgs } from "./browser/browser-profile.js";
+import type { BotEvent } from "./obs/obs-windows.js";
+import { assertInsideDir, assertSafeCaptureFileName, assertSafeCaptureId, type TabReceiverGuard } from "./tab-receiver-guard.js";
+import {createSilenceHealth, silenceHealthEnabled} from "./tab-silence-health.js";
+import {remuxRecoveryEnabled, remuxWebmInPlace} from "./tab-remux.js";
 import {validateCaptureControlGaps, validateCaptureStatusIdentity, type GapWindow} from "./reconnect-gaps.js";
 
-const MAX_CHUNK = 8 * 1024 * 1024;
+import type { NativeTabCaptureConfig } from "./native/native-media-types.js";
+
+
+const TAB_ASSETS = ["manifest.json", "background.js", "recorder.html", "recorder.js", "native-recorder.js", "native-video.js", "native-audio-worklet.js"];
+/** Byte-bound installed producer inventory, including framing to avoid concatenation ambiguity. */
+export function tabCaptureAssetSha256(directory: string) {
+  const hash = createHash('sha256');
+  for (const file of TAB_ASSETS) {
+    const bytes = readFileSync(path.join(directory, file));
+    hash.update(`${file}\0${bytes.length}\0`); hash.update(bytes);
+  }
+  return hash.digest('hex');
+}
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** All writes retain the exact private controller identity and verified managed tail. */
@@ -42,6 +59,8 @@ export function writeOwnedTabStatus(file: string, identity: Record<string, any>,
 }
 
 export interface TabBrowserConfig {
+  /** Server composition only; explicit opt-in. No native qualification is implied. */
+  native?: NativeTabCaptureConfig;
   sessionId?: string;
   tenantId?: string;
   python: string;
@@ -50,100 +69,30 @@ export interface TabBrowserConfig {
   recordDir: string;
   extensionDir?: string;
   browserExecutable?: string;
+  profileDirectory?: string;
   autoClick?: boolean;
+  /** T-034 hardening (id/filename validation + size caps). Undefined = unchanged behaviour. */
+  guard?: TabReceiverGuard;
   startupTimeoutMs?: number;
   onEvent?: (handle: string, event: BotEvent) => void;
   log?: (message: string) => void;
 }
 
-/** Narrow loopback receiver; exposed to exercise real HTTP authentication/durability in tests. */
-export async function createTabCaptureReceiver(output: string, onEvent: (event: BotEvent) => void) {
-  const token = randomBytes(32).toString("hex");
-  const fd = openSync(output, "wx");
-  let nextSequence = 0, previousHash = "", busy = false, stopping = false, closed = false;
-  let bytes = 0;
-  async function body(req: IncomingMessage, cap: number): Promise<Buffer> {
-    const chunks: Buffer[] = []; let size = 0;
-    for await (const chunk of req) {
-      size += chunk.length;
-      if (size > cap) throw new Error("request too large");
-      chunks.push(Buffer.from(chunk));
-    }
-    return Buffer.concat(chunks);
-  }
-  const server = createServer(async (req, res) => {
-    const supplied = req.headers.authorization?.replace(/^Bearer /, "") ?? "";
-    const suppliedBytes = Buffer.from(supplied), expectedBytes = Buffer.from(token);
-    const origin = req.headers.origin ?? "";
-    if (!/^chrome-extension:\/\/[a-p]{32}$/.test(origin) || suppliedBytes.length !== expectedBytes.length ||
-      !timingSafeEqual(suppliedBytes, expectedBytes)) { res.writeHead(403).end(); return; }
-    const route = new URL(req.url ?? "/", "http://127.0.0.1");
-    if ((req.method === "GET" || req.method === "POST") && route.pathname === "/control") {
-      if (req.method === "POST") {
-        try { JSON.parse((await body(req, 1024)).toString("utf8")); }
-        catch { res.writeHead(400).end(); return; }
-      }
-      res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify({stop: stopping})); return;
-    }
-    if (req.method !== "POST" || !["/chunk", "/event"].includes(route.pathname)) { res.writeHead(404).end(); return; }
-    const chunkRequest = route.pathname === "/chunk";
-    if (chunkRequest && busy) { res.writeHead(409).end(); return; }
-    if (chunkRequest) busy = true;
-    try {
-      const data = await body(req, chunkRequest ? MAX_CHUNK : 8192);
-      if (chunkRequest) {
-        const rawSeq = route.searchParams.get("seq") ?? "";
-        if (!/^\d+$/.test(rawSeq) || !data.length) { res.writeHead(400).end(); return; }
-        const seq = Number(rawSeq), hash = createHash("sha256").update(data).digest("hex");
-        if (seq === nextSequence - 1 && hash === previousHash) { res.end("ok"); return; }
-        if (seq !== nextSequence) { res.writeHead(409).end(); return; }
-        let offset = 0;
-        while (offset < data.length) offset += writeSync(fd, data, offset, data.length - offset);
-        fsyncSync(fd); bytes += data.length; previousHash = hash; nextSequence++;
-      } else {
-        const event = JSON.parse(data.toString("utf8")) as BotEvent;
-        event.t = Date.now() / 1000;
-        if (!["capture-started", "capture-stopped", "capture-error", "capture-level"].includes(event.event)) {
-          res.writeHead(400).end(); return;
-        }
-        onEvent(event);
-      }
-      res.end("ok");
-    } catch (error) {
-      if (!res.destroyed) res.writeHead(400).end();
-      onEvent({event: "capture-error", t: Date.now() / 1000, error: error instanceof Error ? error.message : "Receiver failed"});
-    } finally { if (chunkRequest) busy = false; }
-  });
-  server.requestTimeout = 15000;
-  server.headersTimeout = 10000;
-  try {
-    await new Promise<void>((resolve, reject) => {
-      server.once("error", reject); server.listen(0, "127.0.0.1", resolve);
-    });
-  } catch (error) { closeSync(fd); throw error; }
-  const port = (server.address() as {port: number}).port;
-  return {
-    endpoint: `http://127.0.0.1:${port}`, token,
-    stop: () => { stopping = true; }, bytes: () => bytes,
-    close: async () => {
-      if (closed) return; closed = true;
-      server.closeIdleConnections();
-      await new Promise<void>((resolve) => server.close(() => resolve()));
-      fsyncSync(fd); closeSync(fd);
-    },
-  };
-}
-
 export function createTabBrowserDeps(cfg: TabBrowserConfig) {
+  const profileArgs = browserProfileArgs(cfg.profileDir, cfg.profileDirectory);
   const log = cfg.log ?? ((message: string) => console.log(`[tab-bot] ${message}`));
   const levels = new Set<(db: number) => void>();
   const runs = new Map<string, {child: ChildProcess; exited: Promise<number | null>; output: string;
     receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>>; stopFile: string;
-    reloadFile: string; lock: string; done: boolean; failure?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
-  let active = false;
+    reloadFile: string; lock: string; done: boolean; failure?: string; recovered?: string; stopped?: boolean; controlGaps: GapWindow[]; identity: Record<string, any>}>();
+  let active = false, nativeClaimed = false;
   const deps: BrowserJoinerDeps = {
     async launch(url) {
+      if (cfg.guard) { assertSafeCaptureId("tenant id", cfg.tenantId); assertSafeCaptureId("session id", cfg.sessionId); }
+      if (cfg.native && (cfg.native.identity.tenantId !== cfg.tenantId || cfg.native.identity.sessionId !== cfg.sessionId)) throw new Error('Native invocation ownership mismatch');
       if (active) throw new Error("A tab capture is already active; overlapping webinar requires review");
+      if (cfg.native && nativeClaimed) throw new Error('Native capture generation already used; create a new server invocation');
+      if (cfg.native) nativeClaimed = true;
       active = true;
       const handle = `tab-${Date.now()}-${randomBytes(4).toString("hex")}`;
       mkdirSync(cfg.recordDir, {recursive: true}); mkdirSync(cfg.profileDir, {recursive: true});
@@ -153,12 +102,17 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       let receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>> | undefined;
       const extension = path.join(cfg.recordDir, `.extension-${handle}`);
       const output = path.join(cfg.recordDir, `${handle}.webm`);
+      if (cfg.guard) { assertSafeCaptureFileName(path.basename(output)); assertInsideDir(cfg.recordDir, output); }
       const statusPath = `${output}.status.json`;
       const controllerStartedAt = getProcessStartTime(process.pid);
       let captureStartedAt: string | undefined;
       const identity={output,pid:process.pid,handle,sessionId:cfg.sessionId,tenantId:cfg.tenantId,profileDir:path.resolve(cfg.profileDir),recordDir:path.resolve(cfg.recordDir),controllerStartedAt};
       const status = (state: string, error?: string) => writeOwnedTabStatus(statusPath, identity,
         {state,captureStartedAt,error,controlGaps:runs.get(handle)?.controlGaps ?? []});
+      const health = silenceHealthEnabled() ? createSilenceHealth({onChange: (h) => {
+        log(`audio-health: ${h.note}`);
+        try {writeOwnedTabStatus(statusPath, identity, {audioHealth: h});} catch {}
+      }}) : undefined;
       try {
         if (existsSync(recoveryLock)) throw new Error("Profile recovery active or requires inspection");
         if (existsSync(lock)) {
@@ -174,27 +128,44 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         const lockFd = openSync(lock, "wx"); writeSync(lockFd, String(process.pid)); closeSync(lockFd); locked = true;
         if (existsSync(recoveryLock)) throw new Error("Profile recovery claimed during capture startup");
         let ready = false, failure: string | undefined;
+        let admittedSeen = false; // ISS-CAPTUREFIX-001: status says "recording" only once the bot is admitted (the recorder starts in the lobby)
         receiver = await createTabCaptureReceiver(output, (event) => {
-          if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status("recording"); }
+          if (event.event === "capture-started") { ready = true; captureStartedAt = new Date().toISOString(); status(admittedSeen ? "recording" : "starting"); }
           if (event.event === "capture-error") { failure = String(event.error ?? "Capture failed"); status("failed", failure); }
+          // A stop that is not failed:false is a failure by itself: the capture-error POST may have been lost.
+          // The partial .webm stays on disk, status "failed" (never "stopped"); stop() throws so nothing finalizes it.
+          // Fail closed (ISS-T034FIX-003): a stop is clean ONLY when failed is exactly boolean false. A missing or
+          // non-boolean field (e.g. an old extension build) is a malformed stop and counts as a failure.
+          const stopFailed = event.event === "capture-stopped" ? (event as {failed?: unknown}).failed : false;
+          if (stopFailed !== false && !failure) {
+            failure = stopFailed === true ? "Recorder reported a failed stop; media is incomplete"
+              : "Malformed capture-stopped message (failed is not boolean false); media treated as incomplete";
+            status("failed", failure);
+          }
           const run = runs.get(handle);
           if (run && event.event === "capture-stopped") run.stopped = true;
           if (run && failure) run.failure = failure;
           if (event.event === "capture-level" && typeof event.db === "number" && Number.isFinite(event.db)) {
             for (const listener of levels) listener(event.db);
+            health?.onLevel(event.db);
           }
           cfg.onEvent?.(handle, event);
-        });
+        }, cfg.guard, cfg.native);
         mkdirSync(extension);
         const assets = cfg.extensionDir ?? path.resolve(path.dirname(cfg.joinScript), "tab-capture");
-        for (const file of ["manifest.json", "background.js", "recorder.html", "recorder.js"]) copyFileSync(path.join(assets, file), path.join(extension, file));
-        writeFileSync(path.join(extension, "config.json"), JSON.stringify({endpoint: receiver.endpoint, token: receiver.token}), {mode: 0o600});
+        for (const file of TAB_ASSETS) copyFileSync(path.join(assets, file), path.join(extension, file));
+        if (cfg.native && tabCaptureAssetSha256(extension) !== cfg.native.identity.extensionAssetSha256) throw new Error('Native installed producer asset identity mismatch');
+        writeFileSync(path.join(extension, "config.json"), JSON.stringify({endpoint: receiver.endpoint, token: receiver.token,
+          ...(cfg.native ? {native: {identity: cfg.native.identity}} : {})}), {mode: 0o600});
         const stopFile = path.join(cfg.recordDir, `.stop-${handle}`), reloadFile = path.join(cfg.recordDir, `.reload-${handle}`);
         const args = [cfg.joinScript, url, "--profile", cfg.profileDir, "--title", `LKB-BOT ${handle}`,
           "--stop-file", stopFile, "--reload-file", reloadFile, "--capture-extension", extension];
         if (cfg.browserExecutable) args.push("--browser-executable", cfg.browserExecutable);
+        args.push(...profileArgs);
         if (cfg.autoClick === false) args.push("--no-click");
-        const child = spawn(cfg.python, args, {stdio: ["ignore", "pipe", "pipe"], windowsHide: true});
+        const child = spawn(cfg.python, args, {stdio: ["ignore", "pipe", "pipe"], windowsHide: true,
+          ...(cfg.native ? {env:{...process.env,LKB_CAPTURE_CONTROL_GENERATION:cfg.native.identity.captureGeneration,
+            LKB_CAPTURE_SAMPLER_INSTANCE:cfg.native.identity.samplerInstanceId}} : {})});
         let done = false;
         const exited = new Promise<number | null>((resolve) => {
           child.once("exit", (code) => { done = true; const run = runs.get(handle); if (run) run.done = true; resolve(code); });
@@ -206,7 +177,9 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
           if (pending.length > 65536) { failure = "Browser event line too large"; pending = ""; return; }
           const lines = pending.split("\n"); pending = lines.pop() ?? "";
           for (const line of lines) {
-            try { const event = JSON.parse(line) as BotEvent; if (event.event === "fatal") failure = String(event.error); cfg.onEvent?.(handle, event); }
+            try { const event = JSON.parse(line) as BotEvent; if (event.event === "fatal") failure = String(event.error);
+              if (event.event === "admitted") { admittedSeen = true; if (captureStartedAt && !failure && !runs.get(handle)?.stopped) status("recording"); }
+              cfg.onEvent?.(handle, event); }
             catch { /* non-JSON Selenium diagnostics are not protocol events */ }
           }
         });
@@ -219,27 +192,71 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         log(`audio/video recording started: ${output}`);
         return {sessionHandle: handle, mediaStream: output};
       } catch (error) {
-        status("failed", error instanceof Error ? error.message : "Capture startup failed");
+        // Status evidence can itself be corrupt or foreign. Its refusal must never
+        // bypass shutdown of the child/receiver holding capture credentials.
+        try { status("failed", error instanceof Error ? error.message : "Capture startup failed"); }
+        catch { log("Capture failure status could not be persisted; ownership retained for inspection"); }
         const run = runs.get(handle);
-        if (run) { writeFileSync(run.stopFile, "stop"); await Promise.race([run.exited, sleep(5000)]); if (!run.done) run.child.kill(); }
-        await receiver?.close(); if (locked && existsSync(lock) && !lstatSync(lock).isSymbolicLink() && readFileSync(lock, "utf8") === String(process.pid)) rmSync(lock);
-        rmSync(extension, {recursive: true, force: true}); active = false; throw error;
+        const cleanup = [
+          async () => {
+            if (!run) return;
+            try { writeFileSync(run.stopFile, "stop"); await Promise.race([run.exited, sleep(5000)]); }
+            finally { if (!run.done) run.child.kill(); }
+          },
+          async () => { await receiver?.close(); },
+          async () => { if (locked && existsSync(lock) && !lstatSync(lock).isSymbolicLink() && readFileSync(lock, "utf8") === String(process.pid)) rmSync(lock); },
+          async () => { rmSync(extension, {recursive: true, force: true}); },
+        ];
+        for (const action of cleanup) {
+          try { await action(); } catch { log("Capture startup cleanup incomplete; inspection required"); }
+        }
+        active = false; throw error;
       }
     },
     async stop(handle) {
       const run = runs.get(handle); if (!run) return;
-      run.receiver.stop();
-      const deadline = Date.now() + 20000;
-      while (!run.stopped && !run.done && Date.now() < deadline) await sleep(100);
-      if (!run.stopped) run.failure ??= "Recorder did not acknowledge final flush; media requires recovery";
-      writeFileSync(run.stopFile, "stop");
-      await Promise.race([run.exited, sleep(5000)]); if (!run.done) run.child.kill();
-      await run.receiver.close();
-      if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && readFileSync(run.lock, "utf8") === String(process.pid)) rmSync(run.lock);
-      rmSync(run.stopFile, {force: true}); rmSync(run.reloadFile, {force: true});
-      rmSync(path.join(cfg.recordDir, `.extension-${handle}`), {recursive: true, force: true});
-      writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure,bytes:run.receiver.bytes(),controlGaps:run.controlGaps});
-      active = false;
+      let firstError: unknown, failed = false;
+      const remember = (error: unknown) => {
+        if (!failed) { firstError = error; failed = true; }
+        run.failure ??= "Capture stop cleanup failed; media requires inspection";
+        try { log("Capture stop cleanup incomplete; inspection required"); } catch { /* diagnostics must not skip shutdown */ }
+      };
+      const attempt = async (action: () => void | Promise<void>) => { try { await action(); } catch (error) { remember(error); } };
+      try {
+        run.receiver.stop();
+        const deadline = Date.now() + 20000;
+        while (!run.stopped && !run.done && Date.now() < deadline) await sleep(100);
+        if (!run.stopped) run.failure ??= "Recorder did not acknowledge final flush; media requires recovery";
+        writeFileSync(run.stopFile, "stop");
+        await Promise.race([run.exited, sleep(5000)]);
+      } catch (error) { remember(error); }
+      finally {
+        await attempt(async () => {
+          if (!run.done) {
+            if (!run.child.kill()) throw new Error("Owned capture child shutdown refused; lock retained");
+            await Promise.race([run.exited, sleep(1000)]);
+            if (!run.done) throw new Error("Owned capture child shutdown unconfirmed; lock retained");
+          }
+        });
+        await attempt(() => run.receiver.close());
+        if (!cfg.native && !failed && run.failure?.startsWith("Recorder did not acknowledge") && run.receiver.bytes() && remuxRecoveryEnabled()) {
+          await attempt(() => {
+            const r = remuxWebmInPlace(run.output);
+            if (r.ok) { log("final flush not acknowledged; recovered media with ffmpeg -c copy (raw kept as .raw)"); run.failure = undefined; run.recovered = "final flush not acknowledged; media recovered by ffmpeg -c copy remux (tail after the last delivered chunk is lost)"; }
+            else log(`remux recovery failed: ${r.error}`);
+          });
+        }
+        await attempt(() => {
+          if (!run.done) throw new Error("Owned capture child shutdown unconfirmed; lock retained");
+          if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && readFileSync(run.lock, "utf8") === String(process.pid)) rmSync(run.lock);
+        });
+        await attempt(() => { rmSync(run.stopFile, {force: true}); });
+        await attempt(() => { rmSync(run.reloadFile, {force: true}); });
+        await attempt(() => { rmSync(path.join(cfg.recordDir, `.extension-${handle}`), {recursive: true, force: true}); });
+        await attempt(() => writeOwnedTabStatus(`${run.output}.status.json`,run.identity,{state:run.failure ? "failed" : "stopped",error:run.failure ?? run.recovered,bytes:run.receiver.bytes(),controlGaps:run.controlGaps}));
+        active = false;
+      }
+      if (failed) throw firstError;
       if (run.failure || !run.receiver.bytes()) throw new Error(run.failure ?? "Tab capture produced no media bytes");
     },
   };

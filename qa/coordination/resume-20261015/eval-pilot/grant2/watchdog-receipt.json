@@ -1,0 +1,12 @@
+{
+  "status": "RETURNED",
+  "ownExit": 0,
+  "elapsedSeconds": 10.67200000000048,
+  "hardOuterSeconds": 90,
+  "deadlineMet": true,
+  "evaluateDeadlineApplied": true,
+  "helper": "scripts/qa/scoped-check-runner.py#Tree",
+  "helperSha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "reviewRouteNotInvoked": true,
+  "auditDisposition": "All original snapshots/audit/citations preserved"
+}

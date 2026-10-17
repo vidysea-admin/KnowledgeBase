@@ -1,0 +1,32 @@
+[
+  {
+    "path": "scripts/eval/t022-offline-review.mjs",
+    "bytes": 15790,
+    "sha256": "48ab7207f4164a82d6fbc6af013706895db037c4fa0cf06b6ec7747b9c7b6201"
+  },
+  {
+    "path": "scripts/eval/t022-offline-review.test.mjs",
+    "bytes": 13789,
+    "sha256": "49b45db42004b5dd97239cccbc6caf2a80c15f999707cdb018579d6cd668c1c1"
+  },
+  {
+    "path": "scripts/eval/calibration-review.mjs",
+    "bytes": 9197,
+    "sha256": "5deab61e9d8606682a21e0044792997af7c4cc0abbac1e706d0e46f84c1de013"
+  },
+  {
+    "path": "scripts/eval/human-calibration.mjs",
+    "bytes": 19954,
+    "sha256": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf"
+  },
+  {
+    "path": "data/eval/calibration-human-review.json",
+    "bytes": 55652,
+    "sha256": "392086efc282a21bb62ea04e20f9e0893fb6e6a5aa48451092ba19768c225288"
+  },
+  {
+    "path": "apps/web/package.json",
+    "bytes": 763,
+    "sha256": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e"
+  }
+]

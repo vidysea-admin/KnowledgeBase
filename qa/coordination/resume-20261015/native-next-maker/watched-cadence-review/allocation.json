@@ -1,0 +1,18 @@
+{
+  "identity": "watched-cadence-launcher/1/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "allocation": {
+    "token_metric": "actual_total",
+    "tokens": 24000,
+    "completion_tokens": 4000,
+    "active_s": 180,
+    "completion_active_s": 30
+  },
+  "authority": "Root explicit finite one-use manual review allocation",
+  "status": "AUTHORIZED_NOT_DISPATCHED",
+  "actual_usage": null,
+  "no_reset": true,
+  "prior_this_unit_reviewers": [],
+  "unrelated_prior_native_HOLD": "Preserved separately; never relabelled or erased",
+  "predecessor_identity": "watched-cadence-launcher/1/6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "transition": "Exact8source committed, SAMEonceauthorized180s/24000incl30s/4000reserve;noexecution/debit/reset"
+}

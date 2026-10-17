@@ -1,0 +1,33 @@
+{
+  "unit": "t022-offline-transfer",
+  "cycle": 1,
+  "status": "frozen-cycle1-awaiting-central-compiler-and-attributable-evidence",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate": "sha256:e20509a9b1a0b8b3f8639851d625d6ca6350bc138f30c14e6c962a6696e2d568",
+  "workdir": "apps/web",
+  "command": "node node_modules/vitest/vitest.mjs run src/pages/calibration-review/offline-transfer.test.ts src/pages/calibration-review/CalibrationReviewPage.test.tsx --maxWorkers=1 --no-file-parallelism",
+  "outerTimeoutMs": 120000,
+  "expectedTests": 9,
+  "fixtureProvenance": "synthetic-only; zero real review or source packet reads",
+  "makerUsage": "unknown",
+  "pins": {
+    "apps/web/src/pages/calibration-review/offline-transfer.ts": "13079af461ddf1dc3007e64ee811f3556f7509081cc04d26e6818a82123bbc69",
+    "apps/web/src/pages/calibration-review/offline-transfer.test.ts": "790c0ce587815af09d429776dc8e69c6b168b9e174802b58537da4eb2d832f4a",
+    "apps/web/src/pages/calibration-review/CalibrationReviewPage.tsx": "915e15eb2a27a44cc7eb950d97623884df7c4ee690064abca7c7e6bd82b0bc0f",
+    "apps/web/src/pages/calibration-review/CalibrationReviewPage.test.tsx": "bab6c98edbd575d0a7faf3210037c4720ae2db7a2ccfc2fb1bef3f47311c8953",
+    "apps/web/src/pages/calibration-review/client.ts": "30a0c5e4c065e66287b190845f52e140d413546d2f65d6cd2af28790942298c5",
+    "apps/api/src/calibration-review/README.md": "2df7c536c11c532ed5fcfa18eb608efe20acff22a48d8a4e97cca50f13e584eb",
+    "apps/api/src/calibration-review/router.ts": "09a5c167cfea810e542633861e399b24034075cc16fdc299d70610352aa84283",
+    "apps/api/src/calibration-review/file-store.ts": "c0fd3ec5b75a8be3f2e1635c3e677f042ad1e57010d4dc6dac2fa8797d7d0ff3",
+    "apps/api/src/calibration-review/seed.ts": "6d003368b0f6ea7739812cf62fc2d8593235305d7dab1f278db44084b1e09ef9",
+    "apps/api/src/calibration-review/types.ts": "41b6c165da56f7f77a27d135ebf3c2690318ab8707ee48b160587cd952a3e277",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/tsconfig.json": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0",
+    "apps/web/vite.config.ts": "2f6affa66eab3926da4415e4252033fd52b99284f0ac78ba3c666c273bc1e938"
+  },
+  "candidate_id": "sha256:e20509a9b1a0b8b3f8639851d625d6ca6350bc138f30c14e6c962a6696e2d568",
+  "inventory": "qa/evidence/t022-offline-transfer-cycle1-candidate.inventory.txt",
+  "historicalCycle0Request": "qa/evidence/t022-offline-transfer-request.json"
+}

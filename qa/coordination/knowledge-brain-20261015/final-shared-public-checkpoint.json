@@ -1,0 +1,135 @@
+{
+  "state": "FINAL_SHARED_SOURCE_FROZEN_NOT_CHECKED",
+  "historicalCheckpoint": "answer-runs-filter-amendment/final-combined-checkpoint.json",
+  "publicSharedFiles": 18,
+  "selectorBindingFiles": 6,
+  "files": [
+    {
+      "path": "schema/index.json",
+      "sha256": "c949fe2697e3cf735601caee4372378e108e0bf3855079d299cb6cffda1483e8",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "schema/tree_index.schema.json",
+      "sha256": "2b03a2dfacb9c747725ff261e17b7139e418f13e1e9d165cf524a1dd876fe146",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "schema/speaker_attributes.schema.json",
+      "sha256": "784bbece740c2188adb20463880918845a5cbc6677fae9ba433bea386c09567a",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "schema/fixtures/speaker_attributes/valid.json",
+      "sha256": "91089bc53686abcdfe01860236d332254ad4bd106772c3966254ed3d1d3f2c8b",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "schema/fixtures/speaker_attributes/invalid.json",
+      "sha256": "3ef7cbde1bf4f274b93a4e9402a6e93802b6970b49460c8573f865ee96fdf255",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_attributes.ts",
+      "sha256": "d20d6b907f863839a004479ac525849cde3208c010797f4e7e14b57a33c7334d",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/core/src/generated/tree_index.ts",
+      "sha256": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "sha256": "89b52eb2eb2032798b762d92c25e1381665858e49034317de1b92cb809e311f0",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-attributes.ts",
+      "sha256": "90531ad79ca86b3d6ae8c799a0800ce792c7d8f6756da35de0ea23ee9a0a9497",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "migrations/20261015130000-speaker-attributes.cjs",
+      "sha256": "91d0bdf51fa528fff8dac6b21ec2b69e0970730a83d457547560d8c69fd291da",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "scripts/gen-types.mjs",
+      "sha256": "810c7994b1a571f6e18dea8d265a1e32df14d717d2e8aa76cf1e17d663e61d5d",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "structure.config.json",
+      "sha256": "6c99e5af935b72b83fa16b1a6d6a728860af3023c0dae1b4458977260fe06a29",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "schema/answer_runs.schema.json",
+      "sha256": "5b19d4d92b594926d6ea4521c36c3c94a3dc038eb278d016e673f6000e2d7af0",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/core/src/generated/answer_runs.ts",
+      "sha256": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/core/src/source-locator.ts",
+      "sha256": "2f8a0306dfa34236fc28360dd4a3a31ea4b1817460134651328b823141600063",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/ask/src/index.ts",
+      "sha256": "a33370d4ece5d00b401352bea43f0d7d861b269157ca36898cef3cb472ff24a4",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "sha256": "a2e87c0f7b6d86a5b7a1814969d6da368de0d8e6d084ddd576f54b71e8e39638",
+      "scope": "public-schema-export"
+    },
+    {
+      "path": "apps/api/src/routes/ask/ask.ts",
+      "sha256": "23f4f7463d92b22e5d9851b899bde43883fdfad1c1392586b935b7ba0878374b",
+      "scope": "selector-binding"
+    },
+    {
+      "path": "apps/api/src/routes/ask/ask.test.ts",
+      "sha256": "0d2d59299e5e5696ebf57f6b6bd80e485474a822d6aeccd401f0b487c5e55c03",
+      "scope": "selector-binding"
+    },
+    {
+      "path": "apps/api/src/answer-policy/routes.ts",
+      "sha256": "7c6707e0f965a61c27de88fde144328851d64f2e6b1e225ebe27ef7b5a105e82",
+      "scope": "selector-binding"
+    },
+    {
+      "path": "apps/api/src/answer-policy/routes.test.ts",
+      "sha256": "c9c272af3eabca2fe7e5883fd58c2afea47ce3f76c503be510a2248f04e6377a",
+      "scope": "selector-binding"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.ts",
+      "sha256": "b652e5b38bea9e16327ee9bea6ec117d7a024b69e76e0d9148200f8b5fc51c7a",
+      "scope": "selector-binding"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.test.ts",
+      "sha256": "3e4d0fe22a8de67812d04d8b5ebd8cecd6579f1623c56e342850c80cc1b09583",
+      "scope": "selector-binding"
+    }
+  ],
+  "generationReceipts": [
+    "qa/coordination/knowledge-brain-20261015/final-canonical-batch/generation-receipt.json",
+    "qa/coordination/knowledge-brain-20261015/answer-runs-filter-amendment/generation-receipt.json"
+  ],
+  "drift": [],
+  "remainingSourceEpoch": "WhatsApp atomic native publication/audit and native tree admission integration remain separate; do not infer whole-repository freeze or acceptance.",
+  "tests": "Targeted generation exit0 only; current affected tests/API-web types still required. No parent completion or checker PASS implied."
+}

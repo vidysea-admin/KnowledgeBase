@@ -1,0 +1,45 @@
+{
+  "phase": "current-read-only-host-readiness",
+  "startedAt": "2026-10-15T20:10:02.2763574Z",
+  "completedAt": "2026-10-15T20:10:11.3795573Z",
+  "commandLocations": {
+    "wsl": "C:\\Windows\\system32\\wsl.exe",
+    "docker": null,
+    "podman": null
+  },
+  "narrowKnownLocations": [
+    {
+      "path": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+      "exists": false
+    },
+    {
+      "path": "C:\\Program Files\\RedHat\\Podman\\podman.exe",
+      "exists": false
+    },
+    {
+      "path": "C:\\Windows\\System32\\wsl.exe",
+      "exists": true
+    }
+  ],
+  "dockerPath": null,
+  "port": {
+    "port": 27029,
+    "status": "unknown",
+    "listenerCount": null,
+    "errorType": "CimException",
+    "errorId": "HRESULT 0x80041003,Get-NetTCPConnection"
+  },
+  "dockerRuntime": "not inspected: CLI unavailable",
+  "immutableImage": "not inspected: CLI unavailable",
+  "projectAndVolumes": "not inspected: CLI unavailable",
+  "credentialFiles": "not inspected: proposal has variable references only, no literal private file paths",
+  "activationReady": false,
+  "actions": {
+    "daemonStarts": 0,
+    "serviceStarts": 0,
+    "pulls": 0,
+    "containersStarted": 0,
+    "databaseWrites": 0,
+    "credentialContentsRead": 0
+  }
+}

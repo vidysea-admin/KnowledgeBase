@@ -1,0 +1,60 @@
+{
+  "stage": "red",
+  "command": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "--test",
+    "--test-reporter=tap",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "qa/evidence/goal-u25-consumer/third-await.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T21:51:59.653Z",
+  "completedAt": "2026-10-14T21:52:00.784Z",
+  "elapsedMs": 1128.5166,
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "before": {
+    "apps/api/src/session-decisions/reader.ts": "2a21418901b6d7d88f84e1b583192ab962b29ba74c11810ed7069beb4f7e0d57",
+    "apps/api/src/session-decisions/provenance.ts": "e677c6e1ad767cdd622c6e37bbfe32d1307c7570581a43a089c741452f3e4580",
+    "apps/api/src/session-decisions/fixture.testsupport.ts": "3f0151d1b72981a26787299b515f9266523df4109ffab5f7b2aaa2dd5c4e8d8c",
+    "apps/api/src/indexing/decisions-persist.ts": "82c6b6379f1c40e43b07e29584575f4463bed8f41bb9fb2c32e87a3e6aecf532",
+    "packages/index/src/pipeline/notes/decisions.ts": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/composition/integrations/trusted-readers.ts": "c3b6e0db3e6d9b23a0d725799134e687c177f9440738d3cfb7a5a2a5a131cde9",
+    "apps/api/src/transcript-review/effective-reader.ts": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+    "apps/api/src/transcript-review/service.ts": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+    "apps/api/src/transcript-review/store.ts": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+    "qa/evidence/goal-u25-consumer/third-await.test.ts": "731e373b59ede7a2e362459b3639c5e62079cfcc3d82941b0c0491d489cc5743",
+    "qa/evidence/goal-u25-consumer/reader-before-third-await-fix.ts.txt": "2a21418901b6d7d88f84e1b583192ab962b29ba74c11810ed7069beb4f7e0d57"
+  },
+  "after": {
+    "apps/api/src/session-decisions/reader.ts": "2a21418901b6d7d88f84e1b583192ab962b29ba74c11810ed7069beb4f7e0d57",
+    "apps/api/src/session-decisions/provenance.ts": "e677c6e1ad767cdd622c6e37bbfe32d1307c7570581a43a089c741452f3e4580",
+    "apps/api/src/session-decisions/fixture.testsupport.ts": "3f0151d1b72981a26787299b515f9266523df4109ffab5f7b2aaa2dd5c4e8d8c",
+    "apps/api/src/indexing/decisions-persist.ts": "82c6b6379f1c40e43b07e29584575f4463bed8f41bb9fb2c32e87a3e6aecf532",
+    "packages/index/src/pipeline/notes/decisions.ts": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/composition/integrations/trusted-readers.ts": "c3b6e0db3e6d9b23a0d725799134e687c177f9440738d3cfb7a5a2a5a131cde9",
+    "apps/api/src/transcript-review/effective-reader.ts": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+    "apps/api/src/transcript-review/service.ts": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+    "apps/api/src/transcript-review/store.ts": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+    "qa/evidence/goal-u25-consumer/third-await.test.ts": "731e373b59ede7a2e362459b3639c5e62079cfcc3d82941b0c0491d489cc5743",
+    "qa/evidence/goal-u25-consumer/reader-before-third-await-fix.ts.txt": "2a21418901b6d7d88f84e1b583192ab962b29ba74c11810ed7069beb4f7e0d57"
+  },
+  "hashChanges": [],
+  "counts": {
+    "tests": 2,
+    "pass": 1,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "outputPath": "qa/evidence/goal-u25-consumer/third-await-red-output.txt"
+}

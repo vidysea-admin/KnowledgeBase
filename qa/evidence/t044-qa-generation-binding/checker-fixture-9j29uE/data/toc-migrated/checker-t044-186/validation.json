@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "transcriptValidated": true,
+  "durationSec": 186,
+  "turnCount": 1,
+  "lastTEnd": 186,
+  "coverage": 1,
+  "partial": false,
+  "shortfallSec": 0,
+  "gaps": [],
+  "qa": null,
+  "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+  "validatedAt": "2026-10-14T20:43:23.708Z",
+  "validator": "scripts/webinar/validate/validate-session.mjs"
+}

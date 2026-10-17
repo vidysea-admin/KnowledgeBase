@@ -1,0 +1,101 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": 2950647,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "speaker_independent_checker",
+      "active_s": null,
+      "tokens": 320912,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 40
+      },
+      "note": "Fresh idle recorded cumulative ACTUAL total tokens. Prior active actual unavailable; conservative prior40s debit retained. Earlier zero row was prospective before launch and is preserved in linked immutable history, not additive reviewer work."
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 50,
+    "tokens": 100000,
+    "cost": null
+  },
+  "completion_reserve": false,
+  "completion_reserve_id": "product-speaker-relation-workbench/cycle-2/4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146",
+  "bootstrap_scope": "Four-file integrated speaker profile relationship workbench, eight isolated and four mounted broker cases plus immediate server bootstrap DTO consumer. Prior cycle had no reviewer dispatch/debit. Require all broker evidence before dispatch. Prospective zero usage means no work yet. Finalization reserve 30 seconds/800 tokens.",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "escalation": {
+    "authority": "Root explicit finite authorization 2026-10-15 to SAME existing checker; mandatory independent proof/readiness exception permits authoring isolated QA probe before execution, then STOP.",
+    "reason": "Required independent contract-derived probe is absent; finite staged authoring needed. Preserve known actual-token 10-percent overruns and all prior charges. No production edits or execution authorization.",
+    "limits": {
+      "active_s": 120,
+      "tokens": 520912,
+      "cost": null
+    }
+  },
+  "staged_admission": {
+    "status": "ACTUAL_TOTAL_AUTHOR_PREDISPATCH_GATE",
+    "source_input": "product-delivery/speaker-review-budget-input-3.json",
+    "unit": "product-speaker-relation-workbench",
+    "cycle": 2,
+    "total": {
+      "active_s": 120,
+      "cumulative_actual_total_tokens": 520912
+    },
+    "next_review": {
+      "active_s": 50,
+      "actual_total_tokens": 100000,
+      "allocated_output_tokens": 1200
+    },
+    "remaining_review": null,
+    "protected_finalization": {
+      "active_s": 30,
+      "actual_total_tokens": 100000,
+      "allocated_output_tokens": 800
+    },
+    "authority": "Root explicit finite authorization 2026-10-15 to SAME existing checker; mandatory independent proof/readiness exception permits authoring isolated QA probe before execution, then STOP.",
+    "prior_charges": "Observed prior actual tokens plus retained40s active debit; immutable earlier allocations preserved separately.",
+    "dispatch_authorized_by_this_file": false
+  },
+  "actual_total_accounting": {
+    "unit": "cumulative input+output total_tokens",
+    "baseline": 320912,
+    "comparable_maker_total": 2950647,
+    "known_current_ratio": 0.10875987537648522,
+    "known_ten_percent_overrun": true,
+    "additional_actual_total_limit": 200000,
+    "author_phase_actual_total_limit": 100000,
+    "manual_final_reserve_actual_total_limit": 100000,
+    "cumulative_actual_total_ceiling": 520912,
+    "operations_extra_ceiling": null,
+    "phase_stop": "Author QA probe only; STOP before executing probe/tests or material next phase. No review launch by this helper."
+  },
+  "manual_protected_finalization": {
+    "active_s": 30,
+    "actual_total_tokens": 100000,
+    "allocated_output_tokens": 800,
+    "inside_same_cumulative_limit": true,
+    "helper_status": "legacy_unreserved; external manual reserve enforced by root ledger"
+  },
+  "legacy_output_debit_separate": {
+    "prior_active_seconds": 40,
+    "prior_allocated_output_tokens": 1000,
+    "author_allocated_output_tokens": 1200,
+    "final_allocated_output_tokens": 800,
+    "note": "Historical allocation only. Not actual total tokens; no token debit replacing or adding to known cumulative actuals."
+  },
+  "history": {
+    "prior_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-speaker-relation-workbench-prep-input.json",
+    "prior_result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-speaker-relation-workbench-prep-result.json",
+    "fresh_idle_baseline": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z.json",
+    "root_authority_companion": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z-root-authority.json",
+    "preserve_all_prior_artifacts": true
+  },
+  "accounting_helper_cost": "Shared coordination helper; excluded from maker/comparable unit denominator; actual cost unknown.",
+  "ratio_claim": "Known token ratio reported; active/cost unknown. Finite escalation is not 10-percent success."
+}

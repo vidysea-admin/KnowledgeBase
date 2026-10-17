@@ -1,0 +1,44 @@
+{
+  "scope": "Current synthetic independent planner, historical overlay, actual source hydrator; injected tenant-scoped reads; no real database, network, provider, media or private corpus. Appointed ordinary coordinator alone executes after stable coherence.",
+  "spec": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-spec.json",
+  "specSHA256": "a2891a4f6dec58e6138ea81b940125ffade8aba360ebb2c75341d4a234fbff6a",
+  "args": [
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register.mjs",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs"
+  ],
+  "pid": 13160,
+  "startedAt": "2026-10-14T23:32:30.4102425Z",
+  "completedAt": "2026-10-14T23:32:32.6685341Z",
+  "elapsedMs": 2258.0,
+  "exitCode": 0,
+  "timedOut": false,
+  "timeoutMs": 60000,
+  "before": {
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs": "c65dbd88aa39c7cd2f8e91a62c5defb46412393f5cff6e6f87523fa333736f38",
+    "apps/api/src/transcript-review/planner.ts": "9d56eb0a585c78faaa945e47ca5a4d6fbaea16fbe95f3e975d5b3f8bbfe09ade",
+    "apps/api/src/transcript-review/service.ts": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/transcript-review/store.ts": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+    "apps/api/src/ask/source-context.ts": "1f084b8f14764a097d4d826ab3ad431945fc35563c67d1eb9edab2b75009fb8f",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/origin.test.ts": "10c3c31be05475eb8b8033554c1f2dc2c6085c5d0036e32d41f4c95c3978d9ab",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+  },
+  "after": {
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs": "c65dbd88aa39c7cd2f8e91a62c5defb46412393f5cff6e6f87523fa333736f38",
+    "apps/api/src/transcript-review/planner.ts": "9d56eb0a585c78faaa945e47ca5a4d6fbaea16fbe95f3e975d5b3f8bbfe09ade",
+    "apps/api/src/transcript-review/service.ts": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/transcript-review/store.ts": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+    "apps/api/src/ask/source-context.ts": "1f084b8f14764a097d4d826ab3ad431945fc35563c67d1eb9edab2b75009fb8f",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/origin.test.ts": "10c3c31be05475eb8b8033554c1f2dc2c6085c5d0036e32d41f4c95c3978d9ab",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+  },
+  "hashesUnchanged": true,
+  "stdoutPath": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.stdout.txt",
+  "stderrPath": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.stderr.txt",
+  "terminal": true,
+  "preFixRuntimeRed": "not executed/granted; static original floor only"
+}

@@ -1,0 +1,16 @@
+
+> @lkb/web@0.0.0 typecheck C:\Users\product\Desktop\KnowledgeBase\apps\web
+> tsc --noEmit -p tsconfig.json
+
+src/__checker_probes__/collections-kind-identity.test.tsx(44,18): error TS2532: Object is possibly 'undefined'.
+src/__checker_probes__/collections-kind-identity.test.tsx(45,21): error TS2532: Object is possibly 'undefined'.
+src/components/NativeEvidence.test.tsx(22,51): error TS2345: Argument of type '{ kind: "document-page"; documentId: string; sourceId: string; documentSourceId: string; headRevision: number; revisionHash: string; pageNumber: number; passage: Passage; } | { kind: "message"; ... 4 more ...; passage: Passage; }' is not assignable to parameter of type '{ kind: "document-page"; documentId: string; sourceId: string; documentSourceId: string; headRevision: number; revisionHash: string; pageNumber: number; passage: Passage; } | undefined'.
+  Type '{ kind: "message"; sourceId: string; revisionHash: string; threadId: string; messageId: string; passage: Passage; }' is missing the following properties from type '{ kind: "document-page"; documentId: string; sourceId: string; documentSourceId: string; headRevision: number; revisionHash: string; pageNumber: number; passage: Passage; }': documentId, documentSourceId, headRevision, pageNumber
+src/pages/calibration-review/offline-transfer.test.ts(9,16): error TS2352: Conversion of type '{ packet: { tenantId: string; items: { id: string; inputSha256: string; }[]; }; packetSha256: string; total: number; items: { revision: number; id: string; inputSha256: string; }[]; }' to type 'CalibrationReviewView' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ packet: { tenantId: string; items: { id: string; inputSha256: string; }[]; }; packetSha256: string; total: number; items: { revision: number; id: string; inputSha256: string; }[]; }' is missing the following properties from type 'CalibrationReviewView': approvedCount, humanGoldVerified, remainingGate
+src/pages/operations/evaluationFlywheelModel.test.ts(56,10): error TS2532: Object is possibly 'undefined'.
+src/pages/operations/evaluationFlywheelModel.test.ts(57,10): error TS2532: Object is possibly 'undefined'.
+src/pages/operations/evaluationFlywheelModel.test.ts(58,21): error TS2532: Object is possibly 'undefined'.
+C:\Users\product\Desktop\KnowledgeBase\apps\web:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/web@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`
+Exit status 2

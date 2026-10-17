@@ -1,0 +1,38 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "INCOMPLETE_FRAGMENT_NOT_DISPATCH_READY",
+  "unit": {
+    "root": "C:/Users/product/Desktop/KnowledgeBase",
+    "slug": "t056-direct-answer",
+    "cycle": 0,
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": "2ca22a90c161fc2c9e043940dbaa26d4b5da53cedcdb641d9738d64f689dbc01",
+    "files_artifact": "source-pins.json",
+    "before_and_backups": "before-pins.json",
+    "dependencies_artifact": "dependency-pins.json"
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [],
+    "next_phase": null,
+    "ratio_status": "unverified_unknown_maker_denominators"
+  },
+  "pending": [
+    "Attributable successful broker outputs and compatible environment/executable fingerprints",
+    "Real final scoped candidate identity and complete validated file list",
+    "Final relevant typecheck and mandatory contract receipt",
+    "Independent reviewer bootstrap allocation and protected reserve sized to observed runtime startup floor",
+    "Fresh review_budget validate and assess before dispatch and each material phase",
+    "Root live-lease reconciliation and independent admission release"
+  ],
+  "readiness_receipts": [],
+  "commands_and_coverage": "broker-request.json",
+  "packet": "packet.md",
+  "verdict": null
+}

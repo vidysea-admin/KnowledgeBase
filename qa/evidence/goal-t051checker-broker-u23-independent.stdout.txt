@@ -1,0 +1,34 @@
+✔ foreign changed IDs preserve own root without inference in regex mode (3.7969ms)
+✔ foreign cache ID collisions cannot cause refusal or disclosure (1.8928ms)
+✔ bad single and plural evidence refuse without inference or input mutation (1.1702ms)
+✔ all-year refresh removes old heuristic topics and preserves precise shared refs (1.0706ms)
+✔ flag off: returns the heuristic itself and never calls the model (0.4138ms)
+✔ flag defaults to OFF and only LKB_LLM_TOPICS=1 turns it on (0.3093ms)
+✔ flag off: buildTree output is deep-equal to the default heuristic path (0.4934ms)
+✔ valid LLM output is used, grounded, deduped, capped; job kind and page text sent (0.6388ms)
+✔ fenced JSON text is parsed (0.5296ms)
+✔ model error falls back to the heuristic (0.5395ms)
+✔ timeout falls back to the heuristic (19.9726ms)
+✔ schema-invalid output falls back (non-array, non-string item, empty item, over-long item, too many) (1.0151ms)
+✔ ungrounded topics are dropped; all-ungrounded falls back; empty array is honoured (0.4182ms)
+✔ null page -> [] without a model call (0.1973ms)
+✔ prepared extractFn: per-page results, null page, stale page text and unknown page use the heuristic (0.3479ms)
+✔ tenant scoping: same page _id in two tenants never shares an answer (0.2828ms)
+✔ prepared extractFn plugs into buildTree and yields LLM topic children (0.3331ms)
+✔ U2.2 harness can score the output: predictedEntities shape accepted, unlabeled stays unmeasured (1.4095ms)
+✔ off uses the same regex build and regeneration without inference (0.6205ms)
+✔ tenant and session selection precede inference even for colliding foreign session ids (0.4156ms)
+✔ enabled regeneration refreshes all years and promotes shared model topics (0.5514ms)
+✔ each degraded page continues through build and promotion with its regex topics (11.2602ms)
+✔ foreign root, nested foreign identity and unresolvable evidence refuse before inference (0.773ms)
+✔ duplicate scoped identities refuse and missing pages do not call the provider (0.535ms)
+U2.3 sample SHA256 session=166dc3d80875b3140831e9d24bedd3f82b8043eea61e7c0a32e97fbefebf481f page=ebede4a4df2115fad29873dfeb376a05ebda0322603165475859a7ea74f515cd
+✔ source-bound migrated sample reaches actual tree regeneration and search consumers (4.7727ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 380.412

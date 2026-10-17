@@ -1,0 +1,15 @@
+*** Begin Patch
+*** Update File: apps/web/src/pages/search/AskHandoff.tsx
+@@
+-  execute?: (key: string, query: string) => Promise<T>; contextKey?: string;
++  execute?: (key: string, query: string) => Promise<T>; contextKey?: string;
++  errorMessage?: (error: unknown) => string;
+@@
+-      if (activeOwner.current === owner && generation.current === request)
+-        setDraft({ ...empty<T>(owner, baseOwner, query), error: message(error) });
++      if (activeOwner.current === owner && generation.current === request) {
++        let errorText = message(error);
++        try { errorText = options?.errorMessage?.(error) ?? errorText; } catch { /* Retain the safe default. */ }
++        setDraft({ ...empty<T>(owner, baseOwner, query), error: errorText });
++      }
+*** End Patch

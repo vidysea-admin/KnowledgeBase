@@ -1,0 +1,352 @@
+/**
+ * apps/api/src/gws-gmail.test.ts — U2 source-watcher. Tests the pure helpers gws-gmail.ts
+ * exports (decodeGmailBody, extractSessionDateTime, classifyMeetingKind, isRegistrationOnly)
+ * against the REAL body formats named in the task brief. No `gws` call — `scanGmailForMeetingCandidates`
+ * uses injected CLI responses below; no provider request or credential access runs.
+ */
+import { test } from "node:test";
+import assert from "node:assert/strict";
+
+import {
+  decodeGmailBody,
+  extractSessionDateTime,
+  classifyMeetingKind,
+  isRegistrationOnly,
+  scanGmailForMeetingCandidates,
+} from "./gws-gmail.js";
+
+test("actual Gmail mapper requires literal platform host and discovers Webex", async () => {
+  const links = ["https://tenant.webex.com/meet/host", "https://zoom.us.evil.example/j/123", "https://evil.example/zoom.us/j/123",
+    "https://zoom.us@evil.example/j/123", "https://evil.example/youtube.com/watch?v=1"];
+  for (const link of links) {
+    let query = "";
+    const [row] = await scanGmailForMeetingCandidates(100, async args => {
+      if (args.includes("list")) {
+        query = JSON.parse(args[args.indexOf("--params") + 1]!).q;
+        return JSON.stringify({messages: [{id: "mail1"}]});
+      }
+      return JSON.stringify({id: "mail1", payload: {headers: [{name: "From", value: "host@example.org"}], body: {data: Buffer.from(link).toString("base64url")}}});
+    }, {});
+    assert.match(query, /webex\.com/);
+    assert.equal(row?.meetingUrl, link.includes("tenant.webex.com") ? link : undefined);
+    assert.equal(row?.recordingUrl, undefined);
+  }
+});
+
+test("Gmail receivedAt comes solely from valid provider internalDate, never Date header or scan time", async () => {
+  for (const internalDate of ["1791979200000", undefined, "bad", 1791979200000, "-1", "8640000000000001", "99999999999999999"]) {
+    const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+      JSON.stringify({id: "mail1", internalDate, payload: {headers: [{name: "From", value: "host@example.org"}, {name: "Date", value: "today"}],
+        body: {data: Buffer.from("https://meet.google.com/abc-defg-hij").toString("base64url")}}}), {});
+    assert.equal(row?.receivedAt, internalDate === "1791979200000" ? new Date(1791979200000).toISOString() : undefined);
+  }
+});
+
+test("registration acquisition separates literal registration and join URLs and validates thread identity", async () => {
+  const register = "https://zoom.us/webinar/register/abc";
+  for (const join of [undefined, "https://zoom.us/j/1234567890", "https://meeting.zoho.com/session?sessionId=123"]) {
+    const rows = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ?
+      JSON.stringify({messages: [{id: "mail1"}]}) : JSON.stringify({id: "mail1", threadId: "thread_1", payload: {
+        headers: [{name: "From", value: "host@example.org"}], body: {data: Buffer.from(`${register} ${join ?? ""}`).toString("base64url")}}}), {});
+    assert.equal(rows[0]?.registrationUrl, register); assert.equal(rows[0]?.threadId, "thread_1");
+    assert.equal(rows[0]?.meetingUrl, join); assert.equal(rows[0]?.startTime, undefined);
+    if (!join) assert.equal(rows[0]?.registrationOnly, true);
+  }
+  for (const threadId of [undefined, "valid-1", "invalid\nthread", "", 123, "a".repeat(257)]) {
+    const run = async (args: string[]) => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+      JSON.stringify({id: "mail1", threadId, payload: {headers: [{name: "From", value: "host@example.org"}],
+        body: {data: Buffer.from("https://meet.google.com/abc-defg-hij").toString("base64url")}}});
+    if (threadId !== undefined && (typeof threadId !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(threadId))) await assert.rejects(scanGmailForMeetingCandidates(100, run, {}), /Gmail discovery unavailable/);
+    else {const [row] = await scanGmailForMeetingCandidates(100, run, {}); assert.equal(row?.threadId, threadId); assert.equal(row?.registrationUrl, undefined);}
+  }
+});
+
+test("direct snippet join wins over generic body link without losing registration evidence", async () => {
+  const registrationUrl = "https://zoom.us/webinar/register/abc", meetingUrl = "https://zoom.us/j/1234567890";
+  const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ?
+    JSON.stringify({messages: [{id: "mail1"}]}) : JSON.stringify({id: "mail1", snippet: meetingUrl, payload: {
+      headers: [{name: "From", value: "host@example.org"}],
+      body: {data: Buffer.from(`${registrationUrl} https://meeting.zoho.com/session/123`).toString("base64url")}}}), {});
+  assert.equal(row?.meetingUrl, meetingUrl); assert.equal(row?.registrationUrl, registrationUrl);
+  assert.equal(row?.registrationOnly, undefined);
+});
+
+test("alias and label intake unions neutral mail with broad discovery and fetches duplicates once", async () => {
+  const fetched: string[] = [], listed: Record<string, unknown>[] = [];
+  const rows = await scanGmailForMeetingCandidates(100, async args => {
+    const params = JSON.parse(args[args.indexOf("--params") + 1]!);
+    if (args.includes("list")) {
+      listed.push(params);
+      if (params.labelIds) {
+        assert.deepEqual(params.labelIds, ["Label_123"]);
+        assert.equal(params.q, undefined);
+        return JSON.stringify({ messages: [{id: "alias"}, {id: "label"}] });
+      }
+      assert.match(params.q, /webinar.* OR deliveredto:seminars@example.org/);
+      return JSON.stringify({ messages: [{id: "broad"}, {id: "alias"}] });
+    }
+    fetched.push(params.id);
+    return JSON.stringify({ id: params.id, payload: { headers: [{name: "From", value: "host@example.org"},
+      {name: "Subject", value: "Details enclosed"}], body: {data: Buffer.from("Register https://example.org/register").toString("base64url")} } });
+  }, {aliases: "seminars@example.org, seminars@example.org", labelIds: "Label_123,Label_123"});
+  assert.equal(listed.length, 2);
+  assert.deepEqual(fetched.sort(), ["alias", "broad", "label"]);
+  assert.deepEqual(rows.map(r => r.messageId).sort(), fetched);
+  for (const row of rows) {assert.equal(row.registrationOnly, true); assert.equal(row.startTime, undefined);}
+});
+
+test("invalid intake calls no provider; incomplete label acquisition fails whole discovery", async () => {
+  for (const intake of [{aliases: 'bad@example.org OR in:anywhere'}, {aliases: 'a@example.org\n'},
+    {labelIds: 'Label_1, '}, {labelIds: 'Label_1&whoami'}]) {
+    let called = false;
+    await assert.rejects(scanGmailForMeetingCandidates(100, async () => {called = true; return '{}';}, intake), /^Error: Gmail discovery unavailable$/);
+    assert.equal(called, false);
+  }
+  let labels = 0;
+  await assert.rejects(scanGmailForMeetingCandidates(100, async args => {
+    const p = JSON.parse(args[args.indexOf("--params") + 1]!);
+    if (p.q) return '{}';
+    labels++; return JSON.stringify({nextPageToken: 'repeat'});
+  }, {labelIds: "Label_1"}), /unavailable/);
+  assert.equal(labels, 2);
+});
+
+
+
+test("Gmail pagination preserves all unique messages and refuses incomplete or malformed coverage", async () => {
+  const requests: any[] = [];
+  const run = async (args: string[]) => {
+    const params = JSON.parse(args[args.indexOf("--params") + 1]!); requests.push(params);
+    if (args.includes("list")) return JSON.stringify(params.pageToken ? {messages: [{id: "b"}, {id: "a"}]} : {messages: [{id: "a"}], nextPageToken: "next"});
+    return JSON.stringify({id: params.id, payload: {headers: [{name: "From", value: "host@example.org"}, {name: "Subject", value: "Webinar"}], body: {data: Buffer.from("Join https://meet.google.com/abc-defg-hij").toString("base64url")}}});
+  };
+  assert.deepEqual((await scanGmailForMeetingCandidates(100, run)).map(row => row.messageId), ["a", "b"]);
+  assert.equal(requests.filter(row => row.pageToken === "next").length, 1);
+  for (const empty of [{}, {resultSizeEstimate: 0}, {messages: []}]) assert.deepEqual(await scanGmailForMeetingCandidates(100, async () => JSON.stringify(empty)), []);
+  for (const invalid of [null, [], {error: {code: 401}}, {messages: {}}, {messages: [{id: 1}]}, {resultSizeEstimate: -1}, {resultSizeEstimate: 15}, {unexpected: true}, {nextPageToken: "repeat"}]) {
+    await assert.rejects(scanGmailForMeetingCandidates(100, async () => JSON.stringify(invalid)), /Gmail discovery unavailable/);
+  }
+  let pages = 0;
+  await assert.rejects(scanGmailForMeetingCandidates(100, async () => JSON.stringify({nextPageToken: String(++pages)})), /unavailable/);
+  assert.equal(pages, 20);
+  for (const token of ['&echo secret', '%PATH%', '!secret!', 'quote"', "space here", "a\nb", "a|b", "a^b", "<bad>", "$(bad)", "`bad`", "(bad)"]) {
+    for (const reply of [{nextPageToken: token}, {messages: [{id: token}]}]) {
+      let calls = 0;
+      await assert.rejects(scanGmailForMeetingCandidates(100, async () => {calls++; return JSON.stringify(reply);}), /unavailable/);
+      assert.equal(calls, 1, "untrusted token or id never reaches a second CLI invocation");
+    }
+  }
+  for (const message of [null, {error: {}}, {id: "wrong"}, {id: "a", payload: {headers: {}}}]) {
+    await assert.rejects(scanGmailForMeetingCandidates(100, async args => JSON.stringify(args.includes("list") ? {messages: [{id: "a"}]} : message)), /unavailable/);
+  }
+  await assert.rejects(scanGmailForMeetingCandidates(100, async () => {throw new Error("private credentials");}), /^Error: Gmail discovery unavailable$/);
+});
+
+function b64url(text: string): string {
+  return Buffer.from(text, "utf8").toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+test("decodeGmailBody: prefers text/plain when both plain and html parts exist", () => {
+  const payload = {
+    mimeType: "multipart/alternative",
+    parts: [
+      { mimeType: "text/plain", body: { data: b64url("plain body text") } },
+      { mimeType: "text/html", body: { data: b64url("<p>html body</p>") } },
+    ],
+  };
+  assert.equal(decodeGmailBody(payload), "plain body text");
+});
+
+test("decodeGmailBody: falls back to text/html (stripped) when no text/plain part exists", () => {
+  const payload = {
+    mimeType: "multipart/alternative",
+    parts: [{ mimeType: "text/html", body: { data: b64url("<p>Hello<br>World</p>") } }],
+  };
+  assert.equal(decodeGmailBody(payload).trim(), "Hello\nWorld");
+});
+
+test("decodeGmailBody: a simple (non-multipart) message reads the top-level body", () => {
+  const payload = { mimeType: "text/plain", body: { data: b64url("simple message") } };
+  assert.equal(decodeGmailBody(payload), "simple message");
+});
+
+test("decodeGmailBody: nested parts (multipart/mixed with an alternative sub-part) still find text/plain", () => {
+  const payload = {
+    mimeType: "multipart/mixed",
+    parts: [
+      {
+        mimeType: "multipart/alternative",
+        parts: [{ mimeType: "text/plain", body: { data: b64url("nested plain text") } }],
+      },
+    ],
+  };
+  assert.equal(decodeGmailBody(payload), "nested plain text");
+});
+
+test("decodeGmailBody: undefined payload returns empty string, not a throw", () => {
+  assert.equal(decodeGmailBody(undefined), "");
+});
+
+// --- extractSessionDateTime: the real formats from the task brief ---
+
+test("extractSessionDateTime: Ashoka format — 'Day & Date: Sunday, September 27, 2026 Time: 11:00 AM - 12:00 PM IST'", () => {
+  const text = "*Day & Date:* Sunday, September 27, 2026 *Time:* 11:00 AM - 12:00 PM IST";
+  const { startTime, endTime } = extractSessionDateTime(text);
+  // 11:00 AM IST == 05:30 UTC; 12:00 PM IST == 06:30 UTC
+  assert.equal(startTime, "2026-09-27T05:30:00.000Z");
+  assert.equal(endTime, "2026-09-27T06:30:00.000Z");
+});
+
+test("extractSessionDateTime: a single stated time with no range (Zoho-style 'Date & Time: September 28, 2026, 6:00 PM IST')", () => {
+  const text = "Date & Time: September 28, 2026, 6:00 PM IST";
+  const { startTime, endTime } = extractSessionDateTime(text);
+  assert.equal(startTime, "2026-09-28T12:30:00.000Z");
+  assert.equal(endTime, undefined);
+});
+
+test("extractSessionDateTime: a labeled date wins over an EARLIER incidental month-shaped date elsewhere in the mail (real bug repro, live dry-run 2026-09-25)", () => {
+  // Real shape from a forwarded Ashoka mail: a quoted "Subject: ... | Sep 27, 2026" line
+  // appears BEFORE the real "Day & Date:" field. A bare first-match regex picks up the
+  // abbreviated "Sep 27, 2026" (whose month alias failed to resolve, discarding the whole
+  // extraction); the labeled-date regex must prefer the real field instead.
+  const text =
+    "Subject: Reminder: Educator Dialogues | Learning Gaps | Reena Gupta | Sep 27, 2026\r\n\r\n" +
+    "*Day & Date:* Sunday, September 27, 2026\r\n*Time:* 11:00 AM - 12:00 PM IST";
+  const { startTime, endTime } = extractSessionDateTime(text);
+  assert.equal(startTime, "2026-09-27T05:30:00.000Z");
+  assert.equal(endTime, "2026-09-27T06:30:00.000Z");
+});
+
+test("extractSessionDateTime: abbreviated month names parse (real mail rarely spells them out)", () => {
+  const { startTime } = extractSessionDateTime("Date: Sep 27, 2026 Time: 11:00 AM IST");
+  assert.equal(startTime, "2026-09-27T05:30:00.000Z");
+});
+
+test("extractSessionDateTime: no date phrase anywhere — returns {} rather than guessing", () => {
+  assert.deepEqual(extractSessionDateTime("Thanks for joining, see you soon!"), {});
+});
+
+test("extractSessionDateTime: defaults to IST when no timezone token is present", () => {
+  const { startTime } = extractSessionDateTime("Date: October 6, 2026 Time: 6:00 PM");
+  assert.equal(startTime, "2026-10-06T12:30:00.000Z");
+});
+
+// --- classifyMeetingKind ---
+
+test("classifyMeetingKind: a recording URL always means past-recording", () => {
+  const kind = classifyMeetingKind({
+    subject: "Weekly sync",
+    bodyText: "here's the link",
+    recordingUrl: "https://drive.google.com/file/d/abc123/view",
+    now: new Date("2026-09-25T00:00:00Z"),
+  });
+  assert.equal(kind, "past-recording");
+});
+
+test("classifyMeetingKind: 'shared a recording' in the subject means past-recording even with no explicit URL", () => {
+  const kind = classifyMeetingKind({
+    subject: "Vidysea Education shared a recording",
+    bodyText: "",
+    now: new Date("2026-09-25T00:00:00Z"),
+  });
+  assert.equal(kind, "past-recording");
+});
+
+test("classifyMeetingKind: a future startTime with no recording signal means upcoming", () => {
+  const kind = classifyMeetingKind({
+    subject: "Ashoka Educator Dialogues",
+    bodyText: "join us",
+    startTime: "2026-09-27T05:30:00.000Z",
+    now: new Date("2026-09-25T00:00:00Z"),
+  });
+  assert.equal(kind, "upcoming");
+});
+
+test("classifyMeetingKind: a PAST startTime with no recording signal means past-recording", () => {
+  const kind = classifyMeetingKind({
+    subject: "CBSE Career Guidance webinar",
+    bodyText: "",
+    startTime: "2026-09-16T05:30:00.000Z",
+    now: new Date("2026-09-25T00:00:00Z"),
+  });
+  assert.equal(kind, "past-recording");
+});
+
+test("classifyMeetingKind: no signal at all defaults to upcoming (a bare join link reads as an invite)", () => {
+  const kind = classifyMeetingKind({ subject: "Zoom meeting", bodyText: "", now: new Date("2026-09-25T00:00:00Z") });
+  assert.equal(kind, "upcoming");
+});
+
+// --- isRegistrationOnly ---
+
+test("isRegistrationOnly: a registration link with no direct join link is registration-only", () => {
+  assert.equal(isRegistrationOnly("Register here: https://zoom.us/webinar/register/WN_abc123"), true);
+});
+
+test("isRegistrationOnly: a direct zoom join link is NOT registration-only, even if a register link also appears", () => {
+  const body = "Register: https://zoom.us/webinar/register/WN_abc123 Join now: https://zoom.us/j/1234567890";
+  assert.equal(isRegistrationOnly(body), false);
+});
+
+test("isRegistrationOnly: a plain meet.google.com join link is not registration-only", () => {
+  assert.equal(isRegistrationOnly("Join: https://meet.google.com/abc-defg-hij"), false);
+});
+
+test("isRegistrationOnly: no register link at all is not registration-only", () => {
+  assert.equal(isRegistrationOnly("no links here"), false);
+});
+
+test("spoofed direct-link host cannot clear the registration-only boundary", () => {
+  assert.equal(isRegistrationOnly("https://zoom.us/webinar/register/abc https://zoom.us.evil.example/j/123"), true);
+});
+
+test("canonical join trust refuses host-start and embedded redirects without clearing registration", async () => {
+  for (const link of ["https://zoom.us/s/1234567890?zak=SECRET", "https://zoom.us/j/1234567890?next=https://evil.example",
+    "https://zoom.us/j/1234567890?context=https%253A%252F%252Fevil.example", "https://zoom.us/j/123"]) {
+    const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+      JSON.stringify({id: "mail1", payload: {headers: [{name: "From", value: "host@example.org"}],
+        body: {data: Buffer.from(`https://zoom.us/webinar/register/abc ${link}`).toString("base64url")}}}), {});
+    assert.equal(row?.meetingUrl, undefined);
+    assert.equal(row?.registrationOnly, true);
+  }
+});
+
+test("future YouTube evidence is a canonical watch target, never a personal join or past recording", async () => {
+  const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+    JSON.stringify({id: "mail1", payload: {headers: [{name: "From", value: "host@example.org"}],
+      body: {data: Buffer.from("Career guidance Date: October 15, 2099 Time: 10:00 AM UTC https://youtube.com/live/AbCdEfG123_").toString("base64url")}}}), {});
+  assert.equal(row?.meetingUrl, undefined);
+  assert.equal(row?.recordingUrl, undefined);
+  assert.equal(row?.kind, "upcoming");
+  assert.deepEqual(row?.youtubeWatch, {url: "https://www.youtube.com/watch?v=AbCdEfG123_", videoId: "AbCdEfG123_", source: "body"});
+});
+
+test("conflicting YouTube ids remain an explicit ambiguity rather than selecting the first video", async () => {
+  const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+    JSON.stringify({id: "mail1", snippet: "https://youtube.com/live/XyZaBcD456_", payload: {headers: [{name: "From", value: "host@example.org"}],
+      body: {data: Buffer.from("Date: October 15, 2099 Time: 10:00 AM UTC https://youtube.com/live/AbCdEfG123_").toString("base64url")}}}), {});
+  assert.equal(row?.youtubeWatch, undefined);
+  assert.equal(row?.youtubeWatchIssue, "ambiguous");
+  assert.equal(row?.recordingUrl, undefined);
+});
+
+test("actual multipart HTML href retains a join link missing from plain body and anchor text", async () => {
+  const join = "https://zoom.us/j/1234567890?pwd=literal";
+  const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+    JSON.stringify({id: "mail1", payload: {headers: [{name: "From", value: "host@example.org"}], mimeType: "multipart/alternative", parts: [
+      {mimeType: "text/plain", body: {data: Buffer.from("Career guidance details").toString("base64url")}},
+      {mimeType: "text/html", body: {data: Buffer.from(`<p>Career guidance</p><a href="${join}">Join webinar</a>`).toString("base64url")}},
+    ]}}), {});
+  assert.equal(row?.meetingUrl, join);
+});
+
+test("a Gmail snippet cannot override full-body meeting or passcode conflicts", async () => {
+  for (const other of ["https://zoom.us/j/2222222222?pwd=one", "https://zoom.us/j/1111111111?pwd=two"]) {
+    const [row] = await scanGmailForMeetingCandidates(100, async args => args.includes("list") ? JSON.stringify({messages: [{id: "mail1"}]}) :
+      JSON.stringify({id: "mail1", snippet: "https://zoom.us/j/1111111111?pwd=one", payload: {headers: [{name: "From", value: "host@example.org"}],
+        body: {data: Buffer.from(`https://zoom.us/webinar/register/abc https://zoom.us/j/1111111111?pwd=one ${other}`).toString("base64url")}}}), {});
+    assert.equal(row?.meetingUrl, undefined);
+    assert.equal(row?.meetingLinkIssue, "ambiguous");
+    assert.equal(row?.registrationOnly, true);
+  }
+});

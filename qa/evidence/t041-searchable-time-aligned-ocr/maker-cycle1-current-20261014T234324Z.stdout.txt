@@ -1,0 +1,38 @@
+✔ flag off: no hook => result and files are exactly the pre-wiring behaviour (no slide-alignment.json, no slideAlignment key) (132.3097ms)
+✔ flag off via a disabled hook: identical files and state to no hook, nothing written (98.486ms)
+✔ flag on: hook gets the video, turns mapped to align shape, a temp dir that is removed; result is ids/ranges only (51.4859ms)
+✔ flag on, hook throws: the video stage still completes and the failure is recorded by code only (53.6573ms)
+✔ flag on, reused video stage: the slide stage still runs (55.5281ms)
+✔ keyframeOcrHook: builds primary + fallback OCR on the gemini route from env; flag/ocr/retry reach the core stage (0.7871ms)
+✔ fresh and reused video bound final OCR slide and turn overlap to the probed recording duration (131.6944ms)
+✔ dry-run probes inputs but writes no output and never calls vision (17.0402ms)
+✔ scene extraction dedupes bytes, associates real turns, and notes cite real frames (43.5703ms)
+✔ content hash reuse requires outputs and actual frames unchanged (147.8743ms)
+✔ exhausted provider failure is a counted safe gap; retry converges and releases lock (84.8591ms)
+✔ missing vision config does not start extraction or claim screen completion (20.0476ms)
+✔ unreadable stays unresolved; invented model keys are rejected (0.5143ms)
+✔ turns reject fake ids, duplicate ids, out-of-media timestamps (0.5344ms)
+✔ source-derived tenant works; foreign or missing provenance is refused (61.88ms)
+✔ screen IDs remain stable when extraction indexes change; bad refs refused (0.7867ms)
+✔ notes are bounded extractive highlights with traceable excerpts (0.402ms)
+✔ traversal and active lock rejected without output mutation (12.4864ms)
+✔ Gemini request sends actual image through Transport; validates actual response (16.0726ms)
+﹣ real ffmpeg synthetic video yields timestamped playable frame evidence (0.1544ms) # explicit hermetic check; real media not run
+✔ visibility uses half-open overlap, crossing/zero-length turns and finite final coverage (0.5628ms)
+✔ retry/backoff then fallback, malformed replies retry, and blank is a definitive success (1.099ms)
+✔ actual wired stage preserves A/B/blank/A, persisted OCR spans and original speech; reader and chunker consume it (88.7397ms)
+✔ never-resolving primary and fallback time out and abort every attempt without late rejection leaks (86.9857ms)
+✔ direct Gemini and routed backend receive the attempt abort signal (10.2419ms)
+✔ exhausted frame is omitted with typed counted gaps; reuse retries it instead of hiding data loss (127.9574ms)
+✔ production speaker mapper preserves OCR against a screen alias, then actual scoped hydrator returns screen/time citations (68.4366ms)
+✔ legacy evidence keeps its point timestamps; unsupported versions and foreign tenant fail closed (0.6062ms)
+✔ shared ingestion refuses digest-resealed missing, foreign, duplicate and misassigned speech attachments (150.6637ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 28
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 3607.0903
+

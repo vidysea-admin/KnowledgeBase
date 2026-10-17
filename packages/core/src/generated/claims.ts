@@ -12,19 +12,43 @@ export interface Claims {
   confidence?: number;
   status: "verified" | "needs-review" | "conflicting";
   /**
+   * optional: ingestion channel of a human-approved chat claim (T-007 WhatsApp review; Umesh: mark it verified with source as whatsapp). Webinar/legacy claims omit it
+   */
+  source?: "whatsapp";
+  /**
+   * optional: source of the claim's evidence (strict webinar claims); legacy claims omit it
+   */
+  origin?: "speaker-statement" | "screen-ocr" | "visual-observation";
+  /**
    * @minItems 1
    */
   evidence: [
     {
       turnId: string;
       sessionId: string;
+      /**
+       * optional literal contiguous substring of the cited turn's text (strict webinar claims)
+       */
+      quote?: string;
       [k: string]: unknown;
     },
     ...{
       turnId: string;
       sessionId: string;
+      /**
+       * optional literal contiguous substring of the cited turn's text (strict webinar claims)
+       */
+      quote?: string;
       [k: string]: unknown;
     }[]
   ];
+  indexArtifact?: ClaimIndexArtifact;
   [k: string]: unknown;
+}
+export interface ClaimIndexArtifact {
+  version: 1;
+  generation: string;
+  sessionId: string;
+  sourceId: string;
+  turnDigest: string;
 }

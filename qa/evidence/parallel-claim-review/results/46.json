@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "index": 46,
+  "originalIndex": 51,
+  "claimId": "2026-07-28-metrics-and-mingling-c02",
+  "inputHash": "0166b62e44d453873f93620bda2cdab9ffc39dd6574786b31465c6bdc695b096",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited original names Plate Space and encourages inviting a passing person into a group, but does not establish the claimed solo attendees standing alone or table component. Partial support does not entail the full claim.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown despite an inline Niraj label; personal identity is not verified.",
+      "Original timing is 1769-1796; the same turn ID has changed content and timing in current records.",
+      "Artifact hashes are supplied raw byte hashes, not independently verified; transcript support is not external factual truth."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "turnId": "2026-07-28-metrics-and-mingling-t060",
+        "contextVersion": "originalMigration",
+        "quote": "Always make room for the person who is just passing by. I've done it so many times. Somebody is passing by, I'll say, \"Why don't you join us?\"",
+        "textSha256": "28788c6b67faa2ca45aa8833d989d20ee1c7fe572b3e6a4786fb87caa3e1b691",
+        "contextSha256": "062e4df72bf6e814dc57a1fd97a20f0914f8edbb089260c2210b75cfce670a0d",
+        "artifactSha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1769,
+        "tEnd": 1796,
+        "supports": "Supports inviting a passing person into a group under Plate Space; does not identify solo attendees standing alone or a table."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current cited record discusses feeling unwanted, mutual effort, awkwardness and attending an in-person event; it does not mention Plate Space or inviting solo attendees standing alone to a table or group.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef Bhakti is metadata, not independently verified identity.",
+      "Current timing is 2494-2549, replacing original 1769-1796 under the same turn ID.",
+      "Current raw artifact hash differs from its normalized-LF hash; neither was verified against artifact bytes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "turnId": "2026-07-28-metrics-and-mingling-t060",
+        "contextVersion": "current",
+        "quote": "There has to be effort on both sides, I feel, and وہ thoda initial awkwardness to hone hi wala hai.",
+        "textSha256": "43f1a48acdd0cb2c178fbf56ee621d65721b85a7f880493ccde5b4c800828c6c",
+        "contextSha256": "13a99bb6cc566bb2094bed471a55164086b0b0fdea539d3879aa6b9bf510adbc",
+        "artifactSha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+        "revision": null,
+        "speakerRef": "Bhakti",
+        "tStart": 2494,
+        "tEnd": 2549,
+        "supports": "Discusses reciprocal effort and initial awkwardness, without the Plate Space rule or inviting solo attendees to a table or group."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Same cited turn ID has different text, timing and speakerRef. Original partially supports group invitation under Plate Space; current provides no rule-specific support. No missing or duplicate citation matches are supplied; full claim is unsupported in both contexts."
+}

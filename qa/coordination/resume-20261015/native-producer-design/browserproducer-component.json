@@ -1,0 +1,73 @@
+{
+  "validationContract": "managed-review/1",
+  "role": "maker component facts for root aggregate packet",
+  "unit": "t042-native-browserproducer",
+  "fixCycle": 0,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidateSha": null,
+  "candidateState": "uncommitted exact byte pins; root must bind combined candidate",
+  "clauses": [
+    "qa/contracts/t042-trusted-registry-integration.md R3/R4/R7/R14",
+    "qa/contracts/goal-T042.md P3/P9/P11/P12"
+  ],
+  "files": [
+    {
+      "path": "packages/meeting-bot/py/tab-capture/recorder.js",
+      "sha256": "cec060f57788fc9f9925005766a6b2eb35824be410ccd2f1cb03e88045ddae14"
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/native-video.js",
+      "sha256": "c1eb0e2d22881f78537a9cfba4e6a2ef14f08a4f81557fd9977c9da286cba104"
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/native-video.test.mjs",
+      "sha256": "0512619b67171d4ed2c9c48dc49be47be1cecf6244df0ab4d0da6d265bbc04e7"
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/native-audio-worklet.js",
+      "sha256": "90f0d4166d756dfa3bbc7b5cb15f51cdbf04489fd9cac9f03c1a52a50b90916e"
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/native-audio-worklet.test.mjs",
+      "sha256": "3655747f7b7fa89addfe0a97f4da5a4ae8451de1c5c55874c4bda4b337759b8f"
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/native-recorder.js",
+      "sha256": "a22544227493cbf3f1f13b4b790bc3429cfe27095e2860912a987235194c819a"
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/native-recorder.test.mjs",
+      "sha256": "b5dd394da34ce09a336c86457bbb2121358a24d7ab490f82680cc75435913e61"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "sha256": "7406d4139265e15e260e816d6a4f8e2c02651a815e26e58e04e97ce6115d5f72"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+      "sha256": "d3de23616be7fc8703fbcee30b1f327bf32df07c421e32fef31f623544cb36e6"
+    }
+  ],
+  "makerActualTotalTokens": null,
+  "makerActiveSeconds": null,
+  "checksExecuted": [],
+  "pendingGates": [
+    "sole broker focused tests and combined typecheck",
+    "root consent/finalizer/provider WAV join",
+    "independent checker exact combined candidate",
+    "real platform uncertainty and decoded origin acceptance"
+  ],
+  "exports": [
+    "TabBrowserConfig.native {identity,maxBytes,onClosed(ClosedNativeSpool,output):Promise<void>}",
+    "tabCaptureAssetSha256(assetDirectory): string",
+    "createTabCaptureReceiver fourth arg native"
+  ],
+  "limits": [
+    "No calibration/native readiness minted",
+    "Default legacy mode retained",
+    "Native opt-in API failure fails closed; existing legacy usable through new invocation without native",
+    "Explicit onClosed must enforce final candidate/WAV/spool aggregate quota and privacy",
+    "Synthetic API harness and synthetic VP8 envelope only; no native runtime measurement"
+  ]
+}

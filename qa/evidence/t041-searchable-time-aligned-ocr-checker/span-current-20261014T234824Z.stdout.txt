@@ -1,0 +1,2 @@
+{"status":"PASS","checks":134,"oracleTimelines":64,"permutationChecks":64,"scope":"synthetic pure timeline and production mapper; no real media/provider/search"}
+

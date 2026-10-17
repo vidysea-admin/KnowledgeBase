@@ -4,6 +4,7 @@ export * from "./client.js";
 export * from "./lib/tenantScope.js";
 export * from "./collections/sources.js";
 export * from "./collections/sessions.js";
+export { jobs, listJobs } from "./collections/jobs.js";
 export * from "./collections/turns.js";
 export * from "./collections/claims.js";
 export * from "./collections/session-pages.js";
@@ -23,3 +24,13 @@ export * from "./collections/watch-reports.js";
 // polling phase; read by apps/api/src/routes/health.ts's staleness detector, in a DIFFERENT
 // process from the writer (a detector inside the writer dies with it).
 export * from "./collections/watch-heartbeat.js";
+// T-057 D4: content-free per-request usage rows (kind/outcome/latency/day) for GET /usage.
+export * from "./collections/usage-events.js";
+// U2.4 (D-141): suggested speaker names. A suggestion is never a final identity; confirm is the only path.
+export * from "./collections/speaker-suggestions/index.js";
+export * from "./collections/speaker-relationships.js";
+export * from "./collections/speaker-attributes.js";
+export * from "./collections/automation-runs.js";
+export * from "./collections/application-operations.js";
+export * from "./collections/operations-schedules.js";
+export * from "./lib/native-publication.js";

@@ -1,0 +1,261 @@
+{
+ "normalization": "CRLF->LF sha256 (equals git blob content)",
+ "files": {
+  "apps/api/src/indexing/decisions-persist.ts": {
+   "pinned": "82c6b6379f1c40e43b07e29584575f4463bed8f41bb9fb2c32e87a3e6aecf532",
+   "current": "9e5fbdfc976a45556d2bfb4b51f41fa1eb3ec9540cfb61ce27569f0c37d9dd9b",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/indexing/decisions-persist.test.ts": {
+   "pinned": "9e33790c642c3476af0dca6b9bbb2bba9cebf07c7deb456ee45d6cebc2cbb56e",
+   "current": "MISSING",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/indexing/session-decisions.test.ts": {
+   "pinned": "794b9df694b2e3ae5a1a6d3766183116b408ceadb1b017a7c6790a04e030b7f8",
+   "current": "dd827efa2af0d7cef3a73b5465670cffce3b575fb73f66d5762015a83df9e276",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "packages/index/src/pipeline/notes/decisions.ts": {
+   "pinned": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+   "current": "31693e89527855b92100191aac472cf4191e4a306c8604062236fddfe4dcf8dd",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "packages/index/src/pipeline/notes/decisions.test.ts": {
+   "pinned": "d8508665b65d66648e3d0b6592aece9ab6b80ef70f4d2567d6b3c05265c82eb7",
+   "current": "048cb98a30db0b4d7ae143bfd3648f6ff84f4aa67048a34b09b799aad5214687",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/session-decisions/provenance.ts": {
+   "pinned": "e677c6e1ad767cdd622c6e37bbfe32d1307c7570581a43a089c741452f3e4580",
+   "current": "e677c6e1ad767cdd622c6e37bbfe32d1307c7570581a43a089c741452f3e4580",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/session-decisions/reader.ts": {
+   "pinned": "5c6e9dda7e94610aea21ebf01508364a19a285d342cd826a9a05950b740878d5",
+   "current": "5c6e9dda7e94610aea21ebf01508364a19a285d342cd826a9a05950b740878d5",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/session-decisions/router.ts": {
+   "pinned": "28e2789fd0ba2e91f5595662a48e06bee63a02d0075d164322b9f2adf453854a",
+   "current": "28e2789fd0ba2e91f5595662a48e06bee63a02d0075d164322b9f2adf453854a",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/session-decisions/fixture.testsupport.ts": {
+   "pinned": "5dd58be81441ea143ab7aac35df5e173f5f9038a90d6e3548048c4f3084fac68",
+   "current": "5dd58be81441ea143ab7aac35df5e173f5f9038a90d6e3548048c4f3084fac68",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/session-decisions/reader.test.ts": {
+   "pinned": "2997a80e4c2440accf0d62f5bb2400446ad5917104df83cb0015116feac72d96",
+   "current": "6cc2f37fec2d71c0ccd5ff19ab2f08661df851ba475da7cc9dda90a4f3bc49a8",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "qa/evidence/goal-u25-consumer/public-transport.test.ts": {
+   "pinned": "20af6490f560ea0e11dc4627a4d8bc2d5e9742fcad3345114df6446c32e9badf",
+   "current": "20af6490f560ea0e11dc4627a4d8bc2d5e9742fcad3345114df6446c32e9badf",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/visibility/read-snapshot.ts": {
+   "pinned": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+   "current": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/visibility/knowledge.ts": {
+   "pinned": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+   "current": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/transcript-review/effective-reader.ts": {
+   "pinned": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+   "current": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/transcript-review/service.ts": {
+   "pinned": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+   "current": "fac850fbe34cc94775cc0791a3043150033856c67807238186a83bdf961f894a",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/transcript-review/store.ts": {
+   "pinned": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+   "current": "faf670dac24d1f11ea4625f2b9b505bf5c7919e859db7bd6ba76df563fa6ddae",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/composition/integrations/trusted-readers.ts": {
+   "pinned": "1bcb64d9551d4e6ee915b32b060400da2d1f1fee52eea75882d0d60e7fc6911a",
+   "current": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/server.ts": {
+   "pinned": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+   "current": "1ba61413eebcf4679212da2d5d0fd6a76b27ed9df723f0a0b37891b57683a64d",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/composition/production.ts": {
+   "pinned": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+   "current": "cc7abed856204540b4f4ef5c0e970828a476f45a220c7ee6f28044d2d0407eca",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/composition/integrations/routes.ts": {
+   "pinned": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+   "current": "5008201fed89eaaeea6e52fcebc719ceb6ff34d00bef9632fdcc9a7ef585742e",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/fixtures.ts": {
+   "pinned": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b",
+   "current": "45eb8e513de1b7f597108790ff492105c84daee6cd97114b4b25b70dc4718ecd",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/api/src/testUtils.ts": {
+   "pinned": "aedff13a23f522a89ae4029eea1fc2df5484811a79ad5cc105bf6858ba7f987b",
+   "current": "a7930bc1837b86e834c0421d3affff1bffdfc468187e66100996b84af58f36d4",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "packages/db/src/lib/tenantScope.ts": {
+   "pinned": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+   "current": "23e96697181c59620c0c9bbdc74b4645bf0f0f610dcf5f9c919c092e9cf7e09a",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "schema/decisions.schema.json": {
+   "pinned": "7ce38a33026bbc4194b69b78de190a10c89225726aaafdfee70e1178942fbe22",
+   "current": "210db2a5bb30d1e2a7adf534245425d8433ae75fac56cbba4adc8aba6caeb15c",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "packages/core/src/generated/decisions.ts": {
+   "pinned": "04212e855d206584ab60513b3028c4e8997dec66e2add83950d948381b0166ff",
+   "current": "04212e855d206584ab60513b3028c4e8997dec66e2add83950d948381b0166ff",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/src/pages/sessions/decisions/client.ts": {
+   "pinned": "5c45b9947d6e298e97ebaba7ea4f3fca7dc5ff76e647dd75ed5ae78b19e2508e",
+   "current": "5c45b9947d6e298e97ebaba7ea4f3fca7dc5ff76e647dd75ed5ae78b19e2508e",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/src/pages/sessions/decisions/SessionDecisionsPanel.tsx": {
+   "pinned": "0603b12e709c0b0f46a4fd904677ee45dd7c45578f4a2a9e528a1026bb5dd4d4",
+   "current": "0603b12e709c0b0f46a4fd904677ee45dd7c45578f4a2a9e528a1026bb5dd4d4",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/src/pages/sessions/decisions/SessionDecisionsPanel.test.tsx": {
+   "pinned": "974a52cc28e0299327b95aae4aad6a4656dfab8f11e0de1139e8617817aa8942",
+   "current": "c10d1972e03c2607d62957435999fdb2f2da88d1fefe314e077883db71ca9b5c",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/src/pages/sessions/SessionDetailPage.tsx": {
+   "pinned": "16bd213ad66f6c76b2555cce655fa7e2a880f0be5b170e2022aeb41db2620487",
+   "current": "f200361bb41e4ccf46d3ab63003e0eaf6dc4e4bd5d8a5febe9ff436999419fdc",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/src/api/client.ts": {
+   "pinned": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+   "current": "fcd944711d8c4ccca991ba253c9b58f193596cf3f0ce052e94df7d3a2fae138a",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/src/auth/AuthContext.tsx": {
+   "pinned": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+   "current": "8bc76ed1c5d93f841f164fcdf43c0ebdc47168be763ff65077d8e9794eeb5ae1",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  },
+  "apps/web/vitest.config.ts": {
+   "pinned": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+   "current": "caf249e4decdae8d1f65f020cf94e7d5d592a0ccf0dcda1cd3077a1226615ba1",
+   "specs": [
+    "public-api-spec",
+    "public-ui-spec"
+   ]
+  }
+ }
+}

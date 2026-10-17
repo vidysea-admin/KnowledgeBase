@@ -39,8 +39,8 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { tokenize } from "../../scripts/lib/golden-set-diagnostics.mjs";
-import { loadCorpora } from "../../scripts/lib/golden-set-build.mjs";
+import { tokenize } from "../../scripts/eval/golden-set-diagnostics.mjs";
+import { loadCorpora } from "../../scripts/eval/golden-set-build.mjs";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const SET_PATH = join(ROOT, "data", "eval", "golden-set.json");

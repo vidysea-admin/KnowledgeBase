@@ -125,4 +125,13 @@ explicitly rather than inferred from the shape approval.
 
 **Answered:** (pending)
 
-**Gate status:** OPEN — awaiting the Approver; see the Answer format section in this file
+
+## Ruling (recorded 2026-10-10)
+
+**Answered:** 2026-10-10 - (a) APPROVED - Umesh (Approver), answering a direct multiple-choice prompt in the orchestrating session; recorded by the orchestrating agent.
+**Ruled by:** Umesh (Approver).
+**Choice:** (a) Approve the shape: fix all three spoof routes (1), (2) and (3) in one unit, enforcing sender authentication where the unauthenticated header becomes trust. "new file ok": `packages/core/src/domain/sender-authentication.ts` (plus its one `export * from` line in `packages/core/src/index.ts`) is explicitly authorized.
+**Covers:** ISS-322 and ISS-333.
+**Limits:** no other new file, no LOC budget raise, no change to the answered gate's policy. An authorizing DECISIONS entry is still required before files are touched (see D-122 draft).
+
+**Gate status:** ANSWERED - recorded inline: 2026-10-10 - option (a), new file ok - Umesh (Approver)

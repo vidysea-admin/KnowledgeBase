@@ -1,0 +1,7 @@
+{
+  "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --import ./.cache/coordination/safe-test-runtime/register.mjs packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts packages/meeting-bot/src/calendar/schedule-tick.test.ts apps/api/src/bot-events/router.test.ts apps/api/src/answer-policy/routes.test.ts",
+  "startedUtc": "2026-10-14T09:07:31.0160487Z",
+  "endedUtc": "2026-10-14T09:07:34.8793215Z",
+  "exitCode": 0,
+  "durationSeconds": 3.8634567
+}

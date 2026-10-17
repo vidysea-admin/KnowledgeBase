@@ -1,0 +1,45 @@
+{
+  "contract": "managed-review/1",
+  "status": "maker-evidence-only-not-independent-PASS",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "candidate_identity": "uncommitted-byte-hashes",
+  "unit": "checker-offline-budget-engine",
+  "fix_cycle": 2,
+  "changed_paths": [
+    "scripts/qa/bounded-review-transport.py",
+    "scripts/qa/test_bounded_review_transport.py"
+  ],
+  "hashes": {
+    "scripts/qa/bounded-review-transport.py": "52d8d7d301167702fda2ef42b8f01caf48b0a3543dbfb8c8995bc6da51092a15",
+    "scripts/qa/test_bounded_review_transport.py": "b9714b44720ff7c037c37e2e65c5adbad1381cbf886a5cd4f15b1cf72b0d06ff"
+  },
+  "checks": [
+    {
+      "command": "python -m unittest discover -s scripts/qa -p test_bounded_review_transport.py -v",
+      "exit": 0,
+      "tests": 9,
+      "raw": "tests-fix2.log"
+    }
+  ],
+  "prior_failures": [
+    "tests-fix1.log: indentation error; corrected; preserved"
+  ],
+  "usage": {
+    "actual_total_tokens": null,
+    "active_s": null,
+    "allocated_tokens": null,
+    "allocated_active_s": 240,
+    "token_metric": "actual_total"
+  },
+  "limits": [
+    "Offline injected fake client only; no HTTP adapter or provider calls",
+    "Credential reuse/new decision unresolved; no secrets inspected or written",
+    "Pure local trust boundary; client declarations are capabilities, not sandbox enforcement",
+    "Cooperative client deadline; no server cancellation guarantee or process-kill deadline",
+    "No independent quality verdict; managed packet schema validation not run",
+    "Full integration/contract checks outside current bounded delegated scope"
+  ],
+  "behavior": "Exact complete immutable text payload counted once, aggregate exclusive fsynced reservations, finite measured-maker 10 percent limits, output cap includes hidden output; errors preserve full reservation; actual input/output count cached and reasoning subsets once."
+}

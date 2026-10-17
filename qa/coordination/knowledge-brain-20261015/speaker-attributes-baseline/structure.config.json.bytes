@@ -1,0 +1,46 @@
+{
+  "$comment": "Single home for every structure budget (D-003, T-017). scripts/lint-*.mjs and ARCHITECTURE §5 read/refer to this file; never restate these numbers elsewhere.",
+  "roots": ["packages", "apps", "workers", "scripts", "schema"],
+  "ignoreDirs": ["node_modules", "dist", "generated"],
+  "loc": {
+    "extensions": [".ts", ".py", ".mjs"],
+    "max": 300,
+    "testMax": 400,
+    "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
+  },
+  "dirsize": { "$comment": "D-176: schema/ allows 44 canonical collection schemas plus index.json and validate.py for reviewed speaker relationships; other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 46 } },
+  "root": {
+    "maxLooseFiles": 16,
+    "architectureFile": "ARCHITECTURE.md",
+    "architectureMaxLines": 150,
+    "mdMaxLines": 200,
+    "readmeFile": "README.md",
+    "readmeMaxLines": 80
+  },
+  "dupes": {
+    "root": "packages",
+    "extensions": [".ts"],
+    "excludeFiles": ["index.ts"],
+    "exportPattern": "^export\\s+(?:async\\s+)?(?:function\\*?|const|let|class|type|interface|enum)\\s+([A-Za-z_$][\\w$]*)",
+    "schemaDir": "schema",
+    "schemaSuffix": ".schema.json"
+  },
+  "migrations": {
+    "dir": "migrations",
+    "pattern": "^migrate-.*\\.(mjs|js|ts|py)$",
+    "extraIgnoreDirs": [".git", "sources"]
+  },
+  "codexHooks": {
+    "$comment": "D-050-CODEX parity-lint fallback (ISS-355/ISS-268): links (hard link + junction) do not survive git clone/worktree, so this is the durable check. Compares each named file byte-for-byte MODULO LINE ENDINGS only -- CRLF-vs-LF alone (e.g. features-snapshot-session-end.ps1) is not a defect.",
+    "mirrorDir": ".codex/hooks",
+    "sourceDir": ".claude/hooks",
+    "files": [
+      "decisions-append-guard.ps1",
+      "features-snapshot-session-end.ps1",
+      "lab-session-end.ps1",
+      "lab-session-start.ps1",
+      "mc-precommit.ps1",
+      "mc-sessionstart.ps1"
+    ]
+  }
+}

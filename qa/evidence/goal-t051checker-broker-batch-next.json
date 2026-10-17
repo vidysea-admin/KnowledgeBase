@@ -1,0 +1,28 @@
+{
+  "ready": [
+    "t015-cycle1-standing",
+    "t015-cycle1-ledger",
+    "t015-cycle1-plan",
+    "t015-cycle1-validate",
+    "u24-maker",
+    "t041-maker",
+    "t058-api"
+  ],
+  "skipped": [
+    {
+      "n": "t054-api",
+      "drift": [
+        {
+          "p": "apps/api/src/composition/integrations/trusted-readers.ts",
+          "expected": "b9d3fb1102d87ca7d7301422c07996f60aea4b63ee902bf0ec3e63d4512acdec",
+          "actual": "e4c99d947ea0ad3e5dcdadcdb2816b5f5ecb846cd52deedbd0557b806cf0d06b"
+        },
+        {
+          "p": "apps/api/src/visibility/knowledge.ts",
+          "expected": "d5e451c463d275d499ea56a62cc434002531617fd05d32dc68a2abbe7ea482a8",
+          "actual": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada"
+        }
+      ]
+    }
+  ]
+}

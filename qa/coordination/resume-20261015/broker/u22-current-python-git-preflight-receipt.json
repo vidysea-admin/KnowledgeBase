@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "-c",
+    "import sys,json,pathlib,subprocess; p=pathlib.Path(sys.argv[1]).resolve(); compile(p.read_bytes(),str(p),'exec'); args=json.loads(sys.argv[2]); head=subprocess.run([args[0],'rev-parse','HEAD'],check=True,capture_output=True,text=True,timeout=2).stdout.strip(); status=subprocess.run([args[0],'status','--porcelain','--untracked-files=normal','--',*args[1:]],check=True,capture_output=True,text=True,timeout=2).stdout; print(json.dumps({'python':sys.executable,'version':sys.version,'contractOrigin':str(p),'head':head,'status':status}))",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "[\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.EXE\", \"scripts/eval/extraction-review-resume.mjs\", \"scripts/eval/extraction-review-resume.test.mjs\"]"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4.json",
+    "sha256": "5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4",
+    "count": 21
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "MAKER ACCEPTANCE, not watched checker",
+  "pid": 26084,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.35900000000037835,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-python-git-preflight.log",
+    "sha256": "c8f8ca792f541d11015d4afc2de5d6a85190a49c09a11e35d856a7b6887ad40f"
+  },
+  "counts": {}
+}

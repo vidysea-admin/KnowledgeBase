@@ -1,0 +1,11 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+const decision = JSON.parse(readFileSync('schema/fixtures/decisions/valid.json','utf8'));
+decision.sourceEvidenceDigest = 'a'.repeat(64);
+decision.generationEvidenceDigest = 'b'.repeat(64);
+writeFileSync('schema/fixtures/decisions/valid-bound-generation.json',JSON.stringify(decision,null,2)+'\n');
+for (const field of ['sourceEvidenceDigest','generationEvidenceDigest']) writeFileSync('schema/fixtures/decisions/invalid-'+field+'.json',JSON.stringify({...decision,[field]:'NOT-A-DIGEST'},null,2)+'\n');
+const form = JSON.parse(readFileSync('schema/fixtures/application_operations/valid-operation.json','utf8'));
+form.fields[0].source.documentId = 'tenant-a:' + 'c'.repeat(64);
+writeFileSync('schema/fixtures/application_operations/valid-canonical-document.json',JSON.stringify(form,null,2)+'\n');
+writeFileSync('schema/fixtures/application_operations/invalid-document-whitespace.json',JSON.stringify({...form,fields:form.fields.map((field,i)=>i===0?{...field,source:{...field.source,documentId:'tenant a:'+ 'c'.repeat(64)}}:field)},null,2)+'\n');
+console.log('Synthetic canonical producer fixtures authored; validation remains pending.');

@@ -23,7 +23,7 @@ test("accepted end boundary changes remain causal when the shortened end is alre
   assert.equal(activeWebinarStopReason(id,base.endTime,unknown),undefined);
 });
 
-test("watch retries only typed discovery failure after 60s and preserves fatal/preview gates", async () => {
+test("watch retries only typed discovery failure after the 5 minute POLL_MS and preserves fatal/preview gates", async () => {
   const {runPipelineWatch} = await import(new URL('../../../../scripts/webinar/run-pipeline.mjs', import.meta.url).href);
   let ticks = 0; const waits: number[] = [], logs: string[] = [];
   const stopped = new Error("fixture cancellation");
@@ -31,7 +31,7 @@ test("watch retries only typed discovery failure after 60s and preserves fatal/p
     tick: async () => {if (++ticks === 1) throw Object.assign(new Error("private provider details"), {code: "WEBINAR_DISCOVERY_UNAVAILABLE"}); return {status: "running"};},
     wait: async (ms: number) => {waits.push(ms); if (waits.length === 2) throw stopped;}, log: (text: string) => logs.push(text),
   }), error => error === stopped);
-  assert.equal(ticks, 2); assert.deepEqual(waits, [60000, 60000]); assert.ok(!logs.join(" ").includes("private"));
+  assert.equal(ticks, 2); assert.deepEqual(waits, [300000, 300000]); assert.ok(!logs.join(" ").includes("private"));
   for (const failure of [new Error("Webinar discovery unavailable"), new Error("owner mismatch"), new Error("lock invalid"), new Error("proof missing")]) {
     let waited = false;
     await assert.rejects(runPipelineWatch({run: true, watch: true}, {tick: async () => {throw failure;}, wait: async () => {waited = true;}}), error => error === failure);
@@ -172,9 +172,12 @@ test("known actual-wire and id-only cancellations preserve metadata and block st
   const stale = reconcile(first.state, [{id: "cal-a", cancelled: true, providerUpdated: "2026-10-01T07:00:00.000Z"}]);
   assert.equal(choose(stale).toSchedule.length, 1); assert.equal(stale.calendarEvents[0]!.cancelled, false);
   const unknown = reconcile(first.state, [{id: "unknown", cancelled: true}]);
-  assert.equal(unknown.newStartsBlocked, true); assert.deepEqual(unknown.calendarEvents, []); assert.deepEqual(unknown.candidates, []);
+  // CHANGED (ISS-T036CAL-011; was: newStartsBlocked true, both feeds empty, replay still blocked). The tombstone is still recorded and listed
+  // (`unknown-tombstone`), but it can no longer stop the proven pair: the Calendar row and its linked Gmail copy are exactly as without it.
+  // The original hazard (a cancelled meeting's UNLINKED Gmail copy) stays guarded: see tombstone/unknown-tombstone-non-interference.test.ts.
+  assert.equal(unknown.newStartsBlocked, false); assert.deepEqual(unknown.calendarEvents, first.calendarEvents); assert.deepEqual(unknown.candidates, first.candidates);
   assert.ok(unknown.inventory.some(row => row.reason === "unknown-tombstone"));
-  assert.equal(reconcile(unknown.state, [], []).newStartsBlocked, true);
+  assert.equal(reconcile(unknown.state, [], []).newStartsBlocked, false);
 });
 test("accepted reschedule rewrites only proven Gmail lineage and retains sticky barriers", () => {
   const moved = calendarRow({startTime: "2026-10-02T12:00:00.000Z", endTime: "2026-10-02T13:00:00.000Z", meetingUrl: "https://zoom.us/w/333?tk=new", providerUpdated: "2026-10-01T08:30:00.000Z"});

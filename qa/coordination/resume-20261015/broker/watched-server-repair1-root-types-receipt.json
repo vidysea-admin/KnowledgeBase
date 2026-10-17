@@ -1,0 +1,34 @@
+{
+  "label": "watched-server-repair1-root-types",
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "-p",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair1-tsconfig.json"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "canonicalPins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\f22292d27883c4810ecfd0da81f1f17ed9fad53f4c288679e9b560e0c0ce7f95.json",
+    "sha256": "f22292d27883c4810ecfd0da81f1f17ed9fad53f4c288679e9b560e0c0ce7f95",
+    "count": 1677
+  },
+  "pinsBeforeMatch": true,
+  "runtime": {
+    "path": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+  },
+  "lockSha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "supervisorSha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "pid": 7624,
+  "exit": 2,
+  "treeClosed": true,
+  "pinsAfterMatch": true,
+  "drift": [],
+  "active_s": 12.625,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair1-root-types.log",
+    "sha256": "6cc85b76bf13fd336c8cd693b1689a6dac85d60931ea4de3b0ddceb9e36e82cb"
+  },
+  "counts": {}
+}

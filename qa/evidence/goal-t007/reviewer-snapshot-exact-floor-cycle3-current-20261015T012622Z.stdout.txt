@@ -1,0 +1,11 @@
+✔ independent review privacy: consent-withdrawal during the final transcript-head lookup cannot return earlier evidence (11.1846ms)
+✔ independent review privacy: pending-invalidation during the final transcript-head lookup cannot return earlier evidence (2.7074ms)
+✔ independent review control: unchanged pending candidate remains inspectable with exact evidence (5.0363ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 846.8021
