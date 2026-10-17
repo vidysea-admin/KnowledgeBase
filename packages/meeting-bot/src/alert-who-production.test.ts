@@ -25,7 +25,7 @@ const NOW = "2026-10-10T10:00:00.000Z";
 const ev = (id: string, title: string, o: Partial<CalendarEvent> = {}): CalendarEvent =>
   ({ id, title, startTime: "2026-10-10T10:02:00.000Z", endTime: "2026-10-10T11:00:00.000Z", meetingUrl: `https://zoom.us/j/${id.replace(/\D/g, "").padEnd(11, "7")}`, ...o });
 const EVENTS: CalendarEvent[] = [
-  ev("evJ1", "Webinar Alpha", { meetingUrl: "https://zoom.us/j/11111111111" }),
+  ev("evJ1", "Webinar Alpha", { meetingUrl: "https://zoom.us/j/11111111111", organizer: "host@example.org" }), // organizer = the dispatch sender (scheduledDispatchIdentity refuses a sender-less job)
   ev("evO2", "Webinar Beta", { meetingUrl: "https://zoom.us/j/22222222222", startTime: "2026-10-10T10:03:00.000Z", endTime: "2026-10-10T11:30:00.000Z" }),
   ev("evN3", "Webinar NoLink", { meetingUrl: undefined }),
   ev("evU4", "Webinar Unsafe", { meetingUrl: "https://example.com/room" }),

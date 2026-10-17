@@ -64,7 +64,8 @@ async function drive(scenario: string, untilMs: number) {
   try {
     let error: unknown;
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(Date.now() + untilMs).toISOString(), "--backend", "tab",
-      "--session-id", "capadmit", "--tenant", "fixture", "--title", "fixture"], {
+      "--session-id", "capadmit", "--tenant", "fixture", "--title", "fixture",
+      "--capture-approved-by", "fixture", "--capture-approval-ref", "fixture", "--recorded-by", "fixture"], {
       recordDir, telegram, finalize: async () => {},
       wait: async () => {
         await new Promise((r) => setTimeout(r, 20));

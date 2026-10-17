@@ -24,6 +24,8 @@ import {
 
 import {writeOwnedTabStatus} from "./tab-browser.js";
 import {finalizeRecordingWith} from "./record-commands.js";
+import {createRecordConsent} from "./record-consent/context.js";
+import {writeRecordConsent} from "./record-consent/receipt-store.js";
 import {webinarCompletionState} from "../calendar/state/schedule-state.js";
 
 function tmpDir(): string {
@@ -215,7 +217,7 @@ test("Linux process identity validates bounded proc fields without invoking Wind
   }
   const badStats = [undefined, "", "4242 node S 0", stat("123456", "node", 4243), stat().replace(") S", ") ?"),
     stat().split(" ").slice(0, 10).join(" "), ...["0", "-1", "1.5", "01", "18446744073709551616", "123x"].map(value => stat(value)),
-    stat().replace(" S 0", " S NaN"), "x".repeat(8193), "é".repeat(4097)];
+    stat().replace(" S 0", " S NaN"), "x".repeat(8193), "ï¿½".repeat(4097)];
   for (const value of badStats) {
     files.set("/proc/4242/stat", value);
     assert.equal(getProcessStartTime(4242, probes), undefined, `stat ${String(value).slice(0, 60)}`);
@@ -277,6 +279,9 @@ test("first-source normalize/probe/extract failures retain stopped and interrupt
       writeFileSync(path.join(profileDir,".lkb-tab-capture.lock"),String(identity.pid));
       mkdirSync(path.join(recordDir,".extension-"+handle));
     }
+    // The finalizer requires a current consent receipt for the session; this test is about control evidence only.
+    writeRecordConsent(recordDir, createRecordConsent([], { tenantId: "lane", sessionId: sessionId, meetingUrl: "https://example.invalid/fixture" },
+      { LKB_CAPTURE_RECORDED_BY: "fixture", LKB_CAPTURE_APPROVED_BY: "fixture", LKB_CAPTURE_APPROVAL_REF: "fixture" }, new Date(1000)));
     let failing=true, processed=0;
     const recover=()=>finalizeControllerRecording(video,{repoRoot:root,recordDir,profileDir,sessionId,tenantId:"lane",python:"unused",joinScript:"unused"},{
       normalize:media=>{if(failing&&failure==="normalize")throw new Error("first normalize failure");return media;},

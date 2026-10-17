@@ -50,8 +50,12 @@ test("wall jumps, backwards monotonic, forged elapsed time and excessive uncerta
 });
 
 test("actual Python producer bytes enter strict ingestion, without a browser or asserted decoded authority", () => {
-  const python = process.env.LKB_SAMPLER_TEST_PYTHON;
-  assert.ok(python && path.isAbsolute(python), "broker must preflight and supply absolute LKB_SAMPLER_TEST_PYTHON");
+  // Broker-supplied LKB_SAMPLER_TEST_PYTHON wins; otherwise resolve to an absolute interpreter the way joiners.test.ts does
+  // (D2_FIXTURE_PYTHON, as set for CI unit tests, then PATH python), so the absolute-path requirement stays asserted.
+  const configured = process.env.LKB_SAMPLER_TEST_PYTHON || process.env.D2_FIXTURE_PYTHON || (process.platform === "win32" ? "python" : "python3");
+  const probe = spawnSync(configured, ["-I", "-c", "import sys; print(sys.executable)"], { encoding: "utf8", timeout: 30000, windowsHide: true });
+  const python = path.isAbsolute(configured) ? configured : String(probe.stdout).trim();
+  assert.ok(python && path.isAbsolute(python), `could not resolve an absolute Python interpreter from ${configured}: ${probe.stderr}`);
   const pyRoot = fileURLToPath(new URL("../../../py/", import.meta.url));
   const script = [
     "import sys,tempfile,pathlib,json", "sys.path.insert(0,sys.argv[1])", "from sb_join_tiles import TileSampler",

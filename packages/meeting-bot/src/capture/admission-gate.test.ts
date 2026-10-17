@@ -93,7 +93,8 @@ async function drive(scenario: string, untilMs: number) {
     const t0 = Date.now();
     let error: unknown;
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(t0 + untilMs).toISOString(), "--backend", "tab",
-      "--session-id", "adm", "--tenant", "fixture", "--title", "fixture"], {
+      "--session-id", "adm", "--tenant", "fixture", "--title", "fixture",
+      "--capture-approved-by", "fixture", "--capture-approval-ref", "fixture", "--recorded-by", "fixture"], {
       recordDir, wait: async () => { await new Promise((r) => setTimeout(r, 20)); }, finalize: async () => {},
       tab: (onEvent) => {
         const t = createTabBrowserDeps({ python: process.execPath, joinScript: script, profileDir: join(dir, "profile"), recordDir,

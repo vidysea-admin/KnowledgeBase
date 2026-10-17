@@ -16,7 +16,8 @@ test("JSON, copied archive facts and native flags cannot manufacture archive or 
   }
 });
 test("archive roots and quotas are explicit trusted server configuration", async () => {
-  for (const root of ["relative", "//untrusted.example/archive"]) {
+  // A UNC root is a Windows concept: path.resolve("//host/x") collapses to "/host/x" on POSIX, so there it is just a missing local path.
+  for (const root of process.platform === "win32" ? ["relative", "//untrusted.example/archive"] : ["relative"]) {
     await assert.rejects(openNativeArchiveStore({ root, maxArchiveBytes: 100, readCurrentBinding: async () => null }), /local private/);
   }
   const root = await mkdtemp(path.join(tmpdir(), "native-archive-refusal-"));
