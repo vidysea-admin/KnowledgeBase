@@ -116,3 +116,11 @@ docker run --rm -e PORT=8080 -e MONGODB_URL=... -e MONGODB_DB=... -e OLLAMA_API_
 - Runs as the non-root `node` user (UID 1000). The sibling autoTesting image uses UID 10001; switching needs a matching change to the state-volume `chown` in `scripts/qa/container-workflows/run.sh`.
 - Health: `/health` (Cloud Run uses its own startup/liveness probes; the Dockerfile `HEALTHCHECK` is ignored there).
 - CI (`.github/workflows/docker.yml`, job `build-targets`) builds the `api` and `web` targets with `push: false`; no registry credentials are involved.
+
+## Send-now host (which process to run)
+
+`POST /calendar/send-now` (and `GET /calendar/send-now/jobs*`) is served by exactly one supported process: `scripts/webinar/join-rules-api-host.ts` (ruling 6, ISS-SENDNOWAPI-004). Run it with `node --import tsx scripts/webinar/join-rules-api-host.ts` on the capture host; it needs a key carrying the `send-now` scope.
+
+- A plain API start (`apps/api/src/index.ts`, or the `lkb-api` container's `node apps/api/dist/server.js`) intentionally has no send-now launcher. Authenticated callers with the `send-now` scope get `503 {"error":"send_now_unavailable","message":"send-now is served by the join-rules API host; no bot was sent"}`; keys without the scope get 403. This is by design, not a fault: `apps/*` may not import `packages/meeting-bot`, so the real adapter lives only in the host script.
+- Do not run both hosts against the same state directory; the host script takes a single-host lock.
+
