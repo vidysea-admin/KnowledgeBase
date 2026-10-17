@@ -2,9 +2,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync, mkdtempSync, rmSync, existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
+import {createHash} from 'node:crypto';
 import {join, resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {consensusScore, consensusLabel, t022Draft, u22Draft, assertNoHumanGold, safeOutPath, writeSidecar, gatherVotes, run, parseEnvFile, u22Prompt, DRAFT_LABEL, OUT_DIR} from './derived-drafts.mjs';
+import {consensusScore, consensusLabel, t022Draft, u22Draft, assertNoHumanGold, safeOutPath, writeSidecar, gatherVotes, run, parseEnvFile, u22Prompt, resolveCitation, resolveCitations, DRAFT_LABEL, OUT_DIR} from './derived-drafts.mjs';
 import {loadBundle} from './extraction-review.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PACKET_PATH = join(process.env.DD_DATA_ROOT ?? ROOT, 'data/eval/calibration-human-review.json');
@@ -62,7 +63,7 @@ test('full mocked U2.2 run over the real 72 claims; claims with no current passa
   const doc = await run('u22', {items: bundle.entries, judges, maxCalls: 216});
   assert.equal(doc.items.length, 72); assertNoHumanGold(doc);
   assert.deepEqual(doc.items.map(d=>d.claimId), bundle.entries.map(e=>e.claimId));
-  const ruled = bundle.entries.filter(e=>!e.literalCitationContexts.some(c=>c.current?.available)).length;
+  const ruled = bundle.entries.filter(e=>!resolveCitations(e).some(c=>c.record)).length;
   assert.equal(doc.items.filter(d=>d.aiDraft.perModel[0].model.startsWith('rule/')).length, ruled);
   assert.equal(calls, (72-ruled)*3);
   assert.equal(doc.items.find(d=>!d.aiDraft.perModel[0].model.startsWith('rule/')).aiDraft.literalCitationSupport, 'partially_supported');
@@ -87,4 +88,43 @@ test('output path guard: inside derived-drafts only, no overwrite, wx write', ()
 });
 test('env parsing keeps only the two provider keys', () => {
   assert.deepEqual(parseEnvFile('A=1\nOLLAMA_API_KEY="k1"\nGEMINI_API_KEY=k2\nOTHER=z'), {OLLAMA_API_KEY:'k1',GEMINI_API_KEY:'k2'});
+});
+
+const sha = (t) => createHash('sha256').update(t, 'utf8').digest('hex');
+const mkCtx = (over = {}) => {
+  const rec = (text) => ({_id: 'S-t1', tenantId: 'toc', sessionId: 'S', speakerRef: 'spk:0', tStart: 1, tEnd: 2, text});
+  return {sessionId: 'S', turnId: 'S-t1', sameIdContentChanged: true,
+    current: {available: true, matches: [{record: rec('NEW text'), textSha256: sha('NEW text')}]},
+    originalMigration: {available: true, artifact: {revision: 'rev1'}, matches: [{record: rec('OLD text'), textSha256: sha('OLD text')}]}, ...over};
+};
+test('U2.2 re-anchoring: archived original is judged when the id content changed; source and text hash recorded', async () => {
+  const r = resolveCitation(mkCtx());
+  assert.equal(r.citationSource, 'archived-original'); assert.equal(r.record.text, 'OLD text'); assert.equal(r.textSha256, sha('OLD text'));
+  const entry = {claimId: 'c1', claimRecordSha256: 'x', sourceBindingSha256: 'y', persistedClaim: {text: 'claim'}, literalCitationContexts: [mkCtx()]};
+  assert.ok(u22Prompt(entry).includes('OLD text') && !u22Prompt(entry).includes('NEW text'));
+  const prompts = [];
+  const j = (m) => mock('ollama', m, (e) => {prompts.push(u22Prompt(e)); return {label: 'supported', rationale: 'r'};});
+  const doc = await run('u22', {items: [entry], judges: [j('a'), j('b')], maxCalls: 9});
+  const d = doc.items[0].aiDraft; assert.equal(d.citationSource, 'archived-original'); assert.equal(d.literalCitationSupport, 'supported');
+  assert.deepEqual(d.citations, [{turnId: 'S-t1', citationSource: 'archived-original', textSha256: sha('OLD text'), artifactRevision: 'rev1'}]);
+  assert.equal(doc.items[0].humanGold, false); assertNoHumanGold(doc);
+});
+test('U2.2 re-anchoring: unchanged current text is used when no archive; changed current alone is never used', () => {
+  const noArch = {originalMigration: {available: false, matches: []}};
+  assert.equal(resolveCitation(mkCtx({...noArch, sameIdContentChanged: false})).citationSource, 'current');
+  assert.equal(resolveCitation(mkCtx({...noArch, sameIdContentChanged: true})).citationSource, null);
+});
+test('U2.2 re-anchoring: unresolvable citation (missing, tampered hash, wrong id) keeps the unavailable rule vote with zero model calls', async () => {
+  const bad = [mkCtx({originalMigration: {available: false, matches: []}}),
+    mkCtx({originalMigration: {available: true, matches: [{record: {_id: 'S-t1', text: 'OLD text'}, textSha256: sha('tampered')}]}, current: {available: false, matches: []}}),
+    mkCtx({originalMigration: {available: true, matches: [{record: {_id: 'S-t9', text: 'OLD text'}, textSha256: sha('OLD text')}]}, current: {available: false, matches: []}})];
+  let calls = 0; const j = (m) => mock('ollama', m, () => {calls++; return {label: 'supported', rationale: 'r'};});
+  const items = bad.map((c, i) => ({claimId: 'c' + i, claimRecordSha256: 'x', sourceBindingSha256: 'y', persistedClaim: {text: 'claim'}, literalCitationContexts: [c]}));
+  const doc = await run('u22', {items, judges: [j('a'), j('b')], maxCalls: 9});
+  assert.equal(calls, 0); assert.equal(doc.calls.used, 0);
+  for (const d of doc.items) { assert.equal(d.aiDraft.literalCitationSupport, 'unavailable'); assert.equal(d.aiDraft.citationSource, null); assert.ok(d.aiDraft.perModel[0].model.startsWith('rule/')); }
+});
+test('U2.2 real packet: every one of the 80 citations resolves to a hash-verified archived original', () => {
+  const all = bundle.entries.flatMap(resolveCitations);
+  assert.equal(all.length, 80); assert.ok(all.every(c => c.citationSource === 'archived-original' && c.textSha256 === sha(c.record.text)));
 });
