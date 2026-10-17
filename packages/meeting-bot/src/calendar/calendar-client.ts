@@ -109,7 +109,9 @@ function validateReconciliationState(previous: unknown, tenantId: string, checke
   shape(previous.occurrences, Object.keys(previous.occurrences ?? {}));
   if (Object.keys(previous.occurrences).length > 20000 || Buffer.byteLength(JSON.stringify(previous)) > 8 * 1024 * 1024) fail();
   for (const [key, value] of Object.entries(previous.occurrences)) {
-    shape(value, ["source", "snapshot", "providerIds", "aliases", "accepted", "revision", "linkedCalendar", "reviewReason", "unresolved"]);
+    shape(value, ["source", "snapshot", "providerIds", "aliases", "accepted", "revision", "linkedCalendar", "reviewReason", "unresolved", "firstSeen"]);
+    if ((value as {firstSeen?: unknown}).firstSeen !== undefined && (time((value as {firstSeen?: unknown}).firstSeen) !== (value as {firstSeen?: unknown}).firstSeen ||
+        Date.parse((value as {firstSeen: string}).firstSeen) > Date.parse(checkedAt) + 60000)) fail();
     if (value.source !== "calendar" && value.source !== "gmail") fail();
     const row = value as unknown as Occurrence, normalized = normalizeOccurrence(row.source, row.snapshot);
     if (sourceKey(tenantId, row.source, row.snapshot) !== key || stable(normalized.snapshot) !== stable(row.snapshot) ||
@@ -235,12 +237,16 @@ export function reconcileWebinarSources(input: {
     else if (!row.linkedCalendar && targets.length === 1) row.linkedCalendar = targets[0];
     else if (row.linkedCalendar && targets.length && targets[0] !== row.linkedCalendar) row.unresolved = "ambiguous-identity";
   }
+  // ISS-TOMBSTONE-001 (ruling 3): every unknown tombstone row carries the first tick that saw it. A row stored before the field existed is treated as first seen NOW (never released immediately).
+  for (const row of Object.values(state.occurrences) as (Occurrence & {firstSeen?: string})[]) {
+    if (row.unresolved === "unknown-tombstone") row.firstSeen ??= input.checkedAt; else delete row.firstSeen;
+  }
   state.checkedAt = input.checkedAt; state.historyComplete = input.acquisition.historyComplete;
   if (available) state.coverageScope = input.acquisition.scope; else delete state.coverageScope;
   state = validateReconciliationState(state, input.tenantId, input.checkedAt);
   const calendarEvents: CalendarEvent[] = [], candidates: AutoRecordCandidateInput[] = [], inventory: WebinarReconciliationResult["inventory"] = [], transitions: WebinarReconciliationResult["transitions"] = [];
   // ISS-T036CAL-011: an unknown tombstone is recorded and listed but scoped to what it can plausibly refer to (see tombstone/unknown-tombstone-reach.ts).
-  const reach = unknownTombstoneReach(Object.values(state.occurrences));
+  const reach = unknownTombstoneReach(Object.values(state.occurrences), input.checkedAt);
   for (const [key, row] of Object.entries(state.occurrences).sort(([a], [b]) => a.localeCompare(b))) {
     const linked = row.linkedCalendar ? state.occurrences[row.linkedCalendar] : undefined;
     const unresolved = row.unresolved ?? linked?.unresolved ??

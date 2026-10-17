@@ -32,8 +32,10 @@ export const NEAR_AHEAD_MS = 48 * 3600_000;       // the ordinary schedule lead;
 export const NEAR_BEHIND_MS = 24 * 3600_000;
 const EPOCH = "1970-01-01T00:00:00.000Z";
 
-interface Tomb { start: number; at: number; organizer?: string; title?: string; link?: string }
-export interface TombstoneReach { tombs: readonly Tomb[] }
+interface Tomb { start: number; at: number; firstSeen: number; organizer?: string; title?: string; link?: string }
+export interface TombstoneReach { tombs: readonly Tomb[]; now: number }
+/** A stored tombstone row. `firstSeen` (ISS-TOMBSTONE-001, ruling 3): the first tick that saw the tombstone; stamped by reconcileWebinarSources. */
+type TombRow = Occurrence & { firstSeen?: string };
 
 /** The meeting a join link names, independent of start, token, pwd and path form (zoom /j/ vs /w/, meet code). */
 export function linkKey(url: string | undefined): string | undefined {
@@ -48,18 +50,20 @@ export function linkKey(url: string | undefined): string | undefined {
 const norm = (s: string | undefined): string => (s ?? "").trim().toLowerCase().replace(/\s+/g, " ");
 const ms = (s: string | undefined): number => { const t = s ? Date.parse(s) : NaN; return Number.isFinite(t) ? t : NaN; };
 
-export function unknownTombstoneReach(rows: Iterable<Occurrence>): TombstoneReach {
-  const tombs: Tomb[] = [];
+export function unknownTombstoneReach(rows: Iterable<Occurrence>, now?: string): TombstoneReach {
+  const tombs: Tomb[] = [], nowMs = ms(now);
+  // A row with no (or an invalid) firstSeen is treated as first seen at read time (`now`), so it is never released immediately.
+  // With no usable `now` the id-only expiry cannot be evaluated and the hold stays (fail closed).
   for (const row of rows) {
     if (row.source !== "calendar" || row.unresolved !== "unknown-tombstone") continue;
     const s = row.snapshot, orig = s.originalStartTime;
     // An all-day instance (date only) is placed at noon UTC; the 24h window then covers that date in every timezone.
     const start = ms(s.startTime) || ms(orig?.dateTime) || (orig?.date ? ms(`${orig.date}T12:00:00Z`) : NaN);
     const trusted = s.meetingUrlSource === undefined || s.meetingUrlSource === "conference";   // free text is sender-controlled (ISS-T036CAL-010): never an identity
-    tombs.push({ start: Number.isFinite(start) ? start : NaN, at: ms(s.providerUpdated), organizer: norm(s.organizer) || undefined, title: norm(s.title) || undefined,
+    tombs.push({ start: Number.isFinite(start) ? start : NaN, at: ms(s.providerUpdated), firstSeen: ms((row as TombRow).firstSeen) || nowMs, organizer: norm(s.organizer) || undefined, title: norm(s.title) || undefined,
       link: trusted ? linkKey(s.meetingUrl) : undefined });
   }
-  return { tombs };
+  return { tombs, now: nowMs };
 }
 
 /** True when an unknown tombstone could be the cancellation of this UNLINKED Gmail row's meeting. */
@@ -79,6 +83,13 @@ export function reachesUnlinkedGmail(reach: TombstoneReach, row: Occurrence): bo
     if (host && (titleHit || near || (!hasStart && t.title === undefined))) return inMatched;
     const otherParty = t.organizer !== undefined && !host && !(domain && t.organizer.endsWith(`@${domain}`)) && !titleHit;
     if (hasStart) return near && !otherParty;
+    // ISS-TOMBSTONE-001 (ruling 3): the id-only hold is evidence-bounded. It is released 30 days (MATCHED_HORIZON_MS, D-159) after the tick that first saw
+    // the tombstone, and when the tombstone predates the Gmail row's message date (the mail was received after the cancellation, so it cannot be the
+    // cancelled meeting's copy). The tombstone's age is the earlier of Google's `updated` and the first-seen tick (both are upper bounds of the real cancellation time).
+    // Link/host/start matches are identity or start evidence of a real cancellation and are NOT released here.
+    if (Number.isFinite(reach.now) && Number.isFinite(t.firstSeen) && reach.now - t.firstSeen > MATCHED_HORIZON_MS) return false;
+    const received = ms(row.snapshot.receivedAt), tombAge = Math.min(...[t.at, t.firstSeen].filter(Number.isFinite));
+    if (Number.isFinite(received) && Number.isFinite(tombAge) && tombAge < received) return false;
     return hasAt && !otherParty && rs >= t.at - NEAR_BEHIND_MS && rs <= t.at + NEAR_AHEAD_MS && NEAR_AHEAD_MS + NEAR_BEHIND_MS > 0;
   });
 }

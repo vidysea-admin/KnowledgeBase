@@ -5,6 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { reachesUnlinkedGmail, unknownTombstoneReach } from "./unknown-tombstone-reach.js";
 import { CHECKED, MODES, NOW, REV, SCOPES, cal, mail, meet, outcomeOf, pick, recon, recordedTombstones, slot, type TombstoneRow } from "./tombstone-fixtures.js";
 
 const ids = (...x: string[]): ReadonlySet<string> => new Set(x);
@@ -171,6 +172,69 @@ test("ISS-TOMBSTONE-004: a tombstone Google dated long ago (the unfiltered basel
     const later = recon([cal(0), { id: "ghost", cancelled: true }], [mailAt(7, 2 * DAY)], available, again.state, iso(Date.parse(CHECKED) + 20 * DAY));
     const row = Object.values(later.state.occurrences).find(o => o.snapshot.id === "ghost")!;
     assert.equal(row.snapshot.providerUpdated, CHECKED, "the stored first-seen is not moved by a refetch"); assert.equal(row.revision, CHECKED);
+  }
+});
+
+const stored = (r: ReturnType<typeof recon>, id: string) => Object.values(r.state.occurrences).find(o => o.snapshot.id === id) as (ReturnType<typeof recon>["state"]["occurrences"][string] & { firstSeen?: string }) | undefined;
+
+test("ISS-TOMBSTONE-001 (ruling 3): the id-only hold is released 30 days (MATCHED_HORIZON_MS) after the tick that first saw the tombstone: held at 29d and 30d, released at 31d", () => {
+  for (const available of SCOPES) {
+    const first = recon([cal(0), { id: "ghost", cancelled: true }], [mail(5)], available);
+    assert.equal(stored(first, "ghost")!.firstSeen, CHECKED, "first-seen tick stored on the tombstone row");
+    assert.equal(reasonOf(first, "g5"), "unproven-calendar-history");
+    const at = (days: number, from = first.state) => recon([cal(0)], [mail(5)], available, JSON.parse(JSON.stringify(from)), iso(Date.parse(CHECKED) + days * DAY));
+    for (const [days, held] of [[29, true], [30, true], [31, false]] as const) {
+      const r = at(days);
+      assert.equal(gmailIds(r).includes("g5"), !held, `scope=${available} day ${days}`);
+      assert.equal(reasonOf(r, "g5") === "unproven-calendar-history", held, `day ${days} reason`);
+      assert.equal(stored(r, "ghost")!.firstSeen, CHECKED, "first-seen is never moved by later ticks");
+    }
+  }
+});
+
+test("ISS-TOMBSTONE-001: a stored tombstone row without firstSeen (pre-fix state) is treated as first seen at read time: never released immediately, then released 30 days later", () => {
+  for (const available of SCOPES) {
+    const first = recon([cal(0), { id: "ghost", cancelled: true }], [mail(5)], available);
+    const legacy = JSON.parse(JSON.stringify(first.state)); for (const o of Object.values(legacy.occurrences) as { firstSeen?: string }[]) delete o.firstSeen;
+    const day40 = iso(Date.parse(CHECKED) + 40 * DAY);
+    const migrated = recon([cal(0)], [mail(5)], available, legacy, day40);
+    assert.equal(reasonOf(migrated, "g5"), "unproven-calendar-history", "40 days old by the clock, but its age is unknown: held at the read that migrates it");
+    assert.equal(stored(migrated, "ghost")!.firstSeen, day40, "the read-time default is stored");
+    assert.equal(gmailIds(recon([cal(0)], [mail(5)], available, JSON.parse(JSON.stringify(migrated.state)), iso(Date.parse(day40) + 29 * DAY))).includes("g5"), false, "held 29d after migration");
+    assert.ok(gmailIds(recon([cal(0)], [mail(5)], available, JSON.parse(JSON.stringify(migrated.state)), iso(Date.parse(day40) + 31 * DAY))).includes("g5"), "released 31d after migration");
+  }
+});
+
+test("ISS-TOMBSTONE-001: the reach rule itself defaults a tombstone row with no firstSeen to read time (a 40-day-old clock does not release it) and fails closed without a usable now", () => {
+  const first = recon([cal(0), { id: "ghost", cancelled: true }], [mail(5)], true), rows = Object.values(first.state.occurrences) as { firstSeen?: string }[];
+  for (const o of rows) delete o.firstSeen;
+  const row5 = Object.values(first.state.occurrences).find(o => o.snapshot.id === "g5")!;
+  const day40 = iso(Date.parse(CHECKED) + 40 * DAY);
+  assert.equal(reachesUnlinkedGmail(unknownTombstoneReach(Object.values(first.state.occurrences), day40), row5), true, "no firstSeen: held, not released at once");
+  assert.equal(reachesUnlinkedGmail(unknownTombstoneReach(Object.values(first.state.occurrences)), row5), true, "no now: held");
+});
+
+test("ISS-TOMBSTONE-001: the hold is released when the tombstone predates the Gmail row's message date, and kept when the mail is older than the tombstone", () => {
+  for (const available of SCOPES) {
+    const first = recon([cal(0), { id: "ghost", cancelled: true }], [], available);
+    const tick = iso(Date.parse(CHECKED) + 3600_000);
+    const run = (receivedAt: string) => recon([cal(0)], [mail(5, { receivedAt })], available, JSON.parse(JSON.stringify(first.state)), tick);
+    assert.ok(gmailIds(run("2026-10-11T10:45:00.000Z")).includes("g5"), "mail received after the tombstone was first seen: released");
+    assert.deepEqual(gmailIds(run("2026-10-11T09:00:00.000Z")).includes("g5"), false, "mail received before the tombstone: held");
+    assert.equal(gmailIds(run("2026-10-11T10:00:00.000Z")).includes("g5"), false, "same instant is not proof: held");
+  }
+});
+
+test("ISS-TOMBSTONE-001: explicit rejections and real cancellations keep holding after the id-only hold is released", () => {
+  for (const available of SCOPES) {
+    const first = recon([cal(0), cal(1), { id: "ghost", cancelled: true }], [mail(1), mail(5, { status: "rejected" }), mail(6)], available);
+    const day31 = iso(Date.parse(CHECKED) + 31 * DAY), prev = () => JSON.parse(JSON.stringify(first.state));
+    const rej = recon([cal(0), cal(1)], [mail(1), mail(5, { status: "pending" }), mail(6)], available, prev(), day31);
+    assert.equal(stored(rej, "g5")!.snapshot.status, "rejected", "a rejection is sticky");
+    assert.ok(!scheduled(rej, true).includes("g5"), "a rejected row is never scheduled");
+    assert.ok(gmailIds(rej).includes("g6"), "the unrelated unlinked row is released at 31d");
+    const cancelled = recon([cal(0), { id: "c1", cancelled: true, providerUpdated: "2026-11-01T00:00:00.000Z" }], [mail(1)], available, prev(), day31);
+    assert.ok(!scheduled(cancelled, true).includes("c1") && !scheduled(cancelled, true).includes("g1"), "a real cancellation unschedules the meeting and its linked copy");
   }
 });
 
