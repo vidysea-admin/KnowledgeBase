@@ -111,7 +111,17 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const rawRows = await scopedCollection<Turns>(db as never, "turns")(tenantId).find({ sessionId: { $in: sessionIds } }).toArray();
     for (const row of rawRows) assertInScope(row, tenantId, new Set(sessionIds)); // typed scope refusal before any review-overlay read
     const visibility = createKnowledgeVisibility(db);
-    const rows = await visibility.filterTurns(tenantId, await readEffectiveTurns(db, tenantId, rawRows));
+    const effective = await readEffectiveTurns(db, tenantId, rawRows);
+    // D-153: the visibility gate only ever sees well-formed rows (it would silently drop malformed ones). A malformed
+    // row is RETAINED, to be excluded with a per-turn warning below, only when its whole session is visible; a malformed
+    // row of a session that is not visible is dropped here, so nothing about it (id, reason, bytes) reaches the response.
+    const visibleGood = new Set(await visibility.filterTurns(tenantId, effective.filter((t) => !rowProblem(t))));
+    const sessionVisible = new Map<string, boolean>();
+    for (const t of effective) {
+      if (rowProblem(t) && !sessionVisible.has(t.sessionId)) sessionVisible.set(t.sessionId, await visibility.sessionVisible(tenantId, t.sessionId));
+    }
+    const allRows = effective.filter((t) => visibleGood.has(t) || (rowProblem(t) !== null && sessionVisible.get(t.sessionId) === true));
+    const rows = allRows.filter((t) => visibleGood.has(t)); // graph proof binds only citable rows
     const graphScope = deps.graphScope ? await deps.graphScope() : undefined;
     const graphQuotes = new Map<string, string[]>();
     if (graphScope) {
@@ -131,7 +141,7 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const chunks = deps.embed ? await scopedCollection<BoundChunk>(db as never, "chunks")(tenantId)
       .find({ sourceRef: { $in: sessionIds } }).toArray() : [];
     // Parse and hash the SAME frozen serialization, then use only these parsed rows.
-    const bytes = JSON.stringify({ rows, chunks });
+    const bytes = JSON.stringify({ rows: allRows, chunks });
     const snapshot = JSON.parse(bytes) as { rows: Turns[]; chunks: BoundChunk[] };
     const snapshotSHA256 = sha(bytes);
     const byTurn = new Map<string, Turns>();

@@ -11,6 +11,8 @@ import { askV2, BoundedAskError, validateHydration } from "@lkb/ask";
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { unpackContext } from "../../../../packages/ask/src/bounded-refine.js";
 import { withVisibleTranscripts } from "../visibility/read-fixture.js";
+import { speakerTranscriptHash } from "../../../../packages/index/src/pipeline/speaker-profiles/profile.js";
+import type { GraphContextSnapshot } from "./graph-context.js";
 
 const VISA = "2026-04-21-visa-blueprint-part2-italy-france-nz", UCAS = "2026-08-10-ucas-what-changed-what-matters", OK = "2026-05-08-funding-dreams-loans-forex";
 const row = (sessionId: string, n: number, text: string, tStart: number, tEnd: number, extra: Partial<Turns> = {}): Turns =>
@@ -112,4 +114,39 @@ test("ISS-BUDGETAPI-002: scope is checked BEFORE timing exclusion: a row that is
     const db = { collection: () => ({ find: () => ({ toArray: async () => [GOOD_OK, bad] }) }) } as unknown as Pick<Db, "collection">;
     await assert.rejects(() => createSourceHydrator("toc", { db })("loans", [okN]), BoundedAskError);
   }
+});
+test("D-153: a malformed turn of a session that is NOT visible never reaches excludedTurns, the warning, the error or any written job", async () => {
+  // VISA's own source withholds consent, so sessionVisible(VISA) is false: its good AND malformed turns stay fully excluded.
+  const rows = [T141, GOOD_VISA, GOOD_OK];
+  const hidden = { sources: [{ _id: `fixture-source:${VISA}`, tenantId: "toc", kind: "recording", path: `fixture/${VISA}`, consent: { given: false } }] };
+  const db = withVisibleTranscripts(fakeFind(rows), () => rows as unknown as Record<string, unknown>[], hidden);
+  const leaks = (value: unknown) => { const s = JSON.stringify(value) ?? ""; return s.includes(T141._id) || s.includes("bad row shout"); };
+  let hydrated: unknown, hydrateError: unknown;
+  try { hydrated = await createSourceHydrator("toc", { db })("visa forms October", [visaN, okN]); } catch (e) { hydrateError = e; }
+  assert.ok(hydrated === undefined || !leaks(hydrated), "no excludedTurns entry or text for the hidden session's malformed turn");
+  assert.ok(hydrateError === undefined || !leaks({ message: (hydrateError as Error).message }), "refusal names nothing of the hidden turn");
+  // Control: with the session visible, the very same malformed turn IS listed (so the assertion above is not vacuous).
+  const shown = await createSourceHydrator("toc", { db: fakeDb(rows) })("visa forms October", [visaN, okN]);
+  assert.ok(shown.excludedTurns!.some((e) => e.turnId === T141._id));
+  const written: unknown[] = [];
+  const deps = createSourceRequestDepsFor({ db, write: async (job) => { written.push(job); }, treeSearchFn: () => [visaN, okN],
+    dispatch: async (job) => {
+      if (job.kind === "ask.select_nodes") return completion({ node_ids: [visaN.node_id, okN.node_id] });
+      if (job.kind === "evaluator") return completion({ score: 0.9, reason: "source answers" });
+      if (job.kind === "ask.answer_grounding") return completion({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
+      const context = unpackContext(JSON.parse(job.messages[1]!.content).context);
+      return completion({ sentences: [{ text: "Loans cover tuition.", sourceIds: [context[0]!.sourceId] }] });
+    } })("toc");
+  let answer: unknown, askError: unknown;
+  try { answer = await askV2("visa forms October", tree(visaN, okN), { ...deps, tenantId: "toc" }); } catch (e) { askError = e; }
+  assert.ok(!leaks(answer) && !leaks(written) && !leaks(askError === undefined ? null : { message: (askError as Error).message }));
+  assert.ok(!(answer as { auditLog?: { jobKind: string }[] } | undefined)?.auditLog?.some((a) => a.jobKind === "ask.source_rows_excluded"));
+});
+test("D-153 with graph authority: the revision proof binds only citable rows; a retained malformed turn is listed, never quoted", async () => {
+  const bad = row(OK, 9, "Education loans bad timing October.", 600, 500);
+  const scope: GraphContextSnapshot = { edges: [], visibleSources: [{ tenantId: "toc", sessionId: OK, sourceId: `src:${OK}`, revisionHash: speakerTranscriptHash([GOOD_OK]) }],
+    turns: [{ sessionId: OK, turnId: GOOD_OK._id, quote: "Education loans cover tuition" }] };
+  const result = await createSourceHydrator("toc", { db: fakeDb([GOOD_OK, bad]), graphScope: async () => scope })("education loans October", [okN]);
+  assert.deepEqual(result.excludedTurns, [{ sessionId: OK, turnId: bad._id, reason: "tEnd 500 is before tStart 600" }]);
+  assert.deepEqual(validateHydration(result, [okN]).flatMap(quotesOf).map((q) => q.quote), ["Education loans cover tuition"]);
 });
