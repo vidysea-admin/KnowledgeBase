@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { buildPageIndex, type PageSourceDocument } from "./page-segments.js";
 import { validateHighlight } from "./highlight-validator.js";
 
-/** Inline structural fixture in the shape a page-aware reader emits (real-reader e2e: scripts/t055). */
+/** Inline structural fixture in the shape a page-aware reader emits (real-reader e2e: scripts/upload). */
 async function load() {
   const pages = [
     { pageNumber: 1, text: "Admission deadline is October." },

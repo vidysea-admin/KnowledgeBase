@@ -1,7 +1,7 @@
 # Manifest: t055-page-highlights
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Unit: T-055 C1/C2 page-evidenced highlights, foundation (validator + page segments)
 Lane: w17-t055page (lane/w17-t055page). Base a0391420. Candidate: see the commit that adds this file.
 Contract clauses: goal-t055 C1 (page provenance), C7 (forged evidence rejected). C2 persistence/route/UI NOT in this unit.
