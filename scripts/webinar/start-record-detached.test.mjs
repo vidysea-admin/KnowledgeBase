@@ -78,7 +78,7 @@ test("scheduled -Job cannot bypass checked identity with direct overrides or a r
       let status = 0;
       try { execFileSync("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", SCRIPT,
         "-Job", "unavailable-safe-key", ...override], {encoding:"utf8", env:{...process.env,LKB_ARGV_DUMP:dump},timeout:30000}); }
-      catch (error) { status = error.status ?? -1; assert.match(`${error.stdout ?? ""}${error.stderr ?? ""}`, /scheduled dispatch refuses replacement recording arguments/); }
+      catch (error) { status = error.status ?? -1; assert.match(`${error.stdout ?? ""}${error.stderr ?? ""}`.replace(/\s+/g, " "), /scheduled dispatch refuses replacement recording arguments/); }
       assert.notEqual(status, 0); assert.equal(existsSync(dump), false);
     } finally {rmSync(dir,{recursive:true,force:true});}
   }
