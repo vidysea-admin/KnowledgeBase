@@ -5,12 +5,19 @@ import { MeetingBotPage } from "./MeetingBotPage.js";
 import * as sessions from "../api/sessions.js";
 import * as calendar from "../api/calendar.js";
 import * as botEvents from "../api/botEvents.js";
+import * as privacy from "./meeting-bot/privacy/api.js";
+import * as readiness from "./meeting-bot/readiness/api.js";
+import * as retention from "./meeting-bot/RetentionSection.js";
 vi.mock("../auth/AuthContext.js", () => ({ useAuth: () => ({ apiKey: "test-key" }) }));
-// The page now also reads the calendar and the sessions list; these tests are about the operations feed, so those two resolve empty.
+// The page also reads the calendar, sessions, bot events, privacy, capture readiness and retention; these tests are about the
+// operations feed, so those resolve empty. Left unmocked, their real fetches fail on the runner and add unrelated alerts.
 beforeEach(() => {
   vi.spyOn(calendar, "listUpcomingMeetings").mockResolvedValue({ meetings: [] });
   vi.spyOn(sessions, "listSessions").mockResolvedValue({ sessions: [] });
   vi.spyOn(botEvents, "listBotEvents").mockResolvedValue({ events: [] });
+  vi.spyOn(privacy, "listRecordingPrivacy").mockResolvedValue([]);
+  vi.spyOn(readiness, "listCaptureObservations").mockResolvedValue([]);
+  vi.spyOn(retention, "loadRetentionStatus").mockResolvedValue({ status: "never-run" });
 });
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 const display = () => render(<MemoryRouter><MeetingBotPage /></MemoryRouter>);
