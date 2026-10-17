@@ -10,7 +10,7 @@ import { createRetentionStatusRouter } from "./router.js";
 import { buildLastRun } from "../../../../packages/ingest/src/retention/retention-last-run.js";
 import { writeTenantRetentionSummary } from "../../../../packages/ingest/src/retention/production/private-summary.js";
 import { runRetentionPurgeJobCli } from "../../../../packages/ingest/src/retention/retention-purge-job-cli.js";
-import { DAY, NOW, iso, writeSession, baseArgs } from "../../../../packages/ingest/src/retention/retention-report.fixtures.js";
+import { DAY, NOW, iso, writeSession, purgeBaseArgs } from "../../../../packages/ingest/src/retention/retention-report.fixtures.js";
 
 test("actual builder→private writer→reader→authenticated API projection consumes matching tenant state", async () => {
   const root = mkdtempSync(join(tmpdir(), "t046-writer-consumer-")), now = Date.now();
@@ -46,7 +46,7 @@ test("actual dry-run CLI/job private producer is consumed by the real authentica
   const sourcePath = join(dir, "source.json"), source = JSON.parse(readFileSync(sourcePath, "utf8"));
   source.createdAt = new Date(NOW - 100 * DAY).toISOString(); writeFileSync(sourcePath, JSON.stringify(source));
   const errors: string[] = [];
-  const code = runRetentionPurgeJobCli([...baseArgs(root, media, ["--as-of", new Date().toISOString()], "tenant-a"), "--report-file", join(out, "report.json")],
+  const code = runRetentionPurgeJobCli([...purgeBaseArgs(root, media, ["--as-of", new Date().toISOString()], "tenant-a"), "--report-file", join(out, "report.json")],
     { LKB_RETENTION_DATA_ROOT: root }, () => {}, line => errors.push(line));
   assert.equal(code, 0, errors.join("\n"));
   const app = express(); app.use(requireAuth({ verify: async key => key === "private" ? { tenantId: "tenant-a", scopes: ["sessions"] } : null }));
