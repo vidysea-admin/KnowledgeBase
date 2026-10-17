@@ -11,7 +11,7 @@
  */
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
-import { isValidSuggestionKey, type DecisionResult, type SuggestionView } from "../../../../packages/db/src/collections/speaker-suggestions.js";
+import { isValidSuggestionKey, type DecisionResult, type SuggestionView } from "../../../../packages/db/src/collections/speaker-suggestions/index.js";
 
 export interface SpeakerSuggestionDeps {
   list(tenantId: string, sessionId: string): Promise<SuggestionView[]>;

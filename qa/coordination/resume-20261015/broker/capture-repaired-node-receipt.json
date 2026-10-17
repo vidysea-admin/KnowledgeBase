@@ -1,0 +1,68 @@
+{
+  "label": "capture-repaired-node",
+  "old_vector": [
+    "original runtime",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "src/capture/tiles/sampler-clock.test.ts",
+    "src/capture/tiles/registry.test.ts",
+    "../../qa/evidence/t042-trusted-registry/downstream-probe.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+  "actual_total_tokens": null,
+  "authority": "root authorized compatible vector repair; maker evidence only",
+  "new_vector": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test-isolation=none",
+    "--import",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\safe-test-runtime\\register.mjs",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "src/capture/tiles/sampler-clock.test.ts",
+    "src/capture/tiles/registry.test.ts",
+    "../../qa/evidence/t042-trusted-registry/downstream-probe.test.ts"
+  ],
+  "change": "bundled working Node; in-process isolation; same graph synchronous safe bootstrap; original test selection retained",
+  "env_selected": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp",
+    "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp"
+  },
+  "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+  "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "pins_before": {
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_tiles.py": "1a7436579a6bfade1c9c6ad94f5e47e6c04cd8779a90baf8a993729a039fa7fd",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\test_sb_join_tiles.py": "8716a26c2f9c72a7cdba1057f39234d6486976f3359af95917d80ec234b5500e",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.ts": "3f583a0b203a5a6358019d39f97b0773471be51f32a1cad536105528168c6480",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.test.ts": "56de6a8e9ff76b47544c5f2ea2718c36aaf75973a222c0ab77352a947007c4d4",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.ts": "b7e5da4983192fbe4e029d35d36a523cc2d454ec25439b173f3cc3157b18f1a2",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-trusted-registry\\fixture.ts": "7802cf755ec8839814e320bffc36e4eef600294605911fb8e59f3930b901a827",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.test.ts": "90fcda7c5ad5e5e0e795b75ebc7907b558dcfc5d94819b8a30992d9be9d952cc",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-trusted-registry\\downstream-probe.test.ts": "92132fa4c53eaf213eaac90738ad66138c06579a3582f250991c94eb1cbedf2f",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\t042-trusted-registry-integration.md": "5dbafd0000de26aadf74ae0bee0e707236e022e4d10d820042b59ff1a3bdc544",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "exit": 7,
+  "counts": {},
+  "duration_s": 0.8280000000004293,
+  "pins_after": {
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_tiles.py": "1a7436579a6bfade1c9c6ad94f5e47e6c04cd8779a90baf8a993729a039fa7fd",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\test_sb_join_tiles.py": "8716a26c2f9c72a7cdba1057f39234d6486976f3359af95917d80ec234b5500e",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.ts": "3f583a0b203a5a6358019d39f97b0773471be51f32a1cad536105528168c6480",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.test.ts": "56de6a8e9ff76b47544c5f2ea2718c36aaf75973a222c0ab77352a947007c4d4",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.ts": "b7e5da4983192fbe4e029d35d36a523cc2d454ec25439b173f3cc3157b18f1a2",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-trusted-registry\\fixture.ts": "7802cf755ec8839814e320bffc36e4eef600294605911fb8e59f3930b901a827",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.test.ts": "90fcda7c5ad5e5e0e795b75ebc7907b558dcfc5d94819b8a30992d9be9d952cc",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-trusted-registry\\downstream-probe.test.ts": "92132fa4c53eaf213eaac90738ad66138c06579a3582f250991c94eb1cbedf2f",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\t042-trusted-registry-integration.md": "5dbafd0000de26aadf74ae0bee0e707236e022e4d10d820042b59ff1a3bdc544",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "pins_unchanged": true
+}

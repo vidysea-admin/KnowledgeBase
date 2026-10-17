@@ -1,0 +1,20 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": "resume-t053-watched-receipt",
+  "cycle": 0,
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null,
+    "phase_started_at": null,
+    "phase_ended_at": "2026-10-15T19:37:31.6700891Z",
+    "explanation": "Runtime actual-total telemetry and retrospective monotonic start unavailable; no tests, providers, children or checker launched. Earlier maker usage remains unknown; no zero reset."
+  },
+  "reviewers": [],
+  "runtime_hold": true,
+  "readiness_complete": false,
+  "dispatched": false,
+  "ratio_verified": false
+}

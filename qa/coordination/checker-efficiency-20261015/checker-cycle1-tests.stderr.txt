@@ -1,0 +1,75 @@
+test_actual_overrun_cannot_hide_under_lower_debit (__main__.BudgetTests.test_actual_overrun_cannot_hide_under_lower_debit) ... ok
+test_bootstrap_exhaustion_is_needs_extra_review (__main__.BudgetTests.test_bootstrap_exhaustion_is_needs_extra_review) ... ok
+test_bootstrap_unknown_not_ratio_success (__main__.BudgetTests.test_bootstrap_unknown_not_ratio_success) ... ok
+test_children_retries_aggregate (__main__.BudgetTests.test_children_retries_aggregate) ... ok
+test_debits_do_not_reset_across_retry_children (__main__.BudgetTests.test_debits_do_not_reset_across_retry_children) ... ok
+test_duplicate_reviewers_rejected (__main__.BudgetTests.test_duplicate_reviewers_rejected) ... ok
+test_escalation_keeps_ratio_miss (__main__.BudgetTests.test_escalation_keeps_ratio_miss) ... ok
+test_historical_unknowns_conservatively_debited_not_fabricated (__main__.BudgetTests.test_historical_unknowns_conservatively_debited_not_fabricated) ... ok
+test_incomplete_escalation_rejected (__main__.BudgetTests.test_incomplete_escalation_rejected) ... ok
+test_invalid_numbers_rejected (__main__.BudgetTests.test_invalid_numbers_rejected) ... ok
+test_missing_phase_time_rejected (__main__.BudgetTests.test_missing_phase_time_rejected) ... ok
+test_missing_zero_and_invalid_debits_fail_closed (__main__.BudgetTests.test_missing_zero_and_invalid_debits_fail_closed) ... ok
+test_next_phase_allocation_before_execution (__main__.BudgetTests.test_next_phase_allocation_before_execution) ... ok
+test_preflight_checks_import_and_temp_then_cleans_probe (__main__.BudgetTests.test_preflight_checks_import_and_temp_then_cleans_probe) ... ERROR
+test_receipt_exact_identity_and_success_required (__main__.BudgetTests.test_receipt_exact_identity_and_success_required) ... ok
+test_ten_percent_all_dimensions (__main__.BudgetTests.test_ten_percent_all_dimensions) ... ok
+test_unknown_checker_active_is_not_admitted (__main__.BudgetTests.test_unknown_checker_active_is_not_admitted) ... ok
+test_unknown_tokens_and_missing_next_allocation_cannot_unlock (__main__.BudgetTests.test_unknown_tokens_and_missing_next_allocation_cannot_unlock) ... ok
+test_unknown_tokens_remain_unknown (__main__.BudgetTests.test_unknown_tokens_remain_unknown) ... ok
+test_zero_maker_requires_bootstrap_scope (__main__.BudgetTests.test_zero_maker_requires_bootstrap_scope) ... ok
+
+======================================================================
+ERROR: test_preflight_checks_import_and_temp_then_cleans_probe (__main__.BudgetTests.test_preflight_checks_import_and_temp_then_cleans_probe)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\qa\coordination\checker-efficiency-20261015\canonical-candidate\test_review_budget.py", line 108, in test_preflight_checks_import_and_temp_then_cleans_probe
+    root = Path(folder); (root / 'budget_fixture_module.py').write_text('value = 1\n')
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\pathlib.py", line 1047, in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\checker-canonical-test-3pvyd_9x\\budget_fixture_module.py'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\checker-canonical-test-3pvyd_9x'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\qa\coordination\checker-efficiency-20261015\canonical-candidate\test_review_budget.py", line 107, in test_preflight_checks_import_and_temp_then_cleans_probe
+    with tempfile.TemporaryDirectory(prefix='checker-canonical-test-') as folder:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 950, in __exit__
+    self.cleanup()
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 954, in cleanup
+    self._rmtree(self.name, ignore_errors=self._ignore_cleanup_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\checker-canonical-test-3pvyd_9x'
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.068s
+
+FAILED (errors=1)

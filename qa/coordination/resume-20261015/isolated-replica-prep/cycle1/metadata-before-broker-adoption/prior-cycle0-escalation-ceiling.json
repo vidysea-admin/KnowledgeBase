@@ -1,0 +1,10 @@
+{
+  "authority": "Root explicit dispatch 2026-10-16: once finite manual SOURCE review",
+  "reason": "Mandatory skill startup and six security-sensitive drafts cannot fit 4000 review allocation. Prior bootstrap 6000 retained; manual workflow only, not runtime execution.",
+  "limits": {
+    "cost": null,
+    "tokens": 24000,
+    "active_s": 180,
+    "token_metric": "actual_total"
+  }
+}

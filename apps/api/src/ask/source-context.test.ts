@@ -11,6 +11,11 @@ import { askV2, completionBudget, BoundedAskError, validateHydration, type Compl
 import { createSourceHydrator, createSourceRequestDepsFor } from "./source-context.js";
 import { createLlmScorer } from "../score.js";
 import { unpackContext } from "../../../../packages/ask/src/bounded-refine.js";
+import { speakerTranscriptHash } from "../../../../packages/index/src/pipeline/speaker-profiles/profile.js";
+import type { GraphContextSnapshot } from "./graph-context.js";
+import { createNativeSourceHydrator } from "./native-source-context.js";
+import type { NativeSourceLocator } from "@lkb/core";
+import type { SourceHydration } from "../../../../packages/ask/src/source-context.js";
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
 const source = (text = "Visa forms open in October.", fields: Partial<Turns> = {}): Turns =>
   ({ _id: "s-t1", tenantId: "toc", sessionId: "s", speakerRef: "spk:0", tStart: 12, tEnd: 20, text, ...fields });
@@ -207,18 +212,18 @@ test("actual createLlmScorer cannot swallow quota exhaustion into a grounded ans
   assert.equal(calls, 12);
   assert.throws(budget.assertHealthy, /budget/);
 });
-test("request-local memo shares one genuine query embedding across original arm and trusted hydration", async () => {
+test("public request factory ignores explicit vector false across arms and source hydration", async () => {
   let embeds = 0;
   const { db } = fakeDb({ turns: [source()], chunks: [{ _id: "c1", tenantId: "toc", sourceRef: "s", turnRefs: ["s-t1"],
     chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "fixture" }] });
-  const deps = createSourceRequestDepsFor({ db, write: async () => {}, treeSearchFn: () => [node],
+  const deps = createSourceRequestDepsFor({ db, vectorless: false, write: async () => {}, treeSearchFn: () => [node],
     dispatch: async () => completion({}), embed: async (job) => {
       embeds++; assert.equal(job.purpose, "query");
       return { vectors: [[1, 0]], dims: 2, provider: "offline", model: "fixture" };
     } })("toc");
   await deps.extraCandidateArmsFn!("visa", node);
   await deps.sourceContext!.hydrate("visa", [node]);
-  assert.equal(embeds, 1);
+  assert.equal(embeds, 0);
 });
 
 test("claimed nomic provenance validates positive spans and refuses altered policy/digest/input", async () => {
@@ -243,12 +248,12 @@ test("claimed nomic provenance validates positive spans and refuses altered poli
   }
 });
 
-test("actual factory query embedding outage retains exact grounded lexical answer and failed-arm audit", async () => {
+test("actual public factory ignores unavailable or malformed dormant embedding ports and retains cited lexical answer", async () => {
   for (const malformed of [false, true]) {
     let embeds = 0;
     const { db } = fakeDb({ turns: [source()], chunks: [{ _id: "c1", tenantId: "toc", sourceRef: "s", turnRefs: ["s-t1"],
       chunkIndex: 0, vector: [1, 0], dims: 2, embeddingModel: "fixture" }] });
-    const deps = createSourceRequestDepsFor({ db, write: async () => {}, treeSearchFn: () => [],
+    const deps = createSourceRequestDepsFor({ db, vectorless: false, write: async () => {}, treeSearchFn: () => [],
       embed: async () => { embeds++; if (!malformed) throw new Error("local embed unavailable");
         return { vectors: [[]], dims: 0, provider: "offline", model: "fixture" }; },
       dispatch: async (job) => {
@@ -261,12 +266,12 @@ test("actual factory query embedding outage retains exact grounded lexical answe
     const tree = { ...node, level: "tenant" as const, node_id: "tenant:toc", children: [node] };
     const result = await askV2("Visa October", tree, { ...deps, tenantId: "toc" });
     assert.equal(result.verdict, "correct");
-    assert.equal(embeds, 1);
+    assert.equal(embeds, 0);
     assert.equal(result.answer, "The source says forms open in October.");
     const quotes = result.sources.internal[0]!.evidence!.sourceQuotes as { quote: string; turnId: string }[];
     assert.equal(quotes[0]!.turnId, "s-t1");
     assert.equal(quotes[0]!.quote, source().text);
-    assert.ok(result.auditLog.some((a) => a.jobKind === "ask.retrieval_degraded" && a.step.includes("scoped lexical excerpts")));
+    assert.equal(result.auditLog.some((a) => a.step.includes("query vector")), false);
   }
 });
 
@@ -339,4 +344,118 @@ test("duplicate source wording retains actual distinct turn identities and times
   const qs = proof.nodes[0]!.evidence!.sourceQuotes as { turnId: string; tStart: number; quote: string; id: string }[];
   assert.deepEqual(qs.map(q => q.turnId), ["dup-a", "dup-b"]); assert.deepEqual(qs.map(q => q.tStart), [10, 20]);
   assert.notEqual(qs[0]!.id, qs[1]!.id); assert.ok(qs.every(q => q.quote === text));
+});
+
+test("graph selected source hydration releases only exact authorized claim quotations in a shared turn", async () => {
+  const turn = source("Other speaker private words. Visa forms open in October. More unrelated speech.");
+  const other = source("Unselected speaker says visa forms are private.", { _id: "other", speakerRef: "other", tStart: 30, tEnd: 40 });
+  const { db } = fakeDb({ turns: [turn, other] });
+  const scope: GraphContextSnapshot = { edges: [], visibleSources: [{ tenantId: "toc", sessionId: "s", sourceId: "src:s", revisionHash: speakerTranscriptHash([turn, other]) }],
+    turns: [{ sessionId: "s", turnId: turn._id, quote: "Visa forms open in October." }] };
+  const hydrated = await createSourceHydrator("toc", { db, graphScope: async () => scope })("visa forms October", [node]);
+  const qs = hydrated.nodes[0]!.evidence!.sourceQuotes as { quote: string; turnId: string; charStart: number }[];
+  assert.deepEqual(qs.map(q => q.quote), ["Visa forms open in October."]); assert.equal(qs[0]!.turnId, turn._id);
+  assert.equal(qs[0]!.charStart, turn.text.indexOf("Visa")); assert.equal(JSON.stringify(hydrated.nodes).includes("private words"), false);
+});
+test("graph source hydration refuses effective transcript revision changes and stale evidence", async () => {
+  const turn = source(); const { db } = fakeDb({ turns: [turn] });
+  const scope: GraphContextSnapshot = { edges: [], visibleSources: [{ tenantId: "toc", sessionId: "s", sourceId: "src:s", revisionHash: "a".repeat(64) }], turns: [{ sessionId: "s", turnId: turn._id, quote: turn.text }] };
+  await assert.rejects(createSourceHydrator("toc", { db, graphScope: async () => scope })("visa", [node]), /graph source changed/);
+  scope.visibleSources[0]!.revisionHash = speakerTranscriptHash([turn]); scope.turns[0]!.quote = "fabricated";
+  await assert.rejects(createSourceHydrator("toc", { db, graphScope: async () => scope })("visa", [node]), /graph evidence changed/);
+});
+test("request source factory binds selected graph arm filters other arms and refuses authority fallback", async () => {
+  const turn = source(); const { db } = fakeDb({ turns: [turn] });
+  const current = { tenantId: "toc", sessionId: "s", sourceId: "src:s", revisionHash: speakerTranscriptHash([turn]) };
+  const options = { db, dispatch: async () => completion({}), treeSearchFn: () => [node], write: async () => {} };
+  assert.throws(() => createSourceRequestDepsFor(options)("toc", { speakerRefs: ["person:a"] }), /authority unavailable/);
+  const deps = createSourceRequestDepsFor({ ...options, graph: { async readSnapshot(t, selection) {
+    assert.equal(t, "toc"); assert.deepEqual(selection.speakerRefs, ["person:a"]);
+    return { visibleSources: [current], turns: [{ sessionId: "s", turnId: turn._id, quote: turn.text }], edges: [{ id: "edge", tenantId: "toc", status: "accepted", from: { kind: "speaker", ref: "person:a" }, to: { kind: "statement", ref: "claim:1" }, provenance: [current] }] };
+  } } })("toc", { speakerRefs: ["person:a"] });
+  assert.deepEqual(deps.treeSearchFn(node, [node.node_id]), []);
+  const root: TreeIndexNode = { ...node, node_id: "root", level: "topic", children: [node] };
+  const arms = await deps.extraCandidateArmsFn!("visa", root); assert.ok(arms.arms.flat().length);
+  assert.ok(arms.arms.flat().every(n => n.node_id === node.node_id));
+  assert.equal((await deps.sourceContext!.hydrate("visa", [node])).nodes.length, 1);
+});
+test("request source factory composes injected native hydration and final authority revalidation", async () => {
+  const nativeNode: TreeIndexNode = { node_id: "native", title: "Native", level: "topic", summary: "", children: [], evidence: { sourceId: "source", revisionHash: "a".repeat(64) } };
+  const calls: unknown[] = []; const { db } = fakeDb({});
+  const deps = createSourceRequestDepsFor({ db, dispatch: async () => completion({}), treeSearchFn: () => [], write: async () => {},
+    nativeSources: tenant => ({ async hydrate(query, admitted) { calls.push(["hydrate", tenant, query, admitted]); return { nodes: admitted, snapshotSHA256: "b".repeat(64), sourceBytes: 1 }; },
+      async revalidate(nodes) { calls.push(["revalidate", tenant, nodes]); } }) })("toc");
+  assert.deepEqual((await deps.sourceContext!.hydrate("query", [nativeNode])).nodes, [nativeNode]);
+  await deps.sourceContext!.revalidate!([node, nativeNode]);
+  assert.deepEqual(calls, [["hydrate", "toc", "query", [nativeNode]], ["revalidate", "toc", [nativeNode]]]);
+});
+
+test("active vectorless factory ignores an installed throwing embedding port across retrieval hydration and scoring", async () => {
+  for (const mode of [undefined, true, false]) {
+    let embeddings = 0;
+    const { db, filters } = fakeDb({ turns: [source()], chunks: [{ _id: "legacy-vector", tenantId: "toc", sourceRef: "s", turnRefs: ["s-t1"], vector: [1, 0], dims: 2, embeddingModel: "legacy" }] });
+    const deps = createSourceRequestDepsFor({ db, ...(mode === undefined ? {} : { vectorless: mode }),
+      embed: async () => { embeddings++; throw new Error("installed embedding port must never run"); },
+      write: async () => {}, treeSearchFn: () => [], dispatch: async job => {
+        if (job.kind === "ask.select_nodes") return completion({ node_ids: [] });
+        if (job.kind === "evaluator") return completion({ score: 0.9, reason: "source directly answers" });
+        if (job.kind === "ask.answer_grounding") return completion({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
+        const context = unpackContext(JSON.parse(job.messages[1]!.content).context);
+        return completion({ sentences: [{ text: "Forms open in October.", sourceIds: [context[0]!.sourceId] }] });
+      } })("toc");
+    const tree: TreeIndexNode = { ...node, level: "tenant", node_id: "tenant:toc", children: [node] };
+    const result = await askV2("Visa October", tree, { ...deps, tenantId: "toc" });
+    assert.equal(result.verdict, "correct"); assert.equal(result.answer, "Forms open in October.");
+    assert.equal(embeddings, 0); assert.equal(filters.some(f => f.name === "chunks"), false);
+    assert.equal(result.sources.internal.length, 1);
+  }
+});
+
+function mixedHydrationFixture(rows: Turns[], mutate?: (result: SourceHydration) => void) {
+  const text = "Visa native guidance.";
+  const locator: NativeSourceLocator = { kind: "document-page", documentId: "doc", documentSourceId: "bytes", headRevision: 1, sourceId: "native-source", revisionHash: sha("native-revision"), pageNumber: 1, passage: { start: 0, end: text.length, sha256: sha(text) } };
+  const native: TreeIndexNode = { node_id: "native-passage", level: "native-passage", title: "Native", summary: "UNTRUSTED", children: [], evidence: { sourceId: locator.sourceId, revisionHash: locator.revisionHash, sourceLocator: locator } };
+  const nativeHydrate = createNativeSourceHydrator("toc", { listLocators: async () => [locator], resolver: {
+    async resolve(_tenant, sourceLocator) { return { sourceLocator, quote: text }; }, async revalidate(_tenant, evidence) { return evidence; },
+  } });
+  const { db: original } = fakeDb({ turns: rows });
+  const db = { collection(name: string) { return { ...original.collection(name), async findOne(filter: Record<string, unknown>) {
+    if (filter.tenantId !== "toc") return null;
+    if (name === "sessions" && filter._id === "s") return { _id: "s", tenantId: "toc", sourceId: "src:s" };
+    if (name === "sources" && filter._id === "src:s") return { _id: "src:s", tenantId: "toc", kind: "recording", consent: { given: true } };
+    if (name === "turns") return rows.find(t => t.tenantId === filter.tenantId && t._id === filter._id && t.sessionId === filter.sessionId) ?? null;
+    return null;
+  } }; } } as unknown as Pick<Db, "collection">;
+  let child: SourceHydration | undefined;
+  const deps = createSourceRequestDepsFor({ db, treeSearchFn: () => [], write: async () => {}, dispatch: async () => completion({}), nativeSources: () => ({
+    async hydrate(query, admitted) { const result = await nativeHydrate(query, admitted); mutate?.(result); child = result; return result; }, async revalidate() {},
+  }) })("toc");
+  return { deps, native, child: () => child };
+}
+test("mixed transcript and native hydration stamps one combined proof including an empty transcript result", async () => {
+  for (const rows of [[source()], []]) {
+    const f = mixedHydrationFixture(rows);
+    // An empty transcript child has no admitted session, rather than a session with missing source rows.
+    const transcript: TreeIndexNode = rows.length ? node : { ...node, node_id: "container", level: "topic", evidence: undefined };
+    const admitted = [transcript, f.native];
+    const result = await f.deps.sourceContext!.hydrate("visa", admitted);
+    assert.equal(validateHydration(result, admitted).length, rows.length ? 2 : 1);
+    assert.ok(result.nodes.every(n => n.evidence!.sourceSnapshotSHA256 === result.snapshotSHA256));
+    assert.notEqual(f.child()!.snapshotSHA256, result.snapshotSHA256);
+    assert.equal(f.child()!.nodes[0]!.evidence!.sourceSnapshotSHA256, f.child()!.snapshotSHA256, "child proof must not be mutated");
+    assert.equal(f.native.evidence!.sessionRef, undefined); assert.equal(f.native.summary, "UNTRUSTED");
+    assert.ok(result.sourceBytes > f.child()!.sourceBytes);
+  }
+});
+test("mixed hydration refuses forged child proof identity foreign source and altered quote before combined restamp", async () => {
+  const attacks: ((result: SourceHydration) => void)[] = [
+    r => { r.nodes[0]!.evidence!.sourceSnapshotSHA256 = sha("forged child proof"); },
+    r => { r.nodes[0]!.node_id = "foreign-node"; },
+    r => { r.nodes[0]!.evidence!.sourceId = "foreign-source"; },
+    r => { (r.nodes[0]!.evidence!.sourceQuotes as { quote: string }[])[0]!.quote = "Changed source quote"; },
+  ];
+  for (const attack of attacks) {
+    const f = mixedHydrationFixture([source()], attack);
+    await assert.rejects(f.deps.sourceContext!.hydrate("visa", [node, f.native]), /hydration identity|native source quote/);
+  }
 });

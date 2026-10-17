@@ -1,0 +1,75 @@
+{
+  "request": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t036-current-dependencies\\broker-request.json",
+    "sha256": "63bf877e96acbab78ab3003b4471ae117486d47a70563b626284ab5910a5cc87"
+  },
+  "candidate": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "candidateIdentityKind": "Declared baselineGitSHA plus exact rawpins",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\1efc6f1875defe90964439123d5719eb743523ae3f7fb16d13c21fecd9abc6a1.json",
+    "sha256": "1efc6f1875defe90964439123d5719eb743523ae3f7fb16d13c21fecd9abc6a1",
+    "count": 323
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-head-before-receipt.json",
+      "sha256": "98dbcc5e8afe71747164a4443df858401f81fe67745949c0748cffac031f9699",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.25,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-head-before.log",
+        "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-node-preflight-receipt.json",
+      "sha256": "76e1b24f03a5625db003665d9853a7cd45b2d19a94bf91f0a967e7abc11c0647",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.4059999999990396,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-node-preflight.log",
+        "sha256": "8b6892bfd19ef833344e44c6dc1f30d07d56dcd7c44661021c775b52a41362d3"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-selected-receipt.json",
+      "sha256": "4a0d1f3776c98265537133fb9503dbf7b110f56c2434bff35844449b8d2b7b9c",
+      "exit": 0,
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 3.5320000000028813,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-selected.log",
+        "sha256": "34c15d1bd5218790e4936e3a21808cf83c67895f9a4f7d54612c4c898f3a473b"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-head-after-receipt.json",
+      "sha256": "94bb33668c7a5d77b859cf7e6a6bbc8e76dc87ca587c87fa858b899190c52a22",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.23400000000037835,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-head-after.log",
+        "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+      }
+    }
+  ],
+  "failure": null,
+  "beforeHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "afterHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "allPinsFinalMatch": true,
+  "ownedTempRemoved": true,
+  "elapsed_s": 5.85899999999674,
+  "accounting": "SHARED INTEGRATION",
+  "independentVerdict": null,
+  "actual_total_tokens": null
+}

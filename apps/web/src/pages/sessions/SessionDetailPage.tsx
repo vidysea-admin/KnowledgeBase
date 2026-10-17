@@ -6,6 +6,8 @@ import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
 import { SpeakerSuggestions } from "./SpeakerSuggestions.js";
 import { GroundedContentPanel } from "./grounded/GroundedContentPanel.js";
+import { SessionDecisionsPanel } from './decisions/SessionDecisionsPanel.js';
+import { TranscriptReview } from '../transcript-review/TranscriptReview.js';
 
 const MAX_TURNS_SHOWN = 200;
 
@@ -43,9 +45,10 @@ function speakerColor(ref: string): string {
 export function SessionDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
   const { hash } = useLocation();
-  const { apiKey } = useAuth();
-  const [loaded, setLoaded] = useState<{ sessionId: string; key: string | null; data: SessionDetail } | null>(null);
-  const detail = loaded !== null && loaded.sessionId === id && loaded.key === apiKey ? loaded.data : null;
+  const { apiKey, sessionVersion } = useAuth();
+  const [revision, setRevision] = useState(0);
+  const [loaded, setLoaded] = useState<{ sessionId: string; key: string | null; version: number; data: SessionDetail } | null>(null);
+  const detail = loaded !== null && loaded.sessionId === id && loaded.key === apiKey && loaded.version === sessionVersion ? loaded.data : null;
   const [mediaUrl, setMediaUrl] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
@@ -56,7 +59,7 @@ export function SessionDetailPage(): React.ReactElement {
   const assetGeneration = useRef(0);
   useEffect(() => () => { if (mediaUrl) URL.revokeObjectURL(mediaUrl); }, [mediaUrl]);
   useEffect(() => () => { if (frameUrl) URL.revokeObjectURL(frameUrl); }, [frameUrl]);
-  useEffect(() => { assetGeneration.current++; pendingSeek.current = null; setMediaUrl(null); setStreaming(false); setFrameUrl(null); setMediaError(null); return () => { assetGeneration.current++; }; }, [apiKey, id]);
+  useEffect(() => { assetGeneration.current++; pendingSeek.current = null; setMediaUrl(null); setStreaming(false); setFrameUrl(null); setMediaError(null); return () => { assetGeneration.current++; }; }, [apiKey, sessionVersion, id]);
   useEffect(() => {
     if (!streaming || !video.current || !detail?.media) return;
     const stop = streamSessionMedia(apiKey, id!, detail.media.mime, video.current, setMediaError);
@@ -88,8 +91,8 @@ export function SessionDetailPage(): React.ReactElement {
       if (video.current.readyState > 0) pendingSeek.current = null;
     } else void loadAsset();
   }
-  const [loadFailure, setLoadFailure] = useState<{ sessionId: string; key: string | null; message: string } | null>(null);
-  const error = loadFailure !== null && loadFailure.sessionId === id && loadFailure.key === apiKey ? loadFailure.message : null;
+  const [loadFailure, setLoadFailure] = useState<{ sessionId: string; key: string | null; version: number; message: string } | null>(null);
+  const error = loadFailure !== null && loadFailure.sessionId === id && loadFailure.key === apiKey && loadFailure.version === sessionVersion ? loadFailure.message : null;
   let highlightedTurn: string | null = null;
   if (hash.startsWith("#turn-")) {
     try { highlightedTurn = decodeURIComponent(hash.slice("#turn-".length)) || null; } catch { /* unresolved citation */ }
@@ -98,13 +101,12 @@ export function SessionDetailPage(): React.ReactElement {
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    setLoaded(null);
     setLoadFailure(null);
     getSession(apiKey, id)
-      .then((data) => { if (!cancelled) setLoaded({ sessionId: id, key: apiKey, data }); })
-      .catch((err: unknown) => { if (!cancelled) setLoadFailure({ sessionId: id, key: apiKey, message: err instanceof ApiError ? err.message : "failed to load session" }); });
+      .then((data) => { if (!cancelled) setLoaded({ sessionId: id, key: apiKey, version: sessionVersion, data }); })
+      .catch((err: unknown) => { if (!cancelled) setLoadFailure({ sessionId: id, key: apiKey, version: sessionVersion, message: err instanceof ApiError ? err.message : "failed to load session" }); });
     return () => { cancelled = true; };
-  }, [apiKey, id]);
+  }, [apiKey, sessionVersion, id, revision]);
 
   // Runs after the transcript has rendered, which is why it depends on `detail`: the anchor does
   // not exist at mount time, so a browser's own hash handling lands on nothing.
@@ -137,6 +139,8 @@ export function SessionDetailPage(): React.ReactElement {
 
       <SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} />
       <GroundedContentPanel apiKey={apiKey} sessionId={detail.session._id} />
+      <SessionDecisionsPanel apiKey={apiKey} sessionId={detail.session._id} sessionVersion={sessionVersion} revision={revision} />
+      <TranscriptReview key={`${sessionVersion}:${detail.session._id}`} apiKey={apiKey} sessionId={detail.session._id} onCommitted={() => setRevision(value => value + 1)} />
 
       {detail.media && <div className="card">
         <div className="section-title">Recording</div>

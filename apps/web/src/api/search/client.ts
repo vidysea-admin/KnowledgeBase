@@ -1,21 +1,37 @@
 import { apiFetch, ApiError } from "../client.js";
 import type { SessionSummary, Turn } from "../types.js";
+import { parseNativeSourceLocator, type NativeSourceLocator } from "../nativeEvidence.js";
 
-export interface TranscriptSearchHit {
+interface LegacySearchHit {
   turnId: string;
   sessionId: string;
   score: number;
   turn: Turn | null;
   session: SessionSummary | null;
+  nativeSourceLocator?: never;
 }
-export interface TranscriptSearchResponse { query: string; hits: TranscriptSearchHit[] }
+interface NativeSearchHit {
+  nativeSourceLocator: NativeSourceLocator; score: number; title?: string;
+  turnId?: never; sessionId?: never; turn?: never; session?: never;
+}
+export type TranscriptSearchHit = LegacySearchHit | NativeSearchHit;
+export interface TranscriptSearchResponse { query: string; hits: TranscriptSearchHit[]; nativeTruncated?: boolean }
 
 function object(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
-function id(value: unknown): value is string { return typeof value === "string" && value.trim().length > 0; }
+function id(value: unknown): value is string {
+  if (typeof value !== "string" || value.trim().length === 0) return false;
+  // Source identifiers become URI components; malformed UTF-16 must fail before rendering.
+  try { encodeURIComponent(value); return true; } catch { return false; }
+}
 function finite(value: unknown): value is number { return typeof value === "number" && Number.isFinite(value); }
 function hit(value: unknown): value is TranscriptSearchHit {
+  if (object(value) && Object.hasOwn(value, "nativeSourceLocator")) {
+    return Object.keys(value).every(k => ["nativeSourceLocator", "score", "title"].includes(k))
+      && parseNativeSourceLocator(value.nativeSourceLocator) !== null && finite(value.score) && value.score >= 0
+      && (value.title === undefined || typeof value.title === "string" && value.title.length <= 500);
+  }
   if (!object(value) || !id(value.turnId) || !id(value.sessionId) || !finite(value.score) || value.score < 0) return false;
   if (value.turn !== null) {
     const turn = value.turn;
@@ -41,10 +57,14 @@ export async function searchTranscripts(apiKey: string | null, query: string, li
   const normalized = query.trim();
   if (!normalized) throw new ApiError(400, "Enter a search query.");
   if (!Number.isInteger(limit) || limit < 1 || limit > 50) throw new ApiError(400, "Invalid search limit.");
-  const response = await apiFetch<unknown>(`/search?q=${encodeURIComponent(normalized)}&k=${limit}`, apiKey);
+  // A lone UTF-16 surrogate makes encodeURIComponent throw URIError; refuse it as a safe client error before any fetch.
+  let encodedQuery: string;
+  try { encodedQuery = encodeURIComponent(normalized); } catch { throw new ApiError(400, "Search query contains invalid characters."); }
+  const response = await apiFetch<unknown>(`/search?q=${encodedQuery}&k=${limit}`, apiKey);
   if (!object(response) || response.query !== normalized || !Array.isArray(response.hits) ||
       response.hits.length > limit || !response.hits.every(hit) ||
-      new Set(response.hits.map((value) => value.turnId)).size !== response.hits.length) {
+      response.nativeTruncated !== undefined && typeof response.nativeTruncated !== "boolean" ||
+      new Set(response.hits.map((value) => value.nativeSourceLocator ? JSON.stringify(parseNativeSourceLocator(value.nativeSourceLocator)) : value.turnId)).size !== response.hits.length) {
     throw new ApiError(503, "Search results could not be read. Try again.");
   }
   return response as unknown as TranscriptSearchResponse;

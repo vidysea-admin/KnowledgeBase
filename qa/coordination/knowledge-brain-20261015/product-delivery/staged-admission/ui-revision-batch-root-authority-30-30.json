@@ -1,0 +1,74 @@
+{
+  "kind": "ROOT_EXACT_TWO_UNIT_SHARED_ACTUAL_ADMISSION",
+  "authority": "Root explicit latest dispatch:30review+30final within existing60total; token/output grants unchanged.",
+  "scope": [
+    {
+      "slug": "t058-saved-summary-refresh",
+      "cycle": 0,
+      "candidate_sha": "3b7d35f8801dd853b2898dd6302e5199ec8f2f4a8bd4bb8be4064f883876dc98",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a"
+    },
+    {
+      "slug": "product-transcript-refresh-warning",
+      "cycle": 1,
+      "candidate_sha": "cfb521695c119fb407eb240ba11e6b07aa4b4edee40683e9eeac44ae25cd3173",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a"
+    }
+  ],
+  "source_pin_proof": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/review-batch-proposal.json",
+  "prospective_checker": "/root/product_delivery_coordinator/ui_revision_batch_checker",
+  "new_shared_cap": {
+    "actual_total_tokens": 200000,
+    "active_s": 60,
+    "allocated_output_tokens": 1800,
+    "count_once": true
+  },
+  "review": {
+    "actual_total_tokens": 120000,
+    "active_s": 30,
+    "allocated_output_tokens": 1100
+  },
+  "manual_final_reserve": {
+    "actual_total_tokens": 80000,
+    "active_s": 30,
+    "allocated_output_tokens": 700,
+    "not_currently_committed": true
+  },
+  "prior": {
+    "actual_total_tokens": 294849,
+    "allocated_active_debit": 40,
+    "allocated_output_tokens": 1000,
+    "actual_full_active_s": null,
+    "cost": null,
+    "saved_checker_children": 0
+  },
+  "cumulative": {
+    "actual_total_tokens": 494849,
+    "active_s": 100
+  },
+  "maker_comparable_total_tokens": 6052313,
+  "comparison_basis": "Root batch-purpose attests original frozen saved2525301 + transcript3527012 summed exactly; no guessed per-unit future allocation or10-percent success.",
+  "canonical_native_reserve": false,
+  "canonical_limitation": "Legacy canonical800allocated-token completion reserve is not80000ACTUAL tokens; completion_reserve=false. Manual reserve clearly external; no helper-native protection claimed.",
+  "supplemental_helper": {
+    "status": "EXACT_LOCAL_PASS_PIN_AUTHENTICATED_GATE_PENDING",
+    "path": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/checker-runtime-total-20261015/review_budget.py",
+    "raw_sha256": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "packet": "qa/packets/checker-runtime-total.md",
+    "verdict": "qa/verdicts/checker-runtime-total.md",
+    "verdict_cycle": 4,
+    "actual_reviewed_sha": "fbfa445ede6fd9c82138f24743f8cd0ea4f2f3c82f5b98dc71123e5a8cdc24b2",
+    "root_provided_reviewed_sha": "6a3d06d5ee21f5e83502d82d8326deb77dace24dd42a8df5c99685c2dd0c5948",
+    "identity_note": "Actual persisted PASS cycle4 ReviewedSHA matches current packet fbfa...; root supplied older/different aggregate. Exact requested helper rawSHA2b4fe0... matches packet and independently PASSed current artifact; local only, never installed claim."
+  },
+  "all_histories_preserved": true,
+  "collections_excluded": "ALL1399515/3547712 and breaches remain untouched.",
+  "review_test_source_or_launch_performed": false,
+  "supersedes_plan": {
+    "input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-input.json",
+    "result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-result.json",
+    "old_review_s": 40,
+    "old_final_s": 20,
+    "reason": "Root explicitly authorized30review+30final within same60 to meet LOCAL helper fixed30s final reserve. Tokens120k/80k and output1100/700 unchanged; not bypass or new grant."
+  }
+}

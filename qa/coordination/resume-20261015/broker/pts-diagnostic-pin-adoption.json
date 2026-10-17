@@ -1,0 +1,6 @@
+{
+  "authority": "root explicit diagnostic source freeze override",
+  "old_probe_sha256": "763a399a4cc02d63d1d28f07cf1e753430a95623c28b4cbb0f8f57fc63892ea0",
+  "new_probe_sha256": "e59bf9df461e744abe1891ff6efe30550d97bdc3bd80f48664abd2b1562e3a90",
+  "checkpoint_sha256": "2a3a4e1eb1ab13c741e960a826806fc184605f42df58ca4696f6e51c79b909db"
+}

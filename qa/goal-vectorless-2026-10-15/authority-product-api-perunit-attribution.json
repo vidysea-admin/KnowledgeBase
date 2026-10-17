@@ -1,0 +1,37 @@
+{
+  "kind": "PER_UNIT_ATTRIBUTION_FROM_FAILED_SHARED_BATCH",
+  "receipt": "verification-authority-product-api-focused-union.json",
+  "overallExit": 1,
+  "sharedInputPins": 396,
+  "pinsUnchanged": true,
+  "sharedUnhandledSetupFailuresObserved": false,
+  "units": [
+    {
+      "name": "trusted-human-answer-router",
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "name": "evaluation-workflow",
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "name": "evaluation-router",
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "name": "speaker-source-router",
+      "passed": 8,
+      "failed": 0
+    },
+    {
+      "name": "reviews-factory",
+      "passed": 4,
+      "failed": 1
+    }
+  ],
+  "scopeLimit": "Per-test outcomes from isolated files, no standalone process exit or global green inferred",
+  "repairReceiptExpected": "verification-review-factory-affected-one.json"
+}

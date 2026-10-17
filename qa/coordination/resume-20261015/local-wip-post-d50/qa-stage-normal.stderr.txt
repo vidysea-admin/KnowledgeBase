@@ -1,0 +1,13 @@
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/checker-prompt.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/packet.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/native-remaining-two-run.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/native-remaining-two-timeout-checkpoint.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/watched-checker-cycle2-run.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/watched-independent-probe-unexecuted.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/remaining-native-guards-request.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/manifest-before.raw', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/manifest-parser-readback.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/verdict-parser-readback.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/checker-prompt.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/packet.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/manifests/watched-cadence-launcher.md', LF will be replaced by CRLF the next time Git touches it

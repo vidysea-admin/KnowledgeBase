@@ -1,0 +1,13 @@
+{
+  "phase": "resume-request-checkpoint",
+  "started_utc": "2026-10-15T20:07:57.5700927Z",
+  "monotonic_timestamp": 34714339239,
+  "monotonic_frequency": 10000000,
+  "historical_active_s": null,
+  "actual_total_tokens": null,
+  "cost": null,
+  "status": "BROKER_REQUESTED",
+  "no_efficiency_claim": true,
+  "source_hash": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+  "test_hash": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de"
+}

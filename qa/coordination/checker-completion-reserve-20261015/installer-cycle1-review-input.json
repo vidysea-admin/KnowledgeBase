@@ -1,0 +1,23 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [
+    {"id": "canonical-adoption-checker", "active_s": null, "tokens": null, "cost": null,
+     "budget_debit": {"active_s": 180, "tokens": 6000, "cost": null}, "shared_historical_id": "canonical-adoption-checker", "deduplicate_centrally": true},
+    {"id": "completion-reserve-checker", "active_s": 110.6927, "tokens": null, "cost": null,
+     "budget_debit": {"active_s": 90, "tokens": 2500, "cost": null}},
+    {"id": "completion-reserve-checker-closing", "active_s": 35.4405, "tokens": null, "cost": null,
+     "budget_debit": {"active_s": 90, "tokens": 1500, "cost": null}},
+    {"id": "completion-reserve-rollout-cycle0", "active_s": null, "tokens": null, "cost": null,
+     "measured_phase_active_s": 67.6950577, "initial_failed_tool_active_s": null,
+     "budget_debit": {"active_s": 120, "tokens": 3000, "cost": null},
+     "measurement": "rollout-verdict.md", "unknown_reason": "Initial failed clock call unmeasured; measured later interval retained separately, no invented total"}
+  ],
+  "next_phase": {"active_s": 120, "tokens": 3000, "cost": null},
+  "bootstrap": {"active_s": 180, "tokens": 6000},
+  "bootstrap_scope": "Resume original independent rollout checker cycle1, repaired installer delta only. First tool monotonic start;80seconds investigation plus40seconds reserved finalization/readback inside120. No helper/docs rereview, tests or global installation.",
+  "escalation": {
+    "authority": "Root explicit finite installer-repair review approval2026-10-15:next120active seconds3000allocated tokens, cumulative621seconds16000tokens",
+    "reason": "Review exclusive-handle repair after concurrency FAIL; five isolated broker checks pass. Preserve all earlier actuals, unknown failed-start overhead and conservative debits; no efficiency-success claim.",
+    "limits": {"active_s": 621, "tokens": 16000, "cost": null}
+  }
+}

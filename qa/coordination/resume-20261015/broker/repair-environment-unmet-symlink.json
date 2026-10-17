@@ -1,0 +1,6 @@
+{
+  "case": "owned status retains deduplicated durable control gaps and refuses corrupt identity without overwrite",
+  "prior_receipt": "integrated-native-runtime-receipt.json",
+  "state": "known EPERM environment limitation remains unmet",
+  "scope": "root authorized no duplicate privilege reproving; assertion unchanged, no security PASS claim"
+}

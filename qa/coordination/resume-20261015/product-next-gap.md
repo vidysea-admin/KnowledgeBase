@@ -1,0 +1,20 @@
+# Product next gap — targeted read-only survey, 2026-10-15
+
+One concrete remaining software gap: **T-056 cannot reopen or rebuild a source-conflict answer once it falls outside the newest 100 answer-history rows.** This is an existing required conflict workflow, rather than a proposed convenience control.
+
+Requirement: `qa/contracts/goal-t056.md` C3 (follow-ups on the correct persisted answer), C7 (durable source resolution reflected in affected answer behavior), C8 (usable persisted history/review). Catalogue/task source: `TASKS.md` T-056 and `.goal/goal.json` T-056. Existing historical observation in `qa/coordination/knowledge-brain-20261015/product-delivery/t056-journey-inspection.md` remains true in the inspected source.
+
+Exact static chain:
+
+- `apps/api/src/answer-policy/answer-workflow.ts:210` calls `store.list(t, 100)`; `answer-mongo-store.ts:24` sorts newest first and applies that limit. `answer-mongo-store.ts:54` retains the conflict list independently of answer age.
+- `apps/web/src/pages/answer-policy/AnswerReviewPage.tsx:44` links the original answer to `/ask?run=...`; lines 47–48 search only that bounded history before rebuilding and throw when absent. Consequently an older persisted, resolved conflict cannot reach `askWithPolicy` through the actual control.
+- `apps/web/src/pages/answer-policy/PolicyAskPage.tsx:66` onward restores a requested run only if found in that same list, with no direct fetch/missing-run outcome.
+- An authenticated direct read already exists at `apps/api/src/answer-policy/answer-router.ts:50`, but `answer-workflow.ts:211` returns only query/reason/result, lacking original questionClass, evidenceMode and filters needed for faithful rebuild/restoration.
+
+Minimal implementation: make direct get return a validated history-item envelope with original input metadata, preserving `runOf` tenancy and `published` freshness/publication guards; add one bounded authenticated direct-read client; use it for older requested-run restoration and conflict rebuilding. Preserve auth/sessionVersion/generation fencing, stale/missing/foreign refusal, source-resolution lineage and exact applied policy binding. Do not increase the list limit or copy hidden candidate text into the response. No schema/migration/provider change is needed. Exclusive proposed paths: answer-workflow.ts + its existing tests; web answer-policy/client.ts, PolicyAskPage.tsx, AnswerReviewPage.tsx + focused existing UI/client test file(s). Shared composition/App paths are unnecessary. Root must reconcile live leases before dispatch.
+
+Focused broker checks to author/select, not executed here: seed 101+ saved answers with the resolved original outside the latest100; direct read and `/ask?run` restore its exact filters/mode/class; rebuild passes its resolutionId and original policy; foreign/not-found/stale runs refuse; malformed direct DTO and old-login late response cannot restore content or initiate rebuild. Existing resolution-lineage and producer/router tests remain regression floor. Broker chooses compatible command/runtime and final type receipts. This is a new direct-history consumer behavior; observed historical simulator and vectorless-policy PASSes do not certify it. Root should confirm seam accounting before a nonsecurity refinement dispatch; no third-round exception is inferred.
+
+Implementation is technically unblocked by human labels, live providers, browser, native DB or excluded evaluation/native-capture/TS-diagnostic lanes. Full T-056 still needs genuine calibration/semantic acceptance, coherent independent current-byte verification and actual runtime/browser/provider evidence. Profile API19+client2 and T05916/16 are accepted as reported current receipts, not rerun or treated as gaps. Nine frozen product units remain existing candidates, not missing features to rebuild.
+
+Survey only: no tests/build/provider/database/browser/source changes, no verdict, no issue allocation, no parent completion. Only this coordination note was written.

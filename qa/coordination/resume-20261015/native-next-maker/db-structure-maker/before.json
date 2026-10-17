@@ -1,0 +1,92 @@
+[
+  {
+    "path": "apps/api/src/indexing/speaker-suggest.test.ts",
+    "sha256": "3ecf81d258e7ed79e7256821984e48b4cf5c4f32e6b2f2dfba45dc9d954bae86",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__indexing__speaker-suggest.test.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "sha256": "c50352247b1b151d6c49a8ae441675e75f684382a4467920043871ce90143855",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__indexing__tile-speaker-suggest.test.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/speaker-profiles/router.test.ts",
+    "sha256": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__speaker-profiles__router.test.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/speaker-profiles/store.test.ts",
+    "sha256": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__speaker-profiles__store.test.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+    "sha256": "3937c537f7172585f15a6a3cf9c65dc81beb833585a810c4fcafefcd6fffe215",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__speaker-suggestions__reindex-survival.test.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/router.ts",
+    "sha256": "ea5a7098ac10e4c042f42668fe3d4623bb20238caf001b9c8f87a1ed1a52e489",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__speaker-suggestions__router.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts",
+    "sha256": "50e14fedc2280d548a908baa1ad7560273f7fc95c15e08cf113a0ad461c6d49c",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__speaker-suggestions__speaker-suggestions.test.ts",
+    "exists": true
+  },
+  {
+    "path": "apps/api/src/speaker-suggestions/store.ts",
+    "sha256": "22161d6cef0584a356f362878a6ff3074b707a9136bd5331e4ce3d4dfcf6ba96",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-apps__api__src__speaker-suggestions__store.ts",
+    "exists": true
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "sha256": "adfee97da1c4322b922a18695678fba3563035249b2b60ff7232d4abeec18ab8",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.test.ts",
+    "exists": true
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "sha256": "c5ac29311c4fe2866cd679821af2a26f360a45f868a733a8620fbf0847915920",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.testdb.ts",
+    "exists": true
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.ts",
+    "sha256": "7c74c981c49c740d454a831a246b09c87c753dc7a9d46a962f50f53fd8e67a8b",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.ts",
+    "exists": true
+  },
+  {
+    "path": "packages/db/src/index.ts",
+    "sha256": "2fa3d1aa5b4efacbfe9f4b33f8f211fb464d003285eea5c35e24531ef3572a32",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__index.ts",
+    "exists": true
+  },
+  {
+    "path": "scripts/native-capture/production.test.ts",
+    "sha256": "33997f08cf4ba2447b87f368922a32c16848c2d1bb634e26b856b64a172ea278",
+    "backup": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-scripts__native-capture__production.test.ts",
+    "exists": true
+  },
+  {
+    "exists": false,
+    "path": "packages/db/src/collections/speaker-suggestions/index.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/db/src/collections/speaker-suggestions/index.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "packages/db/src/collections/speaker-suggestions/testdb.ts"
+  }
+]

@@ -1,0 +1,104 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "source-frozen-awaiting-broker",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "t042-native-codecledger",
+    "cycle": 0,
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_kind": "uncommitted overlay pinned by raw-byte hashes, not committed candidate",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-ivf.ts",
+        "sha256": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+        "bytes": 3222
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-ivf.test.ts",
+        "sha256": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+        "bytes": 1582
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-clock-ledger.ts",
+        "sha256": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+        "bytes": 6129
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-clock-ledger.test.ts",
+        "sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+        "bytes": 2535
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-spool.ts",
+        "sha256": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+        "bytes": 21869
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-spool.test.ts",
+        "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+        "bytes": 6240
+      }
+    ]
+  },
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [],
+    "remaining": [
+      "sole-broker focused checks",
+      "combined downstream/typecheck",
+      "independent checker admission and verdict"
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "src/capture/native-ivf.test.ts",
+      "reason": "microsecond byte roundtrip, strict codec/dimension/count/overflow",
+      "boundary": "failure"
+    },
+    {
+      "node": "src/capture/native-clock-ledger.test.ts",
+      "reason": "one-to-one lineage, contiguous PCM, foreign clock and epoch step",
+      "boundary": "security"
+    },
+    {
+      "node": "src/capture/native-spool.test.ts",
+      "reason": "opaque issuer, raw hashes, retry poison, quotas, private link checks, server-bound resume",
+      "boundary": "security"
+    }
+  ],
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [],
+    "next_phase": null,
+    "bootstrap_scope": "Not admitted: root must bind final combined candidate, readiness receipts and finite assessed startup allowance."
+  },
+  "contracts": [
+    "qa/contracts/t042-trusted-registry-integration.md R2/R3/R4/R5/R6/R7/R9/R14",
+    "qa/contracts/goal-T042.md full parent gates remain open"
+  ],
+  "limits": [
+    "Synthetic byte fixtures are not measured native qualification",
+    "No captured sample host fit/latency bounds or selected provider zero established here",
+    "Configured per-spool quota includes raw and journal/marker; aggregate raw+final-candidate reservation is composition-owned",
+    "Crash receiver.lock refuses; clean suspend checkpoint supports exact persisted byte/hash resume",
+    "Private POSIX mode requests are not Windows ACL qualification"
+  ],
+  "consumers": [
+    "capture/tab-browser.ts owned browser maker",
+    "capture/native-media-finalize.ts owned finalizer maker"
+  ],
+  "evidence": [
+    "before-pins.json",
+    "candidate-pins.json",
+    "broker-request.json"
+  ],
+  "previous_receipt": null
+}

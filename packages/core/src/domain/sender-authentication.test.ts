@@ -50,7 +50,7 @@ test("only the receiving provider's single header counts: missing, foreign, forg
 
 test("unparseable results fail closed", () => {
   for (const bad of ["mx.google.com; dmarc=pass header.from=ashoka.edu.in)", "mx.google.com; (dmarc=pass header.from=ashoka.edu.in",
-    'mx.google.com; dmarc=pass header.from="ashoka.edu.in"', "mx.google.com; dmarc=pass\\ header.from=ashoka.edu.in",
+    'mx.google.com; dmarc=pass header.from="ashoka.edu.in', "mx.google.com; dmarc=pass\\ header.from=ashoka.edu.in",
     "mx.google.com; garbage", "mx.google.com; dmarc pass header.from=ashoka.edu.in", "mx.google.com dmarc=pass header.from=ashoka.edu.in",
     "mx.google.com; dmarc=fail (dmarc=pass header.from=ashoka.edu.in) header.from=ashoka.edu.in"]) {
     assert.equal(auth(h("a@ashoka.edu.in", bad)), false, bad);

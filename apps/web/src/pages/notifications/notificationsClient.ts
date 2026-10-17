@@ -5,12 +5,12 @@
  */
 import { apiFetch, ApiError } from "../../api/client.js";
 
-export type NotificationSource = "upload-queue" | "provider-jobs" | "watcher";
+export type NotificationSource = "upload-queue" | "provider-jobs" | "watcher" | "file-queue";
 export interface NotificationItem { id: string; source: NotificationSource; severity: "error"; title: string; detail: string | null; occurredAt: string }
 export type SourceState = "ok" | "unavailable";
 export interface NotificationsResponse {
   notifications: NotificationItem[]; limit: number; truncated: boolean;
-  sources: { uploadQueue: SourceState; providerJobs: SourceState; watcher: SourceState };
+  sources: { uploadQueue: SourceState; providerJobs: SourceState; watcher: SourceState; fileQueue?: SourceState };
 }
 const obj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const time = (v: unknown): v is string => typeof v === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(v) && Number.isFinite(Date.parse(v));
@@ -23,14 +23,15 @@ export async function loadNotifications(apiKey: string | null, limit = 50): Prom
   if (!obj(raw) || !Array.isArray(raw.notifications) || raw.limit !== limit || typeof raw.truncated !== "boolean" ||
       raw.notifications.length > limit || !obj(raw.sources)) throw bad();
   const s = raw.sources;
-  if (!state(s.uploadQueue) || !state(s.providerJobs) || !state(s.watcher)) throw bad();
+  if (!state(s.uploadQueue) || !state(s.providerJobs) || !state(s.watcher) || s.fileQueue !== undefined && !state(s.fileQueue)) throw bad();
   const seen = new Set<string>();
   for (const n of raw.notifications) {
-    if (!obj(n) || typeof n.id !== "string" || !n.id || seen.has(n.id) || (n.source !== "upload-queue" && n.source !== "provider-jobs" && n.source !== "watcher") ||
-        n.severity !== "error" || typeof n.title !== "string" || !(n.detail === null || typeof n.detail === "string") || !time(n.occurredAt)) throw bad();
+    if (!obj(n) || typeof n.id !== "string" || !n.id || seen.has(n.id) || (n.source !== "upload-queue" && n.source !== "provider-jobs" && n.source !== "watcher" && n.source !== "file-queue") ||
+        n.source === "file-queue" && s.fileQueue !== "ok" || n.severity !== "error" || typeof n.title !== "string" || !(n.detail === null || typeof n.detail === "string") || !time(n.occurredAt)) throw bad();
     seen.add(n.id);
   }
-  return raw as unknown as NotificationsResponse;
+  return { notifications: raw.notifications.map(n => ({ id: n.id, source: n.source, severity: n.severity, title: n.title, detail: n.detail, occurredAt: n.occurredAt })) as NotificationItem[],
+    limit, truncated: raw.truncated, sources: { uploadQueue: s.uploadQueue, providerJobs: s.providerJobs, watcher: s.watcher, ...(s.fileQueue === undefined ? {} : { fileQueue: s.fileQueue }) } };
 }
 
 const STORAGE_KEY = "lkbNotificationsRead";

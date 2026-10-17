@@ -1,0 +1,85 @@
+{
+  "status": "budget-or-provider-refusal",
+  "ownExit": 0,
+  "evaluationSucceeded": false,
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "model": "glm-5.3-flash",
+  "corpusSha256": "5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162",
+  "sourceCandidateSha256": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+  "configSha256": "a0d4ad094c1043f83c211ec24edeb56a0ae8e040bd6ba4af299fbc386b68e08a",
+  "authorizationSha256": "024460a030ae8552635963539a3e8c9f180d273e8ae938f990a61025c0651991",
+  "startedAt": "2026-10-15T22:39:17.534Z",
+  "completedAt": "2026-10-15T22:39:27.970Z",
+  "totalMs": 10436,
+  "evaluateMs": 9556,
+  "evaluateBudgetMet": true,
+  "actualNewProviderCalls": 2,
+  "cumulativeReservedIds": [
+    4,
+    5
+  ],
+  "priorProviderRequests": 3,
+  "cumulativeProviderRequests": 5,
+  "newUsage": {
+    "inputTokens": 597,
+    "outputTokens": 590
+  },
+  "aggregateLifetimeUsage": null,
+  "historicalUnknownUsagePreserved": true,
+  "attempts": [
+    {
+      "id": 1,
+      "cumulativeRequestId": 4,
+      "status": "returned",
+      "inputBytes": 725,
+      "inputTokens": 151,
+      "outputTokens": 185,
+      "elapsedMs": 2327,
+      "providerHttpStatus": 200,
+      "providerFinishReason": "stop",
+      "diagnostic": null
+    },
+    {
+      "id": 2,
+      "cumulativeRequestId": 5,
+      "status": "returned",
+      "inputBytes": 1872,
+      "inputTokens": 446,
+      "outputTokens": 405,
+      "elapsedMs": 2458,
+      "providerHttpStatus": 200,
+      "providerFinishReason": "stop",
+      "diagnostic": null
+    }
+  ],
+  "totals": {
+    "inputBytes": 2597,
+    "knownInputTokens": 597,
+    "knownOutputTokens": 590,
+    "unknownUsageAttempts": 0
+  },
+  "diagnostic": {
+    "stage": "node-selection",
+    "code": "model-output-validation",
+    "errorName": "Error",
+    "providerHttpStatus": 200,
+    "providerFinishReason": "stop",
+    "outputCapObserved": false
+  },
+  "executionStage": "node-selection",
+  "providerStep": "node-selection",
+  "failure": "admission-budget",
+  "answerPresent": false,
+  "answerSha256": null,
+  "answerContentNotPrinted": true,
+  "citations": [],
+  "passageLocators": [],
+  "retrievalHit": false,
+  "selectedSessionIds": [],
+  "sourcePins": 140,
+  "sourceDrift": [],
+  "all92RowsRetained": true,
+  "full92": false,
+  "auditDisposition": "Original checkpoint/audit/citations remain untouched; additive safe receipt only",
+  "qualityAcceptance": "HOLD: no human gold or independent semantic quality verdict"
+}

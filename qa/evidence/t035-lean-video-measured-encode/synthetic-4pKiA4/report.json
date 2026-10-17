@@ -1,0 +1,60 @@
+{
+  "status": "failed",
+  "startedAt": "2026-10-14T20:18:16.763Z",
+  "completedAt": "2026-10-14T20:18:17.653Z",
+  "error": "AssertionError [ERR_ASSERTION]: ffmpeg: Stream map '' matches no streams.\r\nTo ignore this, add a trailing '?' to the map.\r\nFailed to set value '0:a:0' for option 'map': Invalid argument\r\nError parsing options for output file C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t035-lean-video-measured-encode\\synthetic-4pKiA4\\synthetic-source.mp4.\r\nError opening output files: Invalid argument\r\n\n\n4294967274 !== 0\n",
+  "commands": [
+    {
+      "command": "ffmpeg",
+      "args": [
+        "-version"
+      ],
+      "elapsedMs": 802,
+      "status": 0
+    },
+    {
+      "command": "ffmpeg",
+      "args": [
+        "-n",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-filter_threads",
+        "1",
+        "-filter_complex_threads",
+        "1",
+        "-threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc2=size=640x360:rate=30:duration=12",
+        "-f",
+        "lavfi",
+        "-i",
+        "sine=frequency=440:sample_rate=48000:duration=12",
+        "-map",
+        "0:v:0",
+        "-map",
+        "0:a:0",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-threads",
+        "1",
+        "-b:v",
+        "2000k",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "96k",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t035-lean-video-measured-encode\\synthetic-4pKiA4\\synthetic-source.mp4"
+      ],
+      "elapsedMs": 85,
+      "status": 4294967274
+    }
+  ],
+  "logs": []
+}

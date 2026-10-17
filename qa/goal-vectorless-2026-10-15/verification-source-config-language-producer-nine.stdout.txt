@@ -1,0 +1,17 @@
+✔ missing config is explicit; supplied empty/malformed config fails closed (6.3197ms)
+✔ rejects malformed entries, unsafe URLs, aliases and resource overflow before access (1.477ms)
+✔ immutable inventory cannot change factory inputs; wrong tenant refuses before provider (5.4233ms)
+✔ real factory output preserves review-only literal evidence and truthful complete coverage (2.4995ms)
+✔ document routing metadata is not answerable without supported source proof (करियर सलाह) (15.2578ms)
+✔ message routing metadata is not answerable without supported source proof (admission kaise) (2.1665ms)
+✔ native pages preserve source distinctions, genuine pages, Unicode offsets and exact hashed bytes (4.6469ms)
+✔ empty pages emit nothing and whitespace remains exact source content (2.6383ms)
+✔ invalid bounds, identities, revisions, duplicate pages and broken Unicode refuse (2.5535ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2165.9203

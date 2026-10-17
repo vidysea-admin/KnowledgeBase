@@ -1,5 +1,5 @@
 // Bounded, ordered chunk delivery. A failed receiver ends capture instead of buffering hours.
-let recorder, stream, context, meterTimer, controlTimer, config;
+let recorder, nativeRecorder, stream, context, meterTimer, controlTimer, config;
 let queuedBytes = 0, sequence = 0, queue = Promise.resolve(), failed = false, finishing = false, starting = false;
 const MAX_QUEUE = 16 * 1024 * 1024;
 async function request(route, body, contentType = "application/json") {
@@ -14,6 +14,11 @@ async function stop() {
   if (finishing) return;
   finishing = true;
   clearInterval(meterTimer); clearInterval(controlTimer);
+  if (nativeRecorder) {
+    try { await nativeRecorder.stop({failed}); } catch (error) { failed = true; await event({event: "capture-error", error: error.message}).catch(() => {}); }
+    stream.getTracks().forEach(track => track.stop()); await context.close();
+    await event({event: "capture-stopped", failed}).catch(() => {}); return;
+  }
   if (recorder?.state !== "inactive") recorder?.stop();
 }
 async function fail(error) {
@@ -55,6 +60,13 @@ async function open(message) {
   audio.connect(analyser); audio.connect(context.destination);
   await context.resume();
   const samples = new Float32Array(analyser.fftSize);
+  if (config.native) {
+    const {openNativeRecorder} = await import(chrome.runtime.getURL("native-recorder.js"));
+    nativeRecorder = await openNativeRecorder({stream, context, config, request, fail});
+    recorder = {state: "recording"};
+    // Retain consent lifecycle wall time, never use it as decoded sample calibration.
+    await event({event: "capture-started", mimeType: "video/x-ivf+audio/s16le", mediaStartedAt: Date.now(), nativeQualification: "unavailable"});
+  } else {
   const mimeType = ["video/webm;codecs=vp8,opus", "video/webm"].find((m) => MediaRecorder.isTypeSupported(m));
   if (!mimeType) throw new Error("This browser cannot record WebM audio/video");
   recorder = new MediaRecorder(stream, {mimeType, videoBitsPerSecond: 500000, audioBitsPerSecond: 64000});
@@ -82,8 +94,13 @@ async function open(message) {
   stream.getTracks().forEach((track) => track.addEventListener("ended", () => {
     if (!finishing) void fail(new Error(`${track.kind} track ended unexpectedly`));
   }));
+  const mediaStartedAt = Date.now(); // Legacy wall clock only, never a decoded sample clock.
   recorder.start(2000);
-  await event({event: "capture-started", mimeType});
+  await event({event: "capture-started", mimeType, mediaStartedAt});
+  }
+  if (nativeRecorder) stream.getTracks().forEach(track => track.addEventListener("ended", () => {
+    if (!finishing) void fail(new Error(`${track.kind} track ended unexpectedly`));
+  }));
   meterTimer = setInterval(() => {
     analyser.getFloatTimeDomainData(samples);
     const peak = samples.reduce((max, value) => Math.max(max, Math.abs(value)), 0);

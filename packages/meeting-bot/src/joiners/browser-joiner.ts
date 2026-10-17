@@ -55,6 +55,7 @@ export interface RegistrationInput {
 export interface RegistrationResult {
   status: "submitted" | "uncertain" | "action_required";
   reason: string;
+  submissionDisposition?: "not-attempted";
 }
 export interface RegistrationBrowserConfig {
   python: string; joinScript: string; profileDir: string;
@@ -146,7 +147,9 @@ export async function registerInBrowser(input: RegistrationInput,
           if (ev?.event !== "registration-result") continue;
           count++;
           if (["submitted", "uncertain", "action_required"].includes(ev.status)
-            && typeof ev.reason === "string" && /^[a-z_]{1,64}$/.test(ev.reason)) result = {status: ev.status, reason: ev.reason};
+            && typeof ev.reason === "string" && /^[a-z_]{1,64}$/.test(ev.reason)
+            && (ev.submissionDisposition === undefined || (ev.status === "action_required" && ev.submissionDisposition === "not-attempted")))
+            result = {status: ev.status, reason: ev.reason, ...(ev.submissionDisposition === "not-attempted" ? {submissionDisposition: "not-attempted" as const} : {})};
           else invalid = true;
         } catch {
           // Text progress is compatible; a truncated result cannot revive an earlier success.

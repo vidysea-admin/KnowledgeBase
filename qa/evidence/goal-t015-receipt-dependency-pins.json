@@ -1,0 +1,38 @@
+[
+  {
+    "path": "scripts/lib/transcript-provenance.mjs",
+    "sha256": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301"
+  },
+  {
+    "path": "scripts/lib/turn-timing.mjs",
+    "sha256": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e"
+  },
+  {
+    "path": "scripts/webinar/session-rows.mjs",
+    "sha256": "3cc4de004a670f00683fa63a81627c2bde94c8c5416102cb66dc5995ba695401"
+  },
+  {
+    "path": "scripts/webinar/process-video.mjs",
+    "sha256": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7"
+  },
+  {
+    "path": "qa/evidence/goal-t015-source-pins.json",
+    "sha256": "8d3aba653ddeddecf54d0f4b1184991082918de0d08c87e2fe33ea5187e6a6fd"
+  },
+  {
+    "path": "qa/evidence/goal-t015-real-plan.json",
+    "sha256": "c6f643273dd4fda4d1067ce003c98907028ff32e660bdd14cb4a9b669d48bec1"
+  },
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-tests.json",
+    "sha256": "2df38b3367acdc381fe1c038fc2ba77153a94dea55937a9852c84afe05cb9acc"
+  },
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-plan.json",
+    "sha256": "d53b31b51cefdf675ab9cd8df3f986ce3d7ef28505cbc199ae320fb3633dd2e2"
+  },
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-validate.json",
+    "sha256": "57eb057431a117ec1f39d0309d40426144d1b86a3372220e067fc7c61b8a4edf"
+  }
+]

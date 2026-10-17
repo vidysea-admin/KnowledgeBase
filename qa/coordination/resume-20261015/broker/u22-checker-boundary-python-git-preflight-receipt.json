@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "-c",
+    "import sys,json,pathlib,subprocess; p=pathlib.Path(sys.argv[1]).resolve(); compile(p.read_bytes(),str(p),'exec'); args=json.loads(sys.argv[2]); head=subprocess.run([args[0],'rev-parse','HEAD'],check=True,capture_output=True,text=True,timeout=2).stdout.strip(); status=subprocess.run([args[0],'status','--porcelain','--untracked-files=normal','--',*args[1:]],check=True,capture_output=True,text=True,timeout=2).stdout; print(json.dumps({'python':sys.executable,'version':sys.version,'contractOrigin':str(p),'head':head,'status':status}))",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "[\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.EXE\", \"scripts/eval/extraction-review-resume.mjs\", \"scripts/eval/extraction-review-resume.test.mjs\"]"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad.json",
+    "sha256": "8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad",
+    "count": 23
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "CHECKER u22 aggregate only",
+  "pid": 30752,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.3440000000009604,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-python-git-preflight.log",
+    "sha256": "a76d9407d7586cf9e5f7006ff54bb00f2b41be5f45a5544f1aecf286dbf0c9d1"
+  },
+  "counts": {}
+}

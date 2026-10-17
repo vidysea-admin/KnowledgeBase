@@ -1,0 +1,33 @@
+{
+  "authority": "Umesh explicit human approval relayed by root in current2026-10-16 turn",
+  "approvedBy": "Umesh",
+  "host": "127.0.0.1:27029",
+  "mongoVersion": "8.0.34",
+  "databases": [
+    "lkb_staging",
+    "lkb_t059_acceptance"
+  ],
+  "replicaSet": "lkbAcceptance",
+  "syntheticOnly": true,
+  "freshPrivateFolder": true,
+  "authenticationRequired": true,
+  "temporaryBootstrapAdminMetadata": true,
+  "maximumWallSeconds": 900,
+  "jobCpuPercent": 10,
+  "jobCommitMemoryBytes": 1073741824,
+  "ownedShutdownCleanupRequired": true,
+  "unsupportedControlsOrUAC": "STOP",
+  "explicitExceptions": [
+    "D143 existing provided-server restriction",
+    "D173 host activation restriction, this bounded scope only"
+  ],
+  "forbidden": [
+    "existingMongo modifications",
+    "production writes",
+    "existing.env edits",
+    "service/system configuration changes",
+    "real/private corpus copy"
+  ],
+  "decisionDraft": "D178 reserved, not yet appended",
+  "activationReady": false
+}

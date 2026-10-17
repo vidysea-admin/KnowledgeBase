@@ -30,6 +30,8 @@ FROM manifests AS build
 RUN pnpm install --frozen-lockfile
 COPY packages ./packages
 COPY apps/api ./apps/api
+COPY schema ./schema
+COPY scripts/eval/extraction-authorized-import.mjs ./scripts/eval/extraction-authorized-import.mjs
 RUN pnpm --filter @lkb/api build
 
 # Production-only install for @lkb/api and what it depends on. The bundle keeps real npm packages

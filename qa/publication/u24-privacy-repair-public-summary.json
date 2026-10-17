@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "unit": "u24-profile-privacy-repair",
+  "scope": "synthetic privacy regressions; full parent acceptance pending",
+  "sourceHashes": {
+    "apps/api/src/speaker-profiles/store.ts": "A57C28DB9DDEDC697669158B3B352C5C773592F607458DDFDB4E1427B57CB449",
+    "apps/api/src/speaker-profiles/store.test.ts": "1993644948C2CE298D2F0AE267420154F72D6C18D58A8FD87605C2A7401F59F0",
+    "apps/api/src/knowledge/metadata-visibility.ts": "22BB063B8AC6C46E5D25730CCE44C3DADD59F1A5A1B9CDEE6E641EE6C15C7447",
+    "packages/db/src/lib/tenantScope.ts": "C596FE4C7815A8C44AF31B7590988D3B9C011874991C19B7D2F0DEAEE8FCF443"
+  },
+  "measurements": [
+    {
+      "scope": "original six regressions and two SDK-interface controls",
+      "fail": 0,
+      "receiptSha256": "9990e7208b80ecf5ad24358c39c43232df81e096241dc4552a987930f2506815",
+      "skip": 0,
+      "countDerivativeSha256": "7049a432ddd8ac326719a75330a668228b48e53657ea142b427d4717d7e178bb",
+      "unchangedPins": 17,
+      "pass": 8,
+      "withdrawalTriggersObserved": true,
+      "originalBodiesPreserved": true
+    },
+    {
+      "scope": "mixed eligibility privacy regression and healthy control",
+      "skip": 0,
+      "pass": 2,
+      "receiptSha256": "35c3101e64a704777e8cd8eccd47c7a41238a6009c356f7c1c6338bbc3080f6b",
+      "unchangedPins": 12,
+      "fail": 0
+    },
+    {
+      "scope": "independent attribute provenance privacy regression and healthy control",
+      "skip": 0,
+      "pass": 2,
+      "receiptSha256": "db8db5c9c9a6f4f9f76b22b3e54e96e00250ddafb61b5ab36051c195d593e79a",
+      "unchangedPins": 13,
+      "fail": 0
+    },
+    {
+      "scope": "original seven affected store regressions and four helper additions",
+      "skip": 0,
+      "pass": 11,
+      "receiptSha256": "223bf20d9797f455b12e5edb6ec455e12122901a752f11da8e6c6be457016404",
+      "unchangedPins": 11,
+      "fail": 0
+    }
+  ],
+  "coherence": {
+    "scope": "executed working-tree input snapshot",
+    "checkpointSha256": "53a5cfb891daa746f88dc6ab8068ab9a3f6a3e89b4fcafe48247380ba504c9ee",
+    "inputCount": 1951,
+    "inputDrift": 0,
+    "apiTypesExit": 0,
+    "webTypesExit": 0,
+    "apiBuildExit": 0,
+    "webBuildExit": 0,
+    "exactCommitBuildVerified": false
+  },
+  "realMongoSnapshotSemantics": "unverified",
+  "parentAcceptance": "pending",
+  "externalPublication": "not authorized; no push performed",
+  "fieldSpecificContributorProbe": "two current cases passed",
+  "recordedFloorPassed": 19,
+  "additionalHelperCasesPassed": 4
+}

@@ -1,0 +1,79 @@
+{
+  "outcomes": [
+    {
+      "name": "managed-review/1 admission",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "unsupported provider refuses before invocation",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "actual_total mixed units refuse",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "cumulative retry accounting",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "protected completion reserve refuses review overdraw",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "exhaustion refuses further admission",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "committed finalization refuses new allocation",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "reuse candidate mismatch refuses",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "launcher startup allowance refuses offline",
+      "outcome": "PASS",
+      "duration_s": 0.03099999999994907
+    },
+    {
+      "name": "launcher missing native control fails closed",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    },
+    {
+      "name": "managed admission refuses history reset",
+      "outcome": "PASS",
+      "duration_s": 0.015000000000100044
+    },
+    {
+      "name": "canonical raw bytes unchanged",
+      "outcome": "PASS",
+      "duration_s": 0.0
+    }
+  ],
+  "passed": 12,
+  "failed": 0,
+  "command_active_s": 0.359000000000151,
+  "maker_full_active_s": null,
+  "maker_actual_total_tokens": null,
+  "ratio_status": "UNVERIFIED; synthetic fixtures prove arithmetic only",
+  "git_head": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "git_exit": 0,
+  "canonical_unchanged": true,
+  "missing": [
+    "Live provider/control/startup validation excluded by authorization",
+    "Full maker and checker comparable runtime token telemetry unavailable",
+    "Independent checker verdict remaining",
+    "Repository-wide integration and pipeline sample checks not applicable to offline global helper validation"
+  ]
+}

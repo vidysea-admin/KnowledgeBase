@@ -1,0 +1,12 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+    "lines": 68,
+    "sha256": "9d96c19b487710be597a49136b02ee5d4910cc0addb6678ea408c1a36071f10b"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "lines": 163,
+    "sha256": "a125bb23755d9f51fb496b67bb0993415e3f2decec13949c9b8455cfef7db877"
+  }
+]

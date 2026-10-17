@@ -1,0 +1,51 @@
+{
+  "unit": "source-delivery-registration-retry",
+  "cycle": 1,
+  "tier": 3,
+  "status": "REQUESTED_ROOT_BROKER_ONLY",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "existingManifest": "qa/manifests/source-delivery-registration-retry.md",
+  "existingPacket": "qa/packets/source-delivery-registration-retry.md",
+  "policy": "Retain active existing unit policy and historical usage; no replacement packet or checker launch",
+  "pinsStableSinceReconciliation": true,
+  "drift": [],
+  "reuse": {
+    "pythonResult": "1 passed / 15 deselected, exit 0, 3182.7639 ms",
+    "python": "qa/goal-vectorless-2026-10-15/verification-registration-retry-python.json",
+    "node": "qa/goal-vectorless-2026-10-15/verification-registration-retry-node.json",
+    "basis": "All recorded source/dependency pins, executable hashes, command vectors and environment whitelist hashes matched at reconciliation. These remain maker evidence only.",
+    "nodeResult": "16/16 passed, exit 0, 3499.9275 ms"
+  },
+  "requests": [
+    {
+      "kind": "missing-focused-state-regression",
+      "program": "C:/Program Files/nodejs/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--import",
+        "tsx",
+        "--test-name-pattern=^registration attempt round-trips strictly and confirmation requires unique matching evidence$",
+        "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+      ],
+      "timeoutMs": 30000,
+      "reason": "Only existing missing focused node for durable receipt round-trip and strict invalid phase/hash/extra-field refusal; registration workflow and child process nodes already green",
+      "preflight": "Root broker validates source/import containment, existing dependencies and writable temporary parent before execution",
+      "knownFixtureGap": "Existing confirmation fixture at schedule-state.test.ts:46 lacks receivedAt. Current freshRegistrationConfirmation requires it; later confirmed.phase assertion may fail independently of receipt round-trip. Preserve and report this outcome; do not weaken the freshness barrier."
+    }
+  ],
+  "sharedRootGates": [
+    "Reuse matching existing meeting-bot compiler receipt or run existing direct compiler under root integration grant",
+    "Reuse matching frozen-contract verifier receipt or execute once under root integration grant"
+  ],
+  "exclusions": [
+    "No repeat Node/Python greens",
+    "No real browser/registration/provider/database",
+    "No checker dispatch until runtime released",
+    "No source edits or tracker edits"
+  ],
+  "tokens": null,
+  "token_metric": "actual_total",
+  "cost": null,
+  "createdAt": "2026-10-15T20:08:12.4176327Z"
+}

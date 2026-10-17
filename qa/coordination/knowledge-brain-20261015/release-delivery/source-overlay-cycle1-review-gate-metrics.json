@@ -1,0 +1,81 @@
+{
+  "unit": "source-overlay",
+  "cycle": 1,
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "source-overlay-checker-prior-cycles-runtime-baseline",
+      "active_s": null,
+      "tokens": 587634,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 120
+      },
+      "token_scope": "Dedicated checker lifetime cumulative as prospective same-thread baseline; not fabricated phase attribution",
+      "baseline": "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-cycle1-runtime-baseline.json"
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 50,
+    "tokens": 100000,
+    "cost": null
+  },
+  "completion_reserve": false,
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "bootstrap_scope": "Source-overlay cycle1 bounded repair review only. Maker whole-unit usage unknown. Prior120 seconds committed; historical3000 output allocation is distinct from actual input-plus-output tokens. Admission does not authorize dispatch before eleven plus two green receipts.",
+  "escalation": {
+    "authority": "Root explicit cycle1-only local finite exception and manual reserve grant",
+    "reason": "Runtime total-token accounting corrects prior output-only allocations; preserve587634 actual prior total and120s committed. Add250000 actual input-plus-output tokens and80s, with external protected finalization reserve; helper fixed800-token reserve cannot represent this grant. No global helper change.",
+    "limits": {
+      "active_s": 200,
+      "tokens": 837634,
+      "cost": null
+    }
+  },
+  "output_allocations": {
+    "prior_committed": 3000,
+    "incremental_review": 1200,
+    "incremental_finalization": 800,
+    "incremental_total": 2000,
+    "unit": "output tokens; not helper actual-total-token allocations or actual usage"
+  },
+  "external_manual_reserve": {
+    "authority": "Root explicit local manual reserve exception, source-overlay cycle1 only",
+    "helper_protected": false,
+    "helper_status_expected": "legacy_unreserved",
+    "finalization": {
+      "active_s": 30,
+      "actual_total_tokens": 150000,
+      "output_allocation": 800
+    },
+    "review": {
+      "active_s": 50,
+      "actual_total_tokens": 100000,
+      "output_allocation": 1200
+    },
+    "enforcement": "Preserve finalization allocation outside helper; assess each material phase against cumulative charges; no review dispatch until eleven plus two green receipts."
+  },
+  "baseline_metadata": {
+    "path": "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-cycle1-runtime-baseline.json",
+    "sha256": "1c0153bcecfc4862a929a2060bd8a11ec85b3b37dbedae66ffb5ef59f75fa4a3",
+    "observed_at": "2026-10-15T10:53:48.1900114+00:00",
+    "usage_timestamp": "2026-10-15T10:48:23.549Z",
+    "idle_confirmed_task_complete": "2026-10-15T10:48:23.586Z",
+    "input_tokens": 584163,
+    "output_tokens": 3471,
+    "total_tokens": 587634,
+    "cached_input_tokens": 531328,
+    "cached_tokens_already_subset_of_input": true
+  },
+  "review_dispatch_status": "not dispatched; awaiting eleven plus two green receipts",
+  "actual_active_seconds": null,
+  "maker_unit_usage": null
+}

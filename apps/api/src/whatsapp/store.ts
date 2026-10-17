@@ -147,11 +147,14 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
       // D-136 (pending append): the stored id is tenantSourceId(tenant, hash). Until migration
       // 20261012150000-tenant-scoped-source-ids has run, this tenant's row may still sit under the
       // legacy bare-hash _id; a write under the new id would then trip the unique {tenantId, hash}
-      // index, so the legacy row is reused (both forms are read) and rewritten in place.
+      // index, so the legacy row is reused (both forms are read).
       const sourcesColl = scopedCollection<Sources>(appDb(), "sources")(tenantId);
       const legacy = await sourcesColl.findOne({ _id: source.hash });
       const storedSource: Sources = legacy ? { ...source, _id: source.hash } : source;
-      await sourcesColl.replaceOne({ _id: storedSource._id }, storedSource, { upsert: true });
+      // Source authority belongs to the owner, not this periodic import. Initialize
+      // atomically; an existing row (including a concurrent withdrawal) must retain
+      // its consent and any future authorization metadata unchanged.
+      await sourcesColl.updateOne({ _id: storedSource._id }, { $setOnInsert: storedSource }, { upsert: true });
 
       // IDs, session date and turns consume the same frozen authorized message snapshot.
       const turns = await whatsAppSource.toTurns(source);

@@ -16,6 +16,9 @@ export interface AuditEntry {
   provider?: string;
   model?: string;
   costUsd?: number;
+  costStatus?: "unknown" | "reported";
+  inputTokens?: number;
+  outputTokens?: number;
   /** D-153 (pending append): structured warning, the scoped turns excluded for failing row validation. */
   excludedTurns?: { sessionId: string; turnId: string; reason: string }[];
 }

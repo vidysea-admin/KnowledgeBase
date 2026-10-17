@@ -1,0 +1,9 @@
+✔ native read-view document getter stays tenant scoped on the supplied view without base DB fallback (7.8715ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1756.9672

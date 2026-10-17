@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { sendBotNow } from "../../api/send-now.js";
 import { ApiError } from "../../api/client.js";
 import { useSendNowStatus } from "./useSendNowStatus.js";
+import { ManualJobsSection } from "./ManualJobsSection.js";
 
 const MAX_AHEAD_MS = 24 * 60 * 60 * 1000;
 
@@ -47,6 +48,8 @@ export function SendNowForm({ apiKey }: { apiKey: string | null }): React.ReactE
   const [busy, setBusy] = useState(false), [denied, setDenied] = useState(false);
   const [outcome, setOutcome] = useState<Outcome>(null);
   const [job, setJob] = useState<{ key: string | null; id: string } | null>(null);
+  const [jobsRefresh, setJobsRefresh] = useState(0);
+  const [showJobs, setShowJobs] = useState(false);
   const inFlight = useRef(false);
   const owner = useRef({ key: apiKey, generation: 0 });
   if (owner.current.key !== apiKey) owner.current = { key: apiKey, generation: owner.current.generation + 1 };
@@ -69,7 +72,7 @@ export function SendNowForm({ apiKey }: { apiKey: string | null }): React.ReactE
       setOutcome(r?.status === "launching" && id
         ? { kind: "ok", text: `Launching (job id ${id}). The launcher has started; the bot has not joined yet.` }
         : { kind: "error", text: "The server answered without a job id. No bot was confirmed." });
-      if (r?.status === "launching" && id) setJob({ key: apiKey, id });
+      if (r?.status === "launching" && id) { setJob({ key: apiKey, id }); setJobsRefresh(value => value + 1); }
     } catch (e) {
       if (generation !== owner.current.generation) return;
       const o = describe(e);
@@ -91,5 +94,7 @@ export function SendNowForm({ apiKey }: { apiKey: string | null }): React.ReactE
     {outcome && <p role={outcome.kind === "ok" ? "status" : "alert"}>{outcome.kind === "ok" && progress
       ? `Launch accepted (job id ${job?.id}). Meeting admission is unknown.` : outcome.text}</p>}
     {progress && <p role="status">{progress}</p>}
+    <button type="button" onClick={() => setShowJobs(value => !value)}>{showJobs ? "Hide manual jobs" : "Manage manual jobs"}</button>
+    {showJobs && <ManualJobsSection apiKey={apiKey} refresh={jobsRefresh} />}
   </section>;
 }

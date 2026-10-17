@@ -18,6 +18,7 @@ import { createHash } from "node:crypto";
 import { lstatSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { isPlain } from "../strict-record.js";
+import { isTenantRetentionSummary, readRetentionBytes, requirePhysicalDirectories } from "./production/private-summary-read.js";
 import type { ReportOptions } from "./retention-report-args.js";
 import { NO_MEDIA, REAL_IO, probeMedia, type MediaEvidence, type MediaIo } from "./retention-report-media.js";
 
@@ -93,8 +94,19 @@ export function gatherState(opts: ReportOptions, io: MediaIo = REAL_IO): GatherR
   try {
     if (!lstatSync(opts.dataRoot).isDirectory() || !lstatSync(tenantDir).isDirectory()) throw new Error("not a directory");
     const entries = readdirSync(tenantDir, { withFileTypes: true });
-    names = entries.filter((d) => d.isDirectory() && SESSION_NAME.test(d.name)).map((d) => d.name).sort();
+    const operational = (name: string): boolean => {
+      if (name !== "retention") return false;
+      try {
+        const dir = join(tenantDir, name); requirePhysicalDirectories(dir);
+        const files = readdirSync(dir, { withFileTypes: true });
+        if (files.some(file => !file.isFile() || !/^last-run\.json(?:\.lock|\.[0-9a-f-]{36}\.tmp)?$/.test(file.name))) return false;
+        return isTenantRetentionSummary(JSON.parse(readRetentionBytes(join(dir, "last-run.json"), 16_384).toString("utf8")), opts.tenant);
+      } catch { return false; }
+    };
+    const operationalNames = new Set(entries.filter(d => d.isDirectory() && operational(d.name)).map(d => d.name));
+    names = entries.filter((d) => d.isDirectory() && SESSION_NAME.test(d.name) && !operationalNames.has(d.name)).map((d) => d.name).sort();
     for (const d of entries) {
+      if (operationalNames.has(d.name)) continue;
       if (d.isDirectory() && SESSION_NAME.test(d.name)) continue;
       skipped.push({ path: `${tenantSegment(opts.tenant)}/${d.name}`, why: d.isDirectory() ? "directory name not accepted as a session" : "not a plain session directory (file, link or junction)" });
     }

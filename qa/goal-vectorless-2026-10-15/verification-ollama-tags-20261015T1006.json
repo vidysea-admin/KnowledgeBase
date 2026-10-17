@@ -1,0 +1,36 @@
+{
+  "phase": "authorized-live-metadata-only",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "qa/evidence/ollama-live-preflight/preflight.mts"
+  ],
+  "executionContext": "use_default sandbox; single attempt; no network fallback",
+  "startedAt": "2026-10-15T08:50:57.0774266Z",
+  "completedAt": "2026-10-15T08:50:57.5550315Z",
+  "elapsedMs": 434.7497,
+  "exitCode": 1,
+  "timedOut": false,
+  "failure": "ExecutionOrCapabilityUnknown",
+  "helperBefore": "7F13156F431730E47DCBE8398AE7BB0F94D6E81C6DBC8B7347717D64E9A0988F",
+  "helperAfter": "7F13156F431730E47DCBE8398AE7BB0F94D6E81C6DBC8B7347717D64E9A0988F",
+  "lockHash": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD",
+  "requestedModels": [
+    {
+      "modelId": "glm-5.3-flash",
+      "available": null
+    },
+    {
+      "modelId": "deepseek-v4.1-flash",
+      "available": null
+    }
+  ],
+  "generationCalls": 0,
+  "embeddingCalls": 0,
+  "maximumHttpResponseBytes": 262144,
+  "httpTimeoutMs": 10000,
+  "outerTimeoutMs": 20000,
+  "rawErrorsSuppressed": true,
+  "stdoutPath": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\goal-vectorless-2026-10-15\\verification-ollama-tags-20261015T1006.stdout.json"
+}

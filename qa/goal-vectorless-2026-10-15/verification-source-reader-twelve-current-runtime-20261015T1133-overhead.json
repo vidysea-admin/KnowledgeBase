@@ -1,0 +1,6 @@
+{
+  "testCommandMs": 5979.3584,
+  "aggregateFingerprintIdentityReceiptOverheadMs": 2492.5443999999998,
+  "closurePreparation": "source-reader-closure-overhead.json",
+  "setupMs": 742.5334
+}

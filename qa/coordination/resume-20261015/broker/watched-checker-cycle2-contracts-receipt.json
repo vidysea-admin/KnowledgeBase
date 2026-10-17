@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "contracts/verify_contracts.py",
+    "--repo-root",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af.json",
+    "sha256": "85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af",
+    "count": 23
+  },
+  "beforeMatch": true,
+  "checkerAccounting": true,
+  "maxJobSeconds": 15,
+  "pid": 16804,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.21900000000096043,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-contracts.log",
+    "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8"
+  },
+  "counts": {}
+}

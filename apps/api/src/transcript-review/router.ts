@@ -1,5 +1,5 @@
 /**
- * apps/api/src/transcript-review/router.ts - T-054 durable transcript corrections (NOT mounted in server.ts).
+ * apps/api/src/transcript-review/router.ts - T-054 durable transcript corrections.
  *   GET  /sessions/:sessionId/transcript-review            effective transcript + revision; `ETag: "<revision>"`
  *   POST /sessions/:sessionId/transcript-review            commit corrections; needs `If-Match: "<revision>"` AND body.expectedRevision
  *   GET  /sessions/:sessionId/transcript-review/history    append-only revision history (who/when/why/before/after)
@@ -12,11 +12,17 @@
  * until the refresh endpoint (or an operator) has actually run every target.
  */
 import { Router, type Request, type Response } from "express";
+import { createHash } from "node:crypto";
 import { requireScope } from "../auth.js";
-import { commitReview, loadReview, ReviewServiceError, runRefresh, type RefreshExecutor } from "./service.js";
+import { commitReview, loadReview, loadReviewHistory, ReviewServiceError, runRefresh, type RefreshExecutor } from "./service.js";
 import type { ReviewStore } from "./store.js";
 
-export interface TranscriptReviewDeps { store: ReviewStore; refresh?: RefreshExecutor; clock?: () => string }
+export interface TranscriptReviewDeps {
+  store: ReviewStore; refresh?: RefreshExecutor; clock?: () => string;
+  /** Trusted server-side eligibility. Production MUST bind its source visibility perimeter;
+   * omission exists only for independently injected fixtures/capabilities. Never client-controlled. */
+  authorizeSession?: (tenantId: string, sessionId: string) => Promise<boolean>;
+}
 
 const SESSION_ID = /^[A-Za-z0-9][A-Za-z0-9._:@-]{0,399}$/;
 const IF_MATCH = /^"([A-Za-z0-9._:-]{1,400})"$/;
@@ -51,13 +57,26 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
   const path = "/sessions/:sessionId/transcript-review";
   const badId = (res: Response): void => send(res, 400, { error: "invalid_id", message: "Invalid session id" });
 
+  // Prefix middleware covers snapshot, history, commit and refresh BEFORE any store access
+  // or precondition state. Ordinary sessions scope does not grant raw quarantined chat review.
+  router.use(path, requireScope("sessions"), async (req, res, next) => {
+    const sessionId = req.params.sessionId as string;
+    if (!SESSION_ID.test(sessionId)) return badId(res);
+    try {
+      if (deps.authorizeSession && !await deps.authorizeSession(tenantOf(req), sessionId)) {
+        send(res, 404, { error: "not_found", message: "Transcript review not found" }); return;
+      }
+      next();
+    } catch (error) { fail(res, error); }
+  });
+
   router.get(path, requireScope("sessions"), async (req, res) => {
     const sessionId = req.params.sessionId as string;
     if (!SESSION_ID.test(sessionId)) return badId(res);
     try {
-      const { snapshot, refresh } = await loadReview(deps.store, tenantOf(req), sessionId);
+      const { snapshot, refresh, orphanedTurnIds } = await loadReview(deps.store, tenantOf(req), sessionId);
       send(res, 200, {
-        sessionId, revision: snapshot.revision, refresh: refresh?.status ?? "complete",
+        sessionId, revision: snapshot.revision, refresh: refresh?.status ?? "complete", orphanedTurnIds,
         turns: snapshot.turns.map((t) => ({ _id: t._id, text: t.text, speakerRef: t.speakerRef, tStart: t.tStart, tEnd: t.tEnd, ...(t.speakerLabel !== undefined ? { speakerLabel: t.speakerLabel } : {}) })),
       }, snapshot.revision);
     } catch (e) { fail(res, e); }
@@ -76,7 +95,10 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
       const tenantId = tenantOf(req);
       const { snapshot } = await loadReview(deps.store, tenantId, sessionId);
       if (snapshot.revision !== m[1]) { send(res, 412, { error: "precondition_failed", message: "Transcript changed; reload before saving", currentRevision: snapshot.revision }, snapshot.revision); return; }
-      const receipt = await commitReview(deps.store, { tenantId, sessionId, actorRef: `apikey:${tenantId}`, now: now(), request: body });
+      const verifiedBearer = /^Bearer\s+(.+)$/i.exec(req.header("authorization") ?? "")?.[1];
+      if (!verifiedBearer) throw new Error("Missing verified principal");
+      const keyIdentity = createHash("sha256").update(JSON.stringify([tenantId, verifiedBearer])).digest("hex");
+      const receipt = await commitReview(deps.store, { tenantId, sessionId, actorRef: `apikey:${keyIdentity}`, now: now(), request: body });
       send(res, 200, receipt, receipt.revision);
     } catch (e) { fail(res, e); }
   });
@@ -86,8 +108,7 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
     if (!SESSION_ID.test(sessionId)) return badId(res);
     try {
       const tenantId = tenantOf(req);
-      await loadReview(deps.store, tenantId, sessionId); // 404 for a transcript that is not this tenant's
-      const rows = await deps.store.listRevisions(tenantId, sessionId);
+      const rows = await loadReviewHistory(deps.store, tenantId, sessionId);
       send(res, 200, { sessionId, revisions: rows.map((r) => ({ revision: r.revision, parentRevision: r.parentRevision, actorRef: r.actorRef, reviewedAt: r.reviewedAt, reason: r.reason, changes: r.changes })) });
     } catch (e) { fail(res, e); }
   });
@@ -98,7 +119,13 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
     if (!deps.refresh) { send(res, 503, { error: "refresh_unavailable", message: "No refresh executor is configured" }); return; }
     try {
       const tenantId = tenantOf(req);
-      await loadReview(deps.store, tenantId, sessionId);
+      const loaded = await loadReview(deps.store, tenantId, sessionId);
+      const header = req.header("if-match");
+      if (header !== undefined) {
+        const m = IF_MATCH.exec(header);
+        if (!m) { send(res, 400, { error: "invalid_request", message: "Refresh requires one strong quoted revision" }); return; }
+        if (m[1] !== loaded.snapshot.revision) { send(res, 412, { error: "precondition_failed", message: "Transcript changed; reload before refreshing" }); return; }
+      }
       await runRefresh(deps.store, deps.refresh, tenantId, sessionId);
       // Report what is durably stored now (a superseded run reports the NEWER revision's state, never its own).
       const state = (await deps.store.head(tenantId, sessionId))?.refresh;

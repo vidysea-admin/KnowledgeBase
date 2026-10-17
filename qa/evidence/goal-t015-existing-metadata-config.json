@@ -1,0 +1,41 @@
+{
+  "tenantId": "toc",
+  "seed": "t015-existing-metadata-closure-v1",
+  "sessions": [
+    "2026-04-21-visa-blueprint-part2-italy-france-nz",
+    "2026-05-08-funding-dreams-loans-forex",
+    "2026-05-20-telling-your-brand-story-better",
+    "2026-05-22-uniaccess-xavier-university",
+    "2026-05-23-uniaccess-atlas-skilltech",
+    "2026-05-28-in-focus-1",
+    "2026-05-29-decoding-ever-expanding-cast",
+    "2026-06-03-dual-enrollment-pathway",
+    "2026-06-19-entrance-exams-pathways-india-part1",
+    "2026-06-25-in-focus-2",
+    "2026-06-30-exploring-identity-success-counseling",
+    "2026-07-03-inside-the-uc-session",
+    "2026-07-08-beyond-black-robes-law-careers",
+    "2026-07-15-creative-futures",
+    "2026-07-22-uniaccess-cept-university",
+    "2026-07-28-metrics-and-mingling",
+    "2026-07-30-in-focus-3",
+    "2026-08-03-uk-beyond-offer-letters",
+    "2026-08-03-uk-beyond-offer-letters-reupload",
+    "2026-08-10-ucas-what-changed-what-matters",
+    "2026-08-12-uniaccess-ashoka-university",
+    "2026-08-24-uniaccess-leeds-arts-university",
+    "2026-08-27-in-focus-4",
+    "2026-09-02-india-test-series-part2",
+    "2026-09-09-global-test-prep-pathways",
+    "2026-09-16-pathways-in-psychology",
+    "2026-09-21-uniaccess-japan",
+    "2026-09-24-in-focus",
+    "2026-09-24-zoho-next-european-study-destinations"
+  ],
+  "relatedGroups": [
+    [
+    "2026-08-03-uk-beyond-offer-letters",
+    "2026-08-03-uk-beyond-offer-letters-reupload"
+    ]
+  ]
+}

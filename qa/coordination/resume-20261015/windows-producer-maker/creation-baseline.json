@@ -1,0 +1,27 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-capture-clock.ts",
+    "existed_before": false,
+    "backup": "not-applicable-new-file"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-capture-clock.test.ts",
+    "existed_before": false,
+    "backup": "not-applicable-new-file"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/main.cpp",
+    "existed_before": false,
+    "backup": "not-applicable-new-file"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/CMakeLists.txt",
+    "existed_before": false,
+    "backup": "not-applicable-new-file"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/README.md",
+    "existed_before": false,
+    "backup": "not-applicable-new-file"
+  }
+]

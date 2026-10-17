@@ -1,0 +1,232 @@
+{
+  "checkedAt": "2026-10-14T21:47:51.9751529+00:00",
+  "sourceReceipt": "qa/evidence/goal-t051checker-broker-t040-product-independent.json",
+  "sourceReceiptSHA256": "2491B79BA55AA6CB63C88C2D17A81F9D44A233D6E4A5DD505681BBBCCB583AE3",
+  "cycle": 0,
+  "count": 37,
+  "mismatches": 0,
+  "pins": [
+    {
+      "path": "apps/api/src/grounded-postprocessing/composition.ts",
+      "expected": "062418e35ac9a13daa92a91394d170ea2e391f4eaa585b3ddf40d0e50a8997ec",
+      "actual": "062418e35ac9a13daa92a91394d170ea2e391f4eaa585b3ddf40d0e50a8997ec",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/composition.test.ts",
+      "expected": "02e8a98039bfa4c254b6b98adf5071963b72c2d1447b5b39981f07d6e6f838bc",
+      "actual": "02e8a98039bfa4c254b6b98adf5071963b72c2d1447b5b39981f07d6e6f838bc",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/fixture.testsupport.ts",
+      "expected": "2d1c3f5e42dfa1e3ab4d8bd168df02626c42f15845671dfd24f4b996dd7e91af",
+      "actual": "2d1c3f5e42dfa1e3ab4d8bd168df02626c42f15845671dfd24f4b996dd7e91af",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "expected": "420bab2515ac064229bba4dd10a99fa8484ba62263daca35486a019d72043fcd",
+      "actual": "420bab2515ac064229bba4dd10a99fa8484ba62263daca35486a019d72043fcd",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/transcripts.ts",
+      "expected": "0a611b32fc952f75fd3dcb80bdf9eaacf493f06fda08caca62532fa47e48bc62",
+      "actual": "0a611b32fc952f75fd3dcb80bdf9eaacf493f06fda08caca62532fa47e48bc62",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "expected": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+      "actual": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "expected": "b48ebb3a0e5e2d65ce2004d939e8c3bac11610cdcd410ebf5ee936851102de79",
+      "actual": "b48ebb3a0e5e2d65ce2004d939e8c3bac11610cdcd410ebf5ee936851102de79",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/grounded-write.ts",
+      "expected": "bd0d5a06920ebf1f831ec542e67c6d1b5a16788ac794ea9ef2a7746e26b29886",
+      "actual": "bd0d5a06920ebf1f831ec542e67c6d1b5a16788ac794ea9ef2a7746e26b29886",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/evidence-tuples.ts",
+      "expected": "d5b705274bfb535af848d1bc15167663c132c6a78f0fd7d2d2f6aebfc5287f1f",
+      "actual": "d5b705274bfb535af848d1bc15167663c132c6a78f0fd7d2d2f6aebfc5287f1f",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/db-name.ts",
+      "expected": "8aecc3782e05724f70633e004bbfe8041ef0e75ee4793bc4629c175e02bf83c6",
+      "actual": "8aecc3782e05724f70633e004bbfe8041ef0e75ee4793bc4629c175e02bf83c6",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-content/reader.ts",
+      "expected": "516999564683e533760dc91b6dd83e9615600e90fb3f3a71a7da75e04204cf12",
+      "actual": "516999564683e533760dc91b6dd83e9615600e90fb3f3a71a7da75e04204cf12",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-content/router.ts",
+      "expected": "d645d47b9d4b8c776a329a6258efe5c1f11689986999ee7ee1a2009c12430517",
+      "actual": "d645d47b9d4b8c776a329a6258efe5c1f11689986999ee7ee1a2009c12430517",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/store.ts",
+      "expected": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+      "actual": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "expected": "295ccf510edf1006e1f9f77bb31fe66a24662e4a722f30cc9143457aa2794865",
+      "actual": "295ccf510edf1006e1f9f77bb31fe66a24662e4a722f30cc9143457aa2794865",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "expected": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+      "actual": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.ts",
+      "expected": "40b3afc65279c0072cba70755ed9ef8f853bab559418ff05c997c7a4a786ac57",
+      "actual": "40b3afc65279c0072cba70755ed9ef8f853bab559418ff05c997c7a4a786ac57",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+      "expected": "ebe3def7a4f586e87aa1d9bcf389f5307e368318fdbb0a28180d189052887a1e",
+      "actual": "ebe3def7a4f586e87aa1d9bcf389f5307e368318fdbb0a28180d189052887a1e",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/transaction-db.ts",
+      "expected": "36d426bdda02c6d291be4af381701c182da8954a6d6c0a9f206783aab0f8e343",
+      "actual": "36d426bdda02c6d291be4af381701c182da8954a6d6c0a9f206783aab0f8e343",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "expected": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+      "actual": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "expected": "db0a05d657e0929b766cbd7acf6a9d64cc1226d4fbfdffab2ca26ef62cba0ff0",
+      "actual": "db0a05d657e0929b766cbd7acf6a9d64cc1226d4fbfdffab2ca26ef62cba0ff0",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/grounded-summary.ts",
+      "expected": "58a92a2d4040b40874567dda6d0f132be46196f3c176e1eda92ee8c99a7230a8",
+      "actual": "58a92a2d4040b40874567dda6d0f132be46196f3c176e1eda92ee8c99a7230a8",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/claims.ts",
+      "expected": "08c5bec39767b8773ccc2f10ce9b948b87e12ec4bad9e5a20d7396801c808c67",
+      "actual": "08c5bec39767b8773ccc2f10ce9b948b87e12ec4bad9e5a20d7396801c808c67",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/quote/quote-token-rule.ts",
+      "expected": "7a0c4a523eb078d48b639197e30311350ca6886cbea51d4149766a886c58ea49",
+      "actual": "7a0c4a523eb078d48b639197e30311350ca6886cbea51d4149766a886c58ea49",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/judge.ts",
+      "expected": "ca8dfbd7c5390e7289a1f1557732f796b05a2dfa44a8b20a3eec0f430ab005fd",
+      "actual": "ca8dfbd7c5390e7289a1f1557732f796b05a2dfa44a8b20a3eec0f430ab005fd",
+      "matches": true
+    },
+    {
+      "path": "packages/ai/src/router.ts",
+      "expected": "d11d783c88f24bc159d54f033f2a8c0c6129b2e7100474e839c270953dcd8f71",
+      "actual": "d11d783c88f24bc159d54f033f2a8c0c6129b2e7100474e839c270953dcd8f71",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/eligible-tree.ts",
+      "expected": "040dc797ce8ccf404eb1d5b4c68eb629cdb6f58298491da5d9f2c00091fc454e",
+      "actual": "040dc797ce8ccf404eb1d5b4c68eb629cdb6f58298491da5d9f2c00091fc454e",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "expected": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada",
+      "actual": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/sources.ts",
+      "expected": "f50549030c7e363baea6b9855dc74422ea46a1132b1831f62a2ed4d5092b3993",
+      "actual": "f50549030c7e363baea6b9855dc74422ea46a1132b1831f62a2ed4d5092b3993",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/sessions.ts",
+      "expected": "fe53a0a4ea7b989257f6bd3377415807ccfbb4c939794febe85aa8f456102b11",
+      "actual": "fe53a0a4ea7b989257f6bd3377415807ccfbb4c939794febe85aa8f456102b11",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/types.ts",
+      "expected": "a03749ef65788b5b5893e70c518dacc51c8752c793023f090be59732149aea08",
+      "actual": "a03749ef65788b5b5893e70c518dacc51c8752c793023f090be59732149aea08",
+      "matches": true
+    },
+    {
+      "path": ".cache/coordination/safe-test-runtime/register.mjs",
+      "expected": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "actual": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "matches": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "expected": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "actual": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "matches": true
+    },
+    {
+      "path": "packages/ingest/src/index.ts",
+      "expected": "e75924db8f72b00e3c3bfb8fdb8c442b9e2592e162d5e1b6f399643e9da63364",
+      "actual": "e75924db8f72b00e3c3bfb8fdb8c442b9e2592e162d5e1b6f399643e9da63364",
+      "matches": true
+    },
+    {
+      "path": "packages/ingest/src/join-policy/index.ts",
+      "expected": "15b3ed8e1cbf97bec2cc63a901f0ce2cc4beef0328f20482e4ddf448832d9f58",
+      "actual": "15b3ed8e1cbf97bec2cc63a901f0ce2cc4beef0328f20482e4ddf448832d9f58",
+      "matches": true
+    },
+    {
+      "path": "packages/ingest/src/join-policy/deps.ts",
+      "expected": "41f487cb6a933e8ef1a37eec90b07ede5a618bba5bf1089f6b32676f4d525dc6",
+      "actual": "41f487cb6a933e8ef1a37eec90b07ede5a618bba5bf1089f6b32676f4d525dc6",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/capture-policy.ts",
+      "expected": "3620d95c20350b07ff8767027c875c424975d523fc4de0df77937613eb70da07",
+      "actual": "3620d95c20350b07ff8767027c875c424975d523fc4de0df77937613eb70da07",
+      "matches": true
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/checker-caller.test.ts",
+      "expected": "b4c3370fb0991886fc54cc596ddebaae36b7e8a61130943406e09909833b3beb",
+      "actual": "b4c3370fb0991886fc54cc596ddebaae36b7e8a61130943406e09909833b3beb",
+      "matches": true
+    }
+  ]
+}

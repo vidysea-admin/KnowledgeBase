@@ -1,0 +1,56 @@
+{
+  "kind": "READ_ONLY_PREFLIGHT_EXIT2_CAUSE_CLASSIFICATION",
+  "recorded_at": "2026-10-15T12:34:58.911Z",
+  "original_broker_receipt": "qa/goal-vectorless-2026-10-15/verification-product-remaining-read-preflight.json",
+  "original_mechanics_report": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-artifacts/mechanics-receipt.json",
+  "original_reports_unchanged": true,
+  "own_exit": 2,
+  "complete": false,
+  "metadata_bytes": 11240,
+  "metadata_limit": 5000,
+  "total_mismatches": 27,
+  "counts": {
+    "environment_checks": 4,
+    "environment_receipts": 2,
+    "actual_pin_drift_comparisons": 21,
+    "actual_pin_drift_unique_files": 14,
+    "direct_two_unit_pin_failures": 0,
+    "runtime_version_parser_expectation_bug": 1,
+    "metadata_bound": 1,
+    "end_stability_failures": 0,
+    "normalization_or_missing_path_failures": 0
+  },
+  "representative_fields": [
+    {
+      "field": "KB_U24_PRIVATE_TOC_TESTS environment fingerprint",
+      "classification": "Unset versus present inherited broker flag in two old receipts; corresponding aggregate hash differs. Actual environment drift, no private value disclosed."
+    },
+    {
+      "field": "apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+      "classification": "Real historical-probe hash drift outside exact two-unit closure."
+    },
+    {
+      "field": "apps/api/src/ask/source-context.ts",
+      "classification": "Representative of7API source/test changes appearing in BOTH old web type/build pin maps;14comparison mismatches, all outside exact two-unit closure."
+    },
+    {
+      "field": "apps/web/src/App.tsx",
+      "classification": "Representative of6historical UI composite pin drifts outside exact two-unit closure."
+    },
+    {
+      "field": "verification-final-frozen-contracts.json runtime_version",
+      "classification": "Concrete verification-support bug: receipt uses declared Python interpreter but script compared every version to running Node process.version. Binary pin itself matched. No receipt/source bug."
+    }
+  ],
+  "interpretation": "All6selected source-block SHAs,5clause blocks and9owned/direct proposal pins passed. No real stale direct consumer shown.21drifts are genuine OUT-OF-CLOSURE epoch/provenance differences; strict all-current history expectation is not a scoped-reuse decision. Do not waive or relabel them. Environment differences remain unresolved; exact compatible environment/reuse authority needed.",
+  "metadata_overflow": "Mismatch details expanded audit metadata to11240bytes;5000byte stop correctly fired. Original private report retains all27; this public summary shows only5representativefields. No raw values/maps printed.",
+  "corrected_support_script": {
+    "path": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v2.mjs",
+    "sha256": "4c446b153acf1074201f53067a8e26cf39aa773211b509807184d048e957a7e2",
+    "command_artifact": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v2-command.json",
+    "not_executed": true,
+    "not_requested_for_execution": true,
+    "only_change": "Version probe uses declared runtime --version with safe bounded no-shell invocation for non-current Node runtime."
+  },
+  "no_retry_gate_waiver_review_grant_or_source_refresh": true
+}

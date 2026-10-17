@@ -1,0 +1,27 @@
+{
+  "ratio_verified": false,
+  "allocated_tokens": 3000,
+  "cycle": 6,
+  "unit": "vectorless-publication",
+  "cumulative_allocated_tokens": 17000,
+  "monotonic_frequency": 10000000,
+  "monotonic_end_ticks": 190794499426,
+  "allocated_active_s": 180,
+  "monotonic_start_ticks": 189744453699,
+  "new_tests": 0,
+  "verdict": "FAIL",
+  "utc_start": "2026-10-15T09:01:24.5674768Z",
+  "active_s": 105.0045727,
+  "wait_intervals": [],
+  "prior_closeout_actual_unknown": true,
+  "cumulative_allocated_active_s": 630,
+  "tokens": null,
+  "cost": null,
+  "checker": "publication_checker-source-completion",
+  "candidate_sha": "8398a420331cd135944f727df98b0f25377f1c9bec1ffc9538574a5f1d894d06",
+  "utc_end": "2026-10-15T09:03:09.5724741Z",
+  "prior_continuation_debit": {
+    "active_s": 90,
+    "tokens": 2000
+  }
+}

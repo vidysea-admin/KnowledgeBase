@@ -1,0 +1,1 @@
+import {spawnSync}from'node:child_process';const env={...process.env};delete env.KB_U24_PRIVATE_TOC_TESTS;const r=spawnSync(process.execPath,['qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs',process.argv[2]],{env,encoding:'utf8',timeout:70000,windowsHide:true});process.stdout.write(r.stdout??'');process.stderr.write(r.stderr??'');process.exitCode=r.status??1;

@@ -1,0 +1,9 @@
+# Deferred independent offline probes — do not activate
+
+Candidate1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948, cycle0. Queued to root/sole broker; not an execution authorization. No Mongo/vendor/DB/network/ACL/secret/external action permitted. Independent source verdict is FAIL; runtime readiness HOLD.
+
+1. Port ownership, HIGH, activate-proposal.py143-145/185-195. Isolated static extraction or fully fake socket/process harness only: bind probe succeeds then closes; simulated owned process poll=None; simulated connect succeeds for another PID. Assert bootstrap dispatch is refused. Current control flow instead launches smoke. Do not bind a real port or send credentials. Cover child exit/replacement between readiness and bootstrap/shutdown as well.
+2. Receipt persistence, HIGH, activate-proposal.py162/218-232. Isolated pure fake-filesystem/job harness only: inject owner write failure after created=True; inject owner read/JSON error; inject job.close timeout; inject rmtree failure after synthetic credentials marker exists. Assert a sanitized outer receipt always records cleanup failure/retained ownership uncertainty, and unsafe recursive deletion never occurs. Current code skips receipt232 on each raised cleanup path. Use synthetic placeholders only, no real credentials or ACLs; do not import/invoke launcher run.
+3. Admission gap: PowerShell -Command args164-169 must be checked using parser/string reconstruction with no Get-Acl execution. Its $args[0] + native command-line marshalling has no runtime receipt. Native job/DACL/parent-death/resource probes remain separately gated and cannot be smuggled into these offline checks.
+
+No tests were run in parallel with broker by reviewer. Root must authorize and admit any later probe scope, retain source and environment binding and give the checker a fresh bounded phase; this request does not consume another attempt or authorize waiting/retry.

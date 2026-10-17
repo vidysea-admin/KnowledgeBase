@@ -1,0 +1,67 @@
+{
+  "at": "2026-10-14T22:21:45.6761627Z",
+  "count": 10,
+  "totalBytes": 13472870.0,
+  "files": [
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-YwNBww/synthetic-source.mp4",
+      "bytes": 3199857,
+      "sha256": "77BF67FED9E72E015CEB64805F236408300022732820B721C4E1880544F51DB7",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-YwNBww/downstream-audio.m4a",
+      "bytes": 131649,
+      "sha256": "F932D6BF92783C157E0A557F4F3CFC8CC699A5BB6B2EC472DC66F999E2CD1EDE",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-YwNBww/synthetic-source.lean.mp4",
+      "bytes": 899654,
+      "sha256": "E58A3CB953DE5C111E52A3846B07545B9F974548A4498DB3F448C62D8EF12ECE",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-vMyFny/synthetic-source.mp4",
+      "bytes": 3199857,
+      "sha256": "77BF67FED9E72E015CEB64805F236408300022732820B721C4E1880544F51DB7",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-vMyFny/synthetic-source.lean.mp4",
+      "bytes": 899654,
+      "sha256": "E58A3CB953DE5C111E52A3846B07545B9F974548A4498DB3F448C62D8EF12ECE",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-vMyFny/downstream-audio.m4a",
+      "bytes": 131649,
+      "sha256": "F932D6BF92783C157E0A557F4F3CFC8CC699A5BB6B2EC472DC66F999E2CD1EDE",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/synthetic-source.private.lean.mp4",
+      "bytes": 779390,
+      "sha256": "AEA341C8331DE42CA4C4C04FC2D1FEFB72F7E674D575B00A69D9E4E08676708D",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/synthetic-source.mp4",
+      "bytes": 3199857,
+      "sha256": "77BF67FED9E72E015CEB64805F236408300022732820B721C4E1880544F51DB7",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/synthetic-source.lean.mp4",
+      "bytes": 899654,
+      "sha256": "E58A3CB953DE5C111E52A3846B07545B9F974548A4498DB3F448C62D8EF12ECE",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/downstream-audio.m4a",
+      "bytes": 131649,
+      "sha256": "F932D6BF92783C157E0A557F4F3CFC8CC699A5BB6B2EC472DC66F999E2CD1EDE",
+      "retention": "local immutable synthetic media; exact path excluded from Git; text measurement receipt retained"
+    }
+  ]
+}

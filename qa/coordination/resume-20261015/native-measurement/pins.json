@@ -1,0 +1,22 @@
+{
+  "packages/meeting-bot/src/capture/tiles/native-measurement.ts": "9e0dc2ff51d6b0bf5b775f2f98381ece1e12a82085d9099f6e54696fb3f70384",
+  "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts": "6ff2cb357f588bb0609ead2e26f6be24bd87382a4ac6312c8e39b00fb9bfad59",
+  "packages/meeting-bot/src/capture/tiles/registry.ts": "1e720f1387b55d847440ca5e9c33ef13fbc08dd96815d05d7e7a4cf576a97b86",
+  "packages/meeting-bot/src/capture/tiles/registry.test.ts": "90fcda7c5ad5e5e0e795b75ebc7907b558dcfc5d94819b8a30992d9be9d952cc",
+  "packages/meeting-bot/src/capture/native-media-types.ts": "022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77",
+  "packages/meeting-bot/src/capture/native-media-finalize.ts": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+  "packages/meeting-bot/src/capture/native-media-probe.ts": "d3b2f373c8f37bef33b29a0dbf121b5dfc97732cb4b7ffdfb5fb31b71bf64abc",
+  "packages/meeting-bot/src/capture/native-spool.ts": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+  "packages/meeting-bot/src/capture/native-clock-ledger.ts": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+  "packages/meeting-bot/src/capture/native-ivf.ts": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+  "packages/meeting-bot/src/capture/tiles/sampler-clock.ts": "3f583a0b203a5a6358019d39f97b0773471be51f32a1cad536105528168c6480",
+  "packages/meeting-bot/src/capture/record-consent/context.ts": "19b232dc6163ff8fa54215313dab0a003579058470a9271af0b1851fc12d954c",
+  "packages/meeting-bot/src/capture/record-consent/coverage.ts": "f26a0f5f9f65f5aad39d1d29cbf1a86d5d72b3cf033f155cbe460c1c57aaf99e",
+  "packages/meeting-bot/src/capture/record-consent/private-acl.ts": "db444c6de16632aec9ce8aa67ab367978688e5b6213b8d48efbe1665b41af5f0",
+  "packages/meeting-bot/src/capture/record-consent/receipt-store.ts": "9f07a805ef13895e72f3392071191e00759e2c58aa0a397aa709a16e832efd4c",
+  "packages/core/src/domain/speaker-tile-alignment.ts": "3a8a28c448c59c11e25d47267616fc1c2f81729861af28de6494bfe7ada5d8ba",
+  "qa/evidence/t042-trusted-registry/fixture.ts": "7802cf755ec8839814e320bffc36e4eef600294605911fb8e59f3930b901a827",
+  "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "packages/meeting-bot/package.json": "12fed4722d5d8e954ee47ff5729164fd05ac6e86b26676e23e4ea6552a0e81ab",
+  "packages/meeting-bot/tsconfig.json": "e37d70f01dd85f180c1e3070dbed968acd2d610beb3ec9040a78259aa8ca1b03"
+}

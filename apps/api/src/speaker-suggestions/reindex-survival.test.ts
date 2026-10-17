@@ -7,10 +7,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { SpeakerSuggestions, Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
-import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions.testdb.js";
+import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions/testdb.js";
 import {
   confirmSpeakerSuggestion, rejectSpeakerSuggestion, insertSuggestionsIfAbsent, listConfirmed, listRejected, speakerSuggestions,
-} from "../../../../packages/db/src/collections/speaker-suggestions.js";
+} from "../../../../packages/db/src/collections/speaker-suggestions/index.js";
 import { scopedCollection } from "../../../../packages/db/src/lib/tenantScope.js";
 import { buildSpeakerDocs, writeSpeakerDocs, isHumanConfirmed } from "../../../../packages/index/src/pipeline/speaker-docs.js";
 import { extractSpeakersGrounded, dropOverriddenByConfirmed } from "../../../../packages/index/src/pipeline/speakers-grounded.js";
@@ -31,6 +31,8 @@ const propose = (name: string, quote: string) => [{ label: "spk:1", name, eviden
 
 async function seededSuggestion() {
   const m = memoryDb();
+  m.seed("sessions", { _id: S, tenantId: T, sourceId: "synthetic-reindex-source", title: "Synthetic reindex fixture",
+    date: "2026-10-16", status: { transcribe: "done", index: "pending" } });
   const first = await extractSpeakersGrounded(TURNS, proposer(propose("Priya Nair", QA)), { verifier: YES, suggest: true });
   const docs = buildSuggestionDocs(T, S, first.suggested!);
   assert.equal(await insertSuggestionsIfAbsent(T, S, docs, m.db), 1);

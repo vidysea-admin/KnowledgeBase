@@ -1,0 +1,94 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "resume-speaker-graph",
+    "cycle": 1,
+    "base_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "candidate_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\graph\\speaker-knowledge.ts",
+        "sha256": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\graph\\speaker-knowledge.test.ts",
+        "sha256": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [
+      {
+        "id": "historical-usage-unreconciled",
+        "token_metric": "actual_total",
+        "active_s": null,
+        "tokens": null,
+        "cost": null
+      }
+    ],
+    "next_phase": {
+      "token_metric": "actual_total",
+      "kind": "review",
+      "active_s": 150,
+      "tokens": 4800,
+      "cost": null
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "resume-speaker-graph/1/dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "completion_reserve_tokens": 1200,
+    "bootstrap_scope": "Proposed default180s6000 cumulative incl30s1200completion; no spend/launch authorized while historical charge unknown",
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 6000,
+      "cost": null
+    },
+    "escalation": null
+  },
+  "worker": {
+    "provider": "codex",
+    "executable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+    "runtime_identity": {
+      "route": "manual fresh root dispatch; no launcher startup/control assurance claimed"
+    },
+    "timeout_s": 150,
+    "max_turns": 12,
+    "phase_id": "resume-speaker-graph-review-after-reconciliation",
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\scoped-admission-20261016\\graph\\prompt.txt",
+      "sha256": "03d2ce9376978d4ccf43442dd3036568b32496b1a0c0986270ed2ab391934cb8"
+    }
+  },
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [
+      {
+        "role": "environment",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\scoped-admission-20261016\\graph\\authentication.json",
+        "sha256": "f4f8998fc0e943184e30d70c1f25d64c1928328893d1cf23417a84eba752e522"
+      },
+      {
+        "role": "historical-handoff",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\graph\\authentication-20261016.json",
+        "sha256": "01155a15c85895ce4e4bab325cb58c6a65122a535f1b28316cd807092062cb25"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "colliding tenant metadata and source ids cannot widen the authorized graph",
+      "reason": "Upfront independent tenant/authority boundary; old maker evidence does not replace independent behavior probe",
+      "boundary": "security/refusal"
+    }
+  ],
+  "previous_receipt": null
+}

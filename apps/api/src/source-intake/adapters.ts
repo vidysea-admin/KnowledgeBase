@@ -1,23 +1,26 @@
 /**
  * apps/api/src/source-intake/adapters.ts — T-045 composition of the ordered adapter registry for `POST /ingest/source`.
  * Real wiring points: yt-dlp via `defaultYoutubeExec` (binary from LKB_YT_DLP_PATH), sha256 hashing, `fs` reads, and the
- * generic URL adapter over Jina Reader. Two things are NOT shipped and stay injected:
- *  - `transcribe` (the STT provider/credentials are an owner decision; no provider is composed in apps/api);
- *  - `downloader` for Cloud OnAir / Zoom (OnAir needs a one-time Google login, Zoom links may carry a passcode).
- * Without `downloader` those two adapters fail closed with `downloader-unavailable`.
+ * generic URL adapter over Jina Reader. STT is composed only from trusted explicit configuration in wiring.ts.
+ * Hosted acquisition handles a single embedded OnAir video and Zoom's specific extractor; protected/dynamic pages
+ * remain refused without their authorized session. Configured capability is never a live-source receipt.
  */
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { readFile, mkdir, mkdtemp, lstat, realpath } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Transcribe } from "@lkb/ai";
 import {
   buildSourceRegistry, createDocumentSource, createOnairSource, createRecordingSource, createUrlSource,
-  createYoutubeSource, createZoomRecordingSource, defaultYoutubeExec, isBlockedAddress, resolveAll, resolveFfmpegLocation,
+  createYoutubeSource, createZoomRecordingSource, isBlockedAddress, resolveAll, resolveFfmpegLocation, isInsideDir,
   resolveYtDlpCommand,
   type HostedRecordingDownloader, type Source, type YoutubeExec,
 } from "@lkb/ingest";
 import { sha256Hex } from "../hash.js";
+import { boundedMediaExec } from "../../../../packages/ingest/src/source-acquisition/exec.js";
+import { createHostedAcquisition } from "../../../../packages/ingest/src/source-acquisition/hosted.js";
+import { createMediaDurationProbe } from "../../../../packages/ingest/src/source-acquisition/duration.js";
+import { createSourceReader } from "./source-reader.js";
 
 export interface SourceIntakeAdapterOptions {
   transcribe: Transcribe;
@@ -31,6 +34,7 @@ export interface SourceIntakeAdapterOptions {
   /** DNS seam (default: every address the system resolver returns). Used by the SSRF guard on the url adapter. */
   lookup?: (hostname: string) => Promise<string[]>;
   reader?: (path: string) => Promise<Uint8Array>;
+  durationProbe?: (path: string) => Promise<number>;
 }
 
 /**
@@ -61,32 +65,39 @@ export function guardUrlFetcher(
   };
 }
 
-async function jinaReaderFetch(url: string): Promise<string> {
-  const apiKey = process.env.JINA_API_KEY;
-  const res = await fetch(`https://r.jina.ai/${url}`, {
-    headers: apiKey ? { authorization: `Bearer ${apiKey}` } : {},
-    redirect: "manual",
-  });
-  if (!res.ok) throw new Error(`Jina Reader could not fetch this URL (HTTP ${res.status})`);
-  return res.text();
-}
-
 const bytesHash = (b: Uint8Array): string => createHash("sha256").update(b).digest("hex");
 
 export function buildSourceIntakeAdapters(opts: SourceIntakeAdapterOptions): Source[] {
   const env = opts.env ?? process.env;
   const workDir = opts.workDir ?? join(tmpdir(), "lkb-source-intake");
-  const reader = opts.reader ?? (async (p: string) => new Uint8Array(await readFile(p)));
-  const media = { workDir, hasher: bytesHash, reader, transcribe: opts.transcribe, downloader: opts.downloader };
+  const reader = opts.reader ?? (async (p: string) => {
+    const stat = await lstat(p);
+    const root = await realpath(workDir);
+    const actual = await realpath(p);
+    if (!stat.isFile() || stat.isSymbolicLink() || !isInsideDir(root, actual) || stat.size > 128 * 1024 * 1024) {
+      throw new Error("source media file refused");
+    }
+    return new Uint8Array(await readFile(actual));
+  });
+  const media = { workDir, hasher: bytesHash, reader, transcribe: opts.transcribe,
+    durationProbe: opts.durationProbe ?? (opts.exec || opts.reader ? undefined : createMediaDurationProbe(env)),
+    downloader: opts.downloader ?? (env.LKB_HOSTED_SOURCE_ACQUISITION === "1" ? createHostedAcquisition({ env, exec: opts.exec }) : undefined) };
   return buildSourceRegistry({
     recording: createRecordingSource({ hasher: bytesHash, reader, transcribe: opts.transcribe }),
     document: createDocumentSource({ hasher: sha256Hex, reader: async (p) => readFile(p, "utf8") }),
     youtube: createYoutubeSource({
-      workDir, exec: opts.exec ?? defaultYoutubeExec, hasher: bytesHash, reader, transcribe: opts.transcribe,
+      workDir, exec: opts.exec ?? boundedMediaExec, hasher: bytesHash, reader, transcribe: opts.transcribe,
       ytDlpCommand: resolveYtDlpCommand(env), ffmpegLocation: resolveFfmpegLocation(env),
+      durationProbe: media.durationProbe,
+      allocateWorkDir: opts.exec || opts.reader ? undefined : async () => {
+        await mkdir(workDir, { recursive: true });
+        const root = await realpath(workDir);
+        if ((await lstat(workDir)).isSymbolicLink()) throw new Error("source media directory refused");
+        return mkdtemp(join(root, "youtube-"));
+      },
     }),
     onair: createOnairSource(media),
     zoomRecording: createZoomRecordingSource(media),
-    url: createUrlSource({ hasher: sha256Hex, fetcher: guardUrlFetcher(opts.urlFetcher ?? jinaReaderFetch, opts.lookup) }),
+    url: createUrlSource({ hasher: sha256Hex, fetcher: guardUrlFetcher(opts.urlFetcher ?? createSourceReader({ apiKey: env.JINA_API_KEY }), opts.lookup) }),
   });
 }

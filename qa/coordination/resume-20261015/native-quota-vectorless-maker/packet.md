@@ -1,0 +1,16 @@
+# Native quota + vectorless fixture — source-frozen maker packet
+Validation contract managed-review/1. Unit native-quota-vectorless, cycle0, no verdict. Root C:/Users/product/Desktop/KnowledgeBase; exact HEAD in head.txt, dirty candidate source-pins.json, prior raw bytes backups/ and base-pins.json. Three source paths exclusively granted by root after broker FINAL1649 source release. Small exact before/after text diffs in *.diff. Other actor sources preserved.
+
+Changes:
+- Transcript factory test now requires zero embedding kinds/jobs and meaningful vectorless publication: complete current session generation, manifest retrievalMode vectorless, nonempty lexical chunks with current-generation turn evidence and absent vector/dims/model, tree existence, and independent verifyIndexGeneration artifact readiness. Existing corrected FACT/ACTION/ANSWER, cited speaker/time, graph, real transaction and tenant assertions retained.
+- Native receiver derives pending=min(16MiB,total quota), chunk=min(8MiB,pending), retaining 1<=chunk<=pending<=max validation in the spool. Positive finite native.maxBytes1,000,000 is supported instead of being rejected merely because transport defaults are larger. No fixture quota was inflated; large totals retain prior buffer caps. Existing spool total quota/backpressure/chunk guards remain active.
+- Regression starts genuine HTTP receiver with maxBytes1,000,000, checks persisted budget configuration, submits an oversized chunk, and asserts refusal/no finalization/no playback. Existing deferred HTTP successful close/retry/delay/failure/deadline tests already use the exact 1,000,000 total and now exercise valid complete capture under these supported budgets.
+
+Required sole-broker checks, not executed by maker:
+- apps/api src/grounded-postprocessing/transcripts.test.ts actual factory refresh test and postcommit floor (whole scoped file acceptable).
+- meeting-bot src/capture/tab-browser.test.ts new native1MB quota test plus existing native deferred close/retry/success/failure/deadline and authentication/durability tests; native runtime integration uses the same receiver budgets.
+- Full bot/API types as combined epoch requires; scoped structure/import-cycle check and mandatory contracts where applicable. No claim for unsupported symlink fixture environment: that remains unresolved and must not be waived.
+
+Behavior immediate consumers: runRecord/tab browser native spool construction; real transcript refresh vectorless test only. No capability issuer/privacy/tenant/auth fallback changed, no tests deleted, no new source files. No source quota/path/schema/contracts/deps/enforcement/global changes beyond granted three files.
+
+Evidence: no tests/build/providers/DB/browser/decoder commands run by this maker. Scoped reads/backups/edits/hash/line counts and git no-index text diffs only (git diff expected status1 means differences). Actual maker usage telemetry unknown/null, token_metric actual_total. Prior unknown reviewer charges retained. Checker alone may persist PASS after exact candidate evidence.

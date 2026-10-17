@@ -1,0 +1,110 @@
+{
+  "slug": "t035-lean-video-measured-encode",
+  "cycle": 0,
+  "observedAt": "2026-10-14T20:58:15.3647109Z",
+  "status": "observed-not-frozen",
+  "helperEvidenceFrozen": true,
+  "sharedConsumersFrozen": false,
+  "paths": [
+    {
+      "path": "packages/meeting-bot/src/lean-video-ffmpeg.ts",
+      "sha256": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0"
+    },
+    {
+      "path": "packages/meeting-bot/src/lean-video-ffmpeg.test.ts",
+      "sha256": "2d913183653a577753aa3ebaea3696094c669e30654aefb17bbea710d5750321"
+    },
+    {
+      "path": "scripts/qa/t035-lean-video-measure.mjs",
+      "sha256": "ca0ddc65257788e5011dca86f128377cd0d753b38ae20c6676061c7d09297ad4"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+      "sha256": "40910fb8bb9a113ded495af7a5fe8be435d6382181fdf2fad586afb1d3270c3f"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "sha256": "3c1bfa74f7aa8bd625193403ad3078150740547c96be03f0d96aebc155e8cba0"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.ts",
+      "sha256": "0adcbdaf9772ea0235c1231e76fbe6dc1ef5d6bc302aa330439335f47c79320e"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+      "sha256": "3636dc966d0f5c601a5b248146c9b86f43f8bfcbac5c8067a767f9b2fda3745b"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.test.ts",
+      "sha256": "ece14ef6dd39eabf464a447f2391ea0f59d27f72be2fb0f0cfa4d922513d7d28"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/context.ts",
+      "sha256": "d4533740b0dafee6ba5df229cacc41a578609518395ee31caa7405d483d71313"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/receipt-store.ts",
+      "sha256": "3fe009fefa691abf5988b2f304a4d3c44247ef024898e7870193780ad031d26b"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/coverage.ts",
+      "sha256": "35f3c6426b71f09dd59f48285984cca816769600b89a556be157fd70f11e7c62"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/provider-input.ts",
+      "sha256": "dbfedf933d8e9dceec31f5fc43d9bdc41161bcaba546c8e61b3a3aedbfdb3e10"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/downstream.ts",
+      "sha256": "d7ed8428d7769f4d50e9cad7343f8424e4e5946815ec2a5845ff8f5e85df4199"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/privacy.ts",
+      "sha256": "15e5aa842967c0e4b1a9c0f8b11e5e1a9e76a1d11e905044319e9e67993e0081"
+    },
+    {
+      "path": "scripts/transcribe-long-session.mjs",
+      "sha256": "8b5f8f7f02d27fb2aa1d3531a6a3d2bd810ab65f43307d1ba26937d46cb11913"
+    },
+    {
+      "path": "scripts/lib/find-audio-file.mjs",
+      "sha256": "3628384a7921173f7692150fbc7e696e5b85fda20fff197d56ba32c5c9b9600d"
+    },
+    {
+      "path": "qa/contracts/goal-t035.md",
+      "sha256": "a2013d417a5c37e84ff00a687a78479ef26c6f46d2030d72475fac93a590b3f5"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t035-private-keyframes.json",
+      "sha256": "ac1e66f5b26a2d4efecb623c1df57d2e9bd26283713a6095cb68017fbfcd6128"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t035-private-keyframes.stdout.txt",
+      "sha256": "b27e9a1796723c2db11b5c5c4d965eed0e74959ba272a9193b208b17a912d5b0"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t035-private-keyframes.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/report.json",
+      "sha256": "bf13f88f1704b8ea1ab518716720ca55986657e7b21e89f81c841970c35d62b9"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/synthetic-source.mp4",
+      "sha256": "77bf67fed9e72e015ceb64805f236408300022732820b721c4e1880544f51db7"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/synthetic-source.lean.mp4",
+      "sha256": "e58a3cb953de5c111e52a3846b07545b9f974548a4498db3f448c62d8ef12ece"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/synthetic-source.private.lean.mp4",
+      "sha256": "aea341c8331de42ca4c4c04fc2d1fefb72f7e674d575b00a69d9e4e08676708d"
+    },
+    {
+      "path": "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/downstream-audio.m4a",
+      "sha256": "f932d6bf92783c157e0a557f4f3cfc8cc699a5bb6b2ec472dc66f999e2cd1ede"
+    }
+  ]
+}

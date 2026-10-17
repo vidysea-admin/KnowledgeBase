@@ -1,0 +1,83 @@
+MESSAGE_STAGE http_start POST whatsapp/ingest
+MESSAGE_STAGE http_end POST whatsapp/ingest status=401
+MESSAGE_STAGE http_start POST whatsapp/ingest
+MESSAGE_STAGE tx_request session=1 active=0
+MESSAGE_STAGE tx_begin session=1 active=1
+MESSAGE_STAGE tx_end session=1 active=0
+MESSAGE_STAGE tx_request session=2 active=0
+MESSAGE_STAGE tx_begin session=2 active=1
+MESSAGE_STAGE tx_end session=2 active=0
+MESSAGE_STAGE http_end POST whatsapp/ingest status=201
+MESSAGE_STAGE http_start GET whatsapp/review
+MESSAGE_STAGE http_end GET whatsapp/review status=200
+MESSAGE_STAGE http_start GET search
+MESSAGE_STAGE http_end GET search status=200
+MESSAGE_STAGE http_start POST review-decision
+MESSAGE_STAGE tx_request session=3 active=0
+MESSAGE_STAGE tx_begin session=3 active=1
+MESSAGE_STAGE tx_end session=3 active=0
+MESSAGE_STAGE http_end POST review-decision status=404
+MESSAGE_STAGE http_start POST review-decision
+MESSAGE_STAGE http_end POST review-decision status=403
+MESSAGE_STAGE http_start POST review-decision
+MESSAGE_STAGE tx_request session=4 active=0
+MESSAGE_STAGE tx_begin session=4 active=1
+MESSAGE_STAGE tx_end session=4 active=0
+MESSAGE_STAGE http_end POST review-decision status=200
+MESSAGE_STAGE http_start GET search
+MESSAGE_STAGE tx_request session=5 active=0
+MESSAGE_STAGE tx_begin session=5 active=1
+MESSAGE_STAGE tx_end session=5 active=0
+MESSAGE_STAGE tx_request session=6 active=0
+MESSAGE_STAGE tx_begin session=6 active=1
+MESSAGE_STAGE tx_end session=6 active=0
+MESSAGE_STAGE http_end GET search status=200
+MESSAGE_STAGE http_start POST citations/native
+MESSAGE_STAGE tx_request session=7 active=0
+MESSAGE_STAGE tx_begin session=7 active=1
+MESSAGE_STAGE tx_end session=7 active=0
+MESSAGE_STAGE http_end POST citations/native status=200
+MESSAGE_STAGE http_start POST ask
+MESSAGE_STAGE tx_request session=8 active=0
+MESSAGE_STAGE tx_begin session=8 active=1
+MESSAGE_STAGE tx_end session=8 active=0
+MESSAGE_STAGE tx_request session=9 active=0
+MESSAGE_STAGE tx_begin session=9 active=1
+MESSAGE_STAGE tx_end session=9 active=0
+MESSAGE_STAGE tx_request session=10 active=0
+MESSAGE_STAGE tx_begin session=10 active=1
+MESSAGE_STAGE tx_end session=10 active=0
+MESSAGE_STAGE http_end POST ask status=503
+MESSAGE_STAGE cleanup_start
+MESSAGE_STAGE cleanup_end
+✖ approved Hinglish message traverses actual ingest approval transaction native search citation Ask policy and history (267.6565ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2645.7698
+
+✖ failing tests:
+
+test at src\native-evidence\message-vertical.test.ts:1:13183
+✖ approved Hinglish message traverses actual ingest approval transaction native search citation Ask policy and history (267.6565ms)
+  AssertionError [ERR_ASSERTION]: HOLD actual request-bound native message policy Ask: {"error":"source_context_unavailable","message":"Ask could not validate a bounded source context: source or completion processing failed"}
+  
+  503 !== 200
+  
+      at Object.json (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\message-vertical.test.ts:164:48)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async approve (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\message-vertical.test.ts:209:18)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\message-vertical.test.ts:225:19)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

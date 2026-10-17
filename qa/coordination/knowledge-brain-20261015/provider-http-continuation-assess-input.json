@@ -1,0 +1,53 @@
+{
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "note": "One shared historical review across four initial scopes; charge once, preserve unknown actuals, not a fresh reset.",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180,
+        "cost": null
+      },
+      "id": "vectorless_checker-wip-shared",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    {
+      "id": "provider_http_checker-cycle1-checkpoint",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "tokens": 6000,
+        "cost": null,
+        "active_s": 180
+      },
+      "note": "Persisted cycle1 HOLD after bounded review; preserve committed allocation and unknown actual usage, no reset."
+    }
+  ],
+  "next_phase": {
+    "active_s": 120,
+    "tokens": 3000,
+    "cost": null
+  },
+  "bootstrap_scope": "Continuation of same cycle1 provider+HTTP checker only: identity/reuse authentication + mandatory remaining evidence + independent injected probe + final readback; no provider reread, all required receipts available before resumption.",
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": {
+    "authority": "Root explicit finite continuation approval, 2026-10-15",
+    "reason": "Required remaining credential/security completion after bounded HOLD: exact receipts/pins authentication, independent injected probe, mandatory local compatibility/types evidence and final readback; no source re-survey. All prior unknowns/debits preserved; ratio unverified.",
+    "limits": {
+      "tokens": 15000,
+      "cost": null,
+      "active_s": 480
+    }
+  },
+  "ratio_claim": "UNVERIFIED; unknown maker/reviewer actual tokens and historical time"
+}

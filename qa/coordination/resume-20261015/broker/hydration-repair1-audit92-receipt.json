@@ -1,0 +1,25 @@
+{
+  "argv": [
+    ".venv/Scripts/python.exe",
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/watchdog.py"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f.json",
+    "sha256": "770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f",
+    "count": 349
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 60,
+  "accounting": "MAKER ACCEPTANCE offline hydration",
+  "pid": 22376,
+  "exit": 0,
+  "treeClosed": true,
+  "active_s": 25.68800000000192,
+  "afterMatch": true,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-audit92.log",
+    "sha256": "5e78270e75f7c35128ff30ade2caaa7e2097a07ae9d13e61a26370b15f3edb97"
+  },
+  "counts": {}
+}

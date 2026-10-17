@@ -80,3 +80,38 @@ test("actual createServer mounts simulation behind shared auth and existing Ask 
     assert.deepEqual(tenants, ["tenant-a"]);
   } finally { await server.close(); }
 });
+
+test("graph selector mounted policy simulation forwards normalized hints, never claimed tenant or top-level selectors", async () => {
+  const calls: { tenant: string; selection: unknown }[] = [];
+  const base = buildTestDeps({ keyStore: fakeKeyStore({ "a-key": { tenantId: "tenant-a", scopes: ["ask"] } }) });
+  base.ask = deps();
+  base.ask.requestDepsFor = (tenant, selection) => { calls.push({ tenant, selection }); return fakeAskDeps(); };
+  const server = await startTestServer(base);
+  try {
+    const reply = await post(server.baseUrl + "/answer-policy/simulate", { ...input(), tenantId: "tenant-b",
+      topicRefs: ["forged"], filters: { speakerRefs: [" person:alice ", "person:alice"], topicRefs: ["topic:fees"] } });
+    assert.equal(reply.status, 200);
+    assert.deepEqual(calls, [{ tenant: "tenant-a", selection: { speakerRefs: ["person:alice"], topicRefs: ["topic:fees"] } }]);
+  } finally { await server.close(); }
+});
+
+test("graph selector policy simulation rejects invalid filters before retrieval and preserves tenant authority on foreign hints", async () => {
+  const tenants: string[] = [], d = deps(tenants); let factories = 0;
+  d.requestDepsFor = (tenant, selection) => {
+    factories++; assert.equal(tenant, "tenant-a"); assert.deepEqual(selection, { topicRefs: ["tenant-b:fees"] });
+    throw new BoundedAskError("selected graph authority unavailable");
+  };
+  const server = await start(d);
+  try {
+    for (const filters of [{ speakerRefs: ["spk:0"] }, { topicRefs: ["topic/foreign"] }, { topicRefs: [42] },
+      { speakerRefs: Array.from({ length: 17 }, (_, n) => `person:${n}`) }, { authority: "trusted" }]) {
+      const reply = await post(server.url, { ...input(), filters }); assert.equal(reply.status, 400);
+    }
+    assert.equal(tenants.length, 0); assert.equal(factories, 0);
+    const refused = await post(server.url, { ...input(), filters: { topicRefs: ["tenant-b:fees"] } });
+    assert.equal(refused.status, 503); assert.equal(factories, 1); assert.deepEqual(tenants, ["tenant-a"]);
+  } finally { await server.close(); }
+  const noFactory = await start(deps());
+  try { assert.equal((await post(noFactory.url, { ...input(), filters: { topicRefs: ["topic:fees"] } })).status, 503); }
+  finally { await noFactory.close(); }
+});

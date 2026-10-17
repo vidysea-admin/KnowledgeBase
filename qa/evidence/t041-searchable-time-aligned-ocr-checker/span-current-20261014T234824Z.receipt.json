@@ -1,0 +1,27 @@
+{
+  "scope": "Prepared independent synthetic all-pairs timeline oracle, permutation and screen-mapper assertions only; two local pure MJS files, no native subprocess, network, provider, media, database or private payload. Single appointed ordinary coordinator execution; no duplicate maker suite.",
+  "spec": "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-spec.json",
+  "specSha256": "66d0e7588119e73ac7f2f79323b157724ceec2201763e595e812cdf2780c0deb",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs"
+  ],
+  "pid": 18168,
+  "startedAt": "2026-10-14T23:48:24.3464099Z",
+  "endedAt": "2026-10-14T23:48:24.5129153Z",
+  "elapsedMs": 167,
+  "exit": 0,
+  "timedOut": false,
+  "before": {
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs": "1c20b790d94789bb03af6843b9a83c2e469b112004f7ca4c2841cbf96560817c",
+    "scripts/webinar/slides/slide-knowledge.mjs": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef"
+  },
+  "after": {
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs": "1c20b790d94789bb03af6843b9a83c2e469b112004f7ca4c2841cbf96560817c",
+    "scripts/webinar/slides/slide-knowledge.mjs": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef"
+  },
+  "drift": [],
+  "terminal": true,
+  "stdout": "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current-20261014T234824Z.stdout.txt",
+  "stderr": "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current-20261014T234824Z.stderr.txt"
+}

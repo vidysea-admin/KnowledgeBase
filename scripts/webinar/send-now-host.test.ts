@@ -15,6 +15,25 @@ import { createSendNowDeps, untilProblem, MAX_UNTIL_AHEAD_MS, type SendNowHostOp
 const FIXTURE = path.join(import.meta.dirname, "argv-dump-fixture.mjs");
 const KEYS = { "a-key": { tenantId: "tenant-a", scopes: ["send-now"] }, "b-key": { tenantId: "tenant-b", scopes: ["send-now"] }, "ro-key": { tenantId: "tenant-a", scopes: ["calendar"] } };
 const MEET = "https://meet.google.com/abc-defg-hij";
+test("default authority is canonical operations: expired scheduled file cannot hide an active operation", async () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "send-now-authority-"));
+  const webinars = path.join(root, "raw", "webinars"), scheduled = path.join(webinars, "scheduled");
+  mkdirSync(scheduled, { recursive: true });
+  writeFileSync(path.join(scheduled, "job.json"), JSON.stringify({ tenantId: "tenant-a", url: MEET, sessionId: "s1", until: "2020-01-01T00:00:00.000Z" }));
+  const operations = path.join(webinars, "operations.json");
+  const deps = createSendNowDeps({ root, now: () => NOW, hostTenant: () => "tenant-a", validateUntil: () => undefined });
+  try {
+    writeFileSync(operations, JSON.stringify({ version: 1, tenantId: "tenant-a", operations: { s1: { tenantId: "tenant-a", status: "recording" } } }));
+    const active = await deps.plan("tenant-a", { meetingUrl: MEET, until: "18:00" });
+    assert.deepEqual([active.ok, !active.ok && active.kind], [false, "duplicate"]);
+    for (const state of ["{broken", JSON.stringify({ version: 1, tenantId: "other", operations: {} }),
+      JSON.stringify({ version: 1, tenantId: "tenant-a", operations: { orphan: { tenantId: "tenant-a", status: "queued" } } })]) {
+      writeFileSync(operations, state);
+      const refused = await deps.plan("tenant-a", { meetingUrl: MEET, until: "18:00" });
+      assert.deepEqual([refused.ok, !refused.ok && refused.kind], [false, "unreadable"]);
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
 const NOW = new Date(2026, 9, 12, 10, 0, 0); // local 10:00, so "18:00" is 8 h ahead in any time zone
 
 async function withHost(opts: SendNowHostOptions, fn: (post: (key: string, body: unknown) => Promise<{ status: number; json: any }>, root: string) => Promise<void>) {
@@ -99,6 +118,8 @@ test("launch: 202 with a job id; the child got the validated URL and flags as se
     assert.equal(good.status, 202);
     assert.match(good.json.jobId, /^send-now-\d{14}-[0-9a-f]{6}$/);
     assert.equal(good.json.status, "launching");
+    // the liveness window is not a startup guarantee: under load the child may write its argv after the 202, so wait for the file
+    for (let i = 0; i < 200 && !existsSync(dump); i++) await new Promise((r) => setTimeout(r, 50));
     const argv = JSON.parse(readFileSync(dump, "utf8")) as string[];
     assert.deepEqual(argv.slice(0, 4), ["record", MEET, "--until", "18:00"]);
     assert.deepEqual(argv.slice(4, 8), ["--tenant", "tenant-a", "--session-id", good.json.jobId]);

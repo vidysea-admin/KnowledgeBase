@@ -41,3 +41,7 @@ export { buildSpeakerDocs, writeSpeakerDocs, isHumanConfirmed, type SpeakerWrite
 export { buildSourceSlices, sourceSpanText, type SourceSpan, type SourceSlicePlan } from "./chunk/source-spans.js";
 export { verifyQuote, verifyQuotes, normaliseForQuote, type QuoteSourceTurn, type ClaimedQuote, type QuoteVerdict, type QuoteLocation, type QuoteRefusal } from "./pipeline/quote/quote-verify.js";
 export { windowTranscript, type WindowTurn, type WindowEntry, type TranscriptWindow, type WindowOptions } from "./pipeline/quote/transcript-windows.js";
+export { buildTopicIndex, type TopicIndexOptions } from './tree/topic-indexing.js';
+export { buildSpeakerKnowledgeView, routeSpeakerKnowledge } from "./graph/speaker-knowledge.js";
+export type { SpeakerKnowledgeRelation, SpeakerKnowledgeView, SpeakerKnowledgeRouteInput } from "./graph/speaker-knowledge.js";
+export { expandAuthorizedGraph } from "./graph/authorized-expansion.js";

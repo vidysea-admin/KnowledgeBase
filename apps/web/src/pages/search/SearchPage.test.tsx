@@ -5,6 +5,7 @@ import { AuthProvider, useAuth } from "../../auth/AuthContext.js";
 import { SearchPage } from "./SearchPage.js";
 import { App } from "../../App.js";
 import { SessionDetailPage } from "../sessions/SessionDetailPage.js";
+import type { NativeSourceLocator } from "../../api/nativeEvidence.js";
 
 const hit = (text = "A class size of 23.") => ({ turnId: "t/1", sessionId: "s/1", score: 1,
   turn: { _id: "t/1", sessionId: "s/1", speakerRef: "spk:0", speakerLabel: "Sandeep", tStart: 516, tEnd: 546, text },
@@ -24,7 +25,7 @@ function show(key: string | null = "fixture-key") {
   return render(<AuthProvider><MemoryRouter initialEntries={["/search"]}><Controls /><Routes><Route path="/search" element={<SearchPage />} /></Routes></MemoryRouter></AuthProvider>);
 }
 function submit(query: string) { fireEvent.change(screen.getByRole("searchbox"), { target: { value: query } }); fireEvent.submit(screen.getByRole("form", { name: "Search transcripts" })); }
-/** Routes by URL: speaker-suggestions (U2.4, ebca1cea) gets an empty list and is recorded in `suggestions`; grounded-content gets an empty payload; every other call goes to the ordered `inner` mock, so its order and count are unchanged. */
+/** Route mounted side panels separately so ordered inner mocks measure only search/session reads. */
 function routeSuggestions(inner: ReturnType<typeof vi.fn>) {
   const suggestions: string[] = [];
   const routed = vi.fn((input: unknown, init?: unknown) => {
@@ -33,6 +34,11 @@ function routeSuggestions(inner: ReturnType<typeof vi.fn>) {
     // Grounded panel is mounted in SessionDetailPage by the integrator (t040-grounded-content-consumer): answer with an empty valid payload.
     const grounded = /^\/sessions\/([^/]+)\/grounded-content$/.exec(path);
     if (grounded) return Promise.resolve(new Response(JSON.stringify({ sessionId: decodeURIComponent(grounded[1]!), notes: [], qa: [], claims: [] }), { headers: { "content-type": "application/json" } }));
+    const decisions = /^\/sessions\/([^/]+)\/decisions$/.exec(path);
+    if (decisions) return Promise.resolve(new Response(JSON.stringify({ sessionId: decodeURIComponent(decisions[1]!), decisions: [] }), { headers: { "content-type": "application/json" } }));
+    const review = /^\/sessions\/([^/]+)\/transcript-review(\/history)?$/.exec(path);
+    if (review) return Promise.resolve(new Response(JSON.stringify({ sessionId: decodeURIComponent(review[1]!),
+      ...(review[2] ? { revisions: [] } : { revision: "fixture-1", turns: [], refresh: "complete" }) }), { headers: { "content-type": "application/json" } }));
     return inner(input, init);
   });
   return { routed, suggestions };
@@ -42,6 +48,22 @@ function deferred<T>() { let resolve!: (value: T) => void; const promise = new P
 describe("SearchPage actual client/fake HTTP workflow", () => {
   beforeEach(() => { localStorage.clear(); });
   afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+  test.each(["document-page", "message"] as const)("native %s search result opens a current passage without a fake transcript or early quote", async kind => {
+    const passage = { start: 0, end: 5, sha256: "b".repeat(64) };
+    const locator: NativeSourceLocator = kind === "document-page"
+      ? { kind, documentId: "doc", sourceId: "stable", documentSourceId: "immutable", headRevision: 1, revisionHash: "a".repeat(64), pageNumber: 4, passage }
+      : { kind, sourceId: "chat", threadId: "thread", messageId: "message", revisionHash: "a".repeat(64), passage };
+    const fetcher = vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ query: "native", hits: [{ nativeSourceLocator: locator, score: 1, title: "Native title" }], nativeTruncated: true }), { headers: { "content-type": "application/json" } }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ evidence: { sourceLocator: locator, quote: "hello" } }), { headers: { "content-type": "application/json" } }))
+      .mockResolvedValueOnce(new Response("{}", { status: 404 }));
+    vi.stubGlobal("fetch", fetcher); show(); submit("native"); await screen.findByText("Native title");
+    expect(screen.queryByText("hello")).toBeNull(); expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("link", { name: "Open transcript" })).toBeNull(); expect(screen.getByText(/Native source search is partial/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Open cited passage" })); expect(await screen.findByText("hello")).toBeInTheDocument();
+    expect(JSON.parse(fetcher.mock.calls[1]?.[1].body)).toEqual({ sourceLocator: locator });
+    fireEvent.click(screen.getByRole("button", { name: "Recheck cited passage" })); expect(screen.queryByText("hello")).toBeNull();
+    expect(await screen.findByText(/This source passage is unavailable/)).toBeInTheDocument(); expect(document.querySelector("audio")).toBeNull();
+  });
   test("mount, input editing, blank submit and unauthenticated render never query", () => {
     const fetcher = vi.fn(); vi.stubGlobal("fetch", fetcher); const page = show();
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "size" } }); expect(fetcher).not.toHaveBeenCalled();
@@ -59,7 +81,7 @@ describe("SearchPage actual client/fake HTTP workflow", () => {
   test("empty response and API scope failure are clear states and clear prior evidence", async () => {
     const fetcher = vi.fn().mockResolvedValueOnce(reply("first", [hit()])).mockResolvedValueOnce(reply("absent", [])).mockResolvedValueOnce(new Response("{}", { status: 403 }));
     vi.stubGlobal("fetch", fetcher); show(); submit("first"); await screen.findByRole("link", { name: "Open transcript" });
-    submit("absent"); expect(await screen.findByText("No passages found for “absent”.")).toBeInTheDocument(); expect(screen.queryByRole("link")).toBeNull();
+    submit("absent"); expect(await screen.findByText("No passages found for “absent”.")).toBeInTheDocument(); expect(screen.queryByRole("link", { name: "Open transcript" })).toBeNull();
     submit("restricted"); expect(await screen.findByRole("alert")).toHaveTextContent("This API key needs search access."); expect(screen.queryByRole("link")).toBeNull();
   });
   test("network or malformed evidence never displays an unsupported result", async () => {
@@ -84,7 +106,7 @@ describe("SearchPage actual client/fake HTTP workflow", () => {
     const raw = hit("Paragraph text"); const documentHit = { ...raw, turn: { ...raw.turn, speakerRef: "document", speakerLabel: undefined, tStart: 10, tEnd: 24 } };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValueOnce(reply("paragraph", [documentHit])).mockResolvedValueOnce(reply("missing", [{ ...hit(), turn: null, session: null }]))); show(); submit("paragraph");
     expect(await screen.findByText("Characters 10–24")).toBeInTheDocument(); expect(screen.getByText("Speaker: document")).toBeInTheDocument();
-    submit("missing"); expect(await screen.findByText("Passage unavailable.")).toBeInTheDocument(); expect(screen.queryByRole("link")).toBeNull();
+    submit("missing"); expect(await screen.findByText("Passage unavailable.")).toBeInTheDocument(); expect(screen.queryByRole("link", { name: "Open transcript" })).toBeNull();
   });
   test("401 invalidation removes the authenticated form without automatic resubmission", async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response("{}", { status: 401 })); vi.stubGlobal("fetch", fetcher); show(); submit("expired");

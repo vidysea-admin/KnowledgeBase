@@ -1,0 +1,161 @@
+{
+  "kind": "readonly-preparation-not-checker-verdict",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "head": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "cycle": 1,
+  "oldReceipt": "qa/goal-vectorless-2026-10-15/verification-t036-20261015T0721.json",
+  "pins": [
+    {
+      "path": "packages/db/src/collections/meeting-candidates.ts",
+      "historical": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+      "current": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+      "match": true
+    },
+    {
+      "path": "packages/db/src/collections/meeting-candidates.test.ts",
+      "historical": "5149cac7dafe33a82157b538e0f973efc85194302d62ce9e31ce852f57a0f793",
+      "current": "5149cac7dafe33a82157b538e0f973efc85194302d62ce9e31ce852f57a0f793",
+      "match": true
+    },
+    {
+      "path": "packages/db/src/lib/tenantScope.ts",
+      "historical": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+      "current": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+      "match": true
+    },
+    {
+      "path": "packages/db/src/client.ts",
+      "historical": "eb83337493ace4486c03847bac59ac478b4c6bf84862ec5c9ea7d48b463ba5eb",
+      "current": "eb83337493ace4486c03847bac59ac478b4c6bf84862ec5c9ea7d48b463ba5eb",
+      "match": true
+    },
+    {
+      "path": "packages/core/src/generated/meeting_candidates.ts",
+      "historical": "d6a4f5be963d022bbe07bf768ac20c59295df4724279c92a2a9ca71e316aa626",
+      "current": "d6a4f5be963d022bbe07bf768ac20c59295df4724279c92a2a9ca71e316aa626",
+      "match": true
+    },
+    {
+      "path": "schema/meeting_candidates.schema.json",
+      "historical": "9d3b6b5d6176c29bad4bc7fc4c5c2afc4eee5f9227af8d9e7b02be399ea8203d",
+      "current": "9d3b6b5d6176c29bad4bc7fc4c5c2afc4eee5f9227af8d9e7b02be399ea8203d",
+      "match": true
+    },
+    {
+      "path": "packages/db/package.json",
+      "historical": "77f9a2f02b29062d3272b633e0a6cf583a48a653c2441956a1785dd5aee83e24",
+      "current": "77f9a2f02b29062d3272b633e0a6cf583a48a653c2441956a1785dd5aee83e24",
+      "match": true
+    },
+    {
+      "path": "packages/core/package.json",
+      "historical": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+      "current": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+      "match": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "historical": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "current": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "match": true
+    },
+    {
+      "path": "qa/contracts/t036-candidate-provenance-refresh.md",
+      "historical": "7ec8f6dc93320403f8bafe875652802b1b6ce11d5b7f36a582e54940a3bb2eb0",
+      "current": "7ec8f6dc93320403f8bafe875652802b1b6ce11d5b7f36a582e54940a3bb2eb0",
+      "match": true
+    },
+    {
+      "path": "apps/api/src/store.ts",
+      "historical": "9d976378610a30d56ae12842f2d5024a1363206923dd56325f8e839beaf45907",
+      "current": "33d089ebc5264274e577439b5380ff0c1cd0d7ffdc2416fe9cca337854bf1cd3",
+      "match": false
+    },
+    {
+      "path": "apps/api/src/routes/meeting-candidates.ts",
+      "historical": "10a5f6457b4405308f68d83b972f3d41da0ae58eef159cd749b96cb063125e21",
+      "current": "811a73fbb686ed3728897ecd2b2a0b03ae129231ae3953fb1b4a25d75b802464",
+      "match": false
+    },
+    {
+      "path": "apps/api/src/gws/gws-gmail.ts",
+      "historical": "81385d2e023c40bf9e5b75fd592bbf901327fff08a985cec160281d42e28c455",
+      "current": "81385d2e023c40bf9e5b75fd592bbf901327fff08a985cec160281d42e28c455",
+      "match": true
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "historical": "f9b22d7dcf169a0b27040d0e84411a0b6a5a5fd8b229edbe79d84b79cc9cb328",
+      "current": "86ec1d549ba0b0fa3c9017fae245c7237fde7cc3bcda90c4f534f3f0bc29f0fa",
+      "match": false
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "historical": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+      "current": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+      "match": true
+    },
+    {
+      "path": "packages/core/src/domain/sender-authentication.ts",
+      "historical": "d2475fc7fe1d79c593993afb069e8329052b9bc18469570f8a04c590d4a040e4",
+      "current": "d2475fc7fe1d79c593993afb069e8329052b9bc18469570f8a04c590d4a040e4",
+      "match": true
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "historical": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+      "current": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231",
+      "match": false
+    },
+    {
+      "path": "packages/core/src/domain/webinar-types.ts",
+      "historical": "b0d4489e833e2734f3034356add7d2f1c96714895db7f19888176160d4709760",
+      "current": "b0d4489e833e2734f3034356add7d2f1c96714895db7f19888176160d4709760",
+      "match": true
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/schedule-loaders.ts",
+      "historical": "d87f073c1b78cf13630f063cdc897de7f5e27294487e236a2aa49de8830f8f35",
+      "current": "d87f073c1b78cf13630f063cdc897de7f5e27294487e236a2aa49de8830f8f35",
+      "match": true
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/auto-join.ts",
+      "historical": "a9b6d5c4cd4feb13e3e428778e7e0143aa687af09eccbccace8203b230ac3023",
+      "current": "f284aebd74bc3bf986bf641d196f3569a25d1068ff6e846e3006acaf038cc6c4",
+      "match": false
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/auto-record-policy.ts",
+      "historical": "2172c66cf00ce07444d56043bf2422ce2d4b4963da6717d42e0bf886fea537a6",
+      "current": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+      "match": false
+    },
+    {
+      "path": "qa/evidence/t036-provenance-refresh-independent-20261015.mjs",
+      "historical": "6de80fbbd074bc348019f9f0b442f95a326fe3662e054442c4774ac3550133a4",
+      "current": "6de80fbbd074bc348019f9f0b442f95a326fe3662e054442c4774ac3550133a4",
+      "match": true
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/auto-join.test.ts",
+      "historical": "2675c7055841e694316845254e8945495affb067531b58d1d9083e01dc1fa716",
+      "current": "2675c7055841e694316845254e8945495affb067531b58d1d9083e01dc1fa716",
+      "match": true
+    },
+    {
+      "path": "package.json",
+      "historical": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+      "current": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+      "match": true
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-run.mjs",
+      "historical": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876",
+      "current": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876",
+      "match": true
+    }
+  ],
+  "actualUsage": null,
+  "priorUsage": "unknown preserved; no efficiency claim"
+}

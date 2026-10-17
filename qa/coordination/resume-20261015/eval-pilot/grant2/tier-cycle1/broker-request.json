@@ -1,0 +1,27 @@
+{
+  "candidate": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6ed14cd055a0701dfc689fdd173a142b535a95e205015779072a6e28024886b1"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "db70d69e7495eade222b2b736db10b062ca561c03464126870e04ee4df1ef0e7"
+    }
+  ],
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-name-pattern=grant2 |live disabled by default|persisted finite authorization|inflight output reservations",
+    "scripts/eval/vectorless-production-eval.test.mjs"
+  ],
+  "expectedSelectedTests": 7,
+  "outerTimeoutSeconds": 45,
+  "providerCallsAllowed": false,
+  "reason": "4new grant2 cases +3unchanged legacy/full authorization/output reservation guards",
+  "cpuSlot": "BROKER_ONLY_AFTER_ROOT_RELEASE"
+}

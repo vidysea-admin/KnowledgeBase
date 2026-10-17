@@ -1,0 +1,62 @@
+[
+  {
+    "path": "scripts/webinar/send-now-host.ts",
+    "receiptKey": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\send-now-host.ts",
+    "current": "AC7564EBA70180A64D2EA79F28092749D89DBE92C233DDD88F63F56B2F946DB1",
+    "match": true
+  },
+  {
+    "path": "scripts/webinar/send-now-host.test.ts",
+    "receiptKey": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\send-now-host.test.ts",
+    "current": "2561D521B2C5B38BF52CE5ADAAB9EEC19B8DF8E8EF2A7CCCF9B0CBBA8BDB080C",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now-command.ts",
+    "receiptKey": "packages/meeting-bot/src/send-now-command.ts",
+    "current": "71C51F7304A2866A39DFC5B6F01E4ACB57F96466938861A47C738861B24539A3",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now-command.test.ts",
+    "receiptKey": "packages/meeting-bot/src/send-now-command.test.ts",
+    "current": "6C1E0A9BF4080998394BC8134B246F73AAC61CF7FB21976DC0608C6E2BAFA7D5",
+    "match": true
+  },
+  {
+    "path": "scripts/webinar/manual-jobs/host.ts",
+    "receiptKey": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\manual-jobs\\host.ts",
+    "current": "C7CCD395C44E1D5065B0F4F04F6FD76F3C14B127E271B55439D2C27A5DB63DB0",
+    "match": true
+  },
+  {
+    "path": "scripts/webinar/manual-jobs/host.test.ts",
+    "receiptKey": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\manual-jobs\\host.test.ts",
+    "current": "FF4A4AABE209851FA3521EE617163DA5876D888C8F0DECB2891A88893C92E1F6",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+    "receiptKey": "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+    "current": "2EF302F1282E47EFBA7468B362B44CA5FDBECC1C2719DFB9CD4346F10C925619",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/calendar/calendar-client.ts",
+    "receiptKey": "packages/meeting-bot/src/calendar/calendar-client.ts",
+    "current": "18E631DEFD413CC832BA60FA10DF390B5444BD53FFF78D1CD4EC9F13A4384307",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now.ts",
+    "receiptKey": "packages/meeting-bot/src/send-now.ts",
+    "current": "CB7C973B28A475D1A1640C8B2A0ECAC8D4EDF1FB2342EA5245B00AB330B84B48",
+    "match": true
+  },
+  {
+    "path": "pnpm-lock.yaml",
+    "receiptKey": "pnpm-lock.yaml",
+    "current": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD",
+    "match": true
+  }
+]

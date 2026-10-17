@@ -1,0 +1,307 @@
+/** Actual mounted approved-message journey over public synthetic Mongo/upstream fixtures.
+ * No manually inserted decision, native branch, fake audio identity, live DB or provider proof. */
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import type { AddressInfo } from "node:net";
+import type { ClientSession, TransactionOptions } from "mongodb";
+import type { WhatsAppMessage } from "@lkb/ingest";
+import type { MessageSourceLocator } from "@lkb/core";
+import { treeSearch } from "@lkb/index";
+import { unpackContext } from "../../../../packages/ask/src/bounded-refine.js";
+import { fakeComplete, fakeWrite } from "../../../../packages/ask/src/testUtils.js";
+import { wireMongoFixture } from "../whatsapp/review/wire-fixtures.js";
+import { createWhatsAppReviewWiring } from "../whatsapp/review/compose.js";
+import { buildNativeProductionIntegrations } from "../composition/integrations/native-production.js";
+import { parseNativeSourceLocator } from "./resolver.js";
+import { trustedTreeReads } from "../composition/integrations/trusted-readers.js";
+import { createMongoSearchDeps } from "../search-store.js";
+import { createSourceRequestDepsFor } from "../ask/source-context.js";
+import { createAnswerPolicyService } from "../answer-policy/service.js";
+import { createInMemoryAnswerPolicyStore } from "../answer-policy/store.js";
+import { createInMemoryAnswerRecordStore } from "../answer-policy/answer-record-store.js";
+import { createAnswerWorkflow } from "../answer-policy/answer-workflow.js";
+import { createMongoEvidenceVerifier } from "../answer-policy/answer-evidence.js";
+import { createKnowledgeVisibility } from "../visibility/knowledge.js";
+import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
+import { createServer } from "../server.js";
+
+type Row = Record<string, any>;
+const TENANT = "tenant-a", GROUP = "group@g.us", OWNER = "111111111111111111111111";
+const TEXT = "Scholarship application ka form October mein khulta hai.";
+const SIBLING = "Visa sibling fee is 99.";
+const QUERY = "Scholarship application";
+
+/** Extend only public Mongo query/cursor protocol; all source/service/publication logic is real.
+ * Existing wireMongoFixture supplies rollback and active transaction sessions, not real MVCC. */
+function databaseFixture() {
+  const fx = wireMongoFixture(), counters = { embeddings: 0, vectors: 0 };
+  let activeTransactions = 0, sessionSequence = 0;
+  const operations: { name: string; method: string; session?: ClientSession }[] = [];
+  const values = (row: unknown, path: string[]): unknown[] => {
+    if (!path.length) return [row];
+    if (Array.isArray(row)) return row.flatMap(item => values(item, path));
+    if (!row || typeof row !== "object") return [undefined];
+    return values((row as Row)[path[0]!], path.slice(1));
+  };
+  const one = (actual: unknown, expected: unknown): boolean => {
+    if (expected instanceof RegExp) return typeof actual === "string" && expected.test(actual);
+    if (expected && typeof expected === "object" && !Array.isArray(expected)) {
+      const op = expected as Row;
+      if ("$regex" in op) return typeof actual === "string" && new RegExp(op.$regex, op.$options ?? "").test(actual);
+      if ("$in" in op) return op.$in.includes(actual);
+      if ("$nin" in op) return !op.$nin.includes(actual);
+      if ("$exists" in op) return (actual !== undefined) === op.$exists;
+      if ("$ne" in op) return actual !== op.$ne;
+      throw new Error("Unsupported generic fixture condition");
+    }
+    return actual === expected;
+  };
+  const matches = (row: Row, filter: Row): boolean => Object.entries(filter).every(([key, expected]) => {
+    if (key === "$or") return expected.some((part: Row) => matches(row, part));
+    if (key === "$and") return expected.every((part: Row) => matches(row, part));
+    return values(row, key.split(".")).some(actual => one(actual, expected));
+  });
+  const db = new Proxy(fx.db, { get(target, key) {
+    if (key === "client") return new Proxy(target.client, { get(client, member) {
+      if (member !== "startSession") return Reflect.get(client, member, client);
+      return () => {
+        const session = client.startSession(), sequence = ++sessionSequence;
+        return new Proxy(session, { get(current, method) {
+          if (method === "withTransaction") return async (run: (session: ClientSession) => Promise<unknown>, options?: TransactionOptions) => {
+            console.error(`MESSAGE_STAGE tx_request session=${sequence} active=${activeTransactions}`);
+            return current.withTransaction(async () => {
+              activeTransactions++; console.error(`MESSAGE_STAGE tx_begin session=${sequence} active=${activeTransactions}`);
+              try { return await run(session); }
+              finally { activeTransactions--; console.error(`MESSAGE_STAGE tx_end session=${sequence} active=${activeTransactions}`); }
+            }, options);
+          };
+          const value = Reflect.get(current, method, current);
+          return typeof value === "function" ? value.bind(current) : value;
+        } });
+      };
+    } });
+    if (key !== "collection") return Reflect.get(target, key, target);
+    return (name: string) => {
+      if (/chunk|vector|embedding/i.test(name)) { counters.vectors++; throw new Error("Forbidden vector storage " + name); }
+      const collection = target.collection(name);
+      return new Proxy(collection, { get(coll, method) {
+        if (method === "find") return (filter: Row = {}, options: { limit?: number; session?: ClientSession } = {}) => {
+          operations.push({ name, method: "find", session: options.session }); let max = options.limit ?? Infinity;
+          const cursor = { limit(n: number) { max = n; return cursor; },
+            async toArray() { return fx.rows(name).filter(row => matches(row, filter)).slice(0, max); } };
+          return cursor;
+        };
+        const member = Reflect.get(coll, method, coll);
+        if (typeof member !== "function") return member;
+        return (...args: unknown[]) => {
+          const options = args[["updateOne", "replaceOne"].includes(String(method)) ? 2 : 1] as { session?: ClientSession } | undefined;
+          operations.push({ name, method: String(method), session: options?.session });
+          return member.apply(coll, args);
+        };
+      } });
+    };
+  } });
+  const embed = async (): Promise<never> => { counters.embeddings++; throw new Error("Forbidden embedding port"); };
+  return { db, fx, operations, counters, embed };
+}
+
+async function fixture(testSignal?: AbortSignal) {
+  const f = databaseFixture();
+  let messages: WhatsAppMessage[] = [TEXT, SIBLING].map((text, i) => ({ messageId: `m${i}`, personId: "expert", displayName: "Expert", text,
+    ts: new Date(Date.parse("2026-10-14T10:00:00Z") + i * 1000).toISOString() }));
+  // Public synthetic upstream/verified-owner configuration follows the shipped publication fixture.
+  // It is not a claim that a real user's WhatsApp account, identity or consent was verified here.
+  const wiring = createWhatsAppReviewWiring({ appDb: () => f.db, resolveOwner: async tenant => tenant === TENANT ? OWNER : null,
+    now: () => "2026-10-14T11:00:00Z",
+    listGroups: async () => [{ groupJid: GROUP, ownerUserId: OWNER, subject: "Private fixture group", trackedPersonCount: 1 }],
+    fetchMessages: async () => messages });
+  const native = buildNativeProductionIntegrations(f.db);
+  assert.equal(typeof native.resolver.forReadView, "function", "Actual production factory must bind native authority to trusted-tree read snapshots");
+  assert.equal(typeof native.graph.readSnapshot, "function", "Actual production graph reader must be available for request DI");
+  let expectedMessageLocator: MessageSourceLocator | undefined;
+  const complete = fakeComplete(job => {
+    if (job.kind === "ask.select_nodes") return { json: { node_ids: [...job.messages[1]!.content.matchAll(/^- (.*?) \| /gm)].map(match => match[1]) } };
+    if (job.kind === "evaluator") return { text: JSON.stringify({ score: 0.95, reason: "Synthetic text-model relevance control" }) };
+    if (job.kind === "ask.answer") {
+      const context = unpackContext(JSON.parse(job.messages[1]!.content).context);
+      const kinds = context.map(source => ["message", "document-page", "speech", "screen-ocr-unverified", "visual-observation-unverified"].includes(source.origin) ? source.origin : "other");
+      console.error(`MESSAGE_DIAG phase=answer_context count=${context.length} originKinds=${JSON.stringify(kinds)}`);
+      assert.ok(context.length);
+      const message = context.find(source => source.origin === "message" && source.source && "sourceLocator" in source.source
+        && source.source.sourceLocator.kind === "message");
+      assert.ok(message, "Actual admitted context must contain a native message source");
+      assert.equal(message.origin, "message"); assert.equal(message.text, TEXT);
+      assert.ok(message.source && "sourceLocator" in message.source);
+      const locator = parseNativeSourceLocator(message.source.sourceLocator);
+      assert.ok(locator?.kind === "message"); assert.ok(expectedMessageLocator);
+      assert.deepEqual(locator, expectedMessageLocator, "Answer must bind the actual current search/citation message identity");
+      return { json: { sentences: [{ text: message.text, sourceIds: [message.sourceId] }] } };
+    }
+    if (job.kind === "ask.answer_grounding") return { json: { decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] } };
+    throw new Error("Unexpected approved text-model job " + job.kind);
+  });
+  const write = fakeWrite();
+  const requestDepsFor = createSourceRequestDepsFor({ db: f.db, vectorless: true, embed: f.embed,
+    treeSearchFn: treeSearch, nativeSources: native.nativeSources, graph: native.graph, write,
+    dispatch: async (job, tenant) => {
+      try {
+        assert.equal(tenant, TENANT);
+        if (job.kind === "ask.answer") {
+          assert.ok(expectedMessageLocator);
+          const current = await native.resolver.resolve(tenant, expectedMessageLocator);
+          assert.ok(current, "Actual native message source must still be current before fixture text generation");
+          assert.equal(current.quote, TEXT);
+        }
+        return await complete(job);
+      }
+      catch (error) {
+        const kind = ["evaluator", "ask.select_nodes", "ask.refine_batch", "ask.answer", "ask.answer_grounding"].includes(job.kind) ? job.kind : "other";
+        const errorClass = error instanceof SyntaxError ? "SyntaxError" : error instanceof TypeError ? "TypeError"
+          : error instanceof Error && error.name === "AssertionError" ? "AssertionError" : error instanceof Error ? "Error" : "NonError";
+        console.error(`MESSAGE_DIAG phase=completion jobKind=${kind} errorClass=${errorClass}`);
+        throw error;
+      }
+    },
+  });
+  const policies = createAnswerPolicyService(createInMemoryAnswerPolicyStore());
+  await policies.save(TENANT, "message-career", { questionClass: "career", mode: "internal-only", style: "detailed",
+    onInsufficient: "review", citations: "required", note: "Synthetic native message policy" }, { actor: "synthetic-owner" });
+  const workflow = createAnswerWorkflow(policies, createInMemoryAnswerRecordStore(),
+    createMongoEvidenceVerifier(f.db, undefined, createKnowledgeVisibility(f.db).eligibleTurn, native.resolver));
+  const deps = buildTestDeps({ keyStore: fakeKeyStore({ owner: { tenantId: TENANT, keyId: "synthetic-owner", scopes: ["whatsapp", "search", "citations", "ask"] },
+    foreign: { tenantId: "tenant-b", keyId: "synthetic-foreign", scopes: ["whatsapp", "search", "citations", "ask"] },
+    limited: { tenantId: TENANT, keyId: "synthetic-limited", scopes: ["search"] } }),
+    whatsapp: wiring.whatsapp, whatsappReview: wiring.reviewRouter, nativeEvidence: native.resolver,
+    search: createMongoSearchDeps({ db: f.db, nativeEvidence: native.resolver }),
+    answerWorkflow: workflow, answerPolicyService: policies,
+    ask: { tree: trustedTreeReads(() => f.db, native.resolver), askDeps: requestDepsFor(TENANT), requestDepsFor, answerWorkflow: workflow },
+  });
+  const server = createServer(deps).listen(0, "127.0.0.1");
+  await new Promise<void>((resolve, reject) => { server.once("listening", resolve); server.once("error", reject); });
+  const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  const call = async (path: string, method = "GET", body?: unknown, key = "owner") => {
+    const endpoint = path.startsWith("/whatsapp/review/") ? "review-decision"
+      : path.startsWith("/answer-history/") ? "answer-history-detail" : path.split("?")[0]!.split("/").slice(1, 3).join("/");
+    console.error(`MESSAGE_STAGE http_start ${method} ${endpoint}`);
+    try {
+      const response = await fetch(base + path, {
+        method, signal: testSignal ? AbortSignal.any([testSignal, AbortSignal.timeout(6000)]) : AbortSignal.timeout(6000),
+        headers: { "content-type": "application/json", ...(key ? { authorization: "Bearer " + key } : {}) },
+        ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      });
+      console.error(`MESSAGE_STAGE http_end ${method} ${endpoint} status=${response.status}`); return response;
+    } catch (error) { console.error(`MESSAGE_STAGE http_abort ${method} ${endpoint}`); throw error; }
+  };
+  const json = async (response: Response, expected: number, stage: string): Promise<Row> => {
+    const text = await response.text(); assert.equal(response.status, expected, `HOLD ${stage}: ${text.slice(0, 500)}`);
+    assert.deepEqual(f.counters, { embeddings: 0, vectors: 0 }, stage);
+    return JSON.parse(text) as Row;
+  };
+  const ask = () => call("/ask", "POST", { query: QUERY, questionClass: "career", policyId: "message-career", policyVersion: 1,
+    evidenceMode: true, filters: { sessionIds: [], sources: "internal" } });
+  const search = async (key = "owner") => json(await call("/search?q=" + encodeURIComponent(QUERY), "GET", undefined, key), 200, "actual native message search");
+  let closing: Promise<void> | undefined;
+  return { ...f, wiring, native, complete, call, json, ask, search,
+    expectMessage(locator: MessageSourceLocator) { expectedMessageLocator = structuredClone(locator); },
+    removeMessage() { messages = messages.filter(message => message.messageId !== "m0"); },
+    editMessage() { messages = messages.map(message => message.messageId === "m0" ? { ...message, text: "Scholarship application ka form ab November mein khulta hai." } : message); },
+    close() {
+      return closing ??= (async () => {
+        console.error("MESSAGE_STAGE cleanup_start"); server.closeAllConnections();
+        await new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()));
+        console.error("MESSAGE_STAGE cleanup_end");
+      })();
+    },
+  };
+}
+
+async function approve(f: Awaited<ReturnType<typeof fixture>>) {
+  await f.json(await f.call("/whatsapp/ingest", "POST", { groupJid: GROUP }, ""), 401, "unauthenticated ingest refusal");
+  const ingest = await f.json(await f.call("/whatsapp/ingest", "POST", { groupJid: GROUP }), 201, "actual reviewed message ingest");
+  assert.equal(ingest.turnCount, 2); assert.equal(f.fx.rows("tree_index").length, 0);
+  const pending = await f.json(await f.call("/whatsapp/review"), 200, "actual detector review queue");
+  const candidate = pending.candidates.find((row: Row) => row.text === TEXT); assert.ok(candidate);
+  assert.equal(candidate.status, "needs-review"); assert.equal(candidate.evidence[0].quote, TEXT);
+  assert.equal((await f.search()).hits.length, 0, "Pending messages must stay quarantined");
+  await f.json(await f.call(`/whatsapp/review/${encodeURIComponent(candidate._id)}/approve`, "POST", {}, "foreign"), 404, "foreign approval refusal");
+  await f.json(await f.call(`/whatsapp/review/${encodeURIComponent(candidate._id)}/approve`, "POST", {}, "limited"), 403, "approval scope refusal");
+  f.operations.length = 0;
+  const approved = await f.json(await f.call(`/whatsapp/review/${encodeURIComponent(candidate._id)}/approve`, "POST", {}), 200, "actual same-transaction message approval/publication");
+  assert.equal(approved.candidate.status, "approved");
+  const writes = f.operations.filter(operation => ["sources", "whatsapp_candidates", "claims", "tree_index"].includes(operation.name) && operation.method === "updateOne");
+  for (const name of ["sources", "whatsapp_candidates", "claims", "tree_index"]) assert.ok(writes.some(write => write.name === name), name + " must participate in actual approval");
+  assert.ok(writes.length >= 4 && writes[0]!.session); assert.ok(writes.every(write => write.session === writes[0]!.session));
+  const result = await f.search(); assert.equal(result.nativeTruncated, false);
+  const hits = result.hits.filter((hit: Row) => hit.nativeSourceLocator?.kind === "message"); assert.equal(hits.length, 1);
+  assert.ok(!JSON.stringify(result).includes(SIBLING)); assert.ok(!JSON.stringify(result).includes("Private fixture group"));
+  const locator = hits[0]!.nativeSourceLocator as MessageSourceLocator;
+  assert.equal(locator.sourceId, ingest.sourceId); assert.equal(locator.threadId, ingest.sessionId); assert.equal(locator.messageId, candidate.evidence[0].turnId);
+  assert.equal("turnId" in hits[0], false); assert.equal("sessionId" in hits[0], false);
+  const citation = await f.json(await f.call("/citations/native/resolve", "POST", { sourceLocator: locator }), 200, "actual search-to-native message citation");
+  assert.equal(citation.evidence.quote, TEXT); assert.deepEqual(citation.evidence.sourceLocator, locator);
+  f.expectMessage(locator);
+  const answer = await f.json(await f.ask(), 200, "actual request-bound native message policy Ask");
+  assert.equal(answer.state, "allowed", "HOLD: actual policy must release canonical native message evidence"); assert.equal(answer.answer, TEXT);
+  const proofs = answer.sources.internal.flatMap((node: Row) => node.evidence?.sourceQuotes ?? []); assert.ok(proofs.length);
+  assert.ok(proofs.some((proof: Row) => proof.origin === "message" && proof.sourceLocator?.kind === "message"));
+  for (const proof of proofs) {
+    assert.equal(proof.quote, TEXT);
+    if (proof.origin === "message") {
+      assert.deepEqual(proof.sourceLocator, locator);
+      for (const forbidden of ["turnId", "sessionRef", "tStart", "tEnd", "speakerRef"]) assert.equal(forbidden in proof, false);
+    } else {
+      assert.equal(proof.origin, "speech", "Mixed context may contain only the actual existing transcript source beside the native message");
+      const turn = f.fx.rows("turns").find(row => row._id === proof.turnId && row.tenantId === TENANT);
+      assert.ok(turn); assert.equal(proof.quote, turn.text); assert.equal(proof.sessionRef, turn.sessionId);
+      assert.equal(proof.speakerRef, turn.speakerRef); assert.equal(proof.tStart, turn.tStart); assert.equal(proof.tEnd, turn.tEnd);
+      assert.equal("sourceLocator" in proof, false);
+    }
+  }
+  const historyPath = "/answer-history/" + encodeURIComponent(answer.runId);
+  const history = await f.json(await f.call(historyPath), 200, "actual current native message answer history");
+  assert.equal(history.result.state, "allowed"); assert.equal(history.result.answer, TEXT);
+  return { ingest, candidate, locator, answer, historyPath };
+}
+
+test("approved Hinglish message traverses actual ingest approval transaction native search citation Ask policy and history", { timeout: 30_000 }, async t => {
+  const f = await fixture(t.signal); t.after(() => f.close());
+  try {
+    const ready = await approve(f);
+    assert.deepEqual((await f.search("foreign")).hits, []);
+    await f.json(await f.call("/citations/native/resolve", "POST", { sourceLocator: ready.locator }, "foreign"), 404, "foreign message citation refusal");
+    await f.json(await f.call(ready.historyPath, "GET", undefined, "foreign"), 404, "foreign native answer history refusal");
+    assert.ok(f.complete.calls.some(job => job.kind === "ask.answer")); assert.deepEqual(f.counters, { embeddings: 0, vectors: 0 });
+  } finally { await f.close(); }
+});
+
+for (const invalidation of ["withdrawal", "deletion", "source-mutation"] as const) {
+  test(`native message ${invalidation} invalidates actual search citation policy history and Ask`, { timeout: 30_000 }, async t => {
+    const f = await fixture(t.signal); t.after(() => f.close());
+    try {
+      const ready = await approve(f);
+      if (invalidation === "withdrawal") {
+        await f.db.collection("sources").updateOne({ tenantId: TENANT, _id: ready.ingest.sourceId }, { $set: { "consent.given": false } });
+      } else if (invalidation === "deletion") {
+        f.removeMessage();
+        await f.json(await f.call("/whatsapp/ingest", "POST", { groupJid: GROUP }), 201, "actual upstream deletion re-ingest/invalidation");
+      } else {
+        f.editMessage();
+        await f.json(await f.call("/whatsapp/ingest", "POST", { groupJid: GROUP }), 201, "actual source-message edit re-ingest/invalidation");
+      }
+      const current = await f.search(); assert.ok(!current.hits.some((hit: Row) => hit.nativeSourceLocator?.messageId === ready.locator.messageId));
+      assert.ok(!JSON.stringify(current).includes(TEXT), "Old approved text cannot survive through another search arm");
+      await f.json(await f.call("/citations/native/resolve", "POST", { sourceLocator: ready.locator }), 404, "current native message citation refusal");
+      const history = await f.json(await f.call(ready.historyPath), 200, "native policy history revalidates " + invalidation);
+      assert.equal(history.result.state, "stale"); assert.equal(history.result.answer, "");
+      assert.deepEqual(history.result.sourceEvidence, []); assert.deepEqual(history.result.sources, { internal: [], web: [] });
+      const answerCount = f.complete.calls.filter(job => job.kind === "ask.answer").length;
+      const response = await f.ask(); const body: unknown = await response.json();
+      assert.ok([200, 404, 503].includes(response.status), "HOLD: invalidated source must refuse honestly");
+      assert.ok(body !== null && typeof body === "object" && !Array.isArray(body), "Refusal must be a JSON object");
+      assert.notEqual("state" in body ? body.state : undefined, "allowed");
+      assert.ok(!("answer" in body) || !body.answer); assert.ok(!JSON.stringify(body).includes(TEXT));
+      assert.equal(f.complete.calls.filter(job => job.kind === "ask.answer").length, answerCount, "Invalid source cannot reach answer generation");
+      assert.deepEqual(f.counters, { embeddings: 0, vectors: 0 });
+    } finally { await f.close(); }
+  });
+}

@@ -1,0 +1,99 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import type { Request, Response, Router } from "express";
+import type { Db } from "mongodb";
+import type { VerifiedKey } from "../../auth.js";
+import { buildReviewIntegrations } from "./reviews.js";
+import { createSpeakerRelationsRouter } from "../../speaker-relations/router.js";
+import { createSpeakerRelationSourceRouter } from "../../speaker-relations/source-router.js";
+
+const principal: VerifiedKey = { tenantId: "A", keyId: "key:a", scopes: ["sessions"] };
+const proposal = { id: "proposal:1", personId: "person:priya", fromClaimId: "claim:1", toClaimId: "claim:2",
+  type: "contradicts", sourceRevisionDigest: "a".repeat(64),
+  evidence: [{ sessionId: "session:1", turnId: "turn:1", quote: "Evidence", transcriptHash: "b".repeat(64) }] };
+const review = { baseRevision: 1, requestId: "review:1", decision: "accept" };
+function configuration(reviewerKind: "human" | "automation", canPropose: boolean, canReview: boolean): NodeJS.ProcessEnv {
+  return { LKB_REVIEW_AUTHORITY_JSON: JSON.stringify({ version: 1, tenants: [{ tenantId: "A", keys: [{
+    keyId: "key:a", subject: "actor:configured", reviewerKind, canPropose, canReview, answerActions: [],
+  }] }] }) };
+}
+function database() {
+  const calls: { sessions: number; collections: string[]; filters: unknown[]; ended: number } = { sessions: 0, collections: [], filters: [], ended: 0 };
+  const session = { async withTransaction<T>(run: () => Promise<T>) { return run(); },
+    async endSession() { calls.ended++; }, inTransaction() { return false; } };
+  const db = { client: { startSession() { calls.sessions++; return session; } }, collection(name: string) {
+    calls.collections.push(name);
+    return { async findOne(filter: unknown) { calls.filters.push(filter); return null; } };
+  } } as unknown as Db;
+  return { db, calls };
+}
+/** Exercise the real Express Router dispatcher without a listener, auth headers, or network. */
+async function request(router: Router, auth: VerifiedKey, method: string, url: string, body?: unknown) {
+  const parsed = new URL(url, "http://test.invalid");
+  return new Promise<{ status: number; body: unknown }>((resolve, reject) => {
+    let status = 200;
+    const req = { method, url: parsed.pathname + parsed.search, originalUrl: url, auth,
+      query: Object.fromEntries(parsed.searchParams), body } as unknown as Request;
+    const res = { setHeader() {}, status(value: number) { status = value; return this; },
+      json(value: unknown) { resolve({ status, body: value }); return this; } } as unknown as Response;
+    (router as unknown as { handle(req: Request, res: Response, next: (error?: unknown) => void): void })
+      .handle(req, res, error => reject(error ?? new Error("Unmatched review integration route")));
+  });
+}
+function mounted(db: Db, env: NodeJS.ProcessEnv) {
+  const deps = buildReviewIntegrations(db, env);
+  return { deps, relations: createSpeakerRelationsRouter(deps.speakerRelations), source: createSpeakerRelationSourceRouter(deps.speakerRelationSource) };
+}
+function untouched(calls: ReturnType<typeof database>["calls"]) {
+  assert.deepEqual(calls, { sessions: 0, collections: [], filters: [], ended: 0 });
+}
+
+test("composition denies unset review authority before either mounted router touches Mongo", { timeout: 5000 }, async () => {
+  const { db, calls } = database(); const routes = mounted(db, {});
+  assert.equal((await request(routes.relations, principal, "POST", "/speaker-relations", proposal)).status, 503);
+  assert.equal((await request(routes.relations, principal, "POST", "/speaker-relations/rel:1/review", review)).status, 503);
+  assert.equal((await request(routes.source, principal, "GET", "/speaker-relations/source?personId=person:priya")).status, 503);
+  untouched(calls);
+});
+
+test("composition binds both mounted routes to the exact configured tenant and key", { timeout: 5000 }, async () => {
+  const { db, calls } = database(); const routes = mounted(db, configuration("human", true, true));
+  for (const auth of [{ ...principal, tenantId: "B" }, { ...principal, keyId: "key:b" }]) {
+    assert.equal((await request(routes.relations, auth, "POST", "/speaker-relations", proposal)).status, 503);
+    assert.equal((await request(routes.relations, auth, "POST", "/speaker-relations/rel:1/review", review)).status, 503);
+    assert.equal((await request(routes.source, auth, "GET", "/speaker-relations/source?personId=person:priya")).status, 503);
+  }
+  untouched(calls);
+});
+
+test("configured identity without proposal or review permission cannot read source authority", { timeout: 5000 }, async () => {
+  const { db, calls } = database(); const routes = mounted(db, configuration("human", false, false));
+  assert.equal((await request(routes.relations, principal, "POST", "/speaker-relations", proposal)).status, 403);
+  assert.equal((await request(routes.source, principal, "GET", "/speaker-relations/source?personId=person:priya")).status, 403);
+  untouched(calls);
+});
+
+test("configured automation reaches authorized proposal and source snapshots but cannot review", { timeout: 5000 }, async () => {
+  const { db, calls } = database(); const routes = mounted(db, configuration("automation", true, false));
+  assert.ok(principal.keyId, "fixture requires a verified stored key identity");
+  assert.deepEqual(await routes.deps.speakerRelations.contextFor({ ...principal, keyId: principal.keyId }), {
+    tenantId: "A", actorId: "actor:configured", reviewerKind: "automation", canPropose: true, canReview: false,
+  });
+  assert.equal(routes.deps.speakerRelations.contextFor, routes.deps.speakerRelationSource.contextFor);
+  // Missing fixture speaker intentionally refuses publication; permission still reaches the real snapshot seam.
+  assert.equal((await request(routes.relations, principal, "POST", "/speaker-relations", proposal)).status, 503);
+  assert.equal(calls.sessions, 1); assert.equal(calls.ended, 1);
+  assert.equal((await request(routes.source, principal, "GET", "/speaker-relations/source?personId=person:priya")).status, 503);
+  assert.equal(calls.sessions, 2); assert.equal(calls.ended, 2);
+  assert.deepEqual(calls.collections, ["speaker_relationships", "speakers", "speaker_relationships", "speakers"]);
+  assert.deepEqual(calls.filters, [{ personId: "person:priya", tenantId: "A" }, { personId: "person:priya", tenantId: "A" }]);
+  const beforeReview = structuredClone(calls);
+  assert.equal((await request(routes.relations, principal, "POST", "/speaker-relations/rel:1/review", review)).status, 403);
+  assert.deepEqual(calls, beforeReview);
+});
+
+test("malformed server review configuration fails composition before Mongo access", () => {
+  const { db, calls } = database();
+  assert.throws(() => buildReviewIntegrations(db, { LKB_REVIEW_AUTHORITY_JSON: "{invalid" }), /invalid_review_authority_config/);
+  untouched(calls);
+});

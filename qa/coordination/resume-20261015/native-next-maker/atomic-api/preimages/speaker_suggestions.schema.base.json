@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://speaker_suggestions",
+  "title": "speaker_suggestions",
+  "description": "U2.4 model-judged speaker names that passed deterministic grounding (verbatim quote containing the name, multi-name abstain, deterministic floor not contradicted) and a verifier 'yes' on SINGLE evidence (D-141). A suggestion is NEVER a final speaker identity: it lives here, not in `speakers`, and no reader that serves final names (sessions, /ask citations, notes, graph) reads this collection. Only a human can confirm it (status `confirmed`, `finalProvenance` `human-confirmed`, and only then is a `speakers` row written). A `rejected` row is a durable tombstone: re-indexing must not re-suggest the same (sessionId, speakerRef, personId). Auto-final names stay limited to the deterministic floor plus the independent-pair rule and never pass through this collection.",
+  "type": "object",
+  "required": [
+    "_id",
+    "tenantId",
+    "sessionId",
+    "speakerRef",
+    "personId",
+    "displayName",
+    "status",
+    "provenance",
+    "evidence",
+    "suggestedAt"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Deterministic: <tenantId>-<sessionId>-<speakerRef>-<personId>, so re-suggesting is an idempotent no-op."
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sessionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "speakerRef": {
+      "type": "string",
+      "pattern": "^spk:[0-9]+$",
+      "description": "The positional diarization label this name would replace."
+    },
+    "personId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exactly as spoken in the transcript."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "suggested",
+        "confirmed",
+        "rejected"
+      ]
+    },
+    "provenance": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "turnId",
+          "evidenceQuote",
+          "evidenceKind"
+        ],
+        "properties": {
+          "turnId": {
+            "type": "string"
+          },
+          "evidenceQuote": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidenceKind": {
+            "type": "string",
+            "enum": [
+              "self-intro",
+              "called-on",
+              "address",
+              "handover",
+              "thanks",
+              "role-continuity",
+              "tile"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "turnId",
+          "sessionId"
+        ],
+        "properties": {
+          "turnId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "startTurnIndex",
+          "endTurnIndex"
+        ],
+        "properties": {
+          "startTurnIndex": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "endTurnIndex": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "turnIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 1
+          },
+          "transcriptHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "suggestedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finalProvenance": {
+      "type": "string",
+      "const": "human-confirmed",
+      "description": "Present exactly when status is `confirmed`."
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "confirmed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "finalProvenance",
+          "decidedAt"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "rejected"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "required": [
+          "decidedAt"
+        ],
+        "not": {
+          "required": [
+            "finalProvenance"
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "suggested"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "finalProvenance"
+              ]
+            },
+            {
+              "required": [
+                "decidedAt"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": false
+}

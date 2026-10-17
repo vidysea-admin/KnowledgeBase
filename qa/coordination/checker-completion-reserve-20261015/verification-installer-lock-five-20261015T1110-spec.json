@@ -1,0 +1,37 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "scope": "Isolated installer exclusive-handle repair five cases: owned GUID fixtures only, DefinitionsOnly blocks canonical install",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review; existing PowerShell subprocess; test-only GUID owned fixture writes; canonical helper read/hash only",
+  "program": "C:/Program Files/PowerShell/7/pwsh.exe",
+  "args": [
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "qa/coordination/checker-completion-reserve-20261015/test-installer-lock.ps1"
+  ],
+  "testIDs": [
+    "wrong base untouched",
+    "successful install readback and backup",
+    "idempotent no-op",
+    "competing writer lock refuses",
+    "injected partial write restored under lock"
+  ],
+  "env": {
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 20000,
+  "output": "qa/coordination/checker-completion-reserve-20261015/verification-installer-lock-five-20261015T1110",
+  "pins": {
+    "qa/coordination/checker-completion-reserve-20261015/install-canonical-helper.ps1": "ba16241a88e32e0b64cec0ea3740708cc43574044c9e97ced00a382e135066be",
+    "qa/coordination/checker-completion-reserve-20261015/test-installer-lock.ps1": "204001b889e3e24c1e3eadef72aec632a458e1a61e4ff4c5ad5cbc688bec145f",
+    "qa/coordination/checker-completion-reserve-20261015/installer-cycle1-packet.md": "b2414ea9ad685325e6aca80a44f53c887c3ee662da23ba0bee4b18e06740055f",
+    "qa/coordination/checker-completion-reserve-20261015/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  }
+}

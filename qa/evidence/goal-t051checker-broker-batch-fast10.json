@@ -1,0 +1,90 @@
+{
+  "ready": [],
+  "skipped": [
+    {
+      "n": "u23-cached-root-reviewed-red",
+      "drift": [
+        [
+          "apps/api/src/indexing/session.ts",
+          "b48ebb3a0e5e2d65ce2004d939e8c3bac11610cdcd410ebf5ee936851102de79"
+        ]
+      ]
+    },
+    {
+      "n": "t054-affected-current",
+      "drift": [
+        [
+          "apps/api/src/indexing/session.ts",
+          "B48EBB3A0E5E2D65CE2004D939E8C3BAC11610CDCD410EBF5EE936851102DE79"
+        ],
+        [
+          "apps/api/src/indexing/grounded-write.ts",
+          "BD0D5A06920EBF1F831EC542E67C6D1B5A16788AC794EA9EF2A7746E26B29886"
+        ],
+        [
+          "apps/api/src/indexing/chunk-write.ts",
+          "84E5ED5BB84FEE8ABF5C658850F408D6CFA8CD66F7298EFB922E812C174667B9"
+        ],
+        [
+          "apps/api/src/composition/integrations/trusted-readers.ts",
+          "C3B6E0DB3E6D9B23A0D725799134E687C177F9440738D3CFB7A5A2A5A131CDE9"
+        ]
+      ]
+    },
+    {
+      "n": "t054-history-current",
+      "drift": [
+        [
+          "apps/api/src/indexing/session.ts",
+          "B48EBB3A0E5E2D65CE2004D939E8C3BAC11610CDCD410EBF5EE936851102DE79"
+        ],
+        [
+          "apps/api/src/indexing/grounded-write.ts",
+          "BD0D5A06920EBF1F831EC542E67C6D1B5A16788AC794EA9EF2A7746E26B29886"
+        ],
+        [
+          "apps/api/src/indexing/chunk-write.ts",
+          "84E5ED5BB84FEE8ABF5C658850F408D6CFA8CD66F7298EFB922E812C174667B9"
+        ],
+        [
+          "apps/api/src/composition/integrations/trusted-readers.ts",
+          "C3B6E0DB3E6D9B23A0D725799134E687C177F9440738D3CFB7A5A2A5A131CDE9"
+        ]
+      ]
+    },
+    {
+      "n": "t054-retained-dom-current",
+      "drift": [
+        [
+          "apps/api/src/indexing/session.ts",
+          "B48EBB3A0E5E2D65CE2004D939E8C3BAC11610CDCD410EBF5EE936851102DE79"
+        ],
+        [
+          "apps/api/src/indexing/grounded-write.ts",
+          "BD0D5A06920EBF1F831EC542E67C6D1B5A16788AC794EA9EF2A7746E26B29886"
+        ],
+        [
+          "apps/api/src/indexing/chunk-write.ts",
+          "84E5ED5BB84FEE8ABF5C658850F408D6CFA8CD66F7298EFB922E812C174667B9"
+        ],
+        [
+          "apps/api/src/composition/integrations/trusted-readers.ts",
+          "C3B6E0DB3E6D9B23A0D725799134E687C177F9440738D3CFB7A5A2A5A131CDE9"
+        ]
+      ]
+    },
+    {
+      "n": "u25-third-await-corrected",
+      "drift": [
+        [
+          "apps/api/src/composition/integrations/trusted-readers.ts",
+          "c3b6e0db3e6d9b23a0d725799134e687c177f9440738d3cfb7a5a2a5a131cde9"
+        ],
+        [
+          "apps/api/src/visibility/read-snapshot.ts",
+          "1B97FF09E74DAD6BC5B0F3B89EAD08092FD3044E3FEC8E76F96EF160C3E0C28E"
+        ]
+      ]
+    }
+  ]
+}

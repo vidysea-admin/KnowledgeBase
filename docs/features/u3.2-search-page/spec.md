@@ -1,5 +1,13 @@
 # Spec - u3.2-search-page
 
+## Current parent candidate (2026-10-14)
+
+The D-170 full-parent candidate adds explicit Send to Ask after a submitted lexical query, including no-hit queries. It carries the normalized question through `?q=`; Ask prefill makes no provider call. The actual Ask consumer must use `useAskHandoff` to bind answers/errors to the current key, URL and draft before this behavior is accepted. Search hides stale results immediately when the executed URL query changes.
+
+The T-008 sibling candidate adds explicit chunk-mode semantic retrieval with validated turn membership, quote character offsets, ordered source interval and exact transcript-anchor navigation. It retains lexical results separately and labels retrieval scores honestly. The source change is subject to independent T-008 and U3.2 acceptance; it does not establish real provider/corpus/browser success.
+
+Full acceptance is checker-owned in [goal-u32.md](../../../qa/contracts/goal-u32.md). [u32-search-parent.md](../../../qa/manifests/u32-search-parent.md) records current source ownership, evidence and gates. U3.2 remains in_progress until current focused checks and the real two-persona authenticated browser walk pass. The older behavior/evidence below is historical and proves only its covered lexical slice.
+
 **Status:** describes behaviour verified at main HEAD c2d9db9a. Sources: `qa/manifests/u3-2-global-search-bar.md`, `qa/evidence/u32-browser-check-2026-10-13/README.md`, `apps/web/src`, `apps/api/src/routes/search.ts`.
 
 ## What it does

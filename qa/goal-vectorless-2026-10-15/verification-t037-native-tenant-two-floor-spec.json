@@ -1,0 +1,39 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "T037 exact native launcher original missing and foreign tenant-tag two-case floor only",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=120000",
+    "--test-name-pattern=^ISS-ALERTTENANT-001:",
+    "scripts/webinar/start-record-detached.test.mjs"
+  ],
+  "testIDs": [
+    "ISS-ALERTTENANT-001 one selected node internal2 tenantcases"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 150000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-t037-native-tenant-two-floor",
+  "pins": {
+    "scripts/webinar/start-record-detached.test.mjs": "d30c5abe9a9ea2cc357a71e405c5fdd9f5cd9577d90fd23db3c985d3c742ba62",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "packages/core/src/domain/lean-video.ts": "6cd05771849a03f7462015ecf636a5775d17958c6643b816d2d6a69aec453d94",
+    "node_modules/.pnpm/obs-websocket-js@5.0.8/node_modules/obs-websocket-js/dist/msgpack.cjs": "43d259746f30bf399e9ba208c3af1c504b9cd64b3cfa1feac95fd4ad04f3a6dc"
+  }
+}

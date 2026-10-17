@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=25000",
+    "--test-name-pattern=^(?:whole result tenant/ID corruption refuses before acquisition, even past batch boundary|host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap)$",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "scripts/watched-sources/host.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af.json",
+    "sha256": "85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af",
+    "count": 23
+  },
+  "beforeMatch": true,
+  "checkerAccounting": true,
+  "maxJobSeconds": 30,
+  "pid": 15812,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 9.125,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-boundary2.log",
+    "sha256": "b277fa6585c6e6cde77bbfe79f5d4d15ee98a330aa8fb1ec6929087c2144721a"
+  },
+  "counts": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

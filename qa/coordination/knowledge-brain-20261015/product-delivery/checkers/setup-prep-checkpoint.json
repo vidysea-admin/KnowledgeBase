@@ -1,0 +1,32 @@
+{
+  "unit": "product-setup-login-fencing",
+  "cycle": 0,
+  "phase": "prep",
+  "status": "PREPARATION_CHECKPOINT_WAITING_READY",
+  "candidate_sha": "236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+  "completion_reserve_id": "product-setup-login-fencing/cycle0/236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+  "gate_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-setup-login-fencing-prep-input.json",
+  "gate_result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-setup-login-fencing-prep-result.json",
+  "budget_debit": {
+    "active_s": 40,
+    "tokens": 1000
+  },
+  "actual_active_s": null,
+  "actual_tokens": null,
+  "actual_cost": null,
+  "wait_started_utc": "2026-10-15T10:49:55.7454228Z",
+  "remaining_review": {
+    "active_s": 50,
+    "tokens": 1200
+  },
+  "protected_finalization": {
+    "active_s": 30,
+    "tokens": 800
+  },
+  "ratio_verified": false,
+  "manifest_status": "building",
+  "observations": "Loaded checker skill and root AGENTS; read exact3files and cycle0 packet. Auth current display checks key/version/generation and effect cancellation; configured Gemini explicitly does not imply operational readiness. No verdict or evidence authentication yet. Setup20PASS composite attributed; batch EXIT1 preserved.",
+  "probe": "pnpm exec vitest run src/pages/setup-wizard/SetupWizardPage.test.tsx -t 'old success cannot fill|old 401 cannot sign out|configured integrations:|missing integrations are optional'",
+  "probe_expected": "4pass16skip; sent verification_broker",
+  "limitations": "No local tests/build/browser/network/mutation; source pins independently hashing and immediate consumer review deferred until READY receipt+gate. Prep actuals unavailable; conservative committed debit40s1000, no efficiency success."
+}

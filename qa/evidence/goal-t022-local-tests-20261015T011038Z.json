@@ -1,0 +1,25 @@
+{
+  "scope": "Authorized LOCAL-only private-input offline review test; content-free public summary",
+  "specSha256": "f7ca4901ed586433cc1d761fcd1dbfae07545b919a6da453e2deb66471b6387d",
+  "rawReceiptSha256": "4512e065e62b1ca17ca77ba96822520a61af075f041f431ab77cd6615478bcdb",
+  "startedAt": "2026-10-15T01:10:38.9243060Z",
+  "endedAt": "2026-10-15T01:10:41.2256732Z",
+  "elapsedMs": 2301,
+  "exit": 0,
+  "timedOut": false,
+  "counts": {
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0
+  },
+  "inputPins": 65,
+  "inputDrift": 0,
+  "providerCalls": 0,
+  "databaseCalls": 0,
+  "browserCalls": 0,
+  "networkCalls": 0,
+  "humanJudgments": 0,
+  "privateRawOutputsPublicationExcluded": true,
+  "terminal": true
+}

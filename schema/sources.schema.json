@@ -3,29 +3,121 @@
   "$id": "kb://sources",
   "title": "sources",
   "type": "object",
-  "required": ["_id", "tenantId", "kind", "hash", "consent", "createdAt", "captureMode"],
+  "required": [
+    "_id",
+    "tenantId",
+    "kind",
+    "hash",
+    "consent",
+    "createdAt",
+    "captureMode"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "kind": { "type": "string", "enum": ["recording", "document", "spreadsheet", "whatsapp-batch", "url"] },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "recording",
+        "document",
+        "spreadsheet",
+        "whatsapp-batch",
+        "url"
+      ]
+    },
     "captureMode": {
       "type": "string",
-      "enum": ["provided", "public", "notes", "silent"],
+      "enum": [
+        "provided",
+        "public",
+        "notes",
+        "silent"
+      ],
       "description": "D-008 provided-first capture ordering: organizer-provided > public > notes/live-transcript > silent (last resort)."
     },
-    "path": { "type": "string" },
-    "url": { "type": "string", "description": "Origin URL for kind: 'url' sources (T-023)." },
-    "hash": { "type": "string", "minLength": 8 },
+    "path": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "description": "Origin URL for kind: 'url' sources (T-023)."
+    },
+    "hash": {
+      "type": "string",
+      "minLength": 8
+    },
     "consent": {
       "type": "object",
-      "required": ["given", "recordedBy"],
+      "required": [
+        "given",
+        "recordedBy"
+      ],
       "properties": {
-        "given": { "type": "boolean" },
-        "recordedBy": { "type": "string" },
-        "note": { "type": "string" }
+        "given": {
+          "type": "boolean"
+        },
+        "recordedBy": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
       }
     },
-    "createdAt": { "type": "string", "format": "date-time" }
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourceMeta": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "connectorIndex": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "const": 2
+            },
+            "strict": {
+              "type": "boolean"
+            },
+            "complete": {
+              "const": true
+            },
+            "generation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "turnCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "treeWritten": {
+              "const": true
+            },
+            "sessionId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "version",
+            "strict",
+            "complete",
+            "generation",
+            "turnCount",
+            "treeWritten",
+            "sessionId"
+          ],
+          "additionalProperties": false
+        }
+      }
+    }
   },
   "additionalProperties": true
 }

@@ -92,7 +92,7 @@ try {
   // a per-session fact.
   if (SUBCOMMAND === "entities") {
     const { promoteTreeEntities } = await import("../packages/index/src/index.ts");
-    const { promoteAndPersistEntities, topicPreviewLine } = await import("../apps/api/src/indexing/promote-entities.ts");
+    const { promoteAndPersistEntities, topicPreviewLine } = await import("../apps/api/src/indexing/persistence/promote-entities.ts");
     const { treeIndexRootFilter } = await import("../packages/index/src/index.ts");
 
     const root = await db.collection("tree_index").findOne(treeIndexRootFilter(TENANT));

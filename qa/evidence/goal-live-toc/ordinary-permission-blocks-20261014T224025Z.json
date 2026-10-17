@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-14T22:41:17.6974196Z",
+  "coordinator": "/root/docker_governance_review",
+  "preflight": {
+    "receipt": "qa/evidence/goal-live-toc/ordinary-strict-preflight-20261014T223830Z.json",
+    "childPid": 5868,
+    "exitCode": 0,
+    "elapsedMs": 323,
+    "hashesUnchanged": true,
+    "providerCalls": 0,
+    "databaseAccess": false
+  },
+  "blocked": [
+    {
+      "stage": "strict-claims-run",
+      "spec": "qa/evidence/goal-live-toc/ordinary-strict-run-20261014T223930Z-spec.json",
+      "status": "not-launched",
+      "review": "rejected",
+      "reason": "Private TOC transcript export to Gemini using credentials lacks specific trusted human authorization for that destination.",
+      "providerCalls": 0,
+      "databaseWrites": 0,
+      "childPid": null
+    },
+    {
+      "stage": "staging-read-only",
+      "spec": "qa/evidence/goal-live-toc/ordinary-staging-20261014T224019Z-spec.json",
+      "status": "not-launched",
+      "review": "rejected",
+      "reason": "Existing private staging credentials and source/session/turn read lacks specific trusted human authorization; scratch validation is distinct.",
+      "providerCalls": 0,
+      "databaseReads": 0,
+      "databaseWrites": 0,
+      "childPid": null
+    }
+  ],
+  "restriction": "No bypass, workaround, indirect execution or retry without direct human authorization; no semantic RED inferred.",
+  "currentHandles": "NONE"
+}

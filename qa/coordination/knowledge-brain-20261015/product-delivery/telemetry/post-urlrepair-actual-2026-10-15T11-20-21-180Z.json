@@ -1,0 +1,100 @@
+{
+  "kind": "CONTENT_FREE_POST_IDLE_COLLECTIONS_URL_REPAIR",
+  "captured_at": "2026-10-15T11:20:21.180Z",
+  "read_one": {
+    "read_completed_at": "2026-10-15T11:20:19.673Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+    "source_sha256": "de3c068cd011b1c428f6019a7739c422fe3e82b3ce5143aea825799f235a9867",
+    "meta": {
+      "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "timestamp": "2026-10-15T10:48:35.605Z"
+    },
+    "token_record_count": 15,
+    "latest": {
+      "timestamp": "2026-10-15T11:19:43.509Z",
+      "total_token_usage": {
+        "input_tokens": 846236,
+        "cached_input_tokens": 808064,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4516,
+        "reasoning_output_tokens": 168,
+        "total_tokens": 850752
+      },
+      "last_token_usage": {
+        "input_tokens": 63009,
+        "cached_input_tokens": 62592,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 102,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 63111
+      }
+    }
+  },
+  "read_two": {
+    "read_completed_at": "2026-10-15T11:20:21.180Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+    "source_sha256": "de3c068cd011b1c428f6019a7739c422fe3e82b3ce5143aea825799f235a9867",
+    "meta": {
+      "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "timestamp": "2026-10-15T10:48:35.605Z"
+    },
+    "token_record_count": 15,
+    "latest": {
+      "timestamp": "2026-10-15T11:19:43.509Z",
+      "total_token_usage": {
+        "input_tokens": 846236,
+        "cached_input_tokens": 808064,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 4516,
+        "reasoning_output_tokens": 168,
+        "total_tokens": 850752
+      },
+      "last_token_usage": {
+        "input_tokens": 63009,
+        "cached_input_tokens": 62592,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 102,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 63111
+      }
+    }
+  },
+  "counter_stable": true,
+  "source_hash_stable": true,
+  "root_attestation": "Same collectionchecker completed/idle after ONE repair-only turn; currently frozen probe hash prefix14ac546. Probe source not read or independently hashed by accounting helper.",
+  "baseline_recorded_actual_total": 599787,
+  "current_recorded_actual_total": 850752,
+  "repair_recorded_actual_delta": 250965,
+  "repair_actual_cap": 200000,
+  "repair_cumulative_ceiling": 799787,
+  "phase_breach": true,
+  "status": "NEEDS_EXTRA_REVIEW",
+  "separate_allocations": {
+    "repair_active_s": 30,
+    "repair_allocated_output_tokens": 1200,
+    "actual_full_active_time": null
+  },
+  "future_final": {
+    "admitted": false,
+    "combined_repair_plus_final_increment_ceiling": 400000,
+    "overall_cumulative_ceiling": 999787,
+    "final_additional_actual_limit": 200000,
+    "theoretical_arithmetic_remaining": 149035,
+    "not_a_grant": true
+  },
+  "prior_author_breach": {
+    "recorded_delta": 238500,
+    "phase_cap": 100000,
+    "preserved": true
+  },
+  "maker_comparable_total_tokens": 3547712,
+  "maker_denominator_unchanged": true,
+  "semantics": "total_tokens=input+output; cached input/reasoning output subsets not additive.",
+  "qualifier": "Fresh recorded cumulative counters known; two-read stability plus root completed-idle attestation recorded. Theoretical completion/inflight and finer phase attribution cannot be proven from allowed metadata alone.",
+  "helper_cost": "Shared coordination accounting only; excluded from maker denominator.",
+  "source_or_test_or_gate_actions": false
+}

@@ -1,0 +1,178 @@
+{
+  "atUTC": "2026-10-14T21:58:17.1489440Z",
+  "durationSeconds": 0.1450139,
+  "note": "Independent read-only hash audit; manifest metadata explicitly changed to ready cycle 0 after broker execution; no tests or product mutations",
+  "rows": [
+    {
+      "path": "apps/web/src/pages/counsellor/Avatar.test.tsx",
+      "receiptHash": "b86152ee65185efb3c369fde08fafe4e3328132b7356d62759f45dfd771d418b",
+      "expectedCurrentHash": "b86152ee65185efb3c369fde08fafe4e3328132b7356d62759f45dfd771d418b",
+      "actualHash": "B86152EE65185EFB3C369FDE08FAFE4E3328132B7356D62759F45DFD771D418B",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/Avatar.tsx",
+      "receiptHash": "1502f4f5ea97202a76d5581b43f9399f445ec535e945563dddeb4362b9fd5bc3",
+      "expectedCurrentHash": "1502f4f5ea97202a76d5581b43f9399f445ec535e945563dddeb4362b9fd5bc3",
+      "actualHash": "1502F4F5EA97202A76D5581B43F9399F445EC535E945563DDDEB4362B9FD5BC3",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.test.tsx",
+      "receiptHash": "5a7651c42274062970b08629dd632b660abeba5d97cdb74dabb55ac2f58396ff",
+      "expectedCurrentHash": "5a7651c42274062970b08629dd632b660abeba5d97cdb74dabb55ac2f58396ff",
+      "actualHash": "5A7651C42274062970B08629DD632B660ABEBA5D97CDB74DABB55AC2F58396FF",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.tsx",
+      "receiptHash": "8522876933dc1098c8c030f0de94c9d5c7694d2010c92e108fc8e2cbecdee3f0",
+      "expectedCurrentHash": "8522876933dc1098c8c030f0de94c9d5c7694d2010c92e108fc8e2cbecdee3f0",
+      "actualHash": "8522876933DC1098C8C030F0DE94C9D5C7694D2010C92E108FC8E2CBECDEE3F0",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/provenance.test.ts",
+      "receiptHash": "22520357eb2cb49608e7a55959c43185f7deefb0c8e736956a19ec2081a35b34",
+      "expectedCurrentHash": "22520357eb2cb49608e7a55959c43185f7deefb0c8e736956a19ec2081a35b34",
+      "actualHash": "22520357EB2CB49608E7A55959C43185F7DEEFB0C8E736956A19EC2081A35B34",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/provenance.ts",
+      "receiptHash": "4c007f88788816b2634364bbb32f68f801891ae29e89c26266f1b1259b45c529",
+      "expectedCurrentHash": "4c007f88788816b2634364bbb32f68f801891ae29e89c26266f1b1259b45c529",
+      "actualHash": "4C007F88788816B2634364BBB32F68F801891AE29E89C26266F1B1259B45C529",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/voice.test.ts",
+      "receiptHash": "a63fa643fea20766e245366011483adc99e0d14c78ddafe38751ef7f682c4484",
+      "expectedCurrentHash": "a63fa643fea20766e245366011483adc99e0d14c78ddafe38751ef7f682c4484",
+      "actualHash": "A63FA643FEA20766E245366011483ADC99E0D14C78DDAFE38751EF7F682C4484",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/voice.ts",
+      "receiptHash": "29a3f92b465f51d48f855a547b3c04451fd6981ab4545ce8800c2cd767955844",
+      "expectedCurrentHash": "29a3f92b465f51d48f855a547b3c04451fd6981ab4545ce8800c2cd767955844",
+      "actualHash": "29A3F92B465F51D48F855A547B3C04451FD6981AB4545CE8800C2CD767955844",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "receiptHash": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+      "expectedCurrentHash": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+      "actualHash": "EEF7AF89EB3C3C261678AED701F309D9399E0F77921B73E3B9CE97B1055571EA",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/layout/NavSidebar.tsx",
+      "receiptHash": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+      "expectedCurrentHash": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+      "actualHash": "39319E1CE324EC1110EE101528C08A56F88EB8D46032074CB54D69FBD4CA23F6",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/pages/sessions/SessionDetailPage.tsx",
+      "receiptHash": "16bd213ad66f6c76b2555cce655fa7e2a880f0be5b170e2022aeb41db2620487",
+      "expectedCurrentHash": "16bd213ad66f6c76b2555cce655fa7e2a880f0be5b170e2022aeb41db2620487",
+      "actualHash": "16BD213AD66F6C76B2555CCE655FA7E2A880F0BE5B170E2022AEB41DB2620487",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/api/ask.ts",
+      "receiptHash": "b13c5d164ca261ab0c141580c1a64c9bad2ba79b30bd316cb1d9a0f6e971416d",
+      "expectedCurrentHash": "b13c5d164ca261ab0c141580c1a64c9bad2ba79b30bd316cb1d9a0f6e971416d",
+      "actualHash": "B13C5D164CA261AB0C141580C1A64C9BAD2BA79B30BD316CB1D9A0F6E971416D",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "receiptHash": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+      "expectedCurrentHash": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+      "actualHash": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/api/types.ts",
+      "receiptHash": "0c988730bd44a86a6674d8b92c8db642988db8a1bc54fc0db0e46daca7242547",
+      "expectedCurrentHash": "0c988730bd44a86a6674d8b92c8db642988db8a1bc54fc0db0e46daca7242547",
+      "actualHash": "0C988730BD44A86A6674D8B92C8DB642988DB8A1BC54FC0DB0E46DACA7242547",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.tsx",
+      "receiptHash": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+      "expectedCurrentHash": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+      "actualHash": "196181DC165208A35CB23C9D7F9B7AE5E293A7EB40135A7CD90686DDB4EC3E1C",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/safe-url.ts",
+      "receiptHash": "607fcaf56d942752bd01a1c969457d97bda5f7b5560dd83c8ab4161f3f2875c9",
+      "expectedCurrentHash": "607fcaf56d942752bd01a1c969457d97bda5f7b5560dd83c8ab4161f3f2875c9",
+      "actualHash": "607FCAF56D942752BD01A1C969457D97BDA5F7B5560DD83C8AB4161F3F2875C9",
+      "matches": true
+    },
+    {
+      "path": "apps/web/vitest.config.ts",
+      "receiptHash": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+      "expectedCurrentHash": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+      "actualHash": "7F76B80C8E788CBD3EA649DB2596B69852CA0719B7F6D483CADD6DFEC88300F8",
+      "matches": true
+    },
+    {
+      "path": "apps/web/src/setupTests.ts",
+      "receiptHash": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+      "expectedCurrentHash": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+      "actualHash": "2FDDD90FF11BED9CDA8302206EB123480FA8873E8FFD3B30BBD8E070973ADC08",
+      "matches": true
+    },
+    {
+      "path": "docs/counsellor-client.md",
+      "receiptHash": "9abaa1cb1563d2326d5037baebdabc37f3c5c19bd5f57af75f662dab9c3686ec",
+      "expectedCurrentHash": "9abaa1cb1563d2326d5037baebdabc37f3c5c19bd5f57af75f662dab9c3686ec",
+      "actualHash": "9ABAA1CB1563D2326D5037BAEBDABC37F3C5C19BD5F57AF75F662DAB9C3686EC",
+      "matches": true
+    },
+    {
+      "path": "qa/contracts/goal-t013.md",
+      "receiptHash": "0c89198cc6de12462c8d352d94911cf0661747ae78c80f1a6f560581cc8f540c",
+      "expectedCurrentHash": "0c89198cc6de12462c8d352d94911cf0661747ae78c80f1a6f560581cc8f540c",
+      "actualHash": "0C89198CC6DE12462C8D352D94911CF0661747AE78C80F1A6F560581CC8F540C",
+      "matches": true
+    },
+    {
+      "path": "qa/manifests/goal-t013.md",
+      "receiptHash": "5f8e37357653ebb359e215b2272e47ee85f9489d2fcf567d63b8068df97ad645",
+      "expectedCurrentHash": "C71A7C749720F16037A19705FD2CE061CA9A57FDCE7D2399C846ED2335BE773A",
+      "actualHash": "C71A7C749720F16037A19705FD2CE061CA9A57FDCE7D2399C846ED2335BE773A",
+      "matches": true
+    },
+    {
+      "path": "qa/packets/goal-t013.md",
+      "actualHash": "AF71AE4EBECB780C7FEB144DFB4A68AB1AE504DDACBA41FEA1F70C144BEF89B3"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t013-web.json",
+      "actualHash": "0164AA3C6A136384B219A27AB4A9B44D769DF6B466F098561C719ABC4E163FFC"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t013-web.stdout.txt",
+      "actualHash": "F43513B50677CA389381A5D970A38E1BB64D06146F21F9ABF3FF811BCD3A2F0E"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t013-web.stderr.txt",
+      "actualHash": "898A80F32B7916801406C56F96D7A385FE420E5CDF72DD6376A2A0EBFAC39622"
+    },
+    {
+      "path": "contracts/verify_contracts.py",
+      "actualHash": "1240059FC2ABC63CDE58472EF8F7964978E74BA5BC2F5156A30379DDAE391DB3"
+    },
+    {
+      "path": "contracts/contracts.json",
+      "actualHash": "D31DAD4C1FCE135238169F48C18BC5EF68EA0DEFF7978D9323441330778CC940"
+    }
+  ]
+}

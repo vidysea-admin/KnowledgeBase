@@ -59,6 +59,17 @@ interface RawDecision { text?: unknown; turnIds?: unknown; owner?: unknown }
 /** Real decisions from real turns via the injected `complete`. Never throws. */
 export async function extractDecisions(turns: Turns[], complete: DecisionsCompleteFn): Promise<DecisionsResult> {
   if (turns.length === 0) return { decisions: [], degraded: null };
+  const first = turns[0]!;
+  const identity = (value: unknown) => typeof value === "string" && value.length > 0 && value === value.trim() && !/[\u0000-\u001f\u007f-\u009f\u2028\u2029]/.test(value);
+  const seen = new Set<string>();
+  for (const t of turns) {
+    if (!t || typeof t !== "object" || !identity(t._id) || !identity(t.tenantId) || !identity(t.sessionId) || !identity(t.speakerRef)
+      || t.tenantId !== first.tenantId || t.sessionId !== first.sessionId || seen.has(t._id)
+      || typeof t.text !== "string" || !Number.isFinite(t.tStart) || !Number.isFinite(t.tEnd) || t.tStart < 0 || t.tEnd < t.tStart) {
+      return { decisions: [], degraded: { reason: "decisions source identity, scope or time is invalid" } };
+    }
+    seen.add(t._id);
+  }
   const byId = new Map(turns.map((t) => [t._id, t]));
   const transcript = turns.map((t) => `[id:${t._id}] [${t.speakerRef}] ${t.text}`).join("\n");
 
@@ -78,15 +89,17 @@ export async function extractDecisions(turns: Turns[], complete: DecisionsComple
   if (!Array.isArray(raw)) return { decisions: [], degraded: { reason: "decisions response was not a JSON array" } };
 
   const decisions: ExtractedDecision[] = [];
+  let incomplete = false;
   for (const entry of raw as RawDecision[]) {
-    if (typeof entry !== "object" || entry === null) continue;
-    if (typeof entry.text !== "string" || entry.text.trim() === "") continue;
+    if (typeof entry !== "object" || entry === null || Array.isArray(entry)) { incomplete = true; continue; }
+    if (typeof entry.text !== "string" || entry.text.trim() === "") { incomplete = true; continue; }
     const ids = Array.isArray(entry.turnIds) ? entry.turnIds : [];
+    if (!ids.length || ids.some((id) => typeof id !== "string" || !byId.has(id))) incomplete = true;
     const evidenceTurnIds = [...new Set(ids.filter((id): id is string => typeof id === "string" && byId.has(id)))];
     if (evidenceTurnIds.length === 0) continue; // no fabricated/empty-evidence decisions ship
     const cited = evidenceTurnIds.map((id) => byId.get(id)!);
     const decision: ExtractedDecision = {
-      text: entry.text,
+      text: entry.text.trim(),
       evidenceTurnIds,
       tStart: Math.min(...cited.map((t) => t.tStart)),
       tEnd: Math.max(...cited.map((t) => t.tEnd)),
@@ -94,5 +107,5 @@ export async function extractDecisions(turns: Turns[], complete: DecisionsComple
     if (typeof entry.owner === "string" && cited.some((t) => t.speakerRef === entry.owner)) decision.owner = entry.owner;
     decisions.push(decision);
   }
-  return { decisions, degraded: null };
+  return { decisions, degraded: incomplete ? { reason: "decisions response contained unusable candidates or citations; replacement is incomplete" } : null };
 }

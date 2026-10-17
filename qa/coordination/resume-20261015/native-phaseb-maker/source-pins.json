@@ -1,0 +1,72 @@
+[
+  {
+    "nonblank": 69,
+    "sha256": "a975906c317a0ffd5641b7f9c237dd205c3fb1673b0efe16793354c34a0b330c",
+    "path": "apps/api/src/indexing/types.ts"
+  },
+  {
+    "nonblank": 300,
+    "sha256": "954f3d23d220f89f4ddd19a9095cdaa8df4e83295cc9708defe1af67f1e6ab53",
+    "path": "apps/api/src/indexing/session.ts"
+  },
+  {
+    "nonblank": 68,
+    "sha256": "242bddeca752b595b2578a6e72648b5892e75be7b1117fbd1f276672477057db",
+    "path": "apps/api/src/indexing/post-commit.ts"
+  },
+  {
+    "nonblank": 15,
+    "sha256": "be0a8936d167c06262f15163abf70bf448a3ba04400e681d0257fddf77746473",
+    "path": "apps/api/src/indexing/post-commit.test.ts"
+  },
+  {
+    "nonblank": 209,
+    "sha256": "7f2cde600af06d617595ec60ba346c631c141bc1575adf10b764df0f47f0b1a8",
+    "path": "apps/api/src/indexing/vectorless-publication.test.ts"
+  },
+  {
+    "nonblank": 46,
+    "sha256": "022a2c418777dadc1fe894b92e31a530541b94dd7f1ef7960f8ebe744d679a1c",
+    "path": "apps/api/src/composition/integrations/transcripts.ts"
+  },
+  {
+    "nonblank": 108,
+    "sha256": "eb80e828c2e4246b4fdd8bc769d983ce718ceed26e6a051ed4de040d849eba7a",
+    "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts"
+  },
+  {
+    "nonblank": 131,
+    "sha256": "455423967184c512682c2aba09085090215e54967b2d4317ba705a7b5aed3c3f",
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts"
+  },
+  {
+    "nonblank": 25,
+    "sha256": "94425314bc0fe363e61ca0eb905a35cc0ad4626e7443c7a6fe54393b79898526",
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.test.ts"
+  },
+  {
+    "nonblank": 82,
+    "sha256": "21cbd85205fbb218022e92fffba634214abdfda3af39d331c1d9ba12ae267ac6",
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts"
+  },
+  {
+    "nonblank": 72,
+    "sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+    "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts"
+  },
+  {
+    "nonblank": 296,
+    "sha256": "7fefcd1aa9bb859acedfd4f940c9e4a4afc5d41fd4e31dbbb57c551e0c5be938",
+    "path": "packages/meeting-bot/src/capture/native/native-spool.ts"
+  },
+  {
+    "nonblank": 158,
+    "sha256": "02e8949cdaaacf21450a12dd72f44668aa4ae454cd6f8ac3d5a73662a540fd91",
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.ts"
+  },
+  {
+    "sha256": "21cbd85205fbb218022e92fffba634214abdfda3af39d331c1d9ba12ae267ac6",
+    "nonblank": 82,
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts"
+  }
+]

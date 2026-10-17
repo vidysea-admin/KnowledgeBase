@@ -8,10 +8,10 @@ is `api` (Node 24, port 3300); target `web` serves the compiled React SPA throug
 ## Build and start
 
 Run from the repository root on a Docker-equipped host. Before **any Compose command**,
-supply `MONGODB_URL`, `MONGODB_DB` and `GEMINI_API_KEY` in a private `.env` file or the
-deployment system's environment. Compose interpolates the migration service's required
-`MONGODB_DB` even when the `migrate` profile is inactive. The API service still explicitly
-uses `lkb`; setting `MONGODB_DB` does not change the API's database.
+supply `MONGODB_URL`, `MONGODB_DB` and `OLLAMA_API_KEY` in a private `.env` file or the
+deployment system's environment. Both API and migration services require the explicit
+database target. For staging, set `MONGODB_DB=lkb_staging` and
+`LKB_ALLOW_STAGING=lkb_staging`; the API does not silently choose production.
 
 ```sh
 docker build --target api -t lkb-api .
@@ -28,8 +28,11 @@ or pass them as Docker build arguments.
 | Value | Deployment use |
 | --- | --- |
 | `MONGODB_URL` | Reachable external MongoDB connection URI; Compose requires it. |
-| `MONGODB_DB` | Required before every Compose command, including build/up with migration disabled, because the migration service is interpolated. Also required for standalone API containers and migrations. Compose's API explicitly uses `lkb` regardless of this variable. |
-| `GEMINI_API_KEY` | Runtime AI credential; required by Compose. |
+| `MONGODB_DB` | Explicit API and migration target. Use the approved staging database for acceptance; production requires its separate authorization and opt-in. |
+| `LKB_ALLOW_STAGING` | Must equal `lkb_staging` when selecting that staging database. |
+| `OLLAMA_API_KEY` | Runtime Ollama Cloud text credential, forwarded only to API; never a build argument. |
+| `OLLAMA_CLOUD_MODEL` / `OLLAMA_CLOUD_VERIFIER_MODEL` | Defaults `glm-5.3-flash` / `deepseek-v4.1-flash`. |
+| `GEMINI_API_KEY` | Optional at startup; needed when the configured audio transcription path runs. |
 | `VITE_API_BASE_URL` | Public API URL the user's browser can reach, e.g. `https://api.example.com`; baked into the frontend during build. Rebuild web when it changes. |
 | `CORS_ORIGINS` | Comma-separated frontend origins including scheme and port, e.g. `https://kb.example.com`; must match the browser's frontend origin. |
 | `WEB_PORT` | Host port mapped to nginx port 80; defaults to 8080. |
@@ -63,7 +66,7 @@ files are readable/traversable by the API's `node` user (UID 1000 on the Node im
 Writable operator workflows need separate explicitly owned directories.
 
 The API image probes unauthenticated `/health`; failure to ping MongoDB or read watcher
-health produces an unhealthy container. The web image probes `/` on port 80. Compose's
+health produces an unhealthy container. The web image probes `/` on `${PORT}` (default 80). Compose's
 restart policy restarts exited processes; an unhealthy status alone does not restart
 a container. Configure alerts/recovery in the deployment platform.
 
@@ -95,3 +98,21 @@ the API health/authentication and browser-to-API request path against an isolate
 database. Check a direct SPA deep link and verify the deployed origins/URLs. Build CI
 can verify image construction without database credentials or provider calls. Successful
 image builds do not establish the remaining T-051 operational/live-release acceptance.
+
+## DevOps quick start
+
+Plain `docker build .` produces the Cloud Run-ready API image (default target `api`):
+
+```sh
+docker build -t lkb-api .
+docker build --target web --build-arg VITE_API_BASE_URL=https://api.example.com -t lkb-web .
+docker run --rm -e PORT=8080 -e MONGODB_URL=... -e MONGODB_DB=... -e OLLAMA_API_KEY=... -p 8080:8080 lkb-api
+```
+
+- Required runtime env names: `MONGODB_URL`, `MONGODB_DB`, `OLLAMA_API_KEY` (see the table above for optional names).
+- Ports: the API listens on `PORT` (default 3300); the `web` image's nginx listens on `PORT` (default 80). Cloud Run injects `PORT`; no flag needed.
+- Entrypoint: `startup-diagnostics.sh` prints UID, `PORT` and whether each required variable is set or MISSING (never the values), then `exec`s `node apps/api/dist/server.js`.
+- The build checks `apps/api/dist/server.js` and `source-worker.js` exist and parse (`node --check`).
+- Runs as the non-root `node` user (UID 1000). The sibling autoTesting image uses UID 10001; switching needs a matching change to the state-volume `chown` in `scripts/qa/container-workflows/run.sh`.
+- Health: `/health` (Cloud Run uses its own startup/liveness probes; the Dockerfile `HEALTHCHECK` is ignored there).
+- CI (`.github/workflows/docker.yml`, job `build-targets`) builds the `api` and `web` targets with `push: false`; no registry credentials are involved.

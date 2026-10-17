@@ -28,14 +28,23 @@ test("registration attempt round-trips strictly and confirmation requires unique
       registrationUrl: "https://organizer.example/register", organizerEmail: "host@organizer.example", startTime: "2026-10-05T10:00:00.000Z",
       endTime: "2026-10-05T11:00:00.000Z", attemptId: "12345678-1234-4123-8123-123456789abc", attemptedAt: checkedAt, phase: "submitting" as const,
       baselineMessageIds: ["mail-original"]};
+    const retry = {...attempt, phase: "action_required" as const,
+      preSubmitEvidence: {disposition: "not-attempted" as const, configurationHash: "a".repeat(64)}};
+    assert.deepEqual(validateWebinarRegistration(retry, "owner", checkedAt), retry);
+    for (const patch of [{phase: "submitting"}, {preSubmitEvidence: {disposition: "unknown", configurationHash: "a".repeat(64)}},
+      {preSubmitEvidence: {disposition: "not-attempted", configurationHash: "bad"}},
+      {preSubmitEvidence: {...retry.preSubmitEvidence, secret: "forbidden"}}])
+      assert.throws(() => validateWebinarRegistration({...retry, ...patch}, "owner", checkedAt));
     const file = path.join(dir, "operations.json");
     const source = webinarSessionKey(JSON.stringify(["source", "owner", "gmail", "candidates", attempt.sourceId, "single"]));
     const key = webinarSessionKey(`source-review|${source}`);
     writeWebinarOperationState(file, {version: 1, tenantId: "owner", operations: {[key]: {tenantId: "owner", status: "action_required", registration: attempt}}});
     assert.deepEqual(readWebinarOperationState(file, "owner", checkedAt).operations[key]!.registration, attempt);
+    writeWebinarOperationState(file, {version: 1, tenantId: "owner", operations: {[key]: {tenantId: "owner", status: "action_required", registration: retry}}});
+    assert.deepEqual(readWebinarOperationState(file, "owner", checkedAt).operations[key]!.registration, retry);
     assert.throws(() => writeWebinarOperationState(file, {version: 1, tenantId: "owner", operations: {wrong: {tenantId: "owner", status: "action_required", registration: attempt}}}));
     const confirmation = {id: "candidate-confirmation", title: "Webinar", senderEmail: attempt.organizerEmail, senderDomain: "organizer.example",
-      status: "approved" as const, messageId: "mail-confirmation", threadId: attempt.threadId, startTime: attempt.startTime, endTime: attempt.endTime,
+      status: "approved" as const, messageId: "mail-confirmation", receivedAt: checkedAt, threadId: attempt.threadId, startTime: attempt.startTime, endTime: attempt.endTime,
       meetingUrl: "https://meet.google.com/abc-defg-hij"};
     const confirmed = confirmWebinarRegistration(attempt, "owner", [confirmation], checkedAt)!;
     assert.equal(confirmWebinarRegistration({...attempt, baselineMessageIds: undefined}, "owner", [confirmation], checkedAt), undefined);
@@ -44,7 +53,8 @@ test("registration attempt round-trips strictly and confirmation requires unique
       assert.throws(() => validateWebinarRegistration({...attempt, baselineMessageIds}, "owner", checkedAt));
     assert.equal(confirmed.phase, "confirmed"); assert.equal(confirmed.sourceId, attempt.sourceId);
     assert.equal(confirmed.confirmationMessageId, confirmation.messageId);
-    for (const change of [{threadId: "wrong-thread"}, {messageId: attempt.sourceMessageId}, {senderEmail: "other@organizer.example"},
+    for (const change of [{receivedAt: undefined}, {receivedAt: "2026-10-05T07:59:59.999Z"}, {receivedAt: "2026-10-05T08:00:00.001Z"},
+      {threadId: "wrong-thread"}, {messageId: attempt.sourceMessageId}, {senderEmail: "other@organizer.example"},
       {startTime: "2026-10-05T10:01:00.000Z"}, {endTime: "2026-10-05T11:01:00.000Z"}, {status: "rejected" as const},
       {cancelled: true}, {registrationOnly: true}, {meetingUrl: "https://organizer.example/register"},
       {meetingUrl: "https://zoom.us/webinar/register/foo"}, {meetingUrl: "https://zoom.us/"}, {meetingUrl: "https://user@meet.google.com/abc-defg-hij"}]) {

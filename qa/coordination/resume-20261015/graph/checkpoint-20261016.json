@@ -1,0 +1,12 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": "resume-speaker-graph",
+  "cycle": 1,
+  "candidate_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "status": "NO_RERUN_EXISTING_GRAPH11_GREEN",
+  "historical_request": "broker-request.json",
+  "authentication": "authentication-20261016.json",
+  "independent_admission": "admission-20261016.md",
+  "test_launches": 0,
+  "reviewer_launches": 0
+}

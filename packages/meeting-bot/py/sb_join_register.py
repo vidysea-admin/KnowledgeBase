@@ -82,19 +82,22 @@ fetch(final.target.href, {method:'POST', body, headers:{'Content-Type':'applicat
 
 def register_form(sb, instructions, script_isolated=False, policy_check=None, cdp_connect=None):
     """One submit attempt; positive result is awaiting confirmation, never registration proof."""
+    def not_attempted(reason):
+        return {"status": "action_required", "reason": reason, "submissionDisposition": "not-attempted"}
+
     if not script_isolated:
-        return {"status": "action_required", "reason": "script_isolation_unproved"}
+        return not_attempted("script_isolation_unproved")
     import re
     from urllib.parse import urlsplit
     hosts = instructions.get("allowedHosts")
     raw_url = instructions.get("url", "")
     if not isinstance(raw_url, str) or not raw_url or len(raw_url) > 8192:
-        return {"status": "action_required", "reason": "request_policy_refused"}
+        return not_attempted("request_policy_refused")
     try:
         parsed = urlsplit(raw_url)
         origin_port = parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80)
     except ValueError:
-        return {"status": "action_required", "reason": "request_policy_refused"}
+        return not_attempted("request_policy_refused")
     local = instructions.get("localFixture") is True and parsed.hostname in ("127.0.0.1", "localhost")
     if (not isinstance(hosts, list) or not 1 <= len(hosts) <= 20
             or any(not isinstance(host, str) or not re.fullmatch(r"[a-z0-9.-]{1,253}", host)
@@ -105,9 +108,9 @@ def register_form(sb, instructions, script_isolated=False, policy_check=None, cd
             or not 1 <= origin_port <= 65535
             or parsed.scheme == "http" and any(host not in ("127.0.0.1", "localhost") for host in hosts)
             or parsed.scheme != "https" and not (local and parsed.scheme == "http")):
-        return {"status": "action_required", "reason": "request_policy_refused"}
+        return not_attempted("request_policy_refused")
     if parsed.hostname not in hosts:
-        return {"status": "action_required", "reason": "redirect_host"}
+        return not_attempted("redirect_host")
     sources = [parsed.scheme + "://" + host + ":" + str(origin_port) for host in hosts]
     policy = "form-action " + " ".join(sources)
     script = REGISTRATION_JS
@@ -115,12 +118,12 @@ def register_form(sb, instructions, script_isolated=False, policy_check=None, cd
         driver = getattr(sb, "driver", sb)
         for command, arguments in (("Network.enable", {}), ("Network.setBypassServiceWorker", {"bypass": True})):
             if not isinstance(driver.execute_cdp_cmd(command, arguments), dict):
-                return {"status": "action_required", "reason": "request_policy_unproved"}
+                return not_attempted("request_policy_unproved")
         if not callable(policy_check) or policy_check() is not True:
-            return {"status": "action_required", "reason": "persistent_policy_unproved"}
+            return not_attempted("persistent_policy_unproved")
         result = driver.execute_async_script(script, instructions, "inspect")  # selenium driver: SB's own wrapper takes (script, timeout)
         if result.get("status") != "ready":
-            return result
+            return not_attempted(result["reason"]) if result.get("status") == "action_required" else {"status": "uncertain", "reason": "browser_failure"}
         installed = sb.execute_script(r"""
         if (!document.head) return false;
         const policy = document.createElement('meta');
@@ -129,16 +132,17 @@ def register_form(sb, instructions, script_isolated=False, policy_check=None, cd
         return policy.isConnected && policy.content === arguments[0];
         """, policy)
         if installed is not True:
-            return {"status": "action_required", "reason": "request_policy_unproved"}
+            return not_attempted("request_policy_unproved")
         for command, arguments in (("Network.enable", {}), ("Network.setBypassServiceWorker", {"bypass": True})):
             if not isinstance(driver.execute_cdp_cmd(command, arguments), dict):
-                return {"status": "action_required", "reason": "request_policy_unproved"}
+                return not_attempted("request_policy_unproved")
         if policy_check() is not True:
-            return {"status": "action_required", "reason": "persistent_policy_unproved"}
+            return not_attempted("persistent_policy_unproved")
         import registration_cdp  # T-052: optional CDP redirect policy; cdp_connect=None keeps redirect:'error'
         result = registration_cdp.submit_with_redirects(sb, script, instructions, hosts, raw_url, cdp_connect)
         if not isinstance(result, dict):
             return {"status": "uncertain", "reason": "navigation_during_submit"}
+        result.pop("submissionDisposition", None)  # Post-entry evidence is never a proof of no attempt.
         if result.get("status") == "submitted":
             # What was sent must be exactly what was validated: approved target, operator values.
             try:

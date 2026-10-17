@@ -50,13 +50,13 @@ function semantic(row: Occurrence): string {
   // must not conflict with the same event at the same revision; the accepted merge below stores the FRESH snapshot, so the
   // stored source always equals the freshest Google data (and the url itself, still compared here, decides identity).
   delete snapshot.meetingUrlSource;
-  if (row.source === "gmail") { delete snapshot.status; delete snapshot.registrationOnly; }
+  if (row.source === "gmail") { delete snapshot.status; delete snapshot.registrationOnly; delete snapshot.receivedAt; delete snapshot.senderAuthenticated; }
   const key = identity(snapshot); if (key) snapshot.meetingUrl = key.slice(0, key.lastIndexOf("|"));
   return stable(snapshot);
 }
 function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occurrence {
   const common = ["id", "title", "startTime", "endTime", "meetingUrl", "cancelled", "providerUpdated"];
-  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime", "meetingUrlSource"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"])]);
+  shape(input, [...common, ...(source === "calendar" ? ["organizer", "recurringEventId", "originalStartTime", "meetingUrlSource"] : ["senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"])]);
   text(input.id, 1024, true); text(input.title, 2000); text(input.meetingUrl, 8192);
   text(input.startTime, 128); text(input.endTime, 128); text(input.organizer, 320);
   text(input.meetingUrlSource, 32); // any short string is kept as-is: auto-join.ts treats everything but "conference" as untrusted
@@ -67,6 +67,14 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
       (input.senderAuthenticated !== undefined && typeof input.senderAuthenticated !== "boolean"))) fail();
   if (source === "gmail") { text(input.senderEmail, 320, true); text(input.senderDomain, 320, true); }
   if (source === "gmail") {
+    if (input.receivedAt !== undefined && time(input.receivedAt) !== input.receivedAt) fail();
+    if (input.youtubeWatchIssue !== undefined && input.youtubeWatchIssue !== 'ambiguous') fail();
+    if (input.meetingLinkIssue !== undefined && !['ambiguous', 'registration-only', 'host-start-link'].includes(input.meetingLinkIssue)) fail();
+    if (input.youtubeWatch !== undefined) {
+      shape(input.youtubeWatch, ['url', 'videoId', 'source']);
+      const watch = input.youtubeWatch;
+      if (typeof watch.videoId !== 'string' || !/^[A-Za-z0-9_-]{11}$/.test(watch.videoId) || watch.url !== `https://www.youtube.com/watch?v=${watch.videoId}` || !['body','snippet'].includes(String(watch.source))) fail();
+    }
     text(input.registrationUrl, 8192);
     for (const id of [input.messageId, input.threadId]) if (id !== undefined && (typeof id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(id))) fail();
     if (input.registrationUrl !== undefined) {
@@ -75,7 +83,7 @@ function normalizeOccurrence(source: Occurrence["source"], input: Snapshot): Occ
     }
   }
   const snapshot: Snapshot = {id: input.id, title: input.title ?? "", cancelled: input.cancelled ?? false};
-  for (const key of source === "calendar" ? ["meetingUrl", "meetingUrlSource", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId"]) {
+  for (const key of source === "calendar" ? ["meetingUrl", "meetingUrlSource", "organizer", "recurringEventId"] : ["meetingUrl", "senderEmail", "senderDomain", "senderAuthenticated", "status", "kind", "registrationOnly", "registrationUrl", "messageId", "threadId", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"]) {
     const value = input[key as keyof Snapshot];
     if (value !== undefined) Object.assign(snapshot, {[key]: value});
   }

@@ -1,0 +1,37 @@
+{
+  "unit": "review-runtime-usage",
+  "cycle": 0,
+  "phase": "narrow-probe-authoring",
+  "boundary": "end",
+  "observed_at": "2026-10-15T10:58:32.5429698+00:00",
+  "usage_timestamp": "2026-10-15T10:58:11.078Z",
+  "cumulative_tokens": {
+    "input_tokens": 339078,
+    "cached_input_tokens": 303488,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1682,
+    "reasoning_output_tokens": 35,
+    "total_tokens": 340760
+  },
+  "phase_delta_tokens": {
+    "input_tokens": 130026,
+    "cached_input_tokens": 128000,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 934,
+    "reasoning_output_tokens": 0,
+    "total_tokens": 130960
+  },
+  "lifecycle": {
+    "type": "task_complete",
+    "timestamp": "2026-10-15T10:58:11.116Z"
+  },
+  "active_seconds": null,
+  "active_time_reason": "No prospective stopwatch receipt supplied by checker; wallspan not substituted",
+  "monetary_cost": null,
+  "allocated_phase_total": 100000,
+  "phase_cap_exceeded": true,
+  "remaining_cumulative_total_budget": 69040,
+  "output_remaining": 1318,
+  "counter_scope": "Runtime-reported counters, exact dedicated checker; baseline/end delta excludes all prior work",
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl"
+}

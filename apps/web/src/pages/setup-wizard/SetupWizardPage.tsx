@@ -33,17 +33,17 @@ export async function loadProbes(apiKey: string): Promise<SetupProbes> {
 const LABEL = { ok: "Ready", todo: "To do", problem: "Problem", unknown: "Unknown" } as const;
 
 export function SetupWizardPage(): React.ReactElement {
-  const { apiKey } = useAuth();
+  const { apiKey, sessionVersion } = useAuth();
   const [generation, setGeneration] = useState(0);
-  const [loaded, setLoaded] = useState<{ key: string; generation: number; probes: SetupProbes } | null>(null);
-  const current = loaded && loaded.key === apiKey && loaded.generation === generation ? loaded : null;
+  const [loaded, setLoaded] = useState<{ key: string; version: number; generation: number; probes: SetupProbes } | null>(null);
+  const current = apiKey && loaded && loaded.key === apiKey && loaded.version === sessionVersion && loaded.generation === generation ? loaded : null;
 
   useEffect(() => {
     if (!apiKey) return;
     let cancelled = false;
-    void loadProbes(apiKey).then((probes) => { if (!cancelled) setLoaded({ key: apiKey, generation, probes }); });
+    void loadProbes(apiKey).then((probes) => { if (!cancelled) setLoaded({ key: apiKey, version: sessionVersion, generation, probes }); });
     return () => { cancelled = true; };
-  }, [apiKey, generation]);
+  }, [apiKey, sessionVersion, generation]);
 
   const items = current ? buildItems(current.probes) : null;
   return (

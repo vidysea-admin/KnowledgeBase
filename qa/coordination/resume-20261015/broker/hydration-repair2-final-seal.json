@@ -1,0 +1,150 @@
+{
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91.json",
+    "sha256": "939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91",
+    "count": 351
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-synthetic2-receipt.json",
+      "sha256": "f4733597fe642c5d9840ee798d33b993aa8a6d627dc8a977bf195c88356bb26b",
+      "exit": 0,
+      "active_s": 0.2970000000022992,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-synthetic2.log",
+        "sha256": "3a42a477a98dd8c28b725fd3fd982f114413920012dd1f4f661a1c550d2260c2"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-focused4-receipt.json",
+      "sha256": "fdd7635210dcbfa3a0ba8c98e39b10e12370bd93163df27b24e7dd2947520cfd",
+      "exit": 0,
+      "active_s": 21.5,
+      "counts": {},
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-focused4.log",
+        "sha256": "d0cf002782c6ad265236dfcbe183736ead21de68c7efbef6ef26805237e9f062"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-all92-receipt.json",
+      "sha256": "b2669e1e4378397c477d0931fdce636c8bf3ca56a2a33afccf8750606c539ee5",
+      "exit": 0,
+      "active_s": 29.06199999999808,
+      "counts": {},
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-all92.log",
+        "sha256": "1a0e829d8f1b9d874765c68ff6d5ce79db7a9ae8ed7a429a92015a156dd5f27d"
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\eval-pilot\\offline-hydration-audit\\result.focus-repair2.json",
+      "sha256": "8dff0e9d9baa22c30c8826722a45e879b6ca15f339812d031078393041cd650e"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\eval-pilot\\offline-hydration-audit\\result.all92-repair2.json",
+      "sha256": "23af593a011b2c4e537069c993ec728e62e6c0b0787fa5ac448f7837f08aa51f"
+    }
+  ],
+  "failure": null,
+  "allPinsFinalMatch": true,
+  "reservedRequestIds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "authorizationStatus": "awaiting_human",
+  "completeAnswerIds6to17NotSpentByThisUnit": true,
+  "elapsed_s": 52.46900000000096,
+  "actual_total_tokens": null,
+  "independentVerdict": null,
+  "audit": {
+    "status": "AUDIT_COMPLETED",
+    "questions": 92,
+    "candidates": 29,
+    "expectedSessions": 23,
+    "candidatesWithoutAcceptedQuestion": [
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations"
+    ],
+    "coverage": {
+      "hydrated": 92,
+      "noExcerpts": 0,
+      "refused": 0
+    },
+    "tripwires": {
+      "fetch": 0,
+      "http": 0,
+      "socket": 0,
+      "dns": 0,
+      "udp": 0,
+      "credentialFile": 0,
+      "provider": 0,
+      "embedding": 0
+    },
+    "wallMs": 28780,
+    "rawTurnCount": 3427,
+    "admittedTurnCount": 3424,
+    "dataQualityOpen": [
+      {
+        "status": "DATAQUALITYOPEN",
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t141",
+        "turnSha256": "6ddbb08f4e8a53abccd968915a44980d6fbf64e267091a62855356c7c7752685",
+        "turnTextSha256": "0eaa47a84b1ac58b48f1db13093477b6d0b8881d89fd26d36aaa08248e31f6d7",
+        "reason": "invalid-time-range",
+        "fields": [
+          "tStart",
+          "tEnd"
+        ],
+        "rawDataUnchanged": true,
+        "humanDispositionRequired": true
+      },
+      {
+        "status": "DATAQUALITYOPEN",
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t026",
+        "turnSha256": "dded7aef83ecb5ec09ea971d186174b364c7d2dbfcad5b8d8fe5f33c7ef68201",
+        "turnTextSha256": "c68586f4bb8056dca8d333dcb86a43945d0357bc629add4472477e0274787ff8",
+        "reason": "invalid-time-range",
+        "fields": [
+          "tStart",
+          "tEnd"
+        ],
+        "rawDataUnchanged": true,
+        "humanDispositionRequired": true
+      },
+      {
+        "status": "DATAQUALITYOPEN",
+        "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "turnId": "2026-08-10-ucas-what-changed-what-matters-t114",
+        "turnSha256": "9e4c67b98ed16a34a880058030ee29f9eea16d80813129ab12d92e8c4a246cfe",
+        "turnTextSha256": "14d99cfe606cb52e4e2338e6a0a5ac46b0e62624d355612e0b0f835893f84921",
+        "reason": "invalid-time-range",
+        "fields": [
+          "tStart",
+          "tEnd"
+        ],
+        "rawDataUnchanged": true,
+        "humanDispositionRequired": true
+      }
+    ]
+  },
+  "actualImportedSources": 202
+}

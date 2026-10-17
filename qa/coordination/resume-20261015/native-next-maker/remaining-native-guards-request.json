@@ -1,0 +1,66 @@
+{
+  "request_kind": "sole-broker-original-remaining-guard-batch",
+  "authorization": "Root preauthorized one actual original remaining guard batch after prerequisite and exact SHA matching; root wakes broker separately",
+  "status": "packet-only-not-executed",
+  "policy_version": "managed-review/1",
+  "token_metric": "actual_total",
+  "actual_total_tokens": null,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "candidate_commit": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "candidate_manifest": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-watched-server-join-repair2.json",
+  "candidate_manifest_sha256": "1ad28fd36efe8eb92c454949ed2305a29dac8c6760f51d0e4dbea2dfabb4c797",
+  "required_manifest_entries": 73,
+  "target_sha256": "a125bb23755d9f51fb496b67bb0993415e3f2decec13949c9b8455cfef7db877",
+  "global_phase_active_seconds": 120,
+  "per_command_job_seconds": 75,
+  "node_timeout_ms": 70000,
+  "required_selected": 2,
+  "required_selected_skipped": 0,
+  "required_selected_cancelled": 0,
+  "default_file_isolation": true,
+  "concurrency": 1,
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=70000",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "--test-name-pattern=^(?:retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse|fair bounded pages, quota-before-allocation and interrupted journal refuse)$",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  ],
+  "selected_titles": [
+    "retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse",
+    "fair bounded pages, quota-before-allocation and interrupted journal refuse"
+  ],
+  "prerequisites": {
+    "source_identity": "Verify current HEAD plus manifest hash/count and all 73 raw source hashes before executing. Stop on any mismatch; no pin refresh.",
+    "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "adapter_sha256": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d",
+    "decoders": "Use exact existing native-binaries.json and native-binary-hashes.json identities; set LKB_NATIVE_TEST_FFMPEG and LKB_NATIVE_TEST_FFPROBE. No download/provider/binary discovery or browser launch.",
+    "private_fixture": "Tests create actual private roots through Windows ACL provisioning and therefore need the same approved new disposable UUID helper and verifier as previous native broker passes. Reuse an already active approved owned UUID only when authority/identity still valid; previous cleaned UUIDs must not be reused. Set TMP/TEMP/LKB_NATIVE_TEST_PRIVATE_DIR to that verified owned UUID. Never repair existing ACLs or use a host capture root.",
+    "powershell": "Existing trusted Windows PowerShell executable with its native Modules PSModulePath; same actual private ACL guard. No global settings change.",
+    "external_services": "Keep existing live Mongo/private TOC/host/provider opt-ins disabled. No real DB, network, paid providers or host activation. LKB_NATIVE_TEST_BROWSER not needed for these two nodes."
+  },
+  "bounded_execution": {
+    "setup_budget_seconds": 25,
+    "guard_command_budget_seconds": 75,
+    "cleanup_reserve_seconds": 15,
+    "accounting_reserve_seconds": 5,
+    "admission": "Do not launch guard command unless at least 90 phase seconds remain for full 75-second job plus 15-second owned cleanup. Every command capped by remaining phase budget. Authored per-test 240000ms does not enlarge supervisor admission.",
+    "timeout": "Close owned process tree, perform finally-owned cleanup, preserve raw partial outcomes. Timeout or missing selected terminal result is incomplete, not assertion failure or PASS. No automatic retry, splitting, extension or widening.",
+    "failure": "Record exact actual failing node/assertion with no source changes; stop. Keep original repro names/corpus and all old receipts immutable."
+  },
+  "required_evidence": [
+    "Own command argv/start/end/active duration/exit and full raw output; native capability skips do not count as positive proof.",
+    "Require both exact selected titles to terminate pass, no selected skip/cancel. Runtime may report three pattern-excluded nodes; label these excluded, never missing prerequisite success.",
+    "Source/runtime/lock/adapter identity before and after; exact owned UUID cleanup receipt and absence check.",
+    "Keep scoped result separate from already green readonly/genuine/EXIT/watch8 and parent acceptance; no whole-native-floor or operational qualification claim."
+  ],
+  "not_requested": [
+    "Already green readonly positive, observer refusal, production genuine positive or actual EXIT chain replay",
+    "Unsupported private-transform/platform or repeated host qualification proof",
+    "Any source edits, new tests, checker dispatch or verdict"
+  ]
+}

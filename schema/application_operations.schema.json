@@ -1,0 +1,478 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://application_operations",
+  "title": "ApplicationOperations",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/StoredApplicationDefinition"
+    },
+    {
+      "$ref": "#/$defs/StoredApplicationOperation"
+    }
+  ],
+  "$defs": {
+    "StoredApplicationDefinition": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordType": {
+          "const": "definition"
+        },
+        "targetId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "targetFingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "updatedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "actor": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "configured",
+                  "submitted",
+                  "fields-revised",
+                  "approved",
+                  "claimed",
+                  "heartbeat",
+                  "execution-uncertain",
+                  "succeeded",
+                  "lease-expired",
+                  "operator-cancel",
+                  "operator-retry",
+                  "operator-reconciled"
+                ]
+              },
+              "binding": {
+                "type": "object",
+                "properties": {
+                  "payloadDigest": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "targetFingerprint": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "priorVersion": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "payloadDigest",
+                  "targetFingerprint",
+                  "priorVersion"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "at",
+              "actor",
+              "action",
+              "binding"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "_id",
+        "tenantId",
+        "recordType",
+        "targetId",
+        "targetFingerprint",
+        "maxAttempts",
+        "timeoutMs",
+        "version",
+        "updatedAt",
+        "history",
+        "enabled"
+      ],
+      "additionalProperties": false,
+      "title": "StoredApplicationDefinition"
+    },
+    "StoredApplicationOperation": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordType": {
+          "const": "operation"
+        },
+        "targetId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "targetFingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "updatedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "actor": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "configured",
+                  "submitted",
+                  "fields-revised",
+                  "approved",
+                  "claimed",
+                  "heartbeat",
+                  "execution-uncertain",
+                  "succeeded",
+                  "lease-expired",
+                  "operator-cancel",
+                  "operator-retry",
+                  "operator-reconciled"
+                ]
+              },
+              "binding": {
+                "type": "object",
+                "properties": {
+                  "payloadDigest": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[a-f0-9]{64}$"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "targetFingerprint": {
+                    "type": "string",
+                    "pattern": "^[a-f0-9]{64}$"
+                  },
+                  "priorVersion": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "payloadDigest",
+                  "targetFingerprint",
+                  "priorVersion"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "at",
+              "actor",
+              "action",
+              "binding"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "definitionId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "identityDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "payloadDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/StoredApplicationField"
+          },
+          "minItems": 0,
+          "maxItems": 20
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "approved",
+            "running",
+            "waiting-for-operator",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "approval": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "actor": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+                },
+                "at": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "payloadDigest": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "targetFingerprint": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                }
+              },
+              "required": [
+                "actor",
+                "at",
+                "payloadDigest",
+                "targetFingerprint"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "createdAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "ownerToken": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "leaseUntil": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receiptId": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sideEffectUncertain": {
+          "type": "boolean"
+        },
+        "incident": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "missing-required-fields",
+                "provenance-unavailable",
+                "handler-failed",
+                "handler-timeout",
+                "uncertain-side-effect",
+                "retry-exhausted",
+                "target-changed"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "_id",
+        "tenantId",
+        "recordType",
+        "targetId",
+        "targetFingerprint",
+        "maxAttempts",
+        "timeoutMs",
+        "version",
+        "updatedAt",
+        "history",
+        "definitionId",
+        "identityDigest",
+        "payloadDigest",
+        "fields",
+        "status",
+        "approval",
+        "attempts",
+        "createdAt",
+        "ownerToken",
+        "leaseUntil",
+        "receiptId",
+        "sideEffectUncertain",
+        "incident"
+      ],
+      "additionalProperties": false,
+      "title": "StoredApplicationOperation"
+    },
+    "StoredApplicationField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "source": {
+          "type": "object",
+          "properties": {
+            "documentId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "pattern": "^[^\\s\\u0000-\\u001f\\u007f-\\u009f]+$"
+            },
+            "page": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 10000
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "end": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 1000000
+            },
+            "revision": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "documentId",
+            "page",
+            "start",
+            "end",
+            "revision"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "name",
+        "value",
+        "source"
+      ],
+      "additionalProperties": false,
+      "title": "StoredApplicationField"
+    }
+  }
+}

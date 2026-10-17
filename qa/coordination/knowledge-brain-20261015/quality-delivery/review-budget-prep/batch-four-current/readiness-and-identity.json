@@ -1,0 +1,174 @@
+{
+  "preparation_attempt_note": "Earlier metadata serialization failed on invalid PowerShell false literal; source/proof hashes succeeded but readiness metadata was null. This corrected metadata replaces only invalid new preparation output, not any assessment or review history.",
+  "shared_cost_note": "Existing26case shared suite6096.396ms covers six units; selected four contribute10cases. Shared suite charged once centrally; no per-role measured usage/cost claim.",
+  "identity_algorithm": "SHA256 UTF8-noBOM sorted unit/cycle + ASCIIspace + exact candidate + LF including finalLF",
+  "units": [
+    {
+      "inventory": "qa/packets/extraction-stage-receipts.candidate-inventory.txt",
+      "maker_actual": {
+        "cost": null,
+        "active_s": null,
+        "tokens": null
+      },
+      "manifest": "qa/manifests/extraction-stage-receipts.md",
+      "candidate": "sha256:e643ea586eb60cb67c979538244ef1c34cb89ac6ee2a68232ca13ada87b26899",
+      "review_history": "No reviewer dispatched for these exact candidates; prospective preparation rows are not committed allocations. Preserve discovered history.",
+      "unit": "extraction-stage-receipts",
+      "verdict": "qa/verdicts/extraction-stage-receipts.md",
+      "pins": [
+        {
+          "path": "scripts/eval/extraction-stage-receipts.mjs",
+          "sha256": "6465571a1d52cb2ba3babf187ca4884913d3e005ea89dcee27ccec451b39d17c"
+        },
+        {
+          "path": "scripts/eval/extraction-stage-receipts.test.mjs",
+          "sha256": "1808871b284d4bc852ea0a666994f7a0257cbc0f3f4844a7fa70eae46ff58c31"
+        }
+      ],
+      "packet": "qa/packets/extraction-stage-receipts.md",
+      "cycle": 0
+    },
+    {
+      "inventory": "qa/packets/t022-executed-provenance.inventory",
+      "maker_actual": {
+        "cost": null,
+        "active_s": null,
+        "tokens": null
+      },
+      "manifest": "qa/manifests/t022-executed-provenance.md",
+      "candidate": "sha256:5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+      "review_history": "No reviewer dispatched for these exact candidates; prospective preparation rows are not committed allocations. Preserve discovered history.",
+      "unit": "t022-executed-provenance",
+      "verdict": "qa/verdicts/t022-executed-provenance.md",
+      "pins": [
+        {
+          "path": "scripts/eval/human-calibration.mjs",
+          "sha256": "bb91820014da89802e0641a4a232551c32d0fce498fee7f37f45c0798df6aa6c"
+        },
+        {
+          "path": "scripts/eval/human-calibration.test.mjs",
+          "sha256": "6d9766ea7f67fdcf8530423f108d45ec2b9299c379e3064461df4dcf5045df63"
+        }
+      ],
+      "packet": "qa/packets/t022-executed-provenance.md",
+      "cycle": 0
+    },
+    {
+      "inventory": "qa/evidence/t022-review-dirty-guard/candidate-inventory.txt",
+      "maker_actual": {
+        "cost": null,
+        "active_s": null,
+        "tokens": null
+      },
+      "manifest": "qa/manifests/t022-review-dirty-guard.md",
+      "candidate": "sha256:a0a31ab35f22e6c407c36652844f86c4685383836d67bc4223d4b0aaa41d443b",
+      "review_history": "No reviewer dispatched for these exact candidates; prospective preparation rows are not committed allocations. Preserve discovered history.",
+      "unit": "t022-review-dirty-guard",
+      "verdict": "qa/verdicts/t022-review-dirty-guard.md",
+      "pins": [
+        {
+          "path": "data/eval/t022-offline-review.html",
+          "sha256": "918af50de6aad75e50729343faf0bb3556f738d97fc551a480776ba3c6d237f1"
+        },
+        {
+          "path": "scripts/eval/t022-offline-review.mjs",
+          "sha256": "f3e971cd0bdee3853813a4b490ae317781898ef0622c347c75238699f5752357"
+        },
+        {
+          "path": "scripts/eval/t022-offline-review.test.mjs",
+          "sha256": "0b55e774cd9115255778741e125f8ba76ed96aba2d20a2ef8d792c924904faa9"
+        }
+      ],
+      "packet": "qa/packets/t022-review-dirty-guard.md",
+      "cycle": 1
+    },
+    {
+      "inventory": "qa/packets/u22-extraction-review-resume.candidate-inventory.txt",
+      "maker_actual": {
+        "cost": null,
+        "active_s": null,
+        "tokens": null
+      },
+      "manifest": "qa/manifests/u22-extraction-review-resume.md",
+      "candidate": "sha256:c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+      "review_history": "No reviewer dispatched for these exact candidates; prospective preparation rows are not committed allocations. Preserve discovered history.",
+      "unit": "u22-extraction-review-resume",
+      "verdict": "qa/verdicts/u22-extraction-review-resume.md",
+      "pins": [
+        {
+          "path": "scripts/eval/extraction-review-resume.mjs",
+          "sha256": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206"
+        },
+        {
+          "path": "scripts/eval/extraction-review-resume.test.mjs",
+          "sha256": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb"
+        }
+      ],
+      "packet": "qa/packets/u22-extraction-review-resume.md",
+      "cycle": 0
+    }
+  ],
+  "proofs": [
+    {
+      "current_drift": [],
+      "stdout_sha256": "ae86ec91ab19ea483270b637459eebdc0fe83634e6e466fb6d2e09b6c9430af6",
+      "environment_note": "Recorded whitelist fingerprint; current environment values not read",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recorded_environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+      "before_after_drift": [],
+      "pin_count": 62,
+      "sha256": "57bccf47cb929ba448193bed0186e404b259fe0cd5dbade9911940492e6f244a",
+      "own_exit": 0,
+      "path": "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.json",
+      "elapsedMs": 6096.396,
+      "runtime_matches": true,
+      "stdout": "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.stdout.txt"
+    },
+    {
+      "current_drift": [],
+      "stdout_sha256": "5334fe5c98e6c1621cc3702f7338573f4a9d72a3353f4f03e7704aa6631ad60d",
+      "environment_note": "Recorded whitelist fingerprint; current environment values not read",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recorded_environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+      "before_after_drift": [],
+      "pin_count": 37,
+      "sha256": "7687c5d6cc4846cf6705db30a3b24d183aef0989791c958c07df0016001bcc30",
+      "own_exit": 2,
+      "path": "qa/goal-vectorless-2026-10-15/verification-extraction-stage-current-refusal.json",
+      "elapsedMs": 372.9881,
+      "runtime_matches": true,
+      "stdout": "qa/goal-vectorless-2026-10-15/verification-extraction-stage-current-refusal.stdout.txt"
+    },
+    {
+      "current_drift": [],
+      "stdout_sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8",
+      "environment_note": "Recorded whitelist fingerprint; current environment values not read",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "recorded_environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+      "before_after_drift": [],
+      "pin_count": 2,
+      "sha256": "7f7159d8a88d59f248598be8c8b3ed5ab30fb87f76eb530ff3c0a023108736b6",
+      "own_exit": 0,
+      "path": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.json",
+      "elapsedMs": 192.95030000000003,
+      "runtime_matches": true,
+      "stdout": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.stdout.txt"
+    }
+  ],
+  "helper_authentication": {
+    "probe_receipt_sha256": "773a1604f2f7ed6fb657103cd5817a83e81a52c2a422ba50f3df5f54be95464f",
+    "review_verdict": "qa/verdicts/checker-runtime-total.md",
+    "staged_sha256": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "reviewed_candidate": "fbfa445ede6fd9c82138f24743f8cd0ea4f2f3c82f5b98dc71123e5a8cdc24b2",
+    "global_install": false,
+    "canonical_path": "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "probe_receipt": "qa/goal-vectorless-2026-10-15/verification-combined-finisher-probe.json",
+    "review_cycle": 4,
+    "canonical_sha256": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "staged_path": "qa/coordination/checker-runtime-total-20261015/review_budget.py",
+    "review_verdict_sha256": "6a3d06d5ee21f5e83502d82d8326deb77dace24dd42a8df5c99685c2dd0c5948",
+    "probe_own_exit": 0
+  },
+  "dispatch": false,
+  "batch_candidate": "sha256:9178adef7f4a1c3d9c92717e88ca76c87cb9d1574d2051ef64addfeba87c973e"
+}

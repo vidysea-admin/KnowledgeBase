@@ -1,0 +1,61 @@
+{
+  "format": "own-model-plan-v1",
+  "taskFormat": "grounded-claim-v1",
+  "tenantId": "toc",
+  "status": "blocked-no-current-eligible-examples",
+  "config": {
+    "tenantId": "toc",
+    "seed": "t015-real-readonly-v1",
+    "sessions": [
+      "2026-05-08-funding-dreams-loans-forex",
+      "2026-08-03-uk-beyond-offer-letters",
+      "2026-08-03-uk-beyond-offer-letters-reupload"
+    ],
+    "relatedGroups": [
+      [
+        "2026-08-03-uk-beyond-offer-letters",
+        "2026-08-03-uk-beyond-offer-letters-reupload"
+      ]
+    ]
+  },
+  "transformation": "identity-v1; verified claim with full cited turns; no generated questions, redaction or semantic gold assertion",
+  "permissions": "capture permission is checked; training/export permission requires exact Umesh canonical decision; preparation never authorizes use",
+  "provenance": "only current derivation proof accepted; legacy-unbound/stale rejected",
+  "membership": [],
+  "exclusions": [
+    {
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "reason": "derivation-proof-missing"
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "reason": "derivation-proof-missing"
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "reason": "derivation-proof-missing"
+    }
+  ],
+  "splitAlgorithm": "connected-source-session-content-v1; first hashed group evaluation, second validation, remaining train",
+  "leakageGroups": [],
+  "splits": {
+    "train": [],
+    "validation": [],
+    "evaluation": []
+  },
+  "counts": {
+    "selectedSessions": 3,
+    "acceptedSessions": 0,
+    "rows": 0,
+    "groups": 0,
+    "train": 0,
+    "validation": 0,
+    "evaluation": 0
+  },
+  "splitReady": false,
+  "exported": false,
+  "trained": false,
+  "evaluated": false,
+  "promoted": false,
+  "fingerprint": "030f231bc13f0014df6592c3d18b025f19ef1d239634853ef35bfd64a3632de2"
+}

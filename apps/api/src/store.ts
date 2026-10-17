@@ -32,6 +32,7 @@ import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
 import { scanGmailForMeetingCandidates } from "./gws/gws-gmail.js";
 import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
+import { trustedBrainReads, trustedCitationReads, trustedTreeReads, trustedGraphReads } from './composition/integrations/trusted-readers.js';
 
 /** `schema/index.json`'s top-level keys ARE the canonical list of real Mongo collections (its
  * own comment excludes `features_event` deliberately — a JSONL-file schema, not a collection) —
@@ -48,24 +49,15 @@ export function createMongoApiKeyStore(): ApiKeyStore {
     async verify(key: string): Promise<VerifiedKey | null> {
       const doc = await getDb().collection<ApiKeys>("api_keys").findOne({ keyHash: sha256Hex(key) });
       if (!doc || doc.revokedAt) return null;
-      return { tenantId: doc.tenantId, scopes: doc.scopes ?? [] };
+      return { tenantId: doc.tenantId, scopes: doc.scopes ?? [], keyId: doc._id };
     },
   };
 }
 
 /** One root node per tenant, `level: "tenant"`, `node_id` == tenantId (buildTree's output shape). */
-export function createMongoTreeStore(): TreeStore {
-  return {
-    async load(tenantId: string): Promise<TreeIndexNode | null> {
-      // treeIndexRootFilter (ISS-063) is the single source of the `tenant:<id>` convention this
-      // query used to hand-write -- that hand-written copy was the exact query that got the
-      // node_id shape wrong once, live, on 2026-09-04, before this file matched what buildTree
-      // actually produces. It now also matches on the real `tenantId` field (ISS-062) --
-      // TreeIndexRootDocument satisfies TreeStore's TreeIndexNode return type (it's a superset).
-      try { assertValidTenantId(tenantId, "treeStore.load"); } catch { return null; } // invalid tenant: no tree and NO query (ISS-AUTHTENANT-002); the route answers its 404
-      return treeIndexColl(tenantId).findOne(treeIndexRootFilter(tenantId));
-    },
-  };
+export function createMongoTreeStore(nativeEvidence?: Parameters<typeof trustedTreeReads>[1]): TreeStore {
+  const guarded = trustedTreeReads(getDb, nativeEvidence);
+  return { async load(tenantId) { try { assertValidTenantId(tenantId, 'treeStore.load'); } catch { return null; } return guarded.load(tenantId); } };
 }
 
 /** Mongo-backed `EvalRunStore` (T-012 C3) — thin wrapper over `@lkb/db`'s `eval-runs.ts`
@@ -91,7 +83,7 @@ export function createMongoJobWriter(): WriteJobFn {
  * field (claims relate via `evidence[].sessionId`; turns via their own `sessionId`), so the
  * session-detail join queries each accordingly rather than assuming a shared shape. */
 export function createMongoBrainReadDeps(): BrainReadDeps {
-  return {
+  return trustedBrainReads({
     async listSessions(tenantId) {
       return sessionsColl(tenantId).find({}).toArray();
     },
@@ -111,7 +103,7 @@ export function createMongoBrainReadDeps(): BrainReadDeps {
     async listGaps(tenantId) {
       return gapsColl(tenantId).find({}).toArray();
     },
-  };
+  }, getDb);
 }
 
 /** Real `CitationsDeps` (routes/citations.ts) — same composition-root pattern as the brain deps
@@ -119,22 +111,7 @@ export function createMongoBrainReadDeps(): BrainReadDeps {
  * thousands of rows), so resolving each turn/session in parallel is the right shape — no batching
  * layer needed at this scale. */
 export function createMongoCitationsDeps(): CitationsDeps {
-  return {
-    async getCitation(tenantId, claimId): Promise<Citation | null> {
-      const claim = await claimsColl(tenantId).findOne({ _id: claimId });
-      if (!claim) return null;
-      const evidence = await Promise.all(
-        claim.evidence.map(async (e): Promise<CitationEvidence> => {
-          const [turn, session] = await Promise.all([
-            turnsColl(tenantId).findOne({ _id: e.turnId }),
-            sessionsColl(tenantId).findOne({ _id: e.sessionId }),
-          ]);
-          return { turnId: e.turnId, sessionId: e.sessionId, turn: turn ?? null, session: session ?? null };
-        }),
-      );
-      return { claim, evidence };
-    },
-  };
+  return trustedCitationReads(getDb);
 }
 
 /** Real `GraphReadDeps` — unions the `tree_index` root (same `treeIndexRootFilter` as
@@ -142,15 +119,7 @@ export function createMongoCitationsDeps(): CitationsDeps {
  * `buildKnowledgeGraph`. Both new reads use `packages/db` `coll(tenantId)`, so [I1] holds by
  * construction; full disclosure of what is and is not read lives in `routes/graph.ts`. */
 export function createMongoGraphReadDeps(): GraphReadDeps {
-  return {
-    async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
-      assertValidTenantId(tenantId, "graph.load"); // before the hand-built tree_index query (the accessors below only throw after it was issued)
-      const treeRootP = treeIndexColl(tenantId).findOne(treeIndexRootFilter(tenantId));
-      const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
-      if (!treeRoot && entityEdges.length === 0) return null;
-      return buildKnowledgeGraph({ treeRoot, entityEdges, sessions: sessionDocs });
-    },
-  };
+  return trustedGraphReads(getDb);
 }
 
 export { createGwsCalendarReadDeps } from "./gws/gws-calendar.js";
@@ -174,7 +143,7 @@ export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, s
       const found = await scan();
       let created = 0, autoApproved = 0;
       // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
-      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId", "senderAuthenticated"] as const;
+      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId", "senderAuthenticated", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] as const;
       for (const candidate of found) {
         // ISS-322/333: a From header is not trust. Only an authenticated sender can reach auto_approved; the rest wait for a human.
         const trusted = candidate.senderAuthenticated === true ? await persistence.getTrustedSender(tenantId, candidate.senderDomain) : undefined;

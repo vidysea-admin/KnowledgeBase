@@ -1,0 +1,67 @@
+{
+  "remaining_gates": [
+    "sole broker full combined bot/API typecheck",
+    "actual OS ACL create/descendant guard tests",
+    "actual runRecord positive and source/receipt/quota negatives",
+    "B single runRecord EXIT/reopen chain",
+    "scoped structure/cycles/mandatory contract checks",
+    "actual host qualification and Mongo transactional gates",
+    "independent checker verdict"
+  ],
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "source_pins": [
+    {
+      "nonblank": 299,
+      "sha256": "1dafe3074f70ec5440dc51326f392a58dfbf55ea8b33f9ef18ea59cefd185d3e",
+      "path": "packages/meeting-bot/src/capture/record-commands.ts"
+    },
+    {
+      "nonblank": 295,
+      "sha256": "8ac3798f063c0bb9a06405d10cb274b33dd169cda9d59bf99b610e31e531e927",
+      "path": "packages/meeting-bot/src/capture/record-finalize.ts"
+    },
+    {
+      "nonblank": 143,
+      "sha256": "033454814c587afcfafd4edc0a46e66a5d612f3ae0e10a3458dc8a49f1f2c2a9",
+      "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts"
+    },
+    {
+      "nonblank": 32,
+      "sha256": "1c430142519ed7f9ad8bf1ff82b561578cd7c36b0e9346424f339f599403f59d",
+      "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ts"
+    },
+    {
+      "nonblank": 34,
+      "sha256": "48ec95f14880c235dd8812f7ef68d4afbdf11b9c2beb9a1421151aa4d50178ca",
+      "path": "packages/meeting-bot/src/capture/record-consent/private-directory.ps1"
+    },
+    {
+      "nonblank": 23,
+      "sha256": "22b44c4fdd5da97ded4bb539e629b9bed435ad4c5d4675e5c2c863f0c1486987",
+      "path": "packages/meeting-bot/src/capture/record-consent/private-directory.test.ts"
+    },
+    {
+      "nonblank": 95,
+      "sha256": "bd32bc89a7d3fbd428a4abbfd9559b69be012c0533dee5dc4c6bf3fe6584f002",
+      "path": "packages/meeting-bot/src/capture/native/native-archive-capture.ts"
+    },
+    {
+      "nonblank": 25,
+      "sha256": "02fb26095ab977482b9e87e758b6214b289cd2e69602397999feacb95f1f6a5c",
+      "path": "packages/meeting-bot/src/capture/native/native-archive-capture.test.ts"
+    }
+  ],
+  "role": "maker-fragment",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "unit": "native-next-maker-a",
+  "candidate_sha": null,
+  "tests_executed": [],
+  "maker_usage": {
+    "active_seconds": null,
+    "token_metric": "actual_total",
+    "actual_total": null
+  },
+  "fix_cycle": 1,
+  "token_metric": "actual_total",
+  "policy_version": "managed-review/1"
+}

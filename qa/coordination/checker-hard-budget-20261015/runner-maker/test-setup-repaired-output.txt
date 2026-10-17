@@ -1,0 +1,37 @@
+test_aggregate_reservations_and_immutable_plan (test_scoped_check_runner.ScopedRunnerTests.test_aggregate_reservations_and_immutable_plan) ... ok
+test_changed_bytes_refused (test_scoped_check_runner.ScopedRunnerTests.test_changed_bytes_refused) ... ok
+test_llm_zero_execution (test_scoped_check_runner.ScopedRunnerTests.test_llm_zero_execution) ... ok
+test_missing_required_refused (test_scoped_check_runner.ScopedRunnerTests.test_missing_required_refused) ... ERROR
+test_success_and_unknown_denominator (test_scoped_check_runner.ScopedRunnerTests.test_success_and_unknown_denominator) ... ok
+test_timeout_descendant_cleanup (test_scoped_check_runner.ScopedRunnerTests.test_timeout_descendant_cleanup) ... ok
+
+======================================================================
+ERROR: test_missing_required_refused (test_scoped_check_runner.ScopedRunnerTests.test_missing_required_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\shutil.py", line 637, in _rmtree_unsafe
+    os.rmdir(path)
+PermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-hard-budget-20261015\\runner-maker\\fixture-259380c062de4516928c57343d148f8d'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 38, in tearDown
+    shutil.rmtree(self.root, onerror=repair)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 639, in _rmtree_unsafe
+    onexc(os.rmdir, path, err)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 750, in onexc
+    return onerror(func, path, exc_info)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 37, in repair
+    os.chmod(name, stat.S_IWRITE); function(name)
+                                   ^^^^^^^^^^^^^^
+PermissionError: [WinError 32] The process cannot access the file because it is being used by another process: 'C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-hard-budget-20261015\\runner-maker\\fixture-259380c062de4516928c57343d148f8d'
+
+----------------------------------------------------------------------
+Ran 6 tests in 5.777s
+
+FAILED (errors=1)

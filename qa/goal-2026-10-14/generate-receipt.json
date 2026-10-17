@@ -1,0 +1,14 @@
+{
+  "phase": "generate",
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "scripts/gen-types.mjs"
+  ],
+  "pid": 17116,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "elapsedMs": 733,
+  "stdout": "wrote packages\\core\\src\\generated\\answer_policy_review_items.ts\nwrote packages\\core\\src\\generated\\answer_policy_revisions.ts\nwrote packages\\core\\src\\generated\\answer_runs.ts\nwrote packages\\core\\src\\generated\\answer_source_conflicts.ts\nwrote packages\\core\\src\\generated\\application_operations.ts\nwrote packages\\core\\src\\generated\\automation_runs.ts\nwrote packages\\core\\src\\generated\\championship_events.ts\nwrote packages\\core\\src\\generated\\document_documents.ts\nwrote packages\\core\\src\\generated\\eval_runs.ts\nwrote packages\\core\\src\\generated\\gaps.ts\nwrote packages\\core\\src\\generated\\knowledge_collections.ts\nwrote packages\\core\\src\\generated\\knowledge_outputs.ts\nwrote packages\\core\\src\\generated\\meeting_candidates.ts\nwrote packages\\core\\src\\generated\\operations_schedules.ts\nwrote packages\\core\\src\\generated\\sources.ts\nwrote packages\\core\\src\\generated\\speaker_suggestions.ts\nwrote packages\\core\\src\\generated\\watched_sources.ts\nwrote packages\\core\\src\\index.ts\ndone: 43 collection(s), 18 file(s) written\n",
+  "stderr": ""
+}

@@ -1,0 +1,17 @@
+[
+  {
+    "path": "apps/api/src/visibility/knowledge.ts",
+    "sha256": "BD54B93A2B6429F320A0468F7F062C05ECE08E6483851E570080EFFFB0DB12DC",
+    "rawback": "qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__visibility__knowledge.ts"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/materializer.ts",
+    "sha256": "7FB6ED68352F9D6ECCD0AF49ABC10310DA972C56D5C0BA006037FB9CA8AA2EB9",
+    "rawback": "qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__whatsapp__review__materializer.ts"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/invalidate.ts",
+    "sha256": "7512F739429B9BFB8848E35AC6673037F3A3B5EC20A2AA5DD0F5AE965CBE7214",
+    "rawback": "qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__whatsapp__review__invalidate.ts"
+  }
+]

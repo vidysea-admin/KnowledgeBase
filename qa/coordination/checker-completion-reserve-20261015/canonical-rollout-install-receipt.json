@@ -1,0 +1,35 @@
+{
+  "CommandDurationMs": 182.6668,
+  "SkillReadback": "924F57173D96FA2167DF4C02DA9157052694B1F94D1E618867CBF922662EE811",
+  "Helper": {
+    "Status": "INSTALLED",
+    "Writes": true,
+    "Sha256": "36B1650CF7D65D0CB4416F558486DF279A519C75D2DAE44D3F64875D3DBEF66E",
+    "Backup": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-completion-reserve-20261015\\canonical-before-install.py",
+    "At": "2026-10-15T09:32:10.2384377Z",
+    "VerdictSha256": "5B85282E38D214AAE8B94707ADE86AF10A3F8805CA18B088F2E3D664CBA13324"
+  },
+  "Tokens": null,
+  "Skill": {
+    "Sha256": "924F57173D96FA2167DF4C02DA9157052694B1F94D1E618867CBF922662EE811",
+    "Status": "INSTALLED",
+    "Backup": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-completion-reserve-20261015\\canonical-SKILL-before-install.md",
+    "Writes": true
+  },
+  "Cost": null,
+  "Status": "INSTALLED",
+  "RatioVerified": false,
+  "HelperReadback": "36B1650CF7D65D0CB4416F558486DF279A519C75D2DAE44D3F64875D3DBEF66E",
+  "SkillIdempotent": {
+    "Sha256": "924F57173D96FA2167DF4C02DA9157052694B1F94D1E618867CBF922662EE811",
+    "Status": "ALREADY_CURRENT",
+    "Writes": false
+  },
+  "At": "2026-10-15T09:32:10.3284801Z",
+  "Limitation": "Exclusive same-handle writes, not crash-atomic; durable QA backups retained",
+  "HelperIdempotent": {
+    "Sha256": "36B1650CF7D65D0CB4416F558486DF279A519C75D2DAE44D3F64875D3DBEF66E",
+    "Status": "ALREADY_CURRENT",
+    "Writes": false
+  }
+}

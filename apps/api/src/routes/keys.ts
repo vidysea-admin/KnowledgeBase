@@ -8,7 +8,7 @@
  * route here ever echoes back a `keyHash` or a previously-minted raw key.
  */
 import { Router, type Request, type Response } from "express";
-import { requireScope } from "../auth.js";
+import { requireScope, type VerifiedKey } from "../auth.js";
 
 export interface ApiKeySummary {
   _id: string;
@@ -19,9 +19,9 @@ export interface ApiKeySummary {
 }
 
 export interface KeysDeps {
-  listKeys(tenantId: string): Promise<ApiKeySummary[]>;
-  createKey(tenantId: string, label: string, scopes: string[]): Promise<{ id: string; rawKey: string }>;
-  revokeKey(tenantId: string, id: string): Promise<boolean>;
+  listKeys(tenantId: string, principal?: VerifiedKey): Promise<ApiKeySummary[]>;
+  createKey(tenantId: string, label: string, scopes: string[], principal?: VerifiedKey): Promise<{ id: string; rawKey: string }>;
+  revokeKey(tenantId: string, id: string, principal?: VerifiedKey): Promise<boolean>;
 }
 
 interface CreateKeyBody {
@@ -33,7 +33,7 @@ export function createKeysRouter(deps: KeysDeps): Router {
   const router = Router();
 
   router.get("/keys", requireScope("keys"), async (req: Request, res: Response) => {
-    const keys = await deps.listKeys(req.auth!.tenantId);
+    const keys = await deps.listKeys(req.auth!.tenantId, req.auth);
     res.status(200).json({ keys });
   });
 
@@ -48,14 +48,14 @@ export function createKeysRouter(deps: KeysDeps): Router {
       res.status(400).json({ error: "bad_request", message: "body must be { label: string, scopes: string[] } (scopes non-empty)" });
       return;
     }
-    const { id, rawKey } = await deps.createKey(req.auth!.tenantId, label, scopes as string[]);
+    const { id, rawKey } = await deps.createKey(req.auth!.tenantId, label, scopes as string[], req.auth);
     // The raw key is returned exactly once, here, and never again -- no route in this file (or
     // anywhere else) ever reads it back out of storage, because only its hash is stored.
     res.status(201).json({ id, key: rawKey });
   });
 
   router.delete("/keys/:id", requireScope("keys"), async (req: Request, res: Response) => {
-    const revoked = await deps.revokeKey(req.auth!.tenantId, req.params.id as string);
+    const revoked = await deps.revokeKey(req.auth!.tenantId, req.params.id as string, req.auth);
     if (!revoked) {
       res.status(404).json({ error: "not_found", message: "no key with that id for this tenant" });
       return;

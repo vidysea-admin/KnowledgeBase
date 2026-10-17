@@ -1,5 +1,4 @@
-/** Passage slicing and query-time lexical scoring for source hydration (split from source-context.ts; no behaviour change). */
-import type { Turns } from "@lkb/core";
+/** Unicode passage slicing and query-time lexical scoring for transcript and native source hydration. */
 import { lexicalQueryTokens } from "@lkb/index";
 
 export interface Span { charStart: number; charEnd: number }
@@ -46,16 +45,16 @@ function passageTokenizer(query: string) {
       .replace(/\b(year|class of|cohort of|batch of|intake of|spring|summer|autumn|fall|winter)\s+['’](\d{2})(?![\d'’%])\b/gi,
         (literal, prefix: string, short: string) => years.get(short) ? prefix + " " + years.get(short) : literal);
     // Same lexical token boundaries as lexicalQueryTokens, with actual frequencies retained.
-    return expanded.split(/\W+/).filter(Boolean).map((word) => word === "LED" ? "led-device" : term(word.toLowerCase()));
+    return expanded.split(/[^\p{L}\p{N}\p{M}_]+/u).filter(Boolean).map((word) => word === "LED" ? "led-device" : term(word.toLowerCase()));
   };
 }
 /** Query-independent document frequencies reduce boilerplate overlap; source labels remain unverified metadata. */
-export function passageLexicalScorer(query: string, turns: Turns[]) {
+export function passageLexicalScorer(query: string, turns: readonly { text: string; speakerRef?: string }[]) {
   const wordsFor = passageTokenizer(query);
   const all = wordsFor(query);
   const content = all.filter((word) => !QUERY_FUNCTION_WORDS.has(word));
   const terms = [...new Set((content.length ? content : all).map(term))];
-  const docs = turns.map((turn) => new Set(wordsFor(turn.text + " " + turn.speakerRef)));
+  const docs = turns.map((turn) => new Set(wordsFor(turn.text + " " + (turn.speakerRef ?? ""))));
   const weights = new Map(terms.map((word) => {
     const count = docs.filter((words) => words.has(word)).length;
     return [word, count ? Math.log(1 + (turns.length - count + 0.5) / (count + 0.5)) : 0];
@@ -63,8 +62,8 @@ export function passageLexicalScorer(query: string, turns: Turns[]) {
   const denominator = [...weights.values()].reduce((a, b) => a + b, 0);
   const lengths = turns.flatMap((turn) => slices(turn.text).map((span) => wordsFor(turn.text.slice(span.charStart, span.charEnd)).length));
   const average = lengths.reduce((a, b) => a + b, 0) / Math.max(1, lengths.length);
-  return (text: string, speakerRef: string) => {
-    const words = wordsFor(text), speakers = new Set(wordsFor(speakerRef));
+  return (text: string, speakerRef?: string) => {
+    const words = wordsFor(text), speakers = new Set(wordsFor(speakerRef ?? ""));
     const counts = new Map<string, number>();
     for (const word of words) counts.set(word, (counts.get(word) ?? 0) + 1);
     let textContribution = 0, speakerContribution = 0;

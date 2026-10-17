@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://speaker_relationships",
+  "title": "SpeakerRelationships",
+  "description": "Provenance-bound speaker claim relationships. Suggestions, rejections and revocations remain outside graph_edges; acceptance requires a human review and current source revisions.",
+  "type": "object",
+  "required": ["_id", "tenantId", "revision", "status", "type", "from", "to", "evidence", "createdBy", "sourceRevisionDigest"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["suggested", "accepted", "rejected", "revoked"] },
+    "type": { "type": "string", "enum": ["agrees_with", "contradicts", "supersedes"] },
+    "from": { "$ref": "#/$defs/endpoint" },
+    "to": { "$ref": "#/$defs/endpoint" },
+    "evidence": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["sessionId", "turnId", "quote", "transcriptHash"],
+        "properties": {
+          "sessionId": { "type": "string", "minLength": 1 },
+          "turnId": { "type": "string", "minLength": 1 },
+          "quote": { "type": "string", "minLength": 1 },
+          "transcriptHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdBy": { "type": "string", "minLength": 1 },
+    "review": {
+      "type": "object",
+      "required": ["actorId", "decision", "at", "baseRevision"],
+      "properties": {
+        "actorId": { "type": "string", "minLength": 1 },
+        "decision": { "type": "string", "enum": ["accepted", "rejected", "revoked"] },
+        "at": { "type": "string", "format": "date-time" },
+        "baseRevision": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "sourceRevisionDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "reviewHistory": {
+      "description": "Actor-bound idempotency receipts retained across acceptance then revocation. Terminal relationships cannot reopen.",
+      "type": "array",
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["requestId", "requestHash", "actorId", "decision", "at", "baseRevision", "resultRevision"],
+        "properties": {
+          "requestId": { "type": "string", "minLength": 1 },
+          "requestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "actorId": { "type": "string", "minLength": 1 },
+          "decision": { "type": "string", "enum": ["accept", "reject", "revoke"] },
+          "at": { "type": "string", "format": "date-time" },
+          "baseRevision": { "type": "integer", "minimum": 1 },
+          "resultRevision": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "endpoint": {
+      "type": "object",
+      "required": ["claimId", "personId"],
+      "properties": {
+        "claimId": { "type": "string", "minLength": 1 },
+        "personId": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -35,17 +35,29 @@ function session(e: Env, name: string, ageDays: number, extra: Record<string, un
 }
 
 interface Ran { code: number; out: string; err: string; unlinked: string[] }
-function run(e: Env, flags: string[] = [], opts: { afterPlan?: () => void; purgeIo?: (log: string[]) => PurgeIo; extra?: string[] } = {}): Ran {
+function run(e: Env, flags: string[] = [], opts: { afterPlan?: () => void; purgeIo?: (log: string[]) => PurgeIo; extra?: string[]; omitClips?: boolean } = {}): Ran {
   const out: string[] = [];
   const err: string[] = [];
   const unlinked: string[] = [];
+  const clips: NonNullable<Parameters<typeof runRetentionPurge>[1]["clips"]> = { extract: (_media, windows) => ({ ok: true,
+    outcomes: windows.map(window => ({ turnId: window.turnId, file: "injected-valid-clip", status: "exists" })) }) };
   const purgeIo: PurgeIo = opts.purgeIo ? opts.purgeIo(unlinked) : { unlink: (p) => { unlinked.push(p); REAL_PURGE_IO.unlink(p); } };
   const code = runRetentionPurge([...baseArgs(e.root, e.media, [...ASOF, ...(opts.extra ?? [])]), ...flags], {
     now: () => NOW, write: (l) => out.push(l), error: (l) => err.push(l), purgeIo, ...(opts.afterPlan ? { afterPlan: opts.afterPlan } : {}),
+    ...(opts.omitClips ? {} : { clips }),
   });
   return { code, out: out.join("\n"), err: err.join("\n"), unlinked };
 }
 const mediaFile = (e: Env, name: string): string => join(e.media, "m", `${name}.webm`);
+test("execute refuses a missing extractor before planning or any unlink", () => {
+  const e = env();
+  try {
+    session(e, "missing-clips", 100); let planned = false;
+    const result = run(e, ["--execute"], { omitClips: true, afterPlan: () => { planned = true; } });
+    assert.equal(result.code, 2); assert.match(result.err, /requires evidence-clip extraction/);
+    assert.equal(planned, false); assert.deepEqual(result.unlinked, []); assert.ok(existsSync(mediaFile(e, "missing-clips")));
+  } finally { e.done(); }
+});
 
 test("89 days is kept and 91 days is deleted; exactly 90 days is kept", () => {
   const e = env();

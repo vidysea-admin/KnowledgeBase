@@ -45,9 +45,31 @@ function stripComments(value: string): string | undefined {
 
 interface MethodResult { method: string; result: string; props: Map<string, string[]> }
 
+/** Normalize only quoted property atoms; no delimiter or escaped text can become a method. */
+function normalizePropertyQuotes(value: string): string | undefined {
+  let out = "", depth = 0;
+  for (let i = 0; i < value.length; i++) {
+    const ch = value[i]!;
+    if (ch === "\\") return undefined;
+    if (ch === '"') {
+      if (depth !== 0 || !/(?:^|[\s;])[a-z0-9-]+\.[a-z0-9._-]+=$/i.test(out)) return undefined;
+      const end = value.indexOf('"', i + 1); if (end < 0) return undefined;
+      const atom = value.slice(i + 1, end), next = value[end + 1];
+      if (!atom || !/^[\x21-\x7e]+$/.test(atom) || /[;()"\\]/.test(atom) ||
+        (next !== undefined && !/[\s;()]/.test(next))) return undefined;
+      out += atom; i = end; continue;
+    }
+    if (ch === "(") depth++;
+    if (ch === ")" && --depth < 0) return undefined;
+    out += ch;
+  }
+  return depth === 0 ? out : undefined;
+}
+
 /** Parses one Authentication-Results value; undefined when it is malformed in any way. */
 function parseResults(value: string): MethodResult[] | undefined {
-  const clean = /[\\"]/.test(value) ? undefined : stripComments(value);
+  const normalized = normalizePropertyQuotes(value);
+  const clean = normalized === undefined ? undefined : stripComments(normalized);
   if (clean === undefined) return undefined;
   const [, ...segments] = clean.split(";").map((s) => s.trim());
   const out: MethodResult[] = [];

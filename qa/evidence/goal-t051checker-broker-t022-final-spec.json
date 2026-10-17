@@ -1,0 +1,30 @@
+{
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "apps/api/src/calibration-review/router.test.ts",
+    "scripts/eval/human-calibration.test.mjs"
+  ],
+  "pins": {
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\file-store.ts": "c0fd3ec5b75a8be3f2e1635c3e677f042ad1e57010d4dc6dac2fa8797d7d0ff3",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\persistence.ts": "21940ec318aeae31190520ca9f8d94c60923b08b0d52695be5074695f8e7dc40",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\README.md": "f94e1c7bf4049661220da287389ff2d32223a51f711c5ae38706f38e688ad2c5",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\router.test.ts": "451135a42ef9c9468b3e3d21b89d363b4d666253be81e5a8a7baa624fba424cd",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\router.ts": "09a5c167cfea810e542633861e399b24034075cc16fdc299d70610352aa84283",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\seed.ts": "6d003368b0f6ea7739812cf62fc2d8593235305d7dab1f278db44084b1e09ef9",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\types.ts": "41b6c165da56f7f77a27d135ebf3c2690318ab8707ee48b160587cd952a3e277",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\CalibrationReviewPage.test.tsx": "2e987823262345288a6516b54d790b8db1b01ca32e5be43a6abf106bc5e36f4b",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\CalibrationReviewPage.tsx": "0f46b49e67e7a79379ddc96e1531bf2c44f115584bcc7a4da193a935144f8001",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\client.ts": "09f37e72727492df554d72854acf1600012609cc27d6dd556e7eba8f01596b3a",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\human-calibration.mjs": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\human-calibration.test.mjs": "c904299b6cd55522bd3f527ba945d4f072183f575200ba90414e74173898b9db",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\t022-review-package.html": "931e0a88ea74b6fe420eb4176c280b32a00b82f71e8e674b63d3fbbdef84e335",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\integrations\\evaluation.ts": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28"
+  },
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-t022-final"
+}

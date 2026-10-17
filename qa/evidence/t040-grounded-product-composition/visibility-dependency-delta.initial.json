@@ -1,0 +1,16 @@
+{
+  "capturedAt": "2026-10-14T21:59:04.5925669Z",
+  "path": "apps/api/src/visibility/knowledge.ts",
+  "current": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+  "expectedPrior": "4ED89B000892C5D55291ADD50CF80B9D060E1997A5A309495AE648AD17E84ADA",
+  "memoryInverse": "D5E451C463D275D499EA56A62CC434002531617FD05D32DC68A2ABBE7EA482A8",
+  "exactMatch": false,
+  "sourceModified": false,
+  "sites": [
+    "optional claim argument interface",
+    "optional claim argument implementation",
+    "exact claim WA citation approval",
+    "context explicit consent withdrawal",
+    "source explicit consent withdrawal"
+  ]
+}

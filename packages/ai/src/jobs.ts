@@ -12,6 +12,9 @@ export type JobEntry = Pick<Jobs, "tenantId" | "kind" | "status"> &
   Partial<Pick<Jobs, "provider" | "createdAt" | "updatedAt">> & {
     model?: string;
     costUsd?: number;
+    costStatus?: "unknown" | "reported";
+    inputTokens?: number;
+    outputTokens?: number;
     error?: string;
   };
 

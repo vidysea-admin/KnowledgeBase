@@ -1,0 +1,23 @@
+{
+  "status": "building",
+  "fixCycle": 0,
+  "observedUtc": "2026-10-15T10:49:39.8543328Z",
+  "owned": [
+    {
+      "path": "apps/api/src/answer-policy/answer-evidence.ts",
+      "sha256": "EC94116F478AADFBEC8F4CF9968A9E2224858733E5F32E652188AB0EA9BA10C7",
+      "lines": 94
+    },
+    {
+      "path": "apps/api/src/answer-policy/native-answer-evidence.test.ts",
+      "sha256": "AEC275172116B2F1F011F33B07CFD90EBFBD832D68467C962D765C833D859C98",
+      "lines": 109
+    }
+  ],
+  "testsAuthored": 7,
+  "testsExecuted": 0,
+  "originalSixDriftCount": 0,
+  "makerActiveSeconds": null,
+  "makerTokens": null,
+  "makerCostUsd": null
+}

@@ -9,6 +9,9 @@ import { PastSection } from "./meeting-bot/PastSection.js";
 import { OperationsSections } from "./meeting-bot/OperationsSections.js";
 import { DiscoveryStatus } from "./meeting-bot/DiscoveryStatus.js";
 import { SendNowForm } from "./meeting-bot/SendNowForm.js";
+import { BotPrivacyControls } from './meeting-bot/privacy/BotPrivacyControls.js';
+import { CaptureReadinessControls } from './meeting-bot/readiness/CaptureReadinessControls.js';
+import { RetentionSection, loadRetentionStatus } from './meeting-bot/RetentionSection.js';
 
 /**
  * /meeting-bot: upcoming calendar meetings, live/in-progress operations, operations history and past recordings.
@@ -22,10 +25,14 @@ export function MeetingBotPage(): React.ReactElement {
   const upcoming = useLoad(apiKey, listUpcomingMeetings);
   const sessions = useLoad(apiKey, listSessions);
   const botEvents = useLoad(apiKey, listBotEvents, 30000);
+  const retention = useLoad(apiKey, loadRetentionStatus);
   return <>
     <div className="page-header"><h1>Meeting bot</h1>
       <p>Upcoming meetings, capture in progress, webinar operations and past recordings.</p></div>
     <SendNowForm apiKey={apiKey} />
+    <BotPrivacyControls apiKey={apiKey} />
+    <CaptureReadinessControls apiKey={apiKey} />
+    <RetentionSection state={retention} />
     <UpcomingSection state={upcoming} />
     <DiscoveryStatus state={ops} />
     <OperationsSections state={ops} />

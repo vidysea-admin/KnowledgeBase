@@ -1,0 +1,38 @@
+{
+  "phase": "offline-launcher-diagnosis-only",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "qa/evidence/ollama-live-preflight/launch.mjs",
+    "--offline-import-check"
+  ],
+  "executionContext": "use_default restricted sandbox; one offline attempt; fetch trap before imports; no live-metadata flag",
+  "startedAt": "2026-10-15T08:54:48.6463236Z",
+  "completedAt": "2026-10-15T08:54:49.2434959Z",
+  "elapsedMs": 539.369,
+  "exitCode": 2,
+  "timedOut": false,
+  "launchBefore": "0A6F1CAC75000DA3A3EDD9A70A8B5CE5A8DF63ED40632722C998771382216EF3",
+  "launchAfter": "0A6F1CAC75000DA3A3EDD9A70A8B5CE5A8DF63ED40632722C998771382216EF3",
+  "preflightBefore": "DB6097D061A911A6778616A36FF108779328D3549EE55422AA790A27634C0125",
+  "preflightAfter": "DB6097D061A911A6778616A36FF108779328D3549EE55422AA790A27634C0125",
+  "safeResult": {
+    "status": "unknown",
+    "failureClass": "loader",
+    "models": [
+      {
+        "modelId": "glm-5.3-flash",
+        "available": null
+      },
+      {
+        "modelId": "deepseek-v4.1-flash",
+        "available": null
+      }
+    ]
+  },
+  "environmentFileRead": false,
+  "networkCalls": 0,
+  "generationCalls": 0,
+  "embeddingCalls": 0,
+  "rawErrorsSuppressed": true,
+  "outerTimeoutMs": 15000
+}

@@ -41,6 +41,7 @@ export function selectEventsToAutoJoin(events: CalendarEvent[], now: string,
 export type { AutoRecordCandidateInput, AutoRecordItem, SkipReason, SkippedItem, SelectAutoRecordItemsInput, SelectAutoRecordItemsResult } from "@lkb/core";
 
 interface NormalizedItem {
+  candidate?: AutoRecordCandidateInput;
   sessionKey: string;
   source: "calendar" | "gmail";
   sourceId: string;
@@ -50,6 +51,10 @@ interface NormalizedItem {
   meetingUrl?: string;
   /** T-036: provenance of `meetingUrl`. `unknown` on purpose: the value crosses an HTTP/JSON boundary and is judged at runtime. */
   meetingUrlSource?: unknown;
+  /** Acquired refusals remain barriers even when an older approved URL is retained. */
+  meetingLinkIssue?: unknown;
+  youtubeWatchIssue?: unknown;
+  sourceRefusal?: boolean;
   sender?: string;
   senderDomain?: string;
   /** ISS-322: sender identity is verified (authenticated Gmail scan, or a calendar organizer the Calendar API attests). */
@@ -82,6 +87,7 @@ function normalizeCalendarEvent(e: CalendarEvent): NormalizedItem {
 
 function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
   return {
+    candidate: c,
     sessionKey: `gmail:${c.id}`,
     source: "gmail",
     sourceId: c.id,
@@ -90,6 +96,8 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
     endTime: c.endTime,
     meetingUrl: c.meetingUrl,
     meetingUrlSource: c.meetingUrlSource,
+    meetingLinkIssue: c.meetingLinkIssue,
+    youtubeWatchIssue: c.youtubeWatchIssue,
     sender: c.senderEmail,
     senderDomain: c.senderDomain,
     senderVerified: c.senderAuthenticated === true,
@@ -107,6 +115,9 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
 
 /** A present source other than "conference". Such an item takes no part in the every-webinar identity logic (barriers, session-key collapse). */
 const isUntrustedSource = (item: NormalizedItem): boolean => item.meetingUrlSource !== undefined && item.meetingUrlSource !== "conference";
+/** Fail closed on present malformed issue values at the HTTP boundary as well as typed refusals. */
+const hasSourceRefusal = (item: NormalizedItem): boolean =>
+  item.sourceRefusal === true || item.meetingLinkIssue !== undefined || item.youtubeWatchIssue !== undefined;
 /** Meeting identity used to share barriers and to collapse copies; undefined for an untrusted item (ISS-T036CAL-010). */
 const meetingIdentityOf = (item: NormalizedItem): string | undefined =>
   item.meetingUrl && item.startTime && !isUntrustedSource(item) ? webinarIdentity(item.meetingUrl, item.startTime) : undefined;
@@ -124,7 +135,10 @@ function durationMs(item: NormalizedItem): number {
 }
 
 /** Select due webinars, retain explicit refusals, deduplicate and report one-at-a-time overlaps. */
-export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): SelectAutoRecordItemsResult {
+export function selectAutoRecordItems(input: SelectAutoRecordItemsInput, options: { parallel?: boolean;
+  /** Server-local candidate-specific persisted approval; never shared across candidates. */
+  trustedSendersForCandidate?: (candidate: AutoRecordCandidateInput) => TrustedSenderConfig | undefined;
+} = {}): SelectAutoRecordItemsResult {
   const { calendarEvents, candidates, now, leadMinutes, trustedSenders, alreadyScheduled } = input;
   const nowMs = new Date(now).getTime();
   const leadMs = leadMinutes * 60 * 1000;
@@ -135,18 +149,20 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
     ...candidates.map(normalizeCandidate),
   ];
   if (input.everyWebinar) {
-    const barriers = new Map<string, { rejected: boolean; registration: boolean; cancelled: boolean }>();
+    const barriers = new Map<string, { rejected: boolean; registration: boolean; cancelled: boolean; sourceRefusal: boolean }>();
     for (const item of normalized) {
       const identity = meetingIdentityOf(item);
       if (!identity) continue;
       const prior = barriers.get(identity);
       barriers.set(identity, { rejected: item.rejected || Boolean(prior?.rejected),
-        registration: Boolean(item.registrationOnly || prior?.registration), cancelled: Boolean(item.cancelled || prior?.cancelled) });
+        registration: Boolean(item.registrationOnly || prior?.registration), cancelled: Boolean(item.cancelled || prior?.cancelled),
+        sourceRefusal: hasSourceRefusal(item) || Boolean(prior?.sourceRefusal) });
     }
     for (const item of normalized) {
       const identity = meetingIdentityOf(item);
       const barrier = identity ? barriers.get(identity) : undefined;
-      if (barrier) { item.rejected = barrier.rejected; item.registrationOnly = barrier.registration; item.cancelled = barrier.cancelled; }
+      if (barrier) { item.rejected = barrier.rejected; item.registrationOnly = barrier.registration; item.cancelled = barrier.cancelled;
+        item.sourceRefusal = barrier.sourceRefusal; }
     }
   }
 
@@ -198,6 +214,10 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
       skipped.push({ ...base, reason: "untrusted-sender" });
       continue;
     }
+    if (hasSourceRefusal(item)) {
+      skipped.push({ ...base, reason: "needs-review" });
+      continue;
+    }
     // T-036: a link taken from the invite's free text was chosen by whoever sent the invitation. It is never auto-joined, in
     // any mode (record-every-webinar included). Absent source = a row from before the field existed, when only conference
     // data could supply a link; any value other than "conference" (location, description, unknown) is untrusted.
@@ -205,7 +225,9 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
       skipped.push({ ...base, reason: "unverified-link-source" });
       continue;
     }
-    if (!input.everyWebinar && !item.preTrusted && !(item.senderVerified && isTrustedSender(item.sender, item.senderDomain, trustedSenders))) {
+    const candidateTrust = !input.everyWebinar && item.candidate && item.senderVerified && !item.preTrusted
+      ? options.trustedSendersForCandidate?.(item.candidate) : undefined;
+    if (!input.everyWebinar && !item.preTrusted && !(item.senderVerified && isTrustedSender(item.sender, item.senderDomain, candidateTrust ?? trustedSenders))) {
       skipped.push({ ...base, reason: "untrusted-sender" });
       continue;
     }
@@ -233,6 +255,9 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
 
   const resolveCluster = () => {
     if (cluster.length === 0) return;
+    // Independent tab slots can capture every eligible member. Eligibility, canonical
+    // meeting deduplication and explicit refusals above are unchanged.
+    if (options.parallel) { winners.push(...cluster); cluster = []; return; }
     if (cluster.length === 1) {
       winners.push(cluster[0]!);
       cluster = [];

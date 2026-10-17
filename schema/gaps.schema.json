@@ -3,33 +3,395 @@
   "$id": "kb://gaps",
   "title": "gaps",
   "type": "object",
-  "required": ["_id", "tenantId", "kind", "status"],
+  "required": [
+    "_id",
+    "tenantId",
+    "kind",
+    "status"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
     "kind": {
       "type": "string",
-      "enum": ["recording-pending", "source-pending", "vector-pending"],
+      "enum": [
+        "recording-pending",
+        "source-pending",
+        "vector-pending"
+      ],
       "description": "ADDITIVE (ISS-118): `vector-pending` marks a session that indexed successfully but got NO embedding vectors, so it is absent from vector search while every status field reads \"done\". The first two kinds describe content we never received; this one describes content we HAVE and cannot retrieve — a different failure, but the same standing-ask lifecycle (open -> received), which is why it belongs here rather than in a new collection."
     },
-    "description": { "type": "string" },
+    "description": {
+      "type": "string"
+    },
     "requestedFrom": {
       "type": "string",
       "description": "Who the standing ask went to (docs/adr/0002-standing-ask-process.md) — e.g. an org/person ref, not free text."
     },
-    "requestedAt": { "type": "string", "format": "date-time" },
-    "status": { "type": "string", "enum": ["open", "received", "expired"] },
+    "requestedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "received",
+        "expired"
+      ]
+    },
     "sla": {
       "type": "object",
       "description": "Standing-ask SLA per docs/adr/0002-standing-ask-process.md.",
-      "required": ["dueAt"],
+      "required": [
+        "dueAt"
+      ],
       "properties": {
-        "dueAt": { "type": "string", "format": "date-time" }
+        "dueAt": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "sourceRef": {
       "type": "string",
       "description": "Optional link to the sources/_id this gap resolved into once received."
+    },
+    "watchedSourceRef": {
+      "type": "string",
+      "minLength": 1
+    },
+    "flywheel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "originalEvalRunId",
+        "inputFingerprint",
+        "loss",
+        "revision",
+        "stage"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "originalEvalRunId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputFingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "loss": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "question",
+            "counsellor",
+            "aiAnswer",
+            "counsellorAnswer",
+            "score",
+            "credibility",
+            "createdAt"
+          ],
+          "properties": {
+            "question": {
+              "type": "string",
+              "minLength": 1
+            },
+            "counsellor": {
+              "type": "object",
+              "required": [
+                "name"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "org": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": true
+            },
+            "aiAnswer": {
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "sources": {
+                  "type": "object"
+                }
+              },
+              "additionalProperties": true
+            },
+            "counsellorAnswer": {
+              "type": "object",
+              "required": [
+                "text"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "additionalProperties": true
+            },
+            "score": {
+              "type": "object",
+              "required": [
+                "ai",
+                "counsellor"
+              ],
+              "properties": {
+                "ai": {
+                  "type": "number"
+                },
+                "counsellor": {
+                  "type": "number"
+                },
+                "notes": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": true
+            },
+            "credibility": {
+              "enum": [
+                "internal",
+                "independent-human",
+                "calibrated-llm"
+              ]
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stage": {
+          "enum": [
+            "awaiting-source",
+            "captured",
+            "indexed",
+            "retested"
+          ]
+        },
+        "lock": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "token",
+            "requestId",
+            "expiresAt"
+          ],
+          "properties": {
+            "token": {
+              "type": "string",
+              "minLength": 1
+            },
+            "requestId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+            },
+            "expiresAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "sourceUrlFingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "capture": {
+          "type": "object",
+          "required": [
+            "sourceId",
+            "sessionId",
+            "sourceDigest",
+            "transcriptDigest",
+            "turnCount",
+            "turnIds"
+          ],
+          "properties": {
+            "sourceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sessionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceDigest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "transcriptDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "turnCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "turnIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "index": {
+          "type": "object",
+          "required": [
+            "sourceId",
+            "sessionId",
+            "sourceDigest",
+            "transcriptDigest",
+            "turnCount",
+            "turnIds",
+            "generation",
+            "treeDigest",
+            "chunksDigest",
+            "completedAt"
+          ],
+          "properties": {
+            "sourceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sessionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceDigest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "transcriptDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "turnCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "turnIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "generation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "treeDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "chunksDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "completedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "lastRetestId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "failure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stage",
+            "requestId",
+            "at"
+          ],
+          "properties": {
+            "stage": {
+              "enum": [
+                "capture",
+                "index",
+                "retest",
+                "persist"
+              ]
+            },
+            "requestId": {
+              "type": "string"
+            },
+            "at": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        },
+        "failureHistory": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "stage",
+              "requestId",
+              "at"
+            ],
+            "properties": {
+              "stage": {
+                "enum": [
+                  "capture",
+                  "index",
+                  "retest",
+                  "persist"
+                ]
+              },
+              "requestId": {
+                "type": "string"
+              },
+              "at": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      }
+    },
+    "sourceUrlHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
     }
   },
   "additionalProperties": true

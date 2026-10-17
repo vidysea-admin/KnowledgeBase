@@ -1,0 +1,47 @@
+{
+  "state": "HISTORICAL_SOURCE_PINS_SUPERSEDED_BY_NATIVE_U24_U22_JOINS",
+  "scope": "Current central composition plus scheduled CLI consumer. Other exact leased source owners may still be active; this is not a whole-repository freeze.",
+  "pins": [
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "f2958502e8dd97a37b632c467d674c76e9a1eeebb323e995500561e36bbaa12c"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/routes.ts",
+      "sha256": "f4aef0e1a30e8e44e9c556ea2f7e6cc36b3efc2223dd06398e5fc3ad1619d69f"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/reviews.ts",
+      "sha256": "c12f824fc291e474b6e8585cde1b816096b76aa019059afb71082d594b2a01bf"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "sha256": "99ea968eb1655fb27abdcfe6ff8acab3eac9548b85cb215ee46f75e21036eb16"
+    },
+    {
+      "path": "packages/meeting-bot/src/cli.ts",
+      "sha256": "72c7bc4d22cccb6b0dff17959e9f63524411c03c4b49b9b8a60e3bb0ed575b7d"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/reviews.test.ts",
+      "sha256": "35d55527c8dbfc717774e6fca16187cdd3a6fc6973e13a6c77b4dbda3a13e09d"
+    }
+  ],
+  "joins": [
+    "Canonical watched-snapshot digest, current source/ingest actor authorization, approved snapshot executor before media-only branch",
+    "Configured public-webinar discovery callback mounted after authenticated/work-database route boundary",
+    "Accepted-only current speaker relationship reader injected into speaker profile",
+    "Server-owned default-deny review policy shared by answer reviews and speaker relationship proposals/reviews",
+    "Source bootstrap obtains authorized base evidence in the same transactional authority snapshot",
+    "Saved automatic recording dispatch enters current-rule recheck command before native capture"
+  ],
+  "verification": "Focused policy eight broker tests PASS; bootstrap eight and actual review-factory five requested. No current integrated typecheck/build or independent verdict yet.",
+  "makerUsage": {
+    "activeSeconds": null,
+    "tokens": null,
+    "note": "Whole central active phase timer unavailable. Do not infer actual usage or a ten-percent efficiency ratio."
+  },
+  "parentAcceptance": "All 39 included parents remain open; real human, transactional/native and operational acceptance gates remain.",
+  "nativeBlocker": "Existing staging Mongo is standalone. No replica activation, existing-host change, provider execution, or DB writes performed by these composition edits.",
+  "currentCheckpoint": "central-consumer-checkpoint.json"
+}

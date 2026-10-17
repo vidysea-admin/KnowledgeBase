@@ -1,0 +1,13 @@
+# Split floor + first EXIT + read-only — final phase seal
+
+Source freeze and sole CPU slot RELEASED. Final source inventory is native-next-readonly-final-inventory.json:1890pins stable, current66path manifest3c96de3e41b36c9839ff52a03ccce763df665ae6d19fb7096ce37484627139b1. All owned protected UUID roots cleaned/absent and JobObject trees closed. Measured244.360s including4.344s diagnosed pre-test path spelling setup attempt; shared integration/maker accounting, unknown actual tokens.
+
+Original floor:209executed205pass4skip0fail plus **only** exact genuine node1pass reuse =210terminal206pass4skip0fail. Every original206case has a terminal mapping:205exact titles plus1explicitly approved material T054clauses8/9 expectation repair (old/new titles/reason preserved),4new cases. native-next-split-reconciled210.json is the complete case map; earlier missing-title checkpoint and original206/184/18/4 failures remain historical.
+
+Groups actual:71/71(35.578s);99=97pass2skip(37.329s);36=34pass2skip(21.093s);production remaining3/3(12.328s). Group3shared33.421s below75s. No negative selection or whole-floor retry. Full raw outputs/commands per group native-next-split-repaired-floor{1,2,3a,3b}.log/-receipt.json.
+
+First actual runRecord→seal child EXIT→distinct fresh reopen→retained WAV/provider chain:1/1pass0skip, ownexit0, test59.271s/Node61.404s/Job62.328s. Exacthash,19200samples/firstSourceSampleIndex3552 and distinct-PID assertions passed; actual scalar childPID/hash values were not printed, never invented. Read-only source byte/mode/retained-copy plus throwing observer five-stage ordering/provider guard positive:1/1pass0skip, test40.484s/Job43.625s. Raw logs/receipts native-next-split-exit-original-positive and native-next-readonly-original-positive.
+
+Four SKIPs remain unmet: native-private-directory receipt prerequisite; actual POSIX private-root/tenant/artifact; private authentic TOC mounted-API persona (explicit opt-in absent); retained TOC literal fixture. Earlier intermittent recovered-unavailable failure remains unexplained; no causal fix/flakiness resolution. Tamper/revocation/hardlink/copied-orphan and fair-page/quota/interrupted-journal cases deferred by remaining55.640s vs bounded command+cleanup allowance. Remaining primitive/downstream and real Mongo/native/platform/private/symlink/release gates remain OPEN. No more decoders this phase, no paid/provider/realDB/browser/network/host activation and no unit/parent/independent PASS.
+
+Joined machine-readable seal: native-next-split-joined-final-seal.json. Source coordinators may begin the next explicitly granted leases after this release.

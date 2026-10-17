@@ -1,0 +1,702 @@
+[
+  {
+    "path": "data/eval/golden-set.json",
+    "sha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+    "bytes": 23581
+  },
+  {
+    "path": "data/eval/golden-set-provenance.json",
+    "sha256": "a9523634083f4e154276153b4d94063c514083f3395b109ed2619d48cd9eb21e",
+    "bytes": 990
+  },
+  {
+    "path": "data/eval/golden-set-diagnostics.json",
+    "sha256": "3e1f63552aa153f4935724689f2e93f4e45951d0c62dc5b2a8627d8a2a87a1f7",
+    "bytes": 5093
+  },
+  {
+    "path": "scripts/eval/vectorless-production-eval.mjs",
+    "sha256": "5646b89f254a93f7d603ce8d6de7042c8b295a2babb0dd9c2d7d8f3b81f80915",
+    "bytes": 27018
+  },
+  {
+    "path": "packages/ask/src/ask-v2.ts",
+    "sha256": "f21440832de515cb0b97a481530f8f872d4872f66a87122642f1194c0a7b5f8c",
+    "bytes": 1380
+  },
+  {
+    "path": "packages/ask/src/ask-graph.ts",
+    "sha256": "fab2927b34be7e396bdb2baa65c63c5ae8d92b310a7808741cc8c432d35ca8f9",
+    "bytes": 14515
+  },
+  {
+    "path": "packages/ask/src/ask-shared.ts",
+    "sha256": "85e958ce005197ebdcce8cd6de37bbf7d8755ba1f1cccce7a33728eeaadfca7d",
+    "bytes": 3344
+  },
+  {
+    "path": "packages/ask/src/select-nodes.ts",
+    "sha256": "e974d1cd6640406c28dacfd9473e3519d137b712a14d06a248c072410600a692",
+    "bytes": 4673
+  },
+  {
+    "path": "packages/ask/src/tree-routing.ts",
+    "sha256": "506faae6c018e635eef9e34c5b339c0ec105999ba405cae34725dbabe11077cf",
+    "bytes": 2316
+  },
+  {
+    "path": "packages/ask/src/source-context.ts",
+    "sha256": "0aa7e4c8bdd19c2da4fdcb19a584b9968fc2023326f3c3d0d5fabbb30649e121",
+    "bytes": 12447
+  },
+  {
+    "path": "packages/ask/src/router.ts",
+    "sha256": "c69120e648ae1d901b02c2d9d09eb914cc857d2131701aab997c76c6bee7d817",
+    "bytes": 3762
+  },
+  {
+    "path": "packages/ask/src/evaluator.ts",
+    "sha256": "02069c0be1aa416d80d90439d2906c2bd93d3f2ae69bc8d09aba0dc3709f2d67",
+    "bytes": 4749
+  },
+  {
+    "path": "packages/ask/src/bounded-refine.ts",
+    "sha256": "3337cffdb6ee47b8319ffc1fe4a09d792e35e2a7927b584fa3c35ca1a1d66bf3",
+    "bytes": 7050
+  },
+  {
+    "path": "packages/ask/src/answer.ts",
+    "sha256": "ba178ee1cf4cccea76c501676ee438c3b57abbe06aaefa793f075cc1b3685b0b",
+    "bytes": 5861
+  },
+  {
+    "path": "apps/api/src/score.ts",
+    "sha256": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78",
+    "bytes": 3776
+  },
+  {
+    "path": "apps/api/src/ask/source-context.ts",
+    "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566",
+    "bytes": 20634
+  },
+  {
+    "path": "apps/api/src/ask/passage-lexical.ts",
+    "sha256": "31a22b953e52a3acc588aad14cc7beb97be922d5f7cbf3ec2a981a8c13b9b3ee",
+    "bytes": 5549
+  },
+  {
+    "path": "apps/api/src/visibility/knowledge.ts",
+    "sha256": "bd54b93a2b6429f320a0468f7f062c05ece08e6483851e570080efffb0db12dc",
+    "bytes": 21447
+  },
+  {
+    "path": "apps/api/src/transcript-review/effective-reader.ts",
+    "sha256": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "bytes": 3036
+  },
+  {
+    "path": "packages/ai/src/providers/ollama-cloud.ts",
+    "sha256": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+    "bytes": 5986
+  },
+  {
+    "path": "packages/index/src/tree/build.ts",
+    "sha256": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+    "bytes": 8086
+  },
+  {
+    "path": "packages/index/src/tree/search.ts",
+    "sha256": "44dc55f5a88e29433faa7e33ae2af6d0f64f116d6c9574d7da9a866207874878",
+    "bytes": 1250
+  },
+  {
+    "path": "packages/index/src/search/lexical.ts",
+    "sha256": "c057af4895ab28f247a02c981c78aa28532006a184edb67d8e6e99f7202fe6c0",
+    "bytes": 3644
+  },
+  {
+    "path": "packages/index/src/eval/baseline.ts",
+    "sha256": "958f9f9185d66aaf2909fb83f883c83c6e150207bcb5de94b4e946b114c67525",
+    "bytes": 4215
+  },
+  {
+    "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/session.json",
+    "sha256": "8173493e589652601c546bf4413db8f33ede95de9b3e278b13c0988e6617cbd0",
+    "bytes": 414
+  },
+  {
+    "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/session_page.json",
+    "sha256": "2076d4a2d33aeb41128d7a97983ee291e38f911e3d77f2e4c84f351dfaec43d2",
+    "bytes": 2794
+  },
+  {
+    "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+    "sha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+    "bytes": 175267
+  },
+  {
+    "path": "data/toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/source.json",
+    "sha256": "3a3ff05964ba1c7f294fb27aae2268f42bbcd9de9d4d2f6df4159903797a21da",
+    "bytes": 534
+  },
+  {
+    "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/session.json",
+    "sha256": "97772c95d49746f238e92f99c78f59f885691e23e31f81775768c4c73676292e",
+    "bytes": 396
+  },
+  {
+    "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/session_page.json",
+    "sha256": "bbea50dd11338f1e7d91ad1094de0d138658c6f005eed9cd3d1e30f9d265279e",
+    "bytes": 2313
+  },
+  {
+    "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+    "sha256": "f9971147e17aa63ea203a6bd92d9ecd6c49abea766fb2e62a4e34d4400bf3ae2",
+    "bytes": 76746
+  },
+  {
+    "path": "data/toc-migrated/2026-05-08-funding-dreams-loans-forex/source.json",
+    "sha256": "246b2e477f2d7ec00664160963bf63f5cfd012bad4cf0b586f251bbe4c7a53ea",
+    "bytes": 511
+  },
+  {
+    "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/session.json",
+    "sha256": "5face5a01f5284f964549aa6af786fe3537e360abf16cf651e779969941c471c",
+    "bytes": 386
+  },
+  {
+    "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/session_page.json",
+    "sha256": "2bf6fb55dc584a5b422161a82e87e10623f34422a2ff1be19320fcd515d85b80",
+    "bytes": 1551
+  },
+  {
+    "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+    "sha256": "2ae41f67947436cb5ee92c993bbd8cf4ae82670c2e95b6210eac4fca73f4f78a",
+    "bytes": 49101
+  },
+  {
+    "path": "data/toc-migrated/2026-05-20-telling-your-brand-story-better/source.json",
+    "sha256": "77fad7476f16949c520326e18e94f6c76dc4e49682f73e2308f3075dce50867f",
+    "bytes": 522
+  },
+  {
+    "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/session.json",
+    "sha256": "c2ad607870a60f9736d6b8094e006fe496e6e09603f7864e30bbe04637720de3",
+    "bytes": 380
+  },
+  {
+    "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/session_page.json",
+    "sha256": "3c1362da4cb3d6fc118d5aad1f0f53dff809c7ab5029064fb3528c05adc8f572",
+    "bytes": 1450
+  },
+  {
+    "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+    "sha256": "9540ce875b248339533cec077615dbb111a2f5562c1b795f5627c1b32b9d17ab",
+    "bytes": 41140
+  },
+  {
+    "path": "data/toc-migrated/2026-05-22-uniaccess-xavier-university/source.json",
+    "sha256": "93822574bb22135386854e9dcee95a8a704afdf751a62b5f38bfae4de9d67568",
+    "bytes": 514
+  },
+  {
+    "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/session.json",
+    "sha256": "25dfc1a10d20688a2825f3db19c1a8c025c0991ea9d522888b026d0819c3ae19",
+    "bytes": 385
+  },
+  {
+    "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/session_page.json",
+    "sha256": "7f040d398224840b2eea644929a301ef873c7a2df7aef0c740364ae4004e1fe3",
+    "bytes": 1406
+  },
+  {
+    "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+    "sha256": "e0abcfa40fd7a3b0b341962be64deb46253dc199deda7aa5f7b1417deecdd0f2",
+    "bytes": 10389
+  },
+  {
+    "path": "data/toc-migrated/2026-05-23-uniaccess-atlas-skilltech/source.json",
+    "sha256": "ae83c1ea0d1d1e68834a458d99f1170825834e2740aaeb1655a430edaa5e19f9",
+    "bytes": 510
+  },
+  {
+    "path": "data/toc-migrated/2026-05-28-in-focus-1/session.json",
+    "sha256": "2be04cc901ddc93eec32a09ec4d06fa433e6c41e18681153019c9a6e8e5baefc",
+    "bytes": 336
+  },
+  {
+    "path": "data/toc-migrated/2026-05-28-in-focus-1/session_page.json",
+    "sha256": "6c8be92c0089ad4274967c5de7ce70f824fb0fa1a0d2a1af6dbb209589dbbcc6",
+    "bytes": 1272
+  },
+  {
+    "path": "data/toc-migrated/2026-05-28-in-focus-1/turns.json",
+    "sha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+    "bytes": 52264
+  },
+  {
+    "path": "data/toc-migrated/2026-05-28-in-focus-1/source.json",
+    "sha256": "f8940589f2ac2588753e71b5fc1ad9b1d08dffe346d4f7ceb36e37b07e5a0c64",
+    "bytes": 478
+  },
+  {
+    "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/session.json",
+    "sha256": "33bdcfbe7122a333eb73033ae37470e251cbc951e989a92d70e417cef93e70cb",
+    "bytes": 381
+  },
+  {
+    "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/session_page.json",
+    "sha256": "c08ab7ae683f810333f1c51827252deb0e90f9c09f168fdc3a43ca017647c8d2",
+    "bytes": 1547
+  },
+  {
+    "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+    "sha256": "bec016384879e3e2eef64f3b5826e43fb9d0160807e42d31b87c853e11f7511b",
+    "bytes": 13815
+  },
+  {
+    "path": "data/toc-migrated/2026-05-29-decoding-ever-expanding-cast/source.json",
+    "sha256": "3175186c1f6c516254e02112b3f94bd079465fb9aebdbff84c0a69cc977ef29e",
+    "bytes": 516
+  },
+  {
+    "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/session.json",
+    "sha256": "efba67b814534fb995ce362479777a803c4cde124bf1532a94d8f87017a6ca58",
+    "bytes": 367
+  },
+  {
+    "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/session_page.json",
+    "sha256": "e3df87ed5b28e302e6f1f3bdff1810c2a74ee348cb553d5afdd8cda2cc127ddd",
+    "bytes": 1548
+  },
+  {
+    "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+    "sha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+    "bytes": 88408
+  },
+  {
+    "path": "data/toc-migrated/2026-06-03-dual-enrollment-pathway/source.json",
+    "sha256": "30fe566067798790b3a3710e15b29384892c9b35823132275712e995ac3d71a3",
+    "bytes": 506
+  },
+  {
+    "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/session.json",
+    "sha256": "a0f77a51ac568546cc7e2469fb9125ed8488c01d98d4ecba3dac72d979728a94",
+    "bytes": 405
+  },
+  {
+    "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/session_page.json",
+    "sha256": "5c263891b7e7d348758150257f4f03b2d6a68abe28e76c84ba38aa8431bec59f",
+    "bytes": 2182
+  },
+  {
+    "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+    "sha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+    "bytes": 71001
+  },
+  {
+    "path": "data/toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/source.json",
+    "sha256": "ff3c7d3580ad1399e19603c7d50def99b70ccce85faf201dd4b00d28c6eb3348",
+    "bytes": 531
+  },
+  {
+    "path": "data/toc-migrated/2026-06-25-in-focus-2/session.json",
+    "sha256": "c775881bee0def98cb9c8b8642bdb16843661a8fd233b7cc02de3fbc500c92f9",
+    "bytes": 324
+  },
+  {
+    "path": "data/toc-migrated/2026-06-25-in-focus-2/session_page.json",
+    "sha256": "d6bfe403c57acd8e9ef035f5417be7436cd45d5087f6520a3df033e68a47512e",
+    "bytes": 1491
+  },
+  {
+    "path": "data/toc-migrated/2026-06-25-in-focus-2/turns.json",
+    "sha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+    "bytes": 59932
+  },
+  {
+    "path": "data/toc-migrated/2026-06-25-in-focus-2/source.json",
+    "sha256": "0a7f40166a46de25447e733c51c8ffca5a142b62040a144646c713be18a7e5db",
+    "bytes": 478
+  },
+  {
+    "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/session.json",
+    "sha256": "2b88ebe9ea899749de54c7d64eaff78aa4d713db43f38bfa6b01f052a5ced3a5",
+    "bytes": 411
+  },
+  {
+    "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/session_page.json",
+    "sha256": "16d283259574f6e4b5bd5bdbdbdf0b4fbc1259b8de5d0b34531becaa0547533e",
+    "bytes": 1374
+  },
+  {
+    "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+    "sha256": "3610ddfd8a9fc8d68bbeb04dd73ae508fe042c9e127d0a039315ffa4dd2c9dd0",
+    "bytes": 53561
+  },
+  {
+    "path": "data/toc-migrated/2026-06-30-exploring-identity-success-counseling/source.json",
+    "sha256": "1c530330d7a3878e2973c7ac419fbacfc4fa7c6b9aa187199a96722681462add",
+    "bytes": 535
+  },
+  {
+    "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/session.json",
+    "sha256": "e375fb0139fd48bfa364c2c2038fa12c59171c40e222b1ac7556fdddf9583068",
+    "bytes": 382
+  },
+  {
+    "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/session_page.json",
+    "sha256": "7fba04b518f0f600e8901f5f946569fb101f5427002d28dd0034f1746feee320",
+    "bytes": 1443
+  },
+  {
+    "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+    "sha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+    "bytes": 63682
+  },
+  {
+    "path": "data/toc-migrated/2026-07-03-inside-the-uc-session/source.json",
+    "sha256": "06cdff365b1916ab63ed7f4aab105bbe05d4b5a5170dbbe99bb5aa0340eb4154",
+    "bytes": 502
+  },
+  {
+    "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/session.json",
+    "sha256": "effcf2a4c9e58f5a4faab460cbb862d182b1cb5737c01caa510b3359478b7a13",
+    "bytes": 398
+  },
+  {
+    "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/session_page.json",
+    "sha256": "401400c770109662d2c027e1932a4135ebc1ba542af2234e324504572e618da4",
+    "bytes": 1743
+  },
+  {
+    "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+    "sha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+    "bytes": 110046
+  },
+  {
+    "path": "data/toc-migrated/2026-07-08-beyond-black-robes-law-careers/source.json",
+    "sha256": "c821c70783ec25d38c863833e7092a65749b2820acf62f98e20a3e321228e311",
+    "bytes": 520
+  },
+  {
+    "path": "data/toc-migrated/2026-07-15-creative-futures/session.json",
+    "sha256": "44bb754579548203c514fc678c78e67f82d611deb8d8fabfe2698c1c55c7d325",
+    "bytes": 341
+  },
+  {
+    "path": "data/toc-migrated/2026-07-15-creative-futures/session_page.json",
+    "sha256": "972d1a575a88dcbcfd4f03265745d95394a3b830ca0c527ecf5a9bd63d1167f3",
+    "bytes": 1735
+  },
+  {
+    "path": "data/toc-migrated/2026-07-15-creative-futures/turns.json",
+    "sha256": "90cbdb3b16638028f53e3f1681f52fccd95ad86145c9ed06a665dc25b85ae29d",
+    "bytes": 160163
+  },
+  {
+    "path": "data/toc-migrated/2026-07-15-creative-futures/source.json",
+    "sha256": "9b2db6003c9a572c439c9ae3b6c45111e803e2fbd1d4de9333757e576d067be2",
+    "bytes": 493
+  },
+  {
+    "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/session.json",
+    "sha256": "8e7fdb7d989df12862bfce331f3b154889d352f5bb903e37c3021c59d240e43f",
+    "bytes": 374
+  },
+  {
+    "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/session_page.json",
+    "sha256": "11b675ccae9436436a5e7c77d6b6e091df5e2871cef17a3ee8618fbf70fc2c5c",
+    "bytes": 1562
+  },
+  {
+    "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+    "sha256": "bec2b05a3cfc4c898899b4d7edf003def5f385e98218e6891c5b1bce57d7b015",
+    "bytes": 44699
+  },
+  {
+    "path": "data/toc-migrated/2026-07-22-uniaccess-cept-university/source.json",
+    "sha256": "d462a279b539023e7fd05830a3a6fb25c747263207300201bd5bb4d7bc354bc1",
+    "bytes": 511
+  },
+  {
+    "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/session.json",
+    "sha256": "ce0072c74c0c362514daf8a8466cc8654a65341cde79debb86923ab8f573d191",
+    "bytes": 380
+  },
+  {
+    "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/session_page.json",
+    "sha256": "a0a0fda26565e71f2f724ed8787c0b0843e1b029fd6ded0063fee8a8a8ee6972",
+    "bytes": 1419
+  },
+  {
+    "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+    "sha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+    "bytes": 78842
+  },
+  {
+    "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/source.json",
+    "sha256": "a65353ef16064415c0a82f4eafdd4fbd4842b397dc3266da27e1b0027c95a4bb",
+    "bytes": 501
+  },
+  {
+    "path": "data/toc-migrated/2026-07-30-in-focus-3/session.json",
+    "sha256": "b9c9d462cb984fbfd0b9eef02161bad39d965b6b42a38c5b04aee0507f581ba5",
+    "bytes": 324
+  },
+  {
+    "path": "data/toc-migrated/2026-07-30-in-focus-3/session_page.json",
+    "sha256": "634a4d4a34162e27a8fdf001ebf49e562a85f755b667024a76eb1fd016849a21",
+    "bytes": 1256
+  },
+  {
+    "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+    "sha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+    "bytes": 74118
+  },
+  {
+    "path": "data/toc-migrated/2026-07-30-in-focus-3/source.json",
+    "sha256": "5b27d16423c480430fa4ccd1cc2b597fcee6634518ec72fa657a864b271e007d",
+    "bytes": 479
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/session.json",
+    "sha256": "68ef29bec8a388537c30aac7300bb2bf487e9d05f563f2cb2049555e6e369910",
+    "bytes": 363
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/session_page.json",
+    "sha256": "ad807fb09ca168c2bc6f089649204b36ceb0451824ec260a063bc3b9f04fb2bf",
+    "bytes": 1959
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+    "sha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+    "bytes": 67917
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/source.json",
+    "sha256": "056aa2e54b3004c4a695048b88e3c53f77e77111c45b741ce16d279807ce8dc6",
+    "bytes": 509
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/session.json",
+    "sha256": "56dd00887567ccd6c1e61eace3a43587ccfe4fb8efcfafbdc8a7b8a811986568",
+    "bytes": 400
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/session_page.json",
+    "sha256": "25c7344d89e47a6754a9a1557dabdb77537120e928a85b0d5e3c25d021e3c243",
+    "bytes": 1550
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+    "sha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+    "bytes": 72008
+  },
+  {
+    "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/source.json",
+    "sha256": "3f7b8e499e66c718e760e6d1c083333189501674b28b61811baa7547973cfa95",
+    "bytes": 506
+  },
+  {
+    "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/session.json",
+    "sha256": "4385dd1bdf1ff41ef04feadc9f0c92dea49da0d4c022a91b470271776ef1977b",
+    "bytes": 415
+  },
+  {
+    "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/session_page.json",
+    "sha256": "12cc18a7d7950cae298d3f44cc6d3c9a2ee850695cca8bd081b35ed39c0daba1",
+    "bytes": 1715
+  },
+  {
+    "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/turns.json",
+    "sha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+    "bytes": 107533
+  },
+  {
+    "path": "data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/source.json",
+    "sha256": "1bca96027dcd369b110c40fb04b7fe405eb458e733591e6c11c5b858804ac4c2",
+    "bytes": 555
+  },
+  {
+    "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/session.json",
+    "sha256": "138e5cf7eb4923210cc77ce0480b0246a16377f4a6a4c26236836a401a74f6d5",
+    "bytes": 385
+  },
+  {
+    "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/session_page.json",
+    "sha256": "7c6834701c82f1caabc4e24565c5b970e119464c2645bd89070b463657f6ef42",
+    "bytes": 1517
+  },
+  {
+    "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/turns.json",
+    "sha256": "fcc2b56c91966ac80c75719e135dd238d62e6a092b8227b71978de7cdb58f306",
+    "bytes": 68881
+  },
+  {
+    "path": "data/toc-migrated/2026-08-12-uniaccess-ashoka-university/source.json",
+    "sha256": "d466f202adc3e31ba91a75612598c90e5311d2b4a32f1d38eb70a0a7d8258f62",
+    "bytes": 527
+  },
+  {
+    "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/session.json",
+    "sha256": "99929ae2ce65ffda12698c8f7544d71c47b6ed07e174eb59f7fc58d2a11d0e1f",
+    "bytes": 397
+  },
+  {
+    "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/session_page.json",
+    "sha256": "13c772d6ff035b25c6dccb22ecdadecfc1ffaad3a5117a7940653f0ebcd1d4e3",
+    "bytes": 1299
+  },
+  {
+    "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/turns.json",
+    "sha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+    "bytes": 76396
+  },
+  {
+    "path": "data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/source.json",
+    "sha256": "5c2c5bf7cd46ac080df7eda88c0af248959fd314d5c9f39decd7538a8b1dfd36",
+    "bytes": 534
+  },
+  {
+    "path": "data/toc-migrated/2026-08-27-in-focus-4/session.json",
+    "sha256": "9f865e523c37261bd6c92dba149e86fa6693988631511e7005caad2e12a8dd8d",
+    "bytes": 324
+  },
+  {
+    "path": "data/toc-migrated/2026-08-27-in-focus-4/session_page.json",
+    "sha256": "fa11fedf4e5c7a25208390ea187cbd5455bea226701d5046483868f0c99a6060",
+    "bytes": 1576
+  },
+  {
+    "path": "data/toc-migrated/2026-08-27-in-focus-4/turns.json",
+    "sha256": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e",
+    "bytes": 57407
+  },
+  {
+    "path": "data/toc-migrated/2026-08-27-in-focus-4/source.json",
+    "sha256": "f9ffbce0175fd1d7022800abbb2977d930bc0a49b63819c9082aeea72a7d556d",
+    "bytes": 481
+  },
+  {
+    "path": "data/toc-migrated/2026-09-02-india-test-series-part2/session.json",
+    "sha256": "f633d64477e30d0104f3eb37f6886c82e10b3b15c1bd508946c9f53d84375a5c",
+    "bytes": 415
+  },
+  {
+    "path": "data/toc-migrated/2026-09-02-india-test-series-part2/session_page.json",
+    "sha256": "96cf01d11939eb31cc5745a90efd28a10fb9198ca58898fbf6f02c457b4818d0",
+    "bytes": 1070
+  },
+  {
+    "path": "data/toc-migrated/2026-09-02-india-test-series-part2/turns.json",
+    "sha256": "8a23f29ae0f25238c9073a33b875c99af5545a2e3008d6abe7f220dc914e773f",
+    "bytes": 127104
+  },
+  {
+    "path": "data/toc-migrated/2026-09-02-india-test-series-part2/source.json",
+    "sha256": "ee19ec60cba404e1ad69f5a2f8140e63951638b5759b0089c8984efe1ad70740",
+    "bytes": 822
+  },
+  {
+    "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/session.json",
+    "sha256": "bd5af2f419de8c560ae4a0fe5611102ae5151c5893a9fc1d3cf60ef45d4b4adb",
+    "bytes": 424
+  },
+  {
+    "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/session_page.json",
+    "sha256": "520c70b36291f9bbd2f247df9206b04358f974a8d2d3ae77ebdd971326ad9041",
+    "bytes": 1099
+  },
+  {
+    "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/turns.json",
+    "sha256": "4167fe49e5e018728c03cc1dae358843f1fa491693c16699567e63d87b55690e",
+    "bytes": 125358
+  },
+  {
+    "path": "data/toc-migrated/2026-09-09-global-test-prep-pathways/source.json",
+    "sha256": "be0032e1f48973781488b1156d71ff480c5c69b1bf832889f07d650bc190ff70",
+    "bytes": 833
+  },
+  {
+    "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/session.json",
+    "sha256": "6c048bf1cc42bcff20e1d4af75842e7a51cc4c7c00616efe15b25a11aab27623",
+    "bytes": 380
+  },
+  {
+    "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/session_page.json",
+    "sha256": "fca714176a74fe21c57eaf9500d9dac6cf4986f0386aaeaf4a3a0b7930fc7d5e",
+    "bytes": 1055
+  },
+  {
+    "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/turns.json",
+    "sha256": "dbb5283630a73795dc9130a7c7fd5d7d8d46f9f00f4c50beeba5642e85f7423c",
+    "bytes": 150414
+  },
+  {
+    "path": "data/toc-migrated/2026-09-16-pathways-in-psychology/source.json",
+    "sha256": "bfe14a369c02b37d84ec78cbea59f6f1708247e7d6f6b06de4346deb3ccb99e3",
+    "bytes": 753
+  },
+  {
+    "path": "data/toc-migrated/2026-09-21-uniaccess-japan/session.json",
+    "sha256": "e2bfc1d5bf849cc4fbf99e6debe675a4154687fa678ce98a0d4d8313367cf2a5",
+    "bytes": 347
+  },
+  {
+    "path": "data/toc-migrated/2026-09-21-uniaccess-japan/session_page.json",
+    "sha256": "bbdbb88f7363e294e9d1ce1fb5f5eceb40706aaa5f5fbcf7528e3542423f39dd",
+    "bytes": 976
+  },
+  {
+    "path": "data/toc-migrated/2026-09-21-uniaccess-japan/turns.json",
+    "sha256": "e3a747e72e94ae7e83c088c5101fdd412bb79d376689ef04536b7b9655f39bfa",
+    "bytes": 184401
+  },
+  {
+    "path": "data/toc-migrated/2026-09-21-uniaccess-japan/source.json",
+    "sha256": "7686c63e80b0629ff59d58b6be9899db9476393a0b92485f8c2c98c3157748c9",
+    "bytes": 1685
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-in-focus/session.json",
+    "sha256": "65b6da354ba892e6997984cc97658b34a14ff3951de51e569fc45d3a3279f37e",
+    "bytes": 255
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-in-focus/session_page.json",
+    "sha256": "a970f7fe596204be7a2725a5c4193cb5e70b1e9737dbd1ab3271b40e90c1ef77",
+    "bytes": 1205
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-in-focus/turns.json",
+    "sha256": "107fcbf43ebee74255bcc27f11a1c41352d2ea5925f1499340a8d441a0b60b2d",
+    "bytes": 44476
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-in-focus/source.json",
+    "sha256": "b1e4a4f6f541509c9314253c958c39bf51d56a7bdb938ed4e78761c0b43482e9",
+    "bytes": 479
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/session.json",
+    "sha256": "166dc3d80875b3140831e9d24bedd3f82b8043eea61e7c0a32e97fbefebf481f",
+    "bytes": 494
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/session_page.json",
+    "sha256": "ebede4a4df2115fad29873dfeb376a05ebda0322603165475859a7ea74f515cd",
+    "bytes": 1580
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/turns.json",
+    "sha256": "c0f6bf159a070fc788dce8b2cd7c856c599f286e4d50ff16d48184458acb860e",
+    "bytes": 75693
+  },
+  {
+    "path": "data/toc-migrated/2026-09-24-zoho-next-european-study-destinations/source.json",
+    "sha256": "0638c57c7872c7c6e06d40ca01bd3dd1cbf1e8d5e8ff37a551e9308d46914af1",
+    "bytes": 1181
+  }
+]

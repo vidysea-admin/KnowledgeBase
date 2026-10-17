@@ -13,7 +13,7 @@ const ENTRY = ["retention-report.ts", "retention-report-args.ts", "retention-rep
 const CORE_PURGE_POLICY = resolve(HERE, "..", "..", "..", "core", "src", "domain", "purge-policy.ts");
 const CORE_NAMES = new Set(["deriveEvidenceClipWindows", "isPurgeEligible", "Claims", "EvidenceClipWindow", "Media", "Turns"]);
 const ALLOWED_BARE = new Set(["node:fs", "node:path", "node:crypto", "node:util", "@lkb/core"]);
-const READ_ONLY_FS = new Set(["lstatSync", "readdirSync", "readFileSync", "statSync", "realpathSync", "openSync", "readSync", "closeSync"]);
+const READ_ONLY_FS = new Set(["lstatSync", "readdirSync", "readFileSync", "statSync", "fstatSync", "realpathSync", "openSync", "readSync", "closeSync"]);
 
 test("the report modules and everything they import contain no delete, write, rename or spawn API", () => {
   const g = importGraph(ENTRY.map((f) => join(HERE, f)).concat([join(HERE, "retention-sweep.ts")]), CORE_PURGE_POLICY);
@@ -50,13 +50,16 @@ test("no apply-like option exists in the argument parser source", () => {
   assert.doesNotMatch(strip(src), /apply|force|\byes\b|execute|delete|purge-now/i);
 });
 
-test("the one file open in the report graph is the media probe's literal read-only open, and the scanner rejects every wider flag for it", () => {
+test("both real file opens in the report graph are literal read-only and every wider flag is rejected", () => {
   const g = importGraph(ENTRY.map((f) => join(HERE, f)), CORE_PURGE_POLICY);
   const opens = [...g.sources].flatMap(([file, src]) => [...strip(src).matchAll(/\b(?:openSync|open)\s*\(/g)].map(() => file));
-  assert.deepEqual(opens, [join(HERE, "retention-report-media.ts")]);
+  assert.deepEqual(opens.sort(), [join(HERE, "retention-report-media.ts"), join(HERE, "production", "private-summary-read.ts")].sort());
   const probe = readFileSync(join(HERE, "retention-report-media.ts"), "utf8");
   assert.match(probe, /io\.openSync\(real, "r"\)/);
   for (const flag of ["r+", "w", "a", "wx", "w+", "a+", "rs+"]) {
     assert.notDeepEqual(scanSource(probe.replace('io.openSync(real, "r")', `io.openSync(real, "${flag}")`)), [], `flag ${flag} must be rejected`);
   }
+  const summaryReader = readFileSync(join(HERE, "production", "private-summary-read.ts"), "utf8");
+  assert.match(summaryReader, /openSync\(path, "r"\)/);
+  for (const flag of ["r+", "w", "a", "wx", "w+", "a+", "rs+"]) assert.notDeepEqual(scanSource(summaryReader.replace('openSync(path, "r")', `openSync(path, "${flag}")`)), []);
 });

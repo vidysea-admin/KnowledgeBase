@@ -1,0 +1,42 @@
+✔ schedule tick dry run suppresses degradation alerts and snapshot writes (7.9089ms)
+✔ schedule tick degradation reaches downstream sink and uses injected tick clock (59.2146ms)
+✔ schedule tick validated primary clears outage only after snapshot persists (44.3443ms)
+✔ schedule tick snapshot-save failure cannot clear active outage (47.5429ms)
+✖ saved automatic identity reaches claimed capture argv; retry rechecks newly saved rules and writes no state (34.1854ms)
+✔ source-id, session-key, meeting optout and current organizer/domain deny added after save refuse capture (162.7316ms)
+✔ missing or foreign tenant/key and unsupported automatic rule modes refuse before capture (128.932ms)
+✔ ISS-ALERTTENANT-001: untagged and other-tenant saved jobs refuse without rewriting or deleting (72.8743ms)
+✔ legacy, malformed, forged, mismatched and traversal scheduled identities never reach capture (361.1105ms)
+✖ dispatch snapshot fallback respects original exclusive one-hour bound and preserves bytes/mtime (41.4903ms)
+✔ actual schedule tick persists selected source identity consumed by later deny gate (99.0919ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 9
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2648.2068
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:1:1904
+✖ saved automatic identity reaches claimed capture argv; retry rechecks newly saved rules and writes no state (34.1854ms)
+  Error: Scheduled dispatch refused: authorization unavailable
+      at refusal (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.ts:15:23)
+      at runScheduledDispatch (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.ts:77:136)
+      at async <anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:35:3)
+      at async fixture (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:26:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:1:6182
+✖ dispatch snapshot fallback respects original exclusive one-hour bound and preserves bytes/mtime (41.4903ms)
+  Error: Scheduled dispatch refused: authorization unavailable
+      at refusal (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.ts:15:23)
+      at runScheduledDispatch (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.ts:77:136)
+      at async <anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:101:21)
+      at async fixture (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:26:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\calendar\scheduled-dispatch.test.ts:97:43)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

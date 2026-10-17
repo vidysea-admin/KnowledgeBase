@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import type { Sources } from "@lkb/core";
 import { detectWhatsAppReviewCandidates, whatsAppReviewCandidateId, whatsAppReviewContentHash } from "./detection.js";
 import { createMongoWhatsAppReviewRepository } from "./store.js";
 import { reviewInput, reviewMongoFixture, REVIEW_TIME } from "./test-fixtures.js";
@@ -108,4 +109,43 @@ test("verbatim checker exclusions and impossible audit clock cannot publish or c
   const store = createMongoWhatsAppReviewRepository(fixture.db, { now: () => "2026-02-30T10:00:00Z" });
   await store.insert("tenant-a", [row]); await assert.rejects(store.decide("tenant-a", row._id, "rejected", "verified-key"), /time|schema/);
   assert.equal(fixture.rows("whatsapp_candidates")[0]!.status, "needs-review");
+});
+
+test("withdrawn source consent refuses proposal insertion without candidate writes", async () => {
+  const input = reviewInput();
+  const row = detectWhatsAppReviewCandidates("tenant-a", input, REVIEW_TIME)[0]!;
+  const f = reviewMongoFixture([input]);
+  await f.db.collection<Sources>("sources").updateOne({ _id: input.source._id, tenantId: "tenant-a" },
+    { $set: { consent: { given: false, recordedBy: "owner" } } });
+  const store = createMongoWhatsAppReviewRepository(f.db);
+  await assert.rejects(store.insert("tenant-a", [row]), /source\/session evidence unavailable/);
+  assert.equal(f.rows("whatsapp_candidates").length, 0);
+  assert.equal(f.rows("published").length, 0);
+});
+
+test("withdrawal between proposal and approval blocks materialisation and retains pending audit state", async () => {
+  const input = reviewInput(); const f = reviewMongoFixture([input]);
+  const row = detectWhatsAppReviewCandidates("tenant-a", input, REVIEW_TIME)[0]!;
+  const store = createMongoWhatsAppReviewRepository(f.db, { materialize: async c => { await f.publish(c.candidate, c.session); } });
+  await store.insert("tenant-a", [row]);
+  await f.db.collection<Sources>("sources").updateOne({ _id: input.source._id, tenantId: "tenant-a" },
+    { $set: { consent: { given: false, recordedBy: "owner" } } });
+  await assert.rejects(store.decide("tenant-a", row._id, "approved", "verified-reviewer"), /source\/session evidence unavailable/);
+  await assert.rejects(store.get("tenant-a", row._id), /source\/session evidence unavailable/);
+  await assert.rejects(store.list("tenant-a"), /source\/session evidence unavailable/);
+  assert.equal(f.rows("whatsapp_candidates")[0]!.status, "needs-review");
+  assert.equal(f.rows("whatsapp_candidates")[0]!.decision, undefined);
+  assert.equal(f.rows("published").length, 0);
+});
+
+test("idempotent approval retry rechecks withdrawn consent instead of confirming old trust", async () => {
+  const input = reviewInput(); const f = reviewMongoFixture([input]);
+  const row = detectWhatsAppReviewCandidates("tenant-a", input, REVIEW_TIME)[0]!;
+  const store = createMongoWhatsAppReviewRepository(f.db, { materialize: async c => { await f.publish(c.candidate, c.session); } });
+  await store.insert("tenant-a", [row]);
+  assert.equal((await store.decide("tenant-a", row._id, "approved", "reviewer")).result, "ok");
+  await f.db.collection<Sources>("sources").updateOne({ _id: input.source._id, tenantId: "tenant-a" },
+    { $set: { consent: { given: false, recordedBy: "owner" } } });
+  await assert.rejects(store.decide("tenant-a", row._id, "approved", "reviewer"), /source\/session evidence unavailable/);
+  assert.equal(f.rows("published").length, 1, "historical row is retained; fresh trusted readers enforce withdrawal");
 });

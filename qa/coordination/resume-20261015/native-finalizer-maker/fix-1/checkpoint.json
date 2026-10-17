@@ -1,0 +1,39 @@
+{
+  "maker_usage": {
+    "tokens": null,
+    "cost": null,
+    "active_s": null,
+    "token_metric": "actual_total"
+  },
+  "candidate_sha": null,
+  "prior_broker_receipt": "../../broker/native-finalizer.log",
+  "policy_version": "managed-review/1",
+  "prior_result": "12 passed, 1 real FFmpeg integration failed; no skipped",
+  "required_receipts": [
+    "14 tests including original real FFmpeg integration",
+    "scoped TypeScript diagnostics"
+  ],
+  "prior_checkpoint": "../checkpoint.json",
+  "fix_cycle": 1,
+  "tests_executed_by_maker": [],
+  "status": "SOURCE_FROZEN_AWAITING_BROKER",
+  "unit": "t042-native-finalizer",
+  "files": [
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.ts",
+      "sha256": "763a399a4cc02d63d1d28f07cf1e753430a95623c28b4cbb0f8f57fc63892ea0"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.test.ts",
+      "sha256": "ca7b355b435b27949ff95765bd37f36274a118517114c09e9b5f2da745b73028"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.ts",
+      "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.test.ts",
+      "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d"
+    }
+  ]
+}

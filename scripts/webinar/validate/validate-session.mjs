@@ -34,6 +34,8 @@ import { assertTurnTimings } from "../../lib/turn-timing.mjs";
 import { flagOn, TRANSCRIPT_QA_FLAG, GAP_THRESHOLD_SECONDS, SHORTFALL_THRESHOLD_SECONDS } from "../../lib/transcription-wiring.mjs";
 import { validateTurns } from "../process-video.mjs";
 import { loadWebinarSession } from "../session-rows.mjs";
+import { evaluateTranscriptQaGeneration } from "./transcript-qa-binding.mjs";
+import { loadTrustedRecordingPrivacy, evaluateRecordingCoverage } from "../../lib/transcription/private-recording.mjs";
 
 const DEFAULT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
@@ -48,25 +50,18 @@ export function probeDurationSeconds(audioPath) {
 }
 
 /** QA evidence + failure reasons from transcript-qa.json (T-044). Counts only, never transcript text. */
-function qaEvidence(dir, turnCount, env) {
+async function qaEvidence(dir, turns, turnsBytes, durationSec, env, privacy) {
   const path = join(dir, "transcript-qa.json");
   if (!existsSync(path)) {
-    return { qa: null, reasons: flagOn(env, TRANSCRIPT_QA_FLAG) ? [`${TRANSCRIPT_QA_FLAG}=1 but transcript-qa.json is missing`] : [] };
+    return { qa: null, qaSha256: null, reasons: privacy ? ["trusted captured privacy requires generation-bound transcript-qa.json"] :
+      flagOn(env, TRANSCRIPT_QA_FLAG) ? [`${TRANSCRIPT_QA_FLAG}=1 but transcript-qa.json is missing`] : [] };
   }
-  let merged;
-  try { merged = JSON.parse(readFileSync(path, "utf8")).merged; } catch { merged = null; }
-  if (!merged || typeof merged !== "object") return { qa: null, reasons: ["transcript-qa.json is unreadable"] };
-  const h = merged.hallucination ?? {};
-  const qa = { durationValid: merged.durationValid, inputCount: merged.inputCount, outputCount: merged.outputCount, clampedCount: merged.clampedCount,
-    dropped: merged.dropped?.length ?? 0, overshootSec: merged.overshootSec, pastEnd: h.pastEndIndices?.length ?? 0,
-    repeatedRuns: h.repeatedRuns?.length ?? 0, nonMonotonic: merged.nonMonotonicIndices?.length ?? 0 };
-  const reasons = [];
-  if (qa.durationValid !== true) reasons.push("QA report: audio duration invalid");
-  if (qa.outputCount !== turnCount) reasons.push(`QA report is stale: it covers ${qa.outputCount} turns, turns.json has ${turnCount}`);
-  if (qa.pastEnd > 0) reasons.push(`QA report: ${qa.pastEnd} turn(s) past the audio end (possible hallucination)`);
-  if (qa.repeatedRuns > 0) reasons.push(`QA report: ${qa.repeatedRuns} repeated-turn run(s) (possible hallucination)`);
-  if (qa.nonMonotonic > 0) reasons.push(`QA report: ${qa.nonMonotonic} non-monotonic turn(s)`);
-  return { qa, reasons };
+  let proof;
+  let qaBytes;
+  try { qaBytes = readFileSync(path); proof = JSON.parse(qaBytes.toString("utf8")); } catch { return { qa: null, qaSha256: null, reasons: ["transcript-qa.json is unreadable"] }; }
+  register();
+  const { clampAndValidateTurns } = await import("../../../packages/ai/src/stt/transcript-qa.ts");
+  return { ...evaluateTranscriptQaGeneration({ proof, turnsBytes, turns, durationSec, clamp: clampAndValidateTurns, privacy }), qaSha256: sha(qaBytes) };
 }
 
 /**
@@ -77,33 +72,56 @@ function qaEvidence(dir, turnCount, env) {
 export async function validateSession({ root = DEFAULT_ROOT, sessionId, durationSec, acceptPartial = false, dryRun = false, env = process.env, now = () => new Date(), findTimeGaps } = {}) {
   const dataDir = join(root, "data", "toc-migrated"), dir = join(dataDir, sessionId);
   const tenantId = transcriptTenant(dataDir, sessionId); // validates the sessionId shape too
-  const duration = durationSec ?? probeDurationSeconds(findAudioFile(dataDir, join(root, "raw", "TOC", "TOC-Materials", "Audio"), sessionId).path);
+  const probedAudioPath = durationSec === undefined ? findAudioFile(dataDir, join(root, "raw", "TOC", "TOC-Materials", "Audio"), sessionId).path : undefined;
+  const duration = durationSec ?? probeDurationSeconds(probedAudioPath);
   if (!findTimeGaps) { register(); findTimeGaps = (await import("../../../packages/ai/src/stt/chunk-audio.ts")).findTimeGaps; }
 
   const reasons = [];
+  let source, sourceBytes, privacy = null;
+  try {
+    sourceBytes = readFileSync(join(dir, "source.json")); source = JSON.parse(sourceBytes.toString("utf8"));
+    register();
+    privacy = await loadTrustedRecordingPrivacy({ root, sessionId, source, audioPath: probedAudioPath, durationSeconds: duration });
+    if (privacy && privacy.sourceSha256 !== sha(sourceBytes)) throw new Error("Capture source snapshot changed during validation");
+  } catch (e) { reasons.push(`recording privacy evidence: ${e.message}`); }
   let turns = [];
-  try { turns = JSON.parse(readFileSync(join(dir, "turns.json"), "utf8")); } catch (e) { reasons.push(`turns.json unreadable: ${e.message}`); }
+  let turnsBytes = Buffer.alloc(0);
+  try { turnsBytes = readFileSync(join(dir, "turns.json")); turns = JSON.parse(turnsBytes.toString("utf8")); } catch (e) { reasons.push(`turns.json unreadable: ${e.message}`); }
   if (!Array.isArray(turns) || !turns.length) { reasons.push("turns.json has no turns"); turns = []; }
   const step = (fn) => { try { fn(); } catch (e) { reasons.push(e.message); } };
   if (turns.length) {
     step(() => { if (JSON.stringify(immutableTranscriptTurns(tenantId, sessionId, turns)) !== JSON.stringify(turns)) throw new Error("turns.json does not match its canonical transcript identity (not written by the transcription pipeline?)"); });
     step(() => validateTurns(turns, duration, { tenantId, sessionId }));
     step(() => assertTurnTimings(turns, sessionId));
+    if (privacy) step(() => {
+      if (turns.some(t => !t || !Number.isFinite(t.tStart) || !Number.isFinite(t.tEnd) ||
+          !(0 <= t.tStart && t.tStart <= t.tEnd && t.tEnd <= duration))) throw new Error("private recording transcript outside exact audio bounds");
+      if (privacy.filterSpanTurns(turns, 0, duration).privacy.excludedIndices.length) throw new Error("turns.json includes intentionally protected recording content");
+    });
   }
   const lastTEnd = turns.length ? Math.max(...turns.map((t) => (Number.isFinite(t.tEnd) ? t.tEnd : 0))) : 0;
-  const gaps = turns.length ? findTimeGaps(turns, GAP_THRESHOLD_SECONDS) : [];
-  const shortfallSec = duration - lastTEnd;
-  const coverage = round(Math.min(lastTEnd / duration, 1), 4);
-  const partial = turns.length > 0 && (gaps.length > 0 || shortfallSec > SHORTFALL_THRESHOLD_SECONDS);
+  const publicCoverage = privacy ? evaluateRecordingCoverage({ privacy, turns, durationSeconds: duration,
+    gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS }) : null;
+  const gaps = publicCoverage ? publicCoverage.gaps : turns.length ? findTimeGaps(turns, GAP_THRESHOLD_SECONDS) : [];
+  const shortfallSec = publicCoverage ? publicCoverage.tailShortfall : duration - lastTEnd;
+  const coverage = round(publicCoverage ? publicCoverage.coveredPublicSeconds / publicCoverage.expectedPublicSeconds : Math.min(lastTEnd / duration, 1), 4);
+  const partial = turns.length > 0 && (publicCoverage ? !publicCoverage.complete : gaps.length > 0 || shortfallSec > SHORTFALL_THRESHOLD_SECONDS);
   if (partial && !acceptPartial) {
     reasons.push(`partial coverage ${(coverage * 100).toFixed(1)}% (${gaps.length} internal gap(s) > ${GAP_THRESHOLD_SECONDS}s, tail shortfall ${round(shortfallSec, 1)}s > ${SHORTFALL_THRESHOLD_SECONDS}s); re-run with --accept-partial to record it as accepted`);
   }
-  const { qa, reasons: qaReasons } = qaEvidence(dir, turns.length, env);
+  const { qa, qaSha256, reasons: qaReasons } = await qaEvidence(dir, turns, turnsBytes, duration, env, privacy);
   reasons.push(...qaReasons);
+  if (privacy) { try { await privacy.verifyCurrent(); } catch (e) { reasons.push(`recording privacy evidence changed: ${e.message}`); } }
+  if (sourceBytes) step(() => {
+    if (!readFileSync(join(dir, "source.json")).equals(sourceBytes)) throw new Error("source.json changed during validation");
+  });
 
   const passed = reasons.length === 0;
   const evidence = { durationSec: duration, turnCount: turns.length, lastTEnd, coverage, partial, shortfallSec: round(shortfallSec, 3),
-    gaps: gaps.map((g) => ({ start: g.gapStart, end: g.gapEnd })), qa, turnsSha256: turns.length ? sha(readFileSync(join(dir, "turns.json"))) : null,
+    gaps: gaps.map((g) => ({ start: g.gapStart, end: g.gapEnd, ...(g.gapSeconds === undefined ? {} : { unprotectedSeconds: g.gapSeconds }) })),
+    qa, qaSha256, turnsSha256: turns.length ? sha(turnsBytes) : null, sourceSha256: sourceBytes ? sha(sourceBytes) : null,
+    ...(privacy ? { privacy: { receiptSha256: privacy.receiptSha256, sanitizedAudioSha256: privacy.sanitizedAudioSha256,
+      publicIntervals: privacy.publicIntervals }, privacyCoverage: publicCoverage } : {}),
     validatedAt: now().toISOString(), validator: "scripts/webinar/validate/validate-session.mjs" };
   const report = passed
     ? { status: "passed", transcriptValidated: true, ...evidence, ...(partial ? { partialAccepted: true } : {}) }

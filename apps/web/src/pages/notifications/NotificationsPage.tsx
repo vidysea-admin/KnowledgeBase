@@ -17,13 +17,19 @@ function describe(error: unknown): string {
   if (error instanceof ApiError && error.status === 503) return "Notifications unavailable: the service could not read them right now.";
   return "Notifications unavailable: unable to load them.";
 }
-const SOURCE_LABEL = { uploadQueue: "Upload queue", providerJobs: "Provider jobs", watcher: "Watcher runs" } as const;
+const SOURCE_LABEL = { uploadQueue: "Upload queue", providerJobs: "Provider jobs", watcher: "Watcher runs", fileQueue: "File job queue" } as const;
 
 export function NotificationsPage(): React.ReactElement {
-  const { apiKey } = useAuth();
-  const [view, setView] = useState<View>({ state: "loading" });
-  const [read, setRead] = useState<Set<string>>(() => loadReadIds());
+  const { apiKey, sessionVersion } = useAuth();
+  return apiKey ? <NotificationsSnapshot key={`${sessionVersion}:${apiKey}`} apiKey={apiKey} />
+    : <><div className="page-header"><h1>Notifications</h1></div><div className="card empty-note">Sign in with an API key to view notifications.</div></>;
+}
+function NotificationsSnapshot({ apiKey }: { apiKey: string }): React.ReactElement {
   const [generation, setGeneration] = useState(0);
+  const [stored, setStored] = useState<{ generation: number; view: View }>({ generation: 0, view: { state: "loading" } });
+  const view: View = stored.generation === generation ? stored.view : { state: "loading" };
+  const setView = (value: View) => setStored({ generation, view: value });
+  const [read, setRead] = useState<Set<string>>(() => loadReadIds());
 
   useEffect(() => {
     if (!apiKey) return;

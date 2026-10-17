@@ -1,0 +1,20 @@
+{
+  "unit": "u25-decision-acquisition",
+  "fix_cycle": 0,
+  "candidate_sha": "6cf6080a9f32b5b155f257496fa4d9cfd3353c7f31b5797bdd03684c745130b2",
+  "candidate_kind": "packet-declared ordered owned-path/hash SHA256; not a Git commit",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "packet": "qa/packets/u25-decision-acquisition.md",
+  "candidate_pins": "qa/evidence/u25-decision-acquisition/candidate-pins.json",
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [{"id": "admission-origin-no-checker-phase-committed", "active_s": 0, "tokens": 0, "cost": null}],
+  "reviewer_origin_note": "Prospective admission origin only. Packet says no checker dispatch yet. Zero active/token charges mean no committed checker phase, not measured reviewer success. No prior unit-specific budget history found in scoped coordination/evidence path inventory; two unrelated access-denied directories were not read. Reconcile any additional history before dispatch; preserve all null actuals and committed debits.",
+  "next_phase": {"kind": "review", "active_s": 150, "tokens": 5200, "cost": null},
+  "bootstrap_scope": "u25-decision-acquisition cycle0 exact packet candidate only: independent changed-logic and direct-consumer review plus smallest required boundary probes after attributable green broker receipts and current identity reconciliation; incomplete required evidence means HOLD. This assessment is workflow preparation, not review or dispatch permission.",
+  "bootstrap": {"active_s": 180, "tokens": 6000, "cost": null},
+  "completion_reserve": true,
+  "completion_reserve_id": "u25-decision-acquisition/cycle0/6cf6080a9f32b5b155f257496fa4d9cfd3353c7f31b5797bdd03684c745130b2",
+  "escalation": null,
+  "dispatch_status": "BLOCKED_PENDING_GREEN_ATTRIBUTABLE_BROKER_RECEIPTS_AND_CURRENT_IDENTITY_RECONCILIATION",
+  "finalization_requirement": "After review, append actual metrics or null plus conservative committed budget_debit before assessing finalization. Allocate at most 30s/800 tokens with same completion_reserve_id; append phase_kind finalization exactly once. Never reset history. No finalization assessment is fabricated now."
+}

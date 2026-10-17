@@ -1,0 +1,12 @@
+{
+  "kind": "UNEXECUTED_V3_SUPPORT_COMMAND_BLOCKED_ON_CURRENT_RECEIPTS",
+  "script": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v3.mjs",
+  "script_sha256": "f5d3d0171341d83f7a36997200daff213d44fcc8dd7148cbfca4f8543fb789c6",
+  "current_rebased_spec": null,
+  "current_spec_sha256": null,
+  "command": null,
+  "command_shape": "Exact bundled Node + pinned v3script --root exactworkspace --spec actual-current-rebased-spec --spec-sha itsactualSHA --out uniquenewprivateQApath",
+  "blocked_checkpoint": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-rebase-checkpoint.json",
+  "do_not_execute_old_spec": true,
+  "no_retry_requested": true
+}

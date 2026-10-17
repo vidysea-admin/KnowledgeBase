@@ -1,0 +1,326 @@
+{
+  "schema": "u22-root-frozen-wip-candidate/1",
+  "base": "37e51f95c367594bddb422c39c11415674ecf001",
+  "exactRootAllowlist": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+  "rootAllowlistSha256": "8804da9f628c1c329f258da5249c2a203d944bcb956beb6666949a73adf8b0ea",
+  "entries": [
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4",
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4.json",
+      "bytes": 3369,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "099f62309f65fe58023db7243187b48cadb68e1979de352709a42c49664f54fc",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-contracts-receipt.json",
+      "bytes": 929,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-contracts.log",
+      "bytes": 79,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "!!"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "9f35bb7e6c6edc98f09d7d9a53d1b90a91aef3df8f8f092663771d9d8dcf0820",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-final-seal.json",
+      "bytes": 4587,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "959c32b7f71209096d0b721340411846b07fe4b4d481255dccefd908e34520c5",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-git-after-receipt.json",
+      "bytes": 1701,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "c8f8ca792f541d11015d4afc2de5d6a85190a49c09a11e35d856a7b6887ad40f",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-git-after.log",
+      "bytes": 412,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "!!"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "29554aa1d94d43109c9367274f93fe746f2eab8393689c817dc44ab26de6ecd6",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-node-preflight-receipt.json",
+      "bytes": 1116,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "801ba7d40e84531582767615d62f56dbf4c8637476c14dc59f0ed7c07011c9c7",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-node-preflight.log",
+      "bytes": 259,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "!!"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "349934a12e7e69954d47c2c191a54acb11ffb3e3e21d3393baeff3a1cc7b7bd5",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-python-git-preflight-receipt.json",
+      "bytes": 1714,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "c8f8ca792f541d11015d4afc2de5d6a85190a49c09a11e35d856a7b6887ad40f",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-python-git-preflight.log",
+      "bytes": 412,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "!!"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "d9b108e9bc9403bf5f288b4e1b23cfe792f384d641f4edd8e07f6b6088cb29df",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-resume3-receipt.json",
+      "bytes": 1169,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "310c86ffd7272091fffa06239d2017edb97faf8f1cba471da3652a8225184d6d",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-resume3.log",
+      "bytes": 429,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "!!"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "5e725e3ffbb7c2242b95bb66138baafc667b81bdc28abb8cc72191df5eb605ea",
+      "path": "qa/coordination/resume-20261015/broker/u22-current-three-run.py",
+      "bytes": 6107,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "ec5e208a07af5979e7fca7fdc393a8eefe60139888f6f820d99e7ff5cbd6fc63",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/assess-initial-invalid.json",
+      "bytes": 135,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "37069163abd695d71aa048ed37a45c2ae0235e118e2820a6e979299139be5a53",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/assess-result.json",
+      "bytes": 1066,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "9ce947b79a06db301fd3c71b9735f4ff63b4d46ff623f80554374ac359734321",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/broker-request.json",
+      "bytes": 2476,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "7fdff827b53d0398a85c3f8eb8bf1e5ec2a8c0d145940f0da9b8d442b5371426",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-early-boundary-request.json",
+      "bytes": 916,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "0be475bca06b7a6cb283427fa1f69d9ef5d016947245b8c3559ae5b90948c458",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-prompt.txt",
+      "bytes": 1384,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "43392cb6273367eddc2083fb22149d0248a23262361dfcb2ea8fd8a89c1e91aa",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/current-evidence-authentication.json",
+      "bytes": 458,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "a212eb71274b8a8a883f42cfdbe20259596f1bb9caef39bd9eccbe82a2296f1c",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/identity.json",
+      "bytes": 2024,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "d3ebffbd386d245a2a6920f3b9b6e00776c0f40749e52079165d5e149d4fd676",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/managed-review.current.json",
+      "bytes": 6882,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "42aa7eda24011c10ecad5906a77eb216acf9f6d17642f49fe74abcc48c9251f3",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/managed-review.draft.json",
+      "bytes": 3804,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "9cc06c60499df8d890b896a10b63dafa42501d97d2f8e0804b91b83ecc78eed7",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/metrics-initial-invalid.json",
+      "bytes": 859,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "961a6d38a0907dd3755410c44a34b8f8834f8fe638c64de2a81daeb5511f62e7",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/metrics.json",
+      "bytes": 1006,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "10af9b294c690171a9dee28091168c32e5174c281b0f5378bc4cd9e15445b40f",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/packet.md",
+      "bytes": 3074,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "3ec0f9bf6dcd8592a463aa5be3779faaa257f555fdff0262ed28df4b4200d03a",
+      "path": "qa/evidence/u22-extraction-review-resume-static.json",
+      "bytes": 2082,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "65312a4dbfbe5185ce65d071e1ee58f4ff02621c23eff07c1109eba3b32b2e7c",
+      "path": "qa/manifests/u22-extraction-review-resume.md",
+      "bytes": 3888,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+      "path": "qa/packets/u22-extraction-review-resume.candidate-inventory.txt",
+      "bytes": 219,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "58b4192d255e3f6ba340c68e214ab1c97a0408a4a79cef07c97e9dedf4e2f969",
+      "path": "qa/packets/u22-extraction-review-resume.md",
+      "bytes": 11052,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Preexisting untracked maker output; root authorized WIPcheckpoint, not authored/edited by committer",
+      "sha256": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206",
+      "path": "scripts/eval/extraction-review-resume.mjs",
+      "bytes": 3383,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Preexisting untracked maker output; root authorized WIPcheckpoint, not authored/edited by committer",
+      "sha256": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb",
+      "path": "scripts/eval/extraction-review-resume.test.mjs",
+      "bytes": 4349,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "16cbbfb540fcebdbdb4c261090a1b959b0f3b305f74fa82805c3bca784e89562",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/secret-scan.json",
+      "bytes": 296,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    },
+    {
+      "owner": "Exact unit QA allowlist",
+      "sha256": "8804da9f628c1c329f258da5249c2a203d944bcb956beb6666949a73adf8b0ea",
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "bytes": 2958,
+      "mutation": "add",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json",
+      "status": "??"
+    }
+  ],
+  "source2Pins": {
+    "scripts/eval/extraction-review-resume.mjs": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206",
+    "scripts/eval/extraction-review-resume.test.mjs": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb"
+  },
+  "rawCandidateIdentity": "c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+  "brokerSeal": {
+    "contracts": "exit0, vacuous",
+    "tests": "3/3",
+    "path": "qa/coordination/resume-20261015/broker/u22-current-final-seal.json",
+    "sha256": "9f35bb7e6c6edc98f09d7d9a53d1b90a91aef3df8f8f092663771d9d8dcf0820"
+  },
+  "unchangedOmitted": [
+    "qa/coordination/resume-20261015/broker/broker_lib.py"
+  ],
+  "independentReview": "PENDING; no unit/parentPASS",
+  "humanReview": "Real human gold/review gates OPEN",
+  "actions": {
+    "stage": 0,
+    "push": 0,
+    "commit": 0
+  }
+}

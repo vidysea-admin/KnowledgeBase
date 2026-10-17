@@ -1,0 +1,38 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { buildIndexer } from "../../../apps/api/src/composition/production.js";
+import { createMongoGroundedContentDeps } from "../../../apps/api/src/grounded-content/reader.js";
+import { fixture, QUESTION, ANSWER, FACT, ACTION } from "../../../apps/api/src/grounded-postprocessing/fixture.testsupport.js";
+
+// The provider and database are offline fixtures. The factory, routed generation, writes,
+// tenant-scoped database reader and evidence projection are actual product implementations.
+test("actual caller grounded opt-in overrides explicit legacy choice and real stored-row reader consumes citations", async () => {
+  const state = fixture();
+  const result = await buildIndexer(state.routing, { strictWebinar: false, groundedNotes: true, db: state.db })("t", "s1");
+  assert.equal(result.completion?.strict, true);
+  assert.equal(result.completion?.complete, true);
+  assert.ok(state.kinds.includes("note-judge"));
+  assert.ok(state.kinds.includes("embedding"));
+  assert.ok(state.jobs.length > 0 && state.jobs.every((job) => job.tenantId === "t"));
+  for (const collection of ["session_pages", "claims", "chunks", "tree_index"]) {
+    assert.ok(state.rows(collection).length > 0, `${collection} has actual stored output`);
+    assert.ok(state.rows(collection).every((row) => row.tenantId === "t"));
+  }
+  const reader = createMongoGroundedContentDeps(state.db);
+  const content = await reader.getGroundedContent("t", "s1");
+  assert.ok(content);
+  const fact = content.notes.find((note) => note.text === FACT);
+  assert.deepEqual(fact?.evidence, [{ turnId: "turn-2", sessionId: "s1", quote: FACT,
+    available: true, tStart: 6, tEnd: 8, speaker: "speaker:host" }]);
+  assert.equal(content.notes.find((note) => note.kind === "action")?.text, ACTION);
+  assert.equal(content.qa[0]?.question, QUESTION);
+  assert.equal(content.qa[0]?.answer, ANSWER);
+  assert.equal(content.qa[0]?.questionEvidence[0]?.turnId, "turn-0");
+  assert.equal(content.qa[0]?.answerEvidence[0]?.turnId, "turn-1");
+  assert.equal(content.qa[0]?.questionEvidence[0]?.available, true);
+  assert.equal(content.qa[0]?.answerEvidence[0]?.available, true);
+  assert.equal(content.claims[0]?.evidence[0]?.quote, FACT);
+  assert.equal(await reader.getGroundedContent("foreign", "s1"), null);
+  assert.equal(await reader.getGroundedContent("t", "missing-session"), null);
+  assert.ok(state.calls.some((call) => call.collection === "session_pages" && call.method === "findOne"));
+});

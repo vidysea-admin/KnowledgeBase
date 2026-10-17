@@ -2,9 +2,10 @@
 import { parseJsonLoose } from "@lkb/ai";
 import type { CompleteFn } from "./select-nodes.js";
 import { decompose } from "./refine.js";
-import { BoundedAskError, payloadBytes } from "./source-context.js";
+import { BoundedAskError, payloadBytes, validNativeSourceLocator, type NativeSourceLocator } from "./source-context.js";
 
-interface ContextIdentity { speakerRef: string; turnId: string; sessionRef: string; tStart: number; tEnd: number }
+export type ContextIdentity = { speakerRef: string; turnId: string; sessionRef: string; tStart: number; tEnd: number }
+  | { sourceLocator: NativeSourceLocator };
 export interface ContextSource { id: string; text: string; origin: string; source?: ContextIdentity }
 export interface ContextStrip { id: string; sourceId: string; text: string; origin: string; source?: ContextIdentity }
 export interface PackedContext {
@@ -35,10 +36,16 @@ export function unpackContext(value: PackedContext): ContextStrip[] {
       || typeof source.sourceId !== "string" || !source.sourceId.trim() || sources.has(source.sourceId)
       || typeof source.origin !== "string" || !source.origin.trim()) throw new BoundedAskError("invalid packed source identity");
     const s = source.source;
-    if ("source" in source && (!s || typeof s !== "object" || Object.keys(s).some((k) => !["speakerRef", "turnId", "sessionRef", "tStart", "tEnd"].includes(k))
-      || typeof s.speakerRef !== "string" || !s.speakerRef.trim() || typeof s.turnId !== "string" || !s.turnId.trim()
-      || typeof s.sessionRef !== "string" || !s.sessionRef.trim() || !Number.isFinite(s.tStart) || !Number.isFinite(s.tEnd)
-      || s.tStart < 0 || s.tEnd < s.tStart)) throw new BoundedAskError("invalid packed source tuple");
+    if ("source" in source) {
+      if (!s || typeof s !== "object") throw new BoundedAskError("invalid packed source tuple");
+      if ("sourceLocator" in s) {
+        if (Object.keys(s).some((key) => key !== "sourceLocator") || !validNativeSourceLocator(s.sourceLocator)
+          || source.origin !== s.sourceLocator.kind) throw new BoundedAskError("invalid packed native source tuple");
+      } else if (Object.keys(s).some((key) => !["speakerRef", "turnId", "sessionRef", "tStart", "tEnd"].includes(key))
+        || typeof s.speakerRef !== "string" || !s.speakerRef.trim() || typeof s.turnId !== "string" || !s.turnId.trim()
+        || typeof s.sessionRef !== "string" || !s.sessionRef.trim() || !Number.isFinite(s.tStart) || !Number.isFinite(s.tEnd)
+        || s.tStart < 0 || s.tEnd < s.tStart) throw new BoundedAskError("invalid packed source tuple");
+    }
     sources.set(source.sourceId, source);
   }
   const restored = value.strips.map((strip) => {

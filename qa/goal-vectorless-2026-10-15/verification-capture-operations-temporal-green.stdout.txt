@@ -1,0 +1,16 @@
+✔ absent evidence and self assertions remain HOLD (3.7926ms)
+✔ all operational gates are explicitly required (4.6832ms)
+✔ receipt signature binds role, payload and identity using separately supplied trust (48.4481ms)
+✔ signed local policy fixture exercises every gate without claiming native evidence (38.7397ms)
+✔ signed evidence refuses future nested tab intervals (21.7197ms)
+✔ signed evidence refuses tabs before their gate interval (20.4889ms)
+✔ signed evidence refuses tabs ending after their gate interval (11.564ms)
+✔ signed evidence refuses reversed nested tab event order (9.7527ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 422.2294

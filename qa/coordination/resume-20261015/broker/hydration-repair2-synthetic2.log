@@ -1,0 +1,10 @@
+✔ audit coverage and citation verifier reject duplicates UTF16 byte drift hashes and revoked consent (4.4207ms)
+✔ admitted snapshot oracle preserves invalid timerange data yet rejects forged snapshot and excluded-turn quote (1.4842ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 183.3171

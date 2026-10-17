@@ -1,0 +1,157 @@
+/** Authenticated tab transport and tracked native finalization; close ACK is not playback readiness. */
+import { randomBytes, randomUUID, createHash, timingSafeEqual } from "node:crypto";
+import { createServer, type IncomingMessage } from "node:http";
+import { closeSync, existsSync, fsyncSync, openSync, statSync, writeSync } from "node:fs";
+import type { TabBrowserConfig } from "../tab-browser.js";
+import type { BotEvent } from "../obs/obs-windows.js";
+import type { TabReceiverGuard } from "../tab-receiver-guard.js";
+import { createNativeSpoolReceiver } from "./native-spool.js";
+
+const MAX_CHUNK = 8 * 1024 * 1024;
+/** Narrow loopback receiver; exposed to exercise real HTTP authentication/durability in tests. */
+export async function createTabCaptureReceiver(output: string, onEvent: (event: BotEvent) => void, guard?: TabReceiverGuard, native?: TabBrowserConfig['native']) {
+  const chunkCap = guard ? Math.min(MAX_CHUNK, guard.maxChunkBytes) : MAX_CHUNK;
+  const token = randomBytes(32).toString("hex");
+  const fd = native ? undefined : openSync(output, "wx");
+  const spool = native ? await createNativeSpoolReceiver({directory: `${output}.native`, identity: native.identity,
+    width: 1280, height: 720, sampleRate: 48000, maxBytes: native.maxBytes, maxChunkBytes: MAX_CHUNK, maxPendingBytes: 16 * 1024 * 1024}) : undefined;
+  let transportSequence = 0, persistedSequence = 0, nativeClosed = false, nativePoisoned = false;
+  let finalization:Promise<void>|undefined;const finalizationControl=new AbortController();
+  let lastTransportHash = '';
+  const serverClockId = randomUUID();
+  const bracket = () => { const beforeMonotonicUs = Number(process.hrtime.bigint() / 1000n), epochUs = Date.now() * 1000;
+    return {clockInstanceId: serverClockId, beforeMonotonicUs, epochUs, afterMonotonicUs: Number(process.hrtime.bigint() / 1000n)}; };
+  let nextSequence = 0, previousHash = "", busy = false, stopping = false, closed = false;
+  let bytes = 0;
+  async function body(req: IncomingMessage, cap: number): Promise<Buffer> {
+    const chunks: Buffer[] = []; let size = 0;
+    for await (const chunk of req) {
+      size += chunk.length;
+      if (size > cap) throw new Error("request too large");
+      chunks.push(Buffer.from(chunk));
+    }
+    return Buffer.concat(chunks);
+  }
+  const server = createServer(async (req, res) => {
+    const supplied = req.headers.authorization?.replace(/^Bearer /, "") ?? "";
+    const suppliedBytes = Buffer.from(supplied), expectedBytes = Buffer.from(token);
+    const origin = req.headers.origin ?? "";
+    if (!/^chrome-extension:\/\/[a-p]{32}$/.test(origin) || suppliedBytes.length !== expectedBytes.length ||
+      !timingSafeEqual(suppliedBytes, expectedBytes)) { res.writeHead(403).end(); return; }
+    const route = new URL(req.url ?? "/", "http://127.0.0.1");
+    if (req.method === 'POST' && route.pathname === '/native-clock' && spool) {
+      const serverRequest = bracket();
+      try { await body(req, 1024); res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({serverRequest, serverResponse: bracket()})); }
+      catch { res.writeHead(400).end(); } return;
+    }
+    if (req.method === 'POST' && route.pathname === '/native' && spool && native) {
+      if (busy) { res.writeHead(409).end(); return; } busy = true;
+      try {
+        const data = await body(req, 12 * 1024 * 1024), hash = createHash('sha256').update(data).digest('hex');
+        const message = JSON.parse(data.toString('utf8'));
+        if (!message.identity || Object.keys(message.identity).length !== Object.keys(native.identity).length
+          || Object.entries(native.identity).some(([key,value]) => message.identity[key] !== value)) throw new Error('Native capture identity mismatch');
+        if (nativePoisoned) throw new Error('Native capture poisoned');
+        if (message.sequence === transportSequence - 1 && hash === lastTransportHash) { res.end('ok'); return; }
+        if (!Number.isSafeInteger(message.sequence) || message.sequence !== transportSequence || nativeClosed) throw new Error('Native sequence mismatch');
+        if (message.op === 'observe-video') await spool.observeVideo(message.observation);
+        else if (message.op === 'clock') await spool.appendClockPair({sequence: persistedSequence++, identity: native.identity, kind: message.kind, pair: message.pair});
+        else if (message.op === 'video' || message.op === 'audio') {
+          if (typeof message.bytes !== 'string' || !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(message.bytes)) throw new Error('Invalid native bytes');
+          const payload = {sequence: persistedSequence++, identity: native.identity, observation: message.observation, bytes: Buffer.from(message.bytes, 'base64')};
+          if (message.op === 'video') await spool.appendVideo(payload); else await spool.appendAudio(payload);
+          bytes += payload.bytes.length;
+        } else if (message.op === 'close') {
+          const closedSpool = await spool.close();
+          if (nativePoisoned) throw new Error('Native generation failed while closing');
+          const finish=async()=>{
+            await native.onClosed(closedSpool,output,{signal:finalizationControl.signal});
+            if(finalizationControl.signal.aborted)throw new Error('Native finalization cancelled');
+            if(!existsSync(output)||!statSync(output).isFile()||!statSync(output).size)throw new Error('Native finalizer produced no media');
+          };
+          if(native.deferFinalization){
+            const timeout=native.finalizationTimeoutMs;
+            if(typeof timeout!=='number'||!Number.isSafeInteger(timeout)||timeout<1000||timeout>3600000)throw new Error('Finite native finalization deadline required');
+            finalization=new Promise<void>((resolve,reject)=>{
+              const timer=setTimeout(()=>{finalizationControl.abort();reject(new Error('Native finalization deadline exceeded'));},timeout);
+              void Promise.resolve().then(finish).then(resolve,reject).finally(()=>clearTimeout(timer));
+            });
+            void finalization.catch(()=>{nativePoisoned=true;try{onEvent({event:'capture-error',t:Date.now()/1000,error:'Native finalization failed'});}catch{/* The tracked job still rejects. */}});
+          }else await finish();
+          nativeClosed = true;
+        } else throw new Error('Unknown native operation');
+        transportSequence++; lastTransportHash = hash; res.end('ok');
+      } catch (error) {
+        finalizationControl.abort();
+        nativePoisoned = true; await spool.poison('Native transport failed').catch(() => {});
+        onEvent({event: 'capture-error', t: Date.now()/1000, error: 'Native capture receiver failed'});
+        if (!res.destroyed) res.writeHead(400).end();
+      } finally { busy = false; } return;
+    }
+    if ((req.method === "GET" || req.method === "POST") && route.pathname === "/control") {
+      if (req.method === "POST") {
+        try { JSON.parse((await body(req, 1024)).toString("utf8")); }
+        catch { res.writeHead(400).end(); return; }
+      }
+      res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify({stop: stopping})); return;
+    }
+    if (req.method !== "POST" || !["/chunk", "/event"].includes(route.pathname)) { res.writeHead(404).end(); return; }
+    const chunkRequest = route.pathname === "/chunk";
+    if (chunkRequest && busy) { res.writeHead(409).end(); return; }
+    if (chunkRequest) busy = true;
+    try {
+      const data = await body(req, chunkRequest ? chunkCap : 8192);
+      if (chunkRequest) {
+        if (spool) throw new Error('Legacy chunks refused during native capture');
+        const rawSeq = route.searchParams.get("seq") ?? "";
+        if (!/^\d+$/.test(rawSeq) || !data.length) { res.writeHead(400).end(); return; }
+        const seq = Number(rawSeq), hash = createHash("sha256").update(data).digest("hex");
+        if (seq === nextSequence - 1 && hash === previousHash) { res.end("ok"); return; }
+        if (seq !== nextSequence) { res.writeHead(409).end(); return; }
+        if (guard && bytes + data.length > guard.maxTotalBytes) {
+          res.writeHead(413).end();
+          onEvent({event: "capture-error", t: Date.now() / 1000, error: "Capture total size cap exceeded"}); return;
+        }
+        let offset = 0;
+        while (offset < data.length) offset += writeSync(fd!, data, offset, data.length - offset);
+        fsyncSync(fd!); bytes += data.length; previousHash = hash; nextSequence++;
+      } else {
+        const event = JSON.parse(data.toString("utf8")) as BotEvent;
+        event.t = Date.now() / 1000;
+        if (!["capture-started", "capture-stopped", "capture-error", "capture-level"].includes(event.event)) {
+          res.writeHead(400).end(); return;
+        }
+        if (spool && (event.event === 'capture-error' || (event.event === 'capture-stopped' && (event as {failed?:unknown}).failed !== false))) {
+          finalizationControl.abort();
+          nativePoisoned = true; await spool.poison('Recorder reported incomplete native capture');
+        }
+        onEvent(event);
+      }
+      res.end("ok");
+    } catch (error) {
+      if (!res.destroyed) res.writeHead(guard && error instanceof Error && error.message === "request too large" ? 413 : 400).end();
+      onEvent({event: "capture-error", t: Date.now() / 1000, error: error instanceof Error ? error.message : "Receiver failed"});
+    } finally { if (chunkRequest) busy = false; }
+  });
+  server.requestTimeout = 15000;
+  server.headersTimeout = 10000;
+  try {
+    await new Promise<void>((resolve, reject) => {
+      server.once("error", reject); server.listen(0, "127.0.0.1", resolve);
+    });
+  } catch (error) { if (fd !== undefined) closeSync(fd); await spool?.poison('Receiver startup failed'); throw error; }
+  const port = (server.address() as {port: number}).port;
+  return {
+    endpoint: `http://127.0.0.1:${port}`, token,
+    stop: () => { stopping = true; }, bytes: () => bytes,
+    close: async () => {
+      if (closed) {await finalization;return;} closed = true;
+      server.closeIdleConnections();
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      if (fd !== undefined) { fsyncSync(fd); closeSync(fd); }
+      if (spool && !nativeClosed) await spool.poison('Receiver closed before complete native publication');
+      await finalization;
+    },
+  };
+}
+

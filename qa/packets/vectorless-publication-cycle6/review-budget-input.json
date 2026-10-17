@@ -1,0 +1,39 @@
+{
+  "unit": "vectorless-publication",
+  "cycle": 6,
+  "candidate_sha": "8398a420331cd135944f727df98b0f25377f1c9bec1ffc9538574a5f1d894d06",
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "measured_partial_active_s": 838.7586968,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "tokens": null,
+      "id": "/root/vectorless_checker",
+      "cost": null,
+      "active_s": null,
+      "scope": "Prior shared checker-owned contract and unexecuted probe preparation; no verdict; actual overhead unknown"
+    },
+    {
+      "tokens": 0,
+      "id": "vectorless-publication-cycle6-pending",
+      "cost": 0,
+      "active_s": 0,
+      "scope": "Not dispatched"
+    }
+  ],
+  "next_phase": {
+    "tokens": 1800,
+    "active_s": 60,
+    "cost": null
+  },
+  "bootstrap_scope": "One source publication unit cycle6: hash identity, delta/manual-transaction/preserved-review verification plus required narrowly scoped independent behavioral evidence; real provider/Mongo and full parent acceptance excluded",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "escalation": null,
+  "deduplication": "Shared prior reviewer ID /root/vectorless_checker must be counted once across root unit ledger, not duplicated for each contract. No actual or allocation debit invented."
+}

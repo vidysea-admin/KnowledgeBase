@@ -9,6 +9,7 @@ export * from "./providers/gemini.js";
 export * from "./providers/openai.js";
 export * from "./providers/anthropic.js";
 export * from "./providers/ollama.js";
+export * from "./providers/ollama-cloud.js";
 export * from "./providers/claude-code.js";
 
 export * from "./stt/transcribe.js";

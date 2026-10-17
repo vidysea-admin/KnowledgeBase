@@ -1,0 +1,12 @@
+✔ metadata allowlist, deduplication, cumulative phase delta and downstream receipt (76.7374ms)
+✔ reset, inflight, missing baseline and malformed tail are unknown (73.4604ms)
+✔ prefix boundary excludes siblings; retries/children aggregate by thread identity (44.0992ms)
+✔ explicit output refuses outside workspace and symlinked parent (13.1561ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 338.6895

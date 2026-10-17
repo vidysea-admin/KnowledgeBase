@@ -1,0 +1,82 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "SOURCE_FROZEN_BROKER_AND_ADMISSION_PENDING",
+  "unit": {
+    "root": "C:/Users/product/Desktop/KnowledgeBase",
+    "slug": "vectorless-completion-feasibility",
+    "cycle": 2,
+    "base_sha": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+    "candidate_sha": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+    "identity_kind": "ordered evaluator source/test byte inventory",
+    "files": [
+      {
+        "path": "C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.mjs",
+        "sha256": "c877644c102b4ea666ac2cfbcf6f15560144f2f41094c90d3e30bd930e0c118f"
+      },
+      {
+        "path": "C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs",
+        "sha256": "3fe4d4cc5b8e3a9174bb64e5d45dcdf139ebd482e67d6c301c78975bec1a9ab9"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [],
+    "next_phase": null,
+    "completion_reserve": false,
+    "bootstrap_scope": null,
+    "bootstrap": null,
+    "escalation": null
+  },
+  "worker": null,
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [],
+    "remaining": [
+      "broker selected7 checks",
+      "same-SHA runtime/environment receipt",
+      "complete managed-review/1 validation, known startup and assessed budget",
+      "independent verdict; no reviewer dispatch authorized"
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "preflight deep routing rejects insufficient complete-answer budget before any call",
+      "reason": "Actual topology lower bound fails before paid I/O",
+      "boundary": "admission"
+    },
+    {
+      "node": "preflight actual complete-answer path refuses two calls before transport and checkpoint creation",
+      "reason": "Immediate real evaluator consumer0calls/no checkpoint",
+      "boundary": "admission"
+    },
+    {
+      "node": "preflight sufficient lower bound admits but cannot promise a supported answer",
+      "reason": "Feasible budget still permits legitimate abstention",
+      "boundary": "failure"
+    },
+    {
+      "node": "preflight diagnostic-only two-call pilot remains allowed and admission failure overrides output labels",
+      "reason": "Bounded diagnostic intent and primary failure precedence",
+      "boundary": "budget"
+    }
+  ],
+  "previous_receipt": null,
+  "prior_history_preserved": [
+    "../provider-request-ledger.jsonl",
+    "../receipt.probe-pilot-released.json",
+    "../receipt.remaining-probe.json",
+    "qa/coordination/resume-20261015/checker-admission-hold.json",
+    "qa/coordination/resume-20261015/eval-pilot/grant2/actual-receipt.json",
+    "qa/coordination/resume-20261015/eval-pilot/grant2/provider-request-reservations.jsonl"
+  ],
+  "evidence_packet": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/eval-pilot/preflight-cycle2/packet.md",
+  "dispatch_prohibited": true
+}

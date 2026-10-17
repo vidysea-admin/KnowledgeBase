@@ -1,0 +1,56 @@
+{
+  "label": "profile-repaired-api",
+  "old_vector": [
+    "original runtime",
+    "--import",
+    "tsx",
+    "--test",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "actual_total_tokens": null,
+  "authority": "root authorized compatible vector repair; maker evidence only",
+  "new_vector": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test-isolation=none",
+    "--import",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\safe-test-runtime\\register.mjs",
+    "--test",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts"
+  ],
+  "change": "bundled working Node; in-process isolation; same graph synchronous safe bootstrap; original test selection retained",
+  "env_selected": {
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp",
+    "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp"
+  },
+  "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+  "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "pins_before": {
+    "apps/api/src/speaker-profiles/store.ts": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+    "apps/api/src/speaker-profiles/router.ts": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+    "apps/api/src/speaker-profiles/store.test.ts": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+    "apps/api/src/speaker-profiles/router.test.ts": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+    "packages/index/src/graph/speaker-knowledge.ts": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d"
+  },
+  "exit": 7,
+  "counts": {},
+  "duration_s": 0.8130000000001019,
+  "pins_after": {
+    "apps/api/src/speaker-profiles/store.ts": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+    "apps/api/src/speaker-profiles/router.ts": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+    "apps/api/src/speaker-profiles/store.test.ts": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+    "apps/api/src/speaker-profiles/router.test.ts": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+    "packages/index/src/graph/speaker-knowledge.ts": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d"
+  },
+  "pins_unchanged": true
+}

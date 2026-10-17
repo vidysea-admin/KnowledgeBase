@@ -1,0 +1,41 @@
+{
+  "status": "METADATA_PACKAGED_PENDING_MANDATORY_BINDINGS",
+  "dispatch_allowed": false,
+  "semantic_verdict": null,
+  "created_utc": "2026-10-15T22:47:44.933138+00:00",
+  "candidate_sha256": "6f58d169895c25c95e1c8fb6d9c24969ee08578fff66351bcff400a4ebb7eece",
+  "candidate_kind": "dirty-source-content-sha256-not-Git",
+  "required_pending": [
+    "Final compatible web semantic typecheck exact-candidate receipt",
+    "Final compatible meeting-bot semantic typecheck exact-candidate receipt",
+    "Final compatible API semantic typecheck exact-candidate receipt",
+    "contracts/verify_contracts.py successful receipt; disclose empty registry if applicable",
+    "Applicable scoped structure gate receipt",
+    "Bind central shared integration and lease/freeze scope, command/runtime/lock/environment hashes and outputs; include separately attributed cost",
+    "Fresh packet validate and assess after missing receipts are bound; root releases admission explicitly",
+    "Future native checker identity/runtime authorization and telemetry; no managed launcher invocation admitted",
+    "Current runtime startup binding and supported instruction-aware native checker admission; stop on helper/runtime refusal, no bypass"
+  ],
+  "source_pin_mismatches": [],
+  "dependency_pin_mismatches": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+      "receipt_sha256": "119d23af7c90dfea17b4de7512b0c5427b75cb385d083202f0afc245e34aef16",
+      "current_sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+      "match": false
+    }
+  ],
+  "historical_usage": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\independent-telemetry.json",
+    "classification": "shared prior control-validation review; preserved not reset or charged to this new unit",
+    "actual_total_tokens": 133880,
+    "prior_limit": 51981,
+    "actual_active_s": null,
+    "breach": true
+  },
+  "ratio_status": "UNVERIFIED",
+  "native_hard_total_token_cap_established": false,
+  "helper_results": "helper-results.json",
+  "pure_validate_status": "INVALID_OR_BLOCKED exit2: incomplete maker packet",
+  "pure_assess_status": "BOOTSTRAP_REVIEW exit0, ratio unverified"
+}

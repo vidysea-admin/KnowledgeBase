@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
 import { ApiError } from "../../api/client.js";
 import { listSessions } from "../../api/sessions.js";
@@ -24,15 +24,24 @@ function EntityLinks({ nodes, title, model }: { nodes: GraphNode[]; title: strin
   </li>)}</ul> : <p>No {title.toLowerCase()} are linked in the returned graph{model.selectedSession ? " for this session" : ""}.</p>;
 }
 export function KnowledgeExplorerPage(): React.ReactElement {
-  const { apiKey } = useAuth();
+  const { apiKey, sessionVersion } = useAuth();
+  return apiKey ? <ExplorerSnapshot key={`${sessionVersion}:${apiKey}`} apiKey={apiKey} />
+    : <><div className="page-header"><h1>Knowledge explorer</h1></div><div className="card empty-note">Sign in with an API key to view the knowledge explorer.</div></>;
+}
+function ExplorerSnapshot({ apiKey }: { apiKey: string }): React.ReactElement {
+  const [params, setParams] = useSearchParams();
+  const queryInvalid = [...params.keys()].some(key => !["session", "tab"].includes(key)) || params.getAll("session").length > 1 || params.getAll("tab").length > 1 ||
+    params.has("tab") && !tabs.includes(params.get("tab") as Tab) || params.has("session") && !params.get("session");
+  const tab: Tab = queryInvalid ? "Overview" : params.get("tab") as Tab || "Overview";
+  const selectedId = queryInvalid ? null : params.get("session");
+  const selectSession = (id: string | null) => setParams({ ...(id ? { session: id } : {}), tab });
+  const selectTab = (value: Tab) => setParams({ ...(selectedId ? { session: selectedId } : {}), tab: value });
   const [generation, setGeneration] = useState(0);
-  const [tab, setTab] = useState<Tab>("Overview");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loaded, setLoaded] = useState<{ key: string; generation: number; sessions: SessionSummary[]; graph: Graph; graphMissing: boolean; error: string | null } | null>(null);
   const current = loaded?.key === apiKey && loaded.generation === generation ? loaded : null;
   useEffect(() => {
     let cancelled = false;
-    setLoaded(null); setTab("Overview"); setSelectedId(null);
+    setLoaded(null);
     if (apiKey) Promise.all([listSessions(apiKey), loadGraph(apiKey).then(graph => ({ graph, missing: false })).catch((error: unknown) => {
       if (error instanceof ApiError && error.status === 404) return { graph: emptyGraph, missing: true };
       throw error;
@@ -44,17 +53,20 @@ export function KnowledgeExplorerPage(): React.ReactElement {
     });
     return () => { cancelled = true; };
   }, [apiKey, generation]);
-  const model = current && !current.error ? buildExplorer(current.sessions, current.graph, selectedId) : null;
+  const missingSelection = !!current && !current.error && !!selectedId && !current.sessions.some(session => session._id === selectedId);
+  const model = current && !current.error ? buildExplorer(current.sessions, current.graph, missingSelection ? null : selectedId) : null;
   return <>
     <div className="page-header"><h1>Knowledge explorer</h1><p>Browse sessions by their recorded year and month, and explore topics, speakers and organizations in the knowledge graph.</p></div>
     {!apiKey ? <div className="card empty-note">Sign in with an API key to view the knowledge explorer.</div> : <>
       <button type="button" disabled={!current} onClick={() => setGeneration(value => value + 1)}>Refresh</button>
       {!current && <p role="status">Loading the knowledge explorer…</p>}
       {current?.error && <p role="alert" className="card error-note">{current.error}</p>}
+      {queryInvalid && <p role="alert">Invalid explorer link; choose a session and a supported tab.</p>}
+      {missingSelection && <p role="alert">The requested session is unavailable in the returned results. <button type="button" onClick={() => selectSession(null)}>Show all returned sessions</button></p>}
       {model && <>
-        <label>Session scope <select value={selectedId ?? ""} onChange={event => setSelectedId(event.target.value || null)}><option value="">All returned sessions</option>{(current?.sessions ?? []).map(session => <option key={session._id} value={session._id}>{session.title || "Untitled session"}</option>)}</select></label>
-        <p>{model.selectedSession ? `Entity tabs show graph relationships for: ${model.selectedSession.title}.` : "Entity tabs show the entire returned tenant graph."}</p>
-        <div role="tablist" aria-label="Knowledge explorer views">{tabs.map(value => <button key={value} role="tab" id={`explorer-tab-${value}`} aria-selected={tab === value} aria-controls="explorer-panel" onClick={() => setTab(value)}>{value}</button>)}</div>
+        <label>Session scope <select value={missingSelection ? "" : selectedId ?? ""} onChange={event => selectSession(event.target.value || null)}><option value="">All returned sessions</option>{(current?.sessions ?? []).map(session => <option key={session._id} value={session._id}>{session.title || "Untitled session"}</option>)}</select></label>
+        {!missingSelection && <p>{model.selectedSession ? `Entity tabs show graph relationships for: ${model.selectedSession.title}.` : "Entity tabs show the entire returned tenant graph."}</p>}
+        <div role="tablist" aria-label="Knowledge explorer views">{tabs.map(value => <button key={value} role="tab" id={`explorer-tab-${value}`} aria-selected={tab === value} aria-controls="explorer-panel" onClick={() => selectTab(value)}>{value}</button>)}</div>
         <section className="card" role="tabpanel" id="explorer-panel" aria-labelledby={`explorer-tab-${tab}`}>
           {current?.graphMissing && <p>No knowledge graph has been indexed for this tenant yet. Recorded sessions remain available below.</p>}
           {tab === "Overview" && <>
@@ -66,12 +78,13 @@ export function KnowledgeExplorerPage(): React.ReactElement {
             <p role="status">{model.sessionsCount} returned sessions; {model.topics.length} topics; {model.speakers.length} speakers; {model.orgs.length} organizations in the returned graph.</p>
             <p>Calendar groups use recorded session dates. Missing or invalid dates appear separately; graph entity counts do not measure transcript coverage.</p>
             {model.sessionsCount === 0 && <p>No sessions were returned for this tenant.</p>}
-            {model.years.map(year => <details key={year.year}><summary>{year.year}</summary>{year.months.map(month => <details key={month.month}><summary>{year.year}-{month.month}</summary><SessionLinks sessions={month.sessions} select={setSelectedId} /></details>)}</details>)}
-            {model.undated.length > 0 && <details><summary>Date unavailable ({model.undated.length})</summary><SessionLinks sessions={model.undated} select={setSelectedId} /></details>}
+            {model.years.map(year => <details key={year.year}><summary>{year.year}</summary>{year.months.map(month => <details key={month.month}><summary>{year.year}-{month.month}</summary><SessionLinks sessions={month.sessions} select={selectSession} /></details>)}</details>)}
+            {model.undated.length > 0 && <details><summary>Date unavailable ({model.undated.length})</summary><SessionLinks sessions={model.undated} select={selectSession} /></details>}
           </>}
-          {tab === "Topics" && <EntityLinks nodes={model.topics} title="Topics" model={model} />}
-          {tab === "Speakers" && <><p>Speakers listed here are person nodes in the returned graph; names and roles have not been inferred.</p><EntityLinks nodes={model.speakers} title="Speakers" model={model} /></>}
-          {tab === "Orgs" && <EntityLinks nodes={model.orgs} title="Organizations" model={model} />}
+          {missingSelection && tab !== "Overview" && <p>Select an available session before viewing its graph relationships.</p>}
+          {!missingSelection && tab === "Topics" && <EntityLinks nodes={model.topics} title="Topics" model={model} />}
+          {!missingSelection && tab === "Speakers" && <><p>Speakers listed here are person nodes in the returned graph; names and roles have not been inferred.</p><EntityLinks nodes={model.speakers} title="Speakers" model={model} /></>}
+          {!missingSelection && tab === "Orgs" && <EntityLinks nodes={model.orgs} title="Organizations" model={model} />}
         </section>
       </>}
     </>}

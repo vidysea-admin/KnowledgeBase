@@ -1,0 +1,22 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+    "sha256": "51a56c8f6d98c01a8c6bcc6ffbe2c9ba3b86987366b4da696bfb2361e70552f1"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+    "sha256": "f149985b40a7e991a19e0bbcb1a6a1904d67f7b12215c6acebd7068097901fec"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+    "sha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d"
+  },
+  {
+    "path": "packages/meeting-bot/py/sb_join.py",
+    "sha256": "bae07ab1186319b62938d6d791b8ceaafba86394d55bc1d32fb8e65ceb556cba"
+  },
+  {
+    "path": "packages/meeting-bot/py/test_sb_join.py",
+    "sha256": "2bae4b4914aab0c9912f3d2ed89478edda04c73a42f01d7bf109ef4cd4966b07"
+  }
+]

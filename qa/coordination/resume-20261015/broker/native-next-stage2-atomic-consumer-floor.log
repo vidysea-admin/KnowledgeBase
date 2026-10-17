@@ -1,0 +1,602 @@
+✔ authenticated review uses verified actor/current roles transaction; observed metadata excludes paths and credentials (109.7999ms)
+✔ missing scopes/auth/actor and body tenant/actor injection never issue acceptance; unrelated paths stay reachable (99.1243ms)
+✔ authoritative role refusal and stale reviewer result cannot report acceptance or leak exceptions (16.0579ms)
+✔ host bridge is constructor-lazy and requires its authoritative transaction for mutations (2.7223ms)
+✔ real transcript factory is lazy and enforces D168 exact production database opt-in (2.9384ms)
+✔ actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction (80.4188ms)
+✖ unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers (1.8618ms)
+✔ actual review factory judge outage retains the correction and rolls back all derived targets (9.998ms)
+✔ refresh notifies only after its outer commit and hook failure preserves completed knowledge (27.9737ms)
+✔ failed refresh never calls the archive hook (7.1803ms)
+✔ actual index and post-commit readback join source/effective transcript/current capture (14.2845ms)
+✔ missing source remains pending and changed receipt/generation never gains read authority (39.3463ms)
+✔ capture readback race and incomplete review refuse after a valid index (9.1754ms)
+✔ real batch accessor commits a stamped suggestion and a real session increment; duplicate leaves row intact (14.2082ms)
+✔ concurrent actual first review insert wins; entire publication rolls back (8.2613ms)
+✔ replacement and every refresh state update participate in the same session fence (8.9382ms)
+✔ DB-first consent revocation conflicts with in-flight publication; callback failure restores prior source (11.6593ms)
+✔ second batch insert failure, stale binding, malformed/overflow fence, shared owner and unsupported transaction refuse (13.7486ms)
+✔ caller-forged reserved publication metadata is refused before insertion (10.8399ms)
+✔ source swap refuses caller reset of server-owned revision and rolls back (5.7736ms)
+✔ unconfigured post-commit hook performs no persistence reads (0.2496ms)
+✔ pending, missing and foreign index generations never notify archive consumers (1.2621ms)
+✔ public exact T040 reviewed fee paraphrase survives actual grounded writer and current generation reader (5.0355ms)
+✔ public current-bound invalid reviewed evidence refuses while a detached foreign row stays unconsumed (11.625ms)
+✔ public completed reviewed receipt refuses edited canonical digest and changed current source provenance (14.2363ms)
+✔ public freshly generated fee paraphrase fails the extractive gate despite synthetic same judge (2.2709ms)
+✔ flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1 (0.2452ms)
+✔ suggest writes a status=suggested row with its quote, and NEVER a speakers row (14.1679ms)
+✔ a verifier that does not say yes yields no suggestion (2.0834ms)
+✔ an ungrounded name (quote not in the transcript) is not suggested (0.4721ms)
+✖ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (5.3296ms)
+✔ a model that throws never throws out of the hook and writes nothing (0.5651ms)
+✔ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (10.0975ms)
+✔ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (5.7251ms)
+✖ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (3.6637ms)
+✔ ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw (1.4821ms)
+✔ ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues (65.6893ms)
+✔ indexSession still completes when the suggestion hook fails (3.5626ms)
+✔ production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins (0.242ms)
+✔ default/off performs no capture or database access; env opt-in is exact (1.067ms)
+T-042 adapter sample: 4/4 suggestions; review consumed 4; auto-final 0; explicit confirmation final 1 (synthetic)
+✔ four synthetic panelists: measured offset -> suggestions -> review -> explicit human confirmation (20.5724ms)
+✔ tile/introduction agreement stays suggested; transcript text and timing unchanged (10.8772ms)
+✔ confirmed and rejected decisions survive rerun; no new names for confirmed labels/people (7.0861ms)
+✔ foreign tenant/session/media/capture instance refuses sidecar before any writes (3.0019ms)
+✖ populated foreign tenant with colliding session/label/person stays byte-identical (7.6162ms)
+✖ second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows (5.4425ms)
+✔ unknown clock, bad origins and foreign turns refuse before loader/database access (1.0502ms)
+✔ exact digest, sole first metadata, source, monotonic time and confidence validation (2.8161ms)
+✔ pre-recording samples clipped, confidence preserved, samples beyond recording discarded (0.3254ms)
+✔ low-confidence, no overlap, conflicting tiles and tile-intro disagreement do not guess names (10.0713ms)
+✔ loader cannot change trusted origins; thrown failures return fixed safe reasons (2.3818ms)
+✔ native publication rechecks current registry after async lookups and inside writer (4.4459ms)
+✔ native publication writes only through trusted transaction and leaves names unconfirmed (2.0235ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (5.2975ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (0.8771ms)
+✔ reviewed substring cannot bypass meaning verification of full negated source context (0.7271ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (7.3803ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (9.6412ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (7.6138ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (7.1085ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.3903ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (8.6271ms)
+✔ index hook runs after acknowledged commit and callback failure cannot replay publication (6.0721ms)
+✔ caller-owned index transaction does not notify before its outer commit (3.3856ms)
+✔ failed outer index commit never invokes post-commit work (4.0487ms)
+✖ ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set (2.516ms)
+✖ ISS-274: buildProductionDeps constructs without throwing or requiring a live Mongo/network connection (1.2516ms)
+✔ production buildIndexer forwards trusted callback after acknowledged outer commit (8.0131ms)
+✔ enqueue is immutable/durable/idempotent and cannot execute intake; tenant isolation survives reconstruction (131.535ms)
+✔ claimed worker consumes actual complete fixture receipt before publishing; safe receipt survives restart (108.6081ms)
+✔ two reconstructed workers cannot claim the same queued source concurrently (112.4259ms)
+✔ incomplete downstream index never publishes success and never blindly retries (116.0928ms)
+✔ expired/crashed attempt fences late writes and cannot be reclaimed by another worker (105.1944ms)
+✔ current authorization refusal and thrown execution retain safe uncertainty with no diagnostic leakage (174.9412ms)
+✔ secret/ambiguous URLs and absent approval refuse before journal persistence (7.8767ms)
+✔ abandoned journal lock fails closed; another process cannot ignore a crash lock (19.5793ms)
+✔ production HTTP source wiring refuses configured inline SDK transcription without explicit worker composition (0.5987ms)
+✔ API queue factory is lazy/pure and protects database, trusted tenants and private authority roots (2.9858ms)
+▶ ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model)
+  ✔ WINACL-ROOT-ALLOW-OTHER: On Windows, source spool root ACL owner=current identity, current identity FullControl, unrelated SID Allow Read; enqueue tenant-a/actor-a URL https://zoom.us/rec/share/fixturebearer with idempotencyKey windows-acl-root and server approval matching actor-a. (2.0115ms)
+  ✔ WINACL-TENANT-ALLOW-OTHER: Root privately owned; pre-existing hashed tenant-a directory permits unrelated SID Read. Same approved URL, idempotencyKey windows-acl-tenant. (6.8351ms)
+  ✔ WINACL-FILE-ALLOW-OTHER: Root and hashed tenant directory private; existing audit.jsonl ACL permits unrelated SID Read. Poll/claim/next enqueue must not trust that journal. (18.2659ms)
+  ✔ WINACL-OWNER-OTHER: Spool or tenant artifact owner is unrelated SID even if only current identity has an explicit Allow rule. (3.0497ms)
+✔ ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model) (32.2358ms)
+▶ ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls
+  ✔ ONAIR-FOREIGN-TENANT: Trusted worker tenants [tenant-a,tenant-b], global OnAir cookie representing account-a; tenant-b/actor-b submits https://cloudonair.withgoogle.com/events/account-a-only and receives ordinary server approval. (96.4985ms)
+  ✔ ONAIR-UNBOUND-ACCOUNT: tenant-a valid ingest actor and event approval exist, but OnAir session account has no explicit trusted owner/binding. (115.9741ms)
+  ✔ ONAIR-UNAPPROVED-EVENT: OnAir session owner explicitly tenant-a, but request event is different from the immutable approved event set or event-specific approval. (84.0215ms)
+  ✔ ONAIR-BINDING-CHANGED: Queue approved under account-a/tenant-a/event-one binding; before execution trusted binding is removed, changes account/tenant or no longer authorizes event-one. (81.3748ms)
+✔ ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls (379.976ms)
+✔ OnAir owned-event/public-no-cookie controls and rotated session/event permission fences (71.3047ms)
+﹣ actual native private-directory receipt prerequisite (0.1894ms) # SKIP
+﹣ actual POSIX private-root/tenant/artifact control (0.1401ms) # SKIP
+✔ permission loss after acquisition blocks each provider processing request while allowing scoped cleanup (0.6266ms)
+{"requestId":"5729e8aa-4f15-43bb-ab37-bf587cfc3757","method":"GET","path":"/speaker-profiles/person%3Apriya","status":401,"durationMs":1.23,"time":"2026-10-16T00:05:49.254Z","level":"warn","msg":"request"}
+{"requestId":"750d823e-6ad8-4245-90d6-160c46c36d8c","method":"GET","path":"/speaker-profiles/person%3Apriya","status":401,"durationMs":0.59,"time":"2026-10-16T00:05:49.257Z","level":"warn","msg":"request"}
+{"requestId":"f178acc0-6ae7-4dbd-ab16-d00c9b11be15","method":"GET","path":"/speaker-profiles/person%3Apriya","status":403,"durationMs":4.04,"tenantId":"A","time":"2026-10-16T00:05:49.264Z","level":"warn","msg":"request"}
+{"requestId":"b3898c81-adce-4ca4-b3e5-9fc9f9a234e8","method":"GET","path":"/speaker-profiles/person%3Apriya","status":200,"durationMs":2.06,"tenantId":"A","time":"2026-10-16T00:05:49.269Z","level":"info","msg":"request"}
+{"requestId":"0acec3f7-57c0-47a9-bd6e-219ea42dfc86","method":"GET","path":"/speaker-profiles/person%3Apriya","status":404,"durationMs":1.06,"tenantId":"B","time":"2026-10-16T00:05:49.272Z","level":"warn","msg":"request"}
+{"requestId":"7b368ea1-d52b-4a61-a396-cda7407ddba0","method":"GET","path":"/speaker-profiles/spk%3A1","status":400,"durationMs":1.42,"tenantId":"A","time":"2026-10-16T00:05:49.278Z","level":"warn","msg":"request"}
+✔ route uses verified tenant, sessions scope, safe errors and private no-store (58.1282ms)
+{"requestId":"8d65f4c9-5f71-42a2-afe0-a383db70c5b0","method":"GET","path":"/speaker-profiles/person:priya","status":503,"durationMs":2.13,"tenantId":"A","time":"2026-10-16T00:05:49.293Z","level":"error","msg":"request"}
+✔ store errors hide credentials, transcript and raw exception (15.2653ms)
+{"requestId":"c11bd035-43b2-4845-9fec-aeee4c448c89","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":403,"durationMs":1.57,"tenantId":"A","time":"2026-10-16T00:05:49.306Z","level":"warn","msg":"request"}
+{"requestId":"057e9bcd-323a-4e06-975d-b149794dae58","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":400,"durationMs":1.62,"tenantId":"A","time":"2026-10-16T00:05:49.310Z","level":"warn","msg":"request"}
+{"requestId":"7a83c7f8-dd14-477a-bba3-be6fbee60f16","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":400,"durationMs":1.84,"tenantId":"A","time":"2026-10-16T00:05:49.326Z","level":"warn","msg":"request"}
+{"requestId":"bc1cde0e-c5e4-4af5-9b1e-bf1ceb944fde","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":200,"durationMs":4.02,"tenantId":"A","time":"2026-10-16T00:05:49.344Z","level":"info","msg":"request"}
+{"requestId":"5619a0aa-4b1e-4372-bb07-cc47de34ec09","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":503,"durationMs":1.42,"tenantId":"B","time":"2026-10-16T00:05:49.349Z","level":"error","msg":"request"}
+✔ mounted knowledge route enforces scope, request bounds, tenant and safe DTO (55.2713ms)
+﹣ actual TOC deterministic persona traverses mounted API and produces a downstream response artifact (0.2432ms) # HOLD: private authentic TOC input requires explicit KB_U24_PRIVATE_TOC_TESTS=1
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (31.3018ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (7.7081ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (32.4268ms)
+{"requestId":"9846aebc-de68-41a1-b997-e15cac358d8b","method":"GET","path":"/speaker-profiles/person:priya","status":404,"durationMs":1.1,"tenantId":"A","time":"2026-10-16T00:05:49.437Z","level":"warn","msg":"request"}
+✔ known-person profile and mounted API revoke source consent without a cached identity bypass (21.6447ms)
+{"requestId":"95144cb7-8608-48ea-ac5a-a747e06fddb9","method":"GET","path":"/speaker-profiles/person:priya","status":503,"durationMs":0.97,"tenantId":"A","time":"2026-10-16T00:05:49.456Z","level":"error","msg":"request"}
+✔ unsupported snapshot capability cannot fall back to collection-only profile output (11.742ms)
+✔ cached topic names require every contributing source session to remain visible (16.1024ms)
+✖ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (4.2743ms)
+✔ speaker metadata eligibility permits empty optional evidence and all-visible attribute references (1.191ms)
+✔ speaker metadata eligibility checks withdrawn independent attribute references despite absent values (1.5858ms)
+✔ speaker metadata eligibility refuses malformed declared attribute references before source reads (1.2166ms)
+✔ speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads (1.4239ms)
+✔ speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source (7.1971ms)
+✔ source-only authority is session-free and relation-independent with exact effective transcript hashes (2.7255ms)
+✔ optional accepted relationship reader runs only inside existing source snapshot (3.8322ms)
+✔ source-only attribute authority exposes exact confirmed blocks without recursive accepted attributes (3.1408ms)
+✔ accepted attributes update profile and graph in the same source snapshot and clear revoked cached fields (8.3593ms)
+✖ writeSpeakerDocs re-run after CONFIRM leaves the human-confirmed row untouched (6.6334ms)
+✔ writeSpeakerDocs still replaces an ordinary (non-confirmed) row and writes new people (0.9161ms)
+✖ full extractor + writer re-run after CONFIRM: no re-suggestion, no second name for the label, confirmed row intact (2.4312ms)
+✔ a floor result for a confirmed label with a DIFFERENT person is dropped; the same person is kept (0.4256ms)
+✔ re-index after REJECT: writer, extractor and re-insert leave the tombstone and create no final row (3.2328ms)
+✖ types: a confirmed suggestion row is still schema-shaped (1.4103ms)
+✖ confirming a name that already had an AUTO row (no row-level provenance) is still protected from the writer (3.0227ms)
+{"requestId":"dcaf3327-4554-418a-af5f-f2bea648e737","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":401,"durationMs":0.99,"time":"2026-10-16T00:05:49.552Z","level":"warn","msg":"request"}
+{"requestId":"c05ea2a8-ee24-4a00-95a5-2bc2738c380b","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":403,"durationMs":0.97,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.556Z","level":"warn","msg":"request"}
+{"requestId":"6d2a7c2e-e251-411d-a420-2ea00461e3db","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":401,"durationMs":0.68,"time":"2026-10-16T00:05:49.558Z","level":"warn","msg":"request"}
+{"requestId":"b5b22b40-5137-4a5a-8c30-4b63a5711fe9","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":403,"durationMs":1.04,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.561Z","level":"warn","msg":"request"}
+{"requestId":"8c3587de-4283-47fe-b401-db9457a2850b","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":401,"durationMs":0.53,"time":"2026-10-16T00:05:49.565Z","level":"warn","msg":"request"}
+{"requestId":"39765186-9724-4be1-9813-42268e71ab6a","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":403,"durationMs":0.72,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.567Z","level":"warn","msg":"request"}
+✔ auth: no key 401, wrong scope 403, and nothing is written (38.4961ms)
+{"requestId":"48ba9cbb-69fa-4f37-b377-f57b99541367","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.64,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.578Z","level":"info","msg":"request"}
+✔ GET lists the caller's suggestions with quote and kind, no-store, as `suggestedName` (not a speaker identity) (11.7932ms)
+{"requestId":"04fda5a9-156f-4f68-8fd7-41d3e543c1cf","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.14,"tenantId":"tenant-B","time":"2026-10-16T00:05:49.588Z","level":"info","msg":"request"}
+{"requestId":"a263a756-4d1a-4076-96eb-cba2506a8d64","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":404,"durationMs":1.77,"tenantId":"tenant-B","time":"2026-10-16T00:05:49.592Z","level":"warn","msg":"request"}
+{"requestId":"73dd3058-ca6f-4b0d-af9a-4c29de344630","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":404,"durationMs":0.93,"tenantId":"tenant-B","time":"2026-10-16T00:05:49.595Z","level":"warn","msg":"request"}
+✔ tenant B cannot list, confirm or reject tenant A's suggestions (16.334ms)
+{"requestId":"2522e3bf-6ecf-464d-a766-5bc6b15e96df","method":"POST","path":"/sessions/session-2/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":404,"durationMs":1.19,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.605Z","level":"warn","msg":"request"}
+{"requestId":"d4afd57c-8d0d-4278-958a-be3cd95c1d12","method":"POST","path":"/sessions/session-2/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":404,"durationMs":0.64,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.607Z","level":"warn","msg":"request"}
+{"requestId":"295d018f-a930-4d88-a823-9c0977d7266f","method":"GET","path":"/sessions/session-2/speaker-suggestions","status":200,"durationMs":1.06,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.622Z","level":"info","msg":"request"}
+✔ a suggestion is bound to its session: right id under another session is 404 (26.3888ms)
+{"requestId":"08f540b5-5721-4004-a1a4-12324d10d85b","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":404,"durationMs":1.19,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.632Z","level":"warn","msg":"request"}
+✖ confirm makes the name final with human-confirmed provenance; a repeat is 200 changed:false and writes nothing more (9.254ms)
+{"requestId":"64443f0d-bc28-4f60-88ca-ca913ba87383","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":200,"durationMs":1.51,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.641Z","level":"info","msg":"request"}
+{"requestId":"19f5ab8a-cf34-43bd-b4e8-0ddace9585d4","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":200,"durationMs":0.9,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.644Z","level":"info","msg":"request"}
+{"requestId":"2ade4c85-e0a5-4f3c-a2d7-49a1b9b88cb7","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":0.99,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.654Z","level":"info","msg":"request"}
+{"requestId":"9b78cbee-2127-4dc8-88ec-804c18c3fa08","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":409,"durationMs":1.08,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.669Z","level":"warn","msg":"request"}
+✔ reject stores the rejection (no final row), is idempotent, hides the row, and blocks a later confirm with 409 (37.1337ms)
+{"requestId":"eee8ca51-09f4-44ec-8d32-998f1824203c","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":404,"durationMs":1.12,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.678Z","level":"warn","msg":"request"}
+{"requestId":"187d5032-87ea-433b-881f-dd3acafcdc57","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":200,"durationMs":0.85,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.680Z","level":"info","msg":"request"}
+✖ reject after confirm is 409 and the confirmed name stays final (11.0637ms)
+{"requestId":"11e72788-3229-4101-86ac-4dfadb9cb1ed","method":"GET","path":"/sessions","status":200,"durationMs":2.45,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.692Z","level":"info","msg":"request"}
+{"requestId":"ef1196d2-02f5-46a3-8261-dbe7df986b49","method":"GET","path":"/sessions/session-1","status":200,"durationMs":1.03,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.695Z","level":"info","msg":"request"}
+{"requestId":"47e2674f-9cbd-451b-8152-a6152c2ece5b","method":"GET","path":"/search","status":200,"durationMs":1.66,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.700Z","level":"info","msg":"request"}
+{"requestId":"52a5bddf-e7eb-435c-a206-d75561fb8504","method":"POST","path":"/ask","status":200,"durationMs":6.05,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.709Z","level":"info","msg":"request"}
+{"requestId":"25bd33c8-d063-45e1-8a09-9b4c2a5ee22e","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":0.9,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.714Z","level":"info","msg":"request"}
+✔ a SUGGESTION never appears as a final name: not in /sessions, /ask answer or sources, /search, nor with the final marker (33.9408ms)
+{"requestId":"ca53d2e8-82d9-4458-aad7-ceb944c05527","method":"POST","path":"/sessions/session-1/speaker-suggestions/..%2Fx/confirm","status":400,"durationMs":1.54,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.725Z","level":"warn","msg":"request"}
+{"requestId":"16499592-b7c7-4701-a477-702e73ad4e44","method":"GET","path":"/sessions/a%20b/speaker-suggestions","status":400,"durationMs":0.76,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.728Z","level":"warn","msg":"request"}
+{"requestId":"515d920f-9a92-4efc-9c4d-4183d9c8dbf3","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":503,"durationMs":0.99,"tenantId":"tenant-A","time":"2026-10-16T00:05:49.736Z","level":"error","msg":"request"}
+✔ malformed ids are 400 with no store access; an unavailable store is a generic 503 (21.3817ms)
+✔ actual source visibility denies every maintenance endpoint before raw/history/precondition/write access (18.1098ms)
+✔ verified tenant controls eligibility; recording review remains accessible and source withdrawal is rechecked (7.9248ms)
+✔ auth: no key 401, wrong scope 403, nothing written (49.6461ms)
+✔ GET serves the effective transcript with a strong ETag = revision, no-store, no tenant field (7.3956ms)
+✔ POST commits durably: receipt shape, new ETag, original turns untouched, overlay served, history row with before/after (36.0099ms)
+✔ history is append-only across revisions and the chain links parent to child (30.4144ms)
+✔ preconditions: missing If-Match 428; malformed or body-mismatched 400; stale 412; nothing written on any (63.5167ms)
+✔ tenant isolation: cross-tenant read, write, history and refresh all answer 404; the owner's data is unchanged (46.2365ms)
+✔ same session id in two tenants stays separate; a tenant cannot name A's turn ids or smuggle a tenant/actor/time (56.0822ms)
+✔ invalid requests: bad body 400, unknown turn / no-op 422, bad session id 400; nothing written (26.1227ms)
+✔ atomic: two saves racing on one ETag - exactly one commits, the loser is 409/412, one head, no lost update (470.9896ms)
+✔ a failed history write does not turn a durable commit into an error, and the next commit heals the gap (17.1728ms)
+✔ audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision (38.8926ms)
+✔ a store failure answers 503 with no internal message and no partial write (31.0152ms)
+✔ sample sanity: helper turn() carries extra fields that survive, uncorrected, through an overlay (8.5343ms)
+✔ ISS-T054-PERSIST-001: both tenants commit on the SAME session id: two heads, two history rows, neither disturbs the other (21.887ms)
+✔ ISS-T054-PERSIST-001: head and history ids differ per tenant for the same session/revision (0.3415ms)
+✔ ISS-T054-PERSIST-001: recording the same revision id for two tenants keeps both rows (store level) (3.1708ms)
+✔ ISS-T054-PERSIST-001: tenant comes from the key only - a ?tenantId= query never switches tenant (15.6527ms)
+✔ ISS-T054-PERSIST-002: history rows are insert-once: a second record of the same id does not overwrite the first (3.0576ms)
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (10.1555ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (8.2734ms)
+✔ correction publication never replays paid work on transient body or commit errors (29.2571ms)
+✔ correction unknown commit retries only commit with bounded uncertainty and paid work once (19.4082ms)
+✖ runRefresh reconciles unknown committed head without downgrade or superseded revision leakage (14.3697ms)
+✔ review refresh refuses legacy/vector completion and missing lexical or provenance proof (35.3967ms)
+✔ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (4.5735ms)
+✔ text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score (16.7524ms)
+✖ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (0.7734ms)
+✔ head audit remains readable after secondary history failure without another human correction (0.5976ms)
+✔ complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation (1.3518ms)
+✔ effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes (0.769ms)
+﹣ retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection (0.0904ms) # SKIP
+✔ no executor configured: 503 and the refresh stays pending (never reported complete) (35.5681ms)
+✔ success: every target runs once, in order, for the committed revision; state becomes complete (47.6945ms)
+✔ failure is recorded (failed + failedTarget), earlier targets are kept, retry resumes at the failed target (47.9791ms)
+✔ a newer correction supersedes an in-flight refresh: the old run cannot overwrite the new revision's state (70.4799ms)
+✔ cross-tenant refresh cannot run or observe another tenant's refresh (52.227ms)
+✔ racing writers (insertHead unique _id): exactly one commit, the loser gets a conflict, no lost update (24.3969ms)
+✔ racing writers (replaceHead CAS): exactly one commit, the loser gets a conflict, no lost update (61.6766ms)
+✔ revision of an untouched transcript changes when the source turns change; a committed head no longer depends on them (3.2238ms)
+✔ an overlay entry for a turn that no longer exists is ignored, not an error (1.6122ms)
+✔ snapshot/head re-read race (initial): stale writer cannot CAS a newer head (1.8277ms)
+✔ snapshot/head re-read race (reviewed): stale writer cannot CAS a newer head (2.0884ms)
+✔ inserting a suggestion writes ONLY speaker_suggestions: nothing becomes a final speaker (0.4465ms)
+✔ tenant B cannot list, confirm or reject tenant A's suggestion (same session id, same suggestion id) (0.476ms)
+✔ a suggestion belongs to its session: the right id under another session is not found (0.2547ms)
+✔ confirm makes the name final with the human-confirmed provenance, in the caller's tenant only (0.8345ms)
+✔ confirm is idempotent: a repeat changes nothing and writes no duplicate final row (0.8458ms)
+✔ confirm extends an existing final speaker instead of replacing it, and keeps its other evidence (0.6667ms)
+✔ reject stores the rejection, writes no final speaker, is idempotent, and is hidden from the list (0.686ms)
+✔ a rejected name is not re-suggested: inserting the same suggestion again leaves the rejection untouched (0.5888ms)
+✔ re-suggesting after a confirm does not reset it either (0.5742ms)
+✔ confirm after reject, and reject after confirm, are conflicts and change nothing (0.9297ms)
+✔ a malformed id or tenant is refused without touching anything (0.3906ms)
+✔ insertSuggestionsIfAbsent refuses a non-suggested row and a row of another session (0.2343ms)
+✔ the view carries quote and kind, calls the name `suggestedName`, and has no speakers-shaped fields (0.1662ms)
+✔ a kind=tile suggestion (T-042, D-160) is stored as suggested, writes no final speaker, and only a human confirm makes it final (0.9305ms)
+✔ native pending and confirmed evidence fail closed after generation, capture, review or owner drift (4.136ms)
+✔ callers cannot supply a machine publication binding (0.3567ms)
+✔ native final-write failure rolls back the decision and session fence (0.9647ms)
+✔ publication fence uses a real increment and refuses malformed/exhausted counters without changes (0.917ms)
+✔ unknown commit retries only commit three times and never replays work or aborts (0.4064ms)
+✖ transaction view binds tenant/session, serializes operations and refuses nesting (0.41ms)
+✔ stale native suggestions can be rejected, including after source or session deletion (1.3383ms)
+✔ historical confirmed native audit remains but stale confirmation repair adds no evidence (2.0149ms)
+✔ production refuses network/outside roots and enabled native writes without platform authority before I/O (0.8509ms)
+✔ real private empty store drains boundedly without DB/providers/host qualification (11421.996ms)
+✖ genuine live seal precedes source ingestion; retained public recovery does not invent a clock (26673.4381ms)
+✔ synthetic alignment unit joins actual index generation and concrete transaction factory to existing consumer (32.0655ms)
+✔ explicit capture binds actual sampler and refuses mismatch before effects (1.2553ms)
+✔ real runRecord injection surface receives trusted service and matching producer sampler (0.75ms)
+✔ unconfigured ordinary sync path does not open archive or require database (0.3136ms)
+✔ native configuration refuses unbounded quota and missing configured decoder (0.3089ms)
+✔ startup performs exactly one bounded drain and preserves explicit resume cursor (0.3061ms)
+✔ actual bootstrap connects then drains before constructing listening server (1.1239ms)
+✔ failed bounded drain never reaches server readiness (0.5391ms)
+✔ trusted root host adapter construction stays lazy; ordinary API requires explicit adapter (0.1963ms)
+ℹ tests 206
+ℹ suites 0
+ℹ pass 184
+ℹ fail 18
+ℹ cancelled 0
+ℹ skipped 4
+ℹ todo 0
+ℹ duration_ms 52093.3062
+
+✖ failing tests:
+
+test at apps\api\src\grounded-postprocessing\transcripts.test.ts:94:1
+✖ unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers (1.8618ms)
+  Error: Transactions unsupported
+      at Object.startTransaction (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/refresh-testkit.ts:50:35)
+      at runNativePublicationTransaction (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/lib/native-publication.ts:15:17)
+      at mutate (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/store.ts:27:16)
+      at Object.setRefresh (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/store.ts:77:20)
+      at file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/service.ts:138:34
+      at async TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/grounded-postprocessing/transcripts.test.ts:99:20)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\speaker-suggest.test.ts:74:1
+✖ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (5.3296ms)
+  TypeError: Cannot read properties of undefined (reading 'provenance')
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/indexing/speaker-suggest.test.ts:92:40)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\speaker-suggest.test.ts:124:1
+✖ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (3.6637ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  -   0,
+  -   0,
+      1,
+  +   1,
+  +   2
+    ]
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/indexing/speaker-suggest.test.ts:130:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Array],
+    expected: [Array],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\tile-speaker-suggest.test.ts:111:1
+✖ populated foreign tenant with colliding session/label/person stays byte-identical (7.6162ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/indexing/tile-speaker-suggest.test.ts:129:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\tile-speaker-suggest.test.ts:131:1
+✖ second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows (5.4425ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  3 !== 4
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/indexing/tile-speaker-suggest.test.ts:154:12)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\production.test.ts:18:1
+✖ ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set (2.516ms)
+  Error: Mongo not connected — call connect() first
+      at getDb (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/client.ts:21:15)
+      at buildProductionDeps (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/composition/production.ts:195:54)
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/production.test.ts:22:22)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\production.test.ts:30:1
+✖ ISS-274: buildProductionDeps constructs without throwing or requiring a live Mongo/network connection (1.2516ms)
+  AssertionError [ERR_ASSERTION]: Got unwanted exception.
+  Actual message: "Mongo not connected — call connect() first"
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/production.test.ts:34:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: Error: Mongo not connected — call connect() first
+        at getDb (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/client.ts:21:15)
+        at buildProductionDeps (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/composition/production.ts:195:54)
+        at file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/production.test.ts:34:31
+        at getActual (node:assert:611:5)
+        at strict.doesNotThrow (node:assert:779:32)
+        at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/production.test.ts:34:12)
+        at Test.runInAsyncScope (node:async_hooks:227:14)
+        at Test.run (node:internal/test_runner/test:1382:25)
+        at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+        at Test.postRun (node:internal/test_runner/test:1522:19),
+    expected: undefined,
+    operator: 'doesNotThrow',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-profiles\store.test.ts:190:1
+✖ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (4.2743ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'not_found' !== 'ok'
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-profiles/store.test.ts:213:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'not_found',
+    expected: 'ok',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-suggestions\reindex-survival.test.ts:36:1
+✖ writeSpeakerDocs re-run after CONFIRM leaves the human-confirmed row untouched (6.6334ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(isHumanConfirmed(m.rows("speakers")[0]))
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-suggestions/reindex-survival.test.ts:40:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-suggestions\reindex-survival.test.ts:54:1
+✖ full extractor + writer re-run after CONFIRM: no re-suggestion, no second name for the label, confirmed row intact (2.4312ms)
+  AssertionError [ERR_ASSERTION]: no suggestion for a confirmed label
+  + actual - expected
+  
+  + [
+  +   {
+  +     blocks: [
+  +       {
+  +         endTurnIndex: 1,
+  +         startTurnIndex: 1
+  +       }
+  +     ],
+  +     displayName: 'Rohan Gupta',
+  +     evidence: [
+  +       {
+  +         sessionId: 's1',
+  +         turnId: 't0'
+  +       }
+  +     ],
+  +     personId: 'person:rohan-gupta',
+  +     provenance: [
+  +       {
+  +         evidenceKind: 'called-on',
+  +         evidenceQuote: 'Rohan Gupta, what do you think about the new rules',
+  +         turnId: 't0'
+  +       }
+  +     ],
+  +     speakerRef: 'spk:1'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-suggestions/reindex-survival.test.ts:63:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [Array],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-suggestions\reindex-survival.test.ts:95:1
+✖ types: a confirmed suggestion row is still schema-shaped (1.4103ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   'suggested',
+  +   undefined
+  -   'confirmed',
+  -   'human-confirmed'
+    ]
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-suggestions/reindex-survival.test.ts:99:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Array],
+    expected: [Array],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-suggestions\reindex-survival.test.ts:101:1
+✖ confirming a name that already had an AUTO row (no row-level provenance) is still protected from the writer (3.0227ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+  +   1,
+      0,
+  -   1
+    ]
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-suggestions/reindex-survival.test.ts:108:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [Array],
+    expected: [Array],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-suggestions\speaker-suggestions.test.ts:104:1
+✖ confirm makes the name final with human-confirmed provenance; a repeat is 200 changed:false and writes nothing more (9.254ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  404 !== 200
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-suggestions/speaker-suggestions.test.ts:108:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 404,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\speaker-suggestions\speaker-suggestions.test.ts:150:1
+✖ reject after confirm is 409 and the confirmed name stays final (11.0637ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  200 !== 409
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/speaker-suggestions/speaker-suggestions.test.ts:154:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 409,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\transcript-review\refresh-executor.test.ts:173:1
+✖ runRefresh reconciles unknown committed head without downgrade or superseded revision leakage (14.3697ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1 !== 0
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/refresh-executor.test.ts:204:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\transcript-review\refresh-executor.test.ts:262:1
+✖ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (0.7734ms)
+  Error: Transactions unsupported
+      at Object.startTransaction (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/refresh-testkit.ts:50:35)
+      at runNativePublicationTransaction (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/lib/native-publication.ts:15:17)
+      at mutate (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/store.ts:27:16)
+      at Object.setRefresh (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/store.ts:77:20)
+      at file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/service.ts:138:34
+      at async TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/refresh-executor.test.ts:269:23)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at packages\db\src\collections\speaker-suggestions\index.test.ts:234:1
+✖ transaction view binds tenant/session, serializes operations and refuses nesting (0.41ms)
+  Error: native_publication_tenant_mismatch
+      at filter (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/lib/native-publication.ts:113:19)
+      at file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/lib/native-publication.ts:137:82
+      at async waitForActual (node:assert:646:5)
+      at async strict.rejects (node:assert:769:25)
+      at async file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/collections/speaker-suggestions/index.test.ts:238:9
+      at async runNativePublicationTransaction (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/lib/native-publication.ts:16:24)
+      at async TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/packages/db/src/collections/speaker-suggestions/index.test.ts:236:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at scripts\native-capture\production.test.ts:49:1
+✖ genuine live seal precedes source ingestion; retained public recovery does not invent a clock (26673.4381ms)
+  Error: EPERM: operation not permitted, open 'C:\Users\product\Desktop\KnowledgeBase\qa\evidence\native-acl-fixtures\75677129-0daf-48d0-8548-f29c7fa0f6ce\native-production-live-rGkymQ\archive\7c9d6a17-3d71-41cb-b948-bda8af473a24\source.vp8.ivf'
+      at async Object.open (node:internal/fs/promises:697:25)
+      at async file:///C:/Users/product/Desktop/KnowledgeBase/packages/meeting-bot/src/capture/native/native-capture-archive.ts:136:36
+      at async exclusive (file:///C:/Users/product/Desktop/KnowledgeBase/packages/meeting-bot/src/capture/native/native-capture-archive.ts:73:20)
+      at async Object.sealCapture (file:///C:/Users/product/Desktop/KnowledgeBase/packages/meeting-bot/src/capture/native/native-archive-capture.ts:80:31)
+      at async TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/native-capture/production.test.ts:77:24)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'open',
+    path: 'C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acl-fixtures\\75677129-0daf-48d0-8548-f29c7fa0f6ce\\native-production-live-rGkymQ\\archive\\7c9d6a17-3d71-41cb-b948-bda8af473a24\\source.vp8.ivf'
+  }

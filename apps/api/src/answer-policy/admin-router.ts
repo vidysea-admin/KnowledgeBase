@@ -8,6 +8,7 @@ import { requireScope } from "../auth.js";
 import { PolicyInputError, validPolicyId } from "./rules.js";
 import { PolicyServiceError, type AnswerPolicyService } from "./service.js";
 import type { Actor, ReviewStatus } from "./types.js";
+import { policyYaml, yamlSaveInput } from "./yaml.js";
 
 const STATUS = ["open", "approved", "rejected", "acknowledged", "dismissed", "superseded"];
 const HTTP = { not_found: 404, version_conflict: 409, invalid_state: 409, invalid_policy: 400 } as const;
@@ -48,6 +49,13 @@ export function createAnswerPolicyAdminRouter(service: AnswerPolicyService): Rou
   router.post("/answer-policies/review-queue/:itemId/resolve", ...run(write, 200, async (req, t) =>
     ({ item: await service.resolve(t, String(req.params.itemId), req.body, actor(req)) })));
   router.get("/answer-policies/:policyId/history", ...run(read, 200, async (req, t) => ({ history: await service.history(t, idOf(req)) })));
+  router.get("/answer-policies/:policyId/yaml", ...run(read, 200, async (req, t) => {
+    const revision = (await service.history(t, idOf(req))).at(-1);
+    if (!revision) throw new PolicyServiceError("not_found", "No such policy.");
+    return { yaml: policyYaml(revision), revision };
+  }));
+  router.put("/answer-policies/:policyId/yaml", ...run(write, 200, async (req, t) =>
+    service.save(t, idOf(req), yamlSaveInput((req.body as { yaml?: unknown } | undefined)?.yaml), actor(req))));
   router.put("/answer-policies/:policyId", ...run(write, 200, async (req, t) => service.save(t, idOf(req), req.body, actor(req))));
   router.post("/answer-policies/:policyId/retire", ...run(write, 200, async (req, t) => service.retire(t, idOf(req), req.body, actor(req))));
   return router;

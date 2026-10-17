@@ -1,0 +1,35 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Source overlay cycle2 original two filed reproductions verbatim",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-checker-probe.mjs"
+  ],
+  "testIDs": [
+    "Windows case alias must refuse",
+    "new required file after capture must refuse"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-source-overlay-cycle2-original-two",
+  "pins": {
+    "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-checker-probe.mjs": "2f04383b6844eb419e1776a5c14edb1ec867b96e7b308360e918218ab820eecb",
+    "scripts/qa/source-overlay-candidate.mjs": "af3f882df47320ec1fd5e8e28b714a7c47db2833da2e100832fc78afafe013cc",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297"
+  }
+}

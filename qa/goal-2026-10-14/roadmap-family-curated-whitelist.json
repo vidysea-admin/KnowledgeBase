@@ -1,0 +1,548 @@
+{
+  "owner": "/root/roadmap_status",
+  "createdAt": "2026-10-14T23:12:16.8831502Z",
+  "scope": "Exact owned code/tests, selected source docs/handshake contracts and synthetic issue reproduction floors only; review shortlist, no staging/publication",
+  "sources": [
+    "apps/api/src/calibration-review/file-store.ts",
+    "apps/api/src/calibration-review/persistence.ts",
+    "apps/api/src/calibration-review/README.md",
+    "apps/api/src/calibration-review/router.test.ts",
+    "apps/api/src/calibration-review/router.ts",
+    "apps/api/src/calibration-review/seed.ts",
+    "apps/api/src/calibration-review/types.ts",
+    "apps/api/src/championship/model.ts",
+    "apps/api/src/championship/mongo-store.test.ts",
+    "apps/api/src/championship/mongo-store.ts",
+    "apps/api/src/championship/runtime.test.ts",
+    "apps/api/src/championship/runtime.ts",
+    "apps/api/src/composition/integrations/evaluation.ts",
+    "apps/api/src/evaluation-flywheel/ask.ts",
+    "apps/api/src/evaluation-flywheel/composition.test.ts",
+    "apps/api/src/evaluation-flywheel/receipts.ts",
+    "apps/api/src/evaluation-flywheel/router.test.ts",
+    "apps/api/src/evaluation-flywheel/router.ts",
+    "apps/api/src/evaluation-flywheel/store.ts",
+    "apps/api/src/evaluation-flywheel/test-fixture.ts",
+    "apps/api/src/evaluation-flywheel/types.ts",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts",
+    "apps/api/src/evaluation-flywheel/workflow.ts",
+    "apps/api/src/routes/championship/championship.test.ts",
+    "apps/api/src/routes/championship/championship.ts",
+    "apps/web/src/pages/calibration-review/CalibrationReviewPage.test.tsx",
+    "apps/web/src/pages/calibration-review/CalibrationReviewPage.tsx",
+    "apps/web/src/pages/calibration-review/client.ts",
+    "apps/web/src/pages/championship/ChampionshipPage.test.tsx",
+    "apps/web/src/pages/championship/ChampionshipPage.tsx",
+    "apps/web/src/pages/championship/ChampionshipPlanForm.tsx",
+    "apps/web/src/pages/championship/client.test.ts",
+    "apps/web/src/pages/championship/client.ts",
+    "scripts/eval/human-calibration.mjs",
+    "scripts/eval/human-calibration.test.mjs",
+    "scripts/eval/u010-baseline-audit.mjs",
+    "scripts/eval/u010-baseline-run.mjs",
+    "scripts/eval/u010-baseline-run.test.mjs",
+    "scripts/eval/u010-corpus.mjs",
+    "scripts/eval/u010-provider.mjs",
+    "scripts/eval/u010-state.mjs",
+    "scripts/training/export.mjs",
+    "scripts/training/file-hash.mjs",
+    "scripts/training/plan.mjs",
+    "scripts/training/prepare.mjs",
+    "scripts/training/prepare.test.mjs",
+    "scripts/training/private-path.mjs",
+    "scripts/training/train.mjs",
+    "scripts/training/validate.mjs"
+  ],
+  "docs": [
+    "docs/t059-evaluation-flywheel.md",
+    "docs/own-model-training.md",
+    "docs/championship-workflow.md"
+  ],
+  "handshakes": [
+    "qa/contracts/goal-t022.md",
+    "qa/manifests/goal-t022.md",
+    "qa/packets/goal-t022.md",
+    "qa/verdicts/goal-t022.md",
+    "qa/contracts/goal-t014.md",
+    "qa/manifests/goal-t014.md",
+    "qa/packets/goal-t014.md",
+    "qa/contracts/goal-t015.md",
+    "qa/manifests/goal-t015.md",
+    "qa/packets/goal-t015.md",
+    "qa/verdicts/goal-t015.md",
+    "qa/contracts/goal-t059.md",
+    "qa/manifests/goal-t059.md",
+    "qa/packets/goal-t059.md",
+    "qa/verdicts/goal-t059.md",
+    "qa/contracts/goal-u010.md",
+    "qa/manifests/goal-u010.md",
+    "qa/packets/goal-u010.md",
+    "qa/verdicts/goal-u010.md"
+  ],
+  "syntheticIssueFloorsAndProbes": [
+    "qa/issues.U010CHECKPOINT.jsonl",
+    "qa/issues.goal-t015.jsonl",
+    "qa/issues.T059REPLAY.jsonl",
+    "qa/evidence/goal-u010-checker.test.mjs",
+    "qa/evidence/goal-t015-checker-probe.mjs",
+    "qa/evidence/goal-t015-cycle1-ledger-replay.mjs",
+    "qa/evidence/goal-t015-cycle1-ledger-replay.json",
+    "qa/evidence/goal-t015-checker-cycle0-verdict.md",
+    "qa/evidence/goal-t015-checker-cycle1-source-pass.md",
+    "qa/evidence/goal-t015-checker-cycle1-dependency-hold.md",
+    "qa/evidence/goal-t059-checker-probe.ts",
+    "qa/evidence/goal-t059-checker-rows.py",
+    "qa/evidence/goal-t059-checker-cycle0-fail.md",
+    "qa/evidence/goal-t059-maker/rows.json",
+    "qa/evidence/goal-t014-checker-cycle0-probe.ts",
+    "qa/evidence/goal-t022-checker-mount.mjs"
+  ],
+  "files": [
+    {
+      "path": "apps/api/src/calibration-review/file-store.ts",
+      "bytes": 8461,
+      "sha256": "c0fd3ec5b75a8be3f2e1635c3e677f042ad1e57010d4dc6dac2fa8797d7d0ff3"
+    },
+    {
+      "path": "apps/api/src/calibration-review/persistence.ts",
+      "bytes": 706,
+      "sha256": "21940ec318aeae31190520ca9f8d94c60923b08b0d52695be5074695f8e7dc40"
+    },
+    {
+      "path": "apps/api/src/calibration-review/README.md",
+      "bytes": 4300,
+      "sha256": "f94e1c7bf4049661220da287389ff2d32223a51f711c5ae38706f38e688ad2c5"
+    },
+    {
+      "path": "apps/api/src/calibration-review/router.test.ts",
+      "bytes": 11861,
+      "sha256": "451135a42ef9c9468b3e3d21b89d363b4d666253be81e5a8a7baa624fba424cd"
+    },
+    {
+      "path": "apps/api/src/calibration-review/router.ts",
+      "bytes": 1761,
+      "sha256": "09a5c167cfea810e542633861e399b24034075cc16fdc299d70610352aa84283"
+    },
+    {
+      "path": "apps/api/src/calibration-review/seed.ts",
+      "bytes": 6176,
+      "sha256": "6d003368b0f6ea7739812cf62fc2d8593235305d7dab1f278db44084b1e09ef9"
+    },
+    {
+      "path": "apps/api/src/calibration-review/types.ts",
+      "bytes": 2245,
+      "sha256": "41b6c165da56f7f77a27d135ebf3c2690318ab8707ee48b160587cd952a3e277"
+    },
+    {
+      "path": "apps/api/src/championship/model.ts",
+      "bytes": 5160,
+      "sha256": "7186304211f989df79c0dcf5a705a173b5d8fbc95f7895e752b6c83f39dcd190"
+    },
+    {
+      "path": "apps/api/src/championship/mongo-store.test.ts",
+      "bytes": 4166,
+      "sha256": "46d3631956c6fd4a563144316dbedcbc9b99d1ad24afc49dcb3e19726ee1e7d8"
+    },
+    {
+      "path": "apps/api/src/championship/mongo-store.ts",
+      "bytes": 4003,
+      "sha256": "bbfa10fc5b5f0ddcdee0be70239cde441bde8285073ae86cabcc8544646d396a"
+    },
+    {
+      "path": "apps/api/src/championship/runtime.test.ts",
+      "bytes": 5306,
+      "sha256": "557c3f8eb28f700bda456f5aaaedbf4394248f9f230b195fa64fd3596313195a"
+    },
+    {
+      "path": "apps/api/src/championship/runtime.ts",
+      "bytes": 6571,
+      "sha256": "e5f00441c246e1c34c6af4d380a67c39b528164031c9a1dfa5f8a03a4fbd293d"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/evaluation.ts",
+      "bytes": 3997,
+      "sha256": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/ask.ts",
+      "bytes": 1183,
+      "sha256": "b7aadf3a11ff2745514c03dd89062ff5cede73bc907a40667373714a0cbd1bd0"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/composition.test.ts",
+      "bytes": 6616,
+      "sha256": "c58aff9cc1706df18bc9b2c8d2386a2cfb5fa77a57c3ea1001b5fbf8ead58c5d"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/receipts.ts",
+      "bytes": 3392,
+      "sha256": "a6eb0492e8382288cf142c3848726d01bc3a3fc1ab93d90817c36e8d30ff38f3"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/router.test.ts",
+      "bytes": 5839,
+      "sha256": "1c894b6f4090b6158e0ce405bec831ddaab64546bcc02c55bd3e339871d311d5"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/router.ts",
+      "bytes": 2085,
+      "sha256": "3556ffbcb10d11cd1be60199027fbad41d002123d2369d851eda35117041b279"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/store.ts",
+      "bytes": 2824,
+      "sha256": "bc5896226b0dab2f27d2e808a3153d7fd8bd62109abd93ab575b25115104ea8a"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/test-fixture.ts",
+      "bytes": 6542,
+      "sha256": "6bd2229d3499ccb532a585a7325dcb8052250b22931978768e45f5608ffbd13f"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/types.ts",
+      "bytes": 3090,
+      "sha256": "c1b031c9964dc26a835c410b3034760f6f2a307a73938015bc091e9c41b7003f"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/workflow.test.ts",
+      "bytes": 12919,
+      "sha256": "7fc46d1257e46579d85e985e70858623e2b43720adffecffdaa2419abd3496b7"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/workflow.ts",
+      "bytes": 13014,
+      "sha256": "d480ccc350e9fad85f7541f4fab6b03c1a2669bdf814d42842c7c5741ccef7e7"
+    },
+    {
+      "path": "apps/api/src/routes/championship/championship.test.ts",
+      "bytes": 5233,
+      "sha256": "e80a7dc2ec9fb62be8dec15327b4ce73491e63d8ee6ead7c0f47f6b0ecdfaa8b"
+    },
+    {
+      "path": "apps/api/src/routes/championship/championship.ts",
+      "bytes": 3642,
+      "sha256": "88cc87b254f7c7defd5204d30667b01b5e3625673f123f67a9ce59f62aceb022"
+    },
+    {
+      "path": "apps/web/src/pages/calibration-review/CalibrationReviewPage.test.tsx",
+      "bytes": 4958,
+      "sha256": "2e987823262345288a6516b54d790b8db1b01ca32e5be43a6abf106bc5e36f4b"
+    },
+    {
+      "path": "apps/web/src/pages/calibration-review/CalibrationReviewPage.tsx",
+      "bytes": 6636,
+      "sha256": "0f46b49e67e7a79379ddc96e1531bf2c44f115584bcc7a4da193a935144f8001"
+    },
+    {
+      "path": "apps/web/src/pages/calibration-review/client.ts",
+      "bytes": 1348,
+      "sha256": "09f37e72727492df554d72854acf1600012609cc27d6dd556e7eba8f01596b3a"
+    },
+    {
+      "path": "apps/web/src/pages/championship/ChampionshipPage.test.tsx",
+      "bytes": 6834,
+      "sha256": "169ca58f3cd6c00f6416aaf6a4ab911fa56bb13bb5f7f48a9a0f26732d29cf3c"
+    },
+    {
+      "path": "apps/web/src/pages/championship/ChampionshipPage.tsx",
+      "bytes": 8689,
+      "sha256": "e76a0f0730d56c8b30a8ccc0e0e038b4c7340a5f3dd967d2ab08e06a16bd3809"
+    },
+    {
+      "path": "apps/web/src/pages/championship/ChampionshipPlanForm.tsx",
+      "bytes": 4942,
+      "sha256": "05c20b40c741f8d87846be809333ba3460596c23cd11581581581ed1595d99ec"
+    },
+    {
+      "path": "apps/web/src/pages/championship/client.test.ts",
+      "bytes": 2899,
+      "sha256": "c5fb9be67d391df21b55e59b716f8bb4008a10512a485afba153847d4545df86"
+    },
+    {
+      "path": "apps/web/src/pages/championship/client.ts",
+      "bytes": 4603,
+      "sha256": "e139fe67c383b4e7ffe9c498a210cf3eece5d9f488a6b0f337df9280498a1383"
+    },
+    {
+      "path": "docs/championship-workflow.md",
+      "bytes": 5018,
+      "sha256": "31301cf49ae563b1c4b3255e87591eddc94a8bd7e58116dfe71d59352e9bc1cf"
+    },
+    {
+      "path": "docs/own-model-training.md",
+      "bytes": 9210,
+      "sha256": "45ab58bac88d6823928db68fbf2f95b9ed037e51db5cc1a78ddec540206e8403"
+    },
+    {
+      "path": "docs/t059-evaluation-flywheel.md",
+      "bytes": 6425,
+      "sha256": "f8b60229c400d0a9f863ff7e3386343d6536d9d118a55454e9113607f7865d8a"
+    },
+    {
+      "path": "qa/contracts/goal-t014.md",
+      "bytes": 12609,
+      "sha256": "c70cdb8555ee59261907fd0319d380fa1143666e7d82453aa89accb3e364353f"
+    },
+    {
+      "path": "qa/contracts/goal-t015.md",
+      "bytes": 9492,
+      "sha256": "383482e99a8b8f817848d91b64141a6e4c7f457592592fd5d0f20b9bb8b708d0"
+    },
+    {
+      "path": "qa/contracts/goal-t022.md",
+      "bytes": 10921,
+      "sha256": "2e56571308345202479b3c1bbd0b772016cebfc5737b0b78487777737d2acac4"
+    },
+    {
+      "path": "qa/contracts/goal-t059.md",
+      "bytes": 15973,
+      "sha256": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd"
+    },
+    {
+      "path": "qa/contracts/goal-u010.md",
+      "bytes": 10635,
+      "sha256": "8bb7c459f93885c05f42b6667929e87757422f3c54f98aa13f7a57733ab35ee8"
+    },
+    {
+      "path": "qa/evidence/goal-t014-checker-cycle0-probe.ts",
+      "bytes": 8095,
+      "sha256": "00e4ad3fd36ecc6a691343a2ffd274d0e6f00f6245b5fdc8be578cf0f608bcce"
+    },
+    {
+      "path": "qa/evidence/goal-t015-checker-cycle0-verdict.md",
+      "bytes": 8260,
+      "sha256": "3017cc15958dbcb85e0c3cea81a48a6a1c756b2e220e4e19bcc30af1bf9de8a1"
+    },
+    {
+      "path": "qa/evidence/goal-t015-checker-cycle1-dependency-hold.md",
+      "bytes": 3732,
+      "sha256": "76120b0ea2ce5e54940742f9e085a457a8220c5f7a5e6d26a75cee52d2f1ef96"
+    },
+    {
+      "path": "qa/evidence/goal-t015-checker-cycle1-source-pass.md",
+      "bytes": 9368,
+      "sha256": "da9ccaac50c8b8d7e7a48aa7449e431c82f50b94374be90302e55818d1971a7f"
+    },
+    {
+      "path": "qa/evidence/goal-t015-checker-probe.mjs",
+      "bytes": 3174,
+      "sha256": "3e4d9197a28fa0cae4ad477a31e1a782bbc2a08a3f714e2bdd3618b0d54a442d"
+    },
+    {
+      "path": "qa/evidence/goal-t015-cycle1-ledger-replay.json",
+      "bytes": 7553,
+      "sha256": "daefa7eead19ab3be79d0b9c037a49597dbe580c51842af1c55c64ead81eaaf1"
+    },
+    {
+      "path": "qa/evidence/goal-t015-cycle1-ledger-replay.mjs",
+      "bytes": 3357,
+      "sha256": "9a0405d0ff0ce0e39f6b6311ee19851f784a16fed34b0bcbb85e303e6256933b"
+    },
+    {
+      "path": "qa/evidence/goal-t022-checker-mount.mjs",
+      "bytes": 9174,
+      "sha256": "cdcba62b828243597bdc06d5bbb384c5a74d8f546643184f7be2a7b35f0887b8"
+    },
+    {
+      "path": "qa/evidence/goal-t059-checker-cycle0-fail.md",
+      "bytes": 9208,
+      "sha256": "02f8c972ca0491ba12beb7756ab85634289727d9f49400dd8931602ab3acfa73"
+    },
+    {
+      "path": "qa/evidence/goal-t059-checker-probe.ts",
+      "bytes": 5730,
+      "sha256": "b056b465a89ff02725a04cc1b79213be8bd67cffab104619fd3b02d9c7d82e59"
+    },
+    {
+      "path": "qa/evidence/goal-t059-checker-rows.py",
+      "bytes": 1429,
+      "sha256": "afec2ee5c4b9076c327ad5dd62ef03a136b171d0b16f7219447d1619e985eeb0"
+    },
+    {
+      "path": "qa/evidence/goal-t059-maker/rows.json",
+      "bytes": 8595,
+      "sha256": "ec5793a344414606987b5acddbcca887e90cac28e05a987e3892e7407237bd25"
+    },
+    {
+      "path": "qa/evidence/goal-u010-checker.test.mjs",
+      "bytes": 9913,
+      "sha256": "db57b68d32ceddec06be25d4dde72e38da90080ab8cd95e80d4919ba0f96048d"
+    },
+    {
+      "path": "qa/issues.goal-t015.jsonl",
+      "bytes": 16982,
+      "sha256": "28f211dd55d843c2ae814ab7707125b10aec3b39ecdba522c417537f6334221e"
+    },
+    {
+      "path": "qa/issues.T059REPLAY.jsonl",
+      "bytes": 10998,
+      "sha256": "10859ff375a8496f9d9559021db0cbd2475c3252276c04635c07280100a9905e"
+    },
+    {
+      "path": "qa/issues.U010CHECKPOINT.jsonl",
+      "bytes": 5021,
+      "sha256": "039512aaf3dc8bb623080521d906f3c5534c4e3041b191f923df25d8d625f009"
+    },
+    {
+      "path": "qa/manifests/goal-t014.md",
+      "bytes": 3888,
+      "sha256": "bad553a5745e6cf76d99d02528ab4f969b5f6deb15fce4520484f139aff1dd08"
+    },
+    {
+      "path": "qa/manifests/goal-t015.md",
+      "bytes": 5698,
+      "sha256": "cfc1b7f36d1cf92cc4338785fed0d5da002d953ddb9f2e3561d2a8263d304ad7"
+    },
+    {
+      "path": "qa/manifests/goal-t022.md",
+      "bytes": 9553,
+      "sha256": "6dfb7df3e15c8e223fa3a7e36b51b4a1a8e9d84067b1587589d036bcb26f34ae"
+    },
+    {
+      "path": "qa/manifests/goal-t059.md",
+      "bytes": 6491,
+      "sha256": "9c2be2aa94baa993550301d251454d3d8500d2ff135fb5a638f37cc1103f2e62"
+    },
+    {
+      "path": "qa/manifests/goal-u010.md",
+      "bytes": 6177,
+      "sha256": "eba912a0aa925dc59f539b0fc95f0e6994fa61d103f45e4cbad8470df0bceea0"
+    },
+    {
+      "path": "qa/packets/goal-t014.md",
+      "bytes": 9875,
+      "sha256": "9cdf30ccb9184269a789003f61e9b0077870e67cde0f3fb415f198c9f19bc663"
+    },
+    {
+      "path": "qa/packets/goal-t015.md",
+      "bytes": 16754,
+      "sha256": "65eb859816ce0ef2a7e0355af7e63624d7be39b7a2270cf96ea58a1dc453aadc"
+    },
+    {
+      "path": "qa/packets/goal-t022.md",
+      "bytes": 8569,
+      "sha256": "df622e84f0a372db56ca3673551cd198968d5b89c4edc4bf5a628a4a22545dd3"
+    },
+    {
+      "path": "qa/packets/goal-t059.md",
+      "bytes": 44156,
+      "sha256": "67715e02bb65fa51eabb82547ad5f5904ad129a3b01841c29fb80ba09f0d64de"
+    },
+    {
+      "path": "qa/packets/goal-u010.md",
+      "bytes": 14701,
+      "sha256": "c0df393761e4fea72185093d516c2b8b4d23f9483b351a310c4e8dc591685755"
+    },
+    {
+      "path": "qa/verdicts/goal-t015.md",
+      "bytes": 10503,
+      "sha256": "fec01c6d596524daf57f6f14a2b3154a5c972a84801a87d439b39ec694839994"
+    },
+    {
+      "path": "qa/verdicts/goal-t022.md",
+      "bytes": 15049,
+      "sha256": "9e627dc16a87b34d2bdf2d498b3fa7fdd40a4cde55ba0eebbd55285dd402dd96"
+    },
+    {
+      "path": "qa/verdicts/goal-t059.md",
+      "bytes": 11437,
+      "sha256": "dfa70e983bade1ecbf1f9bd4dcddcb80dc5348bdf8bb35dadd8a6510ba761176"
+    },
+    {
+      "path": "qa/verdicts/goal-u010.md",
+      "bytes": 15857,
+      "sha256": "78ef98bc9c586cdd78094c789f784e831cf832d3a480d1d4a42c2c23b127eebd"
+    },
+    {
+      "path": "scripts/eval/human-calibration.mjs",
+      "bytes": 19954,
+      "sha256": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf"
+    },
+    {
+      "path": "scripts/eval/human-calibration.test.mjs",
+      "bytes": 11501,
+      "sha256": "c904299b6cd55522bd3f527ba945d4f072183f575200ba90414e74173898b9db"
+    },
+    {
+      "path": "scripts/eval/u010-baseline-audit.mjs",
+      "bytes": 13524,
+      "sha256": "aaebeea07f09f1dc9aff31fcd61af930a1f00a6426dad996d351991f94b2d6ca"
+    },
+    {
+      "path": "scripts/eval/u010-baseline-run.mjs",
+      "bytes": 15097,
+      "sha256": "9e5050ce64ee4aa2b13725f497e7f9895e1f144bee41ee01d1a13e90713b232f"
+    },
+    {
+      "path": "scripts/eval/u010-baseline-run.test.mjs",
+      "bytes": 20456,
+      "sha256": "3a175a8704ac737d848c2721d7aaf0afae9e22c14871fd72f1091d9762c23fde"
+    },
+    {
+      "path": "scripts/eval/u010-corpus.mjs",
+      "bytes": 7896,
+      "sha256": "02f6dfab40717e9a2c2aeabad4aea7afaa78218f8308fedb22f2dc54ef8d54cf"
+    },
+    {
+      "path": "scripts/eval/u010-provider.mjs",
+      "bytes": 3401,
+      "sha256": "37ef3377b2c84e59e9fe82cdefc44e1a987420f437155028aa3133f53e32f391"
+    },
+    {
+      "path": "scripts/eval/u010-state.mjs",
+      "bytes": 8634,
+      "sha256": "04354bb707f57421a01568eab195418ed9178fe2be4ec9ed815e43f85b1d14d2"
+    },
+    {
+      "path": "scripts/training/export.mjs",
+      "bytes": 6512,
+      "sha256": "1b64ef97817e59702257ea53ba8530ddf7b7d8a1600c6dac711cf51d47fc20d9"
+    },
+    {
+      "path": "scripts/training/file-hash.mjs",
+      "bytes": 628,
+      "sha256": "aa7a76c7395ee9ac9d588f5dd5de86c55f3c4564628fcae63f3458bd8ffef271"
+    },
+    {
+      "path": "scripts/training/plan.mjs",
+      "bytes": 8561,
+      "sha256": "14df232bde2f320c4937dbe733a6fdc235c3e2dc8c6e0b852ccb33f61b68669f"
+    },
+    {
+      "path": "scripts/training/prepare.mjs",
+      "bytes": 5674,
+      "sha256": "512163b25449684030e4e0a45d8d53e1a9119fb1d2e36683173df85a928ad18b"
+    },
+    {
+      "path": "scripts/training/prepare.test.mjs",
+      "bytes": 17461,
+      "sha256": "d9e78b897ca675f4596f27ad86ae1dc2c63b0c9d0e24a8547a41e3aa4e2e12f1"
+    },
+    {
+      "path": "scripts/training/private-path.mjs",
+      "bytes": 1223,
+      "sha256": "bd7692baf6175dcf5541b0184c8380631fe298d3f2bb0d8bef7335274b10ec4c"
+    },
+    {
+      "path": "scripts/training/train.mjs",
+      "bytes": 8278,
+      "sha256": "2bda09076bdd17a60d4c6710eff684b4466e56a1e741c57d5ec9a51254807f64"
+    },
+    {
+      "path": "scripts/training/validate.mjs",
+      "bytes": 4791,
+      "sha256": "eb5cd898eba524c3b1d7093dbd914b92eedf6c98ddb8f2e9f33ba66f33691869"
+    }
+  ],
+  "explicitExclusions": [
+    "data/eval/** including t022-review-package.html and human packet/actual provider results",
+    "qa/packets/goal-u010-provider-plan.md (external-dispatch review only)",
+    "qa/evidence/goal-u010-maker/provider-input-inventory.json and private corpus/approval/host/export/plan snapshots",
+    "all dependency-only source/schema/generated/migrations/central server/App/Nav pins (integration owner separately curates)",
+    "schema-request.json proposal",
+    "all media, Zoom p1/p2 dirty files, deepseek/glm4 smoke/full output, root backups and blanket QA trees",
+    "node_modules/dist/generated outputs",
+    "actual provider/execution data and any credentials"
+  ],
+  "parentTasks": "Remain in_progress/full acceptance HOLD; no Git action executed"
+}

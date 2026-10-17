@@ -1,0 +1,38 @@
+[
+  {
+    "sha256": "136dfb18f401da4b2ecf4a519061cb5c1bdc02a8f6fb770aab2de7ecf76b3254",
+    "path": "apps/api/src/indexing/types.ts"
+  },
+  {
+    "sha256": "ce0a64b509dc3c9ac1e85ff7d9d8c0eae6774e097e7fafcf2a3c2c5888ad69ad",
+    "path": "apps/api/src/indexing/session.ts"
+  },
+  {
+    "sha256": "f8ac8726f379dfd18e8871a8449926ea8f99de920f4f6fda6987df2fe22cf6c5",
+    "path": "apps/api/src/indexing/vectorless-publication.test.ts"
+  },
+  {
+    "sha256": "0569f8bd71799b23da37f2bc7ea6e11ca3dad29c2f09dc006a421938ab35e6d8",
+    "path": "apps/api/src/composition/integrations/transcripts.ts"
+  },
+  {
+    "sha256": "420bab2515ac064229bba4dd10a99fa8484ba62263daca35486a019d72043fcd",
+    "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts"
+  },
+  {
+    "sha256": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+    "path": "packages/meeting-bot/src/capture/native/native-spool.ts"
+  },
+  {
+    "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.ts"
+  },
+  {
+    "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+    "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts"
+  },
+  {
+    "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+    "path": "packages/meeting-bot/src/capture/native/native-media-finalize.test.ts"
+  }
+]

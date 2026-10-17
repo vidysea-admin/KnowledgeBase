@@ -1,33 +1,18 @@
-# config/ai-routing.yaml — T-019 C4. Per-jobKind ordered provider chain, user-editable
-# (length >= 1, no hardcoded max). Gemini first per D-005/D-008. Parsed by
-# packages/ai/src/routing-config.ts (flat `key: [a, b, c]` shape only — no nesting).
-transcribe: [gemini, ollama, claude-code]
-namemap: [gemini, claude-code]
-summarize: [gemini, claude-code, ollama]
-claims: [gemini, claude-code]
-# U2.5: decisions extraction (flag LKB_EXTRACT_DECISIONS, off by default); same chain as claims.
-decisions: [gemini, claude-code]
-# speakers: the speaker-segment-identity gate (Option A, phase 2, answered 2026-09-21) pins
-# transcript-derived speaker identity to the LOCAL chain — qwen3:8b first, deterministic options —
-# so nothing model-proposed about a person's identity is adjudicated by a public model. Ollama is
-# the only member that can satisfy that today; gemini/claude-code stay off this jobKind.
+# D-173: Cloud-first text tasks; vectorless RAG has no active embedding chain.
+# Local speaker identity stays on its independently approved deterministic local route.
+transcribe: [gemini]
+namemap: [ollama-cloud, ollama-cloud-verifier]
+summarize: [ollama-cloud, ollama-cloud-verifier]
+claims: [ollama-cloud, ollama-cloud-verifier]
+decisions: [ollama-cloud, ollama-cloud-verifier]
 speakers: [ollama]
-tree-summary: [gemini, claude-code]
-# U2.3: LLM topic extractor (tree/extract-topics-llm.ts), behind LKB_LLM_TOPICS (off by default).
-topics: [gemini, claude-code]
-evaluator: [gemini, claude-code]
-answer: [gemini, claude-code, ollama]
-ask: [gemini, claude-code]
-# U1.1: embeddings. Gemini first per D-005; ollama second so the vector index can be built
-# entirely locally when the corpus must not leave our infrastructure (goal.md). Providers without
-# an embed() are skipped by the router rather than failing the chain, so listing one is harmless.
-embedding: [gemini, ollama]
-# T-040 / D-144: the negation-safety JUDGE. A SECOND model (not the generating summarize/claims chain, which is
-# gemini-first) checks each generated note against its cited source sentence(s) for same/different/unsure meaning,
-# polarity and negation included. claude-code first so the judge is a different model family from the generator;
-# gemini is the fallback. Job kind "note-judge" (packages/index/src/pipeline/notes/judge.ts). No existing route changed.
-note-judge: [claude-code, gemini]
-# ollamafirst: webinar slide/frame vision (scripts/webinar/process-video.mjs, flag LKB_VISION_ROUTED=1). Ollama Cloud first
-# (models: OLLAMA_VISION_MODELS, default glm-5.3-flash then deepseek-v4.1-flash), Gemini (WEBINAR_VISION_MODEL) as fallback.
-# STT has no Ollama entry on purpose: no Ollama Cloud model reports an audio capability (measured 2026-10-14).
+tree-summary: [ollama-cloud, ollama-cloud-verifier]
+topics: [ollama-cloud, ollama-cloud-verifier]
+evaluator: [ollama-cloud-verifier, ollama-cloud]
+output-verifier: [ollama-cloud-verifier]
+output-generation: [ollama-cloud]
+answer: [ollama-cloud, ollama-cloud-verifier]
+ask: [ollama-cloud, ollama-cloud-verifier]
+note-judge: [ollama-cloud-verifier, ollama-cloud]
+# Vision remains on the existing capability-specific path; cloud text models are not STT.
 vision: [ollama, gemini]

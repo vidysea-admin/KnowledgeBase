@@ -62,12 +62,16 @@ test('content hash reuse requires outputs and actual frames unchanged', async (t
   writeFileSync(join(f.dir, 'turns.json'), JSON.stringify([{ ...turns[0], text: 'Changed transcript' }]));
   assert.equal((await processVideo(f.input)).reused, undefined);
 });
-test('provider failure is durable; retry converges and releases lock', async (t) => {
+test('exhausted provider failure is a counted safe gap; retry converges and releases lock', async (t) => {
   const f = fixture(t);
-  await assert.rejects(processVideo({ ...f.input, vision: async () => { throw new Error('provider unavailable'); } }), /provider unavailable/);
-  assert.equal(JSON.parse(readFileSync(join(f.dir, 'video-stage.json'))).status, 'failed');
+  const state = await processVideo({ ...f.input, visionRetry: { sleep: async () => {} }, vision: async () => { throw new Error('provider unavailable SECRET'); } });
+  assert.equal(state.frameCount, 0); assert.equal(state.ocrErrors.length, 3);
+  assert.ok(state.ocrErrors.every((error) => error.reason === 'ocr-failed' && error.attempts === 3));
+  assert.ok(!JSON.stringify(state).includes('SECRET'));
+  assert.equal(JSON.parse(readFileSync(join(f.dir, 'video-stage.json'))).ocrErrors.length, 3);
   assert.ok(!readdirSync(f.dir).includes('.video-stage.lock'));
-  assert.equal((await processVideo(f.input)).status, 'done');
+  const recovered = await processVideo(f.input);
+  assert.equal(recovered.status, 'done'); assert.equal(recovered.reused, undefined); assert.equal(recovered.frameCount, 2);
 });
 test('missing vision config does not start extraction or claim screen completion', async (t) => {
   const f = fixture(t);
@@ -139,8 +143,10 @@ test('Gemini request sends actual image through Transport; validates actual resp
   assert.equal(request.body.contents[0].parts[1].inlineData.data, Buffer.from('pixels').toString('base64'));
   await assert.rejects(geminiVision(async () => ({ status: 500 }), { apiKey: 'test', model: 'gemini-test' })({ path: image }), /status 500/);
 });
-const hasFfmpeg = ['ffmpeg', 'ffprobe'].every((bin) => !spawnSync(bin, ['-version'], { stdio: 'ignore' }).error);
-test('real ffmpeg synthetic video yields timestamped playable frame evidence', { skip: hasFfmpeg ? false : 'ffmpeg/ffprobe not found on PATH' }, async (t) => {
+const hasFfmpeg = process.env.LKB_HERMETIC_MEDIA_TESTS !== '1' &&
+  ['ffmpeg', 'ffprobe'].every((bin) => !spawnSync(bin, ['-version'], { stdio: 'ignore' }).error);
+test('real ffmpeg synthetic video yields timestamped playable frame evidence', { skip: process.env.LKB_HERMETIC_MEDIA_TESTS === '1'
+  ? 'explicit hermetic check; real media not run' : hasFfmpeg ? false : 'ffmpeg/ffprobe not found on PATH' }, async (t) => {
   const f = fixture(t), path = join(f.root, 'real.webm');
   await mediaCommand('ffmpeg', ['-hide_banner', '-nostdin', '-y', '-f', 'lavfi', '-i', 'color=c=blue:s=320x240:d=2', '-c:v', 'libvpx', path]);
   const state = await processVideo({ ...f.input, recording: 'real.webm', command: mediaCommand });

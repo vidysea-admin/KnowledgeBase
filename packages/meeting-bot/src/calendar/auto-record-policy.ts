@@ -17,6 +17,8 @@ import { detectPlatform } from "../platform.js";
 import { parseStrictEmail, normalizeDomain } from "./join-rules/join-rules.js";
 import type { WebinarReconciliationResult, WebinarReconciliationState, CalendarEvent } from "@lkb/core";
 import type { TrustedSenderConfig, AutoRecordCandidateInput, AutoRecordItem, SkippedItem } from "@lkb/core";
+import { runWebinarRegistrations, mergeRegistrationOperationDraft } from "./registration-workflow.js";
+export { runWebinarRegistrations } from "./registration-workflow.js";
 
 export type { TrustedSenderConfig } from "@lkb/core";
 
@@ -113,48 +115,6 @@ export function webinarIdentity(url: string, startTime: string): string | undefi
 export function webinarSessionKey(identity: string): string {
   return `webinar-${createHash("sha256").update(identity).digest("hex").slice(0, 24)}`;
 }
-/** The lane owns its lock; injected update must durably settle before any browser submission. */
-export async function runWebinarRegistrations(input: {
-  state: {operations: Record<string, Record<string, any>>}; tenantId: string; candidates: AutoRecordCandidateInput[];
-  acquisition?: WebinarReconciliationResult; now: () => string; config?: () => any;
-  register?: (input: any, config: any) => Promise<any>; update: (id: string, changes: Record<string, any>) => void | Promise<void>;
-  validate: (value: any, tenantId: string, checkedAt: string) => any;
-  confirm: (attempt: any, tenantId: string, candidates: AutoRecordCandidateInput[], checkedAt: string) => any;
-  createUUID: () => string;
-}) {
-  const {state, tenantId, candidates, now, update} = input;
-  if (!input.acquisition) {
-    for (const [id, row] of Object.entries(state.operations)) {
-      if (!row.registration || row.registration.phase === "confirmed") continue;
-      const proof = input.confirm(row.registration, tenantId, candidates, new Date(now()).toISOString());
-      if (proof) await update(id, {registration: proof});
-      else if (row.registration.phase === "submitting") await update(id, {registration: {...row.registration, phase: "uncertain"}});
-    }
-    return;
-  }
-  for (const candidate of candidates) {
-    if (!candidate.registrationOnly || candidate.status === "rejected" || candidate.cancelled || !candidate.registrationUrl ||
-        !candidate.messageId || !candidate.threadId || !candidate.startTime || !candidate.endTime || Date.parse(candidate.endTime) <= Date.parse(now())) continue;
-    const inventory = input.acquisition.inventory.find(row => row.snapshot.id === candidate.id);
-    if (!inventory || input.acquisition.state.occurrences[inventory.occurrenceKey]?.unresolved ||
-        Object.values(state.operations).some(row => row.registration?.sourceId === candidate.id)) continue;
-    let config; try { config = input.config?.(); } catch { continue; }
-    if (!config?.operator?.firstName || !config.operator.lastName || !config.operator.email || !config?.form || !config.python || !config.profileDir ||
-        !Array.isArray(config.allowedHosts) || !config.allowedHosts.length || !input.register) continue;
-    const baselineMessageIds = [...new Set(candidates.map(row => row.messageId).filter((id): id is string => id !== undefined))];
-    if (baselineMessageIds.length > 20000 || baselineMessageIds.some(id => typeof id !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(id))) continue;
-    const registration = {tenantId, sourceId: candidate.id, sourceMessageId: candidate.messageId, threadId: candidate.threadId, baselineMessageIds,
-      registrationUrl: candidate.registrationUrl, organizerEmail: candidate.senderEmail, startTime: new Date(candidate.startTime).toISOString(),
-      endTime: new Date(candidate.endTime).toISOString(), attemptId: input.createUUID(), attemptedAt: new Date(now()).toISOString(), phase: "submitting"};
-    input.validate(registration, tenantId, registration.attemptedAt);
-    await update(inventory.reviewKey, {status: "action_required", reason: "needs-registration", title: candidate.title, registration});
-    let result; try { result = await input.register({url: candidate.registrationUrl, allowedHosts: config.allowedHosts, operator: config.operator, form: config.form}, config); }
-    catch { result = {status: "uncertain"}; }
-    const phase = result?.status === "submitted" ? "awaiting-confirmation" : result?.status === "action_required" ? "action_required" : "uncertain";
-    await update(inventory.reviewKey, {registration: {...registration, phase}});
-  }
-}
-
 /** Only accepted source lineage can change an in-progress capture's planned boundary. */
 export function activeWebinarStopReason(id: string, originalEnd: string, result: Pick<WebinarReconciliationResult, "transitions" | "inventory">): "cancelled" | "rescheduled" | undefined {
   const changed = result.transitions.find(row => row.reason === "cancelled" && row.aliases.includes(id)) ??
@@ -234,6 +194,7 @@ export interface WebinarRegistrationAttempt {
   phase: "submitting" | "awaiting-confirmation" | "uncertain" | "action_required" | "confirmed";
   confirmationMessageId?: string; confirmedAt?: string; meetingUrl?: string;
   baselineMessageIds?: string[];
+  preSubmitEvidence?: {disposition: "not-attempted"; configurationHash: string};
 }
 
 export function projectWebinarRegistrations(input: {
@@ -287,13 +248,20 @@ export async function reconcileWebinarRegistrationState<S extends RegistrationLi
   state: S; tenantId: string; candidates: RegistrationLifecycle["candidates"]; now: RegistrationLifecycle["now"];
   validate: RegistrationLifecycle["validate"]; confirm: RegistrationLifecycle["confirm"]; createUUID: RegistrationLifecycle["createUUID"];
   value: V; checkedAt: string; prepare: (state: S, value: V, candidates: RegistrationLifecycle["candidates"], checkedAt: string) => P;
-  persist: (state: S) => void | Promise<void>;
+  /** Atomic lane-owned file commit; async storage requires its own serialized/CAS boundary. */
+  persistSync: (state: S) => undefined;
 }): Promise<P> {
-  const draft: S = JSON.parse(JSON.stringify(input.state));
-  await runWebinarRegistrations({...input, state: draft,
+  if (typeof input.persistSync !== "function" || input.persistSync.constructor.name === "AsyncFunction")
+    throw new Error("Registration reconciliation requires synchronous persistence");
+  const before: S = JSON.parse(JSON.stringify(input.state));
+  const draft: S = JSON.parse(JSON.stringify(before));
+  await runWebinarRegistrations({...input, state: draft, now: () => input.checkedAt,
     update: (id, changes) => {draft.operations[id] = {...draft.operations[id], ...changes};}});
-  const prepared = input.prepare(draft, input.value, input.candidates, input.checkedAt);
-  await input.persist(prepared.state);
+  const latest: S = JSON.parse(JSON.stringify(input.state));
+  latest.operations = mergeRegistrationOperationDraft(before.operations, draft.operations, latest.operations);
+  const prepared = input.prepare(latest, input.value, input.candidates, input.checkedAt);
+  if (input.persistSync(prepared.state) !== undefined)
+    throw new Error("Registration persistence violated its synchronous contract");
   Object.assign(input.state, prepared.state);
   return prepared;
 }

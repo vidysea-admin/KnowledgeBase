@@ -1,0 +1,8 @@
+{
+  "Verdict": "PASS",
+  "Status": "PASS",
+  "Cycle": "0",
+  "ReviewedSha": "4d26285ce1dc2473016e66ec1eeb3c47db0166242f3f1b8cdfcf6ef70dff2705",
+  "SourcePinsMatch": true,
+  "Parser": "Anchored unique canonical header readback; historical dispatch-state.mjs absent in this checkout"
+}

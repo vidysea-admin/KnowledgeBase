@@ -232,3 +232,19 @@ D110 fresh senior PROPOSED HIGH security findings (building-feature plan review,
 1. sb_join.py624/946 CSP wildcardport and DNR optionalanyport accept default443 organizer444/8443 in actualAST-derivedregex probe, contraryD098/D099currentport scope. Native secondport browser disclosure remains unrun. Independent exact-origin plan approved.
 2. run-pipeline.mjs285 actualsynthetic runPipelineWatch probe prints registration/join token values fromrawoperations; explicit operational projection required, private durable state must remain byte-identical. No realtoken/content used in repro.
 These findings are acted on inside currentBUILDINGsecurityfeature; no PASS, no globalgate downgrade.
+
+
+## ISS-T055COLLECTIONS-001 — original static feedback, no executed RED
+
+Privacy static review found one remaining write-boundary blocker: GET /knowledge/collections sanitizes hidden members and disables UI edit, but PUT with the visible member subset (or []) plus current expectedRevision still replaces the entire stored members array. Neither route nor writeCollection checks the existing collection for unavailable members. Thus an API client submitting the sanitized GET representation can silently delete withheld private references while returning 200, violating the stated preservation/fail-closed partial-edit policy. Before any update, inspect the persisted current row under tenant+revision and refuse replacement when any existing member is unavailable, or explicitly preserve hidden memberships using an approved policy. Full intentional collection DELETE can remain separate. Add mounted API test: mixed safe/private saved members → GET omits private ID → PUT sanitized members/current revision → refused and stored original members/revision unchanged. Source metadata filtering/visible aggregate logic otherwise appears correct statically; no tests/verdict.
+
+
+## ISS-T059REPLAY-001 — verbatim independent executed feedback
+
+T059 independent checker cycle0: FAIL — ISS-T059REPLAY-001 HIGH/data-write.
+Exact actual corpus: first accepted child -> second accepted child -> retry exact first request. The historical first child is returned, but head.lastRetestId is rewritten from newer second to older first. Broker isolated probe exit1 (2488.129ms), assertion77, all18 expanded pins unchanged. Original floor1/1 reproducedRED,0/1fixed in cycle0. Canonical produced rows separately PASS3valid+2invalid-refused (429.0843ms).
+Required repair evidence: replay verbatim original ledger reproduction/script/argv, count against ISS-T059REPLAY-001; verify the historical return does not alter current newer head/revision/lock or reprocess intake/index/Ask; preserve durable interrupted-child promotion and original crash-after-child-write recovery. Additions supplement, never substitute the original floor. Cycle1 source/test must be frozen and independently verified through the sole broker before PASS.
+Current mounted caller evidence remains gated by explicit ROUTE_FREEZE; T022 human calibration/T043 live index+cited Ask and full live flywheel remain HOLD. No human approval or parent completion is granted by source tests.
+
+
+Architecture feedback for checker adoption — public Ask vectorless boundary (root-authorized 2026-10-15): active public /ask must never invoke embedding, vector-storage or legacy retrieval ports, including when configured vectorless:false and with an installed embedding port. Canonical current-authority HTTP acceptance requires 200, exact source citation and zero embedding/vector/legacy-factory counters. Pure low-level vector adapter implementations/tests may remain dormant. The preserved qa/evidence/ask-graph-selection/legacy-http-diagnostic.test.ts keeps its original expected-one-embedding assertion and is an architecture-incompatible historical diagnostic, never evidence of current architecture PASS. Only checker may adopt this feedback into contracts; maker changed no qa/contracts file.

@@ -1,5 +1,6 @@
 /** Real Mongo candidate persistence. Unmounted until all trusted readers enforce quarantine. */
 import type { ClientSession, Db } from "mongodb";
+import { randomUUID } from "node:crypto";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { assertValidTenantId, scopedCollection, withTenant } from "@lkb/db";
 import { detectWhatsAppReviewCandidates, whatsAppReviewCandidateId, whatsAppReviewContentHash, type WhatsAppReviewCandidate } from "./detection.js";
@@ -15,12 +16,25 @@ export interface WhatsAppReviewRepository {
   insert(tenantId: string, candidates: readonly WhatsAppReviewCandidate[]): Promise<number>;
   decide(tenantId: string, id: string, action: WhatsAppReviewAction, actor: string): Promise<WhatsAppReviewResult>;
 }
-/** All materialisation writes MUST use this database and session. No indexSession/batch publish. */
+/** All materialisation writes MUST use this database and session. No indexSession/batch publish.
+ * The retried transaction callback must not perform provider requests or external side effects. */
 export type WhatsAppReviewMaterializer = (context: {
   candidate: Readonly<WhatsAppReviewCandidate>; db: Db; session: ClientSession;
 }) => Promise<void>;
 
 export const isWhatsAppReviewId = (id: unknown): id is string => typeof id === "string" && /^wa-review:[a-f0-9]{64}$/u.test(id);
+
+/** A real same-source write serializes publication with consent withdrawal.
+ * Fresh UUID per transaction attempt avoids no-op writes. Mongo retries conflicting
+ * transactions, which must then revalidate current source consent and evidence. */
+async function fenceApproval(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session: ClientSession): Promise<void> {
+  const result = await db.collection<Sources>("sources").updateOne(withTenant<Sources>(tenantId, {
+    _id: row.sourceId, kind: "whatsapp-batch", path: row.groupJid, "consent.given": { $ne: false },
+  }), { $set: { "sourceMeta.whatsappReviewFence": randomUUID() } }, { session });
+  if (result.acknowledged !== true || result.matchedCount !== 1 || result.modifiedCount !== 1) {
+    throw new Error("WhatsApp review: source authorization fence unavailable");
+  }
+}
 
 export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session?: ClientSession): Promise<void> {
   assertWhatsAppReviewCandidateSchema(row);
@@ -29,7 +43,10 @@ export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppRevie
       || !row.evidence.length) throw new Error("WhatsApp review: invalid candidate identity or evidence");
   const source = await db.collection<Sources>("sources").findOne(withTenant<Sources>(tenantId, { _id: row.sourceId }), { session });
   const sourceSession = await db.collection<Sessions>("sessions").findOne(withTenant<Sessions>(tenantId, { _id: row.sessionId }), { session });
-  if (!source || source.tenantId !== tenantId || source.kind !== "whatsapp-batch" || source.path !== row.groupJid
+  // An old pending/approved row is not authority to override withdrawn source consent.
+  // This is checked in the same Mongo transaction as approval and publication; trusted
+  // readers independently recheck current consent after the transaction commits.
+  if (!source || source.tenantId !== tenantId || source.kind !== "whatsapp-batch" || source.path !== row.groupJid || source.consent?.given === false
       || !sourceSession || sourceSession.tenantId !== tenantId || sourceSession.sourceId !== row.sourceId) {
     throw new Error("WhatsApp review: source/session evidence unavailable");
   }
@@ -116,12 +133,14 @@ export function createMongoWhatsAppReviewRepository(db: Db, options: {
           if (!row) return { result: "not_found" };
           if (row.status === action) {
             await checkEvidence(db, tenantId, row, session);
+            if (action === "approved") await fenceApproval(db, tenantId, row, session);
             return { result: "ok", changed: false, candidate: row };
           }
           if (row.status !== "needs-review") return { result: "conflict" };
           if (action === "approved" && row.flags.some(flag => flag.kind === "personal-excluded")) return { result: "excluded" };
           if (action === "approved" && !options.materialize) return { result: "publish_unavailable" };
           await checkEvidence(db, tenantId, row, session);
+          if (action === "approved") await fenceApproval(db, tenantId, row, session);
           const candidate: WhatsAppReviewCandidate = { ...row, status: action, decision: { action, actor, at } };
           assertWhatsAppReviewCandidateSchema(candidate);
           const changed = await collection(tenantId).updateOne({ _id: id, status: "needs-review" }, { $set: { status: action, decision: candidate.decision } }, { session });

@@ -3,6 +3,13 @@ import type { Db } from "mongodb";
 
 type Row = Record<string, unknown>;
 type Filter = Record<string, unknown>;
+const setFields = (row: Row, values: Row): void => {
+  for (const [key, value] of Object.entries(values)) {
+    const parts = key.split("."); let target = row;
+    for (const part of parts.slice(0, -1)) target = (target[part] ??= {}) as Row;
+    target[parts.at(-1)!] = structuredClone(value);
+  }
+};
 const valuesAt = (row: unknown, path: string[]): unknown[] => {
   if (!path.length) return [row];
   if (Array.isArray(row)) return row.flatMap(item => valuesAt(item, path));
@@ -32,14 +39,16 @@ export function wireMongoFixture(seed: Record<string, Row[]> = {}) {
     coll(name).push(structuredClone(row));
   };
   const db = {
-    client: { startSession: () => ({
+    client: { startSession: () => { let active = false; return ({
+      inTransaction: () => active,
       async withTransaction<T>(body: () => Promise<T>): Promise<T> {
         let unlock!: () => void; const prior = tail; tail = new Promise(r => { unlock = r; }); await prior;
         const backup = structuredClone(rows);
-        try { return await body(); } catch (error) { rows = backup; throw error; } finally { unlock(); }
+        active = true;
+        try { return await body(); } catch (error) { rows = backup; throw error; } finally { active = false; unlock(); }
       },
       async endSession() { /* noop */ },
-    }) },
+    }); } },
     collection: (name: string) => ({
       find: (filter: Filter = {}) => ({ async toArray() { return structuredClone(coll(name).filter(r => matches(r, filter))); } }),
       async findOne(filter: Filter = {}) { return structuredClone(coll(name).find(r => matches(r, filter)) ?? null); },
@@ -56,12 +65,12 @@ export function wireMongoFixture(seed: Record<string, Row[]> = {}) {
       },
       async updateOne(filter: Filter, update: { $set?: Row; $setOnInsert?: Row }, options: { upsert?: boolean } = {}) {
         const row = coll(name).find(r => matches(r, filter));
-        if (row) { Object.assign(row, structuredClone(update.$set ?? {})); return { modifiedCount: update.$set ? 1 : 0, upsertedCount: 0 }; }
+        if (row) { setFields(row, update.$set ?? {}); return { acknowledged: true, matchedCount: 1, modifiedCount: update.$set ? 1 : 0, upsertedCount: 0 }; }
         if (options.upsert) {
           const plain = Object.fromEntries(Object.entries(filter).filter(([, v]) => v === null || typeof v !== "object"));
-          insertRow(name, { ...plain, ...update.$setOnInsert, ...update.$set }); return { modifiedCount: 0, upsertedCount: 1 };
+          insertRow(name, { ...plain, ...update.$setOnInsert, ...update.$set }); return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 1 };
         }
-        return { modifiedCount: 0, upsertedCount: 0 };
+        return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 0 };
       },
       async deleteOne(filter: Filter) {
         const index = coll(name).findIndex(r => matches(r, filter));

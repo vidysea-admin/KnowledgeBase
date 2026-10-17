@@ -1,0 +1,58 @@
+{
+  "pinCount": 12,
+  "timedOut": false,
+  "args": [
+    "--test",
+    "--test-timeout=30000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3.test.mts"
+  ],
+  "stderrPath": "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3-field-fixed-20261015T011742Z.stderr.txt",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "before": {
+    "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3.test.mts": "f2492989a9624d4b2e060c1fedbcaba03f436c249ad67e4c4a0835e4b4e71eea",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts": "32b9cc8c0285612b4a3866c4488de9624354f4580a0369043839c113dfff1886",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle3-capability.test.mts": "f0556a3785b3810a285eeb20b818f636e81521f9a39d23696eb4ed15a547a55c",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle3-20261015T001949Z.receipt.json": "25c67dc5d2cc32ea145203b3461af6734ecb585a225891912386edcfa7f3d326",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+    "apps/api/src/knowledge/metadata-visibility.ts": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "qa/contracts/goal-U24.md": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f"
+  },
+  "drift": 0,
+  "counts": {
+    "skipped": 0,
+    "fail": 0,
+    "tests": 2,
+    "pass": 2
+  },
+  "spec": "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3.spec.json",
+  "elapsedMs": 725,
+  "exit": 0,
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "specSha256": "6ec8074e3f7b95ba0cdd39cbc86dd174002a0ebc8eae971fbece13ba439e6a52",
+  "pid": 22288,
+  "startedAt": "2026-10-15T01:17:42.4618564Z",
+  "after": {
+    "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3.test.mts": "f2492989a9624d4b2e060c1fedbcaba03f436c249ad67e4c4a0835e4b4e71eea",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts": "32b9cc8c0285612b4a3866c4488de9624354f4580a0369043839c113dfff1886",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle3-capability.test.mts": "f0556a3785b3810a285eeb20b818f636e81521f9a39d23696eb4ed15a547a55c",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle3-20261015T001949Z.receipt.json": "25c67dc5d2cc32ea145203b3461af6734ecb585a225891912386edcfa7f3d326",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+    "apps/api/src/knowledge/metadata-visibility.ts": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "qa/contracts/goal-U24.md": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f"
+  },
+  "stdoutPath": "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3-field-fixed-20261015T011742Z.stdout.txt",
+  "endedAt": "2026-10-15T01:17:43.2427703Z"
+}

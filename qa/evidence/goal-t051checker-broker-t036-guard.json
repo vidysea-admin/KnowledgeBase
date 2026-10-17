@@ -1,0 +1,33 @@
+{
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/ingest/src/sources/guarded-fetch.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 120000,
+  "startedAt": "2026-10-14T21:12:29.353Z",
+  "completedAt": "2026-10-14T21:12:30.260Z",
+  "elapsedMs": 902.8335999999999,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/ingest/src/sources/guarded-fetch.ts": "9fa6ef04a97db7096f30d1de0f1f9ead40fb54694f48a16071eaf387d7c9f914",
+    "packages/ingest/src/sources/guarded-fetch.test.ts": "2d7b6b9dd1797edd647c990d376755c287b01d4051f5236cd0dd4ea9568b5bea",
+    "qa/issues.T036GUARD.jsonl": "2189a1b0cf4a0adae86046a9df30d00ff87beb544e6effdb974cf5f1a99a562e"
+  },
+  "after": {
+    "packages/ingest/src/sources/guarded-fetch.ts": "9fa6ef04a97db7096f30d1de0f1f9ead40fb54694f48a16071eaf387d7c9f914",
+    "packages/ingest/src/sources/guarded-fetch.test.ts": "2d7b6b9dd1797edd647c990d376755c287b01d4051f5236cd0dd4ea9568b5bea",
+    "qa/issues.T036GUARD.jsonl": "2189a1b0cf4a0adae86046a9df30d00ff87beb544e6effdb974cf5f1a99a562e"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t036-guard.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t036-guard.stderr.txt",
+  "hashesUnchanged": true
+}

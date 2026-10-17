@@ -1,0 +1,114 @@
+import type { Db } from "mongodb";
+import type { Sessions, Sources, SpeakerSuggestions } from "@lkb/core";
+import { scopedCollection, runNativePublicationTransaction, bumpNativePublicationRevision } from "@lkb/db";
+import { verifyIndexGeneration, indexTurnDigest } from "../generation.js";
+import { readEffectiveTurns } from "../../transcript-review/effective-reader.js";
+import { headId, type ReviewHead } from "../../transcript-review/store.js";
+import type { Turns } from "@lkb/core";
+import type { NativeArchiveOwner, NativeCurrentPublicationBinding } from "./binding.js";
+
+const fail = (): never => { throw new Error("Native publication unavailable"); };
+const sha = /^[a-f0-9]{64}$/;
+const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
+
+async function singleOwner(db: Db, owner: NativeArchiveOwner): Promise<Sessions> {
+  const rows = await scopedCollection<Sessions>(db, "sessions")(owner.tenantId).find({ sourceId: owner.sourceId }).toArray();
+  if (rows.length !== 1 || rows[0]!._id !== owner.sessionId) fail();
+  const source = await scopedCollection<Sources>(db, "sources")(owner.tenantId).findOne({ _id: owner.sourceId });
+  if (!source || source.kind !== "recording" || !object(source.captureConsent) || source.captureConsent.sessionId !== owner.sessionId) fail();
+  return rows[0]!;
+}
+
+async function assertBinding(db: Db, b: NativeCurrentPublicationBinding): Promise<void> {
+  if (!b.tenantId || !b.sessionId || !b.sourceId || !b.generation || !b.captureGeneration ||
+      ![b.turnDigest, b.receiptSha256, b.sourceSha256, b.sidecarSha256].every(s => sha.test(s))) fail();
+  const current = await singleOwner(db, b);
+  const attempt = current.indexAttempt;
+  if (current.status.index !== "done" || attempt?.state !== "complete" || attempt.sourceId !== b.sourceId ||
+      attempt.generation !== b.generation || attempt.turnDigest !== b.turnDigest) fail();
+  const source = await scopedCollection<Sources>(db, "sources")(b.tenantId).findOne({ _id: b.sourceId });
+  const consent = source?.captureConsent;
+  if (!source || source.consent?.given !== true || !object(consent) || consent.sessionId !== b.sessionId ||
+      consent.generation !== b.captureGeneration || consent.receiptSha256 !== b.receiptSha256 ||
+      consent.sanitizedAudioSha256 !== source.hash) fail();
+  const head = await scopedCollection<ReviewHead>(db, "transcript_reviews")(b.tenantId)
+    .findOne({ _id: headId(b.tenantId, b.sessionId), sessionId: b.sessionId });
+  if ((head?.revision ?? null) !== b.reviewRevision || head && (head.refresh.status !== "complete" ||
+      head.refresh.revision !== head.revision || head.refresh.targets.some(t => !head.refresh.completed.includes(t)))) fail();
+  const turns = await readEffectiveTurns(db, b.tenantId,
+    await scopedCollection<Turns>(db, "turns")(b.tenantId).find({ sessionId: b.sessionId }).toArray(), b.sessionId);
+  if (indexTurnDigest(turns) !== b.turnDigest || !await verifyIndexGeneration(db, b.tenantId, b.sessionId, b.generation)) fail();
+}
+
+/** Stamping happens after the ordinary accessor has rejected caller-supplied reserved fields.
+ * Only the real suggestion batch is writable through this view; no arbitrary collection writes. */
+function suggestionWriter(db: Db, b: NativeCurrentPublicationBinding): Db {
+  const binding: NonNullable<SpeakerSuggestions["nativePublication"]> = {
+    sourceId: b.sourceId, generation: b.generation, turnDigest: b.turnDigest, reviewRevision: b.reviewRevision,
+    captureGeneration: b.captureGeneration, receiptSha256: b.receiptSha256,
+  };
+  return { collection(name: string) {
+    if (name !== "speaker_suggestions") fail();
+    const coll = db.collection(name);
+    return new Proxy(coll, { get(target, key) {
+      if (key === "find") return target.find.bind(target);
+      if (key !== "updateOne") fail();
+      return async (filter: unknown, update: unknown, options: unknown) => {
+        if (!object(filter) || !object(update) || !object(options)) throw new Error("Native publication unavailable");
+        const doc = update.$setOnInsert;
+        if (!object(doc)) throw new Error("Native publication unavailable");
+        if (filter.tenantId !== b.tenantId || doc.sessionId !== b.sessionId || doc.status !== "suggested" ||
+            typeof doc.speakerRef !== "string" || typeof doc.personId !== "string" ||
+            "nativePublication" in doc || Object.keys(update).some(k => k !== "$setOnInsert") || options.upsert !== true) fail();
+        const existing = await scopedCollection<SpeakerSuggestions>(db, "speaker_suggestions")(b.tenantId)
+          .find({ sessionId: b.sessionId, status: { $in: ["confirmed", "rejected"] } }).toArray();
+        if (existing.some(p => p.status === "confirmed" ? p.speakerRef === doc.speakerRef || p.personId === doc.personId :
+            p.speakerRef === doc.speakerRef && p.personId === doc.personId)) return { acknowledged: true, upsertedCount: 0 };
+        return target.updateOne(filter, { $setOnInsert: { ...doc, nativePublication: binding } }, options);
+      };
+    } });
+  } } as unknown as Db;
+}
+
+/** The registry callback rechecks immutable artifacts; Mongo commits only DB eligibility.
+ * It cannot atomically lock filesystem mutation. Every DB revocation uses the same session fence. */
+export function createNativeSuggestionPublication(db: Db, expected: NativeCurrentPublicationBinding,
+  assertArtifactsCurrent: () => Promise<void>) {
+  const binding = structuredClone(expected);
+  return {
+    async assertCurrent(): Promise<void> { await assertArtifactsCurrent(); await assertBinding(db, binding); },
+    async write<T>(work: (transactionDb: Db) => Promise<T>): Promise<T> {
+      await assertArtifactsCurrent();
+      return runNativePublicationTransaction(db, binding.tenantId, async tx => {
+        await assertBinding(tx, binding);
+        await bumpNativePublicationRevision(tx, binding.tenantId, binding.sessionId);
+        await assertArtifactsCurrent();
+        return work(suggestionWriter(tx, binding));
+      });
+    },
+  };
+}
+
+/** Trusted root-only source swap. All source/turn writes use tx, never global accessors.
+ * DB invalidation precedes mutable filesystem changes; callers cannot claim cross-store atomicity. */
+export function mutateNativeCaptureSource<T>(db: Db, owner: NativeArchiveOwner,
+  work: (transactionDb: Db) => Promise<T>): Promise<T> {
+  return runNativePublicationTransaction(db, owner.tenantId, async tx => {
+    const sessions = scopedCollection<Sessions>(tx, "sessions")(owner.tenantId);
+    const prior = await sessions.findOne({ _id: owner.sessionId });
+    let reservedRevision: number | undefined;
+    if (prior) {
+      if (prior.sourceId !== owner.sourceId) fail();
+      reservedRevision = await bumpNativePublicationRevision(tx, owner.tenantId, owner.sessionId);
+      await sessions.updateOne({ _id: owner.sessionId }, { $set: { "status.index": "pending" }, $unset: { indexAttempt: "" } });
+    }
+    const result = await work(tx);
+    const after = await singleOwner(tx, owner);
+    if (prior ? after.nativePublicationRevision !== reservedRevision : Object.hasOwn(after, "nativePublicationRevision")) fail();
+    if (!prior) await bumpNativePublicationRevision(tx, owner.tenantId, owner.sessionId);
+    const saved = await sessions.updateOne({ _id: owner.sessionId, sourceId: owner.sourceId },
+      { $set: { "status.index": "pending" }, $unset: { indexAttempt: "" } });
+    if (!saved.acknowledged || saved.matchedCount !== 1) fail();
+    return result;
+  });
+}

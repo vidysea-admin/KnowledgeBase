@@ -8,6 +8,7 @@
  * shape as `packages/ai/src/testUtils.ts`. Not itself a test; imported by them.
  */
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import type { Db } from "mongodb";
 
 export interface Call {
@@ -17,6 +18,26 @@ export interface Call {
   docs?: Record<string, unknown>[];
   update?: Record<string, unknown>;
   options?: Record<string, unknown>;
+}
+
+function fixtureValues(value: unknown, path: string[]): unknown[] {
+  if (Array.isArray(value)) return value.flatMap(item => fixtureValues(item, path));
+  if (!path.length) return [value];
+  if (!value || typeof value !== "object") return [];
+  return fixtureValues((value as Record<string, unknown>)[path[0]!], path.slice(1));
+}
+function fixtureMatches(row: Record<string, unknown>, filter: Record<string, unknown> = {}): boolean {
+  return Object.entries(filter).every(([key, expected]) => {
+    const values = fixtureValues(row, key.split("."));
+    if (expected && typeof expected === "object") {
+      if ("$in" in expected) return values.some(value => (expected as { $in: unknown[] }).$in.includes(value));
+      if ("$nin" in expected) return !values.some(value => (expected as { $nin: unknown[] }).$nin.includes(value));
+      if ("$exists" in expected) return values.some(value => value !== undefined) === (expected as { $exists: boolean }).$exists;
+      if ("$ne" in expected) return values.every(value => value !== (expected as { $ne: unknown }).$ne);
+      throw new Error("Unsupported fixture filter operator");
+    }
+    return values.some(value => value === expected);
+  });
 }
 
 /**
@@ -38,6 +59,8 @@ export function fakeDb(
      * not test the empty case; it tests nothing at all. Opt-in so existing tests are unchanged.
      */
     claims?: Record<string, unknown>[];
+    /** Mongo sessions are opaque handles, not serializable document state. */
+    onSession?: (session: unknown) => void;
   } = {},
 ): { db: Pick<Db, "collection">; calls: Call[] } {
   const calls: Call[] = [];
@@ -47,53 +70,101 @@ export function fakeDb(
   // {} (no root for any tenant) and replaceOne NEVER fires, so nothing about the tree_index write
   // (including the ISS-062 tenantId-stamping fix) was ever really under test. Found by testing
   // the fix's own mutation and getting a false green.
-  // `org` and a topic-bearing page are LOAD-BEARING, not decoration (ISS-154). Without them
-  // `buildTree` produces no topic or org nodes, so `promoteAndPersistEntities` writes nothing, so
+  // `org` is LOAD-BEARING, not decoration (ISS-154). Without an entity-bearing source,
+  // `buildTree` produces no org nodes, so `promoteAndPersistEntities` writes nothing, so
   // the blanket tenant-confinement test had NOTHING TO CONFINE for entities — and the contract's
   // mandatory `scopedCollection` -> bare-handle mutation survived on both `topics` and `orgs` at
   // 159/0 green. A fixture that cannot reach a code path silently exempts it from every test that
   // walks the recorded calls. This is the fifth such gap in this layer.
   const SESSION = { _id: "s1", tenantId: "t", sourceId: "src1", title: "Test Session", date: "2026-09-07", org: "Acme University", status: { transcribe: "done", index: "pending" } };
-  // A capitalised phrase so the default `extractTopicRefs` heuristic yields a real topic node.
-  const PAGE = { _id: "p1", tenantId: "t", sessionId: "s1", summary: "Notes about New Zealand visas.", keyInsights: ["New Zealand visa rules changed."], decisions: [], actionItems: [], evidence: [{ turnId: "t1", sessionId: "s1" }] };
+  const SOURCE = { _id: "src1", tenantId: "t", kind: "recording", path: "fixture/recording", captureMode: "provided",
+    hash: createHash("sha256").update(TURN.text).digest("hex"),
+    consent: { given: true, recordedBy: "synthetic-fixture-owner", note: "Synthetic supplied recording model" }, createdAt: "2026-09-07T00:00:00.000Z" };
+  // MODEL ONLY: real stateful writes/CAS/readback, not Mongo or transaction/MVCC evidence.
+  const rows: Record<string, Record<string, unknown>[]> = {
+    turns: [TURN], sessions: [SESSION], sources: [SOURCE],
+    session_pages: opts.existingSessionPage ? [structuredClone(opts.existingSessionPage)] : [],
+    claims: structuredClone(opts.claims ?? []),
+    tree_index: [{ _id: "tenant-root:t", tenantId: "t", node_id: "tenant:t", level: "tenant", title: "Knowledge", summary: "", children: [], indexRevision: 0 }],
+  };
+  const readRows = (name: string): Record<string, unknown>[] => rows[name] ??= [];
+  const setPath = (row: Record<string, unknown>, key: string, value: unknown, unset = false) => {
+    const parts = key.split("."); let target = row;
+    for (const part of parts.slice(0, -1)) {
+      if (!target[part] || typeof target[part] !== "object" || Array.isArray(target[part])) target[part] = {};
+      target = target[part] as Record<string, unknown>;
+    }
+    if (unset) delete target[parts.at(-1)!]; else target[parts.at(-1)!] = structuredClone(value);
+  };
+  const insert = (name: string, doc: Record<string, unknown>) => {
+    if (readRows(name).some(row => row._id === doc._id)) throw new Error("Fixture duplicate document identity");
+    readRows(name).push(structuredClone(doc));
+  };
   const db = {
     collection(name: string) {
       const rec = (op: string, extra?: { filter?: Record<string, unknown>; docs?: Record<string, unknown>[]; update?: Record<string, unknown>; options?: Record<string, unknown> }) => {
-        calls.push({ coll: name, op, filter: extra?.filter, docs: extra?.docs, update: extra?.update, options: extra?.options });
+        if (extra?.options?.session !== undefined) opts.onSession?.(extra.options.session);
+        const options = extra?.options && { ...extra.options, ...(extra.options.session !== undefined ? { session: "opaque-session" } : {}) };
+        calls.push(structuredClone({ coll: name, op, filter: extra?.filter, docs: extra?.docs, update: extra?.update, options }));
       };
       return {
-        deleteMany: async (filter?: Record<string, unknown>) => { rec("deleteMany", { filter }); return { deletedCount: 0 }; },
-        insertOne: async (doc?: Record<string, unknown>) => { rec("insertOne", { docs: doc ? [doc] : [] }); return {}; },
-        insertMany: async (docs?: Record<string, unknown>[]) => { rec("insertMany", { docs: docs ?? [] }); return {}; },
-        replaceOne: async (filter?: Record<string, unknown>, doc?: Record<string, unknown>) => { rec("replaceOne", { filter, docs: doc ? [doc] : [] }); return {}; },
+        deleteMany: async (filter?: Record<string, unknown>) => {
+          rec("deleteMany", { filter });
+          const original = readRows(name), retained = original.filter(row => !fixtureMatches(row, filter));
+          rows[name] = retained;
+          return { acknowledged: true, deletedCount: original.length - retained.length };
+        },
+        insertOne: async (doc?: Record<string, unknown>) => {
+          rec("insertOne", { docs: doc ? [doc] : [] });
+          if (!doc) throw new Error("Fixture insert requires document"); insert(name, doc);
+          return { acknowledged: true, insertedId: doc._id };
+        },
+        insertMany: async (docs?: Record<string, unknown>[]) => {
+          rec("insertMany", { docs: docs ?? [] });
+          if (!docs) throw new Error("Fixture insertMany requires documents"); docs.forEach(doc => insert(name, doc));
+          return { acknowledged: true, insertedCount: docs.length };
+        },
+        replaceOne: async (filter?: Record<string, unknown>, doc?: Record<string, unknown>, options?: Record<string, unknown>) => {
+          rec("replaceOne", { filter, docs: doc ? [doc] : [], options });
+          if (!doc) throw new Error("Fixture replacement requires document");
+          const index = readRows(name).findIndex(row => fixtureMatches(row, filter));
+          if (index === -1) {
+            if (options?.upsert) { insert(name, doc); return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 1 }; }
+            return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 0 };
+          }
+          const modified = JSON.stringify(readRows(name)[index]) !== JSON.stringify(doc);
+          readRows(name)[index] = structuredClone(doc);
+          return { acknowledged: true, matchedCount: 1, modifiedCount: modified ? 1 : 0, upsertedCount: 0 };
+        },
         findOne: async (filter?: Record<string, unknown>) => {
           rec("findOne", { filter });
-          return name === "session_pages" ? (opts.existingSessionPage ?? null) : null;
+          return structuredClone(readRows(name).find(row => fixtureMatches(row, filter)) ?? null);
         },
         find: (filter?: Record<string, unknown>) => ({
           toArray: async () => {
             rec("find", { filter });
-            if (name === "turns") return [TURN];
-            if (name === "sessions") return [SESSION];
-            if (name === "session_pages") return [PAGE];
-            if (name === "claims") {
-              // HONOURS THE FILTER (ISS-C-CLAIMS-TARGETING-001). It previously ignored it and
-              // returned every seeded row, which made a scoping regression STRUCTURALLY
-              // INVISIBLE: widening `.find({"evidence.sessionId": id})` to `.find({})` returned
-              // the same rows, so the mutation survived a full green suite. A fake that answers
-              // the same regardless of what it was asked cannot test what it was asked.
-              const want = (filter ?? {})["evidence.sessionId"];
-              const rows = opts.claims ?? [];
-              if (want === undefined) return rows;
-              return rows.filter((c) => {
-                const ev = (c.evidence ?? []) as { sessionId?: string }[];
-                return Array.isArray(ev) && ev.some((e) => e.sessionId === want);
-              });
-            }
-            return [];
+            // Real tenant/id/session and nested evidence filters remain observable and applied.
+            return structuredClone(readRows(name).filter(row => fixtureMatches(row, filter)));
           },
         }),
-        updateOne: async (filter?: Record<string, unknown>, update?: Record<string, unknown>, options?: Record<string, unknown>) => { rec("updateOne", { filter, update, options }); return {}; },
+        updateOne: async (filter?: Record<string, unknown>, update?: Record<string, unknown>, options?: Record<string, unknown>) => {
+          rec("updateOne", { filter, update, options });
+          if (!update) throw new Error("Fixture update requires operators");
+          let row = readRows(name).find(candidate => fixtureMatches(candidate, filter));
+          const matched = Boolean(row);
+          if (!row && !options?.upsert) return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 0 };
+          if (!row) row = Object.fromEntries(Object.entries(filter ?? {}).filter(([, value]) => value === null || typeof value !== "object"));
+          const before = JSON.stringify(row);
+          for (const [operator, operand] of Object.entries(update)) {
+            if (!operand || typeof operand !== "object" || Array.isArray(operand)) throw new Error("Unsupported fixture update");
+            if (operator === "$setOnInsert" && matched) continue;
+            if (!["$set", "$unset", "$setOnInsert"].includes(operator)) throw new Error("Unsupported fixture update operator");
+            for (const [key, value] of Object.entries(operand)) setPath(row, key, value, operator === "$unset");
+          }
+          if (!matched) insert(name, row);
+          return { acknowledged: true, matchedCount: matched ? 1 : 0, modifiedCount: matched && before !== JSON.stringify(row) ? 1 : 0,
+            upsertedCount: matched ? 0 : 1, ...(!matched ? { upsertedId: row._id } : {}) };
+        },
       };
     },
   } as unknown as Pick<Db, "collection">;

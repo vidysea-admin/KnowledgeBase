@@ -7,7 +7,8 @@ import type { WhatsAppReviewCandidate } from "./detection.js";
 import { revokeWhatsAppClaim } from "./materializer.js";
 import { checkEvidence } from "./store.js";
 
-export const WHATSAPP_REVIEW_LOG = "whatsapp_review_log";
+import { WHATSAPP_REVIEW_LOG } from "./publication-contract.js";
+export { WHATSAPP_REVIEW_LOG } from "./publication-contract.js";
 /** Review-log ids are tenant-structured and length-prefixed, so two tenants (or tenantId/part boundaries) can never collide on a unique _id. */
 export const whatsAppLogId = (tenantId: string, ...parts: string[]): string => `tenant:${tenantId.length}:${tenantId}:${parts.join(":")}`;
 export const DEFAULT_MAX_DELETE_FRACTION = 0.5;

@@ -1,0 +1,36 @@
+{
+  "phase": "shared-focused-unit-union",
+  "fileIsolation": "Vitest normal default true;1forkworker;no parallel files",
+  "units": {
+    "collections": [
+      "src/pages/knowledge/CuratedCollections.test.tsx",
+      "src/pages/knowledge/collectionsClient.test.ts"
+    ],
+    "transcriptWarning": [
+      "src/pages/transcript-review/TranscriptReview.test.tsx",
+      "src/pages/transcript-review/ReviewHistory.test.tsx"
+    ],
+    "operations": [
+      "src/pages/operations/evaluationFlywheelModel.test.ts",
+      "src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+      "src/pages/operations/OperationsPage.test.tsx",
+      "src/pages/operations/OperationsIntegration.test.tsx"
+    ],
+    "setup": [
+      "src/pages/setup-wizard/SetupWizardPage.test.tsx"
+    ],
+    "trustedRefusal": [
+      "src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx"
+    ],
+    "humanTransfer": [
+      "src/pages/calibration-review/offline-transfer.test.ts",
+      "src/pages/calibration-review/CalibrationReviewPage.test.tsx"
+    ],
+    "speakerIntegration": [
+      "src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+      "src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx"
+    ]
+  },
+  "sharedCost": "Record once; no maker denominator or checker ratio padding",
+  "runtimeClosureNote": "TypeScript AST runtime imports; App.tsx?raw binds source bytes only; explicit App source pin included"
+}

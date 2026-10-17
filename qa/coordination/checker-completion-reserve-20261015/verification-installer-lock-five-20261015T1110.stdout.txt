@@ -1,0 +1,28 @@
+{
+  "Passed": 5,
+  "GlobalWrites": false,
+  "Failed": 0,
+  "FixtureRoot": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-completion-reserve-20261015\\installer-fixtures\\b1bf1084e44f4b3e90784fd5b2c15c71",
+  "Cases": [
+    {
+      "Pass": true,
+      "Case": "wrong base untouched"
+    },
+    {
+      "Pass": true,
+      "Case": "successful install readback and backup"
+    },
+    {
+      "Pass": true,
+      "Case": "idempotent no-op"
+    },
+    {
+      "Pass": true,
+      "Case": "competing writer lock refuses"
+    },
+    {
+      "Pass": true,
+      "Case": "injected partial write restored under lock"
+    }
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "SOURCE_FROZEN_BROKER_AND_ADMISSION_PENDING",
+  "unit": {
+    "root": "C:/Users/product/Desktop/KnowledgeBase/",
+    "slug": "vectorless-complete-answer-authorization",
+    "cycle": 3,
+    "base_sha": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+    "candidate_sha": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+    "identity_kind": "ordered-source-path-sha256-pair",
+    "files": [
+      {
+        "path": "C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.mjs",
+        "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+      },
+      {
+        "path": "C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs",
+        "sha256": "2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [],
+    "next_phase": null,
+    "completion_reserve": false
+  },
+  "worker": null,
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [],
+    "remaining": [
+      "broker focused checks",
+      "managed packet validation and assessed startup/phase admission",
+      "independent review",
+      "actual human scope approval before any provider execution"
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "grant2 preserves legacy ceilings and rejects unbound scope, IDs and nonfinite limits",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "grant2 authorization binds canonical artifact, actor, scope and current source corpus config",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "grant2 cumulative ledger permits only two physical calls across fresh transport instances",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "grant2 byte reservations and crash debits cannot reset with new authorization or directory",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "preflight deep routing rejects insufficient complete-answer budget before any call",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "preflight actual complete-answer path refuses two calls before transport and checkpoint creation",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "preflight sufficient lower bound admits but cannot promise a supported answer",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "preflight diagnostic-only two-call pilot remains allowed and admission failure overrides output labels",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "complete tier preserves legacy and grant2 ceilings and enforces every finite cap and exact identity",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "complete tier pending human approval refuses before credentials transport or checkpoint",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "complete tier approval binds all identities population baseline and immutable artifact",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "complete tier durable IDs6 through17 count crashes and cannot replay reset or refund",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    },
+    {
+      "node": "complete tier aggregate input reservations cannot exceed320KiB across fresh admissions",
+      "reason": "exact authorization, durable limits or adjacent unchanged safety boundary"
+    }
+  ],
+  "previous_receipt": null,
+  "dispatch_prohibited": true
+}

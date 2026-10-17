@@ -1,0 +1,20 @@
+{
+  "unit": "t040-grounded-product-composition",
+  "cycle": 1,
+  "verdict": "PASS",
+  "formalReadLaunch": "2026-10-14T23:12:18.1504986Z",
+  "firstFinalPinRead": "2026-10-14T23:14:11.4406398Z",
+  "readyReviewPreflightEnd": "2026-10-14T23:16:42.3057607Z",
+  "backupConfirmed": "2026-10-14T23:16:54.4351894Z",
+  "initialVerdictPersistConfirmed": "2026-10-14T23:18:45.8670954Z",
+  "completionConfirmed": "2026-10-14T23:19:04.842544+00:00",
+  "grossElapsedMs": 406692.0454,
+  "finalPinCount": 50,
+  "drift": [],
+  "verdictSHA256": "21E0F8EA0849964955F5748891646210074D9ACEF6BB6509868C96A9420F96AC",
+  "parent": "HOLD",
+  "processHandles": "NONE",
+  "unknownPhases": "Original dispatch, approvals, earlier source preparation, freeze/queue duration and individual draft phase boundaries not fully measured",
+  "noDuplicateExecution": true,
+  "newerGlobalGate": "Later U24/T055 private test-only gate edits outside the 50 checked unit pins are not certified by the 1939-input checkpoint. Latest global PRE/types/build remains separately pending; scoped criterion7 uses applicable unchanged product inputs, not an all-repository-current claim."
+}

@@ -1,0 +1,46 @@
+indexSession(t/s): decisions left unchanged — decisions provider call failed: offline
+indexSession(t/s): decisions left unchanged — decisions response was not a JSON array
+indexSession(t/s): decisions left unchanged — decisions response contained unusable candidates or citations; replacement is incomplete
+indexSession(t/s): decisions left unchanged — decisions response contained unusable candidates or citations; replacement is incomplete
+indexSession(t/s): decisions left unchanged — decisions response contained unusable candidates or citations; replacement is incomplete
+indexSession(t/s): decisions left unchanged — decisions source identity, scope or time is invalid
+indexSession(t/s): decisions left unchanged — decisions source identity, scope or time is invalid
+✔ ISS-U25DECISIONS-001(a): clean re-extraction discards human-set status (verified/needs-review) — refused (4.4967ms)
+✔ partial failure leaves preexisting stable proposals byte-identical, even with cosmetic candidate changes (1.4954ms)
+✔ ISS-U25DECISIONS-001(b): failed insertMany after the delete loses the rows — prior loss refused on write failure (0.6058ms)
+✔ partial upsert failure may add proposals but never prunes any prior row (0.6838ms)
+✔ stable reruns deduplicate text/evidence and write before tightly scoped stale pruning (1.3022ms)
+✔ genuine empty response prunes proposed only; reviewed and other scopes survive (0.5358ms)
+✔ degraded, non-array, unusable and partial responses issue no collection operation (1.5759ms)
+✔ foreign target scope and invalid source refuse before provider and DB (0.506ms)
+✔ review racing a refresh cannot be reverted to proposed or pruned (1.1092ms)
+✔ an omitted owner clears a prior proposal owner instead of preserving stale attribution (1.073ms)
+✔ actual In-Focus transcript exercises provenance persistence and downstream harness (scripted provider; no semantic acceptance) (6.4287ms)
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (9.2478ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (2.0819ms)
+✔ flag ON via env var (1.2402ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (1.8983ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (1.3171ms)
+✔ empty turns: no provider call, not degraded (2.2726ms)
+✔ job kind is decisions and the transcript carries real turn ids (0.6187ms)
+✔ keeps a decision with real citations; tStart/tEnd come from the cited turns, not the model (0.3907ms)
+✔ fabricated ids are removed; a decision with no real id is dropped entirely (0.332ms)
+✔ invalid source identity, duplicate IDs, mixed scope and invalid times refuse before provider (0.5377ms)
+✔ unusable nonempty and partially filtered responses remain unknown, never genuine none (0.4451ms)
+✔ duplicate cited ids collapse (0.6048ms)
+✔ owner kept only when it is a speaker of a cited turn (0.8012ms)
+✔ provider failure degrades with a reason, never throws (0.52ms)
+✔ unparseable and non-array output degrade (0.5632ms)
+✔ an honest empty array is non-degraded (0.2673ms)
+✔ decisionsEnabled is OFF by default and for non-opt-in values (0.2051ms)
+✔ output is scorable by the U2.2 harness (filtered + persisted shapes); no labels, so nothing is measured (1.581ms)
+✔ a tampered span is caught by the harness (the timestamps are checkable, not decorative) (0.3826ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3054.8648

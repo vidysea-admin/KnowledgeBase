@@ -1,0 +1,37 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "scope": "Explicit userpaidkey authorization: atmost2tinytextrequests oneexactlistedmodel each; maxnum_predict32 temperature0,20s64KiB each,50s total; no fallback/retry/privatecorpus",
+  "phase": "authorized-paid-capability-smoke",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review; existing TypeScript loader; existing .env key in memory only; safeoutcomes/tokens/unknowncost only",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--import",
+    "tsx",
+    "qa/evidence/ollama-live-preflight/smoke.mts",
+    "--metadata-proof",
+    "qa/goal-vectorless-2026-10-15/verification-ollama-live-tags-20261015T1020.stdout.txt",
+    "--metadata-sha256",
+    "2f12c42bdf939d7de0559ac42b859e8712b3c2d8c55d44677c4e4c2ed1c26319"
+  ],
+  "testIDs": [
+    "glm-5.3-flash Respond OK only max32",
+    "deepseek-v4.1-flash Respond OK only max32"
+  ],
+  "env": {},
+  "timeoutMs": 50000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-ollama-two-paid-smoke-20261015T1026",
+  "pins": {
+    "qa/evidence/ollama-live-preflight/launch.mjs": "0a6f1cac75000da3a3edd9a70a8b5ce5a8df63ed40632722c998771382216ef3",
+    "qa/evidence/ollama-live-preflight/preflight.mts": "db6097d061a911a6778616a36ff108779328d3549ee55422aa790a27634c0125",
+    "packages/ai/src/providers/ollama-cloud.ts": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+    "apps/api/src/ai-transport.ts": "ab266b7496f0b85c810a6c66cd3c5231598ea01e10acad741796e2c807e831f1",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "qa/evidence/ollama-live-preflight/smoke.mts": "f3b6bd98b650c2e62c085e528deeff6e8331e0046cc1c65d2e03aa47bb4f697f",
+    "qa/goal-vectorless-2026-10-15/verification-ollama-live-tags-20261015T1020.stdout.txt": "2f12c42bdf939d7de0559ac42b859e8712b3c2d8c55d44677c4e4c2ed1c26319"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "unit": "collections-bounded-choice-retention",
+  "cycle": 0,
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_files_sha256": {
+    "apps/web/src/pages/knowledge/CuratedCollections.tsx": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+    "apps/web/src/pages/knowledge/CuratedCollections.test.tsx": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3"
+  },
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [],
+  "next_phase": {"kind": "review", "active_s": 90, "tokens": 2200, "cost": null},
+  "bootstrap_scope": "collections-bounded-choice-retention cycle 0 exact two-file candidate: review changed selection logic and immediate PUT consumer, verify broker receipts, one independent bounded-membership probe; mandatory verification remains required. Root allocation via product_delivery_coordinator. Prior unit charges none known; any discovered prior debit must be retained.",
+  "bootstrap": {"active_s": 120, "tokens": 3000},
+  "completion_reserve": true,
+  "completion_reserve_id": "collections-bounded-choice-retention/cycle-0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a/6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97/84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3",
+  "escalation": null
+}

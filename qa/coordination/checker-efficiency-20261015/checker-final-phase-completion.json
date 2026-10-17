@@ -1,0 +1,17 @@
+{
+  "start_monotonic": 147062979023,
+  "end_monotonic": 147630916766,
+  "frequency": 10000000,
+  "active_upper_bound_s": 56.7937743,
+  "approval_wait_s": null,
+  "wait_intervals": [],
+  "note": "Approval wait not separately measured; full monotonic elapsed conservatively included",
+  "tokens": null,
+  "cost": null,
+  "children": [],
+  "phase_debit": {
+    "active_s": 60,
+    "tokens": 1500
+  },
+  "ratio_verified": false
+}

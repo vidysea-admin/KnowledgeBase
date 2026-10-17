@@ -167,5 +167,5 @@ export interface AskResponse {
   web_used: boolean;
   insufficient_coverage: boolean;
   sources: { internal: AskInternalSource[]; web: AskWebSource[] };
-  auditLog: { step: string; provider?: string; model?: string; costUsd?: number }[];
+  auditLog: { step: string; provider?: string; model?: string; costUsd?: number; costStatus?: "unknown" | "reported"; inputTokens?: number; outputTokens?: number }[];
 }

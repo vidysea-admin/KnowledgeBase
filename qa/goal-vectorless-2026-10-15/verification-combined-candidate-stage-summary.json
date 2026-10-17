@@ -1,0 +1,48 @@
+{
+  "kind": "Shared verification support; compiler and build facts only",
+  "at": "2026-10-15T12:39:56.614Z",
+  "stages": [
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-types-combined-candidate.json",
+      "exitCode": 0,
+      "elapsedMs": 16717.5225,
+      "hashesUnchanged": true,
+      "pins": 1775,
+      "sourceMembership": 1573,
+      "inventoryGuard": "qa/goal-vectorless-2026-10-15/verification-api-types-combined-candidate-inventory-guard.json"
+    },
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-api-build-combined-candidate.json",
+      "exitCode": 0,
+      "elapsedMs": 1774.5919,
+      "hashesUnchanged": true,
+      "pins": 1775,
+      "sourceMembership": 1573,
+      "inventoryGuard": "qa/goal-vectorless-2026-10-15/verification-api-build-combined-candidate-inventory-guard.json"
+    },
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-types-combined-candidate.json",
+      "exitCode": 0,
+      "elapsedMs": 11511.0949,
+      "hashesUnchanged": true,
+      "pins": 1775,
+      "sourceMembership": 1573,
+      "inventoryGuard": "qa/goal-vectorless-2026-10-15/verification-web-types-combined-candidate-inventory-guard.json"
+    },
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-build-combined-candidate.json",
+      "exitCode": 0,
+      "elapsedMs": 15217.815,
+      "hashesUnchanged": true,
+      "pins": 1775,
+      "sourceMembership": 1573,
+      "inventoryGuard": "qa/goal-vectorless-2026-10-15/verification-web-build-combined-candidate-inventory-guard.json"
+    }
+  ],
+  "contractReceipt": "qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.json",
+  "contractsEmptyRegistryVacuous": true,
+  "compositionRuntimeStillFailed": true,
+  "compositionDiagnosticReceipt": "qa/goal-vectorless-2026-10-15/verification-deadline-safe-diagnostic-one.json",
+  "historicalPartial18PinReceiptSupersededForCurrentCompilerIdentityOnly": true,
+  "noCheckerVerdict": true
+}

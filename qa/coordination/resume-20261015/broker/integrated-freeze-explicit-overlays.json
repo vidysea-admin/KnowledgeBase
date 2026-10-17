@@ -1,0 +1,251 @@
+{
+  "authority": "root latest all-source freeze; path-specific overlays only",
+  "phaseb_original_sha256": "e338d4e243885200e031f158036d5d0b762d55d496a577d674ca282c94850356",
+  "adoptions": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-spool.ts",
+      "prior": "7fefcd1aa9bb859acedfd4f940c9e4a4afc5d41fd4e31dbbb57c551e0c5be938",
+      "current": "4bf3ca520234980965f2507f591254b03bffabfff62971c5f45d49c3b2320b07",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+      "prior": null,
+      "current": "3a33f1f0135ea131b2a1132cdef91abe7cad90530d152c82b3e2c73bfd6413d0",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+      "prior": null,
+      "current": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "prior": null,
+      "current": "f149985b40a7e991a19e0bbcb1a6a1904d67f7b12215c6acebd7068097901fec",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tiles/registry.ts",
+      "prior": null,
+      "current": "be86f574b267e694d62fd469a385d317a2fd58b01400ae2c3f15be54a9e2f36a",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+      "prior": null,
+      "current": "0e31306c9dabfb3da1fa8e6cfcd5060358ddbb568415aa24ccc1b058d4cb13d7",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tiles/registry-types.ts",
+      "prior": null,
+      "current": "bbf5fd274fdf5414b6ee8078b0c439882cd8840b516f04f3ce80e5ab11b02e61",
+      "authority_artifact": "qa/coordination/resume-20261015/native-cycle-maker/source-pins.json",
+      "artifact_sha256": "0b51912607eeb484236b1f2c976cfca0a287d8b5196d2f534bdb16a9cc2dbf2d"
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "prior": null,
+      "current": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19",
+      "authority_artifact": "qa/coordination/resume-20261015/api-cycle-repairs/candidate-pins.json",
+      "artifact_sha256": "09caeac1ff0e3ef1d30fd142c026848df54e20432635cd36bcc38700351ee32f"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/materializer.ts",
+      "prior": null,
+      "current": "6d5e6c39fc3125d5999c220ccca2ed0d95a0e079392a5833ea65e2f5fc263a1b",
+      "authority_artifact": "qa/coordination/resume-20261015/api-cycle-repairs/candidate-pins.json",
+      "artifact_sha256": "09caeac1ff0e3ef1d30fd142c026848df54e20432635cd36bcc38700351ee32f"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/invalidate.ts",
+      "prior": null,
+      "current": "a64e5dc76e2d194213eb308b61450a0bf42d3a6279762ecf08592d8da831223f",
+      "authority_artifact": "qa/coordination/resume-20261015/api-cycle-repairs/candidate-pins.json",
+      "artifact_sha256": "09caeac1ff0e3ef1d30fd142c026848df54e20432635cd36bcc38700351ee32f"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/publication-contract.ts",
+      "prior": null,
+      "current": "dbf8354bffc1cb8a824103ee3eae5d71c0b2a65c6ce48c747858ed28c1a07021",
+      "authority_artifact": "qa/coordination/resume-20261015/api-cycle-repairs/candidate-pins.json",
+      "artifact_sha256": "09caeac1ff0e3ef1d30fd142c026848df54e20432635cd36bcc38700351ee32f"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts",
+      "prior": null,
+      "current": "8085828e856598072ffcbda78fc5758bc629654acaef55999c2e9b8cf5221112",
+      "authority_artifact": "qa/coordination/resume-20261015/workspace-cycle-repair/pins.json",
+      "artifact_sha256": "2b9553b9459cdba2a38ae87292e52771803fcb4835289b1a15a428adc720d125"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts",
+      "prior": null,
+      "current": "82477a51ae8a57fe3ec91b9610fb8e5b7c0580305002f85f823d494262a9f292",
+      "authority_artifact": "qa/coordination/resume-20261015/workspace-cycle-repair/pins.json",
+      "artifact_sha256": "2b9553b9459cdba2a38ae87292e52771803fcb4835289b1a15a428adc720d125"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts",
+      "prior": null,
+      "current": "95ed772cce4ad76cba089f5cfa6a5208fa6dbf406884b065a29b8ff670c773aa",
+      "authority_artifact": "qa/coordination/resume-20261015/workspace-cycle-repair/pins.json",
+      "artifact_sha256": "2b9553b9459cdba2a38ae87292e52771803fcb4835289b1a15a428adc720d125"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "prior": null,
+      "current": "da19ef9198a47201bdf59dd2f5a484b009cf9af33099319c4e7940860d0380be",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "prior": null,
+      "current": "9e3f10622b1c88210e166d277c57c952a88f4369608faf1a6efa7166e82dbeb2",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "prior": null,
+      "current": "ee1c74fa878ece78d7564a154d7a48c6650209a7dd314e93ec827dbbcc3134ab",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "prior": null,
+      "current": "673ea06b2862b7d8d575c8a04e94b32181563405ea143524d439783f51842108",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "prior": "954f3d23d220f89f4ddd19a9095cdaa8df4e83295cc9708defe1af67f1e6ab53",
+      "current": "a6713203fcbaa5cb79ce60d997543531b8e7b1086f80a5dbb5679140bb39129e",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "apps/api/src/session-decisions/reader.test.ts",
+      "prior": null,
+      "current": "d6d296e1affe2a8b7c8dff26786e169e42c95f43280e1183348a751b82a45fd9",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "scripts/backfill.mjs",
+      "prior": null,
+      "current": "3be65f3c885d4eabc7285fa94fb81c9401e430d4db08a38885b883b1df6c03b7",
+      "authority_artifact": "qa/coordination/resume-20261015/indexing-structure-maker/candidate-pins.json",
+      "artifact_sha256": "c43f5bcf04cc08d9f40ec2f9a3acc424f0763e820ed03038091f33f0c89f77fe"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.ts",
+      "prior": null,
+      "current": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.test.ts",
+      "prior": null,
+      "current": "22032514dcb6a61777f5dbbbc0cf428986e4127f82254416d685f9fd695f342d",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-router.test.ts",
+      "prior": null,
+      "current": "d6739be8f1d76f6cf7946e287e51b1e292dc11cdaa3693df52489f77efd7a989",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/client.ts",
+      "prior": null,
+      "current": "2d4a49a56b63471452173428c779a1c63c0b64be5099c4932a690e3259f40bbd",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+      "prior": null,
+      "current": "e4a4f648f6c20d195bae3156241c24ca176e108fb76c78f2e487124cfe849a6a",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+      "prior": null,
+      "current": "253db568c9a3ebefaaab5e950fd89de4313ea0804750cb043376dd4adaf37ee2",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+      "prior": null,
+      "current": "c7ef0c78679d74d9e6476acb86b18710c4073edbaa6fb72aae1d30a3e7e98f8e",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/directAnswer.test.ts",
+      "prior": null,
+      "current": "9f9d82c7ae77ddfa12cd33610cc40f060369558b4f455990ed85c86ef418f6d9",
+      "authority_artifact": "qa/coordination/resume-20261015/t056-direct-answer/source-pins.json",
+      "artifact_sha256": "a667997d14ed302f28005b52806c78ae3ead90406ddea81eadc2d65008e4dba3"
+    }
+  ],
+  "final_pins": {
+    "apps/api/src/indexing/types.ts": "a975906c317a0ffd5641b7f9c237dd205c3fb1673b0efe16793354c34a0b330c",
+    "apps/api/src/indexing/session.ts": "a6713203fcbaa5cb79ce60d997543531b8e7b1086f80a5dbb5679140bb39129e",
+    "apps/api/src/indexing/post-commit.ts": "242bddeca752b595b2578a6e72648b5892e75be7b1117fbd1f276672477057db",
+    "apps/api/src/indexing/post-commit.test.ts": "be0a8936d167c06262f15163abf70bf448a3ba04400e681d0257fddf77746473",
+    "apps/api/src/indexing/vectorless-publication.test.ts": "7f2cde600af06d617595ec60ba346c631c141bc1575adf10b764df0f47f0b1a8",
+    "apps/api/src/composition/integrations/transcripts.ts": "022a2c418777dadc1fe894b92e31a530541b94dd7f1ef7960f8ebe744d679a1c",
+    "apps/api/src/grounded-postprocessing/transcripts.test.ts": "eb80e828c2e4246b4fdd8bc769d983ce718ceed26e6a051ed4de040d849eba7a",
+    "packages/meeting-bot/src/capture/native/native-capture-archive.ts": "455423967184c512682c2aba09085090215e54967b2d4317ba705a7b5aed3c3f",
+    "packages/meeting-bot/src/capture/native/native-capture-archive.test.ts": "94425314bc0fe363e61ca0eb905a35cc0ad4626e7443c7a6fe54393b79898526",
+    "packages/meeting-bot/src/capture/native/native-archive-authority.ts": "21cbd85205fbb218022e92fffba634214abdfda3af39d331c1d9ba12ae267ac6",
+    "packages/meeting-bot/src/capture/native/native-archive-spool.ts": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+    "packages/meeting-bot/src/capture/native/native-spool.ts": "4bf3ca520234980965f2507f591254b03bffabfff62971c5f45d49c3b2320b07",
+    "packages/meeting-bot/src/capture/native/native-media-finalize.ts": "02e8949cdaaacf21450a12dd72f44668aa4ae454cd6f8ac3d5a73662a540fd91",
+    "packages/meeting-bot/src/capture/native/native-media-types.ts": "3a33f1f0135ea131b2a1132cdef91abe7cad90530d152c82b3e2c73bfd6413d0",
+    "packages/meeting-bot/src/capture/native/native-tab-receiver.ts": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64",
+    "packages/meeting-bot/src/capture/tab-browser.ts": "f149985b40a7e991a19e0bbcb1a6a1904d67f7b12215c6acebd7068097901fec",
+    "packages/meeting-bot/src/capture/tiles/registry.ts": "be86f574b267e694d62fd469a385d317a2fd58b01400ae2c3f15be54a9e2f36a",
+    "packages/meeting-bot/src/capture/tiles/native-measurement.ts": "0e31306c9dabfb3da1fa8e6cfcd5060358ddbb568415aa24ccc1b058d4cb13d7",
+    "packages/meeting-bot/src/capture/tiles/registry-types.ts": "bbf5fd274fdf5414b6ee8078b0c439882cd8840b516f04f3ce80e5ab11b02e61",
+    "apps/api/src/visibility/knowledge.ts": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19",
+    "apps/api/src/whatsapp/review/materializer.ts": "6d5e6c39fc3125d5999c220ccca2ed0d95a0e079392a5833ea65e2f5fc263a1b",
+    "apps/api/src/whatsapp/review/invalidate.ts": "a64e5dc76e2d194213eb308b61450a0bf42d3a6279762ecf08592d8da831223f",
+    "apps/api/src/whatsapp/review/publication-contract.ts": "dbf8354bffc1cb8a824103ee3eae5d71c0b2a65c6ce48c747858ed28c1a07021",
+    "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts": "8085828e856598072ffcbda78fc5758bc629654acaef55999c2e9b8cf5221112",
+    "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts": "82477a51ae8a57fe3ec91b9610fb8e5b7c0580305002f85f823d494262a9f292",
+    "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts": "95ed772cce4ad76cba089f5cfa6a5208fa6dbf406884b065a29b8ff670c773aa",
+    "apps/api/src/indexing/persistence/decisions-persist.test.ts": "da19ef9198a47201bdf59dd2f5a484b009cf9af33099319c4e7940860d0380be",
+    "apps/api/src/indexing/persistence/decisions-persist.ts": "9e3f10622b1c88210e166d277c57c952a88f4369608faf1a6efa7166e82dbeb2",
+    "apps/api/src/indexing/persistence/promote-entities.test.ts": "ee1c74fa878ece78d7564a154d7a48c6650209a7dd314e93ec827dbbcc3134ab",
+    "apps/api/src/indexing/persistence/promote-entities.ts": "673ea06b2862b7d8d575c8a04e94b32181563405ea143524d439783f51842108",
+    "apps/api/src/session-decisions/reader.test.ts": "d6d296e1affe2a8b7c8dff26786e169e42c95f43280e1183348a751b82a45fd9",
+    "scripts/backfill.mjs": "3be65f3c885d4eabc7285fa94fb81c9401e430d4db08a38885b883b1df6c03b7",
+    "apps/api/src/answer-policy/answer-workflow.ts": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb",
+    "apps/api/src/answer-policy/answer-workflow.test.ts": "22032514dcb6a61777f5dbbbc0cf428986e4127f82254416d685f9fd695f342d",
+    "apps/api/src/answer-policy/answer-router.test.ts": "d6739be8f1d76f6cf7946e287e51b1e292dc11cdaa3693df52489f77efd7a989",
+    "apps/web/src/pages/answer-policy/client.ts": "2d4a49a56b63471452173428c779a1c63c0b64be5099c4932a690e3259f40bbd",
+    "apps/web/src/pages/answer-policy/PolicyAskPage.tsx": "e4a4f648f6c20d195bae3156241c24ca176e108fb76c78f2e487124cfe849a6a",
+    "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx": "253db568c9a3ebefaaab5e950fd89de4313ea0804750cb043376dd4adaf37ee2",
+    "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx": "c7ef0c78679d74d9e6476acb86b18710c4073edbaa6fb72aae1d30a3e7e98f8e",
+    "apps/web/src/pages/answer-policy/directAnswer.test.ts": "9f9d82c7ae77ddfa12cd33610cc40f060369558b4f455990ed85c86ef418f6d9"
+  }
+}

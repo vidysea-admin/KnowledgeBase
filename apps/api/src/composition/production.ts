@@ -1,18 +1,11 @@
-/**
- * apps/api/src/production.ts — T-009 C3. Assembles the REAL `ServerDeps` `server.ts` needs:
- * `@lkb/index`'s real `treeSearch`, T-019's real provider `complete` routed via
- * `config/ai-routing.yaml`'s `ask` chain (this task adds that line — no `ask` jobKind existed
- * before it), Mongo-backed key/tree/job stores (`store.ts`), and the real `Transport`
- * (`ai-transport.ts`). Kept out of `server.ts` so that file stays <=80 LOC and injectable-only.
- * Never imported by tests.
- */
+/** Production composition: tenant-bound providers and durable stores behind authenticated routes. */
 import { speakerSuggestEnabled } from "../indexing/speaker-suggest.js";
 import { createMongoSystemStatusDeps } from "../system-status-store.js";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { complete as routeComplete, embed as routeEmbed, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, type Provider } from "@lkb/ai";
-import { treeSearch, createLlmNoteJudge } from "@lkb/index";
-import { listHeartbeats, listWatchState } from "@lkb/db";
+import { complete as routeComplete, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, createOllamaCloudProviders, type Provider } from "@lkb/ai";
+import { treeSearch } from "@lkb/index";
+import { getDb, listHeartbeats, listWatchState } from "@lkb/db";
 import { createTelegramAlertSink } from "@lkb/core";
 import type { ServerDeps } from "../server.js";
 import type { WatchSilenceDeps } from "../routes/health.js";
@@ -21,45 +14,45 @@ import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, 
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
-import { createMongoSemanticSearchDeps, semanticSearchEnabled } from "../semantic-search/semantic-search-store.js";
+import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
+import { buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
 import { createLlmScorer } from "../score.js";
 import { createTavilySearchFn } from "../ask/ask-web-fallback.js";
-import { indexSession, type BoundIndexer } from "../indexing/session.js";
+import { indexSession, type BoundIndexer, type IndexSessionDeps } from "../indexing/session.js";
+import type { IndexCommittedHook } from "../indexing/types.js";
+import { composeGroundedPostProcessing, readGroundedJudgeCostLimit } from '../grounded-postprocessing/composition.js';
+import { buildKnowledgeIntegrations } from './integrations/knowledge.js';
+import { buildEvaluationIntegrations } from './integrations/evaluation.js';
+import { buildAnswerIntegrations } from './integrations/answers.js';
+import { buildHostingIntegrations } from './integrations/hosting.js';
+import { buildTranscriptIntegrations } from './integrations/transcripts.js';
+import { buildAutomationIntegrations } from './integrations/automation.js';
+import { createHostBotPrivacyDeps } from '../bot-privacy/host-connector.js';
+import { buildConfiguredSourceJobStore } from './integrations/source-jobs.js';
+import { collectNotifications } from '../activity-health/notifications.js';
+import { createHostCaptureReadinessDeps } from '../capture-readiness/host-connector.js';
+import type { HostCaptureReadinessAdapter } from '../capture-readiness/types.js';
 import { createAskArmsFor } from "../ask/ask-arms.js";
 import { createSourceRequestDepsFor } from "../ask/source-context.js";
 import { withSessionArtifacts } from "../routes/brain.js";
 import { createMongoJobsReadDeps } from "../jobs/store.js";
 import { createMongoUsageDeps } from "../usage/store.js";
 import { createMongoSpeakerSuggestionDeps } from "../speaker-suggestions/store.js";
+import { buildNativeProductionIntegrations } from "./integrations/native-production.js";
+import { buildReviewIntegrations } from "./integrations/reviews.js";
+import { createConfiguredPublicWebinarDiscovery } from "../gws/public-webinar-config.js";
 import { createMongoWatchRunsDeps } from "../activity-health/watch-runs.js";
 import { createMongoClaimsListDeps } from "../claims/store.js";
 import { createConfiguredActivityHealthDeps } from "../activity-health/queue-reader.js";
+import { createLazyDatabase, defineLazyProperties } from "./lazy-database.js";
 
 const ROUTING_CONFIG_PATH = fileURLToPath(new URL("../../../../config/ai-routing.yaml", import.meta.url));
 
-/** U4b/R2 (D-048): the real, Mongo-backed watcher-silence detector `/health` runs on every probe.
- * Lives here rather than in `store.ts` for a measured reason — `store.ts` is at 299 non-blank lines
- * against a 300 budget (`structure.config.json` loc.max), so any wiring added there fails
- * `lint-loc`; this file is the other "real deps" home and already does env-driven wiring (see
- * `corsOrigins` below).
- *
- * Tenancy: `tenantIds` comes from `WATCH_HEARTBEAT_TENANTS` (default "toc", the tenant
- * run-watch.mjs writes as) — CONFIG, never the request, because `/health` is unauthenticated and has
- * no caller to derive a tenant from. Each read goes through `@lkb/db`'s `listHeartbeats`, i.e.
- * `scopedCollection()`, so it is `withTenant`-merged per tenant and never a cross-tenant scan.
- *
- * `notifyWatchSilent` is now `@lkb/core`'s `createTelegramAlertSink` (packages/core/src/alerts/
- * alert-sink.ts), U4b/R2's D-053 resolution of the boundary noted below: `.dependency-
- * cruiser.cjs`'s `apps-only-ask-ingest-index-ai-db-core` rule forbids `apps/* ->
- * packages/meeting-bot`, so this file cannot import `createTelegramNotifier` directly (only
- * scripts/ can, which is how run-watch.mjs does it). `createTelegramAlertSink` is a SEPARATE,
- * independent Telegram sender living in the already-permitted `packages/core`, satisfying the
- * same `AlertSink`/`notifyWatchSilent` shape `packages/meeting-bot`'s `TelegramNotifier` already
- * does by signature — see alert-sink.ts's own doc comment for why this is two implementations,
- * not a shared one, and why that is disclosed rather than hidden. */
+/** D-048/D-053: health reads only configured WATCH_HEARTBEAT_TENANTS through tenant-scoped
+ * DB accessors. The permitted core Telegram sink binds lazily; API cannot import meeting-bot. */
 /** U4d (D-047/D-048): the ONE place `WATCH_HEARTBEAT_INTERVAL_MS` is parsed with its 1-hour
  * fallback — extracted out of `createMongoWatchSilenceDeps` (which used to inline this) so
  * `createMongoWatchStateReadDeps` below reads the exact same number instead of re-declaring the
@@ -137,7 +130,12 @@ export function buildRouting(): {
   const providers: Record<string, Provider> = {
     gemini: new GeminiProvider(realTransport, { apiKey: process.env.GEMINI_API_KEY ?? "" }),
     "claude-code": new ClaudeCodeProvider(realTransport),
-    ollama: new OllamaProvider(realTransport, { baseUrl: process.env.OLLAMA_BASE_URL }),
+    ...createOllamaCloudProviders(realTransport, {
+      apiKey: process.env.OLLAMA_API_KEY ?? "",
+      baseUrl: process.env.OLLAMA_CLOUD_BASE_URL,
+      primaryModel: process.env.OLLAMA_CLOUD_MODEL,
+      verifierModel: process.env.OLLAMA_CLOUD_VERIFIER_MODEL,
+    }),
   };
   // Speaker-segment-identity gate (Option A, phase 2, answered 2026-09-21): the speakers
   // jobKind is pinned to the LOCAL chain and its model is the gate's frozen qwen3:8b digest,
@@ -153,9 +151,7 @@ export function buildRouting(): {
 }
 
 /**
- * Real "make ingested content searchable" step (ISS: summarize/claims/tree_index were declared
- * job kinds with no implementation until now — see indexing.ts). Bound once so every ingest
- * composition root only ever calls `(tenantId, sessionId) => Promise<void>`.
+ * Bind the tenant-scoped indexer used by ingest and capture consumers.
  *
  * Exported (ISS-296) for the same reason `buildRouting` is: `scripts/webinar/sync-session.mjs
  * --index` must index a bot-captured session through EXACTLY the binding the server's ingest
@@ -173,42 +169,39 @@ export function resolveGroundedNotes(option?: boolean, env: Record<string, strin
 
 /** Optional per-session judge cost cap (USD) from KB_NOTE_JUDGE_MAX_USD; anything not a finite number >= 0 is ignored. */
 export function resolveJudgeMaxCostUsd(env: Record<string, string | undefined> = process.env): number | undefined {
-  const raw = env.KB_NOTE_JUDGE_MAX_USD?.trim();
-  if (!raw) return undefined;
-  const n = Number(raw);
-  return Number.isFinite(n) && n >= 0 ? n : undefined;
+  return readGroundedJudgeCostLimit(env);
 }
 
-export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean; groundedNotes?: boolean } = {}): BoundIndexer {
+export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRouting(), options: { strictWebinar?: boolean; suggestSpeakers?: boolean; groundedNotes?: boolean; db?: IndexSessionDeps['db']; onIndexCommitted?: IndexCommittedHook } = {}): BoundIndexer {
   const { chains, providers, jobWrite } = routing;
   const grounded = resolveGroundedNotes(options.groundedNotes);
-  return (tenantId, sessionId) =>
-    indexSession(tenantId, sessionId, {
-      strictWebinar: options.strictWebinar,
-      // T-040: OFF -> none of these keys is set, so indexSession runs exactly as before.
-      ...(grounded ? { dropUnverified: true, noteJudge: createLlmNoteJudge((job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId })), judgeMaxCostUsd: resolveJudgeMaxCostUsd() } : {}),
+  return (tenantId, sessionId) => {
+    const complete: IndexSessionDeps['complete'] = job => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId });
+    return indexSession(tenantId, sessionId, {
+      ...composeGroundedPostProcessing(complete, { strictWebinar: options.strictWebinar, groundedNotes: grounded, judgeMaxCostUsd: resolveJudgeMaxCostUsd() }),
+      ...(options.db ? { db: options.db } : {}),
+      onIndexCommitted: options.onIndexCommitted,
       // U2.4 / D-141: speaker NAME SUGGESTIONS (never final), OFF unless KB_SPEAKER_SUGGEST=1 or the caller opts in. Uses the `speakers` route.
       suggestSpeakers: resolveSuggestSpeakers(options.suggestSpeakers),
-      complete: (job) => routeComplete(job.kind, job, { chains, providers, write: jobWrite, tenantId }),
-      // Wired only when a chain is configured for it (U1.3). Passing an embedder unconditionally
-      // would make every index run fail on an install with no embedding provider, where today it
-      // simply indexes without a vector layer — `indexSession` treats the absent dep as "skip
-      // chunks" rather than as an error.
-      embed: chains.embedding
-        ? (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId })
-        : undefined,
+      retrievalMode: "vectorless",
+      complete,
+      // D-173: active ingestion never requests embeddings, even with a stale config/flag.
     });
+  };
 }
 
-export function buildProductionDeps(): ServerDeps {
+export function buildProductionDeps(options: { onIndexCommitted?: IndexCommittedHook; captureReadinessHost?: HostCaptureReadinessAdapter } = {}): ServerDeps {
+  const db = createLazyDatabase(getDb);
   const routing = buildRouting();
+  const publicWebinars = createConfiguredPublicWebinarDiscovery(process.env.LKB_PUBLIC_WEBINAR_TENANT, process.env.LKB_PUBLIC_WEBINAR_SOURCES);
   const { chains, providers, jobWrite } = routing;
 
   const tavilySearchFn = createTavilySearchFn();
 
-  const boundIndexer = buildIndexer(routing);
+  const boundIndexer = buildIndexer(routing, options);
+  const native = buildNativeProductionIntegrations(db);
 
-  return {
+  const deps: ServerDeps = {
     keyStore: createMongoApiKeyStore(),
     evalRuns: createMongoEvalRunStore(),
     brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../../", import.meta.url))),
@@ -220,15 +213,12 @@ export function buildProductionDeps(): ServerDeps {
     // U4d: the same A13 watched-sources deps as before, plus the watch_state/watch_heartbeat read
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
-    search: createMongoSearchDeps(),
-    // T-008: OFF unless LKB_SEMANTIC_SEARCH=1 and an embedding chain exists. Router tenant is "system" only for
-    // cost accounting; the retrieval itself is tenant-scoped per request inside the store.
-    semanticSearch: semanticSearchEnabled() && chains.embedding
-      ? createMongoSemanticSearchDeps({ embed: (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }) })
-      : undefined,
+    search: createMongoSearchDeps({ nativeEvidence: native.resolver }),
+    // D-173: dormant semantic routes cannot be enabled through an old environment flag.
+    semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
     calendar: createGwsCalendarReadDeps(),
-    meetingCandidates: createMeetingCandidatesDeps(),
+    meetingCandidates: { ...createMeetingCandidatesDeps(), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
     whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
@@ -258,20 +248,16 @@ export function buildProductionDeps(): ServerDeps {
       return [...expanded];
     })(),
     ask: {
-      tree: createMongoTreeStore(),
+      tree: createMongoTreeStore(native.resolver),
       requestDepsFor: createSourceRequestDepsFor({
         dispatch: (job, tenantId) => routeComplete(job.kind === "evaluator" ? "evaluator" : "ask", job, { chains, providers, write: jobWrite, tenantId }),
-        embed: chains.embedding ? (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }) : undefined,
         treeSearchFn: treeSearch, tavilySearchFn, write: jobWrite,
+        graph: native.graph, nativeSources: native.nativeSources, vectorless: true,
       }),
       // U1.5 C6: a FACTORY. There is no tenant at this point in the process, so there is nothing
       // here that could correctly bind the arms — routes/ask.ts calls this with the verified key's
       // tenantId, per request.
-      extraCandidateArmsFor: createAskArmsFor({
-        embed: chains.embedding
-          ? (job) => routeEmbed("embedding", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID })
-          : undefined,
-      }),
+      extraCandidateArmsFor: createAskArmsFor({}),
       askDeps: {
         complete: (job) => routeComplete("ask", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }),
         // T-009b: real LLM judge by default; createLlmScorer falls back to the keyword heuristic
@@ -290,4 +276,33 @@ export function buildProductionDeps(): ServerDeps {
       },
     },
   };
+  const sourceJobs = buildConfiguredSourceJobStore(process.env);
+  const reviews = buildReviewIntegrations(db, process.env);
+  const input = { db, env: process.env, root: fileURLToPath(new URL('../../../../', import.meta.url)),
+    index: boundIndexer, ask: deps.ask, sourceIntake: deps.sourceIntake, sourceJobs, routing, nativeEvidence: native.resolver,
+    onIndexCommitted: options.onIndexCommitted };
+  const knowledge = buildKnowledgeIntegrations(input);
+  if (knowledge.knowledge) knowledge.knowledge.nativeDocuments = native.headStore;
+  const evaluation = () => buildEvaluationIntegrations(input);
+  const answers = () => buildAnswerIntegrations(input);
+  const transcripts = () => buildTranscriptIntegrations(input);
+  const hosting = buildHostingIntegrations({ ...input, keyStore: deps.keyStore, keys: deps.keys,
+    notifications: tenant => collectNotifications({ activityHealth: deps.activityHealth!, jobs: deps.jobs!, watchRuns: deps.watchRuns!, fileQueue: deps.fileQueue }, tenant, 50) });
+  const automation = buildAutomationIntegrations({ ...input, hosting: hosting.hosting });
+  const capturePolicy = buildCapturePolicyIntegrations(input);
+  const botPrivacy = process.env.LKB_CAPTURE_CONTROL_DIR ? createHostBotPrivacyDeps(process.env.LKB_CAPTURE_CONTROL_DIR) : undefined;
+  const captureReadiness = hosting.hosting && input.env.LKB_CAPTURE_SLOTS && input.env.LKB_TENANT_ID && options.captureReadinessHost
+    ? createHostCaptureReadinessDeps({ root: input.root, env: input.env, hosting: hosting.hosting.service, host: options.captureReadinessHost }) : undefined;
+  const result: ServerDeps = { ...deps, ...knowledge, ...hosting, ...automation, ...capturePolicy, ...reviews, botPrivacy, captureReadiness, sourceJobs, nativeEvidence: native.resolver,
+    sessionDecisions: createSessionDecisionsDeps(deps.brain, db),
+    ask: { ...deps.ask, get answerWorkflow() { return answers().answerWorkflow; } } };
+  return defineLazyProperties(result, {
+    championship: () => evaluation().championship,
+    calibrationReview: () => evaluation().calibrationReview,
+    evaluationFlywheel: () => evaluation().evaluationFlywheel,
+    answerWorkflow: () => answers().answerWorkflow,
+    answerPolicyService: () => answers().answerPolicyService,
+    knowledgeOutputs: () => answers().knowledgeOutputs,
+    transcriptReview: () => transcripts().transcriptReview,
+  });
 }

@@ -1,0 +1,48 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "scope": "Current API build after native request epoch compiler green",
+  "phase": "shared-integration",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/api",
+    "build"
+  ],
+  "testIDs": [
+    "api-build"
+  ],
+  "expectedSelectedNames": 0,
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "Path": "C:\\Program Files\\PowerShell\\7;C:\\Users\\product\\.codex\\tmp\\arg0\\codex-arg0lEhgEn;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\libheif\\libheif\\bin;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\jxrlib\\jxrlib\\bin;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\poppler\\Library\\bin;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\bin\\override;C:\\Program Files\\Python312\\Scripts\\;C:\\Program Files\\Python312\\;C:\\Windows\\system32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\;C:\\Windows\\System32\\OpenSSH\\;C:\\ProgramData\\GooGet;C:\\Program Files\\Google\\Compute Engine\\metadata_scripts;C:\\Program Files (x86)\\Google\\Cloud SDK\\google-cloud-sdk\\bin;C:\\Program Files\\PowerShell\\7\\;C:\\Program Files\\Google\\Compute Engine\\sysprep;C:\\Program Files\\Git\\cmd;C:\\Program Files\\GitHub CLI\\;C:\\Program Files\\nodejs\\;C:\\Users\\product\\AppData\\Local\\Programs\\OpenAI\\Codex\\bin;C:\\Users\\product\\.local\\bin;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell;C:\\Users\\product\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\product\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\product\\AppData\\Local\\Programs\\Ollama;C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin;C:\\Users\\product\\AppData\\Roaming\\npm;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\bin\\fallback;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin;C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\git\\cmd;C:\\Users\\product\\AppData\\Local\\OpenAI\\Codex\\bin\\77fbd4d52e601e0a;C:\\Users\\product\\AppData\\Local\\OpenAI\\Codex\\bin\\9614f1d9b40d9c4f"
+  },
+  "timeoutMs": 90000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-api-build-native-request-epoch",
+  "pins": {
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/api/tsconfig.json": "e37d70f01dd85f180c1e3070dbed968acd2d610beb3ec9040a78259aa8ca1b03",
+    "apps/api/package.json": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede",
+    "packages/core/package.json": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+    "packages/db/package.json": "77f9a2f02b29062d3272b633e0a6cf583a48a653c2441956a1785dd5aee83e24",
+    "packages/ai/package.json": "94410c981c147e9e72fb9e74ab415ab989a6d8f1963f55a55669aa933e21dfbc",
+    "packages/ask/package.json": "016e57234407d7bc00ee39b289f97d704062ce34bfac65223b54f16da05afed4",
+    "packages/index/package.json": "cc3a73c55269cba38982ede806cd3cb6d545ef263413c86c987e2dfbbc2a4d2c",
+    "packages/ingest/package.json": "133ea3e46d60c92da6258f4af2032997f4377b666e5b5ad36192da80fec10486",
+    "packages/meeting-bot/package.json": "12fed4722d5d8e954ee47ff5729164fd05ac6e86b26676e23e4ea6552a0e81ab",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/tsconfig.json": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0",
+    "node_modules/typescript/package.json": "822ef7ca6452205657b6288b066481ecf508bfbf43455d715cf7d3ec457561e6",
+    "apps/api/node_modules/esbuild/package.json": "9d0bc453f4e791553c4cc2298ba023b409241fd9801e494741666eb0f6051490",
+    "apps/web/node_modules/vite/package.json": "59da0b2ed89adbcf6488810159915984f25338d5ce3c1b8534b3c493b8dcbd99",
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs": "ff3224d46b47fbb24a7e9fe15fededef7e00892d07d4e376b6762d4899906bfd",
+    "tsconfig.base.json": "6bc2d632c06e482b900c73f73dd6c703b3791bd5b02b05aaf7701cd9ba417c47"
+  }
+}

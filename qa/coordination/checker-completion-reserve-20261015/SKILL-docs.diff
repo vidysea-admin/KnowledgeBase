@@ -1,0 +1,9 @@
+--- canonical-skill-before-78d5
++++ staged-reserve-docs
+@@ -6,2 +6,6 @@
+ # Independent checker
++
++## Completion reserve (opt-in)
++
++New instruction-aware review dispatches use the protected reserve by default when their allocation supports it: set `completion_reserve: true` and `completion_reserve_id` to the exact unit/cycle/candidate identity. Set `next_phase.kind` to `review` while collecting evidence; the helper keeps30seconds/800allocated tokens inside the existing total for completion, adding no budget. Use `finalization` for final hashes, verdict persistence and readback; its allocation cannot exceed that reserve. Once committed, append the phase's actual metrics/debit with `phase_kind: finalization` and the same `completion_reserve_id`; further positive allocations for that identity refuse. Preserve all prior charges when a changed candidate receives a new identity. Smaller-than-reserve scopes require coherent batching or an explicit finite exception. Old clients with omitted/false opt-in report `legacy_unreserved` and remain unprotected. This changes allocation only, never required evidence, unknown actuals or independent PASS authority.
+ 

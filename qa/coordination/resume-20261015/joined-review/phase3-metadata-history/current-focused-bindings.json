@@ -1,0 +1,138 @@
+[
+  {
+    "label": "integrated-t037-current13",
+    "receipt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current13-receipt.json",
+      "sha256": "bed6612fb16553c7cc4c775191e1daa80a5f0bf673070f488fe1d977c84567c0"
+    },
+    "log": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current13.log",
+      "sha256": "4768ec597740d354e4e16579ecc1f25f32630aa7c722001119f5992627e740bb"
+    },
+    "argv": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--test-isolation=none",
+      "--test",
+      "--test-concurrency=1",
+      "--import",
+      "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+      "src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+      "src/calendar/schedule-tick-rules-integration.test.ts"
+    ],
+    "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+    "exit": 0,
+    "actual_summary": {
+      "tests": 13,
+      "pass": 13,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "active_s": 3.985000000000582,
+    "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "pins_unchanged": true
+  },
+  {
+    "label": "integrated-t037-current-lastvalid2",
+    "receipt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current-lastvalid2-receipt.json",
+      "sha256": "8c54eafff4c1fe6a7a32fea0f2fb8059352b88a41b27c99be846ca1e1a8cbd96"
+    },
+    "log": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current-lastvalid2.log",
+      "sha256": "005f6c5e3b2d0a95d172feb14826f1b072cc97851205b84f4d61a51dd7d38f86"
+    },
+    "argv": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--test",
+      "--test-isolation=none",
+      "--test-concurrency=1",
+      "--test-timeout=30000",
+      "--import",
+      "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+      "--test-name-pattern=^(valid primary seeds snapshot; corruption/missing primary uses it without extending expiry|cached enforcement preserves previously rejected/cancelled selection and evaluator errors refuse)$",
+      "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid-enforce.test.ts"
+    ],
+    "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "exit": 0,
+    "actual_summary": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "active_s": 2.1560000000008586,
+    "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "pins_unchanged": true
+  },
+  {
+    "label": "integrated-t056-page-current",
+    "receipt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t056-page-current-receipt.json",
+      "sha256": "0d95c5e19877f618929f739347d2714b38c2cfff867d01d57117eeb27a4e0f60"
+    },
+    "log": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t056-page-current.log",
+      "sha256": "de97f63527360dc75188ce04832c10e9cdade36176f9b2a6bdee57f3b4edeae0"
+    },
+    "argv": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--require",
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\worker-trace.cjs",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "src/pages/answer-policy/PolicyAskPage.test.tsx",
+      "--pool=threads",
+      "--poolOptions.threads.singleThread",
+      "--maxWorkers=1",
+      "--minWorkers=1",
+      "--reporter=default",
+      "--reporter=C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\collection-reporter.mjs"
+    ],
+    "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+    "exit": 0,
+    "actual_summary": [
+      "Test Files  1 passed (1)",
+      "Tests  19 passed (19)"
+    ],
+    "active_s": 7.313000000000102,
+    "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "pins_unchanged": true
+  },
+  {
+    "label": "t013-ui",
+    "receipt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t013-ui-receipt.json",
+      "sha256": "177306497e836c418f60ff5cb829bac105d05b6092d9ccd36136a542f3ad50cc"
+    },
+    "classification": "Attributed older focused receipt; independent checker must authenticate reuse identity and meaningful boundary",
+    "scope": "unchanged source focused scope"
+  },
+  {
+    "label": "t056-api-exact-readlease",
+    "receipt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-api-exact-readlease-receipt.json",
+      "sha256": "db639bf8c417ec0b9af85d7f61ca731debf555535f43f3ee7deea38273edc819"
+    },
+    "classification": "Attributed older focused receipt; independent checker must authenticate reuse identity and meaningful boundary",
+    "scope": "unchanged source focused scope"
+  },
+  {
+    "label": "t056-ui",
+    "receipt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-ui-receipt.json",
+      "sha256": "b52463488431961358ad58ce813cc6d645349601c6b7e925a8cf79309f33aba8"
+    },
+    "classification": "Attributed older focused receipt; independent checker must authenticate reuse identity and meaningful boundary",
+    "scope": "directAnswer.test.ts2 only; old page19 superseded by current page19"
+  }
+]

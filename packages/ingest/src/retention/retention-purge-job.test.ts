@@ -8,6 +8,8 @@ import { join } from "node:path";
 import test from "node:test";
 import { DAY, NOW, iso, tempRoot, writeSession, baseArgs } from "./retention-report.fixtures.js";
 import { REAL_JOB_IO, MAX_REPORT_LINES, parseSummary, runPurgeJob, splitJobArgs, type JobReport } from "./retention-purge-job.js";
+import { tenantRetentionSummaryPath } from "./production/private-summary.js";
+import { runRetentionPurgeJobCli } from "./retention-purge-job-cli.js";
 
 const ASOF = ["--as-of", new Date(NOW).toISOString()];
 function fixture() {
@@ -26,8 +28,11 @@ function fixture() {
 }
 function job(f: ReturnType<typeof fixture>, flags: string[], extra: Partial<Parameters<typeof runPurgeJob>[1]> = {}) {
   const out: string[] = []; const err: string[] = [];
+  const clips: NonNullable<Parameters<typeof runPurgeJob>[1]["clips"]> = extra.clips ?? { extract: (_media, windows) => ({ ok: true,
+    outcomes: windows.map(window => ({ turnId: window.turnId, file: "injected-valid-clip", status: "exists" })) }) };
   const code = runPurgeJob([...baseArgs(f.root, f.media, ASOF), "--report-file", f.report, ...flags], {
     now: () => NOW, write: (l) => out.push(l), error: (l) => err.push(l), ...extra,
+    clips,
   });
   return { code, out, err };
 }
@@ -87,10 +92,7 @@ test("--report-file is required, single, and needs a value; usage errors write n
     const bad = job(f, ["--bogus"]);
     assert.equal(bad.code, 2);
     assert.equal(mediaFiles(f).length, 1);
-    const rep = readReport(f);
-    assert.equal(rep.exitCode, 2);
-    assert.equal(rep.summary, null);
-    assert.ok(rep.lines.some((l) => l.startsWith("ERROR ")));
+    assert.ok(!existsSync(f.report), "invalid tenant-bound arguments must not write an unscoped report");
   } finally { f.done(); }
 });
 
@@ -144,5 +146,29 @@ test("a long log is truncated to the cap but keeps the SUMMARY line", () => {
     assert.ok(rep.lines[3]?.startsWith("SUMMARY "));
     assert.ok(rep.summary !== null);
     assert.ok(MAX_REPORT_LINES >= 1000);
+  } finally { f.done(); }
+});
+test("actual job publishes a fixed tenant summary that a second sweep can consume", () => {
+  const f = fixture();
+  try {
+    assert.equal(job(f, []).code, 0);
+    const path = tenantRetentionSummaryPath(f.root, "toc"), raw = JSON.parse(readFileSync(path, "utf8"));
+    assert.equal(raw.tenantId, "toc"); assert.equal(raw.mode, "dry-run"); assert.equal(raw.clipsRetained, null); assert.equal(raw.candidates, 1);
+    assert.equal(job(f, []).code, 0); assert.equal(readReport(f).summary?.candidates, 1);
+    assert.equal(job(f, [], { stateRoot: f.media }).code, 2);
+    assert.equal(job(f, [], { lastRunFile: join(f.out, "global.json") }).code, 2);
+    assert.ok(!existsSync(join(f.out, "global.json"))); assert.equal(mediaFiles(f).length, 1);
+  } finally { f.done(); }
+});
+test("real CLI binding refuses legacy/global override and mismatched configured root; dry-run writes private state", () => {
+  const f = fixture(), errors: string[] = [];
+  try {
+    const args = [...baseArgs(f.root, f.media, ["--as-of", new Date().toISOString()]), "--report-file", f.report];
+    assert.equal(runRetentionPurgeJobCli(args, { LKB_RETENTION_LAST_RUN: join(f.out, "legacy.json") }, () => {}, line => errors.push(line)), 2);
+    assert.equal(runRetentionPurgeJobCli(args, { LKB_RETENTION_DATA_ROOT: f.media }, () => {}, line => errors.push(line)), 2);
+    assert.equal(runRetentionPurgeJobCli(args, { LKB_RETENTION_DATA_ROOT: f.root }, () => {}, line => errors.push(line)), 0, errors.join("\n"));
+    const raw = JSON.parse(readFileSync(tenantRetentionSummaryPath(f.root, "toc"), "utf8"));
+    assert.equal(raw.tenantId, "toc"); assert.equal(raw.deleted, 0); assert.equal(raw.clipsRetained, null);
+    assert.equal(mediaFiles(f).length, 1); assert.ok(!existsSync(join(f.out, "legacy.json")));
   } finally { f.done(); }
 });

@@ -1,0 +1,37 @@
+✔ independent C9: pruning an unapproved WhatsApp child invalidates a direct nonWhatsApp parent's cached summary and title (3.049ms)
+✔ independent C9: unsafe descendants taint all cached ancestors even when immediate child counts remain equal (0.6388ms)
+✔ independent unaffected evidence: properly associated nonWhatsApp parent retains its safe text (0.5203ms)
+✔ pending WA material contributes to no trusted turn, citation, claim or aggregate (9.0235ms)
+✔ only approved candidate turn is eligible, with literal substring citations and no sibling (5.3014ms)
+✔ unrelated source behavior retains current validated session, turns and claim (1.426ms)
+✔ every lookup is tenant-qualified and foreign input never becomes visible (0.7039ms)
+✔ fresh eligibility refuses rejected without a durable allow cache (2.1728ms)
+✔ fresh eligibility refuses pending without a durable allow cache (1.7912ms)
+✔ fresh eligibility refuses withdrawn without a durable allow cache (1.3802ms)
+✔ fresh eligibility refuses pending-invalidation without a durable allow cache (1.4212ms)
+✔ current source text drift invalidates old WA approval (0.9858ms)
+✔ current source speakerRef drift invalidates old WA approval (1.3605ms)
+✔ current source speakerLabel drift invalidates old WA approval (1.0653ms)
+✔ current source occurredAt drift invalidates old WA approval (1.0658ms)
+✔ tampered materialized claim text cannot grant trust (0.6412ms)
+✔ tampered materialized claim status cannot grant trust (0.4946ms)
+✔ tampered materialized claim audit cannot grant trust (0.5817ms)
+✔ tampered materialized claim evidence cannot grant trust (0.4976ms)
+✔ review provenance cannot be bypassed through source relabelling or session repointing (3.5895ms)
+✔ withdrawal during evidence validation cannot survive an earlier claim snapshot (0.9362ms)
+✔ database errors and malformed tenants fail closed without exposing an error (0.5981ms)
+✔ safe approved citation session omits raw title, participants and arbitrary metadata (0.8898ms)
+✔ metadata attachment approval does not publish unrelated source-message content (2.0458ms)
+✔ trusted tree drops legacy WA nodes and mixed parent summaries, then admits only reviewed facts (2.8701ms)
+✔ trusted tree does not borrow foreign tenant identities or absent source associations (0.4241ms)
+✔ a valid nonWA parent cannot retain tainted cached title/summary after WA descendants are pruned (1.7206ms)
+✔ nonWA eligibility consumes the real corrected projection without rewriting immutable originals (1.1119ms)
+✔ an effective WA correction withdraws old approval even while raw source evidence still matches (3.0383ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1911.2338

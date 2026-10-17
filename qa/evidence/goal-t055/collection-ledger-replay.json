@@ -1,0 +1,79 @@
+{
+  "issueId": "ISS-T055COLLECTIONS-001",
+  "proofClass": "actual-mounted-api-concrete-store-filter-enforcing-fake-db",
+  "original": {
+    "_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "tenantId": "a",
+    "title": "Saved curation",
+    "revision": 1,
+    "updatedAt": "2026-10-14T00:00:00.000Z",
+    "members": [
+      {
+        "kind": "session",
+        "id": "shared"
+      },
+      {
+        "kind": "speaker",
+        "id": "mixed-speaker"
+      },
+      {
+        "kind": "session",
+        "id": "wa-session"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "caseId": "A",
+      "status": 409,
+      "originalRowUnchanged": true,
+      "storedRow": {
+        "_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tenantId": "a",
+        "title": "Saved curation",
+        "revision": 1,
+        "updatedAt": "2026-10-14T00:00:00.000Z",
+        "members": [
+          {
+            "kind": "session",
+            "id": "shared"
+          },
+          {
+            "kind": "speaker",
+            "id": "mixed-speaker"
+          },
+          {
+            "kind": "session",
+            "id": "wa-session"
+          }
+        ]
+      }
+    },
+    {
+      "caseId": "B",
+      "status": 409,
+      "originalRowUnchanged": true,
+      "storedRow": {
+        "_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tenantId": "a",
+        "title": "Saved curation",
+        "revision": 1,
+        "updatedAt": "2026-10-14T00:00:00.000Z",
+        "members": [
+          {
+            "kind": "session",
+            "id": "shared"
+          },
+          {
+            "kind": "speaker",
+            "id": "mixed-speaker"
+          },
+          {
+            "kind": "session",
+            "id": "wa-session"
+          }
+        ]
+      }
+    }
+  ]
+}

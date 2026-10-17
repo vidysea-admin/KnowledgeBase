@@ -109,7 +109,7 @@ export function createSendNowDeps(opts: SendNowHostOptions = {}): SendNowDeps {
         if (opts.readLiveJobs) jobs = await opts.readLiveJobs();
         else {
           const { readWebinarOperationState } = await import("../../packages/meeting-bot/src/calendar/state/schedule-state.js");
-          jobs = readAllLiveJobs({ operationsFile: path.join(root, "data", "webinar-release", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), recordingsDir: liveRecordingDir(root), tenantId: tenant }, now(), readWebinarOperationState);
+          jobs = readAllLiveJobs({ operationsFile: path.join(root, "raw", "webinars", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), recordingsDir: liveRecordingDir(root), tenantId: tenant }, now(), readWebinarOperationState);
         }
       } catch (e) {
         return { ok: false, kind: "unreadable", reason: "live-jobs-unreadable", message: `cannot tell whether a bot is already in this meeting (${e instanceof Error ? e.message.slice(0, 200) : "unreadable"}); nothing was launched` };

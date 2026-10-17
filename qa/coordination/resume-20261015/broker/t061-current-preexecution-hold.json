@@ -1,0 +1,12 @@
+{
+  "status": "PREEXECUTION_HOLD",
+  "request": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t061-current-dependencies\\request.md",
+    "sha256": "9a74654c64c7fdc4956f4134f86e0746a5696a962aa402121029a7ae7823eb1a"
+  },
+  "singleMetadataIssue": "No exact current candidate/source-dependency pin manifest accompanies this read-only prep request; historical mismatched receipt pins and observed HEAD are not a frozen working-tree binding.",
+  "testCommandsLaunched": 0,
+  "accounting": "SHARED INTEGRATION, not T022 checker",
+  "sourceEdits": false,
+  "retry": false
+}

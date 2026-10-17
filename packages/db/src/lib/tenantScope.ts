@@ -64,7 +64,7 @@ const BULK_OPS = ["insertOne", "updateOne", "updateMany", "replaceOne", "deleteO
  * filter. `updateOne` below closes that gap; `raw` is gone.)
  */
 export function scopedCollection<T extends { tenantId: string; _id: string }>(
-  db: Db,
+  db: Pick<Db, "collection">,
   name: string,
 ) {
   const raw: Collection<T> = db.collection<T>(name);

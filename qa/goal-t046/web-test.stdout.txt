@@ -1,0 +1,10 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/meeting-bot/RetentionSection.test.tsx (4 tests) 314ms
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  19:01:15
+   Duration  2.39s (transform 138ms, setup 266ms, collect 392ms, tests 314ms, environment 887ms, prepare 199ms)
+

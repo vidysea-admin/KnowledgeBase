@@ -1,0 +1,68 @@
+{
+  "phase": "maker-verification",
+  "scope": "T052 Python pre-submit receipt producer selected fake-driver cases only",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "cc1543fee5593ca1b927f7de9881189e0fc986df4eda249f0b20573d8e5f18e8",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "pytest",
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py",
+    "-k",
+    "retry_receipt",
+    "--basetemp",
+    "C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/registration-pytest-owned-temp",
+    "-q"
+  ],
+  "program": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+  "runtime_version": "Python 3.12.10",
+  "runtime_executable_sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+  "runtime_identity": {
+    "executable": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+    "version": "Python 3.12.10",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment_hash": "536475920c6b56ea68847561b44e5b98ab84c903e1eeedcf66d0a42ef95d3277",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "PYTHONDONTWRITEBYTECODE": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "retry_receipt"
+  ],
+  "timeoutMs": 30000,
+  "startedAt": "2026-10-15T11:47:07.466Z",
+  "completedAt": "2026-10-15T11:47:10.652Z",
+  "elapsedMs": 3182.7639,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+    "packages/meeting-bot/py/sb_join.py": "bae07ab1186319b62938d6d791b8ceaafba86394d55bc1d32fb8e65ceb556cba",
+    "packages/meeting-bot/py/sb_join_register.py": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1"
+  },
+  "after": {
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+    "packages/meeting-bot/py/sb_join.py": "bae07ab1186319b62938d6d791b8ceaafba86394d55bc1d32fb8e65ceb556cba",
+    "packages/meeting-bot/py/sb_join_register.py": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-registration-retry-python.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-registration-retry-python.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

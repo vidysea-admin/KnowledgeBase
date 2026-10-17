@@ -1,0 +1,119 @@
+{
+  "format": "qa-local-wip-allowlist-v1",
+  "status": "PREPARED_NOT_STAGED_NOT_COMMITTED",
+  "root": "C:/Users/product/Desktop/KnowledgeBase/",
+  "qaCandidate": "a666f51df7ed8b49d54e5e9b6076468ac7f430eb6ec45cb8a06673e5911b5a3e",
+  "baseHeadDuringBrokerProof": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "headRequirement": "Root must release current native HEAD hold and reconcile actual HEAD before commit; no Git operation by coordinator",
+  "files": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "4c3661b659c4dfacfdcd07144b8de659a406b0b657166f6e1d3dcfb5142a9851"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "sha256": "a0cc779e50ed05a9361aa36500a68ccc42c86b7f21ad318d767321770f02c2a0"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs",
+      "sha256": "1ced3773c03ad443e3396a7983a1c09d729c39902f91ae4d28140c93ce7973c4"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/terminal-report.json",
+      "sha256": "1c3152fbd39d602f1c9be8e0f9a688bf243495445f50b0e676aee16f76649e18"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-final-seal.json",
+      "sha256": "221f2a9758c69c33bc4578abcce3124f82ae818717fbd7eb43a911bce50a8558"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-compact-results.json",
+      "sha256": "707420f4aeb43397d248abe9c6ff35ac1f7253aea16fd9153104c4c79800904c"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-synthetic2-receipt.json",
+      "sha256": "f4733597fe642c5d9840ee798d33b993aa8a6d627dc8a977bf195c88356bb26b"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-focused4-receipt.json",
+      "sha256": "fdd7635210dcbfa3a0ba8c98e39b10e12370bd93163df27b24e7dd2947520cfd"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-all92-receipt.json",
+      "sha256": "b2669e1e4378397c477d0931fdce636c8bf3ca56a2a33afccf8750606c539ee5"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.focus-repair2.json",
+      "sha256": "8dff0e9d9baa22c30c8826722a45e879b6ca15f339812d031078393041cd650e",
+      "bytes": 58144,
+      "hasRawPassage": false
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.all92-repair2.json",
+      "sha256": "23af593a011b2c4e537069c993ec728e62e6c0b0787fa5ac448f7837f08aa51f",
+      "bytes": 250005,
+      "hasRawPassage": false
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91.json",
+      "sha256": "939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91",
+      "bytes": 59510,
+      "hasRawPassage": false
+    }
+  ],
+  "metadataSelfPath": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+  "excluded": [
+    "full1308/1389source inventories",
+    "full corpus",
+    "raw passages/questions",
+    "credentials/env",
+    "vendor or runtime executable files",
+    "nested duplicate result outputs",
+    "production sources",
+    "data/gold/human labels"
+  ],
+  "existingWorkspaceProofReferencesOnly": [],
+  "proofPortability": "Actual focused/full92 results and sealed scoped CAS are now included as original sanitized proof dependencies; referenced production/raw data/runtime identities are not copied or modified. No complete runtime/data replay environment claim.",
+  "noNewTestsCallsOrReviewers": true,
+  "sanitizedProofDependencyAppend": {
+    "status": "READY_FOR_ROOT_AUTHORIZED_LOCAL_WRITER",
+    "previousAllowlistSha256": "37e7da4865afd2e1fffeeb326bed5d74c4bc0dcea44f60f17772a20aa92b2bc3",
+    "files": [
+      {
+        "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.focus-repair2.json",
+        "sha256": "8dff0e9d9baa22c30c8826722a45e879b6ca15f339812d031078393041cd650e",
+        "bytes": 58144,
+        "hasRawPassage": false,
+        "sensitiveFieldMatches": 0,
+        "fieldsChecked": "quote/text/question/answer/content/prompt/messages/rawText/passage/credential/secret/authorization/headers; nonempty values only",
+        "preservedOriginalBytes": true
+      },
+      {
+        "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.all92-repair2.json",
+        "sha256": "23af593a011b2c4e537069c993ec728e62e6c0b0787fa5ac448f7837f08aa51f",
+        "bytes": 250005,
+        "hasRawPassage": false,
+        "sensitiveFieldMatches": 0,
+        "fieldsChecked": "quote/text/question/answer/content/prompt/messages/rawText/passage/credential/secret/authorization/headers; nonempty values only",
+        "preservedOriginalBytes": true
+      },
+      {
+        "path": "qa/coordination/resume-20261015/broker/pin-manifests/939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91.json",
+        "sha256": "939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91",
+        "bytes": 59510,
+        "hasRawPassage": false,
+        "sensitiveFieldMatches": 0,
+        "fieldsChecked": "quote/text/question/answer/content/prompt/messages/rawText/passage/credential/secret/authorization/headers; nonempty values only",
+        "preservedOriginalBytes": true
+      }
+    ],
+    "totalBytes": 367659,
+    "maxBytes": 2097152,
+    "rawPassagesOrCredentialsDetected": false,
+    "originalFileBytesUnmodified": true,
+    "scopedCasPinCount": 351,
+    "sourceInventoryCopied": false,
+    "sourceInventoryReferenceOnly": true,
+    "referencedCodeAndApprovedDataNotIncludedOrModified": true
+  }
+}

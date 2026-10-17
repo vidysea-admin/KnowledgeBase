@@ -1,0 +1,20 @@
+✔ Mongo store binds authority and relation CRUD to one session with tenant/revision CAS (4.7393ms)
+✔ Mongo authority capability refuses source writes/unscoped reads; failure aborts and closes session (1.744ms)
+✔ Mongo store refuses missing transaction support, foreign writes and inconsistent replacement (0.6493ms)
+✔ proposal is durable suggested only; explicit human review makes current same-speaker relation available (5.0032ms)
+✔ automation cannot review; no actor can turn suggested or deterministic identity into confirmed (1.3176ms)
+✔ stale, invisible, foreign, forged and missing endpoint evidence fails closed (2.0732ms)
+✔ cross-person persisted endpoints and revoked/corrected source snapshots never enter accepted reader (2.1112ms)
+✔ review CAS has one winner; mismatched keys and stale expected revisions conflict (1.0792ms)
+✔ idempotent review receipt survives later revocation without reopening the relationship (1.0421ms)
+✔ source changes between proposal and review refuse writes; storage CAS failure refuses receipt (0.5113ms)
+✔ all tenant-bound operations refuse foreign persisted rows and invalid/unbounded input (0.6628ms)
+✔ identical caller proposal keys produce separate Mongo identities across tenants (0.5676ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 861.81

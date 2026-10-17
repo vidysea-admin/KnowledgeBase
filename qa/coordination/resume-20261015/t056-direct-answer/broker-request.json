@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "status": "QUEUED_ROOT_SOLE_BROKER",
+  "unit": "t056-direct-answer",
+  "cycle": 0,
+  "tier": 3,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "policy_version": "managed-review/1",
+  "source_frozen": true,
+  "source_pins": "source-pins.json",
+  "dependency_pins": "dependency-pins.json",
+  "commands": [
+    {
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+      "command": "node --import tsx --test --test-name-pattern=\"direct older|direct legacy|direct answer read|reported evidence uses|all reported conflicts|graph selector conflict replay|changed evidence or policy\" apps/api/src/answer-policy/answer-workflow.test.ts apps/api/src/answer-policy/answer-router.test.ts",
+      "timeout_s": 120,
+      "coverage": "New direct persisted metadata beyond latest100 and legacy refusal; actual HTTP auth/scope/tenant/missing ID; existing freshness/source-resolution lineage and graph-selection mismatch before generation."
+    },
+    {
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+      "command": "node ../../node_modules/vitest/vitest.mjs run src/pages/answer-policy/directAnswer.test.ts src/pages/answer-policy/PolicyAskPage.test.tsx",
+      "timeout_s": 120,
+      "coverage": "Direct DTO/identity/legacy/held rejection; older-run original filters/mode/graph replay; actual UI resolved-source rebuild and same-key/key rotation/URL/ownership downstream regressions."
+    }
+  ],
+  "central_followup": "Select compatible affected API/web semantic typechecks and contracts/verify_contracts.py on final pins. Capture complete outputs, exits, actual node counts, timings, runtime/import/lock fingerprints. Disclose empty-registry vacuity and separately attribute shared integration cost.",
+  "constraints": ["No broad suite/browser/provider/native DB/production writes", "Broker owns CPU grant and process timeout", "Verify source/dependency pins before and after checks", "Stop on drift or setup gap; no silent retry", "Use existing compatible runtime and writable temp parent", "Existing source evidence fixtures remain synthetic, not human acceptance"],
+  "execution_receipts": [],
+  "maker": { "token_metric": "actual_total", "active_s": null, "tokens": null, "cost": null },
+  "review_dispatch_authorized": false
+}

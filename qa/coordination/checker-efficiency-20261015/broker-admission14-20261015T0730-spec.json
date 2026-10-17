@@ -1,0 +1,21 @@
+{
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "skills/checker-efficient/scripts/checker-admission.test.mjs"
+  ],
+  "timeoutMs": 30000,
+  "output": "qa/coordination/checker-efficiency-20261015/broker-admission14-20261015T0730",
+  "pins": {
+    "skills/checker-efficient/scripts/checker-admission.mjs": "961094794547303935768510f947adb66e5f39e4dcfe4b916ba6abc8ab2d5f8c",
+    "skills/checker-efficient/scripts/checker-admission.test.mjs": "fed41bc5b5b03f41cb19e8a37295c029f4718294194fa6e3e22712cb6cb0a9f0",
+    "skills/checker-efficient/SKILL.md": "55b0cd345a5e7cfa3f64c9366e9d2ab1944476c317136a4e40396bfcd7b45ffb",
+    "skills/maker/SKILL.md": "4489f1a3e1b9ed7e794c943becc06f80ffc296ce1a60cb308548b035348a76f0",
+    "skills/checker/SKILL.md": "de26e5d9bf3aa8c117c73928ba2a7fbe97a97f86089a30f6179ee16222d03099",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778"
+  }
+}

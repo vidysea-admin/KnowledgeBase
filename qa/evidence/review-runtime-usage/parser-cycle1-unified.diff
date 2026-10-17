@@ -1,0 +1,58 @@
+--- cycle0/review-runtime-usage.mjs
++++ cycle1/review-runtime-usage.mjs
+@@ -14,13 +14,12 @@
+   let identity = null, usage = null, timestamp = null, lifecycle = null, malformed = false;
+   const lines = createInterface({ input: createReadStream(file), crlfDelay: Infinity });
+   for await (const line of lines) {
+-    // Rollout envelope order is timestamp,type,payload (or type first).
+-    // Parse only the selected metadata event kinds, never response/tool bodies.
++    // This is only a cheap prefilter, not an envelope parser: runtime adds
++    // ordinal and JSON keys may appear in any order. JSON structure below is
++    // authoritative; nested type strings cannot impersonate an outer event.
++    // Only allowlisted metadata is retained, never conversation/tool bodies.
+     if (!line.trimEnd().endsWith('}')) { malformed = true; continue; }
+-    const envelope = line.match(/^\s*\{\s*(?:"timestamp"\s*:\s*"[^"]*"\s*,\s*)?"type"\s*:\s*"([^"]*)"/);
+-    if (!envelope) { malformed = true; continue; }
+-    if (!['session_meta', 'event_msg'].includes(envelope[1])) continue;
+-    if (envelope[1] === 'event_msg' && !/"payload"\s*:\s*\{\s*"type"\s*:\s*"(?:token_count|task_started|task_complete|turn_aborted)"/.test(line)) continue;
++    if (!/"type"\s*:\s*"(?:session_meta|event_msg)"/.test(line)) continue;
+     let event;
+     try { event = JSON.parse(line); } catch { malformed = true; continue; }
+     if (event.type === 'session_meta') {
+--- cycle0/review-runtime-usage.test.mjs
++++ cycle1/review-runtime-usage.test.mjs
+@@ -3,7 +3,7 @@
+ import { mkdtemp, writeFile, readFile, rm, symlink } from 'node:fs/promises';
+ import { tmpdir } from 'node:os';
+ import path from 'node:path';
+-import { TOKEN_FIELDS, snapshot, phaseDelta, writeReceipt } from './review-runtime-usage.mjs';
++import { TOKEN_FIELDS, readSession, snapshot, phaseDelta, writeReceipt } from './review-runtime-usage.mjs';
+ 
+ const time = '2026-10-15T10:00:00Z';
+ const counts = n => Object.fromEntries(TOKEN_FIELDS.map(k => [k, n]));
+@@ -65,3 +65,25 @@
+   await symlink(outside, linked, process.platform === 'win32' ? 'junction' : 'dir');
+   await assert.rejects(writeReceipt(f.root, path.join(linked, 'receipt.json'), {}), /outside_workspace/);
+ });
++test('actual sanitized runtime metadata accepts ordinal and arbitrary envelope/payload ordering', async t => {
++  // Derived from actual dedicated-checker metadata; IDs/path aliased, counters and
++  // timestamps/ordinal preserved. No response, tool or instruction bodies copied.
++  const fixturePath = new URL('../../qa/fixtures/review-runtime-usage-ordinal.jsonl', import.meta.url);
++  const actual = await readSession(fixturePath);
++  assert.equal(actual.status, 'known');
++  assert.equal(actual.identity.agent_path, '/root/public-fixture');
++  assert.equal(actual.cumulative_tokens.total_tokens, 614949);
++  const f = await fixture(t);
++  const source = (await readFile(fixturePath, 'utf8')).trim().split('\n').map(JSON.parse);
++  const reordered = source.map(event => {
++    const p = event.payload;
++    const payload = event.type === 'session_meta'
++      ? { agent_path: p.agent_path, parent_thread_id: p.parent_thread_id, id: p.id }
++      : { ...(p.info ? { info: p.info } : {}), type: p.type };
++    return ` \t${JSON.stringify({ payload, ordinal: event.ordinal, type: event.type, timestamp: event.timestamp })} \t`;
++  }).join('\n');
++  // A nested metadata-looking type in an unrelated event is never identity.
++  const unrelated = { type: 'response_item', payload: { type: 'session_meta', id: 'forged', agent_path: '/root/forged', body: 'PRIVATE_BODY_SENTINEL' } };
++  await writeFile(f.file, reordered + '\n' + JSON.stringify(unrelated) + '\n');
++  assert.deepEqual(await readSession(f.file), actual);
++});

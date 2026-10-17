@@ -1,0 +1,45 @@
+{
+  "status": "MAKER_GREEN_NOT_INDEPENDENT",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "totalMeasuredCommandSeconds": 79.173,
+  "policy": "managed-review/1",
+  "sources": [
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+      "sha256": "7f8e3b57b7b8265fa3f01fadf2cd0a653eb6bb0738d2d453fd4d8e421732b95d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+      "sha256": "d23856afa2ddc319113f6cfe328e5be26c7a13b70100cc46b1a5b1cd29f5db39"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/provider-input.ts",
+      "sha256": "b43270f60a3f2af98b3ba6dd64cfc947046878ec53835bbd441fcbc9c03efab0"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/provider-input.test.ts",
+      "sha256": "6472d427c31f54a31a45b2b791664ebbaf1daf49e00f3e240f081b2d4fca97f4"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+      "sha256": "83d661282aa845662fb34a4e5279ba15afa06ea022c4594758e6c8131388e73c"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.test.ts",
+      "sha256": "76d4462932c18cb0cb4f185a656aeacb64354c02ffbc391903621cb79a3424cf"
+    }
+  ],
+  "candidateSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "cycle": 1,
+  "commandDurationsSeconds": [
+    39.985,
+    39.188
+  ],
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "token_metric": "actual_total"
+}

@@ -1,0 +1,18 @@
+✔ approved exact scope and authenticated approved source need positive relevance; exclusions win (7.4568ms)
+✔ policy strict fields refuse implicit scope, credentials and malformed profile/relevance (1.0327ms)
+✔ CAS persists explicit profile approval across restart; edits revoke it and stale operations cannot restore it (144.2035ms)
+✔ corrupt/foreign/stale approval refuses and cannot be silently repaired (97.7912ms)
+✔ approved registration profile never overrides saved join-rule deny or per-meeting opt-out (85.9044ms)
+✔ unsafe ancestor is refused before missing policy directory can be created outside the state root (3.7515ms)
+✔ oversized mailbox is refused and oversized stored bytes cannot be read or overwritten (57.8283ms)
+✔ private proven registration aliases only restrict cross-source opt-outs; they cannot grant profile scope (75.2348ms)
+✔ actual authenticated route → durable profile approval → candidate-bound registration consumer (935.5239ms)
+✔ saved policy boundaries match actual T052 consumer limits before approval (48.3512ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9182.5188

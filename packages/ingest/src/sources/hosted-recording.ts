@@ -54,6 +54,7 @@ export interface HostedRecordingDeps {
   transcribe: Transcribe;
   downloader?: HostedRecordingDownloader;
   now?: () => string;
+  durationProbe?: (path: string) => Promise<number>;
 }
 
 interface Recogniser {
@@ -185,7 +186,9 @@ function createHosted(rec: Recogniser, deps: HostedRecordingDeps): Source {
       }
       const bytes = await deps.reader(source.path);
       if (bytes.byteLength === 0) throw new HostedRecordingError(rec.name, "empty-output", "media file is empty");
-      return deps.transcribe(bytes, {});
+      const mediaDurationSeconds = deps.durationProbe ? await deps.durationProbe(source.path) : undefined;
+      const opts = mediaDurationSeconds === undefined ? {} : { diarize: true, mediaDurationSeconds };
+      return deps.transcribe(bytes, opts);
     },
   };
 }

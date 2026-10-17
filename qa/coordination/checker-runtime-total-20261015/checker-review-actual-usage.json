@@ -1,0 +1,27 @@
+{
+  "schema": "review-runtime-usage/v1",
+  "unit": "checker-runtime-total",
+  "cycle": 3,
+  "phase": "independent-review",
+  "boundary": "end",
+  "agent_prefix": "/root/checker_token_metric_fix/independent_runtime_checker",
+  "observed_at": "2026-10-15T11:21:46.258Z",
+  "coverage": "explicit_session_files_only",
+  "records": [
+    {
+      "identity": null,
+      "usage_timestamp": null,
+      "lifecycle": null,
+      "cumulative_tokens": null,
+      "status": "unknown",
+      "reasons": [
+        "malformed_or_partial_record",
+        "missing_identity",
+        "missing_or_invalid_usage",
+        "inflight_or_unconfirmed_completion"
+      ]
+    }
+  ],
+  "active_seconds": null,
+  "monetary_cost": null
+}

@@ -1,0 +1,23 @@
+{
+  "phase": "review-authoring-checkpoint",
+  "status": "NEEDS_EXTRA_REVIEW",
+  "start_utc_bound": "2026-10-15T12:04:25+00:00",
+  "end_utc": "2026-10-15T12:07:01.701271+00:00",
+  "active_s": null,
+  "wall_bound_s": 156.701271,
+  "wait_intervals": [],
+  "clock_limitation": "Start is conservative reconstructed UTC bound; initial monotonic stopwatch was subprocess-local and not retained. No measured active-time success claim. All elapsed time conservatively charged; no waits.",
+  "tokens": null,
+  "output_tokens": null,
+  "cost": null,
+  "token_metric": "actual_total",
+  "budget_debit": {
+    "active_s": 156.701271,
+    "tokens": 300000,
+    "token_metric": "actual_total"
+  },
+  "children": [],
+  "native_telemetry": "not yet authenticated; token_count counters unavailable in this phase; no bodies read",
+  "next_gate": "Fresh dual-helper cumulative finalization assess; if charged active time exceeds admission, explicit finite escalation required before any additional review/finalization",
+  "completion_reserve_id": "quality-four/current/sha256:9178adef7f4a1c3d9c92717e88ca76c87cb9d1574d2051ef64addfeba87c973e"
+}

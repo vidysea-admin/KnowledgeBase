@@ -1,0 +1,13 @@
+# goal-t055 independent checker feedback packet
+
+Issue: ISS-T055COLLECTIONS-001. Root explicitly authorized the unique new shard qa/issues.T055COLLECTIONS.jsonl; no canonical issue sequence or shared feedback inbox is changed. Original finding is static source review; no executed original RED run is claimed. Current fix and authored tests remain unverified until ready/freeze and a fresh CPU-broker grant.
+
+## Verbatim original feedback
+
+Privacy static review found one remaining write-boundary blocker: GET /knowledge/collections sanitizes hidden members and disables UI edit, but PUT with the visible member subset (or []) plus current expectedRevision still replaces the entire stored members array. Neither route nor writeCollection checks the existing collection for unavailable members. Thus an API client submitting the sanitized GET representation can silently delete withheld private references while returning 200, violating the stated preservation/fail-closed partial-edit policy. Before any update, inspect the persisted current row under tenant+revision and refuse replacement when any existing member is unavailable, or explicitly preserve hidden memberships using an approved policy. Full intentional collection DELETE can remain separate. Add mounted API test: mixed safe/private saved members → GET omits private ID → PUT sanitized members/current revision → refused and stored original members/revision unchanged. Source metadata filtering/visible aggregate logic otherwise appears correct statically; no tests/verdict.
+
+## Candidate and required measurement
+
+At 2026-10-14T20:53:01.9310185+00:00 the current store SHA256 was ba2c80800f94b556d69cee93a90cc4a06294ee93efbc797f9dbc93cb46c661a7 and standing test SHA256 was a6c9a1910d93a050c4d91d137aa13e0eccb4fe461a2c8e657a62f44f8fec7ef8. Concrete store source loads the current exact tenant/id/revision row and checks every existing member before replacement. The mounted standing test authors both sanitized-subset and empty replacement refusals with full stored-row equality. These observations are reads, not test execution.
+
+The ledger's two reproduction cases A/B are the floor and must be replayed verbatim against actual authenticated createServer plus concrete store and filter-enforcing Mongo-like fixture. Required control C verifies fully visible updates still succeed and preserve a same-tenant sibling. Record per-case output and complete stored membership/revision/updatedAt checks. Current issue measurement: 0/2 unexecuted; control unexecuted. No verdict issued or task completion inferred. Root runtime may consume this packet for coordinated append to shared qa/feedback-inbox.md.

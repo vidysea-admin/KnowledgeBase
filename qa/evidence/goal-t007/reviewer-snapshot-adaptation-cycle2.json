@@ -1,0 +1,12 @@
+{
+  "preparedAt": "2026-10-14T22:31:15.4039558Z",
+  "cycle": 2,
+  "issue": "ISS-T007REVIEWSOURCE-001",
+  "originalHash": "30D3D3B6720332FB1E993AA7F35D3A6AC25350A5A6E1E5DFC931E03AE9AD3F5A",
+  "adaptedHash": "F600541F8C0EE4E22A6EAA2F8C6553450F270D725B9B497B2C8990BFA625087D",
+  "mechanicalFacadeOnlyReversalEqualsOriginal": true,
+  "requiredAttackTrigger": "transcript_reviews findOne count6",
+  "requiredAttackCount": 2,
+  "requiredUnaffectedControl": 1,
+  "execution": "UNEXECUTED: sole broker fresh FIFO required"
+}

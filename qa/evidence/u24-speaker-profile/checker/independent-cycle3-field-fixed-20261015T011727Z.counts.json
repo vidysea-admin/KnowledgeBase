@@ -1,0 +1,11 @@
+{
+  "originalReceiptSha256": "9990e7208b80ecf5ad24358c39c43232df81e096241dc4552a987930f2506815",
+  "reason": "Original receipt parser expected TAP #; actual Node spec reporter uses informational marker. Immutable original preserved.",
+  "counts": {
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0,
+    "tests": 8
+  },
+  "stdoutSha256": "b8491d831cb8ca57e7bff2d6cbe6e8682653dadfd5caa6dd546e494ae976b524"
+}

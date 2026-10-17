@@ -1,0 +1,11 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/championship/ChampionshipPage.test.tsx (5 tests) 532ms
+ ✓ src/pages/championship/client.test.ts (2 tests) 10ms
+
+ Test Files  2 passed (2)
+      Tests  7 passed (7)
+   Start at  21:52:18
+   Duration  4.61s (transform 190ms, setup 490ms, collect 576ms, tests 541ms, environment 2.09s, prepare 361ms)
+

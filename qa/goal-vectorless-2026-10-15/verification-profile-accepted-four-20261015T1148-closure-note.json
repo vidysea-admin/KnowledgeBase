@@ -1,0 +1,5 @@
+{
+  "pins": 501,
+  "resolutionCorrection": "@lkb/core/src/domain/lean-video.js resolves package root/src/domain/lean-video.ts; conservative static import walker initially doubled src; existing source pin corrected, no runtime source changes",
+  "scope": "Actual conservative transitive imports include type-only modules and server imported by selected test file"
+}

@@ -1,0 +1,14 @@
+✔ A8/A14 each call is durably reserved before HTTP; cumulative resume honors actual receipts (274.7906ms)
+✔ A8/A9 actual production scorer sees per-HTTP abort and discloses fallback without raw secrets (244.6504ms)
+✔ A2/A14 source drift during factory loading stops before HTTP and cannot be resumed after bytes restore (47.6456ms)
+✔ A12 real exported entry rejects fabricated human proof even when typed flags and current corpus checksum agree (153.5133ms)
+✔ A14 PID acquisition guards refuse live and ambiguous owners while verified dead guards recover (31.6753ms)
+✔ A7/A9 audit rejects unknown or foreign receipts and duplicate scored cells instead of counting them (140.0943ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 931.0867

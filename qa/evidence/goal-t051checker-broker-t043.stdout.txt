@@ -1,0 +1,15 @@
+✔ passed speech-only source emits a proof without a combined artifact (17.1076ms)
+✔ selected combined input is hashed; stray combined bytes do not change a speech proof (31.6855ms)
+✔ speech proof refuses failed, unvalidated, stale or missing validation (33.0848ms)
+✔ no proof for an incomplete, degraded, empty or foreign-session index result (64.8044ms)
+✔ changed source or validation during indexing cannot certify stale database input (20.2962ms)
+✔ loader disagreement and stale combined-stage hashes are refused before indexing (19.2375ms)
+✔ prepared turn count remains fixed when caller mutates its loader array (16.5063ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 239.8191

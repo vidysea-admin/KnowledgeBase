@@ -1,0 +1,97 @@
+{
+  "candidatePins": [
+    {
+      "path": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "oldPath": "apps/api/src/indexing/decisions-persist.test.ts",
+      "bytes": 11955,
+      "nonblank": 171,
+      "sha256": "da19ef9198a47201bdf59dd2f5a484b009cf9af33099319c4e7940860d0380be"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "oldPath": "apps/api/src/indexing/decisions-persist.ts",
+      "bytes": 4464,
+      "nonblank": 65,
+      "sha256": "9e3f10622b1c88210e166d277c57c952a88f4369608faf1a6efa7166e82dbeb2"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "oldPath": "apps/api/src/indexing/promote-entities.test.ts",
+      "bytes": 26036,
+      "nonblank": 389,
+      "sha256": "ee1c74fa878ece78d7564a154d7a48c6650209a7dd314e93ec827dbbcc3134ab"
+    },
+    {
+      "path": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "oldPath": "apps/api/src/indexing/promote-entities.ts",
+      "bytes": 6605,
+      "nonblank": 123,
+      "sha256": "673ea06b2862b7d8d575c8a04e94b32181563405ea143524d439783f51842108"
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "oldPath": "apps/api/src/indexing/session.ts",
+      "bytes": 22087,
+      "nonblank": 300,
+      "sha256": "a6713203fcbaa5cb79ce60d997543531b8e7b1086f80a5dbb5679140bb39129e"
+    },
+    {
+      "path": "apps/api/src/session-decisions/reader.test.ts",
+      "oldPath": "apps/api/src/session-decisions/reader.test.ts",
+      "bytes": 15895,
+      "nonblank": 221,
+      "sha256": "d6d296e1affe2a8b7c8dff26786e169e42c95f43280e1183348a751b82a45fd9"
+    },
+    {
+      "path": "scripts/backfill.mjs",
+      "oldPath": "scripts/backfill.mjs",
+      "bytes": 10551,
+      "nonblank": 178,
+      "sha256": "3be65f3c885d4eabc7285fa94fb81c9401e430d4db08a38885b883b1df6c03b7"
+    }
+  ],
+  "brokerRequest": "qa/coordination/resume-20261015/indexing-structure-maker/broker-request.json",
+  "token_metric": "actual_total",
+  "requiredInventoryRefresh": "Next broker inventory supersedes old paths with exact mapping and overlays seven current SHA256 pins; all unchanged source pins preserved.",
+  "oldReceiptsReusable": false,
+  "oldSnapshotsPreserved": [
+    {
+      "path": "qa/coordination/resume-20261015/broker/phase-b-authority.json",
+      "sha256": "7f6f4fd1883f47ba4cea4fe4b7db1bd9ea36b676e43d5648c23087f2b9b99dba"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/phase-b-inventory-after.json",
+      "sha256": "7e88c001d1913801d50d3dd463e6f210a0071646bf7537e58e9f955b4983f850"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/phase-b-gate-summary.json",
+      "sha256": "9846ee0a5263a606eb17672df0f09782c9bacc5d85046d7a6a2cb96a0ef191f8"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/phase-b-structure-paths.json",
+      "sha256": "71ac50b821257f8857d95e898dbe5848bbe7c6707a106884603658f50612ea8d"
+    }
+  ],
+  "mapping": [
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.ts",
+      "old": "apps/api/src/indexing/decisions-persist.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/decisions-persist.test.ts",
+      "old": "apps/api/src/indexing/decisions-persist.test.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.ts",
+      "old": "apps/api/src/indexing/promote-entities.ts"
+    },
+    {
+      "new": "apps/api/src/indexing/persistence/promote-entities.test.ts",
+      "old": "apps/api/src/indexing/promote-entities.test.ts"
+    }
+  ],
+  "actual_total_tokens": null,
+  "authority": "Root transferred exact4 move plus3 consumer lease after PhaseB final inventory sealed",
+  "status": "FROZEN_SOURCE_CHECKS_PENDING",
+  "schema": "phase-b-indexing-structure-adoption/1"
+}

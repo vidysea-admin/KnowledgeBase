@@ -7,7 +7,7 @@ const A="111111111111111111111111", B="222222222222222222222222";
 const hash=(s:string)=>createHash("sha256").update(s).digest("hex");
 function fixture(fetchMessages:NonNullable<WhatsAppStoreOptions["fetchMessages"]>,beforeWrite?:()=>void) {
  const rows:Array<{name:string;row:any}>=[];
- const appDb=()=>({collection:(name:string)=>({findOne:async()=>null,replaceOne:async (_filter:unknown,row:unknown)=>{beforeWrite?.();rows.push({name,row})},bulkWrite:async(ops:any[])=>{for(const op of ops)rows.push({name,row:op.replaceOne.replacement})}})}) as unknown as Db;
+ const appDb=()=>({collection:(name:string)=>({findOne:async()=>null,updateOne:async (_filter:unknown,update:any)=>{beforeWrite?.();rows.push({name,row:update.$setOnInsert})},replaceOne:async (_filter:unknown,row:unknown)=>{beforeWrite?.();rows.push({name,row})},bulkWrite:async(ops:any[])=>{for(const op of ops)rows.push({name,row:op.replaceOne.replacement})}})}) as unknown as Db;
  const store=createMongoWhatsAppDeps(undefined,{resolveOwner:async tenant=>tenant==="a"?A:B,listGroups:async owner=>[{groupJid:"same",ownerUserId:owner,subject:"Fixture",trackedPersonCount:2}],fetchMessages,appDb});
  return {store,rows};
 }

@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import path from "node:path";
 import { reconcileWebinarSources, type CalendarEvent, type WebinarReconciliationState } from "../calendar-client.js";
 import type { AutoRecordCandidateInput } from "../auto-join.js";
+import { REGISTRATION_REASONS, freshRegistrationConfirmation } from "../registration-workflow.js";
 import { projectWebinarInventory, projectWebinarRegistrations, webinarSessionKey, isDirectWebinarJoin, type WebinarRegistrationAttempt } from "../auto-record-policy.js";
 export type { WebinarRegistrationAttempt } from "../auto-record-policy.js";
 
@@ -68,6 +69,7 @@ function validateOperations(value: unknown, tenantId: string, checkedAt: string)
       const source = webinarSessionKey(JSON.stringify(["source", tenantId, "gmail", "candidates", attempt.sourceId, "single"]));
       if (id !== webinarSessionKey(`source-review|${source}`)) invalid();
     }
+    if (row.registrationReason !== undefined && !REGISTRATION_REASONS.includes(row.registrationReason)) invalid();
     if (row.stopDisposition !== undefined) {
       object(row.stopDisposition, ["tenantId", "sessionId", "generation", "reason", "requestedAt", "acknowledged"]);
       const stop = row.stopDisposition;
@@ -100,7 +102,12 @@ function validateOperations(value: unknown, tenantId: string, checkedAt: string)
 }
 
 export function validateWebinarRegistration(value: unknown, tenantId: string, checkedAt: string): WebinarRegistrationAttempt {
-  object(value, ["tenantId", "sourceId", "sourceMessageId", "threadId", "registrationUrl", "organizerEmail", "startTime", "endTime", "attemptId", "attemptedAt", "phase", "confirmationMessageId", "confirmedAt", "meetingUrl", "baselineMessageIds"]);
+  object(value, ["tenantId", "sourceId", "sourceMessageId", "threadId", "registrationUrl", "organizerEmail", "startTime", "endTime", "attemptId", "attemptedAt", "phase", "confirmationMessageId", "confirmedAt", "meetingUrl", "baselineMessageIds", "preSubmitEvidence"]);
+  if (value.preSubmitEvidence !== undefined) {
+    object(value.preSubmitEvidence, ["disposition", "configurationHash"]);
+    if (value.phase !== "action_required" || value.preSubmitEvidence.disposition !== "not-attempted" ||
+      typeof value.preSubmitEvidence.configurationHash !== "string" || !/^[a-f0-9]{64}$/.test(value.preSubmitEvidence.configurationHash)) invalid();
+  }
   const identifier = (id: unknown) => typeof id === "string" && /^[A-Za-z0-9_-]{1,256}$/.test(id);
   if (value.baselineMessageIds !== undefined && (!Array.isArray(value.baselineMessageIds) || value.baselineMessageIds.length > 20000 ||
       value.baselineMessageIds.some(id => !identifier(id)) || new Set(value.baselineMessageIds).size !== value.baselineMessageIds.length || !value.baselineMessageIds.includes(value.sourceMessageId))) invalid();
@@ -124,7 +131,8 @@ export function confirmWebinarRegistration(attempt: WebinarRegistrationAttempt, 
   const matches = candidates.filter(row => row.threadId === attempt.threadId && !attempt.baselineMessageIds!.includes(row.messageId!) && row.messageId !== attempt.sourceMessageId &&
     typeof row.messageId === "string" && /^[A-Za-z0-9_-]{1,256}$/.test(row.messageId) && row.senderEmail === attempt.organizerEmail &&
     row.startTime === attempt.startTime && row.endTime === attempt.endTime && row.status !== "rejected" && !row.cancelled &&
-    row.registrationOnly !== true && isDirectWebinarJoin(row.meetingUrl, row.startTime));
+    row.registrationOnly !== true && isDirectWebinarJoin(row.meetingUrl, row.startTime) &&
+    freshRegistrationConfirmation(row, attempt.attemptedAt, checkedAt));
   if (matches.length !== 1) return undefined;
   const confirmed: WebinarRegistrationAttempt = {...attempt, phase: "confirmed", confirmationMessageId: matches[0]!.messageId,
     confirmedAt: checkedAt, meetingUrl: matches[0]!.meetingUrl};

@@ -1,0 +1,14 @@
+{
+  "afterBytes": 10704,
+  "allRemainingRawBytesIdentical": true,
+  "afterSha256": "51a56c8f6d98c01a8c6bcc6ffbe2c9ba3b86987366b4da696bfb2361e70552f1",
+  "testsRerun": false,
+  "beforeSha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+  "authority": "Root explicitly authorized removing one surplus EOF blank line only",
+  "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+  "bytesRemoved": 2,
+  "finalNewlinePreserved": true,
+  "schema": "authorized-eof-whitespace-proof/1",
+  "removedOnlyTerminalNewline": true,
+  "beforeBytes": 10706
+}

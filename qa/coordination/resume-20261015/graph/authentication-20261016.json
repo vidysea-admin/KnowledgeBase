@@ -1,0 +1,210 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "EVIDENCE_AUTHENTICATED_PENDING_INDEPENDENT_ADMISSION",
+  "candidate_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "cycle": 1,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "recorded_utc": "2026-10-16T02:57:12.9879083Z",
+  "source_edited": false,
+  "rerun_requested": false,
+  "authority": "Root explicitly directs authenticate existing graph11 result, no rerun",
+  "graph": {
+    "duration_s": 4.233999999999924,
+    "command": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--test",
+      "--test-isolation=none",
+      "--test-concurrency=1",
+      "--test-timeout=30000",
+      "--import",
+      "./.cache/coordination/safe-test-runtime/register.mjs",
+      "packages/index/src/graph/speaker-knowledge.test.ts"
+    ],
+    "receipt_head_binding": null,
+    "exit": 0,
+    "runtime_hash_match": true,
+    "request_hash_match": true,
+    "counts": {
+      "tests": 11,
+      "pass": 11,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "active_s": 6.061999999999898,
+    "preflight_exit": 0
+  },
+  "consumer": {
+    "counts": {
+      "tests": 99,
+      "pass": 97,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "todo": 0
+    },
+    "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-repaired-floor2.log",
+    "runtime_hash_match": true,
+    "log_sha256": "1ccbad41ebc11e195befbd75f8b994218d2773f87f9b07712f0ae378e9c0c739",
+    "command": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--test",
+      "--test-concurrency=1",
+      "--test-timeout=70000",
+      "--import",
+      "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+      "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "apps/api/src/transcript-review/persist.test.ts",
+      "apps/api/src/transcript-review/service.test.ts",
+      "apps/api/src/transcript-review/refresh.test.ts",
+      "apps/api/src/transcript-review/refresh-executor.test.ts",
+      "apps/api/src/transcript-review/authorization.test.ts",
+      "apps/api/src/indexing/speaker-suggest.test.ts",
+      "apps/api/src/speaker-profiles/router.test.ts",
+      "apps/api/src/speaker-profiles/store.test.ts",
+      "apps/api/src/speaker-suggestions/reindex-survival.test.ts",
+      "apps/api/src/speaker-suggestions/speaker-suggestions.test.ts"
+    ],
+    "receipt_head_binding": null,
+    "exit": 0
+  },
+  "current_bindings": [
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.ts",
+      "original": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "current": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "matches_original": true,
+      "graph_receipt": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d",
+      "consumer_receipt": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d"
+    },
+    {
+      "path": "packages/index/src/graph/speaker-knowledge.test.ts",
+      "original": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+      "current": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+      "matches_original": true,
+      "graph_receipt": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de",
+      "consumer_receipt": "ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-profiles/profile.ts",
+      "original": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+      "current": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+      "matches_original": true,
+      "graph_receipt": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+      "consumer_receipt": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.ts",
+      "original": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+      "current": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+      "matches_original": true,
+      "graph_receipt": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+      "consumer_receipt": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "original": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+      "current": "194f127645a3529fbc316d049d0f29457175c12f082d1aa045945d07fe383e2f",
+      "matches_original": false,
+      "graph_receipt": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+      "consumer_receipt": "194f127645a3529fbc316d049d0f29457175c12f082d1aa045945d07fe383e2f"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.ts",
+      "original": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+      "current": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+      "matches_original": true,
+      "graph_receipt": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+      "consumer_receipt": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.test.ts",
+      "original": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+      "current": "7a01a0c227a72e4d64bc98a35981b31f62712afcc011b5a25ee02c03f0775a79",
+      "matches_original": false,
+      "graph_receipt": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+      "consumer_receipt": "7a01a0c227a72e4d64bc98a35981b31f62712afcc011b5a25ee02c03f0775a79"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "original": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "current": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "matches_original": true,
+      "graph_receipt": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "consumer_receipt": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": ".cache/coordination/safe-test-runtime/register.mjs",
+      "original": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "current": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "matches_original": true,
+      "graph_receipt": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "consumer_receipt": null
+    },
+    {
+      "path": "qa/contracts/speaker-knowledge-vectorless.md",
+      "original": "5a382665547cf53b48dcca32c0f91f50b08376d49f395b2953b551f6bb02d90e",
+      "current": "5a382665547cf53b48dcca32c0f91f50b08376d49f395b2953b551f6bb02d90e",
+      "matches_original": true,
+      "graph_receipt": "5a382665547cf53b48dcca32c0f91f50b08376d49f395b2953b551f6bb02d90e",
+      "consumer_receipt": null
+    },
+    {
+      "path": "qa/contracts/goal-U24.md",
+      "original": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f",
+      "current": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f",
+      "matches_original": true,
+      "graph_receipt": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f",
+      "consumer_receipt": null
+    }
+  ],
+  "evidence": [
+    {
+      "path": "qa/coordination/resume-20261015/graph/broker-request.json",
+      "sha256": "8489c9241d1a7680fc4956d16b62c86fb93091d936b86dfc5cd55c28dcc8355b"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/graph-receipt.json",
+      "sha256": "4dc2534137afe3b1d6f9156b2aa5e2ab814a046ddfccb6e71deaf8a26c12d150"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/graph.log",
+      "sha256": "17008ad2390620b2f28d3c64ca2ac11d53b9edf329278dab80f99697f9d957e7"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/graph-preflight.log",
+      "sha256": "7a5b218dcdad53a63296dcda498d231557f5525df22e07203d2a76cc16ea6740"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/graph_run.py",
+      "sha256": "beecd5bb243a43dce6eff059d77636155f49c86d97980c9bbca2637f44ced0c0"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-floor2-receipt.json",
+      "sha256": "45fabe46beb21c8e139cc21cbfe6fa0b6a3c76eed5ec37c480d7a3171f97f311"
+    }
+  ],
+  "remaining": [
+    "Independent admission assess/validate owned by root before dispatch",
+    "Independent source/consumer security probe at current SHA",
+    "Receipt provenance HEAD/environment reconciliation; no claim of strict same-SHA reuse from missing fields",
+    "Root-owned applicable verifier gate",
+    "No parent completion"
+  ],
+  "usage": {
+    "ratio_verified": false,
+    "preserve_history": true,
+    "prior_actual_cost": null,
+    "prior_actual_total_tokens": null,
+    "token_metric": "actual_total",
+    "prior_actual_maker_active_s": null
+  },
+  "phase": {
+    "wait_intervals": [],
+    "monotonic_start": 280265850864,
+    "frequency": 10000000,
+    "monotonic_end": 280271702564
+  }
+}

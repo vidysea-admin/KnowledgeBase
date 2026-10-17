@@ -1,0 +1,535 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-15T09:50:01.4740933Z",
+  "controller": "/root/integration_control",
+  "mode": "max-parallel-disjoint-source-writers; one CPU broker",
+  "sharedOwner": "/root/integration_control",
+  "sharedReserved": [
+    "schema/**",
+    "migrations/**",
+    "packages/core/src/generated/**",
+    "packages/core/src/index.ts",
+    "packages/db/src/index.ts",
+    "packages/db/src/collections/speaker-relationships.ts",
+    "packages/ai/src/index.ts",
+    "packages/index/src/index.ts",
+    "apps/api/src/composition/**",
+    "apps/api/src/server.ts",
+    "apps/web/src/App.tsx",
+    "package.json",
+    "pnpm-lock.yaml",
+    "**/package.json",
+    "config/ai-routing.yaml",
+    "structure.config.json",
+    "Dockerfile",
+    "docker-compose.yml",
+    "TASKS.md",
+    ".goal/**",
+    "docs/DECISIONS.md"
+  ],
+  "protectedNoOrdinaryEdit": [
+    "AGENTS.md",
+    "ARCHITECTURE.md",
+    "contracts/**",
+    ".codex/hooks/**",
+    ".codex/settings.json",
+    "scripts/append_decision.ps1",
+    "qa/contracts/**",
+    "qa/verdicts/**"
+  ],
+  "runtimeFreeze": {
+    "additionalRelevantModules": "Historical shared9 review-specific hold released by ROOT runtime-health instruction. Shared module ownership and dependency clearance remain central; current application integration source epoch is active.",
+    "checkpoint": "shared-schema-freeze.json",
+    "status": "CHECKPOINT_PRESERVED_REVIEW_HOLD_RELEASED",
+    "releaseAuthority": "ROOT runtime-health instruction relayed by /root/integration_control on 2026-10-15; no exact timestamp invented",
+    "historicalUntil": "ROOT releases after BOTH evaluator and source-reader independent verdicts",
+    "currentValidationConstraint": "No broad coherent tests until central freezes the current application-integration epoch. Historical checkpoint/pins remain preserved."
+  },
+  "coordinationGrants": {
+    "source_delivery_coordinator": "qa/coordination/knowledge-brain-20261015/source-delivery/**",
+    "quality_delivery_coordinator": "qa/coordination/knowledge-brain-20261015/quality-delivery/**",
+    "release_delivery_coordinator": "qa/coordination/knowledge-brain-20261015/release-delivery/**",
+    "product_delivery_coordinator": "qa/coordination/knowledge-brain-20261015/product-delivery/**",
+    "capture_delivery_coordinator": "qa/coordination/knowledge-brain-20261015/capture-delivery/**"
+  },
+  "reservations": [
+    {
+      "paths": [
+        "apps/api/src/whatsapp/review/store.ts",
+        "apps/api/src/whatsapp/review/store.test.ts",
+        "apps/api/src/whatsapp/review/test-fixtures.ts",
+        "apps/api/src/whatsapp/review/wire-fixtures.ts",
+        "apps/api/src/whatsapp/review/consent-race.test.ts",
+        "apps/api/src/whatsapp/review/consent-race-mongo.test.ts"
+      ],
+      "state": "source-frozen-race-check-pending",
+      "owner": "/root/whatsapp_maker"
+    },
+    {
+      "paths": [
+        "apps/api/src/speaker-relations/types.ts",
+        "apps/api/src/speaker-relations/service.ts",
+        "apps/api/src/speaker-relations/mongo-store.ts",
+        "apps/api/src/speaker-relations/service.test.ts",
+        "apps/api/src/speaker-relations/mongo-store.test.ts",
+        "packages/index/src/graph/speaker-knowledge.ts",
+        "packages/index/src/graph/speaker-knowledge.test.ts"
+      ],
+      "state": "service-source-frozen12brokerPASS",
+      "owner": "/root/speaker_graph_maker"
+    },
+    {
+      "paths": [
+        "apps/api/src/speaker-relations/router.ts",
+        "apps/api/src/speaker-relations/router.test.ts"
+      ],
+      "state": "source-frozen8testspending",
+      "owner": "/root/integration_control/relationship_router"
+    },
+    {
+      "paths": [
+        "apps/api/src/speaker-profiles/store.ts",
+        "apps/api/src/speaker-profiles/store.test.ts",
+        "apps/api/src/speaker-profiles/relationship-reader.ts",
+        "apps/api/src/speaker-profiles/relationship-reader.test.ts",
+        "apps/api/src/speaker-profiles/router.ts",
+        "apps/api/src/speaker-profiles/router.test.ts",
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts"
+      ],
+      "state": "source-frozen4newtests-pending",
+      "owner": "/root/knowledge_profiles_maker",
+      "transferNote": "Only KnowledgeSpeakerProfilePage.tsx and its test transferred from this idle owner to product speaker_review_ui by explicit central relay. API profile4 remains frozen unchanged; all other paths in this reservation retain ownership.",
+      "historicalTransferredPaths": [
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx"
+      ]
+    },
+    {
+      "paths": [
+        "apps/api/src/source-intake/adapters.ts",
+        "apps/api/src/source-intake/source-reader.ts",
+        "apps/api/src/source-intake/source-reader.test.ts"
+      ],
+      "state": "frozen-through-independent-source-reader-review",
+      "owner": "/root/source_connectors_maker"
+    },
+    {
+      "paths": [
+        "scripts/eval/vectorless-production-eval.mjs",
+        "scripts/eval/vectorless-production-eval.test.mjs"
+      ],
+      "state": "frozen-through-independent-evaluator-review",
+      "owner": "/root/quality_delivery_maker"
+    },
+    {
+      "paths": [
+        "apps/api/src/transcript-review/refresh-executor.ts",
+        "apps/api/src/transcript-review/refresh-executor.test.ts",
+        "apps/api/src/transcript-review/refresh-testkit.ts",
+        "apps/api/src/transcript-review/service.ts",
+        "apps/api/src/transcript-review/store.ts",
+        "apps/api/src/transcript-review/transaction-db.ts"
+      ],
+      "state": "cycle7checkedPASS-no-activewrites-reserved",
+      "owner": "/root/transcript_review_maker"
+    },
+    {
+      "paths": [
+        "apps/api/src/answer-policy/answer-workflow.ts",
+        "apps/api/src/answer-policy/answer-workflow.test.ts"
+      ],
+      "state": "scopedPASS-reserved-until-narrow-reallocation",
+      "owner": "/root/answer_policy_maker"
+    },
+    {
+      "paths": [
+        "apps/api/src/knowledge-outputs/types.ts",
+        "apps/api/src/knowledge-outputs/synthesis.ts",
+        "apps/api/src/knowledge-outputs/wiring.ts",
+        "apps/api/src/knowledge-outputs/workbench.test.ts"
+      ],
+      "state": "verifier-source-stable-reserved",
+      "owner": "/root/outputs_maker"
+    },
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/tab-startup-cleanup.test.ts",
+        "packages/meeting-bot/src/capture/record-commands.ts",
+        "packages/meeting-bot/src/capture/record-finalize.ts",
+        "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.ts",
+        "packages/meeting-bot/src/capture/workspace/original-capture.ts",
+        "packages/meeting-bot/src/capture/workspace/original-capture.test.ts",
+        "packages/meeting-bot/src/capture/finalize-original-eof.test.mjs",
+        "packages/meeting-bot/src/capture/workspace/record-stop-regression.test.ts"
+      ],
+      "state": "capture-startup-EOF-proof-frozen",
+      "owner": "/root/capture_maker"
+    },
+    {
+      "paths": [
+        "scripts/webinar/index-proof.mjs",
+        "scripts/webinar/index-proof.test.mjs",
+        "scripts/webinar/sync-session.mjs",
+        "scripts/webinar/graph/**"
+      ],
+      "state": "existing-pipeline-proof-graph-reserved",
+      "owner": "/root/pipeline_maker"
+    },
+    {
+      "paths": [
+        "scripts/webinar/run-pipeline*.mjs",
+        "scripts/webinar/scheduler/**"
+      ],
+      "state": "existing-scheduler-reserved",
+      "owner": "/root/scheduler_maker"
+    },
+    {
+      "paths": [
+        "scripts/webinar/send-now-host.ts",
+        "scripts/webinar/send-now-host.test.ts",
+        "packages/meeting-bot/src/send-now-command.ts",
+        "packages/meeting-bot/src/send-now-command.test.ts"
+      ],
+      "state": "existing-manual-jobs-reserved",
+      "owner": "/root/manual_jobs_maker"
+    }
+  ],
+  "newApprovals": [
+    {
+      "grantId": "central-20261015-source-t0529-corrected",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "source_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-worker",
+      "behavior": "Corrected T0529 registration, redirect, joiner, calendar policy and durable schedule paths; no parent acceptance implied.",
+      "paths": [
+        "packages/meeting-bot/py/sb_join_register.py",
+        "packages/meeting-bot/py/test_sb_join_registration_redirect.py",
+        "packages/meeting-bot/src/joiners/browser-joiner.ts",
+        "packages/meeting-bot/src/joiners/joiners.test.ts",
+        "packages/meeting-bot/src/calendar/registration-workflow.ts",
+        "packages/meeting-bot/src/calendar/registration-workflow.test.ts",
+        "packages/meeting-bot/src/calendar/auto-record-policy.ts",
+        "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+        "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-source-t053",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "source_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-worker",
+      "behavior": "T053 source job and connector watched-job consumption; central composition remains reserved.",
+      "paths": [
+        "apps/api/src/source-intake/jobs/types.ts",
+        "apps/api/src/source-intake/jobs/input.ts",
+        "apps/api/src/source-intake/jobs/store.ts",
+        "apps/api/src/connector-workflow/watched.ts",
+        "apps/api/src/connector-workflow/jobs.ts",
+        "apps/api/src/connector-workflow/router.ts",
+        "apps/api/src/connector-workflow/workflow.test.ts",
+        "apps/api/src/connector-workflow/watched-job.ts",
+        "apps/api/src/connector-workflow/watched-job.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-capture-registry-ocr-watch-obs",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "capture_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "Trusted tile registry, OCR processing, watch ingestion and actual OBS settings; later explicit T041 slide-knowledge test grant recorded separately.",
+      "paths": [
+        "packages/meeting-bot/src/capture/tiles/registry.ts",
+        "qa/evidence/t042-trusted-registry/fixture.ts",
+        "scripts/webinar/process-video.mjs",
+        "scripts/webinar/slides/slide-knowledge.mjs",
+        "scripts/watch/lib/ingest-chain.mjs",
+        "scripts/watch/lib/ingest-chain.test.mjs",
+        "packages/meeting-bot/src/lean-video-obs.ts",
+        "packages/meeting-bot/src/lean-video-obs.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-product-setup-policy-flywheel",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "product_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "Setup-wizard3 and new trusted-human refusal consumption test; evaluation flywheel limited to safe reads and final-head behavior. No createRetest timeout change.",
+      "paths": [
+        "apps/web/src/pages/setup-wizard/SetupWizardPage.tsx",
+        "apps/web/src/pages/setup-wizard/setupModel.ts",
+        "apps/web/src/pages/setup-wizard/SetupWizardPage.test.tsx",
+        "apps/web/src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx",
+        "apps/api/src/evaluation-flywheel/workflow.ts",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-quality-acquisition-evidence",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "quality_delivery_coordinator",
+      "state": "approved-new-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "New decisions acquisition and topic-run evidence modules/tests only. Shared dependency clearance remains central; consult current released review-hold status and application-epoch validation constraint.",
+      "paths": [
+        "packages/index/src/eval/decisions-acquisition.ts",
+        "packages/index/src/eval/decisions-acquisition.test.ts",
+        "packages/index/src/eval/topic-run-evidence.ts",
+        "packages/index/src/eval/topic-run-evidence.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-product-earlier-explicit-relay",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "product_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "Explicitly relayed earlier collection, answer-router, outputs, speaker relation, operations and transcript UI grants. No T056 four-file restore proposal was ever authorized.",
+      "paths": [
+        "apps/web/src/pages/knowledge/CuratedCollections.tsx",
+        "apps/web/src/pages/knowledge/CuratedCollections.test.tsx",
+        "apps/api/src/answer-policy/answer-router.ts",
+        "apps/api/src/answer-policy/answer-router.test.ts",
+        "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+        "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+        "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.tsx",
+        "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx",
+        "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+        "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+        "apps/web/src/pages/operations/OperationsPage.tsx",
+        "apps/web/src/pages/operations/EvaluationFlywheelPanel.tsx",
+        "apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+        "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+        "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx"
+      ]
+    },
+    {
+      "grantId": "central-20261015-quality-earlier-explicit-relay",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "quality_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "Offline transfer/calibration, extraction receipts and resume. apps/web/src/client.ts is TENANT IDENTITY TYPING ONLY. Private review artifact remains private; no fabricated human labels or approvals.",
+      "paths": [
+        "apps/web/src/pages/calibration-review/offline-transfer.ts",
+        "apps/web/src/pages/calibration-review/offline-transfer.test.ts",
+        "apps/web/src/pages/calibration-review/CalibrationReviewPage.tsx",
+        "apps/web/src/pages/calibration-review/CalibrationReviewPage.test.tsx",
+        "apps/web/src/client.ts",
+        "apps/api/src/calibration-review/README.md",
+        "scripts/eval/extraction-stage-receipts.mjs",
+        "scripts/eval/extraction-stage-receipts.test.mjs",
+        "scripts/eval/extraction-review-resume.mjs",
+        "scripts/eval/extraction-review-resume.test.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "scripts/eval/t022-offline-review.test.mjs",
+        "data/eval/t022-offline-review.html",
+        "scripts/eval/human-calibration.mjs",
+        "scripts/eval/human-calibration.test.mjs"
+      ]
+    },
+    {
+      "grantId": "central-20261015-capture-earlier-explicit-relay",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "capture_delivery_coordinator",
+      "state": "approved-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "Capture operational acceptance/evidence, tile sampler and clock helpers only. T041 unresolved test filenames remain pending.",
+      "paths": [
+        "scripts/qa/capture-operations-acceptance.mjs",
+        "scripts/qa/capture-operations-evidence.mjs",
+        "scripts/qa/capture-operations-acceptance.test.mjs",
+        "packages/meeting-bot/py/sb_join_tiles.py",
+        "packages/meeting-bot/py/test_sb_join_tiles.py",
+        "packages/meeting-bot/src/capture/tiles/sampler-clock.ts",
+        "packages/meeting-bot/src/capture/tiles/sampler-clock.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-source-earlier-explicit-relay",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "source_delivery_coordinator",
+      "state": "approved-new-exact-paths-coordinator-assigns-exclusive-workers",
+      "behavior": "Public webinar configuration and standalone vectorless multisource language test only; shared ownership and current application-epoch validation constraint remain operative.",
+      "paths": [
+        "apps/api/src/gws/public-webinar-config.ts",
+        "apps/api/src/gws/public-webinar-config.test.ts",
+        "packages/ask/src/vectorless-multisource-language.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-release-metadata-explicit-relay",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "release_delivery_coordinator",
+      "state": "approved-metadata-only",
+      "behavior": "Manifest/packet metadata only; no source, parent status, checker verdict or PASS changes.",
+      "paths": [
+        "qa/manifests/t013-avatar-context-loss.md",
+        "qa/packets/t013-avatar-context-loss.md",
+        "qa/manifests/goal-t060.md",
+        "qa/manifests/goal-t061.md"
+      ]
+    },
+    {
+      "grantId": "central-20261015-t041-t036-t053-exact-additions",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "state": "approved-exact-paths-coordinators-assign-exclusive-workers",
+      "allocations": [
+        {
+          "owner": "capture_delivery_coordinator",
+          "paths": ["scripts/webinar/slides/slide-knowledge.test.mjs"],
+          "behavior": "T041 exact slide-span test filename now explicitly approved; no speculative other OCR test grant."
+        },
+        {
+          "owner": "source_delivery_coordinator",
+          "paths": ["apps/api/src/routes/meeting-candidates.ts", "apps/api/src/routes/meeting-candidates.test.ts"],
+          "behavior": "T036 explicit public acquisition route and focused test."
+        },
+        {
+          "owner": "source_delivery_coordinator",
+          "paths": ["apps/api/src/source-intake/jobs/entry.ts"],
+          "behavior": "T053 narrow media-provider optional-startup change only."
+        }
+      ]
+    },
+    {
+      "grantId": "central-20261015-review-policy2-bootstrap",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "/root/integration_control/relationship_router",
+      "state": "central-owned-child-maker-exact-paths",
+      "behavior": "Central policy2 and source relationship router bootstrap; no independent PASS implied by reported implementation.",
+      "paths": [
+        "apps/api/src/review-authority/policy.ts",
+        "apps/api/src/review-authority/policy.test.ts",
+        "apps/api/src/speaker-relations/source-router.ts",
+        "apps/api/src/speaker-relations/source-router.test.ts"
+      ]
+    },
+    {
+      "grantId": "central-20261015-speaker-review-ui-transfer",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "/root/product_delivery_coordinator/speaker_review_ui",
+      "state": "explicit-transfer-from-idle-knowledge-profiles-maker",
+      "previousOwner": "/root/knowledge_profiles_maker",
+      "behavior": "Existing speaker profile page and test only; API profile4 stays frozen unchanged.",
+      "paths": [
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx"
+      ]
+    },
+    {
+      "grantId": "central-20261015-scheduler-dispatch-exact",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "/root/scheduler_maker",
+      "state": "approved-exact-source-files",
+      "behavior": "Scheduled dispatch/current rule check and detached launcher; central CLI import and record-scheduled branch remain exclusive central ownership.",
+      "paths": [
+        "packages/meeting-bot/src/calendar/schedule-tick.ts",
+        "packages/meeting-bot/src/calendar/scheduled-dispatch.ts",
+        "packages/meeting-bot/src/calendar/scheduled-dispatch.test.ts",
+        "packages/meeting-bot/src/calendar/schedule-tick-rules-integration.test.ts",
+        "packages/meeting-bot/src/calendar/state/schedule-dedup-state.ts",
+        "scripts/webinar/start-record-detached.ps1",
+        "scripts/webinar/start-record-detached.test.mjs"
+      ]
+    },
+    {
+      "grantId": "central-20261015-reviews-test-only",
+      "approvalDate": "2026-10-15",
+      "approvedBy": "/root/integration_control",
+      "owner": "/root/integration_control/schema_integration",
+      "state": "approved-new-test-only",
+      "behavior": "New central reviews integration test only; composition implementation remains central.",
+      "paths": ["apps/api/src/composition/integrations/reviews.test.ts"]
+    }
+  ],
+  "approvalSource": "Central integration_control task brief received 2026-10-15; no exact approval timestamp or hash was supplied or invented.",
+  "messageVerticalGrant": {
+    "approvalDate": "2026-10-15",
+    "approvedBy": "/root/integration_control",
+    "owner": "/root/source_delivery_coordinator/t007_review_receipt_cases",
+    "workerConfirmation": "Exact worker confirmed by source_delivery_coordinator; coordinator retains dispatch control.",
+    "paths": ["apps/api/src/native-evidence/message-vertical.test.ts"],
+    "state": "exclusive-new-test-only",
+    "behavior": "Actual approved-message-to-Ask/policy mounted proof only. Production and document evidence source remain frozen. No runtime or acceptance inferred."
+  },
+  "pendingLatestLeaseDetails": {
+    "collectionsProbeFinisher": "Fresh finisher /root/product_delivery_coordinator/collections_fresh_finisher was actually spawned then interrupted without edits; no longer a writer. Latest authoritative product/ROOT exception transfers this probe exclusively to verification_broker for one mechanical unique missing-row guard insertion plus inverse-SHA proof, then FREEZE. Old850752 plus fresh548763 actual1399515 retained as target misses/breaches; verification-support accounting, never maker denominator, no new allocation.",
+    "telemetryCycle1": "Central supplied exact two paths for original parallelism_snapshot thaw; see runtimeTelemetryCycle1Grant. Original PASS preserved."
+  },
+  "checkerProbeTransfers": {
+    "approvalDate": "2026-10-15",
+    "approvedBy": "/root/integration_control",
+    "state": "exclusive-independent-checker-ownership",
+    "priorMakerMaterializationGrant": "revoked for these three exact new paths only; prior authority retained as history, not current write permission",
+    "allocations": [
+      {
+        "path": "apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+        "owner": "/root/verification_broker",
+        "previousOwner": "/root/product_delivery_coordinator/collections_independent_checker",
+        "interveningOwner": "/root/product_delivery_coordinator/collections_fresh_finisher",
+        "interveningOwnerState": "actual spawn confirmed; subsequently interrupted without edits; no longer writer",
+        "state": "exclusive-one-mechanical-missing-row-guard-insertion-inverse-sha-proof-then-freeze",
+        "authority": "Latest ROOT exception and authoritative product coordinator grant relayed by integration_control",
+        "accounting": { "oldActual": 850752, "freshActual": 548763, "totalActual": 1399515, "classification": "target misses/breaches; verification-support, never maker denominator", "newAllocation": false }
+      },
+      {
+        "path": "apps/web/src/__checker_probes__/speaker-auth-session.test.tsx",
+        "owner": "/root/product_delivery_coordinator/speaker_independent_checker"
+      },
+      {
+        "path": "apps/web/src/__checker_probes__/evaluation-child-lineage.test.tsx",
+        "owner": "/root/product_delivery_coordinator/operations_independent_checker"
+      }
+    ],
+    "integrationCheckpoint": {
+      "api": "frozen; root, source and WhatsApp acknowledgements reported by central",
+      "publicCheckpoint": "qa/coordination/knowledge-brain-20261015/final-shared-public-checkpoint.json",
+      "publicPinCount": 24,
+      "web": "waiting for probe acknowledgement",
+      "assessment": "central-reported metadata only; checkpoint bytes and acknowledgements not newly inspected or independently accepted"
+    }
+  },
+  "runtimeTelemetryCycle1Grant": {
+    "approvalDate": "2026-10-15",
+    "approvedBy": "/root/integration_control",
+    "owner": "/root/parallelism_snapshot",
+    "state": "exclusive-two-file-cycle1-thaw",
+    "paths": ["scripts/qa/review-runtime-usage.mjs", "scripts/qa/review-runtime-usage.test.mjs"],
+    "behavior": "Order-insensitive metadata parser only; preserve original PASS and exact historical accounting. No general source thaw."
+  },
+  "additionalCentralReservations": [
+    "apps/api/src/composition/integrations/source-jobs.ts",
+    "apps/api/src/composition/integrations/reviews.ts",
+    "apps/api/src/composition/production.ts",
+    "apps/api/src/composition/integrations/routes.ts",
+    "packages/meeting-bot/src/cli.ts"
+  ],
+  "coordinationNotes": [
+    "Preserved prior approval records and updatedAt. Historical shared9 review hold released by ROOT runtime-health instruction; checkpoint/pins preserved. Current source integration epoch is active, shared ownership stays central, and broad coherent tests wait for central freeze. Explicit UI transfer retains prior-owner history; any other earlier batch remains unverified rather than invented.",
+    "T0529 corrected exact paths are recorded without inventing superseded grants. All shared schema, dependencies, composition and trackers remain centrally reserved.",
+    "T041 scripts/webinar/slides/slide-knowledge.test.mjs now explicitly approved by central relay; any other unresolved OCR test filename remains pending. Product T056 extra four-file restore proposal was never authorized and has no grant.",
+    "Central reports completed private backup relocation from QA original-review.html to data/eval/t022-offline-review.pre-dirty-guard.html, exact bytes with hash-only QA. Original full QA source path/hash not supplied; this ledger does not perform or independently verify relocation."
+  ],
+  "rules": [
+    "Batch exactfile+worker+behavior lease requests before edits; no broad directory write grants except own QA coordination.",
+    "Read-only surveys parallel allowed; no tests/builds/local CPU-heavy work except sole verification_broker.",
+    "No live accounts/providers/capture/DBwrites/hostactivation/deploy without existing specific root approval; no synthetic human approvals.",
+    "Reuse real implementations and exact valid evidence; security uncapped, ordinary seam roundcap per AGENTS.",
+    "Maker may not edit qa/contracts or verdicts; one fresh compact checker only after ready exact-byte packet/admission.",
+    "New reviews use current canonical completion_reserve true and unique reserve ID; preserve legacy accounting, never assert unknown10percent savings.",
+    "Return compact lease changes/blockers, not all child output to central.",
+    "Coordinator quotas16workers each; queue launches if slot cap reached, no duplicate checker swarm."
+  ]
+}

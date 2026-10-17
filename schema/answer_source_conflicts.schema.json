@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://answer_source_conflicts",
+  "title": "StoredSourceConflict",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "by": {
+      "type": "object",
+      "properties": {
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claimedBy": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "actor"
+      ],
+      "additionalProperties": false
+    },
+    "explanation": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "a": {
+      "$ref": "#/$defs/StoredConflictEvidence"
+    },
+    "b": {
+      "$ref": "#/$defs/StoredConflictEvidence"
+    },
+    "candidateDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "evidenceDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "resolved"
+      ]
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "keepSourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "excludeSourceId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "by": {
+          "type": "object",
+          "properties": {
+            "actor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "claimedBy": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "actor"
+          ],
+          "additionalProperties": false
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "keepSourceId",
+        "excludeSourceId",
+        "note",
+        "by",
+        "at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "_id",
+    "id",
+    "tenantId",
+    "runId",
+    "createdAt",
+    "by",
+    "explanation",
+    "a",
+    "b",
+    "candidateDigest",
+    "evidenceDigest",
+    "status"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "StoredConflictEvidence": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "internal",
+            "web"
+          ]
+        },
+        "fingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "source": {
+          "type": "object",
+          "properties": {},
+          "required": [],
+          "additionalProperties": true
+        },
+        "excerpt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "origin",
+        "fingerprint",
+        "source",
+        "excerpt"
+      ],
+      "additionalProperties": false,
+      "title": "StoredConflictEvidence"
+    }
+  }
+}

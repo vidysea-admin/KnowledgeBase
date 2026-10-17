@@ -1,0 +1,2 @@
+Maker preparation command error retained: python .../review_budget.py assess --input provider-http-assess-input.json --output provider-http-assess-result.json
+Exit 1, argparse rejected unsupported --output. Tool wall time 0.5040328 seconds. This is maker packet preparation, not an independent checker attempt. No check or test ran.

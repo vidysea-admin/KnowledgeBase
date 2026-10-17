@@ -1,0 +1,124 @@
+{
+  "status": "SOURCE_FROZEN_PENDING_ROOT_NEW_BASE_BINDING_AND_SOLE_BROKER",
+  "unit": "native-guard-phases",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "expected_current_head": null,
+  "producer_source_commit": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "candidate_git_sha": null,
+  "candidate_identity": "Dirtytest/helperrawpinsNOTGitcommit",
+  "candidate_manifest": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-native-guard-phases.json",
+  "candidate_manifest_sha256": "c2049221f58de313bb0a2b90984337c413232ecbb8b4c1a3683f0e966daf4df7",
+  "source_count": 74,
+  "two_changed_source_pins": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/source-pins.json",
+  "two_source_digest": "f26cda9bea35fbe6e5bd9fb5288fe6a4e09f130a12a7f4cfa4af6206a24e2ee7",
+  "global_phase_active_seconds": 120,
+  "preconditions_combined_max_s": 30,
+  "native_job_max_s": 75,
+  "owned_cleanup_reserve_s": 15,
+  "concurrency": 1,
+  "default_file_isolation": true,
+  "sequence": [
+    {
+      "stage": "affected-bot-types",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "node_modules/typescript/bin/tsc",
+        "--noEmit",
+        "-p",
+        "tsconfig.json"
+      ],
+      "execution": "Solebrokeronly;mustexit0beforetargetedguards",
+      "charged_within_preconditions30": true
+    },
+    {
+      "stage": "targeted-trace-helper-five",
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=10000",
+        "--test-name-pattern=^native guard phase helper ",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+        "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+      ],
+      "expected": {
+        "tests": 5,
+        "pass": 5,
+        "skipped": 0,
+        "fail": 0
+      },
+      "charged_within_preconditions30": true
+    },
+    {
+      "stage": "exact-original-two-instrumented",
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=70000",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+        "--test-name-pattern=^(?:retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse|fair bounded pages, quota-before-allocation and interrupted journal refuse)$",
+        "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+      ],
+      "expected": {
+        "selected": 2,
+        "pass": 2,
+        "skipped": 0,
+        "fail": 0,
+        "cancelled": 0
+      },
+      "job_max_s": 75,
+      "node_timeout_ms": 70000,
+      "admission": "Startonlywith>=90phase secondsremaining includingfull75job+15ownedcleanup;noextensions/retry",
+      "preserved_original_cases": "all7bindingvariants/11artifactmutations/faircursor/quota/journal/allassertionsandproducer calls"
+    }
+  ],
+  "trace": {
+    "maximum_bytes": 65536,
+    "catalog": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/stage-catalog.json",
+    "fields": [
+      "stageId",
+      "elapsedMs"
+    ],
+    "node2_records": 12,
+    "collection": "Afterallownedchildprocessesclosed,BEFOREfinallyownedUUIDcleanup evenontimeout;copyrawtrace+hash+parsefixedschema+recordlaststage",
+    "root_env": "LKB_NATIVE_TEST_PRIVATE_DIR",
+    "expected_complete_records": 76,
+    "on_failure": "missing/refused/partial/nonmonotonic/unknownpayload trace=DIAGNOSTIC_INCOMPLETE,neversemanticPASS;emptytracecannotprove no mutations",
+    "path": "EXACTbrokerNEWprotectedUUID/native-guard-phases.jsonl,outsideallnestedarchiveproducerroots",
+    "both_envs_required": true,
+    "filename": "native-guard-phases.jsonl",
+    "path_env": "LKB_NATIVE_GUARD_PHASE_LOG",
+    "exclusive_sink": "absentbeforechild;wx0600oneheldmodulefd sharednodes",
+    "test_guard_sinks": "EachhelperguardusesownNEWtemporarydirectory/reset+restorefinally;neveractualbatchsidecar",
+    "maximum_records": 256,
+    "node1_records": 64
+  },
+  "prerequisites": {
+    "source_identity": "Beforedispatch bindactualnewrootWIPcommitreceipt/currentHEAD;74rawsourceoverlay and2dirtydiagnosticpinsmustmatch,producerlogicunchanged. DoNOThardpinold37snapshotorrefreshdrift.",
+    "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "adapter_sha256": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d",
+    "decoders": "Use exact existing native-binaries.json and native-binary-hashes.json identities; set LKB_NATIVE_TEST_FFMPEG and LKB_NATIVE_TEST_FFPROBE. No download/provider/binary discovery or browser launch.",
+    "private_fixture": "Tests create actual private roots through Windows ACL provisioning and therefore need the same approved new disposable UUID helper and verifier as previous native broker passes. Reuse an already active approved owned UUID only when authority/identity still valid; previous cleaned UUIDs must not be reused. Set TMP/TEMP/LKB_NATIVE_TEST_PRIVATE_DIR to that verified owned UUID. Never repair existing ACLs or use a host capture root.",
+    "powershell": "Existing trusted Windows PowerShell executable with its native Modules PSModulePath; same actual private ACL guard. No global settings change.",
+    "external_services": "Keep existing live Mongo/private TOC/host/provider opt-ins disabled. No real DB, network, paid providers or host activation. LKB_NATIVE_TEST_BROWSER not needed for these two nodes."
+  },
+  "before_after": "74sourcepins/runtime/lock/adapter/nativebinary identities+currentbrokerhelpers,ownedsecureUUIDverification",
+  "history": "Originalexit12470.594emptylog andalloldreceiptsimmutable;changedtestbytesnotreused,alreadygreenreadonly/genuine/EXIT/watch28NOTrequested",
+  "remaining_gates": "native2INCOMPLETEuntilactualresults;watched8PASSclosed;T053/live/human/nativequalification/releaseopen",
+  "maker_usage": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null,
+    "token_metric": "actual_total"
+  },
+  "dispatch_authority": "Rootsolebrokeronly;makerexecutesnothing",
+  "authoring_head_snapshot": "37e51f95c367594bddb422c39c11415674ecf001"
+}

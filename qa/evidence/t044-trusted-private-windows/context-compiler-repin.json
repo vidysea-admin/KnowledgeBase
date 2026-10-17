@@ -1,0 +1,7 @@
+{
+  "currentContext": "19b232dc6163ff8fa54215313dab0a003579058470a9271af0b1851fc12d954c",
+  "reconstructedTestedContext": "d2749465d014070f50ed10e70b40313ac92b696c3831f91d8c167903571a666a",
+  "expectedTested": "d2749465d014070f50ed10e70b40313ac92b696c3831f91d8c167903571a666a",
+  "delta": "flag obtains checked local index instead of indexing indices[0] twice; indices are dense from flatMap",
+  "productMutation": false
+}

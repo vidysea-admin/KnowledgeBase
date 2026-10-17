@@ -70,3 +70,29 @@ test("an overlay entry for a turn that no longer exists is ignored, not an error
   assert.equal(after.turns.length, 3);
   assert.equal(after.turns.some((t) => t._id === A0), false);
 });
+
+for (const later of [false, true]) test(`snapshot/head re-read race (${later ? "reviewed" : "initial"}): stale writer cannot CAS a newer head`, async () => {
+  const m = memoryDb(); seed(m);
+  const original = createMongoReviewStore(m.db);
+  let revision = (await loadReview(original, "tenant-A", SESSION)).snapshot.revision;
+  if (later) revision = (await commitReview(original, input(revision, "seed"))).revision;
+  let intercept = true;
+  let winningRevision: string | undefined;
+  const store: ReviewStore = { ...original, head: async (tenant, id) => {
+    const captured = await original.head(tenant, id);
+    if (intercept) { intercept = false; winningRevision = (await commitReview(original, input(revision, "winning correction"))).revision; }
+    return captured;
+  } };
+  await assert.rejects(commitReview(store, input(revision, "stale overwrite")), (e: unknown) => e instanceof ReviewServiceError && e.code === "conflict");
+  assert.equal((await loadReview(original, "tenant-A", SESSION)).snapshot.turns[0]!.text, "winning correction");
+  const history = await original.listRevisions("tenant-A", SESSION);
+  assert.equal(history.length, later ? 2 : 1);
+  // Both fixture commits use the same reviewedAt, so history's hash tie-break is not
+  // causal order. Check the competing receipt's actual audit row, not its list position.
+  assert.ok(winningRevision);
+  const winningAudit = history.find((row) => row.revision === winningRevision);
+  assert.ok(winningAudit);
+  assert.equal(winningAudit.parentRevision, revision);
+  assert.equal(winningAudit.changes[0]!.after.text, "winning correction");
+  assert.equal(history.some((row) => row.changes.some((change) => change.after.text === "stale overwrite")), false);
+});

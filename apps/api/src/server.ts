@@ -33,6 +33,7 @@ import { createKeysRouter, type KeysDeps } from "./routes/keys.js";
 import { createIngestRouter, type IngestDeps } from "./routes/ingest.js";
 import { createSourceIntakeRouter } from "./routes/ingest-source.js";
 import type { SourceIntakeDeps } from "./source-intake/store.js";
+import type { SourceJobStore } from './source-intake/jobs/types.js';
 import { createPagesRouter } from "./routes/pages.js";
 import { createStubsRouter } from "./routes/stubs.js";
 import { createRateLimiter, type RateLimitOptions } from "./rate-limit.js";
@@ -49,11 +50,13 @@ import { usageRecorder } from "./usage/recorder.js";
 import { createUsageRouter, unavailableUsageReadDeps } from "./usage/router.js";
 import type { UsageDeps } from "./usage/store.js";
 import { createSpeakerSuggestionsRouter, unavailableSpeakerSuggestionDeps, type SpeakerSuggestionDeps } from "./speaker-suggestions/router.js";
+import { createSpeakerProfilesRouter, unavailableSpeakerProfileDeps, type SpeakerProfileDeps } from "./speaker-profiles/router.js";
 import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
 import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
+import { mountIntegratedWorkflows, type IntegratedWorkflows } from './composition/integrations/routes.js';
 
-export interface ServerDeps {
+export interface ServerDeps extends IntegratedWorkflows {
   keyStore: ApiKeyStore;
   ask: AskRouteDeps;
   evalRuns: EvalRunStore;
@@ -78,6 +81,7 @@ export interface ServerDeps {
   ingest: IngestDeps;
   /** T-045 `POST /ingest/source` (YouTube / OnAir / Zoom intake). Optional, OFF by default: absent -> the route is not mounted. */
   sourceIntake?: SourceIntakeDeps;
+  sourceJobs?: SourceJobStore;
   jobs?: JobsReadDeps;
   activityHealth?: ActivityHealthDeps;
   /** Autojoin bot activity feed (GET /bot-events, scope jobs). Optional: absent -> 503 (fail closed). Wired by scripts/webinar/join-rules-api-host.ts. */
@@ -90,6 +94,7 @@ export interface ServerDeps {
   usage?: UsageDeps;
   /** U2.4 suggested speaker names (D-141): list/confirm/reject. Optional: absent -> 503. */
   speakerSuggestions?: SpeakerSuggestionDeps;
+  speakerProfiles?: SpeakerProfileDeps;
   rateLimit?: RateLimitOptions;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
@@ -103,7 +108,7 @@ export function createServer(deps: ServerDeps): Express {
   const app = express();
   const log = deps.logger ?? defaultLogger;
   app.use(requestLogger(log)); // first: every response (incl. body-parser/auth failures) gets X-Request-Id + an access line
-  app.use(express.json());
+  app.use(express.json({ limit: '1mb' }));
   app.use(createCors(deps.corsOrigins ?? []));
   // Every *-page.ts route is static markup carrying no data of its own (its own JS/server-side
   // render is what attaches the API key to each fetch) -- mounted BEFORE requireAuth, or a plain
@@ -119,6 +124,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(requireAuth(deps.keyStore));
   app.use(createRateLimiter(deps.rateLimit));
   app.use(usageRecorder(deps.usage, log)); // T-057 D4: fire-and-forget, after the response; never fails or delays a request
+  mountIntegratedWorkflows(app, deps);
   app.use(createUsageRouter(deps.usage ?? unavailableUsageReadDeps));
   app.use(createSystemStatusRouter(deps.systemStatus ?? unavailableSystemStatusDeps));
   app.use(createSetupStatusRouter()); // T-057 E4: booleans only, authenticated
@@ -126,6 +132,7 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createAnswerPolicyRouter(deps.ask));
   app.use(createCompeteRouter({ ...deps.ask, evalRuns: deps.evalRuns }));
   app.use(createSpeakerSuggestionsRouter(deps.speakerSuggestions ?? unavailableSpeakerSuggestionDeps));
+  app.use(createSpeakerProfilesRouter(deps.speakerProfiles ?? unavailableSpeakerProfileDeps));
   app.use(createBrainRouter(deps.brain));
   app.use(createGroundedContentRouter(createGroundedContentDeps(deps.brain)));
   app.use(createJobsRouter(deps.jobs ?? unavailableJobsReadDeps));
@@ -148,14 +155,18 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createWhatsAppRouter(deps.whatsapp));
   app.use(createKeysRouter(deps.keys));
   app.use(createIngestRouter(deps.ingest));
-  if (deps.sourceIntake) app.use(createSourceIntakeRouter(deps.sourceIntake));
+  if (deps.sourceIntake) app.use(createSourceIntakeRouter(deps.sourceIntake, deps.sourceJobs));
   app.use(createStubsRouter());
   app.use(bodyParserErrorHandler(log)); // ISS-APILOGGER-001: body-parser errors: structured log, no body echo, production-identical response
   // Terminal handler (ISS-AUTHTENANT-002): an error with no HTTP status (e.g. a tenant guard throwing in a store) gets a fixed 500 body, never
   // Express's default stack page. Errors that carry a 4xx/5xx status (body-parser) still go to the default handler, unchanged.
   app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
     const e = err as { status?: unknown; statusCode?: unknown } | null, s = e?.status ?? e?.statusCode;
-    if (res.headersSent || (typeof s === "number" && s >= 400 && s < 600)) { next(err); return; }
+    if (res.headersSent) { next(err); return; }
+    if (typeof s === 'number' && s >= 400 && s < 600) {
+      res.status(s).json({ error: s === 403 ? 'forbidden' : s === 401 ? 'unauthorized' : 'service_unavailable', message: 'service unavailable' });
+      return;
+    }
     (req.log ?? log).error("unhandled error", { err }); // server log only (stack stays out of the response)
     res.status(500).json({ error: "internal_error", message: "internal error" });
   });

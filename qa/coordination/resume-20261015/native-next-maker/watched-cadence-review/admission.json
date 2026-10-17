@@ -1,0 +1,23 @@
+{
+  "status": "READY_FOR_ROOT_DISPATCH_NOT_DISPATCHED",
+  "candidate_git_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "base_git_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "source_files": 8,
+  "raw_content_digest": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "packet_sha256": "1444f02369351b9e4b98969de5f909ee5e78a01e7b01b4c8565e296258e6161c",
+  "prompt_sha256": "128a018b2cb826e7d01a5f236f17d11856b128ff695fdb66cd0f4daee03ae836",
+  "validation": {
+    "exit": 0,
+    "sha256": "0615beddf7fb5f037c7c66893f683d37f369efaef73795a0e0caf1fa922a67ab",
+    "path": "validate-commit-admission.json"
+  },
+  "assessment": {
+    "exit": 0,
+    "ratio_verified": false,
+    "sha256": "550a18a1b6c6bd2d636ca4db7ea7057d5d7b912603666799bca595f52b43d89b",
+    "path": "assess-commit-admission.json"
+  },
+  "allocation": "Same once180s/24000 total incl30s/4000reserve; actualmakerunknownnull; no reset",
+  "historical_evidence": "PrebindHOLD/failedcandidate/allocation snapshots preserved, fresh currenthelper epoch only for readiness",
+  "reviewer_dispatched": false
+}

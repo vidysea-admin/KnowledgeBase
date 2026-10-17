@@ -75,10 +75,11 @@ test("judge that throws fails closed: nothing persisted, existing notes untouche
 });
 
 test("re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id", async () => {
-  const evid = [{ turnId: "f", sessionId: "s1" }];
-  const claims = [{ _id: "c-human", tenantId: "t", status: "verified", text: "Human verified claim", evidence: evid }, { _id: "c-dup", tenantId: "t", status: "verified", text: FEE, evidence: evid },
+  const evid = [{ turnId: "f", sessionId: "s1", quote: FEE }];
+  const claims = [{ _id: "c-human", tenantId: "t", status: "verified", text: "The programme costs one thousand rupees today.", evidence: evid }, { _id: "c-dup", tenantId: "t", status: "verified", text: FEE, evidence: evid },
     { _id: "c-old", tenantId: "t", status: "needs-review", text: "Old machine claim", evidence: evid }];
-  const { db, calls } = setup({ claims });
+  const { db, calls } = setup({ claims, existingSessionPage: { _id: "p1", tenantId: "t", sessionId: "s1", summary: FEE,
+    keyInsights: [], decisions: [], actionItems: [], evidence: evid } });
   const res = await run(db);
   assert.deepEqual(res.groundedNotes!.claims, { preserved: 2, replaced: 1, inserted: 1 });
   const inserted = calls.find((c) => c.coll === "claims" && c.op === "insertMany")!;
@@ -102,7 +103,7 @@ test("a failing claims insert leaves every old claim in place (no delete is issu
 test("flag OFF: legacy delete-then-insert path and result shape are unchanged; a judge alone does not switch grounded mode on", async () => {
   const { db: db2, calls: calls2 } = fakeDb();
   const legacy = (async (j: { kind: string }) => ({ text: j.kind === "claims" ? "[]" : JSON.stringify({ summary: "S", keyInsights: [], decisions: [], actionItems: [] }), usage: {}, provider: "f", model: "f" }));
-  const r2 = await indexSession("t", "s1", { db: db2, complete: legacy as never, embed: embedOk, noteJudge: judgeSame as never });
+  const r2 = await indexSession("t", "s1", { retrievalMode: "vector", db: db2, complete: legacy as never, embed: embedOk, noteJudge: judgeSame as never });
   assert.equal("groundedNotes" in r2, false);
   const del = calls2.findIndex((c) => c.coll === "session_pages" && c.op === "deleteMany" && JSON.stringify(c.filter) === JSON.stringify({ sessionId: "s1", tenantId: "t" }));
   assert.ok(del >= 0 && del < calls2.findIndex((c) => c.coll === "session_pages" && c.op === "insertOne"));
@@ -142,10 +143,9 @@ test("GET /citations/:claimId renders a claim written by grounded indexSession w
   } finally { await server.close(); }
 });
 
-test("when the judge rejects every fresh claim, old machine claims are kept (never replace notes with nothing)", async () => {
+test("when the judge rejects every fresh claim, old machine claims are kept and the new generation is refused", async () => {
   const { db, calls } = setup({ claims: [{ _id: "c-old", tenantId: "t", status: "needs-review", text: "Old machine claim", evidence: [{ turnId: "f", sessionId: "s1" }] }] });
   const rejectClaims = async (batch: Batch) => ({ verdicts: batch.map((b) => ({ id: b.id, verdict: b.kind === "claim" ? ("different" as const) : ("same" as const), reason: "r" })) });
-  const res = await run(db, { noteJudge: rejectClaims });
-  assert.equal(res.groundedNotes!.claims, null);
+  await assert.rejects(run(db, { noteJudge: rejectClaims }), /no accepted fresh claims/);
   assert.ok(!calls.some((c) => c.coll === "claims" && WRITES.includes(c.op)));
 });

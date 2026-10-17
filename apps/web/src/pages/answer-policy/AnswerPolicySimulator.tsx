@@ -6,20 +6,21 @@ import { safeHttpUrl } from "../../safe-url.js";
 import { simulateDraftPolicy, type DraftPolicyMode, type PolicySimulationResponse } from "./client.js";
 
 export function AnswerPolicySimulator(): React.ReactElement {
-  const { apiKey } = useAuth();
+  const { apiKey, sessionVersion } = useAuth(); const authOwner = JSON.stringify([apiKey, sessionVersion]);
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<DraftPolicyMode>("internal-only");
   const [version, setVersion] = useState(1);
   const [result, setResult] = useState<PolicySimulationResponse | null>(null);
+  const [viewKey, setViewKey] = useState(authOwner);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const generation = useRef(0);
 
   useEffect(() => {
     generation.current++;
-    setResult(null); setError(null);
+    setViewKey(authOwner); setResult(null); setError(null); setBusy(false); setQuery("");
     return () => { generation.current++; };
-  }, [apiKey]);
+  }, [apiKey, authOwner]);
 
   function changeMode(next: DraftPolicyMode): void {
     if (next === mode) return;
@@ -36,9 +37,10 @@ export function AnswerPolicySimulator(): React.ReactElement {
       if (request === generation.current) setResult(reply);
     } catch (err) {
       if (request === generation.current) setError(err instanceof ApiError ? err.message : "Policy simulation failed.");
-    } finally { setBusy(false); }
+    } finally { if (request === generation.current) setBusy(false); }
   }
 
+  if (viewKey !== authOwner) return <p>Loading this sign-in session…</p>;
   return <>
     <div className="page-header"><h1>Answer policy simulator</h1>
       <p>Test a draft policy against a fresh knowledge-base answer. This runs the existing Ask workflow.</p></div>

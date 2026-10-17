@@ -1,0 +1,32 @@
+[
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "FABF236621196871D176327BEA99D1C030FE5BEB888829490B10F8E6373C0B5E",
+    "backup": "baseline/apps__api__src__composition__production.ts"
+  },
+  {
+    "path": "config/ai-routing.yaml",
+    "sha256": "7D2EFE8903C1090B779053BF079C97C450CF9FBE8CB5546C2CD961370B29EA16",
+    "backup": "baseline/config__ai-routing.yaml"
+  },
+  {
+    "path": "docker-compose.yml",
+    "sha256": "FB262E68EB9127BDD73785A91B34E34BDF07B2CBC9C43AF57A54158DB1336E24",
+    "backup": "baseline/docker-compose.yml"
+  },
+  {
+    "path": "TASKS.md",
+    "sha256": "68A7C3948DF9B8732AF00BB6665B7E0764DDDDBD4BD9DEA8F1ED6F2EBC51EF9F",
+    "backup": "baseline/TASKS.md"
+  },
+  {
+    "path": ".goal/goal.json",
+    "sha256": "A3D1798512695448DB4E30742F87F0095FB77B4619AC00654CE1945739FEA56A",
+    "backup": "baseline/.goal__goal.json"
+  },
+  {
+    "path": "docs/DECISIONS.md",
+    "sha256": "4BF14AF9DCCB1132EE558B56BCE4C7172DF480CA23357019AC36091BF5DC122B",
+    "backup": "baseline/docs__DECISIONS.md"
+  }
+]

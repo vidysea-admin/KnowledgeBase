@@ -1,0 +1,49 @@
+{
+  "operation": "maker metadata closeout of existing independent PASS; no new review or tests",
+  "observed_at": "2026-10-16T02:56:10.864519+00:00",
+  "candidate": "72a3514fbc8f65187af387d124c5cc28d711da3f807ba6169753af83318f16c8",
+  "identity_kind": "ordered scoped pins SHA256; not Git commit",
+  "canonical_verdict_sha256": "c5439d57ae0aef3fcdf54193da836f66ec51aace456818c67a7ecb231811c4f1",
+  "manifest_before_sha256": "72c2feb38d87f7ef1e387675001ecb1969148e08731156370517034983e0c587",
+  "manifest_after_sha256": "e241649ba52b89d1ce313687a9419f6c2af428b04ea659c14885bb57a285e499",
+  "source_dependencies": {
+    "scripts/qa/review-runtime-usage.test.mjs": true,
+    "scripts/qa/review-runtime-usage.mjs": true,
+    "package.json": true,
+    "pnpm-lock.yaml": true,
+    "node_modules/tsx/package.json": true,
+    "node_modules/tsx/dist/esm/index.mjs": true,
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": true,
+    "qa/fixtures/review-runtime-usage-ordinal.jsonl": true,
+    "qa/coordination/checker-runtime-total-20261015/combined_finisher_probe.py": true,
+    "qa/coordination/checker-runtime-total-20261015/review_budget.py": true
+  },
+  "current_candidate_reconstructed": "72a3514fbc8f65187af387d124c5cc28d711da3f807ba6169753af83318f16c8",
+  "parser_before": {
+    "cycle": 1,
+    "manifestCycle": 1,
+    "handshake": "ready-for-check",
+    "dispatch": {
+      "slug": "review-runtime-usage",
+      "state": "complete",
+      "cycle": 1,
+      "verdictCycle": 1
+    }
+  },
+  "parser_after": {
+    "cycle": 1,
+    "manifestCycle": 1,
+    "handshake": "checked-PASS",
+    "dispatch": {
+      "slug": "review-runtime-usage",
+      "state": "not-pending",
+      "reason": "manifest not ready-for-check"
+    }
+  },
+  "existing_receipts": [
+    "qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-green.json",
+    "qa/goal-vectorless-2026-10-15/verification-combined-finisher-probe.json"
+  ],
+  "accounting": "all prior rows/receipts/overruns unchanged; new closeout actual usage unknown; no ratio or hard-cap claim",
+  "limitations": "SQLite mapping is observed closure only; no raw sessions inspected; prospective same-identity baseline+end required"
+}

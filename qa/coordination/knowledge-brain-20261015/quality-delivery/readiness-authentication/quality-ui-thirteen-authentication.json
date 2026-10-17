@@ -1,0 +1,150 @@
+{
+  "purpose": "Readiness receipt/source authentication only; no independent review/PASS or new admission",
+  "observed_at": "2026-10-15T11:49:34.4725138Z",
+  "receipts": [
+    {
+      "current_pin_mismatches": [],
+      "runtime_matches": true,
+      "environment_hash": "e665a022fa0fefb3b2134896e4a46d2f46ed6b8fa36cd47a797c21cb939d2fb3",
+      "candidate": "6ff9889bff172cda4117e17530769d74ed6851eff8353e4e46aa9f2f050e8c4a",
+      "pin_count": 22,
+      "own_exit": 0,
+      "before_after_mismatches": [],
+      "receipt_sha256": "ac42290a2f6ba53c0fde1d35884c9252928091fc296daca3001b89fea3f01e1c",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-quality-ui-and-typing-affected-thirteen.json",
+      "environment_note": "Recorded whitelist fingerprints only; current environment values not read or independently authenticated",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "stdout_sha256": "33950dde65cc801c90863e2ea20175f97a6ec021922c2d8a8ebfb25d18623a34"
+    },
+    {
+      "current_pin_mismatches": [
+        {
+          "path": "apps/api/src/composition/integrations/trusted-readers.ts",
+          "actual": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc",
+          "expected": "22bdffc19a9871f5b3819e566410a332243c0116b3475539c95eae101d1eb732"
+        }
+      ],
+      "runtime_matches": true,
+      "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+      "candidate": "30745c13a91cf68c0fbcfa654d30a7f997ede5f8a87cc5089d48d67b4c7268df",
+      "pin_count": 1675,
+      "own_exit": 0,
+      "before_after_mismatches": [],
+      "receipt_sha256": "8747fbf9dad5fdd20c52c3587249787c5bacda12645853e8e275ea0155878680",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json",
+      "environment_note": "Recorded whitelist fingerprints only; current environment values not read or independently authenticated",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "stdout_sha256": "bcfbb00ef3422379a4658adb07a5886ad069b883b5a5653925210104f720adee"
+    },
+    {
+      "current_pin_mismatches": [
+        {
+          "path": "apps/api/src/composition/integrations/trusted-readers.ts",
+          "actual": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc",
+          "expected": "22bdffc19a9871f5b3819e566410a332243c0116b3475539c95eae101d1eb732"
+        }
+      ],
+      "runtime_matches": true,
+      "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+      "candidate": "30745c13a91cf68c0fbcfa654d30a7f997ede5f8a87cc5089d48d67b4c7268df",
+      "pin_count": 1675,
+      "own_exit": 0,
+      "before_after_mismatches": [],
+      "receipt_sha256": "101ff5401e823c45f3bd964ce1a5bef7b269682957578b371947572d0ce9018c",
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json",
+      "environment_note": "Recorded whitelist fingerprints only; current environment values not read or independently authenticated",
+      "stderr_sha256": "ccb6bf354a0674eeb1e49df9a880a000b75240079fdb849282bb899d81eeb58c",
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "stdout_sha256": "c3ea3e3480189671fa44bc57ad4aaebca499290d60fd4398c7f5a7968f3f30ff"
+    }
+  ],
+  "stdout_summary_matches": true,
+  "unit_mapping": [
+    {
+      "test_ids_absent_from_source": [],
+      "selected_pass_count": 3,
+      "explicit_skip_todo_declarations": 0,
+      "file": "apps/web/src/pages/extraction-review/client.test.ts",
+      "test_ids": [
+        "uses existing authenticated read and authoritative export routes",
+        "sends one exact native option with current CAS and no tenant, actor or fabricated audit",
+        "propagates authority refusal without inventing saved state"
+      ]
+    },
+    {
+      "test_ids_absent_from_source": [],
+      "selected_pass_count": 6,
+      "explicit_skip_todo_declarations": 0,
+      "file": "apps/web/src/pages/extraction-review/ExtractionReviewPage.test.tsx",
+      "test_ids": [
+        "shows exact source/candidate and native choices, initially unset with no writes",
+        "requires fresh affirmation and stores one native label against current revision/input",
+        "shows CAS/source refusal without advancing coverage or preserving affirmation",
+        "fails closed for trusted-human refusal and discards a previous tenant response",
+        "consumes authoritative evaluator export and discloses partial coverage with no gold or threshold promotion",
+        "refuses foreign or changed-source exports before constructing a download"
+      ]
+    },
+    {
+      "test_ids_absent_from_source": [],
+      "selected_pass_count": 3,
+      "explicit_skip_todo_declarations": 0,
+      "file": "apps/web/src/pages/calibration-review/offline-transfer.test.ts",
+      "test_ids": [
+        "checks actual packet bytes and returns only assertion fields, discarding local revisions",
+        "rejects foreign tenant, source drift, duplicate, provenance and dishonest assertions",
+        "refuses mismatched current item sets and unavailable secure hashing"
+      ]
+    },
+    {
+      "test_ids_absent_from_source": [],
+      "selected_pass_count": 1,
+      "explicit_skip_todo_declarations": 0,
+      "file": "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+      "test_ids": [
+        "authenticated client encodes original ID and sends exact minimal write bodies"
+      ]
+    }
+  ],
+  "filter_note": "Thirteen selected tests passed; nineteen Ops tests were filtered by explicit testNamePattern and reported skipped by Vitest. Ops source has zero explicit skip/todo declarations. They are unexecuted, not nineteen passing tests or accidental skipped acceptance tests.",
+  "current_candidates": [
+    {
+      "inventory_hash_matches": true,
+      "inventory": "qa/evidence/t022-offline-transfer-cycle1-candidate.inventory.txt",
+      "unit": "t022-offline-transfer",
+      "cycle": 1,
+      "declared_candidate": "sha256:e20509a9b1a0b8b3f8639851d625d6ca6350bc138f30c14e6c962a6696e2d568"
+    },
+    {
+      "inventory_hash_matches": true,
+      "inventory": "qa/evidence/u22-extraction-review-ui-candidate.inventory.txt",
+      "unit": "u22-extraction-review-ui",
+      "cycle": 0,
+      "declared_candidate": "sha256:62edcb30f4d62caa5b2d83caee2c63e5432f922006b4364a77bb19fb82477dcd"
+    }
+  ],
+  "historical_preserved": [
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-frozen-ui-fourteen-20261015T1205.json",
+      "note": "Preserved without edits; failed-union exit1 and per-file composite never relabelled as standalone success",
+      "own_exit": 1,
+      "sha256": "f60bd63816da5055c007a1149eed32329895b4c71ebcfe73738f9dde77972ec1",
+      "status": null
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json",
+      "note": "Preserved without edits; failed-union exit1 and per-file composite never relabelled as standalone success",
+      "own_exit": null,
+      "sha256": "d61abd1cd4af62c1f71f2ff93a20b79ff8c7b23e720cb2e85aa06a5502c441c5",
+      "status": "ATTRIBUTABLE_COMPOSITE_READY_FOR_INDEPENDENT_REUSE_DECISION"
+    }
+  ],
+  "remaining_gates": [
+    "Independent matching-candidate review not performed",
+    "Recorded current environment not re-read; fingerprints attributable only to receipt",
+    "No actual-total admission: historical seven BOOTSTRAP inputs remain nonadmissible under admission-hold.md; installed canonical helper and exact root finite grants plus fresh assess required",
+    "Human labels remain0/30; no parent completion or role-cost claim"
+  ]
+}

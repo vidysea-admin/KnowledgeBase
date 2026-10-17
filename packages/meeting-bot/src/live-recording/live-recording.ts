@@ -90,6 +90,19 @@ export function readLiveRecordings(src: { dir: string; tenantId: string }, now: 
   return jobs;
 }
 
+/**
+ * Test seam (ISS-T039DUPES-006), INERT in production: every member is optional and `claimLiveRecording` is called without it. It lets a
+ * test inject a second contender at the exact instants where the takeover race lives, instead of relying on process timing.
+ */
+export interface ClaimHooks {
+  /** Between "this entry's content was judged DEAD" and "try to take it over". `raw` is the judged content. Default: no-op. */
+  afterJudgedDead?: (ctx: { file: string; raw: string }) => void;
+  /** While the takeover claim is HELD, after the entry was re-read under it and before it is replaced. Default: no-op. */
+  beforeReplace?: (ctx: { file: string; raw: string }) => void;
+  /** The exclusive-create primitive (`target` is the primary entry or a takeover claim). Default: `fs.linkSync`. */
+  link?: (from: string, target: string) => void;
+}
+
 export type ClaimResult =
   | { ok: true; release: () => void }
   | { ok: false; reason: "held"; heldBy: { sessionId: string; pid: number } };
@@ -97,8 +110,9 @@ export type ClaimResult =
 /** Atomically claim (tenant, meeting). A live holder -> `held`. A dead/stale holder is removed and replaced. Other I/O errors THROW. */
 export function claimLiveRecording(
   src: { dir: string; tenantId: string; meetingUrl: string; sessionId: string; until: Date | null },
-  now: Date, probes: LiveProbes = {}, pid: number = process.pid,
+  now: Date, probes: LiveProbes = {}, pid: number = process.pid, hooks: ClaimHooks = {},
 ): ClaimResult {
+  const link = hooks.link ?? linkSync;
   if (!TENANT.test(src.tenantId)) throw new Error("invalid tenant id");
   const meetingKey = meetingIdentity(src.meetingUrl);
   if (!meetingKey) throw new Error("not a recognisable meeting link");
@@ -117,7 +131,7 @@ export function claimLiveRecording(
   const sleep = (ms: number) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
   try {
     for (let attempt = 0; ; attempt++) {
-      try { linkSync(tmp, file); break; }
+      try { link(tmp, file); break; }
       catch (e) {
         if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
         let raw: string;
@@ -125,6 +139,7 @@ export function claimLiveRecording(
         const held = parseEntry(raw, path.basename(file), src.tenantId); // unreadable holder = THROW (cannot tell)
         if (entryIsLive(held, now, probes)) return { ok: false, reason: "held", heldBy: { sessionId: held.sessionId, pid: held.pid } };
         if (attempt >= 100) throw new Error("could not replace a stale live-recording entry");
+        hooks.afterJudgedDead?.({ file, raw });
         // ATOMIC TAKEOVER of a dead holder (ISS-T039DUPES-004), the run-state lock's claim-then-rename: every contender that judged THIS
         // exact content dead races for ONE exclusive claim file keyed by that content; only the claim holder may touch the entry. It
         // re-reads the bytes under the claim, replaces the entry by rename (never absent, a live entry is never moved) and verifies.
@@ -132,7 +147,7 @@ export function claimLiveRecording(
         const claimTmp = `${tmp}.claim`;
         writeFileSync(claimTmp, JSON.stringify({ pid }));
         let got = false;
-        try { linkSync(claimTmp, claim); got = true; }
+        try { link(claimTmp, claim); got = true; }
         catch (ce) {
           if ((ce as NodeJS.ErrnoException).code !== "EEXIST") throw ce;
           let other: { pid?: unknown } = {};
@@ -143,7 +158,7 @@ export function claimLiveRecording(
         let won = false;
         try {
           let again = ""; try { again = readFileSync(file, "utf8"); } catch { /* removed meanwhile */ }
-          if (again === raw) { renameSync(tmp, file); won = readFileSync(file, "utf8") === body; }
+          if (again === raw) { hooks.beforeReplace?.({ file, raw }); renameSync(tmp, file); won = readFileSync(file, "utf8") === body; }
         } finally { rmSync(claim, { force: true }); }
         if (won) break;
       }

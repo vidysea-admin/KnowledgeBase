@@ -1,0 +1,11 @@
+{
+  "status": "FROZEN_UNEXECUTED",
+  "test_before_sha256": "88193970859c005fddea9f38b1440fdd598024e99d5a9afb32469e945919f6cd",
+  "after_and_consumer_pins": {
+    "packages\\meeting-bot\\py\\test_sb_join_tiles.py": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+    "packages\\meeting-bot\\py\\sb_join_tiles.py": "2c6e9593cc39fd8f714ac447a4669cb8dbdb97703b202a19e25be7ea11603236",
+    "packages\\meeting-bot\\py\\sb_join_loop.py": "d21a821a343aea09b46d9d3c423ea4b47b74c591cd44938d5c5908d0b5fd65c1"
+  },
+  "tests_run": false,
+  "runtime_total_tokens": null
+}

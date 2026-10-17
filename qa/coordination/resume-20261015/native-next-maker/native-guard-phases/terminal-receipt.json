@@ -1,0 +1,100 @@
+{
+  "status": "BROKER_TERMINAL_GUARDS_GREEN_NOT_CHECKER_VERDICT",
+  "unit": "native-guard-phases",
+  "actual_base_head": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "dirty_diagnostic_source_files": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+      "sha256": "aa1de5248f25f941890cb64ff9e89ab61dc4d58f2f3fb3044029aa8ad1869925",
+      "total_lines": 267
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts",
+      "sha256": "099b181cf1178182dfb4c81563d662b37dbeded36c8e40aa3fd879592c3b8fad",
+      "total_lines": 63
+    }
+  ],
+  "source_count": 2,
+  "proofs": [
+    {
+      "node": 1,
+      "seal_path": "qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "seal_sha256": "f421d7fff5e79ee8128308d55e31409ac259a921807430c587c301e906f78a19",
+      "atomic_guard_receipt": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node1-original1-receipt.json",
+      "atomic_guard_receipt_sha256": "578ec7436ab30e2cd310179b066dedb4dd437afc66c3a0f45e3a793dcca1c13e",
+      "exit": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "command_active_s": 107.625,
+      "phase_active_s": 118.07800000000134,
+      "trace": {
+        "status": "COMPLETE",
+        "validScalarMonotonic": true,
+        "records": 64,
+        "last": {
+          "stageId": "node1-cleanup-complete",
+          "elapsedMs": 75000
+        },
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node1-trace.jsonl",
+        "sha256": "13af88d3891d580d2b104d0b98d526f8409a1c8b5b4ae19263fac6831975304c"
+      },
+      "head_after": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "fixture_removed": true
+    },
+    {
+      "node": 2,
+      "seal_path": "qa/coordination/resume-20261015/broker/native-original-node2-final-seal.json",
+      "seal_sha256": "bea21fdc20250635f235b60faef2c63ac8817f4c15a858f8446ed104a062f4bf",
+      "atomic_guard_receipt": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-original1-receipt.json",
+      "atomic_guard_receipt_sha256": "26b5f81108123ca4f89feb73b930830492e817b447a7d998d497a4842533b0a0",
+      "exit": 0,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "command_active_s": 65.79699999999866,
+      "phase_active_s": 75.57800000000134,
+      "trace": {
+        "status": "COMPLETE",
+        "validScalarMonotonic": true,
+        "records": 12,
+        "last": {
+          "stageId": "node2-cleanup-complete",
+          "elapsedMs": 61254
+        },
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node2-trace.jsonl",
+        "sha256": "07bab4fce44682df0d036e15a9d8684a795bd4dd03a6eb50c480121f9885e014"
+      },
+      "head_after": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "fixture_removed": true
+    }
+  ],
+  "terminal_report": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-report.md",
+    "sha256": "a889e860f6554a8cad3788f76b9c0a2447ef67e7a9bfe11f1c20b7eecdb53d1f"
+  },
+  "post75_trace_caveat": "elapsedMsclamped75000;laterstageIDsvalidbuttimestampslowerboundonly",
+  "prerequisites": "Botcompilerexit0andhelper5pass fromexactsealedprerequisite refs,notrerun",
+  "history": "20scompiler/75combinedtimeouts retained; observedcumulativeworkallocation explainswindowchoice,NOTproductionrepair",
+  "remaining": "Native4SKIPs/unexplainedintermittentreproof/realhost/duration/Ubuntu/live/provider/Mongo/human/releasegatesOPEN",
+  "maker_usage": {
+    "token_metric": "actual_total",
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "no_checker_PASS": true,
+  "no_parent_done": true,
+  "no_source_changes_after_freeze": true,
+  "no_staging_commit": true
+}

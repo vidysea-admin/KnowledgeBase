@@ -13,9 +13,10 @@ import { connect } from "../../packages/db/src/index.js";
 import { startServer } from "../../apps/api/src/server.js";
 import { requireDatabaseName } from "../../apps/api/src/db-name.js";
 import { buildProductionDeps } from "../../apps/api/src/composition/production.js";
-import { createSendNowDeps } from "./send-now-host.js";
+import { createManagedSendNowDeps } from "./manual-jobs/host.js";
 import { createBotEventsDeps } from "../watch/bot-events-host.js";
 import { acquireHostLock, createJoinRulesDeps, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
+import { runOperationsSupervisor } from '../operations/supervisor.js';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // Same file index.ts loads: apps/api/src/../../../.env == repo root.
@@ -25,19 +26,30 @@ async function main(): Promise<void> {
   const stateDir = prepareStateDir(resolveStateDir());
   const release = acquireHostLock(stateDir);
   process.on("exit", release);
-  for (const sig of ["SIGINT", "SIGTERM"] as const) process.on(sig, () => { release(); process.exit(sig === "SIGINT" ? 130 : 143); });
+  const abort = new AbortController();
+  let operationsDone: Promise<void> = Promise.resolve();
   try {
     console.log(`join-rules state directory: ${stateDir}`);
     await connect(process.env.MONGODB_URL ?? "mongodb://localhost:27017", requireDatabaseName());
     const prod = buildProductionDeps();
     // T-039: POST /calendar/send-now is live only through this host (needs the "send-now" scope on the key).
-    const server = startServer({ ...prod, calendar: { ...prod.calendar, sendNow: createSendNowDeps() }, joinRules: createJoinRulesDeps({ stateDir }), botEvents: createBotEventsDeps({ stateDir }) });
+    const server = startServer({ ...prod, calendar: { ...prod.calendar, sendNow: createManagedSendNowDeps() }, joinRules: createJoinRulesDeps({ stateDir }), botEvents: createBotEventsDeps({ stateDir }) });
     server.on("listening", () => {
       const addr = server.address();
       const port = typeof addr === "object" && addr ? addr.port : addr;
       console.log(`@lkb/api listening on :${port}`);
+      if (process.env.LKB_OPERATIONS_WORKER_ENABLED === '1') {
+        if (!prod.operationsSchedules) console.error('Operations supervisor unavailable: required runtime is not configured');
+        else operationsDone = runOperationsSupervisor({ ...prod.operationsSchedules, keyStore: prod.keyStore, env: process.env, signal: abort.signal })
+          .catch(() => { console.error('Operations supervisor stopped; operator attention required'); });
+      }
     });
-    server.on("close", release);
+    server.on('close', () => { abort.abort(); void operationsDone.finally(release); });
+    for (const sig of ['SIGINT', 'SIGTERM'] as const) process.once(sig, () => {
+      abort.abort(); server.close();
+      const force = setTimeout(() => { release(); process.exit(sig === 'SIGINT' ? 130 : 143); }, 10000);
+      void operationsDone.finally(() => { clearTimeout(force); release(); process.exit(sig === 'SIGINT' ? 130 : 143); });
+    });
   } catch (e) { release(); throw e; }
 }
 

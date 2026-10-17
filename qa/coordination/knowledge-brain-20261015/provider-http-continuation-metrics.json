@@ -1,0 +1,10 @@
+{
+  "cost": null,
+  "waitSeconds": 21.6632015,
+  "endQpc": 180514070616,
+  "activeBeforeWait": 83.6968989,
+  "actualTokens": null,
+  "endUTC": "2026-10-15T08:46:01.6540673Z",
+  "finalActiveSeconds": 120.6872055,
+  "finalUTC": "2026-10-15T08:46:36.6760694Z"
+}

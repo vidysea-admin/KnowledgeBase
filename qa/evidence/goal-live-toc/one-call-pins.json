@@ -1,0 +1,50 @@
+[
+  {
+    "path": "qa/evidence/goal-live-toc/one-call-sample.mjs",
+    "sha256": "2c2e814d8d755f7e334d03783d38e19fa89f5002df7c585f09e540f1f2e810cc"
+  },
+  {
+    "path": "packages/ai/src/providers/gemini.ts",
+    "sha256": "49fe4fe8b50c79c46bbd3ea446e96b61d8d5f32490b55045e671e2a5c371367b"
+  },
+  {
+    "path": "packages/ai/src/provider.ts",
+    "sha256": "4f22738b7c72883948ac2544a71709c360c57ca7b39b3eb437dc74b82b9aa493"
+  },
+  {
+    "path": "packages/ai/src/gemini-quota.ts",
+    "sha256": "6b7c4d9ac7d7c56ef1a24f7e112cded7b5b681e5344f640470dc3cc949190949"
+  },
+  {
+    "path": "packages/ai/src/json.ts",
+    "sha256": "2ebd19828037788b34ac6d512cee0cc1e9b8fd64df99537047baecc6133251df"
+  },
+  {
+    "path": "packages/index/src/pipeline/summarize.ts",
+    "sha256": "4784fa7abedb94d44a223f64d32470d0d0d14fbf84fd755405bc9379969d81ad"
+  },
+  {
+    "path": "packages/index/src/tree/build.ts",
+    "sha256": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085"
+  },
+  {
+    "path": "packages/index/src/tree/extract-topics.ts",
+    "sha256": "cbf6979098295aaf1cbf2a48ddc1b362900d7d3e967c3a3dca9a71988ffd36f6"
+  },
+  {
+    "path": "scripts/lib/transcript-provenance.mjs",
+    "sha256": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301"
+  },
+  {
+    "path": "scripts/lib/turn-timing.mjs",
+    "sha256": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e"
+  },
+  {
+    "path": "scripts/webinar/session-rows.mjs",
+    "sha256": "684a6d3c5e6fafdd9879ce232d5b0703d6a1e7d667415e2be2b0543b70de8081"
+  },
+  {
+    "path": "scripts/toc/toc-recovery.mjs",
+    "sha256": "b5bf4e11901db92b4cb044c0d9084a249c388af24a74c333147f773c85ce51e1"
+  }
+]

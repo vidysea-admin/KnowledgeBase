@@ -1,0 +1,7 @@
+{
+  "receipt": "t037-approved-trust13-receipt.json",
+  "packet": "../t037-approved-trust/pins.json",
+  "packet_pin_differences": [],
+  "pins_checked": 25,
+  "independent_verdict": null
+}

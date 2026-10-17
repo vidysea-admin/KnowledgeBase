@@ -16,6 +16,7 @@ import { runPurgeJob, type JobReport } from "./retention-purge-job.js";
 import { makeMarkIo, markSessionProcessed, type MarkIo } from "./retention-processed.js";
 import { clipArgs, clipFileName, extractEvidenceClips, resolveFfmpegCommand, type ClipIo } from "./retention-clips.js";
 import { buildLastRun, type LastRun } from "./retention-last-run.js";
+import { tenantRetentionSummaryPath } from "./production/private-summary.js";
 
 const ASOF = ["--as-of", new Date(NOW).toISOString()];
 const WIN = { sessionId: "s", turnId: "t1", tStart: 85, tEnd: 125 };
@@ -223,14 +224,14 @@ test("the job writes data/retention/last-run.json shape: dry run by default, cou
   const out = mkdtempSync(join(tmpdir(), "t046live-out-"));
   try {
     session(e, "s", 120);
-    const reportFile = join(out, "report.json"); const lastRun = join(out, "retention", "last-run.json");
+    const reportFile = join(out, "report.json"); const lastRun = tenantRetentionSummaryPath(e.root, "toc");
     const code = runPurgeJob([...baseArgs(e.root, e.media, ASOF), "--report-file", reportFile], {
       now: () => NOW, write: () => undefined, error: () => undefined, lastRunFile: lastRun,
     });
     assert.equal(code, 0);
     const lr = JSON.parse(readFileSync(lastRun, "utf8")) as LastRun;
     assert.deepEqual(lr, {
-      version: 1, mode: "dry-run", dryRun: true, startedAt: new Date(NOW).toISOString(), finishedAt: new Date(NOW).toISOString(),
+      tenantId: "toc", version: 1, mode: "dry-run", dryRun: true, startedAt: new Date(NOW).toISOString(), finishedAt: new Date(NOW).toISOString(),
       exitCode: 0, ok: true, candidates: 1, deleted: 0, bytes: 0, vetoed: 0, failed: 0, clipsRetained: null, reportFile,
     });
     assert.ok(!readFileSync(lastRun, "utf8").includes("SECRET"));
@@ -250,13 +251,12 @@ test("a last-run write failure is reported (exit 5) without changing the purge o
   const e = env();
   try {
     session(e, "s", 120);
-    const errs: string[] = [];
-    const code = runPurgeJob([...baseArgs(e.root, e.media, ASOF), "--report-file", "/tmp/never-written.json"], {
-      now: () => NOW, write: () => undefined, error: (l) => errs.push(l), lastRunFile: "/x/last-run.json",
-      jobIo: { writeReport: (p) => { if (p.endsWith("last-run.json")) throw Object.assign(new Error("x"), { code: "EACCES" }); } },
-    });
+    const errs: string[] = [], args = [...baseArgs(e.root, e.media, ASOF), "--report-file", join(e.root, "fixture-report.json")];
+    const deps = { now: () => NOW, write: () => undefined, error: (l: string) => errs.push(l), jobIo: { writeReport: () => {} } };
+    assert.equal(runPurgeJob(args, deps), 0); writeFileSync(`${tenantRetentionSummaryPath(e.root, "toc")}.lock`, "another-writer");
+    const code = runPurgeJob(args, deps);
     assert.equal(code, 5);
-    assert.match(errs.join("\n"), /last-run summary \(EACCES\)/);
+    assert.match(errs.join("\n"), /private last-run summary \(summary-writer-busy\)/);
     assert.ok(existsSync(mediaFile(e, "s")));
   } finally { e.done(); }
 });

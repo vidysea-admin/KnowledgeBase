@@ -38,6 +38,7 @@ export interface SessionPages {
       [k: string]: unknown;
     }[]
   ];
+  indexArtifact?: SessionPageIndexArtifact;
   [k: string]: unknown;
 }
 export interface CitedItem {
@@ -90,4 +91,11 @@ export interface QaEntry {
   answerEvidence: QuotedEvidence[];
   status: "answered" | "unanswered";
   [k: string]: unknown;
+}
+export interface SessionPageIndexArtifact {
+  version: 1;
+  generation: string;
+  sessionId: string;
+  sourceId: string;
+  turnDigest: string;
 }

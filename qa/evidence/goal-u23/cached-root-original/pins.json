@@ -1,0 +1,38 @@
+[
+  {
+    "Source": "apps/api/src/indexing/eligible-tree.ts",
+    "SourceSHA256": "040dc797ce8ccf404eb1d5b4c68eb629cdb6f58298491da5d9f2c00091fc454e",
+    "Snapshot": "qa\\evidence\\goal-u23\\cached-root-original\\apps__api__src__indexing__eligible-tree.ts.txt",
+    "SnapshotSHA256": "040dc797ce8ccf404eb1d5b4c68eb629cdb6f58298491da5d9f2c00091fc454e"
+  },
+  {
+    "Source": "apps/api/src/visibility/knowledge.ts",
+    "SourceSHA256": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada",
+    "Snapshot": "qa\\evidence\\goal-u23\\cached-root-original\\apps__api__src__visibility__knowledge.ts.txt",
+    "SnapshotSHA256": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada"
+  },
+  {
+    "Source": "apps/api/src/indexing/session.ts",
+    "SourceSHA256": "b48ebb3a0e5e2d65ce2004d939e8c3bac11610cdcd410ebf5ee936851102de79",
+    "Snapshot": "qa\\evidence\\goal-u23\\cached-root-original\\apps__api__src__indexing__session.ts.txt",
+    "SnapshotSHA256": "b48ebb3a0e5e2d65ce2004d939e8c3bac11610cdcd410ebf5ee936851102de79"
+  },
+  {
+    "Source": "packages/index/src/tree/topic-indexing.ts",
+    "SourceSHA256": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd",
+    "Snapshot": "qa\\evidence\\goal-u23\\cached-root-original\\packages__index__src__tree__topic-indexing.ts.txt",
+    "SnapshotSHA256": "c5cc23e69c9d118b990a1e8fae03aa4d6ec52af22274c5fbea2256914b83aedd"
+  },
+  {
+    "Source": "packages/index/src/tree/build.ts",
+    "SourceSHA256": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085",
+    "Snapshot": "qa\\evidence\\goal-u23\\cached-root-original\\packages__index__src__tree__build.ts.txt",
+    "SnapshotSHA256": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085"
+  },
+  {
+    "Source": "packages/index/src/tree/regenerate.ts",
+    "SourceSHA256": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca",
+    "Snapshot": "qa\\evidence\\goal-u23\\cached-root-original\\packages__index__src__tree__regenerate.ts.txt",
+    "SnapshotSHA256": "23953f98ca2564454efe1f1f29b6a44853e6f2815e6d6284c64f048084edf1ca"
+  }
+]

@@ -1,0 +1,22 @@
+{
+  "capturedAt": "2026-10-15T07:55:02.4094686Z",
+  "phase": "implementation-candidate-frozen-awaiting-broker",
+  "makerStartMonotonic": null,
+  "makerStartNote": "Implementation start was not instrumented; do not fabricate elapsed duration.",
+  "tokens": null,
+  "tokenNote": "Per-agent token counter unavailable",
+  "files": [
+    {
+      "path": "scripts/webinar/index-proof.mjs",
+      "sha256": "704aa4c9a2cc85b32bfe85155c9c8bc0400cff42ec34d3c3c3c98dca4919f06a"
+    },
+    {
+      "path": "scripts/webinar/index-proof.test.mjs",
+      "sha256": "346802359c79a662d1d7c015f239388f3d0a4617911b2bc191c72fc23ff4a3cf"
+    },
+    {
+      "path": "scripts/webinar/sync-session.mjs",
+      "sha256": "95f970f5b43501064eddcd1f47d2be751825842a761465c40660a08020bb015b"
+    }
+  ]
+}

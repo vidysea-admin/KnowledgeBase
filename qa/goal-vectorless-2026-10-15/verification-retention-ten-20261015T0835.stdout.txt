@@ -1,0 +1,18 @@
+✔ current committed proof stamps once, preserves audit, and never resets a prior valid processing clock (309.1739ms)
+✔ stale, foreign, prior generation, incomplete and wrong-lane proofs never stamp (531.1491ms)
+✔ changed source/input bytes, disk status, sourceId and future stamp fail closed (211.9777ms)
+✔ missing proof, existing lock and redirected/hardlinked state are refused without altering audit (155.4208ms)
+✔ invalid clocks/bindings and test-data lane mismatch refuse before writes (38.757ms)
+✔ genuine speech-only input is explicitly bound without creating a combined transcript (211.6965ms)
+✔ real status and re-emission writers preserve prior processing/audit and refuse foreign identities (398.432ms)
+✔ explicit vectorless generation stamps and is consumed by the retention gatherer without semantic proof (298.498ms)
+✔ vectorless proof cannot downgrade missing readiness, hashes, generation or explicit mode binding (967.9371ms)
+✔ legacy v3 cannot claim vectorless mode to bypass its semantic requirement (258.8773ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4078.4874

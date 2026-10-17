@@ -1,0 +1,23 @@
+{
+  "recipes": [
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-transcript-four-current-absent-env-spec.json",
+      "sha256": "87946b8464766f35962bb8f792978b7a47257bb073318c35d34573a5fb3c3ed0"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/transcript-env-absent-wrapper.mjs",
+      "sha256": "35ed5ac811232633db78cdd731060cdcfa2255576eaacab18af1d8f41ce697ae"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-web-types-coherent-current-spec.json",
+      "sha256": "45fc9a0224717e85db607a4d1ed01db73c627387df4beef71821b018ec687672"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-web-build-coherent-current-spec.json",
+      "sha256": "1d0c14c6cab1a0d9621541d864cba5e9797401e986d2a4d533fcbd2d718f32ce"
+    }
+  ],
+  "transcriptUnset": "KB_U24_PRIVATE_TOC_TESTS deleted by preexec child launcher; spec NODE_ENV override retained",
+  "webRecipe": "Prior predeclared stage specs explicit disabled private flag; values not printed",
+  "preExecutionAnchors": "Existing corresponding receipt before maps/command outputs and queued spec writes; no post-hoc mutation"
+}

@@ -1,0 +1,42 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "genuine-phase-observer-c",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "status": "source-frozen-not-executed",
+  "changed_path": "scripts/native-capture/production.test.ts",
+  "source_sha256": "dc8b0f7e2a52d48f1b84175cb996b001fac5ecc827d1fda0a32f43359cd37f68",
+  "nonblank_lines": 138,
+  "preimage": {
+    "sha256": "1725dad0b25a67bb393b0b3cf7087361208532c27131f8188e9f5e9a390d620e",
+    "path": "backups/enum-only-never-run-production.test.ts",
+    "execution": "NEVER_RUN"
+  },
+  "producer_owner": "native_b",
+  "observer_fields": [
+    "stage",
+    "event",
+    "errorName optional whitelist",
+    "errorCode optional whitelist",
+    "elapsedMs integer clamped0..120000"
+  ],
+  "required_exact_title": "genuine live seal precedes source ingestion; retained public recovery does not invent a clock",
+  "request": {
+    "node_timeout_ms": 120000,
+    "no_whole25_retry": true,
+    "no_enum_only_rerun": true,
+    "external_job_bound_s": 125,
+    "selection": "same isolated exact positive anchored test, default per-file isolation; require exactly one actual test"
+  },
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "cost": null,
+    "token_metric": "actual_total",
+    "tokens": null
+  },
+  "execution": "No tests/build/decoder/ACL/DB/provider/browser commands executed."
+}

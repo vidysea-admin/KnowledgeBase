@@ -15,16 +15,21 @@ const claim = (id: string, tenantId: string, status: string, sessionId = "s1"): 
   ({ _id: id, tenantId, text: `text ${id}`, status, confidence: 0.5, evidence: [{ turnId: `t-${id}`, sessionId }] });
 const DATA: Record<string, Row[]> = {
   claims: [claim("c1", "A", "verified"), claim("c2", "A", "needs-review"), claim("c3", "A", "verified", "gone"), claim("c4", "B", "verified", "sB"), claim("c5", "A", "verified")],
-  sessions: [{ _id: "s1", tenantId: "A", title: "Session A1" }, { _id: "sB", tenantId: "B", title: "Secret B" }, { _id: "s1", tenantId: "B", title: "Other tenant s1" }],
+  sessions: [{ _id: "s1", tenantId: "A", sourceId: "source-A", title: "Session A1" }, { _id: "sB", tenantId: "B", sourceId: "source-B", title: "Secret B" }, { _id: "s1", tenantId: "B", sourceId: "source-B", title: "Other tenant s1" }],
+  sources: [{ _id: "source-A", tenantId: "A", kind: "document" }, { _id: "source-B", tenantId: "B", kind: "document" }],
+  turns: ["c1", "c2", "c5"].map(id => ({ _id: `t-${id}`, tenantId: "A", sessionId: "s1", speakerRef: "document", text: `text ${id}`, tStart: 0, tEnd: 1 }))
+    .concat([{ _id: "t-c4", tenantId: "B", sessionId: "sB", speakerRef: "document", text: "text c4", tStart: 0, tEnd: 1 }]),
 };
 function match(row: Row, filter: Row): boolean {
   return Object.entries(filter).every(([k, v]) => {
     if (v && typeof v === "object" && "$in" in (v as Row)) return ((v as { $in: unknown[] }).$in).includes(row[k]);
+    if (v && typeof v === "object" && "$gt" in (v as Row)) return String(row[k]) > String((v as Row).$gt);
     return row[k] === v;
   });
 }
 const fakeDb = {
   collection: (name: string) => ({
+    findOne: async (filter: Row) => (DATA[name] ?? []).find(r => match(r, filter)) ?? null,
     find: (filter: Row) => {
       let rows = (DATA[name] ?? []).filter((r) => match(r, filter));
       const cur = {
@@ -40,7 +45,7 @@ const fakeDb = {
 const realStore = () => createMongoClaimsListDeps({
   claims: scopedCollection(fakeDb, "claims") as never,
   sessions: scopedCollection(fakeDb, "sessions") as never,
-});
+}, () => fakeDb);
 
 async function withServer(deps: ClaimsListDeps | undefined, run: (url: string) => Promise<void>) {
   const app = express();
@@ -68,7 +73,7 @@ test("auth and scope: no key 401, wrong scope 403, store not called", async () =
 test("tenant isolation: key A reads only A's claims, key B only B's; client tenant hints ignored or refused", async () => {
   await withServer(realStore(), async (url) => {
     const a = await (await fetch(`${url}/claims`, h("A"))).json() as { claims: { _id: string }[] };
-    assert.deepEqual(a.claims.map((c) => c._id), ["c1", "c2", "c3", "c5"]);
+    assert.deepEqual(a.claims.map((c) => c._id), ["c1", "c2", "c5"]);
     const b = await (await fetch(`${url}/claims`, h("B"))).json() as { claims: { _id: string; evidence: { sessionTitle: string | null }[] }[] };
     assert.deepEqual(b.claims.map((c) => c._id), ["c4"]);
     assert.equal(b.claims[0]!.evidence[0]!.sessionTitle, "Secret B");
@@ -79,12 +84,12 @@ test("tenant isolation: key A reads only A's claims, key B only B's; client tena
   });
 });
 
-test("citation: session title resolved within tenant only; missing session gives null, same id in another tenant is not borrowed", async () => {
+test("citation: session title resolved within tenant only; missing evidence claim withheld, same id in another tenant is not borrowed", async () => {
   await withServer(realStore(), async (url) => {
     const a = await (await fetch(`${url}/claims`, h("A"))).json() as { claims: { _id: string; evidence: { turnId: string; sessionId: string; sessionTitle: string | null }[] }[] };
     const byId = Object.fromEntries(a.claims.map((c) => [c._id, c.evidence[0]!]));
     assert.deepEqual(byId.c1, { turnId: "t-c1", sessionId: "s1", sessionTitle: "Session A1" });
-    assert.equal(byId.c3!.sessionTitle, null);
+    assert.equal(byId.c3, undefined, "orphan evidence cannot disclose claim text or borrow another tenant's title");
     const b = await (await fetch(`${url}/claims`, h("B"))).json() as { claims: unknown[] };
     assert.ok(!JSON.stringify(b).includes("Session A1"));
   });
@@ -97,10 +102,10 @@ test("filter and paging: status filter, limit/offset, truncated flag, stable ord
     const p1 = await get("?limit=2");
     assert.deepEqual(p1.claims.map((c) => c._id), ["c1", "c2"]); assert.equal(p1.truncated, true);
     const p2 = await get("?limit=2&offset=2");
-    assert.deepEqual(p2.claims.map((c) => c._id), ["c3", "c5"]); assert.equal(p2.truncated, false); assert.equal(p2.offset, 2);
+    assert.deepEqual(p2.claims.map((c) => c._id), ["c5"]); assert.equal(p2.truncated, false); assert.equal(p2.offset, 2);
     assert.deepEqual((await get("?limit=2&offset=4")).claims, []);
     const exact = await get("?limit=4");
-    assert.equal(exact.claims.length, 4); assert.equal(exact.truncated, false);
+    assert.equal(exact.claims.length, 3); assert.equal(exact.truncated, false);
   });
 });
 

@@ -1,0 +1,57 @@
+✔ http transport passes the AbortSignal to fetch: abort cancels a never-answered request and the server sees the close (154.5227ms)
+✔ production text routes bind distinct Cloud generators and verifiers without an embedding route (4.5069ms)
+✔ output verification cannot fall back to generation, even with an unsafe configured verifier chain (3.169ms)
+✔ Compose requires an explicit database and does not bake provider secrets into web builds (1.0214ms)
+✔ judge on: notes persisted, judge totals reported, every note citation resolves to a real turn and time (46.2434ms)
+✔ judge rejects a polarity-flipped decision: dropped from page and claims, never persisted (12.0796ms)
+✔ judge that throws fails closed: nothing persisted, existing notes untouched, status failed (4.4709ms)
+✔ a failing claims insert leaves every old claim in place (no delete is issued) (5.165ms)
+✔ flag OFF: legacy delete-then-insert path and result shape are unchanged; a judge alone does not switch grounded mode on (12.9749ms)
+✔ flag resolution: OFF unless the caller or KB_GROUNDED_NOTES=1 turns it on; cost cap parsing (0.3532ms)
+✔ GET /citations/:claimId renders a claim written by grounded indexSession with the cited turn id and times (79.3955ms)
+✔ flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1 (2.044ms)
+✔ suggest writes a status=suggested row with its quote, and NEVER a speakers row (25.0034ms)
+✔ a verifier that does not say yes yields no suggestion (4.0994ms)
+✔ an ungrounded name (quote not in the transcript) is not suggested (1.0849ms)
+✔ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (9.334ms)
+✔ a model that throws never throws out of the hook and writes nothing (0.8197ms)
+✔ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (49.6687ms)
+✔ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (7.8822ms)
+✔ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (3.4331ms)
+✔ ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw (2.2319ms)
+✔ ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues (52.8291ms)
+✔ indexSession still completes when the suggestion hook fails (8.93ms)
+✔ production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins (0.3258ms)
+✔ route uses verified tenant, sessions scope, safe errors and private no-store (126.0229ms)
+✔ store errors hide credentials, transcript and raw exception (18.3153ms)
+✔ mounted knowledge route enforces scope, request bounds, tenant and safe DTO (33.4105ms)
+﹣ actual TOC deterministic persona traverses mounted API and produces a downstream response artifact (0.331ms) # HOLD: private authentic TOC input requires explicit KB_U24_PRIVATE_TOC_TESTS=1
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (29.6621ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (5.9337ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (48.1357ms)
+✔ known-person profile and mounted API revoke source consent without a cached identity bypass (80.8045ms)
+✔ unsupported snapshot capability cannot fall back to collection-only profile output (22.8711ms)
+✔ cached topic names require every contributing source session to remain visible (21.9875ms)
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (41.7428ms)
+✔ speaker metadata eligibility permits empty optional evidence and all-visible attribute references (1.6623ms)
+✔ speaker metadata eligibility checks withdrawn independent attribute references despite absent values (2.0494ms)
+✔ speaker metadata eligibility refuses malformed declared attribute references before source reads (1.657ms)
+✔ speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads (1.566ms)
+✔ speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source (5.7747ms)
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (61.4494ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (17.4696ms)
+✔ review refresh refuses legacy/vector completion and missing lexical or provenance proof (50.3646ms)
+✔ text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score (30.2902ms)
+✔ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (1.9469ms)
+✔ head audit remains readable after secondary history failure without another human correction (1.8857ms)
+✔ complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation (2.4797ms)
+✔ effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes (1.3741ms)
+﹣ retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection (0.4264ms) # SKIP
+ℹ tests 49
+ℹ suites 0
+ℹ pass 47
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 14528.6338

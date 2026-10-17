@@ -1,0 +1,23 @@
+ISS-W045-001: 6/6 refused
+ISS-W045-002 (turns): sources0 media0 sessions0 turns0
+ISS-W045-002 (media): sources0 media0 sessions0 turns0
+✔ ISS-W045-001: recorded private/loopback/metadata targets are refused before anything is forwarded (8.4008ms)
+✔ ISS-W045-001: extra spellings, non-http schemes and credentials are refused (1.9761ms)
+✔ ISS-W045-001: hostnames resolving to private addresses (any one of several) or failing/empty DNS are refused (0.9391ms)
+✔ ISS-W045-001: a public host is forwarded; the guard wraps the default and an injected fetcher via buildSourceIntakeAdapters (4.2064ms)
+✔ ISS-W045-002: turns insertMany writes a prefix then throws -> zero rows left; other tenants untouched (2.2232ms)
+✔ ISS-W045-002: media insertMany writes a prefix then throws -> zero rows left; other tenants untouched (4.6254ms)
+✔ ISS-SOURCEREADER-001: never-resolving transport is bounded even if it ignores abort (49.7074ms)
+✔ ISS-SOURCEREADER-001: stalled response body is cancelled on deadline (24.6715ms)
+✔ ISS-SOURCEREADER-001: chunked body above byte cap without content-length is refused (1.8828ms)
+✔ declared oversized body is refused before reading and errors hide provider secrets (74.2686ms)
+✔ bounded UTF-8 content survives guarded downstream fetch with manual redirects and scoped key (36.9836ms)
+✔ invalid or expanded resource limits cannot disable bounds (40.6571ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5014.8472

@@ -8,6 +8,78 @@ import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeMeetingCandidatesDeps } from "../fixtures.js";
 import { createMeetingCandidatesDeps } from "../store.js";
 import { scanGmailForMeetingCandidates } from "../gws/gws-gmail.js";
+import {createConfiguredPublicWebinarDiscovery} from "../gws/public-webinar-config.js";
+
+test("public webinar scan requires auth, scope and bound safe work DB before acquisition", {timeout: 10_000}, async () => {
+  let work: string | undefined = "fixture-work", calls = 0;
+  const deps = fakeMeetingCandidatesDeps({getWorkDatabase: tenant => tenant === "tenant-1" ? work : undefined});
+  const server = await startTestServer(buildTestDeps({meetingCandidates: {...deps, discoverPublicWebinars: async tenantId => {
+    calls++; return {version: 1, checkedAt: "2026-10-15T10:00:00Z", complete: true, candidates: [], gaps: [], tenantId};
+  }}, keyStore: fakeKeyStore({"owner": {tenantId: "tenant-1", scopes: ["gmail"]},
+    "foreign": {tenantId: "tenant-2", scopes: ["gmail"]}, "read": {tenantId: "tenant-1", scopes: ["ask"]}})}));
+  const scan = (key: string, binding?: string) => fetch(`${server.baseUrl}/public-webinars/scan`, {method: "POST",
+    headers: {authorization: `Bearer ${key}`, ...(binding ? {"X-LKB-Work-DB": binding} : {})}, signal: AbortSignal.timeout(3_000)});
+  try {
+    for (const [key, expected] of [["unknown", 401], ["read", 403], ["foreign", 503]] as const) {
+      const res = await scan(key, "fixture-work"); assert.equal(res.status, expected); await res.text();
+    }
+    for (const value of [undefined, "lkb", "global_university_db", "fixture-work"]) {
+      work = value;
+      for (const binding of [undefined, "foreign-work"]) {const res = await scan("owner", binding); assert.equal(res.status, 503); await res.text();}
+    }
+    work = "lkb"; const refused = await scan("owner", "lkb"); assert.equal(refused.status, 503); await refused.text();
+    assert.equal(calls, 0);
+  } finally {await server.close();}
+});
+
+test("public webinar scan mounts configured discovery without forging approval or sender identity", {timeout: 10_000}, async () => {
+  const seen: string[] = [];
+  const configured = createConfiguredPublicWebinarDiscovery("tenant-1", JSON.stringify([{id: "college", url: "https://college.example/events"}]), {
+    lookup: async host => {seen.push(host); return ["93.184.216.34"];},
+    request: async () => ({status: 200, location: null, body: `<script type="application/ld+json">${JSON.stringify({"@type": "EducationEvent",
+      name: "Career guidance webinar", startDate: "2099-10-15T10:00:00Z", url: "/register/session"})}</script>`}),
+  });
+  if (!configured.configured) return assert.fail("not configured");
+  const deps = seededMeetingCandidates(), before = structuredClone([...deps._rows.values()]);
+  const server = await startTestServer(buildTestDeps({meetingCandidates: {...deps, getWorkDatabase: () => "fixture-work", discoverPublicWebinars: configured.discover},
+    keyStore: fakeKeyStore({"owner": {tenantId: "tenant-1", scopes: ["gmail"]}})}));
+  try {
+    const response = await fetch(`${server.baseUrl}/public-webinars/scan?tenantId=foreign`, {method: "POST", headers: {authorization: "Bearer owner",
+      "X-LKB-Work-DB": "fixture-work", "X-LKB-Tenant": "foreign", "content-type": "application/json"},
+      body: JSON.stringify({tenantId: "foreign", sources: [{id: "evil", url: "https://evil.example"}]}), signal: AbortSignal.timeout(3_000)});
+    assert.equal(response.status, 200); assert.equal(response.headers.get("x-lkb-tenant"), "tenant-1");
+    const body = await response.json() as {publicDiscovery: {tenantId: string; complete: boolean; candidates: Record<string, unknown>[]}};
+    assert.equal(body.publicDiscovery.tenantId, "tenant-1"); assert.equal(body.publicDiscovery.complete, true);
+    const candidate = body.publicDiscovery.candidates[0]!;
+    assert.equal(candidate.reviewRequired, true); assert.equal(candidate.personalJoinVerified, false);
+    for (const field of ["senderEmail", "senderDomain", "status"]) assert.equal(Object.hasOwn(candidate, field), false);
+    assert.deepEqual(seen, ["college.example"]); assert.deepEqual([...deps._rows.values()], before); assert.equal(deps._trust.size, 0);
+  } finally {await server.close();}
+});
+
+test("public webinar scan preserves incomplete coverage and sanitizes unavailable or foreign results", {timeout: 10_000}, async () => {
+  let mode = "incomplete";
+  const base = {version: 1 as const, checkedAt: "2026-10-15T10:00:00Z", complete: false, candidates: [], gaps: [{sourceId: "college", reason: "unavailable" as const}]};
+  const deps = fakeMeetingCandidatesDeps({getWorkDatabase: () => "fixture-work"});
+  const server = await startTestServer(buildTestDeps({meetingCandidates: {...deps, discoverPublicWebinars: async tenantId => {
+    if (mode === "error") throw new Error("private secret provider failure");
+    return {...base, tenantId: mode === "foreign" ? "tenant-2" : tenantId};
+  }}, keyStore: fakeKeyStore({"owner": {tenantId: "tenant-1", scopes: ["gmail"]}})}));
+  const scan = () => fetch(`${server.baseUrl}/public-webinars/scan`, {method: "POST", headers: {authorization: "Bearer owner", "X-LKB-Work-DB": "fixture-work"}, signal: AbortSignal.timeout(3_000)});
+  try {
+    const incomplete = await scan(); assert.equal(incomplete.status, 200);
+    assert.deepEqual(await incomplete.json(), {publicDiscovery: {...base, tenantId: "tenant-1"}});
+    for (mode of ["error", "foreign"]) {
+      const response = await scan(); assert.equal(response.status, 503); assert.equal(response.headers.get("x-lkb-tenant"), null);
+      const body = await response.text(); assert.equal(body.includes("secret"), false); assert.equal(body.includes("tenant-2"), false);
+    }
+  } finally {await server.close();}
+  const missing = await startTestServer(buildTestDeps({meetingCandidates: deps, keyStore: fakeKeyStore({"owner": {tenantId: "tenant-1", scopes: ["gmail"]}})}));
+  try {
+    const response = await fetch(`${missing.baseUrl}/public-webinars/scan`, {method: "POST", headers: {authorization: "Bearer owner", "X-LKB-Work-DB": "fixture-work"}, signal: AbortSignal.timeout(3_000)});
+    assert.equal(response.status, 503); await response.text();
+  } finally {await missing.close();}
+});
 
 function seededMeetingCandidates() {
   const deps = fakeMeetingCandidatesDeps();

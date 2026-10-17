@@ -1,0 +1,13 @@
+✔ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (37.8928ms)
+✔ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (5.7299ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (47.7123ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (21.2657ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (18.4317ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2421.5126

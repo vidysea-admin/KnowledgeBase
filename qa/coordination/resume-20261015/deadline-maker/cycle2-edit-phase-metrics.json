@@ -1,0 +1,10 @@
+{
+  "phase": "cycle2-byte-edit-packet",
+  "monotonic_start_ns": 4621969261800,
+  "monotonic_end_ns": 4622450839100,
+  "active_seconds": 0.4815773,
+  "wait_seconds": 0,
+  "actual_total_tokens": null,
+  "maker_total_active_seconds": null,
+  "token_metric": "actual_total"
+}

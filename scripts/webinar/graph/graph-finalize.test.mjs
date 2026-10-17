@@ -9,6 +9,9 @@ import {graphEnabled} from './graph-finalize.mjs';
 
 // The same shape as run-pipeline.test.mjs "restart resumes saved artifact with finalize": tick 1 records and leaves no proof, tick 2 recovers.
 function recorder(f, artifact, onFinalize) {
+  // These fixtures isolate recovery. The real fresh graph is covered by graph-retry.test.mjs.
+  // Capture-only leaves no completed index proof, so the next tick enters recovery.
+  f.deps.runFreshSessionGraph = async ({capture}) => capture({signal:new AbortController().signal});
   f.deps.launch = async (args, _env, onLine) => {
     f.calls.push(args);
     if (args[0] === 'record') onLine(`audio/video recording started: ${artifact}`);
@@ -35,7 +38,7 @@ test('flag OFF (unset or non-1): recovery is the sequential finalize child, byte
     recorder(f, artifact);
     assert.equal(status(await runPipelineTick(f.deps, true)), 'ready');
     assert.equal(graphCalls, 0);
-    assert.deepEqual(f.calls.at(-1), ['finalize', '--video', artifact, '--session-id', id, '--title', f.calls.at(-1)[f.calls.at(-1).indexOf('--title') + 1], '--transcribe', '--process-video', '--index']);
+    assert.deepEqual(f.calls.at(-1), ['finalize', '--video', artifact, '--session-id', id, '--title', f.calls.at(-1)[f.calls.at(-1).indexOf('--title') + 1], '--tenant', 'fixture', '--transcribe', '--process-video', '--index']);
     assert.equal(existsSync(join(f.stateDir, 'pipeline-graph')), false, 'no graph state directory is created with the flag off');
   }, true);
 });
@@ -84,7 +87,7 @@ test('flag ON, real graph + real file queue/run-state in a temp dir: stages run 
   await runPipelineTick(f.deps, true); // record only; its finalize is the failing no-op above
   const second = await runPipelineTick(f.deps, true);
   assert.equal(status(second), 'failed'); assert.match(Object.values(second.operations)[0].reason, /failed-terminal index:stage-failed/);
-  assert.deepEqual(ran, ['transcribe-long-session.mjs', 'process-video.mjs', 'sync-session.mjs']);
+  assert.deepEqual(ran, ['transcribe-long-session.mjs', 'validate-session.mjs', 'process-video.mjs', 'sync-session.mjs']);
   const id = Object.keys(second.operations)[0];
   const queueFile = readdirSync(join(f.stateDir, 'pipeline-graph', id, 'queue'));
   assert.ok(queueFile.length > 0);
@@ -92,5 +95,5 @@ test('flag ON, real graph + real file queue/run-state in a temp dir: stages run 
   assert.match(queueText, /"dead"/, 'D-139: a terminally failed run is a FAILED (dead) job');
   const third = await runPipelineTick(f.deps, true);
   assert.equal(status(third), 'ready');
-  assert.deepEqual(ran.slice(3), ['transcribe-long-session.mjs', 'process-video.mjs', 'sync-session.mjs'], 'resubmit started a new attempt');
+  assert.deepEqual(ran.slice(4), ['transcribe-long-session.mjs', 'validate-session.mjs', 'process-video.mjs', 'sync-session.mjs'], 'resubmit started a new attempt');
 }, true));

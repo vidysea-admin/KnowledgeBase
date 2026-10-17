@@ -11,6 +11,10 @@ export interface Jobs {
   status: "pending" | "processing" | "done" | "failed";
   provider?: string;
   maxCost?: number;
+  inputTokens?: number;
+  outputTokens?: number;
+  costStatus?: "unknown" | "reported";
+  costUsd?: number;
   createdAt: string;
   updatedAt?: string;
   [k: string]: unknown;

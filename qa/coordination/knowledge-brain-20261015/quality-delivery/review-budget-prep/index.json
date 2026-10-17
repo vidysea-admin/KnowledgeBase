@@ -1,0 +1,163 @@
+{
+  "purpose": "Prepared canonical budget gates only; no dispatch/review/PASS",
+  "prior_prerequisites": "prerequisites.json preserved as original historical snapshot; missing candidate IDs now resolved by packet/manifest declarations",
+  "maker_actual_usage": {
+    "tokens": null,
+    "active_s": null,
+    "cost": null
+  },
+  "review_phase": {
+    "active_s": 150,
+    "tokens": 5200
+  },
+  "bootstrap_total": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "entries": [
+    {
+      "unit": "extraction-stage-receipts",
+      "cycle": 0,
+      "candidate": "sha256:e643ea586eb60cb67c979538244ef1c34cb89ac6ee2a68232ca13ada87b26899",
+      "input": "extraction-stage-receipts-cycle0-assess-input.json",
+      "result": "extraction-stage-receipts-cycle0-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "extraction-stage-receipts/cycle0/sha256:e643ea586eb60cb67c979538244ef1c34cb89ac6ee2a68232ca13ada87b26899",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    },
+    {
+      "unit": "t022-executed-provenance",
+      "cycle": 0,
+      "candidate": "sha256:5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+      "input": "t022-executed-provenance-cycle0-assess-input.json",
+      "result": "t022-executed-provenance-cycle0-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "t022-executed-provenance/cycle0/sha256:5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    },
+    {
+      "unit": "t022-offline-transfer",
+      "cycle": 0,
+      "candidate": "sha256:172b1229e49f6bd8681c111c90d83de74d055dc93f1875f52ff1d900d65a8b97",
+      "input": "t022-offline-transfer-cycle0-assess-input.json",
+      "result": "t022-offline-transfer-cycle0-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "t022-offline-transfer/cycle0/sha256:172b1229e49f6bd8681c111c90d83de74d055dc93f1875f52ff1d900d65a8b97",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    },
+    {
+      "unit": "t022-review-dirty-guard",
+      "cycle": 1,
+      "candidate": "sha256:a0a31ab35f22e6c407c36652844f86c4685383836d67bc4223d4b0aaa41d443b",
+      "input": "t022-review-dirty-guard-cycle1-assess-input.json",
+      "result": "t022-review-dirty-guard-cycle1-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "t022-review-dirty-guard/cycle1/sha256:a0a31ab35f22e6c407c36652844f86c4685383836d67bc4223d4b0aaa41d443b",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    },
+    {
+      "unit": "u22-extraction-review-resume",
+      "cycle": 0,
+      "candidate": "sha256:c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+      "input": "u22-extraction-review-resume-cycle0-assess-input.json",
+      "result": "u22-extraction-review-resume-cycle0-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "u22-extraction-review-resume/cycle0/sha256:c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    },
+    {
+      "unit": "u23-topic-run-evidence",
+      "cycle": 0,
+      "candidate": "sha256:c5303a707b49776df8394657235767eeb8b697787699f7c2948864ddcaabeccf",
+      "input": "u23-topic-run-evidence-cycle0-assess-input.json",
+      "result": "u23-topic-run-evidence-cycle0-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "u23-topic-run-evidence/cycle0/sha256:c5303a707b49776df8394657235767eeb8b697787699f7c2948864ddcaabeccf",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    },
+    {
+      "unit": "u25-decision-acquisition",
+      "cycle": 0,
+      "candidate": "6cf6080a9f32b5b155f257496fa4d9cfd3353c7f31b5797bdd03684c745130b2",
+      "input": "u25-decision-acquisition-cycle0-assess-input.json",
+      "result": "u25-decision-acquisition-cycle0-assess-result.json",
+      "helper_exit_code": 0,
+      "helper_status": "BOOTSTRAP_REVIEW",
+      "completion_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 800
+        },
+        "id": "u25-decision-acquisition/cycle0/6cf6080a9f32b5b155f257496fa4d9cfd3353c7f31b5797bdd03684c745130b2",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "ratio_verified": false,
+      "dispatch": "BLOCKED: attributable broker receipts/current candidate+environment+history reconciliation required"
+    }
+  ],
+  "helper_refusals": [],
+  "dirtyguard_history": "Coordinator confirms original authored cycle1; no fixes, earlier cycle0 review or reviewer history inferred",
+  "actual92": "frozen and untouched",
+  "genuine_human_labels": "0/30"
+}

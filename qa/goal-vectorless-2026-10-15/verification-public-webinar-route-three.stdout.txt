@@ -1,0 +1,11 @@
+✔ public webinar scan requires auth, scope and bound safe work DB before acquisition (167.8555ms)
+✔ public webinar scan mounts configured discovery without forging approval or sender identity (43.1779ms)
+✔ public webinar scan preserves incomplete coverage and sanitizes unavailable or foreign results (30.0388ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3504.7318

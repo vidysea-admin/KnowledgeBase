@@ -1,0 +1,23 @@
+{
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register.mjs",
+    "qa/evidence/t054-review-completion/checker-race-floor.test.ts"
+  ],
+  "pins": {
+    "qa/evidence/t054-review-completion/checker-race-floor.test.ts": "a08893b89f6a031536d87008ab8971cac14e2b2be8336e7f756beca08dad5202",
+    "qa/evidence/t054-review-completion/service-test-attempt1-source.txt": "032748f4e69a2d98e830a8e5bf68d9feea8f1ef04bf29afc1d304c993802747c",
+    "apps/api/src/transcript-review/service.ts": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+    "apps/api/src/transcript-review/store.ts": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+    "apps/api/src/transcript-review/planner.ts": "295ccf510edf1006e1f9f77bb31fe66a24662e4a722f30cc9143457aa2794865",
+    "apps/api/src/transcript-review/memdb.testsupport.ts": "a616444c988e039e03e5d3a34f187f51b183b69db440730dbab3a10c237195f9",
+    "apps/api/src/transcript-review/persist.testkit.ts": "e9a7182b56c625e3d81a2c18d5189dfeb8e77c09cb07fff9a6801f3f2d3efb80",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+  },
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-t054-independent-race-diagnosis"
+}

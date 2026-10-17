@@ -1,0 +1,69 @@
+{
+  "label": "t052-repaired-state-uri",
+  "old_vector": [
+    "original runtime",
+    "--test",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "--test-name-pattern=^registration attempt round-trips strictly and confirmation requires unique matching evidence$",
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "actual_total_tokens": null,
+  "authority": "root authorized compatible vector repair; maker evidence only",
+  "new_vector": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test-isolation=none",
+    "--test",
+    "--test-concurrency=1",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+    "--test-name-pattern=^registration attempt round-trips strictly and confirmation requires unique matching evidence$",
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+  ],
+  "change": "bundled working Node; in-process isolation; same graph synchronous safe bootstrap; original test selection retained",
+  "env_selected": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp",
+    "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp"
+  },
+  "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+  "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "pins_before": {
+    "packages/meeting-bot/py/sb_join_register.py": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+    "packages/meeting-bot/src/joiners/browser-joiner.ts": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+    "packages/meeting-bot/src/joiners/joiners.test.ts": "267cd00f7855679c0a9ff07265f1ad6db8a35c5482d66eb39d63968258a7321a",
+    "packages/meeting-bot/src/calendar/registration-workflow.ts": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+    "packages/meeting-bot/src/calendar/registration-workflow.test.ts": "f859ab60fd01ea8900431f7eb8f4747edf05b005f9d3d232bd20f0f1da108cff",
+    "packages/meeting-bot/src/calendar/auto-record-policy.ts": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+    "packages/meeting-bot/src/calendar/state/schedule-state.ts": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts": "41dd61db3c524845eff2c55436893a5e4e0f07e86e806fc5e6c7b74667315577"
+  },
+  "exit": 1,
+  "counts": {
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "duration_s": 9.389999999999418,
+  "pins_after": {
+    "packages/meeting-bot/py/sb_join_register.py": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+    "packages/meeting-bot/src/joiners/browser-joiner.ts": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+    "packages/meeting-bot/src/joiners/joiners.test.ts": "267cd00f7855679c0a9ff07265f1ad6db8a35c5482d66eb39d63968258a7321a",
+    "packages/meeting-bot/src/calendar/registration-workflow.ts": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+    "packages/meeting-bot/src/calendar/registration-workflow.test.ts": "f859ab60fd01ea8900431f7eb8f4747edf05b005f9d3d232bd20f0f1da108cff",
+    "packages/meeting-bot/src/calendar/auto-record-policy.ts": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+    "packages/meeting-bot/src/calendar/state/schedule-state.ts": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts": "41dd61db3c524845eff2c55436893a5e4e0f07e86e806fc5e6c7b74667315577"
+  },
+  "pins_unchanged": true
+}

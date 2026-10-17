@@ -1,0 +1,62 @@
+{
+  "format": "offline-control-source-closure-v1",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "preparedAt": "2026-10-16T00:08:33.158Z",
+  "commit": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "commitMeaning": "Historical preparation commit retained; exact current file hashes authoritative; no current commit claim",
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "files": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1"
+    },
+    {
+      "path": "packages/index/src/search/lexical.ts",
+      "sha256": "c057af4895ab28f247a02c981c78aa28532006a184edb67d8e6e99f7202fe6c0"
+    },
+    {
+      "path": "packages/index/src/eval/baseline.ts",
+      "sha256": "958f9f9185d66aaf2909fb83f883c83c6e150207bcb5de94b4e946b114c67525"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": "package.json",
+      "sha256": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778"
+    },
+    {
+      "path": "scripts/qa/scoped-check-runner.py",
+      "sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/adapter.mjs",
+      "sha256": "ec0c86d7ed88e70d37f47b493b037e8092ee3b145473685a9b6566032dee43a5"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/watchdog.py",
+      "sha256": "fe696e9604028eada0b4ca0e81b54796287af0c7b61f26d06e5e95e7fd6b7985"
+    }
+  ],
+  "approvedDataPins": 119,
+  "sourceWriterClosure": {
+    "evaluatorPair": "complete-answer-cycle3 frozen source candidate; current pins checked before/after by broker",
+    "lexicalAndBlind": "unchanged actual pure exports, no production code edits",
+    "sharedChanges": "pinned drift refuses; no whole-checkout freeze claim"
+  },
+  "globalNetworkControlClaim": false,
+  "previousEpoch": {
+    "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls",
+    "sourcePair": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+    "resultSha256": "60cf1a49f235dfe7dc3ee474bc543651b5889846b2e7adb58e166d8f9f0670cd",
+    "lexicalHits": 52,
+    "blindHits": 20,
+    "total": 92
+  },
+  "pathOnlyAdapterDelta": true
+}

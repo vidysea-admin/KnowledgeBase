@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://speaker_attributes",
+  "title": "SpeakerAttributes",
+  "description": "Provenance-bound org and role proposals for confirmed people. Accepted values require current evidence and human review; turn-range ordering is checked by the runtime validator.",
+  "type": "object",
+  "required": ["_id", "tenantId", "personId", "field", "value", "revision", "status", "evidence", "createdBy", "sourceRevisionDigest", "reviewHistory"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "personId": { "type": "string", "minLength": 1 },
+    "field": { "type": "string", "enum": ["org", "role"] },
+    "value": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "status": { "type": "string", "enum": ["suggested", "accepted", "rejected", "revoked"] },
+    "evidence": {
+      "type": "array", "minItems": 1, "maxItems": 20,
+      "items": {
+        "type": "object",
+        "required": ["sessionId", "turnId", "quote", "transcriptHash", "startTurnIndex", "endTurnIndex", "speakerRef"],
+        "properties": {
+          "sessionId": { "type": "string", "minLength": 1 },
+          "turnId": { "type": "string", "minLength": 1 },
+          "quote": { "type": "string", "minLength": 1 },
+          "transcriptHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "startTurnIndex": { "type": "integer", "minimum": 0 },
+          "endTurnIndex": { "type": "integer", "minimum": 0, "description": "Must be at least startTurnIndex; runtime-enforced cross-field constraint." },
+          "speakerRef": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "createdBy": { "type": "string", "minLength": 1 },
+    "sourceRevisionDigest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "review": {
+      "type": "object",
+      "required": ["actorId", "decision", "at", "baseRevision"],
+      "properties": {
+        "actorId": { "type": "string", "minLength": 1 },
+        "decision": { "type": "string", "enum": ["accepted", "rejected", "revoked"] },
+        "at": { "type": "string", "format": "date-time" },
+        "baseRevision": { "type": "integer", "minimum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "reviewHistory": {
+      "type": "array", "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["requestId", "requestHash", "actorId", "decision", "at", "baseRevision", "resultRevision"],
+        "properties": {
+          "requestId": { "type": "string", "minLength": 1 },
+          "requestHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+          "actorId": { "type": "string", "minLength": 1 },
+          "decision": { "type": "string", "enum": ["accept", "reject", "revoke"] },
+          "at": { "type": "string", "format": "date-time" },
+          "baseRevision": { "type": "integer", "minimum": 1 },
+          "resultRevision": { "type": "integer", "minimum": 1 }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

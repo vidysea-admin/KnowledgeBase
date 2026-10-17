@@ -59,6 +59,11 @@ export interface AutoRecordCandidateInput {
   senderDomain: string;
   /** ISS-322: set only by the authenticated Gmail scan; absent/false never earns config or auto trust. */
   senderAuthenticated?: boolean;
+  /** Canonical actual provider internalDate; never a mail Date header or scan clock. */
+  receivedAt?: string;
+  youtubeWatch?: { url: string; videoId: string; source: 'body' | 'snippet' };
+  youtubeWatchIssue?: 'ambiguous';
+  meetingLinkIssue?: 'ambiguous' | 'registration-only' | 'host-start-link';
   status: "pending" | "approved" | "rejected" | "auto_approved";
   meetingUrl?: string;
   /** Set only when a calendar-linked snapshot supplied the URL (see CalendarEvent.meetingUrlSource). */

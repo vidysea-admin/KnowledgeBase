@@ -1,0 +1,17 @@
+✔ actual buildIndexer grounded opt-in produces and persists cited summary/facts/Q&A/actions without a separate strict option (31.0899ms)
+✔ actual buildIndexer environment flag alone enables grounded production; explicit false preserves legacy (8.9559ms)
+✔ actual configured judge failure refuses strict completion before knowledge replacement (3.6004ms)
+✔ composition preserves OFF strict choice and a grounded opt-in cannot silently select legacy (0.2873ms)
+✔ actual grounded factory rejects foreign transcript scope before model or knowledge writes (0.6787ms)
+✔ real transcript factory is lazy and enforces D168 exact production database opt-in (1.0287ms)
+✔ actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction (11.2969ms)
+✔ unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers (0.9921ms)
+✔ actual review factory judge outage retains the correction and rolls back all derived targets (3.9824ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4393.5448

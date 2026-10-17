@@ -1,0 +1,29 @@
+{
+  "authority": "root exact scope confirmation: scripts/backfill.mjs affects scripts direct dir only, not scripts/qa/webinar sibling internals",
+  "affected_direct_directories": [
+    "apps/api/src/answer-policy",
+    "apps/api/src/composition/integrations",
+    "apps/api/src/grounded-postprocessing",
+    "apps/api/src/indexing",
+    "apps/api/src/indexing/persistence",
+    "apps/api/src/session-decisions",
+    "apps/api/src/visibility",
+    "apps/api/src/whatsapp/review",
+    "apps/web/src/pages/answer-policy",
+    "packages/meeting-bot/py",
+    "packages/meeting-bot/src/capture",
+    "packages/meeting-bot/src/capture/native",
+    "packages/meeting-bot/src/capture/record-consent",
+    "packages/meeting-bot/src/capture/tiles",
+    "packages/meeting-bot/src/capture/workspace",
+    "scripts"
+  ],
+  "affected_violations": [],
+  "inherited_unrelated_subtree_findings": [
+    "scripts/qa: 33 files (budget 30)",
+    "scripts/webinar: 34 files (budget 30)"
+  ],
+  "whole_repository_structure_green": false,
+  "affected_structure_green": true,
+  "raw_checker_receipt": "integrated-freeze-scoped-structure-receipt.json"
+}

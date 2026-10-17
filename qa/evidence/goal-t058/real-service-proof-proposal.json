@@ -1,0 +1,68 @@
+{
+  "status": "proposal-not-run",
+  "stage": "t058-one-kind-real-service-usefulness",
+  "ownership": "Root selects exact inputs and dispatches the bounded stage. Maker starts no provider, database, browser or CPU action.",
+  "preservedEvidence": {
+    "sourceFreeze": "qa/evidence/goal-t058/source-freeze.json",
+    "sourceFreezeSHA256": "8a2ef55c4ac892d886d3bc0788b2de0f8070e1e48cd97df6178a0b9563421f9f",
+    "verdict": "qa/verdicts/goal-t058.md",
+    "verdictSHA256": "b1d6fc76ba471b9024023d83e97123c041bbfaf39be958b804158d4316af1010",
+    "isolatedChecksPassed": 27,
+    "parentStatus": "HOLD",
+    "fixCycle": 0
+  },
+  "requiredRootInputs": [
+    "The current authenticated tenant and scopes, resolved through the actual authorization boundary; no client-supplied trusted tenant.",
+    "One or more exact session IDs selected by root from its authorized TOC scope, at most five for this proposal; no invented IDs or verification state.",
+    "A concrete title and audience/purpose framed as guidance recorded in the selected sources, without promoting historical relative deadlines to current advice.",
+    "The explicitly authorized lkb_staging read-only connection and its exact LKB_ALLOW_STAGING=lkb_staging opt-in; no protected-production opt-in or implicit default.",
+    "The existing configured tenant-bound provider adapter, with a central hard cap of two underlying provider requests and a local content-safe usage sink. Root must dispatch this stage explicitly; authorization for another two-call stage is not additional budget."
+  ],
+  "composition": {
+    "service": "apps/api/src/knowledge-outputs/service.ts:createOutputService",
+    "sourceReader": "apps/api/src/knowledge-outputs/reader.ts:createMongoOutputReader",
+    "canonicalPreflight": "apps/api/src/knowledge-outputs/evidence.ts:evidenceFor",
+    "policyStore": "apps/api/src/answer-policy/mongo-store.ts:createMongoAnswerPolicyStore using the named allowed staging database; do not call ensureAnswerPolicyIndexes",
+    "policyService": "apps/api/src/answer-policy/service.ts:createAnswerPolicyService",
+    "policyLookup": "apps/api/src/answer-policy/application.ts:lookupEffectivePolicy; its list/conflicts path reads current policies without queue/save/reconcile writes",
+    "draftRepository": "apps/api/src/knowledge-outputs/repository.ts:createMemoryOutputRepository",
+    "provider": "Root's actual configured tenant-bound completion callback; no fixture-provider, fake response, additional credential or database-backed job log.",
+    "reasonForMemoryDraftStore": "The authorized staging scope is read-only. This exercises the actual create/get/export service and schema validator with real evidence and provider responses; it does not prove durable Mongo persistence or the full production composition."
+  },
+  "sequence": [
+    "Root records current relevant source/schema/guard hashes and the exact requested kind, title, purpose and selected source IDs; no secret key in receipts.",
+    "Root establishes the actual read-only reader and actual current policy service. Existing T054 corrections and T007 eligibility remain mandatory; do not replace approved claims with caller flags or synthetic verified copies.",
+    "Before provider dispatch, call actual evidenceFor for the exact root inputs. The existing bounds remain: at most200 candidate claims,4000 turns,100 citations,60000 quote characters; report actual sourceCoverage/policy/digest and canonical evidence. Empty, unverified, inaccessible, conflicting, over-bound or unsafe evidence refuses with zero provider calls.",
+    "Instantiate actual createOutputService with the same real reader/policy/provider and a fresh memory repository. Begin with kind faq. Call create once: generation plus separate grounding assessment, at most two actual underlying provider requests total, no fallback/retry/external retrieval. Revalidation is not called in this stage because it would consume another provider call.",
+    "Actual service rereads current sources/policy after both calls, checks the actual schema and assessed-content fingerprints, and persists only in process memory. Get and export the created draft at its current revision through the actual service; export rereads current evidence without another model call.",
+    "Root writes local QA draft JSON, canonical-evidence snapshot, Markdown artifact and exact bounded receipt. Record unknown/withheld/missing sections and exceptions honestly; do not force a successful artifact or fabricate elapsed time/token usage.",
+    "An independent reviewer compares every answer/factual clause and citation with the actual current quotations and attribution, checks historical qualifications and usefulness for the declared audience, and returns a concrete semantic decision. Model assessment alone is insufficient."
+  ],
+  "bounds": {
+    "outputKindsPerStage": 1,
+    "initialKind": "faq",
+    "successfulServiceCompletionCalls": 2,
+    "maximumUnderlyingProviderRequests": 2,
+    "modelCallWallTimeoutMs": 30000,
+    "proposedOuterWallTimeoutMs": 90000,
+    "retryOrFallbackRequests": 0,
+    "databaseWrites": 0,
+    "indexOrMigrationWrites": 0,
+    "sourceStatusMutations": 0,
+    "browserActions": 0,
+    "publicationActions": 0
+  },
+  "failureHandling": [
+    "No currently eligible verified source: save a preflight refusal receipt, zero provider calls, leave actual-use gate open; newly indexed needs-review claims do not become trusted automatically.",
+    "No compatible actual current policy service or read-only credentials: stop before provider dispatch; do not substitute an invented active/none policy or bypass store guards.",
+    "Generation or grounding provider request fails, exceeds time/budget or returns invalid JSON/citations: no retry or replacement call; save exact failure and actual count.",
+    "Unsupported answers, current-source/policy drift or export refusal: retain truthful withheld/failure evidence; do not count the stage as useful accepted output.",
+    "Root must enforce the hard cap at underlying provider dispatch; two service calls alone do not constrain retries/fallbacks inside a provider chain."
+  ],
+  "laterSeparatelyDispatchedStages": [
+    "Repeat this actual two-call recipe for report and meeting-brief only after separately authorized root dispatch; never claim three-kind usefulness from the single FAQ stage.",
+    "The existing explicit isolated real-Mongo integration harness still requires separately authorized writes to a fresh named test database, not read-only lkb_staging. Memory create/get/export cannot satisfy it.",
+    "Root ROUTE_FREEZE/compiler/global mounted API, independent real browser/citation clickthrough, actual reviewed source acceptance, T056 full-parent acceptance and Umesh acceptance remain distinct gates."
+  ],
+  "acceptanceLimit": "A successful independently assessed stage establishes actual one-kind provider/evidence usefulness only. It does not close T058 or replace durable Mongo, full mounted UI/runtime, all-three-kind or human acceptance. No stage in this proposal has run."
+}

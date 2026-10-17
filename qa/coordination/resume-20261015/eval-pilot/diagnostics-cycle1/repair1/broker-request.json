@@ -1,0 +1,27 @@
+{
+  "candidate": "d4e5d74be460db92c36c65cb330a4aa9f7d78853b5115de1fa2c9acc14c1eec5",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "e2f2444552d9daf26220eb9c6a476e7383afebe078d701486fc6eed6841b7131"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "fd2a93e0f1e3ac73bc79fb71b77de6aeed60ccf5d7d89e7c1773d527f53f485d"
+    }
+  ],
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-name-pattern=diagnostics provider truncation|diagnostics source authorization|diagnostics legitimate malformed",
+    "scripts/eval/vectorless-production-eval.test.mjs"
+  ],
+  "outerTimeoutSeconds": 45,
+  "expectedSelectedTests": 3,
+  "reason": "Original failing diagnostic boundary now explicitly injected; production malformed-selector abstention separately retained; adjacent actual hydration authorization guard retained",
+  "productionSourceChanged": false,
+  "paidCallsAllowed": false
+}

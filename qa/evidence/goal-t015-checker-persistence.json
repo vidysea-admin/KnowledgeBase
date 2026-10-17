@@ -1,0 +1,12 @@
+{
+  "checker": "/root/roadmap_status/checker_t015",
+  "cycle": 0,
+  "verdict": "FAIL",
+  "launchUtc": "2026-10-14T20:40:24Z",
+  "persistedAt": "2026-10-14T20:59:03.1340999Z",
+  "launchToPersistSeconds": 1119.1340999,
+  "unknownIntervals": "Pause/resume and broker request/grant exact boundaries; active-work duration not measured",
+  "verdictSHA256": "3017cc15958dbcb85e0c3cea81a48a6a1c756b2e220e4e19bcc30af1bf9de8a1",
+  "issue": "ISS-GOALT015-001",
+  "issueSHA256": "43cf80118539621e89e083de2471e9421778d41a66f70130f7f898cb05d37e1c"
+}

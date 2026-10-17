@@ -1,0 +1,115 @@
+{
+  "unit": "quality-four-remaining",
+  "candidate_sha": "sha256:9178adef7f4a1c3d9c92717e88ca76c87cb9d1574d2051ef64addfeba87c973e",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "token_metric": "actual_total",
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null,
+    "token_metric": "actual_total"
+  },
+  "reviewers": [
+    {
+      "tokens": 950992,
+      "active_s": null,
+      "note": "Actual total950992=input945086+output5906; cached input is subset, never additive. Actual active null; conservative wall-bound156.701271 debit retained, no measured active/cost. Prior overrun remains.",
+      "budget_debit": {
+        "active_s": 156.701271,
+        "token_metric": "actual_total"
+      },
+      "cost": null,
+      "id": "same-mjs_four_checker-prior-settled-phase",
+      "token_metric": "actual_total"
+    }
+  ],
+  "next_phase": {
+    "tokens": 200000,
+    "output_tokens": 1500,
+    "kind": "review",
+    "cost": null,
+    "active_s": 90,
+    "token_metric": "actual_total"
+  },
+  "bootstrap_scope": "SAME DONE mjs_four_checker remaining one batched read only: exact621lines10pins70386byte frozen payload, four unchanged units/clauses in batch-four-current/proposal.md, existing independent4probes. Immediate FINALcheckpoint after read. No final verdict write; later final phase requires parent fresh settled telemetry and fresh dual assess. No reactivation by this prep.",
+  "bootstrap": {
+    "cost": null,
+    "tokens": 1350992,
+    "active_s": 180,
+    "token_metric": "actual_total"
+  },
+  "completion_reserve": false,
+  "completion_reserve_id": "quality-four/remaining/sha256:9178adef7f4a1c3d9c92717e88ca76c87cb9d1574d2051ef64addfeba87c973e",
+  "escalation": {
+    "reason": "Four-unit source review incomplete after retained950992actualTOTAL and156.701271wall-bound previous phase; required independent4probes green, exact remaining621line read preflight authenticated. Prior overrun retained, no denominator inflation. Root explicit finite manual-reserve exception supersedes native-preview reserve mismatch; original native-preview inputs/results remain preserved.",
+    "authority": "Root explicit finite escalation in current parent instruction",
+    "limits": {
+      "cost": null,
+      "tokens": 1350992,
+      "active_s": 306.701271,
+      "token_metric": "actual_total"
+    }
+  },
+  "root_full_grant": {
+    "cumulative_known_actual_total_ceiling": 1350992,
+    "additional_output_tokens": 3000,
+    "cumulative_output_ceiling": 8906,
+    "mandatory_protected_final": {
+      "output_tokens": 1500,
+      "actual_total": 200000,
+      "active_s": 60
+    },
+    "cumulative_conservative_active_ceiling": 306.701271,
+    "additional_actual_total": 400000,
+    "review": {
+      "output_tokens": 1500,
+      "actual_total": 200000,
+      "active_s": 90
+    },
+    "additional_active_s": 150
+  },
+  "prior_history": {
+    "actual_active_s": null,
+    "wall_bound_minus_review_allocation": 36.701271,
+    "prior_inputs": "batch-four-current and original seven preparation gates preserved unchanged",
+    "actual_total_tokens": 950992,
+    "cost": null,
+    "wall_bound_s": 156.701271,
+    "former_review_active_allocation": 120,
+    "former_actual_total_cap": 500000,
+    "maker_support_usage": null,
+    "actual_output_tokens": 5906,
+    "actual_input_tokens": 945086,
+    "source": "Root settled accounting instruction; do not sum wall bound as measured active or manufacture money",
+    "actual_total_overrun": 450992
+  },
+  "dispatch": "SAME_CHECKER_INACTIVE_PENDING_PARENT_REACTIVATION_AFTER_RESULTS",
+  "finalization": "Not assessed or authorized now; no auto finalwrite. Preserve new actual/debit/history before future phase; final reserve once only.",
+  "completion_reserve_tokens": 200000,
+  "manual_protected_completion": {
+    "authority": "Root explicit finite exception in current instruction",
+    "output_tokens": 1500,
+    "active_s": 60,
+    "status": "MANUALLY_PROTECTED_COMPLETION; helper reports legacy_unreserved, never helper-native60",
+    "no_borrowing": "Review90s/200000actual/1500output must leave full final60s/200000actual/1500output. Breach checkpoints immediately; cannot borrow final reserve.",
+    "actual_total_tokens": 200000
+  },
+  "exception_disposition": "ROOT EXACT DISPOSITION: completion_reserve:false for both installed canonical compatibility and reviewed LOCAL supplemental actual_total gates; explicit manual protected completion60s/200kactual/1500output, no global installation/helper edits.",
+  "manual_reserve_proof": {
+    "maker_support_usage": null,
+    "cumulative_output_with_both_phases": 8906,
+    "review_output_cap": 1500,
+    "final_active_s_reserve": 60,
+    "prior_actual_active_s": null,
+    "note": "Cumulative active306.701271 is exact156.701271wall-bound conservative debit plus150rootincrement (306.701 is rounded display), never measured active usage.",
+    "cumulative_conservative_active_with_both_phases": 306.701271,
+    "cumulative_actual_token_ceiling_with_both_phases": 1350992,
+    "passes": true,
+    "review_active_s_cap": 90,
+    "final_output_reserve": 1500,
+    "final_actual_total_reserve": 200000,
+    "cost": null,
+    "known_prior_actual_total": 950992,
+    "review_actual_total_cap": 200000
+  }
+}

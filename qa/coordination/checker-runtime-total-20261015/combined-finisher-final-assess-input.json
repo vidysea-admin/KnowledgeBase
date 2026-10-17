@@ -1,0 +1,69 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "historical-helper-checker-cycle3",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 150,
+        "tokens": 1007021
+      },
+      "token_lower_bound": 1007021,
+      "note": "Actual tokens inflight lower bound; prior committed active allocation150, not measured active. All prior cap overruns retained; no ledger reset."
+    },
+    {
+      "id": "historical-parser-checker-cycle0",
+      "active_s": null,
+      "tokens": 614949,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 240,
+        "tokens": 614949
+      },
+      "note": "Prior conservative210s plus recorded final30s allocation from archived checker-verdict-pass-cycle0; actual active unknown. Token total includes cached subset, output4413 separate."
+    },
+    {
+      "id": "fresh-combined-runtime-accounting",
+      "active_s": null,
+      "tokens": 601499,
+      "cost": null,
+      "note": "Settled native lifetime total shared ONCE across both units; actual active/cost unknown; prior committed fresh150 retained.",
+      "budget_debit": {
+        "active_s": 150,
+        "tokens": 601499
+      }
+    }
+  ],
+  "bootstrap_scope": "Root explicit finalization-only finite escalation: same checker exact provenance/current pins/two independent verdicts and parser readback, no tests or duplicate review. Preserve prior actual overrun.",
+  "bootstrap": {
+    "active_s": 570,
+    "tokens": 2423469,
+    "cost": null
+  },
+  "next_phase": {
+    "active_s": 30,
+    "tokens": 200000,
+    "cost": null,
+    "output_tokens": 1500,
+    "kind": "finalization"
+  },
+  "completion_reserve": false,
+  "external_manual_reserve": {
+    "active_s": 30,
+    "actual_total_tokens": 200000,
+    "output_allocation": 1500
+  },
+  "fresh_incremental_caps": {
+    "active_s": 180,
+    "actual_total_tokens": 801499,
+    "output_allocation": 6442
+  },
+  "authority": "Root explicitly granted additional finalization-only200000 actualTOTAL/1500output/30active after observed601499 breach. Cumulative fresh801499/6442/180 conservative; historicalcharges retained. Legacy_unreserved externalmanualledger; unknown actual active/cost/makerdenominators, no10%claim."
+}

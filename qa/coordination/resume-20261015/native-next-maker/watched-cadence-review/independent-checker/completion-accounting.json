@@ -1,0 +1,38 @@
+{
+  "observed_end_utc": "2026-10-16T01:35:30.296421+00:00",
+  "reviewer": "/root/watched_cadence_independent_checker",
+  "token_metric": "actual_total",
+  "actual_active_s": null,
+  "actual_tokens": null,
+  "actual_cost": null,
+  "phase_allocations": [
+    {
+      "kind": "review",
+      "active_s": 150,
+      "tokens": 20000,
+      "token_metric": "actual_total"
+    },
+    {
+      "kind": "finalization",
+      "active_s": 30,
+      "tokens": 4000,
+      "token_metric": "actual_total"
+    }
+  ],
+  "completion_reserve_id": "watched-cadence-launcher/1/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "completion_committed": true,
+  "broker": {
+    "test_processes": 0,
+    "contracts_processes": 0,
+    "known_read_command_wall_s": 1.8713199,
+    "actual_total_active_s": null,
+    "actual_tokens": null,
+    "receipt": "qa/coordination/resume-20261015/broker/watched-independent-probe-unexecuted.md"
+  },
+  "ratio": "UNVERIFIED",
+  "wall_window_status": "180s wall exceeded; active/window compliance unknown, not measured success",
+  "later_escalation": "60s after finalization; NOT consumed; no reopen",
+  "verdict_readback_exit": 0,
+  "wait_intervals": "One bounded wait; exact runtime duration unavailable; excluded only if actual telemetry later resolves",
+  "prior_inputs_preserved": true
+}

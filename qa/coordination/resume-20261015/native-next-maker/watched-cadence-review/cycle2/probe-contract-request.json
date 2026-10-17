@@ -1,0 +1,110 @@
+{
+  "unit": "watched-cadence-launcher",
+  "cycle": 2,
+  "candidate_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "execution_authority": "Root once finite additional90s/12000 includes protected30s/4000; soleCPUbroker checker-child work",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "sequence": [
+    {
+      "phase": "independent-two-boundary-probes",
+      "max_execution_s": 30,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=25000",
+        "--test-name-pattern=^(?:whole result tenant/ID corruption refuses before acquisition, even past batch boundary|host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap)$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+        "scripts/watched-sources/host.test.ts"
+      ],
+      "expected": {
+        "tests": 2,
+        "skipped": 0,
+        "fail": 0,
+        "pass": 2
+      },
+      "default_per_file_isolation": true
+    },
+    {
+      "phase": "mandatory-contracts-verifier",
+      "max_execution_s": 15,
+      "argv": [
+        "C:/Program Files/Python312/python.exe",
+        "-B",
+        "contracts/verify_contracts.py",
+        "--repo-root",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase"
+      ],
+      "expected": {
+        "full_output": true,
+        "exit": 0,
+        "reported_skips_preserved": true
+      }
+    }
+  ],
+  "critical_path": {
+    "completion_s": 30,
+    "reconcile_s": 5,
+    "probe_s": 30,
+    "identity_s": 10,
+    "additional_total_s": 90,
+    "commands_before_finalization": true,
+    "contracts_s": 15
+  },
+  "source_pins": [
+    {
+      "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\connector-workflow\\watched.ts"
+    },
+    {
+      "sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server-watched.test.ts"
+    },
+    {
+      "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server.ts"
+    },
+    {
+      "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.test.ts"
+    },
+    {
+      "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.ts"
+    },
+    {
+      "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\README.md"
+    },
+    {
+      "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\supervisor.ts"
+    },
+    {
+      "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\scheduler\\service.d.mts"
+    }
+  ],
+  "helper_pins": {
+    "qa/coordination/resume-20261015/broker/broker_lib.py": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+    "scripts/qa/scoped-check-runner.py": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "qa/coordination/resume-20261015/runtime-alias-repair/register.mjs": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d"
+  },
+  "contract_script": {
+    "sha256": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3",
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py"
+  },
+  "python": {
+    "sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+    "path": "C:/Program Files/Python312/python.exe"
+  },
+  "identity_reuse": "Bind prior independent-checker/identity.json and finalsource proof; narrow current8raw/Git/helper/runtime/lock reconciliation only, no1691loop/fullsource reread",
+  "receipt_requirements": [
+    "exactargv ownexit actualselectedcounts/fulloutput/logsha",
+    "helper/source/runtime/lock beforeafter",
+    "ownedprocess-treeclosure",
+    "checker child actuals null ifunavailable charged within60review/8000;not maker",
+    "failure/deadline stops dependentwork;no retry or finalization beforemandatorycommands complete"
+  ]
+}

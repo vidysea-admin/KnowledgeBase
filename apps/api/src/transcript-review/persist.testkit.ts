@@ -11,6 +11,7 @@ import type { RefreshExecutor } from "./service.js";
 export const SESSION = "session-1";
 export const keys = fakeKeyStore({
   "key-a": { tenantId: "tenant-A", scopes: ["sessions"] },
+  "key-a-second": { tenantId: "tenant-A", scopes: ["sessions"] },
   "key-b": { tenantId: "tenant-B", scopes: ["sessions"] },
   "key-noscope": { tenantId: "tenant-A", scopes: ["ask"] },
 });
@@ -20,6 +21,10 @@ export function turn(tenantId: string, sessionId: string, i: number, text: strin
 }
 
 export function seed(m: ReturnType<typeof memoryDb>): void {
+  for (const [tenantId, sessionId] of [["tenant-A", SESSION], ["tenant-B", SESSION], ["tenant-A", "only-a"]]) {
+    m.seed("sessions", { _id: sessionId!, tenantId: tenantId!, sourceId: `fixture-${tenantId}-${sessionId}`,
+      title: "Synthetic review fixture", date: "2026-10-15", status: { transcribe: "done", index: "pending" } });
+  }
   for (let i = 0; i < 4; i++) m.seed("turns", turn("tenant-A", SESSION, i, `Alpha original ${i}`, i < 2 ? "spk:0" : "spk:1"));
   for (let i = 0; i < 3; i++) m.seed("turns", turn("tenant-B", SESSION, i, `Bravo original ${i}`));
   m.seed("turns", turn("tenant-A", "only-a", 0, "Only A secret"));

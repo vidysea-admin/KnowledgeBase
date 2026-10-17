@@ -14,6 +14,7 @@ import { AskPage } from "./AskPage.js";
 import * as askApi from "../api/ask.js";
 import { ApiError } from "../api/client.js";
 import type { AskResponse } from "../api/types.js";
+import * as nativeApi from "../api/nativeEvidence.js";
 
 function response(overrides: Partial<AskResponse> = {}): AskResponse {
   return {
@@ -49,6 +50,23 @@ describe("AskPage", () => {
   beforeEach(() => {
     localStorage.clear();
     vi.restoreAllMocks();
+  });
+
+  test.each(["document-page", "message"] as const)("native %s citation rechecks current source instead of showing a cached quote or recording link", async kind => {
+    const passage = { start: 0, end: 5, sha256: "b".repeat(64) };
+    const locator: nativeApi.NativeSourceLocator = kind === "document-page"
+      ? { kind, documentId: "doc", sourceId: "source", documentSourceId: "body", headRevision: 1, revisionHash: "a".repeat(64), pageNumber: 4, passage }
+      : { kind, sourceId: "chat", threadId: "thread", messageId: "message", revisionHash: "a".repeat(64), passage };
+    vi.spyOn(askApi, "ask").mockResolvedValue(response({ sources: { internal: [{ node_id: "native", evidence: {
+      sessionRef: "must-not-link", sourceQuotes: [{ id: "native-q", sourceLocator: locator, origin: kind,
+        quote: "UNVERIFIED", turnId: "fake", speakerRef: "document", tStart: 0, tEnd: 5 }],
+    } }], web: [] } }));
+    const resolve = vi.spyOn(nativeApi, "resolveNativeEvidence").mockResolvedValue({ sourceLocator: locator, quote: "hello" });
+    renderPage(); await submit("native question"); await screen.findByText("native");
+    expect(screen.queryByText("UNVERIFIED")).toBeNull(); expect(screen.queryByRole("link", { name: "native" })).toBeNull();
+    expect(resolve).not.toHaveBeenCalled(); fireEvent.click(screen.getByRole("button", { name: "Open cited passage" }));
+    expect(await screen.findByText("hello")).toBeInTheDocument(); expect(resolve).toHaveBeenCalledWith("test-key", locator);
+    expect(document.querySelector('a[href*="must-not-link"]')).toBeNull(); expect(screen.queryByText("document · 0–5s")).toBeNull();
   });
 
   test("submits the trimmed query and renders the answer", async () => {

@@ -138,6 +138,17 @@ export function recordScheduled(stateDir: string, entry: ScheduledEntry, tenantI
   } finally { releaseLock(lockPath, token); }
 }
 
+/** Closed source identity copied from the actual selected item, never inferred at dispatch. */
+export interface DispatchPolicyV1 {
+  source: "calendar" | "gmail";
+  sourceId: string;
+  sessionKey: string;
+  sender: string;
+  meetingUrl: string;
+  startTime: string;
+  endTime: string;
+}
+
 export interface ScheduledJob {
   
   url: string;
@@ -151,6 +162,7 @@ export interface ScheduledJob {
   careerGuidance?: boolean;
   testData?: boolean;
   matchedKeywords?: string[];
+  dispatchPolicyV1?: DispatchPolicyV1;
 }
 
 function scheduledJobDir(stateDir: string): string {

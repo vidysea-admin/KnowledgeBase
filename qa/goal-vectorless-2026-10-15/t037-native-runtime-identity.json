@@ -1,0 +1,17 @@
+{
+  "kind": "actual native runtime preflight",
+  "observedAt": "2026-10-15T12:04:42.840Z",
+  "PowerShell": {
+    "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe",
+    "version": "5.1.26100.33648",
+    "sha256": "41796f1f3d81f921fdb4030c865f9dcf5032a2a1b49dde148bbc99e8d10f6e8c"
+  },
+  "Node": {
+    "path": "C:/Program Files/nodejs/node.exe",
+    "version": "v24.21.0",
+    "sha256": "ba4e6d110e8c1592a1ecd390f6b05f3da124b13871a5be62b341a07a853c6c32"
+  },
+  "hostShellVersion": "7.4.20",
+  "sourceScope": "actual checked scheduled-dispatch module runtime transitive imports plus actual PowerShell source and fixed test fixture; dynamically generated CLI shim determined by test bytes, real CLI not executed",
+  "priorReceiptLimitation": "initial static8-pin pass lacked full dynamic source identity; authorized refresh only same selectednode2cases"
+}

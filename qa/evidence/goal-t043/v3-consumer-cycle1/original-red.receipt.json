@@ -1,0 +1,31 @@
+{
+  "scope": "T043 actual current v3 producer to original finalizer compatibility floor",
+  "spec": "qa/evidence/goal-t043/v3-consumer-cycle1/red-spec.json",
+  "specSHA256": "6512c64ea6e58f6c33a497109b611fecfc37a2dc1799e6eb13d5130b9e0603ac",
+  "pid": 13332,
+  "startedAt": "2026-10-14T22:43:58.4970069Z",
+  "completedAt": "2026-10-14T22:43:59.7618207Z",
+  "elapsedMs": 1267.0,
+  "exitCode": 1,
+  "timedOut": false,
+  "before": {
+    "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs": "9ea8a3b811b71035746f70fb32b56a12e2cab69f68c69f8cfffb7b5190ad4527",
+    "packages/meeting-bot/src/workspace/index-proof-fixture.mjs": "01498ea293641a4df82ab472a0acb8ab0c9fdbb9f08ce38682055756ede2a844",
+    "scripts/webinar/sync-session.mjs": "9896eff9e8fdc9e6298aca5cf751c708c45e8c24cfd2acf8b42acb96fd5a4012",
+    "packages/meeting-bot/src/capture/record-finalize.ts": "9996474dedf2628151a5941b9a353fbe934c59a19348f87fd5e6bc682d64e056",
+    "scripts/webinar/index-proof.mjs": "7e548f2c2f643d6d3f6afba6c2360aaf225a7b531b6dc7e2d0fb2439283843eb",
+    "packages/ingest/src/retention/production/private-summary.ts": "e78e427ab662036994c846b62f9b904334ffb7d1a8270956b40035b24af50181"
+  },
+  "after": {
+    "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs": "9ea8a3b811b71035746f70fb32b56a12e2cab69f68c69f8cfffb7b5190ad4527",
+    "packages/meeting-bot/src/workspace/index-proof-fixture.mjs": "01498ea293641a4df82ab472a0acb8ab0c9fdbb9f08ce38682055756ede2a844",
+    "scripts/webinar/sync-session.mjs": "9896eff9e8fdc9e6298aca5cf751c708c45e8c24cfd2acf8b42acb96fd5a4012",
+    "packages/meeting-bot/src/capture/record-finalize.ts": "9996474dedf2628151a5941b9a353fbe934c59a19348f87fd5e6bc682d64e056",
+    "scripts/webinar/index-proof.mjs": "7e548f2c2f643d6d3f6afba6c2360aaf225a7b531b6dc7e2d0fb2439283843eb",
+    "packages/ingest/src/retention/production/private-summary.ts": "e78e427ab662036994c846b62f9b904334ffb7d1a8270956b40035b24af50181"
+  },
+  "hashesUnchanged": true,
+  "stdoutPath": "qa/evidence/goal-t043/v3-consumer-cycle1/original-red.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t043/v3-consumer-cycle1/original-red.stderr.txt",
+  "terminal": true
+}

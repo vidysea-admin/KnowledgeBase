@@ -1,0 +1,19 @@
+{
+  "phase": "api-types",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/api",
+    "typecheck"
+  ],
+  "pid": 20888,
+  "exit": 2,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-14T22:49:32.183Z",
+  "endedAt": "2026-10-14T22:49:46.543Z",
+  "elapsedMs": 14360,
+  "stdout": "\n> @lkb/api@0.0.0 typecheck C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\n> tsc --noEmit -p tsconfig.json\n\nsrc/transcript-review/origin.test.ts(57,50): error TS18048: 'item.evidence' is possibly 'undefined'.\r\nsrc/transcript-review/origin.test.ts(57,93): error TS18046: 'item' is of type 'unknown'.\r\nsrc/transcript-review/origin.test.ts(58,40): error TS2339: Property 'origin' does not exist on type '{}'.\r\nsrc/transcript-review/origin.test.ts(58,93): error TS2339: Property 'speakerRef' does not exist on type '{}'.\r\nsrc/whatsapp-review/review-source.test.ts(95,57): error TS2339: Property 'level' does not exist on type 'ReadConcernLike'.\r\n  Property 'level' does not exist on type '\"local\"'.\r\nC:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api:\r\n ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/api@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`\nExit status 2\n",
+  "stderr": ""
+}

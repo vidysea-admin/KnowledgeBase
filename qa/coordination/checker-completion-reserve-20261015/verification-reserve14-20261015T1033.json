@@ -1,0 +1,71 @@
+{
+  "phase": "shared-integration-verification",
+  "scope": "Staged checker completion reserve reserve14; no global writes, adapted import/hash only recorded",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "f204f62f8a1743ea33ec86a87271918eb8199123864ecec77d635791ac6a984f",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "qa/coordination/checker-completion-reserve-20261015/test_completion_reserve.py"
+  ],
+  "program": "C:/Program Files/Python312/python.exe",
+  "runtime_version": "Python 3.12.10",
+  "runtime_executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "runtime_identity": {
+    "executable": "C:/Program Files/Python312/python.exe",
+    "version": "Python 3.12.10",
+    "sandbox": "require_escalated auto-review; Python-B stdlib tests and ephemeral fixtures only"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment_hash": "dc5041dd1ed1d4f36ee6a4f06ba7955e598cd0e5b1885d72f8d9cbf2ab089cff",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "LKB_RETRIEVAL_MODE": null,
+    "PYTHONDONTWRITEBYTECODE": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "reserve14"
+  ],
+  "timeoutMs": 20000,
+  "startedAt": "2026-10-15T09:04:28.575Z",
+  "completedAt": "2026-10-15T09:04:28.850Z",
+  "elapsedMs": 271.996,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/coordination/checker-efficiency-20261015/canonical-candidate/test_review_budget.py": "c46eabf72ab8a75b2214925430ae71f402d0618b0953e2cf13bb63ff5ac4cebc",
+    "qa/coordination/checker-completion-reserve-20261015/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-completion-reserve-20261015/test_completion_reserve.py": "87de2a3d0d38818376795cfe7f3c3c1e4a866af150bb40219d41d88fc7f293b8",
+    "qa/coordination/checker-completion-reserve-20261015/packet.md": "63d30308c86e4e4a040b59e6ff9aaf345b35fa0f32a57f4d6a8e8fad77071f23",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/test_review_budget.py": "19b32f7fde950f692621aeb76565ee0a6dd5dc6bb6853ba7e86bebea2e59478f",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/adapter.json": "f625b474eb7088f80cda915cdd1b8419e6b48c44da7f5c716863954f2c2c4589",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "after": {
+    "qa/coordination/checker-efficiency-20261015/canonical-candidate/test_review_budget.py": "c46eabf72ab8a75b2214925430ae71f402d0618b0953e2cf13bb63ff5ac4cebc",
+    "qa/coordination/checker-completion-reserve-20261015/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-completion-reserve-20261015/test_completion_reserve.py": "87de2a3d0d38818376795cfe7f3c3c1e4a866af150bb40219d41d88fc7f293b8",
+    "qa/coordination/checker-completion-reserve-20261015/packet.md": "63d30308c86e4e4a040b59e6ff9aaf345b35fa0f32a57f4d6a8e8fad77071f23",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/test_review_budget.py": "19b32f7fde950f692621aeb76565ee0a6dd5dc6bb6853ba7e86bebea2e59478f",
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/adapter.json": "f625b474eb7088f80cda915cdd1b8419e6b48c44da7f5c716863954f2c2c4589",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "stdoutPath": "qa/coordination/checker-completion-reserve-20261015/verification-reserve14-20261015T1033.stdout.txt",
+  "stderrPath": "qa/coordination/checker-completion-reserve-20261015/verification-reserve14-20261015T1033.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review; Python-B stdlib tests and ephemeral fixtures only"
+}

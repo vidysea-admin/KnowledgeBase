@@ -144,11 +144,11 @@ test("no cross-event leakage: pure function holds no state", () => {
   assert.equal(d(ZOOM).url, ZOOM);
 });
 
-test("recogniser parity drift guard: every exact host in meeting-bot platform.ts is accepted here", async () => {
+test("recogniser parity drift guard: every exact host in the canonical ingest join-policy platform.ts is accepted here", async () => {
   const { readFileSync } = await import("node:fs");
-  const src = readFileSync(new URL("../../../../packages/meeting-bot/src/platform.ts", import.meta.url), "utf8");
+  const src = readFileSync(new URL("../../../../packages/ingest/src/join-policy/platform.ts", import.meta.url), "utf8");
   for (const h of ["meet.google.com", "teams.microsoft.com", "teams.live.com", "zoom.us", "zoom.com", "webex.com", "cloudonair.withgoogle.com"]) {
-    assert.ok(src.includes(`"${h}"`) || src.includes(h), `platform.ts no longer mentions ${h}`);
+    assert.ok(src.includes(`"${h}"`) || src.includes(h), `canonical join-policy platform.ts no longer mentions ${h}`);
   }
   assert.ok(src.includes("(webinar|meeting)\\.zoho\\.(in|com|eu|com\\.au|jp)"), "zoho host pattern changed upstream: re-sync recognise()");
   assert.ok(recognise("https://webinar.zoho.in/meeting/join?key=1") && recognise("https://webinar.zoho.eu/x?sessionid=1"));

@@ -3,28 +3,118 @@
   "$id": "kb://claims",
   "title": "claims",
   "type": "object",
-  "required": ["_id", "tenantId", "text", "status", "evidence"],
+  "required": [
+    "_id",
+    "tenantId",
+    "text",
+    "status",
+    "evidence"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "text": { "type": "string", "minLength": 1 },
-    "topicRefs": { "type": "array", "items": { "type": "string" } },
-    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
-    "status": { "type": "string", "enum": ["verified", "needs-review", "conflicting"] },
-    "source": { "type": "string", "enum": ["whatsapp"], "description": "optional: ingestion channel of a human-approved chat claim (T-007 WhatsApp review; Umesh: mark it verified with source as whatsapp). Webinar/legacy claims omit it" },
-    "origin": { "type": "string", "enum": ["speaker-statement", "screen-ocr", "visual-observation"], "description": "optional: source of the claim's evidence (strict webinar claims); legacy claims omit it" },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "topicRefs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "needs-review",
+        "conflicting"
+      ]
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "whatsapp"
+      ],
+      "description": "optional: ingestion channel of a human-approved chat claim (T-007 WhatsApp review; Umesh: mark it verified with source as whatsapp). Webinar/legacy claims omit it"
+    },
+    "origin": {
+      "type": "string",
+      "enum": [
+        "speaker-statement",
+        "screen-ocr",
+        "visual-observation"
+      ],
+      "description": "optional: source of the claim's evidence (strict webinar claims); legacy claims omit it"
+    },
     "evidence": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["turnId", "sessionId"],
+        "required": [
+          "turnId",
+          "sessionId"
+        ],
         "properties": {
-          "turnId": { "type": "string" },
-          "sessionId": { "type": "string" },
-          "quote": { "type": "string", "minLength": 1, "description": "optional literal contiguous substring of the cited turn's text (strict webinar claims)" }
+          "turnId": {
+            "type": "string"
+          },
+          "sessionId": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1,
+            "description": "optional literal contiguous substring of the cited turn's text (strict webinar claims)"
+          }
         }
       }
+    },
+    "indexArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "generation",
+        "sessionId",
+        "sourceId",
+        "turnDigest"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "generation": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "turnDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "title": "ClaimIndexArtifact"
     }
   },
   "additionalProperties": true

@@ -1,0 +1,42 @@
+{
+  "files": [
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.ts",
+      "sha256": "569913b3bb1d2acc56b5c094015d15aab2f02d888315557571e929bffe8aa055"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.test.ts",
+      "sha256": "4e6b12e89a7900253112d3e08aad3234a27b2fdc0018ddfd2a6d51c8fa8a9512"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.ts",
+      "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.test.ts",
+      "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d"
+    }
+  ],
+  "unit": "t042-native-finalizer",
+  "candidate_sha": null,
+  "maker_usage": {
+    "active_s": null,
+    "cost": null,
+    "tokens": null,
+    "token_metric": "actual_total"
+  },
+  "status": "SOURCE_FROZEN_MAKER_SELFTEST_GREEN_DEPENDENT_TIMEOUT",
+  "receipts": [
+    "iteration1.json",
+    "iteration2.json",
+    "privacy8.json"
+  ],
+  "policy_version": "managed-review/1",
+  "remaining_gates": [
+    "independent checker",
+    "privacy owner timeout diagnosis",
+    "combined candidate TypeScript checks",
+    "real platform calibration"
+  ],
+  "fix_cycle": 3
+}

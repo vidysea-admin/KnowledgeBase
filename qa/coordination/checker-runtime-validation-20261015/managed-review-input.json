@@ -1,0 +1,86 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015",
+    "slug": "checker-runtime-validation-20261015",
+    "cycle": 0,
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\runtime_probe.py",
+        "sha256": "e0c209aedb85155f76f441e656abc350ff3c56e7a2aaaff7abf2d703812a78bb"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [
+      {
+        "token_metric": "actual_total",
+        "id": "not-started",
+        "active_s": 0,
+        "tokens": 0,
+        "cost": null
+      }
+    ],
+    "next_phase": {
+      "token_metric": "actual_total",
+      "kind": "review",
+      "active_s": 60,
+      "tokens": 2000,
+      "cost": null
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "checker-runtime-validation-20261015/0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "completion_reserve_tokens": 2000,
+    "bootstrap_scope": "one bounded source review and independent probe",
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 6000,
+      "cost": null
+    },
+    "escalation": null
+  },
+  "worker": {
+    "provider": "claude",
+    "executable": "C:\\Program Files\\Python312\\python.exe",
+    "runtime_identity": {
+      "model": "offline-fixture",
+      "policy": "fixture"
+    },
+    "timeout_s": 60,
+    "max_turns": 1,
+    "phase_id": "offline-phase",
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\prompt.txt",
+      "sha256": "d05973a301608b7264492442e4b50e4a55e02b431a7bcdce6dc94923f250a787"
+    }
+  },
+  "readiness": {
+    "complete": true,
+    "mutation_required": false,
+    "receipts": [
+      {
+        "role": "environment",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\environment.json",
+        "sha256": "7358c93b6a909aaffcbf74d6782d76046023ada03668f4b7a9163183507618b3"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "runtime_probe.py",
+      "reason": "offline boundary checks against canonical installed helpers",
+      "boundary": "admission, accounting, reserve, reuse, fail-closed launcher"
+    }
+  ],
+  "previous_receipt": null
+}

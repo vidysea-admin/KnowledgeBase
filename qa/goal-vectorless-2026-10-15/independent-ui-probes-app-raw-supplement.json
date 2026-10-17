@@ -1,0 +1,8 @@
+{
+  "path": "apps/web/src/App.tsx",
+  "sha256": "5e547f5dc5fe736111c8347b497f66130ad16a286f71b01b2933b774ca6284b3",
+  "capturedAt": "2026-10-15T11:14:19.212Z",
+  "timing": "during scoped UI process, not asserted as pre-launch pin",
+  "reason": "static raw import App.tsx?raw resolves content only, not runtime app dependency tree",
+  "sourceFreeze": "central App frozen affirmative before launch"
+}

@@ -1,0 +1,23 @@
+# resume-speaker-graph — independent admission handoff
+
+Policy: managed-review/1; cycle 1; status EVIDENCE_AUTHENTICATED_PENDING_INDEPENDENT_ADMISSION. Root C:/Users/product/Desktop/KnowledgeBase. Current candidate HEAD dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9; original base 5c4cbade2d1a8aa4815de13d587db8de3b01cc4a. This handoff supersedes stale readiness prose in packet.md, preserving every original file and usage record. Checker skill explicitly reloaded at C:/Users/product/.agents/skills/checker/SKILL.md. No source edits or execution in this phase.
+
+## Source, evidence and consumers
+
+Exact current source/test/contracts/runtime/lock bindings and raw receipt hashes: authentication-20261016.json. Original source-only map: packet.md; original eleven node IDs and command: broker-request.json. Source SHA256 remains 0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d; test SHA256 remains ff436078e56316d48943a9f4ab3a169a4b4651633ab27bf1ae75f40dafe370de. Both current source files are tracked and clean against HEAD. Only this lane's QA artifacts changed now.
+
+Actual broker graph evidence: ../broker/graph-receipt.json and graph.log, exit 0, 11/11, zero skipped, request hash matches original packet, before/after graph/profile/loader/lock pins match current files, runtime executable SHA matches. Preflight records Node v24.19.0 and repo-contained tsx; graph_run.py records opt-out environment and writable temp setup. Broker active time 6.062 s, test process duration 4.234 s; actual tokens unknown. This is maker execution evidence, not an independent verdict.
+
+Later immediate-consumer evidence: ../broker/native-next-split-repaired-floor2-receipt.json, exit 0, 97 passed/2 skipped of 99 across its shared eleven-file floor; includes apps/api/src/speaker-profiles/store.test.ts and router.test.ts. Those two test files changed since the original graph receipt; both now match this later receipt. Consumer store/router source and graph source remain unchanged. Shared floor costs belong to its existing accounting; do not charge or describe the whole 97 as this graph unit's checks. Other later combined failures/timeouts remain in their original receipts; this handoff does not erase them.
+
+Receipt limitation: graph receipt has no explicit executed HEAD or complete environment fingerprint. Current HEAD differs from original request. Current byte matching alone is not strict same-SHA/environment reuse certification. Preserve that distinction for root's admission reconciliation; root specifically directs no graph rerun. No reviewer worker/startup identity or validate/assess result has been invented.
+
+## Independent bounded scope and upfront probe
+
+Review speaker-knowledge-vectorless.md clauses 1–5 and goal-U24.md 2/3/6/8 against the two graph files plus buildSpeakerProfile and final authorized store snapshot consumers. Source/publication/generation authority is an upstream snapshot prerequisite; inspect the current actual consumer before inferring product authorization from a pure helper. Confirm literal evidence, attribution ownership, visibility withdrawal, no synthetic relations and deterministic bounds.
+
+Existing original security probes include colliding foreign tenant session/turn/suggestion/topic IDs and own-subject exact evidence from a different speaker outside its accepted block. Original request lists all eleven exact names. No filed issue-fix/reproduction claim is made. Independent checker should first authenticate raw receipt provenance and current bindings, then perform its own contract-derived foreign-speaker or revoked-source behavior/failure probe through root's sole broker if admitted. Required independent commands/sabotage obligations remain governed by current contracts; no mutation receipt is asserted here.
+
+Root must run budget assess/readiness validate with real runtime/startup identity and preserve all historical reviewer charges before any checker dispatch. Scope proposal: BOOTSTRAP_REVIEW 180 active seconds/6000 actual-total allocated tokens maximum, only if current admission allows; not an approved spend or dispatch. Completion reserve must be sized and protected inside that allocation by actual admission. Prior maker active/token/cost denominators and unreported reviewer history remain unknown, never reset to zero. No 10% success claim.
+
+Remaining: admitted independent verdict at exact candidate/cycle; root verifier/current integration gate; human identity/live corpus/mounted UI/transaction and parent acceptance. No parent completion or PASS is claimed. No tests, providers, DB, broad suite or checker were launched by this lane. No rerun requested.

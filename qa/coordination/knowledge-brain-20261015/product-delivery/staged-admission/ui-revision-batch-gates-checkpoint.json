@@ -1,0 +1,33 @@
+{
+  "state": "TWO_HELPER_GATES_GREEN_NO_DISPATCH_BY_PREPARER",
+  "canonical_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-30-30-input.json",
+  "canonical_result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-30-30-result.json",
+  "local_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-local-actual-30-30-input.json",
+  "local_result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-local-actual-30-30-result.json",
+  "authority": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-root-authority-30-30.json",
+  "manual_ledger": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-actual-manual-ledger-30-30.json",
+  "canonical_status": "BOOTSTRAP_REVIEW legacy_unreserved exit0",
+  "local_status": "BOOTSTRAP_REVIEW actual_total reserve80000/30s protected exit0",
+  "old_plan_preserved": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-input.json",
+  "exact_source_pin_inventory_in_inputs": true,
+  "prior_actual_total": 294849,
+  "known_maker_sum": 6052313,
+  "cumulative_actual_ceiling": 494849,
+  "new_shared_total": 200000,
+  "review": {
+    "actual_total": 120000,
+    "active_s": 30,
+    "output_allocation": 1100
+  },
+  "final": {
+    "actual_total": 80000,
+    "active_s": 30,
+    "output_allocation": 700
+  },
+  "unknown_active_cost": true,
+  "no_per_unit_ratio_claim": true,
+  "helper_raw_sha256": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+  "local_current_packet_and_PASS_reviewedSHA": "fbfa445ede6fd9c82138f24743f8cd0ea4f2f3c82f5b98dc71123e5a8cdc24b2",
+  "supplied_older_reviewedSHA": "6a3d06d5ee21f5e83502d82d8326deb77dace24dd42a8df5c99685c2dd0c5948",
+  "identity_fact": "Current persisted packet and cycle4 PASS agree; raw helper hash2b4fe0 matches exact requested. No global installation."
+}

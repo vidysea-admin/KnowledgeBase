@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "scope": "Grounding, OCR, capture suggestions, transcript QA, speaker profiles, and transcript review",
+  "evidenceClass": "Public implementation and authored synthetic fixtures",
+  "units": [
+    {
+      "task": "T040",
+      "publicScope": "Cited notes composition and withdrawal guards",
+      "remainingAcceptance": "Configured provider, durable database, category and long-window coverage, retry recovery, and actual UI acceptance"
+    },
+    {
+      "task": "T041",
+      "publicScope": "OCR slide alignment and guarded origin consumption",
+      "remainingAcceptance": "Actual recording OCR and indexed search acceptance"
+    },
+    {
+      "task": "T042",
+      "publicScope": "Capture clock suggestion adapter",
+      "remainingAcceptance": "Measured media-zero producer, committed-generation hook, native capture and human confirmation"
+    },
+    {
+      "task": "T044",
+      "publicScope": "QA generation and private-window validation helpers",
+      "remainingAcceptance": "Native protected recording and actual media pipeline"
+    },
+    {
+      "task": "U2.4",
+      "publicScope": "Source-cited speaker profile building and eligibility fixtures",
+      "remainingAcceptance": "Current independent cycle closeout, real database durability and human persona calibration"
+    },
+    {
+      "task": "T054",
+      "publicScope": "Authorized transcript review, refresh and editor fixtures",
+      "remainingAcceptance": "Private input opt-in, durable database, actual HTTP and mounted UI"
+    }
+  ],
+  "handshakeBoundary": "Local scoped checker passes apply to their named units and pinned evidence only. The original local handshakes and raw receipts remain separate and unchanged.",
+  "parentStatus": "Full acceptance remains open for every listed task.",
+  "privateProofBoundary": "Actual private source evidence is retained locally and is not included or described as public-repeatable proof.",
+  "publicationBoundary": "This summary supplies no provider, database, external publication or deployment authorization."
+}

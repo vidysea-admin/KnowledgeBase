@@ -1,0 +1,48 @@
+✖ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (940.4413ms)
+✔ three physical attempts stop before answer, sticky across repeated graph/scorer calls and resume (52.3256ms)
+✔ source drift/forged citation offsets fail through actual hydration validation (31.914ms)
+✔ byte, token admission and unknown usage refuse before further physical calls (2.3598ms)
+✔ deadline cancels hanging transport without admitting another attempt (16.1787ms)
+✔ checkpoint integrity/config/candidate binding refuses tampering and collisions (29.6945ms)
+✖ question-blind same-population control ignores query and offline reader refuses foreign scope (37.5805ms)
+✔ live disabled by default; full92 or injected grant expansion refused (1.0739ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 6
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1149.9492
+
+✖ failing tests:
+
+test at scripts\eval\vectorless-production-eval.test.mjs:40:1
+✖ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (940.4413ms)
+  AssertionError [ERR_ASSERTION]: false == true
+      at file:///C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs:48:10
+      at async temporary (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs:38:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at scripts\eval\vectorless-production-eval.test.mjs:87:1
+✖ question-blind same-population control ignores query and offline reader refuses foreign scope (37.5805ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at file:///C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs:92:10
+      at async temporary (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs:38:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tenant/,
+    operator: 'throws',
+    diff: 'simple'
+  }

@@ -1,0 +1,672 @@
+{
+  "schema": "receipt-schema-diagnostic/1",
+  "observed_utc": "2026-10-15T23:18:58.361169+00:00",
+  "input": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+    "sha256": "e08a3c7e9c35715db1e5e18a27a7888ca2f96df3e8558bef1e7175213c892bcc"
+  },
+  "method": "Raw-byte SHA and explicit per-receipt schema paths; no product command executed; per-row persistence before continuation",
+  "rows": [
+    {
+      "row_index": 0,
+      "label": "integrated-t037-current13",
+      "diagnostics": [],
+      "expected": {
+        "exit": 0,
+        "raw_passed": 13
+      },
+      "provenance": {
+        "binding_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+        "binding_row": 0,
+        "claimed_scope": "current focused broker execution"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current13-receipt.json",
+        "expected_sha256": "bed6612fb16553c7cc4c775191e1daa80a5f0bf673070f488fe1d977c84567c0",
+        "observed_sha256": "bed6612fb16553c7cc4c775191e1daa80a5f0bf673070f488fe1d977c84567c0",
+        "match": true
+      },
+      "top_level_exit_present": true,
+      "exit": {
+        "schema_path": "$.exit",
+        "observed": 0,
+        "expected": 0,
+        "valid_integer": true,
+        "matches_expected": true
+      },
+      "execution_provenance": {
+        "argv": {
+          "schema_path": "$.argv",
+          "observed": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--test-isolation=none",
+            "--test",
+            "--test-concurrency=1",
+            "--import",
+            "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+            "src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+            "src/calendar/schedule-tick-rules-integration.test.ts"
+          ]
+        },
+        "cwd": {
+          "schema_path": "$.cwd",
+          "observed": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot"
+        },
+        "pid": {
+          "schema_path": "$.pid",
+          "observed": 6044
+        },
+        "started_utc": {
+          "schema_path": "$.started_utc",
+          "observed": "2026-10-15T23:00:03Z"
+        },
+        "tree_close_completed": {
+          "schema_path": "$.tree_close_completed",
+          "observed": true
+        },
+        "active_s": {
+          "schema_path": "$.active_s",
+          "observed": 3.985000000000582
+        }
+      },
+      "environment_provenance": {
+        "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "pins_unchanged": true
+      },
+      "test_count_fields": [
+        {
+          "schema_path": "$.counts",
+          "observed": {
+            "tests": 13,
+            "pass": 13,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ],
+      "output": {
+        "path_schema": "$.log",
+        "hash_schema": "$.log_sha256",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current13.log",
+        "expected_sha256": "4768ec597740d354e4e16579ecc1f25f32630aa7c722001119f5992627e740bb",
+        "observed_sha256": "4768ec597740d354e4e16579ecc1f25f32630aa7c722001119f5992627e740bb",
+        "hash_matches": true
+      },
+      "actual_raw_passed": {
+        "observed": 13,
+        "schema_path": "complete output: TAP pass N",
+        "expected": 13,
+        "matches_expected": true
+      },
+      "metadata_ok": true
+    },
+    {
+      "row_index": 1,
+      "label": "integrated-t037-current-lastvalid2",
+      "diagnostics": [],
+      "expected": {
+        "exit": 0,
+        "raw_passed": 2
+      },
+      "provenance": {
+        "binding_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+        "binding_row": 1,
+        "claimed_scope": "current focused broker execution"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current-lastvalid2-receipt.json",
+        "expected_sha256": "8c54eafff4c1fe6a7a32fea0f2fb8059352b88a41b27c99be846ca1e1a8cbd96",
+        "observed_sha256": "8c54eafff4c1fe6a7a32fea0f2fb8059352b88a41b27c99be846ca1e1a8cbd96",
+        "match": true
+      },
+      "top_level_exit_present": true,
+      "exit": {
+        "schema_path": "$.exit",
+        "observed": 0,
+        "expected": 0,
+        "valid_integer": true,
+        "matches_expected": true
+      },
+      "execution_provenance": {
+        "argv": {
+          "schema_path": "$.argv",
+          "observed": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--test",
+            "--test-isolation=none",
+            "--test-concurrency=1",
+            "--test-timeout=30000",
+            "--import",
+            "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+            "--test-name-pattern=^(valid primary seeds snapshot; corruption/missing primary uses it without extending expiry|cached enforcement preserves previously rejected/cancelled selection and evaluator errors refuse)$",
+            "packages/meeting-bot/src/calendar/join-rules/join-rules-last-valid-enforce.test.ts"
+          ]
+        },
+        "cwd": {
+          "schema_path": "$.cwd",
+          "observed": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+        },
+        "pid": {
+          "schema_path": "$.pid",
+          "observed": 26384
+        },
+        "started_utc": {
+          "schema_path": "$.started_utc",
+          "observed": "2026-10-15T23:00:07Z"
+        },
+        "tree_close_completed": {
+          "schema_path": "$.tree_close_completed",
+          "observed": true
+        },
+        "active_s": {
+          "schema_path": "$.active_s",
+          "observed": 2.1560000000008586
+        }
+      },
+      "environment_provenance": {
+        "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "pins_unchanged": true
+      },
+      "test_count_fields": [
+        {
+          "schema_path": "$.counts",
+          "observed": {
+            "tests": 2,
+            "pass": 2,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ],
+      "output": {
+        "path_schema": "$.log",
+        "hash_schema": "$.log_sha256",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t037-current-lastvalid2.log",
+        "expected_sha256": "005f6c5e3b2d0a95d172feb14826f1b072cc97851205b84f4d61a51dd7d38f86",
+        "observed_sha256": "005f6c5e3b2d0a95d172feb14826f1b072cc97851205b84f4d61a51dd7d38f86",
+        "hash_matches": true
+      },
+      "actual_raw_passed": {
+        "observed": 2,
+        "schema_path": "complete output: TAP pass N",
+        "expected": 2,
+        "matches_expected": true
+      },
+      "metadata_ok": true
+    },
+    {
+      "row_index": 2,
+      "label": "integrated-t056-page-current",
+      "diagnostics": [],
+      "expected": {
+        "exit": 0,
+        "raw_passed": 19
+      },
+      "provenance": {
+        "binding_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+        "binding_row": 2,
+        "claimed_scope": "current focused broker execution"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t056-page-current-receipt.json",
+        "expected_sha256": "0d95c5e19877f618929f739347d2714b38c2cfff867d01d57117eeb27a4e0f60",
+        "observed_sha256": "0d95c5e19877f618929f739347d2714b38c2cfff867d01d57117eeb27a4e0f60",
+        "match": true
+      },
+      "top_level_exit_present": true,
+      "exit": {
+        "schema_path": "$.exit",
+        "observed": 0,
+        "expected": 0,
+        "valid_integer": true,
+        "matches_expected": true
+      },
+      "execution_provenance": {
+        "argv": {
+          "schema_path": "$.argv",
+          "observed": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--require",
+            "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\worker-trace.cjs",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "src/pages/answer-policy/PolicyAskPage.test.tsx",
+            "--pool=threads",
+            "--poolOptions.threads.singleThread",
+            "--maxWorkers=1",
+            "--minWorkers=1",
+            "--reporter=default",
+            "--reporter=C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\collection-reporter.mjs"
+          ]
+        },
+        "cwd": {
+          "schema_path": "$.cwd",
+          "observed": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web"
+        },
+        "pid": {
+          "schema_path": "$.pid",
+          "observed": 25188
+        },
+        "started_utc": {
+          "schema_path": "$.started_utc",
+          "observed": "2026-10-15T22:58:50Z"
+        },
+        "tree_close_completed": {
+          "schema_path": "$.tree_close_completed",
+          "observed": true
+        },
+        "active_s": {
+          "schema_path": "$.active_s",
+          "observed": 7.313000000000102
+        }
+      },
+      "environment_provenance": {
+        "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "pins_unchanged": true
+      },
+      "test_count_fields": [
+        {
+          "schema_path": "$.counts",
+          "observed": {}
+        },
+        {
+          "schema_path": "$.framework_summary",
+          "observed": [
+            "Test Files  1 passed (1)",
+            "Tests  19 passed (19)"
+          ]
+        }
+      ],
+      "output": {
+        "path_schema": "$.log",
+        "hash_schema": "$.log_sha256",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-t056-page-current.log",
+        "expected_sha256": "de97f63527360dc75188ce04832c10e9cdade36176f9b2a6bdee57f3b4edeae0",
+        "observed_sha256": "de97f63527360dc75188ce04832c10e9cdade36176f9b2a6bdee57f3b4edeae0",
+        "hash_matches": true
+      },
+      "actual_raw_passed": {
+        "observed": 19,
+        "schema_path": "complete output: Vitest Tests N passed",
+        "expected": 19,
+        "matches_expected": true
+      },
+      "metadata_ok": true
+    },
+    {
+      "row_index": 3,
+      "label": "t013-ui",
+      "diagnostics": [
+        "Top-level $.exit absent; actual successful exit is $.execution.exit. A top-level-only assertion would reject this valid schema."
+      ],
+      "expected": {
+        "exit": 0,
+        "raw_passed": 38
+      },
+      "provenance": {
+        "binding_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+        "binding_row": 3,
+        "claimed_scope": "unchanged source focused scope"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t013-ui-receipt.json",
+        "expected_sha256": "177306497e836c418f60ff5cb829bac105d05b6092d9ccd36136a542f3ad50cc",
+        "observed_sha256": "177306497e836c418f60ff5cb829bac105d05b6092d9ccd36136a542f3ad50cc",
+        "match": true
+      },
+      "top_level_exit_present": false,
+      "exit": {
+        "schema_path": "$.execution.exit",
+        "observed": 0,
+        "expected": 0,
+        "valid_integer": true,
+        "matches_expected": true
+      },
+      "execution_provenance": {
+        "argv": {
+          "schema_path": "$.execution.argv",
+          "observed": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--require",
+            "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\worker-trace.cjs",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "src/pages/counsellor/voice.test.ts",
+            "src/pages/counsellor/CounsellorPage.test.tsx",
+            "--maxWorkers=1",
+            "--minWorkers=1",
+            "--pool=threads",
+            "--poolOptions.threads.singleThread",
+            "--reporter=default",
+            "--reporter=C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\collection-reporter.mjs"
+          ]
+        },
+        "cwd": {
+          "schema_path": "$.execution.cwd",
+          "observed": "C:/Users/product/Desktop/KnowledgeBase/apps/web"
+        },
+        "pid": {
+          "schema_path": "$.execution.pid",
+          "observed": 26372
+        },
+        "started_utc": {
+          "schema_path": "$.execution.started_utc",
+          "observed": "2026-10-15T22:38:31Z"
+        },
+        "tree_close_completed": {
+          "schema_path": "$.execution.tree_close_completed",
+          "observed": true
+        },
+        "active_s": {
+          "schema_path": "$.execution.active_s",
+          "observed": 10.485000000000582
+        }
+      },
+      "environment_provenance": {
+        "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "request_sha256": "97513d6af3cd59dcb59ab7d9e7bdd46b317ba6db1142d9aef79e74f3e2f77bb0",
+        "pins_unchanged": true
+      },
+      "test_count_fields": [
+        {
+          "schema_path": "$.actual_vitest_summary",
+          "observed": [
+            "Test Files  2 passed (2)",
+            "Tests  38 passed (38)"
+          ]
+        }
+      ],
+      "output": {
+        "path_schema": "$.execution.log",
+        "hash_schema": "$.execution.log_sha256",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t013-ui.log",
+        "expected_sha256": "3fd3ecd269304a22a361280c06564520221bed825b956891644b69c199523600",
+        "observed_sha256": "3fd3ecd269304a22a361280c06564520221bed825b956891644b69c199523600",
+        "hash_matches": true
+      },
+      "actual_raw_passed": {
+        "observed": 38,
+        "schema_path": "complete output: Vitest Tests N passed",
+        "expected": 38,
+        "matches_expected": true
+      },
+      "metadata_ok": true
+    },
+    {
+      "row_index": 4,
+      "label": "t056-api-exact-readlease",
+      "diagnostics": [],
+      "expected": {
+        "exit": 0,
+        "raw_passed": 7
+      },
+      "provenance": {
+        "binding_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+        "binding_row": 4,
+        "claimed_scope": "unchanged source focused scope"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-api-exact-readlease-receipt.json",
+        "expected_sha256": "db639bf8c417ec0b9af85d7f61ca731debf555535f43f3ee7deea38273edc819",
+        "observed_sha256": "db639bf8c417ec0b9af85d7f61ca731debf555535f43f3ee7deea38273edc819",
+        "match": true
+      },
+      "top_level_exit_present": true,
+      "exit": {
+        "schema_path": "$.exit",
+        "observed": 0,
+        "expected": 0,
+        "valid_integer": true,
+        "matches_expected": true
+      },
+      "execution_provenance": {
+        "argv": {
+          "schema_path": "$.argv",
+          "observed": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--test-isolation=none",
+            "--test-concurrency=1",
+            "--import",
+            "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+            "--test",
+            "--test-name-pattern=direct older|direct legacy|direct answer read|reported evidence uses|all reported conflicts|graph selector conflict replay|changed evidence or policy",
+            "apps/api/src/answer-policy/answer-workflow.test.ts",
+            "apps/api/src/answer-policy/answer-router.test.ts"
+          ]
+        },
+        "cwd": {
+          "schema_path": "$.cwd",
+          "observed": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+        },
+        "pid": {
+          "schema_path": "$.pid",
+          "observed": 14848
+        },
+        "started_utc": {
+          "schema_path": "$.started_utc",
+          "observed": "2026-10-15T22:43:30Z"
+        },
+        "tree_close_completed": {
+          "schema_path": "$.tree_close_completed",
+          "observed": true
+        },
+        "active_s": {
+          "schema_path": "$.active_s",
+          "observed": 7.04700000000048
+        }
+      },
+      "environment_provenance": {
+        "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+        "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "pins_unchanged": true
+      },
+      "test_count_fields": [
+        {
+          "schema_path": "$.counts",
+          "observed": {
+            "tests": 7,
+            "pass": 7,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ],
+      "output": {
+        "path_schema": "$.log",
+        "hash_schema": "$.log_sha256",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-api-exact-readlease.log",
+        "expected_sha256": "1a873199acbeba277234b684c2d6eff8f320ab86ebf99dfaa63626bd65c7bf2c",
+        "observed_sha256": "1a873199acbeba277234b684c2d6eff8f320ab86ebf99dfaa63626bd65c7bf2c",
+        "hash_matches": true
+      },
+      "actual_raw_passed": {
+        "observed": 7,
+        "schema_path": "complete output: TAP pass N",
+        "expected": 7,
+        "matches_expected": true
+      },
+      "metadata_ok": true
+    },
+    {
+      "row_index": 5,
+      "label": "t056-ui",
+      "diagnostics": [
+        "Top-level $.exit absent; actual successful exit is $.execution.exit. A top-level-only assertion would reject this valid schema."
+      ],
+      "expected": {
+        "exit": 0,
+        "raw_passed": 21
+      },
+      "provenance": {
+        "binding_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\current-focused-bindings.json",
+        "binding_row": 5,
+        "claimed_scope": "directAnswer.test.ts2 only; old page19 superseded by current page19"
+      },
+      "raw_receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-ui-receipt.json",
+        "expected_sha256": "b52463488431961358ad58ce813cc6d645349601c6b7e925a8cf79309f33aba8",
+        "observed_sha256": "b52463488431961358ad58ce813cc6d645349601c6b7e925a8cf79309f33aba8",
+        "match": true
+      },
+      "top_level_exit_present": false,
+      "exit": {
+        "schema_path": "$.execution.exit",
+        "observed": 0,
+        "expected": 0,
+        "valid_integer": true,
+        "matches_expected": true
+      },
+      "execution_provenance": {
+        "argv": {
+          "schema_path": "$.execution.argv",
+          "observed": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--require",
+            "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\worker-trace.cjs",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "src/pages/answer-policy/directAnswer.test.ts",
+            "src/pages/answer-policy/PolicyAskPage.test.tsx",
+            "--pool=threads",
+            "--poolOptions.threads.singleThread",
+            "--maxWorkers=1",
+            "--minWorkers=1",
+            "--reporter=default",
+            "--reporter=C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\profile\\collection-reporter.mjs"
+          ]
+        },
+        "cwd": {
+          "schema_path": "$.execution.cwd",
+          "observed": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web"
+        },
+        "pid": {
+          "schema_path": "$.execution.pid",
+          "observed": 25232
+        },
+        "started_utc": {
+          "schema_path": "$.execution.started_utc",
+          "observed": "2026-10-15T22:41:48Z"
+        },
+        "tree_close_completed": {
+          "schema_path": "$.execution.tree_close_completed",
+          "observed": true
+        },
+        "active_s": {
+          "schema_path": "$.execution.active_s",
+          "observed": 10.061999999999898
+        }
+      },
+      "environment_provenance": {
+        "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+        "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+        "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "request_sha256": "c242c4f4997b481219c48c1c7a2dc05f5cad802ed55c1c4da498cac02f61a6ab",
+        "packet_sha256": "2daf41590618364c285f69ab0b6feeb0b460ae42bc2d538a51b1c76a23a5ca4c",
+        "pins_unchanged": true
+      },
+      "test_count_fields": [
+        {
+          "schema_path": "$.vitest_summary",
+          "observed": [
+            "Test Files  2 passed (2)",
+            "Tests  21 passed (21)"
+          ]
+        },
+        {
+          "schema_path": "$.node_counts",
+          "observed": {}
+        }
+      ],
+      "output": {
+        "path_schema": "$.execution.log",
+        "hash_schema": "$.execution.log_sha256",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-ui.log",
+        "expected_sha256": "5b3c197702283e865c143d4f945243c98342368cfc1da8bde91d9e12688fd1c9",
+        "observed_sha256": "5b3c197702283e865c143d4f945243c98342368cfc1da8bde91d9e12688fd1c9",
+        "hash_matches": true
+      },
+      "actual_raw_passed": {
+        "observed": 21,
+        "schema_path": "complete output: Vitest Tests N passed",
+        "expected": 21,
+        "matches_expected": true
+      },
+      "reused_subscope": {
+        "raw_suite_passed": 21,
+        "current_reused_scope": "directAnswer.test.ts2 only; old page19 superseded",
+        "subscope_evidence": [
+          " \u2713 src/pages/answer-policy/directAnswer.test.ts (2 tests) 9ms"
+        ],
+        "subscope_count": 2,
+        "independent_reuse_adoption": "NOT established by this metadata script"
+      },
+      "metadata_ok": true
+    }
+  ],
+  "metadata_only": true,
+  "semantic_verdict": null,
+  "all_metadata_ok": true,
+  "first_top_level_exit_assumption_failure": {
+    "row_index": 3,
+    "label": "t013-ui",
+    "actual_exit_path": "$.execution.exit",
+    "actual_exit": 0
+  },
+  "checker_artifact_bindings": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\verdicts\\t013-t037-t056-joined-source-slices.md",
+      "sha256": "aabce1a7b63c9e16e994d32bb5a3ecd0871c4f1f5ad43fc9c74b7bee2e8a61ba"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-final-metrics.json",
+      "sha256": "fc0b4ea2b0079de25971f56df88450c0ebfa84534b17b4ad24417d8728a678cb"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-final-seal.json",
+      "sha256": "01156b258e970c293cbd2f1592449bef6f6627b30850ec6cdae4542583430e25"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-finalization-assess.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-finalization-assess.stdout",
+      "sha256": "2c84c965cb08f993132bd5f7804c799bb3bea703dfdb7c50c8c1b7130fd909c2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-finalization-clock.json",
+      "sha256": "27d90bbfb07418a9f026e5677970b1c3726887a2ba75a13cd0a58ac9752f6833"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-finalization-input.json",
+      "sha256": "00fb8795cd8a72d250b8ee126e0716d15cb03ba803060246d12620eeeab0758e"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-independent-seal.json",
+      "sha256": "34f0dd2cf43e1fc4aa822cd9351767f30705e5a6e666bc16e92f4d1f91d854ef"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-repository-parser-readback.json",
+      "sha256": "7ac3fe69debbfb8bec22f8bf4ef5a5070c4a887ded3b5362c3270b553269c535"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\checker-verdict-readback.json",
+      "sha256": "d1e7c5496f18568cd64644c9f5d31a702c451adc759f8fba24d8806107c9876a"
+    }
+  ],
+  "authority_limit": "Canonical checker HOLD remains authoritative; parser/schema repair is not semantic acceptance or permission to resume checker. No reviewer budget allocated here."
+}

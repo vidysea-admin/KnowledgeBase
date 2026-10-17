@@ -1,0 +1,37 @@
+[
+  {
+    "name": "frozen-contracts-20261015T0914",
+    "receipt_sha256": "a2c0f6c23917ea9fdfca90e0f23e5e2b6e50305fa730784117137ad30b990b71",
+    "exit": 0,
+    "currentDrift": [],
+    "durationMs": 162.8908
+  },
+  {
+    "name": "api-types-20261015T0940",
+    "receipt_sha256": "d6cd32615533be0afecbfde3be28ca877d05bec839bc0e2e606a8873842b289f",
+    "exit": 0,
+    "currentDrift": [],
+    "durationMs": 13997.3617
+  },
+  {
+    "name": "web-types-20261015T0940",
+    "receipt_sha256": "ce097ac531382047ba4a781a4663417d1d81e15276c9d6c258e6089f5852fd54",
+    "exit": 0,
+    "currentDrift": [],
+    "durationMs": 14553.9657
+  },
+  {
+    "name": "api-build-20261015T0940",
+    "receipt_sha256": "eda6825fdbc5c7ec7d768235f3c33f6f37498302a2f3502f5fcb2c71fcafd2ce",
+    "exit": 0,
+    "currentDrift": [],
+    "durationMs": 2606.3508
+  },
+  {
+    "name": "web-build-20261015T0940",
+    "receipt_sha256": "3f5bab216140fb200afd78304516f80b8571f048b75bd1e1a32013c699714c78",
+    "exit": 0,
+    "currentDrift": [],
+    "durationMs": 17873.7561
+  }
+]

@@ -1,0 +1,36 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Telemetry real-envelope repair plus original four regressions",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "scripts/qa/review-runtime-usage.test.mjs"
+  ],
+  "testIDs": [
+    "all five telemetry fixture cases"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 15000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-green",
+  "pins": {
+    "scripts/qa/review-runtime-usage.test.mjs": "7e6c7e26f0d25b0247c39c779068d1d63b4341f7e1c6cc91d5e214e78c65d2bc",
+    "scripts/qa/review-runtime-usage.mjs": "694c7971c24abf1d0534808fa77772acae3d9b49ddc08ee03ddacbcad75582cb",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "qa/fixtures/review-runtime-usage-ordinal.jsonl": "6dca42de2cb7e706102eae9463d8ca540558ffc831d085b82e0af71b8941f2e9"
+  }
+}

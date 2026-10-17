@@ -1,0 +1,11 @@
+# Playback Opus rational timestamp quantization — source cycle 2
+
+managed-review/1; source frozen awaiting broker, not ready for checker. Exact four-file source pins are adjacent; prior failed receipts/snapshots remain intact. Only probe source/test changed. Maker ran no CPU tests or binary probes. Actual maker usage/cost remain unknown/null (`actual_total`); no efficiency or acceptance claim.
+
+Root supplied the actual broker diagnostic: audio ordinal 1, both readbacks have 21 frames; ffprobe PTS 87 at 1/1000 vs decoded PTS 4200 at 1/48000 (87.5ms), with 960 samples, decoded duration 960 and 1920 bytes. This is playback WebM Opus timestamp quantization, not canonical WAV identity/partitioning.
+
+Production now independently reads format identity (`-show_format`). Only actual `matroska,webm` + Opus + 48000Hz + 1/1000 container ticks and 1/48000 decoded PCM ticks admit a nonzero residual. The exact rational comparison permits the sum of half each grid tick: 1/2000 + 1/96000 seconds, approximately 510.417us. All arithmetic for admission uses BigInt cross multiplication, not a floating epsilon. Equal timebases, video, PCM/WAV, other codecs/containers and unsupported grids remain strict. Unknown/zero/negative/oversized rational fields refuse.
+
+Every readback preserves `timingComparisons`: original probe PTS/timebase, independent decoder PTS/timebase, exact signed rational residual, explicit quantizationBoundUs, stream/ordinal and exact/quantized basis. Deep freeze covers these facts under the private decoder capability. This is only playback representation uncertainty. Opus still supplies no canonical-audio map; selected provider WAV still requires exact independently decoded PCM SHA/sample count/zero priming/first sample zero. Video image/PTS proof is unchanged. Platform/host uncertainty remains unknown.
+
+One added regression reproduces 87ms vs 87.5ms, verifies retained residual/bound, rejects a 1.5ms shift, fake widened grid, wrong container, equal-grid mismatch and zero denominator. Existing original 14 tests are unchanged. Request broker original two files with real existing binary paths (15 tests, original real integration mandatory), then downstream privacy8 and scoped TypeScript diagnostics. No fake readback, skip or parent acceptance is introduced.

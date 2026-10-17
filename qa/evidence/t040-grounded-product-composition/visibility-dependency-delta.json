@@ -1,0 +1,14 @@
+{
+  "capturedAt": "2026-10-14T21:59:23.6244216Z",
+  "path": "apps/api/src/visibility/knowledge.ts",
+  "current": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+  "expectedPrior": "4ED89B000892C5D55291ADD50CF80B9D060E1997A5A309495AE648AD17E84ADA",
+  "memoryInverse": "4ED89B000892C5D55291ADD50CF80B9D060E1997A5A309495AE648AD17E84ADA",
+  "exactMatch": true,
+  "sourceModified": false,
+  "sites": [
+    "context refuses explicit consent:false",
+    "source visibility refuses explicit consent:false"
+  ],
+  "priorHypothesis": "initial inverse also removed existing claim-bound WA citation changes; reproduced earlier D5E451 instead of tested4ED89B, preserved separately"
+}

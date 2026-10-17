@@ -1,0 +1,40 @@
+# T-034 full parent acceptance — browser-tab capture
+
+Checker-owned contract, initialized 2026-10-14 under the explicit root lease and D-170. Roadmap tier 3. This contract covers the complete task, not a helper, fixture suite, capture-slot foundation or narrower first-release slice.
+
+## Authority and scope
+
+- Current user goal: `C:/Users/product/.codex/attachments/db7dce52-5317-4ddc-acf6-e3965405c3ab/pasted-text-1.txt`, capture/transcription lane and full-acceptance task-closure rule.
+- Historical goal reconciliation: `C:/Users/product/.codex/attachments/5b9890de-27a1-4700-9e7e-7f04f6050b5c/goal-objective.md`, including reliable unattended capture and overlapping meetings.
+- `TASKS.md` T-034 and `.goal/goal.json` T-034: in-browser tab capture with extension and MediaRecorder; OBS becomes fallback.
+- `docs/meeting-bot-roadmap.md` P2, T-034: a 60-minute Zoho/YouTube run with OBS absent, and two tabs recorded in parallel.
+- AGENTS.md, ARCHITECTURE.md H3/H8/H9 and section 5; D-056 portable release; D-143 staging boundary; D-146 real-capture authorization; D-170 full-task independence and ownership.
+- Existing `qa/contracts/webinar-portable-release.md` C1/C2/C6/C7 and I1/I2/I4 remain applicable. Its L2 single-active-capture allowance is a narrower first-release allowance; it does not satisfy this full parent task's parallel-capture criterion. Root expressly confirmed the full parent two-tab requirement for this contract.
+
+T-035's precise size target, T-038's week-long scheduler proof and T-051's full Windows/Ubuntu operational-release proof retain their own contracts. Their existence cannot replace T-034 evidence, and a T-034 PASS cannot close those tasks. Any portable-host support claimed by this task must be exercised on that host; unavailable hosts are marked NOT VERIFIED.
+
+## Required full-task criteria
+
+1. **Actual entry point and backend.** The deployed/host executable record entry point reaches real bot Chrome, the owned extension, `chrome.tabCapture` and MediaRecorder. It records tab audio and changing tab video to WebM. Default tab selection and explicit OBS fallback are correctly wired; unavailable tab prerequisites produce an actionable failure rather than empty successful output. An independent Windows invocation exercises the actual OBS fallback when that fallback is claimed usable.
+
+2. **Sustained real capture.** Independently verify a sustained 60-minute real Zoho or YouTube webinar capture using the task's selected entry point, with no OBS running for that capture. Record host/OS, browser/runtime versions, command, start/stop times, observed process/backend identity and final media paths. Probe actual finalized media duration and audio/video streams; inspect audible samples and changing frames near the beginning, middle and end. Synthetic media, fake browser APIs and mocked metadata supplement but cannot substitute for this proof.
+
+3. **Two simultaneous captures.** Run two actual webinar-tab captures with overlapping active periods through supported product invocations. Independently establish distinct browser/tab ownership, capture receiver credentials, session/tenant bindings, recording paths, control state and final media outputs. Both outputs contain the correct source audio/video, with no mixed media, overwritten file, cross-session status or credential reuse. Stopping, failing or reconnecting either capture must not stop or corrupt the other. Separate authenticated profiles are prepared explicitly; no unapproved credential/profile copying is inferred from parallel operation. Single-slot refusal is necessary collision safety, but is not proof of two-slot operation.
+
+4. **Lifecycle and failure boundary.** Real stop/finalization waits for acknowledged queued media and produces readable complete output. Bounded focused checks independently exercise unavailable extension/capture permissions, receiver failures, abrupt track end, process interruption and capture-start failure. They verify visible failed/gap status and absence of false finished/successful transcription claims, plus release of owned locks/processes/resources. Retry and memory/file growth are bounded; invalid, silent, absent-stream and truncated media are refused before transcription/indexing. Preserve provenance of any recovered gaps.
+
+5. **Ownership and security.** Verify the changed real caller/receiver boundaries, not only standalone helper methods. Receiver stays loopback-bound with authenticated owned-extension requests. Foreign sender/origin/token requests and mismatched capture identities cannot write, stop or read another capture. Capture-slot/path selection, including login and recovery callers, rejects unsafe identifiers, alias/symlink/reparse escapes and collisions before writes or process launches; cleanup affects only the proven owned workspace. Credentials/tokens and personal join URLs are not exposed in logs, diagnostics or ordinary status. Tenant/session provenance remains attached to the correct outputs and status. Relevant auth, credentials, tenancy and data-write boundaries are never waived by the non-security round cap.
+
+6. **Immediate downstream consumption.** An actual finalized capture passes the established media-quality gate and the affected processing stage. Its immediate consumer reads the actual audio/video artifacts without error, preserving session, speaker/time and any gap metadata required at that boundary. For claimed transcription/knowledge integration, use the real configured provider and authorized staging environment; verify resolvable citations on consumed output. Do not infer downstream success from a helper fixture, unrelated historic sample or file existence. This criterion does not independently close the broader indexing/Ask tasks.
+
+7. **Checker provenance and required checks.** A ready-for-check packet names the scoped manifest, fix cycle, full changed file list including untracked files, exact final hashes, caller/dependency map, commands/results and attribution of reused evidence. Independent checker source review and focused behavior probes cover the affected seams and immediate consumer; `contracts/verify_contracts.py` passes, with vacuous empty-contract success identified if applicable. Issue-fix claims replay each issue's recorded cases verbatim from the union of all ledgers and report counts per issue. Relevant final hashes and cycle are rechecked before verdict. Execution follows the granted CPU lease, shared-worker restrictions, timeouts and mutation restoration requirements.
+
+## Evidence and verdict rules
+
+Maintain a criterion-to-evidence table in the matching parent verdict `qa/verdicts/goal-t034.md`. Each entry names observed command/output artifact, host and checked bytes; explicitly distinguish reused maker evidence from independent observation. Commands include duration, exit code and measured counts. Missing timestamps remain unknown rather than estimated by subtraction.
+
+Full parent **PASS** requires all seven criteria and the actual real-host/live/security evidence above. A scoped unit PASS remains a scoped unit verdict and leaves this parent task in progress. Foundation work, mocked extension tests, a successful Docker build and backend wiring alone cannot PASS this parent.
+
+**FAIL** identifies a reproducible acceptance violation in the submitted candidate. **HOLD** identifies missing candidate provenance, required live/host/security/downstream evidence, authorization, test lease or other prerequisites. Every unperformed criterion is named NOT VERIFIED. Do not edit historical verdicts, lower this contract to fit a candidate, or mark trackers done from a scoped PASS.
+
+D-146 approves the 60-minute live capture only once Umesh supplies the meeting link; staging write and real-host gates remain explicit. This contract does not authorize browser launches, sends, profile cloning, production writes/promotion, supervisor activation, frozen-contract changes or enforcement changes. Any required unavailable access is reported precisely to the orchestrator while independent authorized work continues.

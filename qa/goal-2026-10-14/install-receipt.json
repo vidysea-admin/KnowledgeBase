@@ -1,0 +1,17 @@
+{
+  "phase": "install",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules\\pnpm\\bin\\pnpm.mjs",
+    "install",
+    "--frozen-lockfile",
+    "--ignore-scripts"
+  ],
+  "pid": 15976,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "elapsedMs": 6321,
+  "stdout": "Scope: all 11 workspace projects\nLockfile is up to date, resolution step is skipped\nProgress: resolved 1, reused 0, downloaded 0, added 0\nPackages: +9\n+++++++++\nProgress: resolved 9, reused 0, downloaded 6, added 6\nProgress: resolved 9, reused 0, downloaded 7, added 7\nProgress: resolved 9, reused 0, downloaded 9, added 7\nProgress: resolved 9, reused 0, downloaded 9, added 9, done\n\nDone in 5.2s using pnpm v10.33.0\n",
+  "stderr": ""
+}

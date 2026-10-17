@@ -1,0 +1,238 @@
+{
+  "gap": {
+    "_id": "eval-gap-0f07fdb0d1b3c96b83fb7189c303460461d3279feebaa94d451f1b80005fc02e",
+    "tenantId": "t",
+    "kind": "source-pending",
+    "status": "received",
+    "description": "Evaluation loss awaiting additional source evidence",
+    "requestedAt": "2026-10-14T21:20:54.247Z",
+    "flywheel": {
+      "version": 1,
+      "originalEvalRunId": "loss",
+      "inputFingerprint": "a9e5d7f5540483055501fa969cd6f78f151cf8449c79682716b8fa4d8623ecc1",
+      "loss": {
+        "question": "When does registration open?",
+        "aiAnswer": {
+          "text": "I do not have the date.",
+          "sources": {
+            "internal": [],
+            "web": []
+          },
+          "insufficient_coverage": true
+        },
+        "counsellor": {
+          "name": "fixture judge"
+        },
+        "counsellorAnswer": {
+          "text": "Registration opens on the first of April."
+        },
+        "score": {
+          "ai": 1,
+          "counsellor": 4
+        },
+        "credibility": "internal",
+        "createdAt": "2026-10-14T00:00:00.000Z"
+      },
+      "revision": 4,
+      "stage": "retested",
+      "capture": {
+        "sourceId": "t:fixture-digest",
+        "sessionId": "s1",
+        "sourceDigest": "fixture-digest",
+        "transcriptDigest": "43a1400c1d6109f6cccb3a402dd97c0981b332b07280b8bb5eb79023f4cbd9ff",
+        "turnCount": 1,
+        "turnIds": [
+          "s1-t001"
+        ]
+      },
+      "sourceUrlFingerprint": "84c0704aba16a476d54f23654842009cb5b0f58c2cdadde511980c9f5582030b",
+      "index": {
+        "sourceId": "t:fixture-digest",
+        "sessionId": "s1",
+        "sourceDigest": "fixture-digest",
+        "transcriptDigest": "43a1400c1d6109f6cccb3a402dd97c0981b332b07280b8bb5eb79023f4cbd9ff",
+        "turnCount": 1,
+        "turnIds": [
+          "s1-t001"
+        ],
+        "generation": "59cc4141-8327-445c-a8d9-fe10d36e64f8",
+        "treeDigest": "b2f79259cf98db96c5bcf197f6c264e07c9e75eb252356a5e5f120fa0feb5111",
+        "chunksDigest": "333a94d254b1db1a5299d252c142f99369acd6defd26ddc59c290c962411ef94",
+        "completedAt": "2026-10-14T21:20:54.280Z"
+      },
+      "lastRetestId": "eval-retest-24126c76d8b87beac9a2a08f72c31552dd0d8231d0851f2093d3ed82169d4143"
+    },
+    "sourceRef": "t:fixture-digest"
+  },
+  "retest": {
+    "_id": "eval-retest-24126c76d8b87beac9a2a08f72c31552dd0d8231d0851f2093d3ed82169d4143",
+    "tenantId": "t",
+    "question": "When does registration open?",
+    "counsellor": {
+      "name": "fixture judge"
+    },
+    "counsellorAnswer": {
+      "text": "Registration opens on the first of April."
+    },
+    "aiAnswer": {
+      "text": "Registration opens on the first of April.",
+      "verdict": "correct",
+      "reason": "at least one candidate scored >= upper threshold 0.7",
+      "scored": [
+        {
+          "node": {
+            "node_id": "t/year:2026/month:10/session:s1",
+            "title": "https://example.org/session",
+            "level": "session",
+            "summary": "[{\"id\":\"quote-ef79308b1fe1c65dd80d963c\",\"nodeId\":\"t/year:2026/month:10/session:s1\",\"sessionRef\":\"s1\",\"turnId\":\"s1-t001\",\"speakerRef\":\"speaker:fixture\",\"tStart\":3,\"tEnd\":7,\"charStart\":0,\"charEnd\":41,\"byteStart\":0,\"byteEnd\":41,\"turnTextSHA256\":\"79c7cde7b9647179c0e4248b894251a09c9e0a7d8d13d7cba6e7e7561c39da07\",\"sliceSHA256\":\"79c7cde7b9647179c0e4248b894251a09c9e0a7d8d13d7cba6e7e7561c39da07\",\"quote\":\"Registration opens on the first of April.\",\"origin\":\"speech\"}]",
+            "children": [],
+            "evidence": {
+              "sessionRef": "s1",
+              "sourceQuotes": [
+                {
+                  "id": "quote-ef79308b1fe1c65dd80d963c",
+                  "nodeId": "t/year:2026/month:10/session:s1",
+                  "sessionRef": "s1",
+                  "turnId": "s1-t001",
+                  "speakerRef": "speaker:fixture",
+                  "tStart": 3,
+                  "tEnd": 7,
+                  "charStart": 0,
+                  "charEnd": 41,
+                  "byteStart": 0,
+                  "byteEnd": 41,
+                  "turnTextSHA256": "79c7cde7b9647179c0e4248b894251a09c9e0a7d8d13d7cba6e7e7561c39da07",
+                  "sliceSHA256": "79c7cde7b9647179c0e4248b894251a09c9e0a7d8d13d7cba6e7e7561c39da07",
+                  "quote": "Registration opens on the first of April.",
+                  "origin": "speech"
+                }
+              ],
+              "sourceSnapshotSHA256": "dbecda383edd5574a989bd469de5e8d994fa3a184e9655e99749c5ec7f48b0be",
+              "sourceMode": "exact-scoped-turn-excerpts"
+            }
+          },
+          "score": 0.95,
+          "reason": "fixture score; no calibration claim"
+        }
+      ],
+      "web_used": false,
+      "insufficient_coverage": false,
+      "sources": {
+        "internal": [
+          {
+            "node_id": "t/year:2026/month:10/session:s1",
+            "evidence": {
+              "sessionRef": "s1",
+              "sourceQuotes": [
+                {
+                  "id": "quote-ef79308b1fe1c65dd80d963c",
+                  "nodeId": "t/year:2026/month:10/session:s1",
+                  "sessionRef": "s1",
+                  "turnId": "s1-t001",
+                  "speakerRef": "speaker:fixture",
+                  "tStart": 3,
+                  "tEnd": 7,
+                  "charStart": 0,
+                  "charEnd": 41,
+                  "byteStart": 0,
+                  "byteEnd": 41,
+                  "turnTextSHA256": "79c7cde7b9647179c0e4248b894251a09c9e0a7d8d13d7cba6e7e7561c39da07",
+                  "sliceSHA256": "79c7cde7b9647179c0e4248b894251a09c9e0a7d8d13d7cba6e7e7561c39da07",
+                  "quote": "Registration opens on the first of April.",
+                  "origin": "speech"
+                }
+              ],
+              "sourceSnapshotSHA256": "dbecda383edd5574a989bd469de5e8d994fa3a184e9655e99749c5ec7f48b0be",
+              "sourceMode": "exact-scoped-turn-excerpts"
+            }
+          }
+        ],
+        "web": []
+      },
+      "answer": "Registration opens on the first of April.",
+      "auditLog": [
+        {
+          "jobKind": "ask.select_nodes",
+          "step": "select_nodes",
+          "provider": "offline",
+          "model": "fixture",
+          "costUsd": 0
+        },
+        {
+          "jobKind": "ask.source_hydrated",
+          "step": "1 source nodes; snapshot dbecda383edd5574a989bd469de5e8d994fa3a184e9655e99749c5ec7f48b0be; 378 source bytes"
+        },
+        {
+          "jobKind": "ask.score",
+          "step": "score",
+          "provider": "offline",
+          "model": "fixture",
+          "costUsd": 0
+        },
+        {
+          "jobKind": "ask.answer",
+          "step": "answer",
+          "provider": "offline",
+          "model": "fixture",
+          "costUsd": 0
+        },
+        {
+          "jobKind": "ask.answer",
+          "step": "answer",
+          "provider": "offline",
+          "model": "fixture",
+          "costUsd": 0
+        }
+      ]
+    },
+    "credibility": "internal",
+    "createdAt": "2026-10-14T21:20:54.300Z",
+    "flywheel": {
+      "version": 1,
+      "originalEvalRunId": "loss",
+      "gapId": "eval-gap-0f07fdb0d1b3c96b83fb7189c303460461d3279feebaa94d451f1b80005fc02e",
+      "requestId": "actual-composition",
+      "inputFingerprint": "a9e5d7f5540483055501fa969cd6f78f151cf8449c79682716b8fa4d8623ecc1",
+      "index": {
+        "sourceId": "t:fixture-digest",
+        "sessionId": "s1",
+        "sourceDigest": "fixture-digest",
+        "transcriptDigest": "43a1400c1d6109f6cccb3a402dd97c0981b332b07280b8bb5eb79023f4cbd9ff",
+        "turnCount": 1,
+        "turnIds": [
+          "s1-t001"
+        ],
+        "generation": "59cc4141-8327-445c-a8d9-fe10d36e64f8",
+        "treeDigest": "b2f79259cf98db96c5bcf197f6c264e07c9e75eb252356a5e5f120fa0feb5111",
+        "chunksDigest": "333a94d254b1db1a5299d252c142f99369acd6defd26ddc59c290c962411ef94",
+        "completedAt": "2026-10-14T21:20:54.280Z"
+      },
+      "comparison": "needs-review"
+    }
+  },
+  "original": {
+    "_id": "loss",
+    "tenantId": "t",
+    "question": "When does registration open?",
+    "counsellor": {
+      "name": "fixture judge"
+    },
+    "aiAnswer": {
+      "text": "I do not have the date.",
+      "sources": {
+        "internal": [],
+        "web": []
+      },
+      "insufficient_coverage": true
+    },
+    "counsellorAnswer": {
+      "text": "Registration opens on the first of April."
+    },
+    "score": {
+      "ai": 1,
+      "counsellor": 4
+    },
+    "credibility": "internal",
+    "createdAt": "2026-10-14T00:00:00.000Z"
+  }
+}

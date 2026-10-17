@@ -1,0 +1,66 @@
+{
+  "next_phase": {
+    "cost": null,
+    "tokens": 1000,
+    "active_s": 30,
+    "kind": "review"
+  },
+  "bootstrap_scope": "Source-reader cycle0 exact source plus current runtime transitive candidate; twelve scoped tests current; independent credential/resource boundary review",
+  "completion_reserve": true,
+  "completion_reserve_id": "source-connectors-vectorless/cycle0/6710b9aa265a472c7b6e172e2d632424b4e9beb0d5435dddcd3486d30751bb6c/resume1",
+  "reviewers": [
+    {
+      "cost": null,
+      "id": "vectorless_checker-wip-shared",
+      "budget_debit": {
+        "cost": null,
+        "tokens": 6000,
+        "active_s": 180
+      },
+      "tokens": null,
+      "active_s": null
+    },
+    {
+      "id": "source_reader_checker",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 90,
+        "cost": null,
+        "tokens": 2200
+      }
+    },
+    {
+      "id": "source_reader_checker-finalization",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "phase_kind": "finalization",
+      "completion_reserve_id": "source-connectors-vectorless/cycle0/6710b9aa265a472c7b6e172e2d632424b4e9beb0d5435dddcd3486d30751bb6c",
+      "budget_debit": {
+        "tokens": 800,
+        "active_s": 30,
+        "cost": null
+      }
+    }
+  ],
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": {
+    "reason": "Mandatory source resource/credential boundary review; historical shared debit preserved and centrally deduplicated; ratio unverified",
+    "limits": {
+      "cost": null,
+      "tokens": 10800,
+      "active_s": 360
+    },
+    "authority": "Root explicit same-checker resume1 admission: preparation30s1000 plus protected finalization30s800, cumulative360s10800"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "authority": "Root explicit current dispatch; SAME EXISTING300000 actual-token grant, no reset or extra grant.",
+  "old_checker_actual_total": 850752,
+  "maker_known_comparable_total": 3547712,
+  "known_ratio": 0.23980300542997854,
+  "cumulative_actual_total_ceiling": 1150752,
+  "historical_time_allocations": {
+    "prep": 40,
+    "author": 50,
+    "url_repair": 30,
+    "total": 120,
+    "actual_full_active_time": null
+  },
+  "fresh_finisher": {
+    "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher",
+    "launched": false,
+    "prospective_actual_tokens": 0
+  },
+  "author_phase": {
+    "actual_total_tokens": 100000,
+    "allocated_output_tokens": 600,
+    "active_s": 30,
+    "scope": "Mechanical puts[0] guard only; throw if missing. Exclusive __checker_probes__/collections-kind-identity.test.tsx current root-reported SHA prefix14ac546. Leave body assertions byte unchanged. Do not edit maker CuratedCollections.tsx/.test.tsx. STOP for broker one-case plus web semantic typecheck."
+  },
+  "manual_final_reserve": {
+    "actual_total_tokens": 200000,
+    "allocated_output_tokens": 1200,
+    "active_s": 30,
+    "admitted_now": false,
+    "requires": "GREEN affected one-case plus mandatory web semantic/validator receipts and later phase gate"
+  },
+  "new_total": {
+    "actual_tokens": 300000,
+    "allocated_output_tokens": 1800,
+    "active_s": 60
+  },
+  "prior_breaches_preserved": {
+    "author_delta": 238500,
+    "author_cap": 100000,
+    "url_repair_delta": 250965,
+    "url_repair_cap": 200000
+  },
+  "coordination_helper_cost": "Separate; excluded from comparable maker denominator.",
+  "source_or_test_or_review_launch": false
+}

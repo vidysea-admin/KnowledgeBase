@@ -1,0 +1,247 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "t059-canonical-vectorless-flywheel-receipt",
+    "cycle": 3,
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": "ec0f5401f54c80375bac7b38c7b0d82741400870a5e2f95db1a59545a12f61c6",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\receipts.ts",
+        "sha256": "770f3b7c14b60337a1f4fc64d86536b07b489af7938d9625ab01fb20672f5544"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\types.ts",
+        "sha256": "387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\workflow.ts",
+        "sha256": "1b0689155c395d7c86cce4586207830471c2b5bbce05eb4f14cdcab0d6e3273c"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\workflow.test.ts",
+        "sha256": "8a207d622caae38fb0635c81de28c2518729d6665840f19f4312fe42482d5f75"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\receipts.test.ts",
+        "sha256": "2113251e2068552341ad50e267e64af62a864155dd1621289fd29220d9e8cc4c"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [
+      {
+        "token_metric": "actual_total",
+        "id": "cycle3-planning-not-dispatched",
+        "active_s": 0,
+        "tokens": 0,
+        "cost": null,
+        "evidence": "Root reports old packet validation failed before dispatch; this row is a non-executed planning sentinel, not actual reviewer telemetry."
+      }
+    ],
+    "next_phase": {
+      "token_metric": "actual_total",
+      "kind": "review",
+      "active_s": 150,
+      "tokens": 130000,
+      "cost": null
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "t059-canonical-vectorless-flywheel-receipt/3/ec0f5401f54c80375bac7b38c7b0d82741400870a5e2f95db1a59545a12f61c6",
+    "completion_reserve_tokens": 50000,
+    "bootstrap_scope": "Only bound5file canonical lexical receipt source review,16sameepoch evidence, required minimal independent failure boundary; root startup authorization prerequisite.",
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 180000,
+      "cost": null
+    },
+    "escalation": {
+      "authority": "Root explicit current packet-repair instruction finite exception",
+      "reason": "Required production/data-write source authority independent review; maker full metrics unknown, root-reported native41k startup carried in review and completion allocations. All ratios unverified.",
+      "limits": {
+        "token_metric": "actual_total",
+        "active_s": 180,
+        "tokens": 180000,
+        "cost": null
+      }
+    }
+  },
+  "worker": {
+    "provider": "codex",
+    "executable": "C:/Users/product/AppData/Local/OpenAI/Codex/bin/9614f1d9b40d9c4f/codex.exe",
+    "runtime_identity": {
+      "native_host": "Codex desktop",
+      "executable": "C:/Users/product/AppData/Local/OpenAI/Codex/bin/9614f1d9b40d9c4f/codex.exe",
+      "startup_floor_root_reported_input_tokens": 41000,
+      "startup_floor_independently_reauthenticated": false,
+      "actual_total_hardcap_established": false,
+      "managed_launcher_supported_controls": false,
+      "dispatch_prerequisite": "Root must bind existing observed same-native-runtime startup receipt/identity and use authorized native scoped fresh-context reviewer; optional managed CLI launcher remains unsupported, no new probe authorized."
+    },
+    "timeout_s": 150,
+    "max_turns": 3,
+    "phase_id": "cycle3-independent-native-review-proposed",
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-review-prompt.txt",
+      "sha256": "6993b9ce962f02a4d2b77b760a18f05b7a64e53cd9b857fdfd459b96b22de379"
+    }
+  },
+  "readiness": {
+    "complete": true,
+    "mutation_required": false,
+    "receipts": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-canonical-mode-and-legacy-guards-receipt.json",
+        "sha256": "65c44d1a3d5d641df379705ef3e33b9d2c69185f535bccfc47672c518261f868",
+        "role": "green"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-canonical-mode-and-legacy-guards.log",
+        "sha256": "ea2fae694d993413902f05a3b706045d7395a583d57e6f46a836b29e370b7087",
+        "role": "green-output"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-HTTP-immediate-consumers-receipt.json",
+        "sha256": "140d20eae771505a4917805dad1904ce57ef3a75e34f6673931cf7791c9fd3e7",
+        "role": "green"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-HTTP-immediate-consumers.log",
+        "sha256": "527af53375f2b21085400b747f3d33de4f65c37d7daf31376945b69346070353",
+        "role": "green-output"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-immediate-consumers-deadlines-and-ledger-floor-receipt.json",
+        "sha256": "49712310d80d28591512b55fc47ae06b501e8663d15ea880898bbda2b72950bd",
+        "role": "green"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-immediate-consumers-deadlines-and-ledger-floor.log",
+        "sha256": "d269a9b1216d339fcfc86c362565829845b9f144016a727eb6a606d20f47dff9",
+        "role": "green-output"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-ORIGINAL-composition-receipt.json",
+        "sha256": "4a90410dcb3e71c326d01b171c5beab2e849f69f83c4c802bc1fcbff1c13cb3a",
+        "role": "green"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-ORIGINAL-composition.log",
+        "sha256": "ca3cdd8a88fe1ee5974bb29ec5fb4fe9f88bd986e0c4f8775a1dedbbf58e011b",
+        "role": "green-output"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-review-readiness.json",
+        "sha256": "f745bc409b91d2f48e0d670aedf6d9aa4f78730f4f2be160fdf630339c5dd1b3",
+        "role": "environment"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-packet.json",
+        "sha256": "aaf816b11e4bb591a4a4c4ad2bb27949ef791d2fa5c2ab6fa3b56373dc22cb78",
+        "role": "maker-packet"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t059.md",
+        "sha256": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+        "role": "contract"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-changes.diff",
+        "sha256": "f6b2c3a4a4b618b0512d38cdfba6ab5bcf92d07abd95a2a7196073f17ea608a9",
+        "role": "diff"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "canonical lexical indexing accepts initial retest and immutable replay",
+      "reason": "Mode trust, missing/mixed/stale artifact refusal and unchanged legacy vectors",
+      "boundary": "canonical-mode-and-legacy-guards"
+    },
+    {
+      "node": "canonical lexical replay rejects missing artifacts and mixed or stale generation",
+      "reason": "Mode trust, missing/mixed/stale artifact refusal and unchanged legacy vectors",
+      "boundary": "canonical-mode-and-legacy-guards"
+    },
+    {
+      "node": "caller vectorless flags cannot replace persisted canonical mode",
+      "reason": "Mode trust, missing/mixed/stale artifact refusal and unchanged legacy vectors",
+      "boundary": "canonical-mode-and-legacy-guards"
+    },
+    {
+      "node": "index artifact read rejects a changed source snapshot before Ask",
+      "reason": "Mode trust, missing/mixed/stale artifact refusal and unchanged legacy vectors",
+      "boundary": "canonical-mode-and-legacy-guards"
+    },
+    {
+      "node": "legacy vector receipt validation remains strict without canonical mode",
+      "reason": "Mode trust, missing/mixed/stale artifact refusal and unchanged legacy vectors",
+      "boundary": "canonical-mode-and-legacy-guards"
+    },
+    {
+      "node": "actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child",
+      "reason": "Actual intake/index/hydration/askV2 producer-to-consumer and immutable replay",
+      "boundary": "ORIGINAL-composition"
+    },
+    {
+      "node": "stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "concurrent attempt CAS and expired restart lock preserve exactly one accepted child",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "terminal CAS deadline preserves committed completion or fences a late CAS after recovery",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "storage read deadlines refuse without dispatch or recovery writes",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "source and index read deadlines keep the lease and never trigger index rebuild",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "child readback deadline preserves the persisted child and retry never repeats Ask",
+      "reason": "CAS/immutable child, original ledger replay and bounded read/terminal recovery",
+      "boundary": "immediate-consumers-deadlines-and-ledger-floor"
+    },
+    {
+      "node": "actual authenticated routes enforce all write scopes, tenant scope, body validation and gaps compatibility",
+      "reason": "Auth/tenant/private lifecycle immediate consumer",
+      "boundary": "HTTP-immediate-consumers"
+    },
+    {
+      "node": "unconfigured flywheel answers safe503 after scope validation, with no writes",
+      "reason": "Auth/tenant/private lifecycle immediate consumer",
+      "boundary": "HTTP-immediate-consumers"
+    },
+    {
+      "node": "actual shared createServer mount invokes the flywheel using the verified tenant",
+      "reason": "Auth/tenant/private lifecycle immediate consumer",
+      "boundary": "HTTP-immediate-consumers"
+    }
+  ],
+  "previous_receipt": null
+}

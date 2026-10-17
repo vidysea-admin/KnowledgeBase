@@ -1,0 +1,7 @@
+{
+  "authority": "root explicit fix2 frozen combined dependency binding",
+  "old_probe_sha256": "d3b2f373c8f37bef33b29a0dbf121b5dfc97732cb4b7ffdfb5fb31b71bf64abc",
+  "new_probe_sha256": "7e5ba947b14202fb8b3320e0c0ce8307873c6956a79ae91477de13b6d435db2d",
+  "fix_checkpoint_sha256": "bc6e8ccbe264d71c810a259d16a1f819e79ff0f2bf2859ef335ed1348a198593",
+  "sampler": "omitted; active central producer"
+}

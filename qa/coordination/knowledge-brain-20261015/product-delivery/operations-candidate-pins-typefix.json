@@ -1,0 +1,36 @@
+{
+  "algorithm": "sha256 of ordered relative path + TAB + lowercase raw-byte sha256 + LF per file, UTF8 no BOM",
+  "candidate_sha": "501290028dea2befc43b784ca18c703de4a349e4c9f02e43f289bb51df93db29",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "files": [
+    {
+      "path": "apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+      "sha256": "f098890d6d46e8bfb9bdc13a2df5d15cd74550bc2f8cc6249ac4b99d1cdcaa52"
+    },
+    {
+      "path": "apps/web/src/pages/operations/EvaluationFlywheelPanel.tsx",
+      "sha256": "ede2a2f240d6f1482eaa8b0264a6393b93f04ffe2f47baabf6aabe87030cf506"
+    },
+    {
+      "path": "apps/web/src/pages/operations/OperationsPage.tsx",
+      "sha256": "b413adeba679683f06d7d5eeb5dbf689275be2f30d2a033453dac2747709fa52"
+    },
+    {
+      "path": "apps/web/src/pages/operations/evaluationFlywheelModel.test.ts",
+      "sha256": "0139404b2a78596342441dc5db28f3c2e27303e3c524bfd3c699ef039957baf2"
+    },
+    {
+      "path": "apps/web/src/pages/operations/evaluationFlywheelModel.ts",
+      "sha256": "89a29eab74efb08f26e46cc1689bc63a433b01b4bc9fa6fc2d002c301443e052"
+    }
+  ],
+  "cycle": 0,
+  "phase": "test-only fixture type narrowing",
+  "supersedes_candidate": "2e566870a470392da307395afd070bfe31d3668e983953995444cf466e25de13",
+  "maker_phase_usage": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "accounting": "Separate genuine fixture build-fix phase; original comparison denominator not inflated. Prior runtime receipts historical for changed fixture. No local test runs."
+}

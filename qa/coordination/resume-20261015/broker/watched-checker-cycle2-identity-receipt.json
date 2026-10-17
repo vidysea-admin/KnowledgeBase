@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "-c",
+    "import sys,json,pathlib,importlib.util,subprocess; p=pathlib.Path(sys.argv[1]).resolve(); s=importlib.util.spec_from_file_location('contract_preflight',p); assert pathlib.Path(s.origin).resolve()==p;compile(p.read_bytes(),str(p),'exec'); x=subprocess.run(json.loads(sys.argv[2]),capture_output=True,text=True,timeout=2,check=True); print(json.dumps({'python':sys.executable,'version':sys.version,'contractOrigin':str(p),'git':x.stdout.splitlines()}))",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "[\"C:\\\\Program Files\\\\Git\\\\cmd\\\\git.EXE\", \"rev-parse\", \"HEAD\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:apps/api/src/connector-workflow/watched.ts\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/native-capture/server-watched.test.ts\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/native-capture/server.ts\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/watched-sources/host.test.ts\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/watched-sources/host.ts\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/watched-sources/README.md\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/watched-sources/supervisor.ts\", \"ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6:scripts/webinar/scheduler/service.d.mts\"]"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af.json",
+    "sha256": "85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af",
+    "count": 23
+  },
+  "beforeMatch": true,
+  "checkerAccounting": true,
+  "maxJobSeconds": 10,
+  "pid": 15100,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.3440000000009604,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-identity.log",
+    "sha256": "8365a5ca3d812e358fc5d4af712549bf86109689b16922cad73a6c5cf292516e"
+  },
+  "counts": {}
+}

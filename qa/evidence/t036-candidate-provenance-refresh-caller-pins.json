@@ -1,0 +1,41 @@
+{
+  "scope": "supplemental-static-caller-pins-not-runtime-proof",
+  "pins": [
+    {
+      "path": "apps/api/src/store.ts",
+      "sha256": "9D976378610A30D56AE12842F2D5024A1363206923DD56325F8E839BEAF45907"
+    },
+    {
+      "path": "apps/api/src/routes/meeting-candidates.ts",
+      "sha256": "10A5F6457B4405308F68D83B972F3D41DA0AE58EEF159CD749B96CB063125E21"
+    },
+    {
+      "path": "apps/api/src/gws/gws-gmail.ts",
+      "sha256": "81385D2E023C40BF9E5B75FD592BBF901327FFF08A985CEC160281D42E28C455"
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "FABF236621196871D176327BEA99D1C030FE5BEB888829490B10F8E6373C0B5E"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "sha256": "5730F4AEB2086999EBE08E81A729055DB118D9A42EFD3E425AE7572EAA2328D2"
+    },
+    {
+      "path": "packages/core/src/domain/sender-authentication.ts",
+      "sha256": "D2475FC7FE1D79C593993AFB069E8329052B9BC18469570F8A04C590D4A040E4"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "B8823BA189D4C92ED4BDC44E9F654D317FA699654E5B0832F1EA7EACC5CE7174"
+    },
+    {
+      "path": "packages/core/src/domain/webinar-types.ts",
+      "sha256": "B0D4489E833E2734F3034356ADD7D2F1C96714895DB7F19888176160D4709760"
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/schedule-loaders.ts",
+      "sha256": "D87F073C1B78CF13630F063CDC897DE7F5E27294487E236A2AA49DE8830F8F35"
+    }
+  ]
+}

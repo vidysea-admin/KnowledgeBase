@@ -1,0 +1,33 @@
+{
+  "consumedUtc": "2026-10-14T22:23:15.8285607Z",
+  "receipts": [
+    {
+      "name": "generation-focused",
+      "exit": 0,
+      "elapsedMs": 3081.18,
+      "sourcePins": 64,
+      "currentBytesMatched": true,
+      "receipt": "final-generation-focused-receipt.json"
+    },
+    {
+      "name": "isolated-history-dom",
+      "exit": 0,
+      "elapsedMs": 2062.8364,
+      "sourcePins": 10,
+      "currentBytesMatched": true,
+      "receipt": "final-isolated-history-dom-receipt.json"
+    },
+    {
+      "name": "isolated-editor-dom-standing",
+      "exit": 0,
+      "elapsedMs": 2200.3967000000002,
+      "sourcePins": 10,
+      "currentBytesMatched": true,
+      "receipt": "final-isolated-editor-dom-standing-receipt.json"
+    }
+  ],
+  "realMongo": false,
+  "browser": false,
+  "fullParentVerified": false,
+  "localProcessHandles": []
+}

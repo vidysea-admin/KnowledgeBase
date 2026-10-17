@@ -1,0 +1,214 @@
+{
+  "validation_contract": "managed-review/1",
+  "status": "SOURCE_FROZEN_BROKER_REQUESTED_CHECKER_PENDING",
+  "slug": "t059-canonical-vectorless-flywheel-receipt",
+  "fix_cycle": 3,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "candidate_identity": "Working-tree patch with exact SHA256 map; no commit created",
+  "priority": "high; root-authorized production plan gap; tier3 roadmap continuation",
+  "authority": "Root exact receipts/types/workflow and relevant test leases; store READONLY retained",
+  "changed_paths": [
+    "apps/api/src/evaluation-flywheel/receipts.ts",
+    "apps/api/src/evaluation-flywheel/types.ts",
+    "apps/api/src/evaluation-flywheel/workflow.ts",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts",
+    "apps/api/src/evaluation-flywheel/receipts.test.ts"
+  ],
+  "untracked_paths": [
+    "apps/api/src/evaluation-flywheel/receipts.test.ts"
+  ],
+  "hashes": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "4715f0d803840bd5ea4a25de9efc59d3d71c98ec0a3919474270102ed7950175",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "b173a8fc29efae214ca06a2e7f97a0f99b73cd11036d1ef4b6e8961ddd98180a",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "1b0689155c395d7c86cce4586207830471c2b5bbce05eb4f14cdcab0d6e3273c",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "8a207d622caae38fb0635c81de28c2518729d6665840f19f4312fe42482d5f75",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "apps/api/src/evaluation-flywheel/receipts.ts": "770f3b7c14b60337a1f4fc64d86536b07b489af7938d9625ab01fb20672f5544",
+    "apps/api/src/evaluation-flywheel/types.ts": "387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030",
+    "apps/api/src/evaluation-flywheel/receipts.test.ts": "2113251e2068552341ad50e267e64af62a864155dd1621289fd29220d9e8cc4c",
+    "apps/api/src/evaluation-flywheel/store.ts": "bc5896226b0dab2f27d2e808a3153d7fd8bd62109abd93ab575b25115104ea8a",
+    "apps/api/src/indexing/generation.ts": "f03c53bf95eeb6bb440a483815a622b5e355313628385ede1a4c6ffddc42dd8b"
+  },
+  "raw_diff": "cycle3-changes.diff",
+  "before_backups": [
+    "cycle3-receipts.ts.before.bytes",
+    "cycle3-types.ts.before.bytes",
+    "cycle3-workflow.ts.before.bytes",
+    "cycle3-workflow.test.ts.before.bytes"
+  ],
+  "preserved_composition_hash": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+  "contract_path": "qa/contracts/goal-t059.md",
+  "applicable_clauses": [
+    "S3 tenant/auth boundary",
+    "S5 failure-safe transitions, persisted identity and replay",
+    "S8 accepted current canonical indexing",
+    "S9 original-question Ask composition",
+    "S10 immutable child lineage",
+    "S12 sanitized observable failures/deadlines",
+    "S13 actual immediate producer/consumer compatibility",
+    "S15 frozen evidence and independent handshake"
+  ],
+  "behavior": "Canonical persisted completed session attempt determines vector/vectorless mode; validate generation/source/session/turn digest/count, manifest chunk identities/digests and bindings, tree revision/session binding, exact lexical plans/content IDs/ordered refs and absent embeddings. Historical no-attempt/manifest-mode-absent records retain strict vector-only checks; caller mode is a consistency check only. Workflow uses same path initial/replay/pre/post Ask, bracketing indexedRows read with identical sourceRows snapshots. No persisted mode/schema/store changes.",
+  "immediate_consumers": [
+    "workflow initial/retry/historical replay",
+    "actual production intake/index/hydration/askV2 composition",
+    "authenticated HTTP retest/gap/child consumers"
+  ],
+  "boundaries": [
+    "No vector field-presence mode inference",
+    "Canonical lexical chunks never require/fabricate embeddings",
+    "Invalid/stale generation or mixed mode refuses; no schema backfill/default-to-lexical",
+    "No production guard weakening, changed source transcript or receipt digest accepted",
+    "Snapshot comparison detects changed source metadata during read; no claim new native DB transaction atomicity",
+    "Historical ISS-T059REPLAY-001 exact standing case retained; no issue-close claim"
+  ],
+  "requests": [
+    {
+      "label": "canonical-mode-and-legacy-guards",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(canonical\\ lexical\\ indexing\\ accepts\\ initial\\ retest\\ and\\ immutable\\ replay|canonical\\ lexical\\ replay\\ rejects\\ missing\\ artifacts\\ and\\ mixed\\ or\\ stale\\ generation|caller\\ vectorless\\ flags\\ cannot\\ replace\\ persisted\\ canonical\\ mode|index\\ artifact\\ read\\ rejects\\ a\\ changed\\ source\\ snapshot\\ before\\ Ask|legacy\\ vector\\ receipt\\ validation\\ remains\\ strict\\ without\\ canonical\\ mode)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts",
+        "apps/api/src/evaluation-flywheel/receipts.test.ts"
+      ],
+      "testIDs": [
+        "canonical lexical indexing accepts initial retest and immutable replay",
+        "canonical lexical replay rejects missing artifacts and mixed or stale generation",
+        "caller vectorless flags cannot replace persisted canonical mode",
+        "index artifact read rejects a changed source snapshot before Ask",
+        "legacy vector receipt validation remains strict without canonical mode"
+      ],
+      "expectedSelected": 5,
+      "outerTimeoutMs": 60000
+    },
+    {
+      "label": "ORIGINAL-composition",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual\\ source\\ intake\\ \\->\\ grounded\\ indexSession\\ \\->\\ request\\-bound\\ source\\ hydration/askV2\\ \\->\\ immutable\\ child)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/composition.test.ts"
+      ],
+      "testIDs": [
+        "actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child"
+      ],
+      "expectedSelected": 1,
+      "outerTimeoutMs": 60000
+    },
+    {
+      "label": "immediate-consumers-deadlines-and-ledger-floor",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(stored\\ loss\\ creates\\ stable\\ tenant\\-linked\\ gap;\\ separate\\ unscored\\ retest\\ preserves\\ original\\ and\\ consumers|concurrent\\ attempt\\ CAS\\ and\\ expired\\ restart\\ lock\\ preserve\\ exactly\\ one\\ accepted\\ child|terminal\\ CAS\\ deadline\\ preserves\\ committed\\ completion\\ or\\ fences\\ a\\ late\\ CAS\\ after\\ recovery|ISS\\-T059REPLAY\\-001\\ recorded\\ historical\\-request\\ replay\\ returns\\ first\\ without\\ changing\\ newer\\ head|storage\\ read\\ deadlines\\ refuse\\ without\\ dispatch\\ or\\ recovery\\ writes|source\\ and\\ index\\ read\\ deadlines\\ keep\\ the\\ lease\\ and\\ never\\ trigger\\ index\\ rebuild|child\\ readback\\ deadline\\ preserves\\ the\\ persisted\\ child\\ and\\ retry\\ never\\ repeats\\ Ask)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ],
+      "testIDs": [
+        "stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers",
+        "concurrent attempt CAS and expired restart lock preserve exactly one accepted child",
+        "terminal CAS deadline preserves committed completion or fences a late CAS after recovery",
+        "ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head",
+        "storage read deadlines refuse without dispatch or recovery writes",
+        "source and index read deadlines keep the lease and never trigger index rebuild",
+        "child readback deadline preserves the persisted child and retry never repeats Ask"
+      ],
+      "expectedSelected": 7,
+      "outerTimeoutMs": 60000
+    },
+    {
+      "label": "HTTP-immediate-consumers",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual\\ authenticated\\ routes\\ enforce\\ all\\ write\\ scopes,\\ tenant\\ scope,\\ body\\ validation\\ and\\ gaps\\ compatibility|unconfigured\\ flywheel\\ answers\\ safe503\\ after\\ scope\\ validation,\\ with\\ no\\ writes|actual\\ shared\\ createServer\\ mount\\ invokes\\ the\\ flywheel\\ using\\ the\\ verified\\ tenant)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/router.test.ts"
+      ],
+      "testIDs": [
+        "actual authenticated routes enforce all write scopes, tenant scope, body validation and gaps compatibility",
+        "unconfigured flywheel answers safe503 after scope validation, with no writes",
+        "actual shared createServer mount invokes the flywheel using the verified tenant"
+      ],
+      "expectedSelected": 3,
+      "outerTimeoutMs": 60000
+    }
+  ],
+  "broker_safe_env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "environment_names": [
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "T054_AUTHENTIC_INPUT_OPT_IN",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN"
+  ],
+  "temp_parent": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\tmp",
+  "temp_writability_probe": "PASS byte probe create/read/delete",
+  "preflight_required": [
+    "Use existing compatible bundled runtime; record executable/version/hash and tsx import containment before test execution",
+    "Set TMP/TEMP to provided writable temp parent; retain exact cwd, safe environment fingerprint, lock/import hashes",
+    "Execute only serial broker commands with external timeout; preserve original historical rows before composition and restore/byte-compare on every exit",
+    "Fingerprint all pins before/after; keep original failure receipts immutable; save attributable full stdout/stderr, exit/count/time and restoration receipts"
+  ],
+  "remaining_mandatory_gates": [
+    "All fresh requested broker receipts",
+    "Central affected API typecheck and contracts/verify_contracts.py; required original T059 verification policy retained",
+    "Independent checker source/failure-boundary verification and explicit verdict, under current runtime/budget authorization",
+    "Full T059 source/live/human criteria remain HOLD"
+  ],
+  "previous_receipts_reusable": false,
+  "reuse_reason": "workflow/receipts/types changed; prior green fixture/workflow receipts retained as historical only, no same-candidate reuse claim. Helpers unchanged directly but import changed workflow; broker may require fresh fixture helper3 as dependency risk.",
+  "maker_usage": {
+    "token_metric": "actual_total",
+    "actual_total_tokens": null,
+    "actual_active_seconds": null,
+    "actual_cost": null,
+    "children": [],
+    "phase_metrics": [
+      "cycle3-edit-phase-metrics.json",
+      "cycle3-regression-phase-metrics.json",
+      "cycle3-packet-phase-metrics.json"
+    ],
+    "note": "Only monotonic script phases instrumented; reasoning/read/edit totals unknown. Earlier cycle costs remain unknown, not reset or credited."
+  },
+  "checks_run_here": {
+    "tests": 0,
+    "builds": 0,
+    "scoped_git_diff_check": "exit0; existing LF/CRLF git warnings only"
+  },
+  "ledger": {
+    "union_scanned": "qa/issues.jsonl and qa/issues.*.jsonl",
+    "issue": "ISS-T059REPLAY-001",
+    "recorded_cases": 1,
+    "executed": 0,
+    "reason": "Not an issue-fix claim; standing exact recorded-replay node requested as fixture consumer regression. Broker execution pending."
+  },
+  "seam_cap": "Data-write/tenancy acceptance seam uncapped per goal-t059 contract; historical broader PASS1, no current unit PASS claimed."
+}

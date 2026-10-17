@@ -1,8 +1,8 @@
 # docker-compose.yml — local/production packaging for @lkb/api and @lkb/web.
 #
 # Mongo is NOT containerized here on purpose: production data lives in the real shared cluster
-# (`MONGODB_URL` in .env, database `lkb` only — see ARCHITECTURE.md / D-003 on why this repo
-# never touches any other database on that cluster). `local-mongo` below is an OPT-IN profile for
+# (`MONGODB_URL` in .env). D-173 requires an explicit approved staging target for acceptance;
+# production `lkb` retains its separate opt-in. `local-mongo` below is an OPT-IN profile for
 # a fully offline dev loop against empty local data, never started by a plain `docker compose up`.
 services:
   # One-shot schema migration (migrate-mongo up). OPT-IN: it sits behind the `migrate` profile, so
@@ -49,13 +49,19 @@ services:
       - "3300:3300"
     environment:
       MONGODB_URL: ${MONGODB_URL:?set MONGODB_URL (see .env's MONGODB_URL)}
-      # Set EXPLICITLY (ISS-LEGACYSEED-009): the api refuses to start without a database name and has no
-      # default. Production is `lkb`; it is written here, not inherited from a fallback.
-      MONGODB_DB: lkb
+      # D-173: the caller must name the target; staging never silently writes to production.
+      MONGODB_DB: ${MONGODB_DB:?set MONGODB_DB explicitly (use an approved staging database for acceptance)}
+      LKB_I_KNOW_THIS_IS_PRODUCTION: ${LKB_I_KNOW_THIS_IS_PRODUCTION:-}
+      LKB_ALLOW_STAGING: ${LKB_ALLOW_STAGING:-}
       # The web origin (WEB_PORT) must be listed here: nginx has no /api proxy, so the browser
       # calls api directly (cross-origin).
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}
-      GEMINI_API_KEY: ${GEMINI_API_KEY:?set GEMINI_API_KEY}
+      # Text uses Ollama Cloud; Gemini remains optional until an audio task needs it.
+      OLLAMA_API_KEY: ${OLLAMA_API_KEY:?set OLLAMA_API_KEY}
+      OLLAMA_CLOUD_BASE_URL: ${OLLAMA_CLOUD_BASE_URL:-https://ollama.com}
+      OLLAMA_CLOUD_MODEL: ${OLLAMA_CLOUD_MODEL:-glm-5.3-flash}
+      OLLAMA_CLOUD_VERIFIER_MODEL: ${OLLAMA_CLOUD_VERIFIER_MODEL:-deepseek-v4.1-flash}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       PORT: 3300
     restart: unless-stopped
 

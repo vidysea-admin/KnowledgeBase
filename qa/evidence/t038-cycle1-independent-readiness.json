@@ -1,0 +1,15 @@
+{
+  "pins": 66,
+  "drift": [
+    "packages/meeting-bot/src/capture/record-commands.ts",
+    "packages/meeting-bot/src/capture/record-finalize.ts",
+    "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.ts"
+  ],
+  "runtime_hash_matches": true,
+  "env_matches": true,
+  "candidate_matches": false,
+  "receipt_hash": "6cbfb1bff702801b1695fa265d64ccbdf1c46c0039f1ed1467117eb40d6f1adb",
+  "source_import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "runtime": "v24.19.0",
+  "temp_writable": true
+}

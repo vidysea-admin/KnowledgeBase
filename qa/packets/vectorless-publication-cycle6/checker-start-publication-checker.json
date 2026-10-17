@@ -1,0 +1,10 @@
+{
+  "unit": "vectorless-publication",
+  "cycle": 6,
+  "checker": "publication_checker",
+  "monotonic_frequency": 10000000,
+  "utc_start": "2026-10-15T08:55:02.5744222Z",
+  "allocated_active_seconds": 180,
+  "monotonic_start_ticks": 185924511856,
+  "allocated_tokens": 6000
+}

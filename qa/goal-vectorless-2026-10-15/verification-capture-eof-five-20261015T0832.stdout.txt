@@ -1,0 +1,33 @@
+✔ private raw clock unavailable refuses before encoder/extraction even when a remux exists (106.0517ms)
+[bot] private masked derivative verified: 635904 bytes, 12.202667s, 187.6 MB/h; original 3079019 bytes retained; encode 2208ms
+[bot] audio → C:\Users\product\AppData\Local\Temp\capture-eof-consumer-73TwNf\raw\webinars\capture-eof.public-f47d1239-47fe-4f85-8726-500c44071185.m4a
+[bot] audio level: max -8 dB, mean -28.9 dB
+[bot] registered session capture-eof
+{"scenario":"private-eof","sourceSha256":"d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7","sourceDuration":12,"outputDuration":12.202667,"tailPeakDb":-91,"originalUnchanged":true}
+✔ actual finalizer preserves exact original12s clock: private-eof (3374.1556ms)
+[bot] private masked derivative verified: 757512 bytes, 12.202667s, 223.5 MB/h; original 3079019 bytes retained; encode 1755ms
+[bot] audio → C:\Users\product\AppData\Local\Temp\capture-eof-consumer-ErPN3i\raw\webinars\capture-eof.public-5a0b2353-4a32-4467-9d93-f205c19617b3.m4a
+[bot] audio level: max -8 dB, mean -28.8 dB
+[bot] registered session capture-eof
+{"scenario":"closed-private-public-tail","sourceSha256":"d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7","sourceDuration":12,"outputDuration":12.202667,"tailPeakDb":-17.8,"originalUnchanged":true}
+✔ actual finalizer preserves exact original12s clock: closed-private-public-tail (2410.6862ms)
+[bot] private masked derivative verified: 635904 bytes, 12.202667s, 187.6 MB/h; original 3079019 bytes retained; encode 1786ms
+[bot] audio → C:\Users\product\AppData\Local\Temp\capture-eof-consumer-xs9omw\raw\webinars\capture-eof.public-650c6f17-20ae-40cd-a667-c1ff879781d7.m4a
+[bot] audio level: max -8 dB, mean -28.9 dB
+[bot] registered session capture-eof
+{"scenario":"raw-remux-private-eof","sourceSha256":"d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7","sourceDuration":12,"outputDuration":12.202667,"tailPeakDb":-91,"originalUnchanged":true}
+✔ actual finalizer preserves exact original12s clock: raw-remux-private-eof (2670.5161ms)
+[bot] private masked derivative verified: 757512 bytes, 12.202667s, 223.5 MB/h; original 3079019 bytes retained; encode 1731ms
+[bot] audio → C:\Users\product\AppData\Local\Temp\capture-eof-consumer-yV9Lq0\raw\webinars\capture-eof.public-091d28ed-a0df-4ce0-b8a2-6226fae2601f.m4a
+[bot] audio level: max -8 dB, mean -28.8 dB
+[bot] registered session capture-eof
+{"scenario":"raw-remux-closed-public-tail","sourceSha256":"d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7","sourceDuration":12,"outputDuration":12.202667,"tailPeakDb":-17.8,"originalUnchanged":true}
+✔ actual finalizer preserves exact original12s clock: raw-remux-closed-public-tail (2590.9105ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11525.0443

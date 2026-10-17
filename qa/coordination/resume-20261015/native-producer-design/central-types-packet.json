@@ -1,0 +1,61 @@
+{
+  "unit": "native-tab-clock-shared-types",
+  "cycle": 0,
+  "status": "SOURCE_FROZEN_NOT_CHECKED",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "tier": 3,
+  "authority": "Root explicit exclusive central writer lease after interface-v1/design ACK; no shared joins authorized",
+  "source": {
+    "path": "packages/meeting-bot/src/capture/native-media-types.ts",
+    "base": "New untracked path; no base file existed",
+    "sha256": "022057B6A629EEC111C3BAFC4D9FEFE39119DA55EE87A7F1F2EBA7C3EE7F1B77"
+  },
+  "designs": [
+    "qa/coordination/resume-20261015/native-producer-design/interface-v1.md",
+    "qa/coordination/resume-20261015/native-producer-design/design.md"
+  ],
+  "change": "Readonly versioned identity, video/audio observations, explicit clock brackets/units/unknown uncertainty, receiver file metadata, opaque closed spool capability and decoded stream/interval transformation receipts. Declarations only; no runtime issuer, validator or public native flag.",
+  "opaqueLimit": "Module-private declared unique-symbol property stops ordinary structural construction. Type casts are not runtime protection. Codec receiver private close/readback implementation alone attests the capability after actual checks; browser wire JSON never grants it.",
+  "exports": [
+    "NativeCaptureIdentity",
+    "ProducerVideoObservation",
+    "ProducerAudioObservation",
+    "AudioClockPair",
+    "EpochClockBracket",
+    "HostClockPair",
+    "NativeClockUncertainty",
+    "NativeSpoolFile",
+    "ClosedNativeSpool",
+    "RationalTimebase",
+    "DecodedStreamIdentity",
+    "DecodedMediaIdentity",
+    "DecodedIntervalMap",
+    "DecodedTransformReceipt"
+  ],
+  "consumers": [
+    "native_codecledger_maker",
+    "native_browserproducer_maker",
+    "native_finalizer_maker"
+  ],
+  "consumerNotification": "Exact immutable SHA and field summaries delivered directly to all three named makers. Field issues go through root; no duplicate issuer/declarations.",
+  "checks": {
+    "executed": "Raw SHA256 and git status on new source only; no runtime test/compiler/provider/browser/DB operation",
+    "required": "Sole broker compiles frozen consumer units together. Runtime validations and decoder evidence belong respective makers. No checker PASS or parent acceptance."
+  },
+  "decisionAssessment": {
+    "appendRequiredForThisTypeImplementation": false,
+    "basis": "D-170 authorizes ordinary application modules/focused tests across remaining tasks; root explicit native-tab-clock/1 ACK supplies scoped implementation authorization. No frozen architecture/contracts, enforcement paths, dependency or schema changes requested. Types implement a measurement hypothesis rather than declaring platform proof.",
+    "optionalScopedProposal": {
+      "type": "session",
+      "status": "ACTIVE",
+      "supersedes": "none",
+      "what": "Record the root-approved native-tab-clock/1 experimental production-chain implementation and exclusive source boundaries.",
+      "result": "Source implementation and offline validation only; no native readiness, browser/host activation, measured uncertainty or full T042 acceptance. No ARCHITECTURE changes authorized.",
+      "id": "Current visible maximum D-177, candidate D-178 must be revalidated against live/archive IDs by append helper immediately before append.",
+      "entryFile": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/native-producer-design/decision-entry.md",
+      "command": "powershell -ExecutionPolicy Bypass -File scripts/append_decision.ps1 -EntryFile C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/native-producer-design/decision-entry.md -RepoRoot C:/Users/product/Desktop/KnowledgeBase",
+      "state": "Proposal only; entry not written and append not executed"
+    }
+  },
+  "accounting": "Source preparation active usage/time not measured; unknown. No measured efficiency claim."
+}

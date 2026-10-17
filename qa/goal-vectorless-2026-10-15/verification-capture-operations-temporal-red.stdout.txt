@@ -1,0 +1,81 @@
+✔ absent evidence and self assertions remain HOLD (2.063ms)
+✔ all operational gates are explicitly required (2.653ms)
+✔ receipt signature binds role, payload and identity using separately supplied trust (8.4081ms)
+✔ signed local policy fixture exercises every gate without claiming native evidence (9.0687ms)
+✖ signed evidence refuses future nested tab intervals (6.4386ms)
+✖ signed evidence refuses tabs before their gate interval (5.6274ms)
+✖ signed evidence refuses tabs ending after their gate interval (4.8141ms)
+✔ signed evidence refuses reversed nested tab event order (5.1416ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 5
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 227.93
+
+✖ failing tests:
+
+test at scripts\qa\capture-operations-acceptance.test.mjs:73:4
+✖ signed evidence refuses future nested tab intervals (6.4386ms)
+  AssertionError [ERR_ASSERTION]: future nested tab intervals
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/qa/capture-operations-acceptance.test.mjs:75:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts\qa\capture-operations-acceptance.test.mjs:73:4
+✖ signed evidence refuses tabs before their gate interval (5.6274ms)
+  AssertionError [ERR_ASSERTION]: tabs before their gate interval
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/qa/capture-operations-acceptance.test.mjs:75:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at scripts\qa\capture-operations-acceptance.test.mjs:73:4
+✖ signed evidence refuses tabs ending after their gate interval (4.8141ms)
+  AssertionError [ERR_ASSERTION]: tabs ending after their gate interval
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/qa/capture-operations-acceptance.test.mjs:75:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

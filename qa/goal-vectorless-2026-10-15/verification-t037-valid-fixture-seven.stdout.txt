@@ -1,0 +1,15 @@
+✔ saved automatic identity reaches claimed capture argv; retry rechecks newly saved rules and writes no state (44.877ms)
+✔ source-id, session-key, meeting optout and current organizer/domain deny added after save refuse capture (154.5188ms)
+✔ missing or foreign tenant/key and unsupported automatic rule modes refuse before capture (111.1511ms)
+✔ ISS-ALERTTENANT-001: untagged and other-tenant saved jobs refuse without rewriting or deleting (56.096ms)
+✔ legacy, malformed, forged, mismatched and traversal scheduled identities never reach capture (294.1789ms)
+✔ dispatch snapshot fallback respects original exclusive one-hour bound and preserves bytes/mtime (174.8388ms)
+✔ actual schedule tick persists selected source identity consumed by later deny gate (80.2264ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1393.3457

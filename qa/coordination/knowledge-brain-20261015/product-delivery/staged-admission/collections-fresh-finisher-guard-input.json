@@ -1,0 +1,81 @@
+{
+  "unit": "collections-bounded-choice-retention",
+  "cycle": 0,
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_files_sha256": {
+    "apps/web/src/pages/knowledge/CuratedCollections.tsx": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+    "apps/web/src/pages/knowledge/CuratedCollections.test.tsx": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3"
+  },
+  "completion_reserve": false,
+  "completion_reserve_id": "collections-bounded-choice-retention/c0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a/6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+  "maker": {
+    "active_s": null,
+    "tokens": 3547712,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "collections_independent_checker",
+      "active_s": null,
+      "tokens": 850752,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 120
+      },
+      "note": "All old checker observed actual tokens and prior40+50+30 time allocations preserved; full actual active unknown."
+    },
+    {
+      "id": "collections_fresh_finisher-prospective-not-launched",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null,
+      "note": "Prospective exact new child; no dispatch/work yet. Does not reset old checker charges."
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 30,
+    "tokens": 100000,
+    "cost": null
+  },
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 1150752,
+    "cost": null
+  },
+  "bootstrap_scope": "Exact existing300k fresh-finisher finite grant, mechanical missing puts[0] guard only, then STOP before broker. Body assertions remain byte unchanged; no maker production files touched.",
+  "escalation": {
+    "authority": "Root explicit finite grant continuation 2026-10-15; existing300k actual total, no new/reset allocation.",
+    "reason": "Mandatory independent proof: newly authored QA probe needs missing captured PUT guard for semantic typecheck, preserving assertions. Prior actual-token misses remain explicit; remaining final reserve only on GREEN.",
+    "limits": {
+      "active_s": 180,
+      "tokens": 1150752,
+      "cost": null
+    }
+  },
+  "legacy_output_allocations_separate": {
+    "prep": 1000,
+    "author": 1200,
+    "url_repair": 1200,
+    "fresh_guard": 600,
+    "future_final": 1200,
+    "note": "Output allocations remain separate from ACTUAL total tokens."
+  },
+  "manual_final_reserve": {
+    "actual_total_tokens": 200000,
+    "allocated_output_tokens": 1200,
+    "active_s": 30,
+    "admitted_now": false,
+    "requires": "GREEN affected one-case plus mandatory web semantic/validator receipts and later phase gate"
+  },
+  "history": {
+    "post_url_repair": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/post-urlrepair-actual-2026-10-15T11-20-21-180Z.json",
+    "prior_actual_author": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-bounded-choice-retention-actual-author-input.json",
+    "prior_url_repair": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-url-repair-actual-input.json",
+    "prior_breaches_preserved": true
+  },
+  "known_current_token_ratio": 0.23980300542997854,
+  "token_target_missed": true,
+  "authority_companion": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-fresh-finisher-guard-authority.json",
+  "coordination_helper_cost": "Separate; no maker denominator increase."
+}

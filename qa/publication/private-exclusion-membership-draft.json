@@ -1,0 +1,993 @@
+{
+  "schemaVersion": 2,
+  "nonQaProposalsRequireExactOwnerResolution": [
+    "apps/api/src/calibration-review/router.test.ts",
+    "apps/api/src/championship/runtime.ts",
+    "apps/web/src/pages/championship/ChampionshipPage.tsx",
+    "data/eval/calibration-human-review.json",
+    "data/eval/t022-offline-review.html",
+    "data/eval/t022-review-package.html",
+    "docs/championship-event-inputs.md",
+    "docs/championship-workflow.md",
+    "docs/own-model-training.md",
+    "docs/t059-evaluation-flywheel.md",
+    "scripts/eval/human-calibration.test.mjs",
+    "scripts/eval/u010-baseline-run.test.mjs"
+  ],
+  "rejectedLocalCandidate": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "publishedHistoryRewriteAuthorized": false,
+  "pushAuthorized": false,
+  "pendingOwnerLists": [
+    "grounding-T042-and-T054-final-exact-qa-list"
+  ],
+  "ownerMetadataSources": [
+    "qa/goal-2026-10-14/ops-family-public-qa-reclassification.json",
+    "qa/goal-2026-10-14/roadmap-family-publication-privacy-audit.json",
+    "qa/publication/implementation-status-public-qa.json",
+    "qa/publication/runtime-confirmed-private-qa-exclusions.json"
+  ],
+  "status": "qa-exclusion-membership-complete-source-blockers-unresolved",
+  "baseline": "ed542fd01c870e5d5b64e1d72b413062d595f675",
+  "qaExclusions": [
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t007-review-source.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t008.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t014.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t015.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t022-offline-review.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t022.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-t043.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-T044.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-u010.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-u22.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/goal-u32.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/contracts/t044-trusted-private-windows.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": true,
+      "cleanRangeAction": "preserve-published-baseline-bytes-exclude-new-private-delta",
+      "path": "qa/contracts/whatsapp-ingestion-first-slice.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": true,
+      "cleanRangeAction": "preserve-published-baseline-bytes-exclude-new-private-delta",
+      "path": "qa/evidence/calendar-gmail-review-after-approve.png",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": true,
+      "cleanRangeAction": "preserve-published-baseline-bytes-exclude-new-private-delta",
+      "path": "qa/evidence/calendar-gmail-review.png",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t014-checker-prerequisites-review.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-checker-cycle0-verdict.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-checker-cycle1-dependency-hold.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-checker-cycle1-source-pass.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-existing-metadata-closure.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-existing-metadata-config.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-existing-recovery-preflight-initial.mjs",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-existing-recovery-preflight.mjs",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t015-real-config.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t022-checker-mount.mjs",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t022-offline-review-pins.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t022-offline-review-readiness-gate.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t022-offline-review-spec.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t028-cycle1-verdict-preserved.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t036-dependency-pins.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t043/v3-consumer-cycle1/original-red.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t043/v3-consumer-cycle1/replay-spec.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t013-web.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t013-web.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t028-t060-mounted-independent4.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t041-maker.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t041-maker.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t050-core-A.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t058-api-corrected.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t058-api-corrected.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t058-api.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t058-api.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t058-independent.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t058-ui.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t060-maker.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t060-retention-factory.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t061-backend.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t061-ui.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t051checker-broker-t061-ui.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t059-checker-cycle0-fail.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t059-checker-prerequisites-20261015.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t059-maker/live-prerequisites-20261015.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-t060-cycle0-HOLD.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-u010-checker-admissibility.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-u010-checker.test.mjs",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-u010-maker/admissibility-reconciliation.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-u010-maker/admissibility-reconciliation.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/goal-u010-maker/provider-input-inventory.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-current-20261014T234824Z.receipt.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.receipt.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/t044-trusted-private-windows/checker-public-whitelist.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3.finding.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/goal-t046/t046-retention-status-api-ui.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/goal-t046/web-test.stdout.txt",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/issues.goal-t015.jsonl",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/issues.T059REPLAY.jsonl",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/issues.U010CHECKPOINT.jsonl",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/issues.u23-cached-root.jsonl",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/issues.U24PROFILECHECK.jsonl",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t007.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t008.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t014.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t015.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t022-offline-review.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t022.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t043.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t050.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t055.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t058.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-t059.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u010.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u22.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u23-cached-root-taint.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u23.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u25-consumer.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u25.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/goal-u32.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/t044-qa-generation-binding.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/manifests/t044-trusted-private-windows.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": true,
+      "cleanRangeAction": "preserve-published-baseline-bytes-exclude-new-private-delta",
+      "path": "qa/manifests/t055-profiles.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": true,
+      "cleanRangeAction": "preserve-published-baseline-bytes-exclude-new-private-delta",
+      "path": "qa/manifests/whatsapp-ingestion-first-slice.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t007-review-source.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t007-visibility.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t007.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t008.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t013.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t014-actual-input.schema.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t014-actual-prerequisites.json",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t014.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t015.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t022-offline-review.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t022.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t028.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t043.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t050.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t053.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t055.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t058.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-t059.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u010-provider-plan.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u010.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u22.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u23-cached-root-taint.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u23.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u25-consumer.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u25.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/goal-u32.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/t044-qa-generation-binding.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/packets/t044-trusted-private-windows.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t007-review-source.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t013.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t015.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t022.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t058.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t059.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-t060.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-u010.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-u22.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-u23-cached-root-taint.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-u23.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-u25-consumer.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/goal-u25.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/t041-searchable-time-aligned-ocr.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/t044-qa-generation-binding.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/t044-trusted-private-windows.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": false,
+      "baselinePresent": false,
+      "cleanRangeAction": "omit-new-path-from-export-keep-local-original",
+      "path": "qa/verdicts/u24-speaker-profile.md",
+      "ownerClassifiedExclude": true
+    },
+    {
+      "unpublished5cPresent": true,
+      "baselinePresent": true,
+      "cleanRangeAction": "preserve-published-baseline-bytes-exclude-new-private-delta",
+      "path": "qa/verdicts/whatsapp-ingestion-first-slice.md",
+      "ownerClassifiedExclude": true
+    }
+  ],
+  "localOriginalsMustRemain": true
+}

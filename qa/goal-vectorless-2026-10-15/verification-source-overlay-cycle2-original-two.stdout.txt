@@ -1,0 +1,2 @@
+{"probe":"case-alias","platform":"win32","refused":true}
+{"probe":"new-required-after-capture","refused":true,"manifestPublished":false}

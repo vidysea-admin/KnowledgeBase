@@ -1,0 +1,45 @@
+{
+  "kind": "ROOT_ACTUAL_TOTAL_FINITE_AUTHOR_MANUAL_LEDGER",
+  "recorded_at": "2026-10-15T11:10:37.008Z",
+  "units": [
+    {
+      "slug": "collections-bounded-choice-retention",
+      "cycle": 0,
+      "input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-bounded-choice-retention-actual-author-input.json",
+      "result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-bounded-choice-retention-actual-author-result.json",
+      "ratio": 0.10183662033445781,
+      "ceiling": 561287,
+      "reserve": "collections-bounded-choice-retention/c0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a/6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97"
+    },
+    {
+      "slug": "product-speaker-relation-workbench",
+      "cycle": 2,
+      "input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-speaker-relation-workbench-actual-author-input.json",
+      "result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-speaker-relation-workbench-actual-author-result.json",
+      "ratio": 0.10875987537648522,
+      "ceiling": 520912,
+      "reserve": "product-speaker-relation-workbench/cycle-2/4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146"
+    },
+    {
+      "slug": "product-operations-evaluation",
+      "cycle": 0,
+      "input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-operations-evaluation-actual-author-input.json",
+      "result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-operations-evaluation-actual-author-result.json",
+      "ratio": 0.05512726579702792,
+      "ceiling": 677854,
+      "reserve": "product-operations-evaluation/cycle0/2e566870a470392da307395afd070bfe31d3668e983953995444cf466e25de13"
+    }
+  ],
+  "fresh_baseline": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z.json",
+  "prior_grants_preserved": true,
+  "author_only_stop_before_execution": true,
+  "external_final_reserve": {
+    "active_s": 30,
+    "actual_total_tokens": 100000,
+    "allocated_output_tokens": 800
+  },
+  "known_overruns_preserved": true,
+  "helper_native_completion_reserve": false,
+  "helper_cost_excluded_from_maker_denominator": true,
+  "review_launched": false
+}

@@ -42,5 +42,13 @@ export interface Claims {
       [k: string]: unknown;
     }[]
   ];
+  indexArtifact?: ClaimIndexArtifact;
   [k: string]: unknown;
+}
+export interface ClaimIndexArtifact {
+  version: 1;
+  generation: string;
+  sessionId: string;
+  sourceId: string;
+  turnDigest: string;
 }

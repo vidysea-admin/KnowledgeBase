@@ -73,3 +73,22 @@ test("the heartbeat decorator beats while a handler runs and stops when the stag
   const during = beats; await new Promise((d) => setTimeout(d, 100)); assert.equal(beats, during, "no heartbeats after the run ends");
   assert.ok(during >= 5, `expected several heartbeats during the slow stage, got ${during}`);
 });
+
+test("ISS-W050-002: the interval timer (not the per-step runner beat) heartbeats during ONE slow handler and stops after it settles", async () => {
+  const r = rig(), log: string[] = []; let beats = 0;
+  const spyQueue = { enqueue: (i: never) => r.queue.enqueue(i), claim: (w: string, o: { tenantId: string }) => r.queue.claim(w, o),
+    heartbeat: (x: never) => { beats++; return r.queue.heartbeat(x); }, complete: (x: never) => r.queue.complete(x), fail: (x: never, c: string, f?: { terminal?: boolean }) => r.queue.fail(x, c, f) };
+  // Beats counted strictly inside the slow handler's own await window can only come from the interval timer: the runner heartbeats between steps, never inside a handler.
+  let inHandler = -1;
+  const slow: NodeHandler = async () => {
+    const before = beats;
+    await new Promise((d) => setTimeout(d, 400));
+    inHandler = beats - before;
+    return { kind: "ok", outputFingerprint: "fp" };
+  };
+  const res = await runSessionThroughGraph(input(r, okAll(log, { transcript: slow }), { queue: spyQueue as never, heartbeatMs: 20 }));
+  assert.ok(res.ok && res.run.outcome === "complete");
+  assert.ok(inHandler >= 2, `expected at least 2 timer beats while the slow stage ran, got ${inHandler}`);
+  const after = beats; await new Promise((d) => setTimeout(d, 150));
+  assert.equal(beats, after, "no heartbeats after the run ends");
+});

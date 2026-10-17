@@ -1,0 +1,41 @@
+{
+  "capturedUtc": "2026-10-14T22:47:51.9563835Z",
+  "cycle": 1,
+  "ready": true,
+  "sourceFreezeAcknowledged": true,
+  "ordinaryCoordinator": "/root/docker_governance_review",
+  "previousProof": "46API+4historyDOM+7editorDOM original receipts retained",
+  "delta": [
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500"
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "sha256": "9D56EB0A585C78FAAA945E47CA5A4D6FBAEA16FBE95F3E975D5B3F8BBFE09ADE"
+    },
+    {
+      "path": "apps/api/src/transcript-review/origin.test.ts",
+      "sha256": "10C3C31BE05475EB8B8033554C1F2DC2C6085C5D0036E32D41F4C95C3978D9AB"
+    }
+  ],
+  "sharedHydrator": [
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "sha256": "1F084B8F14764A097D4D826AB3AD431945FC35563C67D1EB9EDAB2B75009FB8F"
+    }
+  ],
+  "floor": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs",
+  "proofPending": [
+    "matching cycle1 independent scoped verdict",
+    "full-parent native Mongo/HTTP/mounted browser acceptance"
+  ],
+  "fixtureTypingRepair": {
+    "authorization": "root/runtime finite fixture-only lease after API and WEB terminal; final helper preference",
+    "originalTestSha256": "961ED737BC9FA63487EAA43219202E682F40312C35D17A7A47CDA41155C25491",
+    "failedApiReceipt": "qa/goal-2026-10-14/api-types-ordinary-20261014T224919Z.json",
+    "change": "Use existing runtime sourceQuotes inventory parser; retain exact find/assert.ok/origin/speakerRef oracle",
+    "testsRun": true
+  },
+  "activeHandles": []
+}

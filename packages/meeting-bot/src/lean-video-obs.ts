@@ -15,7 +15,7 @@
  * "Stream" ("Same as stream"). If the profile is definitely in another mode/quality the bitrate keys are SKIPPED with a
  * warning (the mode is the operator's choice and is not changed); canvas and fps still apply.
  */
-import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { closeSync, existsSync, fstatSync, lstatSync, openSync, readSync, realpathSync, rmSync, writeFileSync, type BigIntStats } from "node:fs";
 import path from "node:path";
 // Deep import: packages/core/src/index.ts does not re-export lean-video yet (ISS-LEANWIRE-001).
 import { assessLeanVideoSettings, toObsRequests, type LeanVideoAssessment, type LeanVideoInput } from "@lkb/core/src/domain/lean-video.js";
@@ -41,6 +41,7 @@ export const LEAN_RESTORE_FILE = ".lean-video-restore.json";
 export const leanRestorePath = (recordDir: string): string => path.join(recordDir, LEAN_RESTORE_FILE);
 
 const VIDEO_KEYS = ["baseWidth", "baseHeight", "outputWidth", "outputHeight", "fpsNumerator", "fpsDenominator"] as const;
+const validVideo = (video: PrevVideo) => VIDEO_KEYS.every((k) => Number.isSafeInteger(video?.[k]) && video[k] > 0 && video[k] <= (k.startsWith("fps") ? 1000000 : 32768));
 
 async function readParam(obs: LeanObsClient, parameterCategory: string, parameterName: string): Promise<string | null | undefined> {
   try {
@@ -50,14 +51,49 @@ async function readParam(obs: LeanObsClient, parameterCategory: string, paramete
   } catch { return undefined; } // undefined = unreadable
 }
 
-function readState(file: string): LeanRestoreState | undefined {
+interface OwnedState { state: LeanRestoreState; identity: BigIntStats; bytes: string }
+const sameIdentity = (a: BigIntStats, b: BigIntStats) => a.dev === b.dev && a.ino === b.ino && a.size === b.size && a.mtimeNs === b.mtimeNs;
+
+/** State is authority to change OBS, so aliases and foreign replacements are refused. */
+function localStatePath(file: string): void {
+  if (!path.isAbsolute(file) || /^[\\/]{2}/.test(file) || /[\x00-\x1f]/.test(file) ||
+      (process.platform === "win32" && file.slice(path.parse(file).root.length).includes(":"))) throw new Error("unsafe restore state path");
+  for (let current = path.dirname(file); ; current = path.dirname(current)) {
+    if (!lstatSync(current).isDirectory() || lstatSync(current).isSymbolicLink()) throw new Error("restore state ancestor alias");
+    if (path.dirname(current) === current) break;
+  }
+  const canonical = (value: string) => process.platform === "win32" ? value.toLowerCase() : value;
+  if (canonical(realpathSync(path.dirname(file))) !== canonical(path.resolve(path.dirname(file)))) throw new Error("restore state ancestor alias");
+}
+
+function readOwnedState(file: string): OwnedState | undefined {
+  let fd: number | undefined;
   try {
-    const s = JSON.parse(readFileSync(file, "utf8")) as LeanRestoreState;
+    localStatePath(file);
+    const identity = lstatSync(file, { bigint: true });
+    if (!identity.isFile() || identity.isSymbolicLink() || identity.nlink !== 1n || identity.size <= 0n || identity.size > 65536n) return undefined;
+    fd = openSync(file, "r");
+    if (!sameIdentity(identity, fstatSync(fd, { bigint: true }))) return undefined;
+    const buffer = Buffer.alloc(65537);
+    let length = 0;
+    while (length < buffer.length) { const count = readSync(fd, buffer, length, buffer.length - length, null); if (!count) break; length += count; }
+    if (length > 65536) return undefined;
+    const bytes = buffer.subarray(0, length).toString("utf8");
+    if (!sameIdentity(identity, fstatSync(fd, { bigint: true })) || !sameIdentity(identity, lstatSync(file, { bigint: true }))) return undefined;
+    const s = JSON.parse(bytes) as LeanRestoreState;
     if (s?.version !== 1 || !s.video || !Array.isArray(s.params)) return undefined;
-    if (!VIDEO_KEYS.every((k) => Number.isFinite((s.video as any)[k]))) return undefined;
-    if (!s.params.every((p) => typeof p?.parameterCategory === "string" && typeof p?.parameterName === "string" && (p.previous === null || typeof p.previous === "string"))) return undefined;
-    return s;
-  } catch { return undefined; }
+    if (!validVideo(s.video) || Object.keys(s.video).length !== VIDEO_KEYS.length) return undefined;
+    if (s.params.length > 2 || !s.params.every((p) => p?.parameterCategory === "SimpleOutput" &&
+        (p.parameterName === "VBitrate" || p.parameterName === "ABitrate") &&
+        (p.previous === null || (typeof p.previous === "string" && p.previous.length <= 4096))) ||
+        new Set(s.params.map((p) => p.parameterName)).size !== s.params.length) return undefined;
+    return { state: s, identity, bytes };
+  } catch { return undefined; } finally { if (fd !== undefined) closeSync(fd); }
+}
+
+function stillOwned(file: string, owned: OwnedState): boolean {
+  const current = readOwnedState(file);
+  return Boolean(current && sameIdentity(owned.identity, current.identity) && current.bytes === owned.bytes);
 }
 
 export async function applyLeanVideoToObs(obs: LeanObsClient, input: LeanVideoInput, log: (msg: string) => void, opts: LeanApplyOptions = {}): Promise<LeanVideoApplyResult> {
@@ -84,7 +120,8 @@ export async function applyLeanVideoToObs(obs: LeanObsClient, input: LeanVideoIn
   }
 
   // 2. Snapshot the values we are about to change, and persist it BEFORE the first Set call.
-  const stale = opts.stateFile && existsSync(opts.stateFile) ? readState(opts.stateFile) : undefined;
+  const prior = opts.stateFile ? readOwnedState(opts.stateFile) : undefined;
+  const stale = prior?.state;
   if (opts.stateFile && !stale && existsSync(opts.stateFile)) {
     log("lean video: WARNING an earlier restore state file exists but is unreadable; lean video NOT applied (it would overwrite the only record of the original values)");
     return result(false);
@@ -95,7 +132,7 @@ export async function applyLeanVideoToObs(obs: LeanObsClient, input: LeanVideoIn
   try {
     if (!video) {
       const cur = await obs.call("GetVideoSettings");
-      if (!VIDEO_KEYS.every((k) => Number.isFinite(cur?.[k]))) throw new Error("incomplete GetVideoSettings reply");
+      if (!validVideo(cur)) throw new Error("incomplete GetVideoSettings reply");
       video = Object.fromEntries(VIDEO_KEYS.map((k) => [k, cur[k]])) as unknown as PrevVideo;
     }
   } catch (e) {
@@ -110,18 +147,30 @@ export async function applyLeanVideoToObs(obs: LeanObsClient, input: LeanVideoIn
     params.push({ parameterCategory: p.parameterCategory, parameterName: p.parameterName, previous });
     sendable.push(p);
   }
+  let persisted: OwnedState | undefined;
   if (opts.stateFile) {
+    let fd: number | undefined;
     try {
       const state: LeanRestoreState = { version: 1, video, params, appliedAt: new Date().toISOString() };
-      writeFileSync(opts.stateFile, JSON.stringify(state, null, 2) + "\n");
+      localStatePath(opts.stateFile);
+      if (prior) {
+        if (!stillOwned(opts.stateFile, prior) || params.length !== prior.state.params.length) throw new Error("restore state changed or lacks required snapshot");
+      } else {
+        fd = openSync(opts.stateFile, "wx", 0o600);
+        writeFileSync(fd, JSON.stringify(state, null, 2) + "\n");
+        closeSync(fd); fd = undefined;
+      }
+      persisted = readOwnedState(opts.stateFile);
+      if (!persisted || (prior && !sameIdentity(prior.identity, persisted.identity))) throw new Error("restore state publication changed");
     } catch (e) {
       log(`lean video: WARNING cannot persist the restore state (${String(e)}); lean video NOT applied because it could not be restored`);
       return result(false);
-    }
+    } finally { if (fd !== undefined) closeSync(fd); }
   }
 
   // 3. Apply.
   const send = async (name: string, args: unknown): Promise<void> => {
+    if (opts.stateFile && (!persisted || !stillOwned(opts.stateFile, persisted))) { failed.push("state-file"); log("lean video: restore state changed; OBS change refused"); return; }
     try { await obs.call(name, args); } catch (e) { failed.push(name); log(`lean video: ${name} refused, OBS keeps its current value (${String(e)})`); }
   };
   await send("SetVideoSettings", req.videoSettings);
@@ -143,8 +192,9 @@ export async function restoreLeanVideoInObs(obs: LeanObsClient, stateFile: strin
     try { alert?.(msg); } catch { /* an alert failure must not hide the log line above */ }
     return { status: "failed" as const, failed };
   };
-  const state = readState(stateFile);
-  if (!state) return fail(["state-file"], "restore state file unreadable");
+  const owned = readOwnedState(stateFile);
+  if (!owned) return fail(["state-file"], "restore state file unreadable or unsafe");
+  const state = owned.state;
   try {
     const st = await obs.call("GetRecordStatus");
     if (st?.outputActive === true) {
@@ -154,6 +204,7 @@ export async function restoreLeanVideoInObs(obs: LeanObsClient, stateFile: strin
   } catch { /* status unknown: attempt the restore; OBS itself rejects SetVideoSettings during an active output */ }
   const failed: string[] = [];
   const send = async (label: string, name: string, args: unknown) => {
+    if (!stillOwned(stateFile, owned)) { failed.push("state-file"); return; }
     try { await obs.call(name, args); } catch (e) { failed.push(label); log(`lean video: restore ${label} failed (${String(e)})`); }
   };
   await send("SetVideoSettings", "SetVideoSettings", state.video);
@@ -162,6 +213,7 @@ export async function restoreLeanVideoInObs(obs: LeanObsClient, stateFile: strin
       { parameterCategory: p.parameterCategory, parameterName: p.parameterName, parameterValue: p.previous });
   }
   if (failed.length) return fail(failed, `failed: ${failed.join(", ")}`);
+  if (!stillOwned(stateFile, owned)) return fail(["state-file"], "restore state replaced; foreign file preserved");
   try { rmSync(stateFile, { force: true }); } catch (e) { log(`lean video: restored, but could not delete ${stateFile} (${String(e)})`); }
   log("lean video: previous OBS video settings and profile parameters restored");
   return { status: "restored", failed: [] };

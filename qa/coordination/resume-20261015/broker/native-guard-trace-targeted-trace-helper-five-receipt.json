@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "--test-name-pattern=^native guard phase helper ",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3.json",
+    "sha256": "f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3",
+    "count": 89
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 20,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 30228,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 3.5309999999990396,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-targeted-trace-helper-five.log",
+    "sha256": "15bf7b899315fb64813056b02c05636b347a0a1a782ac179f56bc3698e759b55"
+  },
+  "counts": {
+    "tests": 5,
+    "pass": 5,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

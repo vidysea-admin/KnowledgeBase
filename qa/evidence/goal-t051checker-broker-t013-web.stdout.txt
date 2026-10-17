@@ -1,0 +1,13 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/counsellor/CounsellorPage.test.tsx (9 tests) 473ms
+ ✓ src/pages/counsellor/voice.test.ts (8 tests) 10ms
+ ✓ src/pages/counsellor/Avatar.test.tsx (3 tests) 52ms
+ ✓ src/pages/counsellor/provenance.test.ts (1 test) 4ms
+
+ Test Files  4 passed (4)
+      Tests  21 passed (21)
+   Start at  21:52:09
+   Duration  7.15s (transform 220ms, setup 773ms, collect 881ms, tests 539ms, environment 3.38s, prepare 610ms)
+

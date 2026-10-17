@@ -1,0 +1,94 @@
+{
+  "refusedRows": [
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+      "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02",
+      "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq03",
+      "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq04",
+      "expectedSessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway-gq01",
+      "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway-gq02",
+      "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway-gq03",
+      "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway-gq04",
+      "expectedSessionId": "2026-06-03-dual-enrollment-pathway",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters-gq01",
+      "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters-gq02",
+      "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters-gq03",
+      "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters-gq04",
+      "expectedSessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "status": "hydration-or-validation-refused",
+      "errorName": "Error",
+      "errorCode": "current-snapshot-revision"
+    }
+  ],
+  "errorCounts": {
+    "current-snapshot-revision": 12
+  },
+  "duplicateIdCount": 0,
+  "actualImportedSourceCount": 202,
+  "resultSha256": "bb009a95474c7d555f4025e4c601649f1411147e42551402296bd2388e44725f"
+}

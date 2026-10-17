@@ -115,7 +115,9 @@ test("ISS-003: invalidation and revocation are tenant-scoped on every query and 
   assert.ok(touching.length > 0);
   for (const f of touching) assert.equal(f.filter.tenantId, "tenant-a", `${f.collection}.${f.op} must be tenant-scoped`);
   // direct revoke is scoped as well
-  await revokeWhatsAppClaim(db, "tenant-a", { _id: c!._id }, {} as never);
+  const revokeSession = db.client.startSession();
+  try { await revokeSession.withTransaction(() => revokeWhatsAppClaim(db, "tenant-a", { _id: c!._id }, revokeSession)); }
+  finally { await revokeSession.endSession(); }
   assert.ok(fx.rows("claims").some(r => r.tenantId === "tenant-b"));
   await invalidateStaleWhatsAppCandidates(db, "tenant-a", "unrelated-source");
   assert.ok(fx.rows("whatsapp_candidates").some(r => r.tenantId === "tenant-b"));

@@ -1,0 +1,58 @@
+{
+  "phase": "maker-verification",
+  "scope": "Shared frozen contracts validation after final public checkpoint",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "642fd3b34f3a17a94074bfe5b5c67911d90fea5ec49988eef8aa278bba9d451e",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+    "-B",
+    "contracts/verify_contracts.py"
+  ],
+  "program": "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+  "runtime_version": "Python 3.12.10",
+  "runtime_executable_sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+  "runtime_identity": {
+    "executable": "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+    "version": "Python 3.12.10",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "current frozen contract verifier; empty registry vacuity disclosed"
+  ],
+  "timeoutMs": 30000,
+  "startedAt": "2026-10-15T12:38:07.009Z",
+  "completedAt": "2026-10-15T12:38:07.223Z",
+  "elapsedMs": 211.4405,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "contracts/verify_contracts.py": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3",
+    "contracts/contracts.json": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940"
+  },
+  "after": {
+    "contracts/verify_contracts.py": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3",
+    "contracts/contracts.json": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

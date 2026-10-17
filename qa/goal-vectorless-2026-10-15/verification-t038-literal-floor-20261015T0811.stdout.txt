@@ -1,0 +1,23 @@
+✔ shutdown during acquisition, registration, rules, preparation or ownership recheck admits no new capture (5.4392ms)
+✔ canonical completion accepts bound legacy/v3 selected-artifact proofs and refuses mismatched marker/source/DB/validation (1595.9574ms)
+✔ canonical autonomous acquisition continues during two owned captures; capacity and career priority are durable (362.3105ms)
+✔ autonomous rule vetoes are persisted even with no allowed schedule and cannot launch (45.6023ms)
+✔ automatic service refuses unenforced rules and absent real slot readiness before discovery (4.5889ms)
+✔ one owned capture failure never stops another owned slot or creates a false ready state (138.1705ms)
+✔ a completed index marker cannot bypass graph recovery acknowledgement after interrupted completion (105.557ms)
+✔ shutdown after recording disposition but before child microtask prevents launch and retains queued work (55.8765ms)
+✔ autonomous recovery gates legacy default-workspace artifacts instead of allocating an unrelated slot (48.4213ms)
+✔ owned slot recovery passes the persisted slot to the child and preserves its durable identity (104.221ms)
+✔ canonical recording publication failure stops its actual controller and prevents a false ready result (89.0037ms)
+✔ canonical pool uses only accepted matching capabilities and keeps unsupported coverage queued (112.6454ms)
+✔ fresh slot validation refuses capture when previously accepted evidence is revoked (53.1205ms)
+✔ disabled refreshed scheduler controls prevent discovery, registration and capture admissions (17.809ms)
+✔ active capture loses verified authority, stops its owned generation, and cannot become ready (86.1167ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11304.7947

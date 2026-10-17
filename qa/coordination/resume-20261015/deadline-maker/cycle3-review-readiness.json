@@ -1,0 +1,325 @@
+{
+  "schema": "deadline-review-readiness/1",
+  "candidate_identity_kind": "sha256 of ordered relative changed-path/current-raw-hash pairs; NOT Git commit",
+  "candidate_sha": "ec0f5401f54c80375bac7b38c7b0d82741400870a5e2f95db1a59545a12f61c6",
+  "candidate_material": "[[\"apps/api/src/evaluation-flywheel/receipts.ts\",\"770f3b7c14b60337a1f4fc64d86536b07b489af7938d9625ab01fb20672f5544\"],[\"apps/api/src/evaluation-flywheel/types.ts\",\"387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030\"],[\"apps/api/src/evaluation-flywheel/workflow.ts\",\"1b0689155c395d7c86cce4586207830471c2b5bbce05eb4f14cdcab0d6e3273c\"],[\"apps/api/src/evaluation-flywheel/workflow.test.ts\",\"8a207d622caae38fb0635c81de28c2518729d6665840f19f4312fe42482d5f75\"],[\"apps/api/src/evaluation-flywheel/receipts.test.ts\",\"2113251e2068552341ad50e267e64af62a864155dd1621289fd29220d9e8cc4c\"]]",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "changed_files": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\receipts.ts",
+      "sha256": "770f3b7c14b60337a1f4fc64d86536b07b489af7938d9625ab01fb20672f5544"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\types.ts",
+      "sha256": "387d2832dc8ead1e82fc0065ea0499224377432894d5ed988f255a55e249c030"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\workflow.ts",
+      "sha256": "1b0689155c395d7c86cce4586207830471c2b5bbce05eb4f14cdcab0d6e3273c"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\workflow.test.ts",
+      "sha256": "8a207d622caae38fb0635c81de28c2518729d6665840f19f4312fe42482d5f75"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\evaluation-flywheel\\receipts.test.ts",
+      "sha256": "2113251e2068552341ad50e267e64af62a864155dd1621289fd29220d9e8cc4c"
+    }
+  ],
+  "immutable_existing_packet": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-packet.json",
+    "sha256": "aaf816b11e4bb591a4a4c4ad2bb27949ef791d2fa5c2ab6fa3b56373dc22cb78"
+  },
+  "clauses": [
+    "S3 tenant/auth boundary",
+    "S5 failure-safe transitions, persisted identity and replay",
+    "S8 accepted current canonical indexing",
+    "S9 original-question Ask composition",
+    "S10 immutable child lineage",
+    "S12 sanitized observable failures/deadlines",
+    "S13 actual immediate producer/consumer compatibility",
+    "S15 frozen evidence and independent handshake"
+  ],
+  "required_checks_and_reasons": [
+    {
+      "label": "canonical-mode-and-legacy-guards",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(canonical\\ lexical\\ indexing\\ accepts\\ initial\\ retest\\ and\\ immutable\\ replay|canonical\\ lexical\\ replay\\ rejects\\ missing\\ artifacts\\ and\\ mixed\\ or\\ stale\\ generation|caller\\ vectorless\\ flags\\ cannot\\ replace\\ persisted\\ canonical\\ mode|index\\ artifact\\ read\\ rejects\\ a\\ changed\\ source\\ snapshot\\ before\\ Ask|legacy\\ vector\\ receipt\\ validation\\ remains\\ strict\\ without\\ canonical\\ mode)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts",
+        "apps/api/src/evaluation-flywheel/receipts.test.ts"
+      ],
+      "testIDs": [
+        "canonical lexical indexing accepts initial retest and immutable replay",
+        "canonical lexical replay rejects missing artifacts and mixed or stale generation",
+        "caller vectorless flags cannot replace persisted canonical mode",
+        "index artifact read rejects a changed source snapshot before Ask",
+        "legacy vector receipt validation remains strict without canonical mode"
+      ],
+      "expectedSelected": 5,
+      "outerTimeoutMs": 60000
+    },
+    {
+      "label": "ORIGINAL-composition",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual\\ source\\ intake\\ \\->\\ grounded\\ indexSession\\ \\->\\ request\\-bound\\ source\\ hydration/askV2\\ \\->\\ immutable\\ child)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/composition.test.ts"
+      ],
+      "testIDs": [
+        "actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child"
+      ],
+      "expectedSelected": 1,
+      "outerTimeoutMs": 60000
+    },
+    {
+      "label": "immediate-consumers-deadlines-and-ledger-floor",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(stored\\ loss\\ creates\\ stable\\ tenant\\-linked\\ gap;\\ separate\\ unscored\\ retest\\ preserves\\ original\\ and\\ consumers|concurrent\\ attempt\\ CAS\\ and\\ expired\\ restart\\ lock\\ preserve\\ exactly\\ one\\ accepted\\ child|terminal\\ CAS\\ deadline\\ preserves\\ committed\\ completion\\ or\\ fences\\ a\\ late\\ CAS\\ after\\ recovery|ISS\\-T059REPLAY\\-001\\ recorded\\ historical\\-request\\ replay\\ returns\\ first\\ without\\ changing\\ newer\\ head|storage\\ read\\ deadlines\\ refuse\\ without\\ dispatch\\ or\\ recovery\\ writes|source\\ and\\ index\\ read\\ deadlines\\ keep\\ the\\ lease\\ and\\ never\\ trigger\\ index\\ rebuild|child\\ readback\\ deadline\\ preserves\\ the\\ persisted\\ child\\ and\\ retry\\ never\\ repeats\\ Ask)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ],
+      "testIDs": [
+        "stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers",
+        "concurrent attempt CAS and expired restart lock preserve exactly one accepted child",
+        "terminal CAS deadline preserves committed completion or fences a late CAS after recovery",
+        "ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head",
+        "storage read deadlines refuse without dispatch or recovery writes",
+        "source and index read deadlines keep the lease and never trigger index rebuild",
+        "child readback deadline preserves the persisted child and retry never repeats Ask"
+      ],
+      "expectedSelected": 7,
+      "outerTimeoutMs": 60000
+    },
+    {
+      "label": "HTTP-immediate-consumers",
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual\\ authenticated\\ routes\\ enforce\\ all\\ write\\ scopes,\\ tenant\\ scope,\\ body\\ validation\\ and\\ gaps\\ compatibility|unconfigured\\ flywheel\\ answers\\ safe503\\ after\\ scope\\ validation,\\ with\\ no\\ writes|actual\\ shared\\ createServer\\ mount\\ invokes\\ the\\ flywheel\\ using\\ the\\ verified\\ tenant)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/router.test.ts"
+      ],
+      "testIDs": [
+        "actual authenticated routes enforce all write scopes, tenant scope, body validation and gaps compatibility",
+        "unconfigured flywheel answers safe503 after scope validation, with no writes",
+        "actual shared createServer mount invokes the flywheel using the verified tenant"
+      ],
+      "expectedSelected": 3,
+      "outerTimeoutMs": 60000
+    }
+  ],
+  "same_epoch_broker_receipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-canonical-mode-and-legacy-guards-receipt.json",
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "actual_command": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test-isolation=none",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(canonical\\ lexical\\ indexing\\ accepts\\ initial\\ retest\\ and\\ immutable\\ replay|canonical\\ lexical\\ replay\\ rejects\\ missing\\ artifacts\\ and\\ mixed\\ or\\ stale\\ generation|caller\\ vectorless\\ flags\\ cannot\\ replace\\ persisted\\ canonical\\ mode|index\\ artifact\\ read\\ rejects\\ a\\ changed\\ source\\ snapshot\\ before\\ Ask|legacy\\ vector\\ receipt\\ validation\\ remains\\ strict\\ without\\ canonical\\ mode)$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts",
+        "apps/api/src/evaluation-flywheel/receipts.test.ts"
+      ],
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "environment": {
+        "KB_U24_PRIVATE_TOC_TESTS": "0",
+        "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+        "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+        "LKB_NATIVE_TEST_FFMPEG": null,
+        "LKB_NATIVE_TEST_FFPROBE": null,
+        "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp",
+        "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp"
+      },
+      "pins_unchanged": true,
+      "rows_restored": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-HTTP-immediate-consumers-receipt.json",
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "actual_command": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test-isolation=none",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual\\ authenticated\\ routes\\ enforce\\ all\\ write\\ scopes,\\ tenant\\ scope,\\ body\\ validation\\ and\\ gaps\\ compatibility|unconfigured\\ flywheel\\ answers\\ safe503\\ after\\ scope\\ validation,\\ with\\ no\\ writes|actual\\ shared\\ createServer\\ mount\\ invokes\\ the\\ flywheel\\ using\\ the\\ verified\\ tenant)$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+        "apps/api/src/evaluation-flywheel/router.test.ts"
+      ],
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "environment": {
+        "KB_U24_PRIVATE_TOC_TESTS": "0",
+        "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+        "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+        "LKB_NATIVE_TEST_FFMPEG": null,
+        "LKB_NATIVE_TEST_FFPROBE": null,
+        "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp",
+        "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp"
+      },
+      "pins_unchanged": true,
+      "rows_restored": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-immediate-consumers-deadlines-and-ledger-floor-receipt.json",
+      "counts": {
+        "tests": 7,
+        "pass": 7,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "actual_command": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test-isolation=none",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(stored\\ loss\\ creates\\ stable\\ tenant\\-linked\\ gap;\\ separate\\ unscored\\ retest\\ preserves\\ original\\ and\\ consumers|concurrent\\ attempt\\ CAS\\ and\\ expired\\ restart\\ lock\\ preserve\\ exactly\\ one\\ accepted\\ child|terminal\\ CAS\\ deadline\\ preserves\\ committed\\ completion\\ or\\ fences\\ a\\ late\\ CAS\\ after\\ recovery|ISS\\-T059REPLAY\\-001\\ recorded\\ historical\\-request\\ replay\\ returns\\ first\\ without\\ changing\\ newer\\ head|storage\\ read\\ deadlines\\ refuse\\ without\\ dispatch\\ or\\ recovery\\ writes|source\\ and\\ index\\ read\\ deadlines\\ keep\\ the\\ lease\\ and\\ never\\ trigger\\ index\\ rebuild|child\\ readback\\ deadline\\ preserves\\ the\\ persisted\\ child\\ and\\ retry\\ never\\ repeats\\ Ask)$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ],
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "environment": {
+        "KB_U24_PRIVATE_TOC_TESTS": "0",
+        "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+        "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+        "LKB_NATIVE_TEST_FFMPEG": null,
+        "LKB_NATIVE_TEST_FFPROBE": null,
+        "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp",
+        "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp"
+      },
+      "pins_unchanged": true,
+      "rows_restored": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle3-ORIGINAL-composition-receipt.json",
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "actual_command": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test-isolation=none",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual\\ source\\ intake\\ \\->\\ grounded\\ indexSession\\ \\->\\ request\\-bound\\ source\\ hydration/askV2\\ \\->\\ immutable\\ child)$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs",
+        "apps/api/src/evaluation-flywheel/composition.test.ts"
+      ],
+      "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "environment": {
+        "KB_U24_PRIVATE_TOC_TESTS": "0",
+        "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+        "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+        "LKB_NATIVE_TEST_FFMPEG": null,
+        "LKB_NATIVE_TEST_FFPROBE": null,
+        "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp",
+        "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\finite-native-temp"
+      },
+      "pins_unchanged": true,
+      "rows_restored": true
+    }
+  ],
+  "mutation_requirements": {
+    "required_before_tests": false,
+    "authority": "No mutation/sabotage requirement named in effective qa/contracts/goal-t059.md; S15 still mandates independently produced meaningful boundary probe and source judgment. Checker must HOLD if its contract reading identifies required missing mutation evidence. No check waived."
+  },
+  "history": {
+    "same_unit_new_checker_dispatches": "None evidenced before this envelope; parent actual validate on old packet failed before dispatch. Planning row below records no execution, not a measured checker.",
+    "shared_runtime_validation_overrun": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\checker-admission-hold.json",
+      "sha256": "fec534fdb1f29bd11c7f07b3a4a394cf1960bef3334dc08ed163c2944c0a0f5d"
+    },
+    "historical_goal_t059_verdict": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\verdicts\\goal-t059.md",
+      "sha256": "dfa70e983bade1ecbf1f9bd4dcddcb80dc5348bdf8bb35dadd8a6510ba761176"
+    },
+    "accounting": "Separate runtime-validation and historical unit costs not erased or relabelled as current-unit usage; current maker actual total and time unknown. No current-unit reviewer usage claimed."
+  },
+  "runtime": {
+    "native_host": "Codex desktop",
+    "executable": "C:/Users/product/AppData/Local/OpenAI/Codex/bin/9614f1d9b40d9c4f/codex.exe",
+    "startup_floor_root_reported_input_tokens": 41000,
+    "startup_floor_independently_reauthenticated": false,
+    "actual_total_hardcap_established": false,
+    "managed_launcher_supported_controls": false,
+    "dispatch_prerequisite": "Root must bind existing observed same-native-runtime startup receipt/identity and use authorized native scoped fresh-context reviewer; optional managed CLI launcher remains unsupported, no new probe authorized."
+  },
+  "allocation": {
+    "authority": "Root explicit current instruction: finite <=180 active seconds /180000 actual-total-token allocation exception for required source authority independent review plus native41k startup. Proposal only until root dispatch.",
+    "total_active_s": 180,
+    "total_tokens": 180000,
+    "review_active_s": 150,
+    "review_tokens": 130000,
+    "completion_active_s": 30,
+    "completion_tokens": 50000,
+    "startup_input_carried_within_each_allocation": 41000,
+    "ratio": "UNVERIFIED; maker full denominator unknown",
+    "no_hard_cap_claim": true
+  },
+  "remaining_prerequisites": [
+    "Root same-runtime startup receipt and explicit native dispatch authorization",
+    "Independent source review and meaningful failure-boundary probe; only checker verdict",
+    "Central affected API typecheck/contracts validator receipts as mandatory original T059 gate; unavailable receipts remain HOLD",
+    "Full live/human/parent T059 acceptance remains HOLD"
+  ]
+}

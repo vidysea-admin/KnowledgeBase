@@ -1,0 +1,14 @@
+[
+  {
+    "sha256": "eb80e828c2e4246b4fdd8bc769d983ce718ceed26e6a051ed4de040d849eba7a",
+    "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts"
+  },
+  {
+    "sha256": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64",
+    "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts"
+  },
+  {
+    "sha256": "a67793310befb5cfb3372ef7f4866afb07f97df471c370655d9e0ecc112f2f9b",
+    "path": "packages/meeting-bot/src/capture/tab-browser.test.ts"
+  }
+]

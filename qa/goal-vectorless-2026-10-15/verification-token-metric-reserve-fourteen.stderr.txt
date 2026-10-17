@@ -1,0 +1,19 @@
+test_actual_overrun_still_cannot_hide_under_lower_debit (test_completion_reserve.ReserveTests.test_actual_overrun_still_cannot_hide_under_lower_debit) ... ok
+test_committed_finalization_cannot_be_spent_twice (test_completion_reserve.ReserveTests.test_committed_finalization_cannot_be_spent_twice) ... ok
+test_finalization_cannot_allocate_more_than_reserve (test_completion_reserve.ReserveTests.test_finalization_cannot_allocate_more_than_reserve) ... ok
+test_finalization_spends_remaining_reserve_without_adding_it (test_completion_reserve.ReserveTests.test_finalization_spends_remaining_reserve_without_adding_it) ... ok
+test_legacy_callers_explicitly_unprotected_and_unchanged (test_completion_reserve.ReserveTests.test_legacy_callers_explicitly_unprotected_and_unchanged) ... ok
+test_malformed_opt_in_or_phase_rejected (test_completion_reserve.ReserveTests.test_malformed_opt_in_or_phase_rejected) ... ok
+test_new_candidate_keeps_old_charges_but_has_own_completion (test_completion_reserve.ReserveTests.test_new_candidate_keeps_old_charges_but_has_own_completion) ... ok
+test_previous_children_debits_are_included_before_reserve (test_completion_reserve.ReserveTests.test_previous_children_debits_are_included_before_reserve) ... ok
+test_reserve_identity_required (test_completion_reserve.ReserveTests.test_reserve_identity_required) ... ok
+test_review_cannot_consume_final_seconds_or_tokens (test_completion_reserve.ReserveTests.test_review_cannot_consume_final_seconds_or_tokens) ... ok
+test_review_cannot_restart_after_finalization (test_completion_reserve.ReserveTests.test_review_cannot_restart_after_finalization) ... ok
+test_review_fits_exactly_with_completion_reserve (test_completion_reserve.ReserveTests.test_review_fits_exactly_with_completion_reserve) ... ok
+test_unknown_actuals_and_mandatory_debits_still_fail_honestly (test_completion_reserve.ReserveTests.test_unknown_actuals_and_mandatory_debits_still_fail_honestly) ... ok
+test_zero_work_accounting_after_finalization_is_allowed (test_completion_reserve.ReserveTests.test_zero_work_accounting_after_finalization_is_allowed) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.001s
+
+OK

@@ -27,6 +27,10 @@ interface MeetingCandidateApiRow {
   registrationUrl?: string;
   messageId?: string;
   threadId?: string;
+  receivedAt?: string;
+  youtubeWatch?: AutoRecordCandidateInput['youtubeWatch'];
+  youtubeWatchIssue?: AutoRecordCandidateInput['youtubeWatchIssue'];
+  meetingLinkIssue?: AutoRecordCandidateInput['meetingLinkIssue'];
 }
 
 function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput {
@@ -45,6 +49,10 @@ function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput
     registrationUrl: row.registrationUrl,
     messageId: row.messageId,
     threadId: row.threadId,
+    receivedAt: row.receivedAt,
+    youtubeWatch: row.youtubeWatch,
+    youtubeWatchIssue: row.youtubeWatchIssue,
+    meetingLinkIssue: row.meetingLinkIssue,
   };
 }
 

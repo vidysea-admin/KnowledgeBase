@@ -1,0 +1,16 @@
+✔ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (1164.0216ms)
+✔ three physical attempts stop before answer, sticky across repeated graph/scorer calls and resume (60.2552ms)
+✔ source drift/forged citation offsets fail through actual hydration validation (25.829ms)
+✔ byte, token admission and unknown usage refuse before further physical calls (2.1955ms)
+✔ deadline cancels hanging transport without admitting another attempt (16.3407ms)
+✔ checkpoint integrity/config/candidate binding refuses tampering and collisions (55.6657ms)
+✔ question-blind same-population control ignores query and offline reader refuses foreign scope (32.5141ms)
+✔ live disabled by default; full92 or injected grant expansion refused (1.4124ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1428.5247

@@ -1,0 +1,110 @@
+{
+  "state": "API_WEB_TYPECHECK_BUILD_GREEN_NEXT_NATIVE_READ_CONTEXT_REPAIR_DESIGN",
+  "originalReceipt": "qa/goal-vectorless-2026-10-15/verification-api-types-final-public-epoch.stdout.txt",
+  "originalDiagnostics": 53,
+  "originalDiagnosticFiles": 19,
+  "owners": {
+    "headStore": "frozen",
+    "sourceCoordinator": "frozen",
+    "qualityCoordinator": "frozen",
+    "relationshipRouter": "frozen",
+    "speakerSchema": "frozen",
+    "whatsappMaker": "frozen"
+  },
+  "next": [
+    "Consolidate current 19 source hashes after last ACK",
+    "Broker one current API typecheck",
+    "Affected native policy/direct proofs and API build only if green"
+  ],
+  "publicSchemaExports": "unchanged; prior selector workflow source pin superseded explicitly",
+  "acceptance": "No parent closure; failures/history retained",
+  "currentPins": [
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.ts",
+      "sha256": "e95b1a523a8b9ab9619a045944f686ae026547bde3a86d8fd039b670e3ae88e5"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/native-tree-reader.test.ts",
+      "sha256": "e79d6268c9f378dff2f94f6b8e6ab3bbb73d022d53d4505cc971e32883035f2b"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/reviews.test.ts",
+      "sha256": "d2026763c4afee98167cb8763bf8c00100e12d8bca9b071dff18b2291dc2578a"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "sha256": "761c72202df44320ad80fcc5d55aafea205cdd8da6f320e966fa38f6b5442775"
+    },
+    {
+      "path": "apps/api/src/gws/public-webinar-config.ts",
+      "sha256": "3294ced718f03a3f23b96c0392a4b5bf9cc9be9d23c2552f1952e9d698873cd9"
+    },
+    {
+      "path": "apps/api/src/native-evidence/head-store.ts",
+      "sha256": "6120918200a42d714f745650a0cb0c5fab4968e7b8874e2d3aa5a885ed4a91ab"
+    },
+    {
+      "path": "apps/api/src/native-evidence/message-publication.ts",
+      "sha256": "9b8fbaca62136185ad60c5af1dd1ecf089e1cafb4a9d312cb193d783f1b1cbcb"
+    },
+    {
+      "path": "apps/api/src/native-evidence/publication.test.ts",
+      "sha256": "7ff73c0d7fce965a50acfa747ff71aae8c874b28ae53cf2079496e9606bc7be9"
+    },
+    {
+      "path": "apps/api/src/native-evidence/publication.ts",
+      "sha256": "a57808976ed7bf87623dee0b29556ca59b3654d492d615b2e40472172d9f8801"
+    },
+    {
+      "path": "apps/api/src/review-authority/policy.ts",
+      "sha256": "efab2f3544c4877231be53703461f07aafd71db96b73713acb1c87783cad1a63"
+    },
+    {
+      "path": "apps/api/src/search-store.ts",
+      "sha256": "de3f123eaf8505c2e2a7231247a16cfd2cbb87ef26d26e00c9458172cd3958a4"
+    },
+    {
+      "path": "apps/api/src/speaker-attributes/mongo-store.test.ts",
+      "sha256": "a9ed152998546bb5395da9907e1c3beb666481f0d020120ced792f570ce6e022"
+    },
+    {
+      "path": "apps/api/src/speaker-attributes/router.test.ts",
+      "sha256": "dab447f0294298f4b49676173292343a94c3442d4157fe0e61260da16cd15b92"
+    },
+    {
+      "path": "apps/api/src/speaker-attributes/service.test.ts",
+      "sha256": "8fdb7329ad671b72722e7f9279d8dcfde3d3e96a5417284516a37256327dcd3a"
+    },
+    {
+      "path": "apps/api/src/speaker-relations/mongo-store.test.ts",
+      "sha256": "f299a968bb25f5620f8e50b0d775086754b423f117292a6549efc7c6c9cf70e4"
+    },
+    {
+      "path": "apps/api/src/speaker-relations/router.test.ts",
+      "sha256": "198d3b99228bb2643cea1d216e3c9ce4eeaba28a163a6cf231039c165421ee8f"
+    },
+    {
+      "path": "apps/api/src/speaker-relations/source-router.ts",
+      "sha256": "05ea37f6fb8d2934172fde3028648a2d1cdb5ee7e41e6eae3a35dc97195c0a16"
+    },
+    {
+      "path": "apps/api/src/transcript-review/origin.test.ts",
+      "sha256": "de85b683d92befaebe98533adab41dc591483a6adbeac3cd259f60d75a6ce02d"
+    },
+    {
+      "path": "packages/index/src/graph/authorized-expansion.ts",
+      "sha256": "ac135c69cd57219d2c872a6c1774769c0443b6dc21cbc76142a30f2b53bb2217"
+    }
+  ],
+  "apiTypecheck": {
+    "receipt": "qa/goal-vectorless-2026-10-15/verification-api-types-diagnostic-repairs.json",
+    "exitCode": 0,
+    "elapsedSeconds": 15.736,
+    "pinsStable": 1243
+  },
+  "nativePolicy": "Broker reports affected policy1 + direct20 PASS; raw receipt paths pending broker confirmation",
+  "apiBuild": "qa/goal-vectorless-2026-10-15/verification-api-build-diagnostic-repairs.json",
+  "webTypecheck": "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json",
+  "webBuild": "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json",
+  "nextSourceEpoch": "Actual MSG nested read transaction design survey; prior stage receipts retained, no production patch yet"
+}

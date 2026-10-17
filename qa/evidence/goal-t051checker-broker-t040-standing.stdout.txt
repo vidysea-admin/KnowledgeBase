@@ -1,0 +1,20 @@
+✔ authentic quantity keeps source attribution; receipt pins content and leaves full acceptance open (3.5496ms)
+✔ changed amount, qualifier or invented role cannot be added to displayed text (0.6237ms)
+✔ number or word substring cannot masquerade as a complete quote (1.2311ms)
+✔ foreign, missing, unavailable, replaced and mistimed references refuse (0.653ms)
+✔ source scope, timestamps and duplicate IDs are validated before relying on them (0.6729ms)
+✔ source-reviewed category reference detects omitted action despite nonempty insight (0.3525ms)
+✔ question and answer evidence remain separate and unanswered entries cannot expose stale answers (0.4221ms)
+✔ preserved reviewed paraphrase is provenance-audited with explicit semantic limitation; generated paraphrase refuses (0.345ms)
+✔ screen observation keeps its actual origin and unverified label (1.1494ms)
+✔ authenticated route is encoded, redirects refused, and receipt never includes bearer key (2.8637ms)
+✔ HTTP errors and ambiguous credential-bearing base URLs fail without claiming a receipt (1.6197ms)
+✔ transport and JSON errors cannot leak echoed credentials or private response text (0.7557ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 98.6082

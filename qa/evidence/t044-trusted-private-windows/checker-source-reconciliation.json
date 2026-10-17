@@ -1,0 +1,15 @@
+{
+  "slug": "t044-trusted-private-windows",
+  "fixCycle": 0,
+  "integrationVersion": 1,
+  "currentContextSHA256": "19b232dc6163ff8fa54215313dab0a003579058470a9271af0b1851fc12d954c",
+  "reconstructedTestedContextSHA256": "d2749465d014070f50ed10e70b40313ac92b696c3831f91d8c167903571a666a",
+  "contextDelta": "Only checked local index instead of repeated dense indices[0]; memory inverse exact, no product mutation",
+  "indexDelta": "Independent prior read-only exact removal of createJoinPolicyDeps reexport reconstructed bd6eff48332d6a650610a2f097f8fe30801b8668d002ec3060689a41105a43a6; actual current e759 is in READY37",
+  "sourcePinsPath": "qa/evidence/t044-trusted-private-windows/candidate-0-ready-pins.json",
+  "readySourcePinsMatched": 37,
+  "own39ReceiptSHA256": "9afe5b2fd9eee66cb1eecaf8720017237f33bb6c90d069ed01e07f4286ce6563",
+  "currentOwner3ReceiptSHA256": "924f72698055164bb7a90d9afe577a0512756743c79f26941385f74d79aedfa2",
+  "probeState": "NOT RUN, queued sole broker",
+  "capturedAt": "2026-10-14T22:08:05.3363726Z"
+}

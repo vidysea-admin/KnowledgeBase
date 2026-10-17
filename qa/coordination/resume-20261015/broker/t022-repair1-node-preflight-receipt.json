@@ -1,0 +1,30 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--input-type=module",
+    "-e",
+    "import {createRequire} from 'node:module';import {realpathSync} from 'node:fs';import {fileURLToPath} from 'node:url';import {createHash} from 'node:crypto';const r=createRequire(new URL('./apps/api/src/score.ts',import.meta.url));const hash=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');console.log(JSON.stringify({executable:process.execPath,version:process.version,ai:realpathSync(r.resolve('@lkb/ai')),tsx:realpathSync(fileURLToPath(import.meta.resolve('tsx/esm/api'))),execArgvSha256:hash(process.execArgv)}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\163262f05ca48b9786acac31a437685e5c89394521574e363f25c75b32a6920d.json",
+    "sha256": "163262f05ca48b9786acac31a437685e5c89394521574e363f25c75b32a6920d",
+    "count": 56
+  },
+  "environmentWhitelistSha256": "f00c2cff115dd60b715adf069fe6f646a5ae3c12435ceeb0810dc3a4b7276623",
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "MAKER ACCEPTANCE current T022, not checker",
+  "pid": 13976,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.3280000000013388,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t022-repair1-node-preflight.log",
+    "sha256": "04f030d23611cf1c41fde77172a3d60f076a9bcd338be449171b51d3bb8b8a70"
+  },
+  "counts": {}
+}

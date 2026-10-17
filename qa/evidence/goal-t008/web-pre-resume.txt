@@ -1,0 +1,77 @@
+Stage: web
+Cwd: C:\Users\product\Desktop\KnowledgeBase\apps\web
+Command: node node_modules/vitest/vitest.mjs run src/api/search/semanticClient.test.ts src/pages/search/semantic/SemanticResults.test.tsx src/pages/search/semantic/SemanticSearchIntegration.test.tsx --maxWorkers=1 --minWorkers=1
+Exit: 1
+Elapsed seconds: 6.859
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+stderr | src/pages/search/semantic/SemanticResults.test.tsx > explicit chunk action renders exact attributed evidence and source anchor without auto embedding
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/pages/search/semantic/SemanticResults.test.tsx (11 tests) 429ms
+ ❯ src/api/search/semanticClient.test.ts (7 tests | 1 failed) 59ms
+   × chunk mode accepts distinct same-source passages only with complete consistent evidence 41ms
+     → promise resolved "{ query: 'q', mode: 'chunks', …(1) }" instead of rejecting
+stderr | src/pages/search/semantic/SemanticSearchIntegration.test.tsx > actual SearchPage keeps lexical passages and adds semantic matches only after explicit action
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ ✓ src/pages/search/semantic/SemanticSearchIntegration.test.tsx (3 tests) 265ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/api/search/semanticClient.test.ts > chunk mode accepts distinct same-source passages only with complete consistent evidence
+AssertionError: promise resolved "{ query: 'q', mode: 'chunks', …(1) }" instead of rejecting
+
+- Expected
++ Received
+
+- [Error: rejected promise]
++ Object {
++   "hits": Array [
++     Object {
++       "chunkId": "c/1",
++       "quote": Object {
++         "charEnd": 9,
++         "charStart": 4,
++         "speakerRef": "expert",
++         "tEnd": 8,
++         "tStart": 4,
++         "text": "quote",
++         "turnId": "t/1",
++       },
++       "score": -0.25,
++       "session": Object {
++         "_id": "s/1",
++         "date": "2026-10-14",
++         "title": "世界",
++       },
++       "sessionId": "s/1",
++       "tEnd": 9,
++       "tStart": 3,
++       "turnIds": Array [
++         "t/1",
++       ],
++     },
++   ],
++   "mode": "chunks",
++   "query": "q",
++ }
+
+ ❯ src/api/search/semanticClient.test.ts:30:56
+     28|   }
+     29|   fetcher.mockResolvedValue(wire([passage], undefined));
+     30|   await expect(searchSemantic("key", "q", 20, "chunks")).rejects.toMat…
+       |                                                        ^
+     31| });
+     32| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 20 passed (21)
+   Start at  18:59:42
+   Duration  5.98s (transform 218ms, setup 645ms, collect 805ms, tests 753ms, environment 2.51s, prepare 480ms)
+

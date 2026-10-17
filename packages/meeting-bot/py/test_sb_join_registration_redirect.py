@@ -130,3 +130,32 @@ def test_python_rejects_a_result_that_differs_from_the_validated_values(monkeypa
         "status": "uncertain", "reason": "submitted_mismatch"}
     sb.execute_async_script = lambda s, i, a: dict(real(s, i, a), target="http://localhost:1/x") if a == "submit" else real(s, i, a)
     assert sb_join.register_form(sb, INSTRUCTIONS, script_isolated=True, policy_check=lambda: True)["reason"] == "submitted_mismatch"
+
+
+def test_retry_receipt_proves_only_exits_before_submit_entry(monkeypatch):
+    import sb_join_register
+    import registration_cdp
+    class Stub:
+        driver = None
+        def __init__(self, inspect):
+            self.driver = self
+            self.inspect = inspect
+        def execute_cdp_cmd(self, *args):
+            return {}
+        def execute_async_script(self, *args):
+            return self.inspect
+        def execute_script(self, *args):
+            return True
+    called = []
+    def submit(*args):
+        called.append(True)
+        return {"status": "action_required", "reason": "field_mismatch", "submissionDisposition": "not-attempted"}
+    monkeypatch.setattr(registration_cdp, "submit_with_redirects", submit)
+    result = sb_join_register.register_form(Stub({"status": "action_required", "reason": "field_mismatch"}),
+        INSTRUCTIONS, script_isolated=True, policy_check=lambda: True)
+    assert result == {"status": "action_required", "reason": "field_mismatch", "submissionDisposition": "not-attempted"}
+    assert called == []
+    result = sb_join_register.register_form(Stub({"status": "ready"}), INSTRUCTIONS,
+        script_isolated=True, policy_check=lambda: True)
+    assert called == [True]
+    assert "submissionDisposition" not in result

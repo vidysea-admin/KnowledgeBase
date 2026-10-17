@@ -1,0 +1,55 @@
+{
+  "old_vector": "node ../../node_modules/vitest/vitest.mjs run src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+  "new_vector": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+    "--pool=threads",
+    "--poolOptions.threads.singleThread"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "actual_total_tokens": null,
+  "change": "installed local Vitest path; supported single thread options confirmed in local help; no test assertion changes",
+  "pins_before": {
+    "apps/api/src/speaker-profiles/store.ts": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+    "apps/api/src/speaker-profiles/router.ts": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+    "apps/api/src/speaker-profiles/store.test.ts": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+    "apps/api/src/speaker-profiles/router.test.ts": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+    "packages/index/src/graph/speaker-knowledge.ts": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d"
+  },
+  "exit": 1,
+  "output_tail": [
+    "Error: spawn EPERM",
+    "    at ChildProcess.spawn (node:internal/child_process:458:11)",
+    "    at Object.spawn (node:child_process:813:9)",
+    "    at ensureServiceIsRunning (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.21.5\\node_modules\\esbuild\\lib\\main.js:1975:29)",
+    "    at build (C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\esbuild@0.21.5\\node_modules\\esbuild\\lib\\main.js:1873:26)",
+    "    at bundleConfigFile (file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/vite@5.4.21_@types+node@24.13.3/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:66845:24)",
+    "    at loadConfigFromFile (file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/vite@5.4.21_@types+node@24.13.3/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:66815:27)",
+    "    at resolveConfig (file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/vite@5.4.21_@types+node@24.13.3/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:66416:30)",
+    "    at _createServer (file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/vite@5.4.21_@types+node@24.13.3/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:63015:24)",
+    "    at createServer (file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/vite@5.4.21_@types+node@24.13.3/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:63012:10)",
+    "    at createViteServer (file:///C:/Users/product/Desktop/KnowledgeBase/node_modules/.pnpm/vitest@2.1.8_@types+node@24.13.3_jsdom@25.0.1/node_modules/vitest/dist/chunks/cli-api.C2yC_ESk.js:9822:24) {",
+    "  errno: -4048,",
+    "  code: 'EPERM',",
+    "  syscall: 'spawn'",
+    "}",
+    "",
+    "",
+    ""
+  ],
+  "pins_after": {
+    "apps/api/src/speaker-profiles/store.ts": "21abd05e64a137f4bd444270cd03de1fc897988a74e446e40ad8616ccd8a7fca",
+    "apps/api/src/speaker-profiles/router.ts": "cb58852a388f065a7b8db1d7bd502587a73f737f0421ac1759c78e7c9e4eee6b",
+    "apps/api/src/speaker-profiles/store.test.ts": "75421c9896e4056b826fdefbf38c29dad9fbe57c119666284aba5a27ddbe38ef",
+    "apps/api/src/speaker-profiles/router.test.ts": "0cb275c6769c36fa127d9d52c6fccda714b2ad4c941a86a2ad3ce61eaac3530d",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts": "c2f285e16e35c91f9c198558c1d1e1641d820db229b266c979bb28835006439a",
+    "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts": "0592805b111b1dc29da2c333b451875a4cf05be8c454a9a93776eea011e5ce3e",
+    "packages/index/src/graph/speaker-knowledge.ts": "0a275d04c2807fbfe707ff0d9dae430c5a4e3566e9aafd94d79a8e6415aea33d"
+  },
+  "pins_unchanged": true,
+  "active_s": 4.436999999999898
+}

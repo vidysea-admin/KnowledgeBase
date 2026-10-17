@@ -1,0 +1,24 @@
+✔ independent snapshot survives caller context and transcript mutation during awaited loader (20.1598ms)
+✔ every sample with two simultaneous active names is refused downstream (2.0236ms)
+✔ lost acknowledgement after successful upsert exposes unknown writes and retries without replacing row (4.8875ms)
+T-042 adapter sample: 4/4 suggestions; review consumed 4; auto-final 0; explicit confirmation final 1 (synthetic)
+✔ default/off performs no capture or database access; env opt-in is exact (4.0214ms)
+✔ four synthetic panelists: measured offset -> suggestions -> review -> explicit human confirmation (54.1398ms)
+✔ tile/introduction agreement stays suggested; transcript text and timing unchanged (26.8898ms)
+✔ confirmed and rejected decisions survive rerun; no new names for confirmed labels/people (22.0826ms)
+✔ foreign tenant/session/media/capture instance refuses sidecar before any writes (5.4345ms)
+✔ populated foreign tenant with colliding session/label/person stays byte-identical (15.6795ms)
+✔ second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows (10.8563ms)
+✔ unknown clock, bad origins and foreign turns refuse before loader/database access (2.6501ms)
+✔ exact digest, sole first metadata, source, monotonic time and confidence validation (4.8589ms)
+✔ pre-recording samples clipped, confidence preserved, samples beyond recording discarded (0.7674ms)
+✔ low-confidence, no overlap, conflicting tiles and tile-intro disagreement do not guess names (14.9988ms)
+✔ loader cannot change trusted origins; thrown failures return fixed safe reasons (5.1071ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3322.7081

@@ -1,0 +1,28 @@
+✔ production automation factory grounds canonical sources, current hosting roles and credential/source approval generations (175.1396ms)
+✔ mounted approved-form consumer applies verified identity, live role/scope checks and protected evidence review (163.6236ms)
+✔ approved actual configured adapter flow, protected provenance, replay/conflict and fresh store reconstruction (14.1246ms)
+✔ missing/unknown fields, unverifiable source and unregistered target cannot execute (1.7775ms)
+✔ approval binds exact fields/target version and revision invalidates approval before effects (2.2049ms)
+✔ stable operation identity deduplicates a committed effect across an ambiguous safe retry (3.623ms)
+✔ unsafe crash after effect before durable result quarantines and requires verified receipt proof (3.3539ms)
+✔ concurrent claims are exclusive and expired owners cannot commit after monitor recovery (2.4591ms)
+✔ configured adapter refuses unsafe destinations, redirects and wrong-operation receipts without external requests (2.7607ms)
+✔ timeouts/exhaustion, failed writes and corrupt approval remain honest and do not fabricate success (329.6563ms)
+✔ mounted HTTP consumer enforces auth, current permissions, tenant ownership, replay and sanitized outcomes (180.8091ms)
+✔ durable adapter contract, definition CAS, replay, conflict and tenant isolation (7.9483ms)
+✔ unknown handlers, extra caller identities, malformed input and write failures are refused (2.8094ms)
+✔ disabled definitions block queued execution and cancelled work never executes (1.5132ms)
+✔ concurrent execution has one claim and stale workers cannot commit or heartbeat after recovery (1.8764ms)
+✔ timeout writes a durable operator handoff and retry obeys current version and attempt cap (316.3349ms)
+✔ crash after unsafe side effect before durable commit parks reconciliation instead of blind retry (2.0099ms)
+✔ corrupt stored state, arbitrary upstream text and forged outcomes never become successful status (1.7677ms)
+✔ application routine validates typed bounded fields and canonicalizes without invoking I/O (2.4052ms)
+✔ monitor exact lease boundary, bounded retry and reconciliation are explicit (0.367ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4119.0709

@@ -1,0 +1,59 @@
+{
+  "request": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/broker-request.json",
+    "sha256": "3fdb35142ed7ae533642de3075a64af6d34d1dac545fe5983c460ecc99a6e6d6"
+  },
+  "candidate": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2.json",
+    "sha256": "2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2",
+    "count": 89
+  },
+  "trace": {
+    "status": "NOT_REQUESTED_COMPILER_ONLY"
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-head-before-receipt.json",
+      "sha256": "0d17affb71898bf8e0b4c6574e7e7aada11cd39e565058d2f3780503c503c723",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.6100000000005821,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-head-before.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-bot-types-receipt.json",
+      "sha256": "e73d18b26110f4dfa244e7833f85066b66f52b2b0a534b28720416d75d61afed",
+      "exit": 0,
+      "counts": {},
+      "active_s": 13.46900000000096,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-bot-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-head-after-receipt.json",
+      "sha256": "81cdc9bdf4b12a7edfbf1c12ca979269b4a10bc54995b43377c9059e09ef6c96",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.6090000000003783,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-head-after.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    }
+  ],
+  "failure": null,
+  "selectedTitles": "--test-name-pattern=^(?:retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse|fair bounded pages, quota-before-allocation and interrupted journal refuse)$",
+  "elapsed_s": 16.95300000000134,
+  "allPinsFinalMatch": true,
+  "headAfter": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "ownedFixtureRemoved": false,
+  "accounting": "SHARED INTEGRATION only; not watched checker",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

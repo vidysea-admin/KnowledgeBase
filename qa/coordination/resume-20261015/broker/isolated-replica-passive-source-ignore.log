@@ -1,0 +1,66 @@
+{
+  "checks": [
+    {
+      "node": "python_ast/activate-proposal.py",
+      "ok": true
+    },
+    {
+      "node": "python_ast/init-and-smoke.py",
+      "ok": true
+    },
+    {
+      "node": "python_ast/shutdown-owned.py",
+      "ok": true
+    },
+    {
+      "node": "python_ast/inspect-pe.py",
+      "ok": true
+    },
+    {
+      "node": "gitignore/exact-byte-append",
+      "ok": true,
+      "beforeSha256": "449b295b7332f147f1e476c1e25837b84cf264b1fb25bafd5d49342789f74135",
+      "afterSha256": "1889112d1c0fb95d57faf75e3e3cf19756b8c5f6b024d747aa2a0af27d985e1e"
+    },
+    {
+      "node": "gitignore/path-boundary-0",
+      "ok": true,
+      "path": "qa/coordination/resume-20261015/isolated-replica-prep/vendor/mongodb-8.0.34.zip",
+      "expectedExit": 0,
+      "actualExit": 0
+    },
+    {
+      "node": "gitignore/path-boundary-1",
+      "ok": true,
+      "path": "qa/coordination/resume-20261015/isolated-replica-prep/private-run-0123456789abcdef0123456789abcdef/secrets/credentials.json",
+      "expectedExit": 0,
+      "actualExit": 0
+    },
+    {
+      "node": "gitignore/path-boundary-2",
+      "ok": true,
+      "path": "qa/coordination/resume-20261015/isolated-replica-prep/private-run-0123456789abcdef0123456789abcdef/data/WiredTiger",
+      "expectedExit": 0,
+      "actualExit": 0
+    },
+    {
+      "node": "gitignore/path-boundary-3",
+      "ok": true,
+      "path": "qa/coordination/resume-20261015/isolated-replica-prep/PLAN.md",
+      "expectedExit": 1,
+      "actualExit": 1
+    },
+    {
+      "node": "gitignore/path-boundary-4",
+      "ok": true,
+      "path": "qa/coordination/resume-20261015/isolated-replica-prep/private-run-not-a-uuid/unrelated.txt",
+      "expectedExit": 1,
+      "actualExit": 1
+    }
+  ],
+  "applicationImports": 0,
+  "vendorExecutions": 0,
+  "databaseActions": 0,
+  "aclMutations": 0,
+  "activationReady": false
+}

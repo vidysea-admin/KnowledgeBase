@@ -1,0 +1,15 @@
+{
+  "qa/evidence/u24-speaker-profile/checker/field-provenance-cycle3.test.mts": "ae57e3ab6fe04ef4bffebc397536593bfc88f3fde17b519f7ab277633ac62db6",
+  "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts": "32b9cc8c0285612b4a3866c4488de9624354f4580a0369043839c113dfff1886",
+  "qa/evidence/u24-speaker-profile/checker/independent-cycle3-capability.test.mts": "f0556a3785b3810a285eeb20b818f636e81521f9a39d23696eb4ed15a547a55c",
+  "qa/evidence/u24-speaker-profile/checker/mixed-eligibility-cycle3.test.mts": "f2492989a9624d4b2e060c1fedbcaba03f436c249ad67e4c4a0835e4b4e71eea",
+  "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+  "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+  "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+  "apps/api/src/knowledge/metadata-visibility.ts": "22bb063b8ac6c46e5d25730cce44c3dadd59f1a5a1b9cdee6e641ee6c15c7447",
+  "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+  "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+  "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+  "schema/speakers.schema.json": "4517527931b596071fc61568beba608c7de20cce5733c2df7857e3fbfa72a064",
+  "qa/contracts/goal-U24.md": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f"
+}

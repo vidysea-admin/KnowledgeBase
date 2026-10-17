@@ -1,0 +1,75 @@
+{
+  "request": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t061-current-dependencies\\broker-request.json",
+    "sha256": "6d32f467fc6960f3c9c61feb611bdbb88ec2498f878ed48ab38dc4ce7e2e4a12"
+  },
+  "candidate": "9145dffcbed2696b96f472532b4d32174d54dbd930bba78868f9f2ee9fa2d16b",
+  "candidateIdentityKind": "SHA256 of JSON.stringify ordered current raw-byte file pins, not Git SHA",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7.json",
+    "sha256": "33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7",
+    "count": 544
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-head-before-receipt.json",
+      "sha256": "ba5979c46ab1cec4a87a35f9b04b88ed690855126f463f051b032c4340f1690a",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.2969999999986612,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-head-before.log",
+        "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-node-preflight-receipt.json",
+      "sha256": "c32bd09a1a28df0333c9802f94f17b0c5376a8aa3bb650ec54e3fbd84e1d39db",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.4850000000005821,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-node-preflight.log",
+        "sha256": "8b6892bfd19ef833344e44c6dc1f30d07d56dcd7c44661021c775b52a41362d3"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-selected-receipt.json",
+      "sha256": "f511fe95f63b56826a444e343c7098e177b0bc8033b07659be69ee9346680350",
+      "exit": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 21.562000000001717,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-selected.log",
+        "sha256": "cdbb2c5fef2d2abfd336a07c48543bf0aeecdeb3d6e694ffc17d073e3bd6af1e"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-head-after-receipt.json",
+      "sha256": "ec6cfff59c79dd9c18f0c2600aa5af279196482d90d5cbb46b363b19fff6f271",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.4530000000013388,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-head-after.log",
+        "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+      }
+    }
+  ],
+  "failure": null,
+  "beforeHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "afterHead": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "allPinsFinalMatch": true,
+  "ownedTempRemoved": true,
+  "elapsed_s": 24.73400000000038,
+  "accounting": "SHARED INTEGRATION",
+  "independentVerdict": null,
+  "actual_total_tokens": null
+}

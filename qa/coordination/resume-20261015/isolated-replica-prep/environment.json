@@ -1,0 +1,9 @@
+{
+  "actualCompatiblePyMongoImport": "not re-executed; remains unknown until separate admitted preflight",
+  "activation": false,
+  "checker_skill_sha256": "956b28aada9f51a723de1027d5c86f11d4dc6927a55b80ba7c4a086d8849aa99",
+  "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "python": "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+  "kind": "passive-environment-fingerprints",
+  "python_sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14"
+}

@@ -6,12 +6,88 @@ import { delimiter, isAbsolute, join } from "node:path";
 import type { Transport, TransportRequest, TransportResponse } from "@lkb/ai";
 
 function tryParseJson(text: string): unknown { try { return JSON.parse(text); } catch { return text; } }
-async function httpTransport(req: TransportRequest): Promise<TransportResponse> {
-  const res = await fetch(req.url!, { method: req.method ?? "GET", headers: req.headers,
-    body: req.body !== undefined ? JSON.stringify(req.body) : undefined, signal: req.signal });
-  const text = await res.text();
-  return { status: res.status, body: tryParseJson(text), text };
+export interface HttpLimits {
+  timeoutMs?: number;
+  outputBytes?: number;
+  /** Injectable for offline boundary checks; production uses the native fetch implementation. */
+  fetch?: typeof globalThis.fetch;
 }
+/** Refuse redirects before credentials or request bodies can be forwarded; bound response bytes and total time. */
+export function createHttpTransport(options: HttpLimits = {}): Transport {
+  const timeoutMs = options.timeoutMs ?? 180_000;
+  const outputBytes = options.outputBytes ?? 16_777_216;
+  for (const limit of [timeoutMs, outputBytes])
+    if (!Number.isSafeInteger(limit) || limit <= 0) throw new Error("Invalid HTTP limit");
+  return async (req: TransportRequest): Promise<TransportResponse> => {
+    if (req.kind !== "http") throw new Error("HTTP transport requires HTTP request");
+    const controller = new AbortController();
+    let failure: string | undefined;
+    let reader: ReadableStreamDefaultReader<Uint8Array> | undefined;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let rejectBoundary: (reason: Error) => void = () => {};
+    const boundary = new Promise<never>((_, reject) => { rejectBoundary = reject; });
+    const abort = (message: string) => {
+      failure = message;
+      controller.abort();
+      const error = new Error(message);
+      if (message === "HTTP request aborted") error.name = "AbortError";
+      rejectBoundary(error);
+      if (reader) void reader.cancel().catch(() => {});
+    };
+    const onAbort = () => abort("HTTP request aborted");
+    try {
+      if (req.signal?.aborted) {
+        const error = new Error("HTTP request aborted"); error.name = "AbortError"; throw error;
+      }
+      req.signal?.addEventListener("abort", onAbort, { once: true });
+      timer = setTimeout(() => abort("HTTP request timed out"), timeoutMs);
+      const request = async (): Promise<TransportResponse> => {
+        const res = await (options.fetch ?? globalThis.fetch)(req.url!, {
+          method: req.method ?? "GET", headers: req.headers, redirect: "manual",
+          body: req.body !== undefined ? JSON.stringify(req.body) : undefined, signal: controller.signal,
+        });
+        if (controller.signal.aborted) { void res.body?.cancel().catch(() => {}); throw new Error("aborted"); }
+        if (res.status >= 300 && res.status < 400) {
+          void res.body?.cancel().catch(() => {});
+          failure = "HTTP redirects are refused"; controller.abort(); throw new Error(failure);
+        }
+        const declaredLength = res.headers.get("content-length");
+        if (declaredLength !== null && Number(declaredLength) > outputBytes) {
+          void res.body?.cancel().catch(() => {});
+          failure = "HTTP response exceeds byte limit"; controller.abort(); throw new Error(failure);
+        }
+        const chunks: Uint8Array[] = []; let bytes = 0;
+        if (res.body) {
+          reader = res.body.getReader();
+          while (true) {
+            controller.signal.throwIfAborted();
+            const next = await reader.read();
+            if (next.done) break;
+            bytes += next.value.byteLength;
+            if (bytes > outputBytes) {
+              failure = "HTTP response exceeds byte limit"; controller.abort();
+              void reader.cancel().catch(() => {}); throw new Error(failure);
+            }
+            chunks.push(next.value);
+          }
+        }
+        controller.signal.throwIfAborted();
+        const text = Buffer.concat(chunks, bytes).toString("utf8");
+        return { status: res.status, body: tryParseJson(text), text };
+      };
+      return await Promise.race([request(), boundary]);
+    } catch {
+      const error = new Error(failure ?? (req.signal?.aborted ? "HTTP request aborted" : "HTTP request failed"));
+      if (error.message === "HTTP request aborted") error.name = "AbortError";
+      throw error; // Never reflect URLs, credentials, headers, source content or proxy exceptions.
+    } finally {
+      if (timer !== undefined) clearTimeout(timer);
+      req.signal?.removeEventListener("abort", onAbort);
+      try { reader?.releaseLock(); } catch { /* cancellation can still own an outstanding read */ }
+    }
+  };
+}
+const httpTransport = createHttpTransport();
 export interface CliLimits {
   timeoutMs?: number; inputBytes?: number; outputBytes?: number; outputTokens?: number;
   executable?: string; cwd?: string;

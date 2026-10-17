@@ -10,6 +10,8 @@ import { Router, type Request, type Response } from "express";
 import type { TreeIndexNode } from "@lkb/core";
 import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
 import { requireScope } from "../../auth.js";
+import { AnswerWorkflowError, answerGraphSelection, parseAnswerInput, type AnswerWorkflow } from '../../answer-policy/answer-workflow.js';
+import { answerWorkflowFailure } from '../../answer-policy/answer-router.js';
 
 /** Injected dependency (C3) — production impl in `store.ts` is Mongo-backed; tests use a fake. */
 export interface TreeStore {
@@ -17,8 +19,9 @@ export interface TreeStore {
 }
 
 export interface AskRouteDeps {
+  answerWorkflow?: AnswerWorkflow;
   tree: TreeStore;
-  requestDepsFor?: (tenantId: string) => Omit<AskV2Deps, "tenantId">;
+  requestDepsFor?: (tenantId: string, selection?: { speakerRefs?: string[]; topicRefs?: string[] }) => Omit<AskV2Deps, "tenantId">;
   /** Everything `askV2` needs except `tenantId`, which comes from the verified key per request. */
   askDeps: Omit<AskV2Deps, "tenantId" | "extraCandidateArmsFn">;
   /**
@@ -35,32 +38,41 @@ export function createAskRouter(deps: AskRouteDeps): Router {
   const router = Router();
 
   router.post("/ask", requireScope("ask"), async (req: Request, res: Response) => {
-    const body = req.body as { query?: unknown } | undefined;
+    const body = req.body as { query?: unknown; filters?: unknown } | undefined;
     if (!body || typeof body.query !== "string" || body.query.trim() === "") {
       res.status(400).json({ error: "bad_request", message: "body must be { query: string }" });
       return;
     }
 
     const tenantId = req.auth!.tenantId;
+    try {
+    // Keep the legacy request's ignored top-level fields inert. Durable policy Ask
+    // retains its existing strict full-input parser; both paths validate filters.
+    const input = parseAnswerInput(deps.answerWorkflow ? req.body : { query: body.query, filters: body.filters });
+    const selection = answerGraphSelection(input.filters);
+    if ((selection?.speakerRefs?.length || selection?.topicRefs?.length) && !deps.requestDepsFor)
+      throw new BoundedAskError("selected graph authority unavailable");
     const tree = await deps.tree.load(tenantId);
     if (!tree) {
       res.status(404).json({ error: "not_found", message: "no tree index built for this tenant yet" });
       return;
     }
 
-    try {
-    const result = await askV2(body.query, tree, {
+    const requestDeps = {
       ...deps.askDeps,
-      ...(deps.requestDepsFor ? deps.requestDepsFor(tenantId) : {}),
+      ...(deps.requestDepsFor ? deps.requestDepsFor(tenantId, selection) : {}),
       tenantId,
-      ...(!deps.requestDepsFor && deps.extraCandidateArmsFor ? { extraCandidateArmsFn: deps.extraCandidateArmsFor(tenantId) } : {}),
-    });
+    };
+    const result = deps.answerWorkflow
+      ? await deps.answerWorkflow.execute(tenantId, req.body, { actor: `api-key:${req.auth!.keyId ?? tenantId}` }, tree, requestDeps)
+      : await askV2(input.query, tree, requestDeps);
     res.status(200).json(result);
     } catch (error) {
       if (error instanceof BoundedAskError) {
         res.status(503).json({ error: error.code, message: error.message });
         return;
       }
+      if (deps.answerWorkflow || error instanceof AnswerWorkflowError) { answerWorkflowFailure(res, error); return; }
       throw error;
     }
   });

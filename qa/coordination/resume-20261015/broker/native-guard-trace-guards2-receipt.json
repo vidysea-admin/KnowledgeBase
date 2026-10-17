@@ -1,0 +1,32 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=70000",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "--test-name-pattern=^(?:retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse|fair bounded pages, quota-before-allocation and interrupted journal refuse)$",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3.json",
+    "sha256": "f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3",
+    "count": 89
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 75,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 28280,
+  "timeout": true,
+  "exit": 124,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 70.56200000000172,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-guards2.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "counts": {}
+}

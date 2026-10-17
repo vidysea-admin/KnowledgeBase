@@ -27,3 +27,18 @@ ISS-T039NEXT-001 reproduction (send-now-host.test.ts) now 15/15 runs green, 16 p
 Results: apps/api full 810/810 (D2_FIXTURE_PYTHON set), apps/api tsc 0, meeting-bot session-status.test 4/4, meeting-bot tsc 0, lint-loc --all OK.
 Mutations (hash-verified applied, per-mutation restore, HEAD blob equal after): M1 tenant hardcoded, M2 GET scope removed, M3 jobId anchor dropped, M4 host tenant mismatch ignored (cycle-0 survivor, now killed), M5 reader swallows unreadable, M6 throw->200, L1 exit no longer fails launch, L2 liveness timer rejects, P1 probes not passed: 9/9 killed.
 ISSUES-WRITTEN: none
+
+## Cycle 1 (unit t039send, lane/w16-t039send)
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: aac972a9f6441d45f30d23e938f36645b8e72548
+Base SHA: a9fac545
+
+EXPLANATION:
+Diff base..candidate = manifest + 2 lines in scripts/webinar/send-now-host.test.ts (a comment and `for (i<200 && !existsSync(dump)) await 50 ms`). The loop only waits for the child's argv dump (max 10 s); the following `readFileSync(dump)` still throws if the file never appears, and the `deepEqual` argv assertions at lines 123-125 are unchanged. It removes a race (livenessMs 400 does not guarantee the child wrote the dump before the 202) and weakens nothing. No product code changed.
+"Already fixed at base" claims, verified against base a9fac545: (1) ISS-T039NEXT-001: send-now-host.ts:43 has `liveProbes?: LiveProbes`, passed at :90; test line 202 `hermetic = { statusEnabled: true, liveProbes: aliveProbe }` seeds and reads with the same probe; the foreign-tenant assertion is its own test (line 209). TRUE. (2) ISS-T039DUPES-002: base test line 92 job-1.json carries tenantId "tenant-a". TRUE (file passes 17/17).
+Runs (node --test --test-force-exit --import tsx scripts/webinar/send-now-host.test.ts, from the lane): 2/2 runs pass 17 fail 0, exit 0. Evidence: scratchpad/t039send-evidence/run1.txt, run2.txt.
+Mutation M1 (status() tenant check `tenantId !== tenant` -> `false && ...`, per-mutation byte backup, subshell trap EXIT/INT/TERM/ERR, timeout 600): applied (hash b224e79e -> 369ebf9a), result pass 16 fail 1, the failing test is the "tenant this host does not serve is forbidden" test = KILLED. cmp restore OK; git hash-object == HEAD blob b224e79ee6df3b4f1bdd113807ecd89f489bbdc3. mut.txt in the evidence dir.
+Not verified: the before-state race (maker's 4/4 red under load) was not reproduced by me; ISS-T039DUPES-006 (claimLiveRecording survivors) and ISS-SENDNOWAPI-004 are out of this unit's paths and remain open as the maker states; no full suites run (per brief).
+Ledger: ISS-T039NEXT-001 already closed; ISS-T039DUPES-002 (status open in qa/issues.t039dupes.jsonl) may be flipped to verified/closed. ISS-T039DUPES-006 and ISS-SENDNOWAPI-004 stay open.
+ISSUES-WRITTEN: none

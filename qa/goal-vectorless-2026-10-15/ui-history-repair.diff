@@ -1,0 +1,2 @@
+-  expect((await screen.findByRole("status")).textContent).toContain("Knowledge refresh complete");
++  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Knowledge refresh complete"));

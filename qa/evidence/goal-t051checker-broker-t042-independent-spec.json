@@ -1,0 +1,21 @@
+{
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "src/indexing/tile-speaker-suggest.test.ts",
+    "../../qa/evidence/t042-capture-clock-suggestions/checker-probe.test.mts"
+  ],
+  "pins": {
+    "apps/api/src/indexing/tile-speaker-suggest.ts": "d3473147ab4010f533cac8ae5bb36918a6020f33dee2ca3ebb55b1d59ec5edde",
+    "apps/api/src/indexing/tile-speaker-suggest.test.ts": "8600237450ff563feca024cc7d0a2a28cf56a7fd1c20c76f04279287be413f91",
+    "qa/evidence/t042-capture-clock-suggestions/checker-probe.test.mts": "612752dacfc4c7d4951617ca94c8991471c02c015a1e56c36fba7ac4ce982be1",
+    "packages/db/src/collections/speaker-suggestions.ts": "515626d26a77e18970d7cec8df60179646dcd56478304758f985bb165b62129c",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "bce0534f0fd474788e97774da274f8cfa186908a005876d7d1dabd8c95feb000"
+  },
+  "timeoutMs": 60000,
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase/apps/api",
+  "output": "qa/evidence/goal-t051checker-broker-t042-independent"
+}

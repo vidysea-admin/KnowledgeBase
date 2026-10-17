@@ -1,0 +1,30 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Shared frozen contracts validation after final public checkpoint",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+  "args": [
+    "-B",
+    "contracts/verify_contracts.py"
+  ],
+  "testIDs": [
+    "current frozen contract verifier; empty registry vacuity disclosed"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts",
+  "pins": {
+    "contracts/verify_contracts.py": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3",
+    "contracts/contracts.json": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940"
+  }
+}

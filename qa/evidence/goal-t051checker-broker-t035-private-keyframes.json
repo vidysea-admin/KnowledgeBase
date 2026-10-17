@@ -1,0 +1,31 @@
+{
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T20:43:32.851Z",
+  "completedAt": "2026-10-14T20:43:33.509Z",
+  "elapsedMs": 655.1031999999999,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "2d913183653a577753aa3ebaea3696094c669e30654aefb17bbea710d5750321"
+  },
+  "after": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "2d913183653a577753aa3ebaea3696094c669e30654aefb17bbea710d5750321"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t035-private-keyframes.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t035-private-keyframes.stderr.txt",
+  "hashesUnchanged": true
+}

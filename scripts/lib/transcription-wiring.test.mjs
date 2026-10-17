@@ -1,16 +1,18 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync, readdirSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import {
   SINGLE_CALL_FLAG, TRANSCRIPT_QA_FLAG, applyTranscriptQa, boundariesForPlan, flagOn, isSingleCallComplete,
   planTranscriptionPath, selectTranscriber, summariseQaReport,
 } from "./transcription-wiring.mjs";
 import { clampAndValidateTurns } from "../../packages/ai/src/stt/transcript-qa.ts";
 import { chooseTranscriptionPath, T048_THRESHOLDS } from "../../packages/ai/src/stt/transcription-plan.ts";
+import { evaluateTranscriptQaGeneration } from "../webinar/validate/transcript-qa-binding.mjs";
 
 const SCRIPTS = resolve(import.meta.dirname, "..");
 const PKG = resolve(import.meta.dirname, "..", "..", "packages", "ai", "src", "stt");
@@ -95,7 +97,7 @@ export function execFileSync(cmd,args){
  if(cmd==='ffprobe'){const p=args.at(-1);return p.includes('span-')?readFileSync(p,'utf8'):process.env.MEDIA_DURATION;}
  throw Error('unapproved child');
 }`;
-const geminiSrc = `import {appendFileSync} from 'node:fs';
+const geminiSrc = `import {appendFileSync,writeFileSync} from 'node:fs';
 let n=0;
 export async function uploadFile(){return {fileUri:'f',name:'f'}}
 export async function pollFileState(){return 'ACTIVE'}
@@ -104,13 +106,18 @@ export async function transcribeUploadedAudio(uri,tr,key,model,dur){
  appendFileSync(process.env.TRACE,JSON.stringify({call:n,model:model??null,dur})+'\\n');
  if(!c)throw Error('no fake call '+n);
  if(c.error)throw Error(c.error);
+ if(process.env.MUTATE_AUDIO==='1')writeFileSync(process.env.AUDIO_FIXTURE_PATH,'changed-audio');
  const turns=c.turns??Array.from({length:Math.round(dur/20)},(_,i)=>({speakerRef:'spk:0',tStart:i*20,tEnd:(i+1)*20,text:'turn '+i+' of call '+n}));
  return {turns,usage:{inputTokens:1,outputTokens:1}};
 }`;
 function hookSource() {
   const real = (f) => pathToFileURL(join(PKG, f)).href;
   const mod = (s) => "data:text/javascript," + encodeURIComponent(s);
-  return `import {registerHooks} from 'node:module';
+  return `import {registerHooks,syncBuiltinESMExports} from 'node:module';
+import fs from 'node:fs';
+const rename=fs.renameSync;
+fs.renameSync=(a,b)=>{if(process.env.FAIL_QA_PUBLICATION==='1'&&b.endsWith('transcript-qa.json'))throw Error('fixture QA publication failure');return rename(a,b)};
+syncBuiltinESMExports();
 registerHooks({resolve(s,c,next){
  if(s==='dotenv/config')return {url:${JSON.stringify(mod("export {};"))},shortCircuit:true};
  if(s==='tsx/esm/api')return {url:${JSON.stringify(mod("export function register(){}"))},shortCircuit:true};
@@ -153,7 +160,7 @@ function fixture() {
   const run = (media, calls, env = {}) => {
     const r = spawnSync(process.execPath, ["--import", pathToFileURL(join(root, "hook.mjs")).href, join(root, "scripts", "transcribe-long-session.mjs"), "session1"], {
       encoding: "utf8", timeout: 30000,
-      env: { ...process.env, LKB_TRANSCRIPT_QA: "", LKB_SINGLE_CALL_PATH: "", GEMINI_STT_MODEL: "", GEMINI_API_KEY: "fixture", MEDIA_DURATION: String(media), FAKE_CALLS: JSON.stringify(calls), TRACE: trace, ...env },
+      env: { ...process.env, LKB_TRANSCRIPT_QA: "", LKB_SINGLE_CALL_PATH: "", GEMINI_STT_MODEL: "", GEMINI_API_KEY: "fixture", FAIL_QA_PUBLICATION: "", MUTATE_AUDIO: "", MEDIA_DURATION: String(media), FAKE_CALLS: JSON.stringify(calls), TRACE: trace, AUDIO_FIXTURE_PATH: join(root, "fixture.m4a"), ...env },
     });
     const calls_ = existsSync(trace) ? readFileSync(trace, "utf8").trim().split("\n").filter(Boolean).map((l) => JSON.parse(l)) : [];
     return { r, calls: calls_ };
@@ -225,22 +232,159 @@ test("driver, single call fails: falls back to the chunked plan (1 failed + 2 ch
   try {
     const { r, calls } = f.run(3600, [{ error: "provider 500" }, {}, {}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash" });
     ok(r);
-    assert.match(r.stdout, /single call failed \(provider 500\) -- falling back to chunked/);
+    assert.match(r.stdout, /single call failed -- falling back to chunked/);
+    assert.doesNotMatch(r.stdout, /provider 500/);
     assert.deepEqual(calls.map((c) => c.dur), [3600, 2400, 1200]);
     assert.equal(JSON.parse(readFileSync(f.turnsPath, "utf8")).length, 180);
   } finally { rmSync(f.root, { recursive: true, force: true }); }
 });
 
-test("driver, single call returns an incomplete transcript on every attempt: falls back to chunks", () => {
+test("driver, incomplete initial single makes exactly one call then discards it before chunks", () => {
   const f = fixture();
   try {
     const short = { turns: [{ speakerRef: "spk:0", tStart: 0, tEnd: 600, text: "stops early" }] };
-    // 3 attempts at depth 0 + 9 more across the 3 recursive tail splits (all empty), then the 2 chunked-fallback calls.
-    const empty = { turns: [] };
-    const { r } = f.run(3600, [short, short, short, ...Array(9).fill(empty), {}, {}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash" });
+    const { r, calls } = f.run(3600, [short, {}, {}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1" });
     ok(r);
     assert.match(r.stdout, /single call incomplete/);
     assert.match(r.stdout, /chunked fallback: 2 chunk\(s\)/);
+    assert.deepEqual(calls.map(c => c.dur), [3600, 2400, 1200]);
+    const bytes = readFileSync(f.turnsPath);
+    const turns = JSON.parse(bytes);
+    assert.equal(turns.length, 180);
+    assert.ok(turns.every(t => t.text !== "stops early" && t.tenantId === "tenant2" && t.sessionId === "session1"));
+    const qa = JSON.parse(readFileSync(join(f.dir, "transcript-qa.json")));
+    assert.equal(qa.version, 1);
+    assert.equal(qa.turnsSha256, createHash("sha256").update(bytes).digest("hex"));
+    assert.deepEqual(qa.spans.filter(s => s.accepted).map(s => s.id), ["c0-a1", "c1-a1"]);
+    assert.equal(qa.spans.find(s => s.id === "single-a1").accepted, false);
+    const path = JSON.parse(readFileSync(join(f.dir, "transcription-path.json")));
+    assert.equal(path.turnsSha256, qa.turnsSha256);
+    assert.equal(path.actualPath, "chunked");
+    assert.equal(path.singleAttempts, 1);
+    assert.equal(path.providerAttempts.length, 3);
+    const consumed = evaluateTranscriptQaGeneration({ proof: qa, turnsBytes: bytes, turns, durationSec: 3600, clamp: clampAndValidateTurns });
+    assert.deepEqual(consumed.reasons, [], "actual downstream QA gate consumes committed fallback generation");
+    assert.equal(consumed.qa.acceptedSpans, 2);
+    const changed = Buffer.from(bytes.toString().replace("turn 0", "changed 0"));
+    assert.match(evaluateTranscriptQaGeneration({ proof: qa, turnsBytes: changed, turns: JSON.parse(changed), durationSec: 3600, clamp: clampAndValidateTurns }).reasons.join("; "), /hash mismatch/);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, empty/malformed/gapped/invalid initial results go straight to chunk fallback", () => {
+  const cases = [[], {}, [t(0, 100), t(3200, 3600)], [t(-1, 3600)], [t(0, 3700)], [t(3500, 3600)]];
+  for (const turns of cases) {
+    const f = fixture();
+    try {
+      const { r, calls } = f.run(3600, [{ turns }, {}, {}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash" });
+      ok(r);
+      assert.deepEqual(calls.map(c => c.dur), [3600, 2400, 1200]);
+      assert.equal(JSON.parse(readFileSync(f.turnsPath)).length, 180);
+    } finally { rmSync(f.root, { recursive: true, force: true }); }
+  }
+});
+
+test("driver, fallback transient errors retry within the existing bound and redact provider details", () => {
+  const f = fixture();
+  try {
+    const { r, calls } = f.run(3600, [{ error: "https://provider?key=DO-NOT-LOG" }, { error: "DO-NOT-LOG" }, {}, {}],
+      { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1" });
+    ok(r);
+    assert.deepEqual(calls.map(c => c.dur), [3600, 2400, 2400, 1200]);
+    assert.doesNotMatch(r.stdout + r.stderr + readFileSync(join(f.dir, "transcription-path.json")), /DO-NOT-LOG/);
+    const qa = JSON.parse(readFileSync(join(f.dir, "transcript-qa.json")));
+    assert.deepEqual(qa.spans.filter(s => s.accepted).map(s => s.id), ["c0-a2", "c1-a1"]);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, recursive chunk recovery retains only the selected prefix and tail attempt evidence", () => {
+  const f = fixture();
+  try {
+    const prefix = { turns: [t(0, 1000, "selected prefix")] };
+    const { r, calls } = f.run(3600, [{ error: "single refused" }, prefix, prefix, prefix, {}, {}],
+      { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1" });
+    ok(r);
+    assert.deepEqual(calls.map(c => c.dur), [3600, 2400, 2400, 2400, 1400, 1200]);
+    const bytes = readFileSync(f.turnsPath), turns = JSON.parse(bytes);
+    assert.equal(turns.length, 131);
+    assert.equal(turns[1].tStart, 1000);
+    const proof = JSON.parse(readFileSync(join(f.dir, "transcript-qa.json")));
+    assert.deepEqual(proof.spans.filter(s => s.accepted).map(s => [s.id, s.offsetSeconds]), [["c0-a1", 0], ["c0t-a1", 1000], ["c1-a1", 2400]]);
+    assert.deepEqual(evaluateTranscriptQaGeneration({ proof, turnsBytes: bytes, turns, durationSec: 3600, clamp: clampAndValidateTurns }).reasons, []);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, both paths failing preserve prior turns and QA/path bytes", () => {
+  const f = fixture();
+  try {
+    const prior = Buffer.from("[]\n"), qa = Buffer.from("prior QA"), path = Buffer.from("prior path");
+    writeFileSync(f.turnsPath, prior);
+    writeFileSync(join(f.dir, "transcript-qa.json"), qa);
+    writeFileSync(join(f.dir, "transcription-path.json"), path);
+    writeFileSync(join(f.dir, "validation.json"), "prior validation");
+    const { r, calls } = f.run(3600, Array(4).fill({ error: "secret-request" }), { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1" });
+    assert.equal(r.status, 1);
+    assert.equal(calls.length, 4);
+    assert.doesNotMatch(r.stdout + r.stderr, /secret-request/);
+    assert.deepEqual(readFileSync(f.turnsPath), prior);
+    assert.deepEqual(readFileSync(join(f.dir, "transcript-qa.json")), qa);
+    assert.deepEqual(readFileSync(join(f.dir, "transcription-path.json")), path);
+    assert.equal(readFileSync(join(f.dir, "validation.json"), "utf8"), "prior validation");
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, changed source audio after provider return refuses before publication", () => {
+  const f = fixture();
+  try {
+    const paths = [f.turnsPath, ...["transcript-qa.json", "transcription-path.json", "validation.json"].map(n => join(f.dir, n))];
+    for (const path of paths) writeFileSync(path, path === f.turnsPath ? "[]\n" : "prior bytes");
+    const previous = paths.map(path => readFileSync(path));
+    const { r, calls } = f.run(3600, [{}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1", MUTATE_AUDIO: "1" });
+    assert.equal(r.status, 1);
+    assert.equal(calls.length, 1);
+    assert.match(r.stderr, /recording changed during transcription/);
+    paths.forEach((path, index) => assert.deepEqual(readFileSync(path), previous[index]));
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, same turns with newly suspicious accepted QA invalidate prior passed validation", () => {
+  const f = fixture();
+  try {
+    const env = { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1" };
+    ok(f.run(3600, [{}], env).r);
+    const original = readFileSync(f.turnsPath);
+    writeFileSync(join(f.dir, "validation.json"), JSON.stringify({ status: "passed", transcriptValidated: true }));
+    const turns = Array.from({ length: 180 }, (_, i) => t(i * 20, (i + 1) * 20, `turn ${i} of call 1`));
+    ok(f.run(3600, [{ turns: [...turns, t(3600, 3620, "unsupported tail")] }], env).r);
+    assert.deepEqual(readFileSync(f.turnsPath), original, "turn writer idempotent path exercised");
+    assert.equal(JSON.parse(readFileSync(join(f.dir, "validation.json"))).status, "failed");
+    const proof = JSON.parse(readFileSync(join(f.dir, "transcript-qa.json")));
+    assert.match(evaluateTranscriptQaGeneration({ proof, turnsBytes: original, turns: JSON.parse(original), durationSec: 3600, clamp: clampAndValidateTurns }).reasons.join("; "), /past the audio end/);
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, QA publication failure preserves prior sidecar bytes and leaves validation refused", () => {
+  const f = fixture();
+  try {
+    const prior = Buffer.from("prior QA bytes");
+    writeFileSync(join(f.dir, "transcript-qa.json"), prior);
+    writeFileSync(join(f.dir, "validation.json"), JSON.stringify({ status: "passed", transcriptValidated: true }));
+    const { r } = f.run(3600, [{}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash", LKB_TRANSCRIPT_QA: "1", FAIL_QA_PUBLICATION: "1" });
+    assert.equal(r.status, 1);
+    assert.deepEqual(readFileSync(join(f.dir, "transcript-qa.json")), prior);
+    assert.equal(JSON.parse(readFileSync(join(f.dir, "validation.json"))).status, "failed");
+    assert.ok(!readdirSync(f.dir).some(n => n.endsWith(".tmp")));
+  } finally { rmSync(f.root, { recursive: true, force: true }); }
+});
+
+test("driver, 90-minute inclusive boundary is one real initial transcription request", () => {
+  const f = fixture();
+  try {
+    const { r, calls } = f.run(5400, [{}], { LKB_SINGLE_CALL_PATH: "1", GEMINI_STT_MODEL: "gemini-3.8-flash" });
+    ok(r);
+    assert.deepEqual(calls.map(c => c.dur), [5400]);
+    const provenance = JSON.parse(readFileSync(join(f.dir, "transcription-path.json")));
+    assert.equal(provenance.model, "gemini-3.8-flash");
+    assert.equal(provenance.actualPath, "single");
   } finally { rmSync(f.root, { recursive: true, force: true }); }
 });
 

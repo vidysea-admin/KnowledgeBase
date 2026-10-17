@@ -1,0 +1,18 @@
+[
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\SKILL.md",
+    "sha256": "956b28aada9f51a723de1027d5c86f11d4dc6927a55b80ba7c4a086d8849aa99"
+  },
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_contract.py",
+    "sha256": "c1bddb992c5d6d102cba9c2ff36e95c3449f99e2bd7ac6bf702ed1f0ef37b592"
+  },
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+    "sha256": "7dbe2e8593abf570f54646259231607017fb0bac062ce4ae87e49b3c295fce43"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t013.md",
+    "sha256": "0c89198cc6de12462c8d352d94911cf0661747ae78c80f1a6f560581cc8f540c"
+  }
+]

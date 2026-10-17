@@ -7,8 +7,37 @@ import { todayAt } from "./capture/record-commands.js";
 import { readWebinarOperationState } from "./calendar/state/schedule-state.js";
 import { hostOnly, readLiveJobs, REFUSAL_MESSAGES, runSendNow, type SendNowDeps } from "./send-now-command.js";
 import type { SendNowJob, SendNowRefusal } from "./send-now.js";
+import { reconcileWebinarSources } from "./calendar/calendar-client.js";
+import type { WebinarOperationState } from "./calendar/state/schedule-state.js";
 
 const MEET = "https://meet.google.com/abc-defg-hij";
+test("canonical queued/recording operations without scheduled files block their own meeting across restart", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "send-now-canonical-"));
+  const now = new Date("2026-10-10T10:00:00.000Z"), tenantId = "t1";
+  const reconciled = reconcileWebinarSources({ tenantId, checkedAt: now.toISOString(), acquisition: { complete: true, historyComplete: false, scope: "available-connected-source-state" }, candidates: [],
+    calendarEvents: [{ id: "calendar-1", title: "Webinar", meetingUrl: MEET, startTime: "2026-10-10T09:00:00.000Z", endTime: "2026-10-10T12:00:00.000Z" }] });
+  const id = reconciled.inventory[0]!.sessionKey!;
+  const src = { operationsFile: path.join(dir, "operations.json"), scheduledDir: path.join(dir, "scheduled"), tenantId };
+  try {
+    for (const status of ["queued", "recording"]) {
+      const state: WebinarOperationState = { version: 1, tenantId, operations: { [id]: { tenantId, status } }, source: {
+        coverage: { scope: "available-connected-source-state", baselineComplete: true, continuousSince: now.toISOString(), requestStartedAt: now.toISOString(), calendarSyncToken: "fixture", historicalDeletedReconstruction: "unavailable" },
+        mirror: {}, reconciliation: reconciled.state } };
+      writeFileSync(src.operationsFile, JSON.stringify(state));
+      const reader = readWebinarOperationState;
+      const h = harness(readLiveJobs(src, now, reader));
+      assert.equal(await runSendNow([`${MEET}?authuser=1`], h.deps), 1, status);
+      assert.equal(h.calls.length, 0);
+      const other = harness(readLiveJobs(src, now, reader));
+      assert.equal(await runSendNow(["https://meet.google.com/xyz-wxyz-abc"], other.deps), 0);
+      state.operations[id]!.status = "ready";
+      writeFileSync(src.operationsFile, JSON.stringify(state));
+      assert.deepEqual(readLiveJobs(src, now, reader), []);
+    }
+    writeFileSync(src.operationsFile, JSON.stringify({ version: 1, tenantId, operations: { orphan: { tenantId, status: "queued" } } }));
+    assert.throws(() => readLiveJobs(src, now, readWebinarOperationState), /no verifiable meeting identity/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
 function harness(jobs: SendNowJob[] | Error = [], extra: Partial<SendNowDeps> = {}) {
   const calls: string[][] = [], out: string[] = [];
   const deps: SendNowDeps = {

@@ -1,0 +1,108 @@
+{
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f.json",
+    "sha256": "770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f",
+    "count": 349
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-preflight-receipt.json",
+      "sha256": "547079d3ee8a3f903ad2e0fc94da95698552f1e06d1b632b6fcdfcd2fa9d8058",
+      "exit": 0,
+      "active_s": 0.10900000000037835,
+      "counts": {},
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-preflight.log",
+        "sha256": "ec89c89d160688b2c54de07bf94f02c8e633b08e0dc1ad14989f75d86a6a13d7"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-guard1-receipt.json",
+      "sha256": "775389234a0c9ba6ec6b4e5b5fd0bc608b77778c16931196f66534786a79602c",
+      "exit": 0,
+      "active_s": 0.25,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-guard1.log",
+        "sha256": "3442b4be399dda12aa978bd2d98a6ab616b22eea2ac2b8865578686514d3aeaa"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-audit92-receipt.json",
+      "sha256": "a858aa1209f755e2e16589b32c39d8c39a84afb1bc024f1f716950de2829112f",
+      "exit": 0,
+      "active_s": 25.68800000000192,
+      "counts": {},
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-audit92.log",
+        "sha256": "5e78270e75f7c35128ff30ade2caaa7e2097a07ae9d13e61a26370b15f3edb97"
+      }
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\eval-pilot\\offline-hydration-audit\\watchdog-receipt.json",
+      "sha256": "5ee52fe3a9faaf495e760c4b3f8afa13b16c6b0ce60254dc08d8749c07ab37c6"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\eval-pilot\\offline-hydration-audit\\process-output.jsonl",
+      "sha256": "be0e6c329b58860b679366257dfe42ab72f210416751f98f2f74e5cb40671ff3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\eval-pilot\\offline-hydration-audit\\result.json",
+      "sha256": "bb009a95474c7d555f4025e4c601649f1411147e42551402296bd2388e44725f"
+    }
+  ],
+  "failure": null,
+  "allPinsFinalMatch": true,
+  "reservedRequestIds": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "authorizationStatus": "awaiting_human",
+  "completeAnswerIds6to17NotSpentByThisUnit": true,
+  "elapsed_s": 27.5470000000023,
+  "actual_total_tokens": null,
+  "independentVerdict": null,
+  "audit": {
+    "status": "AUDIT_COMPLETED",
+    "questions": 92,
+    "candidates": 29,
+    "expectedSessions": 23,
+    "candidatesWithoutAcceptedQuestion": [
+      "2026-09-02-india-test-series-part2",
+      "2026-09-09-global-test-prep-pathways",
+      "2026-09-16-pathways-in-psychology",
+      "2026-09-21-uniaccess-japan",
+      "2026-09-24-in-focus",
+      "2026-09-24-zoho-next-european-study-destinations"
+    ],
+    "coverage": {
+      "hydrated": 80,
+      "noExcerpts": 0,
+      "refused": 12
+    },
+    "tripwires": {
+      "fetch": 0,
+      "http": 0,
+      "socket": 0,
+      "dns": 0,
+      "udp": 0,
+      "credentialFile": 0,
+      "provider": 0,
+      "embedding": 0
+    },
+    "wallMs": 24993
+  },
+  "actualImportedSources": 202
+}

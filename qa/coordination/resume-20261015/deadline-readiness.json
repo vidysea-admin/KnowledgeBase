@@ -1,0 +1,28 @@
+{
+  "status": "READINESS_ONLY_NO_SOURCE_EDITS_OR_TESTS",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "exactCauseProven": false,
+  "staticCause": "Current fixture replaceOne inserts new lexical chunk but returns matchedCount=0 and no upsertedCount; chunk-write.ts:33 rejects 0+(undefined??0) != 1 as lexical chunk write unconfirmed. Existing sanitized receipt reports generic index Error/UNLISTED, so exact original exception remains unproven dynamically.",
+  "furtherMismatch": "chunk-write.ts:36 prune uses _id $nin; fixture fails unsupported operators closed, so stale rows will not prune after first repair. Implement faithful scalar/array exclusion including missing fields, preserving conjunction and fail-closed unknown operators.",
+  "paths": [
+    "apps/api/src/evaluation-flywheel/test-fixture.ts",
+    "apps/api/src/evaluation-flywheel/composition.test.ts"
+  ],
+  "proposedChanges": [
+    "replaceOne result: upsertedCount=1 only insertion with upsert; 0 on match or non-upsert miss; retain acknowledged/matched/modified and duplicate failure",
+    "Support $nin with Mongo scalar/array exclusion and missing-field matching; retain $exists and tenant/CAS filters",
+    "Extend current helper regression for insert/match/miss/no-op result counts, $nin kept/stale/foreign rows, compound operators and unsupported operator refusal"
+  ],
+  "pins": {
+    "fixture": "4fd0bcbdd3f054c20e5e444f87900609ffb63d306c68b5a5fdaf5c84c4379cee",
+    "composition": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784"
+  },
+  "lease": "Historical registry and leases read: central integration_control owns shared epoch/broker; no evaluation-flywheel matching reservation found in registry. Absence is not grant. Require fresh central exact-path lease and runtime validation before edits/tests.",
+  "brokerCommands": [
+    "node --test --test-concurrency=1 --test-timeout=30000 --test-name-pattern=\"^actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child$\" --import tsx apps/api/src/evaluation-flywheel/composition.test.ts",
+    "node --test --test-concurrency=1 --test-timeout=30000 --test-name-pattern=\"^memory fixture distinguishes missing dotted fields and acknowledges only matched CAS writes$\" --import tsx apps/api/src/evaluation-flywheel/composition.test.ts",
+    "node --test --test-concurrency=1 --test-timeout=30000 --test-name-pattern=\"^stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers$|^concurrent attempt CAS and expired restart lock preserve exactly one accepted child$|^terminal CAS deadline preserves committed completion or fences a late CAS after recovery$\" --import tsx apps/api/src/evaluation-flywheel/workflow.test.ts"
+  ],
+  "preserve": "Production guards unchanged; original failure receipts immutable; broker must preserve/restore historical rows and freeze source pins. No provider/browser/full suite.",
+  "procedureDeviation": "Discovery required six read tool calls because requested coordination directory did not exist; no source/test execution. Actual usage unknown."
+}

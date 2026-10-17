@@ -1,0 +1,227 @@
+{
+  "kind": "FRESH_IDLE_CONTENT_FREE_BASELINE",
+  "captured_at": "2026-10-15T11:07:52.567Z",
+  "separation_requested_ms": 1500,
+  "records": [
+    {
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "thread_id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "read_one": {
+        "read_completed_at": "2026-10-15T11:07:51.050Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+        "source_sha256": "2c5111c175c853345e5e51cedfa0736dc3c4d629f6d11f5a040d27ea609dfe98",
+        "meta": {
+          "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+          "timestamp": "2026-10-15T10:48:35.605Z"
+        },
+        "token_record_count": 7,
+        "latest": {
+          "timestamp": "2026-10-15T10:49:36.117Z",
+          "total_token_usage": {
+            "input_tokens": 359851,
+            "cached_input_tokens": 330880,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1436,
+            "reasoning_output_tokens": 125,
+            "total_tokens": 361287
+          },
+          "last_token_usage": {
+            "input_tokens": 55157,
+            "cached_input_tokens": 54784,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 120,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 55277
+          }
+        }
+      },
+      "read_two": {
+        "read_completed_at": "2026-10-15T11:07:52.565Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+        "source_sha256": "2c5111c175c853345e5e51cedfa0736dc3c4d629f6d11f5a040d27ea609dfe98",
+        "meta": {
+          "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+          "timestamp": "2026-10-15T10:48:35.605Z"
+        },
+        "token_record_count": 7,
+        "latest": {
+          "timestamp": "2026-10-15T10:49:36.117Z",
+          "total_token_usage": {
+            "input_tokens": 359851,
+            "cached_input_tokens": 330880,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1436,
+            "reasoning_output_tokens": 125,
+            "total_tokens": 361287
+          },
+          "last_token_usage": {
+            "input_tokens": 55157,
+            "cached_input_tokens": 54784,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 120,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 55277
+          }
+        }
+      },
+      "counter_stable": true,
+      "source_hash_stable": true,
+      "agent_status_attestation": "Root reports collaboration status completed/idle for all three, no turns since preparation. This collector did not inspect conversation content or independently query status.",
+      "recorded_cumulative_known": true,
+      "inflight_qualifier": "Two stable metadata/counter reads plus root idle attestation support fresh recorded idle baseline; session telemetry alone cannot establish theoretical completion or exclude unrecorded/in-flight usage."
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+      "thread_id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "read_one": {
+        "read_completed_at": "2026-10-15T11:07:51.051Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+        "source_sha256": "13dbe5e03773e3bc4292cf2f52f86911f7fc5d8b864ae229d5f8cf0e3095a1b4",
+        "meta": {
+          "id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+          "timestamp": "2026-10-15T10:48:55.747Z"
+        },
+        "token_record_count": 6,
+        "latest": {
+          "timestamp": "2026-10-15T10:49:43.677Z",
+          "total_token_usage": {
+            "input_tokens": 319555,
+            "cached_input_tokens": 298112,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1357,
+            "reasoning_output_tokens": 32,
+            "total_tokens": 320912
+          },
+          "last_token_usage": {
+            "input_tokens": 60948,
+            "cached_input_tokens": 60544,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 147,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 61095
+          }
+        }
+      },
+      "read_two": {
+        "read_completed_at": "2026-10-15T11:07:52.566Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+        "source_sha256": "13dbe5e03773e3bc4292cf2f52f86911f7fc5d8b864ae229d5f8cf0e3095a1b4",
+        "meta": {
+          "id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+          "timestamp": "2026-10-15T10:48:55.747Z"
+        },
+        "token_record_count": 6,
+        "latest": {
+          "timestamp": "2026-10-15T10:49:43.677Z",
+          "total_token_usage": {
+            "input_tokens": 319555,
+            "cached_input_tokens": 298112,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 1357,
+            "reasoning_output_tokens": 32,
+            "total_tokens": 320912
+          },
+          "last_token_usage": {
+            "input_tokens": 60948,
+            "cached_input_tokens": 60544,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 147,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 61095
+          }
+        }
+      },
+      "counter_stable": true,
+      "source_hash_stable": true,
+      "agent_status_attestation": "Root reports collaboration status completed/idle for all three, no turns since preparation. This collector did not inspect conversation content or independently query status.",
+      "recorded_cumulative_known": true,
+      "inflight_qualifier": "Two stable metadata/counter reads plus root idle attestation support fresh recorded idle baseline; session telemetry alone cannot establish theoretical completion or exclude unrecorded/in-flight usage."
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+      "thread_id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "read_one": {
+        "read_completed_at": "2026-10-15T11:07:51.052Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+        "source_sha256": "325f0b0107aac708ce595e62deb5ca465e38254bf69b826ae17061f38ee8fea8",
+        "meta": {
+          "id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+          "timestamp": "2026-10-15T10:49:04.933Z"
+        },
+        "token_record_count": 8,
+        "latest": {
+          "timestamp": "2026-10-15T10:50:09.847Z",
+          "total_token_usage": {
+            "input_tokens": 475781,
+            "cached_input_tokens": 445312,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 2073,
+            "reasoning_output_tokens": 86,
+            "total_tokens": 477854
+          },
+          "last_token_usage": {
+            "input_tokens": 69983,
+            "cached_input_tokens": 69632,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 163,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 70146
+          }
+        }
+      },
+      "read_two": {
+        "read_completed_at": "2026-10-15T11:07:52.567Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+        "source_sha256": "325f0b0107aac708ce595e62deb5ca465e38254bf69b826ae17061f38ee8fea8",
+        "meta": {
+          "id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+          "timestamp": "2026-10-15T10:49:04.933Z"
+        },
+        "token_record_count": 8,
+        "latest": {
+          "timestamp": "2026-10-15T10:50:09.847Z",
+          "total_token_usage": {
+            "input_tokens": 475781,
+            "cached_input_tokens": 445312,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 2073,
+            "reasoning_output_tokens": 86,
+            "total_tokens": 477854
+          },
+          "last_token_usage": {
+            "input_tokens": 69983,
+            "cached_input_tokens": 69632,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 163,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 70146
+          }
+        }
+      },
+      "counter_stable": true,
+      "source_hash_stable": true,
+      "agent_status_attestation": "Root reports collaboration status completed/idle for all three, no turns since preparation. This collector did not inspect conversation content or independently query status.",
+      "recorded_cumulative_known": true,
+      "inflight_qualifier": "Two stable metadata/counter reads plus root idle attestation support fresh recorded idle baseline; session telemetry alone cannot establish theoretical completion or exclude unrecorded/in-flight usage."
+    }
+  ],
+  "counter_semantics": "total=input+output; cached_input subset input; reasoning_output subset output; no subset addition.",
+  "prior_grants_preserved": true,
+  "accounting_helper_excluded_from_unit_denominators": true,
+  "ratio_success_inferred": false
+}

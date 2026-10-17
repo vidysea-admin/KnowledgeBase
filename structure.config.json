@@ -8,7 +8,7 @@
     "testMax": 400,
     "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
   },
-  "dirsize": { "$comment": "schema/ budget raised 30 -> 40 by D-147 (pending append): one schema file per collection is the convention.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 40 } },
+  "dirsize": { "$comment": "D-177: schema/ allows 45 canonical collection schemas plus index.json and validate.py for reviewed speaker relationships and attributes; other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 47 } },
   "root": {
     "maxLooseFiles": 16,
     "architectureFile": "ARCHITECTURE.md",

@@ -1,22 +1,35 @@
 // @lkb/core — generated types re-exported (schema/ is the source of truth; see scripts/gen-types.mjs).
 // Pure domain functions (no I/O) go in src/domain/<concept>.ts (D-003) — auto re-exported below.
+export * from "./generated/answer_policy_review_items.js";
+export * from "./generated/answer_policy_revisions.js";
+export * from "./generated/answer_runs.js";
+export * from "./generated/answer_source_conflicts.js";
 export * from "./generated/api_keys.js";
+export * from "./generated/application_operations.js";
+export * from "./generated/automation_runs.js";
+export * from "./generated/championship_events.js";
 export * from "./generated/chunks.js";
 export * from "./generated/claims.js";
 export * from "./generated/consent_policies.js";
 export * from "./generated/decisions.js";
+export * from "./generated/document_documents.js";
 export * from "./generated/eval_runs.js";
 export * from "./generated/features_event.js";
 export * from "./generated/gaps.js";
 export * from "./generated/graph_edges.js";
 export * from "./generated/jobs.js";
+export * from "./generated/knowledge_collections.js";
+export * from "./generated/knowledge_outputs.js";
 export * from "./generated/media.js";
 export * from "./generated/meeting_candidates.js";
+export * from "./generated/operations_schedules.js";
 export * from "./generated/orgs.js";
 export * from "./generated/programs.js";
 export * from "./generated/session_pages.js";
 export * from "./generated/sessions.js";
 export * from "./generated/sources.js";
+export * from "./generated/speaker_attributes.js";
+export * from "./generated/speaker_relationships.js";
 export * from "./generated/speaker_suggestions.js";
 export * from "./generated/speakers.js";
 export * from "./generated/tenants.js";
@@ -33,6 +46,7 @@ export * from "./generated/watch_state.js";
 export * from "./generated/watched_sources.js";
 export * from "./generated/whatsapp_candidates.js";
 
+export * from "./domain/automation-monitor.js";
 export * from "./domain/keyframe-dedupe.js";
 export * from "./domain/keyframe-dedupe-validate.js";
 export * from "./domain/lean-video.js";
@@ -49,3 +63,4 @@ export * from "./domain/webinar-types.js";
 // U4b/R2 (D-053): the thin alert interface apps/* imports so a real alert can be delivered
 // without apps/* importing packages/meeting-bot (.dependency-cruiser.cjs forbids that edge).
 export * from "./alerts/alert-sink.js";
+export type { NativePassageLocator, DocumentPageSourceLocator, MessageSourceLocator, NativeSourceLocator, SourceLocator } from "./source-locator.js";

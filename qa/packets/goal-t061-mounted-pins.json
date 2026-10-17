@@ -1,0 +1,26 @@
+{
+  "task": "T-061",
+  "cycle": 0,
+  "command": "node --import tsx --test --test-concurrency=1 --test-timeout=20000 apps/api/src/automation/mounted.test.ts",
+  "expectedCases": 1,
+  "sourcePins": {
+    "apps/api/src/automation/mounted.test.ts": "1b57d96dd7885cdf78266424d3b41882230e42892e51d1a29e79812b4c842e7a",
+    "apps/api/src/automation/form-runtime.ts": "38828b3a559c482444354a48ca95f37e539585f5bc2d6076308ed80ba052cd09",
+    "apps/api/src/automation/form-router.ts": "30966cbd56bdcd09ad06222ef9831e94cda44430375324fd159d3a09b6aa2941",
+    "apps/api/src/automation/form-store.ts": "a5aa65ccfe13efb3222da9a5e5d362ee59d916b2c562653e8ebbd966311c35c1",
+    "apps/api/src/automation/form-types.ts": "a2213f4603f5d24cbafc65615c0300a0daa2f8464181c6962220384956ff84d6",
+    "apps/api/src/automation/form-validation.ts": "87775868707fd43cd2550bcf4a9fbf666094f0f696a96f30accda016f605bef2",
+    "apps/api/src/automation/form-fixture.ts": "f2bccb8d75428a255ffca3db4b1c97e44af2381d8173aeddc7ac86508676b1ec",
+    "apps/api/src/server.ts": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+    "apps/api/src/fixtures.ts": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b",
+    "apps/api/src/testUtils.ts": "aedff13a23f522a89ae4029eea1fc2df5484811a79ad5cc105bf6858ba7f987b",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "apps/api/src/composition/integrations/routes.ts": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+    "apps/api/src/hosting/service.ts": "322f352c404b8ddf472e0a789824e5cd351e7f98d27e861cf112eb0afcefefbb",
+    "apps/api/src/hosting/journal.ts": "55dac9c879e4f6a0364f6bf12c7271b7f2b93e3932429066d684685c9e217725",
+    "apps/api/src/hosting/policy.ts": "1a22c1dccd26c7b1cff96d02ddfebde9a6b6b06c95199c59205f4a68005b36fa",
+    "apps/api/src/hosting/state.ts": "39a8bc57b4ec32894b2e9f6a69d0a08a40f3396ade04c5f7cfb976579b65e83a",
+    "apps/api/src/hosting/types.ts": "8df6c9cf90f7835025496793183fe05342cb7d8e623c6fc001c952647e4318f4",
+    "apps/api/src/hosting/test-kit.ts": "7a5d7ac173410687a6d3c6f6b5532bfb9803e69c0fce15f3a88b469f1557e72e"
+  }
+}

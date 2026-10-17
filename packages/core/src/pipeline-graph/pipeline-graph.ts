@@ -76,7 +76,7 @@ export async function runGraph(input: RunGraphInput): Promise<GraphRun> {
     const s = pending;
     let res;
     try {
-      res = await node.handler({ tenantId: lease.tenantId, runKey: lease.runKey, stage: node.name, inputFingerprint: s.inputFingerprint, attemptNumber: s.attemptNumber, cause: s.cause });
+      res = await node.handler({ tenantId: lease.tenantId, runKey: lease.runKey, generation: lease.generation ?? 0, stage: node.name, inputFingerprint: s.inputFingerprint, attemptNumber: s.attemptNumber, cause: s.cause });
     } catch {
       res = { kind: "fail" as const, code: "node-threw" }; // a thrown handler is a failed attempt, never a crash of the executor; the message is not recorded
     }

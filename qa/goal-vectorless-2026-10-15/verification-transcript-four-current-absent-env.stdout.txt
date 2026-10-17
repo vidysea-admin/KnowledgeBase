@@ -1,0 +1,11 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/transcript-review/TranscriptReview.test.tsx (11 tests | 9 skipped) 195ms
+ ✓ src/pages/transcript-review/ReviewHistory.test.tsx (3 tests | 1 skipped) 144ms
+
+ Test Files  2 passed (2)
+      Tests  4 passed | 10 skipped (14)
+   Start at  12:47:04
+   Duration  3.76s (transform 162ms, setup 397ms, collect 717ms, tests 339ms, environment 1.55s, prepare 295ms)
+

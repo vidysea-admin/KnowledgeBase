@@ -1,0 +1,28 @@
+{
+  "command": "node --import tsx --test --test-concurrency=1 --test-timeout=30000 scripts/lib/transcription/transcript-qa-generation.test.mjs scripts/webinar/validate/transcript-qa-binding.test.mjs scripts/webinar/validate/validate-session.test.mjs",
+  "node": "C:/Program Files/nodejs/node.exe",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "outerTimeoutSeconds": 120,
+  "elapsedSeconds": 3.7819494,
+  "nodeDurationMs": 3596.6491,
+  "exitCode": 0,
+  "tests": 28,
+  "passed": 28,
+  "failed": 0,
+  "skipped": 0,
+  "cancelled": 0,
+  "filePins": {
+    "scripts/lib/transcription/transcript-qa-generation.mjs": "a3c01df4e602078e8c61e1744c7e75cfe3c39326a9a7c7798d8a1655e51530b5",
+    "scripts/lib/transcription/transcript-qa-generation.test.mjs": "b00fa3b56186c671b655db6baae5797345db1ab7c920d2a09e5e3cf9bbeb17ee",
+    "scripts/webinar/validate/transcript-qa-binding.mjs": "2bb52d0c84799a019f7d3b2eb83f27766ab90ad7e31caacda64d351706637178",
+    "scripts/webinar/validate/transcript-qa-binding.test.mjs": "639a229e78f76731e68c59a60ea8ba1546ce7cb56d67f066d53670adcd0ad795",
+    "scripts/webinar/validate/validate-session.mjs": "bd0d2ee2a44bc94867447c29b1409953d2c88f66bd0b1eb6a74f48096d24f6ee",
+    "scripts/webinar/validate/validate-session.test.mjs": "b8c590252916f157cb9b1307a70947ecc673ad86c74d00598f8784f1c386a6de",
+    "scripts/webinar/session-rows.mjs": "3cc4de004a670f00683fa63a81627c2bde94c8c5416102cb66dc5995ba695401"
+  },
+  "stdoutSha256": "8caf96fc248d2559981ebfd6ad3734c13e1ce574a308a79881dda82f716ec1af",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "executionPermissions": "require_escalated approved for known esbuild subprocess access",
+  "fullTaskVerdict": "HOLD pending real audio/provider and composition acceptance",
+  "capturedAt": "2026-10-14T18:59:54.4812571Z"
+}

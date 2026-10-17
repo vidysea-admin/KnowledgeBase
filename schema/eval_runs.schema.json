@@ -3,46 +3,187 @@
   "$id": "kb://eval_runs",
   "title": "eval_runs",
   "type": "object",
-  "required": ["_id", "tenantId", "question", "counsellor", "credibility", "createdAt"],
+  "required": [
+    "_id",
+    "tenantId",
+    "question",
+    "counsellor",
+    "credibility",
+    "createdAt"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "question": { "type": "string", "minLength": 1 },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "question": {
+      "type": "string",
+      "minLength": 1
+    },
     "counsellor": {
       "type": "object",
-      "required": ["name"],
+      "required": [
+        "name"
+      ],
       "properties": {
-        "name": { "type": "string", "minLength": 1 },
-        "org": { "type": "string" }
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "org": {
+          "type": "string"
+        }
       }
     },
     "aiAnswer": {
       "type": "object",
       "properties": {
-        "text": { "type": "string" },
-        "sources": { "description": "askV2's { internal, web } sources object, stored as-is." }
+        "text": {
+          "type": "string"
+        },
+        "sources": {
+          "description": "askV2's { internal, web } sources object, stored as-is."
+        }
       }
     },
     "counsellorAnswer": {
       "type": "object",
       "properties": {
-        "text": { "type": "string" }
+        "text": {
+          "type": "string"
+        }
       }
     },
     "score": {
       "type": "object",
       "properties": {
-        "ai": { "type": "number" },
-        "counsellor": { "type": "number" },
-        "notes": { "type": "string" }
+        "ai": {
+          "type": "number"
+        },
+        "counsellor": {
+          "type": "number"
+        },
+        "notes": {
+          "type": "string"
+        }
       }
     },
     "credibility": {
       "type": "string",
       "description": "D-007 tier rule — a one-person manual form can only ever produce 'internal'.",
-      "enum": ["internal", "independent-human", "calibrated-llm"]
+      "enum": [
+        "internal",
+        "independent-human",
+        "calibrated-llm"
+      ]
     },
-    "createdAt": { "type": "string", "format": "date-time" }
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "flywheel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "originalEvalRunId",
+        "gapId",
+        "inputFingerprint",
+        "requestId",
+        "index",
+        "comparison"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "originalEvalRunId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gapId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "inputFingerprint": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "requestId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]{1,80}$"
+        },
+        "index": {
+          "type": "object",
+          "required": [
+            "sourceId",
+            "sessionId",
+            "sourceDigest",
+            "transcriptDigest",
+            "turnCount",
+            "turnIds",
+            "generation",
+            "treeDigest",
+            "chunksDigest",
+            "completedAt"
+          ],
+          "properties": {
+            "sourceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sessionId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceDigest": {
+              "type": "string",
+              "minLength": 1
+            },
+            "transcriptDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "turnCount": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "turnIds": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "generation": {
+              "type": "string",
+              "minLength": 1
+            },
+            "treeDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "chunksDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            "completedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          "additionalProperties": false
+        },
+        "comparison": {
+          "const": "needs-review"
+        }
+      }
+    }
   },
   "additionalProperties": true
 }

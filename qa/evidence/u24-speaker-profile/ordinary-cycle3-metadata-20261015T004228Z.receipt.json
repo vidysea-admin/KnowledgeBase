@@ -1,0 +1,55 @@
+{
+  "scope": "Finite coherent authority and mixed cached metadata privacy repair; seven public authored synthetic store cases only",
+  "spec": "qa/evidence/u24-speaker-profile/ordinary-cycle3-metadata-spec.json",
+  "specSha256": "9211a156d3cde90b3adff466a1d9efdc2ebd12bff64b2ad977875e8de3bc6c45",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "apps/api/src/speaker-profiles/store.test.ts"
+  ],
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "U24_EVIDENCE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\u24-speaker-profile\\ordinary-cycle3-metadata"
+  },
+  "serverMvccProof": false,
+  "pid": 9160,
+  "startedAt": "2026-10-15T00:42:29.0167917Z",
+  "endedAt": "2026-10-15T00:42:31.3867851Z",
+  "elapsedMs": 2370,
+  "exit": 0,
+  "timedOut": false,
+  "before": {
+    "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+    "apps/api/src/speaker-profiles/store.test.ts": "e5cc85b48808dd90bcaf8e5109fffa3a432de74ba06770072ed0b08f99a99daf",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+    "apps/api/src/knowledge/metadata-visibility.ts": "200262b9b6db1e609a275fa920fba8c96811b7ae59b6094b599c179a665ff8d1",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "bce0534f0fd474788e97774da274f8cfa186908a005876d7d1dabd8c95feb000"
+  },
+  "after": {
+    "apps/api/src/speaker-profiles/store.ts": "a57c28db9ddedc697669158b3b352c5c773592f607458ddfdb4e1427b57cb449",
+    "apps/api/src/speaker-profiles/store.test.ts": "e5cc85b48808dd90bcaf8e5109fffa3a432de74ba06770072ed0b08f99a99daf",
+    "apps/api/src/visibility/read-snapshot.ts": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+    "apps/api/src/knowledge/metadata-visibility.ts": "200262b9b6db1e609a275fa920fba8c96811b7ae59b6094b599c179a665ff8d1",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "bce0534f0fd474788e97774da274f8cfa186908a005876d7d1dabd8c95feb000"
+  },
+  "drift": [],
+  "terminal": true,
+  "stdout": "qa/evidence/u24-speaker-profile/ordinary-cycle3-metadata-20261015T004228Z.stdout.txt",
+  "stderr": "qa/evidence/u24-speaker-profile/ordinary-cycle3-metadata-20261015T004228Z.stderr.txt"
+}

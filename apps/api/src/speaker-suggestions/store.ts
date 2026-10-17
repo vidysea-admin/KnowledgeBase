@@ -6,7 +6,7 @@
 import type { Db } from "mongodb";
 import {
   confirmSpeakerSuggestion, listSessionSuggestions, rejectSpeakerSuggestion,
-} from "../../../../packages/db/src/collections/speaker-suggestions.js";
+} from "../../../../packages/db/src/collections/speaker-suggestions/index.js";
 import type { SpeakerSuggestionDeps } from "./router.js";
 
 /** `db` is injectable so tests run the REAL scoped accessor over an in-memory Db; production passes nothing (lazy getDb()). */

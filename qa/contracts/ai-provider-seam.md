@@ -126,3 +126,9 @@ fakes, matching the pattern already used in `packages/ask` (injectable `score_fn
   `config/ai-routing.yaml`'s ordered per-jobKind chain and `complete()`'s try-in-order with
   `AllProvidersFailedError` are exactly that design (D-005/D-008, verified in U1.x checks).
   Entry had sat unmarked since 2026-09-03 · Mode B sweep fold-in, qa/feedback-inbox.md
+
+## Active text-provider cost amendment — 2026-10-15, D-173/D-174
+
+Checker-owned amendment from Umesh's approved Ollama Cloud vectorless plan. Preserve historical C1/C5/C7 shapes and existing known-price adapter evidence above. For active cloud text calls, CompleteResult and job/audit records may omit costUsd when provider price is unknown, provided explicit costStatus distinguishes unknown from known. Actual nonnegative input/output token usage is retained when supplied; absent usage is never invented as zero. Unknown cost must not be coerced to free in router ledger, aggregate reporting or UI. Known-price providers retain established numeric-cost behavior. Existing approved budget/token/call guards remain binding; unknown price grants no additional spending authority. Additive optional types/schema/UI integration must preserve existing consumers and undergo independent checks.
+
+Distinct Ollama Cloud primary/verifier providers do not replace or overwrite local Ollama. Historical optional embedding capabilities remain dormant; active product vectorless paths never invoke them. This amendment does not authorize model training, audio routing to text-only models, production writes, credential disclosure or fabricated provider usage. Detailed cloud criteria are in ollama-cloud-vectorless.md. D-174 semantic restoration and computed-index caveat remain as stated in goal-t008.md.

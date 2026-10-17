@@ -1,0 +1,24 @@
+{
+  "unit": "t035-lean-video-measured-encode",
+  "fixCycle": 1,
+  "status": "frozen-scoped-helper-eof",
+  "scope": "Local derivative helper, source preservation, fail-closed typed private masking and actual retained EOF corpus correction. Shared consumer/provider binding and full live-hour/host task remain HOLD.",
+  "pins": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "79b11336471e503b3e028ae4d865759c569a73b3782cd78858f39561e089cabc",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "9dd0095a3c2ca2aa74e51b538be78cfec6b8ac29135df3984947a309452e3526",
+    "scripts/qa/t035-lean-video-measure.mjs": "ca0ddc65257788e5011dca86f128377cd0d753b38ae20c6676061c7d09297ad4",
+    "scripts/qa/t035-lean-video-eof-probe.mjs": "ab56f6e9529ff1c93dbe029edd63fac813d131ed6f71ad80d799efe7c17fd845",
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-helper.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-probe.mjs": "73b652d83b71b0399821130e959af45290e7597a354395a07e31180769585788",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/stale-duration-source.mkv": "d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/report.json": "820a3012a67ae700a5b49dd9df21854e6a3c5341b0cc549726dc453fc4dbe2ed",
+    "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.json": "d5f146c932186eb2635e110d48cc3fa8992abe0f87df60f9d8bfc905e7863f44",
+    "qa/evidence/t035-lean-video-measured-encode/eof-current-spec.json": "bce6490bfa3ab6535a66975d440bfaf0be79b884407690248507dbb664d00428",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-focused-20261014T230309Z.receipt.json": "c708157c3f72073c8e1211d5addda6da5b3088909d564642487db8cc72c53150",
+    "qa/evidence/t035-lean-video-measured-encode/ordinary-retained-media-20261014T230352Z.receipt.json": "4d3382b15e202cf7f73357caccba46adf0af1ea2ebf27e1c0e070387cbfa3700",
+    "qa/evidence/t035-lean-video-measured-encode/eof-current-m5uNoV/report.json": "49ac3b6b654d9fb56152306604b9350bf89deec2ec7bed5b9b3b31ddf9504e8a",
+    "qa/evidence/t035-lean-video-measured-encode/synthetic-m4VI4t/report.json": "bf13f88f1704b8ea1ab518716720ca55986657e7b21e89f81c841970c35d62b9"
+  },
+  "historicalMeasurementBinding": "The original 12s public/private green report binds archived ACE429 helper, not current corrected bytes. Current exact-corpus ordinary replay binds 79B113 helper; original synthetic capture was not repeated.",
+  "sharedSnapshot": "candidate-pins.json is historical observed-not-frozen shared consumer data, excluded from this scoped source-only handshake."
+}

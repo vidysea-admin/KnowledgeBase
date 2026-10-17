@@ -13,6 +13,7 @@ import type { Media, Sessions, Sources, Turns } from "@lkb/core";
 import { intakeFromSource, type ConsentContext, type IntakePlan, type IntakeResult, type IntakeSink, type Source } from "@lkb/ingest";
 import { assertTurnTimings } from "../turn-timing.js";
 import type { BoundIndexer } from "../indexing/session.js";
+import type { IndexSessionResult } from "../indexing/types.js";
 
 export interface ScopedColl<T> {
   findOne(filter?: Record<string, unknown>): Promise<unknown>;
@@ -80,7 +81,28 @@ export function createMongoIntakeSink(colls: IntakeCollections = mongoIntakeColl
 
 export interface SourceIntakeRequest { tenantId: string; url: string }
 export interface SourceIntakeDeps {
-  intake(req: SourceIntakeRequest): Promise<IntakeResult>;
+  intake(req: SourceIntakeRequest): Promise<SourceIntakeResult>;
+}
+
+export type SourceIntakeResult = IntakeResult & {
+  /** HTTP creation/dedupe describes raw intake, never implicit downstream success. */
+  indexing?: { status: "done" | "failed" | "pending"; receipt?: IndexSessionResult; reason?: "indexing-incomplete" | "not-requested" | "already-ingested" };
+};
+
+function completeIntakeIndex(receipt: IndexSessionResult, sessionId: string): boolean {
+  return receipt.sessionId === sessionId && receipt.completion?.version === 2 && typeof receipt.completion.strict === "boolean" && receipt.completion.complete === true &&
+    receipt.completion.treeWritten === true && Number.isSafeInteger(receipt.completion.turnCount) && receipt.completion.turnCount > 0 &&
+    typeof receipt.completion.generation === "string" && /^[A-Za-z0-9._:-]{1,100}$/.test(receipt.completion.generation) &&
+    receipt.summary?.degraded === null && receipt.claims?.degraded === null &&
+    receipt.chunks?.skipped === null && Number.isSafeInteger(receipt.chunks.written) && receipt.chunks.written > 0 && !receipt.entities?.skipped;
+}
+
+function safeIntakeIndexReceipt(receipt: IndexSessionResult): IndexSessionResult {
+  // Optional provider-stage diagnostics can contain secrets even when required indexing succeeded.
+  return { sessionId: receipt.sessionId, summary: { degraded: null }, claims: { degraded: null },
+    chunks: { written: receipt.chunks.written, skipped: null }, entities: null,
+    completion: { version: 2, strict: receipt.completion!.strict === true, complete: true,
+      generation: receipt.completion!.generation, turnCount: receipt.completion!.turnCount, treeWritten: true } };
 }
 
 /** Thrown by deps that are mounted but not configured (e.g. no STT); the route answers 503. */
@@ -94,6 +116,7 @@ export interface SourceIntakeOptions {
   indexSession?: BoundIndexer;
   newId?: () => string;
   now?: () => string;
+  consentFor?: (request: SourceIntakeRequest) => ConsentContext;
 }
 
 export function createSourceIntakeDeps(opts: SourceIntakeOptions): SourceIntakeDeps {
@@ -102,7 +125,7 @@ export function createSourceIntakeDeps(opts: SourceIntakeOptions): SourceIntakeD
     async intake({ tenantId, url }) {
       assertValidTenantId(tenantId, "sourceIntake"); // before any fetch or write
       // Same stance as ingestUrl: the caller explicitly handed us a public/provided URL; never the D-008 silent mode.
-      const consent: ConsentContext = { captureMode: "public", given: true, recordedBy: "web-ingest" };
+      const consent: ConsentContext = opts.consentFor?.({ tenantId, url }) ?? { captureMode: "public", given: true, recordedBy: "web-ingest" };
       const result = await intakeFromSource({ kind: "url", url, tenantId }, consent, {
         adapters: opts.adapters,
         sink,
@@ -111,12 +134,16 @@ export function createSourceIntakeDeps(opts: SourceIntakeOptions): SourceIntakeD
       });
       if (result.status === "created" && opts.indexSession) {
         try {
-          await opts.indexSession(tenantId, result.sessionId);
-        } catch (err) {
-          console.error(`sourceIntake: indexing failed for session ${result.sessionId} (raw content still stored):`, err);
+          const receipt = await opts.indexSession(tenantId, result.sessionId);
+          return completeIntakeIndex(receipt, result.sessionId)
+            ? { ...result, indexing: { status: "done", receipt: safeIntakeIndexReceipt(receipt) } }
+            : { ...result, indexing: { status: "failed", reason: "indexing-incomplete" } };
+        } catch {
+          return { ...result, indexing: { status: "failed", reason: "indexing-incomplete" } };
         }
       }
-      return result;
+      // D135: a duplicate never re-indexes or writes. Its prior index state requires a separate verified consumer.
+      return { ...result, indexing: { status: "pending", reason: result.status === "already-ingested" ? "already-ingested" : "not-requested" } };
     },
   };
 }

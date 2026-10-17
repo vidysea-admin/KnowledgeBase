@@ -1,0 +1,43 @@
+{
+  "request": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t022-provenance-current\\broker-request.json",
+    "sha256": "26eb2c7f0be4da55064a35f75e3ad3fcd0b34449a5c153e76040356d23e8ee73"
+  },
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\ee03a5cbbea0faf72ccfd9a24ac9f0760b940c6e2bd38c3329d6dd9cecfc7767.json",
+    "sha256": "ee03a5cbbea0faf72ccfd9a24ac9f0760b940c6e2bd38c3329d6dd9cecfc7767",
+    "count": 56
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t022-current-identity-before-receipt.json",
+      "sha256": "e26a161d0a3ddad65f7619b071269b919a5c53211dee0fceecf44e6721371ffa",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.4059999999990396,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t022-current-identity-before.log",
+        "sha256": "fb7d74b102bc7489ceb068da5ac3dc98d8b5584a8243dd5b3cb7fe476badb045"
+      }
+    }
+  ],
+  "failure": "AssertionError: ",
+  "beforeIdentity": {
+    "python": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "head": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "blobs": {
+      "scripts/eval/human-calibration.mjs": "19d17e09406f0e15286f9eb060059c6b8d4b97c2",
+      "scripts/eval/human-calibration.test.mjs": "a5c62cd02918684940ec6588cea04fbdb07b2c3a"
+    }
+  },
+  "afterIdentity": null,
+  "allPinsFinalMatch": true,
+  "environmentWhitelistSha256": "fd9d581cf6d756ba0a7e663314c16ea6b8e93498c6dd2f80d0e029614eef7267",
+  "elapsed_s": 0.8130000000019209,
+  "contractVerifierNewExecution": false,
+  "contractHistoricalEnvironmentReuseClaim": false,
+  "independentVerdict": null,
+  "actual_total_tokens": null,
+  "ownedTempRemoved": true
+}

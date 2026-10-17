@@ -1,0 +1,32 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-archive.ts",
+    "sha256": "835a1b49531e88782bbab01325e166d92dd3d1804909208765528f8f172ac3e3",
+    "lines": 177
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-authority.ts",
+    "sha256": "947df1788801021e8a32932597bc01df8639c62ac851f024b9a63f07a30a8cda",
+    "lines": 91
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "sha256": "6349f52a186c0ec4c484e4a3b7d1ecfbb81a98e35e1298fc9029d822ca2dc0ff",
+    "lines": 155
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+    "sha256": "f504a9587920b4dd811aa1015b571c3bed494cad7db014153687461117606312",
+    "lines": 32
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "sha256": "fa27995652e4b6b07ea7f30d7dca5ec84eaa20887ea34599d9422134912e83a3",
+    "lines": 121
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-restart.testsupport.ts",
+    "sha256": "cf3ecebb4b3fe37c52b70776bdab4cb20d6c08fc02150dea91fa8bdd3df4f7c2",
+    "lines": 187
+  }
+]

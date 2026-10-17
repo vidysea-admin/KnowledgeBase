@@ -1,0 +1,68 @@
+[
+  {
+    "path": "scripts/webinar/send-now-host.ts",
+    "key": "scripts/webinar/send-now-host.ts",
+    "hash": "AC7564EBA70180A64D2EA79F28092749D89DBE92C233DDD88F63F56B2F946DB1",
+    "match": true
+  },
+  {
+    "path": "scripts/webinar/send-now-host.test.ts",
+    "key": "scripts/webinar/send-now-host.test.ts",
+    "hash": "2561D521B2C5B38BF52CE5ADAAB9EEC19B8DF8E8EF2A7CCCF9B0CBBA8BDB080C",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now-command.ts",
+    "key": "packages/meeting-bot/src/send-now-command.ts",
+    "hash": "71C51F7304A2866A39DFC5B6F01E4ACB57F96466938861A47C738861B24539A3",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now-command.test.ts",
+    "key": "packages/meeting-bot/src/send-now-command.test.ts",
+    "hash": "6C1E0A9BF4080998394BC8134B246F73AAC61CF7FB21976DC0608C6E2BAFA7D5",
+    "match": true
+  },
+  {
+    "path": "scripts/webinar/manual-jobs/host.ts",
+    "key": "scripts/webinar/manual-jobs/host.ts",
+    "hash": "C7CCD395C44E1D5065B0F4F04F6FD76F3C14B127E271B55439D2C27A5DB63DB0",
+    "match": true
+  },
+  {
+    "path": "scripts/webinar/manual-jobs/host.test.ts",
+    "key": "scripts/webinar/manual-jobs/host.test.ts",
+    "hash": "FF4A4AABE209851FA3521EE617163DA5876D888C8F0DECB2891A88893C92E1F6",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+    "key": "packages/meeting-bot/src/calendar/state/schedule-state.ts",
+    "hash": "33D02B724EE3FAD0A029E1D6D6FE6976FB7672D3CD49A438731330246D5FA3EB",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/calendar/calendar-client.ts",
+    "key": "packages/meeting-bot/src/calendar/calendar-client.ts",
+    "hash": "18E631DEFD413CC832BA60FA10DF390B5444BD53FFF78D1CD4EC9F13A4384307",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/calendar/registration-workflow.ts",
+    "key": "packages/meeting-bot/src/calendar/registration-workflow.ts",
+    "hash": "D13FFD0482213AF47DB8B876B20B642B56399BCCCE79E5C908EB1CB8CF0D562B",
+    "match": true
+  },
+  {
+    "path": "packages/meeting-bot/src/send-now.ts",
+    "key": "packages/meeting-bot/src/send-now.ts",
+    "hash": "CB7C973B28A475D1A1640C8B2A0ECAC8D4EDF1FB2342EA5245B00AB330B84B48",
+    "match": true
+  },
+  {
+    "path": "pnpm-lock.yaml",
+    "key": "pnpm-lock.yaml",
+    "hash": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD",
+    "match": true
+  }
+]

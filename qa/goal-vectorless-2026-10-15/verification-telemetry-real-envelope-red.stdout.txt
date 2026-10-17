@@ -1,0 +1,29 @@
+✖ actual sanitized runtime metadata accepts ordinal and arbitrary envelope/payload ordering (10.218ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 139.5169
+
+✖ failing tests:
+
+test at scripts\qa\review-runtime-usage.test.mjs:68:1
+✖ actual sanitized runtime metadata accepts ordinal and arbitrary envelope/payload ordering (10.218ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'unknown' !== 'known'
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/qa/review-runtime-usage.test.mjs:73:10)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'unknown',
+    expected: 'known',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

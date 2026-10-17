@@ -1,0 +1,43 @@
+{"synthetic":true,"identityEvidencePrimaryOnly":true,"independentAttributeRefsWithdrawnInBoth":true,"publicA":{"confidence":0.9,"withheldProfileFields":2},"publicB":{"confidence":0.9,"withheldProfileFields":0}}
+✔ healthy visible primary attributes and claims survive with primary-only identity evidence (24.3863ms)
+✖ independent withdrawn attribute refs cannot reveal stored presence through public withheld counters (14.2352ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 785.1303
+
+✖ failing tests:
+
+test at qa\evidence\u24-speaker-profile\checker\field-provenance-cycle3.test.mts:1:6684
+✖ independent withdrawn attribute refs cannot reveal stored presence through public withheld counters (14.2352ms)
+  AssertionError [ERR_ASSERTION]: changing only private org/role presence must leave public output invariant or equally refused
+  + actual - expected
+  ... Skipped lines
+  
+    {
+      aliases: [
+        'Priya Nair'
+      ],
+      ambiguity: null,
+  ...
+        identityEvidence: 0,
+  +     profileFields: 2
+  -     profileFields: 0
+      }
+    }
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\qa\evidence\u24-speaker-profile\checker\field-provenance-cycle3.test.mts:136:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { personId: 'person:priya-nair', aliases: [ 'Priya Nair' ], identityStatus: 'human-confirmed', ambiguity: null, recordedConfidence: 0.9, identityEvidence: [ [Object] ], organizations: [], roles: [], unavailable: [ 'organizations', 'roles', 'topics' ], claims: [ [Object] ], topics: [], sessions: [ [Object] ], attribution: [ [Object] ], withheld: { claims: 1, identityEvidence: 0, blocks: 0, profileFields: 2 } },
+    expected: { personId: 'person:priya-nair', aliases: [ 'Priya Nair' ], identityStatus: 'human-confirmed', ambiguity: null, recordedConfidence: 0.9, identityEvidence: [ [Object] ], organizations: [], roles: [], unavailable: [ 'organizations', 'roles', 'topics' ], claims: [ [Object] ], topics: [], sessions: [ [Object] ], attribution: [ [Object] ], withheld: { claims: 1, identityEvidence: 0, blocks: 0, profileFields: 0 } },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+

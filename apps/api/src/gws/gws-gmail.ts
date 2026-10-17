@@ -1,9 +1,13 @@
 /** Gmail discovery: literal evidence only; configured intake never grants join approval. */
 import { execFile } from "node:child_process";
 import { assessSender } from "@lkb/core";
+import { supportedMeetingUrl } from "./public-webinars.js";
+import { candidateUrls, MAX_CANDIDATES, MAX_SCAN_CHARS, recognise, resolveEventMeetingLink } from "../join-rules/calendar-link-extract.js";
+import { youtubeVideoId } from "../join-rules/youtube-live-extract.js";
 
 export interface GmailMeetingCandidate {
   messageId: string;
+  receivedAt?: string; // Actual provider receipt; no Date-header or scan-time fallback.
   threadId?: string;
   registrationUrl?: string;
   subject: string;
@@ -14,13 +18,14 @@ export interface GmailMeetingCandidate {
   meetingUrl?: string;
   /** Literal recording link, distinct from the live join link. */
   recordingUrl?: string;
+  youtubeWatch?: {url: string; videoId: string; source: "body" | "snippet"}; // Separate from attendee admission.
+  youtubeWatchIssue?: "ambiguous";
+  meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
   /** Best-effort classification from literal body/subject evidence. */
   kind?: "past-recording" | "upcoming";
   startTime?: string;
   endTime?: string;
-  /** U2: true when the body carries only a registration link and no direct join link — the
-   * approval workflow (routes/meeting-candidates.ts) must never auto-join these; registration
-   * stays a human decision (plan U0). */
+  /** A registration link without canonical join evidence cannot auto-join. */
   registrationOnly?: boolean;
 }
 
@@ -39,6 +44,7 @@ interface GwsMessagePart {
 }
 interface GwsMessageFull extends GwsMessagePart {
   id: string;
+  internalDate?: unknown;
   threadId?: string;
   snippet?: string;
   headers?: GwsMessageHeader[];
@@ -52,12 +58,8 @@ const MEETING_QUERY =
   '(webinar OR seminar OR webcast OR "online seminar" OR "educator dialogues" OR "in focus" OR "in-focus" OR ' +
   '"online workshop" OR "virtual conference" OR invitation OR filename:ics OR ' +
   'meet.google.com OR zoom.us OR teams.microsoft.com OR zoho.in OR zoho.com OR ' +
-  'cloudonair.withgoogle.com OR "youtube.com/watch" OR "youtube.com/live" OR "youtu.be" OR "drive.google.com/file" OR ' +
+  'cloudonair.withgoogle.com OR webex.com OR "youtube.com/watch" OR "youtube.com/live" OR "youtu.be" OR "drive.google.com/file" OR ' +
   "from:karunn@vidysea.com OR from:theoutreachcollective.in OR from:ashoka.edu.in)";
-
-// Shared regex is non-global; each all-match scan creates its own regex to avoid shared state.
-const MEETING_URL_RE =
-  /https?:\/\/[^\s"'<>]*(?:meet\.google\.com|zoom\.us|teams\.microsoft\.com|zoho\.in|zoho\.com|cloudonair\.withgoogle\.com|youtube\.com\/live)[^\s"'<>]*/i;
 
 const RECORDING_URL_RE =
   /https?:\/\/[^\s"'<>]*(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|youtube\.com\/watch|youtu\.be\/|youtube\.com\/live|zoom\.us\/rec)[^\s"'<>]*/i;
@@ -122,9 +124,7 @@ function stripHtml(html: string): string {
     .replace(/&quot;/gi, '"');
 }
 
-/** Prefers `text/plain`, falls back to `text/html` (stripped), falls back to a top-level
- * unstructured body, in that order — matches Gmail API's own multipart shape (`payload.parts`,
- * or a bare `payload.body` for a simple message). */
+/** Plain body preferred; stripped HTML/unstructured body are fallbacks. */
 export function decodeGmailBody(payload: GwsMessagePart | undefined): string {
   if (!payload) return "";
   const plain = findPart(payload, "text/plain");
@@ -139,12 +139,7 @@ const MONTHS = [
   "january", "february", "march", "april", "may", "june",
   "july", "august", "september", "october", "november", "december",
 ];
-// Real mail uses abbreviated month names constantly ("Sep 27, 2026", "Sept 2026") — a lookup on
-// full names alone silently fails on those, which is exactly what happened on the real Ashoka
-// mail this was built against (see this unit's manifest for the live repro): the FIRST
-// month-shaped match in that email's body was "Sep 27, 2026" (quoted from the forwarded
-// Subject: line), not the real "Day & Date:* ... September 27, 2026" field further down, and the
-// abbreviated form silently failed to parse, discarding the whole extraction.
+// Real Ashoka mail uses Sep/Sept abbreviations, including in forwarded subjects.
 const MONTH_ALIASES: Record<string, number> = {};
 for (const [i, full] of MONTHS.entries()) {
   MONTH_ALIASES[full] = i;
@@ -154,15 +149,7 @@ MONTH_ALIASES.sept = 8;
 
 const DATE_RE = /([A-Z][a-z]+\.?\s+\d{1,2},?\s+\d{4})/;
 const ISO_DATE_RE = /(\d{4})-(\d{2})-(\d{2})/;
-// Scoped to a short run after an explicit date label so an incidental month-shaped date
-// elsewhere in the mail (a quoted Subject line, a "Date: <forwarded-on date>" header) is not
-// mistaken for the session's own stated date — tried FIRST, before the unscoped fallback below.
-// The optional weekday-name group requires a LITERAL trailing comma ("Sunday, September 27" —
-// real weekday-prefixed dates always punctuate this way) rather than an optional one. A bare
-// `,?` here let greedy backtracking swallow part of the MONTH name itself when no weekday is
-// present ("September 28, 2026" got split into weekday-group "Septemb" + capture "er 28, 2026",
-// which then failed to parse as a month) — found live against a real Zoho-style "Date & Time:"
-// mail during this unit's own dry-run check.
+// Prefer labelled session dates to forwarded dates. Weekdays require a comma so backtracking cannot swallow a month prefix.
 const DATE_NEAR_LABEL_RE = /(?:Day\s*&?\s*Date|Date\s*&?\s*Time|Date)\s*:?\*?\s*:?\s*(?:[A-Za-z]+,\s*)?([A-Z][a-z]+\.?\s+\d{1,2},?\s+\d{4}|\d{4}-\d{2}-\d{2})/i;
 const TIME_RANGE_RE = /(\d{1,2}:\d{2}\s*[AP]M)\s*(?:-|–|—|to)\s*(\d{1,2}:\d{2}\s*[AP]M)\s*(IST|UTC|GMT)?/i;
 const TIME_SINGLE_RE = /(\d{1,2}:\d{2}\s*[AP]M)\s*(IST|UTC|GMT)?/i;
@@ -191,11 +178,7 @@ function buildIsoDateTime(dateStr: string, timeStr: string, tz: string | undefin
   return new Date(utcMillis).toISOString();
 }
 
-/** Extracts a session's stated start/end time from free body text. Handles the real formats
- * named in the task brief: "*Day & Date:* Sunday, September 27, 2026 *Time:* 11:00 AM - 12:00 PM
- * IST" (a date phrase anywhere in the text + a time-range anywhere in the text, combined) and a
- * single stated time with no range ("Time: 6:00 PM IST"). Best-effort: returns {} rather than a
- * guess when no date phrase is found at all. */
+/** Extract explicit session date plus range/single time; absent date remains unknown. */
 export function extractSessionDateTime(text: string): { startTime?: string; endTime?: string } {
   const labeledMatch = DATE_NEAR_LABEL_RE.exec(text);
   const dateMatch = labeledMatch ?? DATE_RE.exec(text) ?? ISO_DATE_RE.exec(text);
@@ -217,10 +200,7 @@ export function extractSessionDateTime(text: string): { startTime?: string; endT
   return {};
 }
 
-/** A meeting-shaped mail is "past-recording" when it carries a recording link, or its
- * subject/body uses recording language ("shared a recording", "recap", ...); otherwise, if it
- * states a start time, "upcoming" iff that time is still in the future; otherwise defaults to
- * "upcoming" (a bare join link with no other signal reads as an invite, not a recap). */
+/** Recording evidence/past time implies past-recording; other invitation evidence remains upcoming. */
 export function classifyMeetingKind(opts: {
   subject: string;
   bodyText: string;
@@ -239,7 +219,7 @@ export function classifyMeetingKind(opts: {
 /** True when the body carries a registration link but no DIRECT join link — the case that must
  * never auto-join (plan U0/U5: "registration forms stay human"). */
 export function isRegistrationOnly(bodyText: string): boolean {
-  return REGISTER_URL_RE.test(bodyText) && !DIRECT_JOIN_RE.test(bodyText);
+  return REGISTER_URL_RE.test(bodyText) && ![...bodyText.matchAll(new RegExp(DIRECT_JOIN_RE.source, "gi"))].some(match => recognise(match[0])?.kind === "join");
 }
 
 async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCandidate | null> {
@@ -254,24 +234,46 @@ async function fetchOne(messageId: string, run = runGws): Promise<GmailMeetingCa
   if (!sender) return null;
   const subject = header(headers, "Subject") || "(no subject)";
 
-  const bodyText = decodeGmailBody(msg.payload) || msg.snippet || "";
+  const bodyText = decodeGmailBody(msg.payload) || "";
+  if (msg.snippet !== undefined && typeof msg.snippet !== "string") throw new Error("Invalid Gmail snippet");
+  const htmlData = findPart(msg.payload, "text/html")?.body?.data;
+  const htmlBody = htmlData ? base64UrlDecode(htmlData) : "";
+  if (htmlBody.length > MAX_SCAN_CHARS) throw new Error("Gmail HTML acquisition incomplete");
+  const htmlLinks = candidateUrls(htmlBody);
+  if (htmlLinks.length >= MAX_CANDIDATES) throw new Error("Gmail HTML acquisition incomplete");
+  const linkText = `${bodyText}\n${htmlLinks.join("\n")}`;
+  const evidenceText = `${linkText}\n${msg.snippet ?? ""}`;
+  if (evidenceText.length > MAX_SCAN_CHARS || candidateUrls(evidenceText).length >= MAX_CANDIDATES) throw new Error("Gmail link acquisition incomplete");
   if (msg.threadId !== undefined && (typeof msg.threadId !== "string" || !/^[A-Za-z0-9_-]{1,256}$/.test(msg.threadId))) throw new Error("Invalid Gmail thread");
-  const registrationUrl = REGISTER_URL_RE.exec(bodyText)?.[0];
-  const meetingUrl = DIRECT_JOIN_RE.exec(bodyText)?.[0] ?? DIRECT_JOIN_RE.exec(msg.snippet ?? "")?.[0] ?? [bodyText, msg.snippet ?? ""].flatMap(text =>
-    [...text.matchAll(new RegExp(MEETING_URL_RE.source, "gi"))].map(match => match[0])).find(url => !REGISTER_URL_RE.test(url));
-  const recordingUrl = RECORDING_URL_RE.exec(bodyText)?.[0];
-  const { startTime, endTime } = extractSessionDateTime(bodyText);
+  const registrationUrl = REGISTER_URL_RE.exec(evidenceText)?.[0];
+  const link = resolveEventMeetingLink({description: evidenceText});
+  const meetingUrl = link.url;
+  const literalRecording = [...linkText.matchAll(new RegExp(RECORDING_URL_RE.source, "gi"))].map(match => match[0]).find(url =>
+    supportedMeetingUrl(url) || /^https:\/\/drive\.google\.com\//.test(url));
+  const { startTime, endTime } = extractSessionDateTime(bodyText || msg.snippet || "");
+  const youtube = [linkText, msg.snippet ?? ""].flatMap((text, index) => [...text.matchAll(/https:\/\/[^\s"'<>]+/gi)]
+    .map(match => ({videoId: supportedMeetingUrl(match[0]) ? youtubeVideoId(match[0]) : undefined, source: index === 0 ? "body" as const : "snippet" as const}))).filter(item => item.videoId);
+  const youtubeIds = new Set(youtube.map(item => item.videoId));
+  const watch = youtubeIds.size === 1 ? youtube[0] : undefined;
+  const youtubeWatch = watch?.videoId ? {url: `https://www.youtube.com/watch?v=${watch.videoId}`, videoId: watch.videoId, source: watch.source} : undefined;
+  const recordingUrl = literalRecording && youtubeVideoId(literalRecording) && (youtubeIds.size > 1 ||
+    (youtubeWatch && startTime && Date.parse(startTime) > Date.now() && !RECORDING_HINT_RE.test(`${subject}\n${bodyText}`))) ? undefined : literalRecording;
   const kind = classifyMeetingKind({ subject, bodyText, recordingUrl, startTime, now: new Date() });
-  const registrationOnly = isRegistrationOnly(`${bodyText}\n${msg.snippet ?? ""}`);
+  const registrationOnly = REGISTER_URL_RE.test(`${linkText}\n${msg.snippet ?? ""}`) && !meetingUrl;
 
   return {
     messageId: msg.id,
+    ...(typeof msg.internalDate === "string" && /^\d{1,16}$/.test(msg.internalDate) && Number.isSafeInteger(Number(msg.internalDate)) &&
+      Number(msg.internalDate) <= Date.now() ? {receivedAt: new Date(Number(msg.internalDate)).toISOString()} : {}),
     ...(msg.threadId ? {threadId: msg.threadId} : {}),
     ...(registrationUrl ? {registrationUrl} : {}),
     subject,
     ...sender,
     ...(meetingUrl ? { meetingUrl } : {}),
     ...(recordingUrl ? { recordingUrl } : {}),
+    ...(youtubeWatch ? {youtubeWatch} : {}),
+    ...(youtubeIds.size > 1 ? {youtubeWatchIssue: "ambiguous" as const} : {}),
+    ...(link.issue ? {meetingLinkIssue: link.issue} : {}),
     ...(startTime ? { startTime } : {}),
     ...(endTime ? { endTime } : {}),
     kind,

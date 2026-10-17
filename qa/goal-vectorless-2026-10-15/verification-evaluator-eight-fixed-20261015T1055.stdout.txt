@@ -1,0 +1,33 @@
+✖ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (1131.4866ms)
+✔ three physical attempts stop before answer, sticky across repeated graph/scorer calls and resume (62.8136ms)
+✔ source drift/forged citation offsets fail through actual hydration validation (30.5844ms)
+✔ byte, token admission and unknown usage refuse before further physical calls (2.7026ms)
+✔ deadline cancels hanging transport without admitting another attempt (17.1257ms)
+✔ checkpoint integrity/config/candidate binding refuses tampering and collisions (36.9182ms)
+✔ question-blind same-population control ignores query and offline reader refuses foreign scope (33.1814ms)
+✔ live disabled by default; full92 or injected grant expansion refused (1.3015ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 7
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1358.3622
+
+✖ failing tests:
+
+test at scripts\eval\vectorless-production-eval.test.mjs:40:1
+✖ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (1131.4866ms)
+  AssertionError [ERR_ASSERTION]: ask.refine_batch
+      at file:///C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs:52:122
+      at async temporary (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs:38:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

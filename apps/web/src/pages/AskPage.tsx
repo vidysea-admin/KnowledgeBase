@@ -10,13 +10,13 @@
  *  - the router's verdict / insufficient-coverage state is surfaced, so an answer the system
  *    itself judged weakly-covered does not read as a confident one.
  */
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext.js";
-import { ask } from "../api/ask.js";
-import { ApiError } from "../api/client.js";
+import { useAskHandoff } from "./search/AskHandoff.js";
 import { safeHttpUrl } from "../safe-url.js";
-import type { AskResponse, AskInternalSource } from "../api/types.js";
+import type { AskInternalSource } from "../api/types.js";
+import { AiUsageSummary } from "../components/AiUsageSummary.js";
+import { NativeEvidence } from "../components/NativeEvidence.js";
+import { parseNativeSourceLocator, type NativeSourceLocator } from "../api/nativeEvidence.js";
 
 // Web-source `url` comes from an external search provider (open index-signature `WebSource`), so
 // it is attacker-influenceable text: only http(s) may become an `href` (see ../safe-url.ts).
@@ -25,6 +25,24 @@ import type { AskResponse, AskInternalSource } from "../api/types.js";
 function sessionRefOf(source: AskInternalSource): string | null {
   const ref = source.evidence?.sessionRef;
   return typeof ref === "string" && ref !== "" ? ref : null;
+}
+
+function nativeLocators(source: AskInternalSource): NativeSourceLocator[] {
+  const raw = source.evidence?.sourceQuotes;
+  const candidates = [source.evidence?.sourceLocator, ...(Array.isArray(raw) ? raw.map(q =>
+    q && typeof q === "object" ? (q as Record<string, unknown>).sourceLocator : null) : [])];
+  const unique = new Map<string, NativeSourceLocator>();
+  for (const candidate of candidates) {
+    const parsed = parseNativeSourceLocator(candidate);
+    if (parsed) unique.set(JSON.stringify(parsed), parsed);
+  }
+  return [...unique.values()];
+}
+function hasNativeCitation(source: AskInternalSource): boolean {
+  const evidence = source.evidence, quotes = evidence?.sourceQuotes;
+  const native = (value: unknown) => value !== undefined && !(value && typeof value === "object" && (value as Record<string, unknown>).kind === "transcript");
+  return native(evidence?.sourceLocator) || Array.isArray(quotes) && quotes.some(q => q && typeof q === "object"
+    && (native((q as Record<string, unknown>).sourceLocator) || ["document-page", "message"].includes(String((q as Record<string, unknown>).origin))));
 }
 
 interface QuoteCitation { id: string; turnId: string; speakerRef: string; tStart: number; tEnd: number; quote: string; origin: string }
@@ -38,24 +56,7 @@ function quoteCitations(source: AskInternalSource): QuoteCitation[] {
 }
 
 export function AskPage(): React.ReactElement {
-  const { apiKey } = useAuth();
-  const [query, setQuery] = useState("");
-  const [result, setResult] = useState<AskResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  function handleSubmit(event: React.FormEvent): void {
-    event.preventDefault();
-    const trimmed = query.trim();
-    if (trimmed === "" || loading) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    ask(apiKey, trimmed)
-      .then((res) => setResult(res))
-      .catch((err: unknown) => setError(err instanceof ApiError ? err.message : "failed to ask"))
-      .finally(() => setLoading(false));
-  }
+  const { query, setQuery, result, error, loading, handleSubmit } = useAskHandoff();
 
   const internal = result?.sources.internal ?? [];
   const web = result?.sources.web ?? [];
@@ -100,6 +101,7 @@ export function AskPage(): React.ReactElement {
           <div className="card">
             <div className="section-title">Answer</div>
             <p style={{ whiteSpace: "pre-wrap" }}>{result.answer}</p>
+            <AiUsageSummary entries={result.auditLog} />
             {result.insufficient_coverage && (
               <div className="empty-note">
                 The router judged internal coverage insufficient for this question
@@ -121,6 +123,13 @@ export function AskPage(): React.ReactElement {
             {internal.length === 0 && <div className="empty-note">None.</div>}
             <ul style={{ paddingLeft: "1.1rem", margin: 0 }}>
               {internal.map((source) => {
+                if (hasNativeCitation(source)) {
+                  const locators = nativeLocators(source);
+                  return <li key={source.node_id}><span>{source.node_id}</span>
+                    {locators.map(locator => <NativeEvidence key={JSON.stringify(locator)} sourceLocator={locator} />)}
+                    {!locators.length && <p>This source passage is unavailable.</p>}
+                  </li>;
+                }
                 const ref = sessionRefOf(source);
                 return (
                   <li key={source.node_id} style={{ marginBottom: "0.35rem" }}>

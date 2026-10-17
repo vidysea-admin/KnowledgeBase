@@ -1,0 +1,1 @@
+{"crossSplitViolations":0,"cases":20,"privatePathsRefused":12,"foreignRefused":true,"permissionRefused":true}

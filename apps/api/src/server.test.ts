@@ -2,7 +2,7 @@
  * apps/api/src/server.test.ts — T-009 C7. In-process HTTP requests (via `testUtils.ts`'s
  * ephemeral-port helper) against `createServer(deps)` with fakes for every injected dependency.
  * Covers: valid key + `ask` scope -> 200 `AskResult`; missing/invalid key -> 401; valid key
- * missing `ask` scope on `/ask` -> 403; valid key on a stub route -> 501 (never 403, never 200);
+ * missing `ask` scope on `/ask` -> 403; webhook scope/hosting configuration refusals -> 403/503;
  * rate limit trips after N requests -> 429 with `Retry-After`.
  */
 import { test } from "node:test";
@@ -98,9 +98,7 @@ test("POST /ask with a valid key that lacks the ask scope returns 403, not 401",
   }
 });
 
-test("a valid key hitting a stub route gets 501 (authorized but not built), never 403 or 200", async () => {
-  // /search was un-stubbed (plan §10 U0.7) — /webhooks/register is now the only remaining
-  // genuine stub, so it's the only route left that can prove this behavior.
+test("a webhooks-only key cannot register without the hosting scope", async () => {
   const server = await startTestServer(
     buildTestDeps({
       keyStore: fakeKeyStore({ "sources-key": { tenantId: "tenant-1", scopes: ["webhooks"] } }),
@@ -111,16 +109,16 @@ test("a valid key hitting a stub route gets 501 (authorized but not built), neve
       method: "POST",
       headers: { authorization: "Bearer sources-key" },
     });
-    assert.equal(postRes.status, 501);
+    assert.equal(postRes.status, 403);
     const postBody = (await postRes.json()) as { error: string; message: string };
-    assert.equal(postBody.error, "not_implemented");
-    assert.match(postBody.message, /POST \/webhooks\/register is planned, not yet built/);
+    assert.equal(postBody.error, "forbidden");
+    assert.match(postBody.message, /missing the required "hosting" scope/);
   } finally {
     await server.close();
   }
 });
 
-test("a valid key lacking a stub route's scope still gets 403 there (scope check runs before the 501)", async () => {
+test("a valid key lacking hosting scope gets 403 before webhook configuration is read", async () => {
   const server = await startTestServer(
     buildTestDeps({
       keyStore: fakeKeyStore({ "ask-only-key": { tenantId: "tenant-1", scopes: ["ask"] } }),
@@ -132,6 +130,22 @@ test("a valid key lacking a stub route's scope still gets 403 there (scope check
   } finally {
     await server.close();
   }
+});
+
+test("a hosting and webhooks key gets 503 when hosting runtime is not configured", async () => {
+  const server = await startTestServer(buildTestDeps({
+    keyStore: fakeKeyStore({ "hosting-key": { tenantId: "tenant-1", scopes: ["hosting", "webhooks"] } }),
+  }));
+  try {
+    const res = await fetch(`${server.baseUrl}/webhooks/register`, {
+      method: "POST", headers: { authorization: "Bearer hosting-key" },
+    });
+    assert.equal(res.status, 503);
+    assert.equal(res.headers.get("retry-after"), "1");
+    const body = await res.json();
+    assert.ok(body && typeof body === "object" && "error" in body);
+    assert.equal(body.error, "hosting_unavailable");
+  } finally { await server.close(); }
 });
 
 test("rate limit trips after N requests with 429 and a Retry-After header", async () => {

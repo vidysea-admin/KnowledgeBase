@@ -1,0 +1,1 @@
+{"argv": ["C:\\Program Files\\Python312\\python.exe", "-m", "unittest", "discover", "-s", "scripts/qa", "-p", "test_scoped_check_runner.py", "-v"], "exit_code": 0, "wall_s": 5.781999999999925, "interpreter": "C:\\Program Files\\Python312\\python.exe"}

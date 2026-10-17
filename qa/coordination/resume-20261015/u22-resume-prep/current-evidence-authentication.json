@@ -1,0 +1,16 @@
+{
+  "sealSha256": "9f35bb7e6c6edc98f09d7d9a53d1b90a91aef3df8f8f092663771d9d8dcf0820",
+  "pinsVerified": 21,
+  "allMatch": true,
+  "actual3": {
+    "exit": 0,
+    "pass": 3,
+    "fail": 0,
+    "skip": 0
+  },
+  "mandatoryVerifier": {
+    "exit": 0,
+    "vacuous": true
+  },
+  "scope": "Current broker execution, not historical reuse; reviewer independently authenticates source/runtime/helper fingerprint provenance. No independent verdict."
+}

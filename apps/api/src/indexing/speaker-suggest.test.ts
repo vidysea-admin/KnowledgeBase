@@ -6,13 +6,20 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
-import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions.testdb.js";
-import { confirmSpeakerSuggestion, rejectSpeakerSuggestion } from "../../../../packages/db/src/collections/speaker-suggestions.js";
+import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions/testdb.js";
+import { confirmSpeakerSuggestion, rejectSpeakerSuggestion } from "../../../../packages/db/src/collections/speaker-suggestions/index.js";
 import { createLogger } from "../composition/logger.js";
 import { resolveSuggestSpeakers } from "../composition/production.js";
 import { suggestSpeakersForSession, speakerSuggestEnabled } from "./speaker-suggest.js";
 import { indexSession } from "./session.js";
 import { fakeDb, completeWith } from "./testutils.js";
+import { createKnowledgeVisibility } from "../visibility/knowledge.js";
+
+async function visibleIndexFixture() {
+  const fixture = fakeDb();
+  assert.equal(await createKnowledgeVisibility(fixture.db).sessionVisible("t", "s1"), true, "index fixture needs an own-tenant session and linked recording source; eligibility must not be bypassed");
+  return fixture;
+}
 
 const T = "tenant-A", S = "s1";
 const turn = (id: string, speakerRef: string, text: string, tStart = 0): Turns => ({ _id: id, tenantId: T, sessionId: S, speakerRef, tStart, tEnd: tStart, text });
@@ -22,6 +29,11 @@ const TURNS = [
   turn("t2", "spk:2", "Next topic please.", 2),
 ];
 const QA = "Priya Nair, what do you think about the new rules";
+/** Human decisions fence an existing own-tenant session, including non-native recordings. */
+function seedDecisionSession(m: ReturnType<typeof memoryDb>): void {
+  m.seed("sessions", { _id: S, tenantId: T, sourceId: "provided-recording" });
+  m.seed("sources", { _id: "provided-recording", tenantId: T, kind: "recording", consent: { given: true } });
+}
 const reply = (json: unknown): CompleteResult => ({ text: "", json, usage: { inputTokens: 1, outputTokens: 1 }, provider: "fake", model: "fake-1", costUsd: 0 } as CompleteResult);
 /** Scripted model: proposer calls get the proposal, verifier calls get `verdict`. Records every job kind. */
 function scripted(verdict: "yes" | "no" | "unsure" = "yes", name = "Priya Nair", quote = QA) {
@@ -85,8 +97,9 @@ test("re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row 
   assert.equal(JSON.stringify(m.rows("speaker_suggestions")), afterReject, "rejection tombstone byte-identical");
 
   const m2 = memoryDb();
+  seedDecisionSession(m2);
   await suggestSpeakersForSession(T, S, TURNS, scripted().complete, m2.db);
-  await confirmSpeakerSuggestion(T, S, m2.rows("speaker_suggestions")[0]!._id as string, m2.db);
+  assert.equal((await confirmSpeakerSuggestion(T, S, m2.rows("speaker_suggestions")[0]!._id as string, m2.db)).result, "ok");
   const before = JSON.stringify([m2.rows("speakers"), m2.rows("speaker_suggestions")]);
   await suggestSpeakersForSession(T, S, TURNS, scripted().complete, m2.db);
   assert.equal(JSON.stringify([m2.rows("speakers"), m2.rows("speaker_suggestions")]), before, "human-confirmed provenance + row untouched");
@@ -103,7 +116,7 @@ test("a model that throws never throws out of the hook and writes nothing", asyn
 
 test("indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key", async () => {
   for (const deps of [{}, { suggestSpeakers: false }]) {
-    const { db, calls } = fakeDb();
+    const { db, calls } = await visibleIndexFixture();
     const kinds: string[] = [];
     const inner = completeWith();
     const complete = async (job: { kind: string }) => { kinds.push(job.kind); return inner(job); };
@@ -115,7 +128,7 @@ test("indexSession with the flag ABSENT/false: no speakers-route call, no speake
 });
 
 test("indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers`", async () => {
-  const { db, calls } = fakeDb();
+  const { db, calls } = await visibleIndexFixture();
   const kinds: string[] = [];
   const inner = completeWith();
   const complete = async (job: { kind: string }) => { kinds.push(job.kind); return inner(job); };
@@ -128,8 +141,9 @@ test("indexSession with suggestSpeakers:true calls the speakers route and report
 
 test("a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence)", async () => {
   const m = memoryDb();
+  seedDecisionSession(m);
   await suggestSpeakersForSession(T, S, TURNS, scripted().complete, m.db);
-  await confirmSpeakerSuggestion(T, S, m.rows("speaker_suggestions")[0]!._id as string, m.db);
+  assert.equal((await confirmSpeakerSuggestion(T, S, m.rows("speaker_suggestions")[0]!._id as string, m.db)).result, "ok");
   const turns = [turn("t0", "spk:0", "Rohan Gupta, what do you think about the new rules?", 0), ...TURNS.slice(1)];
   const r = await suggestSpeakersForSession(T, S, turns, scripted("yes", "Rohan Gupta", "Rohan Gupta, what do you think about the new rules").complete, m.db);
   assert.deepEqual([r.suggested, r.inserted, m.rows("speaker_suggestions").length], [0, 0, 1]);
@@ -166,7 +180,7 @@ test("ISS-WU24-002: a hung hook times out, logs, and returns so indexing continu
 });
 
 test("indexSession still completes when the suggestion hook fails", async () => {
-  const { db } = fakeDb();
+  const { db } = await visibleIndexFixture();
   const inner = completeWith();
   const complete = async (job: { kind: string }) => { if (job.kind === "speakers") throw new Error("ollama down"); return inner(job); };
   const res = await indexSession("t", "s1", { complete: complete as never, db, suggestSpeakers: true });

@@ -1,0 +1,12 @@
+{
+  "scope": "T053 first public4 attempt evidence-capture failure",
+  "at": "2026-10-15T00:32:27.5801450Z",
+  "pid": 18068,
+  "terminalReached": true,
+  "childExit": null,
+  "testCounts": null,
+  "credited": false,
+  "cause": "Process reached terminal and hashes were read, but Set-Content failed because intended QA directory had not been created. Stdout and actual child exit unavailable after shell termination.",
+  "priorToolExit": 1,
+  "nextAction": "Fresh bounded ordinary public4 rerun with output directory established; no rejected-action or provider retry"
+}

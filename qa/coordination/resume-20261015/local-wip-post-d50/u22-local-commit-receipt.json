@@ -1,0 +1,47 @@
+{
+  "schema": "u22-local-wip-commit/1",
+  "status": "U22_LOCAL_WIP_COMMITTED_NO_PUSH",
+  "base": "37e51f95c367594bddb422c39c11415674ecf001",
+  "actions": {
+    "tests": 0,
+    "stage": 1,
+    "config": 0,
+    "commit": 1,
+    "push": 0
+  },
+  "failures": [],
+  "scan": {
+    "files": 33,
+    "findings": [],
+    "bytes": 74594,
+    "valuesPersisted": false
+  },
+  "unchangedOmitted": [
+    "qa/coordination/resume-20261015/broker/broker_lib.py"
+  ],
+  "manifest": {
+    "bytes": 74594,
+    "path": "qa/coordination/resume-20261015/local-wip-post-d50/u22-commit-allowlist.json",
+    "sha256": "977e7cc47a5859484eb58cfe2b1fe824ffafc3b26a2151d086a8f9a05377ff08",
+    "paths": 33
+  },
+  "stagedScan": {
+    "files": 33,
+    "findings": [],
+    "valuesPersisted": false
+  },
+  "whitespaceExit": 0,
+  "whitespaceDisposition": "Exact raw unit proof preserved; raw log/EOF findings advisory only as authorized, no normalization/config/hook bypass.",
+  "commitExit": 0,
+  "commit": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "unrelatedDirtyStatusDrift": [],
+  "remainingDirty": {
+    "total": 5228,
+    "untracked": 5087,
+    "tracked": 141
+  },
+  "source2CommitBytesVerified": true,
+  "watched8Unchanged": true,
+  "indexEmpty": true,
+  "committedPaths": 33
+}

@@ -1,0 +1,40 @@
+{
+  "capturedAt": "2026-10-15T00:00:25.4923877Z",
+  "scope": "Curated local WIP source publication; full forty parent acceptance pending",
+  "commit": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "branch": "codex/machine-migration-2026-10-09",
+  "destination": "https://github.com/vidysea-admin/KnowledgeBase.git",
+  "changedFiles": 1089,
+  "indexEmpty": true,
+  "sourceUnstagedCount": 0,
+  "ahead": 1,
+  "behind": 0,
+  "checkpoint": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T235052Z-verified.json",
+  "checkpointSha256": "1f7f156d60c8213b3debc6d5f82a4833275f09247e06505c70a7c34bbf886f95",
+  "compilerInputs": 1940,
+  "inputDrift": 0,
+  "typesAndBuildsExit": 0,
+  "privacyAudit": {
+    "initialStagedBlobs": 1079,
+    "initialFingerprint": "b3a17814d8ad7d17605a6a98575a6dc8d1b63f17960e30acba8c94c8c0ccc0fb",
+    "finalDeltaBlobs": 12,
+    "finalFingerprint": "40999636e377dfa0e6594dde01c0912e405c810a6a9484c122ddf25089ca8bac",
+    "blockers": 0
+  },
+  "identity": {
+    "firstCommitAttempt": "Failed before commit; local Git identity unset",
+    "successfulCommit": "Established branch committer identity reused per command; no global/repository config change"
+  },
+  "push": {
+    "processLaunched": false,
+    "result": "Automatic approval review rejected",
+    "reason": "Expanded 1089-file nonpublic source and QA payload requires direct human authorization for this destination",
+    "retry": false,
+    "workaround": false,
+    "directHumanApprovalRequired": true
+  },
+  "currentDockerCiTriggered": false,
+  "deployment": false,
+  "migrationApplied": false,
+  "acceptance": "WIP only; latest U24 secondary-topic withdrawal regression is RED; software compilation does not certify privacy acceptance"
+}

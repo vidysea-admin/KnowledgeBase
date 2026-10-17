@@ -1,0 +1,42 @@
+{
+  "format": "qa-offline-controls-broker-request-v1",
+  "candidate": "ac54e21d70f199fa6423ee111e99ddcb7d5df93b87fb3f36dffee79da6ce06a6",
+  "pins": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/adapter.mjs",
+      "sha256": "ec0c86d7ed88e70d37f47b493b037e8092ee3b145473685a9b6566032dee43a5"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/watchdog.py",
+      "sha256": "fe696e9604028eada0b4ca0e81b54796287af0c7b61f26d06e5e95e7fd6b7985"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/source-closure.json",
+      "sha256": "2e25e96b64790adade23f2b248ec1aa9d215766d8b9fc83423b3a00d99082667"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/approved-data-pins.json",
+      "sha256": "f270f0bbd43269586f687123010d37ef9696c6e01ebda9daa235bf2f59ab7b4c"
+    }
+  ],
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "sourceClosure": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/source-closure.json",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "command": [
+    ".venv/Scripts/python.exe",
+    "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/watchdog.py"
+  ],
+  "allocationSeconds": 60,
+  "finalizationReserveSeconds": 5,
+  "providerNetworkAuthorization": false,
+  "cpuSlot": "SOLE_BROKER_ONLY_AFTER_ROOT_RELEASE",
+  "noRetryAfterTimeout": true,
+  "expectedQuestionCount": 92,
+  "expectedCandidateCount": 29,
+  "rawGoldenSha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "sortedIDSetSha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "runtimeMemory": "Unmeasured until execution;256MiBV8oldspace is not totalRSS bound",
+  "scope": "Existing offline lexical and questionblind controls only; all92rows/hits/misses; no primary/answer/humanPASS",
+  "historicalReceipt": "qa/coordination/resume-20261015/eval-pilot/offline-controls/result.json",
+  "outputDirectory": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2"
+}

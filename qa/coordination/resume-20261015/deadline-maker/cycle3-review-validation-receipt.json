@@ -1,0 +1,37 @@
+{
+  "command": [
+    "C:/Program Files/Python312/python.exe",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "validate",
+    "--input",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-review-envelope.json"
+  ],
+  "exit_code": 0,
+  "result_status": "READY",
+  "input": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-review-envelope.json",
+    "sha256": "124f9e07ea64c9f33d2342124730b52b4fe50501960b0569ab50086187a814c4"
+  },
+  "result": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\cycle3-review-validation-result.json",
+    "sha256": "19bf37ab8e2eaa80c6d9ba35e240a2a4e6c17770372448334b916c9a93887976"
+  },
+  "scope": "Contract validation and budget admission only; no reviewer dispatch, hard-cap proof, runtime startup authentication or verdict",
+  "remaining_prerequisites": [
+    "Root binds current native same-runtime startup receipt and explicit dispatch authorization; observed41k is root-reported only",
+    "Independent review/probe and applicable contracts/API-typecheck evidence; full acceptance remains HOLD"
+  ],
+  "maker_actual_total_tokens": null,
+  "maker_actual_active_seconds": null,
+  "actual_cost": null,
+  "completion_reserve": {
+    "allocation": {
+      "active_s": 30,
+      "tokens": 50000
+    },
+    "id": "t059-canonical-vectorless-flywheel-receipt/3/ec0f5401f54c80375bac7b38c7b0d82741400870a5e2f95db1a59545a12f61c6",
+    "phase_kind": "review",
+    "status": "protected"
+  },
+  "ten_percent_ratio_verified": false
+}

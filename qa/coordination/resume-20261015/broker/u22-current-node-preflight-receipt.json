@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "console.log(JSON.stringify({node:process.execPath,version:process.version,tsx:import.meta.resolve('tsx/esm/api')}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4.json",
+    "sha256": "5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4",
+    "count": 21
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 7,
+  "accounting": "MAKER ACCEPTANCE, not watched checker",
+  "pid": 29524,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.18699999999807915,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-node-preflight.log",
+    "sha256": "801ba7d40e84531582767615d62f56dbf4c8637476c14dc59f0ed7c07011c9c7"
+  },
+  "counts": {}
+}

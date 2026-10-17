@@ -1,0 +1,97 @@
+{
+  "candidate_content_sha256": "495154403c783b78eff8d30120487ebb8cb9c11cefe9eee423acb7da69fcf275",
+  "forbidden": [
+    "maker CPU tests/build/helper/browser/audio/DB/provider activation",
+    "schema/contracts/enforcement edits",
+    "checker PASS by maker",
+    "silent reuse old changed-test receipts"
+  ],
+  "remaining_open": [
+    "ordinary CLI Windows mode and dedicated owned-browser readback/lifecycle not wired",
+    "actual current-host independent calibration and uncertainty",
+    "authentic finalized Windows-tagged qualifier refusal fixture",
+    "raw packet archival conversion replay",
+    "realWindows/Ubuntu/live/privacy/integration/release gates and prior native4SKIPs/intermittent unavailable"
+  ],
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "concurrency": 1,
+  "candidate_git_sha": null,
+  "candidate_kind": "dirty-byte-pinned-13-path-source",
+  "actual_maker_usage": {
+    "total_tokens": null,
+    "monetary_cost": null,
+    "active_seconds": null
+  },
+  "base_git_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "source_pins": "qa/coordination/resume-20261015/windows-qualification-integration/combined-source-pins.json",
+  "additional_required": [
+    "existing exact full dependency graph command; no config changes",
+    "scoped structure/LOC affected13 source paths and native immediate directory count26",
+    "helper C++ build only requires separately admitted verified existing Windows toolchain and owned build dir; no execution"
+  ],
+  "status": "FROZEN-awaiting-sole-broker-admission",
+  "required_commands": [
+    {
+      "job_timeout_seconds": 75,
+      "phase": "types",
+      "argv": [
+        "pnpm",
+        "--filter",
+        "@lkb/meeting-bot",
+        "typecheck"
+      ]
+    },
+    {
+      "expected_tests": 27,
+      "job_timeout_seconds": 75,
+      "phase": "numeric-protocol-retained-spool",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=65000",
+        "--import",
+        "tsx",
+        "packages/meeting-bot/src/capture/native/windows-capture-clock.test.ts",
+        "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts",
+        "packages/meeting-bot/src/capture/native/native-spool.test.ts",
+        "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts"
+      ]
+    },
+    {
+      "expected_selected_tests": 1,
+      "job_timeout_seconds": 30,
+      "phase": "legacy-os-refusal",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=20000",
+        "--import",
+        "tsx",
+        "--test-name-pattern=^legacy OS platform win32 cannot qualify a Meet capture even with consistent numeric clocks$",
+        "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts"
+      ]
+    },
+    {
+      "expected_selected_tests": 1,
+      "prerequisites": [
+        "sole broker NEW owned secure UUID fixture",
+        "pinned existing ffmpeg ffprobe Chromium binary identity; fake tab does not launch browser",
+        "skip is incomplete evidence"
+      ],
+      "job_timeout_seconds": 150,
+      "phase": "actual-runRecord-canonical-platform",
+      "argv": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=140000",
+        "--import",
+        "tsx",
+        "--test-name-pattern=^broker synthetic actual runRecord finalizer seals genuine archive; source receipt and zero spare refuse$",
+        "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts"
+      ]
+    }
+  ]
+}

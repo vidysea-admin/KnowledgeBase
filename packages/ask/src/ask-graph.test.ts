@@ -14,7 +14,7 @@ import type { CompleteFn } from "./select-nodes.js";
 import { fakeComplete, fakeWrite, fakeTreeSearch } from "./testUtils.js";
 import { askV2, type AskV2Deps, type AskV2Result } from "./ask-v2.js";
 import { BoundedAskError, SOURCE_LIMITS, type SourceQuote } from "./source-context.js";
-import { ASK_GRAPH, askGraphV2, initAskGraphState, runAskGraphNodes } from "./ask-graph.js";
+import { ASK_GRAPH, askGraphV2, initAskGraphState, runAskGraphNodes, runAskLangGraphNodes, officialAskGraphEnabled } from "./ask-graph.js";
 
 const TREE: TreeIndexNode = {
   node_id: "tenant:t1", title: "t1", level: "tenant", summary: "",
@@ -229,6 +229,47 @@ const BASELINE_PATH = new URL("./ask-graph.baseline.json", import.meta.url);
 const baseline: Record<string, string> = existsSync(BASELINE_PATH) ? JSON.parse(readFileSync(BASELINE_PATH, "utf8")) : {};
 const recorded: Record<string, string> = {};
 process.on("exit", () => { if (process.env.WRITE_ASK_BASELINE === "1") writeFileSync(BASELINE_PATH, JSON.stringify(recorded, null, 1) + "\n"); });
+
+test("official Ask executor is default-off and accepts only the exact opt-in", () => {
+  for (const value of [undefined, "", "0", "true", " 1", "1 "]) assert.equal(officialAskGraphEnabled({ LKB_ASK_GRAPH: value }), false);
+  assert.equal(officialAskGraphEnabled({ LKB_ASK_GRAPH: "1" }), true);
+});
+for (const sc of S) test(`official LangGraph: ${sc.name} matches frozen original result, writes and calls`, async () => {
+  const rig = sc.make();
+  const result = await askGraphV2(sc.query, sc.tree, rig.deps, { officialGraph: true });
+  assert.equal(JSON.stringify({ result, writes: rig.writes(), calls: rig.calls() }), baseline[sc.name]);
+  sc.check?.(result, rig);
+});
+for (const attack of ["source-unknown", "judge-unknown", "unsupported"]) test(`official LangGraph bounded refusal: ${attack}`, async () => {
+  const old = bounded({ attack }), official = bounded({ attack });
+  assert.deepEqual(await settle(() => askGraphV2("visa form", btree, official.deps, { officialGraph: true })),
+    await settle(() => askGraphV2("visa form", btree, old.deps, { officialGraph: false })));
+  assert.deepEqual(official.writes(), old.writes()); assert.deepEqual(official.calls(), old.calls());
+});
+test("official library routing enters authoritative nodes, stops after a result and preserves original errors", async () => {
+  const fixture = plain([], {}), state = initAskGraphState("q", TREE, fixture.deps);
+  const result = { answer: "done" } as AskV2Result;
+  const output = await runAskLangGraphNodes([
+    { name: "retrieve", run: async s => { s.result = result; } },
+    { name: "answer", run: async () => { assert.fail("must stop before answer"); } },
+  ], state);
+  assert.equal(output, result); assert.deepEqual(state.trace, ["retrieve"]);
+  const error = new Error("original node failure");
+  await assert.rejects(runAskLangGraphNodes([{ name: "retrieve", run: async () => { throw error; } }], initAskGraphState("q", TREE, fixture.deps)), e => e === error);
+});
+test("official executor preserves completion-budget, provider-error and poisoned evaluator refusal writes", async () => {
+  const cases: Array<() => RigX> = [
+    () => boundedX({ swallowedHuge:true }), () => boundedX({ throwOn:"ask.select_nodes" }),
+    () => boundedX({ throwOn:"ask.answer" }),
+    () => boundedX({}, {scoreFn:()=>[1,"llm judge call failed: failed, fell back to heuristic"]}),
+  ];
+  for(const make of cases) {
+    const old=make(), official=make();
+    assert.deepEqual(await settle(()=>askGraphV2("visa form",official.tree,official.deps,{officialGraph:true})),
+      await settle(()=>askGraphV2("visa form",old.tree,old.deps,{officialGraph:false})));
+    assert.deepEqual(official.writes(),old.writes()); assert.deepEqual(official.calls(),old.calls());
+  }
+});
 
 for (const sc of S) {
   test(`golden: ${sc.name} - graph output, writes and provider calls equal askV2`, async () => {

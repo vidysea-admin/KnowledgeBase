@@ -1,0 +1,94 @@
+{
+  "candidateKind": "raw sorted-path inventory SHA256; NOT Git commit",
+  "rawInventorySha256": "c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+  "contextGitBefore": {
+    "python": "C:\\Program Files\\Python312\\python.exe",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "contractOrigin": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "head": "37e51f95c367594bddb422c39c11415674ecf001",
+    "status": "?? scripts/eval/extraction-review-resume.mjs\n?? scripts/eval/extraction-review-resume.test.mjs\n"
+  },
+  "contextGitAfter": {
+    "python": "C:\\Program Files\\Python312\\python.exe",
+    "version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "contractOrigin": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+    "head": "37e51f95c367594bddb422c39c11415674ecf001",
+    "status": "?? scripts/eval/extraction-review-resume.mjs\n?? scripts/eval/extraction-review-resume.test.mjs\n"
+  },
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4.json",
+    "sha256": "5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4",
+    "count": 21
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-python-git-preflight-receipt.json",
+      "sha256": "349934a12e7e69954d47c2c191a54acb11ffb3e3e21d3393baeff3a1cc7b7bd5",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.35900000000037835,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-python-git-preflight.log",
+        "sha256": "c8f8ca792f541d11015d4afc2de5d6a85190a49c09a11e35d856a7b6887ad40f"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-node-preflight-receipt.json",
+      "sha256": "29554aa1d94d43109c9367274f93fe746f2eab8393689c817dc44ab26de6ecd6",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.18699999999807915,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-node-preflight.log",
+        "sha256": "801ba7d40e84531582767615d62f56dbf4c8637476c14dc59f0ed7c07011c9c7"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-contracts-receipt.json",
+      "sha256": "099f62309f65fe58023db7243187b48cadb68e1979de352709a42c49664f54fc",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.25,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-contracts.log",
+        "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-resume3-receipt.json",
+      "sha256": "d9b108e9bc9403bf5f288b4e1b23cfe792f384d641f4edd8e07f6b6088cb29df",
+      "exit": 0,
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 1.375,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-resume3.log",
+        "sha256": "310c86ffd7272091fffa06239d2017edb97faf8f1cba471da3652a8225184d6d"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-git-after-receipt.json",
+      "sha256": "959c32b7f71209096d0b721340411846b07fe4b4d481255dccefd908e34520c5",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.4219999999986612,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-git-after.log",
+        "sha256": "c8f8ca792f541d11015d4afc2de5d6a85190a49c09a11e35d856a7b6887ad40f"
+      }
+    }
+  ],
+  "allPinsFinalMatch": true,
+  "contractVacuity": true,
+  "failure": null,
+  "elapsed_s": 3.5790000000015425,
+  "historicalReuse": false,
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

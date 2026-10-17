@@ -2,6 +2,7 @@
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isProtectedWorkDbName } from '../lib/transcript-provenance.mjs';
+import { createSchedulerRuntime } from './scheduler/deps-runtime.mjs';
 import { register } from 'tsx/esm/api';
 register();
 const {createHttpCalendarLoader, createHttpCandidateLoader} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
@@ -9,6 +10,7 @@ const {redactJoinLink} = await import('../../packages/meeting-bot/src/calendar/a
 const {launchControlledRecording} = await import('../../packages/meeting-bot/src/capture/reconnect-gaps.ts');
 const {createTelegramChannel} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
 const {createBrowserRegistrationExecutor} = await import('../../packages/meeting-bot/src/joiners/browser-joiner.ts');
+const {createRegistrationPolicyResolver} = await import('./registration-policy-host.ts');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export function safeText(text) {
   // Feed errors can include opaque URLs; leave no query, fragment, userinfo or token in logs.
@@ -21,18 +23,30 @@ export function createPipelineDeps(env = process.env) {
   const api = (env.LKB_API_URL ?? 'http://localhost:3300').replace(/\/$/, '');
   const log = (text) => console.log(safeText(text));
   let channel, channelInitialized = false;
+  let verifiedTenant;
+  const registrationExecutor = createBrowserRegistrationExecutor(env, ROOT);
   return {
     root: ROOT, stateDir: join(ROOT, 'data/webinar-release'), env, log,
+    ...createSchedulerRuntime(ROOT, env, log, () => verifiedTenant),
     now: () => new Date().toISOString(),
     validateTenant: async () => {
+      verifiedTenant = undefined;
       if (!env.LKB_TENANT_ID || !env.LKB_API_KEY) throw new Error('Explicit lane owner and API key required');
       const response = await fetch(`${api}/webinar-operations`, { headers: { authorization: `Bearer ${env.LKB_API_KEY}` }, redirect: 'error', signal: AbortSignal.timeout(30000) });
       try {
         if (!response.ok || response.headers.get('x-lkb-tenant') !== env.LKB_TENANT_ID) throw new Error('Connected API owner does not match the configured capture lane');
+        verifiedTenant = env.LKB_TENANT_ID;
       } finally { await response.body?.cancel(); }
     },
     loadCalendarEvents: createHttpCalendarLoader(api, env.LKB_API_KEY),
-    ...createBrowserRegistrationExecutor(env, ROOT),
+    ...registrationExecutor,
+    registrationConfig: candidate => {
+      if (!verifiedTenant || verifiedTenant !== env.LKB_TENANT_ID) throw new Error('Registration requires current verified lane ownership');
+      const runtime = registrationExecutor.registrationConfig();
+      if (!runtime?.python || !runtime.profileDir) throw new Error('Explicit registration runtime paths required');
+      return createRegistrationPolicyResolver({stateDir: join(ROOT, 'raw', 'webinars'), tenantId: verifiedTenant,
+        runtime: {python: runtime.python, profileDir: runtime.profileDir, browserExecutable: runtime.browserExecutable, timeoutMs: runtime.timeoutMs}})(candidate);
+    },
     loadCalendarAcquisition: createHttpCalendarLoader(api, env.LKB_API_KEY, undefined, {tenantId: env.LKB_TENANT_ID}),
     loadCandidates: async (refresh = false) => {
       if (refresh) {

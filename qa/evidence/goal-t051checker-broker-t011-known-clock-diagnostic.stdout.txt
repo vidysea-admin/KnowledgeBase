@@ -1,0 +1,21 @@
+[T011 known-clock] publish native ACL and sealed readiness begin +18ms
+[T011 known-clock] failed at publish native ACL and sealed readiness +944ms
+[T011 known-clock] cleanup child graceful exit begin +945ms
+✖ actual Node child + private API host bridge known-clock (5963.3346ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6576.4959
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:1:1146
+✖ actual Node child + private API host bridge known-clock (5963.3346ms)
+  Error: Fixture deadline: owned child termination
+      at Timeout._onTimeout (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:17:75)
+      at listOnTimeout (node:internal/timers:635:17)
+      at process.processTimers (node:internal/timers:571:7)

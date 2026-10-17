@@ -1,0 +1,18 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/setup-wizard/SetupWizardPage.test.tsx (20 tests | 16 skipped) 331ms
+ ✓ src/pages/transcript-review/TranscriptReview.test.tsx (11 tests | 9 skipped) 267ms
+ ✓ src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx (2 tests) 410ms
+ ✓ src/__checker_probes__/speaker-auth-session.test.tsx (1 test) 229ms
+ ✓ src/pages/transcript-review/ReviewHistory.test.tsx (3 tests | 2 skipped) 109ms
+ ❯ src/__checker_probes__/collections-kind-identity.test.tsx (1 test | 1 failed) 223ms
+   × checker collection kind identity: removing omitted document preserves topic sharing its ID 221ms
+     → expected 'http://localhost:3300/knowledge/colle…' to be '/api/knowledge/collections/dddddddddd…' // Object.is equality
+ ✓ src/__checker_probes__/evaluation-child-lineage.test.tsx (1 test) 206ms
+
+ Test Files  1 failed | 6 passed (7)
+      Tests  1 failed | 11 passed | 27 skipped (39)
+   Start at  11:13:48
+   Duration  16.51s (transform 613ms, setup 1.62s, collect 3.44s, tests 1.77s, environment 6.80s, prepare 1.13s)
+

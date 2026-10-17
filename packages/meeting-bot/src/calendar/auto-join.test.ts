@@ -83,6 +83,54 @@ function candidate(overrides: Partial<AutoRecordCandidateInput> = {}): AutoRecor
 const TICK_NOW = "2026-09-28T12:26:00Z"; // 4 min before candidate() start, lead=5
 const LEAD5 = 5;
 
+test("T036 refreshed source refusals veto retained approved links in both selection modes", () => {
+  for (const everyWebinar of [false, true]) {
+    for (const issue of [{ meetingLinkIssue: "ambiguous" }, { meetingLinkIssue: "registration-only" },
+      { meetingLinkIssue: "host-start-link" }, { youtubeWatchIssue: "ambiguous" }] as const) {
+      const row = candidate({ status: "approved", meetingUrl: "https://zoom.us/j/1234567890", ...issue });
+      const before = structuredClone(row);
+      const result = selectAutoRecordItems({ calendarEvents: [], candidates: [row], now: TICK_NOW,
+        leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [], everyWebinar });
+      assert.equal(result.toSchedule.length, 0, JSON.stringify({ everyWebinar, issue }));
+      assert.deepEqual(result.skipped.map(item => item.reason), ["needs-review"]);
+      assert.deepEqual(row, before, "selection must not rewrite approval or registration lineage");
+      assert.equal(result.skipped[0]!.detail, undefined, "do not expose a retained join token");
+    }
+  }
+});
+
+test("T036 malformed present refusal fields fail closed at the JSON boundary", () => {
+  for (const field of ["meetingLinkIssue", "youtubeWatchIssue"]) {
+    for (const value of [null, false, 0, "", {}, []]) {
+      const row = { ...candidate({ status: "approved" }), [field]: value } as AutoRecordCandidateInput;
+      const result = selectAutoRecordItems({ calendarEvents: [], candidates: [row], now: TICK_NOW,
+        leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [] });
+      assert.equal(result.toSchedule.length, 0, `${field}:${JSON.stringify(value)}`);
+      assert.equal(result.skipped[0]!.reason, "needs-review");
+    }
+  }
+});
+
+test("T036 every-webinar canonical copies cannot bypass a refreshed Gmail source refusal", () => {
+  const refused = candidate({ status: "approved", meetingUrl: "https://zoom.us/j/1234567890", meetingLinkIssue: "ambiguous" });
+  const calendarCopy = event({ id: "same-session", title: refused.title, meetingUrl: refused.meetingUrl,
+    meetingUrlSource: "conference", startTime: refused.startTime!, endTime: refused.endTime! });
+  const healthy = candidate({ id: "independent", status: "approved", meetingUrl: "https://zoom.us/j/9876543210" });
+  const result = selectAutoRecordItems({ calendarEvents: [calendarCopy], candidates: [refused, healthy], now: TICK_NOW,
+    leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [], everyWebinar: true }, { parallel: true });
+  assert.deepEqual(result.toSchedule.map(item => item.sourceId), ["independent"]);
+  assert.deepEqual(result.skipped.map(item => [item.sourceId, item.reason]), [["same-session", "needs-review"], ["c1", "needs-review"]]);
+});
+
+test("T036 retained rejection and registration barriers keep their existing outcomes", () => {
+  for (const [extra, reason] of [[{ status: "rejected" }, "untrusted-sender"], [{ registrationOnly: true }, "needs-registration"]] as const) {
+    const result = selectAutoRecordItems({ calendarEvents: [], candidates: [candidate({ meetingLinkIssue: "ambiguous", ...extra })],
+      now: TICK_NOW, leadMinutes: LEAD5, trustedSenders: TRUSTED, alreadyScheduled: [] });
+    assert.equal(result.toSchedule.length, 0);
+    assert.equal(result.skipped[0]!.reason, reason);
+  }
+});
+
 test("isTrustedSender: exact email match", () => {
   assert.equal(isTrustedSender("karunn@vidysea.com", undefined, TRUSTED), true);
   assert.equal(isTrustedSender("KARUNN@VIDYSEA.COM", undefined, TRUSTED), true); // case-insensitive

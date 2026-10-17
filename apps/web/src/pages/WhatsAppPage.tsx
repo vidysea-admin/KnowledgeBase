@@ -3,14 +3,20 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 import { listWhatsAppGroups, ingestWhatsAppGroup, type WhatsAppGroup, type WhatsAppIngestResult } from "../api/whatsapp.js";
 import { ApiError } from "../api/client.js";
+import { ReviewQueue } from "./whatsapp/ReviewQueue.js";
 
 export function WhatsAppPage(): React.ReactElement {
-  const { apiKey } = useAuth();
+  const { apiKey, sessionVersion } = useAuth();
+  return <WhatsAppPageState key={`${sessionVersion}:${apiKey}`} apiKey={apiKey} />;
+}
+
+function WhatsAppPageState({ apiKey }: { apiKey: string | null }): React.ReactElement {
   const [groups, setGroups] = useState<WhatsAppGroup[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ingestingJid, setIngestingJid] = useState<string | null>(null);
   const [results, setResults] = useState<Record<string, WhatsAppIngestResult>>({});
   const [ingestError, setIngestError] = useState<string | null>(null);
+  const [reviewRevision, setReviewRevision] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,7 +30,7 @@ export function WhatsAppPage(): React.ReactElement {
     setIngestingJid(group.groupJid);
     setIngestError(null);
     ingestWhatsAppGroup(apiKey, group.groupJid)
-      .then((result) => setResults((prev) => ({ ...prev, [group.groupJid]: result })))
+      .then((result) => { setResults((prev) => ({ ...prev, [group.groupJid]: result })); setReviewRevision((revision) => revision + 1); })
       .catch((err: unknown) => setIngestError(err instanceof ApiError ? err.message : "failed to ingest this group"))
       .finally(() => setIngestingJid(null));
   }
@@ -34,9 +40,8 @@ export function WhatsAppPage(): React.ReactElement {
       <div className="page-header">
         <h1>WhatsApp</h1>
         <p>
-          Real groups from your connected WhatsApp archive (<code>sources/whatsapp_msg</code>, its
-          own linked-account app). Ingest a group to pull its real captured messages into the
-          knowledge base as a real session, attributed to who actually said each one.
+          Ingest captured group messages, inspect their source evidence, and explicitly approve
+          or reject each knowledge candidate. Messages await review before publication.
         </p>
       </div>
 
@@ -82,13 +87,7 @@ export function WhatsAppPage(): React.ReactElement {
         </div>
       )}
 
-      <div className="section-title">What's real here today</div>
-      <div className="card empty-note">
-        Ingestion only, for now &mdash; pulling a group's real captured messages into a real
-        session with real per-message attribution. Automatic topic/decision detection, duplicate
-        flagging, and a review-before-publish queue (before anything becomes a citable claim) are
-        a separate, larger follow-up, not built here yet.
-      </div>
+      <ReviewQueue key={apiKey} apiKey={apiKey} revision={reviewRevision} />
     </>
   );
 }

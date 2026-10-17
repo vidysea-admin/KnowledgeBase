@@ -1,0 +1,7 @@
+{
+  "invalidFixtureCases": 64,
+  "validFixtureCases": 52,
+  "source": "schema-receipt.json stdout",
+  "collections": 43,
+  "note": "This receipt predates the late form audit bindings and optional output occurredAt canonical additions."
+}

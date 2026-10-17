@@ -1,0 +1,101 @@
+{
+  "unit": "quality-four-remaining",
+  "candidate_sha": "sha256:9178adef7f4a1c3d9c92717e88ca76c87cb9d1574d2051ef64addfeba87c973e",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "token_metric": "actual_total",
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null,
+    "token_metric": "actual_total"
+  },
+  "reviewers": [
+    {
+      "tokens": 950992,
+      "active_s": null,
+      "note": "Actual total950992=input945086+output5906; cached input is subset, never additive. Actual active null; conservative wall-bound156.701271 debit retained, no measured active/cost. Prior overrun remains.",
+      "budget_debit": {
+        "active_s": 156.701271,
+        "token_metric": "actual_total"
+      },
+      "cost": null,
+      "id": "same-mjs_four_checker-prior-settled-phase",
+      "token_metric": "actual_total"
+    }
+  ],
+  "next_phase": {
+    "tokens": 200000,
+    "output_tokens": 1500,
+    "kind": "review",
+    "cost": null,
+    "active_s": 90,
+    "token_metric": "actual_total"
+  },
+  "bootstrap_scope": "SAME DONE mjs_four_checker remaining one batched read only: exact621lines10pins70386byte frozen payload, four unchanged units/clauses in batch-four-current/proposal.md, existing independent4probes. Immediate FINALcheckpoint after read. No final verdict write; later final phase requires parent fresh settled telemetry and fresh dual assess. No reactivation by this prep.",
+  "bootstrap": {
+    "cost": null,
+    "tokens": 1350992,
+    "active_s": 180,
+    "token_metric": "actual_total"
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "quality-four/remaining/sha256:9178adef7f4a1c3d9c92717e88ca76c87cb9d1574d2051ef64addfeba87c973e",
+  "escalation": {
+    "reason": "Four-unit source review incomplete after retained950992actualTOTAL and156.701271wall-bound previous phase; required independent4probes green, exact remaining621line read preflight authenticated. Prior overrun retained, no denominator inflation.",
+    "authority": "Root explicit finite escalation in current parent instruction",
+    "limits": {
+      "cost": null,
+      "tokens": 1350992,
+      "active_s": 306.701271,
+      "token_metric": "actual_total"
+    }
+  },
+  "root_full_grant": {
+    "cumulative_known_actual_total_ceiling": 1350992,
+    "additional_output_tokens": 3000,
+    "cumulative_output_ceiling": 8906,
+    "mandatory_protected_final": {
+      "output_tokens": 1500,
+      "actual_total": 200000,
+      "active_s": 60
+    },
+    "cumulative_conservative_active_ceiling": 306.701271,
+    "additional_actual_total": 400000,
+    "review": {
+      "output_tokens": 1500,
+      "actual_total": 200000,
+      "active_s": 90
+    },
+    "additional_active_s": 150
+  },
+  "native_protection": {
+    "actual_total_tokens": "staged-only200000",
+    "limitation": "Installed canonical helper fixes finalization30s/800allocation; staged helper also fixes finalization30s. Root mandatory60s/1500output grant is preserved; native reserve is not described as60s.",
+    "output_allocation_tokens": 800,
+    "active_s": 30
+  },
+  "manual_protected_remainder": {
+    "output_tokens": 700,
+    "status": "Root-held remainder. Mandatory full grant is not silently narrowed; no dispatch/finalization admission until parent resolves native/manual protection mismatch.",
+    "actual_total_tokens": 0,
+    "active_s": 30
+  },
+  "prior_history": {
+    "actual_active_s": null,
+    "wall_bound_minus_review_allocation": 36.701271,
+    "prior_inputs": "batch-four-current and original seven preparation gates preserved unchanged",
+    "actual_total_tokens": 950992,
+    "cost": null,
+    "wall_bound_s": 156.701271,
+    "former_review_active_allocation": 120,
+    "former_actual_total_cap": 500000,
+    "maker_support_usage": null,
+    "actual_output_tokens": 5906,
+    "actual_input_tokens": 945086,
+    "source": "Root settled accounting instruction; do not sum wall bound as measured active or manufacture money",
+    "actual_total_overrun": 450992
+  },
+  "dispatch": "HOLD_PARENT_RESERVE_DISPOSITION_AND_REACTIVATION",
+  "finalization": "Not assessed or authorized now; no auto finalwrite. Preserve new actual/debit/history before future phase; final reserve once only.",
+  "completion_reserve_tokens": 200000
+}

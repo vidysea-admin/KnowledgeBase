@@ -1,0 +1,43 @@
+{
+  "format": "root-single-question-pilot-binding-v1",
+  "actor": "root acting on explicit user-approved Ollama goal",
+  "id": "root-ollama-grant2-same-question-20261015",
+  "scope": "single-question-pilot",
+  "grantNumber": 2,
+  "status": "PREPARED_NOT_STARTED_VALIDATOR_CAPABILITY_BLOCKED",
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "selection": "same deterministic first approvedID; not reselected",
+  "configSha256": "b7bf2dc82a5109bbf732aa5682e0dd68b2c9b9175b6c800e0df70ca46bc2e6ec",
+  "corpusSha256": "77de39536bee5589f436a63c3c814f76a0b3e5936de59fd39c7f9a169aad52c6",
+  "sourceCandidateSha256": "d4e5d74be460db92c36c65cb330a4aa9f7d78853b5115de1fa2c9acc14c1eec5",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "e2f2444552d9daf26220eb9c6a476e7383afebe078d701486fc6eed6841b7131"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "fd2a93e0f1e3ac73bc79fb71b77de6aeed60ccf5d7d89e7c1773d527f53f485d"
+    }
+  ],
+  "budget": {
+    "maxInferenceRequests": 2,
+    "aggregateOutput": 2048,
+    "eachOutput": 1024,
+    "aggregateInputUtf8": 32000,
+    "innerHttpSeconds": 20,
+    "evaluateSeconds": 60,
+    "hardJobObjectOuterSeconds": 90
+  },
+  "priorGrant": {
+    "requestsConsumed": 3,
+    "unknownUsagePreserved": true,
+    "overrunMs": 22214,
+    "immutableLedger": "../provider-request-ledger.jsonl"
+  },
+  "requestLedgerPolicy": "New requests use cumulativeIDs4 and5 only; no metadata request; no reset of grant1",
+  "modelAccessProof": "../receipt.remaining-probe.json HTTP200 exactGLM inference; no aliases",
+  "approvalEvidence": "parent explicit NEW finite grant2; no Umesh signature asserted",
+  "cpuSlot": "WAIT_ROOT_RELEASE",
+  "blocker": "validateConfig PILOT outputLimit256 and maxKnownOutputTokens768 reject1024/2048; exact evaluator capability/authorization lease needed"
+}

@@ -1,0 +1,203 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://operations_schedules",
+  "title": "OperationsSchedules",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "digest",
+        "sheets"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 10000
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "intervalHours": {
+      "type": "integer",
+      "enum": [
+        24,
+        168
+      ]
+    },
+    "nextRunAt": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lastAttemptAt": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lastSuccessAt": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "lastResult": {
+      "type": "string",
+      "enum": [
+        "never",
+        "running",
+        "succeeded",
+        "failed",
+        "blocked",
+        "uncertain"
+      ]
+    },
+    "lastErrorCode": {
+      "anyOf": [
+        {
+          "type": "string",
+          "enum": [
+            "configuration",
+            "source-unavailable",
+            "delivery-failed",
+            "write-failed",
+            "lease-expired",
+            "authorization"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "runId": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "leaseToken": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "leaseUntil": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "audit": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actorKeyId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "config-save",
+              "run-claim",
+              "run-complete",
+              "recover-uncertain"
+            ]
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "configured",
+              "running",
+              "succeeded",
+              "failed",
+              "blocked",
+              "uncertain"
+            ]
+          }
+        },
+        "required": [
+          "revision",
+          "at",
+          "actorKeyId",
+          "action",
+          "outcome"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 10000
+    }
+  },
+  "required": [
+    "_id",
+    "tenantId",
+    "kind",
+    "revision",
+    "enabled",
+    "intervalHours",
+    "nextRunAt",
+    "lastAttemptAt",
+    "lastSuccessAt",
+    "lastResult",
+    "lastErrorCode",
+    "runId",
+    "leaseToken",
+    "leaseUntil",
+    "audit"
+  ],
+  "additionalProperties": false
+}

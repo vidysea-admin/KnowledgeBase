@@ -1,0 +1,45 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "not-started",
+      "token_metric": "actual_total",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "token_metric": "actual_total",
+    "kind": "review",
+    "active_s": 150,
+    "tokens": 130000,
+    "cost": null
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "t013-t037-t056-joined-source-slices/0/eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+  "completion_reserve_tokens": 50000,
+  "bootstrap_scope": "ONE joined source-slice independent review, 16 changed paths, no full-parent closure or provider/browser/runtime launch",
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "tokens": 180000,
+    "cost": null
+  },
+  "escalation": {
+    "authority": "Root explicit finite BOOTSTRAP exception in task dispatch 2026-10-15; not claimed Umesh enforcement approval",
+    "reason": "Maker actual denominators unavailable; historical native startup about 41574 input tokens; reserve must include runtime input plus output. Workflow allocation only; no hard token cap or measured 10% guarantee.",
+    "limits": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 180000,
+      "cost": null
+    }
+  }
+}

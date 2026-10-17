@@ -1,0 +1,98 @@
+{
+  "sharedReceipt": 0,
+  "sharedPins": {
+    "total": 62,
+    "stable": 62,
+    "drift": [],
+    "missing": []
+  },
+  "collectorReceipt": 0,
+  "collectorPins": {
+    "total": 47,
+    "stable": 47,
+    "drift": [],
+    "missing": []
+  },
+  "selectedNames": [
+    "executed provenance binds local router adapters parser barrel lock resolver and runtime",
+    "executed provenance predecessor consumer refuses stale missing runtime or after-run bindings"
+  ],
+  "sourceCandidate": "5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+  "evidenceReferences": [
+    {
+      "path": "C:/Users/product/Desktop/KnowledgeBase/qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.json",
+      "sha256": "57bccf47cb929ba448193bed0186e404b259fe0cd5dbade9911940492e6f244a"
+    },
+    {
+      "path": "C:/Users/product/Desktop/KnowledgeBase/qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six-units.json",
+      "sha256": "5bed18972feb608a9c08fa99fdc089525aa04fa77d909d9936ca734233395625"
+    },
+    {
+      "path": "C:/Users/product/Desktop/KnowledgeBase/qa/goal-vectorless-2026-10-15/verification-t022-actual-inventory.json",
+      "sha256": "7cbbc0085f98e3da7b494f5ed5d6933f449d1dde1ec46f6c3b50e6ba93f202dd"
+    },
+    {
+      "path": "C:/Users/product/Desktop/KnowledgeBase/qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.json",
+      "sha256": "12496b0bada1e97135f17eaafa657d77ca23eeb5b2ec76b7f8fe3d47be2139b7"
+    },
+    {
+      "path": "C:/Users/product/Desktop/KnowledgeBase/qa/packets/t022-executed-provenance.inventory",
+      "sha256": "5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2"
+    }
+  ],
+  "mandatory": {
+    "path": "qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.json",
+    "sha256": "12496b0bada1e97135f17eaafa657d77ca23eeb5b2ec76b7f8fe3d47be2139b7",
+    "exitCode": 0,
+    "sourcePinComparison": {
+      "total": 2,
+      "stable": 2,
+      "drift": [],
+      "missing": []
+    },
+    "scope": "Required contracts/verify_contracts.py; empty frozen registry PASS BY VACUITY only",
+    "reuseStatus": "Source pins authenticate; exact current runtime/environment reuse still requires broker authentication. No automatic extra verifier rerun requested by this scope.",
+    "currentEnvironmentEquivalent": false,
+    "currentEnvironmentReason": "Current Node broker whitelist hash f00c2cff… differs historical verifier1f6b045e…; seal explicitly makes no historical verifier environment reuse claim. Mandatory source2pins stable; no new verifier execution. Root must resolve exact-fingerprint reuse or admit narrow verifier before claiming all required current evidence."
+  },
+  "reuse": "Byte-stable historical successful receipts retained; original26shared command is not relabelled current two-node execution. Fresh current2node fingerprint pending root broker readmission after Git metadata fix.",
+  "sharedIntegrationCostChargedOnce": true,
+  "sourceOnly": true,
+  "liveGates": "0/30 genuine human labels; no provider/live calibration acceptance",
+  "currentTwoNodeReceipt": {
+    "seal": {
+      "path": "qa/coordination/resume-20261015/broker/t022-repair1-final-seal.json",
+      "sha256": "e2dac30fd6198369066fc50fc6e572aaab8a6c657e534de40f7086c3c8e8ce2e"
+    },
+    "exactTests": 2,
+    "pass": 2,
+    "fail": 0,
+    "skipped": 0,
+    "exit": 0,
+    "phaseSeconds": 4.359,
+    "sourcePinsStable": true,
+    "canonicalResolutionRuntimeAndTempPreflight": true,
+    "environmentWhitelistSha256": "f00c2cff115dd60b715adf069fe6f646a5ae3c12435ceeb0810dc3a4b7276623",
+    "priorMetadataHoldPreserved": true,
+    "independentVerdict": null
+  },
+  "reviewHistory": {
+    "sameUnitAndCandidate": true,
+    "sameSourceHashes": true,
+    "identityPath": "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/readiness-and-identity.json",
+    "identitySha256": "7609b34b30bbb006c254f83091bba114e1847d8fd617d41bbd06d17e1f0d9084",
+    "usagePath": "qa/coordination/knowledge-brain-20261015/review-runtime-current-batch.json",
+    "usageSha256": "10414fbfc6b01c1c189b92afc81c763a8a2beec7c459d3abf60046ca06c5f458",
+    "partialPath": "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-remaining/interrupted-phase-usage.json",
+    "partialSha256": "fba06df9f5e788f342f0e89ab33443daa575fd63ab86b404a581bbb53c50b1b9",
+    "settledSharedActualTotal": 950992,
+    "interruptedSharedActualTotal": 99903,
+    "knownSharedActualTotal": 1050895,
+    "sharedCostsChargedOnce": true,
+    "provenanceUnitActualSubtotal": null,
+    "activeSeconds": null,
+    "cost": null,
+    "scopeDisposition": "Same cycle0 candidate, not a fresh unit; mixed4unit prior review exists and unknown attribution cannot be reset to zero.",
+    "admissionNeeded": "Root-authorized continuation policy with complete shared history, known same-runtime startup/time allowance and finite assessed actual_total allocation/reserve; no new probe or checker dispatched."
+  }
+}

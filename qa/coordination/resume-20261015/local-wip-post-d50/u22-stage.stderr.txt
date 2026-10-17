@@ -1,0 +1,7 @@
+warning: in the working copy of 'qa/coordination/resume-20261015/broker/u22-current-three-run.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/evidence/u22-extraction-review-resume-static.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/manifests/u22-extraction-review-resume.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/packets/u22-extraction-review-resume.candidate-inventory.txt', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'qa/packets/u22-extraction-review-resume.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/eval/extraction-review-resume.mjs', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/eval/extraction-review-resume.test.mjs', LF will be replaced by CRLF the next time Git touches it

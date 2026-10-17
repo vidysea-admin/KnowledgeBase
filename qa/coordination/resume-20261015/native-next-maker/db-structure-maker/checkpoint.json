@@ -1,0 +1,29 @@
+{
+  "moves": [
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/index.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.ts"
+    },
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/index.test.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.test.ts"
+    },
+    {
+      "new": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+      "old": "packages/db/src/collections/speaker-suggestions.testdb.ts"
+    }
+  ],
+  "rootLeaseTransferred": true,
+  "status": "FROZEN_SOURCE_NOT_RUNTIME_CHECKED",
+  "token_metric": "actual_total",
+  "sourcePins": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/candidate-pins.json",
+  "oldReceiptsPreserved": true,
+  "counts": {
+    "collections": 30,
+    "speakerSuggestions": 3
+  },
+  "preimagePins": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before.json",
+  "actual_total_tokens": null,
+  "active_s": null,
+  "executionNote": "Initial script applied and byte-verified all13 source paths, then count-expression typo prevented metadata finalization. No source rollback/retry; corrected metadata expression and independently reconstructed expected bytes from backups to verify all13 before persisting final pins."
+}

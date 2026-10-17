@@ -1,0 +1,70 @@
+[
+  {
+    "path": "qa/evidence/goal-live-toc/strict-claims-sample.mjs",
+    "sha256": "8c9ec0710029f4731d57fb4094033ac8aba50d521341ab545819293648d670cf"
+  },
+  {
+    "path": "qa/evidence/goal-live-toc/one-call-receipt.json",
+    "sha256": "548a0b1de6e380849028811658c42a127823741e981fdc40ea9e917d2e701d9d"
+  },
+  {
+    "path": "qa/evidence/goal-live-toc/one-call-sample.mjs",
+    "sha256": "2c2e814d8d755f7e334d03783d38e19fa89f5002df7c585f09e540f1f2e810cc"
+  },
+  {
+    "path": "packages/ai/src/providers/gemini.ts",
+    "sha256": "49fe4fe8b50c79c46bbd3ea446e96b61d8d5f32490b55045e671e2a5c371367b"
+  },
+  {
+    "path": "packages/ai/src/provider.ts",
+    "sha256": "4f22738b7c72883948ac2544a71709c360c57ca7b39b3eb437dc74b82b9aa493"
+  },
+  {
+    "path": "packages/ai/src/gemini-quota.ts",
+    "sha256": "6b7c4d9ac7d7c56ef1a24f7e112cded7b5b681e5344f640470dc3cc949190949"
+  },
+  {
+    "path": "packages/ai/src/json.ts",
+    "sha256": "2ebd19828037788b34ac6d512cee0cc1e9b8fd64df99537047baecc6133251df"
+  },
+  {
+    "path": "packages/index/src/pipeline/claims.ts",
+    "sha256": "08c5bec39767b8773ccc2f10ce9b948b87e12ec4bad9e5a20d7396801c808c67"
+  },
+  {
+    "path": "packages/index/src/pipeline/grounded.ts",
+    "sha256": "db88f62c5cee03fcb930fbee5efeb2af177fb0435a284602c3522c5edad0f91c"
+  },
+  {
+    "path": "packages/index/src/pipeline/notes/evidence.ts",
+    "sha256": "d7590d14a71a16539be98e3dc47b39370be52cff592f4489fbb044d28e4ab07f"
+  },
+  {
+    "path": "packages/index/src/pipeline/notes/judge.ts",
+    "sha256": "ca8dfbd7c5390e7289a1f1557732f796b05a2dfa44a8b20a3eec0f430ab005fd"
+  },
+  {
+    "path": "packages/index/src/pipeline/notes/drop-mode.ts",
+    "sha256": "4170bbddd5b10b22c91479fc4613d063bf6690927a33bee2dbb7009eff094308"
+  },
+  {
+    "path": "apps/api/src/indexing/evidence-tuples.ts",
+    "sha256": "d5b705274bfb535af848d1bc15167663c132c6a78f0fd7d2d2f6aebfc5287f1f"
+  },
+  {
+    "path": "schema/claims.schema.json",
+    "sha256": "fbee54668a189ead1336967b37b0ec27b610401385a933e89670260cb0e72c92"
+  },
+  {
+    "path": "scripts/lib/transcript-provenance.mjs",
+    "sha256": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301"
+  },
+  {
+    "path": "scripts/lib/turn-timing.mjs",
+    "sha256": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e"
+  },
+  {
+    "path": "scripts/webinar/session-rows.mjs",
+    "sha256": "684a6d3c5e6fafdd9879ce232d5b0703d6a1e7d667415e2be2b0543b70de8081"
+  }
+]

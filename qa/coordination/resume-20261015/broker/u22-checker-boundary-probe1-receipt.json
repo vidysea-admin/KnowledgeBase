@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "--test-name-pattern=^resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer$",
+    "scripts/eval/extraction-review-resume.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad.json",
+    "sha256": "8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad",
+    "count": 23
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 15,
+  "accounting": "CHECKER u22 aggregate only",
+  "pid": 24568,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.7030000000013388,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-checker-boundary-probe1.log",
+    "sha256": "c9f2b15861d3b5ee861ac33c466fd20d0070489a0094879a229193056eca5cdb"
+  },
+  "counts": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

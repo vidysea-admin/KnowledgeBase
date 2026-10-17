@@ -13,7 +13,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { buildProductionDeps } from "./composition/production.js";
+import { buildProductionDeps, buildIndexer } from "./composition/production.js";
+import { routedFixture, turns, session, source } from "./grounded-postprocessing/fixture.testsupport.js";
+import { transactionalFixture } from "./transcript-review/refresh-testkit.js";
 
 test("ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set", () => {
   const prev = process.env.TAVILY_API_KEY;
@@ -35,4 +37,33 @@ test("ISS-274: buildProductionDeps constructs without throwing or requiring a li
   // file (and every other unit test that calls buildProductionDeps-adjacent factories) would
   // start needing a live database, which is exactly the regression this test guards against.
   assert.doesNotThrow(() => buildProductionDeps());
+});
+
+test("production native/review readers bind before connection while DB-name policies remain deferred", () => {
+  const deps = buildProductionDeps({ onIndexCommitted: async () => {} });
+  assert.equal(typeof deps.nativeEvidence?.resolve, "function");
+  assert.equal(typeof deps.sessionDecisions?.getSessionDecisions, "function");
+  assert.equal(typeof deps.speakerProfiles?.get, "function");
+  assert.equal(typeof deps.ask.askDeps.tavilySearchFn, "function");
+  for (const key of ["transcriptReview", "answerWorkflow", "answerPolicyService", "evaluationFlywheel"]) {
+    assert.equal(typeof Object.getOwnPropertyDescriptor(deps, key)?.get, "function");
+  }
+  assert.equal(typeof Object.getOwnPropertyDescriptor(deps.ask, "answerWorkflow")?.get, "function");
+});
+
+test("production buildIndexer forwards trusted callback after acknowledged outer commit", async () => {
+  const transaction = transactionalFixture(), provider = routedFixture();
+  for (const turn of turns) transaction.seed("turns", turn);
+  transaction.seed("sessions", session);
+  transaction.seed("sources", source);
+  let notified = 0;
+  const index = buildIndexer(provider.routing, { db: transaction.db, strictWebinar: true, onIndexCommitted: async binding => {
+    notified++;
+    assert.equal(binding.tenantId, "t");
+    assert.equal(binding.sessionId, "s1");
+    assert.equal(transaction.rows("sessions")[0]!.indexAttempt.generation, binding.generation);
+  } });
+  const result = await index("t", "s1");
+  assert.equal(result.completion?.complete, true);
+  assert.equal(notified, 1);
 });

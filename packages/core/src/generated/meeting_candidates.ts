@@ -47,5 +47,13 @@ export interface MeetingCandidates {
    * Registration is required: scheduling stays barred until verified direct join evidence. Approved automated registration must retain this barrier until confirmation; this field grants no submission permission.
    */
   registrationOnly?: boolean;
+  receivedAt?: string;
+  youtubeWatch?: {
+    url: string;
+    videoId: string;
+    source: "body" | "snippet";
+  };
+  youtubeWatchIssue?: "ambiguous";
+  meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
   [k: string]: unknown;
 }

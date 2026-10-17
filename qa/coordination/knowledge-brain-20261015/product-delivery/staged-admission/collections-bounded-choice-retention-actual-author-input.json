@@ -1,0 +1,108 @@
+{
+  "unit": "collections-bounded-choice-retention",
+  "cycle": 0,
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_files_sha256": {
+    "apps/web/src/pages/knowledge/CuratedCollections.tsx": "6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+    "apps/web/src/pages/knowledge/CuratedCollections.test.tsx": "84d89021db6758fa80b9e651c0b6d10f75b8d383e8a77884eba557f4bc92d7b3"
+  },
+  "maker": {
+    "active_s": null,
+    "tokens": 3547712,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "collections_independent_checker",
+      "active_s": null,
+      "tokens": 361287,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 40
+      },
+      "note": "Fresh idle recorded cumulative ACTUAL total tokens. Prior active actual unavailable; conservative prior40s debit retained. Earlier zero row was prospective before launch and is preserved in linked immutable history, not additive reviewer work."
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 50,
+    "tokens": 100000,
+    "cost": null
+  },
+  "bootstrap_scope": "collections-bounded-choice-retention cycle 0 exact two-file candidate: review changed selection logic and immediate PUT consumer, verify broker receipts, one independent bounded-membership probe; mandatory verification remains required. Root allocation via product_delivery_coordinator. Prior unit charges none known; any discovered prior debit must be retained.",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "completion_reserve": false,
+  "completion_reserve_id": "collections-bounded-choice-retention/c0/5c4cbade2d1a8aa4815de13d587db8de3b01cc4a/6af57e2b05ca643bd15a17ea2d550336dfdd2c3d210a87bb200f6395cfa4ce97",
+  "escalation": {
+    "authority": "Root explicit finite authorization 2026-10-15 to SAME existing checker; mandatory independent proof/readiness exception permits authoring isolated QA probe before execution, then STOP.",
+    "reason": "Required independent contract-derived probe is absent; finite staged authoring needed. Preserve known actual-token 10-percent overruns and all prior charges. No production edits or execution authorization.",
+    "limits": {
+      "active_s": 120,
+      "tokens": 561287,
+      "cost": null
+    }
+  },
+  "staged_admission": {
+    "status": "ACTUAL_TOTAL_AUTHOR_PREDISPATCH_GATE",
+    "source_input": "qa/coordination/knowledge-brain-20261015/product-delivery/collections-assess-dispatch-retry2-input.json",
+    "unit": "collections-bounded-choice-retention",
+    "cycle": 0,
+    "total": {
+      "active_s": 120,
+      "cumulative_actual_total_tokens": 561287
+    },
+    "next_review": {
+      "active_s": 50,
+      "actual_total_tokens": 100000,
+      "allocated_output_tokens": 1200
+    },
+    "remaining_review": null,
+    "protected_finalization": {
+      "active_s": 30,
+      "actual_total_tokens": 100000,
+      "allocated_output_tokens": 800
+    },
+    "authority": "Root explicit finite authorization 2026-10-15 to SAME existing checker; mandatory independent proof/readiness exception permits authoring isolated QA probe before execution, then STOP.",
+    "prior_charges": "Observed prior actual tokens plus retained40s active debit; immutable earlier allocations preserved separately.",
+    "dispatch_authorized_by_this_file": false
+  },
+  "actual_total_accounting": {
+    "unit": "cumulative input+output total_tokens",
+    "baseline": 361287,
+    "comparable_maker_total": 3547712,
+    "known_current_ratio": 0.10183662033445781,
+    "known_ten_percent_overrun": true,
+    "additional_actual_total_limit": 200000,
+    "author_phase_actual_total_limit": 100000,
+    "manual_final_reserve_actual_total_limit": 100000,
+    "cumulative_actual_total_ceiling": 561287,
+    "operations_extra_ceiling": null,
+    "phase_stop": "Author QA probe only; STOP before executing probe/tests or material next phase. No review launch by this helper."
+  },
+  "manual_protected_finalization": {
+    "active_s": 30,
+    "actual_total_tokens": 100000,
+    "allocated_output_tokens": 800,
+    "inside_same_cumulative_limit": true,
+    "helper_status": "legacy_unreserved; external manual reserve enforced by root ledger"
+  },
+  "legacy_output_debit_separate": {
+    "prior_active_seconds": 40,
+    "prior_allocated_output_tokens": 1000,
+    "author_allocated_output_tokens": 1200,
+    "final_allocated_output_tokens": 800,
+    "note": "Historical allocation only. Not actual total tokens; no token debit replacing or adding to known cumulative actuals."
+  },
+  "history": {
+    "prior_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-bounded-choice-retention-prep-input.json",
+    "prior_result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-bounded-choice-retention-prep-result.json",
+    "fresh_idle_baseline": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z.json",
+    "root_authority_companion": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z-root-authority.json",
+    "preserve_all_prior_artifacts": true
+  },
+  "accounting_helper_cost": "Shared coordination helper; excluded from maker/comparable unit denominator; actual cost unknown.",
+  "ratio_claim": "Known token ratio reported; active/cost unknown. Finite escalation is not 10-percent success."
+}

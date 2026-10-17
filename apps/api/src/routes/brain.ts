@@ -208,7 +208,14 @@ export function createBrainRouter(deps: BrainReadDeps): Router {
   });
 
   router.get("/gaps", requireScope("gaps"), async (req: Request, res: Response) => {
-    const gaps = await deps.listGaps(req.auth!.tenantId);
+    const rows = await deps.listGaps(req.auth!.tenantId);
+    // Evaluation answers/scores and operation locks are available only through the
+    // separately authorized flywheel inspection route, never the ordinary gap list.
+    const gaps = rows.filter(row => row.tenantId === req.auth!.tenantId).map(row => {
+      const { flywheel, ...publicGap } = row;
+      void flywheel;
+      return publicGap;
+    });
     res.status(200).json({ gaps });
   });
 

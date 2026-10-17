@@ -4,22 +4,74 @@
   "title": "watched_sources",
   "description": "T-027 (A13): bookmarked URLs periodically re-checked for content changes via hash+diff. reputationTier follows the brain's source-priority-tier vocabulary (multi-portal-source-priority-tiers): official > community > blog.",
   "type": "object",
-  "required": ["_id", "tenantId", "url", "reputationTier", "checkIntervalHours", "active"],
+  "required": [
+    "_id",
+    "tenantId",
+    "url",
+    "reputationTier",
+    "checkIntervalHours",
+    "active"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "url": { "type": "string", "minLength": 1 },
-    "label": { "type": "string" },
-    "reputationTier": { "type": "string", "enum": ["official", "community", "blog"] },
-    "checkIntervalHours": { "type": "number", "exclusiveMinimum": 0 },
-    "active": { "type": "boolean" },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "url": {
+      "type": "string",
+      "minLength": 1
+    },
+    "label": {
+      "type": "string"
+    },
+    "reputationTier": {
+      "type": "string",
+      "enum": [
+        "official",
+        "community",
+        "blog"
+      ]
+    },
+    "checkIntervalHours": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "active": {
+      "type": "boolean"
+    },
     "lastFetch": {
       "type": "object",
-      "required": ["fetchedAt", "hash", "diffFrom"],
+      "required": [
+        "fetchedAt",
+        "hash",
+        "diffFrom"
+      ],
       "properties": {
-        "fetchedAt": { "type": "string", "format": "date-time" },
-        "hash": { "type": "string", "minLength": 1 },
-        "diffFrom": { "type": ["string", "null"] }
+        "fetchedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "hash": {
+          "type": "string",
+          "minLength": 1
+        },
+        "diffFrom": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     }
   },

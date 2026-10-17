@@ -14,6 +14,19 @@ const edit = async () => {
   fireEvent.change(await screen.findByLabelText("Corrected text"), { target: { value: "Corrected" } });
   fireEvent.change(screen.getByLabelText("Review reason"), { target: { value: "Checked recording" } });
 };
+test.each(["pending", "failed"] as const)("a loaded %s refresh warns about stale answers until canonical reload completes", async (refresh) => {
+  vi.spyOn(api, "getTranscriptReview").mockResolvedValueOnce({ ...snapshot(), refresh }).mockResolvedValue(snapshot());
+  render(<TranscriptReview apiKey="k" sessionId="s1" />);
+  const warning = await screen.findByRole("note", { name: "Knowledge freshness warning" });
+  expect(warning.textContent).toContain(`Knowledge refresh ${refresh}; existing answers may be stale.`);
+  expect(warning.textContent).toContain(refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below");
+  expect(screen.getByRole("button", { name: refresh === "failed" ? "Retry knowledge refresh" : "Refresh knowledge" })).toBeEnabled();
+  fireEvent.click(screen.getByRole("button", { name: "Reload transcript" }));
+  await screen.findByLabelText("Corrected text");
+  expect(screen.queryByRole("note", { name: "Knowledge freshness warning" })).toBeNull();
+  expect(screen.getByText("Knowledge refresh: complete")).toBeInTheDocument();
+});
+
 test("corrections require reason and use loaded revision; pending refresh is not completed", async () => {
   vi.spyOn(api, "getTranscriptReview").mockResolvedValueOnce(snapshot()).mockResolvedValue({ ...snapshot(), revision: "r2", refresh: "pending" });
   const save = vi.spyOn(api, "saveTranscriptReview").mockResolvedValue({ sessionId: "s1", revision: "r2", commit: "committed", refresh: "pending" });

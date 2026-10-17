@@ -1,0 +1,12 @@
+{
+  "finalizationElapsedSeconds": 279.305143,
+  "verdict": "PASS",
+  "completedAt": "2026-10-14T23:10:00.3051430Z",
+  "verdictSHA256": "dfa70e983bade1ecbf1f9bd4dcddcb80dc5348bdf8bb35dadd8a6510ba761176",
+  "cycle1FormalReadyAt": "2026-10-14T21:28:48Z",
+  "scope": "Source only; totals include pauses/central compiler wait, not active CPU",
+  "handles": "NONE",
+  "finalResumeAt": "2026-10-14T23:05:21Z",
+  "totalSinceCycle1FormalReadySeconds": 6072.305143,
+  "cycle": 1
+}

@@ -11,7 +11,7 @@ import { Router, type Request, type Response } from "express";
 import { renderPage, CLIENT_AUTH_JS, escapeHtmlAttr } from "./ui-shell.js";
 import { STUB_ROUTES } from "./stubs.js";
 
-interface RealRoute { label: string; scope: string; }
+interface RealRoute { label: string; scope: string; status?: string; qualification?: string; }
 const REAL_ROUTES: RealRoute[] = [
   { label: "POST /ask", scope: "ask" },
   { label: "POST /compete/start", scope: "compete" },
@@ -28,6 +28,8 @@ const REAL_ROUTES: RealRoute[] = [
   { label: "POST /meeting-candidates/:id/reject", scope: "gmail" },
   { label: "GET /whatsapp/groups", scope: "whatsapp" },
   { label: "POST /whatsapp/ingest", scope: "whatsapp" },
+  { label: "POST /webhooks/register", scope: "hosting + webhooks", status: "201 configured; 503 unavailable",
+    qualification: "Requires an admin or owner hosting role, configured private hosting storage, and an allowed public destination. Registration does not dispatch a delivery." },
 ];
 
 export function createPagesRouter(): Router {
@@ -42,8 +44,7 @@ export function createPagesRouter(): Router {
       bodyHtml: `<div class="card">
         <div class="section-title">Where things stand</div>
         <p>Sessions and Dashboard show real data from the 23 ingested TOC sessions. API Docs
-        lists exactly what's live vs. still a 501 stub, generated from the routing table itself
-        so it can never drift. Compete lets you ask the AI a real question and see a cited
+        lists implemented endpoints, scopes and runtime prerequisites. Compete lets you ask the AI a real question and see a cited
         answer.</p>
       </div>`,
     }));
@@ -262,7 +263,7 @@ export function createPagesRouter(): Router {
 
   router.get("/docs-ui", (_req: Request, res: Response) => {
     const realRows = REAL_ROUTES.map((r) =>
-      `<tr><td><code class="inline">${r.label}</code></td><td><span class="badge badge-good">live</span></td><td>${r.scope}</td></tr>`,
+      `<tr><td><code class="inline">${r.label}</code></td><td><span class="badge badge-good">${r.status ?? "live"}</span>${r.qualification ? `<p>${r.qualification}</p>` : ""}</td><td>${r.scope}</td></tr>`,
     ).join("\n");
     const stubRows = STUB_ROUTES.map((r) =>
       `<tr><td><code class="inline">${r.label}</code></td><td><span class="badge badge-warn">501 not_implemented</span></td><td>${r.scope}</td></tr>`,
@@ -271,7 +272,7 @@ export function createPagesRouter(): Router {
       activePath: "/docs-ui",
       title: "API Docs — Living Knowledge Base",
       heading: "Developer API",
-      description: "Every request carries an Authorization: Bearer header with your API key. This table is rendered directly from the routing tables themselves, so it can never silently drift from what's actually live.",
+      description: "API requests carry an Authorization: Bearer header with your API key. Required scopes, hosting roles and runtime configuration apply before an endpoint can complete.",
       bodyHtml: `
         <div class="card">
           <div class="section-title">Live today</div>
@@ -281,7 +282,7 @@ export function createPagesRouter(): Router {
         <div class="card">
           <div class="section-title">Planned, not yet built</div>
           <table class="data-table"><thead><tr><th>Route</th><th>Status</th><th>Required scope</th></tr></thead>
-          <tbody>${stubRows}</tbody></table>
+          <tbody>${stubRows || '<tr><td colspan="3">No unimplemented stub routes.</td></tr>'}</tbody></table>
         </div>
       `,
     }));

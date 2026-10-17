@@ -1,0 +1,11 @@
+{
+  "clarification_sha256": "60ebac630552b7e204a576b8da9142e9b5b5d6705cf3a03eb1e55862dbd750e2",
+  "raw_golden_sha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "questions": 92,
+  "candidates": 29,
+  "sorted_id_set_sha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "derived_hash": "5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162",
+  "candidate": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+  "provider_calls_authorized": false,
+  "execution": "selected pure fixtures only; no real corpus92 evaluation"
+}

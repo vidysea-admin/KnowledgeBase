@@ -1,0 +1,28 @@
+{
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/championship/client.test.ts",
+    "src/pages/championship/ChampionshipPage.test.tsx",
+    "--maxWorkers=1",
+    "--minWorkers=1"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase/apps/web",
+  "pins": {
+    "apps/api/src/championship/model.ts": "7186304211f989df79c0dcf5a705a173b5d8fbc95f7895e752b6c83f39dcd190",
+    "apps/api/src/championship/runtime.ts": "e5f00441c246e1c34c6af4d380a67c39b528164031c9a1dfa5f8a03a4fbd293d",
+    "apps/api/src/championship/mongo-store.ts": "bbfa10fc5b5f0ddcdee0be70239cde441bde8285073ae86cabcc8544646d396a",
+    "apps/api/src/championship/runtime.test.ts": "557c3f8eb28f700bda456f5aaaedbf4394248f9f230b195fa64fd3596313195a",
+    "apps/api/src/championship/mongo-store.test.ts": "46d3631956c6fd4a563144316dbedcbc9b99d1ad24afc49dcb3e19726ee1e7d8",
+    "apps/api/src/routes/championship/championship.ts": "88cc87b254f7c7defd5204d30667b01b5e3625673f123f67a9ce59f62aceb022",
+    "apps/api/src/routes/championship/championship.test.ts": "e80a7dc2ec9fb62be8dec15327b4ce73491e63d8ee6ead7c0f47f6b0ecdfaa8b",
+    "apps/web/src/pages/championship/client.ts": "e139fe67c383b4e7ffe9c498a210cf3eece5d9f488a6b0f337df9280498a1383",
+    "apps/web/src/pages/championship/ChampionshipPage.tsx": "e76a0f0730d56c8b30a8ccc0e0e038b4c7340a5f3dd967d2ab08e06a16bd3809",
+    "apps/web/src/pages/championship/ChampionshipPlanForm.tsx": "05c20b40c741f8d87846be809333ba3460596c23cd11581581581ed1595d99ec",
+    "apps/web/src/pages/championship/client.test.ts": "c5fb9be67d391df21b55e59b716f8bb4008a10512a485afba153847d4545df86",
+    "apps/web/src/pages/championship/ChampionshipPage.test.tsx": "169ca58f3cd6c00f6416aaf6a4ab911fa56bb13bb5f7f48a9a0f26732d29cf3c",
+    "docs/championship-workflow.md": "31301cf49ae563b1c4b3255e87591eddc94a8bd7e58116dfe71d59352e9bc1cf"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/evidence/goal-t051checker-broker-t014-web"
+}

@@ -1,0 +1,212 @@
+--- apps/api/src/evaluation-flywheel/receipts.ts (cycle3 before)
++++ apps/api/src/evaluation-flywheel/receipts.ts (candidate)
+@@ -1,7 +1,11 @@
+ import type { TreeIndexNode } from "@lkb/core";
+ import type { IndexSessionResult } from "../indexing/types.js";
+ import { tenantSourceId } from "@lkb/ingest";
+-import { fingerprint, FlywheelError, type CaptureReceipt, type SourceRows, type IndexedRows } from "./types.js";
++import { fingerprint, FlywheelError, type CaptureReceipt, type SourceRows, type IndexedRows, type IndexReceiptContext } from "./types.js";
++
++import { buildChunks, runtimeChronologicalTurns } from "@lkb/index";
++import { indexArtifactDigest, indexAttemptBinding, indexTurnDigest } from "../indexing/generation.js";
++import { chunkContentId } from "../indexing/chunk-integrity.js";
+ 
+ const present = (x: unknown): x is string => typeof x === "string" && x.trim().length > 0;
+ export function captureReceipt(t: string, sourceId: string, sessionId: string, rows: SourceRows): CaptureReceipt {
+@@ -22,17 +26,59 @@
+   return { sourceId, sessionId, sourceDigest: source.hash, transcriptDigest: fingerprint(ordered), turnCount: turns.length,
+     turnIds: [ordered[0]!._id, ...ordered.slice(1).map((r) => r._id)] };
+ }
+-export function indexedDigests(t: string, receipt: CaptureReceipt, rows: IndexedRows): { treeDigest: string; chunksDigest: string } {
++export function indexedDigests(t: string, receipt: CaptureReceipt, rows: IndexedRows, context?: IndexReceiptContext): { treeDigest: string; chunksDigest: string } {
+   const { tree, chunks } = rows;
+   const matches = (n: TreeIndexNode): boolean => n.level === "session" && n.evidence?.sessionRef === receipt.sessionId
+     || n.children.some(matches);
+   if (!tree || tree.tenantId !== t || tree.node_id !== `tenant:${t}` || !matches(tree) || !chunks.length)
+     throw new FlywheelError("unavailable", 503);
++  if (context && fingerprint(captureReceipt(t, receipt.sourceId, receipt.sessionId, context.source)) !== fingerprint(receipt))
++    throw new FlywheelError("unavailable", 503);
++  const attempt = context?.source.session?.indexAttempt;
++  // Legacy records have no canonical attempt: keep their strict vector-only checks.
++  // A lexical receipt always requires the current completed manifest and source binding.
++  let mode: "vector" | "vectorless" = "vector";
++  if (attempt) {
++    const manifest = attempt.manifest;
++    const storedMode = manifest?.retrievalMode;
++    if (!context || !manifest || !["vector", "vectorless", undefined].includes(storedMode)
++      || attempt.version !== 1 || typeof attempt.strict !== "boolean" || attempt.state !== "complete" || attempt.phase !== "writing"
++      || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/.test(attempt.generation)
++      || !Number.isFinite(Date.parse(attempt.startedAt)) || !Number.isFinite(Date.parse(attempt.finishedAt ?? ""))
++      || context.source.session?.status.index !== "done" || attempt.generation !== context.generation
++      || attempt.sessionId !== receipt.sessionId || attempt.sourceId !== receipt.sourceId
++      || attempt.turnCount !== receipt.turnCount || attempt.turnDigest !== indexTurnDigest(context.source.turns)
++      || !Number.isSafeInteger(manifest.treeRevision) || manifest.treeRevision < 1
++      || !Number.isSafeInteger(tree.indexRevision) || tree.indexRevision! < manifest.treeRevision)
++      throw new FlywheelError("unavailable", 503);
++    mode = storedMode ?? "vector"; // Historical canonical manifests without a mode were vector-only.
++    const binding = indexAttemptBinding(attempt);
++    const bound = (value: unknown) => fingerprint(value) === fingerprint(binding);
++    if (manifest.chunks.length !== chunks.length || new Set(manifest.chunks.map(ref => ref.id)).size !== chunks.length
++      || chunks.some(c => !bound(c.indexArtifact) || !manifest.chunks.some(ref => ref.id === c._id && ref.digest === indexArtifactDigest(c))))
++      throw new FlywheelError("unavailable", 503);
++    const sessions: TreeIndexNode[] = [];
++    const visit = (node: TreeIndexNode): void => {
++      if (node.level === "session" && node.evidence?.sessionRef === receipt.sessionId) sessions.push(node);
++      node.children.forEach(visit);
++    };
++    visit(tree);
++    if (sessions.length !== 1 || !bound(sessions[0]!.indexArtifact)) throw new FlywheelError("unavailable", 503);
++    if (mode === "vectorless") {
++      const plans = buildChunks(attempt.strict ? runtimeChronologicalTurns(context.source.turns) : context.source.turns);
++      if (!plans.length || plans.length !== chunks.length || plans.some(plan => !chunks.some(c =>
++        c._id === chunkContentId(t, receipt.sessionId, plan.turnRefs, plan.text) && c.chunkIndex === plan.chunkIndex
++        && fingerprint(c.turnRefs) === fingerprint(plan.turnRefs)))) throw new FlywheelError("unavailable", 503);
++    }
++  }
++  if (context?.retrievalMode !== undefined && context.retrievalMode !== mode) throw new FlywheelError("unavailable", 503);
+   const ids = new Set<string>();
+   for (const c of chunks) {
+     if (c.tenantId !== t || c.sourceRef !== receipt.sessionId || !present(c._id) || ids.has(c._id)
+-      || !Array.isArray(c.turnRefs) || !c.turnRefs.length || c.turnRefs.some((id) => !receipt.turnIds.includes(id)) || !Array.isArray(c.vector) || !c.vector.length
+-      || c.vector.some((v) => !Number.isFinite(v)) || c.dims !== c.vector.length || !present(c.embeddingModel))
++      || !Array.isArray(c.turnRefs) || !c.turnRefs.length || c.turnRefs.some((id) => !receipt.turnIds.includes(id))
++      || (mode === "vectorless" ? c.vector !== undefined || c.dims !== undefined || c.embeddingModel !== undefined
++        : !Array.isArray(c.vector) || !c.vector.length || c.vector.some((v) => !Number.isFinite(v))
++          || c.dims !== c.vector.length || !present(c.embeddingModel)))
+       throw new FlywheelError("unavailable", 503);
+     ids.add(c._id);
+   }
+--- apps/api/src/evaluation-flywheel/types.ts (cycle3 before)
++++ apps/api/src/evaluation-flywheel/types.ts (candidate)
+@@ -14,6 +14,8 @@
+ export type RetestRun = EvalRuns & { flywheel: RetestLineage };
+ export interface SourceRows { source: Sources | null; session: Sessions | null; turns: Turns[] }
+ export interface IndexedRows { tree: TreeIndexRootDocument | null; chunks: Chunks[] }
++/** Mode authority is a current persisted session attempt, never a caller-selected fallback. */
++export interface IndexReceiptContext { source: SourceRows; generation: string; retrievalMode?: "vectorless" | "vector" }
+ export interface FlywheelStore {
+   evaluation(tenantId: string, id: string): Promise<EvalRuns | null>;
+   gap(tenantId: string, id: string): Promise<FlywheelGap | null>;
+--- apps/api/src/evaluation-flywheel/workflow.ts (cycle3 before)
++++ apps/api/src/evaluation-flywheel/workflow.ts (candidate)
+@@ -78,9 +78,18 @@
+   async function receipt(t: string, r: CaptureReceipt): Promise<CaptureReceipt> {
+     return captureReceipt(t, r.sourceId, r.sessionId, await bounded(() => deps.store.sourceRows(t, r.sourceId, r.sessionId), true));
+   }
++  async function readIndex(t: string, captured: CaptureReceipt, generation: string, retrievalMode?: "vector" | "vectorless") {
++    const before = await bounded(() => deps.store.sourceRows(t, captured.sourceId, captured.sessionId), true);
++    if (!same(captureReceipt(t, captured.sourceId, captured.sessionId, before), captured)) fail("input_drift");
++    const rows = await bounded(() => deps.store.indexedRows(t, captured.sessionId), true);
++    const digests = indexedDigests(t, captured, rows, { source: before, generation, retrievalMode });
++    const after = await bounded(() => deps.store.sourceRows(t, captured.sourceId, captured.sessionId), true);
++    if (!same(before, after)) fail("input_drift");
++    return { digests, chunkCount: rows.chunks.length };
++  }
+   async function verifyIndex(t: string, r: IndexedReceipt): Promise<void> {
+-    if (!same(await receipt(t, r), (({ generation: _g, treeDigest: _t, chunksDigest: _c, completedAt: _a, ...capture }) => capture)(r))) fail("input_drift");
+-    const digests = indexedDigests(t, r, await bounded(() => deps.store.indexedRows(t, r.sessionId), true));
++    const { generation: _g, treeDigest: _t, chunksDigest: _c, completedAt: _a, ...captured } = r;
++    const { digests } = await readIndex(t, captured, r.generation);
+     if (digests.treeDigest !== r.treeDigest || digests.chunksDigest !== r.chunksDigest) fail("input_drift");
+   }
+   async function retest(t: string, id: string, request: { sourceUrl: string; requestId: string }): Promise<RetestRun> {
+@@ -154,9 +163,8 @@
+           const indexed = await bounded(() => deps.index(t, captured.sessionId));
+           assertIndexResult(indexed, captured);
+           if (!same(await receipt(t, captured), captured)) fail("input_drift");
+-          const rows = await bounded(() => deps.store.indexedRows(t, captured.sessionId), true);
+-          if (rows.chunks.length !== indexed.chunks.written) fail("unavailable", 503);
+-          const digests = indexedDigests(t, captured, rows);
++          const { digests, chunkCount } = await readIndex(t, captured, indexed.completion!.generation, indexed.completion!.retrievalMode);
++          if (chunkCount !== indexed.chunks.written) fail("unavailable", 503);
+           await checkLock();
+           head.flywheel.index = { ...captured, generation: indexed.completion!.generation, ...digests, completedAt: iso() };
+           head.flywheel.stage = "indexed";
+--- apps/api/src/evaluation-flywheel/workflow.test.ts (cycle3 before)
++++ apps/api/src/evaluation-flywheel/workflow.test.ts (candidate)
+@@ -239,3 +239,62 @@
+     assert.equal(r.tables.eval_runs!.length, 2); assert.deepEqual(r.tables.eval_runs![0], ORIGINAL);
+   }
+ });
++
++
++async function canonicalLexicalRig() {
++  const r = rig();
++  const { indexSession } = await import("../indexing/session.js");
++  const evidence = { turnId: TURN._id, sessionId: "s1", quote: TURN.text };
++  r.deps.index = async (tenant, session) => {
++    r.calls.index++;
++    return indexSession(tenant, session, { db: r.db, strictWebinar: true, complete: (async (job: any) => {
++      const p = JSON.parse(job.messages[1].content);
++      const json = p.phase === "extract-summary"
++        ? { processed: p.inventory, items: [{ kind: "insight", text: TURN.text, origin: "speaker-statement", verification: "unverified", evidence: [evidence] }], qa: [] }
++        : p.phase === "extract-claims"
++          ? { processed: p.inventory, claims: [{ text: TURN.text, origin: "speaker-statement", verification: "unverified", evidence: [evidence] }] }
++          : { processed: p.inventory, complete: true, noContent: false, noClaims: false, verdicts: p.items.map((i: any) => ({ id: i.id, supported: true, categoryCorrect: true, answerRelevant: true })) };
++      return { text: JSON.stringify(json), usage: { inputTokens: 1, outputTokens: 1 }, provider: "offline", model: "fixture", costUsd: 0 };
++    }) as never });
++  };
++  return r;
++}
++
++test("canonical lexical indexing accepts initial retest and immutable replay", async () => {
++  const r = await canonicalLexicalRig(), w = r.workflow(); await w.open("t", "loss");
++  const child = await w.retest("t", "loss", request);
++  assert.equal(r.tables.sessions![0]!.indexAttempt.manifest.retrievalMode, "vectorless");
++  assert.ok(r.tables.chunks!.every(c => c.vector === undefined && c.dims === undefined && c.embeddingModel === undefined));
++  const before = structuredClone(r.tables.gaps), calls = structuredClone(r.calls);
++  assert.deepEqual(await w.retest("t", "loss", request), child);
++  assert.deepEqual(r.tables.gaps, before); assert.deepEqual(r.calls, calls);
++  assert.deepEqual(r.tables.eval_runs![0], ORIGINAL); assert.equal(r.tables.eval_runs!.length, 2);
++});
++
++test("canonical lexical replay rejects missing artifacts and mixed or stale generation", async () => {
++  for (const change of [
++    (r: ReturnType<typeof rig>) => { r.tables.chunks!.splice(0); },
++    (r: ReturnType<typeof rig>) => { r.tables.chunks![0]!.vector = [1, 0]; r.tables.chunks![0]!.dims = 2; r.tables.chunks![0]!.embeddingModel = "forged"; },
++    (r: ReturnType<typeof rig>) => { r.tables.sessions![0]!.indexAttempt.manifest.retrievalMode = "vector"; },
++    (r: ReturnType<typeof rig>) => { r.tables.sessions![0]!.indexAttempt.generation = "00000000-0000-4000-8000-000000000000"; },
++  ]) {
++    const r = await canonicalLexicalRig(), w = r.workflow(); await w.open("t", "loss"); await w.retest("t", "loss", request);
++    const before = structuredClone(r.tables.gaps), calls = structuredClone(r.calls); change(r);
++    await assert.rejects(w.retest("t", "loss", request));
++    assert.deepEqual(r.tables.gaps, before); assert.deepEqual(r.calls, calls); assert.equal(r.tables.eval_runs!.length, 2);
++  }
++});
++
++test("caller vectorless flags cannot replace persisted canonical mode", async () => {
++  const r = rig(), w = r.workflow(); await w.open("t", "loss"); const index = r.deps.index;
++  r.deps.index = async (t, s) => { const result = await index(t, s); result.completion!.retrievalMode = "vectorless"; return result; };
++  await reject(w.retest("t", "loss", request), "unavailable");
++  assert.equal(r.calls.ask, 0); assert.equal(r.tables.eval_runs!.length, 1);
++});
++
++test("index artifact read rejects a changed source snapshot before Ask", async () => {
++  const r = rig(), w = r.workflow(); await w.open("t", "loss"); const read = r.deps.store.indexedRows;
++  r.deps.store.indexedRows = async (...args) => { const rows = await read(...args); r.tables.sessions![0]!.title = "changed during artifact read"; return rows; };
++  await reject(w.retest("t", "loss", request), "input_drift");
++  assert.equal(r.calls.ask, 0); assert.equal(r.tables.eval_runs!.length, 1);
++});
+--- apps/api/src/evaluation-flywheel/receipts.test.ts (cycle3 before)
++++ apps/api/src/evaluation-flywheel/receipts.test.ts (candidate)
+@@ -0,0 +1,20 @@
++import { test } from "node:test";
++import assert from "node:assert/strict";
++import { captureReceipt, indexedDigests } from "./receipts.js";
++import { rig, SOURCE } from "./test-fixture.js";
++
++test("legacy vector receipt validation remains strict without canonical mode", async () => {
++  const r = rig(), source = await r.deps.store.sourceRows("t", SOURCE._id, "s1");
++  const captured = captureReceipt("t", SOURCE._id, "s1", source);
++  const rows = await r.deps.store.indexedRows("t", "s1");
++  assert.ok(indexedDigests("t", captured, rows).chunksDigest);
++  for (const change of [
++    (c: any) => { delete c.vector; }, (c: any) => { c.vector = []; }, (c: any) => { c.vector = [NaN, 0]; },
++    (c: any) => { c.dims = 3; }, (c: any) => { c.embeddingModel = ""; }, (c: any) => { c.tenantId = "foreign"; },
++    (c: any) => { c.turnRefs = ["foreign"]; },
++  ]) {
++    const altered = structuredClone(rows); change(altered.chunks[0]);
++    assert.throws(() => indexedDigests("t", captured, altered));
++  }
++  assert.throws(() => indexedDigests("t", captured, rows, { source, generation: "caller", retrievalMode: "vectorless" }));
++});

@@ -1,0 +1,51 @@
+
+> @lkb/api@0.0.0 typecheck C:\Users\product\Desktop\KnowledgeBase\apps\api
+> tsc --noEmit -p tsconfig.json
+
+src/evaluation-flywheel/composition.test.ts(22,34): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(23,37): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(24,34): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(25,34): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(26,40): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(29,44): error TS2322: Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(36,42): error TS2345: Argument of type '{ _id: string; tenantId: string; revision: number; indexAttempt?: undefined; } | { _id: string; tenantId: string; indexAttempt: { $exists: boolean; }; revision?: undefined; }' is not assignable to parameter of type 'Filter<Document>'.
+  Type '{ _id: string; tenantId: string; revision: number; indexAttempt?: undefined; }' is not assignable to type 'Filter<Document>'.
+    Type '{ _id: string; tenantId: string; revision: number; indexAttempt?: undefined; }' is not assignable to type '{ [x: string]: any; _id?: Condition<ObjectId> | undefined; }'.
+      Types of property '_id' are incompatible.
+        Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/evaluation-flywheel/composition.test.ts(39,38): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/native-evidence/message-vertical.test.ts(299,23): error TS18046: 'body' is of type 'unknown'.
+src/native-evidence/message-vertical.test.ts(299,58): error TS18046: 'body' is of type 'unknown'.
+C:\Users\product\Desktop\KnowledgeBase\apps\api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/api@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`
+Exit status 2

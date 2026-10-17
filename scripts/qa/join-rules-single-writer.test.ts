@@ -2,7 +2,8 @@
  * scripts/qa/join-rules-single-writer.test.ts — T-037 unit `t037next-single-writer`.
  * Contract t037-join-rules-api-host criterion 9 ("Single writer: no other code writes the rule files") and the T-037 switch-over
  * exit condition: the scheduler tick (enforceJoinRules) is a READER of `<stateDir>/join-rules/<tenant>.json`; the only mutators
- * are the store's locked helpers, reached in production only through scripts/webinar/join-rules-host.ts. Fakes/temp dirs only.
+ * are the canonical ingest store's locked helpers, bound by its one shared factory. The bot store is an exact
+ * compatibility export and scripts/webinar/join-rules-host.ts delegates to that factory. Fakes/temp dirs only.
  * Run from the repo root: node --test --import tsx scripts/qa/join-rules-single-writer.test.ts
  */
 import { test } from "node:test";
@@ -16,12 +17,19 @@ import { pathToFileURL } from "node:url";
 import { loadTrustedSenderConfig, selectAutoRecordItems, type AutoRecordCandidateInput } from "../../packages/meeting-bot/src/calendar/auto-join.js";
 import { enforceJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.js";
 import { joinRulesFilePath, saveJoinRules } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
+import * as compatibilityStore from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
+import * as canonicalStore from "../../packages/ingest/src/join-policy/join-rules-store.js";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
-const STORE = "packages/meeting-bot/src/calendar/join-rules/join-rules-store.ts";
-const MUTATORS = ["saveJoinRules", "saveJoinRulesIf", "recordTenantApproval", "recordTenantOptOut", "recordTenantUnOptOut"];
-/** Production files allowed to NAME a store mutator (code, comments stripped). The store defines them; the host binds them. */
-const MAY_MUTATE = new Set([STORE, "scripts/webinar/join-rules-host.ts"]);
+const STORE = "packages/ingest/src/join-policy/join-rules-store.ts";
+const STORE_SHIM = "packages/meeting-bot/src/calendar/join-rules/join-rules-store.ts";
+const FACTORY = "packages/ingest/src/join-policy/deps.ts";
+const HOST = "scripts/webinar/join-rules-host.ts";
+const LOCK_MODULES = ["packages/ingest/src/join-policy/join-rules-store-lock.ts",
+  "packages/ingest/src/join-policy/join-rules-store-lock-steps.ts"];
+const MUTATORS = ["saveJoinRules", "saveJoinRulesIf", "recordTenantApproval", "recordTenantOptOut", "recordTenantUnOptOut"] as const;
+/** Exact production paths: the canonical store defines mutators; the shared factory binds them. No folder exemptions. */
+const MAY_MUTATE = new Set([STORE, FACTORY]);
 /** The scheduler/enforcement path: must stay read-only. */
 const READ_ONLY_PATH = ["packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts", "packages/meeting-bot/src/calendar/schedule-tick.ts",
   "packages/meeting-bot/src/calendar/join-rules-wiring/key-tenant.ts"];
@@ -40,12 +48,27 @@ const stripComments = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, "").replace(
 const rel = (p: string) => path.relative(ROOT, p).split(path.sep).join("/");
 const PROD = ["apps", "packages", "scripts"].flatMap((d) => walk(path.join(ROOT, d))).map((p) => ({ file: rel(p), code: stripComments(readFileSync(p, "utf8")) }));
 
-test("static: only the store and the host name a join-rules mutator in code", () => {
+test("static: only the canonical store and factory name mutators; the bot shim and host delegate to them", () => {
   assert.ok(PROD.length > 200, "scan found the production tree");
   assert.ok(PROD.some((f) => f.file === STORE), "store is in the scan");
   const offenders = PROD.filter((f) => !MAY_MUTATE.has(f.file) && MUTATORS.some((m) => new RegExp(`\\b${m}\\b`).test(f.code))).map((f) => f.file);
   assert.deepEqual(offenders, []);
-  assert.ok(PROD.find((f) => f.file === "scripts/webinar/join-rules-host.ts")!.code.includes("recordTenantOptOut"), "the host really binds the mutators (scan is not vacuous)");
+  const store = PROD.find((f) => f.file === STORE)!.code;
+  const factory = PROD.find((f) => f.file === FACTORY)?.code;
+  assert.ok(factory, "canonical factory is in the scan");
+  for (const m of MUTATORS) {
+    assert.match(store, new RegExp(`export function ${m}\\b`), `the canonical store defines ${m}`);
+    assert.match(factory, new RegExp(`\\b${m}\\(`), `the shared factory really calls ${m} (scan is not vacuous)`);
+    assert.equal(compatibilityStore[m], canonicalStore[m], `the old import preserves the actual ${m} function identity`);
+  }
+  assert.equal(compatibilityStore.JoinRulesStoreError, canonicalStore.JoinRulesStoreError, "error class identity is preserved");
+  assert.doesNotMatch(factory, WRITE_API, "the factory delegates writes instead of writing files itself");
+  assert.equal(PROD.find((f) => f.file === STORE_SHIM)?.code.trim(),
+    'export * from "../../../../ingest/src/join-policy/join-rules-store.js";', "the old store is only the exact canonical export");
+  const host = PROD.find((f) => f.file === HOST)?.code;
+  assert.ok(host, "compatibility host is in the scan");
+  assert.match(host, /import \{ createJoinPolicyDeps \} from "\.\.\/\.\.\/packages\/ingest\/src\/join-policy\/deps\.js"/);
+  assert.match(host, /return createJoinPolicyDeps\(\{\s*stateDir\s*\}\)/, "the host delegates to the same canonical factory");
 });
 
 test("static: the scheduler/enforcement path imports only the read side of the store and has no write API", () => {
@@ -60,9 +83,9 @@ test("static: the scheduler/enforcement path imports only the read side of the s
   assert.match(enforce, /import \{ loadJoinRules, JoinRulesStoreError, type StoredJoinRules \} from "\.\/join-rules-store\.js"/);
 });
 
-test("static: no production file other than the store, its lock modules and the host both addresses the join-rules directory and writes", () => {
-  const allowed = (f: string) => f === STORE || /^packages\/meeting-bot\/src\/calendar\/join-rules\/join-rules-store-lock[\w-]*\.ts$/.test(f) || f === "scripts/webinar/join-rules-host.ts";
-  const offenders = PROD.filter((f) => !allowed(f.file) && /["'`]join-rules["'`]/.test(f.code) && WRITE_API.test(f.code)).map((f) => f.file);
+test("static: only the exact canonical store and two lock modules may address the join-rules directory and write", () => {
+  const allowed = new Set([STORE, ...LOCK_MODULES]);
+  const offenders = PROD.filter((f) => !allowed.has(f.file) && /["'`]join-rules["'`]/.test(f.code) && WRITE_API.test(f.code)).map((f) => f.file);
   assert.deepEqual(offenders, []);
 });
 

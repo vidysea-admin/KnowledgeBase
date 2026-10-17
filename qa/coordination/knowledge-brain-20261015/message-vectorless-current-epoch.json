@@ -1,0 +1,106 @@
+{
+  "state": "RECORDED_CURRENT_GREEN_EPOCH_PRESERVED_ONE_TEST_DIAGNOSTIC_THAW",
+  "files": [
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566"
+    },
+    {
+      "path": "apps/api/src/ask/source-context.test.ts",
+      "sha256": "a29005475d8284127be92c4404747c9b8956d5234c8216629d846924eaa0de03"
+    },
+    {
+      "path": "apps/api/src/routes/ask/ask.ts",
+      "sha256": "d0fba93447c1c066d8473f87f3fdfcb13dc5ec4aea4855e9320fc1d1fddf1566"
+    },
+    {
+      "path": "apps/api/src/routes/ask/ask.test.ts",
+      "sha256": "85cbfd2e73901f59d0e9113c38093abbf7fd8d7bbebd235a3436127007220408"
+    },
+    {
+      "path": "apps/api/src/native-evidence/message-vertical.test.ts",
+      "sha256": "a10b05f0682718f144f9dab3ef0615e16e1d76bb9da0d6f6d7f574b6a36761cd"
+    },
+    {
+      "path": "apps/api/src/native-evidence/resolver.ts",
+      "sha256": "75c39b52f8c8620bf28bf55133b63e3b3746d40236806127540a3f843bc4fe61"
+    },
+    {
+      "path": "apps/api/src/native-evidence/whatsapp-authority.ts",
+      "sha256": "32dbcfe90c978c6050afdf0c8717c3937cd547d90b32542d4342bfe94af733cb"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/native-production.ts",
+      "sha256": "a16cacc13ebcc18e1ad959dcfbd7a28bf26ccc9a0c8ef2d3aeb5cd7e651f8698"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/trusted-readers.ts",
+      "sha256": "6a3ef8fba476fda5d25de208b8869fe165990e6d1b2487f486d5c66698e307bc"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/native-read-view-binding.test.ts",
+      "sha256": "06e578fe1eecd1e893e6b075ff2edfc09e9eab22cd13d3113216983f11d83c37"
+    }
+  ],
+  "positiveReceipt": "qa/goal-vectorless-2026-10-15/verification-message-positive-production-verifier.json",
+  "positive": {
+    "passed": 1,
+    "failed": 0,
+    "elapsedSeconds": 2.778
+  },
+  "history": "All original diagnostic/failure receipts preserved; prior API/web green remains historical for changed closure",
+  "next": "Root authorized composition.test.ts only safe canonicalIndexGenerationError class/allowlisted code diagnostic, original owner. New test hash must not inherit all1775 current claim. One original case; no production changes or broad repeats.",
+  "limits": "No remote fullCI/nativeDB/MVCC/human/live/parent acceptance inferred. Original composition runtime failure remains open; all prior failed receipts preserved.",
+  "canonicalPositiveReceipts": [
+    "qa/goal-vectorless-2026-10-15/verification-doc-positive-canonical-factory.json",
+    "qa/goal-vectorless-2026-10-15/verification-message-positive-canonical-graph.json"
+  ],
+  "canonicalPositives": {
+    "doc": {
+      "passed": 1,
+      "elapsedSeconds": 3.431
+    },
+    "message": {
+      "passed": 1,
+      "elapsedSeconds": 4.593
+    },
+    "runtimePinsStable": 405
+  },
+  "canonicalFixturePins": [
+    {
+      "path": "apps/api/src/native-evidence/vertical.test.ts",
+      "sha256": "5a39cb664f38908fe1e596397c101a20fa9082826a0aac91dac1ee60473ff53f"
+    },
+    {
+      "path": "apps/api/src/native-evidence/message-vertical.test.ts",
+      "sha256": "ade0668023ddba435e9b5aa336ae83408d2feac5a81b43f3f4679689c3258641"
+    },
+    {
+      "path": "apps/api/src/evaluation-flywheel/composition.test.ts",
+      "sha256": "99287540c2fe5ed3d3f35bcca3bbf53aa73e17b61b4d82a38d541d6a396e3f07"
+    }
+  ],
+  "currentStageSummary": "qa/goal-vectorless-2026-10-15/verification-combined-candidate-stage-summary.json",
+  "stageEvidence": {
+    "apiTypes": {
+      "exitCode": 0,
+      "seconds": 16.718
+    },
+    "apiBuild": {
+      "exitCode": 0,
+      "seconds": 1.775
+    },
+    "webTypes": {
+      "exitCode": 0,
+      "seconds": 11.511
+    },
+    "webBuild": {
+      "exitCode": 0,
+      "seconds": 15.218
+    },
+    "allPinsUnchanged": 1775,
+    "sourceMembershipVerified": 1573,
+    "sentinelsVerified": 4,
+    "scope": "Before/after EACH command; local stages only"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Root combined runtime accounting fresh review admission retaining historical unknown actuals and explicit conservative debits",
+  "phase": "administrative-review-admission",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "qa/coordination/checker-runtime-total-20261015/combined-checker-dispatch-input.json"
+  ],
+  "testIDs": [
+    "combined admission only"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 10000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-combined-runtime-review-assess",
+  "pins": {
+    "qa/coordination/checker-runtime-total-20261015/combined-checker-dispatch-input.json": "9647adb9d760c2bd74f3b9c72f2d114ba51a6b5f35496b2b4c1bbada86a83772",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e"
+  }
+}

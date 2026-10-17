@@ -1,0 +1,6 @@
+C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\private-acl.ps1 : The 'Get-Acl' 
+command was found in the module 'Microsoft.PowerShell.Security', but the module could not be loaded. For more 
+information, run 'Import-Module Microsoft.PowerShell.Security'.
+    + CategoryInfo          : ObjectNotFound: (Get-Acl:String) [private-acl.ps1], CommandNotFoundException
+    + FullyQualifiedErrorId : CouldNotAutoloadMatchingModule,private-acl.ps1
+ 

@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-14T22:03:38.4667127+00:00",
+  "sourcePath": "apps/api/src/visibility/knowledge.ts",
+  "sourceModified": false,
+  "currentSHA256": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+  "removedClauses": [
+    {
+      "clause": " || source.consent?.given === false",
+      "sites": 1
+    },
+    {
+      "clause": " && source.consent?.given !== false",
+      "sites": 1
+    }
+  ],
+  "memoryInverseSHA256": "4ED89B000892C5D55291ADD50CF80B9D060E1997A5A309495AE648AD17E84ADA",
+  "expectedTestedPriorSHA256": "4ED89B000892C5D55291ADD50CF80B9D060E1997A5A309495AE648AD17E84ADA",
+  "exactTestedPriorReconstructed": true,
+  "sourceHashAfter": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+  "scope": "Independent static byte delta, not execution; consent:true positive fixture follows unchanged allowed branch",
+  "initialProbe": "checker-visibility-delta.initial.json removed only first clause; preserved as incomplete static diagnosis"
+}

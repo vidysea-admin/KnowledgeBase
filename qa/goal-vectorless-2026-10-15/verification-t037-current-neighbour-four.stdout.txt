@@ -1,0 +1,12 @@
+✔ schedule tick dry run suppresses degradation alerts and snapshot writes (9.2102ms)
+✔ schedule tick degradation reaches downstream sink and uses injected tick clock (60.9788ms)
+✔ schedule tick validated primary clears outage only after snapshot persists (39.5535ms)
+✔ schedule tick snapshot-save failure cannot clear active outage (40.0579ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 438.2993

@@ -32,14 +32,14 @@ const claimDeps = (dir: string, extra: Partial<ClaimedRecordDeps> = {}): Claimed
   until: (v) => new Date(/^\d/.test(v) && v.includes("T") ? v : "2026-10-12T15:00:00.000Z"), warn: () => {}, ...extra,
 });
 /** The send-now command wired exactly like defaultSendNowDeps, except runRecord is a fake that stays "recording" until released. */
-function sendNow(dir: string, ops: Record<string, Record<string, unknown>> = {}) {
+function sendNow(dir: string, ops: Record<string, Record<string, unknown>> = {}, source?: unknown) {
   const launched: string[][] = [], out: string[] = [];
   const { gate, release } = holdOpen();
   const deps: SendNowDeps = {
     now: () => NOW, write: (l) => out.push(l),
     runRecord: (rest) => runClaimedRecord(rest, async (r) => { launched.push(r); await gate; }, claimDeps(dir)),
     readLiveJobs: () => readAllLiveJobs({ operationsFile: "unused", scheduledDir: path.join(dir, "no-scheduled"), recordingsDir: dir, tenantId: "vidysea" }, NOW,
-      () => ({ operations: ops }), ALIVE),
+      () => ({ operations: ops, source } as never), ALIVE),
   };
   return { deps, launched, out, release };
 }
@@ -89,13 +89,30 @@ test("ISS-T039CMD-002 verbatim: poller has the webinar in 'recording' (operation
     const poller = runClaimedRecord(["https://zoom.us/j/12345678901?pwd=abc", "--backend", "tab", "--until", "2026-10-12T11:00:00.000Z", "--session-id", "webinar-1",
       "--title", "Webinar", "--transcribe", "--process-video", "--index"], () => gate, claimDeps(dir, { tenant: () => "vidysea" }));
     await tick();
-    const h = sendNow(dir, { "webinar-1": { status: "recording", title: "Webinar", attempts: 1 } }); // operations row carries no URL, as the ledger says
+    // The operations row carries no URL, as the ledger says; since t039-manual-jobs-operation-authority its meeting identity must be verifiable
+    // through a source-reconciliation alias (key = session id, identity = "<meeting url>|<occurrence>"), else readLiveJobs fails closed (see the next test).
+    const aliased = { reconciliation: { occurrences: { occ1: { aliases: [{ key: "webinar-1", identity: "https://zoom.us/j/12345678901?pwd=abc|occ1" }] } } } };
+    const h = sendNow(dir, { "webinar-1": { status: "recording", title: "Webinar", attempts: 1 } }, aliased);
     assert.equal(await runSendNow(["https://us02web.zoom.us/j/12345678901"], h.deps), 1);
     assert.equal(h.launched.length, 0);
     assert.match(h.out.join(""), /already queued/);
     stop(); await poller;
     const after = sendNow(dir, { "webinar-1": { status: "ready" } }); after.release();
     assert.equal(await runSendNow(["https://us02web.zoom.us/j/12345678901"], after.deps), 0, "released when the poller's recorder exits");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("ISS-T039CMD-002 fail-closed: an active operations row with no verifiable meeting identity refuses send-now and launches nothing", async () => {
+  const dir = mk();
+  try {
+    const { gate, release: stop } = holdOpen();
+    const poller = runClaimedRecord(["https://zoom.us/j/12345678901?pwd=abc", "--backend", "tab", "--until", "2026-10-12T11:00:00.000Z", "--session-id", "webinar-1"], () => gate, claimDeps(dir, { tenant: () => "vidysea" }));
+    await tick();
+    const h = sendNow(dir, { "webinar-1": { status: "recording", title: "Webinar", attempts: 1 } });
+    assert.equal(await runSendNow(["https://us02web.zoom.us/j/12345678901"], h.deps), 1);
+    assert.equal(h.launched.length, 0);
+    assert.match(h.out.join(""), /no verifiable meeting identity/);
+    stop(); await poller;
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 

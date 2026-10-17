@@ -4,13 +4,13 @@
   "north_star": "Build the Vidysea Living Knowledge Base as the brain for an AI virtual counsellor that matches and then beats every living top human counsellor in head-to-head evaluation (public championship, AlphaGo-style). Phase 1 exit: POST /ask over the 23 TOC sessions returns speaker+timestamp-cited internal answers, with web-fallback for off-corpus questions.",
   "status": "active",
   "created": "2026-09-03T07:01:15",
-  "updated": "2026-10-09T12:46:22",
+  "updated": "2026-10-14T21:13:26.259Z",
   "progress": {
     "total": 95,
     "done": 55,
-    "in_progress": 28,
-    "blocked": 0,
-    "pending": 12,
+    "in_progress": 39,
+    "blocked": 1,
+    "pending": 0,
     "current": "U2.2",
     "percent": 58
   },
@@ -101,7 +101,7 @@
     },
     {
       "id": "T-008",
-      "title": "Vector index + unstructured search",
+      "title": "Vectorless unstructured search: source trees, keyword and graph retrieval",
       "status": "in_progress",
       "base_criticality": "LOW",
       "deps": [
@@ -109,7 +109,7 @@
       ],
       "criticality": "low",
       "delivery_group": "G5",
-      "note": "2026-10-14: t008-semantic-web-consumer cycle 0 checked-PASS; additive authenticated semantic client/results foundation only. Shared integration, interactive proof and full structured/vector acceptance remain unaccepted."
+      "note": "D-173/D-174: active scope is all-source vectorless retrieval. Historical semantic foundation retained as evidence only; integrated vectorless search and acceptance remain open."
     },
     {
       "id": "T-009",
@@ -139,7 +139,7 @@
     {
       "id": "T-011",
       "title": "Meeting bot (auto-join, consent, live capture)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "HIGH",
       "deps": [
         "T-024"
@@ -164,7 +164,7 @@
     {
       "id": "T-013",
       "title": "Avatar/voice counsellor client",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "T-009"
@@ -175,7 +175,7 @@
     {
       "id": "T-014",
       "title": "Championship run",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "CRITICAL",
       "deps": [
         "T-012",
@@ -188,12 +188,14 @@
     {
       "id": "T-015",
       "title": "Own-model training path",
-      "status": "pending",
+      "status": "blocked",
+      "scopeDisposition": "not_required",
+      "excludedFromActiveScope": true,
       "base_criticality": "CRITICAL",
       "deps": [
         "T-002"
       ],
-      "note": "needs explicit approval before any data export",
+      "note": "D-173/D-174: user explicitly rejected training/fine-tuning. Excluded from active scope without claiming done; historical evidence preserved.",
       "criticality": "low",
       "delivery_group": "G10"
     },
@@ -410,7 +412,7 @@
     {
       "id": "T-028",
       "title": "Counsellor user management/accounts",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-009"
       ],
@@ -650,7 +652,7 @@
     {
       "id": "U2.3",
       "title": "LLM topic extractor via the existing extractFn seam",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "U2.2"
@@ -674,7 +676,7 @@
     {
       "id": "U2.5",
       "title": "Decisions extraction (claims.ts template, different prompt)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [
         "U2.2"
@@ -842,7 +844,7 @@
     {
       "id": "T-038",
       "title": "Scheduler service (5-min poller → selectEventsToAutoJoin → record; overlaps)",
-      "status": "pending",
+      "status": "in_progress",
       "base_criticality": "MEDIUM",
       "deps": [],
       "criticality": "low",
@@ -1005,7 +1007,7 @@
     {
       "id": "T-053",
       "title": "Connector expansion public/on-demand intake missing-recording workflow and watched-source verification",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-006",
         "T-023",
@@ -1092,7 +1094,7 @@
     {
       "id": "T-059",
       "title": "Evaluation loss to gap capture re-index and re-test flywheel",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-021",
         "T-022",
@@ -1106,7 +1108,7 @@
     {
       "id": "T-060",
       "title": "Multi-tenant hosting roles audit API webhooks security and retention completion",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-009",
         "T-018",
@@ -1121,7 +1123,7 @@
     {
       "id": "T-061",
       "title": "Wider application automation and bot-monitored operations",
-      "status": "pending",
+      "status": "in_progress",
       "deps": [
         "T-060"
       ],
@@ -1498,7 +1500,7 @@
         "G8",
         "G9"
       ],
-      "acceptance": "Remaining product/platform and counsellor championship requirements independently verified; existing training-export approvals and account deferral remain.",
+      "acceptance": "D-173/D-174: remaining product/platform, accounts and counsellor championship require complete independent acceptance. Model training is not required; no export/training job is in active scope.",
       "retained_deferred_groups": [
         "G10"
       ]

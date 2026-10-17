@@ -1,0 +1,163 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "candidate_sha": "823d0771c31ea4b72640fd60a679c14725b2199028ed3dc6c2b44a0996fa96fb",
+    "cycle": 0,
+    "slug": "t013-continuing-voice-conversation",
+    "candidate_sha_kind": "sha256-of-exact-candidate-content-manifest-not-git",
+    "candidate_manifest": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\candidate-content-manifest.txt",
+      "sha256": "823d0771c31ea4b72640fd60a679c14725b2199028ed3dc6c2b44a0996fa96fb"
+    },
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\counsellor\\CounsellorPage.tsx",
+        "sha256": "4b423684c18c67391b72a530952cc874084c83c65b96e98f38792f3823e0160b"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\counsellor\\voice.ts",
+        "sha256": "b3f7f92b676a2a4a9e3ab301ac361dd157c8a8ad4a679962b52753fd488b431d"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\counsellor\\CounsellorPage.test.tsx",
+        "sha256": "7221647db4d20a72fe600e1f20993a260f7dc44bb3f97fd881315e1069da138e"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\counsellor\\voice.test.ts",
+        "sha256": "95a89b6af32087445b368de9bf5dc81ffd044031db73fc20a365700edcbbbf6a"
+      }
+    ],
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+  },
+  "metrics": {
+    "completion_reserve": true,
+    "bootstrap": {
+      "active_s": 180,
+      "tokens": 180000,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "completion_reserve_id": "t013-continuing-voice-conversation/0/823d0771c31ea4b72640fd60a679c14725b2199028ed3dc6c2b44a0996fa96fb",
+    "next_phase": {
+      "active_s": 150,
+      "tokens": 130000,
+      "kind": "review",
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "bootstrap_scope": "One shared aggregate T013/T037/T056 independent semantic review; fragment allocation must not be added three times",
+    "completion_reserve_tokens": 50000,
+    "reviewers": [
+      {
+        "active_s": null,
+        "tokens": null,
+        "cost": null,
+        "id": "aggregate-not-dispatched-history-unknown",
+        "token_metric": "actual_total"
+      }
+    ],
+    "token_metric": "actual_total",
+    "maker": {
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "escalation": {
+      "reason": "Root-approved ONE aggregate finite BOOTSTRAP scope; observed native startup approximately41000 input tokens; maker denominator unknown, ratios UNVERIFIED",
+      "limits": {
+        "active_s": 180,
+        "tokens": 180000,
+        "cost": null,
+        "token_metric": "actual_total"
+      },
+      "authority": "Root explicit final-envelope instruction,2026-10-15"
+    }
+  },
+  "worker": {
+    "executable": "C:/Users/product/AppData/Local/OpenAI/Codex/bin/9614f1d9b40d9c4f/codex.exe",
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\final-review-prompt.txt",
+      "sha256": "6f4e9812afd2f5fb462cc0263c8b7eed3f3f3cf2b38c09ec2d88db5833bf419a"
+    },
+    "phase_id": "t013-t037-t056-aggregate-review-proposed",
+    "provider": "codex",
+    "max_turns": 3,
+    "runtime_identity": {
+      "dispatch_prerequisite": "Parent binds exact aggregate native runtime/startup identity and fresh checker; fragment does not launch",
+      "native_host": "Codex desktop",
+      "actual_total_hardcap_established": false,
+      "startup_floor_root_reported_input_tokens": 41000,
+      "startup_floor_independently_reauthenticated": false,
+      "managed_launcher_supported_controls": false
+    },
+    "timeout_s": 150
+  },
+  "readiness": {
+    "receipts": [
+      {
+        "sha256": "0c4146ea9b9d0ae3fb4fb2aee619b6a3b439b0dc3409f5518a9565e0e5aa59aa",
+        "role": "environment",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\final-environment.json"
+      },
+      {
+        "sha256": "177306497e836c418f60ff5cb829bac105d05b6092d9ccd36136a542f3ad50cc",
+        "role": "green",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t013-ui-receipt.json"
+      },
+      {
+        "sha256": "3fd3ecd269304a22a361280c06564520221bed825b956891644b69c199523600",
+        "role": "raw-test-log",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t013-ui.log"
+      },
+      {
+        "sha256": "8bbd5508c3eaec67ac8ae0040f8545a249acc46c5a11f4c7b4a7b8f0548833ff",
+        "role": "preflight",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t013-ui-preflight.log"
+      },
+      {
+        "sha256": "5c5ae29a7cb657de464f77ad5217e4891db5bc9ad74a718665f459e33041b82a",
+        "role": "current-contracts",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\current-contract-bindings.json"
+      },
+      {
+        "sha256": "cac209e982025a84527f9b84ac9a3187799ce0716256251f224b23bfbc926737",
+        "role": "raw-backups",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\candidate-pins.json"
+      }
+    ],
+    "pending": [
+      "mandatory successful full web typecheck bound to exact combined candidate and same environment",
+      "required root integration preflight/validator/structure evidence",
+      "aggregate worker/startup identity and complete prior review history reconciliation",
+      "managed-review/1 validate and assess on final aggregate envelope"
+    ],
+    "dispatch_allowed": false,
+    "mutation_required": false,
+    "complete": false
+  },
+  "selected_checks": [
+    {
+      "reason": "Direct mounted consumer exercises two recognition/API/readback/rearm cycles plus idle/duplicate callback refusal",
+      "node": "src/pages/counsellor/CounsellorPage.test.tsx > conversation completes two spoken turns after one explicit start and never listens during readback",
+      "boundary": "immediate-consumer/lifecycle"
+    },
+    {
+      "reason": "Stop/mode/language/auth/unmount/old completion/error/API retirement preserves F7",
+      "node": "src/pages/counsellor/CounsellorPage.test.tsx > parameterized retirement, replacement and failure cases",
+      "boundary": "cancellation/stale-auth/failure"
+    },
+    {
+      "reason": "Real adapter callback generation gates completion independently of mocked page adapter",
+      "node": "src/pages/counsellor/voice.test.ts > completion is emitted once only by the current successful synthesis end",
+      "boundary": "success/replay"
+    },
+    {
+      "reason": "Stop/replacement/error/unavailable/throw cannot rearm microphone",
+      "node": "src/pages/counsellor/voice.test.ts > parameterized cannot emit a successful completion",
+      "boundary": "failure/stale-callback"
+    }
+  ],
+  "previous_receipt": null
+}

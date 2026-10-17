@@ -1,0 +1,66 @@
+{
+  "status": "failed",
+  "phase": "baseline",
+  "startedAt": "2026-10-14T22:32:12.695Z",
+  "completedAt": "2026-10-14T22:32:12.887Z",
+  "error": "AssertionError [ERR_ASSERTION]: ffmpeg: [aac @ 000001da84f65780] Unsupported channel layout \"1 channels\"\r\n[aost#0:1/aac @ 000001da84f64500] [enc:aac @ 000001da84f1e680] Error while opening encoder - maybe incorrect parameters such as bit_rate, rate, width or height.\r\n[af#0:1 @ 000001da86da96c0] Error sending frames to consumers: Invalid argument\r\n[af#0:1 @ 000001da86da96c0] Task finished with error code: -22 (Invalid argument)\r\n[af#0:1 @ 000001da86da96c0] Terminating thread with return code -22 (Invalid argument)\r\n[aost#0:1/aac @ 000001da84f64500] [enc:aac @ 000001da84f1e680] Could not open encoder before EOF\r\n[aost#0:1/aac @ 000001da84f64500] Task finished with error code: -22 (Invalid argument)\r\n[aost#0:1/aac @ 000001da84f64500] Terminating thread with return code -22 (Invalid argument)\r\n[out#0/matroska @ 000001da84e9c700] Nothing was written into output file, because at least one of its streams received no packets.\r\n\n\n4294967274 !== 0\n",
+  "helperSha256": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+  "scriptSha256": "0dff27f9b6c9955cb6ab6f18bc49a506eb0dd3331e63c335fd2145caca74cb7a",
+  "fixture": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t035-lean-video-measured-encode\\eof-baseline-YTx7AA\\stale-duration-source.mkv",
+  "commands": [
+    {
+      "command": "ffmpeg",
+      "args": [
+        "-version"
+      ],
+      "status": 0,
+      "elapsedMs": 78
+    },
+    {
+      "command": "ffmpeg",
+      "args": [
+        "-n",
+        "-nostdin",
+        "-hide_banner",
+        "-loglevel",
+        "error",
+        "-filter_threads",
+        "1",
+        "-filter_complex_threads",
+        "1",
+        "-threads",
+        "1",
+        "-f",
+        "lavfi",
+        "-i",
+        "testsrc2=size=640x360:rate=30:duration=12",
+        "-f",
+        "lavfi",
+        "-i",
+        "sine=frequency=440:sample_rate=48000:duration=12.2",
+        "-map",
+        "0:v:0",
+        "-map",
+        "1:a:0",
+        "-af",
+        "aeval=exprs='if(gt(lt(t,2)+gte(t,12.15),0),val(0),0)'",
+        "-c:v",
+        "libx264",
+        "-preset",
+        "ultrafast",
+        "-threads",
+        "1",
+        "-b:v",
+        "2000k",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "96k",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t035-lean-video-measured-encode\\eof-baseline-YTx7AA\\stale-duration-source.mkv"
+      ],
+      "status": 4294967274,
+      "elapsedMs": 106
+    }
+  ],
+  "logs": []
+}

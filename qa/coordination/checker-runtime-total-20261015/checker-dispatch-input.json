@@ -1,0 +1,28 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "checker-runtime-total-cycle3",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "bootstrap_scope": "one independent staged helper review; maker denominators unknown; 10% unverified",
+  "bootstrap": {
+    "active_s": 150,
+    "tokens": 400000,
+    "cost": null
+  },
+  "next_phase": {
+    "active_s": 120,
+    "tokens": 250000,
+    "cost": null
+  },
+  "completion_reserve": false
+}

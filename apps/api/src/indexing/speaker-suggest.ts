@@ -14,6 +14,7 @@ import type { CompleteResult, Job } from "@lkb/ai";
 import { insertSuggestionsIfAbsent, listConfirmed, listRejected } from "@lkb/db";
 import { logger, type Logger } from "../composition/logger.js";
 import { extractSpeakersGrounded, buildSuggestionDocs } from "@lkb/index";
+import { speakerTranscriptHash } from "../../../../packages/index/src/pipeline/speaker-profiles/profile.js";
 
 export type SpeakerSuggestOutcome = { suggested: number; inserted: number; degraded: string | null; error?: string };
 
@@ -53,10 +54,19 @@ export async function suggestSpeakersForSession(
 
 async function run(tenantId: string, sessionId: string, turns: Turns[], complete: (job: Job) => Promise<CompleteResult>, db: Db, now: Date): Promise<SpeakerSuggestOutcome> {
   // chronological, stable: the grounder windows by position
-  const ordered = turns.map((t, i) => ({ t, i })).sort((a, b) => (a.t.tStart - b.t.tStart) || (a.i - b.i)).map((x) => x.t);
+  const ordered = [...turns].sort((a, b) => a.tStart - b.tStart || a._id.localeCompare(b._id));
   const [confirmed, rejected] = await Promise.all([listConfirmed(tenantId, sessionId, db), listRejected(tenantId, sessionId, db)]);
   const out = await extractSpeakersGrounded(ordered, complete, { suggest: true, confirmed, rejected });
   const docs = buildSuggestionDocs(tenantId, sessionId, out.suggested ?? [], now);
+  const transcriptHash = speakerTranscriptHash(ordered);
+  for (const doc of docs) for (const block of doc.blocks ?? []) {
+    const ids = ordered.slice(block.startTurnIndex, block.endTurnIndex + 1).map(turn => turn._id);
+    const first = ids[0];
+    if (first !== undefined) {
+      block.turnIds = [first, ...ids.slice(1)];
+      block.transcriptHash = transcriptHash;
+    }
+  }
   const inserted = docs.length > 0 ? await insertSuggestionsIfAbsent(tenantId, sessionId, docs, db) : 0;
   return { suggested: docs.length, inserted, degraded: out.degraded?.reason ?? null };
 }

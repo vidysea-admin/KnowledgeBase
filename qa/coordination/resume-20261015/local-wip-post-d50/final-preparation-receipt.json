@@ -1,0 +1,26 @@
+{
+  "path": "qa/coordination/resume-20261015/local-wip-post-d50/final-allowlist.json",
+  "sha256": "c14a2d6269d78dab2e6e95b2290935d86448a5b5e8c010c49b7118db6b98d3b1",
+  "counts": {
+    "modifiedOriginal": 1,
+    "bytes": 76411110,
+    "deleted": 3,
+    "added": 151,
+    "paths": 571
+  },
+  "unit73Verified": true,
+  "eightFileIdentity": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "changedNewScan": {
+    "valuesPersisted": false,
+    "findingCount": 0,
+    "scannerHelper": "qa/coordination/resume-20261015/create-local-milestone.ps1",
+    "findings": [],
+    "reusedOriginalScans": 416,
+    "changedOrNewFilesScanned": 152,
+    "changedOrNewBytesScanned": 784248
+  },
+  "indexEmpty": true,
+  "stage": 0,
+  "commit": 0,
+  "push": 0
+}

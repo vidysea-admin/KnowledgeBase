@@ -1,0 +1,10 @@
+✔ correction publication never replays paid work on transient body or commit errors (119.2822ms)
+✔ runRefresh reconciles unknown committed head without downgrade or superseded revision leakage (47.7892ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1168.705

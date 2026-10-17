@@ -1,0 +1,38 @@
+[
+  {
+    "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\LICENSE-Community.txt",
+    "bytes": 30608,
+    "signatureStatus": "UnknownError",
+    "signatureStatusMessage": "The form specified for the subject is not one supported or known by the specified trust provider.",
+    "subject": null,
+    "thumbprint": null,
+    "binaryExecuted": false
+  },
+  {
+    "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\MPL-2",
+    "bytes": 16726,
+    "signatureStatus": "UnknownError",
+    "signatureStatusMessage": "The form specified for the subject is not one supported or known by the specified trust provider.",
+    "subject": null,
+    "thumbprint": null,
+    "binaryExecuted": false
+  },
+  {
+    "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\THIRD-PARTY-NOTICES",
+    "bytes": 146330,
+    "signatureStatus": "UnknownError",
+    "signatureStatusMessage": "The form specified for the subject is not one supported or known by the specified trust provider.",
+    "subject": null,
+    "thumbprint": null,
+    "binaryExecuted": false
+  },
+  {
+    "path": "vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\bin\\mongod.exe",
+    "bytes": 77756416,
+    "signatureStatus": "NotSigned",
+    "signatureStatusMessage": "The file C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\bin\\mongod.exe is not digitally signed. You cannot run this script on the current system. For more information about running scripts and setting execution policy, see about_Execution_Policies at https://go.microsoft.com/fwlink/?LinkID=135170",
+    "subject": null,
+    "thumbprint": null,
+    "binaryExecuted": false
+  }
+]

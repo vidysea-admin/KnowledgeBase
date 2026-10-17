@@ -5,8 +5,9 @@ import { asRecords, formatInstant, safeText } from "./model.js";
 const LABEL: Record<string, string> = {
   "about-to-join": "Will join", "capture-started": "Recording", "capture-stopped-early": "Stopped early",
   "capture-failed": "Failed", "capture-done": "Done", "rules-degraded": "Join rules degraded",
+  "coverage-deferred": "Coverage deferred", "discovery-degraded": "Discovery degraded", "discovery-recovered": "Discovery recovered",
 };
-const BAD = new Set(["capture-stopped-early", "capture-failed", "rules-degraded"]);
+const BAD = new Set(["capture-stopped-early", "capture-failed", "rules-degraded", "discovery-degraded"]);
 
 /** "Bot activity" from GET /bot-events (scope `jobs`): what the automatic poller decided and how each capture went, newest first. Text only; no links are rendered. */
 export function BotActivity({ state }: { state: Loaded<{ events?: unknown }> }): React.ReactElement {

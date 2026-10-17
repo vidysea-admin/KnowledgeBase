@@ -1,0 +1,7 @@
+{
+  "parser": "scripts/qa/dispatch-state.mjs:verdictCycle",
+  "cycle": 1,
+  "verdict": "PASS",
+  "sha": "eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+  "runtime": "HOLD"
+}

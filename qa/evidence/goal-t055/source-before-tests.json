@@ -1,0 +1,317 @@
+{
+  "sources": [
+    {
+      "sha256": "aced5860ec3b52f6ea2e57005e3ed2c8f935f70fa9b50eb0be8d02dc605dd333",
+      "path": "apps/api/src/knowledge/catalog-router.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "6e12680a6b19825413cdb78a591983e25130b9e1d0d3738acba67685816945f5",
+      "path": "apps/api/src/knowledge/catalog-store.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "090daa09e5de1907ac15900a6f3ec17305d13ee843ab79c78683f43b32bbd5a0",
+      "path": "apps/api/src/knowledge/catalog.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "2f34d72703acd45f65726c7d9eafc03783e8ce5bc7dc9672580711a83d392421",
+      "path": "apps/api/src/knowledge/collections-router.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "ba2c80800f94b556d69cee93a90cc4a06294ee93efbc797f9dbc93cb46c661a7",
+      "path": "apps/api/src/knowledge/collections-store.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "7b301afd34f50f3fde8d28f279e4bd2383dcbb97f0923db6198b2cdef0388128",
+      "path": "apps/api/src/knowledge/collections.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "169701b63dba37a9e82ba400556748279c400a9f25b067fbf549788978ef6a19",
+      "path": "apps/api/src/knowledge/document-reader.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "2c44297125e79d4e1743d11b10b54a086f06824d5cc6e58427073a71a3a36356",
+      "path": "apps/api/src/knowledge/document-reader.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "416a94a4f40ec2eb35fce91249b64633f828e65ebe97aa4b00de1b8c5329495b",
+      "path": "apps/api/src/knowledge/metadata-visibility.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "6f68d1f53f24f229ddc650bc6b0ccd74b78bf75ad614e66cc97929b77f374f92",
+      "path": "apps/api/src/knowledge/pdf-fixture.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "dccc7da4f1b8e76de98e60320b16044d16e9856fba54c77671a8cf79c4a04080",
+      "path": "apps/api/src/knowledge/schema-validation.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "ef6479110f9b9e3326b3f3979ba36eb7b0435716555189427b942b8fc1ac364b",
+      "path": "apps/api/src/knowledge/schema-validation.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "198af94f315deb5d701cafbb2026eba90426a2710da809a0336c3015b1f17cbe",
+      "path": "apps/web/src/pages/knowledge/catalog/knowledgeCatalogClient.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "5848bb0db5c85f55d08a4d55d71e3fac80fb6025ab598265e99186c6950e63b0",
+      "path": "apps/web/src/pages/knowledge/catalog/knowledgeCatalogClient.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "77eb70d382e021e15ebbe9f0b82e40c0c19db6d69b78f8eb72cd5b4e8968a657",
+      "path": "apps/web/src/pages/knowledge/catalog/KnowledgeResourcesPage.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "c1d590e151976c6246982f2d211dc51e1de0f668aebe089c01e02adb9df7a443",
+      "path": "apps/web/src/pages/knowledge/catalog/KnowledgeResourcesPage.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "26f053792f6a0fe4e03442230c81a8e0f8192ef893089790874dba5a8bad55fd",
+      "path": "apps/web/src/pages/knowledge/catalog/KnowledgeTopicsPage.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "690e872c533f960e0fc66bd3938439f6f16de0d6c2d9320c7904f8ed56d81e37",
+      "path": "apps/web/src/pages/knowledge/catalog/KnowledgeTopicsPage.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "359d0feef23e95d5bdc257bb3b2779a5eabaeec632af25a0959618f5cfaa6bcb",
+      "path": "apps/web/src/pages/knowledge/collectionsClient.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "0eb4915dfed41ba944d17937cd1a4fcf64c972172edfc25134d19a61a8fe5602",
+      "path": "apps/web/src/pages/knowledge/collectionsClient.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "52fda13eaf3dae715e426baf42112df27f000df413e1380a49d96d7f2cdcd1a3",
+      "path": "apps/web/src/pages/knowledge/CuratedCollections.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "cc5ca5ef22cb617a2f7cc949af0dfd525819814ca9a550a389707a755b2d112b",
+      "path": "apps/web/src/pages/knowledge/CuratedCollections.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "940d4ad041641e897c049b0a23320923d480cf87ab17508f5930a1424d6ff9ba",
+      "path": "apps/web/src/pages/knowledge/documentClient.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "0cede69049bd3d8452c0ca407b254d34b8034db1ea5ea855f182ca68028de4ee",
+      "path": "apps/web/src/pages/knowledge/documentClient.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "4419d84fe9c7bf60db523dc3eaa85fd3326c819b286866b595ab61f5567b9fbc",
+      "path": "apps/web/src/pages/knowledge/DocumentPageEvidence.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "e5f475bb39a2c86df4432525abd5c4da9170bbd32c8692db4abea0a93356343c",
+      "path": "apps/web/src/pages/knowledge/DocumentPageEvidence.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "3adbcc65952ef5c523210e5eddb108640c1689719456e3377547fda0d48d0af2",
+      "path": "apps/web/src/pages/knowledge/documentPageModel.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "2a9fd1ba8e4300ee42a1001fc9ed7229e935ffcfa35a93ad4df6d096a41cefce",
+      "path": "apps/web/src/pages/knowledge/documentPageModel.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "f0f13913b53c48ec1ae6abaeb483aafdbbad1f5135a78c83327545005acacf5f",
+      "path": "apps/web/src/pages/knowledge/GoalT055AppIntegration.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "fef1dfb4ef4c9f6c0c56c1b197b38f04e813398704ce8a884dde9a08be3e8870",
+      "path": "apps/web/src/pages/knowledge/GoalT055ProducerArtifact.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "82ef9805bc8977976ed70d1fd86f2c141354d86fe84870a8c07752ceb64a6906",
+      "path": "apps/web/src/pages/knowledge/KnowledgeDocumentsPage.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "dc3451ad44196fd88b91e6a1b976374557c0b72204e7d1d5a557a249c21fdd22",
+      "path": "apps/web/src/pages/knowledge/KnowledgeDocumentsPage.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "7908d477b6bed1a2903c87eb13adbc380ee8f1201a96fe7b3d664b663abd3ed5",
+      "path": "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "58b2fe441d2370da0e3b6fd5610ccd31bc9a737efb8dff4a7d3255d3743a9b21",
+      "path": "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "67265047b657be6e9ef983a3c79552569dbae98b29974e8c2d7826610ffa33a6",
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "8f81d17083a2cb2ab8139b85aebf6ad9481c305ede3d0eafcda9599b840476ae",
+      "path": "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "6815daa350732e4198e93beaaf1458d3ba53314f36528475048505569b879083",
+      "path": "packages/ingest/src/sources/document-pages.test.ts",
+      "base": "no source base existed before this unit"
+    },
+    {
+      "sha256": "a1ca64896ea0ae14c553793c8dd7c76ad0b000d018f92f2523e0b647b07f9145",
+      "path": "packages/ingest/src/sources/document-pages.ts",
+      "base": "no source base existed before this unit"
+    }
+  ],
+  "cycle": 0,
+  "criticalSharedPins": [
+    {
+      "path": "apps/api/package.json",
+      "sha256": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede"
+    },
+    {
+      "path": "apps/api/scripts/build.mjs",
+      "sha256": "35dd2abf95e97510a63db16cd949aab375318337cf73739846edad1d6a97a0fb"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/knowledge.ts",
+      "sha256": "35f4d99593c9304f4cfeb3ef86dbdea1375f4fdf7c17140efebca43f39e9b4d9"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/routes.ts",
+      "sha256": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace"
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "909275b057678736d2202c6296e090528e183fec89f063db050353596ab940bc"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "sha256": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/router.ts",
+      "sha256": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.test.ts",
+      "sha256": "6eb5f5d9b7db008a51f56ea8e8e818f7e39b51b0eb41f6705777486aab68c662"
+    },
+    {
+      "path": "apps/api/src/speaker-profiles/store.ts",
+      "sha256": "169d7a1d4f4d21964bace80516f2eda370b6d9cff7af65005eb638ec0297cb5d"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168"
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "sha256": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada"
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "sha256": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "d11b6566f5988e65226af4fdb198bbfb5d995a7d0d538586c58640d41e58f27d"
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.tsx",
+      "sha256": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c"
+    },
+    {
+      "path": "apps/web/src/layout/NavSidebar.tsx",
+      "sha256": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6"
+    },
+    {
+      "path": "packages/core/src/generated/document_documents.ts",
+      "sha256": "f2edb876662bf15c29093553034300cfbf50fd0585ff1d1b138ba343c12ae853"
+    },
+    {
+      "path": "packages/core/src/generated/knowledge_collections.ts",
+      "sha256": "6645d6505ed1827af2b984ff9f86a5ccf46939926f8fb1a0b949a8cf4aca1485"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174"
+    },
+    {
+      "path": "packages/index/src/pipeline/speaker-profiles/profile.ts",
+      "sha256": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386"
+    },
+    {
+      "path": "packages/ingest/package.json",
+      "sha256": "133ea3e46d60c92da6258f4af2032997f4377b666e5b5ad36192da80fec10486"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": "qa/contracts/goal-t007-visibility.md",
+      "sha256": "2d9fd6a2e9e377185e626cffbf695d76d8d5f6a6ea75b0a2d85daf0c5b350db9"
+    },
+    {
+      "path": "qa/contracts/goal-t055.md",
+      "sha256": "89dfb2b2ef66736b592544f19857a8d994174f565055ebb4799b50fad2eee394"
+    },
+    {
+      "path": "qa/issues.T055COLLECTIONS.jsonl",
+      "sha256": "3a4724f7a9d4bae821ff23b675170af7aa475e802e8b93b9f72dc8c2282f953d"
+    },
+    {
+      "path": "schema/document_documents.schema.json",
+      "sha256": "37e3cfd33156145523409966f4d78122d45f7ca116800213c5395f8cf7dd4fec"
+    },
+    {
+      "path": "schema/knowledge_collections.schema.json",
+      "sha256": "079dc764e4b769b79a6ec866b8663d98a54cb770fb0dd412ca4e5f874d354633"
+    }
+  ],
+  "stage": "draft pre-test inventory; central post-fix compile and fresh FIFO execution pending",
+  "capturedUtc": "2026-10-14T21:16:07.6650276Z",
+  "upstreamEvidence": [
+    {
+      "path": "qa/evidence/u24-speaker-profile/broker-run-20261014T210625/scripted-producer-profile-responses.json",
+      "sha256": "98948cae1b8f3d812346ac2528b822a616ed81b707fb62f33cd7005b731d2c62"
+    },
+    {
+      "path": "qa/evidence/u24-speaker-profile/broker-run-20261014T210625/actual-toc-api-response.json",
+      "sha256": "dedb7726376e3c4ce3e2d7644aa62e46bf115ea675da55930abb32a1aa29613d"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-u24-maker.json",
+      "sha256": "22cc85d0b1f755f27e2870ca50131d2b4f4570f69d9d220b6c3a92f3d71265ab"
+    }
+  ]
+}

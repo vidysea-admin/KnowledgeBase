@@ -1,0 +1,801 @@
+{
+  "schema": "native-guard-terminal-evidence/1",
+  "head": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "scope": "Only native guard2WIP unit; no unrelated prepared83 entries absorbed",
+  "prepared_baseline": "qa/coordination/resume-20261015/local-wip-post-d50/next-after-u22-prepared.json",
+  "prepared_entry_count": 83,
+  "additional_qa_allowlist": [
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-receipt.json",
+      "sha256": "a0877028ae4d5050d6b7a05acb488b5ee3fb81423b1c85e488f07707783c3792",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/packet.md",
+      "sha256": "ab18a762d96f9035f74055648830138ba7498a669eea6a99826ef0c9bda9f418",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/preimages.json",
+      "sha256": "546f073fcb86a2f999077d81c546da113bedb5b76e365702b90bf0d62dcf7fdd",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/source-pins.json",
+      "sha256": "6e20c37a1216dd332fc6241a2d33e1a722d510b5e0a352dcd296d75bb5102194",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/backups/native-archive-recovery.test.ts",
+      "sha256": "a125bb23755d9f51fb496b67bb0993415e3f2decec13949c9b8455cfef7db877",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/native-archive-recovery.test.ts.preimage",
+      "sha256": "3b4a63e28cf619d8ff41078f4d337e171c93daac0877c80bc7c9d68d6870ae45",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/packet.md",
+      "sha256": "e65c6ffbc5949f40ed8ad38ab204f74124daac06ac362dd8979856eb6daff4e5",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/preimage.json",
+      "sha256": "be143b163433707d4510635c571a478f20275a9a3f70f80ecbea4ba7d2abc150",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/source-pins.json",
+      "sha256": "bda281f8df9a1f507b4d94a36c6047e5add878072a5057907e5d6c04e07a5e98",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/packet-before-explicit-trace.json",
+      "sha256": "97204ef71bb7d94b92fa950c0fbe1487b33fdbca5ccedb33ab374971381cf695",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/packet.json",
+      "sha256": "029a7b577a13e381caf6c5743ec7be4f97ec539eb0e30d960542ce2f41cc28fa",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/packet.md",
+      "sha256": "96e1cc94d4af535262c0173e19d1362eb197381c4afbc0ab2d61e349df747714",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/preimages.txt",
+      "sha256": "5937732516ceff6ad5770097318a42eb88fdd5c6f1b97a83e80d0be9ed36be89",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/backups/helper-before-explicit-trace.ts",
+      "sha256": "cc5fc4fa844cc51aa160dd3f3fc4381e929a25d9993f251c69d0b77159ae8815",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-final-seal.json",
+      "sha256": "bea21fdc20250635f235b60faef2c63ac8817f4c15a858f8446ed104a062f4bf",
+      "role": "broker-final-seal/history",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4.json",
+      "sha256": "d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4",
+      "role": "exact-CAS-pin-manifest",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-trace.jsonl",
+      "sha256": "07bab4fce44682df0d036e15a9d8684a795bd4dd03a6eb50c480121f9885e014",
+      "role": "durable-scalar-trace",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-before-receipt.json",
+      "sha256": "051251ab754172398f0447a0eba0f3315dbdd6f45e1f2f791b0040305936130c",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-create-receipt.json",
+      "sha256": "0a5f1e50c067e5b46a32dc84c91245e401a606615095ba4e3f9eda52f94d2e04",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-create.log",
+      "sha256": "86cfc158f22463b13da5aab54e47a5fd5de9ff3767a0bc87b6b273be35713a74",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-verify-receipt.json",
+      "sha256": "30ab619d9df1c6f942ad0b7be7082202d6d8ba79a4c31a62128bb532f3a7513b",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-verify.log",
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-original1-receipt.json",
+      "sha256": "26b5f81108123ca4f89feb73b930830492e817b447a7d998d497a4842533b0a0",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-original1.log",
+      "sha256": "a8f4b9393c48fc37593c1e719a1dff73c919943d127a034889ee43ac7d773d7c",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-cleanup-receipt.json",
+      "sha256": "acfd1be01f90a918d586a90d660387d76dcf4262798797f8894ea46115e19cef",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-cleanup.log",
+      "sha256": "3c4ba97aa3cfd0709827f565156829b0394981b3a0c640dc67d6fdbb72d96b9d",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-after-receipt.json",
+      "sha256": "f49165d8267a60302d54f6850c5c5a2931bb17252f3caf7623262e57ec8c5fcf",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-final-seal.json",
+      "sha256": "da76bdfa57e6712d62f4e7870ae33f7bb28076ff7f8caa2847a447425780c437",
+      "role": "broker-final-seal/history",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-trace.jsonl",
+      "sha256": "7a70f323d41fcfb728f6912bde225c5fb8e2aa4458e24d1568996cbb31f50c8e",
+      "role": "durable-scalar-trace",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-before-receipt.json",
+      "sha256": "faf88fdb73ba3d1befa0f36eac1292604eca5cab975d69cbb0c03b0cc3c5a30d",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-create-receipt.json",
+      "sha256": "d02f149daa1f6e612d53786407767a3ea09b6881e8e62e89eb04c7c416d8671a",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-create.log",
+      "sha256": "3112f90210e5544cde627e75099cef62cf824032f65f0808efb434b9702de365",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-verify-receipt.json",
+      "sha256": "506943aba2e88ee0c75b131cb1a6e02ce076d1cad9cc00ef97b1672e8ec5e7ac",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-verify.log",
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-guards2-receipt.json",
+      "sha256": "b79f2accbb3c27e9b2c88a7327e919dea0241350c0d0fd501c070e26daa4a28e",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-guards2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-cleanup-receipt.json",
+      "sha256": "1dcb1a3a0bd9821c8b84c25cbd544e9ac8637b064d011e515cf4e67d2199a5b2",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-cleanup.log",
+      "sha256": "52a5c0e06fe7f6e58573d9c4c726fc0a707fa1b83368e322464bd4b849240435",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-after-receipt.json",
+      "sha256": "15a2e6569a7600c7fd2bd5959cf0125dcad69e332f18ce8fc80bf9301d2f7c5e",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-run.py",
+      "sha256": "8edb3b531fb797bad799d8c4e50b307ff012ebcc71ee9298fa9a20474ec700ee",
+      "role": "broker-command-provenance/history",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-run.py",
+      "sha256": "358287aa0f5a13c609abb9d3585cdde2b4abe527d1cf8fb2a47556bfeab5c2ba",
+      "role": "broker-command-provenance/history",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-run.py",
+      "sha256": "1c1dd0019c9595bf1b7e5e5040e9ecb6ee52e7f9bfc7ca76c2224bf417c54afd",
+      "role": "broker-command-provenance/history",
+      "git_presence": "untracked",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    }
+  ],
+  "actual_diagnostic_source_paths": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+      "sha256": "aa1de5248f25f941890cb64ff9e89ab61dc4d58f2f3fb3044029aa8ad1869925",
+      "role": "actual-modified-diagnostic-source",
+      "git_presence": "tracked-modified",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts",
+      "sha256": "099b181cf1178182dfb4c81563d662b37dbeded36c8e40aa3fd879592c3b8fad",
+      "role": "actual-new-diagnostic-source",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    }
+  ],
+  "direct_references_already_prepared_or_tracked": [
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/broker-request.json",
+      "sha256": "3fdb35142ed7ae533642de3075a64af6d34d1dac545fe5983c460ecc99a6e6d6",
+      "role": "admitted-request",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/node-specific-request.json",
+      "sha256": "fe57c6ebd502d74812bce162cf457c328721d020d474c90e6f478d68d1fac693",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/packet.json",
+      "sha256": "cf28b538c4cd702f4429e6feb3929632391fee97155afba9053c7391490bfaa6",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/packet.md",
+      "sha256": "7bbafb65626cd09cd28d11db55b6f50eea150d13706444a3a928fc589f3e66a1",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/source-pins.json",
+      "sha256": "f26cda9bea35fbe6e5bd9fb5288fe6a4e09f130a12a7f4cfa4af6206a24e2ee7",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/stage-catalog.json",
+      "sha256": "54442d7c62e43564a49d6f38599ef3cfb3ca4afa168d6d6deee046c9aba997c4",
+      "role": "unit-packet/raw-preimage/frozen-source-metadata",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "sha256": "b8ba6bc2c260cdf92bb3c98e5714c0a3c4ea03425fcf48efd40981d419bff5db",
+      "role": "broker-final-seal/history",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-targeted-trace-helper-five-receipt.json",
+      "sha256": "ec59481d1e9e79e1c588c5b0668b21c50cc246214b2bf11251f3f655c569974d",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "sha256": "f421d7fff5e79ee8128308d55e31409ac259a921807430c587c301e906f78a19",
+      "role": "broker-final-seal/history",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630.json",
+      "sha256": "d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630",
+      "role": "exact-CAS-pin-manifest",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-trace.jsonl",
+      "sha256": "13af88d3891d580d2b104d0b98d526f8409a1c8b5b4ae19263fac6831975304c",
+      "role": "durable-scalar-trace",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-before-receipt.json",
+      "sha256": "a3e3de9f0c5863ac5fcd5558487ea8794a517b5b3c52c4bde00ea518eb7610ef",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-create-receipt.json",
+      "sha256": "d0ed394b30c783ae9fb231ca78a966cd4182b1cce495bef6886306e98f6096d5",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-create.log",
+      "sha256": "35c7ca805907feced57de83c25fa072d7831c2ee4423be70c7d2fbcd5721b6f6",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-verify-receipt.json",
+      "sha256": "a0e467742154dab10e98cf878787e76d44bda19b6328b9d66788a4201a14b623",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-verify.log",
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-original1-receipt.json",
+      "sha256": "578ec7436ab30e2cd310179b066dedb4dd437afc66c3a0f45e3a793dcca1c13e",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-original1.log",
+      "sha256": "ffc6886068d0f6f3b7d6630f509429d9f93e6e62613f52160f47ac16efdca5a5",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-cleanup-receipt.json",
+      "sha256": "019a75ceccf0966925445ffc2497c04bf60722460beb8a7c968ea432d962cce0",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-cleanup.log",
+      "sha256": "9af4684f1b35195354b989467ecaae33bdd0ba735425eeddb16278b140839ee5",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-after-receipt.json",
+      "sha256": "336ff1653ea1b8e0c381f7a8098a6ca624b80a8b445149bba94fe41cbbf002f2",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3.json",
+      "sha256": "f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3",
+      "role": "exact-CAS-pin-manifest",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-targeted-trace-helper-five.log",
+      "sha256": "15bf7b899315fb64813056b02c05636b347a0a1a782ac179f56bc3698e759b55",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2.json",
+      "sha256": "2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2",
+      "role": "exact-CAS-pin-manifest",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-before-receipt.json",
+      "sha256": "0d17affb71898bf8e0b4c6574e7e7aada11cd39e565058d2f3780503c503c723",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-bot-types-receipt.json",
+      "sha256": "e73d18b26110f4dfa244e7833f85066b66f52b2b0a534b28720416d75d61afed",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-bot-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-after-receipt.json",
+      "sha256": "81cdc9bdf4b12a7edfbf1c12ca979269b4a10bc54995b43377c9059e09ef6c96",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "role": "atomic-raw-output",
+      "git_presence": "untracked-ignored",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-final-seal.json",
+      "sha256": "9c36c4730957ddad76b441d0139b31305b43e92727a8d3046c6ef9c6986c97a8",
+      "role": "broker-final-seal/history",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/remaining-native-guards-request.json",
+      "sha256": "f33999d443226823a6ea345b1deb9a3910d2120e8dbac6e3e680c8aa6c6f565f",
+      "role": "admitted-request",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/7492929ca47094b10e26bb2edd87ae04b615e72342672e294e13b078f86d5d8c.json",
+      "sha256": "7492929ca47094b10e26bb2edd87ae04b615e72342672e294e13b078f86d5d8c",
+      "role": "exact-CAS-pin-manifest",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-head-before-receipt.json",
+      "sha256": "5c549dc0c074ddd1165ee2f7a8134a263c2c3e589cf2a603c297e2b00ba870cd",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-head-before.log",
+      "sha256": "4864cf8fd8acb74440dc0c27a1fe4b406946866b2d76374c768ef3ff71904311",
+      "role": "atomic-raw-output",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-acl-create-receipt.json",
+      "sha256": "e5bb22486bebec785150488ac7f391c01099bd9f72836c6997fef67f6e04c159",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-acl-create.log",
+      "sha256": "8f24b1bbc7f27cc3f2c1c7607ee6462a3fbb51e1d4f6482789f91fe1da9abdce",
+      "role": "atomic-raw-output",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-acl-verify-receipt.json",
+      "sha256": "92ad991f88e6a9aa0034c834fc4a1ed72e89074cc0a47bff3de4edd94d296665",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-acl-verify.log",
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "role": "atomic-raw-output",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-guards2-receipt.json",
+      "sha256": "1027f95c45f943a15db0eff8218a1c64555960a409ad4f8ca9dd5de22827bd29",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-guards2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "role": "atomic-raw-output",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-acl-cleanup-receipt.json",
+      "sha256": "884fec9baf13c28337a941bf9041804a0036e841df550437211e8c702094204e",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-acl-cleanup.log",
+      "sha256": "bdbbc82541cdca2ad8557d7bcb54f3f6d56f59d996f215c40a98aa36119509af",
+      "role": "atomic-raw-output",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-head-after-receipt.json",
+      "sha256": "1aaef9b9234d914f8a8276ab323dd76f78b2be0cbf27ad5c7727b011f8ac545c",
+      "role": "atomic-own-exit/HEAD/ACL/cleanup-receipt",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-head-after.log",
+      "sha256": "4864cf8fd8acb74440dc0c27a1fe4b406946866b2d76374c768ef3ff71904311",
+      "role": "atomic-raw-output",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-run.py",
+      "sha256": "e75336fc047cffd608f4fe5edf07b95692ac1cf96df28949a7eaec29633d3230",
+      "role": "broker-command-provenance/history",
+      "git_presence": "untracked",
+      "in_prepared83": true,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-run.py",
+      "sha256": "2db702b5ad45fdf2dd2c8a66e4b635f82270cc7042a3e7b278e4bdfbbcf9dc49",
+      "role": "broker-command-provenance/history",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-remaining-two-timeout-checkpoint.md",
+      "sha256": "591d66308ba13782f4560544c821d3b5ce1f73d48a4dac21f813d3a7684ca1ba",
+      "role": "broker-command-provenance/history",
+      "git_presence": "tracked-unchanged",
+      "in_prepared83": false,
+      "status": "observed-current-bytes"
+    }
+  ],
+  "terminal_report_pending": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-report.md (B owns; central adds final hash)",
+  "self_path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+  "self_hash": "Excluded to avoid recursive self-hash; parent receives SHA separately",
+  "limits": "Node1/node2 actual individual1/1 evidence only; parent4skips/intermittent unavailable/host-duration/Ubuntu/live gates remain open. No independent PASS. Source2 diagnostics are dirty/uncommitted."
+}

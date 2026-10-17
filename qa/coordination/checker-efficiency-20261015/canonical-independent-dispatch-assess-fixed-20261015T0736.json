@@ -1,0 +1,36 @@
+{
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "qa/coordination/checker-efficiency-20261015/canonical-independent-dispatch-input-fixed-20261015T0736.json"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 20000,
+  "startedAt": "2026-10-15T07:34:24.812Z",
+  "completedAt": "2026-10-15T07:34:25.000Z",
+  "elapsedMs": 184.0645,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/coordination/checker-efficiency-20261015/canonical-independent-dispatch-input-fixed-20261015T0736.json": "34009ade30b4ca6ebed36b53f2212be49c4882123a630dc23beb6b16c5a1914f",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "3632d1c4dda665ff5434456c0d875b3d776b411d7d6c4805fdbca30005d1f5b2",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "886ac57c17c223ccbcbd9d38170e38734044f00547db014920d339c592781de9",
+    "C:/Users/product/.codex/AGENTS.md": "5135f571e81efb4b37c21e9e2b42305eeb6dd40167462ac0615a6a25482a700b",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  },
+  "after": {
+    "qa/coordination/checker-efficiency-20261015/canonical-independent-dispatch-input-fixed-20261015T0736.json": "34009ade30b4ca6ebed36b53f2212be49c4882123a630dc23beb6b16c5a1914f",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "3632d1c4dda665ff5434456c0d875b3d776b411d7d6c4805fdbca30005d1f5b2",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "886ac57c17c223ccbcbd9d38170e38734044f00547db014920d339c592781de9",
+    "C:/Users/product/.codex/AGENTS.md": "5135f571e81efb4b37c21e9e2b42305eeb6dd40167462ac0615a6a25482a700b",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  },
+  "stdoutPath": "qa/coordination/checker-efficiency-20261015/canonical-independent-dispatch-assess-fixed-20261015T0736.stdout.txt",
+  "stderrPath": "qa/coordination/checker-efficiency-20261015/canonical-independent-dispatch-assess-fixed-20261015T0736.stderr.txt",
+  "hashesUnchanged": true
+}

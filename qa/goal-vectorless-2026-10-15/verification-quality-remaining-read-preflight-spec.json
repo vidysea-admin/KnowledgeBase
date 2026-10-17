@@ -1,0 +1,29 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Root-authorized read-only summary-only remaining-read readiness authentication; no reviewer reopened",
+  "phase": "shared-verification-support-readonly",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "qa/coordination/knowledge-brain-20261015/quality-delivery/readiness-authentication/remaining-read-preflight.mjs"
+  ],
+  "testIDs": [
+    "readiness counts/hash summary only"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-quality-remaining-read-preflight",
+  "pins": {
+    "qa/coordination/knowledge-brain-20261015/quality-delivery/readiness-authentication/remaining-read-preflight.mjs": "3dadf9ea1261bf9510737b680f527752da858fff24c02994b8fbfe2561eaba31",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  }
+}

@@ -1,0 +1,18 @@
+# Runtime token metadata cycle1 scoped delta
+
+Root C:/Users/product/Desktop/KnowledgeBase; manifest qa/manifests/review-runtime-usage.md has cycle1/current3pins and cycle0 bases. Base commit5c4cbade2d1a8aa4815de13d587db8de3b01cc4a; all3paths untracked. Cycle0 packet/manifest/PASS archived under qa/evidence/review-runtime-usage/*cycle0.md, no historical rewrite.
+
+Root authorized exact2file thaw plus sanitized actual fixture after real runtime ordinal field caused falseunknown. Until fixed+checked, use direct per-field metadata fallback for actual counts; no globalhelper install.
+
+Acceptance unchanged: allowlisted metadata-only receipt, exact phase identity, missing/reset/inflight unknown, canonical subtree/dedup safety, explicit workspace output confinement, no invented active time/cost/10%ratio. New compatibility clause: real ordinal field, arbitrary JSON key order/whitespace including payload.type after info. No auth/data-store/globalenforcement changes.
+
+Production delta ONLY readSession: replace anchored fixed-order envelope and payload-first regex with cheap order-independent selected-type prefilter; parsed JSON outerevent.type/payload.type authoritative. Existing partial guard, allowed retained fields, error/identity/duplicate/counter/lifecycle checks, phaseDelta and outputwriter unchanged. Prefilter may transiently decode a nonmetadata object with nested matching type; outertype causes ignore, no retention/export. No raw body/history dumps.
+
+New test reads qa/fixtures/review-runtime-usage-ordinal.jsonl and expects known genuine614949TOTAL. It reorders envelope/payload keys and whitespace, appends unrelated response_item with nested fake session_meta, requires identical result. Original4 unchanged.
+
+Fixture provenance: selected session_meta and latest task_started/token_count/task_complete from C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl; actual outerkeys timestamp,ordinal,type,payload, usage2026-10-15T11:17:53.324Z. Actual ordinal,timestamps,eventtype,counters,lifecycletype retained; sessionid/parent/path aliased public-fixture values. No instructions/messages/tooloutput/credential/environment bodies copied.
+
+RED: qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-red.json, oldA4AC/newtest33C7/fixture6DCA, broker ownexit1/0PASS1FAIL/~252ms expectedknown gotunknown. Not deliberate source mutation.
+GREEN solebroker executed ONCE: node --test scripts/qa/review-runtime-usage.test.mjs (newaffectednode+original4); source694C/test7E6C/fixture6DCA. qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-green.json PASS5/5 ownexit0/438.0818ms, no pin drift. Scoped candidate72a3514fbc8f65187af387d124c5cc28d711da3f807ba6169753af83318f16c8, notGitcommit. Broker receipt includes timeout/ownexit/fullstdout/stderr/runtime/lock/environment and current beforeafter pins. Original first node covers immediate downstream persisted JSON consumption. No maker execution. Frozen validator/registry unchanged; shared receipt only vacuity, exactpins required before reuse.
+
+Independent checker must inspect small parser delta+sanitized actual fixture, authenticate RED/GREEN/current3pins and independently probe order-insensitive type semantics/privacy/unknown. No full session audit/broad rereview. Allocation/assess awaits root after GREEN; no dispatch authorized by packet alone. Canonical cycle1 verdict checker-owned; preserve cycle0PASS and every historical charge. Maker phase tokens/time/cost unknown; historical checker614949TOTAL/4413output retained, all cap/output overruns preserved. Future helper/global activation blocked until cycle1 acceptance.

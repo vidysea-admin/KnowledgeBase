@@ -1,0 +1,76 @@
+{
+  "format": "complete-answer-rebind-readiness-v1",
+  "observedAt": "2026-10-16T00:09:03.648Z",
+  "approvalState": "awaiting_human",
+  "approvalStatusChanged": false,
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "questions": 92,
+  "candidates": 29,
+  "approvedRawDataPins": 119,
+  "dataDrift": [],
+  "bindingMismatches": [],
+  "configFileSha256": "675b694667476bd4db76731cef18642300bbf578238aa142979963f23b0eec66",
+  "pendingAuthorizationFileSha256": "e300b8773b2e088f859f5a7f52af73d1df7e3c8f4387b211143c6b76c95b8bf9",
+  "baselineHashes": [
+    "a26d1609f4cfbde96638578529a96054799bff90b0de4bab396829b0a01beb3b",
+    "eded82c753e304ff453cce2905f39324a604c6a55fdc9c156c497924c4d083f6",
+    "c255070a6b4030537cf4276845f874d1657abb6741439874fa9ccdff9ac19dc7",
+    "5036012ac7670a680eee7a68762ae98dfc4709d51e02a82d88c58e8ddc37c394"
+  ],
+  "sourcePins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1"
+    }
+  ],
+  "providerRequestsThisPhase": 0,
+  "priorRequests": 5,
+  "nextIds": [
+    6,
+    17
+  ],
+  "rootReportedAuthFocusedChecks": "13/13 actual broker stage2; receipt attribution retained by root/broker, no path invented",
+  "offlineControlsRequest": "qa/coordination/resume-20261015/eval-pilot/offline-controls-20261016-stage2/broker-request.json",
+  "rebindPlan": [
+    "Keep current pending config and authorization immutable; exact current identities already match if mismatch list empty.",
+    "If any dispatch-time source/config/raw data/prior-ledger mismatch: refuse before credentials; create additive revision for root review rather than edit pending or historical files.",
+    "Only after actual human reply: root records exact evidence reference and finite approvedAt/expiresAt into canonical NEW authorization.approved.json; never overwrite original pending artifact.",
+    "Validate exact approved artifact and actual complete-answer preflight before credential access/provider I/O; invoke unchanged exported evaluate with fixed canonical complete-answer/checkpoint, not full92 CLI.",
+    "Verified JobObject240s launcher must be adapted from audited grant2 QA wrapper for exact complete-answer limits before paid dispatch; no current runnable complete-answer wrapper exists."
+  ],
+  "pilotInvocation": {
+    "module": "scripts/eval/vectorless-production-eval.mjs",
+    "exports": [
+      "freezeInputs",
+      "validateConfig",
+      "validateCompleteAuthorization",
+      "preflightEvaluation",
+      "evaluate"
+    ],
+    "canonicalAuthorization": "qa/coordination/resume-20261015/eval-pilot/complete-answer/authorization.approved.json",
+    "canonicalDirectory": "qa/coordination/resume-20261015/eval-pilot/complete-answer/checkpoint",
+    "config": "qa/coordination/resume-20261015/eval-pilot/complete-answer/config.pending.json",
+    "model": "glm-5.3-flash",
+    "endpoint": "https://ollama.com/api/chat",
+    "limits": {
+      "maxAttempts": 12,
+      "maxSeconds": 210,
+      "callTimeoutMs": 20000,
+      "maxInputBytes": 327680,
+      "maxRequestBytes": 65536,
+      "maxResponseBytes": 1048576,
+      "outputLimit": 768,
+      "maxKnownInputTokens": 131072,
+      "maxKnownOutputTokens": 9216
+    },
+    "hardOuterSeconds": 240,
+    "executeNow": false
+  },
+  "paidReadiness": "BLOCKED_HUMAN_APPROVAL_AND_EXACT_QA_LAUNCHER",
+  "qualityPASS": false
+}

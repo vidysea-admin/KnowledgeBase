@@ -4,6 +4,8 @@ import { createHash } from "node:crypto";
 export interface ReviewTurn {
   _id: string; tenantId: string; sessionId: string; tStart: number; tEnd: number;
   text: string; speakerRef: string; speakerLabel?: string;
+  /** Physical capture provenance; review requests cannot write it. */
+  screenEvidence?: unknown;
 }
 export interface ReviewSnapshot { tenantId: string; sessionId: string; revision: string; turns: readonly ReviewTurn[] }
 export interface ReviewRequest {
@@ -75,6 +77,22 @@ export function planTranscriptReview(snapshot: ReviewSnapshot, requestValue: unk
   }
   const corrections = new Map(request.corrections.map((c) => [c.turnId, c.text]));
   const mapped = new Set(request.mapping?.turnIds ?? []);
+  for (const turn of snapshot.turns) {
+    const visual = turn.speakerRef === "screen" || turn.screenEvidence !== undefined;
+    if (visual && turn.speakerRef !== "screen" && (mapped.has(turn._id) || corrections.has(turn._id))) {
+      throw new ReviewPlanningError("invalid", "Screen source identity requires reconciliation before editing");
+    }
+    if (mapped.has(turn._id) && (visual || request.mapping!.speakerRef === "screen") &&
+        (request.mapping!.speakerRef !== turn.speakerRef || request.mapping!.speakerLabel !== turn.speakerLabel)) {
+      throw new ReviewPlanningError("invalid", "Screen source identity cannot be changed by speaker mapping");
+    }
+    if (visual && corrections.has(turn._id)) {
+      const prefix = ["[Screen OCR; unverified]", "[Visual observation; unverified]"].find((marker) => turn.text.startsWith(marker));
+      if (!prefix || !corrections.get(turn._id)!.startsWith(prefix)) {
+        throw new ReviewPlanningError("invalid", "Screen text corrections must retain their source origin marker");
+      }
+    }
+  }
   const changes: ReviewChange[] = [];
   const nextTurns = snapshot.turns.map((turn) => {
     const next = { ...turn };

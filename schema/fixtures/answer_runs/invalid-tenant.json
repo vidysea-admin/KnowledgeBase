@@ -1,0 +1,76 @@
+{
+  "_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "id": "answer-1",
+  "createdAt": "2026-10-14T00:00:00.000Z",
+  "actor": {
+    "actor": "api-key:synthetic"
+  },
+  "query": "Synthetic question?",
+  "questionClass": "career",
+  "filters": {
+    "sessionIds": [],
+    "sources": "internal"
+  },
+  "evidenceMode": true,
+  "state": "review",
+  "reason": "Needs genuine review",
+  "candidate": {
+    "answer": "Synthetic answer",
+    "verdict": "correct",
+    "reason": "Synthetic fixture",
+    "scored": [],
+    "web_used": false,
+    "insufficient_coverage": false,
+    "sources": {
+      "internal": [
+        {
+          "node_id": "synthetic-node",
+          "evidence": {
+            "sessionRef": "synthetic-session",
+            "turnId": "synthetic-turn",
+            "quote": "Synthetic quoted evidence"
+          }
+        }
+      ],
+      "web": []
+    },
+    "auditLog": []
+  },
+  "candidateDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "evidence": [
+    {
+      "id": "source-1",
+      "origin": "internal",
+      "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source": {
+        "node_id": "synthetic-node",
+        "evidence": {
+          "sessionRef": "synthetic-session",
+          "turnId": "synthetic-turn",
+          "quote": "Synthetic quoted evidence"
+        }
+      },
+      "excerpt": "Synthetic quoted evidence"
+    }
+  ],
+  "policy": {
+    "tenantId": "fixture-tenant",
+    "policyId": "advice",
+    "version": 1,
+    "questionClass": "career",
+    "mode": "internal-only",
+    "style": "concise",
+    "onInsufficient": "review",
+    "citations": "required",
+    "action": "save",
+    "retired": false,
+    "changedBy": {
+      "actor": "api-key:synthetic"
+    },
+    "changedAt": "2026-10-14T00:00:00.000Z",
+    "note": "Synthetic schema fixture",
+    "previousVersion": null
+  },
+  "feedback": []
+}

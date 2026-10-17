@@ -1,0 +1,27 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "import {createRequire} from 'node:module';const r=createRequire(import.meta.url);console.log(JSON.stringify({version:process.version,node:process.execPath,tsx:r.resolve('tsx/esm/api')}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f.json",
+    "sha256": "770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f",
+    "count": 349
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 8,
+  "accounting": "MAKER ACCEPTANCE offline hydration",
+  "pid": 30188,
+  "exit": 0,
+  "treeClosed": true,
+  "active_s": 0.10900000000037835,
+  "afterMatch": true,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-preflight.log",
+    "sha256": "ec89c89d160688b2c54de07bf94f02c8e633b08e0dc1ad14989f75d86a6a13d7"
+  },
+  "counts": {}
+}

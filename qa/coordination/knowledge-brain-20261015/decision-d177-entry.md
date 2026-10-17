@@ -1,0 +1,7 @@
+## D-177 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Increase only structure.config.json dirsize.overrides.schema from46 to47 for the approved canonical speaker_attributes collection, with its exact count explanation.
+**Why:** The approved Knowledge Brain plan includes source-backed, human-reviewed organization and role attributes. A separate collection keeps unreviewed proposals outside accepted speaker profile and graph reads. The root orchestrator confirmed this exact ordinary source/config increase after approving the isolated U2.4 implementation. This is not permission to alter protected enforcement paths or frozen contracts.
+**Result:** Central integration may author the corresponding canonical schema, generated types, accessor and unapplied migration source, and apply only this one-count ordinary budget adjustment. No migration execution, host activation, native database writes, unrelated budget changes, frozen architecture or checker-owned acceptance edits are authorized. Earlier decisions and full parent acceptance gates remain intact.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only, plus its count explanation; separate canonical schema/generated/accessor/unapplied migration source follows the approved U2.4 implementation scope.
+**Links:** D-176; D-173; D-174; U2.4; qa/coordination/knowledge-brain-20261015/delivery-matrix.md; proposed schema/speaker_attributes.schema.json.

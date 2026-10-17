@@ -1,0 +1,62 @@
+{
+  "status": "DIAGNOSED_TESTONLY_REPAIR_PROPOSED_NO_SOURCE_EDIT",
+  "cycle": 2,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "receipt": "qa/coordination/resume-20261015/broker/deadline-repaired-original-composition-uri.log",
+  "observed": {
+    "selected": 1,
+    "passed": 0,
+    "error": "index_artifact_generation_incomplete",
+    "phase": "index",
+    "helper_passed": 2,
+    "workflow_passed": 4
+  },
+  "exact_static_cause": {
+    "producer": "composition.test.ts model extract-claims returns exactly one accepted claim; session.ts stamps and stores it and sets generatedClaimRefs using indexArtifactRef",
+    "consumer": "generation.ts actualArtifacts queries claims with { evidence.sessionId: attempt.sessionId }; refsMatch requires count and identities equal manifest.claims",
+    "fixture_behavior": "test-fixture.ts get reduces dotted properties directly. For stored evidence:[{sessionId,...}], evidence.sessionId reads array.sessionId (undefined), rather than traversing array elements as Mongo multikey equality does. match compares undefined to sessionId, excludes physically present generated claim.",
+    "expected_metadata": {
+      "physical_generated_claim_count": 1,
+      "manifest_generated_claim_ref_count": 1,
+      "native_mongo_evidence_session_query_count": 1
+    },
+    "statically_actual_metadata": {
+      "fixture_evidence_session_query_count": 0,
+      "generated_matched_ref_count": 0,
+      "manifest_generated_claim_ref_count": 1
+    },
+    "failing_condition": "generation.ts:196 claims/generated/preserved refsMatch: refsMatch([], manifest.claims with one ref) returns false; finishIndexAttempt:225 throws index_artifact_generation_incomplete",
+    "proof_strength": "Deterministic source-level identity/count mismatch; existing broker confirms error class but does not expose artifact counts. No new execution or raw/private payload capture."
+  },
+  "classification": "Fixture lacks native Mongo dotted-array field traversal, not demonstrated production guard defect",
+  "smallest_faithful_fix": {
+    "paths": [
+      "apps/api/src/evaluation-flywheel/test-fixture.ts",
+      "apps/api/src/evaluation-flywheel/test-fixture.test.ts"
+    ],
+    "proposal": "Add multikey dotted-path lookup for filtering that traverses arrays of embedded documents; equality succeeds if any existing terminal value matches scalar expected. Retain independent path-existence semantics for $exists, conjunctive operators, fail-closed unknown operators and universal exclusions for $nin/$ne. Keep scalar sort lookup untouched where possible. Preserve prior replaceOne upsertedCount/$nin regression behavior.",
+    "regression": "Extend existing helper coverage with one stored claim evidence array containing current and unrelated session references; exact tenant+evidence.sessionId lookup returns intended claim, mismatched session/foreign tenant refuse; preserve existing two helpers. Do not author broad toy corpus. Original composition is acceptance replay.",
+    "no_production_changes": true,
+    "additional_central_lease_needed": false,
+    "existing_lease_only": [
+      "test-fixture.ts",
+      "test-fixture.test.ts",
+      "composition.test.ts"
+    ],
+    "freeze": "Do not edit until central broker freeze ends and parent releases next maker step"
+  },
+  "preserved_pins": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "7fb3b763a65b6c4ee2ba82b9ed822d116d111ebca352e3d92b5a3a7fcf06b279",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "82059ce5f050b28ea7ca09b10354d9ea4425701ef75c418b1d0649fa5de1d47e",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784"
+  },
+  "tests_executed_here": 0,
+  "private_prompts_or_data_recorded": false,
+  "maker_actual_total_tokens": null,
+  "maker_actual_active_seconds": null,
+  "phase": {
+    "monotonic_start_ns": 4457463409700,
+    "monotonic_end_ns": 4457464456500,
+    "note": "Write phase only, read/reasoning total uninstrumented"
+  }
+}

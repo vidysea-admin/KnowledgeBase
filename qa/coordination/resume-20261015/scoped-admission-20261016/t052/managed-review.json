@@ -1,0 +1,122 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "source-delivery-registration-retry",
+    "cycle": 2,
+    "base_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "candidate_sha": "d424b6d86c4f11b09dd9bed65f770f3f6231a123ea286302150dcc1be927eba2",
+    "files": [
+      {
+        "sha256": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_register.py"
+      },
+      {
+        "sha256": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\test_sb_join_registration_redirect.py"
+      },
+      {
+        "sha256": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\joiners\\browser-joiner.ts"
+      },
+      {
+        "sha256": "267cd00f7855679c0a9ff07265f1ad6db8a35c5482d66eb39d63968258a7321a",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\joiners\\joiners.test.ts"
+      },
+      {
+        "sha256": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\registration-workflow.ts"
+      },
+      {
+        "sha256": "f859ab60fd01ea8900431f7eb8f4747edf05b005f9d3d232bd20f0f1da108cff",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\registration-workflow.test.ts"
+      },
+      {
+        "sha256": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+      },
+      {
+        "sha256": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts"
+      },
+      {
+        "sha256": "06dfe7814403a8232e6df4f4be0651580fdcaa86ea4ab54b34846acc130c7865",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\state\\schedule-state.test.ts"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [
+      {
+        "id": "historical-usage-unreconciled",
+        "token_metric": "actual_total",
+        "active_s": null,
+        "tokens": null,
+        "cost": null
+      }
+    ],
+    "next_phase": {
+      "token_metric": "actual_total",
+      "kind": "review",
+      "active_s": 150,
+      "tokens": 4800,
+      "cost": null
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "source-delivery-registration-retry/2/d424b6d86c4f11b09dd9bed65f770f3f6231a123ea286302150dcc1be927eba2",
+    "completion_reserve_tokens": 1200,
+    "bootstrap_scope": "Proposed default180s6000 cumulative incl30s1200completion; no spend/launch authorized while historical charge unknown",
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 6000,
+      "cost": null
+    },
+    "escalation": null
+  },
+  "worker": {
+    "provider": "codex",
+    "executable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+    "runtime_identity": {
+      "route": "manual fresh root dispatch; no launcher startup/control assurance claimed"
+    },
+    "timeout_s": 150,
+    "max_turns": 12,
+    "phase_id": "source-delivery-registration-retry-review-after-reconciliation",
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\scoped-admission-20261016\\t052\\prompt.txt",
+      "sha256": "7e3336667f4d1aae20c7153d693211f3365694689647c1cc7f9f501945fa4c43"
+    }
+  },
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [
+      {
+        "role": "environment",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\scoped-admission-20261016\\t052\\authentication.json",
+        "sha256": "92ae4ce4a254b1c6724f76f0a6400992d38b31a19218b50513e673712d8d277e"
+      },
+      {
+        "role": "historical-handoff",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t052\\independent-admission.json",
+        "sha256": "7b0ceb70aa76bbe3a080603f821bcdd118fc8811e407e7bed35c4118cf59e57c"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "real confirmation consumer requires fresh exact lineage, authenticated evidence and literal direct join",
+      "reason": "Upfront independent tenant/authority boundary; old maker evidence does not replace independent behavior probe",
+      "boundary": "security/refusal"
+    }
+  ],
+  "previous_receipt": null
+}

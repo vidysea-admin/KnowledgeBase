@@ -1,0 +1,20 @@
+{
+  "purpose": "Workflow preparation only; no independent review, verdict, candidate mutation or dispatch",
+  "skill": "C:/Users/product/.agents/skills/checker/SKILL.md",
+  "helper": "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+  "metrics_schema": "C:/Users/product/.agents/skills/checker/references/metrics.json",
+  "default_allocation": {"bootstrap_active_s": 180, "bootstrap_tokens": 6000, "review_active_s": 150, "review_tokens": 5200, "completion_active_s": 30, "completion_tokens": 800},
+  "maker_actual_usage": {"active_s": null, "tokens": null, "cost": null},
+  "ratio_verified": false,
+  "entries": [
+    {"unit": "u22-extraction-review-resume", "requested_cycle": 0, "packet_cycle": 0, "packet": "qa/packets/u22-extraction-review-resume.md", "status": "MISSING_EXACT_CANDIDATE_ID", "detail": "Packet explicitly says Candidate SHA none and supplies file-pin identities. No consolidated exact candidate ID declared; do not invent one. Broker receipts pending."},
+    {"unit": "t022-offline-transfer", "requested_cycle": 0, "packet_cycle": 0, "packet": "qa/packets/t022-offline-transfer.md", "status": "MISSING_EXACT_CANDIDATE_ID", "detail": "Referenced request has generic candidate uncommitted-pinned-working-tree, not unique candidate ID; exact file pins exist. Broker receipts pending."},
+    {"unit": "t022-review-dirty-guard", "requested_cycle": 0, "packet_cycle": 1, "packet": "qa/packets/t022-review-dirty-guard.md", "status": "CYCLE_MISMATCH_AND_MISSING_EXACT_CANDIDATE_ID", "detail": "Current packet is cycle1; preserve any cycle0 review history. It supplies file SHA256 pins without consolidated candidate ID. No cycle0 identity or review ledger is inferred."},
+    {"unit": "t022-executed-provenance", "requested_cycle": 0, "packet_cycle": 0, "packet": "qa/packets/t022-executed-provenance.md", "status": "MISSING_EXACT_CANDIDATE_ID", "detail": "Working-tree source hashes are declared, but no consolidated candidate ID. Broker receipts pending."},
+    {"unit": "extraction-stage-receipts", "requested_cycle": 0, "packet_cycle": 0, "packet": "qa/packets/extraction-stage-receipts.md", "status": "MISSING_EXACT_CANDIDATE_ID", "detail": "Packet says HEAD alone does not identify untracked candidate; source pin set exists without consolidated ID. Required sample gate expects honest exit2; green test receipt must not rewrite this into exit0 acceptance."},
+    {"unit": "u25-decision-acquisition", "requested_cycle": 0, "packet_cycle": 0, "packet": "qa/packets/u25-decision-acquisition.md", "status": "ASSESSMENT_INPUT_PREPARED_DISPATCH_BLOCKED", "candidate": "6cf6080a9f32b5b155f257496fa4d9cfd3353c7f31b5797bdd03684c745130b2", "input": "u25-decision-acquisition-cycle0-assess-input.json", "detail": "Declared candidate is ordered owned-path/hash digest, not Git commit; reconcile exact current bytes and complete attributable broker receipts before dispatch."},
+    {"unit": "u23-topic-run-evidence", "requested_cycle": 0, "packet_cycle": 0, "packet": "qa/packets/u23-topic-run-evidence.md", "status": "MISSING_EXACT_CANDIDATE_ID", "detail": "Source pin table exists without consolidated candidate ID. Maker records source-only elapsed141.174s but total comparable maker active usage/tokens/cost remain unknown; do not substitute partial denominator."}
+  ],
+  "history_policy": "New files only; no prior assessment/result/ledger overwritten. Additional earlier reviewer/retry/child overhead must be merged as null actuals and positive committed debits where known before any admission. Do not infer missing historical usage as zero.",
+  "universal_gate": "No checker dispatch before green attributable required broker receipts, exact candidate/cycle/contract/environment identity reconciliation and canonical assess admission. Missing evidence remains HOLD; no PASS or parent closure. Actual92 evaluator frozen; genuine human calibration0/30."
+}

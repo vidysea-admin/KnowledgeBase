@@ -9,6 +9,7 @@
  */
 export type TreeIndexRootDocument = TreeIndexNode & {
   tenantId: string;
+  indexRevision?: number;
   [k: string]: unknown;
 };
 
@@ -18,12 +19,59 @@ export type TreeIndexRootDocument = TreeIndexNode & {
 export interface TreeIndexNode {
   node_id: string;
   title: string;
-  level: "tenant" | "year" | "month" | "session" | "topic" | "org";
+  level:
+    "tenant" | "year" | "month" | "session" | "topic" | "org" | "native-source" | "native-passage";
   summary: string;
   evidence?: {
     sessionRef?: string;
+    sourceId?: string;
+    revisionHash?: string;
+    documentId?: string;
+    documentSourceId?: string;
+    headRevision?: number;
+    sourceLocator?:
+      | {
+          kind: "document-page";
+          documentId: string;
+          sourceId: string;
+          documentSourceId: string;
+          headRevision: number;
+          revisionHash: string;
+          pageNumber: number;
+          /**
+           * UTF-16 code-unit offsets into current canonical page text; sha256 hashes UTF-8 bytes of that exact slice. Runtime validates end > start.
+           */
+          passage: {
+            start: number;
+            end: number;
+            sha256: string;
+          };
+        }
+      | {
+          kind: "message";
+          sourceId: string;
+          revisionHash: string;
+          threadId: string;
+          messageId: string;
+          /**
+           * UTF-16 code-unit offsets into current canonical message text; sha256 hashes UTF-8 bytes of that exact slice. Runtime validates end > start.
+           */
+          passage: {
+            start: number;
+            end: number;
+            sha256: string;
+          };
+        };
     [k: string]: unknown;
   };
   children: TreeIndexNode[];
+  indexArtifact?: TreeSessionIndexArtifact;
   [k: string]: unknown;
+}
+export interface TreeSessionIndexArtifact {
+  version: 1;
+  generation: string;
+  sessionId: string;
+  sourceId: string;
+  turnDigest: string;
 }

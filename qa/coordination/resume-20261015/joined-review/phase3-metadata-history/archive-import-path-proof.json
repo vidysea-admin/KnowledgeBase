@@ -1,0 +1,50 @@
+{
+  "method": "Static relative-import edges matching broker closure grammar, excluding top-level import type; mixed/type-elision and conditional execution require separate judgment",
+  "seed": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+  "target": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+  "reachable": true,
+  "chain": [
+    {
+      "source": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+      "source_sha256": "abd04693720fff428029d4bf38269e55fcf89696020e354691ab517870e44fcb",
+      "line": 7,
+      "import_text": "import {runScheduleTickOnce, type ScheduleTickDeps} from \"../schedule-tick.js\"",
+      "target": "packages/meeting-bot/src/calendar/schedule-tick.ts"
+    },
+    {
+      "source": "packages/meeting-bot/src/calendar/schedule-tick.ts",
+      "source_sha256": "6d6293f67d14706a003d1b9560e1df08841d0de95f7dd541ae2f13e6cba39ed9",
+      "line": 15,
+      "import_text": "import { scheduledDispatchIdentity } from \"./scheduled-dispatch.js\"",
+      "target": "packages/meeting-bot/src/calendar/scheduled-dispatch.ts"
+    },
+    {
+      "source": "packages/meeting-bot/src/calendar/scheduled-dispatch.ts",
+      "source_sha256": "998bc21f690ad40b7874f2fe916b795b6b328e138ca817d806f20870787e2a19",
+      "line": 92,
+      "import_text": "import(\"../capture/record-commands.js\"",
+      "target": "packages/meeting-bot/src/capture/record-commands.ts"
+    },
+    {
+      "source": "packages/meeting-bot/src/capture/record-commands.ts",
+      "source_sha256": "fe9059890b5a8c2a1b83dd9ecd756060f5f4ab0aacb88e75d482a3b6fae86490",
+      "line": 19,
+      "import_text": "import { createNativeCaptureRuntime, nativeCaptureSettings } from \"./native/native-capture-runtime.js\"",
+      "target": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts"
+    },
+    {
+      "source": "packages/meeting-bot/src/capture/native/native-capture-runtime.ts",
+      "source_sha256": "af219341f09d497c4e646be82420e91db338fb4c8e510c3f63890e4168d0035e",
+      "line": 8,
+      "import_text": "import { readNativeSpoolLedger } from \"./native-spool.js\"",
+      "target": "packages/meeting-bot/src/capture/native/native-spool.ts"
+    },
+    {
+      "source": "packages/meeting-bot/src/capture/native/native-spool.ts",
+      "source_sha256": "4bf3ca520234980965f2507f591254b03bffabfff62971c5f45d49c3b2320b07",
+      "line": 8,
+      "import_text": "import { proveArchivedNativeSpool } from './native-archive-spool.js'",
+      "target": "packages/meeting-bot/src/capture/native/native-archive-spool.ts"
+    }
+  ]
+}

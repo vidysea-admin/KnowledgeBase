@@ -1,0 +1,11 @@
+✔ production refuses network/outside roots and enabled native writes without platform authority before I/O (2.621ms)
+✔ real private empty store drains boundedly without DB/providers/host qualification (7396.6694ms)
+✔ synthetic alignment unit joins actual index generation and concrete transaction factory to existing consumer (81.2198ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11266.5137

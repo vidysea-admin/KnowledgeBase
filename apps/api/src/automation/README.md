@@ -1,0 +1,42 @@
+# Application automation runtime
+
+The registered `application-readiness` routine checks a protected application reference against a bounded document checklist. It does not submit forms, send messages, contact external destinations or call a model.
+
+Production composition must supply `createMongoAutomationStore` with the `packages/db` tenant-scoped `automation_runs` accessor and `AutomationRuntime`. Apply the approved collection migration before enabling writes. Definition and run history are stored atomically with each versioned transition. The API returns sanitized views without the protected reference, identity digests, owner token or actor key IDs.
+
+Mount `createAutomationRouter` after `requireAuth`. `withPermission` must call T-060's current server-side role/account authorization while holding its journal lock through the callback. Keys require `hosting` plus `automation:read`, `automation:write` or `automation:operate` as applicable. Missing verified `keyId` or runtime configuration fails closed. Configuration and execution require an authorized operator; users cannot supply a handler, credential, destination or actor.
+
+1. `PUT /automation/definitions/application-readiness`: `{enabled,maxAttempts,timeoutMs,expectedVersion}`. New definition expects version 0. Attempts are 1–3; timeout is 100–30000 ms.
+2. `POST /automation/runs`: `{idempotencyKey,kind:"application-readiness",input:{applicationRef,requiredDocuments,availableDocuments}}`. Documents are `identity`, `statement`, `transcript`. Same key/input replays the original run; conflicting reuse is 409.
+3. `POST /automation/runs/:id/execute`: `{expectedVersion}`. An atomic version claim gives one worker ownership and a bounded lease. Timeouts and malformed/error results park operator attention; they cannot fabricate success.
+4. `POST /automation/monitor`: `{}`. Scans up to 100 running operations in lease order. Expired read-only work queues for retry within its attempt cap; non-retry-safe adapters park reconciliation. The response reports truncation. Repeated scans do not duplicate incidents.
+5. `POST /automation/runs/:id/intervene`: `{expectedVersion,action:"retry"|"cancel"|"reconcile"}`. Retry requires retry-safe waiting work below its cap. Reconcile is only for a recorded ambiguous result and requires operator authority. No lease-fenced running operation can be blindly cancelled or retried.
+6. `GET /automation/definitions`, `/automation/runs`, `/automation/runs/:id` supply the mounted operations UI. All paths reject caller identity fields and query overrides.
+
+The readiness handler receives a stable operation ID, authenticated tenant, abort signal and fenced heartbeat. Its computed readiness result cannot represent an external application submission. Side-effecting application execution uses the separate `ApplicationFormRuntime` below; merely changing the readiness handler's flag cannot establish a submission or external duplicate guarantee.
+
+There is no OS scheduling or unattended activation in this unit. Invoke the API execution/monitor paths explicitly. Installing a supervisor, activating a live target, external form submission and production writes remain separate authorized runtime gates. A successful injected fixture does not establish Mongo restart persistence, real external submission or full T-061 acceptance.
+
+Focused fixture command (root CPU lease required):
+
+```text
+node --import tsx --test --test-timeout=20000 packages/core/src/domain/automation-monitor.test.ts apps/api/src/automation/runtime.test.ts apps/api/src/automation/router.test.ts
+```
+
+Fixtures recreate the store/runtime over a shared isolated backing map; they do not stand in for actual Mongo proof. Integration must separately execute the same intake → claim → result → monitor/status sequence against an approved scratch database, reconstructing the real accessor/runtime and testing another tenant before acceptance.
+
+## Approved application execution
+
+`ApplicationFormRuntime` uses a separate `application_operations` collection. Trusted composition registers `ApplicationTarget` entries with a fixed target/version, required/allowed field names, exact tenant-owned source verifier and submit/receipt-verification adapter. Caller data never chooses an endpoint, credential, handler or duplicate guarantee. `createConfiguredFormAdapter` implements a bounded HTTPS JSON receipt protocol with a configured origin allowlist, public DNS pinning, TLS verification, no redirects and an operation-ID idempotency header. Its target must actually validate that guarantee before live use; an injected fake response proves only fixture behavior.
+
+The fixed POST receipt body must be exactly `{operationId,tenantId,receiptId,status:"accepted"}` and match the authenticated operation and tenant. Separate reconciliation verifies GET `<endpoint>/operations/<operationId>`, carrying the encoded tenant in `x-lkb-tenant-id`; its response must additionally match the operator-supplied receipt. Redirects, a different tenant/operation and invented receipts are refused.
+
+Mount `createApplicationFormsRouter` using the same current T-060 role/account lock and additional automation scopes. Routes are `/automation/forms/targets`, `/definitions`, `/operations`, `/operations/:id`, `/operations/:id/review`, `/operations/:id/fields`, `/operations/:id/approve`, `/operations/:id/execute`, `/operations/:id/intervene` and `/monitor`. Configure an enabled target before intake. Each field has a protected value and `{documentId,page,start,end,revision}` source; its exact page revision/span/value must verify before approval and again before execution. Required fields cannot be omitted. Draft revision invalidates approval. Approval binds the exact payload and target fingerprints and verified operator. Status omits field values, raw receipts, actors and source metadata; privileged review exposes only source provenance/fingerprints.
+
+The executor persists an exclusive token/lease and `sideEffectUncertain:true` before calling the registered target, then persists its accepted receipt. An ambiguous response, timeout or crash after side effect before result persistence retains uncertainty. Only adapters with a verified operation-ID guarantee can retry the same stable operation; other adapters remain quarantined. Operator reconciliation requires a target-verified receipt for this exact operation and tenant. A computed readiness result or operator-invented receipt never becomes successful submission. Uncertain operations cannot be cancelled as though the external effect had been undone. Even retry exhaustion retains the explicit uncertain-destination flag.
+
+No application destination or source authority is fabricated. Missing configured targets appear unavailable/empty rather than live. Live submission, target credential provisioning, form PII handling and unattended activation remain explicit gates. The operator consumer is `ApplicationFormsPage`; central production composition and browser proof are still required before whole-task acceptance.
+
+Production factory: `buildAutomationIntegrations` in `composition/integrations/automation.ts`. Readiness is opt-in through `LKB_AUTOMATION_ENABLED=1`; application execution additionally requires `LKB_APPLICATION_FORMS_ENABLED=1`, valid T-060 hosting authority, `LKB_APPLICATION_ALLOWED_ORIGINS` (JSON HTTPS origin array) and `LKB_APPLICATION_TARGETS` (JSON target array). Each trusted target has `id`, `version`, `endpoint`, `tokenEnv`, `requiredFields`, `allowedFields`, `duplicateGuarantee` and `approvedSources`. `tokenEnv` names a server-only `LKB_APPLICATION_*_TOKEN` variable; no credential is returned or stored in an operation. Source authority entries have `tenantId`, `documentId`, exact document `revision`, `page` and SHA-256 `pageDigest` of its UTF-8 text. The factory checks the canonical tenant-scoped document row, exact version, page digest and quoted UTF-16 span before approval/execution. No data authority or remote idempotency guarantee is automatically inferred from a flag.
+
+The target binding also hashes its configured destination, credential generation and approved source authority. A configuration/credential/source change invalidates an old approval even when a target ID is reused. Wrong or ambiguous configuration leaves forms unavailable. Construction performs no database mutation or network request. Supply actual approved source/target values before activation; this runbook supplies none.

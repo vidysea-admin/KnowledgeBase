@@ -21,5 +21,5 @@ export type { CalibrationPair, CalibrationDetail, CalibrationResult } from "./ev
 export { heuristicScorer } from "./eval/heuristic-scorer.js";
 
 // Runtime-only bounded source hydration and production-caller boundaries.
-export { BoundedAskError, SOURCE_LIMITS, payloadBytes, sourceCatalog, sourceQuotes, validateHydration, completionBudget } from "./source-context.js";
-export type { SourceQuote, SourceHydration, ExcludedSourceTurn, HydrateSourcesFn, SourceContextDeps } from "./source-context.js";
+export { BoundedAskError, SOURCE_LIMITS, payloadBytes, sourceCatalog, sourceQuotes, validateHydration, completionBudget, isNativeSourceQuote, validNativeSourceLocator } from "./source-context.js";
+export type { SourceQuote, NativeSourceQuote, SourceEvidenceQuote, SourceHydration, ExcludedSourceTurn, HydrateSourcesFn, SourceContextDeps } from "./source-context.js";

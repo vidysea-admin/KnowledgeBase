@@ -1,0 +1,53 @@
+{
+  "validation_contract": "managed-review/1",
+  "unit": "native-measurement-registry",
+  "fix_cycle": 0,
+  "status": "FROZEN_AWAITING_BROKER",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "candidate_identity": "owned raw SHA256 pins.json; shared worktree uncommitted",
+  "owned_paths": [
+    "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "packages/meeting-bot/src/capture/tiles/registry.ts",
+    "packages/meeting-bot/src/capture/tiles/registry.test.ts"
+  ],
+  "changed_paths": [
+    "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "packages/meeting-bot/src/capture/tiles/registry.ts"
+  ],
+  "unchanged_owned_path": "packages/meeting-bot/src/capture/tiles/registry.test.ts",
+  "applicable_contract": "qa/contracts/t042-trusted-registry-integration.md R3,R4,R7,R11,R14",
+  "behavior": "Two distinct opaque capabilities: preindex independently qualified canonical WAV/host/sample map for private masking; postcommit current owner/index generation plus verified provider map for registry. Unknown bounds, unsupported platform, forged capabilities, clock steps, suspension, extrapolation and stale commit unavailable. Native registry rejects arbitrary measurement JSON.",
+  "trust_boundary": "verifyPlatformQualification is trusted server native-adapter closure configured outside HTTP/sidecar; actual platform independently measured bounds and qualification corpus required. DI synthetic test closure does not prove actual native qualification. Provider callback must call opaque requireNativeProviderAudio. No key provisioning.",
+  "new_api": [
+    "createNativeCaptureClockQualifier",
+    "requireNativeCanonicalMeasurement",
+    "createNativeMeasurementAuthority",
+    "nativeMeasurementReceiptBytes",
+    "isIssuedNativeMeasurement"
+  ],
+  "immediate_consumers": [
+    "native private WAV mask engine",
+    "native capture runtime onClosed",
+    "root post-index composition registry"
+  ],
+  "required_checks": [
+    "node --import tsx --test --test-concurrency=1 --test-timeout=30000 src/capture/tiles/native-measurement.test.ts src/capture/tiles/registry.test.ts src/capture/tiles/sampler-clock.test.ts",
+    "Root final combined invocation/finalizer/private-provider/commit/registry integration after actual shared joins freeze",
+    "Actual supported platform native measurement and human T042 acceptance remain open"
+  ],
+  "evidence": "pins.json; no CPU tests executed or attributed",
+  "fingerprints": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-measurement\\pins.json",
+  "maker_usage": {
+    "active_s": null,
+    "tokens": null,
+    "token_metric": "actual_total",
+    "cost": null
+  },
+  "review_state": "NOT_DISPATCHED; independent checker sole PASS authority",
+  "limits": "No browser/provider/DB/host activation/dependencies/schema/contracts/global/enforcement changes. Native successful full chain requires real issuer/finalizer/provider fixtures under broker; pure numeric tests are explicitly synthetic, not runtime acceptance.",
+  "backups": "registry.ts.before.bytes and registry.test.ts.before.bytes are raw private QA before-images; no public QA selection authorized"
+}

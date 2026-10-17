@@ -1,0 +1,10 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/counsellor/Avatar.context-loss.test.tsx (1 test) 273ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  10:05:50
+   Duration  50.64s (transform 242ms, setup 10.81s, collect 8.64s, tests 273ms, environment 29.21s, prepare 1.13s)
+

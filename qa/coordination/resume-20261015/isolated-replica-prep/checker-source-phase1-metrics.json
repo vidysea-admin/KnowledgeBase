@@ -1,0 +1,45 @@
+{
+  "escalation": {
+    "authority": "Root explicit dispatch 2026-10-16: once finite manual SOURCE review",
+    "reason": "Mandatory skill startup and six security-sensitive drafts cannot fit 4000 review allocation. Prior bootstrap 6000 retained; manual workflow only, not runtime execution.",
+    "limits": {
+      "cost": null,
+      "tokens": 24000,
+      "active_s": 180,
+      "token_metric": "actual_total"
+    }
+  },
+  "bootstrap_scope": "Exact offline launcher/config/ignore safety review; no activation or vendor execution",
+  "completion_reserve": true,
+  "next_phase": {
+    "kind": "review",
+    "token_metric": "actual_total",
+    "active_s": 120,
+    "cost": null,
+    "tokens": 16000
+  },
+  "completion_reserve_tokens": 4000,
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "cost": null,
+    "tokens": null
+  },
+  "completion_reserve_id": "isolated-replica-prep/0/1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "reviewers": [
+    {
+      "id": "not-started",
+      "token_metric": "actual_total",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "cost": null,
+    "tokens": 6000
+  },
+  "token_metric": "actual_total"
+}

@@ -28,6 +28,8 @@ export type SendNowPlanValue =
   | { ok: true; meetingUrl: string; meetingKey: string; platform: string }
   | { ok: false; kind: "invalid" | "duplicate" | "unreadable" | "forbidden"; reason: string; message: string };
 export interface SendNowDeps {
+  /** Only an adapter with an atomic persistent dispatch ownership guard may replace the legacy recent-launch memory. */
+  durableDispatch?: true;
   /** Validates the link (the planner's safety rules), the `until` value and the tenant, and checks the live jobs. Never launches. */
   plan(tenantId: string, request: SendNowRequestValue): Promise<SendNowPlanValue> | SendNowPlanValue;
   /** Starts the bot detached and resolves once it is started. MUST throw when it did not start. Called only after an ok plan. */
@@ -37,8 +39,26 @@ export interface SendNowDeps {
    * mounted at all (404, as before this slice). It reports recorder PROCESS state only; "joined the meeting" is never claimed.
    */
   status?(tenantId: string, jobId: string): Promise<SendNowStatusValue> | SendNowStatusValue;
+  /** Durable host services. Absent keeps their routes absent; no in-memory substitute. */
+  manualJobs?: {
+    list(tenantId: string): Promise<ManualJobValue[]> | ManualJobValue[];
+    detail(tenantId: string, jobId: string): Promise<ManualJobValue | null> | ManualJobValue | null;
+    cancel(tenantId: string, jobId: string): Promise<ManualJobValue | null> | ManualJobValue | null;
+  };
   /** Test seam. */
   now?: () => number;
+}
+export interface ManualJobValue {
+  jobId: string; platform: string;
+  state: "queued" | "launching" | "running" | "cancel-requested" | "cancel-acknowledged" | "cancelled" | "completed" | "failed" | "unknown";
+  requestedAt: string; updatedAt: string; joined: "unknown";
+}
+const MANUAL_JOB_STATES = ["queued", "launching", "running", "cancel-requested", "cancel-acknowledged", "cancelled", "completed", "failed", "unknown"];
+/** Whitelist response metadata even if an injected host returns an object with private fields. */
+function publicManualJob(job: ManualJobValue): ManualJobValue {
+  if (!job || !JOB_ID_PATTERN.test(job.jobId) || !/^[a-z-]{1,32}$/.test(job.platform) || !MANUAL_JOB_STATES.includes(job.state) || job.joined !== "unknown" ||
+    typeof job.requestedAt !== "string" || typeof job.updatedAt !== "string" || !Number.isFinite(Date.parse(job.requestedAt)) || !Number.isFinite(Date.parse(job.updatedAt))) throw new Error("manual job response unavailable");
+  return { jobId: job.jobId, platform: job.platform, state: job.state, requestedAt: job.requestedAt, updatedAt: job.updatedAt, joined: "unknown" };
 }
 export type SendNowJobState = "launching" | "running" | "not-running";
 export type SendNowStatusValue =
@@ -79,18 +99,21 @@ export function createSendNowRouter(deps: SendNowDeps): Router {
       slot = `${tenantId}\u0000${plan.meetingKey}`;
       const t = now();
       for (const [k, at] of recent) if (t - at >= RECENT_LAUNCH_MS) recent.delete(k);
-      if (inFlight.has(slot) || recent.has(slot)) {
+      if (inFlight.has(slot) || (!deps.durableDispatch && recent.has(slot))) {
         slot = undefined; // not ours to release
         res.status(409).json({ error: "send_now_duplicate", reason: "duplicate-live-job", message: "a bot was already sent to this meeting by this API; not sending a second one" }); return;
       }
       inFlight.add(slot);
       let jobId: string;
       try { ({ jobId } = await deps.launch(tenantId, plan, until)); }
-      catch {
+      catch (error) {
+        if ((error as { code?: string })?.code === "manual_duplicate") {
+          res.status(409).json({ error: "send_now_duplicate", reason: "duplicate-live-job", message: "this meeting already has an owned manual job" }); return;
+        }
         // Honest failure: the launcher did not start. Nothing is remembered, so a retry is allowed. The cause stays in the host log.
         res.status(502).json({ error: "send_now_launch_failed", message: "the bot launcher failed to start; no bot was sent" }); return;
       }
-      recent.set(slot, now());
+      if (!deps.durableDispatch) recent.set(slot, now());
       res.status(202).json({ jobId, status: "launching", meetingKey: plan.meetingKey, platform: plan.platform });
     } catch {
       res.status(503).json({ error: "send_now_unavailable", message: "send-now is unavailable; no bot was sent" });
@@ -98,6 +121,40 @@ export function createSendNowRouter(deps: SendNowDeps): Router {
       if (slot) inFlight.delete(slot);
     }
   });
+  if (deps.manualJobs) {
+    const jobs = deps.manualJobs;
+    const rejectQuery = (req: Request, res: Response) => {
+      if (!Object.keys(req.query).length) return false;
+      res.status(400).json({ error: "bad_request" }); return true;
+    };
+    const failure = (res: Response, error: unknown) => (error as { code?: string })?.code === "tenant_not_served"
+      ? res.status(403).json({ error: "send_now_forbidden", message: "this host does not capture for your tenant" })
+      : res.status(503).json({ error: "send_now_unavailable", message: "manual jobs are unavailable" });
+    router.get("/calendar/send-now/jobs", requireScope(SEND_NOW_SCOPE), async (req, res) => {
+      if (rejectQuery(req, res)) return;
+      try { const values = await jobs.list(req.auth!.tenantId); if (!Array.isArray(values) || values.length > 100) throw new Error("manual jobs unavailable"); res.json({ jobs: values.map(publicManualJob) }); } catch (error) { failure(res, error); }
+    });
+    router.get("/calendar/send-now/jobs/:jobId", requireScope(SEND_NOW_SCOPE), async (req, res) => {
+      const jobId = req.params.jobId;
+      if (rejectQuery(req, res)) return;
+      if (typeof jobId !== "string" || !JOB_ID_PATTERN.test(jobId)) { res.status(400).json({ error: "bad_request" }); return; }
+      try {
+        const job = await jobs.detail(req.auth!.tenantId, jobId);
+        if (!job) { res.status(404).json({ error: "manual_job_not_found" }); return; }
+        res.json(publicManualJob(job));
+      } catch (error) { failure(res, error); }
+    });
+    router.post("/calendar/send-now/jobs/:jobId/cancel", requireScope(SEND_NOW_SCOPE), async (req, res) => {
+      const jobId = req.params.jobId;
+      if (rejectQuery(req, res)) return;
+      if (typeof jobId !== "string" || !JOB_ID_PATTERN.test(jobId) || !isObj(req.body) || Object.keys(req.body).length) { res.status(400).json({ error: "bad_request" }); return; }
+      try {
+        const job = await jobs.cancel(req.auth!.tenantId, jobId);
+        if (!job) { res.status(404).json({ error: "manual_job_not_found" }); return; }
+        res.status(202).json(publicManualJob(job)); // Intent is durable; only the owner can acknowledge and finish capture.
+      } catch (error) { failure(res, error); }
+    });
+  }
   if (deps.status) {
     const status = deps.status.bind(deps);
     router.get("/calendar/send-now/:jobId", requireScope(SEND_NOW_SCOPE), async (req: Request, res: Response) => {

@@ -1,0 +1,7 @@
+# Review preparation checkpoint — not dispatched
+
+Formal managed-review/1 packet.json now binds eight cohesive files; candidate raw-content digest6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec is explicitly NOT a Git commit. Seven-file pretyping packet/metrics/narrative/allocation snapshots remain preserved. No reviewer has launched and no reviewer usage/debit has been incurred. Root's same one-use180s/24000 allocation (30s/4000reserve) carries forward without reset; maker actuals remain null.
+
+Helper validate-prebind.json exit2 correctly refused incomplete readiness. Initial assess-prebind.json exposed the required not-started reviewer sentinel; corrected assessment assess-prebind-repair1.json and current assess-typing-prebind.json each exit0 BOOTSTRAP_REVIEW, protected reserve, no exceeded allocation, ratio UNVERIFIED. Sentinel zero means no execution, not invented measured reviewer usage.
+
+Pending exact bindings before dispatch: repaired explicit compiler success, configured graph/scoped LOC, actual launcher16 receipt, unchanged upstream7/5 provenance eligibility, final source/environment seal, and root WIP Git commit whose eight source pins match. Set readiness complete only after those exist; preserve failed compiler epoch. Bind final Git identity/reserve ID without erasing previous snapshots/allocation authority, then run helper validate and assess on that exact packet before root dispatch. This checkpoint grants no test or review launch and claims no PASS.

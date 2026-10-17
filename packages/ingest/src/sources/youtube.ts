@@ -165,6 +165,9 @@ export interface YoutubeAdapterDeps {
   /** Absolute ffmpeg binary/dir passed as `--ffmpeg-location`; see `resolveFfmpegLocation`. */
   ffmpegLocation?: string;
   timeoutMs?: number;
+  /** Production allocates a fresh physical scratch directory per request, preventing simultaneous tenant collisions. */
+  allocateWorkDir?: () => Promise<string>;
+  durationProbe?: (path: string) => Promise<number>;
 }
 
 export interface YoutubeInput {
@@ -208,7 +211,9 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
       }
       const { videoId, tenantId } = parsed;
       const canonicalUrl = canonicalYoutubeUrl(videoId);
-      const args = buildYtDlpArgs(videoId, deps.workDir, { ffmpegLocation: deps.ffmpegLocation });
+      const workDir = deps.allocateWorkDir ? await deps.allocateWorkDir() : deps.workDir;
+      if (workDir !== deps.workDir && !isInsideDir(deps.workDir, workDir)) throw new YoutubeSourceError("path-escape", "scratch path is outside workDir");
+      const args = buildYtDlpArgs(videoId, workDir, { ffmpegLocation: deps.ffmpegLocation });
       const command = deps.ytDlpCommand ?? "yt-dlp";
       if (!validBinaryPath(command)) throw new YoutubeSourceError("bad-config", "ytDlpCommand is not a usable path");
 
@@ -216,7 +221,7 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
       let result: YoutubeExecResult;
       try {
         result = await Promise.race([
-          deps.exec(command, args, { cwd: deps.workDir, timeoutMs }),
+          deps.exec(command, args, { cwd: workDir, timeoutMs }),
           new Promise<never>((_, rej) => {
             timer = setTimeout(
               () => rej(new YoutubeSourceError("timeout", `no result within ${timeoutMs}ms`)),
@@ -244,7 +249,7 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
         .filter(Boolean);
       const audioPath = lines[lines.length - 1];
       if (!audioPath) throw new YoutubeSourceError("no-output", "yt-dlp reported no audio file path");
-      if (!isInsideDir(deps.workDir, audioPath)) {
+      if (!isInsideDir(workDir, audioPath)) {
         throw new YoutubeSourceError("path-escape", "reported audio path is outside workDir");
       }
 
@@ -291,7 +296,9 @@ export function createYoutubeSource(deps: YoutubeAdapterDeps): Source {
       }
       const bytes = await deps.reader(source.path);
       if (bytes.byteLength === 0) throw new YoutubeSourceError("empty-output", "audio file is empty");
-      return deps.transcribe(bytes, {});
+      const mediaDurationSeconds = deps.durationProbe ? await deps.durationProbe(source.path) : undefined;
+      const opts = mediaDurationSeconds === undefined ? {} : { diarize: true, mediaDurationSeconds };
+      return deps.transcribe(bytes, opts);
     },
   };
 }

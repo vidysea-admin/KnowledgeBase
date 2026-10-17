@@ -1,0 +1,13 @@
+
+> @lkb/web@0.0.0 build C:\Users\product\Desktop\KnowledgeBase\apps\web
+> tsc -b && vite build
+
+vite v6.0.5 building for production...
+transforming...
+✓ 193 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.41 kB │ gzip:   0.28 kB
+dist/assets/index-DB_xtvnB.css    6.39 kB │ gzip:   1.81 kB
+dist/assets/index-v8bLyAJG.js   596.01 kB │ gzip: 173.52 kB
+✓ built in 2.59s

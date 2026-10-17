@@ -1,5 +1,21 @@
 # Webinar → Knowledge Base operational release
 
+## Ubuntu supervisor interface (T-051)
+
+On the target Ubuntu graphical user session, run
+`node scripts/webinar/supervisor/install-ubuntu-supervisor.mjs --display=:0` for a read-only preview.
+The interface consumes the common setup service preview and verifies the exact runner and user-owned
+physical paths. Add `--install` to exclusively create a private user unit, refusing an existing unit,
+enablement links or unknown systemd state; it does not enable or start anything. After separately
+authorized live readiness, use `--activate` (separate from `--install`) to reload user systemd,
+verify the manager's effective fragment, absence of drop-ins and exact executable before enabling
+the unit, then check `is-active`. Activation currently requires simple POSIX path tokens; ambiguous
+manager serialization refuses activation. This requires a non-root user, trusted
+`/usr/bin/systemctl` and a real local X11 session; it does not provision Ubuntu, create a display or
+enable linger. The runner retains its work-database, connected tenant and actual OS-specific live
+proof gates. An active service alone proves no capture/restart quality. Actual Ubuntu installation,
+start/restart, complete webinar-to-cited-Ask proof and seven-day unattended observation remain required.
+
 The target path is tab audio/video capture → transcript/diarization → screen evidence and notes → work-database indexing → cited Ask. This is an implementation checkpoint, not a completed operational release. Full grounded notes/Q&A are pending canonical-schema approval; strict indexing currently refuses incomplete knowledge. Preview commands are safe defaults. Windows OBS remains an explicit fallback. Ubuntu is an acceptance target, not a verified live deployment.
 
 ## Setup

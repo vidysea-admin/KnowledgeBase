@@ -1,0 +1,70 @@
+{
+  "kind": "CURRENT_UI2_COMPACT_RECEIPT_METADATA_NOT_REVIEW_PASS",
+  "receipts": [
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-ui2-output-independent-command.json",
+      "own_exit": 0,
+      "elapsed_ms": 2238.3887999999997,
+      "hashes_unchanged": true,
+      "candidate_sha": "90341c47a5befbbf2c52dc1a698149364c18fba82d24f27ea49a9704932a9324",
+      "declared_pin_count": 17,
+      "exact_test_ids": [
+        "UI creates, cites, saves, reopens, revalidates and exports through authenticated API"
+      ],
+      "source_pin_matches": [
+        {
+          "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/api/knowledge-outputs.ts",
+          "matches": true
+        }
+      ],
+      "count_attribution": "saved exact1PASS"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-ui2-transcript-independent-command.json",
+      "own_exit": 0,
+      "elapsed_ms": 4797.2125,
+      "hashes_unchanged": true,
+      "candidate_sha": "5b3b75a180c805f076db2bd6df22ccfb793e58c7bde40d69ce56f2c5bf8fdcf0",
+      "declared_pin_count": 18,
+      "exact_test_ids": [
+        "editor2 warning boundaries",
+        "history terminal retry+late identity/unmount2"
+      ],
+      "source_pin_matches": [
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+          "matches": true
+        },
+        {
+          "path": "apps/web/src/api/transcriptReview.ts",
+          "matches": true
+        }
+      ],
+      "count_attribution": "editor2+history2 selected4PASS/10filtered"
+    }
+  ],
+  "accounting_actual": 519546,
+  "status": "NEEDS_EXTRA_REVIEW",
+  "remaining_read_protocol_unchanged": true,
+  "no_gate_or_admission": true
+}

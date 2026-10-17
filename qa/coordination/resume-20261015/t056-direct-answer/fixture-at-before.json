@@ -1,0 +1,6 @@
+{
+  "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+  "sha256": "A0513FE77D9F1BCC1D1FE88E485BB2CC8A4FC38BCA187588D1C2FC140B9C2A0D",
+  "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/PolicyAskPage.test.pre-at-fix.tsx",
+  "authority": "Root: broker sealed1623pins unchanged; exact fixture timestamp repair"
+}

@@ -1,0 +1,602 @@
+{
+  "version": 1,
+  "asOfDate": "2026-10-15",
+  "authority": "Root integration_control requested metadata aggregation of existing coordinator reports only.",
+  "assessment": "owner-reported preliminary engineering classification; no independent acceptance",
+  "scope": {
+    "activeParents": 39,
+    "allParentStatus": "in_progress",
+    "fullyAccepted": 0,
+    "excluded": [
+      {
+        "id": "T-015",
+        "reason": "User excluded model training/fine-tuning; not required, never counted done."
+      }
+    ]
+  },
+  "rootReportedAggregate": {
+    "knownImplementationOrIntegrationGaps": 23,
+    "softwarePresentChecksOrIntegrationPending": 13,
+    "externalOnly": 3,
+    "total": 39,
+    "verification": "Root-supplied aggregate, not independently established by this metadata task."
+  },
+  "coverage": {
+    "ownerReportedRows": 39,
+    "awaitingExistingReports": 0,
+    "missingReports": [],
+    "complete": true
+  },
+  "definitions": {
+    "KNOWN_IMPLEMENTATION_GAPS": "Owner reports remaining code or integration gaps; in-flight repairs do not clear the category until verified and integrated.",
+    "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING": "Owner reports software present but required checks/integration remain; not all software independently checked.",
+    "OWNER_REPORTS_EXTERNAL_ONLY_GATES": "Owner-reported external-only remainder; not an independent engineering-complete or parent-done verdict."
+  },
+  "items": [
+    {
+      "id": "T-007",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/source-delivery/t007-review-cases.md"
+      ],
+      "ownerReportedSummary": "Cached topicRefs mixed-WhatsApp quarantine/current trusted reader and mounted review-to-search chain remain.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-008",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/source-delivery/u32-survey.md"
+      ],
+      "ownerReportedSummary": "Native revision/page/message locators absent from public search/quote envelope.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-011",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t011-live-consent-orchestration.md"
+      ],
+      "ownerReportedSummary": "Building; native-control checks and integration remain.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-013",
+      "lane": "release",
+      "reportedBy": "/root/release_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t013-avatar-context-loss.md"
+      ],
+      "ownerReportedSummary": "Exact existing release owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "T-014",
+      "lane": "release",
+      "reportedBy": "/root/release_delivery_coordinator",
+      "classification": "OWNER_REPORTS_EXTERNAL_ONLY_GATES",
+      "evidenceReferences": [
+        "qa/verdicts/goal-t014.md"
+      ],
+      "ownerReportedSummary": "Exact existing release owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "T-022",
+      "lane": "quality",
+      "reportedBy": "/root/quality_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/packets/t022-offline-transfer.md"
+      ],
+      "ownerReportedSummary": "Exact existing quality owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "T-028",
+      "lane": "release",
+      "reportedBy": "/root/release_delivery_coordinator",
+      "classification": "OWNER_REPORTS_EXTERNAL_ONLY_GATES",
+      "evidenceReferences": [
+        "qa/verdicts/goal-t028.md"
+      ],
+      "ownerReportedSummary": "Exact existing release owner report relayed by central; external-only/deferred remainder; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "T-034",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/capture-delivery/coordinator-status.md"
+      ],
+      "ownerReportedSummary": "Failed-stop cleanup repair.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-035",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/capture-delivery/obs-maker.md"
+      ],
+      "ownerReportedSummary": "OBS state-authority patch awaiting broker.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-036",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/packets/source-delivery-public-webinar-config.md"
+      ],
+      "ownerReportedSummary": "Public acquisition route/config callback wiring repair active; canonical persistence/correlation absent.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-037",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/source-delivery/t037-dispatch-design.md"
+      ],
+      "ownerReportedSummary": "Post-schedule opt-out/deny not rechecked; saved-job authoritative identity missing.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-038",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t038-atomic-lifecycle-outbox.md"
+      ],
+      "ownerReportedSummary": "Runner/dispatch/index checks pending.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-039",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t039-manual-send-now-jobs.md"
+      ],
+      "ownerReportedSummary": "Mounted UI/CLI and cancellation checks pending.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-040",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t040-grounded-product-composition.md"
+      ],
+      "ownerReportedSummary": "Provider/judge and durable-consumer acceptance pending.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-041",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/manifests/t041-searchable-time-aligned-ocr.md"
+      ],
+      "ownerReportedSummary": "Failed OCR visibility-span repair.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-042",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/capture-delivery/clock.md"
+      ],
+      "ownerReportedSummary": "Sampler-to-registry witness awaiting broker; decoded authority remains HOLD.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-043",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t043-vectorless-proof-consumer.md"
+      ],
+      "ownerReportedSummary": "Actual persisted webinar-to-cited-Ask proof pending.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-044",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/capture-delivery/watcher-final-source-packet.md"
+      ],
+      "ownerReportedSummary": "Final-source transcript QA repair awaiting broker.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-045",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/verdicts/goal-t045.md"
+      ],
+      "ownerReportedSummary": "Source present; current native hostile-boundary/downstream checks incomplete. Actual five-source/live proof remains external.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-046",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/goal-t046/t046-retention-status-api-ui.md"
+      ],
+      "ownerReportedSummary": "Review and shared CLI integration pending.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-048",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/t048-sealed-private-capture-20261014.md"
+      ],
+      "ownerReportedSummary": "Sealed finalizer and hostile independent check pending.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-050",
+      "lane": "capture",
+      "reportedBy": "/root/capture_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/packets/goal-t050.md"
+      ],
+      "ownerReportedSummary": "Child/marker/recovery/official Ask checks queued.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-051",
+      "lane": "release",
+      "reportedBy": "/root/release_delivery_coordinator",
+      "classification": "OWNER_REPORTS_EXTERNAL_ONLY_GATES",
+      "evidenceReferences": [
+        "qa/contracts/goal-t051.md"
+      ],
+      "ownerReportedSummary": "Exact existing release owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "T-052",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/source-delivery/t052-retry-design.md"
+      ],
+      "ownerReportedSummary": "Safe proven-pre-submit recovery nine-file repair implemented, pending broker and integration.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-053",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/source-delivery/t053-durable-design.md"
+      ],
+      "ownerReportedSummary": "Durable watched 503 replacement implemented, pending central executor and broker.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-054",
+      "lane": "product",
+      "reportedBy": "/root/product_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/packets/product-transcript-refresh-warning.md"
+      ],
+      "ownerReportedSummary": "Reload freshness warning repair BUILDING; native transaction/derived refresh gates open.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-055",
+      "lane": "product",
+      "reportedBy": "/root/product_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/product-delivery/collections-maker-packet.md"
+      ],
+      "ownerReportedSummary": "Capped-chooser saved-member retention repair BUILDING.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-056",
+      "lane": "product",
+      "reportedBy": "/root/product_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/packets/product-answer-trusted-reviewer.md"
+      ],
+      "ownerReportedSummary": "Tenant-human authority fail-closed repair BUILDING; genuine trusted-human verifier integration absent.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-057",
+      "lane": "product",
+      "reportedBy": "/root/product_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/packets/product-setup-login-fencing.md"
+      ],
+      "ownerReportedSummary": "Same-key sessionVersion fencing/truthful readiness repair BUILDING.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-058",
+      "lane": "product",
+      "reportedBy": "/root/product_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/product-delivery/outputs-maker-packet.md"
+      ],
+      "ownerReportedSummary": "Saved title/revision freshness repair BUILDING.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-059",
+      "lane": "product",
+      "reportedBy": "/root/product_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/packets/product-operations-evaluation.md",
+        "qa/packets/t059-read-head-deadlines.md"
+      ],
+      "ownerReportedSummary": "Operations lifecycle UI/read-head deadlines BUILDING; ambiguous child/intermediate writes explicitly unbounded, no whole-operation bound.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    },
+    {
+      "id": "T-060",
+      "lane": "release",
+      "reportedBy": "/root/release_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/goal-t060.md"
+      ],
+      "ownerReportedSummary": "Exact existing release owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "T-061",
+      "lane": "release",
+      "reportedBy": "/root/release_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/goal-t061.md"
+      ],
+      "ownerReportedSummary": "Exact existing release owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "U0.10",
+      "lane": "quality",
+      "reportedBy": "/root/quality_delivery_coordinator",
+      "classification": "SOFTWARE_PRESENT_CHECKS_OR_INTEGRATION_PENDING",
+      "evidenceReferences": [
+        "qa/manifests/vectorless-production-evaluation.md"
+      ],
+      "ownerReportedSummary": "Exact existing quality owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "U2.2",
+      "lane": "quality",
+      "reportedBy": "/root/quality_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/contracts/goal-u22.md"
+      ],
+      "ownerReportedSummary": "Exact existing quality owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "U2.3",
+      "lane": "quality",
+      "reportedBy": "/root/quality_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/contracts/goal-u23.md"
+      ],
+      "ownerReportedSummary": "Exact existing quality owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "U2.4",
+      "lane": "quality",
+      "reportedBy": "/root/quality_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/contracts/goal-U24.md"
+      ],
+      "ownerReportedSummary": "Exact existing quality owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "U2.5",
+      "lane": "quality",
+      "reportedBy": "/root/quality_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/contracts/goal-u25.md"
+      ],
+      "ownerReportedSummary": "Exact existing quality owner report relayed by central; not independent acceptance.",
+      "assessment": "owner-reported preliminary; exact classification relayed by /root/integration_control",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve every task-specific human/live/native/provider/browser/host/elapsed-time gate; owner-reported external-only is not independent engineering completion.",
+      "relayedBy": "/root/integration_control"
+    },
+    {
+      "id": "U3.2",
+      "lane": "source",
+      "reportedBy": "/root/source_delivery_coordinator",
+      "classification": "KNOWN_IMPLEMENTATION_GAPS",
+      "evidenceReferences": [
+        "qa/coordination/knowledge-brain-20261015/source-delivery/u32-survey.md"
+      ],
+      "ownerReportedSummary": "Embedding-specific SemanticResults lacks active vectorless backend binding.",
+      "assessment": "owner-reported preliminary; not independently accepted",
+      "parentStatus": "in_progress",
+      "fullyAccepted": false,
+      "remainingGates": "Preserve all task-specific human/live/provider/native/browser/host/elapsed-time gates from delivery-matrix.md and cited owner records; no gate waived."
+    }
+  ],
+  "limitations": [
+    "No source surveys, new checks, tests, providers, database or live operation performed.",
+    "Evidence paths are owner-supplied references, not freshly inspected or authenticated.",
+    "Do not aggregate scoped PASS counts into parent completion.",
+    "Parent-specific human/live gates remain in delivery-matrix.md and referenced reports."
+  ]
+}

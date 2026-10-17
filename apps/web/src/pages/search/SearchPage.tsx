@@ -5,9 +5,11 @@ import { ApiError } from "../../api/client.js";
 import { normalizeQuery } from "./query.js";
 import { searchTranscripts, type TranscriptSearchHit } from "../../api/search/client.js";
 import { SemanticResults } from "./semantic/SemanticResults.js";
+import { AskHandoffLink } from "./AskHandoff.js";
+import { NativeEvidence } from "../../components/NativeEvidence.js";
 
 type SearchState = { key: string; query: string } & (
-  { status: "loading" } | { status: "failed"; message: string } | { status: "ready"; hits: TranscriptSearchHit[] }
+  { status: "loading" } | { status: "failed"; message: string } | { status: "ready"; hits: TranscriptSearchHit[]; nativeTruncated?: boolean }
 );
 function message(error: unknown): string {
   if (error instanceof ApiError && error.status === 403) return "This API key needs search access.";
@@ -19,26 +21,27 @@ function message(error: unknown): string {
 const inflight: { current: { id: string; promise: ReturnType<typeof searchTranscripts> } | null } = { current: null };
 
 export function SearchPage(): React.ReactElement {
-  const { apiKey } = useAuth();
+  const { apiKey, sessionVersion } = useAuth();
+  const identity = JSON.stringify([apiKey, sessionVersion]);
   const [params, setParams] = useSearchParams();
   // The URL is the single source of truth for the executed query; the box is only a draft of it.
   const urlQuery = normalizeQuery(params.get("q"));
   const [query, setQuery] = useState(urlQuery);
   const [state, setState] = useState<SearchState | null>(null);
   const generation = useRef(0);
-  const key = useRef(apiKey);
-  const previousKey = useRef(apiKey);
-  key.current = apiKey;
-  const current = state?.key === apiKey ? state : null;
+  const key = useRef(identity);
+  const previousKey = useRef(identity);
+  key.current = identity;
+  const current = state?.key === identity && state.query === urlQuery ? state : null;
   useEffect(() => () => { generation.current++; }, []);
   useEffect(() => {
-    if (previousKey.current === apiKey) return;
-    previousKey.current = apiKey;
+    if (previousKey.current === identity) return;
+    previousKey.current = identity;
     generation.current++;
     setState(null);
     setQuery("");
     setParams({}, { replace: true });
-  }, [apiKey, setParams]);
+  }, [identity, setParams]);
   useEffect(() => {
     setQuery(urlQuery);
     if (!urlQuery || !apiKey) { generation.current++; setState(null); return; }
@@ -50,8 +53,8 @@ export function SearchPage(): React.ReactElement {
 
   async function run(submitted: string) {
     if (!apiKey) return;
-    const request = ++generation.current, requestKey = apiKey, id = JSON.stringify([requestKey, submitted]);
-    setState({ key: requestKey, query: submitted, status: "loading" });
+    const request = ++generation.current, requestKey = apiKey, requestOwner = identity, id = JSON.stringify([requestOwner, submitted]);
+    setState({ key: requestOwner, query: submitted, status: "loading" });
     // Reuse a still-pending identical request (React StrictMode re-runs mount effects in dev).
     const pending = inflight.current?.id === id ? inflight.current.promise : searchTranscripts(requestKey, submitted);
     inflight.current = { id, promise: pending };
@@ -59,12 +62,12 @@ export function SearchPage(): React.ReactElement {
     try {
       const response = await pending;
       settle();
-      if (generation.current === request && key.current === requestKey)
-        setState({ key: requestKey, query: submitted, status: "ready", hits: response.hits });
+      if (generation.current === request && key.current === requestOwner)
+        setState({ key: requestOwner, query: submitted, status: "ready", hits: response.hits, nativeTruncated: response.nativeTruncated });
     } catch (error) {
       settle();
-      if (generation.current === request && key.current === requestKey)
-        setState({ key: requestKey, query: submitted, status: "failed", message: message(error) });
+      if (generation.current === request && key.current === requestOwner)
+        setState({ key: requestOwner, query: submitted, status: "failed", message: message(error) });
     }
   }
 
@@ -72,7 +75,7 @@ export function SearchPage(): React.ReactElement {
     event.preventDefault();
     if (!apiKey) return;
     const submitted = normalizeQuery(query);
-    if (!submitted) { generation.current++; setState({ key: apiKey, query: "", status: "failed", message: "Enter a search query." }); return; }
+    if (!submitted) { generation.current++; setState({ key: identity, query: urlQuery, status: "failed", message: "Enter a search query." }); return; }
     // Same query as the URL: re-run in place (retry); otherwise push so Back returns to the earlier query.
     if (submitted === urlQuery) void run(submitted); else setParams({ q: submitted });
   }
@@ -90,7 +93,12 @@ export function SearchPage(): React.ReactElement {
       {current?.status === "failed" && <div className="card error-note" role="alert">{current.message}</div>}
       {current?.status === "ready" && <section aria-label="Search results">
         <p role="status">{current.hits.length ? `Results for “${current.query}”` : `No passages found for “${current.query}”.`}</p>
-        {current.hits.map((hit) => <article className="row-card" key={hit.turnId}>
+        <AskHandoffLink query={current.query} />
+        {current.nativeTruncated && <p>Native source search is partial. Narrow the query or check the source directly.</p>}
+        {current.hits.map((hit) => hit.nativeSourceLocator ? <article className="row-card" key={JSON.stringify(hit.nativeSourceLocator)}>
+          <h2 className="row-title">{hit.title || "Native source"}</h2>
+          <NativeEvidence sourceLocator={hit.nativeSourceLocator} />
+        </article> : <article className="row-card" key={hit.turnId}>
           <h2 className="row-title">{hit.session?.title || "Session unavailable"}</h2>
           {hit.session && <p className="row-meta">{hit.session.date}</p>}
           {hit.turn ? <>
@@ -103,7 +111,7 @@ export function SearchPage(): React.ReactElement {
             : <p>The source passage could not be resolved.</p>}
         </article>)}
       </section>}
-      <SemanticResults apiKey={apiKey} query={urlQuery} />
+      <SemanticResults key={identity} apiKey={apiKey} query={urlQuery} />
     </>}
   </>;
 }

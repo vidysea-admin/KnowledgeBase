@@ -1,0 +1,26 @@
+{
+  "maker": {
+    "cost": null,
+    "active_s": null,
+    "tokens": null
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "active_s": null,
+      "id": "canonical-adoption-checker",
+      "tokens": null
+    }
+  ],
+  "next_phase": {
+    "cost": null,
+    "active_s": 30,
+    "tokens": 1500
+  },
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "bootstrap_scope": "Canonical adoption review only; unknown reviewer overhead cannot be reset",
+  "escalation": null
+}

@@ -1,0 +1,90 @@
+[
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "F9B22D7DCF169A0B27040D0E84411A0B6A5A5FD8B229EDBE79D84B79CC9CB328"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/transcripts.ts",
+    "sha256": "0569F8BD71799B23DA37F2BC7EA6E11CA3DAD29C2F09DC006A421938AB35E6D8"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/answers.ts",
+    "sha256": "14E0AEBDB481C4DD258A921EF850AB7973C5BC4E65F62A9239AF3B4B816EACA8"
+  },
+  {
+    "path": "apps/api/src/composition/vectorless-routing.test.ts",
+    "sha256": "957F1279DFAADECF262CBC357B102F783B6B249A1FD67BA138BCAEEC33AC95C8"
+  },
+  {
+    "path": "config/ai-routing.yaml",
+    "sha256": "FE908F0ED6151396FD94F5B65A1DBC45EA88C74C3D2F88236D791C5AA9F0D3CA"
+  },
+  {
+    "path": "docker-compose.yml",
+    "sha256": "827E9E7E38FE39B3C40B17CD7FE43C40674782E3E87A44EAFF3DBCE3DA753942"
+  },
+  {
+    "path": "docs/docker-deployment.md",
+    "sha256": "3DB5E3E033EC76B393CA21EC8F308A29D280E4BE0997368F052932BF930BD76F"
+  },
+  {
+    "path": "scripts/qa/container-workflows/run.sh",
+    "sha256": "D70D3C56824198A0D2CC77AD1932B5C22F3AB86C0C3B89EE345B5EE3A1DEFC0C"
+  },
+  {
+    "path": "packages/ai/src/provider.ts",
+    "sha256": "224011A106893BA8D42CECC5D9C43E4897DF6D3D15E692F9E196D10AA050C4C1"
+  },
+  {
+    "path": "packages/ai/src/jobs.ts",
+    "sha256": "FF1D14D504651E56D6BD88B82416BFC135EC951E4CACFCA87A213756758FC180"
+  },
+  {
+    "path": "packages/ai/src/router.ts",
+    "sha256": "111B0A7FB1D586B702D1FE5DD8D3F327E70069D46FD0C1DFC62DFCCF692A7118"
+  },
+  {
+    "path": "packages/ai/src/index.ts",
+    "sha256": "3A881523BF31BD8568BC8BADADE370BA8D430BC2D756E961A82C23F21B30E9F1"
+  },
+  {
+    "path": "packages/ai/src/router-cost.test.ts",
+    "sha256": "81ED0DBC4175153AF5D5559811652990BEB4E5868E7A882A3518AD36FD79EDC3"
+  },
+  {
+    "path": "packages/index/src/index.ts",
+    "sha256": "735B505E484F0E1A02F3218655C27A94FB014A45FD77B1A8445463E7C618114E"
+  },
+  {
+    "path": "schema/jobs.schema.json",
+    "sha256": "FAD3E15EE6037BF64378AECA429E7F66787FCFB1E5C187711B7A961C4BB85F93"
+  },
+  {
+    "path": "schema/sessions.schema.json",
+    "sha256": "872D9C0F457658D0CE5CA56BF689D6EFF65CCFEAC4E5DB0B137014A198A22BA8"
+  },
+  {
+    "path": "schema/answer_runs.schema.json",
+    "sha256": "D58EDC38D2945B875FF2C769FB81386CFF5503004937AEF80F6ADFABB16DEAE2"
+  },
+  {
+    "path": "packages/core/src/generated/jobs.ts",
+    "sha256": "1D9A9EEDA71F974E9BD247EF6A81BB1DBB6C94C8A48BF897F43A585E5FF39F2E"
+  },
+  {
+    "path": "packages/core/src/generated/sessions.ts",
+    "sha256": "8405AD1DB80DDF3CC95A7B62488486F05B85DA1120D1FD8B48AAA93BB61115D6"
+  },
+  {
+    "path": "packages/core/src/generated/answer_runs.ts",
+    "sha256": "A25E65F337BAEF443FF0C7D0F4350015DF558EE2D362F733083DFD2E6751EBCE"
+  },
+  {
+    "path": "TASKS.md",
+    "sha256": "269CCE321ACE6D49B28118AC811CCB35C20B2970F44E10448496DAE0A934044C"
+  },
+  {
+    "path": ".goal/goal.json",
+    "sha256": "AA87A538B33463E70F00350ABFDE81F9ABB743443876F2A72857692E480CB3F7"
+  }
+]

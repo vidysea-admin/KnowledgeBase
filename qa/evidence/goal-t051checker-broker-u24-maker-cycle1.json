@@ -1,0 +1,50 @@
+{
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts",
+    "apps/api/src/indexing/speaker-suggest.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "U24_EVIDENCE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase/qa/evidence/u24-speaker-profile"
+  },
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T21:17:01.323Z",
+  "completedAt": "2026-10-14T21:17:10.135Z",
+  "elapsedMs": 8807.6124,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts": "d08f0ddfd618dc932bd0e1faa67060cc85df9f40c9d0c631a827ce34879837fa",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/router.test.ts": "8dcc08ac59fa440db22f847078db5c81249ba1a9fe7ea492303c75be1f64ba80",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/speaker-profiles/store.test.ts": "6eb5f5d9b7db008a51f56ea8e8e818f7e39b51b0eb41f6705777486aab68c662",
+    "apps/api/src/speaker-profiles/store.ts": "169d7a1d4f4d21964bace80516f2eda370b6d9cff7af65005eb638ec0297cb5d",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/indexing/speaker-suggest.test.ts": "3ecf81d258e7ed79e7256821984e48b4cf5c4f32e6b2f2dfba45dc9d954bae86",
+    "apps/api/src/indexing/testutils.ts": "f3430a3135fbb14e5014e9368d60d6f56801a861e1fdfeca8f3dc21bb2bcfd62"
+  },
+  "after": {
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts": "d08f0ddfd618dc932bd0e1faa67060cc85df9f40c9d0c631a827ce34879837fa",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/router.test.ts": "8dcc08ac59fa440db22f847078db5c81249ba1a9fe7ea492303c75be1f64ba80",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/speaker-profiles/store.test.ts": "6eb5f5d9b7db008a51f56ea8e8e818f7e39b51b0eb41f6705777486aab68c662",
+    "apps/api/src/speaker-profiles/store.ts": "169d7a1d4f4d21964bace80516f2eda370b6d9cff7af65005eb638ec0297cb5d",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/indexing/speaker-suggest.test.ts": "3ecf81d258e7ed79e7256821984e48b4cf5c4f32e6b2f2dfba45dc9d954bae86",
+    "apps/api/src/indexing/testutils.ts": "f3430a3135fbb14e5014e9368d60d6f56801a861e1fdfeca8f3dc21bb2bcfd62"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-u24-maker-cycle1.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-u24-maker-cycle1.stderr.txt",
+  "hashesUnchanged": true
+}

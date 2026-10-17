@@ -1,0 +1,63 @@
+[T011 known-clock] publish native ACL and sealed readiness begin +20ms
+[T011 known-clock] publish native ACL and sealed readiness complete +3283ms
+[T011 known-clock] list actual owner begin +3290ms
+[T011 known-clock] list actual owner complete +9432ms
+[T011 known-clock] list foreign owner begin +9432ms
+[T011 known-clock] list foreign owner complete +10361ms
+[T011 known-clock] reject foreign generation begin +10362ms
+[T011 known-clock] reject foreign generation complete +12619ms
+[T011 known-clock] persist private-start ACK begin +12620ms
+[T011 known-clock] persist private-start ACK complete +18079ms
+[T011 known-clock] restarted API durable private state begin +18092ms
+[T011 known-clock] restarted API durable private state complete +25952ms
+[T011 known-clock] persist private-end ACK begin +25953ms
+[T011 known-clock] persist private-end ACK complete +32552ms
+[T011 known-clock] reject forged HMAC begin +32566ms
+[T011 known-clock] reject forged HMAC complete +32574ms
+[T011 known-clock] reject foreign descriptor host begin +32575ms
+[T011 known-clock] failed at reject foreign descriptor host +40416ms
+[T011 known-clock] cleanup bridge begin +40416ms
+[T011 known-clock] cleanup bridge complete +40419ms
+[T011 known-clock] cleanup child graceful exit begin +40419ms
+[T011 known-clock] child exit code=0 signal=null +40542ms
+[T011 known-clock] cleanup child graceful exit complete +40543ms
+✖ actual Node child + private API host bridge known-clock (40547.6139ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 41172.4046
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:1:1146
+✖ actual Node child + private API host bridge known-clock (40547.6139ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /Foreign/. Input:
+  
+  'Error: Private Windows directory ACL unavailable'
+  
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async step (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:23:18)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:63:77)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: Private Windows directory ACL unavailable
+        at verifyPrivateArtifact (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\bot-privacy\private-acl.ts:39:119)
+        at verifyPrivateDirectory (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\bot-privacy\private-acl.ts:26:3)
+        at tenantPath (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\bot-privacy\host-connector.ts:22:27)
+        at Object.list (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\bot-privacy\host-connector.ts:50:48)
+        at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:63:146)
+        at step (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:23:24)
+        at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\controller-bridge.test.ts:63:83)
+        at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at async Test.run (node:internal/test_runner/test:1389:7)
+        at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3),
+    expected: /Foreign/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

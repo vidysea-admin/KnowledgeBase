@@ -1,0 +1,56 @@
+{
+  "state": "HISTORICAL_SOURCE_PINS_CURRENT_STAGE_SUMMARY_AVAILABLE",
+  "publicCheckpoint": "final-shared-public-checkpoint.json",
+  "narrowPendingEpoch": "packages/ask/src/answer-policy.ts + existing direct test: native provenance policy fix authorized but held until compiler exits",
+  "webHold": "Three independent checker probe files awaiting final writer ACK",
+  "acceptance": "No parent closure; current test/build evidence pending. Historical receipts remain preserved.",
+  "previousPins": [
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "sha256": "b6b931c97ba3f39c5e7ee3007422f293a7f69ccb89a67e38c82a2658c7a326ce"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/native-production.ts",
+      "sha256": "093bf951e0f5e1d45e8fdb4f8635d28f39203c95373c0a30a0b0024b62eeecee"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/routes.ts",
+      "sha256": "5008201fed89eaaeea6e52fcebc719ceb6ff34d00bef9632fdcc9a7ef585742e"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/reviews.ts",
+      "sha256": "9d2c2af92bc798bcd397bf4c99c610a726b25d5edb182e122ad1ef71a9ce026b"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "sha256": "99ea968eb1655fb27abdcfe6ff8acab3eac9548b85cb215ee46f75e21036eb16"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/answers.ts",
+      "sha256": "0185bbea8e021691d4d7eceee14f01783eefc6e429b35987840acc80c2f02e42"
+    },
+    {
+      "path": "apps/api/src/store.ts",
+      "sha256": "33d089ebc5264274e577439b5380ff0c1cd0d7ffdc2416fe9cca337854bf1cd3"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "sha256": "5e547f5dc5fe736111c8347b497f66130ad16a286f71b01b2933b774ca6284b3"
+    },
+    {
+      "path": "packages/meeting-bot/src/cli.ts",
+      "sha256": "72c7bc4d22cccb6b0dff17959e9f63524411c03c4b49b9b8a60e3bb0ed575b7d"
+    },
+    {
+      "path": "Dockerfile",
+      "sha256": "dee0e37bff220a66f0c8406491c757fbe9bb667c80ac889e57c75566429672f6"
+    },
+    {
+      "path": "apps/api/Dockerfile",
+      "sha256": "e8a9c9acbbe0d83ac70ca0aba7d02a0236eb7eba56c1b5f41405b64f80783f61"
+    }
+  ],
+  "pending": "All compiler owners frozen except final WA guard ACK; public canonical24 unchanged. Original 53diagnostics/19files receipt preserved. No checker or parent completion claim.",
+  "currentStageSummary": "qa/goal-vectorless-2026-10-15/verification-combined-candidate-stage-summary.json",
+  "currentEpoch": "message-vectorless-current-epoch.json"
+}

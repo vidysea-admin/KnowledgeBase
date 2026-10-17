@@ -1,0 +1,39 @@
+{
+  "slug": "t013-continuing-voice-conversation",
+  "cycle": 0,
+  "status": "queued",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+  "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "arguments": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/counsellor/voice.test.ts",
+    "src/pages/counsellor/CounsellorPage.test.tsx",
+    "--maxWorkers=1",
+    "--minWorkers=1"
+  ],
+  "timeout_ms": 120000,
+  "environment_overrides": {},
+  "pins": "qa/coordination/resume-20261015/t013-voice-conversation/candidate-pins.json",
+  "capture": [
+    "stdout",
+    "stderr",
+    "exit_code",
+    "signal",
+    "start_end_duration",
+    "before_after_source_hashes"
+  ],
+  "cpu_lease": "root serial broker only",
+  "maker_usage": {
+    "cost": null,
+    "active_s": null,
+    "token_metric": "actual_total",
+    "tokens": null
+  },
+  "remaining_required_checks": [
+    "relevant web typecheck / shared integration on exact bytes",
+    "applicable frozen validator / structure receipts",
+    "independent checker managed-review/1 validation and review"
+  ]
+}

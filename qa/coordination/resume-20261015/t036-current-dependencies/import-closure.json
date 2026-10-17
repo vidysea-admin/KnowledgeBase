@@ -1,0 +1,2089 @@
+{
+  "method": "Conservative lexical static runtime import/re-export plus literal dynamic import/require traversal; pure import type excluded. Workspace edges traversed recursively; external manifest/main and installed lock pinned. External package transitive file trees are not claimed fully traversed.",
+  "workspaceFiles": 235,
+  "edges": [
+    {
+      "from": "qa\\evidence\\t036-provenance-refresh-independent-20261015.mjs",
+      "specifier": "../../packages/db/src/collections/meeting-candidates.ts",
+      "to": "packages\\db\\src\\collections\\meeting-candidates.ts"
+    },
+    {
+      "from": "qa\\evidence\\t036-provenance-refresh-independent-20261015.mjs",
+      "specifier": "../../apps/api/src/store.ts",
+      "to": "apps\\api\\src\\store.ts"
+    },
+    {
+      "from": "qa\\evidence\\t036-provenance-refresh-independent-20261015.mjs",
+      "specifier": "../../packages/meeting-bot/src/calendar/schedule-loaders.ts",
+      "to": "packages\\meeting-bot\\src\\calendar\\schedule-loaders.ts"
+    },
+    {
+      "from": "qa\\evidence\\t036-provenance-refresh-independent-20261015.mjs",
+      "specifier": "../../packages/meeting-bot/src/calendar/auto-join.ts",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-join.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-join.ts",
+      "specifier": "./auto-record-policy.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-join.ts",
+      "specifier": "./auto-record-policy.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts",
+      "specifier": "../platform.js",
+      "to": "packages\\meeting-bot\\src\\platform.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts",
+      "specifier": "./join-rules/join-rules.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\join-rules\\join-rules.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts",
+      "specifier": "./registration-workflow.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\registration-workflow.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts",
+      "specifier": "./registration-workflow.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\registration-workflow.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\join-rules\\join-rules.ts",
+      "specifier": "../../../../ingest/src/join-policy/join-rules.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules.ts",
+      "specifier": "./platform.js",
+      "to": "packages\\ingest\\src\\join-policy\\platform.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules.ts",
+      "specifier": "./join-rules-normalize.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-normalize.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules.ts",
+      "specifier": "./join-rules-optout.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-optout.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules.ts",
+      "specifier": "./join-rules-normalize.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-normalize.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules-optout.ts",
+      "specifier": "./meeting-identity.js",
+      "to": "packages\\ingest\\src\\join-policy\\meeting-identity.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\meeting-identity.ts",
+      "specifier": "./platform.js",
+      "to": "packages\\ingest\\src\\join-policy\\platform.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\platform.ts",
+      "specifier": "../../ingest/src/join-policy/platform.js",
+      "to": "packages\\ingest\\src\\join-policy\\platform.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\schedule-loaders.ts",
+      "specifier": "./state/schedule-state.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts",
+      "specifier": "../calendar-client.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\calendar-client.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts",
+      "specifier": "../registration-workflow.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\registration-workflow.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts",
+      "specifier": "../auto-record-policy.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts",
+      "specifier": "./schedule-dedup-state.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\state\\schedule-dedup-state.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-dedup-state.ts",
+      "specifier": "./state-tenant-tag.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\state\\state-tenant-tag.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-dedup-state.ts",
+      "specifier": "../join-rules/join-rules-store-lock.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\join-rules\\join-rules-store-lock.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\schedule-dedup-state.ts",
+      "specifier": "./skipped-state.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\state\\skipped-state.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\skipped-state.ts",
+      "specifier": "../join-rules/join-rules-store-lock.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\join-rules\\join-rules-store-lock.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\state\\skipped-state.ts",
+      "specifier": "./state-tenant-tag.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\state\\state-tenant-tag.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\join-rules\\join-rules-store-lock.ts",
+      "specifier": "../../../../ingest/src/join-policy/join-rules-store-lock.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store-lock.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules-store-lock.ts",
+      "specifier": "./join-rules-store-lock-steps.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store-lock-steps.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\calendar-client.ts",
+      "specifier": "./auto-record-policy.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\calendar-client.ts",
+      "specifier": "./tombstone/unknown-tombstone-reach.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\tombstone\\unknown-tombstone-reach.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\tombstone\\unknown-tombstone-reach.ts",
+      "specifier": "../auto-record-policy.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "@lkb/index",
+      "to": "packages\\index\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "@lkb/ingest",
+      "to": "packages\\ingest\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "./health-probe.js",
+      "to": "apps\\api\\src\\health-probe.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "./gws/gws-gmail.js",
+      "to": "apps\\api\\src\\gws\\gws-gmail.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "./db-name.js",
+      "to": "apps\\api\\src\\db-name.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "./hash.js",
+      "to": "apps\\api\\src\\hash.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "./composition/integrations/trusted-readers.js",
+      "to": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts"
+    },
+    {
+      "from": "apps\\api\\src\\store.ts",
+      "specifier": "./gws/gws-calendar.js",
+      "to": "apps\\api\\src\\gws\\gws-calendar.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\gws-calendar.ts",
+      "specifier": "../join-rules/calendar-link-extract.js",
+      "to": "apps\\api\\src\\join-rules\\calendar-link-extract.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\gws-calendar.ts",
+      "specifier": "../join-rules/youtube-live-extract.js",
+      "to": "apps\\api\\src\\join-rules\\youtube-live-extract.ts"
+    },
+    {
+      "from": "apps\\api\\src\\join-rules\\youtube-live-extract.ts",
+      "specifier": "./calendar-link-extract.js",
+      "to": "apps\\api\\src\\join-rules\\calendar-link-extract.ts"
+    },
+    {
+      "from": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts",
+      "specifier": "@lkb/index",
+      "to": "packages\\index\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts",
+      "specifier": "../../visibility/knowledge.js",
+      "to": "apps\\api\\src\\visibility\\knowledge.ts"
+    },
+    {
+      "from": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts",
+      "specifier": "../../transcript-review/effective-reader.js",
+      "to": "apps\\api\\src\\transcript-review\\effective-reader.ts"
+    },
+    {
+      "from": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts",
+      "specifier": "../../visibility/read-snapshot.js",
+      "to": "apps\\api\\src\\visibility\\read-snapshot.ts"
+    },
+    {
+      "from": "apps\\api\\src\\composition\\integrations\\trusted-readers.ts",
+      "specifier": "../../indexing/eligible-tree.js",
+      "to": "apps\\api\\src\\indexing\\eligible-tree.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\eligible-tree.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\eligible-tree.ts",
+      "specifier": "../visibility/knowledge.js",
+      "to": "apps\\api\\src\\visibility\\knowledge.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\eligible-tree.ts",
+      "specifier": "../transcript-review/effective-reader.js",
+      "to": "apps\\api\\src\\transcript-review\\effective-reader.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\eligible-tree.ts",
+      "specifier": "@lkb/index",
+      "to": "packages\\index\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\eligible-tree.ts",
+      "specifier": "./generation.js",
+      "to": "apps\\api\\src\\indexing\\generation.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\generation.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\generation.ts",
+      "specifier": "@lkb/index",
+      "to": "packages\\index\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\generation.ts",
+      "specifier": "./chunk-integrity.js",
+      "to": "apps\\api\\src\\indexing\\chunk-integrity.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\generation.ts",
+      "specifier": "../transcript-review/effective-reader.js",
+      "to": "apps\\api\\src\\transcript-review\\effective-reader.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\effective-reader.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\effective-reader.ts",
+      "specifier": "./service.js",
+      "to": "apps\\api\\src\\transcript-review\\service.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\effective-reader.ts",
+      "specifier": "./store.js",
+      "to": "apps\\api\\src\\transcript-review\\store.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\store.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\store.ts",
+      "specifier": "../../../../packages/db/src/client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\store.ts",
+      "specifier": "../../../../packages/db/src/lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/sources.js",
+      "to": "packages\\db\\src\\collections\\sources.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/sessions.js",
+      "to": "packages\\db\\src\\collections\\sessions.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/jobs.js",
+      "to": "packages\\db\\src\\collections\\jobs.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/turns.js",
+      "to": "packages\\db\\src\\collections\\turns.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/claims.js",
+      "to": "packages\\db\\src\\collections\\claims.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/session-pages.js",
+      "to": "packages\\db\\src\\collections\\session-pages.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/eval-runs.js",
+      "to": "packages\\db\\src\\collections\\eval-runs.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/watched-sources.js",
+      "to": "packages\\db\\src\\collections\\watched-sources.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/gaps.js",
+      "to": "packages\\db\\src\\collections\\gaps.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/meeting-candidates.js",
+      "to": "packages\\db\\src\\collections\\meeting-candidates.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/trusted-senders.js",
+      "to": "packages\\db\\src\\collections\\trusted-senders.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/graph-edges.js",
+      "to": "packages\\db\\src\\collections\\graph-edges.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/watch-state.js",
+      "to": "packages\\db\\src\\collections\\watch-state.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/watch-reports.js",
+      "to": "packages\\db\\src\\collections\\watch-reports.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/watch-heartbeat.js",
+      "to": "packages\\db\\src\\collections\\watch-heartbeat.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/usage-events.js",
+      "to": "packages\\db\\src\\collections\\usage-events.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/speaker-suggestions/index.js",
+      "to": "packages\\db\\src\\collections\\speaker-suggestions\\index.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/speaker-relationships.js",
+      "to": "packages\\db\\src\\collections\\speaker-relationships.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/speaker-attributes.js",
+      "to": "packages\\db\\src\\collections\\speaker-attributes.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/automation-runs.js",
+      "to": "packages\\db\\src\\collections\\automation-runs.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/application-operations.js",
+      "to": "packages\\db\\src\\collections\\application-operations.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./collections/operations-schedules.js",
+      "to": "packages\\db\\src\\collections\\operations-schedules.ts"
+    },
+    {
+      "from": "packages\\db\\src\\index.ts",
+      "specifier": "./lib/native-publication.js",
+      "to": "packages\\db\\src\\lib\\native-publication.ts"
+    },
+    {
+      "from": "packages\\db\\src\\lib\\native-publication.ts",
+      "specifier": "./tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\operations-schedules.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\operations-schedules.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\application-operations.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\application-operations.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\automation-runs.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\automation-runs.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-attributes.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-attributes.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-relationships.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-relationships.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-suggestions\\index.ts",
+      "specifier": "../../lib/native-publication.js",
+      "to": "packages\\db\\src\\lib\\native-publication.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-suggestions\\index.ts",
+      "specifier": "../../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\speaker-suggestions\\index.ts",
+      "specifier": "../../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\usage-events.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\usage-events.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watch-heartbeat.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watch-heartbeat.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watch-reports.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watch-reports.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watch-state.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watch-state.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\graph-edges.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\graph-edges.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\trusted-senders.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\trusted-senders.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\meeting-candidates.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\meeting-candidates.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\gaps.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\gaps.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watched-sources.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\watched-sources.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\eval-runs.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\eval-runs.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\session-pages.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\session-pages.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\claims.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\claims.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\turns.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\turns.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\jobs.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\jobs.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\sessions.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\sessions.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\sources.ts",
+      "specifier": "../client.js",
+      "to": "packages\\db\\src\\client.ts"
+    },
+    {
+      "from": "packages\\db\\src\\collections\\sources.ts",
+      "specifier": "../lib/tenantScope.js",
+      "to": "packages\\db\\src\\lib\\tenantScope.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\service.ts",
+      "specifier": "./planner.js",
+      "to": "apps\\api\\src\\transcript-review\\planner.ts"
+    },
+    {
+      "from": "apps\\api\\src\\transcript-review\\service.ts",
+      "specifier": "./store.js",
+      "to": "apps\\api\\src\\transcript-review\\store.ts"
+    },
+    {
+      "from": "apps\\api\\src\\indexing\\chunk-integrity.ts",
+      "specifier": "@lkb/index",
+      "to": "packages\\index\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/build.js",
+      "to": "packages\\index\\src\\tree\\build.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/search.js",
+      "to": "packages\\index\\src\\tree\\search.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./chunk/build-chunks.js",
+      "to": "packages\\index\\src\\chunk\\build-chunks.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/extract-topics.js",
+      "to": "packages\\index\\src\\tree\\extract-topics.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/extract-topics-llm.js",
+      "to": "packages\\index\\src\\tree\\extract-topics-llm.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/regenerate.js",
+      "to": "packages\\index\\src\\tree\\regenerate.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/promote-entities.js",
+      "to": "packages\\index\\src\\tree\\promote-entities.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/flatten-graph.js",
+      "to": "packages\\index\\src\\tree\\flatten-graph.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./graph/build-graph.js",
+      "to": "packages\\index\\src\\graph\\build-graph.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./vector/cosine.js",
+      "to": "packages\\index\\src\\vector\\cosine.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./vector/chunk-evidence.js",
+      "to": "packages\\index\\src\\vector\\chunk-evidence.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./vector/retriever.js",
+      "to": "packages\\index\\src\\vector\\retriever.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./eval/recall.js",
+      "to": "packages\\index\\src\\eval\\recall.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./eval/heuristic-retriever.js",
+      "to": "packages\\index\\src\\eval\\heuristic-retriever.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./eval/baseline.js",
+      "to": "packages\\index\\src\\eval\\baseline.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./search/lexical.js",
+      "to": "packages\\index\\src\\search\\lexical.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/grounded.js",
+      "to": "packages\\index\\src\\pipeline\\grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/notes/evidence.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\evidence.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/notes/judge.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\judge.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/summarize.js",
+      "to": "packages\\index\\src\\pipeline\\summarize.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/claims.js",
+      "to": "packages\\index\\src\\pipeline\\claims.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/notes/decisions.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\decisions.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speakers.js",
+      "to": "packages\\index\\src\\pipeline\\speakers.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speakers-llm.js",
+      "to": "packages\\index\\src\\pipeline\\speakers-llm.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speakers-grounded.js",
+      "to": "packages\\index\\src\\pipeline\\speakers-grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speaker-suggestions.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-suggestions.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speaker-tile-suggestions.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-tile-suggestions.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speakers-verifier.js",
+      "to": "packages\\index\\src\\pipeline\\speakers-verifier.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/speaker-docs.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-docs.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./chunk/source-spans.js",
+      "to": "packages\\index\\src\\chunk\\source-spans.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/quote/quote-verify.js",
+      "to": "packages\\index\\src\\pipeline\\quote\\quote-verify.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./pipeline/quote/transcript-windows.js",
+      "to": "packages\\index\\src\\pipeline\\quote\\transcript-windows.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./tree/topic-indexing.js",
+      "to": "packages\\index\\src\\tree\\topic-indexing.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./graph/speaker-knowledge.js",
+      "to": "packages\\index\\src\\graph\\speaker-knowledge.ts"
+    },
+    {
+      "from": "packages\\index\\src\\index.ts",
+      "specifier": "./graph/authorized-expansion.js",
+      "to": "packages\\index\\src\\graph\\authorized-expansion.ts"
+    },
+    {
+      "from": "packages\\index\\src\\graph\\speaker-knowledge.ts",
+      "specifier": "../pipeline/speaker-profiles/profile.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-profiles\\profile.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-profiles\\profile.ts",
+      "specifier": "../speakers.js",
+      "to": "packages\\index\\src\\pipeline\\speakers.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-profiles\\profile.ts",
+      "specifier": "../speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-profiles\\profile.ts",
+      "specifier": "../speaker-rules/speaker-reported-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-reported-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-name-rules.ts",
+      "specifier": "./speaker-rules/speaker-name-data.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-name-data.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\topic-indexing.ts",
+      "specifier": "./build.js",
+      "to": "packages\\index\\src\\tree\\build.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\topic-indexing.ts",
+      "specifier": "./regenerate.js",
+      "to": "packages\\index\\src\\tree\\regenerate.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\topic-indexing.ts",
+      "specifier": "./extract-topics-llm.js",
+      "to": "packages\\index\\src\\tree\\extract-topics-llm.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\extract-topics-llm.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\extract-topics-llm.ts",
+      "specifier": "./extract-topics.js",
+      "to": "packages\\index\\src\\tree\\extract-topics.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./provider.js",
+      "to": "packages\\ai\\src\\provider.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./json.js",
+      "to": "packages\\ai\\src\\json.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./jobs.js",
+      "to": "packages\\ai\\src\\jobs.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./router.js",
+      "to": "packages\\ai\\src\\router.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./routing-config.js",
+      "to": "packages\\ai\\src\\routing-config.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./providers/gemini.js",
+      "to": "packages\\ai\\src\\providers\\gemini.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./providers/openai.js",
+      "to": "packages\\ai\\src\\providers\\openai.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./providers/anthropic.js",
+      "to": "packages\\ai\\src\\providers\\anthropic.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./providers/ollama.js",
+      "to": "packages\\ai\\src\\providers\\ollama.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./providers/ollama-cloud.js",
+      "to": "packages\\ai\\src\\providers\\ollama-cloud.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./providers/claude-code.js",
+      "to": "packages\\ai\\src\\providers\\claude-code.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./stt/transcribe.js",
+      "to": "packages\\ai\\src\\stt\\transcribe.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./stt/whisper.js",
+      "to": "packages\\ai\\src\\stt\\whisper.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./stt/gemini.js",
+      "to": "packages\\ai\\src\\stt\\gemini.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./stt/gemini-file-upload.js",
+      "to": "packages\\ai\\src\\stt\\gemini-file-upload.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./stt/chunk-audio.js",
+      "to": "packages\\ai\\src\\stt\\chunk-audio.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./trace.js",
+      "to": "packages\\ai\\src\\trace.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./trace-registry.js",
+      "to": "packages\\ai\\src\\trace-registry.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./trace-file-sink.js",
+      "to": "packages\\ai\\src\\trace-file-sink.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./trace-langfuse/sink.js",
+      "to": "packages\\ai\\src\\trace-langfuse\\sink.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./gemini-quota.js",
+      "to": "packages\\ai\\src\\gemini-quota.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\index.ts",
+      "specifier": "./vision/chain.js",
+      "to": "packages\\ai\\src\\vision\\chain.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\vision\\chain.ts",
+      "specifier": "../gemini-quota.js",
+      "to": "packages\\ai\\src\\gemini-quota.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-langfuse\\sink.ts",
+      "specifier": "../trace.js",
+      "to": "packages\\ai\\src\\trace.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-langfuse\\sink.ts",
+      "specifier": "./payload.js",
+      "to": "packages\\ai\\src\\trace-langfuse\\payload.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-langfuse\\sink.ts",
+      "specifier": "./ingestion-response.js",
+      "to": "packages\\ai\\src\\trace-langfuse\\ingestion-response.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-file-sink.ts",
+      "specifier": "./trace.js",
+      "to": "packages\\ai\\src\\trace.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-registry.ts",
+      "specifier": "./trace.js",
+      "to": "packages\\ai\\src\\trace.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-registry.ts",
+      "specifier": "./trace-file-sink.js",
+      "to": "packages\\ai\\src\\trace-file-sink.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\trace-registry.ts",
+      "specifier": "./trace-langfuse/sink.js",
+      "to": "packages\\ai\\src\\trace-langfuse\\sink.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\stt\\gemini-file-upload.ts",
+      "specifier": "../gemini-quota.js",
+      "to": "packages\\ai\\src\\gemini-quota.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\stt\\gemini.ts",
+      "specifier": "../gemini-quota.js",
+      "to": "packages\\ai\\src\\gemini-quota.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\providers\\anthropic.ts",
+      "specifier": "./claude-code.js",
+      "to": "packages\\ai\\src\\providers\\claude-code.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\providers\\gemini.ts",
+      "specifier": "../gemini-quota.js",
+      "to": "packages\\ai\\src\\gemini-quota.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\router.ts",
+      "specifier": "./provider.js",
+      "to": "packages\\ai\\src\\provider.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\router.ts",
+      "specifier": "./jobs.js",
+      "to": "packages\\ai\\src\\jobs.ts"
+    },
+    {
+      "from": "packages\\ai\\src\\router.ts",
+      "specifier": "./trace-registry.js",
+      "to": "packages\\ai\\src\\trace-registry.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\regenerate.ts",
+      "specifier": "./build.js",
+      "to": "packages\\index\\src\\tree\\build.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\regenerate.ts",
+      "specifier": "./extract-topics.js",
+      "to": "packages\\index\\src\\tree\\extract-topics.ts"
+    },
+    {
+      "from": "packages\\index\\src\\tree\\build.ts",
+      "specifier": "./extract-topics.js",
+      "to": "packages\\index\\src\\tree\\extract-topics.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\quote\\quote-verify.ts",
+      "specifier": "./quote-token-rule.js",
+      "to": "packages\\index\\src\\pipeline\\quote\\quote-token-rule.ts"
+    },
+    {
+      "from": "packages\\index\\src\\chunk\\source-spans.ts",
+      "specifier": "./build-chunks.js",
+      "to": "packages\\index\\src\\chunk\\build-chunks.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-verifier.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-tile-suggestions.ts",
+      "specifier": "@lkb/core",
+      "to": "packages\\core\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-tile-suggestions.ts",
+      "specifier": "./speaker-rules/speaker-tile-fusion.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-tile-fusion.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-tile-suggestions.ts",
+      "specifier": "./speaker-suggestions.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-suggestions.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-tile-suggestions.ts",
+      "specifier": "./speakers.js",
+      "to": "packages\\index\\src\\pipeline\\speakers.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-tile-fusion.ts",
+      "specifier": "@lkb/core",
+      "to": "packages\\core\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-tile-fusion.ts",
+      "specifier": "../speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-tile-fusion.ts",
+      "specifier": "../speaker-relation-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-relation-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-tile-fusion.ts",
+      "specifier": "./speaker-selfid-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-selfid-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-selfid-rules.ts",
+      "specifier": "../speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-relation-rules.ts",
+      "specifier": "./speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-relation-rules.ts",
+      "specifier": "./speaker-rules/speaker-reported-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-reported-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-relation-rules.ts",
+      "specifier": "./speaker-rules/speaker-selfid-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-selfid-rules.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/answer_policy_review_items.js",
+      "to": "packages\\core\\src\\generated\\answer_policy_review_items.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/answer_policy_revisions.js",
+      "to": "packages\\core\\src\\generated\\answer_policy_revisions.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/answer_runs.js",
+      "to": "packages\\core\\src\\generated\\answer_runs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/answer_source_conflicts.js",
+      "to": "packages\\core\\src\\generated\\answer_source_conflicts.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/api_keys.js",
+      "to": "packages\\core\\src\\generated\\api_keys.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/application_operations.js",
+      "to": "packages\\core\\src\\generated\\application_operations.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/automation_runs.js",
+      "to": "packages\\core\\src\\generated\\automation_runs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/championship_events.js",
+      "to": "packages\\core\\src\\generated\\championship_events.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/chunks.js",
+      "to": "packages\\core\\src\\generated\\chunks.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/claims.js",
+      "to": "packages\\core\\src\\generated\\claims.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/consent_policies.js",
+      "to": "packages\\core\\src\\generated\\consent_policies.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/decisions.js",
+      "to": "packages\\core\\src\\generated\\decisions.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/document_documents.js",
+      "to": "packages\\core\\src\\generated\\document_documents.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/eval_runs.js",
+      "to": "packages\\core\\src\\generated\\eval_runs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/features_event.js",
+      "to": "packages\\core\\src\\generated\\features_event.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/gaps.js",
+      "to": "packages\\core\\src\\generated\\gaps.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/graph_edges.js",
+      "to": "packages\\core\\src\\generated\\graph_edges.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/jobs.js",
+      "to": "packages\\core\\src\\generated\\jobs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/knowledge_collections.js",
+      "to": "packages\\core\\src\\generated\\knowledge_collections.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/knowledge_outputs.js",
+      "to": "packages\\core\\src\\generated\\knowledge_outputs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/media.js",
+      "to": "packages\\core\\src\\generated\\media.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/meeting_candidates.js",
+      "to": "packages\\core\\src\\generated\\meeting_candidates.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/operations_schedules.js",
+      "to": "packages\\core\\src\\generated\\operations_schedules.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/orgs.js",
+      "to": "packages\\core\\src\\generated\\orgs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/programs.js",
+      "to": "packages\\core\\src\\generated\\programs.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/session_pages.js",
+      "to": "packages\\core\\src\\generated\\session_pages.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/sessions.js",
+      "to": "packages\\core\\src\\generated\\sessions.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/sources.js",
+      "to": "packages\\core\\src\\generated\\sources.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/speaker_attributes.js",
+      "to": "packages\\core\\src\\generated\\speaker_attributes.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/speaker_relationships.js",
+      "to": "packages\\core\\src\\generated\\speaker_relationships.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/speaker_suggestions.js",
+      "to": "packages\\core\\src\\generated\\speaker_suggestions.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/speakers.js",
+      "to": "packages\\core\\src\\generated\\speakers.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/tenants.js",
+      "to": "packages\\core\\src\\generated\\tenants.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/topics.js",
+      "to": "packages\\core\\src\\generated\\topics.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/transcript_review_revisions.js",
+      "to": "packages\\core\\src\\generated\\transcript_review_revisions.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/transcript_reviews.js",
+      "to": "packages\\core\\src\\generated\\transcript_reviews.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/tree_index.js",
+      "to": "packages\\core\\src\\generated\\tree_index.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/trusted_senders.js",
+      "to": "packages\\core\\src\\generated\\trusted_senders.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/turns.js",
+      "to": "packages\\core\\src\\generated\\turns.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/usage_events.js",
+      "to": "packages\\core\\src\\generated\\usage_events.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/watch_heartbeat.js",
+      "to": "packages\\core\\src\\generated\\watch_heartbeat.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/watch_reports.js",
+      "to": "packages\\core\\src\\generated\\watch_reports.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/watch_state.js",
+      "to": "packages\\core\\src\\generated\\watch_state.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/watched_sources.js",
+      "to": "packages\\core\\src\\generated\\watched_sources.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./generated/whatsapp_candidates.js",
+      "to": "packages\\core\\src\\generated\\whatsapp_candidates.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/automation-monitor.js",
+      "to": "packages\\core\\src\\domain\\automation-monitor.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/keyframe-dedupe.js",
+      "to": "packages\\core\\src\\domain\\keyframe-dedupe.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/keyframe-dedupe-validate.js",
+      "to": "packages\\core\\src\\domain\\keyframe-dedupe-validate.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/lean-video.js",
+      "to": "packages\\core\\src\\domain\\lean-video.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/pipeline-workflow.js",
+      "to": "packages\\core\\src\\domain\\pipeline-workflow.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/pipeline-workflow-reduce.js",
+      "to": "packages\\core\\src\\domain\\pipeline-workflow-reduce.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/purge-policy.js",
+      "to": "packages\\core\\src\\domain\\purge-policy.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/sender-authentication.js",
+      "to": "packages\\core\\src\\domain\\sender-authentication.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/slide-turn-alignment.js",
+      "to": "packages\\core\\src\\domain\\slide-turn-alignment.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/speaker-tile-alignment.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-alignment.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/speaker-tile-names.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-names.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/speaker-tile-scan.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-scan.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./domain/webinar-types.js",
+      "to": "packages\\core\\src\\domain\\webinar-types.ts"
+    },
+    {
+      "from": "packages\\core\\src\\index.ts",
+      "specifier": "./alerts/alert-sink.js",
+      "to": "packages\\core\\src\\alerts\\alert-sink.ts"
+    },
+    {
+      "from": "packages\\core\\src\\domain\\speaker-tile-scan.ts",
+      "specifier": "./speaker-tile-names.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-names.ts"
+    },
+    {
+      "from": "packages\\core\\src\\domain\\speaker-tile-alignment.ts",
+      "specifier": "./speaker-tile-names.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-names.ts"
+    },
+    {
+      "from": "packages\\core\\src\\domain\\speaker-tile-alignment.ts",
+      "specifier": "./speaker-tile-scan.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-scan.ts"
+    },
+    {
+      "from": "packages\\core\\src\\domain\\speaker-tile-alignment.ts",
+      "specifier": "./speaker-tile-names.js",
+      "to": "packages\\core\\src\\domain\\speaker-tile-names.ts"
+    },
+    {
+      "from": "packages\\core\\src\\domain\\pipeline-workflow-reduce.ts",
+      "specifier": "./pipeline-workflow.js",
+      "to": "packages\\core\\src\\domain\\pipeline-workflow.ts"
+    },
+    {
+      "from": "packages\\core\\src\\domain\\keyframe-dedupe.ts",
+      "specifier": "./keyframe-dedupe-validate.js",
+      "to": "packages\\core\\src\\domain\\keyframe-dedupe-validate.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-grounded.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-grounded.ts",
+      "specifier": "./speakers.js",
+      "to": "packages\\index\\src\\pipeline\\speakers.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-grounded.ts",
+      "specifier": "./speaker-rules/speakers-grounding.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speakers-grounding.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-grounded.ts",
+      "specifier": "./speakers-verifier.js",
+      "to": "packages\\index\\src\\pipeline\\speakers-verifier.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-grounded.ts",
+      "specifier": "./speaker-rules/speakers-grounding.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speakers-grounding.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speakers-grounding.ts",
+      "specifier": "../speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speakers-grounding.ts",
+      "specifier": "../speaker-relation-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-relation-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speaker-rules\\speakers-grounding.ts",
+      "specifier": "./speaker-reported-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speaker-reported-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-llm.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-llm.ts",
+      "specifier": "./speakers.js",
+      "to": "packages\\index\\src\\pipeline\\speakers.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-llm.ts",
+      "specifier": "./speaker-name-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-name-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-llm.ts",
+      "specifier": "./speaker-relation-rules.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-relation-rules.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-llm.ts",
+      "specifier": "./speaker-rules/speakers-llm-prompt.js",
+      "to": "packages\\index\\src\\pipeline\\speaker-rules\\speakers-llm-prompt.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\speakers-llm.ts",
+      "specifier": "./speakers-grounded.js",
+      "to": "packages\\index\\src\\pipeline\\speakers-grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\decisions.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\claims.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\claims.ts",
+      "specifier": "./notes/evidence.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\evidence.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\claims.ts",
+      "specifier": "./grounded.js",
+      "to": "packages\\index\\src\\pipeline\\grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\claims.ts",
+      "specifier": "./notes/drop-mode.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\drop-mode.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\claims.ts",
+      "specifier": "./notes/judge.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\judge.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\claims.ts",
+      "specifier": "./grounded.js",
+      "to": "packages\\index\\src\\pipeline\\grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\grounded.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\judge.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\drop-mode.ts",
+      "specifier": "../grounded.js",
+      "to": "packages\\index\\src\\pipeline\\grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\drop-mode.ts",
+      "specifier": "./evidence.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\evidence.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\drop-mode.ts",
+      "specifier": "./judge.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\judge.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\evidence.ts",
+      "specifier": "../quote/quote-verify.js",
+      "to": "packages\\index\\src\\pipeline\\quote\\quote-verify.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\evidence.ts",
+      "specifier": "./sentence-span.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\sentence-span.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\notes\\evidence.ts",
+      "specifier": "../grounded.js",
+      "to": "packages\\index\\src\\pipeline\\grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\summarize.ts",
+      "specifier": "@lkb/ai",
+      "to": "packages\\ai\\src\\index.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\summarize.ts",
+      "specifier": "./grounded-summary.js",
+      "to": "packages\\index\\src\\pipeline\\grounded-summary.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\summarize.ts",
+      "specifier": "./notes/judge.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\judge.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\grounded-summary.ts",
+      "specifier": "./notes/drop-mode.js",
+      "to": "packages\\index\\src\\pipeline\\notes\\drop-mode.ts"
+    },
+    {
+      "from": "packages\\index\\src\\pipeline\\grounded-summary.ts",
+      "specifier": "./grounded.js",
+      "to": "packages\\index\\src\\pipeline\\grounded.ts"
+    },
+    {
+      "from": "packages\\index\\src\\vector\\retriever.ts",
+      "specifier": "./cosine.js",
+      "to": "packages\\index\\src\\vector\\cosine.ts"
+    },
+    {
+      "from": "packages\\index\\src\\vector\\chunk-evidence.ts",
+      "specifier": "./cosine.js",
+      "to": "packages\\index\\src\\vector\\cosine.ts"
+    },
+    {
+      "from": "packages\\index\\src\\graph\\build-graph.ts",
+      "specifier": "../tree/flatten-graph.js",
+      "to": "packages\\index\\src\\tree\\flatten-graph.ts"
+    },
+    {
+      "from": "apps\\api\\src\\visibility\\knowledge.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\visibility\\knowledge.ts",
+      "specifier": "../whatsapp/review/store.js",
+      "to": "apps\\api\\src\\whatsapp\\review\\store.ts"
+    },
+    {
+      "from": "apps\\api\\src\\visibility\\knowledge.ts",
+      "specifier": "../whatsapp/review/publication-contract.js",
+      "to": "apps\\api\\src\\whatsapp\\review\\publication-contract.ts"
+    },
+    {
+      "from": "apps\\api\\src\\visibility\\knowledge.ts",
+      "specifier": "../transcript-review/effective-reader.js",
+      "to": "apps\\api\\src\\transcript-review\\effective-reader.ts"
+    },
+    {
+      "from": "apps\\api\\src\\visibility\\knowledge.ts",
+      "specifier": "../native-evidence/resolver.js",
+      "to": "apps\\api\\src\\native-evidence\\resolver.ts"
+    },
+    {
+      "from": "apps\\api\\src\\native-evidence\\resolver.ts",
+      "specifier": "../auth.js",
+      "to": "apps\\api\\src\\auth.ts"
+    },
+    {
+      "from": "apps\\api\\src\\whatsapp\\review\\store.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\whatsapp\\review\\store.ts",
+      "specifier": "./detection.js",
+      "to": "apps\\api\\src\\whatsapp\\review\\detection.ts"
+    },
+    {
+      "from": "apps\\api\\src\\whatsapp\\review\\store.ts",
+      "specifier": "./validation.js",
+      "to": "apps\\api\\src\\whatsapp\\review\\validation.ts"
+    },
+    {
+      "from": "apps\\api\\src\\whatsapp\\review\\validation.ts",
+      "specifier": "../../../../../schema/whatsapp_candidates.schema.json",
+      "to": "schema\\whatsapp_candidates.schema.json"
+    },
+    {
+      "from": "apps\\api\\src\\whatsapp\\review\\detection.ts",
+      "specifier": "@lkb/db",
+      "to": "packages\\db\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\whatsapp\\review\\detection.ts",
+      "specifier": "../../hash.js",
+      "to": "apps\\api\\src\\hash.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\gws-gmail.ts",
+      "specifier": "@lkb/core",
+      "to": "packages\\core\\src\\index.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\gws-gmail.ts",
+      "specifier": "./public-webinars.js",
+      "to": "apps\\api\\src\\gws\\public-webinars.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\gws-gmail.ts",
+      "specifier": "../join-rules/calendar-link-extract.js",
+      "to": "apps\\api\\src\\join-rules\\calendar-link-extract.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\gws-gmail.ts",
+      "specifier": "../join-rules/youtube-live-extract.js",
+      "to": "apps\\api\\src\\join-rules\\youtube-live-extract.ts"
+    },
+    {
+      "from": "apps\\api\\src\\gws\\public-webinars.ts",
+      "specifier": "@lkb/ingest",
+      "to": "packages\\ingest\\src\\index.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./registry.js",
+      "to": "packages\\ingest\\src\\registry.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./gap-tracking.js",
+      "to": "packages\\ingest\\src\\gap-tracking.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/recording.js",
+      "to": "packages\\ingest\\src\\sources\\recording.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/document.js",
+      "to": "packages\\ingest\\src\\sources\\document.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/url.js",
+      "to": "packages\\ingest\\src\\sources\\url.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/whatsapp.js",
+      "to": "packages\\ingest\\src\\sources\\whatsapp.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/gdrive.js",
+      "to": "packages\\ingest\\src\\sources\\gdrive.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/toc-calendar.js",
+      "to": "packages\\ingest\\src\\sources\\toc-calendar.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./watched/schedule.js",
+      "to": "packages\\ingest\\src\\watched\\schedule.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./watched/check.js",
+      "to": "packages\\ingest\\src\\watched\\check.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./watched/run.js",
+      "to": "packages\\ingest\\src\\watched\\run.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/guarded-fetch.js",
+      "to": "packages\\ingest\\src\\sources\\guarded-fetch.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/node-transport.js",
+      "to": "packages\\ingest\\src\\sources\\node-transport.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/youtube.js",
+      "to": "packages\\ingest\\src\\sources\\youtube.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/hosted-recording.js",
+      "to": "packages\\ingest\\src\\sources\\hosted-recording.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./intake.js",
+      "to": "packages\\ingest\\src\\intake.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./join-policy/index.js",
+      "to": "packages\\ingest\\src\\join-policy\\index.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/onair.js",
+      "to": "packages\\ingest\\src\\sources\\onair.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\index.ts",
+      "specifier": "./sources/zoom-recording.js",
+      "to": "packages\\ingest\\src\\sources\\zoom-recording.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\index.ts",
+      "specifier": "./deps.js",
+      "to": "packages\\ingest\\src\\join-policy\\deps.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\deps.ts",
+      "specifier": "./join-rules-store.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\deps.ts",
+      "specifier": "./join-rules.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\deps.ts",
+      "specifier": "./registration-policy-store.js",
+      "to": "packages\\ingest\\src\\join-policy\\registration-policy-store.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy-store.ts",
+      "specifier": "./join-rules-store.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy-store.ts",
+      "specifier": "./join-rules.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy-store.ts",
+      "specifier": "./join-rules-optout.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-optout.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy-store.ts",
+      "specifier": "./join-rules-store-lock.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store-lock.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy-store.ts",
+      "specifier": "./registration-policy.js",
+      "to": "packages\\ingest\\src\\join-policy\\registration-policy.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy.ts",
+      "specifier": "./join-rules-normalize.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-normalize.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy.ts",
+      "specifier": "./join-rules.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\registration-policy.ts",
+      "specifier": "./platform.js",
+      "to": "packages\\ingest\\src\\join-policy\\platform.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules-store.ts",
+      "specifier": "./join-rules.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules-store.ts",
+      "specifier": "./join-rules-optout.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-optout.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules-store.ts",
+      "specifier": "./join-rules-store-lock.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store-lock.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\join-policy\\join-rules-store.ts",
+      "specifier": "./join-rules-store-lock.js",
+      "to": "packages\\ingest\\src\\join-policy\\join-rules-store-lock.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\intake.ts",
+      "specifier": "./registry.js",
+      "to": "packages\\ingest\\src\\registry.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\intake.ts",
+      "specifier": "./source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\hosted-recording.ts",
+      "specifier": "../source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\hosted-recording.ts",
+      "specifier": "./youtube.js",
+      "to": "packages\\ingest\\src\\sources\\youtube.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\hosted-recording.ts",
+      "specifier": "./onair.js",
+      "to": "packages\\ingest\\src\\sources\\onair.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\hosted-recording.ts",
+      "specifier": "./zoom-recording.js",
+      "to": "packages\\ingest\\src\\sources\\zoom-recording.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\youtube.ts",
+      "specifier": "../source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\youtube.ts",
+      "specifier": "./youtube-url.js",
+      "to": "packages\\ingest\\src\\sources\\youtube-url.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\watched\\run.ts",
+      "specifier": "./schedule.js",
+      "to": "packages\\ingest\\src\\watched\\schedule.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\watched\\run.ts",
+      "specifier": "./check.js",
+      "to": "packages\\ingest\\src\\watched\\check.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\whatsapp.ts",
+      "specifier": "../source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\url.ts",
+      "specifier": "../source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\url.ts",
+      "specifier": "./document.js",
+      "to": "packages\\ingest\\src\\sources\\document.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\document.ts",
+      "specifier": "../source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\ingest\\src\\sources\\recording.ts",
+      "specifier": "../source.js",
+      "to": "packages\\ingest\\src\\source.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-join.test.ts",
+      "specifier": "./auto-join.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\auto-join.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-join.test.ts",
+      "specifier": "./state/skip-describe.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\state\\skip-describe.ts"
+    },
+    {
+      "from": "packages\\meeting-bot\\src\\calendar\\auto-join.test.ts",
+      "specifier": "./calendar-client.js",
+      "to": "packages\\meeting-bot\\src\\calendar\\calendar-client.ts"
+    }
+  ],
+  "externalPackages": {
+    "mongodb": {
+      "manifest": "packages\\db\\node_modules\\mongodb\\package.json",
+      "version": "7.6.0",
+      "main": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\db\\node_modules\\mongodb\\lib\\index.js"
+    }
+  },
+  "unresolved": []
+}

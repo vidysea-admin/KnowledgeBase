@@ -12,6 +12,8 @@ import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { buildLastRun } from "./retention-last-run.js";
 import { runRetentionPurge, type PurgeDeps } from "./retention-purge.js";
+import { parseArgs } from "./retention-report-args.js";
+import { tenantRetentionSummaryPath, validRetentionTenant, writeTenantRetentionSummary } from "./production/private-summary.js";
 
 export const REPORT_VERSION = 1;
 export const MAX_REPORT_LINES = 2000;
@@ -37,7 +39,15 @@ export const REAL_JOB_IO: JobIo = {
   },
 };
 
-export interface JobDeps extends PurgeDeps { jobIo?: JobIo; /** when set, also write the compact /meeting-bot summary (retention-last-run.ts) here */ lastRunFile?: string; /** test seam: line cap, default MAX_REPORT_LINES */ maxLines?: number }
+export interface JobDeps extends PurgeDeps {
+  jobIo?: JobIo;
+  /** Optional explicit API/host configuration; must equal the strict --data-root. */
+  stateRoot?: string;
+  /** Compatibility assertion only: cannot choose a different/global summary path. */
+  lastRunFile?: string;
+  maxLines?: number;
+}
+const samePath = (a: string, b: string) => process.platform === "win32" ? resolve(a).toLowerCase() === resolve(b).toLowerCase() : resolve(a) === resolve(b);
 
 const SUMMARY_RE = /^SUMMARY mode=\S+ candidates=(\d+) deleted=(\d+) bytes=(\d+) vetoed=(\d+) failed=(\d+)$/;
 
@@ -73,6 +83,19 @@ export function runPurgeJob(argv: readonly string[], deps: JobDeps): number {
     deps.error("retention-purge-job: --report-file and the last-run summary path must differ (the summary would overwrite the full report)");
     return 2;
   }
+  const parsed = parseArgs(split.rest.filter(arg => arg !== "--execute"));
+  if (!parsed.ok || split.rest.filter(arg => arg === "--execute").length > 1) {
+    deps.error(`retention-purge-job: ${parsed.ok ? "--execute given more than once" : parsed.message}`); return 2;
+  }
+  const opts = parsed.opts;
+  if (!validRetentionTenant(opts.tenant) || !opts.dataRoot.trim()) { deps.error("retention-purge-job: invalid private-summary binding"); return 2; }
+  const summaryPath = tenantRetentionSummaryPath(opts.dataRoot, opts.tenant);
+  if (samePath(summaryPath, split.reportFile) || (deps.lastRunFile !== undefined && !samePath(deps.lastRunFile, summaryPath))) {
+    deps.error("retention-purge-job: report and bound private summary must differ; summary overrides are refused"); return 2;
+  }
+  if (deps.stateRoot !== undefined && (!deps.stateRoot.trim() || !samePath(deps.stateRoot, opts.dataRoot))) {
+    deps.error("retention-purge-job: configured LKB_RETENTION_DATA_ROOT must equal --data-root"); return 2;
+  }
   const lines: string[] = [];
   const startedAt = new Date(deps.now()).toISOString();
   const capture = (line: string): void => { lines.push(line); };
@@ -95,14 +118,7 @@ export function runPurgeJob(argv: readonly string[], deps: JobDeps): number {
     deps.error(`retention-purge-job: could not write the report file (${(e as NodeJS.ErrnoException).code ?? "error"})`);
     return code === 0 ? 5 : code;
   }
-  if (deps.lastRunFile !== undefined) {
-    try {
-      (deps.jobIo ?? REAL_JOB_IO).writeReport(deps.lastRunFile, `${JSON.stringify(buildLastRun(report, split.reportFile), null, 2)}
-`);
-    } catch (e) {
-      deps.error(`retention-purge-job: could not write the last-run summary (${(e as NodeJS.ErrnoException).code ?? "error"})`);
-      return code === 0 ? 5 : code;
-    }
-  }
+  const written = writeTenantRetentionSummary(opts.dataRoot, opts.tenant, buildLastRun(report, split.reportFile));
+  if (!written.ok) { deps.error(`retention-purge-job: could not write the private last-run summary (${written.reason})`); return code === 0 ? 5 : code; }
   return code;
 }

@@ -10,7 +10,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { planSendNow, type SendNowJob, type SendNowRefusal } from "./send-now.js";
+import { planSendNow, TERMINAL_JOB_STATUSES, type SendNowJob, type SendNowRefusal } from "./send-now.js";
+import type { WebinarOperationState } from "./calendar/state/schedule-state.js";
 import { assertTenantTag } from "./calendar/state/state-tenant-tag.js";
 import { liveRecordingDir, readLiveRecordings, type LiveProbes } from "./live-recording/live-recording.js";
 import { claimedRecordWithDefaults } from "./live-recording/claimed-record.js";
@@ -83,8 +84,8 @@ export async function runSendNow(rest: string[], deps: SendNowDeps): Promise<num
   return 0;
 }
 
-/** Where live jobs can be found today (see the manifest): the poller's operations rows carry status but NO url;
- * the task-scheduler's per-job files carry url but NO status. They are joined on sessionId. Neither store is
+/** Canonical poller operations resolve URLs through source-reconciliation aliases;
+ * task-scheduler files carry URLs and join operation status on sessionId. Neither store is
  * written by `runRecord`; manual and poller recordings are covered by `readAllLiveJobs` (live-recording view). */
 export interface LiveJobSources { operationsFile: string; scheduledDir: string; tenantId: string }
 
@@ -94,12 +95,12 @@ export interface LiveJobSources { operationsFile: string; scheduledDir: string; 
  * or `readScheduledJob` here: both turn a corrupt file into `{}` / `null`, i.e. into "no jobs". */
 export function readLiveJobs(
   src: LiveJobSources, now: Date,
-  readOperations: (file: string, tenantId: string, checkedAt: string) => { operations: Record<string, Record<string, any>> },
+  readOperations: (file: string, tenantId: string, checkedAt: string) => Pick<WebinarOperationState, "operations" | "source">,
 ): SendNowJob[] {
-  const ops = readOperations(src.operationsFile, src.tenantId, now.toISOString()).operations;
-  if (!existsSync(src.scheduledDir)) return [];
+  const state = readOperations(src.operationsFile, src.tenantId, now.toISOString()), ops = state.operations;
   const jobs: SendNowJob[] = [];
-  for (const name of readdirSync(src.scheduledDir).filter((n) => n.endsWith(".json"))) {
+  const mapped = new Set<string>();
+  for (const name of existsSync(src.scheduledDir) ? readdirSync(src.scheduledDir).filter((n) => n.endsWith(".json")) : []) {
     let job: { url?: unknown; sessionId?: unknown; until?: unknown };
     try { job = JSON.parse(readFileSync(path.join(src.scheduledDir, name), "utf8")); }
     catch { throw new Error(`scheduled job file ${name} is unreadable or not JSON`); }
@@ -111,6 +112,21 @@ export function readLiveJobs(
     // No operations row: still queued while `until` is ahead (or unparseable: fail closed); past `until` it has ended.
     const until = typeof job.until === "string" ? Date.parse(job.until) : NaN;
     jobs.push({ meetingUrl: job.url, status: row ? row.status : Number.isFinite(until) && until <= now.getTime() ? "ready" : "queued" });
+    mapped.add(job.sessionId);
+  }
+  // The canonical poller queues operations without task-scheduler job files.
+  // Historical aliases retain the original meeting when the source is rescheduled.
+  for (const [id, row] of Object.entries(ops)) {
+    if (mapped.has(id) || (TERMINAL_JOB_STATUSES as readonly unknown[]).includes(row.status)) continue;
+    const urls = new Set<string>();
+    for (const occurrence of Object.values(state.source?.reconciliation.occurrences ?? {})) {
+      for (const alias of occurrence.aliases) if (alias.key === id) {
+        const split = alias.identity.lastIndexOf("|");
+        if (split > 0) urls.add(alias.identity.slice(0, split));
+      }
+    }
+    if (!urls.size) throw new Error("active webinar operation has no verifiable meeting identity");
+    for (const meetingUrl of urls) jobs.push({ meetingUrl, status: row.status });
   }
   return jobs;
 }
@@ -134,7 +150,7 @@ export async function defaultSendNowDeps(): Promise<SendNowDeps> {
   return {
     runRecord: (rest) => claimedRecordWithDefaults(rest, runRecord), now, write: (line) => console.error(line), validateUntil: todayAt,
     readLiveJobs: () => readAllLiveJobs(
-      { operationsFile: path.join(root, "data", "webinar-release", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), recordingsDir: liveRecordingDir(root), tenantId: captureTenant([]) },
+      { operationsFile: path.join(root, "raw", "webinars", "operations.json"), scheduledDir: path.join(root, "raw", "webinars", "scheduled"), recordingsDir: liveRecordingDir(root), tenantId: captureTenant([]) },
       now(), readWebinarOperationState),
   };
 }

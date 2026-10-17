@@ -129,8 +129,11 @@ function optOutBody(req: Request): { eventId: string; hint: { meetingUrl?: strin
   return { eventId: body.eventId, hint };
 }
 
+import { createRegistrationPolicyRouter } from "./registration-policy-router.js";
+
 export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
   const router = Router();
+  router.use(createRegistrationPolicyRouter(deps.registrationPolicy));
   const tails = new Map<string, Promise<unknown>>();
 
   /** One writer at a time per tenant (in this process); other tenants are never blocked. */

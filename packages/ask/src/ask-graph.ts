@@ -9,6 +9,7 @@
  * non-BoundedAskError once, in askGraphV2) — the original error propagates exactly as before.
  */
 import type { TreeIndexNode } from "@lkb/core";
+import type { StateGraph as OfficialStateGraph } from "@langchain/langgraph";
 import { recordJob } from "@lkb/ai";
 
 import { ask, type AskResult, type WebSource } from "./router.js";
@@ -17,9 +18,10 @@ import { selectNodes, type CompleteFn } from "./select-nodes.js";
 import { rrfMerge } from "./merge.js";
 import { refine, type RefinableDoc } from "./refine.js";
 import { answer as generateAnswer } from "./answer.js";
-import { sourceCatalog, validateHydration, sourceQuotes, completionBudget, BoundedAskError, SOURCE_LIMITS } from "./source-context.js";
+import { sourceCatalog, validateHydration, sourceQuotes, isNativeSourceQuote, completionBudget, BoundedAskError, SOURCE_LIMITS } from "./source-context.js";
 import { boundedRefine, contextStrips, type ContextSource } from "./bounded-refine.js";
 import type { AskV2Deps, AskV2Result, AuditEntry } from "./ask-shared.js";
+import { completionAudit } from "./usage-audit.js";
 
 export type AskNodeName = "retrieve" | "evaluate" | "refine" | "answer";
 
@@ -160,7 +162,7 @@ const refineNode: AskGraphNode = {
     const askResult = s.askResult!;
     const goodDocNodes: TreeIndexNode[] = askResult.scored.filter((x) => x.score >= s.lower).map((x) => x.node);
     const boundedSources: ContextSource[] = deps.sourceContext ? [
-      ...goodDocNodes.flatMap((n) => sourceQuotes(n).map((q) => ({ id: q.id, text: q.quote, origin: q.origin, source: { speakerRef: q.speakerRef, turnId: q.turnId, sessionRef: q.sessionRef, tStart: q.tStart, tEnd: q.tEnd } }))),
+      ...goodDocNodes.flatMap((n) => sourceQuotes(n).map((q) => ({ id: q.id, text: q.quote, origin: q.origin, source: isNativeSourceQuote(q) ? { sourceLocator: q.sourceLocator } : { speakerRef: q.speakerRef, turnId: q.turnId, sessionRef: q.sessionRef, tStart: q.tStart, tEnd: q.tEnd } }))),
       ...askResult.sources.web.map((w, i) => ({ id: `web-${i}`, text: webDocText(w), origin: "web-unverified" })),
     ] : [];
     s.boundedSources = boundedSources;
@@ -184,8 +186,13 @@ const answerNode: AskGraphNode = {
   name: "answer",
   async run(s) {
     const askResult = s.askResult!;
+    const nativeNodes = s.deps.sourceContext ? s.candidates.filter((node) => sourceQuotes(node).some(isNativeSourceQuote)) : [];
+    const revalidate = s.deps.sourceContext?.revalidate;
+    if (nativeNodes.length && !revalidate) throw new BoundedAskError("native source revalidation is unavailable");
+    if (nativeNodes.length) await revalidate!(nativeNodes);
     const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources } : undefined);
     s.budget?.assertHealthy();
+    if (nativeNodes.length) await revalidate!(nativeNodes);
     s.result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog };
   },
 };
@@ -201,7 +208,7 @@ export function initAskGraphState(query: string, tree: TreeIndexNode, deps: AskV
   const loggingComplete = (step: string): CompleteFn => async (job) => {
     const completion = await complete(job);
     await recordJob({ tenantId, kind: `ask.${step}`, status: "done", provider: completion.provider, model: completion.model }, write);
-    auditLog.push({ jobKind: `ask.${step}`, step, provider: completion.provider, model: completion.model, costUsd: completion.costUsd });
+    auditLog.push(completionAudit(step, completion));
     return completion;
   };
   return {
@@ -223,9 +230,35 @@ export async function runAskGraphNodes(nodes: readonly AskGraphNode[], state: As
   throw new Error("ask graph ended without a result");
 }
 
+/** D-142: official execution is opt-in; both executors consume the same authoritative nodes. */
+export const officialAskGraphEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => env.LKB_ASK_GRAPH === "1";
+
+export async function runAskLangGraphNodes(nodes: readonly AskGraphNode[], state: AskGraphState): Promise<AskV2Result> {
+  if (!nodes.length) throw new Error("ask graph ended without a result");
+  const { Annotation, END, START, StateGraph } = await import("@langchain/langgraph");
+  const State = Annotation.Root({ next: Annotation<string>() });
+  const builder: OfficialStateGraph<typeof State.spec, typeof State.State, typeof State.Update, string> = new StateGraph(State);
+  const destinations = [...nodes.map(n => n.name), END];
+  for (const [index, node] of nodes.entries()) {
+    builder.addNode(node.name, async () => {
+      state.trace.push(node.name);
+      await node.run(state);
+      return { next: state.result ? END : nodes[index + 1]?.name ?? END };
+    });
+    builder.addConditionalEdges(node.name, s => s.next, destinations);
+  }
+  builder.addEdge(START, nodes[0]!.name);
+  await builder.compile().invoke({ next: nodes[0]!.name }, { recursionLimit: nodes.length + 2 });
+  if (!state.result) throw new Error("ask graph ended without a result");
+  return state.result;
+}
+
 /** The single /ask implementation (askV2 delegates here). The graph itself stays unexported from index.ts. */
-export async function askGraphV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
-  try { return await runAskGraphNodes(ASK_GRAPH, initAskGraphState(query, tree, deps)); }
+export async function askGraphV2(query: string, tree: TreeIndexNode, deps: AskV2Deps, options: { officialGraph?: boolean } = {}): Promise<AskV2Result> {
+  try {
+    const run = (options.officialGraph ?? officialAskGraphEnabled()) ? runAskLangGraphNodes : runAskGraphNodes;
+    return await run(ASK_GRAPH, initAskGraphState(query, tree, deps));
+  }
   catch (err) {
     if (deps.sourceContext) {
       const failure = err instanceof BoundedAskError ? err : new BoundedAskError("source or completion processing failed");

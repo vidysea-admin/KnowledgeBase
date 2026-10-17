@@ -1,0 +1,60 @@
+{
+  "request": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/broker-request.json",
+    "sha256": "3fdb35142ed7ae533642de3075a64af6d34d1dac545fe5983c460ecc99a6e6d6"
+  },
+  "candidate": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\80fbc19f24f361aaffd1eab7377644ec51d31293507f3eda8732bf8f05d7569e.json",
+    "sha256": "80fbc19f24f361aaffd1eab7377644ec51d31293507f3eda8732bf8f05d7569e",
+    "count": 89
+  },
+  "trace": {
+    "status": "DIAGNOSTIC_INCOMPLETE",
+    "records": 0
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-head-before-receipt.json",
+      "sha256": "ab269d312fba898b71e6d61e3986f807d6d745e6484ee82e563ef3743aff3eb6",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.625,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-head-before.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-affected-bot-types-receipt.json",
+      "sha256": "85293f78b6ec89b1ea8a7e28cf3957f5cc09b916ef43da835397d45043fa1c0f",
+      "exit": 124,
+      "counts": {},
+      "active_s": 15.640999999999622,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-affected-bot-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-head-after-receipt.json",
+      "sha256": "1603ec46d2b880346e84a951f8c12cc64dcfebc78188c833628a33896516ec37",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.6100000000005821,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-head-after.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    }
+  ],
+  "failure": "AssertionError: prerequisite failure",
+  "selectedTitles": "--test-name-pattern=^(?:retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse|fair bounded pages, quota-before-allocation and interrupted journal refuse)$",
+  "elapsed_s": 19.264999999999418,
+  "allPinsFinalMatch": true,
+  "headAfter": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "ownedFixtureRemoved": false,
+  "accounting": "SHARED INTEGRATION only; not watched checker",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

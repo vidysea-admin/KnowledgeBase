@@ -1,0 +1,40 @@
+✔ shutdown during acquisition, registration, rules, preparation or ownership recheck admits no new capture (5.273ms)
+✔ canonical completion accepts bound legacy/v3 selected-artifact proofs and refuses mismatched marker/source/DB/validation (3363.2258ms)
+✔ canonical autonomous acquisition continues during two owned captures; capacity and career priority are durable (2202.6074ms)
+✔ autonomous rule vetoes are persisted even with no allowed schedule and cannot launch (57.2901ms)
+✔ automatic service refuses unenforced rules and absent real slot readiness before discovery (5.9708ms)
+✔ one owned capture failure never stops another owned slot or creates a false ready state (478.1999ms)
+✔ a completed index marker cannot bypass graph recovery acknowledgement after interrupted completion (433.8995ms)
+✖ shutdown after recording disposition but before child microtask prevents launch and retains queued work (57.7961ms)
+✔ autonomous recovery gates legacy default-workspace artifacts instead of allocating an unrelated slot (62.665ms)
+✔ owned slot recovery passes the persisted slot to the child and preserves its durable identity (420.899ms)
+✔ canonical recording publication failure stops its actual controller and prevents a false ready result (131.0399ms)
+✔ canonical pool uses only accepted matching capabilities and keeps unsupported coverage queued (641.5165ms)
+✔ fresh slot validation refuses capture when previously accepted evidence is revoked (66.413ms)
+✔ disabled refreshed scheduler controls prevent discovery, registration and capture admissions (26.671ms)
+✔ active capture loses verified authority, stops its owned generation, and cannot become ready (116.5516ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 61786.1058
+
+✖ failing tests:
+
+test at scripts\webinar\scheduler\pipeline.test.mjs:93:1
+✖ shutdown after recording disposition but before child microtask prevents launch and retains queued work (57.7961ms)
+  AssertionError [ERR_ASSERTION]: false == true
+      at file:///C:/Users/product/Desktop/KnowledgeBase/scripts/webinar/scheduler/pipeline.test.mjs:99:10
+      at async withFixture (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/webinar/run-pipeline-fixtures.mjs:26:30)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

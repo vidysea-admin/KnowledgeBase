@@ -1,0 +1,46 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null,
+    "token_metric": "actual_total"
+  },
+  "reviewers": [
+    {
+      "id": "not-started",
+      "token_metric": "actual_total",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null,
+      "status": "No reviewer dispatched; zero means no execution, not unknown launched usage"
+    }
+  ],
+  "next_phase": {
+    "active_s": 150,
+    "tokens": 20000,
+    "cost": null,
+    "token_metric": "actual_total",
+    "kind": "review"
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "watched-cadence-launcher/1/6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "completion_reserve_tokens": 4000,
+  "bootstrap_scope": "One eight-file joined watched cadence/auth/lifecycle unit including exact unchanged-JS declaration; same manual review allocation",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000,
+    "cost": null,
+    "token_metric": "actual_total"
+  },
+  "escalation": {
+    "reason": "Default6000 insufficient for skill/startup and seven-file auth/tenant/write/lifecycle security inspection; ratio remains unverified",
+    "limits": {
+      "active_s": 180,
+      "tokens": 24000,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "authority": "Root explicit once finite180s/24000 allocation including4000completion"
+  }
+}

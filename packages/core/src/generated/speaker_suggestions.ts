@@ -9,6 +9,17 @@
  */
 export type SpeakerSuggestions = {
   /**
+   * Server-stamped native publication binding; descriptive data, never capture authority or human confirmation.
+   */
+  nativePublication?: {
+    sourceId: string;
+    generation: string;
+    turnDigest: string;
+    reviewRevision: string | null;
+    captureGeneration: string;
+    receiptSha256: string;
+  };
+  /**
    * Deterministic: <tenantId>-<sessionId>-<speakerRef>-<personId>, so re-suggesting is an idempotent no-op.
    */
   _id: string;
@@ -59,6 +70,11 @@ export type SpeakerSuggestions = {
   blocks?: {
     startTurnIndex: number;
     endTurnIndex: number;
+    /**
+     * @minItems 1
+     */
+    turnIds?: [string, ...string[]];
+    transcriptHash?: string;
     [k: string]: unknown;
   }[];
   suggestedAt: string;

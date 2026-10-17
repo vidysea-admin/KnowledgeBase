@@ -1,0 +1,25 @@
+{
+  "title": "genuine read-only closed spool seals without changing source mode or bytes",
+  "matchingOriginalDeclarations": 1,
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=70000",
+    "--test-name-pattern=^genuine\\ read\\-only\\ closed\\ spool\\ seals\\ without\\ changing\\ source\\ mode\\ or\\ bytes$",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  ],
+  "oldVectorFlags": [
+    "--test-isolation=none",
+    "--test-timeout=65000"
+  ],
+  "newVectorFlags": [
+    "default per-file process isolation",
+    "--test-timeout=70000",
+    "positive anchored exact name"
+  ],
+  "authority": "root next-split remaining readonly priority;75s incl close,300s global; no repeat",
+  "accounting": "shared maker/integration; not checker"
+}

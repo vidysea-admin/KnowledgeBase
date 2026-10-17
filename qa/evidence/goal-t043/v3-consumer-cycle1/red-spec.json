@@ -1,0 +1,14 @@
+{
+  "name": "T043 actual current v3 producer to original finalizer compatibility floor",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "program": "C:/Program Files/nodejs/node.exe",
+  "args": ["--test", "--import", "tsx", "--test-isolation=none", "--test-concurrency=1", "--test-timeout=30000", "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs"],
+  "timeoutMs": 60000,
+  "costUsd": 0,
+  "expectedOutcome": "RED before validator repair: actual sync emits v3; actual original finalizer requires v2. Preserve actual exit/output rather than assuming this expectation.",
+  "scope": "Local synthetic filesystem fixtures and current actual producer source block plus actual finalizer guard; no provider, database, browser, native app or external call. This does not establish parent live acceptance.",
+  "sourcePinsPath": "qa/evidence/goal-t043/v3-consumer-cycle1/source-pins.json",
+  "stdoutPath": "qa/evidence/goal-t043/v3-consumer-cycle1/original-red.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t043/v3-consumer-cycle1/original-red.stderr.txt",
+  "receiptPath": "qa/evidence/goal-t043/v3-consumer-cycle1/original-red.receipt.json"
+}

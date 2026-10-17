@@ -1,9 +1,9 @@
 /**
  * scripts/webinar/join-rules-host.ts — T-037 unit `t037-join-rules-api-host`.
- * Production wiring for the join-rules edit API. `.dependency-cruiser.cjs` forbids `apps/* ->
- * packages/meeting-bot`, but only cruises `packages apps workers`, so a script is the one lawful place
- * that may import both `apps/api` (the structural `JoinRulesDeps`) and the real store/validator.
- * Pure helpers only (no listen, no Mongo): the entry point is join-rules-api-host.ts.
+ * Compatibility host wiring for the join-rules edit API. The canonical engine/store is in
+ * packages/ingest/src/join-policy, so both API and bot consumers follow their permitted dependency layer.
+ * This script retains host-state readiness/PID helpers; createJoinRulesDeps only binds the shared factory.
+ * No listen or Mongo here: the compatibility entry point is join-rules-api-host.ts.
  */
 import { accessSync, closeSync, constants, mkdirSync, openSync, readFileSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync, writeSync } from "node:fs";
 import { randomBytes } from "node:crypto";
@@ -11,29 +11,13 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { JoinRulesDeps } from "../../apps/api/src/join-rules/deps.js";
-import { loadJoinRules, saveJoinRules, loadJoinRulesWithValidator, saveJoinRulesIf, recordTenantApproval, recordTenantOptOut, recordTenantUnOptOut } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.js";
-import { validateJoinRuleSet } from "../../packages/meeting-bot/src/calendar/join-rules/join-rules.js";
+import { createJoinPolicyDeps } from "../../packages/ingest/src/join-policy/deps.js";
 
 export const HOST_PID_FILE = "join-rules-host.pid";
 
 /** The real store + engine validator mapped onto the injected seam. Store errors pass through unchanged. */
 export function createJoinRulesDeps({ stateDir }: { stateDir: string }): JoinRulesDeps {
-  return {
-    load: t => loadJoinRules(stateDir, t),
-    save: (t, v) => saveJoinRules(stateDir, t, v), // legacy unconditional replace: NOT used by the PUT route any more
-    loadWithValidator: t => loadJoinRulesWithValidator(stateDir, t),
-    // The PUT route's only write path: the store's atomic compare-and-set (per-tenant lock, state taken under the lock).
-    saveIf: (t, expected, ruleSet) => saveJoinRulesIf(stateDir, t, expected, ruleSet),
-    validateRuleSet: validateJoinRuleSet,
-    recordApproval: (t, a) => recordTenantApproval(stateDir, t, a),
-    recordOptOut: (t, id, meeting) => recordTenantOptOut(stateDir, t, id, {}, meeting),
-    // Un-opt: the store's locked read-modify-write (recordTenantUnOptOut) - load, pure removal and write are ONE critical section per tenant
-    // across processes. A no-op writes nothing; a busy lock throws the store's typed `locked` error and nothing is written.
-    removeOptOut: (t, id, meeting) => {
-      const r = recordTenantUnOptOut(stateDir, t, id, {}, meeting);
-      return { state: r.state, removed: { eventId: r.removedEventId, meetings: r.removedMeetings } };
-    },
-  };
+  return createJoinPolicyDeps({stateDir});
 }
 
 /** Exactly the scheduler's rule (schedule-tick.ts DEFAULT_STATE_DIR): `<repo root>/raw/webinars`.

@@ -1,0 +1,26 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+const gitproof=JSON.parse(fs.readFileSync('qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-gitproof.json','utf8').replace(/^\uFEFF/,''));
+import {verdictCycle,manifestCycle,canonicalHandshakeStatus} from '../../../../scripts/qa/dispatch-state.mjs';
+const root=process.cwd(),dir=path.resolve('qa/coordination/resume-20261015/u22-resume-prep');
+const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const verdictPath='qa/verdicts/u22-extraction-review-resume.md',manifestPath='qa/manifests/u22-extraction-review-resume.md';
+const verdict=fs.readFileSync(verdictPath,'utf8');let manifest=fs.readFileSync(manifestPath,'utf8');
+const field=n=>new RegExp('^'+n+':\\s*(\\S+)','m').exec(verdict)?.[1];
+if(field('Verdict')!=='PASS'||field('Status')!=='PASS'||verdictCycle(verdict)!==0||manifestCycle(manifest)!==0||field('Reviewed SHA')!=='d0f6f2eff242f98a85ba4ccde483db08030ba3c8'||field('Base SHA')!=='37e51f95c367594bddb422c39c11415674ecf001')throw Error('canonical-verdict-identity-refused');
+const pins=JSON.parse(fs.readFileSync(path.join(dir,'committed-source-binding.json'),'utf8')).files;
+for(const p of pins){if(sha(p.path)!==p.rawSha256)throw Error('raw-source-drift');const entry=gitproof.sources.find(x=>x.path===p.path);const blob=entry.blob,filtered=entry.filtered;if(blob!==p.committedBlob||blob!==filtered)throw Error('git-source-drift');}
+const boundary='qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json';if(sha(boundary)!=='f900ca55faa59d8e86b9cdde088691294e8ef348625b99433dddb4e0eb68b603')throw Error('boundary-seal-drift');
+manifest=manifest.replace(/^\*\*Handshake status:\*\* ready-for-check/m,'**Handshake status:** checked-PASS').replace(/^Status: ready-for-check/m,'Status: checked-PASS');
+manifest+='\n## Maker close-out — cycle0\nCanonical independent PASS/cycle0/d0f6f2eff242f98a85ba4ccde483db08030ba3c8/base37e51f95 independently parsed with dispatch-state verdictCycle/manifestCycle and anchored authoritative fields; both raw/Git source pins unchanged. This closes only additive resume S1–S5. Current independent1/1/zeroFAIL/zeroSKIP probe seal f900ca55... ran atd0,2.078s CHECKER accounting. Original maker3/3 ran atparent37 with exact content equivalence; verifier0 remains vacuous. Full U2.2 P1–P4 OPEN, labels0 and39includedparents in_progress unchanged. Wholechecker actual usage null, no10percent claim. Closeout receipt: qa/coordination/resume-20261015/u22-resume-prep/maker-closeout.json.\n';
+fs.writeFileSync(manifestPath,manifest);
+const reread=fs.readFileSync(manifestPath,'utf8');if(canonicalHandshakeStatus(reread)!=='checked-PASS'||manifestCycle(reread)!==0)throw Error('manifest-parser-closeout-failed');
+const receipt={status:'checked-PASS',cycle:0,candidate:field('Reviewed SHA'),base:field('Base SHA'),parser:'scripts/qa/dispatch-state.mjs verdictCycle/manifestCycle/canonicalHandshakeStatus + anchored authoritative verdict fields',verdict:{path:verdictPath,sha256:sha(verdictPath)},manifest:{path:manifestPath,sha256:sha(manifestPath)},sourcePins:pins,independent:{seal:boundary,sha256:sha(boundary),pass:1,fail:0,skip:0,active_s:2.078,accounting:'CHECKER'},makerEvidence:'3/3 at parent37, qualified exact bytes to d0; mandatory verifier0/vacuous',checkerActualUsage:null,ratioVerified:false,parentUnchanged:true,genuineHumanLabels:0,actions:{sourceEdits:0,gitWrites:0,parentTrackerEdits:0}};
+fs.writeFileSync(path.join(dir,'maker-closeout.json'),JSON.stringify(receipt,null,2)+'\n');
+const scopes=[manifestPath,verdictPath,'qa/coordination/resume-20261015/u22-resume-prep',boundary];
+const status='';
+const paths=[...gitproof.qaDelta,'qa/manifests/u22-extraction-review-resume.md','qa/coordination/resume-20261015/u22-resume-prep/maker-closeout.json','qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-gitproof.json'];
+paths.push('qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json');
+fs.writeFileSync(path.join(dir,'maker-closeout-allowlist.json'),JSON.stringify({paths:[...new Set(paths)].sort(),QAOnly:true,stageCommitPerformed:false,noSourceParentTrackerDecisionPaths:true},null,2)+'\n');
+console.log(JSON.stringify({manifestSha256:sha(manifestPath),verdictSha256:sha(verdictPath),receiptSha256:sha(path.join(dir,'maker-closeout.json')),allowlistSha256:sha(path.join(dir,'maker-closeout-allowlist.json')),paths:paths.length}));

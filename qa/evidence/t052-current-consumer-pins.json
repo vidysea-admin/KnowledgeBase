@@ -1,0 +1,24 @@
+{
+  "status": "BUILDING; read-only byte checkpoint, not runtime acceptance",
+  "cycle": 1,
+  "liveProviderExecuted": false,
+  "pins": {
+    "apps/api/src/gws/gws-gmail.ts": "81385D2E023C40BF9E5B75FD592BBF901327FFF08A985CEC160281D42E28C455",
+    "apps/api/src/store.ts": "9D976378610A30D56AE12842F2D5024A1363206923DD56325F8E839BEAF45907",
+    "apps/api/src/routes/meeting-candidates.ts": "10A5F6457B4405308F68D83B972F3D41DA0AE58EEF159CD749B96CB063125E21",
+    "packages/db/src/collections/meeting-candidates.ts": "F5DF62C1656F7733FFC280BE56260BFF4C49F18108BFD899E4BCB5AFF56775D9",
+    "schema/meeting_candidates.schema.json": "9D3B6B5D6176C29BAD4BC7FC4C5C2AFC4EEE5F9227AF8D9E7B02BE399EA8203D",
+    "packages/core/src/generated/meeting_candidates.ts": "D6A4F5BE963D022BBE07BF768AC20C59295DF4724279C92A2A9CA71E316AA626",
+    "packages/core/src/domain/webinar-types.ts": "B0D4489E833E2734F3034356ADD7D2F1C96714895DB7F19888176160D4709760",
+    "packages/meeting-bot/src/calendar/schedule-loaders.ts": "D87F073C1B78CF13630F063CDC897DE7F5E27294487E236A2AA49DE8830F8F35",
+    "packages/meeting-bot/src/calendar/calendar-client.ts": "18E631DEFD413CC832BA60FA10DF390B5444BD53FFF78D1CD4EC9F13A4384307",
+    "scripts/webinar/run-pipeline-deps.mjs": "603D193DBDDE031621BC721AD8C2DED15C1BD9E825DE349FFEE09E2DC3D7036B",
+    "scripts/webinar/run-pipeline.mjs": "31BC17E84F0C51C5E0FEC196A52A369CE45757C75457C24E1297791857E03F83"
+  },
+  "remaining": [
+    "Broker-granted focused tests/typecheck/verifier; faithful six affected runner fixtures are authored, unexecuted",
+    "Existing messageId rows return early in createIfNew; new receipt/auth provenance is not refreshed on rescan",
+    "Inactive provider candidates need real independently verified metadata, durable consume/dedup, and explicit activation approval",
+    "Full real registration/restart/OS/downstream acceptance remains HOLD"
+  ]
+}

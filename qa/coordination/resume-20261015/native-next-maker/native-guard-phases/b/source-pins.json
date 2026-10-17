@@ -1,0 +1,6 @@
+{
+  "nonblank_lines": 256,
+  "sha256": "3b4a63e28cf619d8ff41078f4d337e171c93daac0877c80bc7c9d68d6870ae45",
+  "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+  "total_lines": 263
+}

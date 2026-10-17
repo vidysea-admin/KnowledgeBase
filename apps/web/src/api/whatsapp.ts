@@ -23,3 +23,25 @@ export function listWhatsAppGroups(apiKey: string | null): Promise<{ groups: Wha
 export function ingestWhatsAppGroup(apiKey: string | null, groupJid: string): Promise<WhatsAppIngestResult> {
   return apiFetch("/whatsapp/ingest", apiKey, { method: "POST", body: { groupJid } });
 }
+
+// HTTP response shape, matching the schema-generated backend candidate without a domain import.
+export interface WhatsAppCandidate {
+  _id: string;
+  sessionId: string;
+  groupJid: string;
+  kind: "claim" | "topic" | "decision" | "attachment";
+  text: string;
+  status: "needs-review" | "approved" | "rejected";
+  attachment?: { name: string; mimeType?: string };
+  evidence: { turnId: string; sessionId: string; speakerRef: string; speakerLabel?: string; quote: string; occurredAt: string }[];
+  flags: { kind: "sensitive" | "duplicate" | "personal-excluded"; reason: string; turnId: string; duplicateOf?: string }[];
+  decision?: { action: "approved" | "rejected"; actor: string; at: string };
+}
+
+export function listWhatsAppCandidates(apiKey: string | null): Promise<{ candidates: WhatsAppCandidate[] }> {
+  return apiFetch("/whatsapp/review", apiKey);
+}
+
+export function decideWhatsAppCandidate(apiKey: string | null, id: string, action: "approve" | "reject"): Promise<{ candidate: WhatsAppCandidate; changed: boolean }> {
+  return apiFetch(`/whatsapp/review/${encodeURIComponent(id)}/${action}`, apiKey, { method: "POST", body: {} });
+}

@@ -68,7 +68,7 @@ export function indexFile(names) {
     : `${collectionLines.join("\n")}\n`;
   const alerts = domainModuleNames("alerts").map(n => `export * from "./alerts/${n}.js";`);
   const alertBody = alerts.length ? `\n// U4b/R2 (D-053): the thin alert interface apps/* imports so a real alert can be delivered\n// without apps/* importing packages/meeting-bot (.dependency-cruiser.cjs forbids that edge).\n${alerts.join("\n")}\n` : "";
-  return `// @lkb/core — generated types re-exported (schema/ is the source of truth; see scripts/gen-types.mjs).\n// Pure domain functions (no I/O) go in src/domain/<concept>.ts (D-003) — auto re-exported below.\n${body}${alertBody}`;
+  return `// @lkb/core — generated types re-exported (schema/ is the source of truth; see scripts/gen-types.mjs).\n// Pure domain functions (no I/O) go in src/domain/<concept>.ts (D-003) — auto re-exported below.\n${body}${alertBody}export type { NativePassageLocator, DocumentPageSourceLocator, MessageSourceLocator, NativeSourceLocator, SourceLocator } from "./source-locator.js";\n`;
 }
 
 async function main() {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { getTranscriptReview, saveTranscriptReview } from "./transcriptReview.js";
+import { getTranscriptReview, saveTranscriptReview, getTranscriptReviewHistory, refreshTranscriptReview } from "./transcriptReview.js";
 import * as client from "./client.js";
 afterEach(() => vi.restoreAllMocks());
 const valid = () => ({ sessionId: "s1", revision: "r1", refresh: "complete", turns: [
@@ -31,4 +31,13 @@ describe("revision-bound review client", () => {
       call.mockResolvedValue(bad); await expect(saveTranscriptReview("k", "s1", request)).rejects.toThrow("Invalid transcript review response");
     }
   });
+});
+test("history rejects foreign or invalid audit and refresh requires same loaded revision", async () => {
+  const call = vi.spyOn(client, "apiFetch").mockResolvedValue({ sessionId: "s1", revisions: [{ revision: "r1", parentRevision: "base-r0", actorRef: "key:t", reviewedAt: "2026-10-14T10:00:00Z", reason: "Checked", changes: [{ turnId: "t1", before: { text: "One", speakerRef: "spk:0" }, after: { text: "Two", speakerRef: "person:a" } }] }] });
+  expect((await getTranscriptReviewHistory("k", "s1"))[0]!.changes[0]!.after.text).toBe("Two");
+  call.mockResolvedValue({ sessionId: "foreign", revisions: [] }); await expect(getTranscriptReviewHistory("k", "s1")).rejects.toThrow();
+  call.mockResolvedValue({ sessionId: "s1", revision: "r1", refresh: "complete", completed: ["claims", "session-page", "chunks", "tree", "graph"] });
+  expect(await refreshTranscriptReview("k", "s1", "r1")).toBe("complete");
+  expect(call).toHaveBeenLastCalledWith("/sessions/s1/transcript-review/refresh", "k", { method: "POST", body: {}, headers: { "If-Match": '"r1"' } });
+  call.mockResolvedValue({ sessionId: "s1", revision: "r2", refresh: "complete", completed: [] }); await expect(refreshTranscriptReview("k", "s1", "r1")).rejects.toThrow();
 });

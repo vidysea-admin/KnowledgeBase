@@ -12,7 +12,10 @@ import { describeSkip } from "./state/skip-describe.js";
 import { requireStateTenant } from "./state/state-tenant-tag.js";
 import { recordSkipped } from "./state/skipped-state.js";
 import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
+import { scheduledDispatchIdentity } from "./scheduled-dispatch.js";
 import { enforceJoinRules, parseJoinRulesEnforce, type JoinRulesEnforceIo } from "./join-rules/join-rules-enforce.js";
+import { projectApprovedSenderTrust, type ApprovedTrustContext } from "./join-rules/join-rules-approved-trust.js";
+import { classifyWebinarInvite } from "./auto-record-policy.js";
 import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
@@ -103,10 +106,14 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
     onCorruptUnmoved: (why) => deps.log(`  WARNING: schedule-state.json is corrupt and could not be moved aside (${why}); proceeding with EMPTY dedup state so meetings are still joined`),
   });
 
-  const selected = selectAutoRecordItems({
+  const select = (authority?: ApprovedTrustContext) => selectAutoRecordItems({
     calendarEvents, candidates, now, leadMinutes: DEFAULT_LEAD_MINUTES, trustedSenders, alreadyScheduled,
     everyWebinar: deps.everyWebinar, ...lookup?.hooks,
-  });
+  }, { trustedSendersForCandidate: authority?.configuredTenantId === stateTenant ? candidate => projectApprovedSenderTrust({context: authority,
+    candidate, base: trustedSenders, classification: lookup?.hooks.classifyInvite?.({title: candidate.title,
+      meetingUrl: candidate.meetingUrl, sender: candidate.senderEmail}) ?? classifyWebinarInvite(candidate.title),
+    leadMinutes: DEFAULT_LEAD_MINUTES}) : undefined });
+  const selected = select();
   // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
   // Key tenant (ISS-T037WIRE-001): fetched per tick, only when enforcing; a throwing loader means "unverified" (null).
   const keyTenantId = deps.joinRulesKeyTenantId === undefined && deps.loadKeyTenant && parseJoinRulesEnforce(deps.joinRulesEnforce) !== "off"
@@ -114,6 +121,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   const result = await enforceJoinRules(selected, {
     mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
     now: () => Date.parse(now), readOnly: dryRun, onDegraded: aj?.rulesDegraded, onHealthy: aj?.rulesHealthy,
+    selectWithRules: deps.everyWebinar ? undefined : select,
   });
 
   deps.log(`schedule-tick: ${result.toSchedule.length} to schedule, ${result.skipped.length} skipped ` +
@@ -156,6 +164,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
         until: item.endTime,
         title: item.title,
         sessionId: item.sessionKey,
+        dispatchPolicyV1: scheduledDispatchIdentity(item),
       }, stateTenant);
     } catch (err) {
       // ISS-321: writeScheduledJob refuses (throws) when jobKey already belongs to a different

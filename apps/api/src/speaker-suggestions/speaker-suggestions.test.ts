@@ -8,7 +8,7 @@ import assert from "node:assert/strict";
 import type { SpeakerSuggestions } from "@lkb/core";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
-import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions.testdb.js";
+import { memoryDb } from "../../../../packages/db/src/collections/speaker-suggestions/testdb.js";
 import { createMongoSpeakerSuggestionDeps } from "./store.js";
 
 const keys = fakeKeyStore({
@@ -33,6 +33,9 @@ const base = (path = "") => `/sessions/${SESSION}/speaker-suggestions${path}`;
 
 async function boot() {
   const m = memoryDb();
+  for (const tenantId of ["tenant-A", "tenant-B"]) m.seed("sessions", { _id: SESSION, tenantId,
+    sourceId: `synthetic-suggestion-${tenantId}`, title: "Synthetic suggestion fixture", date: "2026-10-16",
+    status: { transcribe: "done", index: "pending" } });
   m.seed("speaker_suggestions", suggestion("tenant-A"));
   m.seed("speaker_suggestions", suggestion("tenant-B"));
   const server = await startTestServer(buildTestDeps({ keyStore: keys, speakerSuggestions: createMongoSpeakerSuggestionDeps(m.db) }));

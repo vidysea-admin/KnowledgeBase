@@ -1,0 +1,7 @@
+# Complete-answer cycle3 — import closure HOLD
+
+No test process launched. Selected request expects13 cases; actual executed0, provider calls0. Grants6–17 remain unspent/awaiting human approval.
+
+Actual selected preflight cases invoke evaluate(), which calls productionRuntime() and dynamically imports apps/api/src/ask/source-context.ts. That file has a runtime import {getDb,scopedCollection} from @lkb/db. packages/db/package.json declares main ./src/index.ts; that barrel is explicitly being rewritten by the current DB structure actor (native-next-maker/db-structure-plan.json publicExports.barrel). Thus actual selected import closure intersects ACTIVE **packages/db/src/index.ts**, and its speaker-suggestions runtime export enters the three collection moves. A type-only import or unreachable paid route is not being confused with this actual graph import: selected preflight evaluate fixtures execute productionRuntime even though transport is synthetic.
+
+Source pair candidate d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87. Request source pins 6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa and2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1 read from broker-request.json; no execution receipt or current-byte validation claimed. No full92 evaluation, data reads/writes, ledger mutation, key access, DB/provider/browser/network action. One checkpoint for unchanged blocker; no polling/retry or partial selection dropping the four required preflight tests. CPU returned for root source freeze scheduling.

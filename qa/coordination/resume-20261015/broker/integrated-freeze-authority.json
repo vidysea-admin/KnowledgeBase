@@ -1,0 +1,15 @@
+{
+  "authority": "root ALL central PhaseB native/API/web FROZEN; PhaseB14 entries override prior PhaseA/relocated snapshots",
+  "phaseb_pins_sha256": "e338d4e243885200e031f158036d5d0b762d55d496a577d674ca282c94850356",
+  "entry_count": 40,
+  "unique_paths": 40,
+  "eval_pair_excluded": "outside all API/web/package compiler sources; no source import/name reference found",
+  "inventory_count": 1649,
+  "environment": {
+    "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-temp",
+    "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\integrated-freeze-temp",
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  }
+}

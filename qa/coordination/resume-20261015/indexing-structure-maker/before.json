@@ -1,0 +1,60 @@
+[
+  {
+    "path": "apps/api/src/indexing/decisions-persist.test.ts",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-apps__api__src__indexing__decisions-persist.test.ts",
+    "exists": true,
+    "sha256": "9e33790c642c3476af0dca6b9bbb2bba9cebf07c7deb456ee45d6cebc2cbb56e"
+  },
+  {
+    "path": "apps/api/src/indexing/decisions-persist.ts",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-apps__api__src__indexing__decisions-persist.ts",
+    "exists": true,
+    "sha256": "82c6b6379f1c40e43b07e29584575f4463bed8f41bb9fb2c32e87a3e6aecf532"
+  },
+  {
+    "path": "apps/api/src/indexing/promote-entities.test.ts",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-apps__api__src__indexing__promote-entities.test.ts",
+    "exists": true,
+    "sha256": "6dbc37084cadd4a63d76edd7cc88ccd69e92f60c10aa118ed8fb3224df40da0f"
+  },
+  {
+    "path": "apps/api/src/indexing/promote-entities.ts",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-apps__api__src__indexing__promote-entities.ts",
+    "exists": true,
+    "sha256": "673ea06b2862b7d8d575c8a04e94b32181563405ea143524d439783f51842108"
+  },
+  {
+    "path": "apps/api/src/indexing/session.ts",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-apps__api__src__indexing__session.ts",
+    "exists": true,
+    "sha256": "954f3d23d220f89f4ddd19a9095cdaa8df4e83295cc9708defe1af67f1e6ab53"
+  },
+  {
+    "path": "apps/api/src/session-decisions/reader.test.ts",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-apps__api__src__session-decisions__reader.test.ts",
+    "exists": true,
+    "sha256": "2997a80e4c2440accf0d62f5bb2400446ad5917104df83cb0015116feac72d96"
+  },
+  {
+    "path": "scripts/backfill.mjs",
+    "backup": "qa/coordination/resume-20261015/indexing-structure-maker/before-scripts__backfill.mjs",
+    "exists": true,
+    "sha256": "770a54dbead3730c9c67fd3940822e69686adff7295b37755e68c5828f203d81"
+  },
+  {
+    "exists": false,
+    "path": "apps/api/src/indexing/persistence/decisions-persist.ts"
+  },
+  {
+    "exists": false,
+    "path": "apps/api/src/indexing/persistence/decisions-persist.test.ts"
+  },
+  {
+    "exists": false,
+    "path": "apps/api/src/indexing/persistence/promote-entities.ts"
+  },
+  {
+    "exists": false,
+    "path": "apps/api/src/indexing/persistence/promote-entities.test.ts"
+  }
+]

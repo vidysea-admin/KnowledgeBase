@@ -1,0 +1,29 @@
+✔ public exact T040 reviewed fee paraphrase survives actual grounded writer and current generation reader (41.6357ms)
+✖ public reviewed missing invented and foreign quote identities refuse before artifact writes or receipt (17.2445ms)
+✔ public completed reviewed receipt refuses edited canonical digest and changed current source provenance (13.5354ms)
+✔ public freshly generated fee paraphrase fails the extractive gate despite synthetic same judge (3.7713ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 3
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 913.6013
+
+✖ failing tests:
+
+test at apps\api\src\indexing\public-preserved-review.test.ts:1:1816
+✖ public reviewed missing invented and foreign quote identities refuse before artifact writes or receipt (17.2445ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\public-preserved-review.test.ts:42:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /quote|evidence/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+

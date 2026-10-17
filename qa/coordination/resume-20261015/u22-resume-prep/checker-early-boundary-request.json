@@ -1,0 +1,14 @@
+{
+  "accounting": "CHECKER requested independent probe; never maker accounting",
+  "outer_timeout_s": 15,
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "--test-name-pattern=^resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer$",
+    "scripts/eval/extraction-review-resume.test.mjs"
+  ],
+  "expected": "onePASS/twoSKIP/zeroFAIL, own exit0; filtered nodes never newPASS",
+  "critical_path": "Immediately after admitted assessment, request this single original boundary node through sole broker while reviewer reads renderer/validator semantics. If root/checker policy permits independent constructed equivalent refusal probe, record it separately. Persist checkpoint and FINAL if broker queued; do not wait/poll."
+}

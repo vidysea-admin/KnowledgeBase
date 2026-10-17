@@ -1,0 +1,281 @@
+{
+  "kind": "calibration",
+  "date": "2026-10-13",
+  "generatedAt": "2026-10-13T13:37:44.873Z",
+  "model": "deepseek-v4.1-flash",
+  "provider": "ollama",
+  "baseUrl": "https://ollama.com",
+  "jobKind": "evaluator",
+  "referenceSet": "data/eval/evaluator-calibration-set.json: DERIVED reference (own session 1.0 / other session 0.0), NOT human-hand-scored (qa/contracts/evaluator-calibration.md); an MAE here is a proxy, not the plan's final calibration",
+  "pairsSelected": 30,
+  "pairsScored": 30,
+  "pairsNotScored": 0,
+  "limitQuestions": null,
+  "summary": {
+    "mae": 0.04766666666666668,
+    "n": 30,
+    "heuristicFallbackPairs": []
+  },
+  "calls": {
+    "made": 30,
+    "ok": 30,
+    "failed": 0,
+    "heuristicFallbacks": 0,
+    "capReached": false,
+    "maxCalls": 40,
+    "maxCostUsd": null,
+    "costUsd": 0,
+    "inputTokens": 8790,
+    "outputTokens": 4644,
+    "latency": {
+      "n": 30,
+      "meanMs": 1354,
+      "p50Ms": 1190,
+      "p95Ms": 2739,
+      "maxMs": 3453
+    },
+    "firstErrors": []
+  },
+  "details": [
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document directly confirms New Zealand's 76% 2025 approval rate and the 27,000-by-2030 target, fully answering the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses US dual-enrollment programs and college credit, which is entirely unrelated to New Zealand visa approval rates or Indian student targets.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02-relevant",
+      "predicted": 0.4,
+      "reference": 1,
+      "absError": 0.6,
+      "reason": "Document confirms one of four accepted sponsor types (nationalized-bank secured loans) and NBFC/unsecured rejection, but omits the 3-month bank statements, 6-month fixed deposits, Provident Fund withdrawals, and the 14-bank detail.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses US high school dual-enrollment credit transfer, which is entirely unrelated to New Zealand's funds test sponsor requirements.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex-gq01-relevant",
+      "predicted": 0.82,
+      "reference": 1,
+      "absError": 0.18000000000000005,
+      "reason": "The document directly confirms FRR Forex's roughly 1% markup versus 2-2.5% at banks/Flywire, though it does not address Category II authorization or large-remittance savings explicitly.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document is about Indian engineering and medical entrance exams, which is entirely unrelated to forex dealers or remittance markups.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex-gq02-relevant",
+      "predicted": 0.75,
+      "reference": 1,
+      "absError": 0.25,
+      "reason": "The document directly confirms FEMA rules restrict education remittances to parents, siblings, and spouse, matching the core query, though it does not explicitly mention the exclusion of grandparents, aunts, or uncles.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses Indian engineering and medical entrance exams, not FEMA rules on remitting funds abroad for education.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better-gq01-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document explicitly names and explains the E.D.U.C.A.T.E. sequence with all seven components, directly matching the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document does not mention the E.D.U.C.A.T.E. framework or any of its components, discussing unrelated educational programs instead.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better-gq02-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document explicitly presents the same 7 'emotional doors' (Joy, Surprise, Fear/Anxiety, Pride, Belonging, Nostalgia, Hope) that a story can open, directly answering the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses education sessions and courses, not the seven emotional doors a story can open.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university-gq01-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document explicitly states Xavier University's 11:1 student-faculty ratio and average class size of 23, directly matching both elements of the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses counseling, identity, and success frameworks but does not mention student-to-faculty ratios or average class sizes.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university-gq02-relevant",
+      "predicted": 1,
+      "reference": 1,
+      "absError": 0,
+      "reason": "The document directly states that Xavier received a $2.8 million NIH grant and was among only six institutions in that inaugural cohort, matching the query exactly.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses counseling, identity, and success frameworks, with no mention of a $2.8 million NIH research grant, Xavier University, or an inaugural cohort of six institutions.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech-gq01-relevant",
+      "predicted": 1,
+      "reference": 1,
+      "absError": 0,
+      "reason": "The document explicitly states that ISDI is a design school in collaboration with Parsons, directly confirming the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document is about the University of California system and does not mention ISDI or Parsons School of Design.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech-gq02-relevant",
+      "predicted": 1,
+      "reference": 1,
+      "absError": 0,
+      "reason": "The document directly states that ISME is the management school and is part of the Babson group of roughly 30 schools worldwide.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses the University of California system and has no information about ISME, Babson group, or management schools.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-28-in-focus-1-gq01-relevant",
+      "predicted": 1,
+      "reference": 1,
+      "absError": 0,
+      "reason": "The document directly states that Innovique matches high schoolers to MSME-hosted research/internship projects with a stated 48-hour turnaround, fully supporting the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-28-in-focus-1-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses legal careers and AI in law, with no mention of Innovique, a 48-hour turnaround, or matching students with MSME-hosted projects.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-28-in-focus-1-gq02-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document summary explicitly states that Innovique provides government-registered copyright certificates for student inventions, directly answering the query.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-28-in-focus-1-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses legal career paths and AI in law practice, with no mention of Innovique or copyright certificates for student inventions.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast-gq01-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document explicitly confirms the query's claim, stating that facilitators mapped roughly 24 distinct professional roles across the six stages of a student's journey in the education-services ecosystem.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses creative-career pathways and portfolio expectations but does not mention facilitators mapping roughly 24 distinct professional roles across the education-services ecosystem.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast-gq02-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document directly reports that 75% of participants identified 'university outreach yield targets vs. family cost reality' as the sharpest tension in the ecosystem, matching the query exactly.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast-gq02-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses creative-career pathways and portfolio expectations but does not mention the 75% participant finding or the university-outreach-yield-goals vs. family-cost-reality tension.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway-gq01-relevant",
+      "predicted": 0.95,
+      "reference": 1,
+      "absError": 0.050000000000000044,
+      "reason": "The document explicitly confirms the query's claim, stating that roughly 80% of US high school students now have some form of dual-enrollment access.",
+      "heuristicFallback": false
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway-gq01-irrelevant",
+      "predicted": 0,
+      "reference": 0,
+      "absError": 0,
+      "reason": "The document discusses CEPT University admissions in India and contains no information about US high school dual enrollment access.",
+      "heuristicFallback": false
+    }
+  ]
+}

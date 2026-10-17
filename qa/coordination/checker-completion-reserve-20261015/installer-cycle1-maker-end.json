@@ -1,0 +1,18 @@
+{
+  "monotonic_start": 20151.593,
+  "monotonic_end": 20262.843,
+  "measured_segment_active_s": 111.25,
+  "explicit_wait_s": 0,
+  "wait_intervals": [],
+  "tokens": null,
+  "cost": null,
+  "scope": "staged installer repair only; no tests or approvals in measured segment",
+  "pins": {
+    "install-canonical-helper.ps1": "ba16241a88e32e0b64cec0ea3740708cc43574044c9e97ced00a382e135066be",
+    "test-installer-lock.ps1": "204001b889e3e24c1e3eadef72aec632a458e1a61e4ff4c5ad5cbc688bec145f",
+    "installer-cycle1.diff": "4f4b774fbe4748b87865b531b13150f49a276e01a6734fd5109f86a362775370",
+    "review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "SKILL.staged.md": "924f57173d96fa2167df4c02da9157052694b1f94d1e618867cbf922662ee811",
+    "rollout-verdict.md": "194f69bd5c781add7bacad62c08f6af96930b4da0f5de6ab0edccd12b8294c0b"
+  }
+}

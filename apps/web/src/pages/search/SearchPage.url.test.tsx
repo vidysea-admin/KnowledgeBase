@@ -19,7 +19,8 @@ const queries = (f: ReturnType<typeof vi.fn>) => f.mock.calls.map((c) => new URL
 function Nav() {
   const n = useNavigate(), l = useLocation(), auth = useAuth();
   return <><button onClick={() => n(-1)}>Back</button><button onClick={() => n(1)}>Forward</button>
-    <button onClick={() => auth.setApiKey("other-key")}>Replace key</button><output data-testid="loc">{l.pathname + l.search}</output></>;
+    <button onClick={() => auth.setApiKey("other-key")}>Replace key</button>
+    <button onClick={() => auth.setApiKey("fixture-key")}>Reset same key</button><output data-testid="loc">{l.pathname + l.search}</output></>;
 }
 function mount(route: string, opts: { key?: string | null; strict?: boolean } = {}) {
   const key = opts.key === undefined ? "fixture-key" : opts.key;
@@ -36,6 +37,13 @@ const settle = () => act(async () => { await new Promise((r) => setTimeout(r, 50
 describe("SearchPage ?q= URL sync", () => {
   beforeEach(() => localStorage.clear());
   afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
+
+  test("same credential in a new auth session clears executed query and previously visible results", async () => {
+    const f = echo(); vi.stubGlobal("fetch", f); mount("/search?q=private");
+    await screen.findByText("passage for private"); fireEvent.click(screen.getByRole("button", { name: "Reset same key" }));
+    expect(screen.queryByText("passage for private")).toBeNull(); expect(loc()).toBe("/search");
+    expect(screen.getByRole("searchbox")).toHaveValue(""); expect(f).toHaveBeenCalledTimes(1);
+  });
 
   test("missing or empty q: idle state, zero requests", async () => {
     const f = echo(); vi.stubGlobal("fetch", f);

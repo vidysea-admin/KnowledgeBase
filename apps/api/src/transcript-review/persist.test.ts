@@ -77,7 +77,7 @@ test("POST commits durably: receipt shape, new ETag, original turns untouched, o
     const [row] = hist.revisions;
     assert.equal(row!.revision, receipt.revision);
     assert.equal(row!.parentRevision, loaded.revision);
-    assert.equal(row!.actorRef, "apikey:tenant-A");
+    assert.match(row!.actorRef, /^apikey:[0-9a-f]{64}$/);
     assert.equal(row!.reason, REASON);
     const c0 = row!.changes.find((c) => c.turnId === A0)!;
     assert.equal(c0.before.text, "Alpha original 0");
@@ -209,8 +209,26 @@ test("a failed history write does not turn a durable commit into an error, and t
     const r1 = ((await first.json()) as { revision: string }).revision;
     assert.equal(h.m.rows("transcript_review_revisions").length, 0, "history row missing right after the injected failure");
     assert.equal((await h.get("key-a")).body.revision, r1);
+    const recovered = await (await h.call("GET", `/sessions/${SESSION}/transcript-review/history`, "key-a")).json() as { revisions: { revision: string; changes: { after: { text: string } }[] }[] };
+    assert.equal(recovered.revisions[0]!.revision, r1);
+    assert.equal(recovered.revisions[0]!.changes[0]!.after.text, "v1", "head audit is accessible before another edit");
     assert.equal((await h.post("key-a", r1, fix(A0, "v2"))).status, 200);
     assert.equal(h.m.rows("transcript_review_revisions").length, 2, "revision 1 was recovered from the head's audit entry");
+  } finally { await h.close(); }
+});
+
+test("audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision", async () => {
+  let calls = 0;
+  const h = await boot({ refresh: async () => { calls++; } });
+  try {
+    const r0 = (await h.get("key-a")).body.revision;
+    const r1 = (await (await h.post("key-a", r0, fix(A0, "v1"))).json() as { revision: string }).revision;
+    await h.post("key-a-second", r1, fix(A0, "v2"));
+    const history = await (await h.call("GET", `/sessions/${SESSION}/transcript-review/history`, "key-a")).json() as { revisions: { actorRef: string }[] };
+    assert.equal(history.revisions.length, 2); assert.notEqual(history.revisions[0]!.actorRef, history.revisions[1]!.actorRef);
+    assert.ok(history.revisions.every((r) => /^apikey:[0-9a-f]{64}$/.test(r.actorRef)));
+    const stale = await h.call("POST", `/sessions/${SESSION}/transcript-review/refresh`, "key-a", {}, { "if-match": `"${r1}"` });
+    assert.equal(stale.status, 412); assert.equal(calls, 0);
   } finally { await h.close(); }
 });
 

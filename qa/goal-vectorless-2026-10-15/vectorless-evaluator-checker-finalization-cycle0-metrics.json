@@ -1,0 +1,16 @@
+{
+  "active_s": 7.2438814,
+  "readback": "authoritative fields parsed independently from saved file",
+  "completion_reserve_id": "vectorless-production-evaluation/cycle0/4de31247efc975f1f103fb4afe7ab768f874e4d60665960cc881e7715f819f65",
+  "ended_monotonic": 222240046536,
+  "started_monotonic": 222167607722,
+  "budget_debit": {
+    "active_s": 30,
+    "tokens": 800
+  },
+  "cost": null,
+  "tokens": null,
+  "assess_exit": 2,
+  "verdict": "HOLD",
+  "phase_kind": "finalization"
+}

@@ -1,0 +1,341 @@
+{
+  "at": "2026-10-14T23:16:42.3057607+00:00",
+  "cycle": 1,
+  "pins": [
+    {
+      "path": "apps/api/src/grounded-postprocessing/composition.ts",
+      "expected": "062418e35ac9a13daa92a91394d170ea2e391f4eaa585b3ddf40d0e50a8997ec",
+      "actual": "062418E35AC9A13DAA92A91394D170EA2E391F4EAA585B3DDF40D0E50A8997EC",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/composition.test.ts",
+      "expected": "02e8a98039bfa4c254b6b98adf5071963b72c2d1447b5b39981f07d6e6f838bc",
+      "actual": "02E8A98039BFA4C254B6B98ADF5071963B72C2D1447B5B39981F07D6E6F838BC",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/fixture.testsupport.ts",
+      "expected": "2d1c3f5e42dfa1e3ab4d8bd168df02626c42f15845671dfd24f4b996dd7e91af",
+      "actual": "2D1C3F5E42DFA1E3AB4D8BD168DF02626C42F15845671DFD24F4B996DD7E91AF",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "expected": "420bab2515ac064229bba4dd10a99fa8484ba62263daca35486a019d72043fcd",
+      "actual": "420BAB2515AC064229BBA4DD10A99FA8484BA62263DACA35486A019D72043FCD",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/transcripts.ts",
+      "expected": "0a611b32fc952f75fd3dcb80bdf9eaacf493f06fda08caca62532fa47e48bc62",
+      "actual": "0A611B32FC952F75FD3DCB80BDF9EAACF493F06FDA08CACA62532FA47E48BC62",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/production.ts",
+      "expected": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+      "actual": "FABF236621196871D176327BEA99D1C030FE5BEB888829490B10F8E6373C0B5E",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "expected": "6734738ce50f493bc27c9db7b4170ed4db590f3dba6bda47f47dcbaa6e2709f5",
+      "actual": "6734738CE50F493BC27C9DB7B4170ED4DB590F3DBA6BDA47F47DCBAA6E2709F5",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/grounded-write.ts",
+      "expected": "c6fa3b092e4ce159ee6cfe738d8d24fde79581ed0eefe7494947ec078c39b247",
+      "actual": "C6FA3B092E4CE159EE6CFE738D8D24FDE79581ED0EEFE7494947EC078C39B247",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/evidence-tuples.ts",
+      "expected": "d5b705274bfb535af848d1bc15167663c132c6a78f0fd7d2d2f6aebfc5287f1f",
+      "actual": "D5B705274BFB535AF848D1BC15167663C132C6A78F0FD7D2D2F6AEBFC5287F1F",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/db-name.ts",
+      "expected": "8aecc3782e05724f70633e004bbfe8041ef0e75ee4793bc4629c175e02bf83c6",
+      "actual": "8AECC3782E05724F70633E004BBFE8041EF0E75EE4793BC4629C175E02BF83C6",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-content/reader.ts",
+      "expected": "516999564683e533760dc91b6dd83e9615600e90fb3f3a71a7da75e04204cf12",
+      "actual": "516999564683E533760DC91B6DD83E9615600E90FB3F3A71A7DA75E04204CF12",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-content/router.ts",
+      "expected": "d645d47b9d4b8c776a329a6258efe5c1f11689986999ee7ee1a2009c12430517",
+      "actual": "D645D47B9D4B8C776A329A6258EFE5C1F11689986999EE7EE1A2009C12430517",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/store.ts",
+      "expected": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+      "actual": "304F7DCF0E156E6D825B0D739793BC976409639EA6E4AE7375801227ECBB2C1D",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "expected": "9d56eb0a585c78faaa945e47ca5a4d6fbaea16fbe95f3e975d5b3f8bbfe09ade",
+      "actual": "9D56EB0A585C78FAAA945E47CA5A4D6FBAEA16FBE95F3E975D5B3F8BBFE09ADE",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "expected": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+      "actual": "1FA9A35EE5393F63E4E4A3F9EA2BFF4AE15F706376A9379D029CC91704E55B28",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.ts",
+      "expected": "40b3afc65279c0072cba70755ed9ef8f853bab559418ff05c997c7a4a786ac57",
+      "actual": "40B3AFC65279C0072CBA70755ED9EF8F853BAB559418FF05C997C7A4A786AC57",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+      "expected": "a5d509a2caa30cbf25982faccca1477f2171dbe0f0146ade0c9f872586494244",
+      "actual": "A5D509A2CAA30CBF25982FACCCA1477F2171DBE0F0146ADE0C9F872586494244",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/transaction-db.ts",
+      "expected": "36d426bdda02c6d291be4af381701c182da8954a6d6c0a9f206783aab0f8e343",
+      "actual": "36D426BDDA02C6D291BE4AF381701C182DA8954A6D6C0A9F206783AAB0F8E343",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "expected": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+      "actual": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "expected": "db0a05d657e0929b766cbd7acf6a9d64cc1226d4fbfdffab2ca26ef62cba0ff0",
+      "actual": "DB0A05D657E0929B766CBD7ACF6A9D64CC1226D4FBFDFFAB2CA26EF62CBA0FF0",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/grounded-summary.ts",
+      "expected": "58a92a2d4040b40874567dda6d0f132be46196f3c176e1eda92ee8c99a7230a8",
+      "actual": "58A92A2D4040B40874567DDA6D0F132BE46196F3C176E1EDA92EE8C99A7230A8",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/claims.ts",
+      "expected": "08c5bec39767b8773ccc2f10ce9b948b87e12ec4bad9e5a20d7396801c808c67",
+      "actual": "08C5BEC39767B8773CCC2F10CE9B948B87E12EC4BAD9E5A20D7396801C808C67",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/quote/quote-token-rule.ts",
+      "expected": "7a0c4a523eb078d48b639197e30311350ca6886cbea51d4149766a886c58ea49",
+      "actual": "7A0C4A523EB078D48B639197E30311350CA6886CBEA51D4149766A886C58EA49",
+      "matches": true
+    },
+    {
+      "path": "packages/index/src/pipeline/notes/judge.ts",
+      "expected": "ca8dfbd7c5390e7289a1f1557732f796b05a2dfa44a8b20a3eec0f430ab005fd",
+      "actual": "CA8DFBD7C5390E7289A1F1557732F796B05A2DFA44A8B20A3EEC0F430AB005FD",
+      "matches": true
+    },
+    {
+      "path": "packages/ai/src/router.ts",
+      "expected": "d11d783c88f24bc159d54f033f2a8c0c6129b2e7100474e839c270953dcd8f71",
+      "actual": "D11D783C88F24BC159D54F033F2A8C0C6129B2E7100474E839C270953DCD8F71",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/eligible-tree.ts",
+      "expected": "0dfc6e5cdc067c176e50eb44189d9ef860e14cddaf8f8b537f7b5e3a71a88e8f",
+      "actual": "0DFC6E5CDC067C176E50EB44189D9EF860E14CDDAF8F8B537F7B5E3A71A88E8F",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "expected": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+      "actual": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/sources.ts",
+      "expected": "f50549030c7e363baea6b9855dc74422ea46a1132b1831f62a2ed4d5092b3993",
+      "actual": "F50549030C7E363BAEA6B9855DC74422EA46A1132B1831F62A2ED4D5092B3993",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/sessions.ts",
+      "expected": "3977b5aaf6c516512974f727322f82751b19a2415b1a500b88a752aa54ce5516",
+      "actual": "3977B5AAF6C516512974F727322F82751B19A2415B1A500B88A752AA54CE5516",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/types.ts",
+      "expected": "a03749ef65788b5b5893e70c518dacc51c8752c793023f090be59732149aea08",
+      "actual": "A03749EF65788B5B5893E70C518DACC51C8752C793023F090BE59732149AEA08",
+      "matches": true
+    },
+    {
+      "path": ".cache/coordination/safe-test-runtime/register.mjs",
+      "expected": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "actual": "FE80C5A2C766A6A20AD2532F434541D381E45EF77C90D9C7F485C939A11AF644",
+      "matches": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "expected": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "actual": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD",
+      "matches": true
+    },
+    {
+      "path": "packages/ingest/src/index.ts",
+      "expected": "e75924db8f72b00e3c3bfb8fdb8c442b9e2592e162d5e1b6f399643e9da63364",
+      "actual": "E75924DB8F72B00E3C3BFB8FDB8C442B9E2592E162D5E1B6F399643E9DA63364",
+      "matches": true
+    },
+    {
+      "path": "packages/ingest/src/join-policy/index.ts",
+      "expected": "15b3ed8e1cbf97bec2cc63a901f0ce2cc4beef0328f20482e4ddf448832d9f58",
+      "actual": "15B3ED8E1CBF97BEC2CC63A901F0CE2CC4BEEF0328F20482E4DDF448832D9F58",
+      "matches": true
+    },
+    {
+      "path": "packages/ingest/src/join-policy/deps.ts",
+      "expected": "41f487cb6a933e8ef1a37eec90b07ede5a618bba5bf1089f6b32676f4d525dc6",
+      "actual": "41F487CB6A933E8EF1A37EEC90B07EDE5A618BBA5BF1089F6B32676F4D525DC6",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/composition/integrations/capture-policy.ts",
+      "expected": "3620d95c20350b07ff8767027c875c424975d523fc4de0df77937613eb70da07",
+      "actual": "3620D95C20350B07FF8767027C875C424975D523FC4DE0DF77937613EB70DA07",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/grounded-postprocessing/visibility.test.ts",
+      "expected": "95cce8514ae215bd038fc0d08b857e9824083b980ec843d8076d6259141103fa",
+      "actual": "95CCE8514AE215BD038FC0D08B857E9824083B980EC843D8076D6259141103FA",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/generation.ts",
+      "expected": "443b969a218a4ad9716f5e9e9fb04c284bfd276a8633f5f26a82284674646d0d",
+      "actual": "443B969A218A4AD9716F5E9E9FB04C284BFD276A8633F5F26A82284674646D0D",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/indexing/chunk-write.ts",
+      "expected": "80b6ae5c866cc8dfafb8c2fabb5872b52f702bd1f18c0b42edc811d806a143ae",
+      "actual": "80B6AE5C866CC8DFAFB8C2FABB5872B52F702BD1F18C0B42EDC811D806A143AE",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/claims.ts",
+      "expected": "d0f28938b51a3c92fcd8ac1a8c3eb28d6b00e474f5c652dfeb84cfd09efd36c2",
+      "actual": "D0F28938B51A3C92FCD8AC1A8C3EB28D6B00E474F5C652DFEB84CFD09EFD36C2",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/chunks.ts",
+      "expected": "3b7ded2ba630f293231b3af76ea8e8e40136e7de186af52efdbdcdd4f69e1561",
+      "actual": "3B7DED2BA630F293231B3AF76EA8E8E40136E7DE186AF52EFDBDCDD4F69E1561",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/session_pages.ts",
+      "expected": "9093b3d7ff480c149aadee4aa2625bf29afb57e3785646dbefc99cf3b6b7428b",
+      "actual": "9093B3D7FF480C149AADEE4AA2625BF29AFB57E3785646DBEFC99CF3B6B7428B",
+      "matches": true
+    },
+    {
+      "path": "packages/core/src/generated/tree_index.ts",
+      "expected": "47f4514ba063718df6c7d1e05f0ebc09854b211ad536ab0d3d7a48c54e47f361",
+      "actual": "47F4514BA063718DF6C7D1E05F0EBC09854B211AD536AB0D3D7A48C54E47F361",
+      "matches": true
+    },
+    {
+      "path": "schema/claims.schema.json",
+      "expected": "fbee54668a189ead1336967b37b0ec27b610401385a933e89670260cb0e72c92",
+      "actual": "FBEE54668A189EAD1336967B37B0EC27B610401385A933E89670260CB0E72C92",
+      "matches": true
+    },
+    {
+      "path": "schema/chunks.schema.json",
+      "expected": "a9b4a36289c63a67ce72c6bb9a9cbae9feba4d59412daa0b4b83d2c8b2b467b9",
+      "actual": "A9B4A36289C63A67CE72C6BB9A9CBAE9FEBA4D59412DAA0B4B83D2C8B2B467B9",
+      "matches": true
+    },
+    {
+      "path": "schema/session_pages.schema.json",
+      "expected": "0e89bb80d3cb87ad729cb0baebce081bab45b9b9cff1ceb6f49917a10ec48e54",
+      "actual": "0E89BB80D3CB87AD729CB0BAEBCE081BAB45B9B9CFF1CEB6F49917A10EC48E54",
+      "matches": true
+    },
+    {
+      "path": "schema/sessions.schema.json",
+      "expected": "36e8396e57a796a85d66421e1144516407f1fe53ca89abd922d1abfa74027c51",
+      "actual": "36E8396E57A796A85D66421E1144516407F1FE53CA89ABD922D1ABFA74027C51",
+      "matches": true
+    },
+    {
+      "path": "schema/tree_index.schema.json",
+      "expected": "d2845fba39077d15ca6df2a8f52cff4c3bd55ddfa5bdd94d32e628cc81823ce9",
+      "actual": "D2845FBA39077D15CA6DF2A8F52CFF4C3BD55DDFA5BDD94D32E628CC81823CE9",
+      "matches": true
+    },
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "expected": "1f084b8f14764a097d4d826ab3ad431945fc35563c67d1eb9edab2b75009fb8f",
+      "actual": "1F084B8F14764A097D4D826AB3AD431945FC35563C67D1EB9EDAB2B75009FB8F",
+      "matches": true
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/checker-caller.test.ts",
+      "expected": "013468edae74b1b8f57e3d296295c8709baa873b7be82f5abf3bb5a5cf33ff79",
+      "actual": "013468EDAE74B1B8F57E3D296295C8709BAA873B7BE82F5ABF3BB5A5CF33FF79",
+      "matches": true
+    }
+  ],
+  "mismatches": 0,
+  "additional": [
+    {
+      "path": "qa/manifests/t040-grounded-product-composition.md",
+      "hash": "4FF03F6177270267BE903C12FB925E72B3F060E649C59F7D268A89D5B1AA1B6C"
+    },
+    {
+      "path": "qa/packets/t040-grounded-product-composition.md",
+      "hash": "93C54BDAF549476FC1980576747345B54A4CE38C00501724637F01559E25F390"
+    },
+    {
+      "path": "qa/contracts/t040-grounded-product-composition.md",
+      "hash": "1535E5CC68AC5D88C6FAA6A86EC3A86BAA0F9CEAC9B1643F2EA81BFF59F9A3A3"
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/maker-current-ready-reconciliation.json",
+      "hash": "566E1CEDFC7EDF9109468E3588F9EF024C3905BEE84F61BF7F3D309CA0C5C5CB"
+    },
+    {
+      "path": "contracts/verify_contracts.py",
+      "hash": "1240059FC2ABC63CDE58472EF8F7964978E74BA5BC2F5156A30379DDAE391DB3"
+    },
+    {
+      "path": "contracts/contracts.json",
+      "hash": "D31DAD4C1FCE135238169F48C18BC5EF68EA0DEFF7978D9323441330778CC940"
+    },
+    {
+      "path": "qa/goal-2026-10-14/contracts-receipt.json",
+      "hash": "9E3BE1CC17601231D5D7D25968654A946E7D8644E3F88BD79D254D53B943B86F"
+    },
+    {
+      "path": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T225425Z.json",
+      "hash": "9901FC4B8BA492648072584796450E1C8EC3EEDB87829E3E95B278750689ED68"
+    }
+  ]
+}

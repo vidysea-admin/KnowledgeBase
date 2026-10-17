@@ -1,0 +1,78 @@
+{
+  "unit": "vectorless-publication",
+  "cycle": 7,
+  "candidate_sha": "59316179f26032191c6c11cbf7d87e540a66d1722bb9379f3b1eca2f64629066",
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "measured_partial_active_s": 838.7586968,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "tokens": null,
+      "id": "vectorless_checker-wip-shared",
+      "cost": null,
+      "active_s": null,
+      "scope": "Prior shared checker-owned contract and unexecuted probe preparation; no verdict; actual overhead unknown",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180
+      }
+    },
+    {
+      "tokens": null,
+      "id": "vectorless-publication-cycle6-pending",
+      "cost": null,
+      "active_s": 161.0335024,
+      "scope": "Completed source review and readiness HOLD, actual active measured, tokens/cost unknown",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180
+      }
+    },
+    {
+      "tokens": null,
+      "measured_partial_active_s": 80.338956,
+      "id": "publication-checker-continuation",
+      "cost": null,
+      "budget_debit": {
+        "active_s": 90,
+        "tokens": 2000
+      },
+      "active_s": null,
+      "scope": "Prior continuation incl unmeasured final closeout, conservative full allocation charge"
+    },
+    {
+      "id": "publication_checker-source-completion-cycle6",
+      "active_s": 105.0045727,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 180,
+        "tokens": 3000
+      },
+      "scope": "Measured final cycle6 source phase found canonical C3 FAIL; all historical receipts/checkpoints preserved."
+    }
+  ],
+  "next_phase": {
+    "active_s": 180,
+    "tokens": 3000,
+    "cost": null
+  },
+  "bootstrap_scope": "Cycle7 DELTA-only repair of cycle6 soleC3 failure: fivechanged immediateconsumer files, authenticate unchanged23pins, exact original reproduction plus one ambiguouscommit boundary, reserve40s finalization. Do not reread pipeline/C1C2C4C5.",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "escalation": {
+    "authority": "Root explicit finite security/data-write delta review approval",
+    "reason": "Mandatory correction consumer paid-work replay/ambiguous-commit repair; original reproduction and one independent boundary required, all historical debits retained; ratio unverified.",
+    "limits": {
+      "active_s": 810,
+      "tokens": 20000,
+      "cost": null
+    }
+  },
+  "deduplication": "vectorless_checker-wip-shared charged once in root shared ledger; actual metrics null; conservative debit180s/6000tokens is allocation accounting, not measured usage."
+}

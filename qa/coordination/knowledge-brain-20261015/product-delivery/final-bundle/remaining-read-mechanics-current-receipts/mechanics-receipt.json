@@ -1,0 +1,50 @@
+{
+  "kind": "READ_ONLY_REMAINING_READ_MECHANICS_PREFLIGHT_NOT_INDEPENDENT_PASS",
+  "complete": false,
+  "source_clause_diff_bytes": 27336,
+  "metadata_bytes": 3338,
+  "selected_payload_bytes": 30691,
+  "estimated_tokens": 10231,
+  "payload_sha256": "d42e0477ac3eda6d763dacacf7d1a6d606f97346ac760eea285c88d5e4e11095",
+  "spec_sha256": "0af4f0fdc3dcc299730957cec17eb7cb1e113a9499d7731288b503b5e47087b1",
+  "script_sha256": "f5d3d0171341d83f7a36997200daff213d44fcc8dd7148cbfca4f8543fb789c6",
+  "counts": {
+    "declared_pin_entries": 3587,
+    "unique_pin_files": 1789,
+    "receipt_count": 5,
+    "identity_fields": 9094,
+    "source_blocks": 6,
+    "clause_blocks": 5
+  },
+  "mismatch_count": 4,
+  "mismatches": [
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-ui2-transcript-independent-command.json env hash KB_U24_PRIVATE_TOC_TESTS",
+      "expected": null,
+      "actual": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-ui2-transcript-independent-command.json env aggregate",
+      "expected": "e665a022fa0fefb3b2134896e4a46d2f46ed6b8fa36cd47a797c21cb939d2fb3",
+      "actual": "38dfbf884bdb864e87f6ea8e34e9edca6a7129c1e9b461f2c07d5ce317901db1"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-types-combined-candidate.json current apps/api/src/evaluation-flywheel/composition.test.ts",
+      "expected": "99287540c2fe5ed3d3f35bcca3bbf53aa73e17b61b4d82a38d541d6a396e3f07",
+      "actual": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784"
+    },
+    {
+      "kind": "identity",
+      "label": "qa/goal-vectorless-2026-10-15/verification-web-build-combined-candidate.json current apps/api/src/evaluation-flywheel/composition.test.ts",
+      "expected": "99287540c2fe5ed3d3f35bcca3bbf53aa73e17b61b4d82a38d541d6a396e3f07",
+      "actual": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784"
+    }
+  ],
+  "review_admission": false,
+  "tests_run": false,
+  "production_writes": false,
+  "support_accounting": "Count this verification-support run once, separately; not maker denominator padding."
+}

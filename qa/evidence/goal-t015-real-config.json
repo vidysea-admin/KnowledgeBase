@@ -1,0 +1,10 @@
+{
+  "tenantId": "toc",
+  "seed": "t015-real-readonly-v1",
+  "sessions": [
+    "2026-05-08-funding-dreams-loans-forex",
+    "2026-08-03-uk-beyond-offer-letters",
+    "2026-08-03-uk-beyond-offer-letters-reupload"
+  ],
+  "relatedGroups": [["2026-08-03-uk-beyond-offer-letters", "2026-08-03-uk-beyond-offer-letters-reupload"]]
+}

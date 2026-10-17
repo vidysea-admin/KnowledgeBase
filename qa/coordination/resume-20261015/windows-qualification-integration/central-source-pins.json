@@ -1,0 +1,22 @@
+[
+  {
+    "lines": 300,
+    "path": "packages/meeting-bot/src/capture/record-commands.ts",
+    "sha256": "531bda060e6b723cc6adbe14abef900dbc390e33c3cda3e4a0b33b55c0dc76e0"
+  },
+  {
+    "lines": 176,
+    "path": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+    "sha256": "0fbc8bc37ee6987115d4b4151508b19fe8444f1b372a4843b94d5b70906e92b1"
+  },
+  {
+    "lines": 93,
+    "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.ts",
+    "sha256": "e574fdb1899f3d74b0a9e03f3a042786d2c014c5f1513285861750acc5631b34"
+  },
+  {
+    "lines": 176,
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "sha256": "d2dc2113d963cda1119499f5d144d5cec7d5ad41912266578388b59794f7ceaa"
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "_id": "formdef-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "tenantId": "tenant-a",
+  "recordType": "definition",
+  "targetId": "example-application",
+  "targetFingerprint": "9b931fa992f28f01b74dff8699058f41506868dee10afa0214329712a6a93ded",
+  "enabled": false,
+  "maxAttempts": 4,
+  "timeoutMs": 5000,
+  "version": 1,
+  "updatedAt": 1000,
+  "history": [
+    {
+      "at": 1000,
+      "actor": "key-admin",
+      "action": "configured",
+      "binding": {
+        "payloadDigest": null,
+        "targetFingerprint": "9b931fa992f28f01b74dff8699058f41506868dee10afa0214329712a6a93ded",
+        "priorVersion": 0
+      }
+    }
+  ]
+}

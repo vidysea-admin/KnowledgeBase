@@ -1,0 +1,1 @@
+error TS18003: No inputs were found in config file 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/broker/native-next-tsconfig.json'. Specified 'include' paths were '["C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\*.ts"]' and 'exclude' paths were '[]'.

@@ -5,11 +5,16 @@ import { getDb, scopedCollection } from "@lkb/db";
 import type { Chunks, TreeIndexNode, Turns } from "@lkb/core";
 import { cosineSimilarity } from "@lkb/index";
 import type { EmbedResult, WriteJobFn, Job } from "@lkb/ai";
-import { BoundedAskError, payloadBytes, type AskV2Deps, type CompleteFn, type NodeSearchFn,
+import { BoundedAskError, payloadBytes, validateHydration, type AskV2Deps, type CompleteFn, type NodeSearchFn,
   type SourceQuote, type HydrateSourcesFn } from "@lkb/ask";
 import { createAskArmsFor, type ArmsEmbedFn } from "./ask-arms.js";
 import { createLlmScorer } from "../score.js";
 import { passageLexicalScorer, slices, type Span } from "./passage-lexical.js";
+import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
+import { createKnowledgeVisibility } from '../visibility/knowledge.js';
+import { chunkContentMatches } from '../indexing/chunk-integrity.js';
+import { createGraphContextFor, hasGraphSelection, graphTurnKey, type GraphContextDeps, type GraphContextSelection, type GraphContextSnapshot } from "./graph-context.js";
+import { speakerTranscriptHash } from "../../../../packages/index/src/pipeline/speaker-profiles/profile.js";
 
 type ReadDb = Pick<Db, "collection">;
 const sha = (text: string) => createHash("sha256").update(text, "utf8").digest("hex");
@@ -43,14 +48,16 @@ function rowProblem(turn: Turns): string | null {
 }
 function quote(node: TreeIndexNode, turn: Turns, span: Span): SourceQuote {
   const text = turn.text.slice(span.charStart, span.charEnd);
-  const origin = turn.speakerRef === "screen"
+  // Review overlays may change text/speaker labels, but cannot promote frame evidence to speech.
+  const screenSource = turn.speakerRef === "screen" || turn.screenEvidence !== undefined;
+  const origin = screenSource
     ? turn.text.startsWith("[Screen OCR; unverified]") ? "screen-ocr-unverified"
       : turn.text.startsWith("[Visual observation; unverified]") ? "visual-observation-unverified" : null
     : "speech";
   if (!origin) throw new BoundedAskError("screen source origin is unresolved");
   return {
     id: "quote-" + sha(JSON.stringify([node.node_id, turn._id, span, text])).slice(0, 24),
-    nodeId: node.node_id, sessionRef: turn.sessionId, turnId: turn._id, speakerRef: turn.speakerRef,
+    nodeId: node.node_id, sessionRef: turn.sessionId, turnId: turn._id, speakerRef: screenSource ? "screen" : turn.speakerRef,
     tStart: turn.tStart, tEnd: turn.tEnd, charStart: span.charStart, charEnd: span.charEnd,
     byteStart: Buffer.byteLength(turn.text.slice(0, span.charStart), "utf8"),
     byteEnd: Buffer.byteLength(turn.text.slice(0, span.charEnd), "utf8"),
@@ -93,7 +100,7 @@ function validateChunk(chunk: BoundChunk, tenantId: string, turns: Map<string, T
   }
 }
 
-export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embed?: ArmsEmbedFn; observePassages?: (sessionId: string, rows: PassageDiagnostic[]) => void }): HydrateSourcesFn {
+export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embed?: ArmsEmbedFn; graphScope?: () => Promise<GraphContextSnapshot>; observePassages?: (sessionId: string, rows: PassageDiagnostic[]) => void }): HydrateSourcesFn {
   return async (query, admitted) => {
     const nodes = admitted.filter((n) => n.level === "session");
     const refs = new Set(nodes.map((n) => n.evidence?.sessionRef));
@@ -101,7 +108,25 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     const sessionIds = [...refs] as string[];
     const db = deps.db ?? getDb();
     // Query both collections by exact admitted session IDs and tenant-scoped wrappers.
-    const rows = await scopedCollection<Turns>(db as never, "turns")(tenantId).find({ sessionId: { $in: sessionIds } }).toArray();
+    const rawRows = await scopedCollection<Turns>(db as never, "turns")(tenantId).find({ sessionId: { $in: sessionIds } }).toArray();
+    const visibility = createKnowledgeVisibility(db);
+    const rows = await visibility.filterTurns(tenantId, await readEffectiveTurns(db, tenantId, rawRows));
+    const graphScope = deps.graphScope ? await deps.graphScope() : undefined;
+    const graphQuotes = new Map<string, string[]>();
+    if (graphScope) {
+      for (const sessionId of sessionIds) {
+        const current = graphScope.visibleSources.find(s => s.tenantId === tenantId && s.sessionId === sessionId);
+        const sessionRows = rows.filter(t => t.sessionId === sessionId).sort((a, b) => a.tStart - b.tStart || a._id.localeCompare(b._id));
+        if (!current || speakerTranscriptHash(sessionRows) !== current.revisionHash) throw new BoundedAskError("graph source changed before hydration");
+      }
+      for (const e of graphScope.turns) {
+        const turn = rows.find(t => t.sessionId === e.sessionId && t._id === e.turnId);
+        if (!sessionIds.includes(e.sessionId)) continue;
+        if (!turn || typeof e.quote !== "string" || !e.quote.trim() || !turn.text.includes(e.quote)) throw new BoundedAskError("graph evidence changed before hydration");
+        const key = graphTurnKey(e.sessionId, e.turnId);
+        graphQuotes.set(key, [...(graphQuotes.get(key) ?? []), e.quote]);
+      }
+    }
     const chunks = deps.embed ? await scopedCollection<BoundChunk>(db as never, "chunks")(tenantId)
       .find({ sourceRef: { $in: sessionIds } }).toArray() : [];
     // Parse and hash the SAME frozen serialization, then use only these parsed rows.
@@ -128,9 +153,12 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
     for (const c of snapshot.chunks) if (c.tenantId !== tenantId || !sessionIds.includes(c.sourceRef)) throw new BoundedAskError("invalid scoped vector evidence");
     snapshot.chunks = snapshot.chunks.filter((c) => !(Array.isArray(c.turnRefs) && c.turnRefs.some((id) => excludedIds.has(id)))
       && !(Array.isArray(c.sourceSpans) && c.sourceSpans.some((s) => excludedIds.has(s.turnId))));
+    const boundChunks = snapshot.chunks.filter(chunk => chunkContentMatches(chunk, byTurn, tenantId));
+    const staleVectors = boundChunks.length !== snapshot.chunks.length;
+    snapshot.chunks = boundChunks;
     for (const chunk of snapshot.chunks) validateChunk(chunk, tenantId, byTurn);
     let embedding: EmbedResult | undefined;
-    let degraded: string | undefined;
+    let degraded: string | undefined = staleVectors ? 'source vector changed or requires content-bound reindexing; scoped lexical excerpts used' : undefined;
     if (snapshot.chunks.length && deps.embed) {
       try {
         const candidate = await deps.embed({ kind: "embedding", texts: [query], purpose: "query" });
@@ -151,7 +179,12 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
         throw new BoundedAskError("admitted session has no source rows");
       }
       const lexicalScore = passageLexicalScorer(query, turns);
-      const choices = turns.flatMap((turn) => slices(turn.text).map((span) => {
+      const spansFor = (turn: Turns): Span[] => graphScope ? (graphQuotes.get(graphTurnKey(turn.sessionId, turn._id)) ?? []).flatMap(text => {
+        const spans: Span[] = []; let from = 0;
+        while (from <= turn.text.length) { const at = turn.text.indexOf(text, from); if (at < 0) break; spans.push({ charStart: at, charEnd: at + text.length }); from = at + text.length; }
+        return spans;
+      }) : slices(turn.text);
+      const choices = turns.flatMap((turn) => spansFor(turn).map((span) => {
         const text = turn.text.slice(span.charStart, span.charEnd);
         const contributions = lexicalScore(text, turn.speakerRef);
         const lexical = contributions.textContribution + contributions.speakerContribution;
@@ -186,7 +219,7 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
       const at = turns.indexOf(first.turn);
       for (const i of [at - 1, at + 1]) {
         const turn = turns[i];
-        if (turn) { const span = slices(turn.text)[0]; if (span) add(turn, span); }
+        if (turn) { const span = spansFor(turn)[0]; if (span) add(turn, span); }
       }
       deps.observePassages?.(node.evidence!.sessionRef!, ranked.map((hit) => ({
         turnId: hit.turn._id, ...hit.span, lexical: hit.lexical, semantic: hit.vectorScore, score: hit.score,
@@ -205,31 +238,54 @@ export function createSourceHydrator(tenantId: string, deps: { db?: ReadDb; embe
 
 export interface RequestAskOptions {
   dispatch: (job: Job, tenantId: string) => ReturnType<CompleteFn>;
+  /** Compatibility input only. Public request composition is always vectorless, including false. */
+  vectorless?: boolean;
   embed?: ArmsEmbedFn;
   db?: ReadDb;
   treeSearchFn: NodeSearchFn;
   tavilySearchFn?: AskV2Deps["tavilySearchFn"];
   write: WriteJobFn;
+  graph?: GraphContextDeps;
+  nativeSources?: (tenantId: string) => { hydrate: HydrateSourcesFn; revalidate: (nodes: TreeIndexNode[]) => Promise<void> };
 }
 /** Actual production scorer and arms share request-local completion/embedding boundaries. */
 export function createSourceRequestDepsFor(options: RequestAskOptions) {
-  return (tenantId: string): Omit<AskV2Deps, "tenantId"> => {
-    let query: string | undefined, pending: Promise<EmbedResult> | undefined;
-    const embed: ArmsEmbedFn | undefined = options.embed ? (job) => {
-      const text = job.texts[0];
-      if (job.purpose !== "query" || job.texts.length !== 1 || typeof text !== "string") {
-        return Promise.reject(new BoundedAskError("invalid shared query embedding request"));
-      }
-      if (query !== undefined && query !== text) return Promise.reject(new BoundedAskError("query changed during source hydration"));
-      query = text;
-      return pending ??= options.embed!(job);
-    } : undefined;
+  return (tenantId: string, selection?: GraphContextSelection): Omit<AskV2Deps, "tenantId"> => {
     const complete: CompleteFn = (job) => options.dispatch(job, tenantId);
+    const selected = hasGraphSelection(selection);
+    if (selected && !options.graph) throw new BoundedAskError("selected graph authority unavailable");
+    const graph = selected ? createGraphContextFor(options.graph!)(tenantId, selection!) : undefined;
+    const ordinaryArms = createAskArmsFor({ db: options.db })(tenantId);
+    const transcriptHydrate = createSourceHydrator(tenantId, { db: options.db, ...(graph ? { graphScope: graph.scope } : {}) });
+    const nativeSource = options.nativeSources?.(tenantId);
+    const nativeHydrate = nativeSource?.hydrate;
+    const isNative = (n: TreeIndexNode) => typeof n.evidence?.sourceId === "string" && typeof n.evidence?.sessionRef !== "string";
     return {
       complete, scoreFn: createLlmScorer(complete), scoreFnForComplete: createLlmScorer,
-      treeSearchFn: options.treeSearchFn, tavilySearchFn: options.tavilySearchFn, write: options.write,
-      extraCandidateArmsFn: createAskArmsFor({ embed, db: options.db })(tenantId),
-      sourceContext: { hydrate: createSourceHydrator(tenantId, { db: options.db, embed }) },
+      treeSearchFn: graph ? () => [] : options.treeSearchFn, tavilySearchFn: graph ? undefined : options.tavilySearchFn, write: options.write,
+      extraCandidateArmsFn: async (query, tree) => {
+        const routed = graph ? await graph.arm(query, tree) : undefined;
+        const ordinary = await ordinaryArms(query, tree);
+        if (!routed) return ordinary;
+        const allowed = new Set(routed.arms.flat().map(n => n.node_id));
+        return { arms: [...ordinary.arms.map(arm => arm.filter(n => allowed.has(n.node_id))), ...routed.arms], degraded: [ordinary.degraded, routed.degraded].filter(Boolean).join("; ") || null };
+      },
+      sourceContext: { hydrate: async (query, admitted) => {
+        const native = admitted.filter(isNative);
+        if (graph && native.length) throw new BoundedAskError("native source selection requires graph authority");
+        if (native.length && !nativeHydrate) throw new BoundedAskError("native source hydration unavailable");
+        if (!native.length) return transcriptHydrate(query, admitted);
+        if (native.length === admitted.length) return nativeHydrate!(query, admitted);
+        const transcriptAdmitted = admitted.filter(n => !isNative(n));
+        const transcript = await transcriptHydrate(query, transcriptAdmitted);
+        const other = await nativeHydrate!(query, native);
+        const proven = [...validateHydration(transcript, transcriptAdmitted), ...validateHydration(other, native)];
+        const snapshotSHA256 = sha(JSON.stringify([transcript.snapshotSHA256, other.snapshotSHA256]));
+        const nodes = proven.map(node => { const copy = structuredClone(node); return { ...copy, evidence: { ...copy.evidence, sourceSnapshotSHA256: snapshotSHA256 } }; });
+        const excludedTurns = [...(transcript.excludedTurns ?? []), ...(other.excludedTurns ?? [])];
+        return { nodes, snapshotSHA256, sourceBytes: transcript.sourceBytes + other.sourceBytes, ...(excludedTurns.length ? { excludedTurns } : {}),
+          degraded: [transcript.degraded, other.degraded].filter(Boolean).join("; ") || undefined };
+      }, ...(nativeSource ? { revalidate: (nodes: TreeIndexNode[]) => nativeSource.revalidate(nodes.filter(isNative)) } : {}) },
     };
   };
 }

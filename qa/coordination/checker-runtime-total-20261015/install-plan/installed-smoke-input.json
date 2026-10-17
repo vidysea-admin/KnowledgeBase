@@ -1,0 +1,10 @@
+{
+  "token_metric": "actual_total",
+  "maker": {"active_s": 1000, "tokens": 1000000, "cost": null, "token_metric": "actual_total"},
+  "reviewers": [{"id": "installed-smoke", "active_s": 10, "tokens": 41000, "cost": null, "token_metric": "actual_total"}],
+  "next_phase": {"active_s": 10, "tokens": 1000, "output_tokens": 800, "cost": null, "token_metric": "actual_total"},
+  "bootstrap_scope": "Installed actual-total assess smoke; unknown optional cost, known primary denominators; synthetic only.",
+  "completion_reserve": true,
+  "completion_reserve_id": "installed-checker-runtime-total/cycle4/2b4fe0",
+  "completion_reserve_tokens": 58000
+}

@@ -1,0 +1,39 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Staged actual-total token metric ten focused synthetic tests",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "qa/coordination/checker-runtime-total-20261015",
+    "-p",
+    "test_review_budget.py",
+    "-v"
+  ],
+  "testIDs": [
+    "Staged actual-total token metric ten focused synthetic tests"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 20000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-staged-token-metric-ten",
+  "pins": {
+    "qa/coordination/checker-runtime-total-20261015/review_budget.py": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "qa/coordination/checker-runtime-total-20261015/test_review_budget.py": "229186df3ca881a817194cd9f768f5cd06c95e03a9a48f7a7f941970d975b910",
+    "qa/coordination/checker-runtime-total-20261015/SKILL.md": "22bf0fc5e846311f150316f1053c37c2cc38ca0966ecb0050f46bee0d2f9e4bb"
+  }
+}

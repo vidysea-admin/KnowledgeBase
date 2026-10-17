@@ -1,0 +1,19 @@
+{
+  "phase": "web-types",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules\\pnpm\\bin\\pnpm.mjs",
+    "--filter",
+    "@lkb/web",
+    "typecheck"
+  ],
+  "pid": 8436,
+  "exit": 2,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-14T21:36:13.101Z",
+  "endedAt": "2026-10-14T21:36:26.283Z",
+  "elapsedMs": 13182,
+  "stdout": "\n> @lkb/web@0.0.0 typecheck C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\n> tsc --noEmit -p tsconfig.json\n\nsrc/pages/meeting-bot/readiness/CaptureReadinessControls.tsx(49,14): error TS2339: Property 'error' does not exist on type 'View | { owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\n  Property 'error' does not exist on type '{ owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\nsrc/pages/meeting-bot/readiness/CaptureReadinessControls.tsx(49,46): error TS2339: Property 'error' does not exist on type 'View | { owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\n  Property 'error' does not exist on type '{ owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\nsrc/pages/meeting-bot/readiness/CaptureReadinessControls.tsx(50,14): error TS2339: Property 'outcome' does not exist on type 'View | { owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\n  Property 'outcome' does not exist on type '{ owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\nsrc/pages/meeting-bot/readiness/CaptureReadinessControls.tsx(50,49): error TS2339: Property 'outcome' does not exist on type 'View | { owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\n  Property 'outcome' does not exist on type '{ owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\nsrc/pages/meeting-bot/readiness/CaptureReadinessControls.tsx(51,38): error TS2339: Property 'error' does not exist on type 'View | { owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\n  Property 'error' does not exist on type '{ owner: {}; rows: never[]; loading: boolean; busy: boolean; }'.\r\nC:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web:\r\n ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/web@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`\nExit status 2\n",
+  "stderr": ""
+}

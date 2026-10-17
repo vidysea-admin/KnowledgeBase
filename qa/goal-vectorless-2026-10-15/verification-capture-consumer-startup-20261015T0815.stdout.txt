@@ -1,0 +1,19 @@
+✔ ISS-CAPTUREMAKER-001: corrupt failure status cannot strand owned startup resources (2206.4241ms)
+✔ ISS-CAPTUREMAKER-001: foreign failure status cannot strand owned startup resources (1450.1627ms)
+✔ legacy sync v3 producer output is consumed by the actual finalizer (123.3076ms)
+✔ actual v4 selected speech-only producer input is consumed with its current passed validation (98.3505ms)
+✔ legacy v2 combined proof remains supported with its existing core guarantees (75.6256ms)
+✔ v3 refuses wrong source, database, bytes, generation, selected count and stage status (304.7588ms)
+✔ v3 refuses changed source/session metadata and foreign selected turns (102.1726ms)
+✔ v3 database binding is independently expected and test-data sources remain staging only (60.9244ms)
+✔ actual sync v4 vectorless producer reaches finalizer without semantic/vector proof (88.3945ms)
+✔ v4 refuses missing mode, incomplete readiness and identity/input downgrade attacks (411.4703ms)
+✔ v4 still refuses stale selected validation and foreign session metadata (72.4145ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11381.2629

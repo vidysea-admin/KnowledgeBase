@@ -68,7 +68,10 @@ function rig(opts: { turns?: TestTurn[]; downloader?: boolean; indexer?: (t: str
     downloader: opts.downloader === false ? undefined : async (r) => { calls.download++; return { path: `${WORK}/${r.platform}-${r.id}.mp4` }; },
   });
   let n = 0;
-  const indexer = opts.indexer ?? (async (_t: string, s: string) => { calls.index.push(s); return { chunks: {} }; });
+  const indexer = opts.indexer ?? (async (_t: string, s: string) => { calls.index.push(s); return {
+    sessionId: s, summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null,
+    completion: { version: 2, strict: true, complete: true, generation: "fixture", turnCount: 2, treeWritten: true },
+  }; });
   const sourceIntake: SourceIntakeDeps = createSourceIntakeDeps({
     adapters, sink: createMongoIntakeSink(mem.colls), indexSession: indexer as never,
     newId: () => `sess-${++n}`, now: () => "2026-10-13T10:00:00.000Z",
@@ -193,16 +196,54 @@ test("invalid turn timing is refused before the first write; zero turns -> 422",
   });
 });
 
-test("an indexing failure after a successful store is swallowed (still 201)", async () => {
-  const r = rig({ indexer: async () => { throw new Error("index down"); } });
-  const orig = console.error;
-  console.error = () => {};
-  try {
-    await withServer(r.sourceIntake, async (base) => {
-      assert.equal((await post(base, "k1", { url: YT_URL })).status, 201);
-      assert.equal(r.mem.tables.sessions!.length, 1);
+test("source creation reports downstream failure safely; repeat preserves rows and never claims complete", async () => {
+  let attempts = 0;
+  const r = rig({ indexer: async () => { attempts++; throw new Error("private provider credential"); } });
+  await withServer(r.sourceIntake, async (base) => {
+    const first = await post(base, "k1", { url: YT_URL });
+    assert.equal(first.status, 201);
+    assert.deepEqual(first.body.indexing, { status: "failed", reason: "indexing-incomplete" });
+    assert.ok(!JSON.stringify(first.body).includes("credential"));
+    const before = JSON.stringify(r.mem.tables);
+    const repeat = await post(base, "k1", { url: YT_URL });
+    assert.equal(repeat.status, 200);
+    assert.deepEqual(repeat.body.indexing, { status: "pending", reason: "already-ingested" });
+    assert.equal(JSON.stringify(r.mem.tables), before); assert.equal(attempts, 1);
+  });
+});
+
+test("only positive complete index receipts report done; degraded/incomplete/mismatched receipts fail", async () => {
+  const good = rig();
+  await withServer(good.sourceIntake, async (base) => {
+    const response = await post(base, "k1", { url: YT_URL });
+    const indexing = response.body.indexing as { status: string; receipt: { sessionId: string } };
+    assert.equal(indexing.status, "done"); assert.equal(indexing.receipt.sessionId, response.body.sessionId);
+  });
+  for (const receipt of [{ sessionId: "foreign", chunks: {} }, { sessionId: "sess-1", summary: { degraded: "private error" }, chunks: {} },
+    { sessionId: "sess-1", completion: { version: 2, complete: false }, chunks: {} },
+    { sessionId: "sess-1", summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null,
+      completion: { version: 2, strict: "invalid", complete: true, generation: "fixture", turnCount: 2, treeWritten: true } }]) {
+    const failed = rig({ indexer: async () => receipt });
+    await withServer(failed.sourceIntake, async (base) => {
+      const response = await post(base, "k1", { url: YT_URL });
+      assert.deepEqual(response.body.indexing, { status: "failed", reason: "indexing-incomplete" });
+      assert.equal(failed.mem.tables.sessions!.length, 1);
     });
-  } finally { console.error = orig; }
+  }
+});
+
+test("positive index receipt excludes optional raw provider-stage diagnostics", async () => {
+  const r = rig({ indexer: async (_tenant, sessionId) => ({ sessionId,
+    summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null,
+    completion: { version: 2, strict: true, complete: true, generation: "fixture", turnCount: 2, treeWritten: true },
+    speakerSuggestions: { suggested: 0, inserted: 0, degraded: "optional-failed", error: "private-provider-key" },
+  }) });
+  await withServer(r.sourceIntake, async (base) => {
+    const response = await post(base, "k1", { url: YT_URL });
+    assert.equal((response.body.indexing as { status: string }).status, "done");
+    assert.ok(!JSON.stringify(response.body).includes("private-provider-key"));
+    assert.ok(!JSON.stringify(response.body).includes("speakerSuggestions"));
+  });
 });
 
 test("flag OFF: no deps built and the route does not exist (same answer as any unknown path)", async () => {

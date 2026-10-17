@@ -14,6 +14,30 @@ FIX = pathlib.Path(__file__).parent / "fixtures_tiles"
 html = lambda n: (FIX / n).read_text(encoding="utf-8")
 
 
+def test_server_sampler_instance_is_bound_through_actual_tile_clock(tmp_path):
+    output = tmp_path / "native-tiles.jsonl"
+    instance = "22222222-2222-4222-8222-222222222222"
+    _run(tmp_path, lambda _: html("meet_one_speaking.html"),
+         {T.ENV_FLAG: str(output), T.SAMPLER_INSTANCE_ENV: instance})
+    rows = [json.loads(line) for line in output.read_text(encoding="utf-8").splitlines()]
+    assert rows[0]["samplerClock"]["samplerInstance"] == instance
+    assert rows[0]["samplerClock"]["captureGeneration"] == "11111111-1111-4111-8111-111111111111"
+
+
+def test_invalid_supplied_sampler_instance_refuses_evidence_without_stopping_capture(tmp_path):
+    for index, value in enumerate(["", "not-a-uuid", "22222222-2222-1222-8222-222222222222"]):
+        # Each run writes a stop marker; never reuse it across invalid identities.
+        case_path = tmp_path / str(index)
+        case_path.mkdir()
+        output = case_path / "invalid-native-tiles.jsonl"
+        events, wrapped, clock = _run(case_path, lambda _: html("meet_one_speaking.html"),
+                                     {T.ENV_FLAG: str(output), T.SAMPLER_INSTANCE_ENV: value})
+        assert wrapped is clock
+        assert not output.exists()
+        assert clock.now > 1000
+        assert [event for event, _ in events][-1] == "closed"
+
+
 def test_one_speaking_tile_by_class():
     assert T.speaking_names(html("meet_one_speaking.html")) == ["Priya Nair"]
 
@@ -41,6 +65,9 @@ class _Clock:
 
     def time(self):
         return self.now
+
+    def monotonic(self):
+        return self.now - 900
 
     def sleep(self, s):
         self.now += s
@@ -85,7 +112,7 @@ def _run(tmp_path, pages, env, seconds=20):
     clock = _Clock(lambda c: stop.write_text("x") if c.now - 1000 >= seconds else None)
     sb = _SB(pages)
     sb.clock = clock
-    fake_os = SimpleNamespace(path=os.path, environ=env, remove=os.remove)
+    fake_os = SimpleNamespace(path=os.path, environ={T.GENERATION_ENV: "11111111-1111-4111-8111-111111111111", **env}, remove=os.remove)
     t = T.tile_clock(sb, fake_os, clock)
     run_session(sb, a, os=fake_os, time=t, emit=lambda e, **kw: events.append((e, kw)))
     return events, t, clock
@@ -112,7 +139,9 @@ def test_flag_on_writes_aligner_shaped_observations(tmp_path):
     rows = _rows(out)
     assert rows[0]["kind"] == "meta" and rows[0]["startedAtEpoch"] == 1000.0
     obs = rows[1:]
-    assert all(set(r) == {"tSec", "displayName", "source"} for r in obs)
+    assert all(set(r) == {"tSec", "displayName", "source", "samplerClock"} for r in obs)
+    assert rows[0]["samplerClock"]["captureGeneration"] == "11111111-1111-4111-8111-111111111111"
+    assert rows[0]["samplerClock"]["monotonicSec"] == 100
     named = [r for r in obs if r["displayName"] == "Priya Nair"]
     assert named and named[0]["tSec"] == 0.0 and max(r["tSec"] for r in named) < 10
     assert any(r["displayName"] is None and r["tSec"] >= 10 for r in obs)           # release when nobody is highlighted
@@ -139,3 +168,41 @@ def test_sampler_failure_never_breaks_the_hold_loop(tmp_path):
 def test_entry_point_hooks_only_through_tile_clock():
     src = (pathlib.Path(__file__).parent / "sb_join.py").read_text(encoding="utf-8")
     assert "time=tile_clock(sb, os, time)" in src and sb_join.tile_clock is T.tile_clock
+
+
+def test_missing_generation_never_writes_evidence(tmp_path):
+    clock = _Clock()
+    out = tmp_path / "tiles.jsonl"
+    assert T.tile_clock(object(), SimpleNamespace(environ={T.ENV_FLAG: str(out)}), clock) is clock
+    assert not out.exists()
+
+
+def test_monotonic_elapsed_and_permanent_invalidation_on_clock_jump(tmp_path):
+    for jump in (-100, 100):
+        out = tmp_path / (str(jump) + ".jsonl")
+        state = {"epoch": 1000.0, "mono": 100.0}
+        sampler = T.TileSampler(str(out), lambda: state["epoch"], lambda: html("meet_one_speaking.html"),
+                                lambda: state["mono"], "11111111-1111-4111-8111-111111111111")
+        sampler.tick()
+        state.update(epoch=1004.1, mono=104)
+        sampler.tick()
+        assert _rows(out)[-1]["tSec"] == 4
+        state.update(epoch=1008 + jump, mono=108)
+        sampler.tick()
+        assert _rows(out)[-1] == {"kind": "sampler-clock-invalid", "source": T.SOURCE}
+        prior = out.read_bytes()
+        state.update(epoch=1012, mono=112)
+        sampler.tick()
+        assert out.read_bytes() == prior
+
+
+def test_backwards_monotonic_invalidates_and_attempts_have_distinct_instances(tmp_path):
+    state = [1000, 100]
+    samplers = [T.TileSampler(str(tmp_path / (str(i) + ".jsonl")), lambda: state[0], lambda: "",
+                             lambda: state[1], "11111111-1111-4111-8111-111111111111") for i in range(2)]
+    for sampler in samplers:
+        sampler.tick()
+    assert samplers[0].identity["samplerInstance"] != samplers[1].identity["samplerInstance"]
+    state[:] = [1001, 99]
+    samplers[0].tick()
+    assert _rows(samplers[0].path)[-1]["kind"] == "sampler-clock-invalid"

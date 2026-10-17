@@ -57,7 +57,7 @@ export interface PurgeDeps {
   afterPlan?: () => void;
   /**
    * D-008 evidence clips. When set, EXECUTE mode extracts every retained window into `outDir` BEFORE the unlink and
-   * keeps the media (VETOED clip-extraction-failed) unless all clips exist. Unset = previous behaviour, unchanged.
+   * keeps the media (VETOED clip-extraction-failed) unless all clips exist. Execute refuses a missing extractor.
    */
   clips?: { extract: (mediaAbs: string, windows: readonly EvidenceClipWindow[], outDir: string) => ClipResult };
 }
@@ -130,6 +130,10 @@ export function evaluatePurge(opts: ReportOptions, io: MediaIo, now: number): Ev
 export interface PurgeSummary { candidates: number; deleted: number; bytes: number; vetoed: number; failed: number }
 
 export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeDeps): { code: number; summary: PurgeSummary | null } {
+  if (execute && (!deps.clips || typeof deps.clips.extract !== "function")) {
+    deps.error("retention-purge: execute requires evidence-clip extraction before any deletion");
+    return { code: 2, summary: null };
+  }
   const io = deps.io ?? REAL_IO;
   const purgeIo = deps.purgeIo ?? REAL_PURGE_IO;
   const first = evaluatePurge(opts, io, deps.now());
@@ -178,7 +182,7 @@ export function executePurge(opts: ReportOptions, execute: boolean, deps: PurgeD
       deps.write(`FAILED ${where} error=${cleanText(why, 120)}`);
     }
   }
-  if (deps.clips) deps.write(`CLIPS retained=${clipsKept}`);
+  if (execute && deps.clips) deps.write(`CLIPS retained=${clipsKept}`);
   deps.write(`SUMMARY mode=${execute ? "execute" : "dry-run"} candidates=${s.candidates} deleted=${s.deleted} bytes=${s.bytes} vetoed=${s.vetoed} failed=${s.failed}`);
   return { code: s.failed > 0 ? 4 : 0, summary: s };
 }

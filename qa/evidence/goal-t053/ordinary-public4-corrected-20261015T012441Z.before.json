@@ -1,0 +1,15 @@
+{
+  "apps/api/src/indexing/chunk-write.ts": "80b6ae5c866cc8dfafb8c2fabb5872b52f702bd1f18c0b42edc811d806a143ae",
+  "apps/api/src/indexing/generation.ts": "443b969a218a4ad9716f5e9e9fb04c284bfd276a8633f5f26a82284674646d0d",
+  "apps/api/src/indexing/grounded-write.ts": "c6fa3b092e4ce159ee6cfe738d8d24fde79581ed0eefe7494947ec078c39b247",
+  "apps/api/src/indexing/public-preserved-review.fixture.ts": "2d4e6c821a7658458add47f32e5157cfb64d3a6d8548f275f2bfeee310329341",
+  "apps/api/src/indexing/public-preserved-review.test.ts": "791ea8da28354e8bcaf5df7cedfd352f805ce64a88ae76842c0c29d9c9b82cb1",
+  "apps/api/src/indexing/session.ts": "6734738ce50f493bc27c9db7b4170ed4db590f3dba6bda47f47dcbaa6e2709f5",
+  "apps/api/src/indexing/types.ts": "2d297b84c921504ce5b4806ff5f57bcbe5ac5ffc0f644232f4b22fa35a6dca00",
+  "packages/core/src/generated/chunks.ts": "3b7ded2ba630f293231b3af76ea8e8e40136e7de186af52efdbdcdd4f69e1561",
+  "packages/core/src/generated/claims.ts": "d0f28938b51a3c92fcd8ac1a8c3eb28d6b00e474f5c652dfeb84cfd09efd36c2",
+  "packages/core/src/generated/session_pages.ts": "9093b3d7ff480c149aadee4aa2625bf29afb57e3785646dbefc99cf3b6b7428b",
+  "packages/core/src/generated/sessions.ts": "3977b5aaf6c516512974f727322f82751b19a2415b1a500b88a752aa54ce5516",
+  "packages/core/src/generated/tree_index.ts": "47f4514ba063718df6c7d1e05f0ebc09854b211ad536ab0d3d7a48c54e47f361",
+  "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443"
+}

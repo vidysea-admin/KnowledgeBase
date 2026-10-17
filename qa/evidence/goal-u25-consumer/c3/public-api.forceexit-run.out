@@ -1,0 +1,29 @@
+TAP version 13
+# Subtest: PUBLIC synthetic actual persisted producer→authenticated mounted route capture for client/panel
+ok 1 - PUBLIC synthetic actual persisted producer→authenticated mounted route capture for client/panel
+  ---
+  duration_ms: 2504.8478
+  type: 'test'
+  ...
+# Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\\win\\async.c, line 94
+# Subtest: qa\\evidence\\goal-u25-consumer\\public-transport.test.ts
+not ok 1 - qa\\evidence\\goal-u25-consumer\\public-transport.test.ts
+  ---
+  duration_ms: 157766.8765
+  type: 'test'
+  location: 'C:\\Users\\product\\Desktop\\KnowledgeBase-lanes\\w16-u25web\\qa\\evidence\\goal-u25-consumer\\public-transport.test.ts:1:1'
+  failureType: 'testCodeFailure'
+  exitCode: 3221226505
+  signal: ~
+  error: 'test failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 157851.7336

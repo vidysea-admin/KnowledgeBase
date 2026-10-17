@@ -1,0 +1,16 @@
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (27.6497ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (5.5218ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (48.3944ms)
+✔ known-person profile and mounted API revoke source consent without a cached identity bypass (82.434ms)
+✔ unsupported snapshot capability cannot fall back to collection-only profile output (22.4685ms)
+✔ cached topic names require every contributing source session to remain visible (21.6827ms)
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (51.5269ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2232.6958
+

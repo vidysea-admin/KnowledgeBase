@@ -1,0 +1,10 @@
+{
+  "kind": "allowed historical QA rows side effect preserved",
+  "beforeSha": "ec5793a344414606987b5acddbcca887e90cac28e05a987e3892e7407237bd25",
+  "testOutputSha": "ec5793a344414606987b5acddbcca887e90cac28e05a987e3892e7407237bd25",
+  "byteBackup": ".cache\\coordination\\t059-composition-rows-before-1792067850846.bin",
+  "restored": true,
+  "commandExit": 1,
+  "error": null,
+  "sourceWrites": []
+}

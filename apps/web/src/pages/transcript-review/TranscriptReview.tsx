@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiError } from "../../api/client.js";
 import { getTranscriptReview, saveTranscriptReview, type TranscriptReviewSnapshot } from "../../api/transcriptReview.js";
+import { ReviewHistory } from "./ReviewHistory.js";
 
-/** Standalone T-054 editor. Mount only when the audited canonical backend is available. */
+/** Revision-bound transcript correction and explicit contiguous speaker mapping. */
 export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
   apiKey: string | null; sessionId: string; onCommitted?: () => void;
 }): React.ReactElement {
@@ -28,6 +29,7 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
       if (!active()) return;
       if (committedRevision && value.revision !== committedRevision) throw new Error("Reload did not return the committed revision; reload again before editing.");
       setLoaded({ key: apiKey, sessionId, value }); setSelected(value.turns[0]?._id ?? "");
+      return value;
     } catch (error) {
       if (active()) setMessage((previous) => ({ key: apiKey, sessionId,
         text: `${!reset && previous?.key === apiKey && previous.sessionId === sessionId ? `${previous.text} ` : ""}${error instanceof Error ? error.message : "Transcript review unavailable"}`, error: true }));
@@ -59,7 +61,13 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
       // Canonical reload is required: a commit receipt is not an authoritative transcript snapshot.
       try { onCommitted?.(); } catch { /* callback cannot turn a committed write into a retry */ }
       if (!active()) return;
-      await load(false, result.revision);
+      const reloading = load(false, result.revision);
+      const reloadIdentity = { ...current.current };
+      const canonical = await reloading;
+      if (canonical && current.current.key === reloadIdentity.key && current.current.sessionId === reloadIdentity.sessionId && current.current.generation === reloadIdentity.generation) {
+        setMessage({ key: apiKey, sessionId, error: false, text: canonical.refresh === "complete" ? "Transcript saved. Knowledge refresh complete." :
+          canonical.refresh === "failed" ? "Transcript saved. Knowledge refresh failed; existing answers may be stale." : "Transcript saved. Knowledge refresh pending; existing answers may be stale." });
+      }
     } catch (error) {
       if (!active()) return;
       setConflict(true);
@@ -67,12 +75,27 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
         "Transcript changed. Your draft is retained. Reload before saving." : "Save could not be confirmed. Your draft is retained. Reload before saving again." });
     } finally { if (active()) setBusy(false); }
   }
+  async function reloadAfterRefresh() {
+    const pending = load(false);
+    const identity = { ...current.current };
+    const value = await pending;
+    if (current.current.key !== identity.key || current.current.sessionId !== identity.sessionId || current.current.generation !== identity.generation) return;
+    if (value) setMessage({ key: apiKey, sessionId, error: value.refresh === "failed", text: value.refresh === "complete" ? "Knowledge refresh complete." :
+      value.refresh === "failed" ? "Knowledge refresh failed; existing answers may be stale." : "Knowledge refresh pending; existing answers may be stale." });
+    try { onCommitted?.(); } catch { /* reload truth remains intact */ }
+  }
   return <section className="card" aria-label="Transcript review">
     <h2>Transcript review</h2>
     {notice && <p role={notice.error ? "alert" : "status"}>{notice.text}</p>}
     <button onClick={() => void load()} disabled={busy && !!snapshot}>Reload transcript</button>
     {!snapshot ? <p>{busy ? "Loading transcript review…" : "Transcript review unavailable."}</p> : <>
       <p>Knowledge refresh: {snapshot.refresh}</p>
+      {snapshot.refresh !== "complete" && <p role="note" aria-label="Knowledge freshness warning">
+        Knowledge refresh {snapshot.refresh}; existing answers may be stale. {snapshot.refresh === "failed" ? "Retry knowledge refresh below." : "Refresh knowledge below to update dependent knowledge."}
+      </p>}
+      {!!snapshot.orphanedTurnIds?.length && <p role="alert">Source passages changed after review. {snapshot.orphanedTurnIds.length} reviewed passage(s) no longer exist: {snapshot.orphanedTurnIds.join(", ")}. Their audit remains available; restore stable source passage identifiers before refreshing knowledge.</p>}
+      <ReviewHistory apiKey={apiKey} sessionId={sessionId} revision={snapshot.revision} refresh={snapshot.refresh} disabled={busy}
+        onRefreshed={reloadAfterRefresh} />
       {snapshot.turns.length === 0 ? <p>No transcript turns to review.</p> : <>
         <label>Passage <select aria-label="Passage" value={selected} onChange={(e) => setSelected(e.target.value)}>
           {snapshot.turns.map((t) => <option key={t._id} value={t._id}>{t.tStart}s · {t.speakerLabel ?? t.speakerRef} · {t._id}</option>)}

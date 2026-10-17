@@ -3,6 +3,8 @@
  * Callers must obtain the result through tenant-scoped retrieval before attaching its tenant.
  */
 import type { AskV2Result } from "./ask-shared.js";
+import { createHash } from "node:crypto";
+import { validNativeSourceLocator } from "./source-context.js";
 
 export type AnswerPolicyMode = "internal-only" | "internal-and-web";
 export interface AnswerPolicyVersion {
@@ -28,6 +30,32 @@ function validPolicy(policy: AnswerPolicyVersion): boolean {
   return !!policy && identifier(policy.tenantId) && identifier(policy.policyId)
     && Number.isSafeInteger(policy.version) && policy.version > 0
     && (policy.mode === "internal-only" || policy.mode === "internal-and-web");
+}
+
+/** Provenance shape is checked here; current tenant/head/visibility authority remains the release verifier's job. */
+function internalProvenance(source: AskV2Result["sources"]["internal"][number]): boolean {
+  if (!source || !identifier(source.node_id)) return false;
+  const evidence = source.evidence;
+  if (!evidence || typeof evidence !== "object" || Array.isArray(evidence)) return false;
+  const quotes = evidence.sourceQuotes;
+  const native = "sourceId" in evidence || "revisionHash" in evidence || (Array.isArray(quotes) && quotes.some(q => q && typeof q === "object"
+    && ("sourceLocator" in q || q.origin === "document-page" || q.origin === "message")));
+  // Existing transcript provenance stays unchanged, including independently valid transcript sources in mixed answers.
+  if (!native) return identifier(evidence.sessionRef);
+  if ("sessionRef" in evidence || !identifier(evidence.sourceId) || typeof evidence.revisionHash !== "string"
+    || !/^[a-f0-9]{64}$/.test(evidence.revisionHash) || !Array.isArray(quotes) || !quotes.length) return false;
+  const ids = new Set<string>();
+  return quotes.every(q => {
+    if (!q || typeof q !== "object" || Array.isArray(q) || Object.keys(q).length !== 5
+      || Object.keys(q).some(key => !["id", "nodeId", "quote", "origin", "sourceLocator"].includes(key))
+      || !identifier(q.id) || ids.has(q.id) || q.nodeId !== source.node_id || typeof q.quote !== "string" || !q.quote.trim()) return false;
+    const locator = q.sourceLocator;
+    if (!validNativeSourceLocator(locator) || q.origin !== locator.kind || locator.sourceId !== evidence.sourceId
+      || locator.revisionHash !== evidence.revisionHash || locator.passage.end - locator.passage.start !== q.quote.length
+      || createHash("sha256").update(q.quote, "utf8").digest("hex") !== locator.passage.sha256) return false;
+    ids.add(q.id);
+    return true;
+  });
 }
 
 /** Creates a detached frozen value; previous versions remain unchanged. No storage implied. */
@@ -59,7 +87,7 @@ export function simulateAnswerPolicy(tenantId: string, policy: AnswerPolicyVersi
     || !["correct", "ambiguous", "incorrect"].includes(result.verdict)) return reply("refuse", "invalid-result");
   if (policy.mode === "internal-only" && (result.web_used || web.length > 0)) return reply("refuse", "web-disallowed");
   if (internal.length + web.length === 0) return reply("refuse", "no-sources");
-  if (internal.some((source) => !source || !identifier(source.node_id) || !identifier(source.evidence?.sessionRef))) {
+  if (internal.some(source => !internalProvenance(source))) {
     return reply("review", "missing-provenance");
   }
   if (web.some((source) => {

@@ -1,0 +1,11 @@
+{
+  "gate_exit": 2,
+  "prior_phase1_actual_seconds": null,
+  "prior_phase1_reported_35_seconds_valid": false,
+  "tokens": null,
+  "cost": null,
+  "children": [],
+  "retry_history": "Coordinator reconciliation requested",
+  "reason": "Prior active time was not instrumented; unknown preserved. Invalid 35-second snapshot retained for audit.",
+  "recorded_at": "2026-10-15T07:35:40.0912547Z"
+}

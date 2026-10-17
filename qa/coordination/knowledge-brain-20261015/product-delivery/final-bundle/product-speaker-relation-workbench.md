@@ -1,0 +1,17 @@
+# product-speaker-relation-workbench
+
+Status: **SOURCE_READY_FOR_FINITE_REVIEW** (SOURCE_METADATA_READY_NOT_REVIEW_ADMITTED). This is source metadata, never checker PASS/admission. Cycle 2. Root `C:/Users/product/Desktop/KnowledgeBase`; base `5c4cbade2d1a8aa4815de13d587db8de3b01cc4a`; candidate `3de6e403fdc7bebcee8329f81c6544e1cd302dbb7c3a41b9e58714976149bf92` (SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit).
+
+Key mounted workbench by login/person/generation, fetch exact source authority, validate current digest/capabilities/evidence, disable absent authority and refresh source after accepted write.
+
+Changed logic: [raw scoped DIFF](qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff) and exact owned sources [SpeakerRelationWorkbench.tsx](C:/Users/product/Desktop/KnowledgeBase/apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.tsx), [SpeakerRelationWorkbench.test.tsx](C:/Users/product/Desktop/KnowledgeBase/apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx), [KnowledgeSpeakerProfilePage.tsx](C:/Users/product/Desktop/KnowledgeBase/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx), [KnowledgeSpeakerProfilePage.test.tsx](C:/Users/product/Desktop/KnowledgeBase/apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx). New-file source/hash stands in for absent base. Minimal immediate consumer context: `apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts`, `apps/api/src/speaker-relations/source-router.ts`, `apps/api/src/speaker-relations/types.ts`. Exact current owned/direct-consumer SHA256, receipt matches and prior-composite differences are in [index.json](index.json) → this slug; no whole module/App/stdout copy.
+
+Applicable: qa/contracts/goal-t055.md C4,C7,C8,C9; existing speaker-relations exact DTO/evidence/CAS contract. Contract hashes and shared final24 checkpoint are deduplicated in index. Packet `qa/packets/product-speaker-relation-workbench.md`; manifest `qa/manifests/product-speaker-relation-workbench.md` unchanged.
+
+Scoped proof: UI composite workbench8+profile7pass/1privateSKIP; independent late-auth-source1 passes inside UI12 globalexit1. API source/router producer evidence scoped separately. Owned independent probe `apps/web/src/__checker_probes__/speaker-auth-session.test.tsx`, current SHA256 `fe38f0337a9cc585b13aeff019817fd1ed1db938d7a4843f445d866d5ec4f1e6`.
+
+Current type/build: `verification-web-types-fixture-repairs.json` exit0/12.312s; `verification-web-build-fixture-repairs.json` exit0/16.720s,1675pins unchanged. Shared exact runtime/lock/environment/import fingerprints and commands are linked once in index; API epoch qualification retained. Frozen verifier `verification-final-frozen-contracts.json` exit0, empty registry/vacuous; current two validator hashes match.
+
+Missing/limits: No missing scoped receipt identified by this metadata reconciliation; independent review/evidence reuse remains undecided. Independent current-candidate review/verdict and explicit finite future authority remain pending; no admission implied. Parent live/browser/provider/native persistence/human acceptance gates remain open as packet specifies. All historical failed global exits remain.
+
+Accounting: common index preserves all children/debits/breaches and known collection1399515/3547712; no actual10% claim or finite-authority grant.

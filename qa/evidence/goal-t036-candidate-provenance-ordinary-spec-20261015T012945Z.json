@@ -1,0 +1,30 @@
+{
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/db/src/collections/meeting-candidates.test.ts"
+  ],
+  "timeoutMs": 120000,
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0"
+  },
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "expectedTests": 12,
+  "classification": "Root/runtime authorized minimal current public synthetic provenance/CAS writer cases",
+  "pins": {
+    "packages/db/src/collections/meeting-candidates.ts": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+    "packages/db/src/collections/meeting-candidates.test.ts": "5149cac7dafe33a82157b538e0f973efc85194302d62ce9e31ce852f57a0f793",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/db/src/client.ts": "eb83337493ace4486c03847bac59ac478b4c6bf84862ec5c9ea7d48b463ba5eb",
+    "packages/core/src/generated/meeting_candidates.ts": "d6a4f5be963d022bbe07bf768ac20c59295df4724279c92a2a9ca71e316aa626",
+    "schema/meeting_candidates.schema.json": "9d3b6b5d6176c29bad4bc7fc4c5c2afc4eee5f9227af8d9e7b02be399ea8203d",
+    "packages/db/package.json": "77f9a2f02b29062d3272b633e0a6cf583a48a653c2441956a1785dd5aee83e24",
+    "packages/core/package.json": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "qa/contracts/t036-candidate-provenance-refresh.md": "7ec8f6dc93320403f8bafe875652802b1b6ce11d5b7f36a582e54940a3bb2eb0"
+  },
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+}

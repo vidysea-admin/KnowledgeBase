@@ -1,0 +1,11 @@
+{"synthetic":true,"identityEvidencePrimaryOnly":true,"independentAttributeRefsWithdrawnInBoth":true,"publicA":{"confidence":null,"withheldProfileFields":0},"publicB":{"confidence":null,"withheldProfileFields":0}}
+✔ healthy visible primary attributes and claims survive with primary-only identity evidence (26.7717ms)
+✔ independent withdrawn attribute refs cannot reveal stored presence through public withheld counters (10.9336ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 629.0518

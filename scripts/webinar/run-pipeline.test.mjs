@@ -1,33 +1,47 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {writeFileSync, readFileSync, existsSync} from 'node:fs';
-import {join} from 'node:path';
+import {join, resolve} from 'node:path';
 import {runPipelineTick, validateRunGate, createPipelineDeps} from './run-pipeline.mjs';
 const {runWebinarRegistrations, activeWebinarStopReason, webinarSessionKey, webinarIdentity} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
-const {prepareWebinarSourceState} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
+const {prepareWebinarSourceState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
+const {reconcileWebinarSources} = await import('../../packages/meeting-bot/src/calendar/calendar-client.ts');
 
 import {NOW, event, withFixture, proof, completed} from './run-pipeline-fixtures.mjs';
+const receipt = new Date(NOW).toISOString();
+const nativeRegistrationConfig = (host, root = resolve('fixture-registration-runtime')) => ({
+  python: join(root, 'fixture-python'), profileDir: join(root, 'fixture-profile'), allowedHosts: [host],
+  operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'},
+  form: {mode: 'native-html', formSelector: 'form', submitSelector: 'button[type=submit]',
+    fields: {firstName: '#first', lastName: '#last', email: '#email'}},
+});
 test('registration persistence rejection prevents any browser side effect', async () => {
   const candidate = {id: 'original', title: 'Webinar', senderEmail: 'host@example.test', senderDomain: 'example.test', status: 'approved',
+    senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
     registrationOnly: true, registrationUrl: 'https://example.test/register', messageId: 'message', threadId: 'thread',
     startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
   let submissions = 0;
+  const acquisition = reconcileWebinarSources({tenantId: 'fixture', checkedAt: receipt, calendarEvents: [], candidates: [candidate],
+    acquisition: {complete: true, historyComplete: true}});
+  assert.equal(acquisition.inventory[0].classification, 'webinar');
+  assert.equal(acquisition.state.occurrences[acquisition.inventory[0].occurrenceKey].accepted, true);
   await assert.rejects(runWebinarRegistrations({state: {operations: {}}, tenantId: 'fixture', candidates: [candidate], now: () => NOW,
-    acquisition: {inventory: [{snapshot: candidate, occurrenceKey: 'source', reviewKey: 'review'}], state: {occurrences: {source: {}}}},
-    config: () => ({python: 'python', profileDir: 'profile', allowedHosts: ['example.test'],
-      operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'}, form: {mode: 'native-html'}}),
-    register: async () => {submissions++;}, update: async () => {throw new Error('disk failure');}, validate: () => {}, confirm: () => {},
+    acquisition, config: () => nativeRegistrationConfig('example.test'),
+    register: async () => {submissions++;}, update: async (_id, changes) => {
+      assert.equal(changes.registration?.phase, 'submitting', 'failure must exercise the durable attempt boundary');
+      throw new Error('disk failure');
+    }, validate: validateWebinarRegistration, confirm: confirmWebinarRegistration,
     createUUID: () => '12345678-1234-4123-8123-123456789abc'}), /disk failure/);
   assert.equal(submissions, 0);
 });
 test('registration saves submitting before browser and never resubmits after result or interrupted restart', async () => {
   for (const outcome of ['submitted', 'uncertain', 'action_required', 'throw']) await withFixture(async f => {
     const candidate = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
       status: 'approved', registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
       startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
     f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [candidate];
-    f.deps.registrationConfig = () => ({python: 'python', profileDir: 'profile', allowedHosts: ['organizer.example'],
-      operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'}, form: {mode: 'native-html', formSelector: 'form', submitSelector: 'button', fields: {email: '#email'}}});
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
     let submitted = 0;
     f.deps.registerWebinar = async () => {
       submitted++;
@@ -52,16 +66,16 @@ test('registration saves submitting before browser and never resubmits after res
 });
 test('confirmed registration preserves original source and raw barrier and schedules once', () => withFixture(async f => {
   const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+    senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
     registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
     startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
   let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
-  f.deps.registrationConfig = () => ({python: 'python', profileDir: 'profile', allowedHosts: ['organizer.example'],
-    operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'}, form: {mode: 'native-html'}});
+  f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
   let submissions = 0; f.deps.registerWebinar = async () => {submissions++; return {status: 'submitted'};};
   f.deps.launch = async args => completed(f.root, args[args.indexOf('--session-id') + 1]);
   await runPipelineTick(f.deps, true); assert.equal(submissions, 1); assert.equal(f.calls.length, 0);
   const confirmation = {...original, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
-    registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij'};
+    registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt};
   rows = [original, confirmation];
   const native = f.deps.loadCalendarAcquisition;
   f.deps.loadCalendarAcquisition = async (...args) => ({...await native(...args), version: 2});
@@ -89,12 +103,13 @@ test('confirmed registration preserves original source and raw barrier and sched
 test('missing profile or thread never invokes registration, preview never persists an attempt', async () => {
   for (const missing of ['profile', 'thread', 'preview']) await withFixture(async f => {
     const row = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
       registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
       startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
     if (missing === 'thread') delete row.threadId;
     f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [row];
-    f.deps.registrationConfig = () => ({python: 'python', profileDir: missing === 'profile' ? undefined : 'profile', allowedHosts: ['organizer.example'],
-      operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'}, form: {mode: 'native-html'}});
+    f.deps.registrationConfig = () => ({...nativeRegistrationConfig('organizer.example', f.root),
+      ...(missing === 'profile' ? {profileDir: undefined} : {})});
     let submissions = 0; f.deps.registerWebinar = async () => {submissions++; return {status: 'submitted'};};
     await runPipelineTick(f.deps, missing !== 'preview'); assert.equal(submissions, 0);
     if (missing === 'preview') assert.equal(existsSync(join(f.stateDir, 'operations.json')), false);
@@ -104,11 +119,11 @@ test('missing profile or thread never invokes registration, preview never persis
 test('unresolved registration blocks correlated wrong confirmation but preserves unrelated invitations', async () => {
   for (const wrong of ['organizer', 'time', 'unrelated', 'same-thread-unrelated']) await withFixture(async f => {
     const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
       registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
       startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
     let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
-    f.deps.registrationConfig = () => ({python: 'python', profileDir: 'profile', allowedHosts: ['organizer.example'],
-      operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'}, form: {mode: 'native-html'}});
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
     f.deps.registerWebinar = async () => ({status: 'submitted'});
     f.deps.launch = async () => {};
     await runPipelineTick(f.deps, true);
@@ -116,7 +131,7 @@ test('unresolved registration blocks correlated wrong confirmation but preserves
       {endTime: '2026-09-30T13:01:00.000Z'} : wrong === 'same-thread-unrelated' ?
       {senderEmail: 'other@organizer.example', endTime: '2026-09-30T13:01:00.000Z'} : {threadId: 'other-thread'};
     rows = [original, {...original, ...change, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
-      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij'}];
+      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt}];
     const result = await runPipelineTick(f.deps, true);
     assert.equal(result.toRecord.length, ['unrelated', 'same-thread-unrelated'].includes(wrong) ? 1 : 0, wrong);
   }, true);
@@ -125,16 +140,16 @@ test('unresolved registration blocks correlated wrong confirmation but preserves
 test('registration confirmation cannot bypass missing, rejected, cancelled or changed original source', async () => {
   for (const changed of ['missing', 'rejected', 'cancelled', 'time', 'organizer']) await withFixture(async f => {
     const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
       registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
       startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
     let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
-    f.deps.registrationConfig = () => ({python: 'python', profileDir: 'profile', allowedHosts: ['organizer.example'],
-      operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'}, form: {mode: 'native-html'}});
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
     f.deps.registerWebinar = async () => ({status: 'submitted'});
     let captures = 0; f.deps.launch = async () => {captures++;};
     await runPipelineTick(f.deps, true);
     const confirmation = {...original, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
-      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij'};
+      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt};
     const alteration = changed === 'rejected' ? {status: 'rejected'} : changed === 'cancelled' ? {cancelled: true} :
       changed === 'time' ? {endTime: '2026-09-30T13:01:00.000Z'} : {senderEmail: 'other@organizer.example'};
     rows = changed === 'missing' ? [confirmation] : [{...original, ...alteration}, confirmation];

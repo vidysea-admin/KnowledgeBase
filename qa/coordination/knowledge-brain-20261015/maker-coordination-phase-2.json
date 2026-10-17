@@ -1,0 +1,13 @@
+{
+  "role": "maker",
+  "priorUnmeasuredCoordination": "unknown/null, not zero",
+  "explicitWaitIntervals": [],
+  "monotonicStart": 155379517122,
+  "monotonicEnd": 155381834316,
+  "actualTokens": null,
+  "outcome": "Checkpoint reflects root resumption; capture exact paths corrected; central pins refreshed, no feature edits.",
+  "monotonicFrequency": 10000000,
+  "actualCost": null,
+  "activeSeconds": 0.2317194,
+  "phase": "central-coordination-pins-2"
+}

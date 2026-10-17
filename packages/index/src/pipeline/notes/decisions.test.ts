@@ -42,6 +42,31 @@ test("fabricated ids are removed; a decision with no real id is dropped entirely
     { text: "No ids." }, { text: "  ", turnIds: ["a"] }, "junk", null,
   ]));
   assert.deepEqual(r.decisions.map((d) => [d.text, d.evidenceTurnIds]), [["Mixed.", ["b"]]]);
+  assert.match(r.degraded!.reason, /incomplete/);
+});
+
+test("invalid source identity, duplicate IDs, mixed scope and invalid times refuse before provider", async () => {
+  const bad = [
+    { ...TURNS[1]!, tenantId: "foreign" }, { ...TURNS[1]!, sessionId: "foreign" },
+    { ...TURNS[1]!, _id: "a" }, { ...TURNS[1]!, _id: "" }, { ...TURNS[1]!, speakerRef: " " },
+    { ...TURNS[1]!, tStart: -1 }, { ...TURNS[1]!, tEnd: NaN }, { ...TURNS[1]!, tEnd: 1 },
+    { ...TURNS[1]!, tStart: Infinity }, null,
+  ];
+  for (const t of bad) {
+    let calls = 0;
+    const result = await extractDecisions([TURNS[0]!, t as Turns], async () => { calls++; return done("[]"); });
+    assert.equal(calls, 0);
+    assert.deepEqual(result.decisions, []);
+    assert.match(result.degraded!.reason, /source identity/);
+  }
+});
+
+test("unusable nonempty and partially filtered responses remain unknown, never genuine none", async () => {
+  for (const rows of [[null], [{ text: "No citation" }], [{ text: "Fabricated", turnIds: ["missing"] }],
+    [{ text: "Valid", turnIds: ["b"] }, { text: "Invalid", turnIds: ["missing"] }]]) {
+    const result = await extractDecisions(TURNS, fake(rows));
+    assert.match(result.degraded!.reason, /incomplete/);
+  }
 });
 
 test("duplicate cited ids collapse", async () => {

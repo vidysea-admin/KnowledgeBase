@@ -1,0 +1,8 @@
+{
+  "dependencyClosurePreparationMs": null,
+  "note": "Prior metadata closure timing unavailable;211 conservative static import pins include type-only sources, no unrelated test inventory",
+  "runnerWallMs": 2242.4339,
+  "aggregateFingerprintIdentityReceiptOverheadMs": 554.4921999999999,
+  "testCommandMs": 1687.9417,
+  "specSetupMs": 216.0042
+}

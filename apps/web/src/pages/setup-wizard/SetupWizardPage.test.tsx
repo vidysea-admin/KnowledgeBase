@@ -1,7 +1,7 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { AuthProvider } from "../../auth/AuthContext.js";
+import { AuthProvider, useAuth } from "../../auth/AuthContext.js";
 import { NavSidebar } from "../../layout/NavSidebar.js";
 import appSource from "../../App.tsx?raw";
 import { SetupWizardPage } from "./SetupWizardPage.js";
@@ -34,7 +34,7 @@ beforeEach(() => { localStorage.setItem("lkbApiKey", "k1"); fetchMock.mockReset(
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); localStorage.clear(); });
 
 describe("Setup wizard: item states", () => {
-  test("all healthy: every checkable item is Ready; scopes and Google stay Unknown with an action", async () => {
+  test("configured integrations: checkable items Ready; runtime readiness, scopes and Google remain Unknown", async () => {
     route(); renderPage();
     expect(screen.getByText("Running setup checks…")).toBeInTheDocument();
     for (const id of ["api", "db", "key", "gemini", "tavily", "langfuse", "join-rules", "sources"]) expect((await item(id)).dataset.status).toBe("ok");
@@ -46,6 +46,10 @@ describe("Setup wizard: item states", () => {
     const google = await item("google");
     expect(google.dataset.status).toBe("unknown");
     expect(google.textContent).toContain("gws auth status");
+    const readiness = await item("ai-readiness");
+    expect(readiness.dataset.status).toBe("unknown");
+    expect(readiness.textContent).toContain("do not test model access");
+    expect((await item("gemini")).textContent).toContain("does not verify a working provider or model");
   });
 
   test("API unreachable: api is a Problem with a start command, db/key unknown, nothing claimed", async () => {
@@ -85,12 +89,14 @@ describe("Setup wizard: item states", () => {
     await screen.findByText("Sign in with an API key to run the setup checks.");
   });
 
-  test("integrations not configured: Gemini is a Problem, Tavily and Langfuse optional To do, each with an env action", async () => {
+  test("missing integrations are optional To do and cannot establish AI unavailability", async () => {
     route({ "/setup/status": { status: 200, body: { configured: { gemini: false, tavily: false, langfuse: false } } } });
     renderPage();
     const g = await item("gemini");
-    expect(g.dataset.status).toBe("problem");
+    expect(g.dataset.status).toBe("todo");
     expect(g.textContent).toContain("GEMINI_API_KEY");
+    expect(g.textContent).toContain("Other configured providers may support AI jobs");
+    expect(g.textContent).not.toContain("summaries are unavailable");
     expect((await item("tavily")).dataset.status).toBe("todo");
     expect((await item("tavily")).textContent).toContain("TAVILY_API_KEY");
     const lf = await item("langfuse");
@@ -171,6 +177,83 @@ describe("Setup wizard: no secrets, only existing read endpoints", () => {
     const { container } = renderPage();
     await item("gemini");
     expect(container.textContent).not.toContain("LEAK");
+  });
+});
+
+function LoginControls(): React.ReactElement {
+  const auth = useAuth();
+  return <>
+    <button onClick={() => auth.setApiKey("k1")}>Same-key login</button>
+    <button onClick={() => { auth.clearApiKey(); auth.setApiKey("k1"); }}>Logout and login</button>
+    <button onClick={() => auth.clearApiKey()}>Logout</button>
+  </>;
+}
+
+// Hold only the status read; every snapshot still exercises all four real client reads.
+function holdStatusReads() {
+  route();
+  const normal = fetchMock.getMockImplementation()!;
+  const pending: Array<(reply: { status: number; body: unknown }) => void> = [];
+  fetchMock.mockImplementation((url: string, options: unknown) => {
+    if (!String(url).endsWith("/system-status")) return normal(url, options);
+    return new Promise((resolve) => pending.push(({ status, body }) => resolve({
+      ok: status < 400, status, headers: new Headers(), json: async () => body,
+    })));
+  });
+  return pending;
+}
+
+describe("Setup wizard: login and refresh ownership", () => {
+  const renderWithControls = () => render(<AuthProvider><LoginControls /><SetupWizardPage /></AuthProvider>);
+  const settle = async (resolve: (reply: { status: number; body: unknown }) => void, status: number, db = "ok") => {
+    await act(async () => { resolve({ status, body: { db } }); });
+  };
+
+  test("a completed checklist is immediately hidden on same-key login, then freshly read", async () => {
+    const pending = holdStatusReads(); renderWithControls();
+    await settle(pending[0]!, 200);
+    expect((await item("db")).dataset.status).toBe("ok");
+    fireEvent.click(screen.getByRole("button", { name: "Same-key login" }));
+    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Running setup checks");
+    expect(pending).toHaveLength(2);
+    await settle(pending[1]!, 200, "error");
+    expect((await item("db")).dataset.status).toBe("problem");
+    expect(fetchMock).toHaveBeenCalledTimes(8);
+  });
+
+  test("old success cannot fill a new same-key login's pending checklist", async () => {
+    const pending = holdStatusReads(); renderWithControls();
+    fireEvent.click(screen.getByRole("button", { name: "Logout and login" }));
+    expect(pending).toHaveLength(2);
+    await settle(pending[0]!, 200);
+    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
+    await settle(pending[1]!, 200, "error");
+    expect((await item("db")).dataset.status).toBe("problem");
+  });
+
+  test("old 401 cannot sign out or replace the later same-key login", async () => {
+    const pending = holdStatusReads(); renderWithControls();
+    fireEvent.click(screen.getByRole("button", { name: "Logout and login" }));
+    await settle(pending[1]!, 200);
+    expect((await item("db")).dataset.status).toBe("ok");
+    await settle(pending[0]!, 401);
+    expect(screen.getByTestId("item-db").dataset.status).toBe("ok");
+    expect(localStorage.getItem("lkbApiKey")).toBe("k1");
+    expect(screen.queryByText("Sign in with an API key to run the setup checks.")).not.toBeInTheDocument();
+  });
+
+  test("logout hides a loaded checklist and late responses cannot restore it", async () => {
+    const pending = holdStatusReads(); renderWithControls();
+    await settle(pending[0]!, 200);
+    await item("db");
+    fireEvent.click(screen.getByRole("button", { name: "Re-check" }));
+    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Logout" }));
+    await settle(pending[1]!, 200);
+    expect(screen.queryByTestId("item-db")).not.toBeInTheDocument();
+    expect(screen.getByText("Sign in with an API key to run the setup checks.")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(8);
   });
 });
 

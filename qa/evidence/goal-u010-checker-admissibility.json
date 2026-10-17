@@ -1,0 +1,104 @@
+{
+  "format": "u010-independent-admissibility-review-v1",
+  "status": "METADATA_VERIFIED; BULK_PAYLOAD_AUTHORITY_UNRESOLVED",
+  "approval": false,
+  "checker": "/root/roadmap_status/checker_u010",
+  "reviewedAt": "2026-10-15T00:21:11.8020311Z",
+  "scope": "Metadata/authority only; no source/test authoring or repeated existing source acceptance",
+  "execution": {
+    "providerCalls": 0,
+    "databaseAccess": false,
+    "browsers": false,
+    "gitChanges": false,
+    "privatePayloadExport": false,
+    "testRuns": 0,
+    "newApprovals": 0
+  },
+  "evidence": {
+    "currentInventory": {
+      "path": "qa/evidence/goal-u010-maker/provider-input-inventory.json",
+      "sha256": "fe361f74f614421a352d7cb1c806d073e7a567593dad695e6490d0fd42763a87"
+    },
+    "makerReconciliation": {
+      "path": "qa/evidence/goal-u010-maker/admissibility-reconciliation.json",
+      "sha256": "8df550596ae339e23dfa74bcb05f54bcb04381e24424e136047d7f2415c8fd63"
+    },
+    "retainedCanonicalPacket": {
+      "path": "C:/Users/product/Documents/Codex/2026-10-09/what-is-the-current-update-and/work/toc-recovery-v1/packet.json",
+      "sha256": "268c94cc13d3c70def84ea2f959b9e0da1a22774f8fd7d74b5653866ef976205"
+    }
+  },
+  "independentlyVerified": {
+    "originalSessionIds": 23,
+    "septemberSessionIds": 6,
+    "currentCandidateIds": 29,
+    "currentCandidatesExactlyMatchRetainedOriginalPlusSeptember": true,
+    "goldenQuestionIds": 92,
+    "orderedQuestionIdsMatchInventory": true,
+    "goldenByteHashMatchesInventory": true,
+    "goldenExpectedUniqueIds": 23,
+    "goldenExpectedIdsOutsideCanonicalOriginals": [],
+    "currentSessionPageBindings": 58,
+    "currentInventoryHashMismatches": [],
+    "currentSourceSessionPageBindings": 87,
+    "archivedParentByteMatches": 87,
+    "archivedParentByteMismatches": [],
+    "currentSessionPageMatchesRecoveredOutputHashes": 0,
+    "scopeOfArchivedByteMatch": "Current legacy parent source/session/page bytes, not reconstructed recovery outputs, historical golden-generation byte authority, semantic gold or external-processing approval",
+    "sourceConsentGivenTrue": 29,
+    "sourceConsentMeaning": "Source/capture-policy assertions only; external AI processing purpose not established by those fields",
+    "zohoAdditionalSourceNote": "attendee-side capture for internal KB use; organizer recording not available to attendees",
+    "bulkEgressRows": {
+      "unresolved": 29,
+      "provenExplicitlyApprovedForExactBulkPayload": 0,
+      "affirmativelyDeniedFound": 0
+    }
+  },
+  "governingAuthority": [
+    {
+      "path": "docs/DECISIONS.md",
+      "line": 2227,
+      "decision": "D-164",
+      "establishes": "Paid U0.10/T022, existing keys, named Ollama GLM5.3Flash and DeepSeek4.1Flash before Gemini",
+      "doesNotEnumerate": "Exact current92-by29 payload identities/hashes, Gemini model ID or numerical call/run/cost ceiling"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "line": 2161,
+      "decision": "D-156",
+      "establishes": "Redesigned golden lineage/condition4 accepted; no reopening inferred"
+    },
+    {
+      "path": "qa/verdicts/reviewed-toc-recovery.md",
+      "line": 15,
+      "establishes": "Actual local recovered source/import/read acceptance for29, zero providers",
+      "doesNotEstablish": "Bulk model egress or human semantic gold"
+    },
+    {
+      "path": "qa/gates/external-eval-data-egress.md",
+      "line": 52,
+      "establishes": "AnsweredA for exact92-query-only Gemini embedding payload9920bytes SHA0e00f22840b14d2317fd81cbdddb4947f7448b5a035d9a1da4f98909042e5cf5 plus one separate Ask context",
+      "doesNotEstablish": "92-by29 title/summary generative prompts to three judge models"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "line": 2107,
+      "decision": "D-149",
+      "establishes": "D148 T043 provenance regeneration and itsUSD10 cap superseded in full",
+      "doesNotEstablish": "A U010 cost ceiling"
+    }
+  ],
+  "budget": {
+    "requiredCellsPerModel": 2668,
+    "threeModelMinimumAttempts": 8004,
+    "proposedLifetimeCallsPerModel": 2668,
+    "proposedRunSeconds": 14400,
+    "proposedCallTimeoutMs": 30000,
+    "approvedNumericalCeilingRecorded": false,
+    "spend": "unpriced/unknown; token budget is not provider-spend or expanded-corpus authorization"
+  },
+  "operatorReviewTarget": "Reconcile trusted existing authorization to the exact92 question IDs +29 candidate IDs +current58 session/page payload hashes, providers/model purpose/order, private destination, and finite dispatch ceilings. Canonical23 byte membership and the six September rows are separate review sets; unresolved is not affirmative denial. Do not silently remove candidates or claim a restricted run is the full baseline.",
+  "humanCalibration": "Separate genuine30 Umesh judgments, authoritative export/confirmations, independent checked receipt and operator-configured digest remain required; no proxy, capture-consent field, recovery proposal or agent label is human gold.",
+  "unchangedSourceUtility": "Existing cycle1 sourcePASS with6+15+ledger1 remains separate; not repeated or upgraded to full task completion.",
+  "wholeTask": "HOLD"
+}

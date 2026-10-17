@@ -31,6 +31,8 @@ type MaybePromise<T> = T | Promise<T>;
  * `name === "JoinRulesStoreError"` and a string `code` (what `JoinRulesStoreError` does).
  */
 export interface JoinRulesDeps {
+  /** Profile PII is readable only with the dedicated join-rules scope. */
+  registrationPolicy?: import("./registration-policy-router.js").RegistrationPolicyDeps;
   /** Missing file -> empty value; any defect throws (fail closed). */
   load(tenantId: string): MaybePromise<StoredJoinRulesValue>;
   /** LEGACY unconditional full replace. The join-rules PUT no longer calls it (ISS-UNOPTLOCK-002); kept for seeding and other callers. */

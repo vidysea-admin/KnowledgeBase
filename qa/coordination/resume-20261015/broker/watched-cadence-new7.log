@@ -1,0 +1,15 @@
+✔ 31-source cadence visits later due rows after 25 not-due rows, then wraps (17.418ms)
+✔ failed acquisition advances fairly and remains due for a later sweep retry (9.7017ms)
+✔ unchanged consumed snapshot skips enqueue; failed hash CAS stays due (0.9043ms)
+✔ deleted cursor resumes lexically, and restart preserves persisted due work (0.5336ms)
+✔ whole result tenant/ID corruption refuses before acquisition, even past batch boundary (0.9621ms)
+✔ host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap (1.0167ms)
+✔ supervisor is passive while disabled; abort drains tick and sanitizes failure (0.7052ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2815.7324

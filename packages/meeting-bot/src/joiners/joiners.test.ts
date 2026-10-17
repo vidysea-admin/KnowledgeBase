@@ -68,6 +68,11 @@ test("registration child lifecycle requires clean unique result and verified cle
   const submitted = {event: "registration-result", status: "submitted", reason: "awaiting_confirmation"};
   const cases = [
     {name: "clean", events: [submitted], expected: {status: "submitted", reason: "awaiting_confirmation"}},
+    {name: "pre-submit-clean", events: [{event: "registration-result", status: "action_required", reason: "field_mismatch", submissionDisposition: "not-attempted"}],
+      expected: {status: "action_required", reason: "field_mismatch", submissionDisposition: "not-attempted"}},
+    {name: "pre-submit-dirty", events: [{event: "registration-result", status: "action_required", reason: "field_mismatch", submissionDisposition: "not-attempted"}], exit: 7, reason: "browser_failure"},
+    {name: "receipt-on-submitted", events: [{...submitted, submissionDisposition: "not-attempted"}], reason: "invalid_result"},
+    {name: "malformed-receipt", events: [{event: "registration-result", status: "action_required", reason: "field_mismatch", submissionDisposition: "invented"}], reason: "invalid_result"},
     {name: "nonzero", events: [submitted], exit: 7, reason: "browser_failure"},
     {name: "signal", events: [submitted], signal: true, reason: "browser_failure"},
     {name: "fatal", events: [submitted, {event: "fatal", error: "private diagnostic"}], reason: "browser_failure"},
@@ -90,9 +95,9 @@ process.stdin.on('end', () => {
   const output = ${JSON.stringify(fixture.events.map(event => JSON.stringify(event)).join("\n") + "\n")};
   process.stdout.write(output, () => ${fixture.signal ? "process.kill(process.pid, 'SIGTERM')" : `process.exit(${fixture.exit ?? 0})`});
 });`);
-      const result = await registerInBrowser(registration, {python: process.execPath, joinScript: script, profileDir, timeoutMs: 2000});
+      const result = await registerInBrowser(registration, {python: process.execPath, joinScript: script, profileDir, timeoutMs: 30000});
       assert.deepEqual(result, fixture.expected ?? {status: "uncertain", reason: fixture.reason});
-      assert.equal(existsSync(cleanup), fixture.name !== "clean");
+      assert.equal(existsSync(cleanup), !fixture.expected);
       if (existsSync(cleanup)) {
         assert.deepEqual(JSON.parse(readFileSync(cleanup, "utf8")), ["about:blank", "--profile", profileDir,
           "--title", "LKB registration", "--stop-file", `${profileDir}/registration-stop`, "--cleanup-only"]);

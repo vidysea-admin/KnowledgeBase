@@ -1,5 +1,11 @@
 # Plan - u3.2-search-page
 
+## Full-parent candidate, 2026-10-14
+
+Under D-170, implementation now proceeds against checker-owned `qa/contracts/goal-u32.md` C1–C8. T-008 owns real chunk-mode semantic API/client/UI, while U3.2 owns Search query visibility and Send to Ask. Root integration owns adoption of the bounded, explicit-action `useAskHandoff` consumer into AskPage. Their source hashes and focused downstream evidence must be bound together in `qa/manifests/u32-search-parent.md`.
+
+Remaining acceptance gates: adopted Ask consumer, focused current source tests/typecheck/contract validator, mounted real API/DB/provider retrieval, and current umesh-operator/external-developer browser walks covering ranked source navigation and explicit Ask submission. Missing live evidence yields HOLD, never source-only whole-task completion. The prior unit/status table below remains historical; its pending rows are not silently treated as done.
+
 **Status:** U3.2 is `in_progress`. One slice is merged; the rest is pending.
 
 | # | unit | state | notes |

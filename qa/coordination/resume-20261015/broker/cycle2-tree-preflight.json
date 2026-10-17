@@ -1,0 +1,18 @@
+{
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "console.log(JSON.stringify({executable:process.execPath,version:process.version,tsx:import.meta.resolve('tsx')}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "supervisor_sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "supervisor": "existing verified Tree JobObject",
+  "pid": 14332,
+  "launched_utc": "2026-10-15T20:34:08Z",
+  "exit": 0,
+  "tree_close_completed": true,
+  "duration_s": 0.14000000000032742,
+  "log_sha256": "7a5b218dcdad53a63296dcda498d231557f5525df22e07203d2a76cc16ea6740",
+  "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\cycle2-tree-preflight.log"
+}

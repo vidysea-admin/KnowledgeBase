@@ -1,0 +1,9 @@
+{
+  "currentIndex": "e75924db8f72b00e3c3bfb8fdb8c442b9e2592e162d5e1b6f399643e9da63364",
+  "reconstructedPriorIndex": "bd6eff48332d6a650610a2f097f8fe30801b8668d002ec3060689a41105a43a6",
+  "expectedPrior": "bd6eff48332d6a650610a2f097f8fe30801b8668d002ec3060689a41105a43a6",
+  "exactSingleLineDelta": "export { createJoinPolicyDeps, type JoinPolicyDeps } from './join-policy/index.js';",
+  "consentGateSource": "066e5f51331ef0dac23ce11613b53821829718889e458b749c8103ae7d36ab3f",
+  "registry": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940",
+  "productMutation": false
+}

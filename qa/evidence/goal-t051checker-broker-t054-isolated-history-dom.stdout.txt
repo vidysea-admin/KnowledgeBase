@@ -1,0 +1,12 @@
+✔ real history client sends bearer and renders trusted before/after/reason as literal text (153.4787ms)
+✔ refresh uses loaded revision and failed retry honest completion invokes reload (46.4776ms)
+✔ late history cannot expose old identity and late refresh after unmount cannot reload (23.0636ms)
+✔ entire source disappearance remains visible with history and actionable refresh retry (23.1014ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1938.2618

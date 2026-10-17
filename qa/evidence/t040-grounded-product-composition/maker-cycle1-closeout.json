@@ -1,0 +1,19 @@
+{
+  "unit": "t040-grounded-product-composition",
+  "cycle": 1,
+  "status": "checked-PASS",
+  "at": "2026-10-14T23:20:08.3807017Z",
+  "verdictSHA256": "88635B1A3C14D9A92280260CB90535F20AA8186D30D53B69FE55A954DEE18C15",
+  "sourcePins": 50,
+  "drift": [],
+  "actualCurrentCases": 4,
+  "reviewedRunnerSkipped": 0,
+  "unexecutedFilteredDefinitions": 3,
+  "fullParentStatus": "HOLD",
+  "coherenceScope": "Executed 1939 unchanged applicable product inputs only; newer unrelated U24/T055 test-only gates require separate global PRE/types/build receipt",
+  "sourceEdited": false,
+  "cpuReruns": false,
+  "initialVerdictSHA256": "21E0F8EA0849964955F5748891646210074D9ACEF6BB6509868C96A9420F96AC",
+  "citationRepair": "Checker corrected two evidence paths only; claims, cycle1 PASS, source/probe bytes and underlying executions unchanged",
+  "citationRepairRereadAt": "2026-10-14T23:21:26.2074095Z"
+}

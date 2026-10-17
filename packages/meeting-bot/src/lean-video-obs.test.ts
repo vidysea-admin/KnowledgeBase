@@ -5,7 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, linkSync, mkdtempSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -67,6 +67,66 @@ function fakeObs(opts: { refuse?: string[]; startFails?: boolean; stopPath?: str
 }
 const names = (calls: Call[]) => calls.map((c) => c.name);
 const sets = (calls: Call[]) => calls.filter((c) => c.name === "SetVideoSettings" || c.name === "SetProfileParameter");
+
+const securityState = () => ({ version: 1, video: { ...OPERATOR_VIDEO }, params: [
+  { parameterCategory: "SimpleOutput", parameterName: "VBitrate", previous: "02500" },
+  { parameterCategory: "SimpleOutput", parameterName: "ABitrate", previous: null },
+], appliedAt: "2026-10-15T00:00:00Z" });
+
+test("OBS state security refuses arbitrary profile authority and malformed snapshots", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "lkb-obs-security-")), file = leanRestorePath(dir);
+  try {
+    const malicious = securityState(); malicious.params[0]!.parameterName = "FilePath"; malicious.params[0]!.previous = "C:/foreign";
+    const duplicate = securityState(); duplicate.params.push({ ...duplicate.params[0]! });
+    const invalidVideo = securityState(); invalidVideo.video.fpsDenominator = 0;
+    for (const state of [malicious, duplicate, invalidVideo]) {
+      const bytes = JSON.stringify(state); writeFileSync(file, bytes);
+      const fake = fakeObs();
+      assert.equal((await restoreLeanVideoInObs(fake.obs, file, () => {})).status, "failed");
+      assert.equal((await applyLeanVideoToObs(fake.obs, {}, () => {}, { stateFile: file })).restorable, false);
+      assert.equal(sets(fake.calls).length, 0);
+      assert.equal(readFileSync(file, "utf8"), bytes);
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("OBS state security refuses hardlink aliases without overwriting original bytes", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "lkb-obs-security-")), file = leanRestorePath(dir), original = join(dir, "original.json");
+  const bytes = JSON.stringify(securityState());
+  try {
+    writeFileSync(original, bytes); linkSync(original, file);
+    const fake = fakeObs();
+    assert.equal((await applyLeanVideoToObs(fake.obs, {}, () => {}, { stateFile: file })).restorable, false);
+    assert.equal((await restoreLeanVideoInObs(fake.obs, file, () => {})).status, "failed");
+    assert.equal(sets(fake.calls).length, 0);
+    assert.equal(readFileSync(original, "utf8"), bytes); assert.ok(existsSync(file));
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("OBS state security refuses same-byte replacement before restoration", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "lkb-obs-security-")), file = leanRestorePath(dir), replacement = join(dir, "replacement.json");
+  const bytes = JSON.stringify(securityState());
+  try {
+    writeFileSync(file, bytes);
+    const fake = fakeObs({ onCall: (name) => { if (name === "GetRecordStatus") { writeFileSync(replacement, bytes); renameSync(replacement, file); } } });
+    assert.equal((await restoreLeanVideoInObs(fake.obs, file, () => {})).status, "failed");
+    assert.equal(sets(fake.calls).length, 0); assert.equal(readFileSync(file, "utf8"), bytes);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("OBS state security preserves a foreign replacement during restore cleanup", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "lkb-obs-security-")), file = leanRestorePath(dir), replacement = join(dir, "replacement.json");
+  try {
+    writeFileSync(file, JSON.stringify(securityState()));
+    const fake = fakeObs({ onCall: (name, args) => {
+      if (name === "SetProfileParameter" && args.parameterName === "ABitrate") { writeFileSync(replacement, "foreign-original"); renameSync(replacement, file); }
+    } });
+    assert.equal((await restoreLeanVideoInObs(fake.obs, file, () => {})).status, "failed");
+    assert.equal(fake.state.profile["SimpleOutput/VBitrate"], "02500");
+    assert.equal(fake.state.profile["SimpleOutput/ABitrate"], null);
+    assert.equal(readFileSync(file, "utf8"), "foreign-original");
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
 
 function cfgFor(extra: Partial<ObsBrowserConfig>): ObsBrowserConfig {
   return {
@@ -323,7 +383,9 @@ async function driveObsRecord(fake: ReturnType<typeof fakeObs>, alerts: string[]
   const prevPw = process.env.OBS_WS_PASSWORD; process.env.OBS_WS_PASSWORD = "unit-test";
   try {
     await runRecord(["https://meet.google.com/abc-defg-hij", "--until", new Date(Date.now() + 2500).toISOString(), "--backend", "obs",
-      "--session-id", "lean-rr", "--tenant", "fixture", "--title", "fixture"], {
+      "--session-id", "lean-rr", "--tenant", "fixture", "--title", "fixture",
+      "--capture-approved-by", "fixture-operator", "--capture-approval-ref", "OBS-local-fake-client-test",
+      "--organizer-consent", "given", "--recorded-by", "fixture-operator", "--confirmed-no-alternative"], {
       recordDir, wait: () => new Promise((r) => setTimeout(r, 50)), finalize: async (...a) => { finalized.push(a); },
       telegram: silentTelegram(alerts), platform: "win32", // OBS flow is platform-independent once the Windows-only gate is satisfied
       obs: { obs: fake.obs, connectObs: async () => undefined, confirmBotWindow: async () => true, subscribeLevel: () => () => {},

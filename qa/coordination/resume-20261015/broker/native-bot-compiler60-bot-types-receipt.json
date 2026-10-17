@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "node_modules/typescript/bin/tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.json"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2.json",
+    "sha256": "2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2",
+    "count": 89
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 60,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 29356,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 13.46900000000096,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-bot-compiler60-bot-types.log",
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "counts": {}
+}

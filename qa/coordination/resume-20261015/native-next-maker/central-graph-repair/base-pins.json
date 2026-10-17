@@ -1,0 +1,26 @@
+[
+  {
+    "path": "apps/api/src/composition/integrations/hosting.ts",
+    "sha256": "f356f167a31cb52f47bc73eb62e7be84a4b08638ffe92babaf8e68d63bdd9ee8"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/source-jobs.ts",
+    "sha256": "761c72202df44320ad80fcc5d55aafea205cdd8da6f320e966fa38f6b5442775"
+  },
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "8c3efcf144c1307fa0c8b19a79fc7cff8e2ecf4d1aad5b2cd13c5f77b218a357"
+  },
+  {
+    "path": "apps/api/src/capture-readiness/host-connector.ts",
+    "sha256": "596405844c67309e68b6bf14162941ea245d415c171173482d171c89d62f4416"
+  },
+  {
+    "path": "scripts/native-capture/server.ts",
+    "sha256": "7348dc7fc760571ef89c4279f34f8ba48c33c4451c7b681bfeff8c95a493aec9"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "sha256": "fa27995652e4b6b07ea7f30d7dca5ec84eaa20887ea34599d9422134912e83a3"
+  }
+]

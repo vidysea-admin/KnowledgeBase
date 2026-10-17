@@ -1,0 +1,13 @@
+{
+  "wait_s": 0,
+  "actual_tokens": null,
+  "actual_active_s": null,
+  "status": "QUEUED-BROKER",
+  "checker_dispatched": false,
+  "phase": "resume-request",
+  "recorded_at": "2026-10-15T20:08:29.8227613Z",
+  "measurements": "Resume pin check completed; exact active phase start not instrumented; unknown remains null",
+  "source_bytes_changed": false,
+  "token_metric": "actual_total",
+  "cost": null
+}

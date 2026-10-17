@@ -12,7 +12,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createServer, type Server } from "node:http";
+import { createServer, type Server, type ServerResponse } from "node:http";
 import { AddressInfo } from "node:net";
 
 import { httpRequest, resolveAll } from "./node-transport.js";
@@ -87,6 +87,36 @@ test("a normal response comes back whole", async () => {
   } finally { await s.close(); }
 });
 
+test("absolute deadline destroys a continuously streaming socket, rather than only abandoning the caller", {timeout: 4000}, async t => {
+  let stream: ReturnType<typeof setInterval> | undefined;
+  let response: ServerResponse | undefined;
+  let closed = false;
+  let notifyClosed!: () => void;
+  const closedSignal = new Promise<void>(resolve => {notifyClosed = resolve;});
+  t.signal.addEventListener("abort", () => {if (stream) clearInterval(stream); response?.destroy();}, {once: true});
+  const s = await serve((req, res) => {
+    response = res;
+    if (t.signal.aborted) {res.destroy(); return;}
+    req.socket.once("close", () => {closed = true; if (stream) clearInterval(stream); notifyClosed();});
+    res.writeHead(200);
+    res.write("first");
+    stream = setInterval(() => res.write("x"), 10);
+  });
+  let waitTimer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const started = Date.now();
+    await assert.rejects(httpRequest(`http://pinned.invalid:${s.port}/`, {maxBytes: 100000, timeoutMs: 150, address: "127.0.0.1"}), /timed out/);
+    await Promise.race([closedSignal, new Promise<void>(resolve => {waitTimer = setTimeout(resolve, 600);})]);
+    assert.equal(closed, true, "server observes native socket closure before cleanup in finally");
+    assert.ok(Date.now() - started < 1200, "continuous progress cannot renew the absolute transport budget");
+  } finally {
+    if (waitTimer) clearTimeout(waitTimer);
+    if (stream) clearInterval(stream);
+    response?.destroy();
+    await s.close();
+  }
+});
+
 test("resolveAll returns EVERY address, not just the first", async () => {
   const addrs = await resolveAll("localhost");
   assert.ok(Array.isArray(addrs) && addrs.length >= 1);
@@ -95,4 +125,24 @@ test("resolveAll returns EVERY address, not just the first", async () => {
 
 test("resolveAll rejects rather than returning an empty list for an unresolvable host", async () => {
   await assert.rejects(() => resolveAll("no-such-host.invalid"));
+});
+
+test("bounded DNS cancels both owned queries on deadline and rejects incomplete family coverage", async () => {
+  let cancelled = 0;
+  await assert.rejects(resolveAll("publisher.example", {timeoutMs: 20, resolver: {
+    resolve4: async () => new Promise<string[]>(() => {}), resolve6: async () => new Promise<string[]>(() => {}), cancel: () => {cancelled++;},
+  }}), /timed out/);
+  assert.ok(cancelled >= 1);
+  await assert.rejects(resolveAll("publisher.example", {timeoutMs: 100, resolver: {
+    resolve4: async () => ["93.184.216.34"], resolve6: async () => {throw Object.assign(new Error("failure"), {code: "EREFUSED"});}, cancel: () => {cancelled++;},
+  }}), /unavailable/);
+});
+
+test("bounded DNS combines every family and allows only explicit missing-family negatives", async () => {
+  assert.deepEqual(await resolveAll("publisher.example", {timeoutMs: 100, resolver: {
+    resolve4: async () => ["93.184.216.34"], resolve6: async () => ["2606:2800:220:1:248:1893:25c8:1946"], cancel: () => {},
+  }}), ["93.184.216.34", "2606:2800:220:1:248:1893:25c8:1946"]);
+  assert.deepEqual(await resolveAll("publisher.example", {timeoutMs: 100, resolver: {
+    resolve4: async () => ["93.184.216.34"], resolve6: async () => {throw Object.assign(new Error("no records"), {code: "ENODATA"});}, cancel: () => {},
+  }}), ["93.184.216.34"]);
 });

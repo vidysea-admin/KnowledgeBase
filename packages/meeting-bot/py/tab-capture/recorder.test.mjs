@@ -20,7 +20,9 @@ const failChunks = (c) => { if (c.url.includes("/chunk")) throw new Error("down"
 test("P1/P7 start: capture-started, control polling, destination is only the configured endpoint with bearer", T, async () => {
   const w = makeRecorderWorld();
   assert.equal((await w.begin()).ok, true);
-  assert.deepEqual(w.events()[0], { event: "capture-started", mimeType: "video/webm;codecs=vp8,opus" });
+  const {mediaStartedAt, ...startEvent} = w.events()[0];
+  assert.deepEqual(startEvent, { event: "capture-started", mimeType: "video/webm;codecs=vp8,opus" });
+  assert.ok(Number.isFinite(mediaStartedAt) && mediaStartedAt > 0);
   assert.equal(w.recorder().timeslice, 2000);
   await w.timers.tick();
   for (const c of w.calls) { assert.ok(c.url.startsWith("http://127.0.0.1:4321/")); assert.equal(c.headers.Authorization, "Bearer tok-abc"); assert.equal(c.method, "POST"); }

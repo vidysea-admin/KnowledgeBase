@@ -1,0 +1,15 @@
+{
+  "observedAt": "2026-10-15T11:37:03.429Z",
+  "commandKind": "read-only Win32_Process node.exe filtered exact native-evidence message-vertical.test.ts argv",
+  "outputFields": [
+    "ProcessId",
+    "ParentProcessId",
+    "CreationDate"
+  ],
+  "matchingProcesses": [],
+  "exitCode": 0,
+  "elapsedSeconds": 0.7228696,
+  "terminatedProcesses": [],
+  "rawCommandLinesOmitted": true,
+  "scopeLimit": "No matching named test process observed; no claim all processes idle"
+}

@@ -1,10 +1,42 @@
-import { randomUUID } from "node:crypto";
 import type { Db } from "mongodb";
 import { scopedCollection } from "@lkb/db";
 import type { Chunks, Turns } from "@lkb/core";
 import { buildChunks } from "@lkb/index";
 import type { IndexEmbedFn, ChunkWriteResult } from "./types.js";
 import { toEvidenceTuple } from "./evidence-tuples.js";
+import { chunkContentId } from "./chunk-integrity.js";
+import type { IndexArtifactBinding } from "./generation.js";
+
+export interface ChunkGenerationWrite {
+  binding: IndexArtifactBinding;
+  assertOwned(): Promise<void>;
+  prepared(docs: Chunks[]): void;
+}
+
+/** Lexical evidence inventory: source references only, with no embedding provider call. */
+export async function writeSessionLexicalChunks(
+  tenantId: string, sessionId: string, turns: Turns[], db: Pick<Db, "collection">,
+  generation: ChunkGenerationWrite,
+): Promise<ChunkWriteResult> {
+  const plans = buildChunks(turns);
+  if (!plans.length) return { written: 0, skipped: "no-chunkable-turns" };
+  const docs: Chunks[] = plans.map(plan => ({
+    _id: chunkContentId(tenantId, sessionId, plan.turnRefs, plan.text), tenantId, sourceRef: sessionId,
+    turnRefs: toEvidenceTuple(plan.turnRefs), chunkIndex: plan.chunkIndex, indexArtifact: { ...generation.binding },
+  }));
+  generation.prepared(docs);
+  const coll = scopedCollection<Chunks>(db as never, "chunks")(tenantId);
+  for (const doc of docs) {
+    await generation.assertOwned();
+    // Replace, rather than $set: a previous vector with the same content ID must not survive.
+    const saved = await coll.replaceOne({ _id: doc._id, sourceRef: sessionId }, doc, { upsert: true });
+    if (saved.acknowledged !== true || saved.matchedCount + (saved.upsertedCount ?? 0) !== 1) throw new Error("lexical chunk write unconfirmed");
+  }
+  await generation.assertOwned();
+  const pruned = await coll.deleteMany({ sourceRef: sessionId, _id: { $nin: docs.map(doc => doc._id) } });
+  if (pruned.acknowledged !== true) throw new Error("lexical chunk prune unconfirmed");
+  return { written: docs.length, skipped: null };
+}
 
 
 /** Shared validated vector/document preparation; callers choose their persistence policy. */
@@ -23,6 +55,7 @@ export function prepareChunkDocuments(
     );
   }
   if (!Number.isInteger(embedded.dims) || embedded.dims <= 0 || embedded.vectors.some((v) => v.some((n) => !Number.isFinite(n)))) throw new Error("invalid embedding dimensions/values");
+  if (typeof embedded.model !== "string" || !embedded.model.trim()) throw new Error("invalid embedding model identity");
   const chunkDocs: Chunks[] = plans.map((plan, i) => {
     const vector = embedded.vectors[i] ?? [];
     if (vector.length !== embedded.dims) {
@@ -31,7 +64,7 @@ export function prepareChunkDocuments(
       );
     }
     return {
-      _id: randomUUID(),
+      _id: chunkContentId(tenantId, sessionId, plan.turnRefs, plan.text),
       tenantId,
       sourceRef: sessionId,
       turnRefs: toEvidenceTuple(plan.turnRefs),
@@ -53,11 +86,15 @@ export async function writeSessionChunks(
   db: Pick<Db, "collection">,
   persist = true,
   provenance?: { status: "legacy-unbound"; reason: string },
+  generation?: ChunkGenerationWrite,
 ): Promise<ChunkWriteResult> {
   const chunksColl = scopedCollection<Chunks>(db as never, "chunks");
   const plans = buildChunks(turns);
   if (plans.length === 0) {
-    console.warn(`indexSession(${tenantId}/${sessionId}): no chunkable turns — chunks left unchanged`);
+    if (persist) {
+      try { await chunksColl(tenantId).deleteMany({ sourceRef: sessionId } as never); }
+      catch { return { written: 0, skipped: "embedding-failed" }; }
+    }
     return { written: 0, skipped: "no-chunkable-turns" };
   }
   // ISS-112: the C8 assertions below MUST sit inside this try. They previously followed it, so a
@@ -68,12 +105,22 @@ export async function writeSessionChunks(
   try {
     const embedded = await embed({ kind: "embedding", texts: plans.map((p) => p.text), purpose: "document" });
 
-    const chunkDocs = prepareChunkDocuments(tenantId, sessionId, plans, embedded, provenance);
-    // Clean replace, never accumulate — a re-index must not double the corpus. Reached only
-    // after every assertion above has passed, so the delete never runs without its replacement.
+    const chunkDocs = prepareChunkDocuments(tenantId, sessionId, plans, embedded, provenance).map(chunk => ({ ...chunk,
+      ...(generation ? { indexArtifact: { ...generation.binding } } : {}) }));
+    // Persist replacements before pruning. Stable content identities make unchanged reruns
+    // idempotent and partial write failure cannot erase the previous index. Current-source
+    // integrity checks refuse old vectors after source changes even when embedding fails.
     if (!persist) return { written: chunkDocs.length, skipped: null };
-    await chunksColl(tenantId).deleteMany({ sourceRef: sessionId } as never);
-    await chunksColl(tenantId).insertMany(chunkDocs);
+    generation?.prepared(chunkDocs);
+    for (const chunk of chunkDocs) {
+      await generation?.assertOwned();
+      const saved = await chunksColl(tenantId).updateOne({ _id: chunk._id, sourceRef: sessionId } as never,
+        { $set: chunk } as never, { upsert: true });
+      if (generation && (saved.acknowledged !== true || saved.matchedCount + (saved.upsertedCount ?? 0) !== 1)) throw new Error("chunk generation write unconfirmed");
+    }
+    await generation?.assertOwned();
+    const pruned = await chunksColl(tenantId).deleteMany({ sourceRef: sessionId, _id: { $nin: chunkDocs.map(chunk => chunk._id) } } as never);
+    if (generation && pruned.acknowledged !== true) throw new Error("chunk generation prune unconfirmed");
     return { written: chunkDocs.length, skipped: null };
   } catch (err) {
     // Never rethrow: the rest of indexing already succeeded, and failing the whole call would

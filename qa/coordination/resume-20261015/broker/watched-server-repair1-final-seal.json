@@ -1,0 +1,39 @@
+{
+  "unitManifest": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-watched-server-join-repair1.json",
+    "sha256": "4ad0bc94b0c858788e1e683b1ed9ff2e85e1cf95dc66bc3db3d7731de43eaf26",
+    "count": 72
+  },
+  "canonicalPins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\f22292d27883c4810ecfd0da81f1f17ed9fad53f4c288679e9b560e0c0ce7f95.json",
+    "sha256": "f22292d27883c4810ecfd0da81f1f17ed9fad53f4c288679e9b560e0c0ce7f95",
+    "count": 1677
+  },
+  "commandReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair1-preflight-receipt.json",
+      "sha256": "e0d67d0350093f55cf1999d3233ed1a0269a3eac156cd00cf010f85c23c1d72c",
+      "label": "watched-server-repair1-preflight",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.8279999999977008
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair1-root-types-receipt.json",
+      "sha256": "86214e3db2b4e3f0b1945c4791616e53c282d7a950cff157044c927db522a397",
+      "label": "watched-server-repair1-root-types",
+      "exit": 2,
+      "counts": {},
+      "active_s": 12.625
+    }
+  ],
+  "upstreamReuse": [],
+  "failure": "AssertionError: root types failure",
+  "elapsed_s": 14.235000000000582,
+  "finalPinsMatch": true,
+  "noNativeDecoderOrActivation": true,
+  "actual_total_tokens": null,
+  "independentVerdict": null,
+  "unit72PinsFinalMatch": true,
+  "sourceFreezeReleased": true
+}

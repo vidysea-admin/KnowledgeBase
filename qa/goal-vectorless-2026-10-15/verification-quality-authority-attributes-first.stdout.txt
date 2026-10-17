@@ -1,0 +1,29 @@
+✔ fixture only: trusted review persists, replays refuse, export consumes evaluator, drift refuses (174.2292ms)
+✔ actual auth and shared human policy gate authoritative review/export (141.7178ms)
+✔ attribute writes and source authority share tenant-pinned snapshot/CAS (3.1707ms)
+✔ source writes/unscoped reads forbidden and errors abort/end transaction (1.1186ms)
+✔ foreign writes, inconsistent CAS, overflow and unsupported transactions refuse (0.733ms)
+✔ accepted profile reader reuses caller snapshot and opens no nested session (0.7099ms)
+✔ mounted attribute router trusts verified context and exposes bounded source-safe DTO/receipts (121.6577ms)
+✔ missing principal/scope, foreign policy and automation review cannot reach service (57.8799ms)
+✔ forged body authority, invalid evidence/review and ambiguous query shapes refused (66.4398ms)
+✔ foreign list outputs and async service/policy failure sanitize errors (33.8761ms)
+✔ org proposal remains suggested until human accept; exact own-block evidence reaches consumer (4.8869ms)
+✔ automation/permission refusal and unresolved/deterministic/ambiguous identity cannot finalize (1.5862ms)
+✔ stale tenant/person/hash/quote/window/label and duplicate turn authority refuse (2.1375ms)
+✔ invalid evidence and unsupported value refuse before write (0.7841ms)
+✔ actor-bound replay survives revocation and deletion without reopening; changed command conflicts (1.1295ms)
+✔ source deletion refuses acceptance but permits durable rejection (2.5851ms)
+✔ concurrent accept/reject has one winner and failed CAS never accepts (1.1574ms)
+✔ conflicting accepted values withheld; same-value and independent role survive (12.9876ms)
+✔ forged accepted rows lacking valid review receipt and stale accepted source excluded (1.659ms)
+✔ proposal keys are tenant isolated and immutable including actor/value (0.8863ms)
+✔ only exact reviewed native labels reach evaluator; pending remains absent (2.5141ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3185.1677

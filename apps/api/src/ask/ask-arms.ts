@@ -20,6 +20,9 @@ import { getDb, scopedCollection } from "@lkb/db";
 import type { Chunks, TreeIndexNode, Turns } from "@lkb/core";
 import { rankSessionsByCosine, lexicalSearchTurns } from "@lkb/index";
 import type { EmbedJob, EmbedResult } from "@lkb/ai";
+import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
+import { createKnowledgeVisibility } from '../visibility/knowledge.js';
+import { chunkContentMatches } from '../indexing/chunk-integrity.js';
 
 export type ArmsEmbedFn = (job: EmbedJob) => Promise<EmbedResult>;
 
@@ -48,7 +51,15 @@ function sessionNodesById(root: TreeIndexNode): Map<string, TreeIndexNode> {
     const n = stack.pop()!;
     if (n.level === "session") {
       const i = n.node_id.lastIndexOf("/session:");
-      if (i !== -1) bySession.set(n.node_id.slice(i + "/session:".length), n);
+      const pathId = i === -1 ? undefined : n.node_id.slice(i + '/session:'.length);
+      const evidenceId = n.evidence?.sessionRef;
+      if (evidenceId && pathId && evidenceId !== pathId) throw new Error('Session node source identity disagrees');
+      const id = evidenceId ?? pathId;
+      if (id) {
+        const prior = bySession.get(id);
+        if (prior && prior.node_id !== n.node_id) throw new Error('Ambiguous session node source identity');
+        bySession.set(id, n);
+      }
     }
     for (const c of n.children ?? []) stack.push(c);
   }
@@ -71,19 +82,27 @@ export function createAskArmsFor(deps: AskArmsDeps = {}) {
       const bySession = sessionNodesById(tree);
       const arms: TreeIndexNode[][] = [];
       const failures: string[] = [];
+      const sourceTurns = async () => createKnowledgeVisibility(db).filterTurns(tenantId,
+        await readEffectiveTurns(db, tenantId, await scopedCollection<Turns>(db as never, 'turns')(tenantId).find({}).toArray()));
+      let turnPromise: ReturnType<typeof sourceTurns> | undefined;
+      const currentTurns = () => turnPromise ??= sourceTurns();
 
       // ---- vector arm -------------------------------------------------------------------------
       if (deps.embed) {
         try {
           const embedded = await deps.embed({ kind: "embedding", texts: [query], purpose: "query" });
           const qv = embedded.vectors[0];
-          if (!qv || qv.length === 0) throw new Error("embedder returned no query vector");
+          if (!qv || qv.length === 0 || !embedded.model?.trim()) throw new Error("embedder returned no query vector or model identity");
           // Tenant-scoped read: `scopedCollection` merges the tenantId, so this cannot see another
           // tenant's chunks even if one somehow shared a sessionId.
-          const chunks = (await scopedCollection<Chunks>(db as never, "chunks")(tenantId)
+          const chunks = await scopedCollection<Chunks>(db as never, "chunks")(tenantId)
             .find({})
-            .toArray()) as unknown as { _id: string; sourceRef: string; vector: number[] }[];
-          const hits = rankSessionsByCosine(qv, chunks, k, { skipMismatched: true });
+            .toArray();
+          const byTurn = new Map((await currentTurns()).map(turn => [turn._id, turn]));
+          const compatible = chunks.filter(chunk => chunk.embeddingModel === embedded.model && chunkContentMatches(chunk, byTurn, tenantId)
+            && Array.isArray(chunk.vector) && chunk.vector.length === qv.length && chunk.vector.every(Number.isFinite));
+          if (compatible.length !== chunks.length) failures.push('vector: source changed, model differs, or content-bound reindexing is required');
+          const hits = rankSessionsByCosine(qv, compatible as (Chunks & { vector: number[] })[], k, { skipMismatched: true });
           arms.push(hits.map((h) => bySession.get(h.sessionId)).filter((n): n is TreeIndexNode => n !== undefined));
         } catch (err) {
           failures.push(`vector: ${err instanceof Error ? err.message : String(err)}`);
@@ -92,9 +111,7 @@ export function createAskArmsFor(deps: AskArmsDeps = {}) {
 
       // ---- lexical arm ------------------------------------------------------------------------
       try {
-        const turns = (await scopedCollection<Turns>(db as never, "turns")(tenantId)
-          .find({})
-          .toArray()) as unknown as { _id: string; sessionId: string; text: string }[];
+        const turns = await currentTurns();
         const hits = lexicalSearchTurns(query, turns as never, k);
         const seen = new Set<string>();
         const nodes: TreeIndexNode[] = [];

@@ -23,6 +23,7 @@ import { applyJoinRules, type JoinRuleEvaluator } from "./join-rules-select.js";
 import { loadJoinRules, JoinRulesStoreError, type StoredJoinRules } from "./join-rules-store.js";
 import { joinRulesFilePath } from "./join-rules-store.js";
 import { JoinRulesSnapshotError, loadPrimaryJoinRules, loadLastValidJoinRules, saveLastValidJoinRules } from "./join-rules-last-valid.js";
+import type { ApprovedTrustContext } from "./join-rules-approved-trust.js";
 
 export type JoinRulesEnforceMode = "off" | "fail-closed" | "fail-open" | "last-valid";
 export const JOIN_RULES_ENFORCE_ENV = "LKB_JOIN_RULES_ENFORCE";
@@ -66,6 +67,8 @@ export interface JoinRulesEnforceConfig {
   onDegraded?: (event: JoinRulesDegradation) => Promise<unknown> | unknown;
   /** Clear the active degradation outage after current primary validation and successful snapshot persistence. */
   onHealthy?: () => Promise<unknown> | unknown;
+  /** Server-local preselection using the exact authenticated document subsequently vetoed here. */
+  selectWithRules?: (authority: ApprovedTrustContext) => SelectAutoRecordItemsResult;
 }
 /** Fixed/sanitized fields only; never includes rule contents, paths, sender identities or meeting URLs. */
 export interface JoinRulesDegradation {
@@ -188,11 +191,23 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
     return items.length === 0 ? selection : { toSchedule: [], skipped: [...skipped, ...skipAll(items)] };
   }
 
+  // Granting persisted trust requires the real current key binding, including in legacy modes.
+  // Reuse this read for selection and veto; never reopen the primary between those operations.
+  const tickNow = c.selectWithRules ? (c.now ?? Date.now)() : NaN;
+  if (c.selectWithRules && c.keyTenantId === c.tenantId && typeof c.tenantId === "string" &&
+    Number.isSafeInteger(tickNow) && tickNow >= 0) {
+    selection = c.selectWithRules({configuredTenantId: c.tenantId, keyTenantId: c.tenantId,
+      verifiedAt: tickNow, now: tickNow, document: {tenantId: c.tenantId,
+        source: "snapshot" in read && read.snapshot ? "last-valid" : "primary",
+        validatedAt: "snapshot" in read && read.snapshot ? read.snapshot.validatedAt : tickNow, stored: read.stored}});
+  }
+  const selectedItems = Array.isArray(selection?.toSchedule) ? selection.toSchedule : [];
+  const selectedSkipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
   const out = applyJoinRules(selection, read.stored.ruleSet, { state: read.stored.state }, c.io?.evaluate);
   const recover = mode === "last-valid" && "healthy" in read && read.healthy === true;
   if (out === selection) { if (recover) await healthy(c); return selection; }
-  const removed = out.skipped.slice(skipped.length);
-  const gone = items.filter((i) => !out.toSchedule.includes(i)); // removed[k] belongs to gone[k] (applyJoinRules appends in order)
+  const removed = out.skipped.slice(selectedSkipped.length);
+  const gone = selectedItems.filter((i) => !out.toSchedule.includes(i)); // removed[k] belongs to gone[k] (applyJoinRules appends in order)
   const unevaluable = gone.filter((_, k) => removed[k]?.reason === "rules-unevaluable");
   if (unevaluable.length === 0) { if (recover) await healthy(c); return out; }
   if (mode === "last-valid") {
@@ -207,7 +222,7 @@ export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c
   warn(`${unevaluable.length} meeting(s) could not be evaluated`, "left scheduled, other rules still applied");
   const back = new Set<AutoRecordItem>(unevaluable);
   return {
-    toSchedule: items.filter((i) => out.toSchedule.includes(i) || back.has(i)),
-    skipped: [...skipped, ...removed.filter((_, k) => removed[k]?.reason !== "rules-unevaluable")],
+    toSchedule: selectedItems.filter((i) => out.toSchedule.includes(i) || back.has(i)),
+    skipped: [...selectedSkipped, ...removed.filter((_, k) => removed[k]?.reason !== "rules-unevaluable")],
   };
 }

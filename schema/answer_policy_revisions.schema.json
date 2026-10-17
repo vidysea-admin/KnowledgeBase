@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://answer_policy_revisions",
+  "title": "StoredPolicyRevision",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "object",
+      "properties": {
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "policyId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "required": [
+        "tenantId",
+        "policyId",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policyId": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "questionClass": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "mode": {
+      "type": "string",
+      "enum": [
+        "internal-only",
+        "internal-and-web"
+      ]
+    },
+    "style": {
+      "type": "string",
+      "enum": [
+        "concise",
+        "detailed"
+      ]
+    },
+    "onInsufficient": {
+      "type": "string",
+      "enum": [
+        "review",
+        "refuse"
+      ]
+    },
+    "citations": {
+      "const": "required"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "save",
+        "retire"
+      ]
+    },
+    "retired": {
+      "type": "boolean"
+    },
+    "changedBy": {
+      "type": "object",
+      "properties": {
+        "actor": {
+          "type": "string",
+          "minLength": 1
+        },
+        "claimedBy": {
+          "type": "string",
+          "maxLength": 200
+        }
+      },
+      "required": [
+        "actor"
+      ],
+      "additionalProperties": false
+    },
+    "changedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "note": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "previousVersion": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "_id",
+    "tenantId",
+    "policyId",
+    "version",
+    "questionClass",
+    "mode",
+    "style",
+    "onInsufficient",
+    "citations",
+    "action",
+    "retired",
+    "changedBy",
+    "changedAt",
+    "note",
+    "previousVersion"
+  ],
+  "additionalProperties": false
+}

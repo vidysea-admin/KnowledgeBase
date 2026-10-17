@@ -1,0 +1,28 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--max-old-space-size=256",
+    "--import",
+    "tsx",
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91.json",
+    "sha256": "939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91",
+    "count": 351
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 60,
+  "accounting": "MAKER ACCEPTANCE offline hydration",
+  "pid": 22824,
+  "exit": 0,
+  "treeClosed": true,
+  "active_s": 29.06199999999808,
+  "afterMatch": true,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair2-all92.log",
+    "sha256": "1a0e829d8f1b9d874765c68ff6d5ce79db7a9ae8ed7a429a92015a156dd5f27d"
+  },
+  "counts": {}
+}

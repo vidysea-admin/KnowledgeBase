@@ -11,6 +11,8 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 export interface VerifiedKey {
   tenantId: string;
   scopes: string[];
+  /** Stored non-secret API-key document id, verified by the store, never request-derived. */
+  keyId?: string;
 }
 
 /** Injected dependency (C2) — production impl in `store.ts` is Mongo-backed; tests use a fake. */

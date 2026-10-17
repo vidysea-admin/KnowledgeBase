@@ -1,0 +1,67 @@
+{
+  "unit": "vectorless-publication",
+  "cycle": 6,
+  "candidate_sha": "8398a420331cd135944f727df98b0f25377f1c9bec1ffc9538574a5f1d894d06",
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "measured_partial_active_s": 838.7586968,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "tokens": null,
+      "id": "vectorless_checker-wip-shared",
+      "cost": null,
+      "active_s": null,
+      "scope": "Prior shared checker-owned contract and unexecuted probe preparation; no verdict; actual overhead unknown",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180
+      }
+    },
+    {
+      "tokens": null,
+      "id": "vectorless-publication-cycle6-pending",
+      "cost": null,
+      "active_s": 161.0335024,
+      "scope": "Completed source review and readiness HOLD, actual active measured, tokens/cost unknown",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180
+      }
+    },
+    {
+      "tokens": null,
+      "measured_partial_active_s": 80.338956,
+      "id": "publication-checker-continuation",
+      "cost": null,
+      "budget_debit": {
+        "active_s": 90,
+        "tokens": 2000
+      },
+      "active_s": null,
+      "scope": "Prior continuation incl unmeasured final closeout, conservative full allocation charge"
+    }
+  ],
+  "next_phase": {
+    "tokens": 3000,
+    "active_s": 180,
+    "cost": null
+  },
+  "bootstrap_scope": "One source publication unit cycle6: hash identity, delta/manual-transaction/preserved-review verification plus required narrowly scoped independent behavioral evidence; real provider/Mongo and full parent acceptance excluded",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "escalation": {
+    "limits": {
+      "cost": null,
+      "tokens": 17000,
+      "active_s": 630
+    },
+    "reason": "Required remaining data-write/security source and immediate consumer review; no new tests absent proven gap",
+    "authority": "Root explicit finite source-review phase180s/3000tokens"
+  },
+  "deduplication": "vectorless_checker-wip-shared charged once in root shared ledger; actual metrics null; conservative debit180s/6000tokens is allocation accounting, not measured usage."
+}

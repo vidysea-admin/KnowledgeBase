@@ -1,0 +1,8 @@
+[
+  "qa/contracts/goal-T042.md",
+  "qa/verdicts/t042-capture-clock-suggestions.md",
+  "qa/evidence/t042-capture-clock-suggestions/checker-probe.test.mts",
+  "qa/evidence/t042-capture-clock-suggestions/checker-confirmation.json",
+  "qa/evidence/goal-t051checker-broker-t042-independent.json",
+  "qa/evidence/goal-t051checker-broker-t042-independent.stdout.txt"
+]

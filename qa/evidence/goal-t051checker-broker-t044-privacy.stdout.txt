@@ -1,0 +1,47 @@
+✔ producer proof hashes exact committed bytes and detaches mutable audit input (3.0252ms)
+✔ invalid duration, legacy report and malformed counts refuse (1.624ms)
+✔ attempt identities are unique including rejected retries, and retained evidence is required (1.1734ms)
+✔ index/count reconciliation rejects hidden dropped and fabricated clamp evidence (0.4614ms)
+✔ real repaired/past-end audit reports are retained without builder discarding their signals (0.3912ms)
+✔ privacy ledger conserves raw/public counts while keeping provider anomalies visible (1.1737ms)
+✔ privacy generation intervals must be finite, ordered and inside audio (0.6543ms)
+✔ clean selected generation accepts; same-count replacement and different audio duration refuse (4.6945ms)
+✔ accepted pre-clamp past-end evidence survives a clean merged report (0.7339ms)
+✔ exact committed audio bounds refuse tiny overshoot even when clamp tolerance counts no repair (0.7232ms)
+✔ rejected retry or discarded single-path anomalies are audit-only (0.541ms)
+✔ finite clamping alone is repaired evidence, accepted dropped-invalid/repeats/nonmonotonic refuse (0.9393ms)
+✔ current turns are recomputed: a forged clean merged report cannot hide repeats or unordered turns (0.5957ms)
+✔ legacy/unbound/malformed proof and contradictory clamp/drop/overshoot claims refuse (0.5171ms)
+✔ actual trusted privacy generation must match QA; same output with changed privacy refuses (0.597ms)
+✔ accepted raw provider anomaly survives filtered public QA; discarded raw attempt is audit only (0.6936ms)
+✔ failed -> re-transcribed -> validate -> passed -> sync gate accepts (and the pipeline's failed file is kept as history) (165.399ms)
+✔ bad transcript -> validate fails with reasons -> sync gate still refuses (39.7652ms)
+✔ a hand-edited turns.json (non-canonical identity) fails; no turns fails (49.2723ms)
+✔ partial coverage (e.g. --range 0:360) is recorded explicitly; failed unless --accept-partial (49.9212ms)
+✔ an internal gap > 30s is partial even when the tail reaches the end (34.8245ms)
+✔ QA: flag on but report missing, stale report, hallucination signals all fail; clean report passes (143.0021ms)
+✔ ISS-REVALIDATE-001: stale same-count and contradictory audit metadata refuse downstream admission (85.4925ms)
+✔ retained span hallucination refuses; rejected retry metadata permits a clean bound generation (96.4131ms)
+✔ same output with a newly suspicious accepted QA artifact invalidates previous downstream acceptance (58.7841ms)
+✔ canonical bound turns with an uncounted sub-microsecond overshoot cannot pass the real gate (53.4298ms)
+✔ validation binds QA presence; removed, truncated or newly created reports cannot reuse a verdict (72.3162ms)
+✔ bound QA recomputes current repeated and swapped turns rather than trusting clean claims (94.7728ms)
+✔ --dry-run reports but writes nothing (18.8227ms)
+✔ unsafe sessionId is refused (0.5806ms)
+✔ known capture without durable receipt cannot waive missing speech or reuse public validation (83.5182ms)
+✔ trusted durable private interval excuses only protected time and real consumer accepts public generation (551.4767ms)
+✔ durable privacy cannot admit protected canonical speech or waive a mixed public deficit (192.059ms)
+✔ same speech with changed source, consent receipt or media cannot reuse passed validation (574.3739ms)
+✔ trusted captured privacy requires raw bound QA even with the public QA flag off (235.9149ms)
+✔ parseCliArgs: bare id, id with --root (either order), --dry-run, --accept-partial (0.5494ms)
+✔ parseCliArgs: no id or a dangling --root is a usage error (0.2088ms)
+✔ parseCliArgs: a second positional id or a repeated --root is an error, not silently ignored (0.304ms)
+✔ CLI: a bare session id reaches validation instead of printing usage (end to end) (1345.4789ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4833.4784

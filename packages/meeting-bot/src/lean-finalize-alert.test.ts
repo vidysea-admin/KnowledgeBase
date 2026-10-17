@@ -10,12 +10,18 @@ import { join } from "node:path";
 
 import { finalizeRecordingWith, measuredMbPerHour } from "./capture/record-finalize.js";
 import { createTelegramNotifier, type TelegramNotifier } from "./capture/notify/telegram-alerts.js";
+import { createRecordConsent } from "./capture/record-consent/context.js";
+import { writeRecordConsent } from "./capture/record-consent/receipt-store.js";
 
 // --- over-target report ------------------------------------------------------------------------
 
-function root(): string {
+function root(sessionId = "sess-lean"): string {
   const r = mkdtempSync(join(tmpdir(), "lkb-lean-fin-"));
-  writeFileSync(join(r, "v.mkv"), "x"); mkdirSync(join(r, "raw", "webinars"), { recursive: true });
+  mkdirSync(join(r, "raw", "webinars"), { recursive: true }); writeFileSync(join(r, "raw", "webinars", "v.mkv"), "x"); // media must sit in its actual slot
+  // The finalizer requires an explicit tenant and a current consent receipt (T-011); this test is about the size alert only.
+  const owner = { tenantId: "lane", sessionId, meetingUrl: "https://example.invalid/fixture" };
+  writeRecordConsent(join(r, "raw", "webinars"), createRecordConsent([], owner,
+    { LKB_CAPTURE_RECORDED_BY: "fixture", LKB_CAPTURE_APPROVED_BY: "fixture", LKB_CAPTURE_APPROVAL_REF: "fixture" }, new Date(1000)));
   return r;
 }
 const extract = (_v: string, out: string) => writeFileSync(out, "a");
@@ -23,9 +29,9 @@ async function finalize(sizeBytes: number | (() => number), durationSec: number,
   const r = root();
   const telegram = createTelegramNotifier({ token: "t", chatId: "c", send: async (_t, _c, text) => { sent.push(text); }, log: () => {} });
   try {
-    await finalizeRecordingWith({ repoRoot: r, probeMedia: () => durationSec, extractAudio: extract, measureVolume: () => ({ maxDb: -20, meanDb: -30 }),
+    await finalizeRecordingWith({ repoRoot: r, tenantId: "lane", probeMedia: () => durationSec, extractAudio: extract, measureVolume: () => ({ maxDb: -20, meanDb: -30 }),
       videoSizeBytes: typeof sizeBytes === "function" ? sizeBytes : () => sizeBytes },
-      join(r, "v.mkv"), "sess-lean", "Lean Session", "zoho", false, [], plain ? undefined : telegram, durationSec);
+      join(r, "raw", "webinars", "v.mkv"), "sess-lean", "Lean Session", "zoho", false, [], plain ? undefined : telegram, durationSec);
     await new Promise((x) => setTimeout(x, 20));
   } finally { rmSync(r, { recursive: true, force: true }); }
 }
@@ -67,11 +73,11 @@ test("finalize: an unreadable size never fails the finalize and sends no alert",
 });
 
 test("finalize: a notifier without notifyOverTarget (older fake) does not break an over-target finalize", async () => {
-  const r = root();
+  const r = root("sess-old");
   let finished = false;
   try {
-    await finalizeRecordingWith({ repoRoot: r, probeMedia: () => 60, extractAudio: extract, measureVolume: () => ({ maxDb: -20, meanDb: -30 }), videoSizeBytes: () => 9e9 },
-      join(r, "v.mkv"), "sess-old", "Old", "zoho", false, [], { enabled: false, notifyFinished: () => { finished = true; } } as unknown as TelegramNotifier, 60);
+    await finalizeRecordingWith({ repoRoot: r, tenantId: "lane", probeMedia: () => 60, extractAudio: extract, measureVolume: () => ({ maxDb: -20, meanDb: -30 }), videoSizeBytes: () => 9e9 },
+      join(r, "raw", "webinars", "v.mkv"), "sess-old", "Old", "zoho", false, [], { enabled: false, notifyFinished: () => { finished = true; } } as unknown as TelegramNotifier, 60);
     assert.equal(finished, true);
   } finally { rmSync(r, { recursive: true, force: true }); }
 });

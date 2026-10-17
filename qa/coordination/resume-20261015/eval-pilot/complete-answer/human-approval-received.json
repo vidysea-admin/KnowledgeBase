@@ -1,0 +1,40 @@
+{
+  "format": "root-relayed-human-pilot-approval-v1",
+  "recordedAt": "2026-10-16T03:59:01.126Z",
+  "source": "Direct human reply received in /root current turn and explicitly relayed to /root/quality_delivery_coordinator in NEW_TASK",
+  "authority": "root acting on explicit user-approved Ollama goal",
+  "approvalIsSynthetic": false,
+  "cryptographicHumanSignatureClaim": false,
+  "scope": {
+    "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+    "questionSha256": "484335769f0957e252b9ae16e6372953344f0b951845b1598abcc51be83611c1",
+    "endpoint": "https://ollama.com/api/chat",
+    "model": "glm-5.3-flash",
+    "payload": "Same one private question and bounded legitimately retrieved private evidence from unchanged approved92/29 population",
+    "maxRequests": 12,
+    "cumulativeIds": [
+      6,
+      17
+    ],
+    "outputTokensPerRequest": 768,
+    "aggregateOutputTokens": 9216,
+    "inputBytesPerRequest": 65536,
+    "aggregateInputBytes": 327680,
+    "httpSeconds": 20,
+    "evaluationSeconds": 210,
+    "hardProcessSeconds": 240,
+    "invocations": 1,
+    "auditAndCitationsPreserved": true,
+    "actualCostUnknown": true
+  },
+  "priorSpentRequests": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "humanCalibrationLabelsApproved": 0,
+  "full92ExecutionApproved": false,
+  "rootApprovalRelay": "NEW HUMAN APPROVAL RECEIVED currentturn: boundedcomplete-answerOllamaGLM pilot authorized exactlysameonequestion/privateboundedretrievedevidence, max12requests cumulativeIDs6–17,768out/request9216total,64KiBinput/request320KiBtotal,ONEinvocation240sprocesslimit,audit/citationsintact,actualcostunknown."
+}

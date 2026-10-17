@@ -75,7 +75,13 @@ export function buildItems(p: SetupProbes): SetupItem[] {
       ? { id, title, status: "ok", means: on, action: "Nothing to do.", source: "GET /setup/status" }
       : { id, title, status: required ? "problem" : "todo", means: off, action, source: "GET /setup/status" };
   };
-  items.push(integ("gemini", "Gemini configured", "gemini", true, "A Gemini key is set (its value is never shown).", "No Gemini key is set: embeddings, transcription and summaries are unavailable.", "Set GEMINI_API_KEY in .env (see .env.example), restart the API, then Re-check."));
+  items.push(integ("gemini", "Gemini configured (optional)", "gemini", false, "A Gemini key is set (its value is never shown). This does not verify a working provider or model.", "No Gemini key is set. Other configured providers may support AI jobs; this check does not report their availability.", "If Gemini is needed, set GEMINI_API_KEY in .env (see .env.example), restart the API, then Re-check."));
+  items.push({
+    id: "ai-readiness", title: "AI provider and model readiness", status: "unknown",
+    means: "These checks report optional integration configuration only. They do not test model access, local provider runtime, job routing or successful AI output.",
+    action: "Confirm the provider and model configured for the intended job, then verify an authorized sample job. A configured key alone does not establish readiness.",
+    source: "not tested by these setup endpoints",
+  });
   items.push(integ("tavily", "Tavily configured (optional)", "tavily", false, "A Tavily key is set (its value is never shown).", "No Tavily key: Ask cannot fall back to web search.", "Optional: set TAVILY_API_KEY in .env, restart the API, then Re-check."));
   items.push(integ("langfuse", "Langfuse configured (optional)", "langfuse", false, "All Langfuse tracing variables are set (values never shown).", "Langfuse tracing is off.", "Optional: set LANGFUSE_BASE_URL, LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY in .env, restart the API, then Re-check."));
 

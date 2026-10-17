@@ -1,0 +1,4 @@
+
+# Disposable local Mongo acceptance runtime; exact UUID roots and public vendor files only.
+/qa/coordination/resume-20261015/isolated-replica-prep/vendor/
+/qa/coordination/resume-20261015/isolated-replica-prep/private-run-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]/

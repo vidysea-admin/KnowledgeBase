@@ -1,0 +1,18 @@
+[
+  {
+    "path": "packages/db/src/index.ts",
+    "sha256": "89B52EB2EB2032798B762D92C25E1381665858E49034317DE1B92CB809E311F0"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.ts",
+    "sha256": "515626D26A77E18970D7CEC8DF60179646DCD56478304758F985BB165B62129C"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "sha256": "E9BBF6EA41005B377DE8C69820F295FFB2FB781B3517E4CBB6F489E0136409C8"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "sha256": "BCE0534F0FD474788E97774DA274F8CFA186908A005876D7D1DABD8C95FEB000"
+  }
+]

@@ -1,0 +1,12 @@
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (54.9788ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.4855ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (14.1283ms)
+✔ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (58.4443ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2170.3177

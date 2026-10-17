@@ -1,0 +1,10 @@
+{
+  "maker": { "active_s": null, "tokens": null, "cost": null },
+  "reviewers": [{ "id": "t059-read-head-deadlines-checker0", "active_s": 0, "tokens": 0, "cost": 0 }],
+  "completion_reserve": true,
+  "completion_reserve_id": "t059-read-head-deadlines/cycle0/487ebc2b08d128f1-94563bffce039a51",
+  "next_phase": { "kind": "review", "active_s": 90, "tokens": 2200, "cost": null },
+  "bootstrap_scope": "BOOTSTRAP_REVIEW: exact two-file T059 read/accepted-child-head deadlines; identity and changed logic, relevant CAS/router consumers, current broker receipts. Total120s/3000 allocated tokens includes30s/800 finalization reserve. Native/live/full-parent gates remain HOLD; unknown actual maker usage means ratios unverified.",
+  "bootstrap": { "active_s": 120, "tokens": 3000 },
+  "escalation": null
+}

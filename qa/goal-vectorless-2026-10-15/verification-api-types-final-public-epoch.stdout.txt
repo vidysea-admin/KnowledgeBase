@@ -1,0 +1,108 @@
+
+> @lkb/api@0.0.0 typecheck C:\Users\product\Desktop\KnowledgeBase\apps\api
+> tsc --noEmit -p tsconfig.json
+
+src/answer-policy/answer-workflow.ts(66,44): error TS2322: Type '{ topicRefs?: string[] | undefined; speakerRefs?: string[] | undefined; sessionIds: AnswerFilters["sessionIds"]; sources: "all" | "internal"; }' is not assignable to type '{ sessionIds: [] | [string] | [string, string] | [string, string, string] | [string, string, string, string] | [string, string, string, string, string] | [string, string, string, string, string, string] | ... 13 more ... | [...]; speakerRefs?: [] | ... 16 more ... | undefined; topicRefs?: [] | ... 16 more ... | unde...'.
+  Types of property 'speakerRefs' are incompatible.
+    Type 'string[] | undefined' is not assignable to type '[] | [string] | [string, string] | [string, string, string] | [string, string, string, string] | [string, string, string, string, string] | [string, string, string, string, string, string] | ... 10 more ... | undefined'.
+      Type 'string[]' is not assignable to type '[] | [string] | [string, string] | [string, string, string] | [string, string, string, string] | [string, string, string, string, string] | [string, string, string, string, string, string] | ... 10 more ... | undefined'.
+        Type 'string[]' is not assignable to type '[] | [string] | [string, string] | [string, string, string] | [string, string, string, string] | [string, string, string, string, string] | [string, string, string, string, string, string] | ... 9 more ... | [...]'.
+          Type 'string[]' is not assignable to type '[string, string, string, string, string, string, string, string, string, string, string, string, string, string, string, string]'.
+            Target requires 16 element(s) but source may have fewer.
+src/composition/integrations/native-tree-reader.test.ts(22,72): error TS2322: Type '(tenant: string, id: string) => Promise<PageDocument | null>' is not assignable to type '(tenantId: string, id: string) => Promise<DocumentDocuments | null>'.
+  Type 'Promise<PageDocument | null>' is not assignable to type 'Promise<DocumentDocuments | null>'.
+    Type 'PageDocument | null' is not assignable to type 'DocumentDocuments | null'.
+      Property 'highlights' is missing in type 'PageDocument' but required in type 'DocumentDocuments'.
+src/composition/integrations/reviews.test.ts(78,66): error TS2345: Argument of type 'VerifiedKey' is not assignable to parameter of type 'RelationshipPrincipal'.
+  Types of property 'keyId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/composition/integrations/source-jobs.ts(45,168): error TS18048: 'key.scopes' is possibly 'undefined'.
+src/gws/public-webinar-config.ts(29,22): error TS18046: 'parsed' is of type 'unknown'.
+src/gws/public-webinar-config.ts(36,9): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(36,39): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(36,55): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(36,71): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(36,87): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(36,99): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(37,38): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(38,32): error TS2454: Variable 'url' is used before being assigned.
+src/gws/public-webinar-config.ts(39,51): error TS2454: Variable 'url' is used before being assigned.
+src/native-evidence/head-store.ts(108,47): error TS2345: Argument of type '{ "sourceMeta.nativeDocumentHead": { $exists: boolean; }; _id: string; tenantId: string; kind: string; hash: string; "consent.given": boolean; "consent.recordedBy": string; status: { $nin: string[]; }; } | { ...; }' is not assignable to parameter of type 'Filter<SourceRow>'.
+  Type '{ "sourceMeta.nativeDocumentHead": { $exists: boolean; }; _id: string; tenantId: string; kind: string; hash: string; "consent.given": boolean; "consent.recordedBy": string; status: { $nin: string[]; }; }' is not assignable to type 'Filter<SourceRow>'.
+    Type '{ "sourceMeta.nativeDocumentHead": { $exists: boolean; }; _id: string; tenantId: string; kind: string; hash: string; "consent.given": boolean; "consent.recordedBy": string; status: { $nin: string[]; }; }' is not assignable to type '{ tenantId?: Condition<string> | undefined; createdAt?: Condition<string> | undefined; status?: unknown; kind?: Condition<"document"> | undefined; captureMode?: Condition<...> | undefined; hash?: Condition<...> | undefined; consent?: Condition<...> | undefined; sourceMeta?: Condition<...>; _id?: Condition<...> | und...'.
+      Types of property 'kind' are incompatible.
+        Type 'string' is not assignable to type 'Condition<"document"> | undefined'.
+src/native-evidence/head-store.ts(117,47): error TS2345: Argument of type '{ "sourceMeta.nativeDocumentHead": { $exists: boolean; }; _id: string; tenantId: string; kind: string; hash: string; "consent.given": boolean; "consent.recordedBy": string; status: { $nin: string[]; }; } | { ...; }' is not assignable to parameter of type 'Filter<SourceRow>'.
+  Type '{ "sourceMeta.nativeDocumentHead": { $exists: boolean; }; _id: string; tenantId: string; kind: string; hash: string; "consent.given": boolean; "consent.recordedBy": string; status: { $nin: string[]; }; }' is not assignable to type 'Filter<SourceRow>'.
+    Type '{ "sourceMeta.nativeDocumentHead": { $exists: boolean; }; _id: string; tenantId: string; kind: string; hash: string; "consent.given": boolean; "consent.recordedBy": string; status: { $nin: string[]; }; }' is not assignable to type '{ tenantId?: Condition<string> | undefined; createdAt?: Condition<string> | undefined; status?: unknown; kind?: Condition<"document"> | undefined; captureMode?: Condition<...> | undefined; hash?: Condition<...> | undefined; consent?: Condition<...> | undefined; sourceMeta?: Condition<...>; _id?: Condition<...> | und...'.
+      Types of property 'kind' are incompatible.
+        Type 'string' is not assignable to type 'Condition<"document"> | undefined'.
+src/native-evidence/message-publication.ts(57,50): error TS2345: Argument of type 'WithId<Sources> | null' is not assignable to parameter of type 'Sources'.
+  Type 'null' is not assignable to type 'Sources'.
+src/native-evidence/message-publication.ts(58,32): error TS18047: 'source' is possibly 'null'.
+src/native-evidence/message-publication.ts(58,68): error TS18047: 'turn' is possibly 'null'.
+src/native-evidence/message-publication.ts(58,95): error TS18047: 'turn' is possibly 'null'.
+src/native-evidence/message-publication.ts(59,73): error TS18047: 'turn' is possibly 'null'.
+src/native-evidence/publication.test.ts(118,55): error TS2532: Object is possibly 'undefined'.
+src/native-evidence/publication.test.ts(140,57): error TS2322: Type '(tenant: string, locator: NativeSourceLocator) => Promise<{ kind: "document-page"; tenantId: string; sourceId: string; documentId: string; documentSourceId: string; ... 4 more ...; text: string; } | null>' is not assignable to type '(tenantId: string, locator: NativeSourceLocator) => Promise<NativeCurrentUnit | null>'.
+  Type 'Promise<{ kind: "document-page"; tenantId: string; sourceId: string; documentId: string; documentSourceId: string; headRevision: number; revisionHash: string; currentRevisionHash: string; eligible: true; text: string; } | null>' is not assignable to type 'Promise<NativeCurrentUnit | null>'.
+    Type '{ kind: "document-page"; tenantId: string; sourceId: string; documentId: string; documentSourceId: string; headRevision: number; revisionHash: string; currentRevisionHash: string; eligible: true; text: string; } | null' is not assignable to type 'NativeCurrentUnit | null'.
+      Type '{ kind: "document-page"; tenantId: string; sourceId: string; documentId: string; documentSourceId: string; headRevision: number; revisionHash: string; currentRevisionHash: string; eligible: true; text: string; }' is not assignable to type 'NativeCurrentUnit | null'.
+        Type '{ kind: "document-page"; tenantId: string; sourceId: string; documentId: string; documentSourceId: string; headRevision: number; revisionHash: string; currentRevisionHash: string; eligible: true; text: string; }' is not assignable to type 'CurrentBase & { kind: "document-page"; documentId: string; documentSourceId: string; headRevision: number; pageNumber: number; }'.
+          Property 'pageNumber' is missing in type '{ kind: "document-page"; tenantId: string; sourceId: string; documentId: string; documentSourceId: string; headRevision: number; revisionHash: string; currentRevisionHash: string; eligible: true; text: string; }' but required in type '{ kind: "document-page"; documentId: string; documentSourceId: string; headRevision: number; pageNumber: number; }'.
+src/native-evidence/publication.ts(69,23): error TS18048: 'm' is possibly 'undefined'.
+src/native-evidence/publication.ts(70,18): error TS18048: 'm' is possibly 'undefined'.
+src/native-evidence/publication.ts(77,57): error TS2345: Argument of type 'Manifest | undefined' is not assignable to parameter of type 'NativeDocumentBinding'.
+  Type 'undefined' is not assignable to type 'NativeDocumentBinding'.
+src/native-evidence/publication.ts(82,59): error TS2345: Argument of type 'Manifest | undefined' is not assignable to parameter of type 'NativeDocumentBinding'.
+  Type 'undefined' is not assignable to type 'NativeDocumentBinding'.
+src/native-evidence/publication.ts(83,15): error TS18048: 'leaf' is possibly 'undefined'.
+src/native-evidence/publication.ts(83,41): error TS2345: Argument of type 'NativeSourceLocator | null' is not assignable to parameter of type 'NativeSourceLocator'.
+  Type 'null' is not assignable to type 'NativeSourceLocator'.
+src/native-evidence/publication.ts(131,20): error TS2345: Argument of type 'Node | undefined' is not assignable to parameter of type 'Node'.
+  Type 'undefined' is not assignable to type 'Node'.
+src/review-authority/policy.ts(44,26): error TS18046: 'config' is of type 'unknown'.
+src/search-store.ts(94,39): error TS2344: Type 'Record<string, unknown> & { tenantId: string; }' does not satisfy the constraint '{ tenantId: string; _id: string; }'.
+  Property '_id' is missing in type 'Record<string, unknown> & { tenantId: string; }' but required in type '{ tenantId: string; _id: string; }'.
+src/speaker-attributes/mongo-store.test.ts(22,152): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/speaker-attributes/mongo-store.test.ts(29,75): error TS2322: Type 'string' is not assignable to type 'ObjectId'.
+src/speaker-attributes/mongo-store.test.ts(29,140): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(filter: Filter<Document>): Promise<WithId<Document> | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 2 of 6, '(filter: Filter<Document>): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+  Overload 3 of 6, '(filter: Filter<Document>, options?: (Omit<FindOneOptions, "timeoutMode"> & Abortable) | undefined): Promise<Document | null>', gave the following error.
+    Type 'string' is not assignable to type 'Condition<ObjectId> | undefined'.
+src/speaker-attributes/mongo-store.test.ts(34,55): error TS2322: Type 'Promise<void> | Promise<boolean> | Promise<SpeakerAttributes[]>' is not assignable to type 'Promise<void>'.
+  Type 'Promise<boolean>' is not assignable to type 'Promise<void>'.
+    Type 'boolean' is not assignable to type 'void'.
+src/speaker-attributes/router.test.ts(29,171): error TS18046: 'body' is of type 'unknown'.
+src/speaker-attributes/service.test.ts(39,66): error TS2542: Index signature in type 'Readonly<Record<string, string>>' only permits reading.
+src/speaker-relations/mongo-store.test.ts(44,84): error TS2322: Type 'string' is not assignable to type 'ObjectId'.
+src/speaker-relations/mongo-store.test.ts(58,55): error TS2322: Type 'Promise<void> | Promise<boolean>' is not assignable to type 'Promise<void>'.
+  Type 'Promise<boolean>' is not assignable to type 'Promise<void>'.
+    Type 'boolean' is not assignable to type 'void'.
+src/speaker-relations/router.test.ts(100,18): error TS18046: 'body' is of type 'unknown'.
+src/speaker-relations/source-router.ts(29,12): error TS18047: 'c' is possibly 'null'.
+src/speaker-relations/source-router.ts(29,29): error TS18047: 'c' is possibly 'null'.
+src/speaker-relations/source-router.ts(40,26): error TS18047: 'authority' is possibly 'null'.
+src/speaker-relations/source-router.ts(46,51): error TS18047: 'authority' is possibly 'null'.
+src/speaker-relations/source-router.ts(47,34): error TS18047: 'authority' is possibly 'null'.
+src/speaker-relations/source-router.ts(55,52): error TS18047: 'c' is possibly 'null'.
+src/speaker-relations/source-router.ts(55,77): error TS18047: 'c' is possibly 'null'.
+src/speaker-relations/source-router.ts(55,104): error TS18047: 'c' is possibly 'null'.
+src/speaker-relations/source-router.ts(56,41): error TS18047: 'authority' is possibly 'null'.
+src/transcript-review/origin.test.ts(58,74): error TS2339: Property 'turnId' does not exist on type 'SourceEvidenceQuote'.
+  Property 'turnId' does not exist on type 'NativeSourceQuote'.
+../../packages/index/src/graph/authorized-expansion.ts(70,96): error TS7006: Parameter 'proof' implicitly has an 'any' type.
+../../packages/index/src/graph/authorized-expansion.ts(75,95): error TS7006: Parameter 'p' implicitly has an 'any' type.
+C:\Users\product\Desktop\KnowledgeBase\apps\api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/api@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`
+Exit status 2

@@ -1,0 +1,44 @@
+{
+  "tokensActual": null,
+  "recordedMonotonic": 208882321606,
+  "unmeasuredSupplement": "Maker optional reviewHistory handshake added then targeted output regenerated; supplementary active duration unknown.",
+  "recordedUtc": "2026-10-15T09:33:18.3181925Z",
+  "hashes": [
+    {
+      "path": "schema/speaker_relationships.schema.json",
+      "sha256": "E993AA74524800BB66C31F37EBE6725AAFFC15A25FAD4F32F43AE58C047073A4"
+    },
+    {
+      "path": "schema/fixtures/speaker_relationships/valid.json",
+      "sha256": "7ED837B51E39311DC7DD696FF5736066455288DE7C9796EF4CE7957918BD08B9"
+    },
+    {
+      "path": "schema/fixtures/speaker_relationships/invalid.json",
+      "sha256": "704F55D81271CB6B018282DE94621822CFD154EE21B8EB627976B2455707CFC6"
+    },
+    {
+      "path": "schema/index.json",
+      "sha256": "A24A176D74C06891AA18547CBA4B3FA0E09F7662F7383E8A989F20FE4D061391"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_relationships.ts",
+      "sha256": "C595943527C6780C8A8635C618CC2A24A962AF8C12F8B8B88477151E9AC7DA8C"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "A2713A4D68DC9C8419A081E952AE2B17A456B9409618ADA299C25176FFB581CF"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-relationships.ts",
+      "sha256": "C2C85D1DC6F40FD6DE3D0471463B5E0C76D583E7E64F63AA713A3D88A73D161A"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "sha256": "7745B14F3323F6B587312BFCA2E76B107C31C47D4B05F5B6F42FD52CEEBE767B"
+    },
+    {
+      "path": "migrations/20261015120000-speaker-relationships.cjs",
+      "sha256": "42FE251D75D1C491F198D6BD96673905703269987B7FC4404337157F3F943908"
+    }
+  ]
+}

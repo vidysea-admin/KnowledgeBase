@@ -1,0 +1,22 @@
+✔ explicit speaker selection expands two hops into current original tree nodes only (14.5706ms)
+✔ topic selection and unknown selection work without scans becoming implicit authority (0.6212ms)
+✔ graph omits foreign-tenant edge and does not traverse through it (0.4441ms)
+✔ graph omits suggested edge and does not traverse through it (0.2154ms)
+✔ graph omits revoked edge and does not traverse through it (0.2053ms)
+✔ graph omits stale edge and does not traverse through it (0.2232ms)
+✔ graph omits wrong-source edge and does not traverse through it (0.2697ms)
+✔ graph omits invisible edge and does not traverse through it (0.2741ms)
+✔ graph omits partial-proof edge and does not traverse through it (0.2474ms)
+✔ current source alone is insufficient without matching current tree membership (0.4998ms)
+✔ mismatched or duplicate current authority fails closed (0.2734ms)
+✔ bounded graph rejects oversized rows/bytes and limits resulting sessions deterministically (0.6548ms)
+✔ cyclic/duplicate tree and duplicate edge identities refuse rather than widen evidence (0.2166ms)
+✔ malicious labels are neither matched nor converted into graph evidence (0.2258ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 448.1964

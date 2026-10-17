@@ -1,16 +1,23 @@
-/**
- * packages/meeting-bot/src/capture/record-finalize.ts — the finalize body split out of
- * record-commands.ts (T-033, ISS-300): adding a test seam there pushed it over the file's own
- * 300-LOC budget (the same reason `cli.ts` was originally split — see record-commands.ts's own
- * header). `finalizeRecording` in record-commands.ts keeps T-030's exact param list
- * (wave/t-030-telegram-alerts, 883c7b2/1649da9) and delegates to `finalizeRecordingWith` here.
- */
-import { createHash } from "node:crypto";
+/** Capture finalization with current consent, actual source EOF and pre-upload privacy proof. */
+import { createHash, randomUUID } from "node:crypto";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, statSync, lstatSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { normalizeLeanCapture } from '../lean-video-ffmpeg.js';
 import { readCaptureTags } from "../autojoin/capture-tags.js";
+import { prepareRecordFinalizerInput } from './record-consent/finalizer-input.js';
+import { readRecordConsent } from './record-consent/receipt-store.js';
+import { bindOriginalCapture } from './workspace/original-capture.js';
+import { recordConsentSourceFields } from './record-consent/context.js';
+import { runPrivateCaptureProvider } from './record-consent/provider-input.js';
+import type { NativeFinalizedMedia } from './native/native-media-finalize.js';
+import { prepareNativeFinalizerAudio, publishNativeCaptureTurns } from './native/native-capture-runtime.js';
+import { sealFinalizedNativeCapture } from './native/native-archive-capture.js';
+import type { NativeCaptureSealer } from './native/native-archive-join-types.js';
+import type { QualifiedCaptureClock } from './tiles/native-measurement.js';
+import { publishPrivateCaptureTurns } from './record-consent/downstream.js';
+import { validateCaptureIndexProof } from '../workspace/index-proof-consumer.js';
 
 import { gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./notify/telegram-alerts.js";
@@ -31,21 +38,19 @@ export function isSilentCapture(maxDb: number): boolean {
   return maxDb < SILENCE_MAX_DB;
 }
 
-/** T-035: measured MB/hour of a finished recording (MB = 1,000,000 bytes, as lean-video's estimator).
- * undefined when size or duration is unusable — the check is advisory and never fails a finalize. */
+/** Advisory measured MB/hour (decimal MB); undefined for unusable size/duration. */
 export function measuredMbPerHour(sizeBytes: number, durationSec: number): number | undefined {
   if (!Number.isFinite(sizeBytes) || sizeBytes <= 0 || !Number.isFinite(durationSec) || durationSec <= 0) return undefined;
   return sizeBytes / 1_000_000 / (durationSec / 3600);
 }
 
 function defaultExtractAudio(video: string, audioOut: string): void {
-  execFileSync("ffmpeg", ["-y", "-hide_banner", "-loglevel", "error", "-i", video, "-vn", "-ac", "1",
-    "-c:a", "aac", "-b:a", "96k", audioOut], { stdio: "inherit" });
+  execFileSync("ffmpeg", ["-n", "-nostdin", "-hide_banner", "-loglevel", "error", "-i", video, "-vn", "-ac", "1",
+    "-c:a", "aac", "-b:a", "96k", audioOut], { stdio: "inherit", timeout: 600000 });
 }
 
 function defaultMeasureVolume(audioPath: string): { maxDb: number; meanDb: number } {
-  // Silence gate. Measured 2026-09-24: a silent (-91 dB) capture sent to Gemini came back as 18
-  // fluent, invented turns. A KB must never ingest that, so silent audio is never transcribed.
+  // Silent captures are never transcribed: the provider can hallucinate turns from silence.
   const vd = spawnSync("ffmpeg", ["-hide_banner", "-i", audioPath, "-af", "volumedetect", "-f", "null", "-"],
     { encoding: "utf8" });
   const maxDb = Number(/max_volume:\s*(-?[\d.]+) dB/.exec(vd.stderr ?? "")?.[1] ?? "-999");
@@ -53,12 +58,16 @@ function defaultMeasureVolume(audioPath: string): { maxDb: number; meanDb: numbe
   return { maxDb, meanDb };
 }
 
-function defaultRunTranscription(sessionId: string): void {
-  execFileSync("node", [path.join(REPO_ROOT, "scripts", "transcribe-long-session.mjs"), sessionId],
-    { cwd: REPO_ROOT, stdio: "inherit" });
+export interface SealedCaptureProviderInput {
+  version: 1; tenantId: string; sessionId: string; audioPath: string; sha256: string;
+  receiptSha256: string; sourceSha256: string; generation: string;
+}
+function defaultRunTranscription(sessionId: string, input: SealedCaptureProviderInput): void {
+  execFileSync('node', [path.join(REPO_ROOT, 'scripts', 'transcribe-long-session.mjs'), sessionId, '--capture-input-fd', '0'],
+    { cwd: REPO_ROOT, env: { ...process.env, LKB_TRANSCRIPT_QA: '1' }, input: JSON.stringify(input),
+      stdio: ['pipe', 'inherit', 'inherit'], timeout: 2 * 60 * 60 * 1000 });
 }
 
-/** Read packets as well as headers: an empty stream declaration is not a capture. */
 function defaultProbeMedia(video: string): number {
   const probe = spawnSync("ffprobe", ["-v", "error", "-count_packets", "-show_streams",
     "-show_format", "-of", "json", video], { encoding: "utf8", timeout: 120_000 });
@@ -87,22 +96,27 @@ function validateTranscript(turnsPath: string, duration: number): void {
   }
 }
 
-/** Test seam (T-033, ISS-300): every field defaults to REAL production behaviour unchanged, so
- * every in-repo caller (`finalizeRecording`, no overrides arg) is exactly today's code path. */
 export interface FinalizeRecordingOverrides {
+  nativeArchive?: NativeCaptureSealer;
+  nativeSidecarPath?: string;
+  /** Process-private verified receiver/finalizer capability; never loaded from source JSON. */
+  nativeMedia?: NativeFinalizedMedia;
+  nativeMaxTotalBytes?: number;
+  nativeCanonicalClock?: QualifiedCaptureClock;
   tenantId?: string;
+  lean?: boolean;
+  originalVideo?: string;
+  recordDir?: string;
   probeMedia?: (video: string) => number; // actual container duration in seconds
   extractAudio?: (video: string, audioOut: string) => void;
   measureVolume?: (audioPath: string) => { maxDb: number; meanDb: number };
-  runTranscription?: (sessionId: string) => void;
+  runTranscription?: (sessionId: string, input: SealedCaptureProviderInput) => void;
+  validateTranscription?: (sessionId: string) => void;
   repoRoot?: string; // a test's temp dir, so nothing is ever written into the real repo tree
   videoSizeBytes?: (video: string) => number; // T-035: defaults to statSync(video).size
 }
 
-/** Recording file → m4a → silence gate → source.json → (optional) transcript → T-030 Telegram
- * "finished" summary. Shared by `record` and `finalize` (the recovery path when the controlling
- * process died mid-run). `finalizeRecording` (record-commands.ts) is a thin pass-through with
- * today's defaults, kept param-list-stable for T-030 (see `FinalizeRecordingOverrides` above). */
+/** Media → verified selected audio → silence gate → source.json → optional transcript/notification. */
 export async function finalizeRecordingWith(
   overrides: FinalizeRecordingOverrides,
   video: string, sessionId: string, title: string, platform: string, transcribe: boolean,
@@ -113,12 +127,17 @@ export async function finalizeRecordingWith(
   // false` and every call below is a guaranteed no-op — never a live send (contract C6).
   telegram: TelegramNotifier = createTelegramNotifier(),
   durationSec?: number, // T-030: unknown (0) on the `finalize` recovery path — no live startedAt there
-): Promise<void> {
+): Promise<string> {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId)) throw new Error("invalid sessionId");
-  const tenantId = overrides.tenantId ?? "vidysea";
+  const tenantId = overrides.tenantId ?? process.env.LKB_TENANT_ID;
+  if (!tenantId) throw new Error('Explicit capture tenant required');
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(tenantId)) throw new Error("invalid capture tenant");
   const root = overrides.repoRoot ?? REPO_ROOT;
-  const recordDir = overrides.repoRoot ? path.join(root, "raw", "webinars") : RECORD_DIR;
+  const tagDir = overrides.repoRoot ? path.join(root, 'raw', 'webinars') : RECORD_DIR;
+  const recordDir = overrides.recordDir ?? tagDir;
+  if(!overrides.nativeMedia&&existsSync(`${overrides.originalVideo??video}.native`))throw new Error("Native recovery requires private archive revalidation; legacy extraction refused");
+  const recordRelative = path.relative(root, recordDir);
+  if (!path.isAbsolute(recordDir) || !recordRelative || recordRelative.startsWith('..') || path.isAbsolute(recordRelative)) throw new Error('Capture slot must be confined to the configured repository');
   const extractAudio = overrides.extractAudio ?? defaultExtractAudio;
   const measureVolume = overrides.measureVolume ?? defaultMeasureVolume;
   const runTranscription = overrides.runTranscription ?? defaultRunTranscription;
@@ -150,18 +169,29 @@ export async function finalizeRecordingWith(
     JSON.stringify({ stage, status: "failed", error: String(error) }, null, 2) + "\n");
   writeFileSync(validationPath, JSON.stringify({ stage: "media", status: "processing" }, null, 2) + "\n");
   let measuredDuration: number;
+  const consent=readRecordConsent(recordDir,{tenantId,sessionId});
+  const {nativeAudio,nativeVideoReserve}=await prepareNativeFinalizerAudio({media:overrides.nativeMedia,maxTotalBytes:overrides.nativeMaxTotalBytes,
+    canonicalClock:overrides.nativeCanonicalClock,recordDir,owner:{tenantId,sessionId},receipt:consent,video,probeMedia:overrides.probeMedia??defaultProbeMedia});
+  const original=await bindOriginalCapture(overrides.originalVideo??video,video,recordDir);
+  // A private source retains its original EOF, never an encoder-padded clock.
+  if(consent.privateWindows.length)video=original.file;
   try {
-    measuredDuration = (overrides.probeMedia ?? defaultProbeMedia)(video);
+    measuredDuration = nativeAudio?.durationSec ?? (overrides.probeMedia ?? defaultProbeMedia)(video);
     if (!Number.isFinite(measuredDuration) || measuredDuration <= 0) {
-      throw new Error("recording duration must be finite and positive");
+      throw new Error(consent.privateWindows.length?"Original private capture timeline unavailable":"recording duration must be finite and positive");
     }
   } catch (error) {
     writeFileSync(path.join(dataDir, "validation.json"), JSON.stringify({ stage: "media", status: "failed",
       error: String(error) }, null, 2) + "\n");
     throw error;
   }
+  const prepared = await prepareRecordFinalizerInput({ video, recordDir, owner: { tenantId, sessionId }, duration: measuredDuration,
+    lean: overrides.lean, ...(overrides.nativeMedia?{nativeMedia:overrides.nativeMedia,canonicalClock:overrides.nativeCanonicalClock,nativeAudio}:{}) });
+  await original.verify();
+  if(prepared.receiptSha256!==createHash("sha256").update(JSON.stringify(consent)).digest("hex"))throw new Error("Capture consent changed during original source binding");
+  video = prepared.publicVideo;
+  if(nativeVideoReserve&&statSync(video).size>nativeVideoReserve)throw new Error("Native video mask exceeds reserved quota");
 
-  // T-035: flag a finished recording that is not under the lean target. Advisory: never throws.
   try {
     const sizeBytes = (overrides.videoSizeBytes ?? ((v: string) => statSync(v).size))(video);
     const mbPerHour = measuredMbPerHour(sizeBytes, measuredDuration);
@@ -172,8 +202,8 @@ export async function finalizeRecordingWith(
     }
   } catch (error) { console.log(`[bot] lean-target size check skipped: ${String(error)}`); }
 
-  const audio = path.join(recordDir, `${sessionId}.m4a`);
-  try { extractAudio(video, audio); } catch (error) { fail("audio", error); throw error; }
+  const audio = nativeAudio?.audioPath ?? path.join(recordDir, `${sessionId}.public-${randomUUID()}.m4a`);
+  try { if(!nativeAudio)extractAudio(video, audio); } catch (error) { fail("audio", error); throw error; }
   console.log(`[bot] audio → ${audio}`);
 
   let volume: { maxDb: number; meanDb: number };
@@ -189,22 +219,21 @@ export async function finalizeRecordingWith(
     _id: `${sessionId}-src`,
     tenantId,
     kind: "recording",
-    // schema/sources.schema.json requires hash (unique index {tenantId, hash}).
     hash: createHash("sha256").update(readFileSync(audio)).digest("hex"),
-    captureMode: "silent",
     title,
     platform,
     path: toPosix(path.relative(root, video)),
     audioPath: toPosix(path.relative(root, audio)),
     audioLevel: { maxDb, meanDb, silent },
     gaps: gapsForSourceDoc(gaps), // T-029: forced-disconnect windows recovered mid-run, if any
-    ...readCaptureTags(recordDir, sessionId), // autojoin: testData / careerGuidance / matchedKeywords from the schedule tick, if any
-    consent: {
-      given: true,
-      recordedBy: "Umesh Sugara (registered attendee) via LKB bot",
-      note: "attendee-side capture for internal KB use; organizer recording not available to attendees",
-      confirmedNoAlternative: true,
-    },
+    ...readCaptureTags(tagDir, sessionId),
+    ...recordConsentSourceFields(prepared.receipt),
+    captureConsent: { recordDir: toPosix(recordRelative), sessionId, generation: prepared.receipt.generation, meetingHash: prepared.receipt.meetingHash,
+      receiptSha256: prepared.receiptSha256, publicVideoSha256: prepared.publicVideoSha256,
+      originalVideoPath:toPosix(path.relative(root,original.file)),originalVideoSha256:original.sha256,
+      sanitizedAudioSha256: createHash('sha256').update(readFileSync(audio)).digest('hex'),
+      originalAudioPath: toPosix(path.relative(root, nativeAudio?.originalAudioPath??prepared.originalVideo)) },
+    guardedPrivateWindows: { audio: prepared.audioPrivacyWindows, video: prepared.videoPrivacyWindows },
     createdAt: new Date().toISOString(),
   };
   writeFileSync(path.join(dataDir, "source.json"), JSON.stringify(sourceDoc, null, 2) + "\n");
@@ -218,31 +247,45 @@ export async function finalizeRecordingWith(
   const turnsPath = path.join(dataDir, "turns.json");
   if (transcribe) {
     try {
-      runTranscription(sessionId);
+      await runPrivateCaptureProvider({ receipt: prepared.receipt, owner: { tenantId, sessionId }, duration: measuredDuration,
+        audioPath: audio, originalAudioPath: nativeAudio?.originalAudioPath??prepared.originalVideo,
+        sanitizedSha256: sourceDoc.captureConsent.sanitizedAudioSha256,...(nativeAudio?{nativeAudio}:{}) },
+        async (audioPath, checked) => {
+          const generation = prepared.receipt.generation;
+          if (!generation) throw new Error('Current capture generation required before provider dispatch');
+          runTranscription(sessionId, { version: 1, tenantId, sessionId, audioPath, sha256: checked.sha256,
+            receiptSha256: checked.receiptSha256, sourceSha256: createHash('sha256').update(readFileSync(path.join(dataDir, 'source.json'))).digest('hex'), generation });
+        });
+      if(nativeAudio)await publishNativeCaptureTurns(turnsPath,nativeAudio,prepared.receipt);else publishPrivateCaptureTurns(turnsPath,prepared.receipt);
       validateTranscript(turnsPath, measuredDuration);
+      if (overrides.validateTranscription) overrides.validateTranscription(sessionId);
+      else execFileSync('node', [path.join(REPO_ROOT, 'scripts', 'webinar', 'validate', 'validate-session.mjs'), sessionId, '--root', root], { cwd: root, stdio: 'inherit', timeout: 120000 });
     } catch (error) {
       writeFileSync(path.join(dataDir, "validation.json"), JSON.stringify({ stage: "transcript", status: "failed",
         durationSec: measuredDuration, error: String(error) }, null, 2) + "\n");
       throw error;
     }
   }
-  writeFileSync(path.join(dataDir, "validation.json"), JSON.stringify({ status: "passed",
-    durationSec: measuredDuration, transcriptValidated: transcribe }, null, 2) + "\n");
-  // T-030: finished + transcript-ready summary — no LLM call, turnCount is turns.json's own length.
+  if (!transcribe) writeFileSync(path.join(dataDir, 'validation.json'), JSON.stringify({ status: 'passed', durationSec: measuredDuration, transcriptValidated: false }, null, 2) + '\n');
+  await sealFinalizedNativeCapture({ sealer: overrides.nativeArchive, media: overrides.nativeMedia, providerAudio: nativeAudio,
+    maxTotalBytes: overrides.nativeMaxTotalBytes, sidecarPath: overrides.nativeSidecarPath,
+    sourcePath: path.join(dataDir, 'source.json'), publicVideoPath: video, recordDir });
   telegram.notifyFinished({
     title, sessionId, durationSec: measuredDuration, gapCount: gaps.length,
     transcriptPath: transcribe ? toPosix(path.relative(root, turnsPath)) : undefined,
     turnCount: transcribe ? readTurnCount(turnsPath) : undefined,
   });
+  return video;
 }
 
-export function normalizeCapture(video: string): string {
-  if (!video.endsWith(".webm") || video.endsWith(".playable.webm")) return video;
+export function normalizeCapture(video: string, lean = false): string {
+  if (!video.endsWith(".webm") || video.endsWith(".playable.webm")) return normalizeLeanCapture(video, { enabled: lean, log: message => console.log(message) });
   const output = video.slice(0, -5) + ".playable.webm";
-  const normalized = spawnSync("ffmpeg", ["-y", "-nostdin", "-hide_banner", "-loglevel", "error", "-i", video,
+  if (existsSync(output)) throw new Error('WebM finalization destination already exists; original retained');
+  const normalized = spawnSync("ffmpeg", ["-n", "-nostdin", "-hide_banner", "-loglevel", "error", "-i", video,
     "-c", "copy", output], { stdio: "inherit", timeout: 600_000 });
   if (normalized.status !== 0) throw new Error("WebM finalization failed; original stream retained");
-  return output;
+  return normalizeLeanCapture(output, { enabled: lean, log: message => console.log(message) });
 }
 export function processRecordingArtifacts(video: string, sessionId: string, rest: string[]): void {
   if (!rest.includes("--process-video")) return;
@@ -266,14 +309,6 @@ export function processRecordingArtifacts(video: string, sessionId: string, rest
     report("done");
   } catch (error) { report("failed", String(error)); throw error; }
 }
-export function validateIndexProof(dir: string, sessionId: string): Record<string, unknown> {
-  const read = (name: string) => JSON.parse(readFileSync(path.join(dir, name), "utf8"));
-  const proof = read("index-proof.json"), source = read("source.json");
-  const inputHash = createHash("sha256").update(readFileSync(path.join(dir, "knowledge-turns.json"))).digest("hex");
-  if (proof.version !== 2 || proof.sessionId !== sessionId || proof.tenantId !== source.tenantId || proof.inputHash !== inputHash ||
-    !proof.generation || proof.strict !== true || proof.status !== "done" || proof.semanticSupport !== "passed" ||
-    !Number.isInteger(proof.turnCount) || proof.turnCount <= 0 || ["summary", "claims", "chunks", "tree"].some((key) => proof[key] !== "done")) {
-    throw new Error("required fresh strict index proof unavailable");
-  }
-  return proof;
+export function validateIndexProof(dir: string, sessionId: string, expectedWorkDb = process.env.MONGO_WORK_DB): Record<string, unknown> {
+  return validateCaptureIndexProof(dir, sessionId, expectedWorkDb);
 }

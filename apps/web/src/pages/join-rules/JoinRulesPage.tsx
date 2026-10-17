@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../auth/AuthContext.js";
 import { ApprovalsPanel } from "./ApprovalsPanel.js";
+import { RegistrationPolicyPanel } from "./RegistrationPolicyPanel.js";
 import { JOIN_RULES_ENFORCED, pageCopy } from "./enforcement.js";
 import { RuleSetEditor } from "./RuleSetEditor.js";
 import { MESSAGES, classify, getJoinRules, looksStored, postPending, putRuleSet, type Problem } from "./joinRulesClient.js";
@@ -151,6 +152,7 @@ export function JoinRulesPage(): React.ReactElement {
 
   return <>
     <div className="page-header"><h1>Join rules</h1><p>{copy.subtitle}</p></div>
+    {apiKey && <RegistrationPolicyPanel apiKey={apiKey} />}
     {!apiKey ? <p className="card empty-note">Sign in with an API key to view join rules.</p>
       : phase.name === "loading" ? <p role="status">Loading join rules…</p>
       : phase.name === "blocked" ? <div className="card">

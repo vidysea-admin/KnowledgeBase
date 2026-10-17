@@ -1,0 +1,188 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/native-next-gate-summary.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "b5ffe7cc4bf30ab63832efaa112aba3716ec168575447ad1c6d5997cfec8f52e",
+    "bytes": 6292325
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "active_s": 70.06200000000172,
+    "gates_raw_green": false,
+    "inventory_count": 1887,
+    "inventory_unchanged": true,
+    "drift": {},
+    "active_eval_exclusion": "only scripts/eval/vectorless-production-eval.mjs/.test.mjs active; no native/TS source reference, excluded",
+    "contracts_vacuity": true,
+    "environment": {
+      "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-temp",
+      "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-temp",
+      "LKB_NATIVE_PUBLICATION_MONGO_RUN": "0",
+      "KB_U24_PRIVATE_TOC_TESTS": "0",
+      "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+      "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+    },
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "6a3e6070e620d0c4e80318ef6c1c8735067dc0596ac0a5965c457a9983cb5afd",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-preflight-receipt.json",
+        "rawBytes": 468528,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "60c63c1ff6679c3b8e03567aba290f74e3407ae623c4cd763d2f753ecbe9bc81"
+      },
+      "logSha256": "694dd7d05f5a47a290a40d527baf90e489612483963b24fe45dce1ed006aa118",
+      "label": "native-next-preflight",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-preflight.log"
+    },
+    {
+      "canonicalJsonSha256": "e45bc13287f555d2bbf44b402e067373d286450bdc24630f73a26f942355c00a",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-core-types-receipt.json",
+        "rawBytes": 467998,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "877434e36d2b3563b5e0f89bf573b7466e854fb109e768e01661f16044d0461e"
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "label": "native-next-core-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-core-types.log"
+    },
+    {
+      "canonicalJsonSha256": "d13a4e5e92e5839c6f804f002fcc3aa2bf93a4b0e715503dd69ca3a6c509b6d2",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-db-types-receipt.json",
+        "rawBytes": 469959,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "7fc81cf7312632de51a4281e76f9f6f3d2656b6aac1461b95a9c2682f6ca9da3"
+      },
+      "logSha256": "eb79b65f5431a4c34875ecd46ddadf7d179e0f0054d3a318c704c40545a9b0e1",
+      "label": "native-next-db-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-db-types.log"
+    },
+    {
+      "canonicalJsonSha256": "2fbaa9e05735315d0d0030b146911ecb812c768ed92b4bb21d857ba60ea575dc",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-bot-types-receipt.json",
+        "rawBytes": 468172,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "8afc0963f881ede40442bbfbab73c887923acecca8e40b85e6ccaa0c640b529f"
+      },
+      "logSha256": "332bb3b1d653129d0201b658880ddd25ca75ad90ef17c44fcf1c892f89dc8dcf",
+      "label": "native-next-bot-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-bot-types.log"
+    },
+    {
+      "canonicalJsonSha256": "e20193785d74f8094c2e89a039957d64bfb6e0fed668d9031a1e9788a01ad688",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-api-types-receipt.json",
+        "rawBytes": 468517,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "78ff8ff03c2c2552eb7e407aa47bb7eb9db6837bfe6ea23b44d89435fda55187"
+      },
+      "logSha256": "05e44f499c3c1213f120604944db55485ed815d0b227aca7e9e1b48575715c10",
+      "label": "native-next-api-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-api-types.log"
+    },
+    {
+      "canonicalJsonSha256": "578f519fb80a74270b24c0a296b2355f5f8b43563df1b91636093c6a64020edb",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-web-types-receipt.json",
+        "rawBytes": 467992,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "fafceea21a45db6640269abc70495c4143ff8074b73fc42900921cad7bbd8965"
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "label": "native-next-web-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-web-types.log"
+    },
+    {
+      "canonicalJsonSha256": "82364e50ee7ee6cd85f050e6ad15f962c975a174fca299729ca5ab35b39259cf",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-root-script-types-receipt.json",
+        "rawBytes": 468423,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "3ff74f19d71defea02e93b29c70987d761244acadde4cabc3b7468ed22055980"
+      },
+      "logSha256": "af0f4e5bfae396a7432edcfe1d27757b96a6e839747f7c1bc15f3e0f79da1e88",
+      "label": "native-next-root-script-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-root-script-types.log"
+    },
+    {
+      "canonicalJsonSha256": "3dd1a6c8279c7971a368f15bd060e7a85facf41507083cd290e95850c5f59f42",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-generated-drift-receipt.json",
+        "rawBytes": 468002,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "50d66404d1d2a254e31bf5bb2a7570b6faf8501b735e4e2c36dcfb10a0ebd8b1"
+      },
+      "logSha256": "ef06fd85e7c722cb7805b03b700fe2923bf5650b15402dcd4500d1d58445aa43",
+      "label": "native-next-generated-drift",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-generated-drift.log"
+    },
+    {
+      "canonicalJsonSha256": "7dd4a4d8dbcbeed8b3087aebfccb61738ee534240531f03ad1704923dc66a935",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-schema-preflight-receipt.json",
+        "rawBytes": 468155,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "4698567a82c419e88836b5784d0d06da1e30801d7c8225a38941170a04390c71"
+      },
+      "logSha256": "873adad6e35b40faa2312bac791bb06c7c9910df2444b4f7b7fa302c1e86956b",
+      "label": "native-next-schema-preflight",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-schema-preflight.log"
+    },
+    {
+      "canonicalJsonSha256": "f0c234fd284499014acf8edc60bdef3099ff9bf1f93c2edc5eafc43143d2e0e1",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-schema-fixtures-receipt.json",
+        "rawBytes": 470245,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "59ae0c7d42fc2512e62c7619aa0aac8221d6cdf9a9058ada7ebf025835a9db90"
+      },
+      "logSha256": "91f449bcbc40c27e445708a1f9cb2c0999197e17e02e8c2662d0d1ebe84219d5",
+      "label": "native-next-schema-fixtures",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-schema-fixtures.log"
+    },
+    {
+      "canonicalJsonSha256": "48c00394046976bd98ba72920a18d3a3b3273bdecb0e1394ed36d105afd694ae",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-contracts-receipt.json",
+        "rawBytes": 468008,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "16e1a26a521c085053aa76112cb2a08c7581a348345ececa740431f8d6080abb"
+      },
+      "logSha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8",
+      "label": "native-next-contracts",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-contracts.log"
+    },
+    {
+      "canonicalJsonSha256": "2f4dbf3352b572e507829c056039e122a01ae9e0a448d878108a9d80c62c012d",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-scoped-structure-receipt.json",
+        "rawBytes": 469710,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "2fbafd229965bb3b3802b406a7cc4a2b12a3a3c6f6ddd7a635e323b037046793"
+      },
+      "logSha256": "71d78c1f20f0f65664aa27fd0f5e839da27f1e10d9e3107666f9149a10bbd79d",
+      "label": "native-next-scoped-structure",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-scoped-structure.log"
+    },
+    {
+      "canonicalJsonSha256": "ffab295403095c81a29d38b4609800a2ac98747f075ee3948a5d873150ad573b",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-dependency-cycles-receipt.json",
+        "rawBytes": 469513,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "ea1bd2beed9bfbe134eeb8ee375c601088373c86f8cebb29a39e8b96247d9a8a"
+      },
+      "logSha256": "20f614931a61f758ef42537d29c942cf2195d739e84d57eef104c7024a13b004",
+      "label": "native-next-dependency-cycles",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-dependency-cycles.log"
+    }
+  ]
+}

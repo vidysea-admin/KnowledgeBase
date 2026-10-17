@@ -1,0 +1,17 @@
+{
+  "_id": "f9b9b10aed06fb5e5be7fe5b5ee81084647af26474cd542842d7b3b022931700",
+  "tenantId": "fixture-ops",
+  "kind": "digest",
+  "revision": 0,
+  "enabled": false,
+  "intervalHours": 24,
+  "nextRunAt": null,
+  "lastAttemptAt": null,
+  "lastSuccessAt": null,
+  "lastResult": "never",
+  "lastErrorCode": null,
+  "runId": null,
+  "leaseToken": null,
+  "leaseUntil": null,
+  "audit": []
+}

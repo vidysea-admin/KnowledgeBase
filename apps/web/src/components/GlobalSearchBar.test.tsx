@@ -1,12 +1,13 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { AuthProvider } from "../auth/AuthContext.js";
+import { AuthProvider, useAuth } from "../auth/AuthContext.js";
 import { AppShell } from "../layout/AppShell.js";
 import { GlobalSearchBar } from "./GlobalSearchBar.js";
 import { MAX_QUERY_CHARS } from "../pages/search/query.js";
 
 function Probe() { const l = useLocation(); return <output data-testid="loc">{l.pathname + l.search}</output>; }
+function ResetOwner() { const auth = useAuth(); return <button onClick={() => auth.setApiKey("fixture-key")}>Reset same key</button>; }
 function mount(route: string, key: string | null = "fixture-key") {
   if (key) localStorage.setItem("lkbApiKey", key);
   return render(<AuthProvider><MemoryRouter initialEntries={[route]}><GlobalSearchBar /><Probe /></MemoryRouter></AuthProvider>);
@@ -59,6 +60,13 @@ describe("GlobalSearchBar", () => {
   test("malformed percent-encoding in the URL does not throw", () => {
     mount("/search?q=%E0%A4%A");
     expect(screen.getByLabelText("Search all sessions")).toHaveValue(new URLSearchParams("q=%E0%A4%A").get("q"));
+  });
+  test("a new auth session using the same credential clears an unsubmitted private draft", () => {
+    localStorage.setItem("lkbApiKey", "fixture-key");
+    render(<AuthProvider><MemoryRouter><GlobalSearchBar /><ResetOwner /></MemoryRouter></AuthProvider>);
+    fireEvent.change(screen.getByLabelText("Search all sessions"), { target: { value: "private draft" } });
+    fireEvent.click(screen.getByRole("button", { name: "Reset same key" }));
+    expect(screen.getByLabelText("Search all sessions")).toHaveValue(""); expect(fetch).not.toHaveBeenCalled();
   });
   test("is not rendered when signed out; the shell renders it once when signed in", () => {
     mount("/", null); expect(screen.queryByRole("search")).toBeNull(); cleanup();

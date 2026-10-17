@@ -65,7 +65,10 @@ export async function complete(jobKind: string, job: Job, config: RoutingConfig)
           status: "done",
           provider: result.provider,
           model: result.model,
-          costUsd: result.costUsd,
+          ...(result.costUsd !== undefined ? { costUsd: result.costUsd } : {}),
+          costStatus: result.costStatus ?? (result.costUsd === undefined ? "unknown" : "reported"),
+          inputTokens: result.usage.inputTokens,
+          outputTokens: result.usage.outputTokens,
         },
         config.write,
       );

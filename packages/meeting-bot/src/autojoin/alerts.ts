@@ -35,14 +35,17 @@ interface AlertState {
 }
 const MAX_ATTEMPTS = 3, HOUR = 3_600_000, KEEP_MS = 14 * 24 * HOUR, DIGEST_AFTER_MS = 5 * 60_000;
 const MAX_RETRIES = 50, MAX_REPLAYS_PER_FLUSH = 10;
-const FAILURE: ReadonlySet<AlertKind> = new Set(["capture-stopped-early", "capture-failed"]);
+const FAILURE: ReadonlySet<AlertKind> = new Set(["capture-stopped-early", "capture-failed", "discovery-degraded"]);
 const LABEL: Record<AlertKind, string> = {
   "about-to-join": "Bot will join", "capture-started": "Recording started", "capture-stopped-early": "Recording stopped EARLY",
   "capture-failed": "Recording FAILED", "capture-done": "Recording finished",
   "rules-degraded": "Join rules DEGRADED",
+  "coverage-deferred": "Coverage deferred", "discovery-degraded": "Discovery unavailable", "discovery-recovered": "Discovery recovered",
 };
-const COLOR: Record<AlertKind, string> = { "about-to-join": "5", "capture-started": "11", "capture-stopped-early": "6", "capture-failed": "4", "capture-done": "10", "rules-degraded": "4" };
-const STATUS: Record<AlertKind, string> = { "about-to-join": "joining", "capture-started": "recording", "capture-stopped-early": "stopped early", "capture-failed": "failed", "capture-done": "done", "rules-degraded": "degraded" };
+const COLOR: Record<AlertKind, string> = { "about-to-join": "5", "capture-started": "11", "capture-stopped-early": "6", "capture-failed": "4", "capture-done": "10", "rules-degraded": "4",
+  "coverage-deferred": "6", "discovery-degraded": "4", "discovery-recovered": "10" };
+const STATUS: Record<AlertKind, string> = { "about-to-join": "joining", "capture-started": "recording", "capture-stopped-early": "stopped early", "capture-failed": "failed", "capture-done": "done", "rules-degraded": "degraded",
+  "coverage-deferred": "deferred", "discovery-degraded": "discovery unavailable", "discovery-recovered": "discovery recovered" };
 
 function statePath(stateDir: string, tenantId: string): string {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(tenantId)) throw new Error("invalid tenant for alert state");
@@ -198,7 +201,7 @@ async function deliverAlert(deps: AlertDeps, a: AlertInput, flushDigest: boolean
   if (cfg.alerts.calendar) {
     const prev = st.calendar[a.sessionKey];
     const occurrence = eventAt ?? nowIso, previous = Date.parse(prev?.eventAt ?? prev?.lastAt ?? ""), at = Date.parse(occurrence);
-    const rank = (kind?: AlertKind) => kind === "capture-done" ? 3 : FAILURE.has(kind!) ? 2 : kind === "capture-started" ? 1 : 0;
+    const rank = (kind?: AlertKind) => kind === "capture-done" || kind === "discovery-recovered" ? 3 : FAILURE.has(kind!) ? 2 : kind === "capture-started" ? 1 : 0;
     if (!fresh("calendar")) res.calendar = "duplicate";
     else if (prev && (at < previous || (at === previous && rank(a.kind) < rank(prev.kind)))) { st.done[key("calendar")] = nowIso; res.calendar = "superseded"; }
     else if (!a.startTime || !a.endTime || Number.isNaN(Date.parse(a.startTime)) || Number.isNaN(Date.parse(a.endTime))) { st.done[key("calendar")] = nowIso; res.calendar = "skipped-no-times"; }

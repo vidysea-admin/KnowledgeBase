@@ -281,10 +281,10 @@ test("first-source normalize/probe/extract failures retain stopped and interrupt
     const recover=()=>finalizeControllerRecording(video,{repoRoot:root,recordDir,profileDir,sessionId,tenantId:"lane",python:"unused",joinScript:"unused"},{
       normalize:media=>{if(failing&&failure==="normalize")throw new Error("first normalize failure");return media;},
       pidProbe:()=>"dead",cleanup:()=>{},mediaDuration:()=>20,processArtifacts:()=>{processed++;},
-      finalize:(media,gaps)=>finalizeRecordingWith({repoRoot:root,tenantId:"lane",
+      finalize:async(media,gaps)=>{await finalizeRecordingWith({repoRoot:root,tenantId:"lane",
         probeMedia:()=>{if(failing&&failure==="probe")throw new Error("first probe failure");return 20;},
         extractAudio:(_input,output)=>{if(failing&&failure==="extract")throw new Error("first extract failure");writeFileSync(output,"audio");},
-        measureVolume:()=>({maxDb:-20,meanDb:-30})},media,sessionId,"Fixture","meet",false,gaps),
+        measureVolume:()=>({maxDb:-20,meanDb:-30})},media,sessionId,"Fixture","meet",false,gaps);},
     });
     try {
       await assert.rejects(recover(),new RegExp("first "+failure+" failure"));

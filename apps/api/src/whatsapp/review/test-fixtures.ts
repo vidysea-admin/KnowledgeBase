@@ -15,6 +15,15 @@ export function reviewInput(text: string = "Scholarship closes Friday.", tenantI
 
 type Row = Record<string, unknown>;
 type Filter = Record<string, unknown>;
+const valueAt = (row: Row, key: string): unknown => key.split(".").reduce<unknown>((value, part) =>
+  value !== null && typeof value === "object" ? (value as Row)[part] : undefined, row);
+const setFields = (row: Row, values: Row): void => {
+  for (const [key, value] of Object.entries(values)) {
+    const parts = key.split("."); let target = row;
+    for (const part of parts.slice(0, -1)) target = (target[part] ??= {}) as Row;
+    target[parts.at(-1)!] = structuredClone(value);
+  }
+};
 export function reviewMongoFixture(inputs: readonly WhatsAppReviewInput[] = [reviewInput()]) {
   let rows: Record<string, Row[]> = { sources: [], sessions: [], turns: [], whatsapp_candidates: [], published: [] };
   for (const input of inputs) {
@@ -24,17 +33,32 @@ export function reviewMongoFixture(inputs: readonly WhatsAppReviewInput[] = [rev
   const calls: { collection: string; filter: Filter; session?: unknown; operation: string }[] = [];
   let tail = Promise.resolve();
   let sessionCount = 0; let ended = 0;
-  const matches = (row: Row, filter: Filter): boolean => Object.entries(filter).every(([key, value]) => row[key] === value);
+  const matches = (row: Row, filter: Filter): boolean => Object.entries(filter).every(([key, value]) => {
+    const actual = valueAt(row, key);
+    if (value !== null && typeof value === "object" && "$ne" in value && Object.keys(value).length === 1) return actual !== value.$ne;
+    // The effective reader selects immutable physical turns with scalar _id:$in.
+    // Keep all other fixture predicates on their existing equality path.
+    if (value !== null && typeof value === "object" && Object.hasOwn(value, "$in") && "$in" in value && Object.keys(value).length === 1) {
+      const operands = value.$in;
+      if (Array.isArray(operands) && operands.every(operand => operand === null || ["string", "number", "boolean"].includes(typeof operand))) {
+        return operands.some(operand => actual === operand);
+      }
+    }
+    return actual === value;
+  });
   const db = {
     client: {
       startSession() {
         sessionCount++;
+        let active = false;
         const session = {
+          inTransaction: () => active,
           async withTransaction<T>(body: () => Promise<T>): Promise<T> {
             let unlock!: () => void;
             const prior = tail; tail = new Promise(resolve => { unlock = resolve; }); await prior;
             const backup = structuredClone(rows);
-            try { return await body(); } catch (error) { rows = backup; throw error; } finally { unlock(); }
+            active = true;
+            try { return await body(); } catch (error) { rows = backup; throw error; } finally { active = false; unlock(); }
           },
           async endSession() { ended++; },
         };
@@ -56,11 +80,11 @@ export function reviewMongoFixture(inputs: readonly WhatsAppReviewInput[] = [rev
           calls.push({ collection: name, filter: structuredClone(filter), session: options.session, operation: "updateOne" });
           const row = rows[name]!.find(row => matches(row, filter));
           if (row) {
-            if (update.$set) Object.assign(row, structuredClone(update.$set));
-            return { modifiedCount: update.$set ? 1 : 0, upsertedCount: 0 };
+            if (update.$set) setFields(row, update.$set);
+            return { acknowledged: true, matchedCount: 1, modifiedCount: update.$set ? 1 : 0, upsertedCount: 0 };
           }
-          if (options.upsert) { rows[name]!.push(structuredClone({ ...filter, ...update.$setOnInsert, ...update.$set })); return { modifiedCount: 0, upsertedCount: 1 }; }
-          return { modifiedCount: 0, upsertedCount: 0 };
+          if (options.upsert) { rows[name]!.push(structuredClone({ ...filter, ...update.$setOnInsert, ...update.$set })); return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 1 }; }
+          return { acknowledged: true, matchedCount: 0, modifiedCount: 0, upsertedCount: 0 };
         },
       };
     },

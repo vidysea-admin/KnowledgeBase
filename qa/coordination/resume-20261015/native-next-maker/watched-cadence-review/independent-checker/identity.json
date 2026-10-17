@@ -1,0 +1,130 @@
+{
+  "observed_at": "2026-10-16T01:32:55.159976+00:00",
+  "packet_sha256": "1444f02369351b9e4b98969de5f909ee5e78a01e7b01b4c8565e296258e6161c",
+  "parent": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "checked": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\connector-workflow\\watched.ts",
+      "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server-watched.test.ts",
+      "sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server.ts",
+      "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.test.ts",
+      "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.ts",
+      "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\README.md",
+      "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\supervisor.ts",
+      "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\scheduler\\service.d.mts",
+      "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-final-seal.json",
+      "sha256": "8ee3243083406afb20db669507b31fe017793457411a02c0d8a84c13d5c08ef3",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac.json",
+      "sha256": "bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-preflight-receipt.json",
+      "sha256": "5b0fa4756e2a5fdb6714b0270fc32a46a4989c32ba233129f6a7ca2e33f79ed1",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-root-types-receipt.json",
+      "sha256": "2ff0c1e3bc22f657bd580e32a38afb0809c5bc960d17e6b73b656ce1b162b67c",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-full-graph-receipt.json",
+      "sha256": "4e8d8c71201f301bd3ace1e16dea73fe30481be04bb9ef21e3af408e76e7997c",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-scoped-structure-receipt.json",
+      "sha256": "aac2964b6072bc7bd825d4c33b9fe024be4a8c1ef55155805cce08a9998c28c8",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-all28-receipt.json",
+      "sha256": "ea33c924fee8e838cdac4b5ac667f58b48cd985f216df12d7694b5d78d70f092",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\broker_lib.py",
+      "sha256": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\scoped-check-runner.py",
+      "sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-alias-repair\\register.mjs",
+      "sha256": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\local-wip-post-d50\\local-commit-receipt.json",
+      "sha256": "afd430830b3d3ca622acc658258f8b88a8b62606d82ff811a336904dd5f3b5d1",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\committed-eight-blobs.json",
+      "sha256": "c62646c3b9b98ee07be336a876fb7d5a48fa2e8f31ee5abaad592c51ec5f524e",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\packet.md",
+      "sha256": "05d6c72843c4fed96d8a2b0d6166bc92b183c456357241c0e8e338e541c62316",
+      "ok": true
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t053.md",
+      "sha256": "8de51421af2c76cbbee113ee5ac035fe7e4b54b426202ca9ca316a31f2d6bb21",
+      "ok": true
+    }
+  ],
+  "canonical": {
+    "sourceFiles": {
+      "count": 1691,
+      "bad": []
+    },
+    "runtimeFiles": {
+      "count": 2,
+      "bad": []
+    }
+  },
+  "errors": [],
+  "status": "IDENTITIES_MATCH",
+  "actual_tokens": null
+}

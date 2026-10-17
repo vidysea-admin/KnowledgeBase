@@ -1,0 +1,11 @@
+{
+  "status": "RETURNED",
+  "ownExit": 0,
+  "elapsedSeconds": 25.5,
+  "hardOuterSeconds": 60,
+  "deadlineMet": true,
+  "helperSha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "v8OldSpaceMiB": 256,
+  "totalRssCapClaim": false,
+  "primaryPipelinePASS": false
+}

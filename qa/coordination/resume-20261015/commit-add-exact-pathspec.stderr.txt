@@ -1,0 +1,1 @@
+fatal: the option '--pathspec-file-nul' requires '--pathspec-from-file'

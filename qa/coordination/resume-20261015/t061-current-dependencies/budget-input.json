@@ -1,0 +1,36 @@
+{
+  "next_phase": {
+    "token_metric": "actual_total",
+    "kind": "review",
+    "cost": null,
+    "active_s": 120,
+    "tokens": 4500
+  },
+  "maker": {
+    "token_metric": "actual_total",
+    "cost": null,
+    "active_s": null,
+    "tokens": null
+  },
+  "completion_reserve_tokens": 1000,
+  "token_metric": "actual_total",
+  "completion_reserve_id": "t061-dependency-prep/0/dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "bootstrap_scope": "Readonly T061 dependency attribution and minimal broker request, no verdict or execution",
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "cost": null,
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "active_s": 0,
+      "tokens": 0,
+      "id": "dependency-prep-not-started",
+      "token_metric": "actual_total"
+    }
+  ],
+  "completion_reserve": true,
+  "escalation": null
+}

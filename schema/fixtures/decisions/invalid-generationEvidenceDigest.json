@@ -1,0 +1,14 @@
+{
+  "_id": "dec1",
+  "tenantId": "toc",
+  "text": "Scale Gemini pipeline to all 23 sessions.",
+  "status": "proposed",
+  "evidence": [
+    {
+      "turnId": "t1",
+      "sessionId": "sess1"
+    }
+  ],
+  "sourceEvidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "generationEvidenceDigest": "NOT-A-DIGEST"
+}

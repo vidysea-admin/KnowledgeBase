@@ -1,0 +1,22 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [
+    {
+      "id": "canonical-adoption-checker",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {"active_s": 180, "tokens": 6000, "cost": null},
+      "prior_checkpoint": "checker-accounting-checkpoint-input.json",
+      "debit_basis": "Original commissioning allocation conservatively charged in full; actual usage remains unknown"
+    }
+  ],
+  "next_phase": {"active_s": 120, "tokens": 3000, "cost": null},
+  "bootstrap_scope": "Resume same independent checker: compact debit delta, final pins, receipt provenance/reuse and one independent failure probe only",
+  "bootstrap": {"active_s": 180, "tokens": 6000},
+  "escalation": {
+    "authority": "Root explicit finite commissioning allocation approved 2026-10-15 under user systemwide checker-efficiency-first mandate",
+    "reason": "Historical actual usage remains unknown and is conservatively debited; finish incomplete scoped independent acceptance without rerunning unrelated suites",
+    "limits": {"active_s": 300, "tokens": 9000, "cost": null}
+  }
+}
