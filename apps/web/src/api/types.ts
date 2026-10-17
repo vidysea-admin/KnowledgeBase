@@ -53,8 +53,8 @@ export interface Source {
   _id: string;
   kind: string;
   captureMode: string;
-  path?: string;
   url?: string;
+  hash?: string;
   createdAt: string;
 }
 

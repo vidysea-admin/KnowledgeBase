@@ -8,13 +8,14 @@ import type { Source } from "../api/types.js";
 const auth = vi.hoisted(() => ({ apiKey: "test-key" as string | null }));
 vi.mock("../auth/AuthContext.js", () => ({ useAuth: () => auth }));
 
-const records: Source[] = [
+// Legacy rows may still carry a local `path`; the page must never read or show it.
+const records = [
   { _id: "z", kind: "recording", captureMode: "provided", path: "/raw/TOC/August.mp4", createdAt: "2026-08-01T00:00:00Z" },
-  { _id: "b", kind: "url", captureMode: "public", url: "https://example.test/September", createdAt: "2026-09-01T00:00:00Z" },
-  { _id: "a", kind: "document", captureMode: "provided", url: "https://example.test/notes", path: "/docs/Hidden-Path.pdf", createdAt: "2026-09-01T02:00:00+02:00" },
+  { _id: "b", kind: "url", captureMode: "public", url: "https://example.test/September", hash: "abcdef0123456789", createdAt: "2026-09-01T00:00:00Z" },
+  { _id: "a", kind: "document", captureMode: "provided", url: "https://example.test/notes", path: "C:\\Users\\x\\Hidden-Path.pdf", createdAt: "2026-09-01T02:00:00+02:00" },
   { _id: "c", kind: "recording", captureMode: "silent-full", createdAt: "unknown" },
   { _id: "d", kind: "url", captureMode: "public", url: "javascript:alert(1)", createdAt: "invalid" },
-];
+] as Source[];
 
 function rowTitles(): string[] {
   return [...document.querySelectorAll(".row-title")].map((node) => node.textContent ?? "");
@@ -31,24 +32,55 @@ describe("Sources explorer", () => {
     await screen.findByText("Showing 5 of 5 sources · Newest first");
     expect(rowTitles()).toEqual(["document · provided", "url · public", "recording · provided", "recording · silent-full", "url · public"]);
     expect(records.map((source) => source._id)).toEqual(original);
-    expect(screen.getByText(/\(no location recorded\)/)).toBeInTheDocument();
-    expect(screen.getByText(/javascript:alert\(1\)/)).toBeInTheDocument();
+    expect(screen.getByText(/^recording \(silent-full\) · unknown$/)).toBeInTheDocument();
+    expect(screen.queryByText(/javascript/)).not.toBeInTheDocument();
     expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(sourcesApi.listSources).toHaveBeenCalledWith("test-key");
   });
 
-  test("searches both location fields and kind case-insensitively with surrounding whitespace ignored", async () => {
+  test("searches url, kind, capture mode and hash case-insensitively with surrounding whitespace ignored", async () => {
     vi.spyOn(sourcesApi, "listSources").mockResolvedValue({ sources: records });
     render(<SourcesPage />);
     await screen.findByRole("searchbox", { name: "Search sources" });
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "  SEPTEMBER  " } });
     expect(rowTitles()).toEqual(["url · public"]);
-    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "hidden-path" } });
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "example.test/notes" } });
     expect(rowTitles()).toEqual(["document · provided"]);
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "ABCDEF01" } });
+    expect(rowTitles()).toEqual(["url · public"]);
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "hidden-path" } });
+    expect(rowTitles()).toEqual([]);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "RECORDING" } });
     expect(rowTitles()).toEqual(["recording · provided", "recording · silent-full"]);
     expect(screen.getByRole("status")).toHaveTextContent("Showing 2 of 5 sources");
     expect(sourcesApi.listSources).toHaveBeenCalledTimes(1);
+  });
+
+  test("renders friendly labels without any path-like string even when fixtures carry path", async () => {
+    vi.spyOn(sourcesApi, "listSources").mockResolvedValue({ sources: records });
+    render(<SourcesPage />);
+    await screen.findByText("Showing 5 of 5 sources · Newest first");
+    const text = document.body.textContent ?? "";
+    expect(text).toContain("example.test/September · #abcdef01");
+    expect(text).toContain("example.test/notes");
+    expect(text).toContain("recording (provided) 2026-08-01");
+    for (const bad of ["/raw/TOC", "August.mp4", "Hidden-Path", "C:\\", "Users\\", "file:"]) expect(text).not.toContain(bad);
+    expect(document.body.innerHTML).not.toMatch(/[A-Za-z]:\\|\/raw\/|\/docs\//);
+  });
+
+  test.each([
+    ["whitespace-padded", " https://example.test/pad "],
+    ["ftp", "ftp://example.test/file"],
+    ["file", "file:///C:/Users/x/secret.txt"],
+    ["javascript", "javascript:alert(1)"],
+    ["credentials", "https://user:pass@example.test/private"],
+  ])("falls back to the kind/captureMode/date label for %s urls", async (_name, url) => {
+    vi.spyOn(sourcesApi, "listSources").mockResolvedValue({ sources: [{ _id: "u", kind: "url", captureMode: "public", url, createdAt: "2026-09-01T00:00:00Z" }] as Source[] });
+    render(<SourcesPage />);
+    await screen.findByText("Showing 1 of 1 sources · Newest first");
+    const meta = document.querySelector(".row-meta")?.textContent ?? "";
+    expect(meta).toContain("url (public) 2026-09-01");
+    for (const bad of ["example.test", "user:pass", "secret", "javascript", "ftp:", "file:"]) expect(meta).not.toContain(bad);
   });
 
   test("combines exact kind and capture filters, distinguishes no match, and clears all controls", async () => {
