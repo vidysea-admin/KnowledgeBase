@@ -67,7 +67,7 @@ test('zero numeric residual cannot replace an independently supplied corpus or k
   }
 });
 test('legacy AudioContext arithmetic refuses Windows-labelled applicability and absent browser clock coverage', () => {
-  const windows = fixture(); windows.qualification.identity.platform = 'win32';
+  const windows = fixture(); (windows.qualification.identity as { platform: string }).platform = 'win32';
   assert.throws(() => calculateNativeClock(windows));
   const noBrowser = fixture(); noBrowser.audioPairs = [];
   assert.throws(() => calculateNativeClock(noBrowser));

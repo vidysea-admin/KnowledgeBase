@@ -166,7 +166,7 @@ export async function startWindowsPacketCapture(options:WindowsPacketCaptureOpti
       framer.finish();if(await exit!==0||expired||stderrBytes||!ended||!hello||!samples)fail();
       physicalHelper(o.helperPath,o.helperSha256);const current=await o.readOwnedBrowser();ownership(current);
       if(current.pid!==browser.pid||current.creationFiletime!==browser.creationFiletime||current.executableSha256!==browser.executableSha256)fail();
-      const proof:WindowsPacketProof=Object.freeze({identity:o.identity,browser,helperSha256:o.helperSha256,hostFingerprint:o.hostFingerprint,hello,
+      const proof:WindowsPacketProof=Object.freeze({identity:o.identity,browser,helperSha256:o.helperSha256,hostFingerprint:o.hostFingerprint,hello:hello as WindowsPacketHello,
         pcmSha256:hash.digest('hex'),rawSha256:rawHash.digest('hex'),rawByteCount,sampleCount:samples,clocks:Object.freeze(clocks),qualification:null});
       const cap=Object.freeze({}) as ClosedWindowsPacketCapture;captures.set(cap,proof);return cap;
     }catch{child.kill();readyReject(new Error('Windows packet capture unavailable'));throw new Error('Windows packet capture unavailable');}
