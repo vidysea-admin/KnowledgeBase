@@ -1,29 +1,28 @@
 # Verdict: t055-page-highlights
 
-VERDICT: FAIL
-Status: FAIL
-Cycle checked: 1
-Reviewed SHA: 4825bdec56841998d287b49c474376c87ef39bef
-Base SHA: 7fd26f94 (cycle 0 candidate); original base a0391420
+VERDICT: PASS
+Status: PASS
+Cycle checked: 2
+Reviewed SHA: a3e4156c413b26fe3fce7f9e9f92023c210f99df
+Base SHA: 4825bdec (cycle 1 candidate); original base a0391420
 Contract: qa/contracts/goal-t055.md C1, C2 (foundation only), C7
 
-## Cycle 1 result
-The cycle-0 blocker F1 is fixed, but the candidate now breaks a different stage of the same mandatory gate.
+## Cycle 2 result (scoped PASS: page-evidence foundation only)
+Candidate moves the real-reader e2e test to scripts/upload/ (pure rename, 0 line changes) and updates one comment and the manifest. Independent checks:
+- `node scripts/lint-loc.mjs --all`: stages loc (1708 files), dirsize, root, dupes, migrations, codex-hooks, snapshot, lint-tests, tracker all exit 0. snapshot passes (scripts/t055 is gone, no new dir). dependencies exits 1215: every error is no-unresolvable-workspace-import (lane has no workspace node_modules, env gap); no error of any other rule and none cites the t055 or page-evidence files, so the cycle-0 ask-index-ingest-only-ai-db-core violation is closed.
+- e2e scripts/upload/t055-page-highlights.e2e.test.mjs: 1/1 pass (real pdfjs reader). Index test 8/8 pass. tsc --noEmit packages/index exit 0.
+- Source unchanged: page-segments.ts and highlight-validator.ts have an empty diff 7fd26f94..a3e4156c, so the cycle-0 probes (forged page, quote on other page, Unicode offsets, malformed input) and the cycle-1 whole-document-search mutation (killed, hash equals HEAD blob) still apply.
 
-F2 (proven, blocking): `node scripts/lint-loc.mjs --all` exits 1 at stage=snapshot: "docs/SNAPSHOT.md is stale (94 line(s) differ from a fresh regeneration)", first diff line 78: committed `scripts/toc/`, fresh `scripts/t055/`. The new directory scripts/t055/ is listed in the generated snapshot and docs/SNAPSHOT.md was not regenerated (the snapshot stage passed at 7fd26f94). Fix: regenerate docs/SNAPSHOT.md with the repo's snapshot generator (never hand-edit), or place the e2e test in an existing scripts/ subdir, then rerun lint:structure fully. Other stages: loc OK (1708 files), dirsize OK (272 dirs, scripts/ within budget), root OK, dupes, migrations, codex-hooks, lint-tests, tracker all exit 0.
-
-Verified closed: F1. No packages/** file imports across the boundary (the cycle diff in packages touches only the index test, which no longer imports ingest). dependency-cruiser (stage=dependencies, exit 1215): all 1215 errors are no-unresolvable-workspace-import (lane has no workspace node_modules; env gap); zero errors of any other rule, none cites the t055 or page-evidence files.
-
-Independent runs (exit 0 each): index test 8/8; scripts/t055 e2e 1/1 (real pdfjs reader; standardFontDataUrl warning only); tsc --noEmit packages/index exit 0. Mutation (seg.text.includes -> index.text.includes) killed by "forged page is rejected" (7 pass / 1 fail); per-mutation backup and trap, cmp restored, hash 9e801c07662e31f531146e473d44308fbb21a508 equals HEAD blob (core.autocrlf=true), git status clean. Product code unchanged since cycle 0, so the cycle-0 probes still apply.
-
-Environment note: the C: drive hit 100% full during the review (a cp of scratch failed with no space left); results above were captured before that and are unaffected.
-
-Not run: contracts/verify_contracts.py, browser, full suite. C2 persistence/route/UI, tenant binding at storage and DOCX remain outside this unit.
+Open gates (parent T-055 stays open): C2 persistence, route and UI; tenant/source/version binding at storage; DOCX renderer; P1/P2. Not run: contracts/verify_contracts.py, browser, full suite. Note: pageCount is the segment count, so non-contiguous reader page numbers are falsely rejected (not a bypass).
 
 ISSUES-WRITTEN: none
-Ledger rows may be flipped: no.
+Ledger rows may be flipped: yes, for this scoped foundation unit only.
 
-## Superseded history (cycle 0)
+## Superseded history
+
+### Cycle 1 verdict (superseded by cycle 2): FAIL at 4825bdec
+Blocked by docs/SNAPSHOT.md stale at lint:structure stage=snapshot because the new scripts/t055/ directory was not in the generated snapshot. Fixed in cycle 2 by relocating the test to scripts/upload/.
+
 
 ### Cycle 0 verdict (superseded by cycle 1)
 
