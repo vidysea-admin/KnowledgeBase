@@ -3,14 +3,14 @@ import { useAuth } from "../auth/AuthContext.js";
 import { listSources } from "../api/sources.js";
 import { ApiError } from "../api/client.js";
 import type { Source } from "../api/types.js";
-import { safeHttpUrl } from "../safe-url.js";
+import { safePublicResourceUrl } from "../safe-url.js";
 
 // Human-friendly label from API-provided fields only; never a local filesystem path.
 function sourceLabel(s: Source): string {
-  const safe = safeHttpUrl(s.url);
+  const safe = safePublicResourceUrl(s.url);
   if (safe) {
-    const u = new URL(safe);
-    if (!u.username && !u.password) return `${u.host}${u.pathname === "/" ? "" : u.pathname}`;
+    const u = new URL(safe.href);
+    return `${u.host}${u.pathname === "/" ? "" : u.pathname}`;
   }
   const day = /^\d{4}-\d{2}-\d{2}/.exec(s.createdAt)?.[0];
   return `${s.kind} (${s.captureMode})${day ? ` ${day}` : ""}`;
