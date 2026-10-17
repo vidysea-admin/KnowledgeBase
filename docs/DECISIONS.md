@@ -2358,3 +2358,20 @@ fourth would have left real decisions idle behind an unrelated unit.
 - apps/api/src/ask/source-context.ts (D-153)
 **Approved-by:** Umesh
 **Links:** T-037, T-036, T-052, T-046, T-039, ISS-376, ISS-T037VETO-003, ISS-TOMBSTONE-001, ISS-SENDNOWAPI-004, D-153
+
+## D-179 | 2026-10-17 | type: decision | status: ACTIVE
+**Title:** PIVOT checkpoint: align contract C5 and tombstone clause 2 with rulings 1 and 3; U2.4 model-derived speaker names stay suggestion-only
+**Verdict:** PIVOT
+**What:** Approved PIVOT checkpoint that updates two contract clauses to match code already implemented and checker-PASSed under D-178, and records the U2.4 choice.
+- qa/contracts/webinar-portable-release.md [C5]: the sentence "Scheduler admits every positively classified webinar across Gmail and Calendar regardless of prior sender trust" is replaced by ruling 1 (ISS-376 hybrid). In everyWebinar mode a Gmail candidate whose sender authentication explicitly failed is skipped unless a human approved it; an unknown unauthenticated sender goes to needs-approval and is scheduled once a human approves it; authenticated, human-approved and calendar-sourced candidates are admitted. The rest of C5 is unchanged.
+- qa/contracts/calendar-unknown-tombstone.md clause 2: restated to carry ruling 3 (ISS-TOMBSTONE-001). The 30-day firstSeen horizon (D-159) applies to the id-only tier only; the id-only hold is also released when the tombstone predates the Gmail message; LINK/HOST/START holds, explicit rejections and real (known) cancellations are never released. A row lacking firstSeen is stamped on the migrating tick, so the 30-day rule cannot release it then, but the predates-the-mail rule still applies. Checker verdict b44dc2c8 (qa/verdicts/tombstone-expiry-ruling3.md, finding L3) flagged the old wording.
+- U2.4 (delegated by the Approver, chosen by the orchestrator): MODEL-derived speaker names (LLM or tile suggestions) stay suggestion-only. Each needs human confirmation, and there is no phase-4 write of them until a precision re-gate PASSes. The deterministic floor plus independent-pair auto-final in goal-U24 clause 3 is unchanged, so that clause needs no edit.
+**Why:** After D-178 rulings 1 and 3, the contract text contradicts implemented and checker-PASSed behaviour. The Approver approved this checkpoint in chat on 2026-10-17 with "go for it too", replying to this exact proposal, verbatim: "Contract update (/graduate ya PIVOT). Ruling 1 ke baad contract C5 ki line 'har webinar admit hoga, sender trust ke bina' galat ho gayi hai." and "Ruling 3 ke baad clause 2 bhi takrata hai, kyunki cancel hone ke baad aaya reminder mail release ho jaata hai." For U2.4 the Approver wrote, verbatim: "jo best hai go for it".
+**Result:** Both contract clauses now state the rulings and cite D-179; every other contract line is unchanged. U2.4 is recorded: model-derived names are suggestion-only with a precision re-gate before any phase-4 write; goal-U24 clause 3 is unchanged.
+**Amends:** contract C5 (qa/contracts/webinar-portable-release.md) and clause 2 of qa/contracts/calendar-unknown-tombstone.md, completing the contract update D-178 deferred. No decision is superseded.
+**Changes-authorized:**
+- qa/contracts/webinar-portable-release.md, clause [C5] only (ruling 1)
+- qa/contracts/calendar-unknown-tombstone.md, clause 2 only (ruling 3)
+- U2.4 ruling: MODEL-derived speaker names (LLM or tile suggestions) suggestion-only, human confirmation for each, no phase-4 write until a precision re-gate PASSes; goal-U24 clause 3 deterministic floor plus independent-pair auto-final unchanged
+**Approved-by:** Umesh
+**Links:** T-036, T-037, U2.4, D-178, ISS-376, ISS-TOMBSTONE-001, ISS-282

@@ -10,6 +10,7 @@ import type { Db } from "mongodb";
 import { indexSession } from "./session.js";
 import type { TileCaptureContext, TileCaptureSidecar } from "./tile-speaker-suggest.js";
 import { fakeDb, completeWith, embedOk } from "./testutils.js";
+import { createIndexGenerationSuggestionPublication, resolveTileSuggest } from "../composition/tile-suggest.js";
 
 const T = "t", S = "s1", MEDIA = "a".repeat(64);
 const NAMES = ["Priya Nair", "Rahul Verma", "Asha Rao", "Kiran Shah"];
@@ -56,7 +57,7 @@ function rig(opts: { storeThrows?: boolean } = {}) {
   return { db, calls: base.calls, suggestionOps, rows };
 }
 function tileDeps(enabled: boolean, reads: { n: number }) {
-  return { enabled, context: CONTEXT, readCapture: async () => { reads.n++; return SIDECAR; } };
+  return { enabled, context: CONTEXT, readCapture: async () => { reads.n++; return SIDECAR; }, publication: createIndexGenerationSuggestionPublication };
 }
 async function withEnv<R>(value: string | undefined, fn: () => Promise<R>): Promise<R> {
   const prev = process.env.LKB_TILE_SUGGEST;
@@ -130,10 +131,48 @@ test("store throws: degraded key, completion and every other field unchanged", a
 test("hook throws outside the producer (context accessor): reason failed, completion unchanged", async () => {
   await withEnv("1", async () => {
     let touched = 0;
-    const tile = { enabled: true, readCapture: async () => SIDECAR, get context(): TileCaptureContext { touched++; throw new Error("boom"); } };
+    const tile = { enabled: true, readCapture: async () => SIDECAR, publication: createIndexGenerationSuggestionPublication, get context(): TileCaptureContext { touched++; throw new Error("boom"); } };
     const res = await run(rig(), tile);
     assert.equal(res.completion?.complete, true);
     assert.deepEqual(res.tileSpeakerSuggestions, { suggested: 0, inserted: null, reason: "failed" });
     assert.equal(touched, 1);
   });
+});
+
+test("w17-wireapi: composition resolver is off unless LKB_TILE_SUGGEST=1 and never supplies a context", async () => {
+  for (const v of [undefined, "", "0", "true", " 1"]) assert.equal(resolveTileSuggest(v === undefined ? {} : { LKB_TILE_SUGGEST: v }), undefined);
+  const dep = resolveTileSuggest({ LKB_TILE_SUGGEST: "1" })!;
+  assert.equal(dep.enabled, true); assert.equal(dep.context, undefined); assert.equal(dep.readCapture, undefined);
+  assert.equal(dep.publication, createIndexGenerationSuggestionPublication);
+  await withEnv("1", async () => {
+    const r = rig(); const res = await run(r, dep);
+    assert.equal(res.completion?.complete, true); assert.equal("tileSpeakerSuggestions" in res, false); assert.deepEqual(r.suggestionOps, []);
+  });
+});
+
+test("w17-wireapi: enabled with context but no publication fence is a no-op (no read, no write)", async () => {
+  await withEnv("1", async () => {
+    const r = rig(), reads = { n: 0 }; const { publication: _p, ...unfenced } = tileDeps(true, reads);
+    const res = await run(r, unfenced);
+    assert.equal("tileSpeakerSuggestions" in res, false); assert.deepEqual(r.suggestionOps, []); assert.equal(reads.n, 0);
+  });
+});
+
+test("w17-wireapi: a superseded generation fails the fence; no suggestion row is written", async () => {
+  await withEnv("1", async () => {
+    const r = rig(), reads = { n: 0 }, seen: string[] = [];
+    const stale = { ...tileDeps(true, reads), publication: (db: Db, t: string, s: string, g: string) => { seen.push(g); return createIndexGenerationSuggestionPublication(db, t, s, `${g}-superseded`); } };
+    const res = await run(r, stale);
+    assert.equal(res.completion?.complete, true); assert.equal(seen.length, 1); assert.ok(seen[0]);
+    assert.equal(res.tileSpeakerSuggestions!.inserted, 0); assert.equal(res.tileSpeakerSuggestions!.reason, "failed");
+    assert.equal(r.rows.length, 0); assert.deepEqual(r.suggestionOps, []);
+  });
+});
+
+test("w17-wireapi: fence write never runs work when the generation is not current", async () => {
+  const db = { collection: () => ({ findOne: async () => null }) } as unknown as Db; let ran = 0;
+  const pub = createIndexGenerationSuggestionPublication(db, T, S, "g1");
+  await assert.rejects(pub.assertCurrent(), /tile_suggestion_generation_stale/);
+  await assert.rejects(pub.write(async () => { ran++; }), /tile_suggestion_generation_stale/); assert.equal(ran, 0);
+  await assert.rejects(createIndexGenerationSuggestionPublication(db, T, S, "").assertCurrent(), /stale/);
 });

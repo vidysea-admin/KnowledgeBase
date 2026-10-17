@@ -22,6 +22,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: "/operations", label: "Operations workspace", icon: <DashboardIcon /> },
   { to: "/counsellor", label: "AI counsellor", icon: <AskIcon /> },
   { to: "/calibration-review", label: "Calibration review", icon: <DocsIcon /> },
+  { to: "/extraction-review", label: "Extraction review", icon: <DocsIcon /> },
   { to: "/championship", label: "Championship", icon: <AskIcon /> },
   { to: "/sessions", label: "Sessions", icon: <SessionsIcon /> },
   { to: "/ask", label: "Ask", icon: <AskIcon /> },

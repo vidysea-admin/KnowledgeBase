@@ -23,7 +23,7 @@ function fixture(ready = true) {
     },
   };
   const db = { collection: () => collection } as unknown as Db;
-  return { store: createMongoChampionshipStore(db), rows, filters, writes: () => writes };
+  return { store: createMongoChampionshipStore(db, { verifyEvidence: async () => false }), rows, filters, writes: () => writes };
 }
 test("durable adapter refuses uninstalled schema before writes", async () => {
   const f = fixture(false), e = createChampionshipEvent("a", plan, "2026-10-14T00:00:00Z");
@@ -47,4 +47,9 @@ test("unique eval association duplicate-key is a conflict across distinct event 
       score: { ai: 4, counsellor: 3 }, credibility: "internal", createdAt: "2026-10-14T00:02:00Z" }, "2026-10-14T00:03:00Z");
     assert.equal(await f.store.replace("a", e._id, 1, trial), n === 0);
   }
+});
+test("store refuses construction without the composed verifier (no bare default)", () => {
+  const db = { collection: () => ({}) } as unknown as Db;
+  assert.throws(() => createMongoChampionshipStore(db, undefined as never), /composed evidence verifier/);
+  assert.throws(() => createMongoChampionshipStore(db, {} as never), /composed evidence verifier/);
 });

@@ -33,30 +33,38 @@ export async function suggestSpeakersForSession(
 ): Promise<SpeakerSuggestOutcome> {
   const log = opts.log ?? logger;
   const timeoutMs = opts.timeoutMs ?? SPEAKER_SUGGEST_TIMEOUT_MS;
+  const abort = new AbortController();
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<"timeout">((resolve) => { timer = setTimeout(() => resolve("timeout"), timeoutMs); });
+  const work = run(tenantId, sessionId, turns, complete, db, opts.now ?? new Date(), abort.signal);
+  work.catch(() => {}); // an abandoned run must never become an unhandled rejection
   try {
-    const won = await Promise.race([run(tenantId, sessionId, turns, complete, db, opts.now ?? new Date()), timeout]);
+    const won = await Promise.race([work, timeout]);
     if (won === "timeout") {
+      abort.abort(); // abandonment: the background run checks the signal before it writes anything
       // ids only: never transcript text
       log.warn("speaker suggestion timed out; indexing continues", { tenantId, sessionId, timeoutMs });
       return { suggested: 0, inserted: 0, degraded: null, error: "timeout" };
     }
+    // ISS-WU24-001: a degraded run is not silent either (reason is a short grounder code, never transcript text)
+    if (won.degraded) log.warn("speaker suggestion degraded; indexing continues", { tenantId, sessionId, reason: won.degraded });
     return won;
   } catch (err) {
-    // ids and the error CLASS only: never transcript text, never the message (a provider error can echo a prompt)
-    log.warn("speaker suggestion failed; indexing continues", { tenantId, sessionId, errorName: err instanceof Error ? err.name : typeof err });
-    return { suggested: 0, inserted: 0, degraded: null, error: err instanceof Error ? err.message : String(err) };
+    // ids and the error CLASS only, in the log AND in the result: never transcript text, never the message (a provider error can echo a prompt)
+    const errorName = err instanceof Error ? err.name : typeof err;
+    log.warn("speaker suggestion failed; indexing continues", { tenantId, sessionId, errorName });
+    return { suggested: 0, inserted: 0, degraded: null, error: errorName };
   } finally {
     if (timer) clearTimeout(timer);
   }
 }
 
-async function run(tenantId: string, sessionId: string, turns: Turns[], complete: (job: Job) => Promise<CompleteResult>, db: Db, now: Date): Promise<SpeakerSuggestOutcome> {
+async function run(tenantId: string, sessionId: string, turns: Turns[], complete: (job: Job) => Promise<CompleteResult>, db: Db, now: Date, signal: AbortSignal): Promise<SpeakerSuggestOutcome> {
   // chronological, stable: the grounder windows by position
   const ordered = [...turns].sort((a, b) => a.tStart - b.tStart || a._id.localeCompare(b._id));
   const [confirmed, rejected] = await Promise.all([listConfirmed(tenantId, sessionId, db), listRejected(tenantId, sessionId, db)]);
   const out = await extractSpeakersGrounded(ordered, complete, { suggest: true, confirmed, rejected });
+  if (signal.aborted) return { suggested: 0, inserted: 0, degraded: null, error: "timeout" }; // abandoned after the timeout: write nothing
   const docs = buildSuggestionDocs(tenantId, sessionId, out.suggested ?? [], now);
   const transcriptHash = speakerTranscriptHash(ordered);
   for (const doc of docs) for (const block of doc.blocks ?? []) {

@@ -1,0 +1,14 @@
+✔ valid highlight from the real PDF page reader is accepted (1325.7072ms)
+✖ forged page is rejected (15.0469ms)
+✔ absent quote is rejected (16.2454ms)
+✔ page 0 and negative/fractional pages are rejected (16.9137ms)
+✖ page beyond the end is rejected (43.4428ms)
+✔ wrong offsets on the right page are rejected (9.7339ms)
+✔ offsets are independent of page numbers (11.1897ms)
+✔ re-ingesting the same document is idempotent (40.2651ms)
+ℹ pass 6
+ℹ fail 2
+✖ failing tests:
+✖ forged page is rejected (15.0469ms)
+✖ page beyond the end is rejected (43.4428ms)
+restored

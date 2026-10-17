@@ -12,11 +12,10 @@ import { isRefusedWorkDb } from "../../db-name.js";
 import { createAnswerPolicyService, type AnswerPolicyService } from "../../answer-policy/service.js";
 import { createMongoAnswerPolicyStore } from "../../answer-policy/mongo-store.js";
 import { createMongoAnswerRecordStore } from "../../answer-policy/answer-mongo-store.js";
-import { createMongoEvidenceVerifier } from "../../answer-policy/answer-evidence.js";
+import { createComposedEvidenceVerifier } from "./evidence-verifier.js";
 import { createAnswerWorkflow, type AnswerWorkflow } from "../../answer-policy/answer-workflow.js";
 import { createConfiguredOutputService } from "../../knowledge-outputs/wiring.js";
 import type { OutputService } from "../../knowledge-outputs/service.js";
-import { createKnowledgeVisibility } from "../../visibility/knowledge.js";
 import type { OutputDeps } from "../../knowledge-outputs/types.js";
 import type { NativeEvidenceResolver } from "../../native-evidence/resolver.js";
 
@@ -57,9 +56,8 @@ export function buildAnswerIntegrations(input: {
   const answerPolicyService = createAnswerPolicyService(createMongoAnswerPolicyStore(input.db, { production }));
   // Current approval and effective transcript eligibility come from the real trusted
   // reader. Web evidence still refuses without a trusted web freshness capability.
-  const visibility = createKnowledgeVisibility(input.db);
   const answerWorkflow = createAnswerWorkflow(answerPolicyService,
-    createMongoAnswerRecordStore(input.db, { production }), createMongoEvidenceVerifier(input.db, undefined, visibility.eligibleTurn, input.nativeEvidence));
+    createMongoAnswerRecordStore(input.db, { production }), createComposedEvidenceVerifier(input.db, input.nativeEvidence));
   const integrations: AnswerIntegrations = { answerPolicyService, answerWorkflow };
 
   // T-058 deliberately has no inherited authorization to write a protected DB.

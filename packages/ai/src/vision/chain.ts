@@ -140,6 +140,9 @@ export interface VisionChainOptions<T> {
   deadlineMs?: number;
 }
 
+/** A backend is not tried with less budget than this (timer/clock skew leaves 1-2 ms slivers on a spent deadline). */
+const MIN_BACKEND_BUDGET_MS = 10;
+
 export async function runVisionChain<T = string>(
   backends: readonly VisionBackend[], req: VisionImageRequest, opts: VisionChainOptions<T> = {},
 ): Promise<{ value: T; provider: string; model: string; attempts: number }> {
@@ -149,7 +152,8 @@ export async function runVisionChain<T = string>(
   const deadline = Date.now() + (opts.deadlineMs ?? visionDeadlineMs());
   for (const [i, b] of backends.entries()) {
     const remaining = deadline - Date.now();
-    if (remaining <= 0) {
+    // timers can fire a few ms before Date.now() reaches the deadline; a sliver of budget is a spent budget
+    if (remaining < MIN_BACKEND_BUDGET_MS) {
       const error = "vision deadline exceeded before this backend was tried";
       attempts.push({ provider: b.provider, model: b.model, error });
       if (tally.failures.length < 50) tally.failures.push({ provider: b.provider, model: b.model, error });
