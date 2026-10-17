@@ -47,8 +47,12 @@ export function validNativeSourceLocator(value: unknown): value is NativeSourceL
 
 /** D-153 (pending append): a scoped turn that failed row validation was EXCLUDED from the hydration (never cited). */
 export interface ExcludedSourceTurn { sessionId: string; turnId: string; reason: string }
+/** The live turn text the hydrator loaded. When present, quote proofs are recomputed against it (fail closed). */
+export interface LiveSourceTurn { sessionId: string; turnId: string; text: string }
 export interface SourceHydration {
   excludedTurns?: ExcludedSourceTurn[];
+  /** Optional: live turn text for proof recomputation. Same canonicalization as the proof producer (raw UTF-8 sha256, UTF-16 char offsets, UTF-8 byte offsets of the prefix). */
+  liveTurns?: LiveSourceTurn[];
   nodes: TreeIndexNode[];
   snapshotSHA256: string;
   sourceBytes: number;
@@ -87,6 +91,19 @@ export const SOURCE_LIMITS = Object.freeze({
 export const payloadBytes = (value: unknown): number => Buffer.byteLength(JSON.stringify(value), "utf8");
 const hash = (value: unknown): value is string => typeof value === "string" && /^[a-f0-9]{64}$/.test(value);
 const text = (value: unknown): value is string => typeof value === "string" && value.trim().length > 0;
+const sha256 = (value: string): string => createHash("sha256").update(value, "utf8").digest("hex");
+/** Returns a stale-proof reason, or null when the proof matches the live turn text. */
+function staleQuoteProof(q: SourceQuote, live: Map<string, string>): string | null {
+  const turnText = live.get(JSON.stringify([q.sessionRef, q.turnId]));
+  if (turnText === undefined) return "quote-proof-stale: live turn missing";
+  if (sha256(turnText) !== q.turnTextSHA256) return "quote-proof-stale: turn text hash differs";
+  if (q.charEnd > turnText.length) return "quote-proof-stale: offsets out of range";
+  const slice = turnText.slice(q.charStart, q.charEnd);
+  if (slice !== q.quote || sha256(slice) !== q.sliceSHA256) return "quote-proof-stale: slice hash differs";
+  if (Buffer.byteLength(turnText.slice(0, q.charStart), "utf8") !== q.byteStart
+    || Buffer.byteLength(turnText.slice(0, q.charEnd), "utf8") !== q.byteEnd) return "quote-proof-stale: byte offsets differ";
+  return null;
+}
 
 /** Metadata only; routing summaries are explicitly supplied by the accepted-source indexer.
  * The complete catalog stays local. selectNodes admits bounded frontiers to the provider. */
@@ -133,6 +150,12 @@ export function validateHydration(result: SourceHydration, admitted: TreeIndexNo
   const originals = new Map(admitted.map((n) => [n.node_id, n]));
   const nodeIds = new Set<string>();
   const quoteIds = new Set<string>();
+  const live = result.liveTurns === undefined ? undefined
+    : new Map(result.liveTurns.map((t) => [JSON.stringify([t.sessionId, t.turnId]), t.text] as const));
+  if (live && !result.liveTurns!.every((t) => text(t?.sessionId) && text(t?.turnId) && typeof t.text === "string")) {
+    throw new BoundedAskError("invalid live turn text");
+  }
+  const kept: TreeIndexNode[] = [];
   for (const node of result.nodes) {
     const original = originals.get(node.node_id);
     if (!original || nodeIds.has(node.node_id) || original.evidence?.sessionRef !== node.evidence?.sessionRef
@@ -170,11 +193,22 @@ export function validateHydration(result: SourceHydration, admitted: TreeIndexNo
       quoteIds.add(q.id);
     }
     if (node.summary !== JSON.stringify(quotes)) throw new BoundedAskError("hydrated text differs from quote inventory");
+    if (!live) { kept.push(node); continue; }
+    // Recompute against live turn text; a stale citation is excluded (never cited) with a per-citation reason.
+    const good: SourceEvidenceQuote[] = [];
+    for (const q of quotes) {
+      const reason = isNativeSourceQuote(q) ? null : staleQuoteProof(q, live);
+      if (!reason) { good.push(q); continue; }
+      const sq = q as SourceQuote;
+      (result.excludedTurns ??= []).push({ sessionId: sq.sessionRef, turnId: sq.turnId, reason });
+    }
+    if (good.length === quotes.length) kept.push(node);
+    else if (good.length > 0) kept.push({ ...node, summary: JSON.stringify(good), evidence: { ...node.evidence, sourceQuotes: good } as TreeIndexNode["evidence"] });
   }
   if (result.nodes.length > SOURCE_LIMITS.candidates || payloadBytes(result.nodes) > SOURCE_LIMITS.contextBytes) {
     throw new BoundedAskError("hydrated context exceeds byte budget");
   }
-  return result.nodes;
+  return kept;
 }
 
 /** Sticky limits survive the existing scorer's catch-and-heuristic fallback. */
