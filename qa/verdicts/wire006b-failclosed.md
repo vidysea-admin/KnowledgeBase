@@ -1,15 +1,42 @@
 # Verdict: wire006b-failclosed
 
-VERDICT: FAIL
-Status: FAIL
-Cycle checked: 0
-Reviewed SHA: e9a0cd2037c323719e20602121b577fc12cfbbd2
+VERDICT: PASS
+Status: PASS
+Cycle checked: 1
+Reviewed SHA: f53de672f503c492d3558491768923b8e1a22d95
+Base SHA: 306228cb2c3de6b9d96164d327f539188cc1a032
+Unit: ISS-W17WIRE006-001 and ISS-W17WIRE006-003 (both medium, tenancy/security class).
+ISSUES-WRITTEN: none.
+Ledger flip: YES, on the integration branch only. That branch holds one row per id. Set ISS-W17WIRE006-001 (medium) and ISS-W17WIRE006-003 (medium) to `verified`, with verified_date 2026-10-17. -002 stays low and open. This lane makes no ledger change.
+
+## Cycle 1 (f53de672, on top of e9a0cd20)
+1. `git diff 306228cb f53de672 -- qa/issues.W17WIRE006.jsonl` is empty. The shard is restored, and this lane makes no ledger change.
+2. `timeout 600 node scripts/tracker-audit.mjs --gate g1,g4,g5` exits **0**, with no "Duplicate" line (`qa/evidence/w17-wire006b/checker/tracker-audit.c1.log`, `.exit`). The cycle-0 violation is closed.
+3. **Code diff:** `git diff --quiet e9a0cd20 f53de672 -- apps packages scripts` is empty. The full e9a0cd20..f53de672 diff touches only:
+   - the ledger shard (2 rows removed);
+   - the manifest (Fix cycle 1, ledger note);
+   - this verdict file (the checker's own cycle-0 commit 2f21d1f9).
+4. **Merge check:** `git merge-tree` of lane/w17-integrate (d661df76) with f53de672 is clean (`checker/merge-tree.c1.out`). The merged shard has exactly one row each for -001 (medium, open), -002 (low, open) and -003 (medium, open), so there is no duplicate id.
+5. **Reused code evidence:** the code bytes are identical to e9a0cd20, so the cycle-0 code evidence below applies unchanged. That evidence was produced by this checker, not the maker:
+   - tsc exit 0;
+   - authorization 3/3, persist 18/18, trusted 9/9, reader 7/7 (without force-exit; the force-exit teardown crash already happens at base);
+   - M1 and M2 KILLED, with HEAD-OK hashes.
+6. The low note from cycle 0 still stands: the historical receipt qa/evidence/t040.../checker-caller.test.ts can no longer be replayed.
+
+Budget: cycle 1 was a short re-check of about 60 s, and the maker's usage is unknown. The cumulative overrun for this unit stays recorded under the cycle-0 assess result (NEEDS_EXTRA_REVIEW). It is never waived.
+
+## Superseded history
+### Cycle 0 (e9a0cd20): FAIL, superseded by the cycle-1 PASS above
+Cycle-0 VERDICT (superseded): FAIL
+Cycle-0 Status (superseded): FAIL
+Cycle-0 Cycle checked (superseded): 0
+Cycle-0 Reviewed SHA (superseded): e9a0cd2037c323719e20602121b577fc12cfbbd2
 Base SHA: 306228cb2c3de6b9d96164d327f539188cc1a032
 Unit: ISS-W17WIRE006-001 and ISS-W17WIRE006-003 (both medium, tenancy/security class).
 ISSUES-WRITTEN: none. The checker did not write to the ledger.
 Ledger flip: NO. Both rows stay open. They become verified only after a cycle-1 PASS (see "Ledger" below).
 
-## Why FAIL: one proven violation, and it is bookkeeping only
+### Why FAIL: one proven violation, and it is bookkeeping only
 The code fixes are correct. The failure is in the commit's ledger edit.
 
 **The problem.** `qa/issues.W17WIRE006.jsonl` lines 3-4 **append second rows for ids that already exist**: ISS-W17WIRE006-001 is already on line 1, and -003 is new to this lane. The repository's ledger reader refuses duplicate ids. `scripts/lib/ledger-rows.mjs:54` throws `Duplicate ledger id`.
@@ -22,7 +49,7 @@ Evidence is in `checker/tracker-audit.w17-wire006b.log` and `checker/tracker-aud
 
 **Fix for cycle 1.** Edit row 1 (-001) in place: set severity to medium and status to fixed-pending-check. Write -003 as a single row. Delete the appended duplicates. Then re-run tracker-audit and confirm exit 0.
 
-## Code review (passes)
+### Code review (passes)
 1. **Router constructions** (git grep over apps, packages and scripts):
    - composition/integrations/routes.ts:80 takes `deps.transcriptReview` from production.ts:306 -> transcripts.ts:47-48. That binds the real `createKnowledgeVisibility(input.db).sessionVisible`, not an allow-all.
    - The only other constructions are authorization.test.ts:30 and :74, and persist.testkit.ts:40.
@@ -47,7 +74,7 @@ Evidence is in `checker/tracker-audit.w17-wire006b.log` and `checker/tracker-aud
 
    The libuv crash is the same at base 306228cb (`checker/base-reader.forceexit.log`). It comes from the runtime environment and was not introduced by this candidate.
 
-## Ledger: integration conflict and final statuses
+### Ledger: integration conflict and final statuses
 `git merge-tree` of lane/w17-integrate (d661df76, ledger close-out 1038058c) with e9a0cd20 merges **textually clean** (`checker/merge-tree.out`). It is still semantically broken: the merged file holds -001 twice and -003 twice, so tracker-audit and CI would crash.
 
 The integrator must keep exactly one row per id:
@@ -55,11 +82,11 @@ The integrator must keep exactly one row per id:
 - **-003:** severity medium, a single row. Status open, then `verified` after a cycle-1 PASS.
 - **-002:** low, open. Unchanged.
 
-## Not verified
+### Not verified
 - The full `pnpm lint:structure` run. Only its tracker-audit step was run.
 - The service, refresh and grounded-postprocessing tests named in the manifest. The brief scoped the runs to four files plus tsc.
 
-## Budget record (never waived)
+### Budget record (never waived)
 - The maker's usage is unknown, so this ran as BOOTSTRAP_REVIEW with the ratio unverified.
 - The checker's active time was about 389 s. Its tokens are unknown, with a debit of 60k allocated.
 - `review_budget.py assess` exited 2, NEEDS_EXTRA_REVIEW, exceeded active_s and tokens (`checker/metrics.finalization.result.json`). This is recorded for ORCH.
