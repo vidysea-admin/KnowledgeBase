@@ -4,7 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SendNowDeps, SendNowPlanValue } from "../../../apps/api/src/join-rules/send-now.js";
 import { ManualJobStore, terminalManualState, type ManualRequest } from "../../../packages/meeting-bot/src/manual-jobs/store.js";
-import { createSendNowDeps, type SendNowHostOptions } from "../send-now-host.js";
+import { createSendNowDeps, type SendNowHostOptions } from "../send-now/send-now-host.js";
 
 export interface ManagedSendNowOptions extends SendNowHostOptions {
   jobsDir?: string;

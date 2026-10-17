@@ -19,7 +19,7 @@ const {validateIndexProof} = await import('../../packages/meeting-bot/src/captur
 const {loadTrustedSenderConfig, activeWebinarStopReason, runWebinarRegistrations, reconcileWebinarRegistrationState, projectWebinarSelection} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
 const {createOperationNotifications} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
 const {readWebinarOperationState, writeWebinarOperationState, prepareWebinarSourceState, webinarCompletionState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
-const {createPipelineDeps, safeText} = await import('./run-pipeline-deps.mjs');
+const {createPipelineDeps, safeText, captureWait} = await import('./run-pipeline-deps.mjs');
 const {graphEnabled, runSessionGraph, runFreshSessionGraph} = await import('./graph/graph-finalize.mjs'); // T-050: flag only
 const {SKIP_REASON_MEANING} = await import('../../packages/meeting-bot/src/calendar/state/skip-describe.ts');
 const {REGISTRATION_REASONS} = await import('../../packages/meeting-bot/src/calendar/registration-workflow.ts');
@@ -36,13 +36,6 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const ID = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const load = (path) => JSON.parse(readFileSync(path, 'utf8'));
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
-function captureWait(ms, signal) {
-  return new Promise(resolve => {
-    const finish = () => { clearTimeout(timer); signal.removeEventListener('abort', finish); resolve(); };
-    const timer = setTimeout(finish, ms); signal.addEventListener('abort', finish, {once: true});
-    if (signal.aborted) finish();
-  });
-}
 function confined(root, file) {
   const actual = realpathSync(file), rel = relative(realpathSync(root), actual);
   if (rel.startsWith('..') || isAbsolute(rel)) throw new Error('Recording is outside project directory');

@@ -10,7 +10,7 @@ const {redactJoinLink} = await import('../../packages/meeting-bot/src/calendar/a
 const {launchControlledRecording} = await import('../../packages/meeting-bot/src/capture/reconnect-gaps.ts');
 const {createTelegramChannel} = await import('../../packages/meeting-bot/src/capture/notify/telegram-channel.ts');
 const {createBrowserRegistrationExecutor} = await import('../../packages/meeting-bot/src/joiners/browser-joiner.ts');
-const {createRegistrationPolicyResolver} = await import('./registration-policy-host.ts');
+const {createRegistrationPolicyResolver} = await import('./registration/registration-policy-host.ts');
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export function safeText(text) {
   // Feed errors can include opaque URLs; leave no query, fragment, userinfo or token in logs.
@@ -80,4 +80,11 @@ export function createPipelineDeps(env = process.env) {
       return 'sent';
     },
   };
+}
+export function captureWait(ms, signal) {
+  return new Promise(resolve => {
+    const finish = () => { clearTimeout(timer); signal.removeEventListener('abort', finish); resolve(); };
+    const timer = setTimeout(finish, ms); signal.addEventListener('abort', finish, {once: true});
+    if (signal.aborted) finish();
+  });
 }

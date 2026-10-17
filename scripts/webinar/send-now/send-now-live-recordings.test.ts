@@ -8,12 +8,12 @@ import assert from "node:assert/strict";
 import { mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { startTestServer } from "../../apps/api/src/testUtils.js";
-import { buildTestDeps, fakeCalendarReadDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
+import { startTestServer } from "../../../apps/api/src/testUtils.js";
+import { buildTestDeps, fakeCalendarReadDeps, fakeKeyStore } from "../../../apps/api/src/fixtures.js";
 import { createSendNowDeps } from "./send-now-host.js";
-import { claimLiveRecording, liveRecordingDir } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
+import { claimLiveRecording, liveRecordingDir } from "../../../packages/meeting-bot/src/live-recording/live-recording.js";
 
-const FIXTURE = path.join(import.meta.dirname, "argv-dump-fixture.mjs");
+const FIXTURE = path.join(import.meta.dirname, "..", "argv-dump-fixture.mjs");
 const MEET = "https://meet.google.com/abc-defg-hij";
 const NOW = new Date(2026, 9, 12, 10, 0, 0);
 const KEYS = { "a-key": { tenantId: "tenant-a", scopes: ["send-now"] } };

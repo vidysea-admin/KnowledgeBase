@@ -1,18 +1,18 @@
 /**
- * scripts/webinar/send-now-host.test.ts - T-039 `t039-send-now-api-endpoint`. The real adapter (`createSendNowDeps`) behind the REAL
+ * scripts/webinar/send-now/send-now-host.test.ts - T-039 `t039-send-now-api-endpoint`. The real adapter (`createSendNowDeps`) behind the REAL
  * createServer. The only process ever spawned is `node argv-dump-fixture.mjs` (records its argv, exits or sleeps 8 s) - never the real
- * CLI, Chrome, OBS, a Python joiner or a meeting. Run: node --test --import tsx scripts/webinar/send-now-host.test.ts
+ * CLI, Chrome, OBS, a Python joiner or a meeting. Run: node --test --import tsx scripts/webinar/send-now/send-now-host.test.ts
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { startTestServer } from "../../apps/api/src/testUtils.js";
-import { buildTestDeps, fakeCalendarReadDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
+import { startTestServer } from "../../../apps/api/src/testUtils.js";
+import { buildTestDeps, fakeCalendarReadDeps, fakeKeyStore } from "../../../apps/api/src/fixtures.js";
 import { createSendNowDeps, untilProblem, MAX_UNTIL_AHEAD_MS, type SendNowHostOptions } from "./send-now-host.js";
 
-const FIXTURE = path.join(import.meta.dirname, "argv-dump-fixture.mjs");
+const FIXTURE = path.join(import.meta.dirname, "..", "argv-dump-fixture.mjs");
 const KEYS = { "a-key": { tenantId: "tenant-a", scopes: ["send-now"] }, "b-key": { tenantId: "tenant-b", scopes: ["send-now"] }, "ro-key": { tenantId: "tenant-a", scopes: ["calendar"] } };
 const MEET = "https://meet.google.com/abc-defg-hij";
 test("default authority is canonical operations: expired scheduled file cannot hide an active operation", async () => {
@@ -179,7 +179,7 @@ test("untilProblem: a non-existent calendar date that would roll into the 24 h w
 });
 
 // ---- ISS-SENDNOWAPI-003: job status, behind LKB_SEND_NOW_STATUS (default OFF) ----
-import { claimLiveRecording, liveRecordingDir } from "../../packages/meeting-bot/src/live-recording/live-recording.js";
+import { claimLiveRecording, liveRecordingDir } from "../../../packages/meeting-bot/src/live-recording/live-recording.js";
 const JOB_NOW = "send-now-20261012100000-abc123";
 const aliveProbe = { isAlive: () => true, startTime: () => "T0" };
 async function statusOf(opts: SendNowHostOptions, tenant: string, id: string, seed?: (root: string) => void) {

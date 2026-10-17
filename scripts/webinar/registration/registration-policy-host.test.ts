@@ -3,12 +3,12 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { startTestServer } from "../../apps/api/src/testUtils.js";
-import { buildTestDeps, fakeKeyStore } from "../../apps/api/src/fixtures.js";
-import { createJoinRulesDeps } from "./join-rules-host.js";
+import { startTestServer } from "../../../apps/api/src/testUtils.js";
+import { buildTestDeps, fakeKeyStore } from "../../../apps/api/src/fixtures.js";
+import { createJoinRulesDeps } from "../join-rules-host.js";
 import { createRegistrationPolicyResolver } from "./registration-policy-host.js";
-import { registrationConfigurationReason } from "../../packages/meeting-bot/src/calendar/registration-workflow.js";
-import { loadRegistrationPolicy, mutateRegistrationPolicy } from "../../packages/meeting-bot/src/calendar/join-rules/registration-policy-store.js";
+import { registrationConfigurationReason } from "../../../packages/meeting-bot/src/calendar/registration-workflow.js";
+import { loadRegistrationPolicy, mutateRegistrationPolicy } from "../../../packages/meeting-bot/src/calendar/join-rules/registration-policy-store.js";
 
 const policy = {version: 1, operator: {firstName: "Operator", lastName: "Test", email: "operator@example.org"},
   form: {mode: "native-html", formSelector: "#registration", submitSelector: "button[type=submit]", fields: {firstName: "#first", lastName: "#last", email: "#email"}},

@@ -40,7 +40,7 @@ export interface CalendarAcquisition {
 export interface CalendarReadDeps {
   listUpcoming(tenantId: string, changedSince?: string): Promise<UpcomingMeeting[]>;
   acquire?(tenantId: string, syncToken?: string): Promise<CalendarAcquisition>;
-  /** T-039 `POST /calendar/send-now`. Optional: absent -> that route answers 503 (fail closed). Real adapter: scripts/webinar/send-now-host.ts. */
+  /** T-039 `POST /calendar/send-now`. Optional: absent -> that route answers 503 (fail closed). Real adapter: scripts/webinar/send-now/send-now-host.ts. */
   sendNow?: SendNowDeps;
 }
 

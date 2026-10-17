@@ -9,7 +9,7 @@
  * Scope: the DEDICATED write scope "send-now" (Approver ruling 2026-10-12), exact-match `requireScope`; a "calendar" read key is 403.
  * Tenant: ONLY `req.auth.tenantId`; a body field naming a tenant (or any unknown field) is a 400.
  * `.dependency-cruiser.cjs` forbids apps/* -> packages/meeting-bot, so the planner (link-safety validator + duplicate check) and the
- * launcher are injected structurally (as join-rules/deps.ts); the real adapter is scripts/webinar/send-now-host.ts.
+ * launcher are injected structurally (as join-rules/deps.ts); the real adapter is scripts/webinar/send-now/send-now-host.ts.
  * KNOWN GAP: the duplicate check reads the scheduler's stores only; a manual `lkb record` and poller launches leave no readable
  * trace (ISS-T039CMD-001/-002, still open). This router adds an in-process memory of launches it made itself (lost on restart).
  */
