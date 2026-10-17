@@ -169,6 +169,18 @@ export function withSessionArtifacts(deps: BrainReadDeps, root: string): BrainRe
   };
 }
 
+/** Allowlist projection for `/sources`: local paths (`path`, `sourceMeta`, consent notes) never leave the API. */
+export function publicSourceView(row: Sources): Record<string, unknown> {
+  const out: Record<string, unknown> = {
+    _id: row._id, tenantId: row.tenantId, kind: row.kind, captureMode: row.captureMode, hash: row.hash, createdAt: row.createdAt,
+    consent: { given: row.consent?.given === true, recordedBy: row.consent?.recordedBy },
+  };
+  if (typeof row.url === "string") {
+    try { const u = new URL(row.url); if ((u.protocol === "http:" || u.protocol === "https:") && !u.username && !u.password) out.url = row.url; } catch { /* non-URL (e.g. a local path) is withheld */ }
+  }
+  return out;
+}
+
 export function createBrainRouter(deps: BrainReadDeps): Router {
   const router = Router();
   router.get("/webinar-operations", requireScope("sessions"), async (req: Request, res: Response) => {
@@ -203,8 +215,8 @@ export function createBrainRouter(deps: BrainReadDeps): Router {
   });
 
   router.get("/sources", requireScope("sources"), async (req: Request, res: Response) => {
-    const sources = await deps.listSources(req.auth!.tenantId);
-    res.status(200).json({ sources });
+    const rows = await deps.listSources(req.auth!.tenantId);
+    res.status(200).json({ sources: rows.map(publicSourceView) });
   });
 
   router.get("/gaps", requireScope("gaps"), async (req: Request, res: Response) => {
