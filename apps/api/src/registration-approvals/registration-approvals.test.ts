@@ -172,3 +172,28 @@ test("human lookup: only a configured human key of the same tenant yields a subj
   assert.equal(canonicalRegistrationLink("https://ZOOM.us/a#frag"), null);
   assert.equal(canonicalRegistrationLink("https://ZOOM.us/a"), "https://zoom.us/a");
 });
+
+test("route: non-canonical forms of an approved link store the CANONICAL hash or are refused, never a raw-link hash", async () => {
+  const sha256 = (v: string) => createHash("sha256").update(v).digest("hex");
+  const accepted = ["https://B64WC.R.A.D.SENDIBM1.COM/tracked/FIXTURE", "https://b64wc.r.a.d.sendibm1.com:443/tracked/FIXTURE",
+    "https://b64wc.r.a.d.sendibm1.com/other/../tracked/FIXTURE", "https://b64wc.r.a.d.sendibm1.com/./tracked/FIXTURE"];
+  for (const raw of accepted) {
+    assert.notEqual(sha256(raw), LINK, `${raw} differs from the canonical hash when hashed raw`);
+    const s = await serve();
+    try {
+      const r = await s.call("/registration-approvals", "human", { ...body, link: raw });
+      assert.equal(r.status, 201, raw);
+      assert.equal(s.f.rows[0]!.linkHash, LINK, `stored hash is the canonical hash for ${raw}`);
+      assert.equal(r.json!.approval.linkHash, LINK, raw);
+      assert.ok(await s.store.findMatching("tenant-A", linkMatch, NOW), "canonical form matches");
+      assert.equal(await s.store.findMatching("tenant-A", { ...linkMatch, linkHash: sha256(raw) } as ApprovalMatch, NOW), null, `raw hash of ${raw} never matches`);
+    } finally { await s.close(); }
+  }
+  for (const raw of [body.link + " ", " " + body.link, body.link + "\n", "https://b64wc.r.a.d.sendibm1.com:8443/tracked/FIXTURE", "https://u:p@b64wc.r.a.d.sendibm1.com/tracked/FIXTURE", body.link + "#frag"]) {
+    const s = await serve();
+    try {
+      assert.equal((await s.call("/registration-approvals", "human", { ...body, link: raw })).status, 400, JSON.stringify(raw));
+      assert.equal(s.f.rows.length, 0);
+    } finally { await s.close(); }
+  }
+});

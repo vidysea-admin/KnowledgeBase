@@ -112,3 +112,13 @@ test("proof: no record, expired, revoked, cross-tenant and each hash mismatch ar
     assert.equal(result.status, "refused", name); assert.equal((result as {reason: string}).reason, "no-bound-confirmation", name);
   }
 });
+test("resolver: only the canonical link form matches; a record keyed by a raw non-canonical link is never honoured", async () => {
+  for (const raw of ["https://B64WC.R.A.D.SENDIBM1.COM/tracked/FIXTURE", "https://b64wc.r.a.d.sendibm1.com:443/tracked/FIXTURE",
+    "https://b64wc.r.a.d.sendibm1.com/x/../tracked/FIXTURE", link.link + " "]) {
+    const rawInput = {...link, link: raw};
+    const forRaw = memoryLookup([record({linkHash: h(raw), scopeHash: registrationResolutionScopeHash(rawInput)})]);
+    assert.notEqual((await resolve(forRaw, rawInput)).status, "candidate", `raw ${JSON.stringify(raw)} refused even with a raw-hash record`);
+    assert.notEqual((await resolve(memoryLookup([record()]), rawInput)).status, "candidate", `canonical record does not authorise ${JSON.stringify(raw)}`);
+  }
+  assert.equal((await resolve(memoryLookup([record()]))).status, "candidate");
+});
