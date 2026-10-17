@@ -5,8 +5,8 @@ Base SHA: 9e55b642
 Candidate SHA: see lane HEAD (single commit)
 
 ## Changed paths
-- scripts/eval/derived-drafts.mjs (new): multi-model consensus drafts
-- scripts/eval/derived-drafts.test.mjs (new): 9 tests
+- scripts/eval/derived-drafts/derived-drafts.mjs (new): multi-model consensus drafts
+- scripts/eval/derived-drafts/derived-drafts.test.mjs (new): 9 tests
 - data/eval/derived-drafts/t022-derived-drafts-2026-10-17.json, u22-derived-drafts-2026-10-17.json (live output, sidecars)
 - qa/manifests/deriveddrafts.md
 
@@ -20,7 +20,7 @@ D-163 (AI drafts, never humanGold), D-164 (Ollama glm-5.3-flash then deepseek-v4
 - U2.2 claims whose cited turns are all unavailable get a deterministic rule vote (no model call).
 
 ## Checks for the checker
-- DD_DATA_ROOT=<byte-exact tree> node --test scripts/eval/derived-drafts.test.mjs
+- DD_DATA_ROOT=<byte-exact tree> node --test scripts/eval/derived-drafts/derived-drafts.test.mjs
 - Pinned sources are mixed LF/CRLF; a fresh lane checkout fails extraction-review loadBundle (batch-drift) independent of this unit. Tests therefore read the main tree via DD_DATA_ROOT.
 - Confirm sidecars contain no humanGold true, no approvedBy/approvedAt/decision non-null, no keys.
 

@@ -8,8 +8,8 @@
  * and input hashes so the review UI/builders can merge them without breaking the packet bindings.
  *
  * Usage (from repo root; keys are read from the process env or a --env-file, never printed):
- *   node scripts/eval/derived-drafts.mjs t022 --max-calls 120 [--env-file <abs .env>] [--out <new file>] [--data-root <byte-exact tree>]
- *   node scripts/eval/derived-drafts.mjs u22  --max-calls 300 [--env-file <abs .env>] [--out <new file>] [--data-root <byte-exact tree>]
+ *   node scripts/eval/derived-drafts/derived-drafts.mjs t022 --max-calls 120 [--env-file <abs .env>] [--out <new file>] [--data-root <byte-exact tree>]
+ *   node scripts/eval/derived-drafts/derived-drafts.mjs u22  --max-calls 300 [--env-file <abs .env>] [--out <new file>] [--data-root <byte-exact tree>]
  * Models (D-164 order): ollama glm-5.3-flash, ollama deepseek-v4.1-flash, then gemini (tie-break only, on disagreement).
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
@@ -17,7 +17,7 @@ import { createHash } from "node:crypto";
 import { resolve, dirname, relative, isAbsolute, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 export const OUT_DIR = "data/eval/derived-drafts";
 export const DRAFT_LABEL = "derived, not humanGold";
 export const DRAFT_STATUS = "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL";
@@ -168,8 +168,8 @@ export function u22Prompt(entry) {
 }
 
 async function makeRealJudges(models, env, kinds, stats) {
-  const { createEvalComplete, createLlmScoreFn, redactor } = await import("./llm-eval.mjs");
-  const { parseJsonLoose } = await import("../../packages/ai/src/index.ts");
+  const { createEvalComplete, createLlmScoreFn, redactor } = await import("../llm-eval.mjs");
+  const { parseJsonLoose } = await import("../../../packages/ai/src/index.ts");
   const redact = redactor([env.OLLAMA_API_KEY, env.GEMINI_API_KEY]);
   const judges = [];
   for (const m of models) {
@@ -218,7 +218,7 @@ async function main(argv) {
   const env = { ...parseEnvFile(val("--env-file") ? readFileSync(val("--env-file"), "utf8") : ""), ...Object.fromEntries(["OLLAMA_API_KEY", "GEMINI_API_KEY"].filter((k) => process.env[k]).map((k) => [k, process.env[k]])) };
   let items, extra;
   if (kind === "t022") { const p = JSON.parse(readFileSync(resolve(dataRoot, "data/eval/calibration-human-review.json"), "utf8")); items = p.items; extra = { source: "data/eval/calibration-human-review.json", rubric: p.rubric }; }
-  else { const { loadBundle } = await import("./extraction-review.mjs"); const b = loadBundle(dataRoot); items = b.entries; extra = { sourcePacketSha256: b.sourcePacketSha256, draftIndexSha256: b.draftIndexSha256, anchoring: "cited legacy turn ids re-anchored to the archived original turn text carried in the hash-bound packet (originalMigration); unresolvable citations get a deterministic unavailable rule vote, no model call" }; }
+  else { const { loadBundle } = await import("../extraction-review.mjs"); const b = loadBundle(dataRoot); items = b.entries; extra = { sourcePacketSha256: b.sourcePacketSha256, draftIndexSha256: b.draftIndexSha256, anchoring: "cited legacy turn ids re-anchored to the archived original turn text carried in the hash-bound packet (originalMigration); unresolvable citations get a deterministic unavailable rule vote, no model call" }; }
   const stats = { calls: 0 }, judges = await makeRealJudges(DEFAULT_MODELS, env, kind === "t022" ? "score" : "label", stats);
   if (judges.filter((j) => j.provider === "ollama").length < 2) throw new Error("refused: need both Ollama models (OLLAMA_API_KEY missing?); live run pending");
   const doc = await run(kind, { items, judges, maxCalls, extra });

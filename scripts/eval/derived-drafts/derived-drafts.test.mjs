@@ -6,8 +6,8 @@ import {createHash} from 'node:crypto';
 import {join, resolve, dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {consensusScore, consensusLabel, t022Draft, u22Draft, assertNoHumanGold, safeOutPath, writeSidecar, gatherVotes, run, parseEnvFile, u22Prompt, resolveCitation, resolveCitations, DRAFT_LABEL, OUT_DIR} from './derived-drafts.mjs';
-import {loadBundle} from './extraction-review.mjs';
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+import {loadBundle} from '../extraction-review.mjs';
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const PACKET_PATH = join(process.env.DD_DATA_ROOT ?? ROOT, 'data/eval/calibration-human-review.json');
 const packet = JSON.parse(readFileSync(PACKET_PATH, 'utf8'));
 // Pinned review sources are byte-exact (mixed LF/CRLF); a fresh LF/CRLF-normalised lane checkout cannot satisfy them, so tests may read a byte-exact tree via DD_DATA_ROOT.

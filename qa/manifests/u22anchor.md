@@ -5,8 +5,8 @@ Base SHA: d42f3713 (deriveddrafts PASS verdict)
 Candidate SHA: see lane HEAD (single commit)
 
 ## Changed paths
-- scripts/eval/derived-drafts.mjs: resolveCitation/resolveCitations; u22Prompt, u22Draft and run use resolved text
-- scripts/eval/derived-drafts.test.mjs: 13 tests (4 new: resolution, current-only rule, unresolvable, real-packet 80/80)
+- scripts/eval/derived-drafts/derived-drafts.mjs: resolveCitation/resolveCitations; u22Prompt, u22Draft and run use resolved text
+- scripts/eval/derived-drafts/derived-drafts.test.mjs: 13 tests (4 new: resolution, current-only rule, unresolvable, real-packet 80/80)
 - data/eval/derived-drafts/u22-derived-drafts-anchored-2026-10-17.json (NEW sidecar, wx; old u22 sidecar kept untouched)
 - qa/manifests/u22anchor.md
 
@@ -17,7 +17,7 @@ Candidate SHA: see lane HEAD (single commit)
 - humanGold false, assertNoHumanGold before write, packets untouched, authoritative store untouched.
 
 ## Checks for the checker
-- DD_DATA_ROOT=C:\Users\product\Desktop\KnowledgeBase node --test --import tsx scripts/eval/derived-drafts.test.mjs (13 pass)
+- DD_DATA_ROOT=C:\Users\product\Desktop\KnowledgeBase node --test --import tsx scripts/eval/derived-drafts/derived-drafts.test.mjs (13 pass)
 - Sidecar: no humanGold true, no non-null approvedBy/approvedAt/decision, no keys.
 - Spot-check some archived turns against `git show 907c9c9:data/toc-migrated/<id>/turns.json`.
 
