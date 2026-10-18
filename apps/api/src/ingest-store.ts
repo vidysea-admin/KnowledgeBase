@@ -14,16 +14,13 @@ import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createUrlSource, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { IngestDeps, IngestResult } from "./routes/ingest.js";
 import { sha256Hex } from "./hash.js";
+import { createSourceReader } from "./source-intake/source-reader.js";
 import { assertTurnTimings } from "./turn-timing.js";
 import type { BoundIndexer } from "./indexing/session.js";
 
+/** Bounded acquisition (ISS-SOURCEREADER-001): 10s whole-response deadline, 1,000,000-byte streaming cap. */
 async function jinaReaderFetch(url: string): Promise<string> {
-  const apiKey = process.env.JINA_API_KEY;
-  const res = await fetch(`https://r.jina.ai/${url}`, {
-    headers: apiKey ? { authorization: `Bearer ${apiKey}` } : {},
-  });
-  if (!res.ok) throw new Error(`Jina Reader could not fetch this URL (HTTP ${res.status})`);
-  return res.text();
+  return createSourceReader({ apiKey: process.env.JINA_API_KEY })(url);
 }
 
 /** `indexSession` is optional (tests never wire it) — real production wiring passes

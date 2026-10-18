@@ -132,7 +132,7 @@ test("job writer positive control: each tenant's job row carries exactly its own
 // ---------------------------------------------------------------- URL ingest (raw insertOne of source/session/turns)
 async function withFetchStub<T>(fn: (calls: string[]) => Promise<T>): Promise<T> {
   const real = globalThis.fetch, calls: string[] = [];
-  globalThis.fetch = (async (u: unknown) => { calls.push(String(u)); return { ok: true, status: 200, text: async () => "Hello world.\n\nA second paragraph about visas." }; }) as never;
+  globalThis.fetch = (async (u: unknown) => { calls.push(String(u)); return new Response("Hello world.\n\nA second paragraph about visas."); }) as never;
   try { return await fn(calls); } finally { globalThis.fetch = real; }
 }
 for (const [name, bad] of HOSTILE) {
