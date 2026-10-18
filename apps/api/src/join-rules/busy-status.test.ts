@@ -59,6 +59,9 @@ for (const [name, method, path, body] of ROUTES) {
     assert.equal(r.status, 503);
     assert.equal(r.json.error, "join_rules_busy");
     assert.equal(r.retryAfter, String(BUSY_RETRY_AFTER_SECONDS));
+    // ISS-JRLOCK-002 (a)/(b): pinned to literals, not only to the constants that define them (the web compares the code "join_rules_busy" and caps Retry-After).
+    assert.equal(r.retryAfter, "5");
+    assert.equal(r.json.message, "join rules are busy; try again in a few seconds");
     assert.deepEqual(Object.keys(r.json).sort(), ["error", "message"]);
     noLeak(r, name);
   });
