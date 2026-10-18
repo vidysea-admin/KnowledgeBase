@@ -81,6 +81,10 @@ export async function runScheduledDispatch(rest: string[], injected?: ScheduledD
     keyTenantId: keyTenant, stateDir: d.stateDir, log: () => d.log("Scheduled dispatch: current rule policy evaluated"),
     now: () => Date.parse(now), readOnly: true, io: d.io}); } catch { throw refusal(); }
   if (selection.toSchedule.length !== 1 || selection.toSchedule[0] !== item) throw refusal();
+  // A Calendar cancellation withdraws the saved job (schedule-withdraw.ts). Rule evaluation is async, so re-read it right before capture (ISS-WEBINARRELEASE-013).
+  let current: ReturnType<typeof readScheduledJob> = null;
+  try { current = readScheduledJob(d.stateDir, rest[0]!, tenant); } catch { /* refused below */ }
+  if (!current || current.sessionId !== identity.sessionKey) throw refusal();
   await d.record([identity.meetingUrl, "--until", identity.endTime, "--session-id", identity.sessionKey,
     "--title", item.title, "--tenant", tenant]);
 }

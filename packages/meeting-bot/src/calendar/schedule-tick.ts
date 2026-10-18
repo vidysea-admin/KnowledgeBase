@@ -19,6 +19,7 @@ import { classifyWebinarInvite } from "./auto-record-policy.js";
 import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
+import { withdrawCancelledLaunches } from "./state/schedule-withdraw.js";
 import { announceScheduled, buildAutojoinTickDeps, createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, type AutojoinTickDeps } from "../autojoin/tick-wiring.js";
 export {
   createHttpCandidateLoader, createHttpCalendarLoader, loadNoCalendarEvents, loadWebinarSourcesWithHealth, type WebinarFeedHealth,
@@ -81,6 +82,11 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
 // inside task-scheduler.ts's scheduleOnce, from the already-validated jobKey (buildTaskName),
 // never built here from an unvalidated sessionKey.
 
+const seriesOf = (events: CalendarEvent[], id: string) => {
+  const series = events.find(e => e.id === id)?.recurringEventId;
+  return series ? {recurringEventId: series} : {};
+};
+
 function describeToSchedule(item: AutoRecordItem): string {
   return `  schedule — ${item.source}:${item.sourceId} "${item.title}" ${item.startTime} -> ${item.endTime} ` +
     `join: ${redactJoinLink(item.meetingUrl)}`;
@@ -93,7 +99,10 @@ function describeToSchedule(item: AutoRecordItem): string {
  */
 export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolean) {
   const [loadedEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
-  const aj = deps.autojoin, calendarEvents = aj ? dropOwnMarkerEvents(loadedEvents) : loadedEvents;
+  const aj = deps.autojoin, ownEvents = aj ? dropOwnMarkerEvents(loadedEvents) : loadedEvents;
+  // A cancelled series cancels its still-listed occurrences; a cancelled occurrence (it carries recurringEventId) never cancels the series.
+  const cancelledSeries = new Set(ownEvents.filter(e => e.cancelled && !e.recurringEventId).map(e => e.id));
+  const calendarEvents = ownEvents.map(e => e.recurringEventId && cancelledSeries.has(e.recurringEventId) && !e.cancelled ? {...e, cancelled: true} : e);
   const lookup = aj ? createTopicLookup(aj, calendarEvents, candidates) : undefined;
   const now = deps.now();
   const trustedSenders = loadTrustedSenderConfig();
@@ -128,6 +137,14 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
     `(${calendarEvents.length} calendar event(s), ${candidates.length} candidate(s), now=${now})`);
   for (const item of result.toSchedule) deps.log(describeToSchedule(item));
   for (const s of result.skipped) deps.log(describeSkip(s));
+
+  if (!dryRun) { // A cancellation stops launches already scheduled, not only new ones (ISS-WEBINARRELEASE-013).
+    try {
+      await withdrawCancelledLaunches({stateDir: deps.stateDir, tenantId: stateTenant, scheduler: deps.scheduler, log: deps.log,
+        cancelled: result.skipped.filter(x => x.reason === "cancelled").map(x => ({sessionKey: x.sessionKey, source: x.source, sourceId: x.sourceId})),
+        cancelledSeriesIds: [...cancelledSeries]});
+    } catch (err) { deps.log(`  could not withdraw cancelled launches: ${err instanceof Error ? err.message : String(err)}`); }
+  }
 
   if (dryRun) {
     deps.log("schedule-tick: --dry-run — nothing scheduled, nothing written to state");
@@ -165,6 +182,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
         title: item.title,
         sessionId: item.sessionKey,
         dispatchPolicyV1: scheduledDispatchIdentity(item),
+        ...(item.source === "calendar" ? seriesOf(calendarEvents, item.sourceId) : {}),
       }, stateTenant);
     } catch (err) {
       // ISS-321: writeScheduledJob refuses (throws) when jobKey already belongs to a different

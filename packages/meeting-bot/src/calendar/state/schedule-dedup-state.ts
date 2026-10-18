@@ -138,6 +138,21 @@ export function recordScheduled(stateDir: string, entry: ScheduledEntry, tenantI
   } finally { releaseLock(lockPath, token); }
 }
 
+/** Drops one dedup entry (a withdrawn launch) so a later un-cancelled meeting can be scheduled again. Same lock and atomic write as recordScheduled. */
+export function removeScheduled(stateDir: string, sessionKey: string, tenantId: string): void {
+  requireStateTenant(tenantId);
+  if (!existsSync(scheduleStateFilePath(stateDir))) return;
+  const lockPath = scheduleStateLockPath(stateDir);
+  const token = acquireLock(lockPath);
+  try {
+    const entries = readScheduleState(stateDir, tenantId);
+    if (!Object.hasOwn(entries, sessionKey)) return;
+    delete entries[sessionKey];
+    writeAtomic(scheduleStateFilePath(stateDir), JSON.stringify({ version: STATE_FILE_VERSION, tenantId, entries }, null, 2) + "\n", renameSync,
+      () => { if (!lockStillOwned(lockPath, token)) throw new Error("schedule-state lock was lost before the write; nothing written"); });
+  } finally { releaseLock(lockPath, token); }
+}
+
 /** Closed source identity copied from the actual selected item, never inferred at dispatch. */
 export interface DispatchPolicyV1 {
   source: "calendar" | "gmail";
@@ -163,6 +178,8 @@ export interface ScheduledJob {
   testData?: boolean;
   matchedKeywords?: string[];
   dispatchPolicyV1?: DispatchPolicyV1;
+  /** Calendar series the occurrence belongs to (instances only); lets a cancelled series withdraw its pending occurrences. */
+  recurringEventId?: string;
 }
 
 function scheduledJobDir(stateDir: string): string {

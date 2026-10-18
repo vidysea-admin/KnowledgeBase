@@ -130,7 +130,7 @@ export function projectWebinarInventory(previous: Record<string, Record<string, 
   const operations = JSON.parse(JSON.stringify(previous)) as typeof previous;
   const terminal = (row: Record<string, any> | undefined) => row &&
     (["ready", "recording", "processing", "failed"].includes(row.status) || (row.status === "action_required" &&
-      !["needs-review", "invalid-time", "no-join-link", "unsafe-join-link", "source-discontinuity", "unproven-calendar-history"].includes(row.reason)));
+      !["needs-review", "invalid-time", "no-join-link", "unsafe-join-link", "source-discontinuity", "unproven-calendar-history", "recurring-series"].includes(row.reason)));
   const put = (id: string, changes: Record<string, any>) => {
     if (terminal(operations[id])) return;
     operations[id] = {...operations[id], ...changes, tenantId, updatedAt: checkedAt};
@@ -170,7 +170,9 @@ export function projectWebinarInventory(previous: Record<string, Record<string, 
   }
   for (const row of series) {
     if (!row.cancelled && classifyWebinarInvite(row.title) === "meeting") continue;
-    put(webinarSessionKey(`source-series|${tenantId}|${row.id}`), {status: "action_required", reason: row.cancelled ? "cancelled" : "recurring-series",
+    const seriesId = webinarSessionKey(`source-series|${tenantId}|${row.id}`), reason = row.cancelled ? "cancelled" : "recurring-series";
+    if (operations[seriesId]?.reason === reason) continue; // ISS-WEBINARRELEASE-014: a later parent cancellation replaces the live-series review; an unchanged one is left alone
+    put(seriesId, {status: "action_required", reason,
       title: row.title.replace(/https?:\/\/\S+/gi, "[link removed]"), sourceKind: "series", sourceId: row.id, attempts: 0});
   }
   return operations;
