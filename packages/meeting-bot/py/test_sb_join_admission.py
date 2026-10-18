@@ -180,12 +180,16 @@ def test_watchdog_reload_still_happens_after_admission(tmp_path):
     assert sb.reloads >= 1 and "watchdog-reload" in _names(events)
 
 
-def test_non_meet_platform_is_no_longer_assumed_admitted(tmp_path):
-    # ISS-LOBBYWATCH-001: this used to assert admitted-at-once (assumed=True) for a zoom URL.
+def test_non_meet_platform_is_not_admitted_at_once_but_assumed_after_the_wait(tmp_path):
+    # ISS-LOBBYWATCH-001 + D-167: not admitted on the first tick (the old bug), but a wait that ends with
+    # no lobby/denied text ever seen is assumed-in (assumed=True) instead of aborting a possibly-live join.
     events, _, _, _clock = _run(tmp_path, "https://zoom.us/j/1", lambda now: (False, "welcome to the webinar"),
                                 timeout=10, seconds=200)
     names = _names(events)
-    assert "admitted" not in names and names.count("admission_timeout") == 1
+    assert "admission_timeout" not in names and names.count("admitted") == 1
+    ev = dict(events)["admitted"]
+    assert ev["assumed"] is True and ev["reason"] == "no-lobby-signal" and ev["platform"] == "zoom"
+    assert _names(events).index("admitted") > 0 and _clock.now - 1000 >= 10
 
 
 def test_cli_flag_default_and_override():

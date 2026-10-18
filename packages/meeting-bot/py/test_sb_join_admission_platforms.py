@@ -11,7 +11,7 @@ import pytest
 sys.path.insert(0, os.path.dirname(__file__))
 from sb_join import classify_admission, classify_meet_state, platform_of  # noqa: E402
 from test_sb_join_admission import _names, _run  # noqa: E402
-from sb_join_detect import FLUSH_GRACE_S  # noqa: E402
+from sb_join_detect import FLUSH_GRACE_S, AdmissionState  # noqa: E402
 
 ZOOM = "https://us02web.zoom.us/wc/join/123456"
 TEAMS = "https://teams.microsoft.com/v2/?meetingjoin=true"
@@ -105,11 +105,55 @@ def test_denied_page_is_never_admitted_even_with_a_stale_leave_control(tmp_path,
     assert "admitted" not in names and names.count("admission_timeout") == 1
 
 
-def test_unknown_platform_without_a_signal_is_not_admitted_and_times_out(tmp_path):
-    events, _, _, clock = _run(tmp_path, OTHER, lambda now: (False, "welcome to the webinar"), timeout=300, seconds=100000)
+ONAIR = "https://vidysea.cloudonair.com/event/1"
+
+
+@pytest.mark.parametrize("url", [OTHER, ONAIR, ZOOM, TEAMS])
+def test_non_meet_without_lobby_or_denied_text_is_assumed_in_not_aborted(tmp_path, url):
+    """D-167: a successful join whose in-call DOM probe never fires must not abort at the timeout."""
+    events, _, _, clock = _run(tmp_path, url, lambda now: (False, "welcome to the webinar"), timeout=300, seconds=400)
+    names = _names(events)
+    assert "admission_timeout" not in names and names.count("admitted") == 1
+    ev = dict(events)["admitted"]
+    assert ev["assumed"] is True and ev["platform"] == platform_of(url)
+    assert names[-1] == "closed"
+
+
+@pytest.mark.parametrize("url", [OTHER, ONAIR])
+def test_non_meet_lobby_text_seen_once_keeps_the_timeout_strict(tmp_path, url):
+    def scenario(now):
+        return (False, "please wait, the host will let you in soon") if now - 1000 < 20 else (False, "welcome")
+    events, _, _, _ = _run(tmp_path, url, scenario, timeout=300, seconds=100000)
     names = _names(events)
     assert "admitted" not in names and names.count("admission_timeout") == 1
-    assert clock.now - 1000 < 310 + FLUSH_GRACE_S and names[-1] == "closed"
+
+
+def test_non_meet_denied_text_seen_once_keeps_the_timeout_strict(tmp_path):
+    def scenario(now):
+        return (False, "you have been removed from this meeting") if now - 1000 < 20 else (False, "welcome")
+    events, _, _, _ = _run(tmp_path, ONAIR, scenario, timeout=300, seconds=100000)
+    assert "admitted" not in _names(events) and _names(events).count("admission_timeout") == 1
+
+
+def test_meet_stays_strict_without_a_signal(tmp_path):
+    from test_sb_join_admission import MEET
+    events, _, _, _ = _run(tmp_path, MEET, lambda now: (False, "connecting"), timeout=300, seconds=100000)
+    assert "admitted" not in _names(events) and _names(events).count("admission_timeout") == 1
+
+
+def test_assumed_admission_unsuppresses_the_watchdog_reload_only_after_the_wait(tmp_path):
+    events, sb, _, _ = _run(tmp_path, ONAIR, lambda now: (False, "welcome"), timeout=300, seconds=400, reload_at=20)
+    names = _names(events)
+    assert "watchdog-reload-suppressed" in names and sb.reloads == 0
+
+
+def test_admission_state_lenient_unit():
+    s = AdmissionState(started=0, timeout_s=100, lenient=True)
+    assert s.tick(False, 50) is None and s.tick(False, 101) == "assumed" and s.tick(False, 200) is None and s.admitted
+    s = AdmissionState(started=0, timeout_s=100, lenient=True)
+    assert s.tick(False, 10, blocked=True) is None and s.tick(False, 101) == "timeout"
+    s = AdmissionState(started=0, timeout_s=100)  # strict (Meet) default
+    assert s.tick(False, 101) == "timeout"
 
 
 def test_unknown_platform_admits_only_on_a_positive_in_call_signal(tmp_path):

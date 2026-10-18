@@ -4,7 +4,7 @@
  * The audio-silence watchdog (T-031) must not run while the bot waits in the Meet lobby: a lobby is
  * silent, so after SILENT_TRIGGER_SEC the watchdog asked sb_join.py to reload the page, which ended
  * the tab's audio track and killed the capture (live run 2026-10-13). sb_join.py now emits
- * `admitted` once it sees the in-call controls (other platforms: immediately, `assumed: true`);
+ * `admitted` once it sees the in-call controls (non-Meet platforms with no lobby or denied text for the whole wait: `assumed: true`, D-167);
  * this gate starts the watchdog only then, and turns the two failure shapes into clear messages:
  *  - `admission_timeout`  -> "admission_timeout: ..." (the bot was never let in);
  *  - a `capture-error` that follows a post-admission page reload -> the error plus the reload cause.

@@ -2,7 +2,7 @@
 import json
 
 from sb_join_detect import (ADMISSION_TIMEOUT_S, END_PHRASES, FLUSH_GRACE_S, JOIN_TEXTS, AdmissionState, ReconnectState, apply_reload,
-                            classify_admission, click_gate, detect_trouble, platform_of, should_force_reload)
+                            classify_admission, click_gate, detect_trouble, is_blocked_text, platform_of, should_force_reload)
 from sb_join_scripts import BODY_TEXT_JS, CLICK_JS, IN_CALL_JS_BY_PLATFORM
 
 
@@ -17,12 +17,12 @@ def run_session(sb, a, *, os, time, emit):
     extra_click_until = 0.0  # widened click window after a reload; MAX_CLICKS/JOIN_TEXTS unchanged
     gave_up_emitted = False
     hold_for_flush = False
-    # ISS-CAPTUREFIX-001 / ISS-LOBBYWATCH-001: admission for every platform. "admitted" is emitted only
-    # on a positive in-call signal (Meet / Zoom web / Teams web / generic leave control); an unknown
-    # platform is never assumed admitted and ends in admission_timeout like the others.
+    # ISS-CAPTUREFIX-001 / ISS-LOBBYWATCH-001: admission for every platform. "admitted" is emitted on a positive
+    # in-call signal; a lobby / denied page is never admitted. On non-Meet platforms (probes unverified live) a
+    # wait that ends with no lobby or denied text ever seen is assumed admitted (assumed=True), not aborted.
     platform = platform_of(a.url)
     in_call_js = IN_CALL_JS_BY_PLATFORM[platform]
-    admission = AdmissionState(started, getattr(a, "admission_timeout", None))
+    admission = AdmissionState(started, getattr(a, "admission_timeout", None), lenient=platform != "meet")
     if admission.timeout_s is None:
         admission.timeout_s = ADMISSION_TIMEOUT_S
     while not os.path.exists(a.stop_file):
@@ -61,9 +61,13 @@ def run_session(sb, a, *, os, time, emit):
             except Exception:
                 in_call_dom = False
             state = classify_admission(platform, in_call_dom, body)
-            verdict = admission.tick(state == "in-call", now)
+            verdict = admission.tick(state == "in-call", now, blocked=state == "lobby" or is_blocked_text(body))
             if verdict == "admitted":
                 emit("admitted", platform=platform, assumed=False)
+            elif verdict == "assumed":
+                # D-167 / ISS-LOBBYWATCH-001: non-Meet in-call probes are unverified live; after the wait with
+                # no lobby or denied text ever seen, assume we are in rather than abort a possibly-live join.
+                emit("admitted", platform=platform, assumed=True, reason="no-lobby-signal", seconds=int(now - started))
             elif verdict == "timeout":
                 emit("admission_timeout", seconds=int(now - started), limit=admission.timeout_s)
                 hold_for_flush = True
