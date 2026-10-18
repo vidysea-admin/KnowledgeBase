@@ -14,17 +14,15 @@ import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createUrlSource, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { IngestDeps, IngestResult } from "./routes/ingest.js";
 import { sha256Hex } from "./hash.js";
+import { createSourceReader } from "./source-intake/source-reader.js";
+import { guardUrlFetcher } from "./source-intake/adapters.js";
 import { assertTurnTimings } from "./turn-timing.js";
 import type { BoundIndexer } from "./indexing/session.js";
 
-async function jinaReaderFetch(url: string): Promise<string> {
-  const apiKey = process.env.JINA_API_KEY;
-  const res = await fetch(`https://r.jina.ai/${url}`, {
-    headers: apiKey ? { authorization: `Bearer ${apiKey}` } : {},
-  });
-  if (!res.ok) throw new Error(`Jina Reader could not fetch this URL (HTTP ${res.status})`);
-  return res.text();
-}
+/** Bounded acquisition (ISS-SOURCEREADER-001): 10s whole-response deadline, 1,000,000-byte streaming cap. */
+/** SSRF guard (same `guardUrlFetcher` as source-intake): scheme, credentials, literal and resolved private/reserved addresses are refused before any fetch. */
+const jinaReaderFetch = (lookup?: (hostname: string) => Promise<string[]>) =>
+  guardUrlFetcher((url) => createSourceReader({ apiKey: process.env.JINA_API_KEY })(url), lookup);
 
 /** `indexSession` is optional (tests never wire it) — real production wiring passes
  * `indexing.ts`'s `indexSession`, bound with the real routed `complete`. A rejected indexing
@@ -32,8 +30,8 @@ async function jinaReaderFetch(url: string): Promise<string> {
  * safely stored), so it still returns 201 with the real result rather than failing the whole
  * request over the searchability step. */
 /** `urlSource` is a test seam only (a fake adapter that yields invalid turn timing); production passes none. */
-export function createMongoIngestDeps(indexSession?: BoundIndexer, seams: { urlSource?: ReturnType<typeof createUrlSource> } = {}): IngestDeps {
-  const urlSource = seams.urlSource ?? createUrlSource({ hasher: sha256Hex, fetcher: jinaReaderFetch });
+export function createMongoIngestDeps(indexSession?: BoundIndexer, seams: { urlSource?: ReturnType<typeof createUrlSource>; lookup?: (hostname: string) => Promise<string[]> } = {}): IngestDeps {
+  const urlSource = seams.urlSource ?? createUrlSource({ hasher: sha256Hex, fetcher: jinaReaderFetch(seams.lookup) });
 
   return {
     async ingestUrl(tenantId, url): Promise<IngestResult> {

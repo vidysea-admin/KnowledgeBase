@@ -132,7 +132,7 @@ test("job writer positive control: each tenant's job row carries exactly its own
 // ---------------------------------------------------------------- URL ingest (raw insertOne of source/session/turns)
 async function withFetchStub<T>(fn: (calls: string[]) => Promise<T>): Promise<T> {
   const real = globalThis.fetch, calls: string[] = [];
-  globalThis.fetch = (async (u: unknown) => { calls.push(String(u)); return { ok: true, status: 200, text: async () => "Hello world.\n\nA second paragraph about visas." }; }) as never;
+  globalThis.fetch = (async (u: unknown) => { calls.push(String(u)); return new Response("Hello world.\n\nA second paragraph about visas."); }) as never;
   try { return await fn(calls); } finally { globalThis.fetch = real; }
 }
 for (const [name, bad] of HOSTILE) {
@@ -147,7 +147,7 @@ for (const [name, bad] of HOSTILE) {
 }
 test("ingestUrl positive control: two tenants ingest the same URL; every stored row carries exactly its own tenant", async () => {
   const db = fresh();
-  await withFetchStub(async () => { await createMongoIngestDeps().ingestUrl(A, "https://example.com/p"); await createMongoIngestDeps().ingestUrl(B, "https://example.com/p"); });
+  await withFetchStub(async () => { await createMongoIngestDeps(undefined, { lookup: async () => ["93.184.216.34"] }).ingestUrl(A, "https://example.com/p"); await createMongoIngestDeps(undefined, { lookup: async () => ["93.184.216.34"] }).ingestUrl(B, "https://example.com/p"); });
   for (const c of ["sources", "sessions", "turns"]) { const t = new Set(db.all(c).map((r) => r.tenantId)); assert.deepEqual([...t].sort(), [A, B], `${c} rows carry exactly tA and tB`); }
   assert.ok(db.queries.every((q) => q.op === "insertOne" || q.op === "insertMany"));
 });
