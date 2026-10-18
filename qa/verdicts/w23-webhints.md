@@ -1,8 +1,34 @@
 # Verdict: w23-webhints
 
-VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 2d0deaee271821acb3342b67c24783fafc47343d
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 4645e325207510eda04df83f5668560ecd57a3f5
+Base: 3c99337f. Web fix commit 0104801a, api fix commit 4645e325 (on top of cycle-0 candidate 2d0deaee). Checker: Sonnet 5.5, independent. Metrics: host tokens/active time not measured (unknown, not claimed).
+
+## Cycle 1 review (diff 2d0deaee..4645e325, evidence qa/.chk/c1/)
+Cycle-0 findings:
+1. FIXED. joinRulesModel.ts checkMeetingUrl now `v.length <= 2048 && safePublicResourceUrl(v) !== null`. Probe (probe-url.out): `https://user:pw@...` refused, tab-bearing URL refused, `javascript:` refused, plain https accepted.
+2. FIXED. router.ts `isPlainHttpUrl` used by POST /opt-outs (`optOutBody(req, true)`). Probe by extracting the function text from router.ts (probe-api.out), 18 cases, 0 mismatches: refused `https://user:pw@`, `http://user@`, `https://:pw@`, `javascript:` (also mixed case), `data:`, `ftp:`, `zoom:111`, `not a url`, control chars  / TAB / LF /  / , leading space, `//host`; accepted https and http with query/fragment. Router test loop covers 11 of these.
+3. Note (cycle 0) now resolved for forms: apiFetch accepts HeadersInit. Probe (scratch test, deleted, git clean): plain object with AUTHORIZATION/authorization/AuThOrIzAtIoN and Content-TYPE; Headers object; tuple array with three case variants; undefined/[]/empty Headers. In all, the sent request has authorization "Bearer real" and content-type "application/json" only, no e1/e2/e3/x/y text anywhere, If-Match preserved. Note: Headers.entries() lowercases keys; plain/tuple keep caller casing for non-protected names; only the two protected names are removed, in any case, so no case variant can survive.
+4. /opt-outs/remove left lenient: SAFE. Route uses requireScope(WRITE_SCOPE), tenantId from auth (guarded), body allow-list and 2048/256 bounds unchanged; recordTenantUnOptOut loads only that tenant's file and removeOptOutEntries is a pure removal from that state, writing nothing when nothing matches. The hint is a match key, never stored or echoed on remove. Leniency is needed for legacy identities such as zoom:111. Note (low, not blocking): no test pins the remove route staying lenient.
+
+Checks (own runs, exit codes in qa/.chk/c1/*.rc, all timeout 600): web vitest src/pages/join-rules src/api exit 0, 17 files, 203 passed. api node --test router.test.ts busy-status.test.ts exit 0, 34 pass 0 fail. tsc --noEmit web exit 0, api exit 0 (empty output).
+Mutations (own; per-mutation byte backup, trap, timeout 300, cmp restore; qa/.chk/c1/mut2.sh): L header strip case-sensitive killed (3 tests); M tuple branch unfiltered killed; N Headers branch dropped killed; O credentials allowed in api killed; P strict flag off on POST /opt-outs killed; Q any scheme in api killed; S control-char/whitespace check removed killed; T web check replaced by /^https?:/ killed (cases 4,5,6...). Post-run `git -c core.autocrlf=true hash-object` equals `git rev-parse HEAD:<f>` for client.ts, joinRulesModel.ts, router.ts. Cycle-0 mutations A-K stand (all but F killed; F parseRetryAfter {1,6}->{1,12} remains open, low, benign).
+
+## Ledger rows (cycle 1)
+- ISS-RULESWEB-002: may flip.
+- ISS-JRLOCK-002: may flip.
+- ISS-WEBHINTS-002: may flip (regex-width mutation stays filed-open low).
+- ISS-WEBHINTS-001: meetingUrl half verified. sessionKey still has no web source (W7 gate b / ISS-T037OPT-002 remain open), so do NOT flip the row to verified as written; flip only if the row is narrowed to the sessionKey remainder.
+ISSUES-WRITTEN: none
+Raw evidence in untracked qa/.chk/ (not committed).
+
+# Superseded history
+
+## Cycle 0 (2d0deaee): FAIL, superseded by cycle 1 above
+Verdict (cycle 0): FAIL
+Cycle 0 (superseded) checked: 0
+Cycle 0 (superseded) reviewed SHA: 2d0deaee271821acb3342b67c24783fafc47343d
 Base: 3c99337f (web commit 8c46caae). Checker: Sonnet 5.5, independent. Metrics: tokens/active time not measured by host (unknown, not claimed).
 
 ## Findings
