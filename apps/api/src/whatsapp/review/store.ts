@@ -24,19 +24,58 @@ export type WhatsAppReviewMaterializer = (context: {
 
 export const isWhatsAppReviewId = (id: unknown): id is string => typeof id === "string" && /^wa-review:[a-f0-9]{64}$/u.test(id);
 
-/** A real same-source write serializes publication with consent withdrawal.
- * Fresh UUID per transaction attempt avoids no-op writes. Mongo retries conflicting
- * transactions, which must then revalidate current source consent and evidence. */
-async function fenceApproval(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session: ClientSession): Promise<void> {
+const REVISION_PATH = "sourceMeta.authorizationRevision";
+const MAX_WITHDRAWAL_ATTEMPTS = 8;
+// The generated Sources type indexes sourceMeta as unknown, which Mongo's numeric-$inc typing rejects.
+const INCREMENT_REVISION = { [REVISION_PATH]: 1 } as unknown as { _id?: never };
+/** Absent revision means 0. Anything else that is not a non-negative safe integer fails closed. */
+function revisionOf(source: Sources): number {
+  const revision = (source.sourceMeta as Record<string, unknown> | undefined)?.authorizationRevision;
+  if (revision === undefined || revision === null) return 0;
+  if (typeof revision !== "number" || !Number.isSafeInteger(revision) || revision < 0) {
+    throw new Error("WhatsApp review: source authorization revision invalid");
+  }
+  return revision;
+}
+/** A revision-0 source may legitimately lack the field; every other revision matches exactly. */
+const revisionFilter = (revision: number) => (revision === 0 ? { $in: [null, 0] } : revision);
+
+/** Compare-and-swap on the source authorization revision (ISS-WAVECTORLESS-002). Succeeds only if
+ * the source still carries the revision this approval validated and consent is still given, and
+ * increments it. A withdrawal committed after the evidence read changed the revision, so this
+ * matches nothing and approval aborts; the shared write also makes Mongo serialize concurrent
+ * transactions on the same source row. The UUID keeps the legacy fence field changing. */
+async function fenceApproval(db: Db, tenantId: string, row: WhatsAppReviewCandidate, revision: number, session: ClientSession): Promise<void> {
   const result = await db.collection<Sources>("sources").updateOne(withTenant<Sources>(tenantId, {
-    _id: row.sourceId, kind: "whatsapp-batch", path: row.groupJid, "consent.given": { $ne: false },
-  }), { $set: { "sourceMeta.whatsappReviewFence": randomUUID() } }, { session });
+    _id: row.sourceId, kind: "whatsapp-batch", path: row.groupJid, "consent.given": true, [REVISION_PATH]: revisionFilter(revision),
+  }), { $set: { "sourceMeta.whatsappReviewFence": randomUUID() }, $inc: INCREMENT_REVISION }, { session });
   if (result.acknowledged !== true || result.matchedCount !== 1 || result.modifiedCount !== 1) {
     throw new Error("WhatsApp review: source authorization fence unavailable");
   }
 }
 
-export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session?: ClientSession): Promise<void> {
+/** The one writer protocol for withdrawing a WhatsApp source's consent. Conditional on the revision it
+ * read; increments the revision; on a lost CAS it re-reads and retries (a withdrawal is monotonic, so it
+ * is never dropped). Exhausted retries throw rather than report success. Idempotent once withdrawn. */
+export async function withdrawWhatsAppSourceConsent(db: Db, tenantId: string, sourceId: string, recordedBy: string, note?: string): Promise<void> {
+  assertValidTenantId(tenantId, "whatsapp.review.withdraw");
+  if (typeof recordedBy !== "string" || !recordedBy.trim()) throw new Error("WhatsApp review: withdrawal actor required");
+  const coll = db.collection<Sources>("sources");
+  for (let attempt = 0; attempt < MAX_WITHDRAWAL_ATTEMPTS; attempt++) {
+    const source = await coll.findOne(withTenant<Sources>(tenantId, { _id: sourceId, kind: "whatsapp-batch" }));
+    if (!source || source.tenantId !== tenantId) throw new Error("WhatsApp review: source not found for withdrawal");
+    if (source.consent?.given === false) return;
+    const result = await coll.updateOne(withTenant<Sources>(tenantId, { _id: sourceId, kind: "whatsapp-batch", [REVISION_PATH]: revisionFilter(revisionOf(source)) }), {
+      $set: { consent: { given: false, recordedBy, ...(note ? { note } : {}) } }, $inc: INCREMENT_REVISION,
+    });
+    if (result.acknowledged !== true) throw new Error("WhatsApp review: withdrawal not acknowledged");
+    if (result.matchedCount === 1) return;
+  }
+  throw new Error("WhatsApp review: withdrawal lost the revision race repeatedly; retry");
+}
+
+/** Validates current evidence and returns the source authorization revision it was validated against. */
+export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppReviewCandidate, session?: ClientSession): Promise<number> {
   assertWhatsAppReviewCandidateSchema(row);
   if (row.tenantId !== tenantId || !isWhatsAppReviewId(row._id)
       || row._id !== whatsAppReviewCandidateId(row) || row.contentHash !== whatsAppReviewContentHash(row.text)
@@ -46,10 +85,11 @@ export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppRevie
   // An old pending/approved row is not authority to override withdrawn source consent.
   // This is checked in the same Mongo transaction as approval and publication; trusted
   // readers independently recheck current consent after the transaction commits.
-  if (!source || source.tenantId !== tenantId || source.kind !== "whatsapp-batch" || source.path !== row.groupJid || source.consent?.given === false
+  if (!source || source.tenantId !== tenantId || source.kind !== "whatsapp-batch" || source.path !== row.groupJid || source.consent?.given !== true
       || !sourceSession || sourceSession.tenantId !== tenantId || sourceSession.sourceId !== row.sourceId) {
     throw new Error("WhatsApp review: source/session evidence unavailable");
   }
+  const revision = revisionOf(source);
   const turns: Turns[] = [];
   for (const evidence of row.evidence) {
     if (evidence.sessionId !== row.sessionId) throw new Error("WhatsApp review: evidence session mismatch");
@@ -68,6 +108,7 @@ export async function checkEvidence(db: Db, tenantId: string, row: WhatsAppRevie
       throw new Error("WhatsApp review: required sensitive/exclusion flag missing");
     }
   }
+  return revision;
 }
 
 export function createMongoWhatsAppReviewRepository(db: Db, options: {
@@ -132,15 +173,15 @@ export function createMongoWhatsAppReviewRepository(db: Db, options: {
           const row = await load(tenantId, id, session);
           if (!row) return { result: "not_found" };
           if (row.status === action) {
-            await checkEvidence(db, tenantId, row, session);
-            if (action === "approved") await fenceApproval(db, tenantId, row, session);
+            const seen = await checkEvidence(db, tenantId, row, session);
+            if (action === "approved") await fenceApproval(db, tenantId, row, seen, session);
             return { result: "ok", changed: false, candidate: row };
           }
           if (row.status !== "needs-review") return { result: "conflict" };
           if (action === "approved" && row.flags.some(flag => flag.kind === "personal-excluded")) return { result: "excluded" };
           if (action === "approved" && !options.materialize) return { result: "publish_unavailable" };
-          await checkEvidence(db, tenantId, row, session);
-          if (action === "approved") await fenceApproval(db, tenantId, row, session);
+          const seen = await checkEvidence(db, tenantId, row, session);
+          if (action === "approved") await fenceApproval(db, tenantId, row, seen, session);
           const candidate: WhatsAppReviewCandidate = { ...row, status: action, decision: { action, actor, at } };
           assertWhatsAppReviewCandidateSchema(candidate);
           const changed = await collection(tenantId).updateOne({ _id: id, status: "needs-review" }, { $set: { status: action, decision: candidate.decision } }, { session });

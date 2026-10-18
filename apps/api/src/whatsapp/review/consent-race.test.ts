@@ -22,10 +22,12 @@ test("approval and idempotent retry write fresh UUID fences in the same transact
   assert.equal(f.rows("published").length, 1);
   const fences = f.calls.filter(c => c.collection === "sources" && c.operation === "updateOne");
   assert.equal(fences.length, 2);
-  for (const fence of fences) {
-    assert.deepEqual(fence.filter, { _id: input.source._id, tenantId: "tenant-a", kind: "whatsapp-batch", path: input.source.path, "consent.given": { $ne: false } });
+  const expectedRevision = [{ $in: [null, 0] }, 1];
+  fences.forEach((fence, i) => {
+    assert.deepEqual(fence.filter, { _id: input.source._id, tenantId: "tenant-a", kind: "whatsapp-batch", path: input.source.path, "consent.given": true, "sourceMeta.authorizationRevision": expectedRevision[i] });
     assert.ok(fence.session);
-  }
+  });
+  assert.equal(second.authorizationRevision, 2);
   const publish = f.calls.find(c => c.collection === "published"); assert.equal(publish!.session, fences[0]!.session);
 });
 
