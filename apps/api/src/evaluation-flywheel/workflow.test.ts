@@ -308,3 +308,34 @@ test("index artifact read rejects a changed source snapshot before Ask", async (
   await reject(w.retest("t", "loss", request), "input_drift");
   assert.equal(r.calls.ask, 0); assert.equal(r.tables.eval_runs!.length, 1);
 });
+test("ISS-T059REPLAY-001 interrupted older request cannot replace a newer head; current update still advances", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  const base = r.deps.store.replaceGap;
+  r.deps.store.replaceGap = async (t, rev, row) => {
+    if (row.flywheel.stage === "retested" && !row.flywheel.lock && !row.flywheel.failure) throw new Error("head write down");
+    return base(t, rev, row);
+  };
+  await reject(w.retest("t", "loss", { ...request, requestId: "first" }), "unavailable");
+  r.deps.store.replaceGap = base; r.advance(1000);
+  const second = await w.retest("t", "loss", { ...request, requestId: "second" });
+  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, second._id);
+  // Hand-built state: the older request is again marked interrupted while the newer head stands.
+  const gap = r.tables.gaps![0]!; gap.flywheel.failure = { stage: "persist", requestId: "first", at: "2026-10-14T01:00:00.000Z" };
+  const firstChild = await w.retest("t", "loss", { ...request, requestId: "first" });
+  assert.notEqual(firstChild._id, second._id);
+  const after = await w.inspect("t", "loss");
+  assert.equal(after.flywheel.lastRetestId, second._id); assert.equal(after.flywheel.failure, undefined); assert.equal(after.flywheel.lock, undefined);
+  r.advance(1000); const third = await w.retest("t", "loss", { ...request, requestId: "third" });
+  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, third._id);
+});
+test("ISS-T059REPLAY-001 concurrent historical replay and current update leave the newest head, repeated 15x", async () => {
+  for (let i = 0; i < 15; i++) {
+    const r = rig(), w = r.workflow(); await w.open("t", "loss");
+    const first = await w.retest("t", "loss", { ...request, requestId: "first" }); r.advance(1000);
+    const [replay, update] = await Promise.allSettled([w.retest("t", "loss", { ...request, requestId: "first" }), r.workflow().retest("t", "loss", { ...request, requestId: "second" })]);
+    assert.equal(replay.status, "fulfilled"); assert.deepEqual((replay as PromiseFulfilledResult<unknown>).value, first);
+    const head = await w.inspect("t", "loss");
+    if (update.status === "fulfilled") assert.equal(head.flywheel.lastRetestId, (update as PromiseFulfilledResult<{ _id: string }>).value._id);
+    else { await reject(Promise.reject((update as PromiseRejectedResult).reason), "conflict"); assert.equal(head.flywheel.lastRetestId, first._id); }
+  }
+});

@@ -190,7 +190,11 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
         if (!same(written, child)) fail("input_drift");
       }
       await checkLock();
-      head.flywheel.lastRetestId = childId; head.flywheel.stage = "retested";
+      // A historical child must never replace a newer head: release the lease, keep the head pointer.
+      const headId = head.flywheel.lastRetestId;
+      const headChild = headId && headId !== childId ? await bounded(() => deps.store.evaluation(t, headId), true) : null;
+      const historical = !!headChild && Date.parse(headChild.createdAt) > Date.parse(child.createdAt);
+      if (!historical) { head.flywheel.lastRetestId = childId; head.flywheel.stage = "retested"; }
       delete head.flywheel.lock; delete head.flywheel.failure;
       await save(t, head, true);
       return structuredClone(child);

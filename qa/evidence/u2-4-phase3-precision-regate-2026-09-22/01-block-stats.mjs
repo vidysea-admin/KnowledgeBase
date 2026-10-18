@@ -6,8 +6,9 @@ import { join } from "node:path";
 
 const POSITIONAL = /^spk:\d+$/;
 
-const dirs = (await import("node:fs")).readdirSync("data/toc-migrated", { withFileTypes: true })
-  .filter((d) => d.isDirectory()).map((d) => d.name).sort();
+// ISS-290: measure the PINNED corpus only (corpus.lock.json, verified); unpinned sessions are named on stderr, never silently counted
+const { verifyCorpus } = await import("./corpus-lock.mjs");
+const dirs = [...verifyCorpus().sessions].sort();
 
 const rows = [];
 let posTotal = 0, blockTotal = 0, pairTotal = 0;

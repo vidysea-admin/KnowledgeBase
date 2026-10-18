@@ -2,8 +2,8 @@
 // The pinned set is gold-labels.json's session list; corpus.lock.json holds a sha256 of each pinned
 // session's turns.json (CRLF-normalised). verifyCorpus() throws on any mismatch or missing session, so
 // a re-measure over drifted data fails BEFORE spending provider calls. Positional sessions that appear
-// in data/toc-migrated but are NOT pinned (a later ingest) are returned as `unpinned` and printed: they
-// are outside the measured corpus by design, but never silently.
+// in data/toc-migrated but are NOT pinned (a later ingest) make verifyCorpus THROW (ISS-290 fix_direction: fail
+// loudly), so the measured corpus can never silently exclude data.
 //   write the lock:  node qa/evidence/<dir>/corpus-lock.mjs --write   (deliberate act; review the diff)
 import { createHash } from "node:crypto";
 import { readFileSync, readdirSync, writeFileSync, existsSync } from "node:fs";
@@ -25,7 +25,7 @@ export function verifyCorpus() {
   const unpinned = readdirSync("data/toc-migrated", { withFileTypes: true }).filter((d) => d.isDirectory() && !sessions.includes(d.name) &&
     existsSync(join("data/toc-migrated", d.name, "turns.json")) &&
     JSON.parse(readFileSync(join("data/toc-migrated", d.name, "turns.json"), "utf8")).some((t) => /^spk:\d+$/.test(t.speakerRef ?? ""))).map((d) => d.name);
-  if (unpinned.length) console.error(`ISS-290 NOTE: ${unpinned.length} positional session(s) are outside the pinned corpus and are NOT measured: ${unpinned.join(", ")}`);
+  if (unpinned.length) throw new Error(`ISS-290: ${unpinned.length} unpinned positional session(s) in data/toc-migrated: [${unpinned.join(", ")}] -- pin them (gold + corpus-lock.mjs --write) or remove them; refusing to measure a corpus that silently excludes them`);
   return { sessions, unpinned };
 }
 
