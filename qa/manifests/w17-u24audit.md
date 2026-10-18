@@ -1,7 +1,7 @@
 # w17-u24audit
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 0
 Lane: lane/w17-u24audit · Base: a0391420 · Candidate: see the lane HEAD commit ("w17-u24audit") · Tier: medium ledger rows (no auth/tenancy/data-write), light ceremony.
 

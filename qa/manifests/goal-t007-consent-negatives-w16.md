@@ -1,6 +1,6 @@
 # goal-t007-consent-negatives-w16
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base: 6b64964b66d9a92688221b8ae1ebfbca5b72bb66 (lane/w16-t007wa)
 Candidate: see git log of lane/w16-t007consent (single commit)

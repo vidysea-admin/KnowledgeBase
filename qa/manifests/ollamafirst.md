@@ -1,5 +1,5 @@
 # Manifest — ollamafirst
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 0
 **Contract:** none (provider routing; no frozen contract applies)
 **Goal task:** none

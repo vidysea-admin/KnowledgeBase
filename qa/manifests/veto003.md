@@ -1,5 +1,5 @@
 # veto003 (ISS-T037VETO-003, ruling 2)
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Base: 9e55b642
 Changed: packages/meeting-bot/src/calendar/join-rules/join-rules-select.ts, join-rules-enforce.ts, join-rules-veto003.test.ts

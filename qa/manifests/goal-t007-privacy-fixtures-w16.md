@@ -1,6 +1,6 @@
 # Manifest — goal-t007-privacy-fixtures-w16
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w16-t007wa (branch lane/w16-t007wa), base a9fac545. Candidate SHA: the lane HEAD commit (see commit).
 Task: T-007 (data-write/privacy, full ceremony). Issues: ISS-T007VISIBILITY-001, ISS-T007REVIEWSOURCE-001 (ledger rows stay open until a checker verdict; ISS-WA-REVIEW-WIRE-006 NOT touched, different readers/packages, left).

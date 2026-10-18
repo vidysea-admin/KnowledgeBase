@@ -1,6 +1,6 @@
 # Manifest — wire006-readside-quarantine
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w17-wire006 (branch lane/w17-wire006), base 9e55b642. Candidate SHA: the lane HEAD commit.
 Task: T-007, ISS-WA-REVIEW-WIRE-006 (HIGH tenancy / privacy class, full ceremony). The ledger row stays `open` until a checker verdict.

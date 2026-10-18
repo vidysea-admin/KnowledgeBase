@@ -1,5 +1,5 @@
 # w17-wireapi: central apps/api wiring (championship verifier, T-052 caller, T-042 tile-suggest, T-056/T-054/T-008 routes)
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w17-wireapi (lane/w17-wireapi)
 Base: a0391420 (tip of codex/kb-wave2-2026-10-17, PR #4), then merge --no-ff lane/w17-champproof (3912e5e3; code ec78833c) = dcc5e565

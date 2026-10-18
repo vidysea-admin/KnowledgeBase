@@ -1,6 +1,6 @@
 # Manifest: t055-page-highlights-store
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Unit: T-055 C1/C2/C7, validated highlights on the canonical document_documents store
 Lane: w20-t055store (lane/w20-t055store). Base 41ca141c (origin/master). Candidate: the commit that adds this manifest (see `git log -1`); code commit 9114a99c.

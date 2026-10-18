@@ -1,5 +1,5 @@
 # sendnowhost (ruling 6, ISS-SENDNOWAPI-004)
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Base: 9e55b642
 Candidate: see commit on lane/w17-sendnowhost

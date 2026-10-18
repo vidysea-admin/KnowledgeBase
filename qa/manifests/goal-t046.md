@@ -1,7 +1,7 @@
 # goal-t046
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 0
 Task: T-046 (D-008 raw-video retention + real /meeting-bot page). Tier 3 roadmap. Class: data-delete + tenant/auth, full ceremony.
 Contract: qa/contracts/goal-t046.md C1-C7 (maker never edits it). No parent verdict exists yet.

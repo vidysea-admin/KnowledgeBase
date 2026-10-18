@@ -3,8 +3,8 @@
 **Goal task:** T-052
 **Tier:** 3 — scoped continuation
 **Fix cycle:** 1
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Root:** C:/Users/product/Desktop/KnowledgeBase
 **Base observed:** 5c4cbade2d1a8aa4815de13d587db8de3b01cc4a
 **Packet:** qa/packets/source-delivery-registration-retry.md

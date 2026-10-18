@@ -1,5 +1,5 @@
 # Manifest — w17-sourcepath
-**Status:** ready-for-check
+**Status:** checked-PASS
 **Fix cycle:** 1
 **Contract:** qa/contracts/goal-t055.md C6 ("No local source.path leakage")
 **Base SHA:** a0391420

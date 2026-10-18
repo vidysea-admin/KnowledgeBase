@@ -1,6 +1,6 @@
 # tombstone-expiry-ruling3
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base SHA: 9e55b642 (origin/codex/kb-build-wave-2026-10-16). Candidate SHA: recorded in the commit on lane/w17-tombstone (see the review packet).
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w17-tombstone, branch lane/w17-tombstone

@@ -1,5 +1,5 @@
 # Unit: deriveddrafts (lane w17-deriveddrafts)
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base SHA: 9e55b642
 Candidate SHA: see lane HEAD (single commit)

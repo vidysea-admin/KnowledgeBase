@@ -1,7 +1,7 @@
 # Maker manifest - goal-t060 hosting runtime
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 2
 Goal task: T-060 (remaining hosting runtime; no whole umbrella completion)
 Priority: Explicit active all-40 user goal; roadmap tier 3. Security/auth/tenant/write/credential class, uncapped, full ceremony.
