@@ -1,7 +1,7 @@
 # w23-releasecancel: calendar cancellation stops pending, scheduled and launching captures
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-releasecancel (branch lane/w23-releasecancel)
 Base: 4264418c7488d95e76bc0d86e3920efb0e0ccd72 (origin/master)
 Candidate: the single commit on the branch tip (`git rev-parse lane/w23-releasecancel`)
@@ -37,3 +37,10 @@ Issues: ISS-WEBINARRELEASE-013 (cancel withdraws a scheduled launch), ISS-WEBINA
 - Gmail-only job for a meeting whose Calendar copy is cancelled by id only (no link/start) is not matched in the tick path; the reconcile path (linkedCalendar) covers it.
 - A capture already past `record` is stopped by the pipeline's active-stop (activeWebinarStopReason), not by this change.
 - The Windows `schtasks /delete` path is read-reviewed only (fake exec in tests), no real task created.
+
+## Fix cycle 1 (checker verdict a9fb2e14 on 3648d62b)
+- Withdrawal now matches only the saved job's OWN Calendar event id (raw feed rows with cancelled=true) or its `recurringEventId`; session-key matching through the selector's identity barrier is removed (ISS-TOMBSTONE-005). Gmail-sourced jobs are never withdrawn by the tick.
+- New test: forged tombstones (link+start, start+title, id-only, foreign id with recurringEventId) leave all 3 jobs; the job's own cancelled event withdraws. Now 7 new tests; regression set 128/128 incl. them; tsc meeting-bot and api exit 0; lint-loc --all OK; 013 floor 1/1.
+- Mutations M1-M5 plus M6 (withdraw on any tombstone) all fail the new file (failing tests: M1 1, M2 4, M3 4, M4 1, M5 5, M6 5); pre/post hashes equal.
+- ISS-013 id-only tombstone + stale Gmail invite in the tick path: NOT changed. Holding every unlinked Gmail row on any id-only tombstone is the contract's id-only tier (clause 2/4, bounded, in the reconcile path); doing it in the legacy tick would also trip clause 1 non-interference. Needs the owner to say the tick must use the reconcile path.
+- Junctions: apps/api and meeting-bot do not import @lkb/meeting-bot (api has no such junction), so the 013 floor test cannot exercise lane code; no junction change made.

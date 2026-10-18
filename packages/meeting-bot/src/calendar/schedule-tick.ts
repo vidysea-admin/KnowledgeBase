@@ -141,7 +141,7 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   if (!dryRun) { // A cancellation stops launches already scheduled, not only new ones (ISS-WEBINARRELEASE-013).
     try {
       await withdrawCancelledLaunches({stateDir: deps.stateDir, tenantId: stateTenant, scheduler: deps.scheduler, log: deps.log,
-        cancelled: result.skipped.filter(x => x.reason === "cancelled").map(x => ({sessionKey: x.sessionKey, source: x.source, sourceId: x.sourceId})),
+        cancelledEventIds: ownEvents.filter(e => e.cancelled).map(e => e.id), // raw feed rows: an outsider's look-alike tombstone has a different id
         cancelledSeriesIds: [...cancelledSeries]});
     } catch (err) { deps.log(`  could not withdraw cancelled launches: ${err instanceof Error ? err.message : String(err)}`); }
   }

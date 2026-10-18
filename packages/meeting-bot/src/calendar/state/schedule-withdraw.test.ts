@@ -52,6 +52,25 @@ test("cancel before launch: the scheduled job, task and dedup entry are withdraw
   } finally { r.done(); }
 });
 
+test("an outsider's tombstone copying the link and start (or start and title, or only a foreign id) never withdraws a scheduled job", async () => {
+  const r = rig();
+  try {
+    await r.scheduleAll();
+    const mine = occ(2);
+    for (const forged of [
+      {id: "outsider-1", title: "x", startTime: mine.startTime, endTime: mine.endTime, meetingUrl: url, cancelled: true},          // link + start
+      {id: "outsider-2", title: mine.title, startTime: mine.startTime, endTime: mine.endTime, cancelled: true},                    // start + title
+      {id: "outsider-3", title: "", startTime: "", endTime: "", cancelled: true},                                                    // id only
+      {id: "outsider-4", title: mine.title, startTime: mine.startTime, endTime: mine.endTime, meetingUrl: url, organizer: "evil@example.com", cancelled: true, recurringEventId: "other"},
+    ] as CalendarEvent[]) {
+      await r.tick(at(9), [forged, occ(1), occ(2), occ(3)]);
+      assert.deepEqual(r.jobs(), [1, 2, 3], `survives ${forged.id}`); assert.equal(r.cancelled.length, 0);
+    }
+    await r.tick(at(9), [occ(2, {cancelled: true}), occ(1), occ(3)]); // the job's own event, genuinely cancelled
+    assert.deepEqual(r.jobs(), [1, 3]);
+  } finally { r.done(); }
+});
+
 test("cancel during launch: withdrawal between the checks and capture start refuses cleanly, siblings untouched", async () => {
   const r = rig();
   try {
@@ -59,7 +78,7 @@ test("cancel during launch: withdrawal between the checks and capture start refu
     await runScheduledDispatch([r.key(1)], r.dispatchDeps(at(12))); assert.equal(r.calls.length, 1, "control: an uncancelled occurrence launches");
     const d = r.dispatchDeps(at(14));
     d.io = {evaluate: (event, rules, state) => { // the cancellation lands after the job was read, while current rules are evaluated
-      void withdrawCancelledLaunches({stateDir: r.dir, tenantId: TEN, scheduler: {}, log: () => {}, cancelled: [{sessionKey: sessionOf(2), source: "calendar", sourceId: "series_2"}], cancelledSeriesIds: []});
+      void withdrawCancelledLaunches({stateDir: r.dir, tenantId: TEN, scheduler: {}, log: () => {}, cancelledEventIds: ["series_2"], cancelledSeriesIds: []});
       return evaluateJoinRules(event, rules, state);
     }};
     await assert.rejects(runScheduledDispatch([r.key(2)], d), /Scheduled dispatch refused/);
