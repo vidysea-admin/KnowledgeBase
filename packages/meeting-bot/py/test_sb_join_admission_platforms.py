@@ -135,6 +135,16 @@ def test_non_meet_denied_text_seen_once_keeps_the_timeout_strict(tmp_path):
     assert "admitted" not in _names(events) and _names(events).count("admission_timeout") == 1
 
 
+@pytest.mark.parametrize("phrase", ["the webinar has ended", "thank you for attending", "event has ended"])
+def test_end_phrase_seen_once_keeps_the_timeout_strict(tmp_path, phrase):
+    """F2: an END_PHRASES page (not in DENIED_PHRASES) also sets the sticky flag; an ended webinar is never assumed in."""
+    def scenario(now):
+        return (False, phrase) if now - 1000 < 20 else (False, "welcome")
+    events, _, _, _ = _run(tmp_path, ONAIR, scenario, timeout=300, seconds=100000)
+    names = _names(events)
+    assert "ended" in names and "admitted" not in names and names.count("admission_timeout") == 1
+
+
 def test_meet_stays_strict_without_a_signal(tmp_path):
     from test_sb_join_admission import MEET
     events, _, _, _ = _run(tmp_path, MEET, lambda now: (False, "connecting"), timeout=300, seconds=100000)

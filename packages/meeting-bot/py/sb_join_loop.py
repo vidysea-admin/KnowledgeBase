@@ -61,7 +61,7 @@ def run_session(sb, a, *, os, time, emit):
             except Exception:
                 in_call_dom = False
             state = classify_admission(platform, in_call_dom, body)
-            verdict = admission.tick(state == "in-call", now, blocked=state == "lobby" or is_blocked_text(body))
+            verdict = admission.tick(state == "in-call", now, blocked=state == "lobby" or bool(ended) or is_blocked_text(body))
             if verdict == "admitted":
                 emit("admitted", platform=platform, assumed=False)
             elif verdict == "assumed":

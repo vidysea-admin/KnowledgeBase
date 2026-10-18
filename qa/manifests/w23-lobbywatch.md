@@ -1,7 +1,7 @@
 # w23-lobbywatch
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Issue: ISS-LOBBYWATCH-001 (high). Lane lane/w23-lobbywatch, base 3c99337f.
 
 ## Finding
@@ -24,3 +24,10 @@ ISS-LOBBYWATCH-001: 1/1 (Zoom "Please wait, the host will let you in soon": lobb
 - node scripts/lint-loc.mjs --all: OK (10 stages, 0 failed).
 - Mutations (D-020, per-mutation backup/trap, restored, hash == post-fix blob): M1 lenient=False: 5 failed; M2 ignore blocked_seen: 10 failed.
 - TS not run (comment-only change).
+
+## Fix cycle 1 (checker a310db3f findings)
+- F1: admission-gate exposes `admission {assumed, reason}`; notifyJoined says "Joined (assumed: no lobby signal)"; record-commands passes `gate.admission` through finalizeRecording to finalizeRecordingWith, which writes `admission` and `captureDegraded` (assumed AND silent) to source.json and appends "[degraded: ...]" to the existing silent-recording failure. Readiness already ignored assumed admission (capture-slot-readiness unchanged).
+- F2: END_PHRASES (`ended`) now also set the sticky blocked flag in sb_join_loop.py; 3 new pytest cases.
+- Evidence: pytest 67 passed (23 Chrome tests deselected, not run); node --test admission-gate 10, telegram-alerts 32, record-commands 22, all pass; tsc meeting-bot clean; lint-loc 10/10 OK.
+- Mutations (backup + trap, restored, cmp equal): drop assumed propagation (gate) 1 failed; drop captureDegraded 1 failed; notifier ignores assumed 1 failed; drop END_PHRASES from sticky 3 failed.
+- Not covered by a test: the record-commands.ts line passing `assumed` into notifyJoined (runRecord has no notifier-level test).

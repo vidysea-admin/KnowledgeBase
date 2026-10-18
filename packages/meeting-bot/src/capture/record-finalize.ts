@@ -20,6 +20,7 @@ import { publishPrivateCaptureTurns } from './record-consent/downstream.js';
 import { validateCaptureIndexProof } from '../workspace/index-proof-consumer.js';
 
 import { gapsForSourceDoc, type GapWindow } from "./reconnect-gaps.js";
+import type { AdmissionInfo } from "./admission-gate.js";
 import { createTelegramNotifier, readTurnCount, type TelegramNotifier } from "./notify/telegram-alerts.js";
 // Deep import: packages/core/src/index.ts does not re-export lean-video yet (ISS-LEANWIRE-001).
 import { isWithinLeanTarget, LEAN_TARGET_MB_PER_HOUR } from "@lkb/core/src/domain/lean-video.js";
@@ -106,6 +107,8 @@ export interface FinalizeRecordingOverrides {
   tenantId?: string;
   lean?: boolean;
   originalVideo?: string;
+  /** How the bot was admitted (admission-gate). `assumed` + a silent recording = degraded, never a success. */
+  admission?: AdmissionInfo;
   recordDir?: string;
   probeMedia?: (video: string) => number; // actual container duration in seconds
   extractAudio?: (video: string, audioOut: string) => void;
@@ -225,6 +228,7 @@ export async function finalizeRecordingWith(
     path: toPosix(path.relative(root, video)),
     audioPath: toPosix(path.relative(root, audio)),
     audioLevel: { maxDb, meanDb, silent },
+    ...(overrides.admission ? { admission: overrides.admission, captureDegraded: overrides.admission.assumed && silent } : {}),
     gaps: gapsForSourceDoc(gaps), // T-029: forced-disconnect windows recovered mid-run, if any
     ...readCaptureTags(tagDir, sessionId),
     ...recordConsentSourceFields(prepared.receipt),
@@ -240,7 +244,8 @@ export async function finalizeRecordingWith(
   console.log(`[bot] registered session ${sessionId}`);
 
   if (silent) {
-    const error = new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window`);
+    const degraded = overrides.admission?.assumed ? " [degraded: admission was only assumed (no lobby signal) and there is no audio, so the bot may never have been in the call]" : "";
+    const error = new Error(`recording is silent (max ${maxDb} dB) — not transcribing; the capture did not hear the bot window${degraded}`);
     fail("audio", error);
     throw error;
   }

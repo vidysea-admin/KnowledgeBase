@@ -211,6 +211,40 @@ test("finalizeRecordingWith: silent capture (-50.1 dB) throws, still writes sour
   }
 });
 
+test("finalizeRecordingWith: assumed admission + silent = degraded (error says so, source.json flags it); positively admitted silent is not flagged degraded", async () => {
+  const root = fixtureRoot();
+  try {
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
+    const base = { repoRoot: root, probeMedia: () => 60, extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -60, meanDb: -70 }) };
+    await assert.rejects(
+      () => finalizeRecordingWith({ ...base, admission: { assumed: true, reason: "no-lobby-signal" } }, video, "sess-assumed-silent", "T", "zoho", false),
+      /recording is silent.*\[degraded: admission was only assumed/);
+    const doc = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "sess-assumed-silent", "source.json"), "utf8"));
+    assert.deepEqual(doc.admission, { assumed: true, reason: "no-lobby-signal" });
+    assert.equal(doc.captureDegraded, true);
+    await assert.rejects(
+      () => finalizeRecordingWith({ ...base, admission: { assumed: false } }, video, "sess-seen-silent", "T", "zoho", false),
+      (e: Error) => /recording is silent/.test(e.message) && !/degraded/.test(e.message));
+    const seen = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "sess-seen-silent", "source.json"), "utf8"));
+    assert.equal(seen.captureDegraded, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("finalizeRecordingWith: assumed admission with audible audio still succeeds and records admission.assumed", async () => {
+  const root = fixtureRoot();
+  try {
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
+    await finalizeRecordingWith({ repoRoot: root, probeMedia: () => 60, extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -20, meanDb: -30 }),
+      admission: { assumed: true, reason: "no-lobby-signal" } }, video, "sess-assumed-ok", "T", "zoho", false);
+    const doc = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "sess-assumed-ok", "source.json"), "utf8"));
+    assert.deepEqual([doc.admission.assumed, doc.captureDegraded], [true, false]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("finalizeRecordingWith: -50 dB exactly (the boundary) does NOT throw, source.json has audioLevel.silent:false, transcription runs", async () => {
   const root = fixtureRoot();
   let transcribeCalledWith: string | undefined;

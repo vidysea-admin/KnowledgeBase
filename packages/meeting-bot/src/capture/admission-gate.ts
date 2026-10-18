@@ -10,7 +10,9 @@
  *  - a `capture-error` that follows a post-admission page reload -> the error plus the reload cause.
  * Split out of record-commands.ts to keep that file inside the repo LOC budget.
  */
-export interface GateEvent { event: string; error?: unknown; seconds?: unknown; limit?: unknown }
+export interface GateEvent { event: string; error?: unknown; seconds?: unknown; limit?: unknown; assumed?: unknown; reason?: unknown }
+/** How the bot came to be `admitted`: positively seen in the call, or assumed (non-Meet, no lobby signal, D-167). */
+export interface AdmissionInfo { assumed: boolean; reason?: string }
 export interface GateWatchdog { start(): void }
 
 /** A reload this recent before a capture-error is treated as its cause. */
@@ -22,10 +24,12 @@ export function createAdmissionGate(now: () => number = Date.now) {
   let lastReload: { at: number; kind: string } | undefined;
   let failure: string | undefined;
   let timedOut = false;
+  let admission: AdmissionInfo | undefined;
 
   function decide(ev: GateEvent): string | undefined {
     switch (ev.event) {
       case "admitted":
+        if (!admitted) admission = ev.assumed === true ? { assumed: true, reason: typeof ev.reason === "string" ? ev.reason : "no-lobby-signal" } : { assumed: false };
         admitted = true;
         watchdog?.start();
         return undefined;
@@ -49,6 +53,8 @@ export function createAdmissionGate(now: () => number = Date.now) {
 
   return {
     get admitted(): boolean { return admitted; },
+    /** Undefined until `admitted`; `assumed: true` means no positive in-call signal was ever seen. */
+    get admission(): AdmissionInfo | undefined { return admission; },
     /** "lobby" until `admitted`; "failed" once an admission_timeout was reported; a capture is "recording" only in "admitted". */
     get state(): "lobby" | "admitted" | "failed" { return admitted ? "admitted" : timedOut ? "failed" : "lobby"; },
     /** The most recent failure message this gate produced (the tab backend's own stop error is terser). */
