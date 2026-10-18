@@ -69,7 +69,7 @@ test("POST /ingest path (ingest-store jinaReaderFetch) is bounded: oversized pub
   const real = globalThis.fetch;
   globalThis.fetch = (async (_u: unknown, init?: RequestInit) => real(srv.base, { ...init, headers: { connection: "close" } })) as typeof fetch;
   try {
-    await assert.rejects(createMongoIngestDeps().ingestUrl("tenant-a", "https://public.example/a"), /acquisition failed/);
+    await assert.rejects(createMongoIngestDeps(undefined, { lookup: async () => ["93.184.216.34"] }).ingestUrl("tenant-a", "https://public.example/a"), /acquisition failed/);
     await waitFor(() => srv.closedCount() >= 1);
     assert.ok(srv.closedCount() >= 1);
   } finally { globalThis.fetch = real; await srv.stop(); }

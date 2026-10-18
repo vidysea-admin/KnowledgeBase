@@ -147,7 +147,7 @@ for (const [name, bad] of HOSTILE) {
 }
 test("ingestUrl positive control: two tenants ingest the same URL; every stored row carries exactly its own tenant", async () => {
   const db = fresh();
-  await withFetchStub(async () => { await createMongoIngestDeps().ingestUrl(A, "https://example.com/p"); await createMongoIngestDeps().ingestUrl(B, "https://example.com/p"); });
+  await withFetchStub(async () => { await createMongoIngestDeps(undefined, { lookup: async () => ["93.184.216.34"] }).ingestUrl(A, "https://example.com/p"); await createMongoIngestDeps(undefined, { lookup: async () => ["93.184.216.34"] }).ingestUrl(B, "https://example.com/p"); });
   for (const c of ["sources", "sessions", "turns"]) { const t = new Set(db.all(c).map((r) => r.tenantId)); assert.deepEqual([...t].sort(), [A, B], `${c} rows carry exactly tA and tB`); }
   assert.ok(db.queries.every((q) => q.op === "insertOne" || q.op === "insertMany"));
 });

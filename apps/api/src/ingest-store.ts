@@ -15,13 +15,14 @@ import { createUrlSource, type ConsentContext, type Turn } from "@lkb/ingest";
 import type { IngestDeps, IngestResult } from "./routes/ingest.js";
 import { sha256Hex } from "./hash.js";
 import { createSourceReader } from "./source-intake/source-reader.js";
+import { guardUrlFetcher } from "./source-intake/adapters.js";
 import { assertTurnTimings } from "./turn-timing.js";
 import type { BoundIndexer } from "./indexing/session.js";
 
 /** Bounded acquisition (ISS-SOURCEREADER-001): 10s whole-response deadline, 1,000,000-byte streaming cap. */
-async function jinaReaderFetch(url: string): Promise<string> {
-  return createSourceReader({ apiKey: process.env.JINA_API_KEY })(url);
-}
+/** SSRF guard (same `guardUrlFetcher` as source-intake): scheme, credentials, literal and resolved private/reserved addresses are refused before any fetch. */
+const jinaReaderFetch = (lookup?: (hostname: string) => Promise<string[]>) =>
+  guardUrlFetcher((url) => createSourceReader({ apiKey: process.env.JINA_API_KEY })(url), lookup);
 
 /** `indexSession` is optional (tests never wire it) — real production wiring passes
  * `indexing.ts`'s `indexSession`, bound with the real routed `complete`. A rejected indexing
@@ -29,8 +30,8 @@ async function jinaReaderFetch(url: string): Promise<string> {
  * safely stored), so it still returns 201 with the real result rather than failing the whole
  * request over the searchability step. */
 /** `urlSource` is a test seam only (a fake adapter that yields invalid turn timing); production passes none. */
-export function createMongoIngestDeps(indexSession?: BoundIndexer, seams: { urlSource?: ReturnType<typeof createUrlSource> } = {}): IngestDeps {
-  const urlSource = seams.urlSource ?? createUrlSource({ hasher: sha256Hex, fetcher: jinaReaderFetch });
+export function createMongoIngestDeps(indexSession?: BoundIndexer, seams: { urlSource?: ReturnType<typeof createUrlSource>; lookup?: (hostname: string) => Promise<string[]> } = {}): IngestDeps {
+  const urlSource = seams.urlSource ?? createUrlSource({ hasher: sha256Hex, fetcher: jinaReaderFetch(seams.lookup) });
 
   return {
     async ingestUrl(tenantId, url): Promise<IngestResult> {
