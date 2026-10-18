@@ -1,8 +1,38 @@
 # Verdict: w23-releasecancel (ISS-WEBINARRELEASE-013, ISS-WEBINARRELEASE-014)
 
-VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 3648d62b2d9c9b6b077cf85dd2f1a191c2b3136b
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 355cf2ba0395d29932f40a2523d5f210d9cb0ba8
+Base: 4264418c7488d95e76bc0d86e3920efb0e0ccd72 (prior reviewed candidate 3648d62b)
+Checker: independent (fresh context), 2026-10-18
+
+Scope of PASS: the withdrawal unit (013 withdrawal part, 014). ISS-WEBINARRELEASE-013 itself is NOT closed (see Rows).
+
+## Cycle 1 results
+1. Outsider probe, rerun on 355cf2ba (the same fixture as cycle 0: schedule one webinar in its lead window, tick again with the live event plus one tombstone): link+title+start copy job kept; start+title only kept; id-only kept; free-text link kept; our own event id cancelled withdrawn. F1 fixed. Exit 0, log `rc/probe1.log`.
+2. Spoof analysis. `matches()` (schedule-withdraw.ts) now trusts only (a) the saved job's own `dispatchPolicyV1.sourceId`, set when the job was written from the Calendar item we selected, compared with `e.id` of a raw feed row (`ownEvents`, schedule-tick.ts:144) that has `cancelled`; (b) `job.recurringEventId` against a cancelled non-instance row's id. Session keys and the selector's identity barrier no longer reach it. The feed is our own authenticated Calendar read (`/calendar/upcoming?discovery=1`), where ids come from our calendar. An outsider can copy link, start, title and organiser, but cannot give their own tombstone our event's id; only the organiser of the meeting can cancel that event, which is a genuine cancellation. A tombstone carrying a foreign `recurringEventId` is an instance and never joins `cancelledSeries`. Residual (note, not a finding): knowledge of our event id plus the ability to cancel it implies organiser control. A Gmail-sourced job is never withdrawn by the tick.
+3. Test inventory. `git diff 3648d62b 355cf2ba --stat`: schedule-tick.ts (1 line), schedule-withdraw.ts, schedule-withdraw.test.ts (+1 test, 1 call updated), the manifest and my cycle-0 verdict. No other test file touched; grep of the diff for removed `test(`/`it(`/skip lines found none beyond the one reworked call. The maker's 142 -> 128 was a different file list in its own run; my cycle-0 list rerun on the candidate gives 143 = 142 + 1 new, 0 skipped, 0 todo.
+4. Commands (lane, `timeout 600`): regression set (same 11 files as cycle 0) tests 143, pass 143, fail 0, skipped 0, exit 0 (`rc/reg1.log`); tsc packages/meeting-bot exit 0; tsc apps/api exit 0 (apps/api resolves `@lkb/*` to MAIN, so it does not type-check lane meeting-bot code; no api import of lane code exists). New file passes inside the set.
+5. Own mutation (per-mutation byte backup, trap on INT/TERM/ERR, restore verified): `matches()` first condition replaced with `input.cancelledEventIds.length > 0` (withdraw on any tombstone). Applied; new file exit 1, 5 fail / 2 pass, including the new forged-tombstone test. Restore check with `-c core.autocrlf=true`: pre = HEAD:file = post = 42201deee3014ab2855e21defc1cce1845d53ea7; `git status` clean. Log `rc/mut1.log`.
+6. ISS-013 left open: acceptable as non-blocking for this unit. The unit's purpose is withdrawal of a scheduled launch, which now works for the job's own cancelled event, its series, and never for look-alikes. The residual (id-only tombstone plus stale Gmail invite still schedules in the legacy tick path, F2 in the history below) needs a hold on unlinked Gmail rows. That hold exists in the bounded reconcile path and would breach contract clause 1 in the tick. It pre-dates this unit, is unchanged by it, and is an owner decision (route the tick through reconcile). It is not hidden: the row stays open.
+
+## Rows
+- ISS-WEBINARRELEASE-014: may flip to fixed/verified (test 6 replay on lane code passes; code read-verified).
+- ISS-WEBINARRELEASE-013: stays OPEN; add a note that the scheduled-launch withdrawal part is verified (verdict cycle 1 on 355cf2ba) and the id-only tombstone plus Gmail invite tick gap remains.
+- Maker may flip the manifest to checked-PASS.
+
+ISSUES-WRITTEN: none
+Metrics: checker tokens unknown (null); active time not clocked (about 10 minutes of tool time); ratio unverified.
+
+---
+
+# Superseded history: cycle 0 (candidate 3648d62b, FAIL)
+
+## Prior header: w23-releasecancel (ISS-WEBINARRELEASE-013, ISS-WEBINARRELEASE-014)
+
+Cycle-0 VERDICT: FAIL
+Cycle-0 cycle checked: 0
+Cycle-0 reviewed SHA: 3648d62b2d9c9b6b077cf85dd2f1a191c2b3136b
 Base: 4264418c7488d95e76bc0d86e3920efb0e0ccd72
 Checker: independent (fresh context), 2026-10-18
 
