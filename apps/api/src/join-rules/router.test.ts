@@ -318,6 +318,9 @@ test("opt-outs: optional meetingUrl / sessionKey hints are passed to the store f
     const saves = s.log.filter(isWrite).length;
     for (const bad of [{ eventId: "e", meetingUrl: 5 }, { eventId: "e", meetingUrl: "x".repeat(2049) }, { eventId: "e", sessionKey: ["k"] }, { eventId: "e", sessionKey: "k".repeat(257) }, { eventId: "e", meetingUrl: null }])
       assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", bad)).status, 400, JSON.stringify(bad).slice(0, 60));
+    // Cycle 1: meetingUrl must be http(s), without credentials or control characters (mirrors apps/web safePublicResourceUrl).
+    for (const meetingUrl of ["https://user:pw@zoom.us/j/1", "http://user@zoom.us/j/1", "javascript:alert(1)", "ftp://zoom.us/j/1", "zoom:111", "not a url", "https://zoom.us/j/1\u0001", "https://zoom.us/j/1\u007f", "https://zoom.us/j/1\u0085", " https://zoom.us/j/1", "//zoom.us/j/1"])
+      assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "bad-url", meetingUrl })).status, 400, JSON.stringify(meetingUrl));
     assert.equal((await call("POST", `${URL_PATH}/opt-outs`, "a-key", { eventId: "e", meetingUrl: url, tenantId: "tenant-b" })).status, 400);
     assert.equal(s.log.filter(isWrite).length, saves);
   });

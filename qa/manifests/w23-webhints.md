@@ -1,7 +1,7 @@
 # w23-webhints
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-webhints (branch lane/w23-webhints)
 Base: 3c99337f (origin/master)
 Web commit: 8c46caae. Candidate = lane HEAD (this manifest's commit, api test only on top of 8c46caae).
@@ -31,3 +31,8 @@ Post-run: router.ts and JoinRulesPage.tsx hash-object (autocrlf=true) equal HEAD
 ## Left
 - ISS-WEBHINTS-001 sessionKey source; regex-width mutation of parseRetryAfter.
 - Ledger rows not flipped (per brief).
+
+## Fix cycle 1 (checker verdict 4e159efb FAIL on 2d0deaee)
+- Web: checkMeetingUrl reuses safePublicResourceUrl (refuses credentials, control chars, javascript:, ftp:); tests added. apiFetch normalises Headers objects and tuple arrays, dropping authorization/content-type in any case; caller key casing of other headers is preserved (not via new Headers(), which lowercases and broke joinRulesEtag.test.tsx assertions on "If-Match").
+- Api: POST /opt-outs validates meetingUrl (http(s), no credentials, no control chars incl. C1, no surrounding whitespace, <=2048). /opt-outs/remove deliberately NOT validated: un-opt must match older stored identities such as zoom:111 (un-opt.test.ts). No API-side URL helper existed; isPlainHttpUrl added in router.ts. Tests: 11 bad forms -> 400.
+- Checks: api join-rules router+busy-status+un-opt 43 pass; web join-rules+api+calendar 318 pass; tsc web/api exit 0; lint-loc OK 10 stages.
