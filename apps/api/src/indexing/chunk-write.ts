@@ -13,16 +13,24 @@ export interface ChunkGenerationWrite {
   prepared(docs: Chunks[]): void;
 }
 
+/** ISS-LEGACYSEED-008: the stamp a legacy-unbound session carries onto its chunks (same shape backfill writes); else undefined. */
+export function legacyChunkProvenance(session: unknown): { status: "legacy-unbound"; reason: string } | undefined {
+  const p = (session as { provenance?: { status?: unknown; reason?: unknown } } | null | undefined)?.provenance;
+  return p?.status === "legacy-unbound" && typeof p.reason === "string" ? { status: "legacy-unbound", reason: p.reason } : undefined;
+}
+
 /** Lexical evidence inventory: source references only, with no embedding provider call. */
 export async function writeSessionLexicalChunks(
   tenantId: string, sessionId: string, turns: Turns[], db: Pick<Db, "collection">,
   generation: ChunkGenerationWrite,
+  provenance?: { status: "legacy-unbound"; reason: string },
 ): Promise<ChunkWriteResult> {
   const plans = buildChunks(turns);
   if (!plans.length) return { written: 0, skipped: "no-chunkable-turns" };
   const docs: Chunks[] = plans.map(plan => ({
     _id: chunkContentId(tenantId, sessionId, plan.turnRefs, plan.text), tenantId, sourceRef: sessionId,
     turnRefs: toEvidenceTuple(plan.turnRefs), chunkIndex: plan.chunkIndex, indexArtifact: { ...generation.binding },
+    ...(provenance ? { provenance: { ...provenance } } : {}),
   }));
   generation.prepared(docs);
   const coll = scopedCollection<Chunks>(db as never, "chunks")(tenantId);

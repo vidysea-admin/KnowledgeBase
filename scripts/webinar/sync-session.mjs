@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { isProtectedWorkDbName, bindDerivedArtifacts } from "../lib/transcript-provenance.mjs";
+import { isProtectedWorkDbName, bindDerivedArtifacts, requireScriptDatabase } from "../lib/transcript-provenance.mjs";
 import { resolveWorkDb } from "../watch/test-data-route.mjs";
 /**
  * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
@@ -201,6 +201,11 @@ const route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.
 const workDb = route.workDb;
 if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
 if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+// ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
+// resolved work database, refuses here, before any retention state or Mongo connection.
+const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
+if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
+const target = requireScriptDatabase(guardEnv, process.argv.slice(2));
 const gen = `gen-${Date.now()}`;
 const retentionIdentity = { tenantId, sessionId, sourceId: source._id };
 const retentionIo = INDEX ? await import("../../packages/ingest/src/retention/production/private-summary.ts") : undefined;
@@ -211,7 +216,7 @@ try {
     const processing = retentionWrites.setSessionIndexStatus(dir, retentionIdentity, "processing");
     if (!processing.ok) throw new Error(`retention processing state refused: ${processing.reason}`);
   }
-  await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", workDb);
+  await connect(target.url, target.dbName);
   const priorSource = await sources(tenantId).findOne({ _id: source._id });
   const priorSession = await sessions(tenantId).findOne({ _id: sessionId });
   const nativeSwap = sourceDoc.captureConsent !== undefined || priorSource?.captureConsent !== undefined ||
