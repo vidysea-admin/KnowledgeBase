@@ -89,6 +89,11 @@ export interface ApiFetchOptions {
   onResponseHeaders?: (headers: Headers) => void;
 }
 
+/** Caller headers minus authorization / content-type in ANY letter case: a differently-cased duplicate key would otherwise be merged into the real one by fetch (ISS-RULESWEB-002). */
+function callerHeaders(extra: Record<string, string> | undefined): Record<string, string> {
+  return Object.fromEntries(Object.entries(extra ?? {}).filter(([k]) => { const n = k.toLowerCase(); return n !== "authorization" && n !== "content-type"; }));
+}
+
 export async function apiFetch<T>(path: string, apiKey: string | null, options: ApiFetchOptions = {}): Promise<T> {
   if (!apiKey) throw new ApiError(401, "no API key set");
   const sentSession = authSession;
@@ -98,7 +103,7 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
     res = await fetch(`${API_BASE_URL}${path}`, {
       method: options.method ?? "GET",
       headers: {
-        ...options.headers,
+        ...callerHeaders(options.headers),
         authorization: `Bearer ${apiKey}`,
         ...(options.body !== undefined ? { "content-type": "application/json" } : {}),
       },

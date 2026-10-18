@@ -3,7 +3,7 @@ import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { ApiError, apiFetch } from "../../api/client.js";
 import { AuthProvider } from "../../auth/AuthContext.js";
 import { JoinRulesPage } from "./JoinRulesPage.js";
-import { classify, optOutBody, postPending } from "./joinRulesClient.js";
+import { BUSY_ERROR_CODE, classify, optOutBody, postPending } from "./joinRulesClient.js";
 
 vi.mock("../../api/client.js", async orig => ({ ...(await orig<typeof import("../../api/client.js")>()), apiFetch: vi.fn() }));
 const api = vi.mocked(apiFetch);
@@ -61,6 +61,56 @@ test("the page's opt-out (event id only, the editor has no URL or session key) s
   expect(writes()[0]![2]!.body).toEqual({ eventId: "evt-77" });
 });
 
+// ---- ISS-WEBHINTS-001: the opt-out UI supplies meetingUrl
+const link = (v: string) => fireEvent.change(screen.getByLabelText("Meeting link for the opt-out (optional)"), { target: { value: v } });
+test("ISS-WEBHINTS-001: a typed meeting link is sent as meetingUrl with the opt-out and shown in the confirmation", async () => {
+  mount(); await screen.findByLabelText("Rule 1 name");
+  link(" https://meet.example.com/abc ");
+  fireEvent.change(screen.getByLabelText("Event id to opt out of"), { target: { value: "evt-5" } });
+  fireEvent.click(screen.getByRole("button", { name: "Opt out of event…" }));
+  expect(screen.getByRole("alertdialog").textContent).toContain("https://meet.example.com/abc");
+  fireEvent.click(screen.getByRole("button", { name: "Confirm opt-out" })); await screen.findByText("Opted out of event evt-5.");
+  expect(writes()[0]![2]!.body).toEqual({ eventId: "evt-5", meetingUrl: "https://meet.example.com/abc" });
+});
+
+test.each(["not a url", "javascript:alert(1)", "ftp://x.example/a", "https://x.example/" + "a".repeat(2048)])("ISS-WEBHINTS-001: an unusable meeting link %# is refused before anything is sent", async bad => {
+  mount(); await screen.findByLabelText("Rule 1 name");
+  link(bad); fireEvent.change(screen.getByLabelText("Event id to opt out of"), { target: { value: "evt-5" } });
+  fireEvent.click(screen.getByRole("button", { name: "Opt out of event…" }));
+  expect(screen.getByRole("alert").textContent).toContain("meeting link");
+  expect(screen.queryByRole("button", { name: "Confirm opt-out" })).toBeNull(); expect(writes()).toHaveLength(0);
+});
+
+test("ISS-WEBHINTS-001: a link typed for the opt-out never rides on an approval", async () => {
+  mount(); await screen.findByLabelText("Rule 1 name");
+  link("https://meet.example.com/abc");
+  fireEvent.change(screen.getByLabelText("Sender to approve"), { target: { value: "a@example.com" } });
+  fireEvent.click(screen.getByRole("button", { name: "Approve sender…" })); fireEvent.click(screen.getByRole("button", { name: "Confirm approval" }));
+  await screen.findByText("Approved a@example.com.");
+  expect(writes()[0]![2]!.body).toEqual({ kind: "sender", value: "a@example.com" });
+});
+
+// ---- ISS-WEBHINTS-002: the 60 s cap and timer cleanup
+test("ISS-WEBHINTS-002: Retry-After 999999 is capped: Retry disabled at 59 s, enabled by 61 s", async () => {
+  getFail = [new ApiError(503, "busy", { code: "join_rules_busy", retryAfterSeconds: 999999 })];
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  mount(); await screen.findByRole("button", { name: "Retry" });
+  await act(async () => { vi.advanceTimersByTime(59000); });
+  expect(screen.getByRole("button", { name: "Retry" })).toBeDisabled();
+  await act(async () => { vi.advanceTimersByTime(2000); });
+  expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
+});
+
+test("ISS-WEBHINTS-002: unmounting during the wait leaves no timer behind", async () => {
+  getFail = [new ApiError(503, "busy", { code: "join_rules_busy", retryAfterSeconds: 30 })];
+  vi.useFakeTimers({ shouldAdvanceTime: true });
+  const baseline = vi.getTimerCount();
+  const view = mount(); await screen.findByRole("button", { name: "Retry" });
+  expect(vi.getTimerCount()).toBeGreaterThan(baseline);
+  view.unmount();
+  expect(vi.getTimerCount()).toBe(baseline);
+});
+
 // ---- ISS-JRLOCK-002: busy is the status + code, never the message text
 test("busy (503 + join_rules_busy) on save shows the busy message", async () => {
   mount(); await screen.findByLabelText("Rule 1 name");
@@ -84,6 +134,10 @@ test("ISS-JRLOCK-002 (c)/(d): busy on initial LOAD shows the busy text and an en
   mount(); await screen.findByRole("alert");
   expect(alerts()).toBe(BUSY_MSG);
   expect(screen.getByRole("button", { name: "Retry" })).toBeEnabled();
+});
+
+test("ISS-JRLOCK-002 (a): the busy code literal the web compares against is the api's literal", () => {
+  expect(BUSY_ERROR_CODE).toBe("join_rules_busy");
 });
 
 test("the old busy message text WITHOUT the code is not busy", () => {

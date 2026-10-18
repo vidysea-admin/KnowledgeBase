@@ -124,7 +124,7 @@ export function parseView(raw: unknown): JoinRulesView | null {
 }
 
 export type PendingKind = "sender" | "domain" | "optout";
-/** Identity of the meeting an opt-out refers to. The editor does not know these today (it only has event ids); see postPending. */
+/** Identity of the meeting an opt-out refers to. The opt-out form supplies meetingUrl (optional, typed by the user); sessionKey has no web source yet. */
 export interface MeetingHints { meetingUrl?: string; sessionKey?: string }
 export interface Pending { kind: PendingKind; value: string; hints?: MeetingHints }
 
@@ -141,6 +141,15 @@ export function checkPendingValue(kind: PendingKind, raw: string): { value: stri
   return value !== "" && value.length <= 1024 ? { value } : { error: "Enter the event id to opt out of." };
 }
 
+/** The optional meeting link of an opt-out: blank is "not given"; otherwise an http(s) URL of at most 2048 characters (the router's bound), kept as typed (trimmed). */
+export function checkMeetingUrl(raw: string): { url?: string } | { error: string } {
+  const v = raw.trim();
+  if (v === "") return {};
+  let ok = v.length <= 2048;
+  try { const u = new URL(v); ok = ok && (u.protocol === "https:" || u.protocol === "http:"); } catch { ok = false; }
+  return ok ? { url: v } : { error: "Enter the meeting link as a full http(s) address, or leave it empty." };
+}
+
 /** The plain-language consequence the user must confirm. Domain approval is deliberately stronger. */
 export function confirmationText(p: Pending, enforced: boolean = JOIN_RULES_ENFORCED): string {
   const note = enforced ? "" : " Join rules are not enforced by the bot yet: this is recorded, and the bot may still join until enforcement is switched on.";
@@ -154,7 +163,8 @@ export function confirmationText(p: Pending, enforced: boolean = JOIN_RULES_ENFO
       : `Approving the domain ${p.value} records that, once enforcement is switched on, the bot joins future meetings from EVERY sender at ${p.value} automatically, with no human click. `)
       + `That includes addresses you have never seen and people who join that organisation later. Approve a whole domain only if you fully trust everyone who can send from it.${note}`;
   }
-  return enforced
+  const link = p.hints?.meetingUrl ? ` The meeting link ${p.hints.meetingUrl} is sent with it, so the opt-out also matches by link.` : "";
+  return (enforced
     ? `Opting out of event ${p.value} means the bot will not join that meeting, even if a rule or an approval would otherwise allow it.`
-    : `Opting out of event ${p.value} records an opt-out for that event.${note}`;
+    : `Opting out of event ${p.value} records an opt-out for that event.`) + link + note;
 }

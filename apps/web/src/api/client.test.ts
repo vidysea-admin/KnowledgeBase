@@ -11,6 +11,17 @@ describe("apiFetch", () => {
     vi.restoreAllMocks();
   });
 
+  test("ISS-RULESWEB-002: caller-supplied headers cannot override Authorization or Content-Type", async () => {
+    const fetchMock = vi.fn(async () => new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await apiFetch("/x", "real-key", { method: "POST", body: { a: 1 }, headers: { authorization: "Bearer evil", Authorization: "Bearer evil2", "content-type": "text/plain", "If-Match": '"e1"' } });
+    const init = (fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1];
+    const h = new Headers(init.headers);
+    expect(h.get("authorization")).toBe("Bearer real-key");
+    expect(h.get("content-type")).toBe("application/json");
+    expect(h.get("if-match")).toBe('"e1"');
+  });
+
   test("an in-flight 401 from a previous login cannot invalidate a new login using the same key", async () => {
     localStorage.setItem(AUTH_KEY_STORAGE_KEY, "same-key");
     let resolve!: (value: Response) => void;
