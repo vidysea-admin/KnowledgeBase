@@ -64,6 +64,22 @@ test("gate: a reload seen before admission is not blamed as a post-admission rel
   assert.equal(g.onEvent({ event: "capture-error", error: "x" }), undefined);
 });
 
+test("gate: admission info carries assumed + reason from the admitted event; positive admission is not assumed", () => {
+  const g = createAdmissionGate();
+  assert.equal(g.admission, undefined);
+  g.onEvent({ event: "admitted", assumed: true, reason: "no-lobby-signal" });
+  assert.deepEqual(g.admission, { assumed: true, reason: "no-lobby-signal" });
+  assert.equal(g.admitted, true);
+  g.onEvent({ event: "admitted", assumed: false });
+  assert.equal((g as { admission?: { assumed: boolean } }).admission?.assumed, true, "first admission wins");
+  const h = createAdmissionGate();
+  h.onEvent({ event: "admitted", assumed: false });
+  assert.deepEqual(h.admission, { assumed: false });
+  const k = createAdmissionGate();
+  k.onEvent({ event: "admitted" });
+  assert.equal(k.admission?.assumed, false, "an admitted event without assumed is a positive admission");
+});
+
 // ---- runRecord with a fake join script ----
 
 const FAKE = [

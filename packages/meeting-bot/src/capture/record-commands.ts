@@ -120,7 +120,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     consentControl.privacy.onCaptureEvent(ev);
     consentControl.readiness.onCaptureEvent(ev);
     const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
-    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
+    if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
     if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
@@ -220,9 +220,9 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     if(!native)video = (inject.normalize ?? normalizeCapture)(video, false);
     const publicVideo=native&&!inject.finalize ? await finalizeRecordingWith({...inject.nativeFinalizerOverrides,tenantId,recordDir:workspace.recordDir,originalVideo,
       nativeMedia:native.media,nativeMaxTotalBytes:native.maxTotalBytes,nativeCanonicalClock:native.canonicalClock,
-      nativeArchive:inject.nativeArchive,nativeSidecarPath:inject.nativeSamplerPath??process.env.LKB_TILE_CAPTURE_FILE},video,sessionId,title,platform,rest.includes("--transcribe"),gaps,telegram)
+      nativeArchive:inject.nativeArchive,admission:gate.admission,nativeSidecarPath:inject.nativeSamplerPath??process.env.LKB_TILE_CAPTURE_FILE},video,sessionId,title,platform,rest.includes("--transcribe"),gaps,telegram)
       : await (inject.finalize ?? finalizeRecording)(video, sessionId, title, platform, rest.includes("--transcribe"), gaps,
-        telegram, (Date.now() - startedAt) / 1000, tenantId, workspace.recordDir, rest.includes("--lean-video"),originalVideo);
+        telegram, (Date.now() - startedAt) / 1000, tenantId, workspace.recordDir, rest.includes("--lean-video"),originalVideo,gate.admission);
     processRecordingArtifacts(finalizedCaptureVideo(publicVideo,video,!!inject.finalize), sessionId, rest);
   } finally {
     audioWatchdog.stop(); // idempotent — belt-and-suspenders if the inner finally was never reached

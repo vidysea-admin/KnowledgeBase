@@ -63,7 +63,8 @@ export interface TelegramNotifierDeps {
 
 export interface TelegramNotifier {
   readonly enabled: boolean;
-  notifyJoined(title: string, platform: string): void;
+  /** `assumed`: admitted by assumption (non-Meet, no lobby signal), not positively seen in the call. */
+  notifyJoined(title: string, platform: string, opts?: { assumed?: boolean }): void;
   notifyDisconnected(reason: string): void;
   notifyRecovered(reason: string, durationSec: number): void;
   /** Exposed for a future live silence-watchdog (T-031) to call; nothing in this module triggers
@@ -152,8 +153,8 @@ export function createTelegramNotifier(deps: TelegramNotifierDeps = {}): Telegra
 
   const notifier: TelegramNotifier = {
     enabled,
-    notifyJoined(title, platform) {
-      fireAndForget("joined", `✅ Joined: ${title} (${platform})`);
+    notifyJoined(title, platform, opts) {
+      fireAndForget("joined", opts?.assumed ? `✅ Joined (assumed: no lobby signal): ${title} (${platform})` : `✅ Joined: ${title} (${platform})`);
     },
     notifyDisconnected(reason) {
       fireAndForget("disconnected", `⚠️ Disconnected — ${reason}`);

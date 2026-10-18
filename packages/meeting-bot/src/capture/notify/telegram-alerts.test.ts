@@ -67,6 +67,18 @@ test("notifyJoined sends title and platform", async () => {
   assert.match(calls[0]!.text, /zoho/);
 });
 
+test("notifyJoined says 'assumed: no lobby signal' when admission was only assumed, plain otherwise", async () => {
+  const { calls, send } = fakeTransport();
+  const notifier = createTelegramNotifier(notifierDeps({ send }));
+  notifier.notifyJoined("Weekly Sync", "cloudonair", { assumed: true });
+  await flush();
+  assert.match(calls[0]!.text, /Joined \(assumed: no lobby signal\): Weekly Sync \(cloudonair\)/);
+  const second = fakeTransport();
+  createTelegramNotifier(notifierDeps({ send: second.send })).notifyJoined("Weekly Sync", "cloudonair", { assumed: false });
+  await flush();
+  assert.equal(second.calls[0]!.text, "✅ Joined: Weekly Sync (cloudonair)");
+});
+
 test("notifyDisconnected sends the reason", async () => {
   const { calls, send } = fakeTransport();
   const notifier = createTelegramNotifier(notifierDeps({ send }));

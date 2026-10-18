@@ -221,24 +221,44 @@ def classify_admission(platform, in_call_dom, body_lower):
     return "in-call" if in_call_dom else "unknown"
 
 
-class AdmissionState:
-    """Pure state machine. tick(admitted_now, now) -> "admitted" (once, on the first admitted tick)
-    | "timeout" (once, when still not admitted past timeout_s) | None. timeout_s <= 0 disables the
-    timeout. Once admitted it stays admitted (a later reload is not a new lobby wait)."""
+def is_blocked_text(body_lower):
+    """Pure: does the body text show a denied / removed / ended page? (the DENIED_PHRASES set)"""
+    body = body_lower or ""
+    return any(p in body for p in DENIED_PHRASES)
 
-    def __init__(self, started, timeout_s=ADMISSION_TIMEOUT_S):
+
+class AdmissionState:
+    """Pure state machine. tick(admitted_now, now, blocked=False) -> "admitted" (once, on the first
+    admitted tick) | "assumed" (once, lenient mode only) | "timeout" (once, when still not admitted past
+    timeout_s) | None. timeout_s <= 0 disables the timeout. Once admitted it stays admitted (a later
+    reload is not a new lobby wait).
+
+    `blocked` is True on a tick that positively showed a lobby or a denied/ended page. With
+    lenient=True (non-Meet platforms, whose in-call DOM probes are unverified live; D-167: the bot must
+    try its hardest to join and a false "not admitted" must not abort a join that succeeded) a timeout
+    that was never preceded by a blocked tick is NOT a failure: the bot is assumed to be in the call
+    ("assumed") instead of aborting. Any blocked tick makes the timeout strict again."""
+
+    def __init__(self, started, timeout_s=ADMISSION_TIMEOUT_S, lenient=False):
         self.started = started
         self.timeout_s = timeout_s
+        self.lenient = lenient
         self.admitted = False
         self.timed_out = False
+        self.blocked_seen = False
 
-    def tick(self, admitted_now, now):
+    def tick(self, admitted_now, now, blocked=False):
         if self.admitted or self.timed_out:
             return None
         if admitted_now:
             self.admitted = True
             return "admitted"
+        if blocked:
+            self.blocked_seen = True
         if self.timeout_s and self.timeout_s > 0 and now - self.started > self.timeout_s:
+            if self.lenient and not self.blocked_seen:
+                self.admitted = True
+                return "assumed"
             self.timed_out = True
             return "timeout"
         return None
