@@ -84,14 +84,16 @@ export interface ApiFetchOptions {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
   /** Extra request headers (e.g. If-Match). Never overrides authorization or content-type. */
-  headers?: Record<string, string>;
+  headers?: HeadersInit;
   /** Called with the response headers of a 2xx response, before the body is parsed. Lets a caller read ETag without the wrapper changing its return type. */
   onResponseHeaders?: (headers: Headers) => void;
 }
 
-/** Caller headers minus authorization / content-type in ANY letter case: a differently-cased duplicate key would otherwise be merged into the real one by fetch (ISS-RULESWEB-002). */
-function callerHeaders(extra: Record<string, string> | undefined): Record<string, string> {
-  return Object.fromEntries(Object.entries(extra ?? {}).filter(([k]) => { const n = k.toLowerCase(); return n !== "authorization" && n !== "content-type"; }));
+/** Caller headers (plain object, tuple array or Headers) minus authorization / content-type in ANY letter case: a differently-cased duplicate key would otherwise be merged into the real one by fetch (ISS-RULESWEB-002). */
+function callerHeaders(extra: HeadersInit | undefined): Record<string, string> {
+  // Entries keep the caller's own key casing (existing consumers assert on it); only the two protected names go, in any case.
+  const entries: [string, string][] = extra === undefined ? [] : extra instanceof Headers ? [...extra.entries()] : Array.isArray(extra) ? extra.map(([k, v]) => [k, v] as [string, string]) : Object.entries(extra);
+  return Object.fromEntries(entries.filter(([k]) => { const n = k.toLowerCase(); return n !== "authorization" && n !== "content-type"; }));
 }
 
 export async function apiFetch<T>(path: string, apiKey: string | null, options: ApiFetchOptions = {}): Promise<T> {

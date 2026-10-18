@@ -4,6 +4,7 @@
  * (join-rules-normalize.ts). apps/web may not import packages/meeting-bot, so the rules are re-stated here;
  * this is a CONVENIENCE for the form only. The server re-validates and stays the authority.
  */
+import { safePublicResourceUrl } from "../../safe-url.js";
 import { JOIN_RULES_ENFORCED } from "./enforcement.js";
 export const PLATFORMS = ["meet", "teams", "zoom", "webex", "zoho", "cloudonair", "unknown"] as const;
 export type Platform = typeof PLATFORMS[number];
@@ -145,8 +146,7 @@ export function checkPendingValue(kind: PendingKind, raw: string): { value: stri
 export function checkMeetingUrl(raw: string): { url?: string } | { error: string } {
   const v = raw.trim();
   if (v === "") return {};
-  let ok = v.length <= 2048;
-  try { const u = new URL(v); ok = ok && (u.protocol === "https:" || u.protocol === "http:"); } catch { ok = false; }
+  const ok = v.length <= 2048 && safePublicResourceUrl(v) !== null;
   return ok ? { url: v } : { error: "Enter the meeting link as a full http(s) address, or leave it empty." };
 }
 

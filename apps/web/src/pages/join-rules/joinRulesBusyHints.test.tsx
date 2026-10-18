@@ -73,7 +73,7 @@ test("ISS-WEBHINTS-001: a typed meeting link is sent as meetingUrl with the opt-
   expect(writes()[0]![2]!.body).toEqual({ eventId: "evt-5", meetingUrl: "https://meet.example.com/abc" });
 });
 
-test.each(["not a url", "javascript:alert(1)", "ftp://x.example/a", "https://x.example/" + "a".repeat(2048)])("ISS-WEBHINTS-001: an unusable meeting link %# is refused before anything is sent", async bad => {
+test.each(["not a url", "javascript:alert(1)", "ftp://x.example/a", "https://x.example/" + "a".repeat(2048), "https://user:pw@host/", "https://user@host/", "https://host/a\u0001b", "https://host/a\u0085b"])("ISS-WEBHINTS-001: an unusable meeting link %# is refused before anything is sent", async bad => {
   mount(); await screen.findByLabelText("Rule 1 name");
   link(bad); fireEvent.change(screen.getByLabelText("Event id to opt out of"), { target: { value: "evt-5" } });
   fireEvent.click(screen.getByRole("button", { name: "Opt out of event…" }));
