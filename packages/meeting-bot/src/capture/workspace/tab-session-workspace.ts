@@ -10,6 +10,7 @@ import { createCaptureSlotReadinessObserver } from "./capture-slot-readiness.js"
 
 import type { CaptureWorkspace } from "./capture-workspace-types.js";
 export type { CaptureWorkspace } from "./capture-workspace-types.js";
+export { seedSlotFromArgs } from "./slot-profile-seed.js";
 type WorkspaceOperation = "login" | "record" | "finalize";
 
 function physicalDirectories(target: string): void {

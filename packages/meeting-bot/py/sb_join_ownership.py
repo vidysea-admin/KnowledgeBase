@@ -8,6 +8,7 @@ import sys
 import time
 
 from sb_join_profile import existing_profile_directory
+from sb_join_seed import unproved_entries
 
 
 def kill_orphans(profile, launch=False, expected_exe=None, profile_directory=None, *, os=os, time=time):
@@ -239,7 +240,7 @@ def kill_orphans(profile, launch=False, expected_exe=None, profile_directory=Non
         elif ctypes.get_last_error() != 2 or browser_alive:
             raise RuntimeError("Cannot inspect owned Job")
         record["phase"] = "cleaned"; persist(record)
-    elif any(name != ".lkb-profile.lock" for name in os.listdir(expected)):
+    elif unproved_entries(expected, os.listdir(expected), profile_directory):
         raise RuntimeError("Legacy occupied or unproved profile refused")
     for name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
         target = checked(os.path.join(expected, name))

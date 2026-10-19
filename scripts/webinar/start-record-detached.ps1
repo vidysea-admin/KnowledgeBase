@@ -27,6 +27,12 @@ param(
   [string]$SessionId,
   [string]$EndNotBefore,
   [string]$ExtraArgs = "",
+  # w24-signedslots: parallel signed-in recordings. -CaptureSlot gives the run its own user-data-dir;
+  # -SeedProfile copies the session files of an already signed-in Chrome profile into it (fail-closed
+  # if not signed in); -ProfileDirectory names the sub-profile inside it (e.g. "Profile 1").
+  [string]$CaptureSlot,
+  [string]$SeedProfile,
+  [string]$ProfileDirectory,
   # ISS-317 fix (cycle 2): the ONLY value a Task Scheduler-launched run passes. Validated below
   # against the same [a-z0-9-]{1,64} shape task-scheduler.ts's JOB_KEY_RE enforces on the maker
   # side — belt-and-suspenders, since this script trusts nothing about how it was invoked.
@@ -46,7 +52,7 @@ if ($Job) {
     Write-Error "invalid -Job '$Job' (must match ^[a-z0-9-]{1,64}$) - refusing to read a job file"
     exit 1
   }
-  if ($Url -or $Until -or $Title -or $SessionId -or $EndNotBefore -or $ExtraArgs -or $CliEntry) {
+  if ($Url -or $Until -or $Title -or $SessionId -or $EndNotBefore -or $ExtraArgs -or $CliEntry -or $CaptureSlot -or $SeedProfile -or $ProfileDirectory) {
     Write-Error "scheduled dispatch refuses replacement recording arguments"
     exit 1
   }
@@ -78,6 +84,9 @@ if ($Job) {
   if ($Title) { $cliArgs += @("--title", $Title) }
   if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
   if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
+  if ($CaptureSlot) { $cliArgs += @("--capture-slot", $CaptureSlot) }
+  if ($SeedProfile) { $cliArgs += @("--seed-profile", $SeedProfile) }
+  if ($ProfileDirectory) { $cliArgs += @("--profile-directory", $ProfileDirectory) }
   if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
 }
 
