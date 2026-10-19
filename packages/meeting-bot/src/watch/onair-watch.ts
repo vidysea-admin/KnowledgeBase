@@ -44,6 +44,20 @@ export function watchDurationSec(mediaDurationSec: unknown, cfg: Pick<OnairWatch
   return Math.ceil(Math.min(media + cfg.paddingSec, cfg.maxSec));
 }
 
+/** `--onair-session TITLE`: validated, then handed to the bot browser through LKB_ONAIR_SESSION (acts only under LKB_ONAIR_WATCH=1). */
+export function applyOnairSession(title: string | undefined, env: NodeJS.ProcessEnv = process.env): void {
+  if (title === undefined) return;
+  if (!/^[ -~]{1,200}$/.test(title)) throw new Error("invalid --onair-session (1-200 printable ASCII characters)");
+  env.LKB_ONAIR_SESSION = title;
+}
+
+/** The `onair-duration` event from the bot browser -> a new recording end (media + padding, capped); else undefined. */
+export function onairUntilFromEvent(ev: { event?: unknown; seconds?: unknown }, nowMs: number, env: NodeJS.ProcessEnv = process.env): Date | undefined {
+  const cfg = onairWatchConfig(env);
+  if (!cfg.enabled || ev.event !== "onair-duration" || typeof ev.seconds !== "number" || !(ev.seconds > 0) || !Number.isFinite(ev.seconds)) return undefined;
+  return new Date(nowMs + watchDurationSec(ev.seconds, cfg) * 1000);
+}
+
 /** Canonical watch URL for an exact allowlisted origin and `/events/<slug>`; query and fragment are dropped. */
 export function canonicalWatchUrl(url: unknown, slug: string): { ok: true; url: string } | { ok: false; reason: WatchRefusal } {
   if (typeof url !== "string" || url.length > 2048 || /[\x00-\x20\x7f\\]/.test(url)) return { ok: false, reason: "invalid-url" };
