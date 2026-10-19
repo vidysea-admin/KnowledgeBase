@@ -19,6 +19,7 @@ import { classifyWebinarInvite } from "./auto-record-policy.js";
 import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
 import { createWhatsappLoaderFromEnv } from "./whatsapp-discovery/whatsapp-candidate-loader.js";
+import { createArchiverFetcherFromEnv } from "./whatsapp-discovery/whatsapp-archiver-fetcher.js";
 import { mergeWhatsappCandidates } from "./whatsapp-discovery/whatsapp-merge.js";
 import { withOnairMailFromEnv } from "./onair/onair-mail-loader.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
@@ -74,7 +75,7 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
     loadCalendarEvents: discoveryOff ? async () => [] : createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
     loadCandidates: discoveryOff ? async () => [] : withOnairMailFromEnv(createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
       process.env, REPO_ROOT, log, createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY)),
-    loadWhatsappCandidates: discoveryOff ? undefined : createWhatsappLoaderFromEnv(process.env, log),
+    loadWhatsappCandidates: discoveryOff ? undefined : createWhatsappLoaderFromEnv(process.env, log, createArchiverFetcherFromEnv(process.env, REPO_ROOT, log)),
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
     joinRulesTenantId: process.env.LKB_TENANT_ID,

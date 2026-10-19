@@ -2443,3 +2443,19 @@ fourth would have left real decisions idle behind an unrelated unit.
 - qa/manifests/w27-labelreview.md
 **Approved-by:** Umesh (verbatim quote in What)
 **Links:** T-022, U2.2, D-163, D-164, D-020, D-015, qa/manifests/w27-labelreview.md
+
+## D-184 | 2026-10-19 | type: decision | status: ACTIVE
+**Title:** WhatsApp groups become a webinar-discovery source through a minimal read-only path into the archiver
+**What:** Records two Approver statements given in chat on 2026-10-19. Question: "Where do the daily webinars actually come from?" Answer, verbatim: "WhatsApp groups". Later, verbatim: "whatsapp open krkee de ai connect krwa deta hu". The archiver runs at localhost:3000 and writes to the staging Mongo database `whatsapp_msg` (collections messages, groups, tracking).
+- Rule 1, new read path for webinar discovery only. Read only the archiver's `messages` from groups that are tracked AND listed in `WA_DISCOVERY_GROUPS` AND whose consent is not false.
+- Rule 2, minimal extraction. Extract only {url, ts, groupIdHash, messageIdHash}. Message text and sender are never stored or logged; the text exists only in memory inside the extractor and is discarded.
+- Rule 3, approval. WhatsApp candidates are needs-approval under D-178 ruling 1, unless the join link's host is a known meeting platform AND the group is allow-listed. In that case they are scheduled like an authenticated sender. This follows D-167 (try hardest to join).
+- Default stays off: enabled only by LKB_WA_DISCOVERY=1 plus a non-empty WA_DISCOVERY_GROUPS.
+**Why:** The Approver stated that the daily webinars come from WhatsApp groups and connected the archiver for this purpose. A narrow, allow-listed, text-discarding read path serves discovery without widening access to private chat content.
+**Result:** The real fetcher for the existing flag-off extractor and loader (packages/meeting-bot/src/calendar/whatsapp-discovery/) is authorized. No contract or ARCHITECTURE edit is authorized. No decision is superseded.
+**Amends:** D-178 ruling 1 is unchanged except for the allow-listed known-platform case in Rule 3. D-167 is unchanged.
+**Changes-authorized:**
+- the real archiver message fetcher and its wiring in packages/meeting-bot/src/calendar/ (whatsapp-discovery/, schedule-tick.ts) with tests
+- the LKB_WA_DISCOVERY flag wiring
+**Approved-by:** Umesh
+**Links:** T-036, T-038, D-167, D-178, ISS-WAVECTORLESS-001
