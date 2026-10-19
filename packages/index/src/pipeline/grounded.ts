@@ -24,11 +24,11 @@ export interface RuntimeSpan {
 export const runtimeDigest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 export function runtimeRecord(value: unknown): Record<string, unknown> {
     if (!value || typeof value !== "object" || Array.isArray(value))
-        throw new Error("expected evidence object");
+        throw new RuntimeIncompleteError("expected evidence object");
     return value as Record<string, unknown>;
 }
 export function runtimeArray(value: unknown): unknown[] { if (!Array.isArray(value))
-    throw new Error("expected evidence array"); return value; }
+    throw new RuntimeIncompleteError("expected evidence array"); return value; }
 export function runtimeString(value: unknown): string { if (typeof value !== "string" || !value.trim())
     throw new Error("expected evidence text"); return value; }
 export function runtimeOrigin(turn: Turns): RuntimeOrigin {
@@ -118,13 +118,17 @@ export function runtimeWindows(turns: Turns[], budget = runtimeRequestBudget()):
 export const runtimeInventory = (spans: RuntimeSpan[]) => spans.map(({ turnId, from, to, digest }) => ({ turnId, from, to, digest }));
 export function assertRuntimeCoverage(value: unknown, spans: RuntimeSpan[]): void {
     const rows = runtimeArray(value).map((entry) => {
-        const r = runtimeRecord(entry);
-        if (Object.keys(r).sort().join(",") !== "digest,from,to,turnId")
-            throw new Error("invalid processed-span shape");
+        if (!entry || typeof entry !== "object" || Array.isArray(entry))
+            throw new RuntimeIncompleteError("invalid processed-span shape"); // e.g. a bare turn id string instead of the inventory row
+        const r = entry as Record<string, unknown>;
+        // Models echo the whole span object (GLM, live 2026-10-19): the span's own sessionId is tolerated, never any other extra key.
+        const keys = Object.keys(r).filter((k) => k !== "sessionId" || !spans.some((s) => s.sessionId === r.sessionId)).sort().join(",");
+        if (keys !== "digest,from,to,turnId")
+            throw new RuntimeIncompleteError("invalid processed-span shape");
         return { turnId: r.turnId, from: r.from, to: r.to, digest: r.digest };
     });
     if (JSON.stringify(rows) !== JSON.stringify(runtimeInventory(spans)))
-        throw new Error("incomplete or altered processed-span acknowledgement");
+        throw new RuntimeIncompleteError("incomplete or altered processed-span acknowledgement");
 }
 export function runtimeEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[]): NonEmptyEvidence {
     const evidence = runtimeArray(value).map((raw) => {
@@ -183,6 +187,34 @@ export async function runtimeComplete(complete: RuntimeComplete, kind: "summariz
     const result = await complete({ kind, messages: [{ role: "system", content: system }, { role: "user", content }] });
     return result.json ?? parseJsonLoose(result.text);
 }
+/** Judge verdict that the extractor omitted informative content: the one failure a fresh extraction of the same window can legitimately cure. */
+export class RuntimeIncompleteError extends Error {
+}
+/** Verifier edge rule (notes/sentence-span.ts), stated to the extractor so quotes are not dropped for their cut points; the verifier itself is unchanged. */
+export const QUOTE_RULE = " Each evidence quote must be one or more WHOLE sentences or clauses copied exactly: begin at the start of the turn or right after . ? ! , ; : and end ON a . ? ! , ; : mark or at the turn end. Never begin or stop mid-sentence, and never end on a dangling vocative or fragment such as a trailing name; if a sentence is cut short in the source, quote the whole preceding clause instead.";
+export const RETRY_HINT = "A previous independent review found informative statements omitted from an earlier attempt at these exact spans. Extract EVERY informative statement: lists of offerings, methods, plans, numbers, dates and conflicting statements, each as its own exact whole-sentence quote. Offers, requests and suggestions are insights, never actions." + QUOTE_RULE;
+/** Rolls the drop log back to `mark` and returns the verifier's rejections since then (reason + excerpt), to tell the extractor what to re-quote. */
+export function rejectedFeedback(log: { reason: string; excerpt: string }[] | undefined, mark: number): string {
+    if (!log)
+        return "";
+    const rejected = log.splice(mark).filter((d) => d.excerpt).slice(0, 12).map((d) => `${d.reason}: "${d.excerpt}"`);
+    return rejected.length ? " Rejected last time (re-quote these as whole sentences): " + rejected.join(" | ") : "";
+}
+/** Runs one window's extract+judge. On a judge-reported omission or a malformed acknowledgement (and only those) the failing spans are re-extracted: a lone span once, else as two halves (recursively), each told which proposals the verifier rejected last time (`rollback` returns that feedback). Finite (<= 2 attempts per span depth) and the bar is unchanged: a retried lone span that fails again throws. */
+export async function withWindowRetry<T>(spans: RuntimeSpan[], run: (spans: RuntimeSpan[], hint?: string) => Promise<T>, join: (parts: T[]) => T, rollback: () => string, hint?: string): Promise<T> {
+    try {
+        return await run(spans, hint);
+    }
+    catch (error) {
+        if (!(error instanceof RuntimeIncompleteError) || (hint !== undefined && spans.length < 2))
+            throw error;
+        const next = RETRY_HINT + rollback();
+        if (spans.length < 2)
+            return run(spans, next);
+        const mid = Math.ceil(spans.length / 2), first = await withWindowRetry(spans.slice(0, mid), run, join, rollback, next);
+        return join([first, await withWindowRetry(spans.slice(mid), run, join, rollback, next)]);
+    }
+}
 export interface RuntimeVerdict { id: string; supported: unknown; categoryCorrect: unknown; answerRelevant: unknown }
 /** Runs the independent judge and returns the verdict records; protocol failures (coverage, completeness, missing/duplicate/unknown ids) still throw. */
 export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {
@@ -201,10 +233,10 @@ export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summariz
     if (JSON.stringify(context).length > runtimeRequestBudget() * 3)
         throw new Error("full semantic context exceeds48K budget");
     const raw = runtimeRecord(await runtimeComplete(complete, kind, (mode === "pending-qa" ? 'Review exactly every pending question candidate; completeness is per-question judgment, not new insight extraction. ' : mode === "claim-extraction" ? 'Review factual claim extraction completeness; informative but fact-free source may have noClaims=true. ' : 'Review informative summary extraction completeness. ') +
-        'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions; noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 4));
+        'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions of informative content INSIDE the submitted spans only: adjacent context turns outside the spans belong to other windows and never make complete=false. noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 4));
     assertRuntimeCoverage(raw.processed, spans);
     if (raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)))
-        throw new Error("informative extraction gap or incomplete semantic review");
+        throw new RuntimeIncompleteError("informative extraction gap or incomplete semantic review");
     const verdicts = runtimeArray(raw.verdicts).map(runtimeRecord);
     if (verdicts.length !== items.length || new Set(verdicts.map((v) => v.id)).size !== verdicts.length || verdicts.some((v) => !items.some((item) => item.id === v.id)))
         throw new Error("missing/failed/unknown semantic verdict");

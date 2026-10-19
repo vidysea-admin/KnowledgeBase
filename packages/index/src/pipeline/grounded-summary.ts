@@ -2,8 +2,8 @@
 import type { Turns } from "@lkb/core";
 import type { JudgeContext } from "./notes/judge.js";
 import { collectWindow, judgePendingCandidates, tryQA, type DroppedNote } from "./notes/drop-mode.js";
-import { runtimeChronologicalTurns, runtimeArray, runtimeRecord, runtimeComplete, runtimeWindows, runtimeRequestBudget, runtimeInventory, assertRuntimeCoverage, runtimeItem, runtimeQA, runtimeJudge, validateRuntimePage, type RuntimeComplete, type RuntimeItem, type RuntimeQA } from "./grounded.js";
-const EXTRACT = 'Read ALL supplied source spans. Return {processed: exact inventory, items:[], qa:[]}. Items: {kind:insight|decision|action,text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}. QA: {question,questionEvidence,answer:null|string,answerEvidence:[],status:answered|unanswered}. Every text/question/answer must equal its exact evidence quotes joined by newline. Evidence quotes must lie entirely inside a submitted span. Do not supply ids. Preserve source origin; screen content is unverified. Proposals/negated adoption are not decisions; suggestions are not assigned actions. Extract informative content throughout; no inferred owners/names/dates. Questions without relevant cited answers are unanswered/null/empty answerEvidence.';
+import { runtimeChronologicalTurns, runtimeArray, runtimeRecord, runtimeComplete, runtimeWindows, runtimeRequestBudget, runtimeInventory, assertRuntimeCoverage, runtimeItem, runtimeQA, runtimeJudge, validateRuntimePage, withWindowRetry, rejectedFeedback, QUOTE_RULE, type RuntimeComplete, type RuntimeItem, type RuntimeQA } from "./grounded.js";
+const EXTRACT = 'Read ALL supplied source spans. Return {processed: exact inventory, items:[], qa:[]}. Items: {kind:insight|decision|action,text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}. QA: {question,questionEvidence,answer:null|string,answerEvidence:[],status:answered|unanswered}. Every text/question/answer must equal its exact evidence quotes joined by newline. Evidence quotes must lie entirely inside a submitted span. Do not supply ids. Preserve source origin; screen content is unverified. Proposals/negated adoption are not decisions; suggestions are not assigned actions. Extract informative content throughout; no inferred owners/names/dates. Questions without relevant cited answers are unanswered/null/empty answerEvidence.' + QUOTE_RULE;
 function mergeQuestion(map: Map<string, RuntimeQA>, q: RuntimeQA): void {
     const prior = map.get(q.id);
     if (prior?.status === "answered" && q.status === "answered" && JSON.stringify(prior) !== JSON.stringify(q))
@@ -17,20 +17,23 @@ export async function produceRuntimeSummary(turns: Turns[], complete: RuntimeCom
     const windows = runtimeWindows(turns), items = new Map<string, RuntimeItem>(), questions = new Map<string, RuntimeQA>();
     const processed = new Map<string, Set<string>>();
     for (const spans of windows) {
-        const raw = runtimeRecord(await runtimeComplete(complete, "summarize", EXTRACT, { phase: "extract-summary", spans, inventory: runtimeInventory(spans) }));
-        assertRuntimeCoverage(raw.processed, spans);
-        let nextItems: RuntimeItem[], nextQuestions: RuntimeQA[];
-        if (drops) {
-            ({ items: nextItems, qa: nextQuestions } = await collectWindow(complete, turns, spans, raw.items, raw.qa, drops, jc));
-        }
-        else {
-            nextItems = runtimeArray(raw.items).map((i) => runtimeItem(i, turns, spans));
-            nextQuestions = runtimeArray(raw.qa).map((q) => runtimeQA(q, turns, spans, spans));
+        let mark = 0; // drop-log start of the CURRENT attempt, so a failed half rolls back only its own rejections
+        const { nextItems, nextQuestions } = await withWindowRetry(spans, async (sp, hint) => {
+            mark = drops?.length ?? 0;
+            const raw = runtimeRecord(await runtimeComplete(complete, "summarize", EXTRACT, { phase: "extract-summary", spans: sp, inventory: runtimeInventory(sp), ...(hint ? { retry: hint } : {}) }));
+            assertRuntimeCoverage(raw.processed, sp);
+            if (drops) {
+                const w = await collectWindow(complete, turns, sp, raw.items, raw.qa, drops, jc);
+                return { nextItems: w.items as RuntimeItem[], nextQuestions: w.qa as RuntimeQA[] };
+            }
+            const nextItems = runtimeArray(raw.items).map((i) => runtimeItem(i, turns, sp));
+            const nextQuestions = runtimeArray(raw.qa).map((q) => runtimeQA(q, turns, sp, sp));
             const proposed = [...nextItems, ...nextQuestions];
             if (new Set(proposed.map((i) => i.id)).size !== proposed.length)
                 throw new Error("duplicate window extracts");
-            await runtimeJudge(complete, "summarize", turns, spans, proposed);
-        }
+            await runtimeJudge(complete, "summarize", turns, sp, proposed);
+            return { nextItems, nextQuestions };
+        }, (parts) => ({ nextItems: parts.flatMap((p) => p.nextItems), nextQuestions: parts.flatMap((p) => p.nextQuestions) }), () => rejectedFeedback(drops, mark));
         for (const item of nextItems)
             items.set(item.id, item);
         for (const q of nextQuestions)

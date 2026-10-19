@@ -108,3 +108,23 @@ test("cloud deadline aborts the request even when transport never resolves", asy
   await assert.rejects(new OllamaCloudProvider(t, { apiKey: "test-key", timeoutMs: 5 }).complete(job), /timed out/);
   assert.equal(signal?.aborted, true);
 });
+
+test("HTTP 429 is retried a bounded number of times; 5xx, other statuses and exhausted retries still fail", async () => {
+  const limited = { status: 429, body: {} };
+  const t = fakeTransport(limited, limited, ok);
+  const result = await new OllamaCloudProvider(t, { apiKey: "test-key", retryDelaysMs: [0, 0] }).complete(job);
+  assert.equal(result.text, "source-backed answer");
+  assert.equal(t.calls.length, 3);
+  const stuck = fakeTransport(limited);
+  await assert.rejects(new OllamaCloudProvider(stuck, { apiKey: "test-key", retryDelaysMs: [0, 0] }).complete(job), /API error HTTP 429/);
+  assert.equal(stuck.calls.length, 3);
+  const denied = fakeTransport({ status: 401, body: {} }, ok);
+  await assert.rejects(new OllamaCloudProvider(denied, { apiKey: "test-key", retryDelaysMs: [0, 0] }).complete(job), /HTTP 401/);
+  assert.equal(denied.calls.length, 1);
+  const down = fakeTransport({ status: 503, body: {} }, ok);
+  await assert.rejects(new OllamaCloudProvider(down, { apiKey: "test-key", retryDelaysMs: [0, 0] }).complete(job), /HTTP 503/);
+  assert.equal(down.calls.length, 1);
+  const off = fakeTransport(limited, ok);
+  await assert.rejects(new OllamaCloudProvider(off, { apiKey: "test-key", retryDelaysMs: [] }).complete(job), /HTTP 429/);
+  assert.equal(off.calls.length, 1);
+});
