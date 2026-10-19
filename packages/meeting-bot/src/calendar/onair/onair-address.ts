@@ -28,22 +28,24 @@ export function parseFromAddress(from: string): { email: string; domain: string 
 const GOOGLE_AUTHSERV = "mx.google.com";
 const googleDomain = (d: string) => d === "google.com" || d.endsWith(".google.com");
 
+const authservOf = (header: string) => header.replace(/\([^)]*\)/g, " ").split(";")[0]!.trim().split(/\s+/)[0]?.toLowerCase();
+
 /**
- * True only when a Google-added (authserv-id mx.google.com) Authentication-Results header has ONE dmarc clause whose result is exactly
- * pass and whose header.from is exactly google.com or a subdomain of it, and that header.from equals the From domain.
+ * True only when the TOPMOST Authentication-Results header (the one Gmail prepends; list is in message order) has authserv-id
+ * mx.google.com, no other header carries that id, and it holds ONE dmarc clause whose result is exactly pass and whose header.from
+ * is google.com or a subdomain and equals the From domain.
  */
 export function dmarcPassesFor(authResults: string[], fromDomain: string): boolean {
   const want = fromDomain.toLowerCase();
-  if (!googleDomain(want)) return false;
-  for (const header of authResults) {
-    const clauses = header.replace(/\([^)]*\)/g, " ").split(";");
-    if (clauses[0]!.trim().split(/\s+/)[0]?.toLowerCase() !== GOOGLE_AUTHSERV) continue;
-    for (const clause of clauses.slice(1)) {
-      const tokens = clause.trim().split(/\s+/);
-      if (!/^dmarc=pass$/i.test(tokens[0] ?? "")) continue;
-      const hf = tokens.slice(1).map(t => /^header\.from=([^\s]+)$/i.exec(t)?.[1]?.toLowerCase()).filter(Boolean);
-      if (hf.length === 1 && hf[0] === want) return true;
-    }
+  if (!googleDomain(want) || authResults.length === 0) return false;
+  if (authservOf(authResults[0]!) !== GOOGLE_AUTHSERV) return false;
+  if (authResults.filter(h => authservOf(h) === GOOGLE_AUTHSERV).length !== 1) return false;
+  const clauses = authResults[0]!.replace(/\([^)]*\)/g, " ").split(";");
+  for (const clause of clauses.slice(1)) {
+    const tokens = clause.trim().split(/\s+/);
+    if (!/^dmarc=pass$/i.test(tokens[0] ?? "")) continue;
+    const hf = tokens.slice(1).map(t => /^header\.from=([^\s]+)$/i.exec(t)?.[1]?.toLowerCase()).filter(Boolean);
+    if (hf.length === 1 && hf[0] === want) return true;
   }
   return false;
 }

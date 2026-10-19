@@ -1,7 +1,7 @@
 # w27-onairmail: join Google Cloud OnAir webinars announced by mail
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-onairmail (lane/w27-onairmail)
 Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4
 Commits: U2 c79b3fc4 (resolver); U1 = candidate SHA (git log -1 on the lane branch)
@@ -36,3 +36,8 @@ New onair-address.ts: RFC 5322 From parser (quoted names, comments, single mailb
 mx.google.com only; one dmarc=pass clause whose header.from equals the From domain exactly). Multiple From headers -> unauthenticated, from="".
 Tests added: google.com.evil.com (checker bypass, now refused), cross-clause pass, quoted display name, foreign authserv-id, multiple From, subdomain mismatch.
 51 pass (onair 37 + schedule-tick 14); tsc exit 0. D-020: exact-domain match replaced by startsWith -> caught by loader test; restored identical.
+
+## Fix cycle 2 (checker FAIL dc1529ad, forged Authentication-Results)
+dmarcPassesFor now trusts only the topmost Authentication-Results header (must be authserv-id mx.google.com) and refuses when more than one header
+carries that id. Tests: forged pass above/below Google's fail, two passing mx.google.com headers, foreign topmost header. 51 pass, tsc exit 0.
+D-020: dropped topmost-authserv check and dropped single-header check, each caught by the loader test; files restored identical.

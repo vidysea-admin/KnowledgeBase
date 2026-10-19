@@ -85,7 +85,13 @@ test("gmail fetch: sender-gate bypass attempts are not authenticated", async () 
   assert.equal(await auth(GOOD, ['"x <a@google.com>" <a@evil.com>']), false, "quoted display name");
   assert.equal(await auth(GOOD, ["A <a@google.com>", "B <b@evil.com>"]), false, "multiple From headers");
   assert.equal(await auth(GOOD, ["A <a@mail.google.com>"]), false, "From domain differs from dmarc header.from");
-  assert.equal(await auth(["mx.evil.example; dmarc=pass header.from=google.com", GOOD]), true, "a genuine Google header still counts");
+  const FAIL = "mx.google.com; dmarc=fail (p=REJECT) header.from=google.com";
+  const FORGED = "mx.google.com; dmarc=pass header.from=google.com";
+  assert.equal(await auth([FORGED, FAIL]), false, "forged pass above Google's fail");
+  assert.equal(await auth([FAIL, FORGED]), false, "forged pass below Google's fail");
+  assert.equal(await auth([GOOD, FORGED]), false, "two mx.google.com headers that both pass");
+  assert.equal(await auth(["mx.evil.example; dmarc=pass header.from=google.com", GOOD]), false, "topmost header has a foreign authserv-id");
+  assert.equal(await auth([GOOD, "mx.evil.example; dmarc=fail header.from=google.com"]), true, "topmost Google header passes");
   const mails = await createOnairGmailLoader(fakeGws([], GOOD, ["A <a@google.com>", "B <b@evil.com>"]))();
   assert.equal(mails[0]!.from, "");
 });

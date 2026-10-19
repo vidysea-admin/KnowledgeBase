@@ -29,6 +29,10 @@ test("dmarcPassesFor: exact clause, exact domain, Google authserv-id only", () =
   assert.equal(dmarcPassesFor(["mx.google.com; dmarc=pass header.from=evil.com; spf=pass header.from=google.com"], "google.com"), false);
   assert.equal(dmarcPassesFor(["evil.example; dmarc=pass header.from=google.com"], "google.com"), false);
   assert.equal(dmarcPassesFor([], "google.com"), false);
+  const pass = "mx.google.com; dmarc=pass header.from=google.com", fail = "mx.google.com; dmarc=fail header.from=google.com";
+  assert.equal(dmarcPassesFor([pass, fail], "google.com"), false);
+  assert.equal(dmarcPassesFor([fail, pass], "google.com"), false);
+  assert.equal(dmarcPassesFor(["evil.example; dmarc=pass header.from=google.com", pass], "google.com"), false);
 });
 
 test("senderIsGoogle uses the real address parser", () => {
