@@ -10,6 +10,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
 import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { citesNameAsAnIntroduction } from "./speaker-name-rules.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
   return { _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text };
@@ -78,6 +79,10 @@ for (const [text, name] of [["We met in Paris. My name is Paris.", "Paris"], ["I
  * one case where the signal cannot tell the two readings apart, because the turn contains both.
  * Refusal is the safe direction under C12 (a fabricated identity is the worse error), and the cost
  * is bounded to single-token candidates — the multi-token recall test above is the bound.
+ *
+ * ISS-104CC-3: the cost is CONSTRUCTION-CONDITIONAL, not a flat "15%". The refusal is candidate-independent, so inside
+ * a locative-mention-plus-weak-cue turn it is ~100% for ANY name, and outside one it is ~0%. The two blocks below pin
+ * exactly that, per name; the counts a reader should quote are 6/6 inside the construction and 0/6 outside it.
  */
 test("ISS-104 place signal cost: a weak cue plus a place reading of the same string is refused", async () => {
   assert.equal(await shipped("We met in Paris. Paris here, from admissions.", "Paris"), false,
@@ -127,4 +132,44 @@ test("ISS-104 handover: `coming up next` refuses the introduced name for the CUR
 test("ISS-104 handover: self-naming in the same turn still resolves", async () => {
   assert.equal(await shipped("Hello everyone, I would like to introduce myself, my name is Nilesh.", "Nilesh"), true,
     "a self-naming cue survives the handover gate");
+});
+
+/**
+ * ISS-104CC-3 -- the cost, measured as the construction it depends on. The four rows are the manifest's own refused
+ * rows, verbatim (qa/manifests/iss-104-place-vs-person-signal.md); the checker's 7-case sentences were never recorded in
+ * the ledger row (names only), so the per-name block below is AUTHORED to that description and is an illustration of
+ * the shape, not the ledger's corpus. Asia is a pre-existing `over to` handover refusal and is not this signal's cost.
+ */
+for (const [text, name] of [
+  ["Over to Asia for the next section.", "Asia"],
+  ["We met in Paris. Paris here, from admissions.", "Paris"],
+  ["Our centre is in Georgia. Georgia speaking from the visa team.", "Georgia"],
+  ["I studied in Sydney. Sydney here with an update.", "Sydney"],
+] as [string, string][]) {
+  test(`ISS-104CC-3 manifest row: refused ${JSON.stringify(text)}`, async () => { assert.equal(await shipped(text, name), false); });
+}
+const COST_NAMES = ["Paris", "India", "Mumbai", "Georgia", "Austin", "Sydney"];
+for (const name of COST_NAMES) {
+  test(`ISS-104CC-3 inside the construction (locative mention + weak cue): ${name} refused`, async () => {
+    assert.equal(await shipped(`We met in ${name}. ${name} here, from admissions.`, name), false);
+  });
+  test(`ISS-104CC-3 outside the construction (no locative mention): ${name} resolves`, async () => {
+    assert.equal(await shipped(`${name} here, from admissions.`, name), true);
+  });
+}
+
+/**
+ * The same cost, at the NAMING-CUE PREDICATE. extractSpeakers has a stricter allow-list in front of it that refuses most of
+ * these turns on its own, so only the predicate isolates the place signal -- and the relation rules call the predicate directly.
+ */
+for (const name of COST_NAMES) {
+  test(`ISS-104CC-3 predicate, inside the construction: ${name} refused`, () => {
+    assert.equal(citesNameAsAnIntroduction(`We met in ${name}. ${name} here, from admissions.`, name), false);
+  });
+  test(`ISS-104CC-3 predicate, outside the construction: ${name} resolves`, () => {
+    assert.equal(citesNameAsAnIntroduction(`${name} here, from admissions.`, name), true);
+  });
+}
+test("ISS-104CC-3 predicate: a direct address survives the place reading (the escape the cost is bounded by)", () => {
+  assert.equal(citesNameAsAnIntroduction("Our centre is in Georgia. Georgia, what do you think?", "Georgia"), true);
 });
