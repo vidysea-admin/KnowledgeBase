@@ -18,6 +18,7 @@ import { projectApprovedSenderTrust, type ApprovedTrustContext } from "./join-ru
 import { classifyWebinarInvite } from "./auto-record-policy.js";
 import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
+import { withOnairMailFromEnv } from "./onair/onair-mail-loader.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 import { announceScheduled, buildAutojoinTickDeps, createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, type AutojoinTickDeps } from "../autojoin/tick-wiring.js";
 export {
@@ -64,7 +65,8 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
   return {
     autojoin,
     loadCalendarEvents: discoveryOff ? async () => [] : createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
-    loadCandidates: discoveryOff ? async () => [] : createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+    loadCandidates: discoveryOff ? async () => [] : withOnairMailFromEnv(createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+      process.env, REPO_ROOT, log, createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY)),
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
     joinRulesTenantId: process.env.LKB_TENANT_ID,
