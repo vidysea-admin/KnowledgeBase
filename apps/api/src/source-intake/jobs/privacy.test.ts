@@ -54,7 +54,7 @@ test("ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before b
 });
 
 const binding = { id: "owner-approval-1", tenantId: "tenant-a", accountId: "account-a", eventId: "event-one",
-  actorKeyIds: ["actor-a"], providerProcessing: "approved-recording", approvalRef: "actual-owner-permission-reference-fixture" };
+  actorKeyIds: ["actor-a"], providerProcessing: "approved-recording", approvalRef: "actual-owner-permission-reference-fixture", expiresAt: "2099-01-01T00:00:00Z" };
 const protectedEnv = (): NodeJS.ProcessEnv => ({ LKB_ONAIR_COOKIE_HEADER: "synthetic-session-only", LKB_ONAIR_SESSION_TENANT: "tenant-a",
   LKB_ONAIR_SESSION_ACCOUNT: "account-a", LKB_ONAIR_SOURCE_BINDINGS: JSON.stringify([binding]) });
 const onair: SourceJobInput = { ...zoom, url: "https://cloudonair.withgoogle.com/events/event-one", idempotencyKey: "onair-approved" };
