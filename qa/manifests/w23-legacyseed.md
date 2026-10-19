@@ -1,7 +1,7 @@
 # w23-legacyseed: DB-write guard for join-rules host and sync-session, provenance on indexSession chunks
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-legacyseed (branch lane/w23-legacyseed)
 Base: 3c99337f (origin/master)
 Candidate SHA: the commit carrying this manifest (`git log -1 lane/w23-legacyseed`; a manifest cannot name its own SHA)
@@ -40,3 +40,9 @@ The join-rules API host previously accepted `MONGODB_DB=lkb` through `requireDat
 - lint-loc --all: `lint:structure: OK (10 stages, 0 failed)`
 - Mutations (D-020, per-mutation backup and trap, scripts outside the repo): m1 session.ts vector call passes undefined (killed, 1 fail), m1b lexical call drops provenance (killed), m2 host restores the localhost fallback (killed), m3 sync-session restores the localhost fallback (killed). Each restored with `cmp`; HEAD blob fidelity checked after commit.
 - No seed or script was run against a real database; the only spawned script was sync-session against an env with no valid Mongo target.
+
+## Fix cycle 1 (checker verdict 8bb74869 FAIL on 02a2a6f6)
+- sync-session.mjs: the DB guard now runs before `register()` and `--emit-files` (skipped only for `--dry-run`, which touches no DB). New spawn test `--emit-files with blank/mismatched Mongo env refuses before writing any file` asserts non-zero exit and an unchanged session directory.
+- Join-rules host start instructions updated: docs/docker-deployment.md, docs/meeting-bot-roadmap.md, scripts/watch/install-tasks.ps1 (comment text only; the script never starts the host), and the host script header.
+- Mutation m4 (guard moved back below emit-files): killed (pass 11, fail 2; "files were written before the refusal"); restored, cmp ok.
+- db-guard-paths 13/13, script-db-guard 14/14, api tests 46/46; spawn child timeout raised to 240 s.

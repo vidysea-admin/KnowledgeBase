@@ -19,7 +19,8 @@
     powershell -NoProfile -ExecutionPolicy Bypass -File scripts\watch\install-tasks.ps1 -Remove -Apply  # uninstall
   Optional: -NodePath <node.exe> (default: node on PATH), -IntervalMinutes <1-59> (default 5).
 
-  The poller needs the API host running (LKB_API_URL, default http://localhost:3300): `node --import tsx scripts/webinar/join-rules-api-host.ts`.
+  The poller needs the API host running (LKB_API_URL, default http://localhost:3300): `node --import tsx scripts/webinar/join-rules-api-host.ts --i-know-this-is-production`
+  with MONGODB_URL and MONGODB_DB=lkb set (or MONGO_WORK_DB=<isolated db> instead of the flag); there is no localhost fallback. This script only registers the poller; it never starts the host.
 #>
 param(
   [switch]$Apply,

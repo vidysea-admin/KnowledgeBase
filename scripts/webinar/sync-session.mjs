@@ -152,6 +152,20 @@ console.log(`session ${sessionId} (tenant ${tenantId})`);
 console.log(`  turns ${turns.length} · speakers ${speakerDocs.length} · orgs ${orgDocs.length} · topics ${topicDocs.length}`);
 console.log(`  graph_edges ${edgeList.length}: ${JSON.stringify(byType)}`);
 
+// DB guard first: nothing below (file emission included) may run when the Mongo target is refused. A dry run touches no DB.
+let route, workDb, target;
+if (!DRY_RUN) {
+  // Test-data routing (2026-10-14): a source tagged testData:true goes to lkb_staging only (scripts/watch/test-data-route.mjs).
+  route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
+  workDb = route.workDb;
+  if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
+  if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+  // ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
+  // resolved work database, refuses here, before any retention state or Mongo connection.
+  const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
+  if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
+  target = requireScriptDatabase(guardEnv, process.argv.slice(2));
+}
 register();
 const retentionWrites = !DRY_RUN && (INDEX || EMIT_FILES) ? await import("../../packages/ingest/src/retention/production/retention-processed-proof.ts") : undefined;
 if (EMIT_FILES) {
@@ -196,16 +210,6 @@ const upsert = (coll, doc) => {
 };
 const strip = ({ tenantId: _t, ...rest }) => rest;
 
-// Test-data routing (2026-10-14): a source tagged testData:true goes to lkb_staging only (scripts/watch/test-data-route.mjs).
-const route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
-const workDb = route.workDb;
-if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
-if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
-// ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
-// resolved work database, refuses here, before any retention state or Mongo connection.
-const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
-if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
-const target = requireScriptDatabase(guardEnv, process.argv.slice(2));
 const gen = `gen-${Date.now()}`;
 const retentionIdentity = { tenantId, sessionId, sourceId: source._id };
 const retentionIo = INDEX ? await import("../../packages/ingest/src/retention/production/private-summary.ts") : undefined;

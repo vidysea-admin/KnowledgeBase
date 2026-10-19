@@ -3,7 +3,7 @@
 // no database, network or browser is touched (fetch is replaced; the other two paths are asserted at source level).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync} from 'node:fs';
+import {readFileSync, readdirSync, mkdtempSync, mkdirSync, writeFileSync, rmSync} from 'node:fs';
 import {createServer} from 'node:net';
 import {spawn} from 'node:child_process';
 import {tmpdir} from 'node:os';
@@ -68,9 +68,9 @@ test('Gmail preflight: isolated or opted-in lkb_staging passes; a mismatching AP
 test('sync-session.mjs resolves the work DB through resolveWorkDb, then gates the RESOLVED name with isProtectedWorkDbName before connecting, with no lkb literal list', () => {
   const s = code('scripts/webinar/sync-session.mjs');
   assert.match(s, /import \{ resolveWorkDb \} from "\.\.\/watch\/test-data-route\.mjs";/);
-  const route = s.search(/const route = resolveWorkDb\(\{[^}]*workDb: process\.env\.MONGO_WORK_DB\?\.trim\(\)[^}]*env: process\.env \}\);/);
+  const route = s.search(/route = resolveWorkDb\(\{[^}]*workDb: process\.env\.MONGO_WORK_DB\?\.trim\(\)[^}]*env: process\.env \}\);/);
   assert.ok(route > 0, 'the work DB must come from resolveWorkDb fed with MONGO_WORK_DB and process.env');
-  assert.match(s, /const workDb = route\.workDb;/);
+  assert.match(s, /workDb = route\.workDb;/);
   const guard = s.search(/if \(isProtectedWorkDbName\(workDb, process\.env\)\) throw new Error\(/);
   assert.ok(guard > route, 'guard call missing, its env argument dropped, or it runs before the route is resolved');
   assert.ok(guard < s.indexOf('await connect('), 'guard must precede connect()');
@@ -179,7 +179,7 @@ test('sync-session.mjs with MONGODB_URL missing/blank or MONGODB_DB ambiguous ex
       let err = '';
       child.stderr.on('data', d => { err += d; });
       child.stdout.resume();
-      const exit = await new Promise(r => { const t = setTimeout(() => child.kill(), 200000); child.on('close', c => { clearTimeout(t); r(c); }); });
+      const exit = await new Promise(r => { const t = setTimeout(() => child.kill(), 240000); child.on('close', c => { clearTimeout(t); r(c); }); });
       assert.notEqual(exit, 0, `${JSON.stringify(extra)}: must exit non-zero`);
       assert.match(err, /explicit isolated work database and Mongo URL required; production writes refused/, `${JSON.stringify(extra)}: ${err.slice(0, 300)}`);
       assert.deepEqual(attempts, [], `${JSON.stringify(extra)}: a Mongo connection was attempted`);
@@ -187,6 +187,33 @@ test('sync-session.mjs with MONGODB_URL missing/blank or MONGODB_DB ambiguous ex
     if (!listening) console.log('note: 127.0.0.1:27017 busy, localhost-connect probe skipped (refusal assertions still ran)');
   } finally {
     if (listening) server.close();
+    rmSync(dir, {recursive: true, force: true});
+  }
+});
+
+// Fix cycle 1: the guard must run before ANY side effect, --emit-files included. The real script is spawned with a blank or
+// mismatched Mongo env; it must exit non-zero and leave the session directory exactly as it was (no emitted artifacts).
+test('sync-session.mjs --emit-files with blank/mismatched Mongo env refuses before writing any file', async () => {
+  const sid = `zz-legacyseed-emit-${process.pid}-${Date.now()}`, dir = join(root, 'data', 'toc-migrated', sid);
+  try {
+    mkdirSync(dir, {recursive: true});
+    writeFileSync(join(dir, 'source.json'), JSON.stringify({_id: `${sid}-src`, tenantId: 't-guard', title: 'guard fixture', createdAt: '2026-10-14T00:00:00Z'}));
+    writeFileSync(join(dir, 'turns.json'), JSON.stringify([{_id: `${sid}-t001`, tenantId: 't-guard', sessionId: sid, speakerRef: 'spk:0', tStart: 0, tEnd: 5, text: 'hello'}]));
+    const before = readdirSync(dir).sort();
+    for (const extra of [{MONGO_WORK_DB: 'lkb_work_x', MONGODB_URL: ''}, {MONGO_WORK_DB: 'lkb_work_x', MONGODB_URL: URL_, MONGODB_DB: 'some_other_db'}]) {
+      const env = {...process.env, ...extra};
+      delete env.LKB_ALLOW_STAGING;
+      if (extra.MONGODB_DB === undefined) delete env.MONGODB_DB;
+      const child = spawn(process.execPath, ['--import', 'tsx', join(root, 'scripts/webinar/sync-session.mjs'), sid, '--emit-files'], {env, cwd: root});
+      let err = '';
+      child.stderr.on('data', d => { err += d; });
+      child.stdout.resume();
+      const exit = await new Promise(r => { const t = setTimeout(() => child.kill(), 240000); child.on('close', c => { clearTimeout(t); r(c); }); });
+      assert.notEqual(exit, 0, `${JSON.stringify(extra)}: must exit non-zero`);
+      assert.match(err, /explicit isolated work database and Mongo URL required; production writes refused/, `${JSON.stringify(extra)}: ${err.slice(0, 300)}`);
+      assert.deepEqual(readdirSync(dir).sort(), before, `${JSON.stringify(extra)}: files were written before the refusal`);
+    }
+  } finally {
     rmSync(dir, {recursive: true, force: true});
   }
 });
