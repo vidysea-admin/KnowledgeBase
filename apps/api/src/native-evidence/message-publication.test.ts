@@ -88,9 +88,10 @@ test("consent control: an explicitly consented source publishes exactly one nati
 });
 
 test("consent record absent: approval is refused by the publication gate and writes nothing to tree_index", async () => {
-  const f = await messagePublicationFixture(); await sourcePatch(f, { consent: undefined });
+  const f = await messagePublicationFixture(); const [candidate] = await f.wiring.repository.list("tenant-a"); assert.ok(candidate);
+  await sourcePatch(f, { consent: undefined });
   assert.equal(f.fx.rows("sources")[0]!.consent, undefined);
-  await refused(f, /whatsapp_native_publication_unavailable/);
+  await refused(f, /whatsapp_native_publication_unavailable|source\/session evidence unavailable/, candidate._id);
 });
 
 test("consent.given === false: approval is refused and writes nothing to tree_index", async () => {

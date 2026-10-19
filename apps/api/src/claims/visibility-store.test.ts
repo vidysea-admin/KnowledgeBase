@@ -25,7 +25,7 @@ function matches(row: Row, filter: Row): boolean {
 }
 function fixture() {
   const tenantId = "tenant-a";
-  const source = { _id: "source-wa", tenantId, kind: "whatsapp-batch", path: "group@g.us" } as Sources;
+  const source = { _id: "source-wa", tenantId, kind: "whatsapp-batch", path: "group@g.us", consent: { given: true, recordedBy: "test-owner" } } as Sources;
   const session: Sessions = { _id: "session-wa", tenantId, sourceId: source._id, title: "PRIVATE group title", participants: ["PRIVATE person"],
     date: "2026-10-14", status: { transcribe: "done", index: "pending" } };
   const turn: Turns = { _id: "turn-wa", tenantId, sessionId: session._id, speakerRef: "expert", speakerLabel: "Asha", tStart: 0, tEnd: 0,
