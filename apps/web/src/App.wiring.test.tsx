@@ -10,6 +10,7 @@ import appSource from "./App.tsx?raw";
 
 const ROUTES = [
   { path: "/extraction-review", navLabel: "Extraction review" },
+  { path: "/label-review", navLabel: "Label review" },
   { path: "/championship", navLabel: "Championship" },
   { path: "/answer-policy", navLabel: "Answer policy" },
   { path: "/answer-review", navLabel: "Answer review" },
