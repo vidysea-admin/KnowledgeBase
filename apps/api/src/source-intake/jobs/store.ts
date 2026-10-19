@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { isAbsolute, resolve } from "node:path";
 import { PrivateSourceJournal, type SourceSpoolVerifier } from "./private-journal.js";
 import type { HostingJournalRecord } from "../../hosting/types.js";
@@ -8,6 +8,10 @@ import { consumedSourceResult } from "./receipt.js";
 import { SourceJobError, type SourceJob, type SourceJobStore, type SourceJobView } from "./types.js";
 
 export interface SourceJobStoreOptions { now?: () => number; newAttempt?: () => string; leaseMs?: number; verifier?: SourceSpoolVerifier }
+const SETTLED = ["succeeded", "uncertain"];
+const REDACTED = "redacted:sha256:";
+/** Bearer/signed recording URLs are not retained once a job settles; only this one-way digest marker is written. */
+export const redactedSourceUrl = (url: string): string => `${REDACTED}${createHash("sha256").update(url).digest("hex")}`;
 const view = (job: SourceJob): SourceJobView => ({ jobId: job.jobId, state: job.state, revision: job.revision,
   createdAt: job.createdAt, updatedAt: job.updatedAt, ...(job.reason ? { reason: job.reason } : {}),
   ...(job.state === "succeeded" && job.result ? { result: { sessionId: job.result.sessionId, sourceId: job.result.sourceId,
@@ -20,18 +24,23 @@ function replay(rows: HostingJournalRecord[], tenant: string): Map<string, Sourc
         !["queued", "running", "succeeded", "uncertain"].includes(job.state) || !Number.isSafeInteger(job.revision) || job.revision < 1 ||
         !job.approval || !job.approval.approvedBy || !job.approval.approvalRef) throw new SourceJobError("source_spool_corrupt");
     jobIdentity(job.jobId); actorIdentity(job.actorKeyId);
-    const source = approvedSourceInput({ ...job, tenantId: tenant, idempotencyKey: "stored" });
-    if (source.url !== job.url || job.inputHash !== sourceJobInputHash(source) ||
-        (job.watchedSnapshot !== undefined && JSON.stringify(job.watchedSnapshot) !== JSON.stringify(source.watchedSnapshot)) ||
+    const prior = jobs.get(job.jobId);
+    // A settled row carries the digest marker instead of the URL (legacy settled rows may still hold it). The marker
+    // is only trusted when it matches the URL of the prior row; its input hash and snapshot are then pinned to that row.
+    const redacted = SETTLED.includes(job.state) && typeof job.url === "string" && job.url.startsWith(REDACTED);
+    if (redacted && (!prior || job.url !== redactedSourceUrl(prior.url) || job.inputHash !== prior.inputHash ||
+        JSON.stringify(job.watchedSnapshot) !== JSON.stringify(prior.watchedSnapshot))) throw new SourceJobError("source_spool_corrupt");
+    const source = redacted ? undefined : approvedSourceInput({ ...job, tenantId: tenant, idempotencyKey: "stored" });
+    if ((source && (source.url !== job.url || job.inputHash !== sourceJobInputHash(source) ||
+        (job.watchedSnapshot !== undefined && JSON.stringify(job.watchedSnapshot) !== JSON.stringify(source.watchedSnapshot)))) ||
         (job.state === "running" && (!job.attemptId || !Number.isFinite(job.leaseUntil))) ||
         (job.state === "succeeded" && (!job.result || !consumedSourceResult(job.result) ||
           !job.result.sourceId.startsWith(`${encodeURIComponent(tenant)}:`)))) throw new SourceJobError("source_spool_corrupt");
-    const prior = jobs.get(job.jobId);
     if ((!prior && (job.revision !== 1 || job.state !== "queued")) ||
         (prior && (prior.state === "succeeded" || prior.state === "uncertain" ||
           (prior.state === "queued" && job.state !== "running") || (prior.state === "running" && job.state === "queued")))) throw new SourceJobError("source_spool_corrupt");
     if (prior && (job.revision !== prior.revision + 1 || job.inputHash !== prior.inputHash || job.actorKeyId !== prior.actorKeyId ||
-        job.url !== prior.url || job.createdAt !== prior.createdAt || (prior.state === "running" && job.attemptId !== prior.attemptId) ||
+        (job.url !== prior.url && !redacted) || job.createdAt !== prior.createdAt || (prior.state === "running" && job.attemptId !== prior.attemptId) ||
         JSON.stringify(job.approval) !== JSON.stringify(prior.approval))) throw new SourceJobError("source_spool_corrupt");
     jobs.set(job.jobId, job);
   }
@@ -46,13 +55,15 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
   const timestamp = () => new Date(now()).toISOString();
   const append = <T>(job: SourceJob, value: T) => ({ value, operation: "source.job", target: job.jobId, outcome: job.state, data: job });
   const change = (job: SourceJob, fields: Partial<SourceJob>): SourceJob => ({ ...job, ...fields, revision: job.revision + 1, updatedAt: timestamp() });
+  /** Every transition into a settled state drops the retained URL. */
+  const settle = (job: SourceJob, fields: Partial<SourceJob>): SourceJob => change(job, { ...fields, url: redactedSourceUrl(job.url) });
   const stale = (job: SourceJob) => job.state === "running" && job.leaseUntil! <= now();
   const update = async (tenant: string, id: string, attempt: string, mutate: (job: SourceJob) => SourceJob | null): Promise<SourceJob | null> => {
     actorIdentity(tenant); jobIdentity(id);
     return journal.transaction<SourceJob | null>(tenant, "source-worker", timestamp(), async rows => {
       const job = replay(rows, tenant).get(id);
       if (!job || job.state !== "running" || job.attemptId !== attempt) return { value: null };
-      const next = stale(job) ? change(job, { state: "uncertain", reason: "worker-interrupted" }) : mutate(job);
+      const next = stale(job) ? settle(job, { state: "uncertain", reason: "worker-interrupted" }) : mutate(job);
       return next ? append(next, next) : { value: null };
     });
   };
@@ -85,14 +96,14 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
         const job = replay(rows, tenant).get(id);
         if (!job) return { value: null };
         if (!stale(job)) return { value: view(job) };
-        const next = change(job, { state: "uncertain", reason: "worker-interrupted" }); return append(next, view(next));
+        const next = settle(job, { state: "uncertain", reason: "worker-interrupted" }); return append(next, view(next));
       });
     },
     async claim(tenant, workerId) {
       actorIdentity(tenant); actorIdentity(workerId);
       return journal.transaction<SourceJob | null>(tenant, workerId, timestamp(), async rows => {
         const jobs = [...replay(rows, tenant).values()], expired = jobs.find(stale);
-        if (expired) return append(change(expired, { state: "uncertain", reason: "worker-interrupted" }), null);
+        if (expired) return append(settle(expired, { state: "uncertain", reason: "worker-interrupted" }), null);
         const job = jobs.find(row => row.state === "queued");
         if (!job) return { value: null };
         const next = change(job, { state: "running", attemptId: options.newAttempt?.() ?? randomUUID(), leaseUntil: now() + leaseMs });
@@ -113,12 +124,12 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
     async finish(tenant, id, attempt, result) {
       const receipt = consumedSourceResult(result);
       if (!receipt || !receipt.sourceId.startsWith(`${encodeURIComponent(tenant)}:`)) throw new SourceJobError("source_job_indexing_incomplete", 502);
-      const job = await update(tenant, id, attempt, current => change(current, { state: "succeeded", result: receipt }));
+      const job = await update(tenant, id, attempt, current => settle(current, { state: "succeeded", result: receipt }));
       if (!job || job.state !== "succeeded") throw new SourceJobError("source_job_claim_lost", 409);
       return view(job);
     },
     async uncertain(tenant, id, attempt, reason) {
-      await update(tenant, id, attempt, current => change(current, { state: "uncertain", reason }));
+      await update(tenant, id, attempt, current => settle(current, { state: "uncertain", reason }));
     },
   };
 }
