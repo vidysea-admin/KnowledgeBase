@@ -7,7 +7,7 @@
  */
 export const STATE_TENANT_RE = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/;
 
-export type StateTenantRefusalReason = "invalid-tenant" | "untagged" | "other-tenant";
+export type StateTenantRefusalReason = "invalid-tenant" | "untagged" | "other-tenant" | "key-tenant-unverified" | "key-tenant-mismatch";
 
 export class StateTenantRefusal extends Error {
   constructor(readonly reason: StateTenantRefusalReason, readonly fileLabel: string, message: string) {
@@ -23,6 +23,25 @@ export function requireStateTenant(tenantId: unknown): string {
       "refusing to read or write scheduler state: no valid tenant id (set LKB_TENANT_ID or pass --tenant); the state files are tenant-tagged and are never used without one");
   }
   return tenantId;
+}
+
+/**
+ * ISS-ALERTTENANT-002: the tenant that tags the state files must be the tenant of the API key the tick fetches meetings with.
+ * `keyTenant` is the VERIFIED key tenant (the X-LKB-Tenant header, see join-rules-wiring/key-tenant.ts); null / undefined / invalid = could not
+ * be verified, which is refused (a tick that cannot show whose key it holds must not record that key's meetings under any tenant).
+ * Neither message names the key's tenant.
+ */
+export function requireStateTenantMatchesKey(stateTenant: string, keyTenant: unknown): string {
+  requireStateTenant(stateTenant);
+  if (typeof keyTenant !== "string" || !STATE_TENANT_RE.test(keyTenant)) {
+    throw new StateTenantRefusal("key-tenant-unverified", "(none)",
+      "refusing to read or write scheduler state: the API key's tenant could not be verified, so the state cannot be shown to belong to the configured tenant (LKB_TENANT_ID). Nothing was scheduled.");
+  }
+  if (keyTenant !== stateTenant) {
+    throw new StateTenantRefusal("key-tenant-mismatch", "(none)",
+      `refusing to read or write scheduler state: the API key belongs to a different tenant than the configured '${stateTenant}' (LKB_TENANT_ID). Nothing was scheduled; fix LKB_TENANT_ID or LKB_API_KEY.`);
+  }
+  return stateTenant;
 }
 
 const isPlain = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);

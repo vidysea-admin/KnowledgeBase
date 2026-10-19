@@ -121,7 +121,7 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
     else try {
       const names = readdirSync(jobDir).filter((n) => n.endsWith(".json")).sort();
       if (names.length > LIMITS.jobFiles) problems.push(`scheduled/ has more than ${LIMITS.jobFiles} job files (only the first ${LIMITS.jobFiles} read)`);
-      const refused = { untagged: 0, "other-tenant": 0, "invalid-tenant": 0 };
+      const refused = { untagged: 0, "other-tenant": 0, "invalid-tenant": 0, "key-tenant-unverified": 0, "key-tenant-mismatch": 0 };
       for (const n of names.slice(0, LIMITS.jobFiles)) {
         try {
           const j = readJsonCapped(path.join(jobDir, n), LIMITS.jobBytes);
@@ -164,6 +164,21 @@ export function loadCandidates(src: AlertWhoSources, deps: Pick<AlertWhoDeps, "r
   }
   return { tagged: [...T.by.values()], problems };
 }
+
+/**
+ * ISS-ALERTID-008: the PRINTED-FIELD ALLOWLIST. Whatever a source file or a candidate carries, the command prints exactly these
+ * fields and nothing else; a registration link, organizer / sender e-mail or a join URL that reaches a candidate field is not
+ * printed, because each printed field is re-validated here against a closed shape (not merely trusted from the loader).
+ */
+export const PRINTED_FIELDS = ["record", "title", "time", "platform", "host", "source", "status"] as const;
+/** Platform names detectPlatform can return; any other platform value prints as "unknown". */
+export const PRINTED_PLATFORMS: ReadonlySet<string> = new Set(["meet", "teams", "zoom", "webex", "zoho", "cloudonair", "unknown"]);
+const HOST_SHAPE = /^[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?)+$/;
+const STATUS_SHAPE = /^[a-z][a-z_-]{0,31}$/;
+/** A bare lower-case dotted host name or nothing. Never an address, URL, path, port or token. */
+const printableHost = (v: string | undefined): string | undefined => (v !== undefined && v.length <= 253 && HOST_SHAPE.test(v) ? v : undefined);
+const printablePlatform = (v: string | undefined): string => (v !== undefined && PRINTED_PLATFORMS.has(v) ? v : "unknown");
+const printableStatus = (v: string | undefined): string | undefined => (v !== undefined && STATUS_SHAPE.test(v) ? v : undefined);
 
 const plain = (v: string | undefined, max = 120): string => (v ? v.replace(/[^A-Za-z0-9:._ ,;-]/g, "?").slice(0, max) : "unknown");
 
@@ -208,8 +223,9 @@ export function runAlertWho(rest: string[], deps: AlertWhoDeps): number {
     deps.write(`  record:   ${plain(m.sessionKey)}`);
     deps.write(`  title:    ${neutralizeText(m.title)}`);
     deps.write(`  time:     ${iso ? renderStart(iso, tz) : endIso ? `ends ${renderStart(endIso, tz)}` : "unknown"}`);
-    deps.write(`  platform: ${plain(m.platform)}${m.host ? ` (${plain(m.host, 100)})` : ""}`);
-    deps.write(`  source:   ${plain(m.source, 120)}${m.status ? `; status ${plain(m.status, 40)}` : ""}`);
+    const host = printableHost(m.host), status = printableStatus(m.status);
+    deps.write(`  platform: ${printablePlatform(m.platform)}${host ? ` (${host})` : ""}`);
+    deps.write(`  source:   ${plain(m.source, 120)}${status ? `; status ${status}` : ""}`);
   }
   return 0;
 }
