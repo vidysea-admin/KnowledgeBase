@@ -9,7 +9,7 @@ import {
   type AutoRecordCandidateInput, type AutoRecordItem,
 } from "./auto-join.js";
 import { describeSkip } from "./state/skip-describe.js";
-import { requireStateTenant } from "./state/state-tenant-tag.js";
+import { requireStateTenant, requireStateTenantMatchesKey } from "./state/state-tenant-tag.js";
 import { recordSkipped } from "./state/skipped-state.js";
 import { createKeyTenantLoader } from "./join-rules-wiring/key-tenant.js";
 import { scheduledDispatchIdentity } from "./scheduled-dispatch.js";
@@ -38,6 +38,8 @@ export interface ScheduleTickDeps {
   stateDir: string;
   /** Tenant that owns the dedup/job state files under stateDir (LKB_TENANT_ID). Absent or invalid = the tick refuses, before anything is read or scheduled (ISS-ALERTID-006). */
   stateTenantId?: string;
+  /** ISS-ALERTTENANT-002: when true the tick refuses (before touching state) unless the API key's VERIFIED tenant equals stateTenantId. Absent = off: today's behaviour (needs an Approver decision to turn on, because it costs one request per tick even with join rules off). */
+  bindStateTenantToKey?: boolean;
   scheduler: TaskScheduler;
   log: (msg: string) => void;
   everyWebinar?: boolean;
@@ -99,6 +101,13 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   const trustedSenders = loadTrustedSenderConfig();
   // Fail closed (ISS-ALERTID-006): no valid tenant, or an untagged / other-tenant state file, stops the tick before anything is scheduled.
   const stateTenant = requireStateTenant(deps.stateTenantId);
+  // ISS-ALERTTENANT-002 (opt-in, OFF in production wiring until the Approver decides, see the manifest): bind the state tenant to the VERIFIED tenant of the
+  // API key BEFORE any state is read or written. One verification per tick, reused below for join rules. Unverifiable or different = the tick refuses.
+  // With the flag off (today's behaviour) the key is verified only when join-rules enforcement is enabled, exactly as before.
+  const verifyNow = deps.bindStateTenantToKey === true;
+  const keyTenantId = deps.joinRulesKeyTenantId !== undefined ? deps.joinRulesKeyTenantId
+    : deps.loadKeyTenant && (verifyNow || parseJoinRulesEnforce(deps.joinRulesEnforce) !== "off") ? await deps.loadKeyTenant().catch(() => null) : undefined;
+  if (verifyNow) requireStateTenantMatchesKey(stateTenant, keyTenantId);
   // ISS-ALERTWHOFIX-001: a corrupt dedup file must not stop joining. Quarantine it (kept), warn loudly, proceed with an empty set.
   const alreadyScheduled = loadScheduledKeysForTick(deps.stateDir, stateTenant, {
     readOnly: dryRun,
@@ -116,8 +125,6 @@ export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolea
   const selected = select();
   // Veto-only join rules (T-037); `off` (the default) returns `selected` itself without opening the store.
   // Key tenant (ISS-T037WIRE-001): fetched per tick, only when enforcing; a throwing loader means "unverified" (null).
-  const keyTenantId = deps.joinRulesKeyTenantId === undefined && deps.loadKeyTenant && parseJoinRulesEnforce(deps.joinRulesEnforce) !== "off"
-    ? await deps.loadKeyTenant().catch(() => null) : deps.joinRulesKeyTenantId;
   const result = await enforceJoinRules(selected, {
     mode: deps.joinRulesEnforce, tenantId: deps.joinRulesTenantId, keyTenantId, stateDir: deps.stateDir, log: deps.log, io: deps.joinRulesIo,
     now: () => Date.parse(now), readOnly: dryRun, onDegraded: aj?.rulesDegraded, onHealthy: aj?.rulesHealthy,
