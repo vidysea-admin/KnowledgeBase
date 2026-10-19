@@ -1,7 +1,16 @@
 # w24-signedslots: parallel signed-in recordings via seeded capture slots
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
+
+## Fix cycle 1 (verdict 5c950edb: F1-F3)
+- Owner approval, recorded 2026-10-19 (goal-t034 criterion 3). Umesh, verbatim from chat: "I approve: ... (3) copying signed-in session cookies (never passwords or cards) into temporary capture slots for parallel recordin[gs]".
+- F1: `assertSlotSignedIn` opens the copied Cookies DB read-only (node:sqlite, BigInt expiry) and requires a row with name exactly SID/__Secure-1PSID/__Secure-3PSID, host_key `google.com` or `*.google.com`, non-empty value, unexpired. Tests cover non-Google SID, xxSIDxx, SIDCC, HSID, lookalike hosts, empty value, expired, raw non-database bytes.
+- F2: `slot-seed-signals.ts` removes seeded files on SIGINT/SIGTERM/SIGBREAK/exit and re-raises; removal retries and reports leftovers loudly; `sweepStaleSlots` cleans sibling slots whose marker pid is dead at the next launch. Tested with a fake process.
+- F3: marker holds per-run nonce, pid, slot path, profile; the launcher sets `LKB_SEED_NONCE`; `py/sb_join_seed.py` trusts the marker only with a matching nonce and slot path (4 pytest pass).
+- Results: tsc clean; node 44/44 (seed, tab-session-workspace, record-commands); lint-loc --all 10 stages OK.
+- D-020 mutation on F1 (host check replaced with `true`): 2 tests fail; restored, hash equals index blob.
+- Not re-run: real-Chrome smoke (code path for launch unchanged since cycle 0); sb_join_ownership pytest (needs Chrome).
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w24-signedslots  Branch: lane/w24-signedslots
 Base: 8029be9f (origin/master)  Candidate: see `git rev-parse lane/w24-signedslots` (single commit)
 

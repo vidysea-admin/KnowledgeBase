@@ -1,6 +1,9 @@
 import * as nodeFs from "node:fs";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
+import { DatabaseSync } from "node:sqlite";
 import type { CaptureWorkspace } from "./capture-workspace-types.js";
+import { installSeedCleanup } from "./slot-seed-signals.js";
 
 /**
  * w24-signedslots: explicit, opt-in seeding of a capture slot's own user-data-dir from an already
@@ -21,7 +24,7 @@ export interface SeedFs {
   writeFileSync: typeof nodeFs.writeFileSync;
 }
 
-export interface SlotSeed { seeded: string[]; dispose: () => void }
+export interface SlotSeed { seeded: string[]; nonce: string; dispose: () => string[] }
 
 /** Root-level and profile-level session-state files. Order matters only for reporting. */
 export const ROOT_SEED_FILES = ["Local State"] as const;
@@ -32,7 +35,7 @@ export const PROFILE_SEED_DIRS = ["Local Storage", "Session Storage",
 /** Read by py/sb_join_seed.py: only a slot carrying this marker may hold seeded files without an ownership ledger. */
 export const SEED_MARKER = ".lkb-seed.json";
 export const SEED_DIR_MAX_BYTES = 32 * 1024 * 1024;
-const SESSION_COOKIE_NAMES = ["__Secure-1PSID", "__Secure-3PSID", "SID"];
+const SESSION_COOKIE_NAMES = ["__Secure-1PSID", "__Secure-3PSID", "SID"] as const;
 
 export class SlotNotSignedInError extends Error {
   constructor(reason: string) { super(`capture slot is not signed in: ${reason}`); this.name = "SlotNotSignedInError"; }
@@ -86,17 +89,59 @@ function copyDirectory(fs: SeedFs, from: string, to: string): void {
   }
 }
 
-/** Fail-closed signed-in check on the bytes the slot will actually launch with. */
-export function assertSlotSignedIn(slotRoot: string, profile: string, fs: Pick<SeedFs, "readFileSync"> = nodeFs): void {
-  let state: string, cookies: Buffer;
+/** Fail-closed signed-in check on the copied files the slot will launch with: real cookie rows, not raw bytes. */
+export function assertSlotSignedIn(slotRoot: string, profile: string, fs: Pick<SeedFs, "readFileSync"> = nodeFs, now = Date.now()): void {
+  let state: string;
   try { state = String(fs.readFileSync(path.join(slotRoot, "Local State"), "utf8")); }
   catch { throw new SlotNotSignedInError("Local State missing in the slot"); }
   if (!/"(?:encrypted_key|app_bound_encrypted_key)"/.test(state)) throw new SlotNotSignedInError("Local State has no cookie encryption key");
-  try { cookies = fs.readFileSync(path.join(slotRoot, profile, "Network", "Cookies")) as Buffer; }
-  catch { throw new SlotNotSignedInError("Cookies database missing in the slot"); }
-  const text = cookies.toString("latin1");
-  if (!SESSION_COOKIE_NAMES.some((name) => text.includes(name)) || !text.includes("google.com"))
-    throw new SlotNotSignedInError("no Google session cookie in the copied profile; sign the source profile in first");
+  let rows: { host_key: string; name: string; len: number | bigint | null; expires_utc: number | bigint | null }[];
+  let db: DatabaseSync | undefined;
+  try {
+    db = new DatabaseSync(path.join(slotRoot, profile, "Network", "Cookies"), { readOnly: true });
+    const query = db.prepare("SELECT host_key, name, length(encrypted_value) AS len, expires_utc FROM cookies WHERE name IN (?, ?, ?)");
+    query.setReadBigInts(true); // Chrome expiry (microseconds since 1601) exceeds 2^53
+    rows = query.all(...SESSION_COOKIE_NAMES) as typeof rows;
+  } catch { throw new SlotNotSignedInError("Cookies database missing or unreadable in the slot"); }
+  finally { try { db?.close(); } catch { /* already closed */ } }
+  const chromeNow = BigInt(now + 11644473600000) * 1000n; // Chrome stores microseconds since 1601
+  const live = rows.some((row) => (SESSION_COOKIE_NAMES as readonly string[]).includes(row.name) && /^(?:.*\.)?google\.com$/.test(row.host_key) &&
+    row.len != null && BigInt(row.len) > 0n && row.expires_utc != null && (BigInt(row.expires_utc) === 0n || BigInt(row.expires_utc) > chromeNow));
+  if (!live) throw new SlotNotSignedInError("no live Google session cookie in the copied profile; sign the source profile in first");
+}
+
+const sleep = (ms: number) => { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms); };
+
+/** Removes every seeded file, retrying while a browser is still exiting. Returns what could NOT be removed. */
+export function removeSeeded(fs: SeedFs, to: string, profile: string, attempts = 5, wait: (ms: number) => void = sleep): string[] {
+  const targets = [...files("", profile).map((e) => path.join(to, ...e.to.split("/"))),
+    ...PROFILE_SEED_DIRS.map((dir) => path.join(to, profile, ...dir.split("/"))), path.join(to, SEED_MARKER)];
+  let left: string[] = [];
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    left = [];
+    for (const target of targets) { try { fs.rmSync(target, { recursive: true, force: true }); } catch { left.push(target); } }
+    if (!left.length) return [];
+    if (attempt < attempts - 1) wait(500);
+  }
+  return left;
+}
+
+/** Removes seeded files left by killed runs: sibling slot dirs whose marker pid is no longer alive (so not in use). */
+export function sweepStaleSlots(parent: string, ownSlot: string, fs: SeedFs = nodeFs,
+  alive: (pid: number) => boolean = (pid) => { try { process.kill(pid, 0); return true; } catch (e) { return (e as NodeJS.ErrnoException).code === "EPERM"; } }): string[] {
+  const swept: string[] = [];
+  let names: string[];
+  try { names = fs.readdirSync(parent) as unknown as string[]; } catch { return swept; }
+  for (const name of names) {
+    const dir = path.join(parent, name);
+    if (path.resolve(dir) === path.resolve(ownSlot)) continue;
+    try {
+      const marker = JSON.parse(String(fs.readFileSync(path.join(dir, SEED_MARKER), "utf8")));
+      if (marker?.version !== 1 || !Number.isInteger(marker.pid) || alive(marker.pid)) continue;
+      if (removeSeeded(fs, dir, seedProfileDirectory(marker.profile), 1).length === 0) swept.push(dir);
+    } catch { /* not a seeded slot */ }
+  }
+  return swept;
 }
 
 /**
@@ -112,13 +157,8 @@ export function seedCaptureSlotProfile(source: string, slotRoot: string, profile
   try {
     if (!fs.lstatSync(path.join(from, profile)).isDirectory()) throw new Error("not a directory");
   } catch { throw new Error(`seed source has no browser profile '${profile}': ${from}`); }
-  /** Best-effort: a browser that has not fully exited can still hold a copied file; the next seed re-wipes it. */
-  const dispose = () => {
-    const attempt = (remove: () => void, label: string) => { try { remove(); } catch (error) { console.warn(`[bot] seeded slot file not removed yet (${label}): ${(error as NodeJS.ErrnoException).code}`); } };
-    for (const { to: rel } of files(from, profile)) attempt(() => fs.rmSync(path.join(to, ...rel.split("/")), { force: true, maxRetries: 3 }), rel);
-    for (const dir of PROFILE_SEED_DIRS) attempt(() => fs.rmSync(path.join(to, profile, ...dir.split("/")), { recursive: true, force: true, maxRetries: 3 }), dir);
-    attempt(() => fs.rmSync(path.join(to, SEED_MARKER), { force: true }), SEED_MARKER);
-  };
+  const nonce = randomUUID();
+  const dispose = () => removeSeeded(fs, to, profile);
   dispose(); // every launch starts from a fresh copy; stale session state from a crashed run is dropped
   const seeded: string[] = [];
   try {
@@ -145,9 +185,9 @@ export function seedCaptureSlotProfile(source: string, slotRoot: string, profile
       seeded.push(`${profile}/${dir}`);
     }
     assertSlotSignedIn(to, profile, fs);
-    fs.writeFileSync(path.join(to, SEED_MARKER), JSON.stringify({ version: 1, seededAt: new Date().toISOString() }));
+    fs.writeFileSync(path.join(to, SEED_MARKER), JSON.stringify({ version: 1, nonce, pid: process.pid, slot: to, profile, seededAt: new Date().toISOString() }));
   } catch (error) { dispose(); throw error; }
-  return { seeded, dispose };
+  return { seeded, nonce, dispose };
 }
 
 /** CLI entry used by `record`: undefined when no seed source is configured; refuses a seed without a slot. */
@@ -156,5 +196,14 @@ export function seedSlotFromArgs(rest: string[], workspace: CaptureWorkspace, en
   if (!source) return undefined;
   if (!workspace.slot) throw new Error("--seed-profile requires --capture-slot");
   const index = rest.indexOf("--profile-directory");
-  return seedCaptureSlotProfile(source, workspace.profileDir, index >= 0 ? rest[index + 1] : env.LKB_BROWSER_PROFILE_DIRECTORY, fs);
+  sweepStaleSlots(path.dirname(workspace.profileDir), workspace.profileDir, fs);
+  const seed = seedCaptureSlotProfile(source, workspace.profileDir, index >= 0 ? rest[index + 1] : env.LKB_BROWSER_PROFILE_DIRECTORY, fs);
+  env.LKB_SEED_NONCE = seed.nonce; // py/sb_join_seed.py accepts the marker only with this launch's nonce
+  const uninstall = installSeedCleanup(() => { seed.dispose(); });
+  return { ...seed, dispose: () => {
+    uninstall(); delete env.LKB_SEED_NONCE;
+    const left = seed.dispose();
+    if (left.length) console.error(`[bot] SEEDED SESSION FILES REMAIN, delete manually: ${left.join(", ")}`);
+    return left;
+  } };
 }
