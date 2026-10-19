@@ -28,6 +28,7 @@ from sb_join_detect import (  # noqa: F401
     RECONNECT_PHRASES, RECONNECT_THRESHOLD_S, AdmissionState, ReconnectState, apply_reload, classify_admission, classify_meet_state, click_gate, detect_trouble,
     is_meet_url, platform_of, should_force_reload)
 from sb_join_loop import run_session
+from sb_join_onair import OnairRefused, onair_enabled, onair_play, onair_prepare  # noqa: F401
 from sb_join_ownership import kill_orphans as _kill_orphans
 from sb_join_profile import existing_profile_directory, selected_uc_profile, validate_uc_profile_support
 from sb_join_recorder import recorder_link
@@ -124,6 +125,9 @@ def main():
                     return
                 sb.uc_open_with_reconnect(a.url, 4)
                 emit("opened", url=sb.get_current_url())
+                onair = onair_enabled(a.url)  # LKB_ONAIR_WATCH=1 + cloudonair.withgoogle.com only; otherwise untouched
+                if onair:
+                    onair_prepare(sb, time=time, emit=emit, session=os.environ.get("LKB_ONAIR_SESSION"))
                 if a.capture_extension:
                     link.arm(15)
                     targets = command("Target.getTargets", {"filter": [{"type": "tab", "exclude": False}, {"exclude": True}]}).get("targetInfos", [])
@@ -133,6 +137,8 @@ def main():
                     command("Target.activateTarget", {"targetId": tabs[0]["targetId"]})
                     command("Extensions.triggerAction", {"id": extension_id, "targetId": tabs[0]["targetId"]})
                     emit("capture-invoked")
+                if onair:
+                    onair_play(sb, time=time, emit=emit)
         run_session(sb, a, os=os, time=tile_clock(sb, os, time), emit=emit)
 
 

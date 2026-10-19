@@ -10,6 +10,10 @@
     powershell -NoProfile -ExecutionPolicy Bypass -File scripts\webinar\start-record-detached.ps1 `
       -Url <url> -Until HH:MM [-Title T] [-SessionId ID] [-EndNotBefore HH:MM] [-ExtraArgs "--transcribe"]
 
+  OnAir replay (cloudonair.withgoogle.com, signed-in bot profile): set LKB_ONAIR_WATCH=1, LKB_BOT_PROFILE_DIR and
+  LKB_ADMISSION_TIMEOUT_S=1 in the environment, pass -Until as an ISO datetime 4 h ahead (the player's media duration
+  + 2 min then replaces it) and optionally -OnairSession "<title substring>".
+
   Usage (U5 auto-record, fix cycle 2 / ISS-317): a Windows Scheduled Task built by
   task-scheduler.ts's scheduleOnce calls this script as -Job <jobKey> instead — a validated
   [a-z0-9-]{1,64} key, never raw title/url/sessionId text (those never reach the Task Scheduler
@@ -26,6 +30,9 @@ param(
   [string]$Title,
   [string]$SessionId,
   [string]$EndNotBefore,
+  # w24-onairplay: title substring picking which "Watch now" card to play on a cloudonair.withgoogle.com event page.
+  # Acts only with LKB_ONAIR_WATCH=1 in the environment; the first visible "Watch now" is used when omitted.
+  [string]$OnairSession,
   [string]$ExtraArgs = "",
   # ISS-317 fix (cycle 2): the ONLY value a Task Scheduler-launched run passes. Validated below
   # against the same [a-z0-9-]{1,64} shape task-scheduler.ts's JOB_KEY_RE enforces on the maker
@@ -46,7 +53,7 @@ if ($Job) {
     Write-Error "invalid -Job '$Job' (must match ^[a-z0-9-]{1,64}$) - refusing to read a job file"
     exit 1
   }
-  if ($Url -or $Until -or $Title -or $SessionId -or $EndNotBefore -or $ExtraArgs -or $CliEntry) {
+  if ($Url -or $Until -or $Title -or $SessionId -or $EndNotBefore -or $OnairSession -or $ExtraArgs -or $CliEntry) {
     Write-Error "scheduled dispatch refuses replacement recording arguments"
     exit 1
   }
@@ -78,6 +85,7 @@ if ($Job) {
   if ($Title) { $cliArgs += @("--title", $Title) }
   if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
   if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
+  if ($OnairSession) { $cliArgs += @("--onair-session", $OnairSession) }
   if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
 }
 
