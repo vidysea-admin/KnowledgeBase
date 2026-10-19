@@ -108,6 +108,8 @@ export interface ScheduleOnceOptions {
 
 export interface TaskScheduler {
   scheduleOnce(opts: ScheduleOnceOptions): Promise<void>;
+  /** Removes a pending one-off task (a cancelled meeting). Idempotent: an already-absent task is not an error. Optional so older fakes keep compiling. */
+  cancelOnce?(jobKey: string): Promise<void>;
 }
 
 function pad2(n: number): string {
@@ -148,6 +150,17 @@ type ExecFileFn = (
  */
 export function createWindowsTaskScheduler(execFileFn: ExecFileFn = execFile as unknown as ExecFileFn): TaskScheduler {
   return {
+    cancelOnce(jobKey: string): Promise<void> {
+      if (!JOB_KEY_RE.test(jobKey)) return Promise.reject(new Error(`refusing to cancel: jobKey '${jobKey}' fails ${JOB_KEY_RE} (ISS-317)`));
+      const taskName = buildTaskName(jobKey);
+      return new Promise((resolve, reject) => {
+        execFileFn("schtasks", ["/delete", "/tn", taskName, "/f"], (error, _stdout, stderr) => {
+          // A task that is already gone (it fired, or was never created) is the desired end state.
+          if (error && !/cannot find|does not exist|not exist/i.test(stderr)) reject(new Error(`schtasks /delete failed for task '${taskName}': ${stderr || error.message}`));
+          else resolve();
+        });
+      });
+    },
     scheduleOnce(opts: ScheduleOnceOptions): Promise<void> {
       if (!JOB_KEY_RE.test(opts.jobKey)) {
         return Promise.reject(
