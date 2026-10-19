@@ -237,9 +237,11 @@ def test_no_iframe_page_click_and_body_text_regression(sb, fixture_server):
 if __name__ == "__main__":
     sys.exit(pytest.main([__file__, "-v"]))
 
-def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
+def test_registration_actual_local_form_and_safety_exceptions():
     """Real local HTTP POST, explicit installed Chrome/driver, no provider/network fixture."""
     import pathlib
+    import shutil
+    import tempfile
     import sb_join
     import http.server
     import threading
@@ -248,6 +250,8 @@ def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service
     import seleniumbase
+    # Short profile dir: a long pytest basetemp makes the extension fail "Internal error while updating dynamic rules".
+    profile_dir = pathlib.Path(tempfile.mkdtemp(prefix="lkb-")) / "native-profile"
     posts, cookies, resources_seen = [], [], []
     redirect_code, redirect_host = [None], ["localhost"]
     extra = [""]
@@ -284,7 +288,7 @@ def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
     options = webdriver.ChromeOptions()
     options.binary_location = str(drivers / "cft_drivers/chrome-win64/chrome.exe")
     options.add_argument("--headless=new")
-    options.add_argument("--user-data-dir=" + str(tmp_path / "native-profile"))
+    options.add_argument("--user-data-dir=" + str(profile_dir))
     options.add_argument("--disable-background-networking")
     options.add_argument("--disable-gpu")
     options.add_argument("--enable-unsafe-extension-debugging")
@@ -334,7 +338,7 @@ def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
         processes = [process for process in psutil.Process(browser.service.process.pid).children(recursive=True) if pathlib.Path(process.exe()).resolve() == pathlib.Path(options.binary_location).resolve() and not any(arg.startswith("--type=") for arg in process.cmdline())]
         assert len(processes) == 1
         process = processes[0]
-        receipt = {"nonce": str(uuid.uuid4()), "browserPid": process.pid, "browserCreatedAt": process.create_time(), "profile": str((tmp_path / "native-profile").resolve()), "extensionId": extension_id, "fingerprint": hashlib.sha256(json.dumps(rules, sort_keys=True).encode()).hexdigest()}
+        receipt = {"nonce": str(uuid.uuid4()), "browserPid": process.pid, "browserCreatedAt": process.create_time(), "profile": str(profile_dir.resolve()), "extensionId": extension_id, "fingerprint": hashlib.sha256(json.dumps(rules, sort_keys=True).encode()).hexdigest()}
         expected = {"receipt": receipt, "rules": rules, "javascript": {"setting": "block"}}
         assert evaluate("installRegistrationPolicy(" + json.dumps({"receipt": receipt, "rules": rules, "primaryUrl": url}) + ")") == expected
         def policy_check():
@@ -355,7 +359,7 @@ def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
             extra[0] = markup
             browser.get(url)
             result = sb_join.register_form(browser, instructions, script_isolated=True, policy_check=policy_check)
-            assert result == {"status": "action_required", "reason": reason}
+            assert result == {"status": "action_required", "reason": reason, "submissionDisposition": "not-attempted"}
             assert posts == []
         extra[0] = ""
         form_action[0] = "https://other.example/submit"
@@ -423,4 +427,5 @@ def test_registration_actual_local_form_and_safety_exceptions(tmp_path):
             browser.quit()
         server.shutdown()
         server.server_close()
+        shutil.rmtree(profile_dir.parent, ignore_errors=True)
 
