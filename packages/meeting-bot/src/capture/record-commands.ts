@@ -108,7 +108,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   if (selectJoinStrategy(platform) === "vexa") {
     console.warn(`[bot] '${platform}' is Vexa-routed but no Vexa is deployed — using the local browser bot`);
   }
-  const startedAt = Date.now(), consentControl = prepareWorkspaceCaptureControls(rest, {tenantId, sessionId, meetingUrl:url, until:until.getTime(), startedAt, platform, evidenceKind:inject.tab ? "fixture" : "browser"}, workspace, inject.recordDir ?? path.join(REPO_ROOT,"raw","webinars"));
+  const startedAt = Date.now(), owner: Parameters<typeof prepareWorkspaceCaptureControls>[1] = {tenantId, sessionId, meetingUrl:url, until:until.getTime(), startedAt, platform, evidenceKind:inject.tab ? "fixture" : "browser"}, consentControl = prepareWorkspaceCaptureControls(rest, owner, workspace, inject.recordDir ?? path.join(REPO_ROOT,"raw","webinars"));
   const control = consentControl.captureControl;
   try {
   let endedAt: number | undefined;
@@ -122,7 +122,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     consentControl.readiness.onCaptureEvent(ev);
     const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
     if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
-    until = onairUntilFromEvent(ev as { event?: unknown; seconds?: unknown }, Date.now()) ?? until;
+    owner.until = (until = onairUntilFromEvent(ev as { event?: unknown; seconds?: unknown }, Date.now()) ?? until).getTime(); // the capture-control gap end follows the adjusted end
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
     if (ev.event === "admission_timeout") captureFailure ??= gateFailure;

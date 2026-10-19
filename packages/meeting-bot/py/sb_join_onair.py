@@ -7,6 +7,7 @@ It NEVER clicks sign-in, register, an account chooser or a consent control: the 
 "Watch now" control chosen by text. A refusal raises OnairRefused; main() turns that into a `fatal` event (exit 1).
 """
 import os
+import re
 from urllib.parse import urlsplit
 
 ONAIR_HOST = "cloudonair.withgoogle.com"
@@ -23,23 +24,47 @@ const card = e => { let n = e; for (let i = 0; i < 6 && n.parentElement; i++) { 
 const videos = [...document.querySelectorAll('video')];
 const v = videos.find(x => isFinite(x.duration) && x.duration > 0) || videos[0];
 return {url: location.href, text: (document.body.innerText || '').toLowerCase().slice(0, 4000),
-  controls: controls.map(e => ({text: ((e.innerText || e.value || e.getAttribute('aria-label') || '') + '').trim().toLowerCase().slice(0, 80), context: card(e)})),
-  video: videos.length > 0, iframe: [...document.querySelectorAll('iframe')].some(vis),
+  controls: controls.map(e => ({text: ((e.innerText || e.value || e.getAttribute('aria-label') || '') + '').trim().toLowerCase().slice(0, 80),
+    href: (e.href || '').toLowerCase().slice(0, 300), context: card(e)})),
+  video: videos.length > 0, iframes: [...document.querySelectorAll('iframe')].filter(vis).map(f => (f.src || '').toLowerCase().slice(0, 300)),
   duration: v && isFinite(v.duration) && v.duration > 0 ? v.duration : null};
 """
-CLICK_WATCH_JS = """
+# Fresh look at controls[idx] at click time: the index came from an earlier snapshot and the DOM may have moved since.
+_CONTROLS_JS = """
 const vis = e => { const r = e.getBoundingClientRect(), s = getComputedStyle(e);
   return r.width > 0 && r.height > 0 && s.visibility !== 'hidden' && s.display !== 'none'; };
 const controls = [...document.querySelectorAll('button,a,[role=button],input[type=button],input[type=submit]')].filter(vis);
-const e = controls[arguments[0]]; if (!e) return false; e.click(); return true;
+const e = controls[arguments[0]]; if (!e) return null;
+const trail = []; for (let n = e, i = 0; n && n !== document.body && i < 10; n = n.parentElement, i++)
+  trail.push([n.id, n.className, n.getAttribute('aria-label'), n.getAttribute('role'), n.getAttribute('data-testid')].join(' ').toLowerCase());
+let card = e; for (let i = 0; i < 6 && card.parentElement; i++) { card = card.parentElement;
+  if (card.matches('article,li,section,[role=listitem],[class*=card]')) break; }
+const d = {text: ((e.innerText || e.value || e.getAttribute('aria-label') || '') + '').trim().toLowerCase().slice(0, 80),
+  href: (e.href || '').toLowerCase().slice(0, 300), trail: trail.join(' | ').slice(0, 1500), context: (card.innerText || '').toLowerCase().slice(0, 400)};
+d.sig = d.text + '|' + d.href + '|' + d.trail;
 """
+DESCRIBE_JS = _CONTROLS_JS + "return d;"
+CLICK_WATCH_JS = _CONTROLS_JS + "if (d.sig !== arguments[1]) return false; e.click(); return true;"
 PLAY_JS = """
 const v = document.querySelector('video'); if (!v) return false;
 v.muted = false; v.volume = 1; const p = v.play(); if (p && p.catch) p.catch(() => {}); return true;
 """
-REFUSE_CONTROL = ("sign in", "log in", "login", "register", "sign up")
+# Case-insensitive SUBSTRING match on a visible control's text/href/ancestor attributes (e.g. "sign in to watch", "register now").
+REFUSE_RE = re.compile(r"sign[ _-]?in|sign[ _-]?up|log[ _-]?in|register|choose an account|consent|allow|continue with google|accounts\.google\.com", re.I)
 CHOOSER_TEXT = ("choose an account", "use another account", "to continue to", "wants to access your google account",
                 "sign in with google", "before you continue to google")
+# An iframe counts as the player only on these hosts (exact or subdomain) or on the OnAir host itself.
+PLAYER_HOSTS = ("youtube.com", "youtube-nocookie.com", "vimeo.com", "brightcove.net", "brightcove.com", ONAIR_HOST)
+LOGIN_FRAME_RE = re.compile(r"accounts\.google\.com|sign[ _-]?in|log[ _-]?in|consent|oauth|/o/oauth2|servicelogin", re.I)
+
+
+def _host_ok(src):
+    host = urlsplit(src).hostname or ""
+    return urlsplit(src).scheme == "https" and any(host == h or host.endswith("." + h) for h in PLAYER_HOSTS)
+
+
+def player_frames(snap):
+    return [f for f in snap.get("iframes", []) if _host_ok(f) and not LOGIN_FRAME_RE.search(f)]
 
 
 class OnairRefused(Exception):
@@ -69,8 +94,11 @@ def refusal(snap):
     if any(t in snap.get("text", "") for t in CHOOSER_TEXT):
         return "onair-refused: account chooser or consent page"
     for c in snap.get("controls", []):
-        if c["text"] in REFUSE_CONTROL:
-            return "onair-refused: signed out ('%s' button visible); sign the bot profile in first" % c["text"]
+        if REFUSE_RE.search(c["text"]) or REFUSE_RE.search(c.get("href", "")):
+            return "onair-refused: signed out or consent control visible ('%s'); sign the bot profile in first" % c["text"]
+    for f in snap.get("iframes", []):
+        if LOGIN_FRAME_RE.search(f):
+            return "onair-refused: login or consent iframe (%s)" % (urlsplit(f).hostname or "unknown")
     return None
 
 
@@ -80,6 +108,20 @@ def pick_watch(snap, session=None):
     for i, c in enumerate(snap.get("controls", [])):
         if c["text"].startswith("watch now") and (not want or want in c["context"] or want in c["text"]):
             return i
+    return None
+
+
+def verify_target(desc, session=None):
+    """Reason string if the freshly described control must NOT be clicked, else None."""
+    if not desc:
+        return "control vanished"
+    if not desc["text"].startswith("watch now"):
+        return "control is '%s', not 'Watch now'" % desc["text"]
+    for part in (desc["text"], desc.get("href", ""), desc.get("trail", "")):
+        if REFUSE_RE.search(part):
+            return "control is or sits inside a sign-in, register or consent element"
+    if session and session.strip().lower() not in desc["context"] + " " + desc["text"]:
+        return "control is outside the matching card"
     return None
 
 
@@ -103,11 +145,17 @@ def onair_prepare(sb, *, time, emit, session=None, wait_s=PLAYER_WAIT_S):
     clicked = []
 
     def step(snap):
-        if snap["video"] or snap["iframe"]:
+        if snap["video"] or player_frames(snap):
             return True
         if not clicked:
             idx = pick_watch(snap, session)
-            if idx is not None and sb.execute_script(CLICK_WATCH_JS, idx):
+            if idx is not None:
+                desc = sb.execute_script(DESCRIBE_JS, idx)
+                why = verify_target(desc, session)
+                if why:
+                    raise OnairRefused("onair-refused: click target changed (%s)" % why)
+                if sb.execute_script(CLICK_WATCH_JS, idx, desc["sig"]) is not True:
+                    raise OnairRefused("onair-refused: click target changed between check and click")
                 clicked.append(idx)
                 emit("onair-watch-clicked", index=idx)
         return None
