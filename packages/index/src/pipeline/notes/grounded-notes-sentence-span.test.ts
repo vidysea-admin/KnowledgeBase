@@ -183,8 +183,14 @@ test("ISS-T040GEN-010 replay: unlisted LOWER-CASE abbreviations before a capital
   }
   // cost, stated: a <=4-letter word that really ends a sentence merges when a marker is on the left; with no marker on the left it still breaks
   assert.equal(await spanOf("We do not like it. Fees are 1000 rupees.", "Fees are 1000 rupees."), "starts-mid-sentence");
-  assert.equal(await spanOf("We do not like that. Fees are 1000 rupees.", "Fees are 1000 rupees."), "starts-mid-sentence"); assert.equal(await spanOf("We do not like waiting. Fees are 1000 rupees.", "Fees are 1000 rupees."), null);
+  assert.equal(await spanOf("We do not like that. Fees are 1000 rupees.", "Fees are 1000 rupees."), null); // ruling 2026-10-19: >= 3 letters breaks
+  assert.equal(await spanOf("We do not like waiting. Fees are 1000 rupees.", "Fees are 1000 rupees."), null);
   assert.equal(await spanOf("It is good now. Fees are 1000 rupees today.", "Fees are 1000 rupees today."), null);
+  // T-040 live fix (ruling 2026-10-19): ALL-CAPS tokens and >= 3-letter words end a sentence before a capital; listed/dotted/initial/title abbreviations do not
+  for (const [a, b] of [["Offerings are SAT, GRE, GMAT.", "The Indian test began in 2018."], ["We joined TOC.", "Only members vote."], ["Everything is analyzed in an exam.", "Only then do we plan."]] as const)
+    assert.equal(await spanOf(a + " " + b, b), null, a);
+  for (const text of ["Dr. Rao spoke.", "He lives in the U.S. Army housing.", "Ask J. K. Rowling about it.", "Meet Mr. Rao today.", "It is cheap vs. Costly options.", "Use e.g. Fees and i.e. Costs."])
+    assert.equal(await spanOf(text, text.slice(text.indexOf(". ") + 2)), "starts-mid-sentence", text);
   // a >4-letter lower-case word is an ordinary word: still a break
   assert.equal(await spanOf("We do not accept pvtly. Colleges applications after March first.", "Colleges applications after March first."), null);
 });
@@ -245,6 +251,6 @@ test("ISS-T040GEN-012: marker AFTER an unlisted lower-case abbreviation -- the l
   // the whole merged sentence still ships (recall), and an abbreviation with no marker anywhere is still a plain break
   assert.equal(sentenceSpanProblem(leftShips[0]![0], 0, leftShips[0]![0].length), null);
   const plain = "Admission is open for pvt. Colleges in March are usually quite crowded every year.";
-  assert.equal(sentenceSpanProblem(plain, 0, "Admission is open for pvt.".length), null);
+  assert.equal(sentenceSpanProblem(plain, 0, "Admission is open for pvt.".length), "ends-mid-sentence"); // ruling 2026-10-19: pvt. is now a LISTED abbreviation, never a break
   assert.equal(sentenceSpanProblem("Apply early. Seats fill quickly in the popular colleges.", 0, "Apply early.".length), null);
 });
