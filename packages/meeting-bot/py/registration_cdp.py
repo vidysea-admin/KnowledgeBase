@@ -226,6 +226,11 @@ def submit_with_redirects(sb, script, instructions, approved_hosts, origin_url, 
     (stderr line plus cdp/cdp_reason on a dict result) whenever a connector was supplied but could not be used."""
     interceptor, why = None, None
     driver = getattr(sb, "driver", sb)  # SB's own execute_async_script takes (script, timeout); the selenium driver takes script args
+    # ISS-REGCDP-002: when the interceptor's socket dies mid-submit Chrome resumes paused requests, which would
+    # let a 307/308 re-send the body to a DIFFERENT approved host. With one approved host that cannot leak,
+    # so follow mode is offered only then; with several, redirect:'error' stays (fail closed).
+    if connect is not None and len({normalise_host(h) for h in approved_hosts} - {None}) != 1:
+        connect, why = None, "multiple_approved_hosts"
     if connect is not None:
         cdp = None
         try:

@@ -52,12 +52,13 @@ function mutate(name) {
   else throw new Error("unknown mutation " + name);
 }
 if (scenario.preMutate) mutate(scenario.preMutate);
-if (scenario.formAction) form.action = scenario.formAction;
+if (scenario.formAction) form.action = new URL(scenario.formAction, base + "/register").href; // DOM form.action is always resolved
+if (scenario.buttonFormAction) button.attrs.formaction = scenario.buttonFormAction; // raw attribute, as getAttribute returns it
 
 // Fake server: path -> {code, location}. redirect:'error' rejects on 3xx, 'follow' re-sends the same body (307/308).
 globalThis.fetch = async (url, opts) => {
   const u = new URL(url);
-  posts.push({ host: u.hostname, path: u.pathname, body: opts.body, redirect: opts.redirect });
+  posts.push({ host: u.hostname, path: u.pathname, body: opts.body, redirect: opts.redirect, credentials: opts.credentials, headers: opts.headers, url: u.href });
   const rule = (scenario.server || {})[u.pathname];
   if (rule && [301, 302, 303, 307, 308].includes(rule.code)) {
     if (opts.redirect === "error") throw new TypeError("Failed to fetch (redirect error)");
