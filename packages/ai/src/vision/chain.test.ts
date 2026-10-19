@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { fakeTransport } from "../testUtils.js";
-import { buildVisionBackends, createGeminiVisionBackend, createOllamaVisionBackend, extractJsonObject, DEFAULT_VISION_BACKEND_TIMEOUT_MS, MAX_EXTRACT_CHARS, newVisionTally, runVisionChain, VisionAllProvidersFailedError, type VisionImageRequest } from "./chain.js";
+import { buildVisionBackends, createGeminiVisionBackend, createOllamaVisionBackend, extractJsonObject, VisionDemotion, VisionNonJsonError, DEFAULT_VISION_BACKEND_TIMEOUT_MS, MAX_EXTRACT_CHARS, newVisionTally, runVisionChain, VisionAllProvidersFailedError, type VisionImageRequest } from "./chain.js";
 import { detectGeminiFreeTier, GeminiFreeTierQuotaError } from "../gemini-quota.js";
 import { createGeminiSttAdapter } from "../stt/gemini.js";
 import { parseRoutingYaml } from "../routing-config.js";
@@ -228,4 +228,79 @@ test("outer signal (ctx.signal) abort cancels the in-flight request and rejects"
   assert.equal(sig!.aborted, true);
   const pre = new AbortController(); pre.abort();
   await b.call(REQ, { signal: pre.signal }).catch(() => {}); assert.equal(sig!.aborted, true, "pre-aborted outer signal aborts at once");
+});
+
+// ---- w27 aitransport: ISS-OLLAMAFIRST-001 (caller AbortSignal through the chain) and -002 (demote the prose model) ----
+const PROSE = "The user wants me to describe the image. Let me think about it";
+/** ollama: first model replies with prose, every other model replies with JSON; gemini JSON. Records the model per call. */
+function proseFirst(failModel?: string) {
+  const models: string[] = [];
+  const t = async (r: TransportRequest): Promise<TransportResponse> => {
+    if (!r.url!.includes("ollama.com")) { models.push("gemini"); return geminiOk(); }
+    const m = (r.body as { model: string }).model; models.push(m);
+    if (m === failModel) return { status: 500, body: "x" };
+    return m === "glm-5.3-flash" ? { status: 200, body: { message: { content: PROSE } } } : ollamaOk();
+  };
+  return Object.assign(t, { models });
+}
+
+test("ISS-OLLAMAFIRST-002: prose from the first model demotes it; later frames skip the wasted call; ollama stays ahead of gemini", async () => {
+  const t = proseFirst(); const backends = buildVisionBackends(ENV, t); const tally = newVisionTally(); const logs: string[] = [];
+  const frame1 = await runVisionChain(backends, REQ, { tally, log: (l) => logs.push(l), validateJson: strict });
+  assert.equal(frame1.model, "deepseek-v4.1-flash"); assert.equal(frame1.attempts, 2);
+  assert.ok(logs.some((l) => /glm-5.3-flash demoted/.test(l)));
+  const frame2 = await runVisionChain(backends, REQ, { tally, validateJson: strict });
+  const frame3 = await runVisionChain(backends, REQ, { tally, validateJson: strict });
+  assert.deepEqual(t.models, ["glm-5.3-flash", "deepseek-v4.1-flash", "deepseek-v4.1-flash", "deepseek-v4.1-flash"], "glm paid once, not per frame");
+  assert.equal(frame2.attempts, 1); assert.equal(frame3.provider, "ollama");
+  assert.equal(tally.failures.length, 1); assert.ok(!/The user|Let me think/.test(tally.failures[0]!.error));
+});
+
+test("demotion reorders only inside a provider group: a demoted ollama model is still tried before gemini", async () => {
+  const t = proseFirst("deepseek-v4.1-flash"); const backends = buildVisionBackends(ENV, t);
+  const d = new VisionDemotion(); d.recordNonJson(backends[0]!);
+  assert.deepEqual(d.order(backends).map((b) => `${b.provider}/${b.model}`), ["ollama/deepseek-v4.1-flash", "ollama/glm-5.3-flash", "gemini/gemini-2.5-flash"]);
+  await assert.doesNotReject(runVisionChain(backends, REQ, { demotion: d, validateJson: strict }));
+  assert.deepEqual(t.models, ["deepseek-v4.1-flash", "glm-5.3-flash", "gemini"], "demoted glm still comes before gemini");
+});
+
+test("a demoted model that later serves valid JSON is restored; below-threshold strikes keep the order; demotion:false retries the prose model every call", async () => {
+  const [a, b] = [1, 2].map((n) => createOllamaVisionBackend({ transport: async () => ollamaOk(), model: `m${n}`, baseUrl: "https://ollama.com" }));
+  const d = new VisionDemotion(); d.recordNonJson(a!);
+  assert.deepEqual(d.order([a!, b!]).map((x) => x.model), ["m2", "m1"]);
+  d.recordServed(a!); assert.deepEqual(d.order([a!, b!]).map((x) => x.model), ["m1", "m2"]);
+  const lenient = new VisionDemotion(2); lenient.recordNonJson(a!); assert.deepEqual(lenient.order([a!, b!]).map((x) => x.model), ["m1", "m2"]);
+  const t = proseFirst(); const backends = buildVisionBackends(ENV, t);
+  await runVisionChain(backends, REQ, { demotion: false, validateJson: strict }); await runVisionChain(backends, REQ, { demotion: false, validateJson: strict });
+  assert.equal(t.models.filter((m) => m === "glm-5.3-flash").length, 2);
+});
+
+test("ISS-OLLAMAFIRST-002: JSON.parse SyntaxError from a `validate` callback does not leak the reply into tally/log and counts as prose", async () => {
+  const t = proseFirst(); const backends = buildVisionBackends(ENV, t); const tally = newVisionTally(); const logs: string[] = [];
+  await runVisionChain(backends, REQ, { tally, log: (l) => logs.push(l), validate: (s) => JSON.parse(s) });
+  assert.equal(tally.failures.length, 1);
+  assert.equal(tally.failures[0]!.error, new VisionNonJsonError().message);
+  assert.ok(![...logs, tally.failures[0]!.error].some((l) => /The user|Unexpected token|is not valid JSON/.test(l)));
+  assert.ok(logs.some((l) => /demoted/.test(l)));
+});
+
+test("status/transport failures do NOT demote (only prose does)", async () => {
+  const t = split({ ollama: () => ({ status: 503, body: "down" }), gemini: geminiOk }); const backends = buildVisionBackends(ENV, t);
+  const d = new VisionDemotion();
+  await runVisionChain(backends, REQ, { demotion: d, validateJson: strict });
+  assert.ok(backends.every((x) => !d.isDemoted(x)));
+});
+
+test("ISS-OLLAMAFIRST-001: opts.signal reaches every backend request; abort cancels the in-flight call and no later backend is tried", async () => {
+  const sigs: (AbortSignal | undefined)[] = [];
+  const t = async (r: TransportRequest) => { sigs.push(r.signal); return new Promise<TransportResponse>(() => {}); };
+  const backends = [1, 2, 3].map((n) => createOllamaVisionBackend({ transport: t, model: `m${n}`, baseUrl: "https://ollama.com", timeoutMs: 10_000 }));
+  const outer = new AbortController(); const started = Date.now();
+  const p = runVisionChain(backends, REQ, { signal: outer.signal, deadlineMs: 60_000 });
+  await new Promise((r) => setTimeout(r, 15)); outer.abort();
+  await assert.rejects(p, (e: unknown) => e instanceof VisionAllProvidersFailedError && e.attempts.length === 3 && /aborted/.test(e.attempts[0]!.error) && /aborted before this backend/.test(e.attempts[2]!.error));
+  assert.ok(Date.now() - started < 1500, "returns on abort, not after the 10 s backend timeout");
+  assert.equal(sigs.length, 1, "no further backend request after the abort"); assert.equal(sigs[0]!.aborted, true);
+  const pre = new AbortController(); pre.abort();
+  await assert.rejects(runVisionChain(backends, REQ, { signal: pre.signal }), VisionAllProvidersFailedError); assert.equal(sigs.length, 1, "pre-aborted: no request at all");
 });
