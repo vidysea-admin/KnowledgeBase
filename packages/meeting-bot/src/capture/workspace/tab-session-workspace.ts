@@ -104,7 +104,8 @@ export function selectTabCaptureWorkspace(rest: string[], defaults: CaptureWorks
   const indices = rest.flatMap((arg, index) => arg === "--capture-slot" ? [index] : []);
   if (indices.length > 1) throw new Error("duplicate --capture-slot");
   if (!indices.length) return { ...defaults };
-  const slot = rest[indices[0]! + 1];
+  const rawSlot = rest[indices[0]! + 1];
+  const slot = typeof rawSlot === "string" ? rawSlot.toLowerCase() : rawSlot; // `-CaptureSlot A` and `a` are the same slot
   if (typeof slot !== "string" || !/^[a-z0-9][a-z0-9_-]{0,63}$/.test(slot) ||
       /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/.test(slot)) throw new Error("--capture-slot requires a safe lowercase identifier");
   if (backend !== "tab") throw new Error("--capture-slot supports tab capture only; OBS fallback is single-session");

@@ -8,6 +8,7 @@ import { EventEmitter } from "node:events";
 import { DatabaseSync } from "node:sqlite";
 import { SlotNotSignedInError, assertSlotSignedIn, removeSeeded, seedCaptureSlotProfile, seedProfileDirectory, seedSlotFromArgs, seedSourceFromArgs, sweepStaleSlots } from "./slot-profile-seed.js";
 import { installSeedCleanup } from "./slot-seed-signals.js";
+import { selectTabCaptureWorkspace } from "./tab-session-workspace.js";
 import { runRecord } from "../record-commands.js";
 
 type Cookie = { host: string; name: string; value?: number; expires?: number };
@@ -261,5 +262,46 @@ test("runRecord: an unsigned source exits with a clear reason and never launches
       { profileDir: f.slot, recordDir: path.join(f.root, "rec"), tab: () => { launched = true; throw new Error("launched"); } }),
       /capture slot is not signed in/);
     assert.equal(launched, false);
+  } finally { f.clean(); }
+});
+
+test("w25 regression: the nonce set by seedSlotFromArgs reaches the real Python ownership check; own .lkb-* control files pass, foreign entries still refuse", { timeout: 60000 }, async (t) => {
+  const { spawnSync } = await import("node:child_process");
+  const python = process.env.LKB_PYTHON ?? "python";
+  if (spawnSync(python, ["-c", "import json"]).status !== 0) { t.skip("python unavailable"); return; }
+  const f = fixture();
+  const py = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, "$1")), "..", "..", "..", "py");
+  const check = (slot: string, env: NodeJS.ProcessEnv) => {
+    const names = readdirSync(slot);
+    const r = spawnSync(python, ["-c", "import json,sys;sys.path.insert(0,sys.argv[1]);from sb_join_seed import unproved_entries as u;print(json.dumps(u(sys.argv[2],json.loads(sys.argv[3]),'Profile 1')))", py, slot, JSON.stringify(names)],
+      { env: { ...process.env, ...env, LKB_SEED_NONCE: env.LKB_SEED_NONCE ?? "" }, encoding: "utf8" });
+    assert.equal(r.status, 0, r.stderr);
+    return JSON.parse(r.stdout) as string[];
+  };
+  const keep = process.env.LKB_SEED_NONCE;
+  try {
+    const parent = path.join(f.root, "slots");
+    const ws = { profileDir: path.join(parent, "a"), recordDir: f.root, tenantId: "t", slot: "a" };
+    const seed = seedSlotFromArgs(["--seed-profile", f.source, "--profile-directory", "Profile 1"], ws)!;
+    // what the real launch has at that moment: the TS per-slot lock and a leftover readiness record
+    writeFileSync(path.join(ws.profileDir, ".lkb-tab-capture.lock"), "1"); writeFileSync(path.join(ws.profileDir, ".lkb-readiness-failure-cloudonair.json"), "{}");
+    writeFileSync(path.join(ws.profileDir, ".lkb-profile.lock"), "0");
+    assert.equal(process.env.LKB_SEED_NONCE, seed.nonce, "TS side exports the nonce into the child environment");
+    assert.deepEqual(check(ws.profileDir, { LKB_SEED_NONCE: process.env.LKB_SEED_NONCE }), []);
+    assert.deepEqual(check(ws.profileDir, { LKB_SEED_NONCE: "" }), readdirSync(ws.profileDir).filter((n) => n !== ".lkb-profile.lock"), "no nonce: nothing is trusted");
+    writeFileSync(path.join(ws.profileDir, "Cookies"), "foreign");
+    assert.deepEqual(check(ws.profileDir, { LKB_SEED_NONCE: process.env.LKB_SEED_NONCE }), ["Cookies"], "a foreign entry still refuses");
+    mkdirSync(path.join(ws.profileDir, ".lkb-dir"));
+    assert.ok(check(ws.profileDir, { LKB_SEED_NONCE: process.env.LKB_SEED_NONCE }).includes(".lkb-dir"), "only regular .lkb-* files are own control files");
+    seed.dispose();
+  } finally { if (keep === undefined) delete process.env.LKB_SEED_NONCE; else process.env.LKB_SEED_NONCE = keep; f.clean(); }
+});
+
+test("w25: an uppercase --capture-slot is the same slot as its lowercase form", () => {
+  const f = fixture();
+  try {
+    const a = selectTabCaptureWorkspace(["--capture-slot", "A"], { profileDir: f.slot, recordDir: f.root, tenantId: "t" });
+    const b = selectTabCaptureWorkspace(["--capture-slot", "a"], { profileDir: f.slot, recordDir: f.root, tenantId: "t" });
+    assert.deepEqual(a, b); assert.equal(a.slot, "a");
   } finally { f.clean(); }
 });
