@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync, readdirSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { canonicalWatchUrl, onairWatchConfig, scheduleOnairWatch, watchDurationSec, WATCH_MAX_SEC, type OnairWatchDeps } from "./onair-watch.js";
+import { applyOnairSession, canonicalWatchUrl, onairUntilFromEvent, onairWatchConfig, scheduleOnairWatch, watchDurationSec, WATCH_MAX_SEC, type OnairWatchDeps } from "./onair-watch.js";
 import { planSendNow } from "../send-now.js";
 
 const NOW = new Date("2026-10-19T10:00:00.000Z");
@@ -121,4 +121,20 @@ test("live planning is unchanged: planSendNow output is identical with the flag 
   try { process.env.LKB_ONAIR_WATCH = "1"; assert.equal(plans(), off); }
   finally { if (saved === undefined) delete process.env.LKB_ONAIR_WATCH; else process.env.LKB_ONAIR_WATCH = saved; }
   assert.equal((JSON.parse(off)[0] as { ok: boolean }).ok, true);
+});
+
+test("onair-duration event moves the recording end: media + 2 min, capped at 4 h, only when the flag is on", () => {
+  const on = { LKB_ONAIR_WATCH: "1" }, now = NOW.getTime();
+  assert.equal(onairUntilFromEvent({ event: "onair-duration", seconds: 1800 }, now, on)?.getTime(), now + 1920_000);
+  assert.equal(onairUntilFromEvent({ event: "onair-duration", seconds: 99999 }, now, on)?.getTime(), now + WATCH_MAX_SEC * 1000);
+  assert.equal(onairUntilFromEvent({ event: "onair-duration", seconds: 1800 }, now, {}), undefined);
+  for (const bad of [0, -1, NaN, Infinity, "1800", null, undefined]) assert.equal(onairUntilFromEvent({ event: "onair-duration", seconds: bad }, now, on), undefined, String(bad));
+  assert.equal(onairUntilFromEvent({ event: "heartbeat", seconds: 1800 }, now, on), undefined);
+});
+
+test("--onair-session is validated and exported to the bot browser env only when valid", () => {
+  const env: NodeJS.ProcessEnv = {};
+  applyOnairSession(undefined, env); assert.equal(env.LKB_ONAIR_SESSION, undefined);
+  applyOnairSession("Data Pipelines", env); assert.equal(env.LKB_ONAIR_SESSION, "Data Pipelines");
+  for (const bad of ["", "x".repeat(201), "a\nb", "é"]) assert.throws(() => applyOnairSession(bad, {}), /invalid --onair-session/, JSON.stringify(bad));
 });

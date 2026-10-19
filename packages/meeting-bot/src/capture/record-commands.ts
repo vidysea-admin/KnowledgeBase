@@ -19,6 +19,7 @@ import { tabReceiverGuardFromEnv } from "./tab-receiver-guard.js";
 import { createNativeCaptureRuntime, nativeCaptureSettings } from "./native/native-capture-runtime.js";
 import type { NativeCaptureClockQualifierOptions } from "./tiles/native-measurement.js";
 import type { NativeCaptureSealer } from "./native/native-archive-join-types.js";
+import { applyOnairSession, onairUntilFromEvent } from "../watch/onair-watch.js";
 import { selectedBrowserProfile } from "./browser/browser-profile.js";
 import { assertCaptureWorkspaceVideo, claimCaptureSession, loginInCaptureWorkspace, prepareWorkspaceCaptureControls, selectTabCaptureWorkspace, slotCaptureSessionId } from "./workspace/tab-session-workspace.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -82,7 +83,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const untilArg = flag(rest, "--until");
   if (!url || !untilArg) {
     throw new Error("usage: lkb record <url> --until HH:MM [--end-not-before HH:MM] [--title T] " +
-      "[--session-id ID] [--capture-slot ID] [--backend tab|obs] [--native-tab-clock] [--lean-video] [--transcribe]"
+      "[--session-id ID] [--onair-session TITLE] [--capture-slot ID] [--backend tab|obs] [--native-tab-clock] [--lean-video] [--transcribe]"
     );
   }
   const envFile = path.join(REPO_ROOT, ".env");
@@ -97,7 +98,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const obsPassword = process.env.OBS_WS_PASSWORD ?? "";
   if (backend === "obs" && !obsPassword) throw new Error("OBS_WS_PASSWORD missing from .env");
   console.log(`[bot] capture backend: ${backend}`);
-  const until = todayAt(untilArg);
+  let until = todayAt(untilArg); applyOnairSession(flag(rest, "--onair-session")); // OnAir may move `until` once, when the player reports its duration
   const endNotBefore = todayAt(flag(rest, "--end-not-before") ?? untilArg);
   const platform = detectPlatform(url);
   const title = flag(rest, "--title") ?? `${platform} webinar`;
@@ -121,6 +122,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
     consentControl.readiness.onCaptureEvent(ev);
     const gateFailure = gate.onEvent(ev as Parameters<typeof gate.onEvent>[0]);
     if (ev.event === "admitted" && !joinedNotified) { joinedNotified = true; telegram.notifyJoined(title, platform, { assumed: (ev as { assumed?: unknown }).assumed === true }); } // T-030, now only once admitted (ISS-CAPTUREFIX-001)
+    until = onairUntilFromEvent(ev as { event?: unknown; seconds?: unknown }, Date.now()) ?? until;
     if (ev.event === "ended" && endedAt === undefined) endedAt = Date.now();
     if (ev.event === "capture-error") captureFailure = gateFailure ?? String(ev.error ?? "capture failed");
     if (ev.event === "admission_timeout") captureFailure ??= gateFailure;
@@ -231,9 +233,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   } catch(error) {consentControl.readiness.onCaptureEvent({event:"capture-error"});throw error;}
   finally { consentControl.dispose(); }
 }
-export { normalizeCapture } from "./record-finalize.js";
-export { processRecordingArtifacts, validateIndexProof } from "./record-finalize.js";
-export { isSilentCapture, finalizeRecordingWith, type FinalizeRecordingOverrides } from "./record-finalize.js";
+export { normalizeCapture, processRecordingArtifacts, validateIndexProof, isSilentCapture, finalizeRecordingWith, type FinalizeRecordingOverrides } from "./record-finalize.js";
 export { finalizeRecording } from "./workspace/finalize-workspace-recording.js";
 export interface RunFinalizeOverrides extends Partial<Pick<ControllerRecoveryContext, "repoRoot" | "recordDir" | "profileDir">>, Partial<Omit<ControllerRecoveryActions, "finalize" | "processArtifacts">> {
   obs?: ObsClientLike;
