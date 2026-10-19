@@ -3,7 +3,7 @@
 **Contract:** none specific (live defect, 2026-10-13 Zoom WEBINAR via web client).
 **Date:** 2026-10-14
 **Fix cycle:** 0
-**Status:** ready-for-check
+**Status:** checked-PASS
 
 ## Defect
 Bot was inside a Zoom webinar (share frames, non-silent audio) but admission never fired ("admission_timeout ... waited 900s in the lobby"); the stop then failed with "Recorder did not acknowledge final flush; media requires recovery".

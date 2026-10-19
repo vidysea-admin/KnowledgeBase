@@ -1,6 +1,6 @@
 # t039-takeover-seam (T-039, ISS-T039DUPES-006)
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 1
 Base SHA: a9fac545d0da015668d7dba455031b3a0fe52078
 Candidate SHA: ccc78b467c335bc0966dead782d8a4be0f302a8d

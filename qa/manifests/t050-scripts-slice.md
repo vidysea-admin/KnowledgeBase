@@ -1,6 +1,6 @@
 # t050-scripts-slice
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: lane/w16-t050scripts (base a9fac545). Touches only scripts/webinar/graph/* (+ this manifest).
 Contract: qa/contracts/goal-t050.md (scripts slice: criteria 3, 5, 6 at the script boundary). packages/core is another lane.

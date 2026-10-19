@@ -27,7 +27,7 @@ function fixture(approved = true) {
   const first: Turns = { _id: "turn-approved", tenantId, sessionId, speakerRef: "expert", speakerLabel: "Asha", tStart: 0, tEnd: 0,
     text: "Scholarship closes Friday.", occurredAt: "2026-10-14T10:00:00.000Z" };
   const sibling: Turns = { ...first, _id: "turn-sibling", text: "UNREVIEWED sibling fee is 99.", tStart: 1, tEnd: 1 };
-  const source = { _id: sourceId, tenantId, kind: "whatsapp-batch", path: "group@g.us" } as Sources;
+  const source = { _id: sourceId, tenantId, kind: "whatsapp-batch", path: "group@g.us", consent: { given: true, recordedBy: "test-owner" } } as Sources;
   const session: Sessions = { _id: sessionId, tenantId, sourceId, title: "PRIVATE group title", participants: ["PRIVATE person"], date: "2026-10-14",
     status: { transcribe: "done", index: "pending" } };
   const candidates = detectWhatsAppReviewCandidates(tenantId, { source, session, turns: [first, sibling] }, "2026-10-14T11:00:00.000Z");

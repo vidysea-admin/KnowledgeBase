@@ -1,6 +1,6 @@
 # t050-wire-pipeline-graph
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Tier: 3 (roadmap task T-050, wiring slice: runner adapter + graph -> real entry point). T-050 stays in_progress. Data-write class (drives the queue and run-state files): full ceremony.
 Lane: lane/w050 (from 406d5ef4).

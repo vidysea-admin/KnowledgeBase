@@ -1,6 +1,6 @@
 # u2-4-suggestion-regate-w17
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: lane/w17-u24regate, base a0391420 (candidate SHA = the lane commit; see git log)
 Issues: ISS-282 (NOT flipped; the checker judges). Evaluation only: no production write, no Mongo, no stored-speaker change.

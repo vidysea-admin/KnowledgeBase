@@ -26,6 +26,10 @@ export interface Sources {
   };
   createdAt: string;
   sourceMeta?: {
+    /**
+     * Source authorization CAS version (ISS-WAVECTORLESS-002). Consent withdrawal and WhatsApp approval write only with a conditional match on the revision they read and increment it; absent means 0.
+     */
+    authorizationRevision?: number;
     connectorIndex?: {
       version: 2;
       strict: boolean;

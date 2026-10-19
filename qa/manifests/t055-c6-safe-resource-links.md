@@ -1,6 +1,6 @@
 # t055-c6-safe-resource-links
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 
 Task: T-055 clause C6 (qa/contracts/goal-t055.md). Base a0391420, lane lane/w17-t055c6. Candidate SHA: see the lane HEAD commit.

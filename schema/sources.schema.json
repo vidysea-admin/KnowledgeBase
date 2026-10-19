@@ -77,6 +77,11 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
+        "authorizationRevision": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Source authorization CAS version (ISS-WAVECTORLESS-002). Consent withdrawal and WhatsApp approval write only with a conditional match on the revision they read and increment it; absent means 0."
+        },
         "connectorIndex": {
           "type": "object",
           "properties": {

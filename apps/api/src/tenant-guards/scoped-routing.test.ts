@@ -64,8 +64,8 @@ test("ingestUrl: B's ingest adds only B-stamped rows and leaves A's sources/sess
   const db = fresh({ sources: [{ _id: "sa", tenantId: A }], sessions: [{ _id: "xa", tenantId: A }], turns: [{ _id: "ta", tenantId: A }] });
   const before = ["sources", "sessions", "turns"].map((c) => snap(db, c));
   const real = globalThis.fetch;
-  globalThis.fetch = (async () => ({ ok: true, status: 200, text: async () => "Hello world.\n\nSecond paragraph." })) as never;
-  try { await createMongoIngestDeps().ingestUrl(B, "https://example.com/p"); } finally { globalThis.fetch = real; }
+  globalThis.fetch = (async () => (new Response("Hello world.\n\nSecond paragraph."))) as never;
+  try { await createMongoIngestDeps(undefined, { lookup: async () => ["93.184.216.34"] }).ingestUrl(B, "https://example.com/p"); } finally { globalThis.fetch = real; }
   for (const [i, c] of ["sources", "sessions", "turns"].entries()) {
     const rows = db.all(c);
     assert.equal(JSON.stringify(rows[0]), JSON.parse(before[i]!).length ? JSON.stringify(JSON.parse(before[i]!)[0]) : "", `${c}: A row unchanged`);

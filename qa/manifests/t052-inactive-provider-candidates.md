@@ -3,8 +3,8 @@
 **Goal task:** T-052
 **Tier:** 3 — approved roadmap engineering; activation/PIVOT retained for Umesh.
 **Fix cycle:** 1
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Contract:** qa/contracts/goal-t052.md C1/C2/C5/C7/C8/C12–C14; candidate-specific independent criteria pending checker.
 **Packet:** qa/packets/t052-inactive-provider-candidates.md
 

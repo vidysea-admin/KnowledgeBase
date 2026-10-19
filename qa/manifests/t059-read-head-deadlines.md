@@ -1,7 +1,7 @@
 # t059-read-head-deadlines
 
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Task:** T-059
 **Priority:** tier3 centrally authorized roadmap slice

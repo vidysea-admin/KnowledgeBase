@@ -1,9 +1,9 @@
 # outputs-vectorless-integration
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Priority tier: 3 — D-173/D-174 approved T-058 integration.
-Handshake status: ready-for-check
+Handshake status: checked-PASS
 
 Scoped behavior: separate generation and grounding callbacks; production factory requires an explicit verifier. Generation uses complete; assessment/revalidation uses verify. Legacy direct service fixtures without verify retain their original callback behavior; production supplies the required distinct callback. Explicit verifier failure never retries the generator and cannot persist a new draft. No embedding dependency is added.
 

@@ -1,6 +1,6 @@
 # Manifest: apismall
 
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Base SHA: a9fac545
 Candidate SHA: 9495c4bd70ec86407425dccc1a1be2f1694767db

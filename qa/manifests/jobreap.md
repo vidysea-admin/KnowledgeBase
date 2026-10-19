@@ -1,5 +1,5 @@
 # Manifest: jobreap
-Status: ready-for-check
+Status: checked-PASS
 Fix cycle: 0
 Lane: lane/jobreap (from main 775264f2, then merged main 4f449b27)
 Issue: ISS-REGFLAKE-002 (medium, qa/issues.REGFLAKE.jsonl)

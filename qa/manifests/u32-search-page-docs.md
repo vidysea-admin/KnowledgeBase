@@ -1,6 +1,6 @@
 # Manifest - u32-search-page-docs
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: lane/u32docs (from c7b09b87)
 Tier: 3 (roadmap precondition). docs/plan.md row 15 requires docs/features/u3.2-search-page/ before U3.2 work proceeds.

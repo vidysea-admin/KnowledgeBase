@@ -1,7 +1,7 @@
 # Speaker knowledge vectorless projection
 
-**Handshake status:** building
-Status: building
+**Handshake status:** checked-PASS
+Status: checked-PASS
 Fix cycle: 1
 Base SHA: a9fac545
 Updated hashes (supersede table below): speaker-knowledge.ts a1f6259ea6f75fd2c75243784bda187f0b2c0d0a2c9bdedf937440bfc0c91fdf; speaker-knowledge.test.ts cc8da455c5455a1e97b1ae9330e85da394cc20b75065f8f5f5083039146f5f21. Both tracked at base; no source edit in this lane.

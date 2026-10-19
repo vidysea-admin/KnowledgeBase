@@ -1,6 +1,6 @@
 # retention-ruling5
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: lane/w17-retention. Base 9e55b642. Class: data delete path, FULL ceremony.
 Authority: ruling 5 (2026-10-17, Approver Umesh): min-age-days=90, clip-padding-seconds=15, agents dry-run only, real deletion stays human.

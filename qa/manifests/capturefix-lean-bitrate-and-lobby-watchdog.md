@@ -1,6 +1,6 @@
 # capturefix-lean-bitrate-and-lobby-watchdog
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Fix cycle: 0
 Lane: lane/capturefix. Tier: roadmap T-035 (defect 2 DELIVERED); T-034 lobby watchdog (defect 1 NOT delivered, STOPPED).
 
