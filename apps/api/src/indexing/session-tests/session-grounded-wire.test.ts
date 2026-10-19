@@ -5,6 +5,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { createLlmNoteJudge } from "@lkb/index";
 import { indexSession } from "../session.js";
 import { fakeDb, embedOk, type Call } from "../testutils.js";
 import { resolveGroundedNotes, resolveJudgeMaxCostUsd } from "../../composition/production.js";
@@ -148,4 +149,25 @@ test("when the judge rejects every fresh claim, old machine claims are kept and 
   const rejectClaims = async (batch: Batch) => ({ verdicts: batch.map((b) => ({ id: b.id, verdict: b.kind === "claim" ? ("different" as const) : ("same" as const), reason: "r" })) });
   await assert.rejects(run(db, { noteJudge: rejectClaims }), /no accepted fresh claims/);
   assert.ok(!calls.some((c) => c.coll === "claims" && WRITES.includes(c.op)));
+});
+
+// ISS-T040WIRE-001: the session-level pass-through of judgeMaxCostUsd to summarize AND claims is pinned here.
+test("judgeMaxCostUsd:0 through indexSession never calls the judge (injected judge and judge-model provider), nothing written", async () => {
+  for (const mode of ["injected", "provider"] as const) {
+    const { db, calls } = setup(), model = fakeModel();
+    let judgeCalls = 0, judgeModelCalls = 0;
+    const counting = (async (job: Job & { kind?: string }) => { if (job.kind === "note-judge") { judgeModelCalls++; return { text: "{}", usage: { inputTokens: 0, outputTokens: 0 }, provider: "fixture", model: "judge", costUsd: 0 }; } return model(job); }) as never;
+    const noteJudge = mode === "injected" ? (async (b: Batch) => { judgeCalls++; return judgeSame(b); }) : createLlmNoteJudge(counting);
+    await assert.rejects(indexSession("t", "s1", { db, complete: counting, embed: embedOk, strictWebinar: true, dropUnverified: true, noteJudge: noteJudge as never, judgeMaxCostUsd: 0 }), /strict webinar index incomplete/);
+    assert.equal(judgeCalls, 0, `${mode}: injected judge called`);
+    assert.equal(judgeModelCalls, 0, `${mode}: judge model called`);
+    assert.ok(!calls.some((c) => ["session_pages", "claims", "chunks", "tree_index"].includes(c.coll) && WRITES.includes(c.op)));
+  }
+});
+
+test("control: without a cap the same run does call the judge (the counter is live)", async () => {
+  const { db } = setup();
+  let judgeCalls = 0;
+  await run(db, { noteJudge: async (b: Batch) => { judgeCalls++; return judgeSame(b); } });
+  assert.ok(judgeCalls > 0);
 });
