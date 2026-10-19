@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { checkPendingValue, confirmationText, type Pending, type PendingKind, type RuleState } from "./joinRulesModel.js";
+import { checkMeetingUrl, checkPendingValue, confirmationText, type Pending, type PendingKind, type RuleState } from "./joinRulesModel.js";
 
 interface Props { state: RuleState; disabled: boolean; busy: boolean; onConfirm: (p: Pending) => void }
 
@@ -13,13 +13,16 @@ function List({ title, items, empty }: { title: string; items: readonly string[]
 /** Current approvals / opt-outs plus the three add forms. Nothing is sent until the inline confirmation is accepted. */
 export function ApprovalsPanel({ state, disabled, busy, onConfirm }: Props): React.ReactElement {
   const [inputs, setInputs] = useState<Record<PendingKind, string>>({ sender: "", domain: "", optout: "" });
+  const [meetingUrl, setMeetingUrl] = useState("");
   const [pending, setPending] = useState<Pending | null>(null);
   const [understood, setUnderstood] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const ask = (kind: PendingKind) => {
     const r = checkPendingValue(kind, inputs[kind]);
     if ("error" in r) { setError(r.error); setPending(null); return; }
-    setError(null); setUnderstood(false); setPending({ kind, value: r.value });
+    const link = kind === "optout" ? checkMeetingUrl(meetingUrl) : {};
+    if ("error" in link) { setError(link.error); setPending(null); return; }
+    setError(null); setUnderstood(false); setPending({ kind, value: r.value, ...(link.url ? { hints: { meetingUrl: link.url } } : {}) });
   };
   const adder = (kind: PendingKind, label: string, placeholder: string, button: string) => <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "0.4rem" }}>
     <label style={{ flex: "1 1 14rem" }}>{label}
@@ -35,6 +38,9 @@ export function ApprovalsPanel({ state, disabled, busy, onConfirm }: Props): Rea
     <h3 className="section-title">Add</h3>
     {adder("sender", "Sender to approve", "speaker@example.com", "Approve sender…")}
     {adder("domain", "Domain to approve", "example.com", "Approve domain…")}
+    <label style={{ display: "block", marginBottom: "0.4rem" }}>Meeting link for the opt-out (optional)
+      <input aria-label="Meeting link for the opt-out (optional)" style={{ width: "100%" }} disabled={disabled} value={meetingUrl} placeholder="https://meet.example.com/abc" onChange={e => setMeetingUrl(e.target.value)} />
+    </label>
     {adder("optout", "Event id to opt out of", "calendar event id", "Opt out of event…")}
     {error && <p role="alert" className="error-note">{error}</p>}
     {pending && <div role="alertdialog" aria-label="Confirm change" className="card" style={{ borderLeft: `4px solid ${domain ? "var(--bad)" : "var(--warn)"}` }}>

@@ -11,6 +11,34 @@ describe("apiFetch", () => {
     vi.restoreAllMocks();
   });
 
+  test("ISS-RULESWEB-002: caller-supplied headers cannot override Authorization or Content-Type", async () => {
+    const fetchMock = vi.fn(async () => new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await apiFetch("/x", "real-key", { method: "POST", body: { a: 1 }, headers: { authorization: "Bearer evil", Authorization: "Bearer evil2", "content-type": "text/plain", "If-Match": '"e1"' } });
+    const init = (fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1];
+    const h = new Headers(init.headers);
+    expect(h.get("authorization")).toBe("Bearer real-key");
+    expect(h.get("content-type")).toBe("application/json");
+    expect(h.get("if-match")).toBe('"e1"');
+  });
+
+  test("ISS-RULESWEB-002: a Headers object and a tuple array are normalised; authorization / content-type are dropped, others kept", async () => {
+    const fetchMock = vi.fn(async () => new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const seen = () => new Headers((fetchMock.mock.calls.at(-1) as unknown as [string, RequestInit])[1].headers);
+    await apiFetch("/x", "real-key", { method: "POST", body: {}, headers: new Headers({ Authorization: "Bearer evil", "Content-Type": "text/plain", "If-Match": '"e1"' }) });
+    expect(seen().get("authorization")).toBe("Bearer real-key"); expect(seen().get("content-type")).toBe("application/json"); expect(seen().get("if-match")).toBe('"e1"');
+    await apiFetch("/x", "real-key", { method: "POST", body: {}, headers: [["AUTHORIZATION", "Bearer evil"], ["authorization", "Bearer evil2"], ["Content-Type", "text/plain"], ["If-None-Match", "*"]] });
+    expect(seen().get("authorization")).toBe("Bearer real-key"); expect(seen().get("content-type")).toBe("application/json"); expect(seen().get("if-none-match")).toBe("*");
+  });
+
+  test("ISS-RULESWEB-002: without a body the caller's content-type is still dropped", async () => {
+    const fetchMock = vi.fn(async () => new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await apiFetch("/x", "real-key", { headers: { "Content-Type": "text/plain" } });
+    expect(new Headers((fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].headers).get("content-type")).toBeNull();
+  });
+
   test("an in-flight 401 from a previous login cannot invalidate a new login using the same key", async () => {
     localStorage.setItem(AUTH_KEY_STORAGE_KEY, "same-key");
     let resolve!: (value: Response) => void;
