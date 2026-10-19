@@ -13,7 +13,7 @@ import { promoteAndPersistEntities, type PromotionResult } from "./persistence/p
 import type { IndexEmbedFn, IndexSessionResult, IndexSessionDeps } from "./types.js";
 import { notifyIndexCommitted, publishIndexWithCommit } from "./post-commit.js";
 import { toEvidenceTuple, toCitedItems, toQaEntries } from "./evidence-tuples.js";
-import { writeSessionChunks, writeSessionLexicalChunks } from "./chunk-write.js";
+import { writeSessionChunks, writeSessionLexicalChunks, legacyChunkProvenance } from "./chunk-write.js";
 import { replacePageInsertFirst, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
 import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
 import { eligibleTreeInput } from './eligible-tree.js';
@@ -262,11 +262,11 @@ async function indexSessionWithinPublication(
   // so the caller needs a value to inspect, not an exception to catch.
   let entities: PromotionResult | null = null;
   const chunkGeneration = { binding, assertOwned, prepared(docs: import("@lkb/core").Chunks[]) { chunkRefs = docs.map(indexArtifactRef); } };
+  const chunkProvenance = legacyChunkProvenance(await sessionsColl(tenantId).findOne({ _id: sessionId } as never));
   const chunks = retrievalMode === "vectorless"
-    ? await writeSessionLexicalChunks(tenantId, sessionId, turns, db, chunkGeneration)
+    ? await writeSessionLexicalChunks(tenantId, sessionId, turns, db, chunkGeneration, chunkProvenance)
     : deps.embed
-    ? await writeSessionChunks(tenantId, sessionId, turns, preparedEmbed ? async () => preparedEmbed! : deps.embed, db, true, undefined,
-      chunkGeneration)
+    ? await writeSessionChunks(tenantId, sessionId, turns, preparedEmbed ? async () => preparedEmbed! : deps.embed, db, true, chunkProvenance, chunkGeneration)
     : { written: 0, skipped: "no-embedder" as const };
   // Disabled vector retrieval is intentional, so it must not create an embedding backlog.
   await recordVectorGap(tenantId, sessionId, chunks, db, retrievalMode);

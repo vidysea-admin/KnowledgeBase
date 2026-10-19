@@ -94,5 +94,5 @@ Rough total: **8–10 working days**. Each unit goes through `/maker` → `/chec
 
 ## Send-now API host
 
-Send-now (`POST /calendar/send-now`, T-039) is live only through `scripts/webinar/join-rules-api-host.ts`. A plain `apps/api` start answers 503 `send_now_unavailable` ("send-now is served by the join-rules API host") by design. See `docs/docker-deployment.md`, "Send-now host".
+Send-now (`POST /calendar/send-now`, T-039) is live only through `scripts/webinar/join-rules-api-host.ts`. A plain `apps/api` start answers 503 `send_now_unavailable` ("send-now is served by the join-rules API host") by design. Start it with `MONGODB_URL` set and either `MONGODB_DB=lkb` plus `--i-know-this-is-production` (production) or `MONGO_WORK_DB=<isolated db>` (no localhost fallback). See `docs/docker-deployment.md`, "Send-now host".
 
