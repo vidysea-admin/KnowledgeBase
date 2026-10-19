@@ -1,8 +1,34 @@
 # Verdict: w27-onairmail
 
-VERDICT: FAIL
-Cycle checked: 1
-Reviewed SHA: 53f0d6cceaf0aa110470758b714905cfc9f0e727
+VERDICT: PASS
+Cycle checked: 2
+Reviewed SHA: a19abdaa0e56d4ec0cd2b9f02cdac233b972418e
+Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4
+Checker: independent (Sonnet 5.5), ship-mode re-check of fix cycle 2.
+
+## Cycle 2 result
+Change reviewed (53f0d6cc..a19abdaa): onair-address.ts `dmarcPassesFor` now uses only the topmost Authentication-Results header, requires authserv-id mx.google.com, and returns false if more than one header carries that id.
+Resolver, loader hook and schedule-tick are byte-unchanged since cycle 0 (git diff de0fe97f..a19abdaa on those three files empty).
+
+Probes run (no network, fake gws runner, probe file deleted afterwards):
+- forged mx.google.com pass ABOVE genuine fail -> false; BELOW genuine fail -> false (also via createOnairGmailLoader: senderAuthenticated=false both ways).
+- forged other-authserv-id header above a genuine pass -> false (topmost is not mx.google.com; fails closed).
+- genuine single mx.google.com dmarc=pass header.from=google.com -> true (loader true); empty list -> false.
+- own probe: topmost mx.google.com pass with From domain mismatch: evil.com, google.com.evil.com, mail.google.com -> false; pass for header.from=evil.com with From google.com -> false; loader with From x@google.com.evil.com -> false.
+- Cycle 0 bypass (google.com.evil.com + quoted display name) remains refused.
+Tests (timeout 600, node --test --test-force-exit --import tsx, cwd packages/meeting-bot), all exit 0: onair-address 4/4, onair-link-resolver 11/11, onair-mail-source 14/14, onair-mail-loader 8/8, schedule-tick 14/14. `tsc --noEmit -p tsconfig.json` exit 0.
+Carried forward from cycle 0 (unchanged files): resolver safety probes, flag-off identity, synthetic fixtures, host-suffix mutation killed with hash-verified restore.
+
+Not verified: live Gmail header ordering (assumes the API returns headers in message order, topmost first) and real Authentication-Results formats; live network resolution; lint-loc --all; end-to-end tick trust rules for pending candidates.
+ISSUES-WRITTEN: none. Ledger rows may be flipped for this unit (14 rows only if the maker's manifest ties them to w27-onairmail; none were cited to me).
+
+---
+
+# Superseded history (cycles 0 and 1)
+
+Superseded VERDICT (cycle 1): FAIL
+Superseded cycle checked: 1
+Superseded reviewed SHA: 53f0d6cceaf0aa110470758b714905cfc9f0e727
 Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4
 Checker: independent (Sonnet 5.5), ship-mode re-check of fix cycle 1.
 
@@ -27,7 +53,7 @@ ISSUES-WRITTEN: none. Ledger rows may NOT be flipped; maker should fix F2 and re
 
 ---
 
-# Superseded history (cycle 0)
+## Superseded history (cycle 0, in this block)
 
 Superseded VERDICT: FAIL
 Superseded cycle: 0
