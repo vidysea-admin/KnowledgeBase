@@ -87,5 +87,12 @@ export function createMongoAnswerPolicyStore(db: Db, opts: { production?: boolea
       const r = await items.updateOne({ _id: id as never, tenantId, status: "open" }, { $set: rest });
       return r.matchedCount === 1;
     },
+    async reopenSuperseded(tenantId, id, reopened) {
+      tenant(tenantId, "reopenSuperseded");
+      if (reopened.tenantId !== tenantId || reopened.id !== id || reopened.status !== "open") return false;
+      const { id: _ignored, tenantId: _t, resolution: _r, ...rest } = reopened; void _ignored; void _t; void _r;
+      const r = await items.updateOne({ _id: id as never, tenantId, status: "superseded" }, { $set: rest, $unset: { resolution: "" } });
+      return r.matchedCount === 1;
+    },
   };
 }

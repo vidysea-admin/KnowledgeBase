@@ -16,6 +16,8 @@ export interface AnswerPolicyStore {
   getItem(tenantId: string, id: string): Promise<ReviewItem | null>;
   /** Replaces the item only while it is still `open`; returns false if it was already closed (atomic). */
   closeItem(tenantId: string, id: string, closed: ReviewItem): Promise<boolean>;
+  /** Reopens an item only while it is `superseded` (a recurring conflict); acknowledged/dismissed/approved/rejected stay closed. Atomic: returns false if the item was not superseded. */
+  reopenSuperseded(tenantId: string, id: string, reopened: ReviewItem): Promise<boolean>;
 }
 
 interface TenantState { revisions: Map<string, PolicyRevision[]>; items: Map<string, ReviewItem>; keys: Set<string> }
@@ -57,6 +59,13 @@ export function createInMemoryAnswerPolicyStore(): AnswerPolicyStore {
       const s = peek(tenantId); const cur = s?.items.get(id);
       if (!s || !cur || cur.status !== "open" || closed.tenantId !== tenantId || closed.id !== id) return false;
       s.items.set(id, clone(closed));
+      return true;
+    },
+    async reopenSuperseded(tenantId, id, reopened) {
+      const s = peek(tenantId); const cur = s?.items.get(id);
+      if (!s || !cur || cur.status !== "superseded" || reopened.status !== "open" || reopened.tenantId !== tenantId || reopened.id !== id) return false;
+      const { resolution: _dropped, ...next } = reopened; void _dropped;
+      s.items.set(id, clone(next));
       return true;
     },
   };
