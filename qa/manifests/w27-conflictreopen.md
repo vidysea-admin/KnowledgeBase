@@ -14,7 +14,7 @@ Issue: ISS-T056CONFLICTS-006 (qa/issues.T056CONFLICTS.jsonl) - a recurring confl
 - apps/api/src/answer-policy/mongo-store.test.ts (fake Db gains $unset; 4 new tests over mongo + in-memory)
 
 ## Behaviour
-Only `superseded` items reopen (same id, createdAt/summary/conflict refreshed, resolution cleared). acknowledged/dismissed stay final (ISS-004 preserved). Atomic: concurrent reopen matches once. Tenant is ANDed into the filter.
+Only `superseded` items reopen (same id, createdAt/summary/conflict refreshed, resolution cleared). acknowledged/dismissed stay final (ISS-T056CONFLICTS-004 preserved). Atomic: concurrent reopen matches once. Tenant is ANDed into the filter.
 
 ## D-015
 The row records one reproduction (p1 + p2 flips to match p1, then back; in-memory). Replayed verbatim in "superseded conflict item reopens ..." test: 1/1 (both stores).
