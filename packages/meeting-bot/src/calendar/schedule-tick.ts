@@ -20,6 +20,7 @@ import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type Webi
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
 import { createWhatsappLoaderFromEnv } from "./whatsapp-discovery/whatsapp-candidate-loader.js";
 import { mergeWhatsappCandidates } from "./whatsapp-discovery/whatsapp-merge.js";
+import { withOnairMailFromEnv } from "./onair/onair-mail-loader.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 import { withdrawCancelledLaunches } from "./state/schedule-withdraw.js";
 import { announceScheduled, buildAutojoinTickDeps, createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, type AutojoinTickDeps } from "../autojoin/tick-wiring.js";
@@ -71,7 +72,8 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
   return {
     autojoin,
     loadCalendarEvents: discoveryOff ? async () => [] : createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
-    loadCandidates: discoveryOff ? async () => [] : createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+    loadCandidates: discoveryOff ? async () => [] : withOnairMailFromEnv(createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+      process.env, REPO_ROOT, log, createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY)),
     loadWhatsappCandidates: discoveryOff ? undefined : createWhatsappLoaderFromEnv(process.env, log),
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
