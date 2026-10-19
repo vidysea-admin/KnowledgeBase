@@ -17,7 +17,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
 import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
-import { citesNameAsAnIntroduction } from "./speaker-name-rules.js";
+import { citesNameAsAnIntroduction, isDiscourseOnly, looksLikeAName } from "./speaker-name-rules.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
   return { _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text };
@@ -42,7 +42,8 @@ const replies = (json: unknown): SpeakersCompleteFn => async () => completion(""
  * frame that this turn does not supply. Its GENERALISATION is closed -- "Our students in India.
  * India speaking on the panel." refuses -- which is the honest boundary of a contextual signal.
  *
- * Current standing: ISS-093: 19/20 refused, 1 open (India, named above with its reason).
+ * Current standing: ISS-093 (= ISS-104): 20/20 refused through the LLM path AND 20/20 at the bare naming-cue predicate
+ * (replayed below). India was the last open row at the predicate: "X speaking" now needs X to OPEN its clause.
  *
  * "English" was in that residue set until the cycle-1 checker showed it was NOT gazetteer-bound:
  * in "English speaking students may apply." the `speaking` cue is a participial modifier, not the
@@ -315,3 +316,43 @@ for (const [text, name] of [
     assert.equal(resolved[0]?.displayName, name);
   });
 }
+
+/**
+ * ISS-104, D-015 -- the SAME 20 recorded reproductions replayed at the bare naming-cue predicate (shape guard, discourse
+ * guard, cue), with no extractSpeakers allow-list in front of it. The rule must never ship a fabricated person by itself:
+ * the relation rules call `hasNamingCueAt` directly, so a hole here is a hole there. Before this unit 19/20 refused here
+ * and "This is India speaking on the panel." shipped person:india.
+ */
+for (const [text, name] of ISS_093_CORPUS) {
+  test(`ISS-104 predicate corpus: ${JSON.stringify(name)} in ${JSON.stringify(text)} is refused`, () => {
+    assert.equal(looksLikeAName(name) && !isDiscourseOnly(name) && citesNameAsAnIntroduction(text, name), false);
+  });
+}
+
+/**
+ * ISS-110's two recorded probes: a legitimate self-introduction refused because `very` / `first` were not in a hand-listed
+ * set. The rule is now a following-NOUN test, so an intensifier or a sequencing adverb is looked THROUGH, and a noun after
+ * it still refuses -- the controls pin the refusal direction so the fix cannot become "allow anything".
+ */
+for (const text of ["Ruby speaking very briefly.", "Ruby speaking first, then Nilesh."]) {
+  test(`ISS-110 recorded: still resolves ${JSON.stringify(text)}`, () => {
+    assert.equal(citesNameAsAnIntroduction(text, "Ruby"), true);
+  });
+}
+for (const [text, name] of [
+  ["English speaking students may apply.", "English"], ["English speaking first graders may apply.", "English"],
+  ["Ruby speaking very good students.", "Ruby"], ["Ruby speaking first students.", "Ruby"], ["Ruby speaking staff are here.", "Ruby"],
+] as [string, string][]) {
+  test(`ISS-110 control: a following noun still refuses ${JSON.stringify(text)}`, () => {
+    assert.equal(citesNameAsAnIntroduction(text, name), false, "`speaking` modifies the noun, so it is a participle, not a cue");
+  });
+}
+
+/** ISS-104: "X speaking" binds only when X opens its clause; the greeting-led and sentence-initial forms keep resolving. */
+for (const text of ["Hello everyone, Ruby speaking.", "Good morning. Ruby speaking from Pune.", "Thanks. Ruby speaking again."]) {
+  test(`ISS-104 clause-opening recall: ${JSON.stringify(text)}`, () => { assert.equal(citesNameAsAnIntroduction(text, "Ruby"), true); });
+}
+test("ISS-104: a name inside a larger construction does not bind through `speaking`", () => {
+  assert.equal(citesNameAsAnIntroduction("This is Ruby speaking on the panel.", "Ruby"), false, "single-token; the multi-token form is a separate cue");
+  assert.equal(citesNameAsAnIntroduction("This is Ruby Mehta speaking on the panel.", "Ruby Mehta"), true);
+});

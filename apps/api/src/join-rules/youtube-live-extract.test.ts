@@ -62,3 +62,20 @@ test("a YouTube link never becomes a joinable meeting url (join resolver unchang
   assert.deepEqual(resolveEventMeetingLink({ description: `https://www.youtube.com/live/${ID} https://meet.google.com/abc-defg-hij` }),
     { url: "https://meet.google.com/abc-defg-hij", source: "description" });
 });
+
+test("host matching is exact: each accepted host resolves, each lookalike host is refused (ISS-T036NEXT-001)", () => {
+  const accepted: Array<[string, string]> = [
+    ["youtube.com", `https://youtube.com/live/${ID}`], ["www.youtube.com", `https://www.youtube.com/live/${ID}`],
+    ["m.youtube.com", `https://m.youtube.com/watch?v=${ID}`], ["youtu.be", `https://youtu.be/${ID}`],
+    ["YOUTUBE.COM (case-insensitive)", `https://YOUTUBE.COM/live/${ID}`],
+  ];
+  for (const [host, u] of accepted) assert.equal(youtubeVideoId(u), ID, host);
+  const rejected: Array<[string, string]> = [
+    ["evilyoutube.com", `https://evilyoutube.com/live/${ID}`], ["evilyoutu.be", `https://evilyoutu.be/${ID}`],
+    ["youtube.com.evil.com", `https://youtube.com.evil.com/live/${ID}`], ["www.youtube.com.evil.com", `https://www.youtube.com.evil.com/watch?v=${ID}`],
+    ["youtu.be.evil.com", `https://youtu.be.evil.com/${ID}`], ["evilwww.youtube.com", `https://evilwww.youtube.com/live/${ID}`],
+    ["evil.youtube.com (unlisted subdomain)", `https://evil.youtube.com/live/${ID}`], ["evil.youtu.be", `https://evil.youtu.be/${ID}`],
+    ["youtube.co", `https://youtube.co/live/${ID}`], ["youtubecom", `https://youtubecom/live/${ID}`],
+  ];
+  for (const [host, u] of rejected) assert.equal(youtubeVideoId(u), undefined, host);
+});

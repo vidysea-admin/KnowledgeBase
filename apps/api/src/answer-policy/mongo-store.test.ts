@@ -24,10 +24,10 @@ function fakeDb(databaseName = "lkb_t056_test") {
       if (rows(name).some((r) => same(r._id, doc._id) || (uniques.get(name) ?? []).some((cols) => cols.every((c) => r[c] === doc[c])))) throw dup();
       rows(name).push(structuredClone(doc)); return { acknowledged: true };
     },
-    async updateOne(f: Row, u: { $set: Row }) {
+    async updateOne(f: Row, u: { $set: Row; $unset?: Row }) {
       calls.push(`update:${name}`); await Promise.resolve();
       const hit = rows(name).find((r) => match(r, f)); if (!hit) return { matchedCount: 0 };
-      Object.assign(hit, structuredClone(u.$set)); return { matchedCount: 1 };
+      Object.assign(hit, structuredClone(u.$set)); for (const k of Object.keys(u.$unset ?? {})) delete hit[k]; return { matchedCount: 1 };
     },
   });
   return { db: { databaseName, collection } as unknown as Db, rows, calls };
@@ -169,5 +169,52 @@ for (const [name, make] of stores) {
     assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 2), 1), true);
     assert.equal(await store.appendRevision("tenant-a", rev("tenant-a", "p", 2), 1), false, "duplicate version refused");
     assert.deepEqual((await store.history("tenant-a", "p")).map((r) => r.version), [1, 2]);
+  });
+}
+
+// ---- ISS-T056CONFLICTS-006: a recurring conflict must come back to the open queue ----
+const openConflicts = async (svc: ReturnType<typeof createAnswerPolicyService>, t: string) => (await svc.queue(t, "open")).filter((i) => i.kind === "conflict");
+for (const [name, make] of stores) {
+  const svcFor = () => { let n = 0; return { store: make(), tick: () => new Date(Date.UTC(2026, 9, 14, 12, 0, n++)) }; };
+  const setup = () => { const { store, tick } = svcFor(); return { store, svc: createAnswerPolicyService(store, tick) }; };
+  const base = { questionClass: "fees", mode: "internal-only", style: "concise", onInsufficient: "review", note: "n" };
+  test(`ISS-T056CONFLICTS-006 (${name}): superseded conflict item reopens when the same conflict recurs, without duplicates`, async () => {
+    const { store, svc } = setup();
+    await svc.save("tenant-a", "p1", base, A);
+    await svc.save("tenant-a", "p2", { ...base, mode: "internal-and-web" }, A);
+    const first = (await openConflicts(svc, "tenant-a"))[0]!;
+    await svc.save("tenant-a", "p2", { ...base, expectedVersion: 1, note: "match p1" }, A);
+    assert.equal((await openConflicts(svc, "tenant-a")).length, 0);
+    assert.equal((await svc.queue("tenant-a", "superseded")).length, 1);
+    await svc.save("tenant-a", "p2", { ...base, mode: "internal-and-web", expectedVersion: 2, note: "flip back" }, A);
+    assert.equal((await svc.conflicts("tenant-a")).length, 1);
+    const open = await openConflicts(svc, "tenant-a");
+    assert.equal(open.length, 1, "exactly one open conflict item");
+    assert.equal(open[0]!.id, first.id, "same item identity is reused, not duplicated");
+    assert.equal(open[0]!.resolution, undefined, "stale supersede resolution is cleared");
+    assert.equal((await svc.queue("tenant-a")).filter((i) => i.kind === "conflict").length, 1, "no second conflict item in any status");
+    await svc.save("tenant-a", "p1", { ...base, expectedVersion: 1, note: "bump, same values" }, A);
+    assert.equal((await openConflicts(svc, "tenant-a")).length, 1, "reconcile is idempotent while the conflict persists");
+    assert.equal(await store.reopenSuperseded("tenant-a", first.id, { ...open[0]! }), false, "an open item is not 'reopened' again");
+  });
+  test(`ISS-T056CONFLICTS-006 (${name}): human decisions stay final and tenants are scoped`, async () => {
+    const { store, svc } = setup();
+    for (const t of ["tenant-a", "tenant-b"]) {
+      await svc.save(t, "p1", base, { actor: `api-key:${t}` });
+      await svc.save(t, "p2", { ...base, mode: "internal-and-web" }, { actor: `api-key:${t}` });
+    }
+    const a = (await openConflicts(svc, "tenant-a"))[0]!;
+    await svc.resolve("tenant-a", a.id, { decision: "acknowledged", note: "known" }, A);
+    await svc.save("tenant-a", "p1", { ...base, expectedVersion: 1, note: "bump" }, A);
+    assert.equal((await openConflicts(svc, "tenant-a")).length, 0, "acknowledged conflict is not reopened");
+    // supersede tenant-b's item, then try to reopen it through tenant-a
+    await svc.save("tenant-b", "p2", { ...base, expectedVersion: 1, note: "match" }, B);
+    const b = (await svc.queue("tenant-b", "superseded"))[0]!;
+    assert.equal(await store.reopenSuperseded("tenant-a", b.id, { ...b, status: "open" }), false, "cross-tenant reopen refused");
+    assert.equal(await store.reopenSuperseded("tenant-b", b.id, { ...b, tenantId: "tenant-a", status: "open" }), false, "tenant mismatch refused");
+    assert.equal((await svc.queue("tenant-b", "superseded")).length, 1);
+    await svc.save("tenant-b", "p2", { ...base, mode: "internal-and-web", expectedVersion: 2, note: "back" }, B);
+    assert.equal((await openConflicts(svc, "tenant-b")).length, 1);
+    assert.equal((await openConflicts(svc, "tenant-a")).length, 0, "tenant-b recurrence does not touch tenant-a");
   });
 }

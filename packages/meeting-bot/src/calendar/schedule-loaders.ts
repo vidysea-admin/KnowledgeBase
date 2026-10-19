@@ -180,3 +180,4 @@ export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefi
     return body.meetings;
   };
 }
+export { dedupeWhatsappCandidates } from "./whatsapp-discovery/whatsapp-merge.js";

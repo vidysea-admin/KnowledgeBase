@@ -76,8 +76,8 @@ export interface TranscriptQaResult {
   report: TranscriptQaReport;
 }
 
-const DEFAULT_REPEAT_THRESHOLD = 3;
-const DEFAULT_TOLERANCE_SEC = 1e-6;
+export const DEFAULT_REPEAT_THRESHOLD = 3;
+export const DEFAULT_TOLERANCE_SEC = 1e-6;
 
 function normaliseText(text: unknown): string {
   if (typeof text !== "string") return "";

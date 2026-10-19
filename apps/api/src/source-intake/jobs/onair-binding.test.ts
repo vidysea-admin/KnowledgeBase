@@ -8,9 +8,10 @@ import { approvedSourceSession, sourceSessionStillApproved } from "./source-priv
 import { runSourceJob } from "./worker.js";
 import type { SourceJobInput } from "./types.js";
 
+const EXP = "2026-10-21T12:00:00Z", T0 = Date.parse("2026-10-20T12:00:00Z"), BEFORE = T0 - 1, AFTER = Date.parse("2026-10-21T12:00:01Z"); // D-182: expiresAt = event end + 24h
 // ISS-T045WORKER-002 negative matrix: tenant, approved event, replayed authority, rotated/revoked (expired) authority.
 const row = (over: Record<string, unknown> = {}) => ({ id: "b1", tenantId: "tenant-a", accountId: "account-a", eventId: "event-one",
-  actorKeyIds: ["actor-a"], providerProcessing: "approved-recording", approvalRef: "owner-permission-ref-fixture", ...over });
+  actorKeyIds: ["actor-a"], providerProcessing: "approved-recording", approvalRef: "owner-permission-ref-fixture", expiresAt: "2099-01-01T00:00:00Z", ...over });
 const envWith = (rows: unknown[]): NodeJS.ProcessEnv => ({ LKB_ONAIR_COOKIE_HEADER: "synthetic-session-only", LKB_ONAIR_SESSION_TENANT: "tenant-a",
   LKB_ONAIR_SESSION_ACCOUNT: "account-a", LKB_ONAIR_SOURCE_BINDINGS: JSON.stringify(rows) });
 const input = (eventId: string, over: Partial<SourceJobInput> = {}): SourceJobInput => ({ tenantId: "tenant-a", actorKeyId: "actor-a",
@@ -68,4 +69,41 @@ test("revoked, rotated or changed authority after queueing (expiry by removal) i
   assert.equal(sourceSessionStillApproved(envWith([row({ approvalRef: "rotated-ref" })]), job), false);
   assert.equal(sourceSessionStillApproved({ ...env, LKB_ONAIR_SESSION_ACCOUNT: "account-b" }, job), false);
   assert.equal(sourceSessionStillApproved({ ...env, LKB_ONAIR_COOKIE_HEADER: "rotated-session" }, job), false);
+});
+
+// D-182: expiry (event end + 24h) is enforced at enqueue AND at execution; missing expiresAt is expired (fail closed).
+test("D-182 before expiry the grant is allowed at enqueue and at execution", async t => {
+  const env = envWith([row({ expiresAt: EXP })]), i = input("event-one");
+  const authority = approvedSourceSession(env, i, { now: BEFORE });
+  assert.equal(authority?.bindingId, "b1");
+  const { job } = await queueWith(t, i, authority);
+  assert.equal(sourceSessionStillApproved(env, job, BEFORE), true);
+});
+
+test("D-182 after expiry (and at the exact instant) enqueue is refused", () => {
+  const env = envWith([row({ expiresAt: EXP })]), i = input("event-one");
+  refused(() => approvedSourceSession(env, i, { now: AFTER }));
+  refused(() => approvedSourceSession(env, i, { now: Date.parse("2026-10-21T12:00:00Z") }));
+  refused(() => approvedSourceSession(env, i, { now: AFTER, requireCookie: false }));
+});
+
+test("D-182 a grant that expires after queueing is refused at execution with 0 worker calls", async t => {
+  const env = envWith([row({ expiresAt: EXP })]), i = input("event-one");
+  const store = queueFixtureStore(root(t));
+  await store.enqueue(i, async s => ({ approvedBy: s.actorKeyId, approvalRef: "r", sourceAuthority: approvedSourceSession(env, s, { now: BEFORE }) }));
+  const job = (await store.claim(i.tenantId, "worker"))!;
+  assert.equal(sourceSessionStillApproved(env, job, BEFORE), true); // control
+  assert.equal(sourceSessionStillApproved(env, job, AFTER), false);
+  let calls = 0;
+  await runSourceJob({ store, authorizeExecution: async j => sourceSessionStillApproved(env, j, AFTER), intake: { intake: async () => { calls++; throw new Error("must not run"); } } }, i.tenantId, "worker");
+  assert.equal(calls, 0);
+});
+
+test("D-182 missing, null or malformed expiresAt is refused (legacy rows fail closed)", () => {
+  const { expiresAt: _drop, ...legacy } = row({ expiresAt: EXP });
+  void _drop;
+  for (const bad of [legacy, row({ expiresAt: null }), row({ expiresAt: "" }), row({ expiresAt: "tomorrow" }), row({ expiresAt: "2099-01-01" }), row({ expiresAt: 4102444800000 }), row({ expiresAt: "2099-13-45T00:00:00Z" })])
+    refused(() => approvedSourceSession(envWith([bad]), input("event-one"), { now: BEFORE }));
+  // A legacy row also fails closed at execution, even for a job approved earlier.
+  assert.equal(sourceSessionStillApproved(envWith([legacy]), { ...input("event-one"), approval: { sourceAuthority: undefined } } as never, BEFORE), false);
 });

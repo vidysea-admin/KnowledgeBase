@@ -45,6 +45,7 @@ import { OperationsPage } from "./pages/operations/OperationsPage.js";
 import { CounsellorPage } from "./pages/counsellor/CounsellorPage.js";
 import { CalibrationReviewPage } from "./pages/calibration-review/CalibrationReviewPage.js";
 import { ExtractionReviewPage } from "./pages/extraction-review/ExtractionReviewPage.js";
+import { LabelReviewPage } from "./pages/label-review/LabelReviewPage.js";
 import { ChampionshipPage } from "./pages/championship/ChampionshipPage.js";
 import { ConnectorsPage } from "./pages/ConnectorsPage.js";
 
@@ -60,6 +61,7 @@ export function App(): React.ReactElement {
               <Route path="/counsellor" element={<CounsellorPage />} />
               <Route path="/calibration-review" element={<CalibrationReviewPage />} />
               <Route path="/extraction-review" element={<ExtractionReviewPage />} />
+              <Route path="/label-review" element={<LabelReviewPage />} />
               <Route path="/championship" element={<ChampionshipPage />} />
               <Route path="/automation/forms" element={<ApplicationFormsPage />} />
               <Route path="/sessions" element={<SessionsListPage enableFilters={import.meta.env.VITE_SESSIONS_FILTERS === "1"} />} />

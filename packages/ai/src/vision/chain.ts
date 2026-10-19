@@ -61,8 +61,35 @@ export function extractJsonObject(text: string, accept?: (v: unknown) => unknown
   for (const [from, to] of spans.slice(0, MAX_EXTRACT_CANDIDATES)) {
     try { const v = JSON.parse(src.slice(from, to)); return accept ? accept(v) : v; } catch { /* next candidate */ }
   }
-  throw new Error("vision reply contained no valid JSON object");
+  throw new VisionNonJsonError();
 }
+
+/** The reply was not (valid) JSON, e.g. a reasoning model answering in prose. Fixed message: it never echoes the reply. */
+export class VisionNonJsonError extends Error {
+  constructor() { super("vision reply contained no valid JSON object"); this.name = "VisionNonJsonError"; }
+}
+
+/** Per-run record of backends that answered in prose; demoted ones are tried after the others of their provider
+ *  (ISS-OLLAMAFIRST-002: a model that never complies must not cost a wasted call on every frame). Ollama stays ahead of Gemini. */
+export class VisionDemotion {
+  private readonly strikes = new Map<string, number>();
+  constructor(public readonly threshold = 1) {}
+  private static key(b: VisionBackend): string { return `${b.provider}/${b.model}`; }
+  recordNonJson(b: VisionBackend): void { this.strikes.set(VisionDemotion.key(b), (this.strikes.get(VisionDemotion.key(b)) ?? 0) + 1); }
+  recordServed(b: VisionBackend): void { this.strikes.delete(VisionDemotion.key(b)); }
+  isDemoted(b: VisionBackend): boolean { return (this.strikes.get(VisionDemotion.key(b)) ?? 0) >= this.threshold; }
+  /** Stable order: provider groups keep their first-seen order; inside a group non-demoted backends come first. */
+  order(backends: readonly VisionBackend[]): VisionBackend[] {
+    const providers: string[] = [];
+    for (const b of backends) if (!providers.includes(b.provider)) providers.push(b.provider);
+    return providers.flatMap((p) => {
+      const group = backends.filter((b) => b.provider === p);
+      return [...group.filter((b) => !this.isDemoted(b)), ...group.filter((b) => this.isDemoted(b))];
+    });
+  }
+}
+/** Default demotion state is per backends array, so a caller that reuses its backend list across frames gets demotion for free. */
+const DEMOTIONS = new WeakMap<readonly VisionBackend[], VisionDemotion>();
 
 export function createOllamaVisionBackend(o: { transport: Transport; model: string; baseUrl?: string; apiKey?: string; timeoutMs?: number }): VisionBackend {
   const base = (o.baseUrl ?? OLLAMA_CLOUD_URL).replace(/\/+$/, "");
@@ -138,6 +165,10 @@ export interface VisionChainOptions<T> {
   validateJson?: (value: any) => T;
   /** Overall budget for the whole call across all backends (default visionDeadlineMs(): 90 s). Each backend gets what remains. */
   deadlineMs?: number;
+  /** Caller abort (e.g. run cancelled): passed to every backend call; once aborted no further backend is tried. */
+  signal?: AbortSignal;
+  /** Demotion state; defaults to one per `backends` array. Pass `false` to disable demotion. */
+  demotion?: VisionDemotion | false;
 }
 
 /** A backend is not tried with less budget than this (timer/clock skew leaves 1-2 ms slivers on a spent deadline). */
@@ -150,7 +181,19 @@ export async function runVisionChain<T = string>(
   const tally = opts.tally ?? newVisionTally();
   const attempts: { provider: string; model: string; error: string }[] = [];
   const deadline = Date.now() + (opts.deadlineMs ?? visionDeadlineMs());
-  for (const [i, b] of backends.entries()) {
+  let demotion: VisionDemotion | undefined;
+  if (opts.demotion !== false) {
+    demotion = opts.demotion ?? DEMOTIONS.get(backends) ?? new VisionDemotion();
+    if (!opts.demotion) DEMOTIONS.set(backends, demotion);
+  }
+  const ordered = demotion ? demotion.order(backends) : backends;
+  for (const [i, b] of ordered.entries()) {
+    if (opts.signal?.aborted) {
+      const error = "vision call aborted before this backend was tried";
+      attempts.push({ provider: b.provider, model: b.model, error });
+      if (tally.failures.length < 50) tally.failures.push({ provider: b.provider, model: b.model, error });
+      continue;
+    }
     const remaining = deadline - Date.now();
     // timers can fire a few ms before Date.now() reaches the deadline; a sliver of budget is a spent budget
     if (remaining < MIN_BACKEND_BUDGET_MS) {
@@ -161,8 +204,11 @@ export async function runVisionChain<T = string>(
       continue;
     }
     try {
-      const raw = await b.call(req, { timeoutMs: remaining });
-      const value = (opts.validateJson ? extractJsonObject(raw, opts.validateJson) : opts.validate ? opts.validate(raw) : raw) as T;
+      const raw = await b.call(req, { timeoutMs: remaining, signal: opts.signal });
+      let value: T;
+      try { value = (opts.validateJson ? extractJsonObject(raw, opts.validateJson) : opts.validate ? opts.validate(raw) : raw) as T; }
+      catch (e) { throw e instanceof SyntaxError ? new VisionNonJsonError() : e; } // JSON.parse's SyntaxError text quotes the reply
+      demotion?.recordServed(b);
       tally.calls++;
       tally.byProvider[b.provider] = (tally.byProvider[b.provider] ?? 0) + 1;
       if (i > 0) tally.fallbacks++;
@@ -170,6 +216,10 @@ export async function runVisionChain<T = string>(
       return { value, provider: b.provider, model: b.model, attempts: i + 1 };
     } catch (err) {
       const error = err instanceof Error ? err.message : String(err);
+      if (err instanceof VisionNonJsonError && demotion) {
+        const was = demotion.isDemoted(b); demotion.recordNonJson(b);
+        if (!was && demotion.isDemoted(b)) opts.log?.(`vision: ${b.provider}/${b.model} demoted (replied with prose instead of JSON)`);
+      }
       if (err instanceof GeminiFreeTierQuotaError) tally.geminiFreeTierQuota = true;
       attempts.push({ provider: b.provider, model: b.model, error });
       if (tally.failures.length < 50) tally.failures.push({ provider: b.provider, model: b.model, error });

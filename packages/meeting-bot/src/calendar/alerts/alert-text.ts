@@ -103,18 +103,28 @@ const lit = (w: string) => w.split(" ").join(`${SP}*`);
 const spaced = (w: string) => Array.from(w).join(`${SP}+`);
 const STRONG = ["password", "pass word", "passcode", "pass code", "passphrase", "passwd", "passwrd", "passwort", "passkey", "pwd", "pswd", "paasvard",
   "paasword", "paascode", "passvard", "kennwort", "mot de passe", "motdepasse", "contrasena"]; // no word boundary: "meetingPassword", "passcodeHello"
-const BOUNDED = ["pw", "psw", "pass", "pin", "otp", "code", "kood", "kod", "secret", "key", "token", "tk", "credential", "credentials", "auth", "login", "clave"];
+const BOUNDED = ["pw", "p/w", "psw", "pass", "pin", "otp", "code", "kood", "kod", "secret", "key", "token", "tk", "credential", "credentials", "auth", "login", "clave",
+  "secrit", "secert", "secrat", "seceret", "tokan", "tokn", "tokin", "credentail", "credentails", "crendential", "crendentials"]; // last row: typos of the words above (ISS-R1ALERTS-010)
 const DEVANAGARI = ["पासकोड", "पासवर्ड", "पास कोड", "पास वर्ड", "पिन", "कोड", "ओटीपी", "कुंजी", "टोकन", "सीक्रेट"];
+// ISS-R1ALERTS-010: typo-tolerant stems (no word boundary, like STRONG). Joined forms only: no separator is allowed inside a typo, so "pass wednesday" is not a hit.
+const PW_TYPO = "pa{0,2}s{1,2}[wv](?:[aeo0]{0,2}r?|ro|or)d"; // pasword paswrd paswerd pasvard paasward passwrod pssword pasw0rd
+const PC_TYPO = "pa{1,2}s{1,2}c{1,2}o{1,2}d{1,2}e?"; // pascode pasccode passcod
+const PIN_TYPO = `pin${SP}*c{1,2}o{1,2}d{1,2}e?`; // pincode pincod pin cod
+// Devanagari password / passcode with a dropped vowel sign, halant or ra (the nukta is folded away first, see fold()).
+const DEVA_TYPO = "(?<![\\p{L}\\p{M}])(?:पा?सव(?:र्?)?ड|पा?सको?ड)(?![\\p{L}\\p{M}])";
+/** Matching view of the text for keyword search only: U+093C (nukta) removed, so "पासवर्ड़" meets "पासवर्ड". */
+const fold = (s: string): string => s.replace(/\u{93c}/gu, "");
 const EDGE = (body: string) => new RegExp(`(?<![\\p{L}\\p{M}])(?:${body})(?![\\p{L}\\p{M}])`, "iu"); // JS \b is ASCII-only; these also work for Devanagari
 const KEYWORD_RES: RegExp[] = [
-  new RegExp(STRONG.map(lit).join("|"), "iu"),
+  new RegExp([STRONG.map(lit).join("|"), PW_TYPO, PC_TYPO, PIN_TYPO, DEVA_TYPO].join("|"), "iu"),
   EDGE([...BOUNDED, ...DEVANAGARI].map(lit).concat([...BOUNDED, ...STRONG.filter((w) => !w.includes(" "))].map(spaced)).join("|")),
   new RegExp(`(?<=\\p{Ll})(?:${["Pw", "Psw", "Pass", "Pin", "Otp", "Code", "Kood", "Secret", "Key", "Token", "Auth", "Login"].join("|")})(?![\\p{Ll}\\p{M}])`, "u"), // camelCase: "apiKey"
 ];
 const REPEAT = /(\((?:link|email|hidden)\))(?: ?\1)+/g;
 
-/** Index of the earliest secret keyword, or -1. */
-export function keywordIndex(s: string): number {
+/** Index of the earliest secret keyword in the nukta-folded text, or -1 (only >= 0 is relied on). */
+export function keywordIndex(raw: string): number {
+  const s = fold(raw);
   let best = -1;
   for (const re of KEYWORD_RES) { const i = s.search(re); if (i >= 0 && (best < 0 || i < best)) best = i; }
   return best;

@@ -1,6 +1,6 @@
 import {test} from "node:test";
 import assert from "node:assert/strict";
-import {createCliTransport, cliEnvironment, resolveCliCommand, realTransport} from "./ai-transport.js";
+import {createCliTransport, cliEnvironment, resolveCliCommand, realTransport, groupGone, linuxGroupStates} from "./ai-transport.js";
 import {createServer} from "node:http";
 const call=(source:string, stdin="")=>({kind:"cli" as const,command:process.execPath,args:["-e",source],stdin});
 test("Native transport roundtrips literal Unicode stdin without shell",async()=>{
@@ -34,7 +34,7 @@ test("Child cannot inherit app credentials or retry watchdog",()=>{
 });
 test("Invalid limits fail closed",()=>{assert.throws(()=>createCliTransport({timeoutMs:0}),/Invalid/)});
 test("Windows shell shims fail closed",{skip:process.platform!=="win32"},()=>{assert.throws(()=>resolveCliCommand("claude.cmd"),/shell shims/)});
-import {mkdtempSync, readFileSync, rmSync, existsSync} from "node:fs";
+import {mkdtempSync, readFileSync, rmSync, existsSync, mkdirSync, writeFileSync} from "node:fs";
 import {tmpdir} from "node:os";
 import {join} from "node:path";
 test("Deadline kills owned descendant tree",async()=>{
@@ -121,4 +121,55 @@ test("http transport passes the AbortSignal to fetch: abort cancels a never-answ
   for(let i=0;i<50&&!closed;i++)await new Promise((r)=>setTimeout(r,20));
   assert.equal(closed,true);
  }finally{srv.closeAllConnections();srv.close()}
+});
+// --- ISS-CILINUX4-001: a process group whose members are all zombies is gone (fakes only; no real processes) ---
+const errno=(code:string)=>Object.assign(new Error(code),{code});
+const alwaysAlive=()=>true; // kill(-pgid,0) keeps succeeding for zombies
+test("groupGone: all-zombie group counts as gone at once (no 2 s spin)",async()=>{
+ const t0=Date.now();const seen:string[]=[];
+ await groupGone(4242,{platform:"linux",kill:alwaysAlive,states:()=>["Z","Z"],onBound:(r)=>seen.push(r)});
+ assert.ok(Date.now()-t0<500,`took ${Date.now()-t0} ms`);assert.deepEqual(seen,[]);
+});
+test("groupGone: a live member keeps it waiting until the bound, then reports the bound once",async()=>{
+ const seen:string[]=[];const t0=Date.now();
+ await groupGone(4242,{platform:"linux",boundMs:150,pollMs:5,kill:alwaysAlive,states:()=>["Z","S"],onBound:(r)=>seen.push(r)});
+ assert.ok(Date.now()-t0>=140);assert.deepEqual(seen,["bound"]);
+});
+test("groupGone: returns as soon as the last live member turns zombie",async()=>{
+ let polls=0;const seen:string[]=[];
+ await groupGone(4242,{platform:"linux",boundMs:5000,pollMs:2,kill:alwaysAlive,states:()=>(++polls<4?["S","Z"]:["Z","Z"]),onBound:(r)=>seen.push(r)});
+ assert.equal(polls,4);assert.deepEqual(seen,[]);
+});
+test("groupGone: ESRCH is gone; EPERM stops waiting and is reported",async()=>{
+ const seen:string[]=[];
+ await groupGone(1,{platform:"linux",kill:()=>{throw errno("ESRCH")},onBound:(r)=>seen.push(r)});
+ assert.deepEqual(seen,[]);
+ const t0=Date.now();const perm:string[]=[];
+ await groupGone(1,{platform:"linux",boundMs:5000,kill:()=>{throw errno("EPERM")},onBound:(r)=>perm.push(r)});
+ assert.ok(Date.now()-t0<500);assert.deepEqual(perm,["eperm"]);
+});
+test("groupGone: unknown member states fall back to kill() alone (waits to the bound); win32 and no pid are no-ops",async()=>{
+ const seen:string[]=[];
+ await groupGone(4242,{platform:"linux",boundMs:60,pollMs:5,kill:alwaysAlive,states:()=>undefined,onBound:(r)=>seen.push(r)});
+ assert.deepEqual(seen,["bound"]);
+ const w:string[]=[];
+ await groupGone(4242,{platform:"win32",kill:()=>{throw new Error("must not run")},onBound:(r)=>w.push(r)});
+ await groupGone(undefined,{platform:"linux",kill:()=>{throw new Error("must not run")}});
+ assert.deepEqual(w,[]);
+});
+test("groupGone: a throwing onBound reporter cannot alter the outcome",async()=>{
+ await groupGone(4242,{platform:"linux",boundMs:30,pollMs:5,kill:alwaysAlive,states:()=>["S"],onBound:()=>{throw new Error("boom")}});
+});
+test("linuxGroupStates parses /proc/<n>/stat (comm with spaces and parens), filters by pgrp, skips junk and exited entries",()=>{
+ const root=mkdtempSync(join(tmpdir(),"lkb-proc-"));
+ try{
+  const put=(n:string,line:string)=>{mkdirSync(join(root,n));writeFileSync(join(root,n,"stat"),line)};
+  put("100","100 (node) S 1 100 100 0 -1");
+  put("101","101 (we ird) (x)) Z 100 100 100 0 -1"); // member, zombie, hostile comm
+  put("102","102 (other) R 1 555 555 0 -1");          // other group
+  mkdirSync(join(root,"103"));                         // exited: no stat file
+  mkdirSync(join(root,"self"));                        // not a pid
+  assert.deepEqual(linuxGroupStates(100,root)?.sort(),["S","Z"]);
+  assert.equal(linuxGroupStates(100,join(root,"missing")),undefined);
+ }finally{rmSync(root,{recursive:true,force:true})}
 });

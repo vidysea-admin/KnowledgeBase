@@ -314,11 +314,26 @@ def test_approved_302_with_interceptor_registers_again():
     assert box[0].methods("Fetch.disable") and box[0].closed
 
 
-def test_307_to_other_approved_host_is_refused_end_to_end():
+@pytest.mark.parametrize("code", [307, 308])
+def test_iss_regcdp_002_307_to_other_approved_host_sends_exactly_one_post(code):
+    """Several approved hosts: follow mode is never offered, so a dying interceptor cannot let Chrome
+    re-send the body to the second approved host. Zero second POSTs, the connector is not even used."""
     two = dict(INSTRUCTIONS, allowedHosts=["127.0.0.1", "localhost"])
-    result, _, box = register_cdp({"server": {"/submit": {"code": 307, "location": "http://localhost:50700/thanks"}}}, instructions=two)
-    assert result == {"status": "uncertain", "reason": "submission_not_confirmed"}
-    assert box[0].methods("Fetch.failRequest")
+    scenario = {"server": {"/submit": {"code": code, "location": "http://localhost:50700/thanks"}}}
+    connected = []
+    sb = CdpSB(scenario, [])
+    result = sb_join.register_form(sb, two, script_isolated=True, policy_check=lambda: True,
+                                   cdp_connect=lambda d: connected.append(d))
+    assert {k: result[k] for k in ("status", "reason")} == {"status": "uncertain", "reason": "submission_not_confirmed"}
+    assert result["cdp"] == "inactive" and result["cdp_reason"] == "multiple_approved_hosts"
+    assert connected == []
+    posts = sb.submit_runs[0]["posts"]
+    assert [(p["host"], p["redirect"]) for p in posts] == [("127.0.0.1", "error")]
+
+
+def test_iss_regcdp_002_control_single_approved_host_still_follows():
+    result, sb, box = register_cdp({"server": {"/submit": {"code": 307, "location": "/thanks"}}})
+    assert sb.submit_runs[0]["posts"][0]["redirect"] == "follow" and result["status"] == "submitted"
 
 
 def test_final_non_2xx_after_approved_redirect_is_not_reported_as_submitted():

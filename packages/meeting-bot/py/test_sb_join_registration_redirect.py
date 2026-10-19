@@ -94,6 +94,8 @@ def test_iss_374_clean_submission_still_works_and_sends_validated_body():
     post = sb.submit_runs[0]["posts"][0]
     assert post["path"] == "/submit" and post["body"] == "first=Fixture&last=Operator&email=fixture%40example.test&csrf=token"
     assert sb.submit_runs[0]["calls"] == ["checkValidity"]  # no form.submit(), no FormData
+    # ISS-REGSAFE-002: the clean case pins the request options that carry cookies/CSRF semantics
+    assert post["credentials"] == "include" and post["headers"] == {"Content-Type": "application/x-www-form-urlencoded"}
 
 
 # --- ISS-373: validate-then-use gap. Hostile mutations fired at the one point a listener could run.
@@ -159,3 +161,32 @@ def test_retry_receipt_proves_only_exits_before_submit_entry(monkeypatch):
         script_isolated=True, policy_check=lambda: True)
     assert called == [True]
     assert "submissionDisposition" not in result
+
+
+# --- ISS-REGSAFE-002: STATIC unapproved targets (set before the script runs, not mutated after validation) ---
+# The checker's recorded cases: evil.example, //evil.example, 127.0.0.1@evil.example, user:p@, LOCALHOST, :50701, https.
+STATIC_BAD_TARGETS = [
+    "http://evil.example/x",
+    "//evil.example/x",
+    "http://127.0.0.1@evil.example/x",
+    "http://user:p@127.0.0.1:50700/x",
+    "http://LOCALHOST:50700/x",
+    "http://127.0.0.1:50701/x",
+    "https://127.0.0.1:50700/x",
+]
+
+
+@pytest.mark.parametrize("key", ["formAction", "buttonFormAction"])
+@pytest.mark.parametrize("target", STATIC_BAD_TARGETS)
+def test_iss_regsafe_002_static_unapproved_target_is_refused_with_zero_posts(key, target):
+    result, sb = register({key: target})
+    assert result == {"status": "action_required", "reason": "redirect_host", "submissionDisposition": "not-attempted"}
+    assert [run["posts"] for run in sb.submit_runs] == []  # refused during inspect: submit never ran
+    assert unapproved(sb.submit_runs) == []
+
+
+def test_iss_regsafe_002_control_approved_static_target_is_submitted():
+    """Proves the cases above bite: the same wiring with an approved absolute target posts once."""
+    result, sb = register({"buttonFormAction": "http://127.0.0.1:50700/other"})
+    assert result["status"] == "submitted"
+    assert [p["url"] for p in sb.submit_runs[0]["posts"]] == ["http://127.0.0.1:50700/other"]

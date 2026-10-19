@@ -19,6 +19,7 @@ import { createSpeakerAttributesRouter, type SpeakerAttributesRouterDeps } from 
 import { createNativeEvidenceRouter } from '../../native-evidence/router.js';
 import type { NativeEvidenceResolver } from '../../native-evidence/resolver.js';
 import { createExtractionReviewRouter } from '../../extraction-review/router.js';
+import { createLabelReviewRouter } from '../../label-review/router.js';
 import { createAnswerPolicyAdminRouter } from '../../answer-policy/admin-router.js';
 import { createHostingRouter } from '../../hosting/router.js';
 import { createCounsellorAccountRouter } from '../../counsellor-accounts/router.js';
@@ -41,13 +42,14 @@ export type IntegratedWorkflows = EvaluationIntegrations & AnswerIntegrations & 
   & Pick<HostingIntegrations, 'hosting' | 'counsellorAccounts' | 'operationsSchedules' | 'retentionStatus'>
   & AutomationIntegrations & { botPrivacy?: BotPrivacyDeps; captureReadiness?: CaptureReadinessDeps; sessionDecisions?: SessionDecisionsDeps;
     answerReviewAuthority?: AnswerReviewAuthority; speakerRelations?: SpeakerRelationsRouterDeps; speakerRelationSource?: SpeakerRelationSourceRouterDeps;
-    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0] };
+    nativeEvidence?: NativeEvidenceResolver; speakerAttributes?: SpeakerAttributesRouterDeps; registrationApprovals?: RegistrationApprovalRouterDeps; extractionReview?: Parameters<typeof createExtractionReviewRouter>[0]; labelReview?: Parameters<typeof createLabelReviewRouter>[0] };
 const unavailable: RequestHandler = (_req, res) => { res.status(503).json({ error: 'workflow_unavailable', message: 'Workflow is unavailable; configure its required runtime.' }); };
 
 /** Called strictly after the shared authentication/rate-limit perimeter. */
 export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows): void {
   app.use(createCalibrationReviewRouter(deps.calibrationReview));
   app.use(createExtractionReviewRouter(deps.extractionReview));
+  app.use(createLabelReviewRouter(deps.labelReview));
   app.use(createEvaluationFlywheelRouter(deps.evaluationFlywheel));
   app.use(createOutputRouter(deps.knowledgeOutputs));
   app.use(createHostingRouter(deps.hosting));

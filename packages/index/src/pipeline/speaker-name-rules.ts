@@ -23,6 +23,9 @@
  */
 
 import { DEMONSTRATIVE_CUES, LOCATIVE_GOVERNORS, NEVER_A_PERSON } from "./speaker-rules/speaker-name-data.js";
+import { FUNCTION_FOLLOWERS, followedByNoun, opensAClause } from "./speaker-rules/speaker-following-rules.js";
+
+export { FUNCTION_FOLLOWERS };
 
 /**
  * Name particles that are legitimately lowercase INSIDE a name ("van der Berg", "de Souza").
@@ -153,36 +156,15 @@ const NAMING_CUES_AFTER = ["here", "speaking", "from", "with us", "joining us"];
 /** Interrogatives that follow a direct address: "Prasanti, what do you think?" */
 const ADDRESS_FOLLOWERS = ["what", "how", "would", "could", "do you", "can you", "any", "your", "please", "over to you"];
 
-/** Is the occurrence of `name` at `at` a person-directed act of naming, not a passing mention? */
-/**
- * Words that may follow `speaking` in the self-identification idiom: prepositions, conjunctions
- * and adverbs. Anything NOT here and not punctuation is taken to be a noun that `speaking` is
- * modifying, which makes it a participle rather than a cue (ISS-097 / ISS-098).
- *
- * Stated as the complement on purpose: the first attempt allowlisted what may follow and refused
- * the rest, which is the opposite rule and cost ten recorded introductions.
- */
-export const FUNCTION_FOLLOWERS = new Set([
-  "from", "on", "at", "for", "with", "to", "in", "of", "about", "as", "over", "after", "before",
-  "during", "via", "by", "into", "through", "under", "across", "per", "behalf", "alongside",
-  "and", "or", "but", "so", "yet", "then",
-  "here", "now", "today", "tonight", "again", "also", "too", "still", "just", "currently",
-  "live", "remotely", "briefly", "finally", "actually", "obviously",
-  "i", "we", "you", "my", "our", "this", "that",
-]);
-
 /**
  * Does `tail` END the clause rather than continue it? The `speaking` / `here` idiom discriminator.
  *
- * ISS-098's lesson stated once instead of twice: a following NOUN is the thing the word would be
- * modifying, so it is a participle or a deictic; punctuation, end of clause, a conjunction, an
- * adverb, any preposition or another naming cue all mean the self-identification idiom.
+ * A following NOUN is the thing the word would be modifying, so it is a participle or a deictic; punctuation, end of
+ * clause, a conjunction, an adverb, any preposition or another naming cue all mean the self-identification idiom.
+ * The noun test itself lives in speaker-following-rules.ts (ISS-110).
  */
 function endsTheClause(tail: string): boolean {
-  const nextWord = /^\s*([\p{L}']+)/u.exec(tail);
-  if (!nextWord) return true;
-  const word = nextWord[1]!.toLowerCase();
-  return FUNCTION_FOLLOWERS.has(word) || NAMING_CUES_AFTER.includes(word);
+  return !followedByNoun(tail, NAMING_CUES_AFTER);
 }
 
 /**
@@ -194,9 +176,14 @@ function endsTheClause(tail: string): boolean {
  * "students in Mumbai" is a place reading of that string and "Mumbai said" is not — the ruling's own
  * "I'm in Mumbai" vs "Mumbai said" distinction, made syntactically and candidate-independently.
  *
- * Two bounds keep the recall cost small and visible. Multi-token candidates are exempt, because
+ * Two bounds keep the recall cost visible. Multi-token candidates are exempt, because
  * "Mumbai Sharma" is a person whatever the turn says about Mumbai. And a possessive occurrence is
  * not a place ("at Priya's desk" is a person's desk), so it is skipped.
+ *
+ * The cost is CONSTRUCTION-CONDITIONAL, not a flat percentage (ISS-104CC-3): ~0% outside a turn that
+ * mentions the same single-token string after a locative preposition AND relies on a weak after-cue
+ * (`here` / `from` / `speaking`); ~100% inside one, for ANY name, because nothing here is per-name.
+ * The earlier "3/20 = 15%" described one 20-case corpus's mix of such turns, not the mechanism.
  */
 export function readsAsAPlaceOrOrg(text: string, name: string): boolean {
   if (name.trim().split(/\s+/).filter(Boolean).length > 1) return false;
@@ -253,7 +240,9 @@ function hasNamingCue(text: string, name: string, at: number, place: boolean): b
     const SPEAKING_AT = /^[\s,:;.'"()\u2019-]*speaking\b/iu;
     // A bare noun after either word means participle or deictic, not a cue. Fall through rather than
     // returning false: an unconditional veto here was ISS-098's second defect.
-    if (SPEAKING_AT.test(rawAfter) && endsTheClause(rawAfter.replace(SPEAKING_AT, ""))) return true;
+    // ISS-104: and the name must OPEN its clause. "This is India speaking on the panel." has the same shape as
+    // "This is Rahul speaking on the panel.", so the weak cue is withheld inside a larger construction.
+    if (SPEAKING_AT.test(rawAfter) && opensAClause(text, at) && endsTheClause(rawAfter.replace(SPEAKING_AT, ""))) return true;
   }
 
   // Direct address takes a comma the greeting-of-an-object form does not: "Good morning Prasanti,"

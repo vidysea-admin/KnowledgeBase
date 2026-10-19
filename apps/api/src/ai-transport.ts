@@ -1,6 +1,6 @@
 /** Real provider transport. CLI jobs are isolated, bounded, and never invoke a shell. */
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { delimiter, isAbsolute, join } from "node:path";
 import type { Transport, TransportRequest, TransportResponse } from "@lkb/ai";
@@ -94,6 +94,8 @@ export interface CliLimits {
   /** Ephemeral-directory cleanup seam. Cleanup never changes the call's outcome; `onFailure`
    *  gets only the error code (never the path) once the bounded retries are exhausted. */
   cleanup?: { remove?: (dir: string) => void; delayMs?: number; onFailure?: (code: string) => void };
+  /** Called once when the post-kill wait for the process group gives up (never receives the pid or any path). */
+  onGroupBound?: (reason: "bound" | "eperm") => void;
 }
 /** Total attempts 4; waits delayMs*1..3 between them (default 50 => 300 ms worst case, only after a failure). */
 const CLEANUP_ATTEMPTS = 4;
@@ -108,12 +110,48 @@ async function removeEphemeral(dir: string, c: CliLimits["cleanup"] = {}): Promi
   }
   try { c.onFailure?.(code); } catch { /* reporting must not alter the outcome */ }
 }
-/** POSIX: SIGKILL to the group is asynchronous, so wait (bounded) until the group has no members left
- *  before the caller sees the rejection. No-op on win32 (taskkill /T handles the tree there). */
-async function groupGone(pid: number | undefined, boundMs = 2_000): Promise<void> {
-  if (process.platform === "win32" || !pid) return;
-  for (const end = Date.now() + boundMs; Date.now() < end; await new Promise((r) => setTimeout(r, 10)))
-    try { process.kill(-pid, 0); } catch { return; }
+/** Linux: process-state letters of the live members of process group `pgid`, read from /proc/<n>/stat.
+ *  Returns undefined when /proc is not readable (caller then falls back to kill(-pgid, 0) alone). */
+export function linuxGroupStates(pgid: number, procDir = "/proc"): string[] | undefined {
+  let names: string[];
+  try { names = readdirSync(procDir).filter((n) => /^\d+$/.test(n)); } catch { return undefined; }
+  const states: string[] = [];
+  for (const n of names) {
+    try {
+      const stat = readFileSync(`${procDir}/${n}/stat`, "utf8");
+      const rest = stat.slice(stat.lastIndexOf(")") + 2).split(" "); // "<state> <ppid> <pgrp> ..." (comm may contain spaces/parens)
+      if (Number(rest[2]) === pgid) states.push(rest[0] ?? "");
+    } catch { /* the process exited between readdir and read */ }
+  }
+  return states;
+}
+export interface GroupGoneOptions {
+  boundMs?: number; platform?: string; pollMs?: number;
+  kill?: (pid: number, signal: number) => unknown;
+  /** Member states of the group (see linuxGroupStates); undefined means unknown. */
+  states?: (pgid: number) => string[] | undefined;
+  onBound?: (reason: "bound" | "eperm") => void;
+}
+/** POSIX: SIGKILL to the group is asynchronous, so wait (bounded) until the group has no LIVE members left
+ *  before the caller sees the rejection. Zombies (state Z, killed but awaiting a slow reaper such as a container
+ *  PID 1 without init) count as gone: kill(-pgid, 0) keeps succeeding for them. Only ESRCH means gone through
+ *  kill; EPERM stops the wait and is reported once. No-op on win32 (taskkill /T handles the tree there).
+ *  ISS-CILINUX4-001. */
+export async function groupGone(pid: number | undefined, o: GroupGoneOptions = {}): Promise<void> {
+  const platform = o.platform ?? process.platform;
+  if (platform === "win32" || !pid) return;
+  const kill = o.kill ?? ((p: number, sig: number) => process.kill(p, sig));
+  const states = o.states ?? (platform === "linux" ? linuxGroupStates : () => undefined);
+  const report = (reason: "bound" | "eperm") => { try { o.onBound?.(reason); } catch { /* reporting must not alter the outcome */ } };
+  for (const end = Date.now() + (o.boundMs ?? 2_000); Date.now() < end; await new Promise((r) => setTimeout(r, o.pollMs ?? 10))) {
+    try { kill(-pid, 0); } catch (e) {
+      if ((e as { code?: unknown } | null)?.code === "ESRCH") return;
+      report("eperm"); return; // cannot observe the group (not ours); waiting longer would not help
+    }
+    const members = states(pid);
+    if (members && members.every((st) => st === "Z" || st === "X")) return;
+  }
+  report("bound");
 }
 export function resolveCliCommand(command: string): string {
   if (process.platform !== "win32") return command;
@@ -160,7 +198,7 @@ export function createCliTransport(options: CliLimits = {}): Transport {
         let settled = false; let timer: ReturnType<typeof setTimeout>;
         const finish = (error?: string, code?: number | null) => {
           if (settled) return; settled = true; clearTimeout(timer);
-          if (error) void groupGone(child.pid).then(() => reject(new Error(error)));
+          if (error) void groupGone(child.pid, { onBound: options.onGroupBound }).then(() => reject(new Error(error)));
           else { const text = Buffer.concat(stdout).toString("utf8"); resolve({status: code ?? 1, body: tryParseJson(text), text}); }
         };
         const terminate = (reason: string) => {
