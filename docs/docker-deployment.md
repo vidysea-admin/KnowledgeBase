@@ -119,7 +119,7 @@ docker run --rm -e PORT=8080 -e MONGODB_URL=... -e MONGODB_DB=... -e OLLAMA_API_
 
 ## Send-now host (which process to run)
 
-`POST /calendar/send-now` (and `GET /calendar/send-now/jobs*`) is served by exactly one supported process: `scripts/webinar/join-rules-api-host.ts` (ruling 6, ISS-SENDNOWAPI-004). Run it with `node --import tsx scripts/webinar/join-rules-api-host.ts` on the capture host; it needs a key carrying the `send-now` scope.
+`POST /calendar/send-now` (and `GET /calendar/send-now/jobs*`) is served by exactly one supported process: `scripts/webinar/join-rules-api-host.ts` (ruling 6, ISS-SENDNOWAPI-004). Run it with `node --import tsx scripts/webinar/join-rules-api-host.ts --i-know-this-is-production` on the capture host (ISS-LEGACYSEED-004: `MONGODB_URL` is required (no localhost fallback). A production start needs `MONGODB_DB=lkb` and the `--i-know-this-is-production` argument; any other start needs `MONGO_WORK_DB=<isolated db>` (`MONGODB_DB`, if set, must equal it).); it needs a key carrying the `send-now` scope.
 
 - A plain API start (`apps/api/src/index.ts`, or the `lkb-api` container's `node apps/api/dist/server.js`) intentionally has no send-now launcher. Authenticated callers with the `send-now` scope get `503 {"error":"send_now_unavailable","message":"send-now is served by the join-rules API host; no bot was sent"}`; keys without the scope get 403. This is by design, not a fault: `apps/*` may not import `packages/meeting-bot`, so the real adapter lives only in the host script.
 - Do not run both hosts against the same state directory; the host script takes a single-host lock.

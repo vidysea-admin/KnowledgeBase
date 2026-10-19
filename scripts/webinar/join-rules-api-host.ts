@@ -3,6 +3,9 @@
  * Starts the API exactly as apps/api/src/index.ts does (repo-root .env, MONGODB_URL/MONGODB_DB,
  * startServer with PORT, same listening log) but with the real join-rules store injected, so
  * /calendar/join-rules stops answering 503. Run: node --import tsx scripts/webinar/join-rules-api-host.ts
+ * Mongo target (ISS-LEGACYSEED-004, no localhost or database default): MONGODB_URL is required, plus either
+ * MONGODB_DB=lkb with the --i-know-this-is-production argument (production), or MONGO_WORK_DB=<isolated db>
+ * (MONGODB_DB, if set, must equal it). Anything else is refused before the first connection.
  * Differences from index.ts, deliberately: a state-directory check + single-host pid file first, and
  * lock release on exit/SIGINT/SIGTERM (index.ts has no shutdown handling).
  */
@@ -11,7 +14,7 @@ import path from "node:path";
 import { config as loadEnv } from "dotenv";
 import { connect } from "../../packages/db/src/index.js";
 import { startServer } from "../../apps/api/src/server.js";
-import { requireDatabaseName } from "../../apps/api/src/db-name.js";
+import { requireScriptDatabase } from "../lib/transcript-provenance.mjs";
 import { buildProductionDeps } from "../../apps/api/src/composition/production.js";
 import { createManagedSendNowDeps } from "./manual-jobs/host.js";
 import { createBotEventsDeps } from "../watch/bot-events-host.js";
@@ -30,7 +33,9 @@ async function main(): Promise<void> {
   let operationsDone: Promise<void> = Promise.resolve();
   try {
     console.log(`join-rules state directory: ${stateDir}`);
-    await connect(process.env.MONGODB_URL ?? "mongodb://localhost:27017", requireDatabaseName());
+    // ISS-LEGACYSEED-004: no localhost URL and no database default; refuses before any connection.
+    const target = requireScriptDatabase(process.env, process.argv.slice(2), { allowProduction: true });
+    await connect(target.url, target.dbName);
     const prod = buildProductionDeps();
     // T-039: POST /calendar/send-now is live only through this host (needs the "send-now" scope on the key).
     const server = startServer({ ...prod, calendar: { ...prod.calendar, sendNow: createManagedSendNowDeps() }, joinRules: createJoinRulesDeps({ stateDir }), botEvents: createBotEventsDeps({ stateDir }) });

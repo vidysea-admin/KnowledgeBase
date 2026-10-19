@@ -113,8 +113,15 @@ function bodyOf(req: Request, allowed: readonly string[]): Record<string, unknow
   return body;
 }
 
+/** Recording an opt-out only (un-opt must still match older stored identities such as zoom:111): http(s) only, no credentials, no control characters, no surrounding whitespace (mirrors apps/web safePublicResourceUrl; apps/api may not import apps/web). */
+function isPlainHttpUrl(v: string): boolean {
+  // eslint-disable-next-line no-control-regex
+  if (/[\u0000-\u001f\u007f-\u009f]/.test(v) || v !== v.trim()) return false;
+  try { const u = new URL(v); return (u.protocol === "http:" || u.protocol === "https:") && !u.username && !u.password; } catch { return false; }
+}
+
 /** Body of opt-out and un-opt. Optional hints (ISS-T037W1-001) are bounded strings; an empty / blank one is "not given". */
-function optOutBody(req: Request): { eventId: string; hint: { meetingUrl?: string; sessionKey?: string } } {
+function optOutBody(req: Request, strictUrl = false): { eventId: string; hint: { meetingUrl?: string; sessionKey?: string } } {
   const body = bodyOf(req, ["eventId", "meetingUrl", "sessionKey"]);
   if (typeof body.eventId !== "string" || body.eventId === "" || body.eventId.length > 1024) {
     throw new BadRequest("body must be { eventId: <non-empty string>, meetingUrl?: string, sessionKey?: string }");
@@ -124,7 +131,10 @@ function optOutBody(req: Request): { eventId: string; hint: { meetingUrl?: strin
     const v = body[key];
     if (v === undefined) continue;
     if (typeof v !== "string" || v.length > max) throw new BadRequest(`${key} must be a string of at most ${max} characters`);
-    if (v.trim() !== "") hint[key] = v;
+    if (v.trim() !== "") {
+      if (strictUrl && key === "meetingUrl" && !isPlainHttpUrl(v)) throw new BadRequest("meetingUrl must be an http(s) URL without credentials or control characters");
+      hint[key] = v;
+    }
   }
   return { eventId: body.eventId, hint };
 }
@@ -230,7 +240,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
 
   router.post("/calendar/join-rules/opt-outs", requireScope(WRITE_SCOPE), (req: Request, res: Response) =>
     guarded(req, res, async tenantId => {
-      const { eventId, hint } = optOutBody(req);
+      const { eventId, hint } = optOutBody(req, true);
       await deps.load(tenantId);
       try { return { state: await (hint.meetingUrl || hint.sessionKey ? deps.recordOptOut(tenantId, eventId, hint) : deps.recordOptOut(tenantId, eventId)) }; }
       catch (e) {
