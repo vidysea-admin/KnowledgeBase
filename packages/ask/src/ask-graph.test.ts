@@ -305,6 +305,21 @@ test("golden: bounded completion-budget refusal (swallowed over-budget call, the
   assert.equal(parsed.budgetRefusal.reason, "job_byte_limit");
 });
 
+// ISS-ASKSHARED-001: pins the FIRST assertHealthy (right after evaluate). Score 0.05 + no tavily means refine would
+// otherwise return the "No supported internal source" success early, so only this check rethrows the sticky budget failure.
+test("budget refusal after a swallowed over-budget evaluator call is not masked by the low-score 'no supported source' early return", async () => {
+  const lowScore = { scoreFnForComplete: (c: CompleteFn) => async () => {
+    try { await c({ kind: "ask.score_probe", messages: [{ role: "user", content: "x".repeat(70_000) }] }); } catch { /* swallowed like the evaluator's heuristic fallback */ }
+    return 0.05; } };
+  for (const run of [askV2, askGraphV2]) {
+    const r = boundedX({ swallowedHuge: true }, lowScore);
+    const out = await settle(() => run("visa form", r.tree, r.deps));
+    assert.equal(out.ok, false, "must refuse, not return the no-supported-source success");
+    assert.match((out as { message: string }).message, /budget exhausted/);
+    assert.deepEqual(r.calls(), ["ask.select_nodes"]);
+  }
+});
+
 for (const kind of ["ask.answer", "ask.select_nodes"]) {
   test(`golden: bounded non-BoundedAskError from ${kind} is wrapped identically as 'source or completion processing failed'`, async () => {
     const mk = () => boundedX({ throwOn: kind });
