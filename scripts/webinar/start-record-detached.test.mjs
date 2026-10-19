@@ -135,6 +135,25 @@ test("ISS-323(c): the Zoom join URL's `&` and a title with spaces reach the reco
   }
 });
 
+test("w24-signedslots: -CaptureSlot/-SeedProfile/-ProfileDirectory reach the recorder as single arguments (paths with spaces)", WIN_ONLY, () => {
+  const before = logsBefore();
+  const dir = mkdtempSync(join(tmpdir(), "lkb-argv-slot-"));
+  const dump = join(dir, "argv.json"), SEED = "C:/Users/x y/signed in chrome";
+  try {
+    const { status, stdout } = runLauncher({ env: { LKB_ARGV_DUMP: dump },
+      extraArgs: ["-CaptureSlot", "slot-a", "-SeedProfile", SEED, "-ProfileDirectory", "Profile 1"] });
+    assert.equal(status, 0, `launcher should succeed; got:
+${stdout}`);
+    const argv = JSON.parse(readFileSync(dump, "utf8"));
+    assert.equal(argv[argv.indexOf("--capture-slot") + 1], "slot-a");
+    assert.equal(argv[argv.indexOf("--seed-profile") + 1], SEED);
+    assert.equal(argv[argv.indexOf("--profile-directory") + 1], "Profile 1");
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+    cleanupNewLogs(before);
+  }
+});
+
 test("ISS-323(a,b): a recorder that dies immediately makes the launcher exit non-zero and never claim success", WIN_ONLY, () => {
   const before = logsBefore();
   try {

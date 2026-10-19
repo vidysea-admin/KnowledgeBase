@@ -1,8 +1,8 @@
 # Verdict: w24-onairplay
 
-VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 22e076432d0bf6dc9c5b488881f9f2e4cb07544e
+Cycle-0 VERDICT: FAIL (superseded by cycle 1 PASS below)
+Cycle-0 checked: 0 (historical)
+Cycle-0 reviewed SHA (historical): 22e076432d0bf6dc9c5b488881f9f2e4cb07544e
 Base: 8029be9f
 ISSUES-WRITTEN: none
 
