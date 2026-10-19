@@ -7,6 +7,7 @@
 import type { AutoRecordCandidateInput } from "../auto-join.js";
 import type { CalendarEvent } from "../calendar-client.js";
 import { canonicalOnairEvent, resolveOnairLink, MARKETO_HOST, ONAIR_EVENT_HOST, type OnairResolution } from "./onair-link-resolver.js";
+import { parseFromAddress } from "./onair-address.js";
 import { calendarWindow, parseMailWindow, type OnairWindow } from "./onair-mail-window.js";
 
 export type OnairMailKind = "registered" | "reminder" | "starting-soon" | "on-demand";
@@ -41,10 +42,8 @@ export function classifyOnairMail(subject: string): OnairMailKind | undefined {
 }
 
 export function senderIsGoogle(from: string, authenticated: boolean | undefined): { ok: boolean; email: string } {
-  const m = /<([^<>\s]+@[^<>\s]+)>/.exec(from ?? "") ?? /^\s*([^\s<>"]+@[^\s<>"]+)\s*$/.exec(from ?? "");
-  const email = (m?.[1] ?? "").toLowerCase();
-  const domain = email.slice(email.lastIndexOf("@") + 1);
-  return { ok: authenticated === true && email.includes("@") && domain === SENDER_DOMAIN, email };
+  const addr = parseFromAddress(from);
+  return { ok: authenticated === true && !!addr && addr.domain === SENDER_DOMAIN, email: addr?.email ?? "" };
 }
 
 const decodeEntities = (s: string) => s.replace(/&amp;/gi, "&").replace(/&#x3d;|&#61;/gi, "=").replace(/&quot;/gi, '"').replace(/&#39;|&apos;/gi, "'");

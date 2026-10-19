@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import type { AutoRecordCandidateInput } from "../auto-join.js";
 import { onairMailEnabled, withOnairMailCandidates, withOnairMailFromEnv } from "./onair-mail-loader.js";
-import { createOnairGmailLoader, headerAuthenticated } from "./onair-gmail-fetch.js";
+import { createOnairGmailLoader } from "./onair-gmail-fetch.js";
 import * as f from "./onair-mail.fixtures.js";
 
 const baseRow = (over: Partial<AutoRecordCandidateInput> = {}): AutoRecordCandidateInput =>
@@ -49,11 +49,11 @@ test("enabled: a failing calendar loader only costs the calendar window", async 
 });
 
 const b64 = (s: string) => Buffer.from(s, "utf8").toString("base64url");
-const fakeGws = (calls: string[][], authResults: string) => async (args: string[]) => {
+const fakeGws = (calls: string[][], authResults: string | string[], fromHeaders: string[] = ["Google <a@google.com>"]) => async (args: string[]) => {
   calls.push(args);
   if (args[3] === "list") return JSON.stringify({ messages: [{ id: "m1", threadId: "t1" }, { id: "../bad" }] });
   return JSON.stringify({ id: "m1", threadId: "t1", internalDate: String(Date.parse("2026-10-14T08:00:00Z")), payload: { mimeType: "multipart/alternative",
-    headers: [{ name: "Subject", value: "You're registered: X" }, { name: "From", value: "Google <a@google.com>" }, { name: "Authentication-Results", value: authResults }],
+    headers: [{ name: "Subject", value: "You're registered: X" }, ...fromHeaders.map(value => ({ name: "From", value })), ...[authResults].flat().map(value => ({ name: "Authentication-Results", value }))],
     parts: [{ mimeType: "text/plain", body: { data: b64("plain body") } }, { mimeType: "text/html", body: { data: b64("<b>html body</b>") } }] } });
 };
 
@@ -71,5 +71,21 @@ test("gmail fetch: missing or failing authentication results are not authenticat
   for (const ar of ["", "mx.google.com; dmarc=fail header.from=google.com", "mx.google.com; dmarc=pass header.from=evil.example"]) {
     assert.equal((await createOnairGmailLoader(fakeGws([], ar))())[0]!.senderAuthenticated, false, ar);
   }
-  assert.equal(headerAuthenticated("dmarc=pass header.from=google.com"), true);
+});
+
+const GOOD = "mx.google.com; dkim=pass header.i=@google.com; dmarc=pass (p=REJECT) header.from=google.com";
+test("gmail fetch: sender-gate bypass attempts are not authenticated", async () => {
+  const auth = async (ar: string | string[], from?: string[]) => (await createOnairGmailLoader(fakeGws([], ar, from))())[0]!.senderAuthenticated;
+  assert.equal(await auth(GOOD), true);
+  assert.equal(await auth("mx.google.com; dmarc=pass header.from=google.com.evil.com"), false, "checker bypass: look-alike header.from");
+  assert.equal(await auth("mx.google.com; dmarc=pass header.from=evil.com; dkim=pass header.from=google.com"), false, "different clauses");
+  assert.equal(await auth("mx.google.com; dmarc=fail header.from=google.com; spf=pass header.from=google.com"), false);
+  assert.equal(await auth("mx.evil.example; dmarc=pass header.from=google.com"), false, "foreign authserv-id");
+  assert.equal(await auth(["mx.evil.example; dmarc=pass header.from=google.com"]), false);
+  assert.equal(await auth(GOOD, ['"x <a@google.com>" <a@evil.com>']), false, "quoted display name");
+  assert.equal(await auth(GOOD, ["A <a@google.com>", "B <b@evil.com>"]), false, "multiple From headers");
+  assert.equal(await auth(GOOD, ["A <a@mail.google.com>"]), false, "From domain differs from dmarc header.from");
+  assert.equal(await auth(["mx.evil.example; dmarc=pass header.from=google.com", GOOD]), true, "a genuine Google header still counts");
+  const mails = await createOnairGmailLoader(fakeGws([], GOOD, ["A <a@google.com>", "B <b@evil.com>"]))();
+  assert.equal(mails[0]!.from, "");
 });

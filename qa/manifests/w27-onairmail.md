@@ -1,7 +1,7 @@
 # w27-onairmail: join Google Cloud OnAir webinars announced by mail
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-onairmail (lane/w27-onairmail)
 Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4
 Commits: U2 c79b3fc4 (resolver); U1 = candidate SHA (git log -1 on the lane branch)
@@ -30,3 +30,9 @@ onair tests: 11 (resolver) + 14 (mail source) + 7 (loader/fetch) = 32 pass; with
 lint-loc (loc stage alone) OK 1736 files; --all see final report. No D-015 corpus (new feature, no ledger issue).
 D-020 mutations (per-mutation backup, restore verified identical, HEAD hash check): host pin removed -> 1 fail (host pin test);
 dedup removed (slots keyed per message) -> 1 fail; sender auth gate loosened -> 1 fail; flag default-on -> 1 fail. Script: scratchpad w27/mut.mjs.
+
+## Fix cycle 1 (checker FAIL 1a5b33f7, sender-gate bypass)
+New onair-address.ts: RFC 5322 From parser (quoted names, comments, single mailbox only) and per-clause Authentication-Results check (authserv-id
+mx.google.com only; one dmarc=pass clause whose header.from equals the From domain exactly). Multiple From headers -> unauthenticated, from="".
+Tests added: google.com.evil.com (checker bypass, now refused), cross-clause pass, quoted display name, foreign authserv-id, multiple From, subdomain mismatch.
+51 pass (onair 37 + schedule-tick 14); tsc exit 0. D-020: exact-domain match replaced by startsWith -> caught by loader test; restored identical.

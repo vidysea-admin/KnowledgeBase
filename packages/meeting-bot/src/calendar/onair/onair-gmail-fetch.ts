@@ -1,5 +1,6 @@
 /** Reads recent Google Cloud event mails over the gws CLI (read-only list/get). Tests inject a fake runner; nothing here sends or modifies mail. */
 import type { AutojoinGwsRunner } from "../../autojoin/gws-channels.js";
+import { dmarcPassesFor, parseFromAddress } from "./onair-address.js";
 import type { OnairMail } from "./onair-mail-source.js";
 
 const QUERY = "from:google.com (cloudplatformonline.com OR cloudonair.withgoogle.com) newer_than:14d";
@@ -16,12 +17,8 @@ function bodies(part: Part | undefined, acc = { html: "", text: "" }): { html: s
   for (const p of part.parts ?? []) bodies(p, acc);
   return acc;
 }
-const header = (part: Part | undefined, name: string) => part?.headers?.find(h => h.name.toLowerCase() === name)?.value ?? "";
-
-/** Authenticated = the receiving server recorded dmarc=pass for a google.com From domain (the first Authentication-Results header). */
-export function headerAuthenticated(authResults: string): boolean {
-  return /\bdmarc=pass\b/i.test(authResults) && /\bheader\.from=google\.com\b/i.test(authResults);
-}
+const headers = (part: Part | undefined, name: string) => (part?.headers ?? []).filter(h => h.name.toLowerCase() === name).map(h => h.value);
+const header = (part: Part | undefined, name: string) => headers(part, name)[0] ?? "";
 
 export function createOnairGmailLoader(gws: AutojoinGwsRunner): () => Promise<OnairMail[]> {
   return async () => {
@@ -33,9 +30,12 @@ export function createOnairGmailLoader(gws: AutojoinGwsRunner): () => Promise<On
       const ms = Number(msg.internalDate);
       if (!Number.isFinite(ms)) continue;
       const { html, text } = bodies(msg.payload);
+      const fromHeaders = headers(msg.payload, "from"); // several From headers are never trusted
+      const addr = fromHeaders.length === 1 ? parseFromAddress(fromHeaders[0]!) : undefined;
+      const authenticated = !!addr && dmarcPassesFor(headers(msg.payload, "authentication-results"), addr.domain);
       mails.push({ messageId: ref.id, threadId: typeof msg.threadId === "string" ? msg.threadId : undefined, subject: header(msg.payload, "subject"),
-        date: new Date(ms).toISOString(), from: header(msg.payload, "from"),
-        senderAuthenticated: headerAuthenticated(header(msg.payload, "authentication-results")), html, text });
+        date: new Date(ms).toISOString(), from: fromHeaders.length === 1 ? fromHeaders[0]! : "",
+        senderAuthenticated: authenticated, html, text });
     }
     return mails;
   };
