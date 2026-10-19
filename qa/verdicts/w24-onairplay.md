@@ -27,3 +27,34 @@ SNAPSHOT_JS, CLICK_WATCH_JS and PLAY_JS in a real browser (not permitted). recor
 
 ## Ledger rows
 No rows may be flipped. Re-submit at fix cycle 1 after findings 1-3, with a test per finding.
+
+---
+
+# Verdict: w24-onairplay, fix cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 8e5a4c6d0db3c52995fabce471cc4c14844f0d04
+ISSUES-WRITTEN: none
+(This section supersedes the cycle 0 FAIL above; the cycle 0 record is kept unchanged.)
+
+## Re-check of cycle 0 findings
+1. HIGH click re-verify: FIXED. DESCRIBE_JS re-queries controls[idx] at click time; Python verify_target requires text startswith "watch now", no REFUSE_RE hit in text, href or the 10-level ancestor attribute trail, and the session card; CLICK_WATCH_JS recomputes the signature (text|href|trail) and returns false on drift; either failure raises OnairRefused. No new escape found: the click can only reach an element whose text, href and ancestors passed the refuse scan at that moment, and the signature is compared atomically in the same script as the click.
+2. MEDIUM refusal: FIXED. REFUSE_RE is a case-insensitive substring match on control text and href (sign in/up, log in, register, choose an account, consent, allow, continue with google, accounts.google.com). Fixtures sign_in_to_watch.html and register_now.html are covered by tests.
+3. MEDIUM iframe: FIXED. Probed player_frames: www.youtube.com https accepted; youtube.com.evil, evil-youtube.com, youtube.com@evil.com, http://, accounts.google.com, empty src all rejected. A visible login/consent iframe now raises refusal in every poll.
+4. LOW adjusted until: FIXED and read-verified beyond tsc. `owner` is the same object passed to prepareWorkspaceCaptureControls -> prepareCaptureConsentControls -> installCaptureControl(owner); reconnect-gaps.ts:116-117 reads `context.until` lazily in gap(), so `owner.until = ...` reaches the capture-control gap end. (The consent receipt and readiness observer copy the initial until at construction; unchanged and acceptable.) With the flag off `until` is reassigned to the same value.
+
+## Independently produced evidence
+- unittest test_sb_join_onair: Ran 12, OK, exit 0. node onair-watch.test.ts: 11/11, exit 0. tsc --noEmit: exit 0. lint-loc: OK (1768 files); record-commands.ts within the 300 budget.
+- Fresh D-020 mutation (per-mutation backup .w24_mut2.bak, trap, timeout 120): `if sb.execute_script(CLICK_WATCH_JS, idx, desc["sig"]) is not True:` -> `if False:` in sb_join_onair.py. test_dom_drift_between_check_and_click_refuses FAILED (also 1 more failure and 2 errors, since the mutant also skips the click body). Restored; `git -c core.autocrlf=true hash-object` before = after = HEAD blob 1c842b01e75dba36d9d4d61540bf83840b26e68d; cmp ok; tests OK after restore.
+
+## Notes (low, not filed)
+- The signature omits card context, so with --onair-session two Watch now controls with identical text/href/trail could swap after a reflow and the wrong (still Watch now) card could be clicked. Not a sign-in/consent risk.
+- A Watch now link whose href leads off the OnAir host is clicked; the next poll's host check then refuses. Unchanged behaviour.
+- Localized (non-English) sign-in text without matching href is still not refused, but it can never be clicked; only an English "watch now" control is clickable.
+
+## Not verified
+SNAPSHOT_JS, DESCRIBE_JS and CLICK_WATCH_JS in a real browser (not permitted; only fixture-parsed snapshots and syntax check). record-commands.test.ts, tracker and dependencies lint stages not rerun.
+
+## Ledger rows
+Rows tied to w24-onairplay may be flipped to verified.
