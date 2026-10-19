@@ -1,8 +1,44 @@
 # Checker verdict: w29-realchrome-373-374 (real-Chrome verification of ISS-373 / ISS-374)
 
-VERDICT: HOLD
-Cycle checked: 0
-Reviewed SHA: 4ca0271e3a8be2b6b7efc199280bd165493e9e77
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 1a6c9f1ee39657f0c0ca3bec253b0e4962547563
+Base: 4ca0271e3a8be2b6b7efc199280bd165493e9e77. Cycle-0 HOLD verdict: 3478360e. Scope: localhost fixtures, local headless Chrome for Testing (seleniumbase drivers), main .venv python, no external network.
+
+## Diff review (3478360e..1a6c9f1e)
+- One file, test-only: packages/meeting-bot/py/test_sb_join_iframe.py (+9/-4). No product source changed.
+- Expected dict now includes `"submissionDisposition": "not-attempted"`. sb_join_register.py:85-86 `not_attempted(reason)` returns exactly `{"status": "action_required", "reason": reason, "submissionDisposition": "not-attempted"}`. The assertion is still full-dict equality (not weakened), and `assert posts == []` is untouched.
+- Profile dir is `tempfile.mkdtemp(prefix="lkb-")/native-profile` (short path), the receipt uses the same path, and `shutil.rmtree(parent)` runs in `finally`. The `tmp_path` parameter was dropped. No other assertion removed or relaxed. The ISS-374 loop still asserts exactly `posts == [/submit]` plus cookies and `resources_seen == []` for 307/308 x localhost/127.0.0.1.
+
+## Independent runs (exit codes)
+| Run | Exit | Result |
+|---|---|---|
+| test_sb_join_iframe.py, whole file, real Chrome, timeout 900 | 0 | 14 passed (31 s), includes test_registration_actual_local_form_and_safety_exceptions |
+| Real-Chrome replay (hostile page scripts ENABLED + 307/308 redirects), 16 cases | 0 | 16/16 as expected |
+| Own mutation: REGISTRATION_JS `redirect:` forced to `'follow'` (on disk), that node | 1 | FAILED at test_sb_join_iframe.py:415, `/redirected` received the forwarded POST for 307 -> 127.0.0.1 |
+
+Replay (POSTs per target): 307/308 to localhost and 127.0.0.1: `/submit` 1, `/redirected` 0 each, result uncertain/submission_not_confirmed, body equals validated body. Clean control: `/submit` 1, submitted. ISS-373 hostile cases (listener action/formaction/consent/hidden/value/field mutations, native submit on input, prototype setter hooks, setInterval): `/exfil` 0 in all 11, bodies byte-equal to the validated body; setter-hook and interval cases refused with zero POSTs.
+
+## Mutation safety
+Per-mutation byte backup, `timeout 900`, trap on EXIT INT TERM ERR restoring and `cmp`-checking (restored OK). Final `git -c core.autocrlf=true hash-object`: sb_join_register.py ca5f79be... equals HEAD blob; test_sb_join_iframe.py 77461d12... equals HEAD blob. `git status` clean (temporary scripts in qa/_tmp_c1 deleted).
+
+## Ledger
+- ISS-373: may flip to verified (real-Chrome committed node green and hostile replay 0 POSTs to /exfil).
+- ISS-374: may flip to verified (2/2 recorded reproductions: 1 POST, 0 forwarded; mutation reproduces the leak).
+- ISS-REGSAFE-001: may flip to verified (real-Chrome fetch submit works with cookies and CSRF; control case).
+- Cycle-0 findings F1 (stale expected dict) and F2 (profile path sensitivity) are fixed. F3 (committed test runs with scripts disabled, so listeners are only exercised by the replay) remains a note, not blocking.
+
+Not verified: real external registration pages, service-worker behavior beyond Network.setBypassServiceWorker, CDP Fetch interception in real Chrome.
+ISSUES-WRITTEN: none
+Accounting: checker token usage not exposed (null); maker denominator unknown, ratio unverified. The replay script is the cycle-0 one (sha256 prefix 1441e08fcaf5424a), copied into the lane temporarily.
+
+## Superseded history
+
+### Cycle 0 (superseded): Checker verdict: w29-realchrome-373-374 (real-Chrome verification of ISS-373 / ISS-374)
+
+VERDICT (cycle 0, superseded): HOLD
+Cycle checked (cycle 0): 0
+Reviewed SHA (cycle 0): 4ca0271e3a8be2b6b7efc199280bd165493e9e77
 Scope: replaces fake-driver-only verdict 7780542e. Owner approved a local headless Chrome run 2026-10-19. Localhost fixtures only, no external network, no real registration pages. No candidate source or test was edited.
 
 ## Short answer
