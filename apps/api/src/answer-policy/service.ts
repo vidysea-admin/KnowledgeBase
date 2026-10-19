@@ -43,7 +43,10 @@ export function createAnswerPolicyService(store: AnswerPolicyStore, clock: () =>
     const findings = detectConflicts(await store.latest(tenantId));
     const live = new Set(findings.map((f) => f.key));
     for (const f of findings) {
-      await store.addItemIfAbsent(tenantId, { id: randomUUID(), tenantId, kind: "conflict", status: "open", createdAt: clock().toISOString(), key: f.key, summary: f.explanation, conflict: f });
+      const fresh: ReviewItem = { id: randomUUID(), tenantId, kind: "conflict", status: "open", createdAt: clock().toISOString(), key: f.key, summary: f.explanation, conflict: f };
+      const { item, created } = await store.addItemIfAbsent(tenantId, fresh);
+      // ISS-T056CONFLICTS-006: a conflict that returns after its item was superseded must be open again. Only `superseded` reopens; a human decision stays final.
+      if (!created && item.status === "superseded") await store.reopenSuperseded(tenantId, item.id, { ...fresh, id: item.id });
     }
     for (const item of await store.items(tenantId)) {
       if (item.kind === "conflict" && item.status === "open" && !live.has(item.key)) {
