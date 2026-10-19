@@ -1,8 +1,37 @@
 # Verdict: w27-onairmail
 
 VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: de0fe97f238054cd655ef3de989bb14c91343efb
+Cycle checked: 1
+Reviewed SHA: 53f0d6cceaf0aa110470758b714905cfc9f0e727
+Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4
+Checker: independent (Sonnet 5.5), ship-mode re-check of fix cycle 1.
+
+## Cycle 1 finding F2 (FAIL, in scope: sender gate) - a forged Authentication-Results header is accepted
+- packages/meeting-bot/src/calendar/onair/onair-address.ts `dmarcPassesFor` loops over EVERY Authentication-Results header and returns true if ANY
+  header with authserv-id mx.google.com has a `dmarc=pass` clause for the From domain. onair-gmail-fetch.ts passes all such headers (`headers(msg.payload,"authentication-results")`).
+- An attacker simply includes their own `Authentication-Results: mx.google.com; dmarc=pass header.from=google.com` header. Gmail stamps its genuine result (dmarc=fail) on top, but the OR across headers still accepts the forged one.
+- Probe (run, no network; fake gws runner): `dmarcPassesFor([forged, real-fail],"google.com")` = true; `[real-fail, forged]` = true;
+  createOnairGmailLoader with real(dmarc=fail)+forged headers -> senderAuthenticated=true. Genuine-only -> true; real-fail only -> false; authserv-id other than mx.google.com -> false.
+  The attacker then also needs a From of x@google.com (trivially spoofed, no DKIM needed), so the gate is fully bypassed for a spoofed google.com sender (impact bounded to cloudonair event slugs/windows, but it is the D-178 control).
+- Fix: trust only the receiver-stamped header: take the FIRST (topmost) Authentication-Results header only, require authserv-id mx.google.com, and evaluate its dmarc clause; do not OR across headers.
+  Better, refuse (fail closed) if more than one Authentication-Results header carries authserv-id mx.google.com. Add regression tests for [forged, real-fail], [real-fail, forged].
+
+## Cycle 1 verified OK
+- Cycle 0 bypass (google.com.evil.com + quoted display name `"<a@google.com>" <x@google.com.evil.com>`): parseFromAddress -> x@google.com.evil.com; dmarcPassesFor false; senderIsGoogle ok:false. FIXED.
+- Mixed-clause strings (`dmarc=fail header.from=google.com; x=dmarc=pass`, `dmarc=pass header.from=evil.com; dkim=pass header.from=google.com`) -> false. Multiple From headers -> senderAuthenticated false. Non-mx.google.com authserv-id -> false.
+- Tests (timeout 600, node --test --test-force-exit --import tsx, cwd packages/meeting-bot), all exit 0: onair-address 4/4, onair-link-resolver 11/11, onair-mail-source 14/14, onair-mail-loader 8/8, schedule-tick 14/14. `tsc --noEmit -p tsconfig.json` exit 0.
+- Resolver and flag-off paths unchanged since cycle 0 (diff touches only address/gmail-fetch/mail-source/tests/manifest); cycle 0 resolver probes and mutation stand.
+- Not re-run: a fresh mutation (no source change to resolver). Not verified: live Gmail header ordering/format.
+
+ISSUES-WRITTEN: none. Ledger rows may NOT be flipped; maker should fix F2 and request cycle 2.
+
+---
+
+# Superseded history (cycle 0)
+
+Superseded VERDICT: FAIL
+Superseded cycle: 0
+Superseded reviewed SHA: de0fe97f238054cd655ef3de989bb14c91343efb
 Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4
 Checker: independent (Sonnet 5.5), ship-mode review, flag-off unit with network resolver.
 
