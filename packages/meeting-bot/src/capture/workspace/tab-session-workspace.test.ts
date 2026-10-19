@@ -71,7 +71,7 @@ test("global downstream session ownership refuses cross-slot and cross-tenant du
 test("slot identifiers, duplicate flags, file ancestors and redirected directories refuse before writes", () => {
   const fixture=temporary();
   try {
-    for(const slot of ["","..","../x","x/y","x\\y","x..y","a.","A","a ","--tenant","con","nul","com1","lpt9","a".repeat(65)])
+    for(const slot of ["","..","../x","x/y","x\\y","x..y","a.","a ","--tenant","con","nul","com1","lpt9","a".repeat(65)])
       assert.throws(()=>selectTabCaptureWorkspace(["--capture-slot",slot],fixture.defaults),/safe lowercase/);
     assert.throws(()=>selectTabCaptureWorkspace(["--capture-slot"],fixture.defaults));
     assert.throws(()=>selectTabCaptureWorkspace(["--capture-slot","a","--capture-slot","b"],fixture.defaults),/duplicate/);

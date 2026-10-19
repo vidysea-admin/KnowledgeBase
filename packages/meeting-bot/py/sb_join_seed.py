@@ -6,12 +6,16 @@ written by the recorder's seeding step with a per-run nonce, the writer's pid an
 The marker is trusted only when its nonce equals the one the launcher passed for THIS launch
 (LKB_SEED_NONCE) and its slot path is this directory; a stale or copied marker is therefore inert.
 Then, and only then, `Local State` and the one selected sub-profile directory are accepted next to the
-ownership lock. Any other entry still refuses.
+ownership lock. The recorder's own control files (`.lkb-*`: the per-slot capture lock, readiness
+records) are accepted under the same marker, because the TS side creates them before Python looks.
+Any other entry still refuses.
 """
 import json
 import os
+import re
 
 SEED_MARKER = ".lkb-seed.json"
+OWN_CONTROL_FILE = re.compile(r"^\.lkb-[A-Za-z0-9][A-Za-z0-9._-]{0,120}$")
 
 
 def _valid_marker(root, nonce):
@@ -38,4 +42,6 @@ def unproved_entries(root, names, profile_directory=None, nonce=None):
     allowed = {".lkb-profile.lock"}
     if SEED_MARKER in names and _valid_marker(root, nonce):
         allowed |= {SEED_MARKER, "Local State", profile_directory or "Default"}
-    return [name for name in names if name not in allowed]
+    seeded = SEED_MARKER in names and _valid_marker(root, nonce)
+    return [name for name in names if name not in allowed and not (
+        seeded and OWN_CONTROL_FILE.match(name) and os.path.isfile(os.path.join(root, name)) and not os.path.islink(os.path.join(root, name)))]

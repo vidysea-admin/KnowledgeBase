@@ -63,3 +63,15 @@ def test_stale_marker_wrong_nonce_missing_nonce_or_other_slot_gives_no_trust(tmp
         names = sorted(os.listdir(root))
         got = unproved_entries(root, names, "Profile 1", nonce) if nonce else unproved_entries(root, names, "Profile 1", "")
         assert got == names, (index, got)
+
+
+def test_own_control_files_pass_only_under_a_valid_marker_and_only_as_regular_files(tmp_path):
+    base = tmp_path / "ctl"
+    base.mkdir()
+    root, _ = slot(base, [".lkb-profile.lock", "Local State", "Profile 1", ".lkb-tab-capture.lock", ".lkb-readiness-failure-cloudonair.json", "Cookies"])
+    (base / "slot" / SEED_MARKER).write_text(json.dumps(good(root)))
+    names = sorted(os.listdir(root))
+    assert unproved_entries(root, names, "Profile 1", NONCE) == ["Cookies"]  # control files accepted, foreign entry refused
+    (base / "slot" / ".lkb-dir").mkdir()
+    assert ".lkb-dir" in unproved_entries(root, sorted(os.listdir(root)), "Profile 1", NONCE)  # directories are not control files
+    assert ".lkb-tab-capture.lock" in unproved_entries(root, names, "Profile 1", "wrong")  # wrong nonce: nothing trusted
