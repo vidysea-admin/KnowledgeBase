@@ -384,3 +384,40 @@ test("CLI: a bare session id reaches validation instead of printing usage (end t
     }
   } finally { rmSync(empty, { recursive: true, force: true }); }
 });
+
+// ISS-REVALIDATE-001 cycle 1: ordering, overlap and repetition come from turns.json itself, and missing QA fails closed.
+test("ISS-REVALIDATE-001: swapped, overlapping and 75 identical-text turns with NO QA file are refused", () => fixture(async ({ transcribe, validate }) => {
+  const swapped = raw(73); [swapped[10], swapped[11]] = [swapped[11], swapped[10]];
+  transcribe(swapped);
+  assert.match((await validate({ env: {} })).report.error, /turns\.json: non-monotonic turn/);
+  const overlapping = raw(73); overlapping[20] = { ...overlapping[20], tEnd: overlapping[20].tEnd + 8 };
+  transcribe(overlapping);
+  const overlap = await validate({ env: {} });
+  assert.equal(overlap.passed, false);
+  assert.match(overlap.report.error, /1 overlapping turn\(s\) \(first at index 21\)/);
+  transcribe(raw(75).map(t => ({ ...t, text: "thank you for watching" })));
+  const repeated = await validate({ env: {} });
+  assert.equal(repeated.passed, false);
+  assert.match(repeated.report.error, /turns\.json: repeated-turn run/);
+  transcribe(raw(73));
+  assert.equal((await validate({ env: {} })).passed, true); // same count, clean ordering and text: still accepted
+}));
+
+test("ISS-REVALIDATE-001: QA contradicting its own transcript refuses (non-monotonic and invalid-duration survivors)", () => fixture(async ({ dir, put, transcribe, validate }) => {
+  transcribe(raw(73));
+  const mono = qaReport(dir, { nonMonotonicIndices: [5] });
+  put("transcript-qa.json", mono);
+  assert.match((await validate()).report.error, /QA merged: non-monotonic turn/);
+  const invalid = qaReport(dir); invalid.merged.durationValid = false;
+  put("transcript-qa.json", invalid);
+  assert.match((await validate()).report.error, /audio duration invalid/);
+  put("transcript-qa.json", qaReport(dir));
+  assert.equal((await validate()).passed, true);
+}));
+
+test("ISS-REVALIDATE-001: a negative-start turn edited into turns.json is refused by the timing step itself", () => fixture(async ({ dir, put, transcribe, validate }) => {
+  transcribe(raw(73));
+  const turns = JSON.parse(readFileSync(join(dir, "turns.json"), "utf8")); turns[0].tStart = -3; // the writer refuses this, so edit the file
+  put("turns.json", turns);
+  assert.match((await validate({ env: {} })).report.error, /invalid turn timing, write refused \(1 turn/);
+}));
