@@ -18,6 +18,8 @@ import { projectApprovedSenderTrust, type ApprovedTrustContext } from "./join-ru
 import { classifyWebinarInvite } from "./auto-record-policy.js";
 import { loadScheduledKeysForTick, recordScheduled, writeScheduledJob, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, createHttpCalendarLoader } from "./schedule-loaders.js";
+import { createWhatsappLoaderFromEnv } from "./whatsapp-discovery/whatsapp-candidate-loader.js";
+import { mergeWhatsappCandidates } from "./whatsapp-discovery/whatsapp-merge.js";
 import { createWindowsTaskScheduler, deriveJobKey, type TaskScheduler } from "./task-scheduler.js";
 import { announceScheduled, buildAutojoinTickDeps, createTopicLookup, dropOwnMarkerEvents, writeCaptureTags, type AutojoinTickDeps } from "../autojoin/tick-wiring.js";
 export {
@@ -34,6 +36,8 @@ export interface ScheduleTickDeps {
   loadCalendarEvents: () => Promise<CalendarEvent[]>;
   loadCalendarAcquisition?: (syncToken?: string, requestStartedAt?: string) => Promise<WebinarCalendarAcquisition>;
   loadCandidates: (refresh?: boolean) => Promise<AutoRecordCandidateInput[]>;
+  /** LKB_WA_DISCOVERY=1 only (w27-walinks, default OFF): WhatsApp-shared link candidates. Absent = today's behaviour exactly. */
+  loadWhatsappCandidates?: () => Promise<AutoRecordCandidateInput[]>;
   now: () => string;
   stateDir: string;
   /** Tenant that owns the dedup/job state files under stateDir (LKB_TENANT_ID). Absent or invalid = the tick refuses, before anything is read or scheduled (ISS-ALERTID-006). */
@@ -65,6 +69,7 @@ export function buildRealScheduleTickDeps(): ScheduleTickDeps {
     autojoin,
     loadCalendarEvents: discoveryOff ? async () => [] : createHttpCalendarLoader(apiUrl, process.env.LKB_API_KEY),
     loadCandidates: discoveryOff ? async () => [] : createHttpCandidateLoader(apiUrl, process.env.LKB_API_KEY, log, true),
+    loadWhatsappCandidates: discoveryOff ? undefined : createWhatsappLoaderFromEnv(process.env, log),
     everyWebinar: true,
     joinRulesEnforce: process.env.LKB_JOIN_RULES_ENFORCE,
     joinRulesTenantId: process.env.LKB_TENANT_ID,
@@ -92,7 +97,8 @@ function describeToSchedule(item: AutoRecordItem): string {
  * can assert on it without re-parsing log lines.
  */
 export async function runScheduleTickOnce(deps: ScheduleTickDeps, dryRun: boolean) {
-  const [loadedEvents, candidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
+  const [loadedEvents, loadedCandidates] = await Promise.all([deps.loadCalendarEvents(), deps.loadCandidates()]);
+  const candidates = deps.loadWhatsappCandidates ? await mergeWhatsappCandidates(deps.loadWhatsappCandidates, loadedEvents, loadedCandidates, deps.log) : loadedCandidates;
   const aj = deps.autojoin, calendarEvents = aj ? dropOwnMarkerEvents(loadedEvents) : loadedEvents;
   const lookup = aj ? createTopicLookup(aj, calendarEvents, candidates) : undefined;
   const now = deps.now();
