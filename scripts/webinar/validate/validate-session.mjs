@@ -35,6 +35,7 @@ import { flagOn, TRANSCRIPT_QA_FLAG, GAP_THRESHOLD_SECONDS, SHORTFALL_THRESHOLD_
 import { validateTurns } from "../process-video.mjs";
 import { loadWebinarSession } from "../session-rows.mjs";
 import { evaluateTranscriptQaGeneration } from "./transcript-qa-binding.mjs";
+import { turnIntegrityReasons } from "./turn-integrity.mjs";
 import { loadTrustedRecordingPrivacy, evaluateRecordingCoverage } from "../../lib/transcription/private-recording.mjs";
 
 const DEFAULT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
@@ -108,6 +109,10 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
   const partial = turns.length > 0 && (publicCoverage ? !publicCoverage.complete : gaps.length > 0 || shortfallSec > SHORTFALL_THRESHOLD_SECONDS);
   if (partial && !acceptPartial) {
     reasons.push(`partial coverage ${(coverage * 100).toFixed(1)}% (${gaps.length} internal gap(s) > ${GAP_THRESHOLD_SECONDS}s, tail shortfall ${round(shortfallSec, 1)}s > ${SHORTFALL_THRESHOLD_SECONDS}s); re-run with --accept-partial to record it as accepted`);
+  }
+  if (turns.length) { // fail closed without relying on transcript-qa.json: ordering, overlap and repeated runs come from turns.json itself
+    register();
+    reasons.push(...turnIntegrityReasons({ turns, durationSec: duration, qa: await import("../../../packages/ai/src/stt/transcript-qa.ts") }));
   }
   const { qa, qaSha256, reasons: qaReasons } = await qaEvidence(dir, turns, turnsBytes, duration, env, privacy);
   reasons.push(...qaReasons);

@@ -1,7 +1,7 @@
 # w27-qahash: ISS-REVALIDATE-001 (QA report bound by turns.json content hash)
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Base: 4264418c7488d95e76bc0d86e3920efb0e0ccd72 (origin/master)
 Changed paths: qa/manifests/w27-qahash.md only (NO source change: the fix is already on base)
 
@@ -22,3 +22,9 @@ ISS-REVALIDATE-001 recorded reproductions: (a) stale same-count QA, (b) clamped=
 
 ## D-020 mutation
 Mutated transcript-qa-binding.mjs hash check to `if (false)`: 30 pass / 2 fail (ISS-REVALIDATE-001 test killed). Restored from per-mutation backup; `git -c core.autocrlf=true hash-object` equals HEAD blob 73b0b468b179dd6bd976d7165c5d386b19808141.
+
+## Cycle 1
+Changed: scripts/webinar/validate/turn-integrity.mjs (new), validate-session.mjs, validate-session.test.mjs, packages/ai/src/stt/transcript-qa.ts (export of the writer's two default constants only).
+Validator now recomputes non-monotonic, overlap (tStart < prev tEnd - writer tolerance 1e-6) and repeated runs (writer threshold 3) from turns.json, with or without a QA file.
+Tests: validate-session + transcript-qa-binding 35/35 pass. lint-loc --all: lint-tests exit 0; tracker and dependencies stages SIGTERM "unavailable" under load (not a finding; rerun alone needed).
+D-020 mutations M1-M5 all killed, hash-restored (see scratchpad w27-mut.out). D-015 ISS-REVALIDATE-001: 5/5 reproductions covered, none open.
