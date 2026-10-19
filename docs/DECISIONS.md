@@ -2411,3 +2411,18 @@ fourth would have left real decisions idle behind an unrelated unit.
 - `sources` rows on lkb_staging only, inserted by that script with the markers above
 - qa/manifests/ entry for the unit
 **Links:** T-055, ISS-T055STORE-001, D-117, D-020, D-015
+
+## D-182 | 2026-10-19 | type: decision | status: ACTIVE
+**Title:** OnAir login permission expires 24h after the event; ISS-WEBINARRELEASE-013 resolved by ruling (keep trying to join)
+**What:** Records two Approver rulings given in chat on 2026-10-19.
+- Ruling 1, ISS-WEBINARRELEASE-013 (ID-only tombstone plus an old Gmail invite). Question, verbatim: "ISS-WEBINARRELEASE-013: when there's an ID-only tombstone plus an old Gmail invite, what should the bot do?" Answer, verbatim: "Keep trying to join (Recommended)". Current behaviour stays: the bot attempts to join, and the ended-detection stops it if the meeting was cancelled. The withdrawal part of the issue was verified separately (7c7e310b). The issue is closed as "resolved by ruling".
+- Ruling 2, OnAir login permission lifetime. Question, verbatim: "OnAir login permission: should it expire automatically?" Answer, verbatim: "Expire 24h after event (Recommended)". Each OnAir authority binding row (env LKB_ONAIR_SOURCE_BINDINGS, validated in apps/api/src/source-intake/jobs/source-privacy.ts) gains a required field `expiresAt` (ISO-8601 UTC timestamp, event end + 24h). Expiry is enforced at enqueue (approvedSourceSession) and at execution (sourceSessionStillApproved, and the media transport recheck that calls it). An expired binding is refused exactly like a removed binding: 0 page, tool or provider calls.
+- Migration, fail closed: an existing binding row that lacks `expiresAt` (or carries an unparseable one) is treated as expired and refused. Operators must add `expiresAt` to every live row; no row is grandfathered. The binding schema therefore changes from exactly 7 keys to exactly 8 keys (accountId, actorKeyIds, approvalRef, eventId, expiresAt, id, providerProcessing, tenantId). The bindings live in an operator env value, not a collection, so there is no schema/ file or generated type to change.
+**Why:** Both questions were open Approver decisions, answered by the Approver in chat as quoted above. A login permission that never lapses keeps a protected-source session usable long after the event it was granted for; a time-boxed grant fails closed by default.
+**Result:** Rulings recorded. Unit B (expiresAt field, enqueue and execution enforcement, fail-closed migration, tests) and Unit C (ledger row ISS-WEBINARRELEASE-013 to resolved) are authorized. No contract or ARCHITECTURE edit is authorized. No decision is superseded.
+**Amends:** D-167 and D-179 are unchanged; ruling 1 confirms the existing attempt-to-join behaviour and the tombstone handling of D-179. The T-045 OnAir binding rule (ISS-T045WORKER-002) gains the expiry field.
+**Changes-authorized:**
+- OnAir binding schema field `expiresAt` in apps/api/src/source-intake/jobs/source-privacy.ts and its tests (apps/api/src/source-intake/jobs/onair-binding.test.ts, privacy.test.ts) and docs/t045-source-worker.md
+- qa/issues.WEBINARRELEASE.jsonl: ISS-WEBINARRELEASE-013 status to resolved ("resolved by ruling") only
+**Approved-by:** Umesh
+**Links:** T-045, T-038, ISS-WEBINARRELEASE-013, ISS-T045WORKER-002, D-167, D-179
