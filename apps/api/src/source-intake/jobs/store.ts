@@ -27,8 +27,10 @@ function replay(rows: HostingJournalRecord[], tenant: string): Map<string, Sourc
     const prior = jobs.get(job.jobId);
     // A settled row carries the digest marker instead of the URL (legacy settled rows may still hold it). The marker
     // is only trusted when it matches the URL of the prior row; its input hash and snapshot are then pinned to that row.
-    const redacted = SETTLED.includes(job.state) && typeof job.url === "string" && job.url.startsWith(REDACTED);
-    if (redacted && (!prior || job.url !== redactedSourceUrl(prior.url) || job.inputHash !== prior.inputHash ||
+    // Rows from enqueue onward carry only the marker; their URL lives in a private per-job secret file, checked on read.
+    const redacted = typeof job.url === "string" && job.url.startsWith(REDACTED);
+    const priorMarker = prior ? (prior.url.startsWith(REDACTED) ? prior.url : redactedSourceUrl(prior.url)) : undefined;
+    if (redacted && prior && (job.url !== priorMarker || job.inputHash !== prior.inputHash ||
         JSON.stringify(job.watchedSnapshot) !== JSON.stringify(prior.watchedSnapshot))) throw new SourceJobError("source_spool_corrupt");
     const source = redacted ? undefined : approvedSourceInput({ ...job, tenantId: tenant, idempotencyKey: "stored" });
     if ((source && (source.url !== job.url || job.inputHash !== sourceJobInputHash(source) ||
@@ -38,7 +40,7 @@ function replay(rows: HostingJournalRecord[], tenant: string): Map<string, Sourc
           !job.result.sourceId.startsWith(`${encodeURIComponent(tenant)}:`)))) throw new SourceJobError("source_spool_corrupt");
     if ((!prior && (job.revision !== 1 || job.state !== "queued")) ||
         (prior && (prior.state === "succeeded" || prior.state === "uncertain" ||
-          (prior.state === "queued" && job.state !== "running") || (prior.state === "running" && job.state === "queued")))) throw new SourceJobError("source_spool_corrupt");
+          (prior.state === "queued" && job.state !== "running" && !(job.state === "uncertain" && redacted)) || (prior.state === "running" && job.state === "queued")))) throw new SourceJobError("source_spool_corrupt");
     if (prior && (job.revision !== prior.revision + 1 || job.inputHash !== prior.inputHash || job.actorKeyId !== prior.actorKeyId ||
         (job.url !== prior.url && !redacted) || job.createdAt !== prior.createdAt || (prior.state === "running" && job.attemptId !== prior.attemptId) ||
         JSON.stringify(job.approval) !== JSON.stringify(prior.approval))) throw new SourceJobError("source_spool_corrupt");
@@ -56,7 +58,21 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
   const append = <T>(job: SourceJob, value: T) => ({ value, operation: "source.job", target: job.jobId, outcome: job.state, data: job });
   const change = (job: SourceJob, fields: Partial<SourceJob>): SourceJob => ({ ...job, ...fields, revision: job.revision + 1, updatedAt: timestamp() });
   /** Every transition into a settled state drops the retained URL. */
-  const settle = (job: SourceJob, fields: Partial<SourceJob>): SourceJob => change(job, { ...fields, url: redactedSourceUrl(job.url) });
+  const settle = (job: SourceJob, fields: Partial<SourceJob>): SourceJob =>
+    change(job, { ...fields, url: job.url.startsWith(REDACTED) ? job.url : redactedSourceUrl(job.url) });
+  /** The private secret goes before the settled row is appended: a crash can only lose a secret, never leave one behind. */
+  const retire = (next: SourceJob): SourceJob => { if (SETTLED.includes(next.state)) journal.dropSecret(next.tenantId, next.jobId); return next; };
+  /** The claimed URL: legacy rows hold it, redacted rows must match both the journal marker and the input hash. */
+  const secretUrl = (job: SourceJob): string | null => {
+    if (!job.url.startsWith(REDACTED)) return job.url;
+    const url = journal.readSecret(job.tenantId, job.jobId);
+    if (url === null) return null;
+    try {
+      const source = approvedSourceInput({ tenantId: job.tenantId, actorKeyId: job.actorKeyId, url, idempotencyKey: "stored",
+        ...(job.watchedSnapshot ? { watchedSnapshot: job.watchedSnapshot } : {}) });
+      return source.url === url && redactedSourceUrl(url) === job.url && sourceJobInputHash(source) === job.inputHash ? url : null;
+    } catch { return null; }
+  };
   const stale = (job: SourceJob) => job.state === "running" && job.leaseUntil! <= now();
   const update = async (tenant: string, id: string, attempt: string, mutate: (job: SourceJob) => SourceJob | null): Promise<SourceJob | null> => {
     actorIdentity(tenant); jobIdentity(id);
@@ -64,7 +80,7 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
       const job = replay(rows, tenant).get(id);
       if (!job || job.state !== "running" || job.attemptId !== attempt) return { value: null };
       const next = stale(job) ? settle(job, { state: "uncertain", reason: "worker-interrupted" }) : mutate(job);
-      return next ? append(next, next) : { value: null };
+      return next ? append(retire(next), next) : { value: null };
     });
   };
   return {
@@ -85,8 +101,9 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
         }
         if (jobs.size >= 1000) throw new SourceJobError("source_job_capacity");
         const at = timestamp(), job: SourceJob = { version: 1, jobId: id, tenantId: snapshot.tenantId, actorKeyId: snapshot.actorKeyId,
-          url: snapshot.url, ...(snapshot.watchedSnapshot ? { watchedSnapshot: snapshot.watchedSnapshot } : {}),
+          url: redactedSourceUrl(snapshot.url), ...(snapshot.watchedSnapshot ? { watchedSnapshot: snapshot.watchedSnapshot } : {}),
           inputHash, approval: safeApproval, state: "queued", revision: 1, createdAt: at, updatedAt: at };
+        journal.writeSecret(snapshot.tenantId, id, snapshot.url);
         return append(job, view(job));
       });
     },
@@ -96,18 +113,21 @@ export function createSourceJobStore(root: string, options: SourceJobStoreOption
         const job = replay(rows, tenant).get(id);
         if (!job) return { value: null };
         if (!stale(job)) return { value: view(job) };
-        const next = settle(job, { state: "uncertain", reason: "worker-interrupted" }); return append(next, view(next));
+        const next = retire(settle(job, { state: "uncertain", reason: "worker-interrupted" })); return append(next, view(next));
       });
     },
     async claim(tenant, workerId) {
       actorIdentity(tenant); actorIdentity(workerId);
       return journal.transaction<SourceJob | null>(tenant, workerId, timestamp(), async rows => {
         const jobs = [...replay(rows, tenant).values()], expired = jobs.find(stale);
-        if (expired) return append(settle(expired, { state: "uncertain", reason: "worker-interrupted" }), null);
+        if (expired) return append(retire(settle(expired, { state: "uncertain", reason: "worker-interrupted" })), null);
         const job = jobs.find(row => row.state === "queued");
         if (!job) return { value: null };
+        const url = secretUrl(job);
+        // Missing or mismatched secret: fail closed, never refetch or guess.
+        if (url === null) return append(retire(settle(job, { state: "uncertain", reason: "execution-unconfirmed" })), null);
         const next = change(job, { state: "running", attemptId: options.newAttempt?.() ?? randomUUID(), leaseUntil: now() + leaseMs });
-        return append(next, structuredClone(next));
+        return append(next, { ...structuredClone(next), url });
       });
     },
     async completed(tenant, id) {
