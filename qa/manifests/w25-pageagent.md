@@ -1,7 +1,7 @@
-# w25-pageagent: generic vision page agent (replaces the hard-coded OnAir Watch-now logic)
+# w25-pageagent (verdict 1bd56f26 FAIL at b395fb68; fix cycle 1 below): generic vision page agent (replaces the hard-coded OnAir Watch-now logic)
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w25-onairfix (branch lane/w25-onairfix), base origin/master 50c320a6
 Candidate: the commit that adds this file (`git log -1 lane/w25-onairfix`); earlier lane commits a363e7c4 (diagnosis) and 5624ca60 (agent).
 
@@ -28,3 +28,11 @@ Wiring: sb_join.py runs the agent instead of onair_prepare when LKB_PAGE_AGENT=1
 
 ## Not verified
 Registration fill against a live form (fixtures only). Any playback on a non-YouTube player. Seeded slot files were deleted after the run.
+
+## Fix cycle 1
+- F1 HIGH: ELEMENTS_JS reports `form` and `submit`; on any goal except register-with-approval, clicks on form-owned, submit, image-submit controls and on buttons matching regist/rsvp/reserve/sign up/get access/continue/next/submit/confirm/complete are refused. Typing and selecting are refused unless the goal is register (profile values still required).
+- F2 MEDIUM: AUTH_RE refuses "continue/sign/log in|up with|using <anything>", sso, sign-on, facebook, apple, microsoft, linkedin, github, twitter, x.com, okta, auth0 before the click (control text, href, ancestors).
+- F3 LOW: SECRET_RE adds pin, ssn, secret, passcode/passwd, social security; a leetspeak-normalised password match. Code-level bot-check detector `check_page` (page text plus text inside iframes via WebDriver, and captcha iframe src) runs every step before the model and fails closed.
+- Tests: 30 agent tests (CheckerProbes class, one test per probe) + 22 OnAir = 52. D-020 mutations: form-owner gate (`el.get("form") or` -> `False or`) killed; provider refusal (generic `continue/sign/log ... with|using` alternative removed) killed by test_f2_unknown_provider_refused_even_with_the_submit_gate_open (a first attempt survived because the submit gate also refused those names on a play goal; a gate-open test was added). HEAD-blob hash matches after each.
+- Evidence: qa/evidence/w25-pageagent-live.md. The live test still hits YouTube's bot check after Umesh's sign-in; the full recordings were not started.
+- Not run again: tsc and lint-loc (no TS or budgeted file changes beyond py); not re-run live after the guard changes.
