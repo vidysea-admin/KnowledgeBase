@@ -2,7 +2,7 @@
 import type { Turns } from "@lkb/core";
 import type { JudgeContext } from "./notes/judge.js";
 import { collectWindow, judgePendingCandidates, tryQA, type DroppedNote } from "./notes/drop-mode.js";
-import { runtimeChronologicalTurns, runtimeArray, runtimeRecord, runtimeComplete, runtimeWindows, runtimeRequestBudget, runtimeInventory, assertRuntimeCoverage, runtimeItem, runtimeQA, runtimeJudge, validateRuntimePage, withWindowRetry, rejectedFeedback, QUOTE_RULE, type RuntimeComplete, type RuntimeItem, type RuntimeQA } from "./grounded.js";
+import { runtimeChronologicalTurns, runtimeArray, runtimeRecord, runtimeComplete, runtimeWindows, runtimeRequestBudget, runtimeInventory, assertRuntimeCoverage, runtimeItem, runtimeQA, runtimeJudge, validateRuntimePage, withWindowRetry, rejectedFeedback, RETRY_EXTRACT_KIND, QUOTE_RULE, type RuntimeComplete, type RuntimeItem, type RuntimeQA } from "./grounded.js";
 const EXTRACT = 'Read ALL supplied source spans. Return {processed: exact inventory, items:[], qa:[]}. Items: {kind:insight|decision|action,text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}. QA: {question,questionEvidence,answer:null|string,answerEvidence:[],status:answered|unanswered}. Every text/question/answer must equal its exact evidence quotes joined by newline. Evidence quotes must lie entirely inside a submitted span. Do not supply ids. Preserve source origin; screen content is unverified. Proposals/negated adoption are not decisions; suggestions are not assigned actions. Extract informative content throughout; no inferred owners/names/dates. Questions without relevant cited answers are unanswered/null/empty answerEvidence.' + QUOTE_RULE;
 function mergeQuestion(map: Map<string, RuntimeQA>, q: RuntimeQA): void {
     const prior = map.get(q.id);
@@ -20,7 +20,7 @@ export async function produceRuntimeSummary(turns: Turns[], complete: RuntimeCom
         let mark = 0; // drop-log start of the CURRENT attempt, so a failed half rolls back only its own rejections
         const { nextItems, nextQuestions } = await withWindowRetry(spans, async (sp, hint) => {
             mark = drops?.length ?? 0;
-            const raw = runtimeRecord(await runtimeComplete(complete, "summarize", EXTRACT, { phase: "extract-summary", spans: sp, inventory: runtimeInventory(sp), ...(hint ? { retry: hint } : {}) }));
+            const raw = runtimeRecord(await runtimeComplete(complete, hint ? RETRY_EXTRACT_KIND : "summarize", EXTRACT, { phase: "extract-summary", spans: sp, inventory: runtimeInventory(sp), ...(hint ? { retry: hint } : {}) }));
             assertRuntimeCoverage(raw.processed, sp);
             if (drops) {
                 const w = await collectWindow(complete, turns, sp, raw.items, raw.qa, drops, jc);

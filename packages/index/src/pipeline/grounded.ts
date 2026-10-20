@@ -82,14 +82,18 @@ export function runtimeRequestBudget(env: Record<string, string | undefined> = p
 }
 /** Exact size of the extract request a window produces: spans plus the duplicated inventory plus wrapper. */
 const extractPayloadLength = (spans: RuntimeSpan[]) => JSON.stringify({ phase: "extract-summary", spans, inventory: runtimeInventory(spans) }).length;
+/** Dense windows defeat the completeness judge (live 2026-10-19): a window holds <= windowTextCap(budget) characters (spans no longer than that) of source text. */
+export const windowTextCap = (budget: number) => Math.floor(budget / 8); // 16000 -> 2000; a larger budget still yields fewer windows
+/** Retries extract with the verifier model (multi-model hybrid): the router chain for this kind is the verifier alone. */
+export const RETRY_EXTRACT_KIND = "output-verifier";
 export function runtimeWindows(turns: Turns[], budget = runtimeRequestBudget()): RuntimeSpan[][] {
-    const spanBudget = Math.floor(budget * 3 / 4), fits = (spans: RuntimeSpan[]) => JSON.stringify(spans).length <= spanBudget && extractPayloadLength(spans) <= budget;
+    const spanBudget = Math.floor(budget * 3 / 4), fits = (spans: RuntimeSpan[]) => spans.reduce((n, x) => n + x.text.length, 0) <= windowTextCap(budget) && JSON.stringify(spans).length <= spanBudget && extractPayloadLength(spans) <= budget;
     turns = runtimeChronologicalTurns(turns);
     const spans: RuntimeSpan[] = [];
     for (const turn of turns) {
         let from = 0;
         do {
-            let to = Math.min(from + 4000, turn.text.length);
+            let to = Math.min(from + Math.min(4000, windowTextCap(budget)), turn.text.length);
             if (to < turn.text.length && /[\uD800-\uDBFF]/.test(turn.text[to - 1]!))
                 to--;
             const text = turn.text.slice(from, to);
@@ -180,7 +184,7 @@ export function runtimeQA(raw: unknown, turns: Turns[], questionSpans?: RuntimeS
     const answerEvidence = runtimeEvidence(r.answerEvidence, turns, answerSpans);
     return { id, question, questionEvidence, answer: runtimeExtractive(r.answer, answerEvidence), answerEvidence, status: "answered" };
 }
-export async function runtimeComplete(complete: RuntimeComplete, kind: "summarize" | "claims", system: string, payload: unknown, budget = runtimeRequestBudget()): Promise<unknown> {
+export async function runtimeComplete(complete: RuntimeComplete, kind: "summarize" | "claims" | typeof RETRY_EXTRACT_KIND, system: string, payload: unknown, budget = runtimeRequestBudget()): Promise<unknown> {
     const content = JSON.stringify(payload);
     if (content.length > budget)
         throw new Error("complete evidence context exceeds request budget");

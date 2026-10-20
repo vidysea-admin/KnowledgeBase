@@ -18,7 +18,7 @@ import { resolveEvidence, extractiveText } from "./notes/evidence.js";
 import { runtimeVerdicts, verdictPasses } from "./grounded.js";
 import { lexicalHits, settleDrop, type DroppedNote } from "./notes/drop-mode.js";
 import { makeJudgeContext, judgeCandidates, type JudgeContext, type JudgeSidecar, type NoteJudge } from "./notes/judge.js";
-import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, withWindowRetry, rejectedFeedback, QUOTE_RULE, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
+import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, withWindowRetry, rejectedFeedback, RETRY_EXTRACT_KIND, QUOTE_RULE, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
 
 export type ClaimsCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -126,7 +126,7 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
     let mark = 0; // drop-log start of the CURRENT attempt, so a failed half rolls back only its own rejections
     const accepted = await withWindowRetry(spans, async (sp, hint) => {
       mark = dropped?.length ?? 0;
-      const raw = runtimeRecord(await runtimeComplete(complete, "claims",
+      const raw = runtimeRecord(await runtimeComplete(complete, hint ? RETRY_EXTRACT_KIND : "claims",
         'Read ALL supplied source spans; return {processed:exact inventory,claims:[{text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}]}. Extract atomic factual source statements only. Text equals literal evidence quotes joined by newline, and every quote lies entirely inside a submitted span. Preserve unverified screen origin. Return claims:[] only if no factual claim exists; no made-up facts or speaker identities.' + QUOTE_RULE,
         { phase: "extract-claims", spans: sp, inventory: runtimeInventory(sp), ...(hint ? { retry: hint } : {}) }));
       assertRuntimeCoverage(raw.processed, sp);

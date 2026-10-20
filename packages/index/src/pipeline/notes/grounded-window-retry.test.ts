@@ -15,20 +15,20 @@ type R = Record<string, unknown>;
 const turns = [turn(0, "Fees for the programme are listed on the website."), turn(1, "Applications close on the first of March.")];
 
 function fake(kind: "summarize" | "claims", incompleteJudgements: number) {
-  const phases: string[] = [], hints: unknown[] = [];
+  const phases: string[] = [], hints: unknown[] = [], kinds: string[] = [];
   let judged = 0;
-  const complete = async (job: { messages: { content: string }[] }): Promise<CompleteResult> => {
+  const complete = async (job: { kind: string; messages: { content: string }[] }): Promise<CompleteResult> => {
     const p = JSON.parse(job.messages[1]!.content) as R;
     phases.push(p.phase as string);
     const spans = (p.spans ?? []) as { turnId: string; sessionId: string; text: string; origin: string }[];
     if (p.phase === "extract-summary" || p.phase === "extract-claims") {
-      hints.push(p.retry);
+      hints.push(p.retry); kinds.push(job.kind);
       const list = spans.map((s) => ({ kind: "insight", text: s.text, origin: s.origin, verification: "unverified", evidence: [{ turnId: s.turnId, sessionId: s.sessionId, quote: s.text }] }));
       return done(kind === "summarize" ? { processed: p.inventory, qa: [], items: list } : { processed: p.inventory, claims: list.map(({ kind: _k, ...c }) => c) });
     }
     return done({ processed: p.inventory, complete: ++judged > incompleteJudgements, noContent: false, noClaims: false, verdicts: ((p.items ?? []) as { id: string }[]).map((x) => ({ id: x.id, supported: true, categoryCorrect: true, answerRelevant: true })) });
   };
-  return { complete, phases, hints };
+  return { complete, phases, hints, kinds };
 }
 
 test("summary: one incomplete judge verdict is cured by re-extracting the window as two hinted halves", async () => {
@@ -40,6 +40,7 @@ test("summary: one incomplete judge verdict is cured by re-extracting the window
   assert.match(String(f.hints[1]), /omitted/);
   assert.match(String(f.hints[2]), /omitted/);
   assert.equal(r.page.citedItems!.length, 2);
+  assert.deepEqual(f.kinds, ["summarize", "output-verifier", "output-verifier"]); // hybrid: retries extract with the verifier model
 });
 
 test("summary: a second incomplete verdict still degrades the page (bounded, bar not relaxed)", async () => {
@@ -68,4 +69,13 @@ test("coverage acknowledgement: the span's own sessionId echo is tolerated; stri
   assertRuntimeCoverage(inv.map((r, i) => ({ ...r, sessionId: spans[i]!.sessionId })), spans);
   for (const bad of [spans.map((s) => s.turnId), inv.map((r) => ({ ...r, extra: 1 })), inv.map((r) => ({ ...r, sessionId: "other" })), inv.slice(1), inv.map((r) => ({ ...r, digest: "0" }))])
     assert.throws(() => assertRuntimeCoverage(bad, spans), RuntimeIncompleteError);
+});
+
+test("windows hold at most budget/8 characters of source text (2000 at the default budget)", async () => {
+  const { runtimeWindows } = await import("../grounded.js");
+  const long = [turn(0, "Fees are listed. ".repeat(500)), turn(1, "Short line here."), turn(2, "Another short line.")];
+  const ws = runtimeWindows(long);
+  assert.ok(ws.length > 4);
+  for (const w of ws) assert.ok(w.reduce((n, x) => n + x.text.length, 0) <= 2000);
+  assert.ok(runtimeWindows(long, 32000).length < ws.length);
 });
