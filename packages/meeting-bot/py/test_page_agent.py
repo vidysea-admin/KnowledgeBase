@@ -171,6 +171,11 @@ class CheckerProbes(unittest.TestCase):
             self.assertIn("refused", refused({"action": "click", "index": 1}, CTX, self.one(name=name)) or "", name)
         self.assertIn("refused", refused({"action": "click", "index": 1}, CTX, self.one(tag="a", name="idp", href="https://login.okta.com/x")) or "")
 
+    def test_f2_unknown_provider_refused_even_with_the_submit_gate_open(self):
+        open_gate = {**REG, "allow_submit": True}
+        for name in ("continue with acme", "sign in using zorg", "continue with x"):
+            self.assertIn("provider control refused", refused({"action": "click", "index": 1}, open_gate, self.one(name=name)) or "", name)
+
     def test_f3_secret_field_spellings(self):
         for name in ("pin", "ssn", "secret answer", "p4ssw0rd", "pass word", "p@ssw0rd", "security code", "passcode", "social security number"):
             page = self.one(tag="input", name=name, type="text")
