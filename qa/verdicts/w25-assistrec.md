@@ -26,3 +26,36 @@ Base: 50c320a6505a3d7d2802b42167b2a854355d5cd4
 
 ISSUES-WRITTEN: none
 Ledger rows may NOT be flipped. Code is otherwise sound; re-check after the test fix (cycle 1).
+
+---
+# Cycle 1 re-check
+
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: 892d46f0b29c3d8fb4e7bf7ece1179c0e0598015
+Prior: cycle 0 FAIL at 603e265f (verdict commit 37a95083).
+
+## Finding 1 (surviving ended-confirm mutant): resolved
+New tests assert exact poll counts for 2 consecutive ended (no stop) and 3 consecutive ended (stop).
+Re-run mutations (per-mutation backup, trap INT/TERM/ERR, timeout 300, cmp and `git -c core.autocrlf=true hash-object` == HEAD blob after each):
+- `ended >= 1`: KILLED (pass 9 / fail 2). Blob 87cd1408... == HEAD.
+- `ended >= 4` (own new mutant): KILLED (test run hung to timeout rc=124, i.e. fails). Blob restored == HEAD.
+- wiring guard `if (on && backend !== "tab")` -> `if (false)`: KILLED (pass 10 / fail 1). Blob d68cf271... == HEAD.
+- dispose guard `!launched ||` removed (assisted-cdp.ts): SURVIVED, because the real CDP adapter is not unit-testable without Chrome. Verified by reading instead (below). Blob 67812703... == HEAD.
+
+## Commands (cwd packages/meeting-bot unless noted)
+- assisted-record.test.ts: exit 0, pass 11 fail 0
+- record-commands.test.ts: exit 0, pass 22 fail 0
+- tsc --noEmit: exit 0
+- repo root `node scripts/lint-loc.mjs --all`: exit 0, 10 stages OK (an earlier run failed lint-root only because of my own stray scratch files in the lane root; removed and re-run clean)
+
+## dispose safety (read review of assisted-cdp.ts)
+`launched` is set true only on the branch where no matching tab exists AND `/json/list` on the debug port is empty (nothing listening), immediately before this run spawns Chrome. dispose() returns at once if `!launched || keepBrowser`; otherwise it sends Browser.close to that port's browser and rmSync's the user-data-dir. A Chrome the human already had open on the port (list non-empty, tab found or not) never sets `launched`, so it is never closed and its profile never removed. `--keep-browser` also skips it. --assisted with a non-tab backend is now refused (assistedFlag). Both stop() and the no-play refusal call dispose.
+
+## Notes (low, not blocking, no issues filed)
+- If connect fails after the spawn (no tab found), dispose is not called and the launched Chrome/profile remain.
+- The `launched` guard has no automated test (needs real Chrome); relies on the read review above.
+- rmSync removes assisted-chrome-profile only when this run launched it; a profile from a prior --keep-browser run is deleted too if a later run launches fresh.
+
+ISSUES-WRITTEN: none
+Ledger rows for w25-assistrec may be flipped to verified.
