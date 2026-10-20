@@ -204,26 +204,31 @@ export function rejectedFeedback(log: { reason: string; excerpt: string }[] | un
     const rejected = log.splice(mark).filter((d) => d.excerpt).slice(0, 12).map((d) => `${d.reason}: "${d.excerpt}"`);
     return rejected.length ? " Rejected last time (re-quote these as whole sentences): " + rejected.join(" | ") : "";
 }
-/** Runs one window's extract+judge. On a judge-reported omission or a malformed acknowledgement (and only those) the failing spans are re-extracted: a lone span once, else as two halves (recursively), each told which proposals the verifier rejected last time (`rollback` returns that feedback). Finite (<= 2 attempts per span depth) and the bar is unchanged: a retried lone span that fails again throws. */
-export async function withWindowRetry<T>(spans: RuntimeSpan[], run: (spans: RuntimeSpan[], hint?: string) => Promise<T>, join: (parts: T[]) => T, rollback: () => string, hint?: string): Promise<T> {
+/** Runs one window's extract+judge. A malformed acknowledgement/reply or missing per-item verdict (RuntimeIncompleteError) is retried: a lone span once, else as two halves (recursively), each told which proposals the verifier rejected (`rollback` returns that feedback). A part that still fails is SKIPPED (`empty`, reported via `onSkip`), never thrown: D-185 treats it as not processed. Grounding failures of single items are dropped by the callers, not here. */
+export async function withWindowRetry<T>(spans: RuntimeSpan[], run: (spans: RuntimeSpan[], hint?: string) => Promise<T>, join: (parts: T[]) => T, rollback: () => string, empty: T, onSkip: (error: Error) => void, hint?: string): Promise<T> {
     try {
         return await run(spans, hint);
     }
     catch (error) {
-        if (!(error instanceof RuntimeIncompleteError) || (hint !== undefined && spans.length < 2))
+        if (!(error instanceof RuntimeIncompleteError))
             throw error;
         const next = RETRY_HINT + rollback();
+        if (spans.length < 2 && hint !== undefined) {
+            onSkip(error);
+            return empty;
+        }
         if (spans.length < 2)
-            return run(spans, next);
-        const mid = Math.ceil(spans.length / 2), first = await withWindowRetry(spans.slice(0, mid), run, join, rollback, next);
-        return join([first, await withWindowRetry(spans.slice(mid), run, join, rollback, next)]);
+            return withWindowRetry(spans, run, join, rollback, empty, onSkip, next);
+        const mid = Math.ceil(spans.length / 2), first = await withWindowRetry(spans.slice(0, mid), run, join, rollback, empty, onSkip, next);
+        return join([first, await withWindowRetry(spans.slice(mid), run, join, rollback, empty, onSkip, next)]);
     }
 }
+export type RuntimeVerdicts = RuntimeVerdict[] & { advisory?: string };
 export interface RuntimeVerdict { id: string; supported: unknown; categoryCorrect: unknown; answerRelevant: unknown }
 /** Runs the independent judge and returns the verdict records; protocol failures (coverage, completeness, missing/duplicate/unknown ids) still throw. */
 export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {
     id: string;
-}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<RuntimeVerdict[]> {
+}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<RuntimeVerdicts> {
     const citedIds = new Set(spans.map((s) => s.turnId));
     for (const item of items)
         for (const key of ["evidence", "questionEvidence", "answerEvidence"]) {
@@ -239,12 +244,12 @@ export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summariz
     const raw = runtimeRecord(await runtimeComplete(complete, kind, (mode === "pending-qa" ? 'Review exactly every pending question candidate; completeness is per-question judgment, not new insight extraction. ' : mode === "claim-extraction" ? 'Review factual claim extraction completeness; informative but fact-free source may have noClaims=true. ' : 'Review informative summary extraction completeness. ') +
         'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions of informative content INSIDE the submitted spans only: adjacent context turns outside the spans belong to other windows and never make complete=false. noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 4));
     assertRuntimeCoverage(raw.processed, spans);
-    if (raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)))
-        throw new RuntimeIncompleteError("informative extraction gap or incomplete semantic review");
+    // D-185: completeness is ADVISORY. The omission verdict is reported on the result, never thrown; per-item verdicts below remain a hard gate.
+    const advisory = raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)) ? "coverage advisory: judge reported informative content not extracted (D-185)" : undefined;
     const verdicts = runtimeArray(raw.verdicts).map(runtimeRecord);
     if (verdicts.length !== items.length || new Set(verdicts.map((v) => v.id)).size !== verdicts.length || verdicts.some((v) => !items.some((item) => item.id === v.id)))
-        throw new Error("missing/failed/unknown semantic verdict");
-    return verdicts as unknown as RuntimeVerdict[];
+        throw new RuntimeIncompleteError("missing/failed/unknown semantic verdict");
+    return Object.assign(verdicts as unknown as RuntimeVerdict[], { advisory });
 }
 export const verdictPasses = (v: RuntimeVerdict | undefined) => v?.supported === true && v.categoryCorrect === true && v.answerRelevant === true;
 export async function runtimeJudge(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {

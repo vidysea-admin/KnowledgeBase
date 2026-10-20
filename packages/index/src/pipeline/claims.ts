@@ -139,6 +139,7 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
       let accepted = proposed;
       if (dropped) {
         const verdicts = await runtimeVerdicts(complete, "claims", turns, sp, proposed);
+        if (verdicts.advisory) dropped.push({ what: "unknown", reason: verdicts.advisory, excerpt: "" });
         accepted = proposed.filter((c) => verdictPasses(verdicts.find((v) => v.id === c.id)) || (dropped.push({ what: "claim", reason: "independent judge rejected the claim", excerpt: c.text.slice(0, 120) }), false));
         if (jc) {
           const keep = await judgeCandidates(jc, turns, accepted.map((c) => ({ id: c.id, kind: "claim", note: c.text, evidence: c.evidence })));
@@ -147,7 +148,7 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
         }
       } else await runtimeJudge(complete, "claims", turns, sp, proposed);
       return accepted;
-    }, (parts) => parts.flat(), () => rejectedFeedback(dropped, mark));
+    }, (parts) => parts.flat(), () => rejectedFeedback(dropped, mark), [] as never[], (e) => dropped?.push({ what: "unknown", reason: `window part skipped, not processed: ${e.message}`, excerpt: "" }));
     for (const c of accepted) result.set(c.id, { text: c.text, evidenceTurnIds: c.evidence.map((e) => e.turnId), evidence: c.evidence, origin: c.origin, verification: c.verification });
   }
   return [...result.values()];

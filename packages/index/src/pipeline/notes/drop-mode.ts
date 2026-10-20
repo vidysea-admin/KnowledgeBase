@@ -66,6 +66,7 @@ export async function collectWindow(complete: RuntimeComplete, turns: Turns[], s
   for (const raw of runtimeArray(rawItems)) { const i = tryItem(raw, turns, spans, log, !!jc); if (i) items.set(i.id, i); }
   for (const raw of runtimeArray(rawQa)) { const q = tryQA(raw, turns, spans, spans, log, !!jc); if (q) qa.set(q.id, q); }
   const verdicts = await runtimeVerdicts(complete, "summarize", turns, spans, [...items.values(), ...qa.values()]);
+  if (verdicts.advisory) log.push({ what: "unknown", reason: verdicts.advisory, excerpt: "" });
   const out = applyVerdicts(verdicts, items, qa, log);
   return jc ? applyNoteJudge(jc, turns, out.items, out.qa, log) : out;
 }
@@ -114,6 +115,7 @@ function applyVerdicts(verdicts: RuntimeVerdict[], items: Map<string, CitedItem>
 /** Judge pending-question candidates; a candidate the judge rejects is discarded and the prior unanswered question stands. */
 export async function judgePendingCandidates(complete: RuntimeComplete, turns: Turns[], spans: RuntimeSpan[], candidates: QaEntry[], log: DroppedNote[], jc?: JudgeContext): Promise<QaEntry[]> {
   const verdicts = await runtimeVerdicts(complete, "summarize", turns, spans, candidates, "pending-qa");
+  if (verdicts.advisory) log.push({ what: "unknown", reason: verdicts.advisory, excerpt: "" });
   const byId = new Map(verdicts.map((v) => [v.id, v]));
   const passed = candidates.filter((c) => c.status === "unanswered" || (verdictPasses(byId.get(c.id)) || (log.push({ what: "qa-answer", reason: "judge rejected the late answer", excerpt: c.question.slice(0, 120) }), false)));
   if (!jc) return passed;

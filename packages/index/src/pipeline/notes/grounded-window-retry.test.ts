@@ -1,6 +1,5 @@
 /**
- * T-040 live fix (2026-10-19): a judge verdict of "extraction incomplete" is retried ONCE with a re-extraction of that
- * window; a second incomplete verdict still degrades the page (the bar is unchanged). Fake `complete` only; no network.
+ * T-040 live fix: a malformed judge acknowledgement is retried (halves, hinted, verifier model); a part that still fails is skipped, never thrown (D-185). Fake `complete` only; no network.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -26,12 +25,13 @@ function fake(kind: "summarize" | "claims", incompleteJudgements: number) {
       const list = spans.map((s) => ({ kind: "insight", text: s.text, origin: s.origin, verification: "unverified", evidence: [{ turnId: s.turnId, sessionId: s.sessionId, quote: s.text }] }));
       return done(kind === "summarize" ? { processed: p.inventory, qa: [], items: list } : { processed: p.inventory, claims: list.map(({ kind: _k, ...c }) => c) });
     }
-    return done({ processed: p.inventory, complete: ++judged > incompleteJudgements, noContent: false, noClaims: false, verdicts: ((p.items ?? []) as { id: string }[]).map((x) => ({ id: x.id, supported: true, categoryCorrect: true, answerRelevant: true })) });
+    const badAck = ++judged <= incompleteJudgements;
+    return done({ processed: badAck ? spans.map((x) => x.turnId) : p.inventory, complete: true, noContent: false, noClaims: false, verdicts: ((p.items ?? []) as { id: string }[]).map((x) => ({ id: x.id, supported: true, categoryCorrect: true, answerRelevant: true })) });
   };
   return { complete, phases, hints, kinds };
 }
 
-test("summary: one incomplete judge verdict is cured by re-extracting the window as two hinted halves", async () => {
+test("summary: one malformed judge reply is cured by re-extracting the window as two hinted halves", async () => {
   const f = fake("summarize", 1);
   const r = await summarizeSession(turns, f.complete as never, { strictWebinar: true });
   assert.equal(r.degraded, null);
@@ -43,11 +43,11 @@ test("summary: one incomplete judge verdict is cured by re-extracting the window
   assert.deepEqual(f.kinds, ["summarize", "output-verifier", "output-verifier"]); // hybrid: retries extract with the verifier model
 });
 
-test("summary: a second incomplete verdict still degrades the page (bounded, bar not relaxed)", async () => {
-  const f = fake("summarize", 2);
+test("summary: persistent protocol failure is bounded (3 extracts), emits nothing, degrades only because no grounded insight exists", async () => {
+  const f = fake("summarize", 99);
   const r = await summarizeSession(turns, f.complete as never, { strictWebinar: true });
-  assert.match(r.degraded?.reason ?? "", /informative extraction gap or incomplete semantic review/);
-  assert.equal(f.phases.filter((x) => x === "extract-summary").length, 2); // full window, then the first half fails again: stop
+  assert.ok(r.degraded); assert.equal(r.page.citedItems, undefined);
+  assert.equal(f.phases.filter((x) => x === "extract-summary").length, 3); // full window, then each lone-span half once
 });
 
 test("claims: same bounded half-window retry", async () => {
@@ -56,10 +56,10 @@ test("claims: same bounded half-window retry", async () => {
   assert.equal(r.degraded, null);
   assert.equal(r.claims.length, 2);
   assert.equal(ok.phases.filter((x) => x === "extract-claims").length, 3);
-  const bad = fake("claims", 2);
+  const bad = fake("claims", 99);
   const d = await extractClaims(turns, bad.complete as never, { strictWebinar: true, dropUnverified: true });
-  assert.match(d.degraded?.reason ?? "", /incomplete semantic review/);
-  assert.equal(bad.phases.filter((x) => x === "extract-claims").length, 2);
+  assert.equal(d.degraded, null); assert.deepEqual(d.claims, []); // skipped, not crashed
+  assert.equal(bad.phases.filter((x) => x === "extract-claims").length, 3);
 });
 
 test("coverage acknowledgement: the span's own sessionId echo is tolerated; strings, other extra keys and altered rows are retryable protocol errors", async () => {

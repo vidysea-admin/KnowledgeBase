@@ -2459,3 +2459,18 @@ fourth would have left real decisions idle behind an unrelated unit.
 - the LKB_WA_DISCOVERY flag wiring
 **Approved-by:** Umesh
 **Links:** T-036, T-038, D-167, D-178, ISS-WAVECTORLESS-001
+
+## D-185 | 2026-10-20 | type: decision | status: ACTIVE
+**Title:** T-040 summary completeness becomes advisory; quote grounding stays strict
+**What:** Records the Approver ruling given in chat on 2026-10-20. Question asked: "for summaries of dense sessions, either loosen the check that confirms nothing important was left out, or keep it strict and accept fewer summaries." Answer, verbatim: "nothing need to be mentioned and more summaries".
+- Rule 1, completeness is advisory. The independent judge's completeness/omission result (complete=false, noContent, noClaims) no longer fails a window or a session. It is stored as a coverage note on the output. A window with no verified item is skipped.
+- Rule 2, grounding unchanged. Every insight, decision, action, claim and Q&A answer must still be a verified verbatim quote with a timestamp citation, pass the sentence-span rules and the per-item judge verdicts (supported, category, relevance).
+- Rule 3, protocol noise. A malformed processed-span echo or non-object reply is retried once and then counts as not processed; it never crashes the session.
+**Why:** On a real 51-minute session the strict completeness gate rejected every attempt although the extracted items were grounded, so no summary was produced at all. The Approver prefers more summaries over exhaustive ones.
+**Result:** packages/index/src/pipeline completeness handling is made advisory (lane w25-t040fix). No grounding or quote-verification check is relaxed.
+**Amends:** None superseded. Narrows only the completeness requirement of the T-040 strict producer.
+**Changes-authorized:**
+- packages/index/src/pipeline/grounded.ts, grounded-summary.ts, claims.ts, notes/drop-mode.ts with tests
+- qa/manifests/w25-t040fix.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-040, D-162, D-144, D-151, qa/manifests/w25-t040fix.md
