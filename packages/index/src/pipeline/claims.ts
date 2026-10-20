@@ -18,7 +18,7 @@ import { resolveEvidence, extractiveText } from "./notes/evidence.js";
 import { runtimeVerdicts, verdictPasses } from "./grounded.js";
 import { lexicalHits, settleDrop, type DroppedNote } from "./notes/drop-mode.js";
 import { makeJudgeContext, judgeCandidates, type JudgeContext, type JudgeSidecar, type NoteJudge } from "./notes/judge.js";
-import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
+import { runtimeChronologicalTurns, runtimeWindows, runtimeComplete, runtimeRecord, runtimeArray, assertRuntimeCoverage, runtimeInventory, runtimeEvidence, runtimeExtractive, runtimeEvidenceOrigin, runtimeDigest, runtimeJudge, withWindowRetry, rejectedFeedback, RETRY_EXTRACT_KIND, QUOTE_RULE, type RuntimeEvidence, type RuntimeOrigin } from "./grounded.js";
 
 export type ClaimsCompleteFn = (job: Job) => Promise<CompleteResult>;
 
@@ -122,29 +122,40 @@ export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn, 
 async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, dropped?: DroppedNote[], jc?: JudgeContext): Promise<ExtractedClaim[]> {
   turns = runtimeChronologicalTurns(turns);
   const result = new Map<string, ExtractedClaim>();
+  let proposedTotal = 0, groundedTotal = 0; // raw claims the model proposed; grounding failure (not completeness) is judged on this
   for (const spans of runtimeWindows(turns)) {
-    const raw = runtimeRecord(await runtimeComplete(complete, "claims",
-      'Read ALL supplied source spans; return {processed:exact inventory,claims:[{text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}]}. Extract atomic factual source statements only. Text equals literal evidence quotes joined by newline, and every quote lies entirely inside a submitted span. Preserve unverified screen origin. Return claims:[] only if no factual claim exists; no made-up facts or speaker identities.',
-      { phase: "extract-claims", spans, inventory: runtimeInventory(spans) }));
-    assertRuntimeCoverage(raw.processed, spans);
-    const proposed = dropped ? dropUnverifiedClaims(runtimeArray(raw.claims), turns, spans, dropped, !!jc) : runtimeArray(raw.claims).map((entry) => {
-      const c = runtimeRecord(entry), evidence = runtimeEvidence(c.evidence, turns, spans), origin = runtimeEvidenceOrigin(evidence, turns);
-      if (c.origin !== origin || c.verification !== "unverified") throw new Error("claim source origin mismatch");
-      return { id: runtimeDigest(["claim", evidence]), text: runtimeExtractive(c.text, evidence), origin, verification: "unverified" as const, evidence };
-    });
-    if (!dropped && new Set(proposed.map((c) => c.id)).size !== proposed.length) throw new Error("duplicate proposed claim");
-    let accepted = proposed;
-    if (dropped) {
-      const verdicts = await runtimeVerdicts(complete, "claims", turns, spans, proposed);
-      accepted = proposed.filter((c) => verdictPasses(verdicts.find((v) => v.id === c.id)) || (dropped.push({ what: "claim", reason: "independent judge rejected the claim", excerpt: c.text.slice(0, 120) }), false));
-      if (jc) {
-        const keep = await judgeCandidates(jc, turns, accepted.map((c) => ({ id: c.id, kind: "claim", note: c.text, evidence: c.evidence })));
-        // D-151 (pending append): the judge AND the lexical rules both gate a claim; the sidecar records which dropped it.
-        accepted = accepted.filter((c) => { const r = settleDrop(jc, keep, c.id, "claim", c.text, c.evidence, c); return r === undefined || (dropped.push({ what: "claim", reason: r, excerpt: c.text.slice(0, 120) }), false); });
-      }
-    } else await runtimeJudge(complete, "claims", turns, spans, proposed);
+    let mark = 0; // drop-log start of the CURRENT attempt, so a failed half rolls back only its own rejections
+    const accepted = await withWindowRetry(spans, async (sp, hint) => {
+      mark = dropped?.length ?? 0;
+      const raw = runtimeRecord(await runtimeComplete(complete, hint ? RETRY_EXTRACT_KIND : "claims",
+        'Read ALL supplied source spans; return {processed:exact inventory,claims:[{text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}]}. Extract atomic factual source statements only. Text equals literal evidence quotes joined by newline, and every quote lies entirely inside a submitted span. Preserve unverified screen origin. Return claims:[] only if no factual claim exists; no made-up facts or speaker identities.' + QUOTE_RULE,
+        { phase: "extract-claims", spans: sp, inventory: runtimeInventory(sp), ...(hint ? { retry: hint } : {}) }));
+      assertRuntimeCoverage(raw.processed, sp);
+      proposedTotal += runtimeArray(raw.claims).length;
+      const proposed = dropped ? dropUnverifiedClaims(runtimeArray(raw.claims), turns, sp, dropped, !!jc) : runtimeArray(raw.claims).map((entry) => {
+        const c = runtimeRecord(entry), evidence = runtimeEvidence(c.evidence, turns, sp), origin = runtimeEvidenceOrigin(evidence, turns);
+        if (c.origin !== origin || c.verification !== "unverified") throw new Error("claim source origin mismatch");
+        return { id: runtimeDigest(["claim", evidence]), text: runtimeExtractive(c.text, evidence), origin, verification: "unverified" as const, evidence };
+      });
+      groundedTotal += proposed.length; // proposals that passed the quote/sentence/origin verification
+      if (!dropped && new Set(proposed.map((c) => c.id)).size !== proposed.length) throw new Error("duplicate proposed claim");
+      let accepted = proposed;
+      if (dropped) {
+        const verdicts = await runtimeVerdicts(complete, "claims", turns, sp, proposed);
+        if (verdicts.advisory) dropped.push({ what: "unknown", reason: verdicts.advisory, excerpt: "" });
+        accepted = proposed.filter((c) => verdictPasses(verdicts.find((v) => v.id === c.id)) || (dropped.push({ what: "claim", reason: "independent judge rejected the claim", excerpt: c.text.slice(0, 120) }), false));
+        if (jc) {
+          const keep = await judgeCandidates(jc, turns, accepted.map((c) => ({ id: c.id, kind: "claim", note: c.text, evidence: c.evidence })));
+          // D-151 (pending append): the judge AND the lexical rules both gate a claim; the sidecar records which dropped it.
+          accepted = accepted.filter((c) => { const r = settleDrop(jc, keep, c.id, "claim", c.text, c.evidence, c); return r === undefined || (dropped.push({ what: "claim", reason: r, excerpt: c.text.slice(0, 120) }), false); });
+        }
+      } else await runtimeJudge(complete, "claims", turns, sp, proposed);
+      return accepted;
+    }, (parts) => parts.flat(), () => rejectedFeedback(dropped, mark), [] as never[], (e) => dropped?.push({ what: "unknown", reason: `window part skipped, not processed: ${e.message}`, excerpt: "" }));
     for (const c of accepted) result.set(c.id, { text: c.text, evidenceTurnIds: c.evidence.map((e) => e.turnId), evidence: c.evidence, origin: c.origin, verification: c.verification });
   }
+  // D-185 makes completeness advisory, NOT grounding: a stage whose every proposal failed quote verification emits nothing and is refused (typed degrade), never silently empty.
+  if (dropped && proposedTotal > 0 && groundedTotal === 0) throw new Error("every proposed claim failed grounding verification");
   return [...result.values()];
 }
 

@@ -305,7 +305,8 @@ test("strict claims require literal submitted quotes and separate complete suppo
     };
     const result = await extractClaims(turns, complete, { strictWebinar: true });
     if (fault === "none") { assert.equal(result.degraded, null); assert.equal(result.claims[0]!.evidence![0]!.quote, turns[0]!.text); assert.equal(result.claims[0]!.verification, "unverified"); }
-    else { assert.ok(result.degraded, fault); assert.deepEqual(result.claims, [], fault); }
+    else if (fault === "empty-gap") { assert.equal(result.degraded, null, "D-185: completeness is advisory"); assert.deepEqual(result.claims, []); }
+    else { if (["wrong-valid", "unsupported"].includes(fault)) assert.ok(result.degraded, fault); /* D-185: protocol noise is retried then skipped, never emitted */ assert.deepEqual(result.claims, [], fault); }
   }
 });
 test("strict no-claim result is distinct only after explicit full semantic no-content review", async () => {

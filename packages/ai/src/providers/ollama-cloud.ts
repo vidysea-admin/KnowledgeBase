@@ -14,6 +14,8 @@ export interface OllamaCloudConfig {
   primaryModel?: string;
   verifierModel?: string;
   timeoutMs?: number;
+  /** Waits before each retry of a transient HTTP failure (HTTP 429 only; 5xx still fails over to the next model at once); default [4000, 12000, 30000]. [] disables retry. */
+  retryDelaysMs?: number[];
 }
 
 type StructuredJob = Job & {
@@ -46,14 +48,26 @@ export class OllamaCloudProvider implements Provider {
       throw new Error("ollama cloud requires the official HTTPS endpoint");
     }
     this.baseUrl = endpoint.origin;
-    this.timeoutMs = config.timeoutMs ?? 120_000;
+    this.timeoutMs = config.timeoutMs ?? 240_000;
     if (!Number.isSafeInteger(this.timeoutMs) || this.timeoutMs < 1 || this.timeoutMs > 300_000) {
       throw new Error("ollama cloud timeout must be between 1 and 300000 ms");
     }
     if (!model.trim() || /[\r\n]/.test(model)) throw new Error("ollama cloud model is invalid");
   }
 
+  /** Bounded backoff retry of rate limiting (live 2026-10-19: parallel summarize+claims+judge calls drew 429 from both models at once). */
   async complete(job: Job): Promise<CompleteResult> {
+    const delays = this.config.retryDelaysMs ?? [4000, 12000, 30000];
+    for (let attempt = 0; ; attempt++) {
+      try { return await this.attempt(job); }
+      catch (error) {
+        if (attempt >= delays.length || !(error instanceof Error) || !/^ollama cloud API error HTTP 429$/.test(error.message)) throw error;
+        await new Promise((resolve) => setTimeout(resolve, delays[attempt]));
+      }
+    }
+  }
+
+  private async attempt(job: Job): Promise<CompleteResult> {
     const key = this.config.apiKey?.trim();
     if (!key || /[\r\n]/.test(key)) throw new Error("ollama cloud credentials unavailable");
     if (job.tools?.length) throw new Error("ollama cloud text adapter does not support tool execution");

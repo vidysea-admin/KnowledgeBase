@@ -24,11 +24,11 @@ export interface RuntimeSpan {
 export const runtimeDigest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 export function runtimeRecord(value: unknown): Record<string, unknown> {
     if (!value || typeof value !== "object" || Array.isArray(value))
-        throw new Error("expected evidence object");
+        throw new RuntimeIncompleteError("expected evidence object");
     return value as Record<string, unknown>;
 }
 export function runtimeArray(value: unknown): unknown[] { if (!Array.isArray(value))
-    throw new Error("expected evidence array"); return value; }
+    throw new RuntimeIncompleteError("expected evidence array"); return value; }
 export function runtimeString(value: unknown): string { if (typeof value !== "string" || !value.trim())
     throw new Error("expected evidence text"); return value; }
 export function runtimeOrigin(turn: Turns): RuntimeOrigin {
@@ -82,14 +82,18 @@ export function runtimeRequestBudget(env: Record<string, string | undefined> = p
 }
 /** Exact size of the extract request a window produces: spans plus the duplicated inventory plus wrapper. */
 const extractPayloadLength = (spans: RuntimeSpan[]) => JSON.stringify({ phase: "extract-summary", spans, inventory: runtimeInventory(spans) }).length;
+/** Dense windows defeat the completeness judge (live 2026-10-19): a window holds <= windowTextCap(budget) characters (spans no longer than that) of source text. */
+export const windowTextCap = (budget: number) => Math.floor(budget / 8); // 16000 -> 2000; a larger budget still yields fewer windows
+/** Retries extract with the verifier model (multi-model hybrid): the router chain for this kind is the verifier alone. */
+export const RETRY_EXTRACT_KIND = "output-verifier";
 export function runtimeWindows(turns: Turns[], budget = runtimeRequestBudget()): RuntimeSpan[][] {
-    const spanBudget = Math.floor(budget * 3 / 4), fits = (spans: RuntimeSpan[]) => JSON.stringify(spans).length <= spanBudget && extractPayloadLength(spans) <= budget;
+    const spanBudget = Math.floor(budget * 3 / 4), fits = (spans: RuntimeSpan[]) => spans.reduce((n, x) => n + x.text.length, 0) <= windowTextCap(budget) && JSON.stringify(spans).length <= spanBudget && extractPayloadLength(spans) <= budget;
     turns = runtimeChronologicalTurns(turns);
     const spans: RuntimeSpan[] = [];
     for (const turn of turns) {
         let from = 0;
         do {
-            let to = Math.min(from + 4000, turn.text.length);
+            let to = Math.min(from + Math.min(4000, windowTextCap(budget)), turn.text.length);
             if (to < turn.text.length && /[\uD800-\uDBFF]/.test(turn.text[to - 1]!))
                 to--;
             const text = turn.text.slice(from, to);
@@ -118,13 +122,17 @@ export function runtimeWindows(turns: Turns[], budget = runtimeRequestBudget()):
 export const runtimeInventory = (spans: RuntimeSpan[]) => spans.map(({ turnId, from, to, digest }) => ({ turnId, from, to, digest }));
 export function assertRuntimeCoverage(value: unknown, spans: RuntimeSpan[]): void {
     const rows = runtimeArray(value).map((entry) => {
-        const r = runtimeRecord(entry);
-        if (Object.keys(r).sort().join(",") !== "digest,from,to,turnId")
-            throw new Error("invalid processed-span shape");
+        if (!entry || typeof entry !== "object" || Array.isArray(entry))
+            throw new RuntimeIncompleteError("invalid processed-span shape"); // e.g. a bare turn id string instead of the inventory row
+        const r = entry as Record<string, unknown>;
+        // Models echo the whole span object (GLM, live 2026-10-19): the span's own sessionId is tolerated, never any other extra key.
+        const keys = Object.keys(r).filter((k) => k !== "sessionId" || !spans.some((s) => s.sessionId === r.sessionId)).sort().join(",");
+        if (keys !== "digest,from,to,turnId")
+            throw new RuntimeIncompleteError("invalid processed-span shape");
         return { turnId: r.turnId, from: r.from, to: r.to, digest: r.digest };
     });
     if (JSON.stringify(rows) !== JSON.stringify(runtimeInventory(spans)))
-        throw new Error("incomplete or altered processed-span acknowledgement");
+        throw new RuntimeIncompleteError("incomplete or altered processed-span acknowledgement");
 }
 export function runtimeEvidence(value: unknown, turns: Turns[], spans?: RuntimeSpan[]): NonEmptyEvidence {
     const evidence = runtimeArray(value).map((raw) => {
@@ -176,18 +184,51 @@ export function runtimeQA(raw: unknown, turns: Turns[], questionSpans?: RuntimeS
     const answerEvidence = runtimeEvidence(r.answerEvidence, turns, answerSpans);
     return { id, question, questionEvidence, answer: runtimeExtractive(r.answer, answerEvidence), answerEvidence, status: "answered" };
 }
-export async function runtimeComplete(complete: RuntimeComplete, kind: "summarize" | "claims", system: string, payload: unknown, budget = runtimeRequestBudget()): Promise<unknown> {
+export async function runtimeComplete(complete: RuntimeComplete, kind: "summarize" | "claims" | typeof RETRY_EXTRACT_KIND, system: string, payload: unknown, budget = runtimeRequestBudget()): Promise<unknown> {
     const content = JSON.stringify(payload);
     if (content.length > budget)
         throw new Error("complete evidence context exceeds request budget");
     const result = await complete({ kind, messages: [{ role: "system", content: system }, { role: "user", content }] });
     return result.json ?? parseJsonLoose(result.text);
 }
+/** Judge verdict that the extractor omitted informative content: the one failure a fresh extraction of the same window can legitimately cure. */
+export class RuntimeIncompleteError extends Error {
+}
+/** Verifier edge rule (notes/sentence-span.ts), stated to the extractor so quotes are not dropped for their cut points; the verifier itself is unchanged. */
+export const QUOTE_RULE = " Each evidence quote must be one or more WHOLE sentences or clauses copied exactly: begin at the start of the turn or right after . ? ! , ; : and end ON a . ? ! , ; : mark or at the turn end. Never begin or stop mid-sentence, and never end on a dangling vocative or fragment such as a trailing name; if a sentence is cut short in the source, quote the whole preceding clause instead.";
+export const RETRY_HINT = "A previous independent review found informative statements omitted from an earlier attempt at these exact spans. Extract EVERY informative statement: lists of offerings, methods, plans, numbers, dates and conflicting statements, each as its own exact whole-sentence quote. Offers, requests and suggestions are insights, never actions." + QUOTE_RULE;
+/** Rolls the drop log back to `mark` and returns the verifier's rejections since then (reason + excerpt), to tell the extractor what to re-quote. */
+export function rejectedFeedback(log: { reason: string; excerpt: string }[] | undefined, mark: number): string {
+    if (!log)
+        return "";
+    const rejected = log.splice(mark).filter((d) => d.excerpt).slice(0, 12).map((d) => `${d.reason}: "${d.excerpt}"`);
+    return rejected.length ? " Rejected last time (re-quote these as whole sentences): " + rejected.join(" | ") : "";
+}
+/** Runs one window's extract+judge. A malformed acknowledgement/reply or missing per-item verdict (RuntimeIncompleteError) is retried: a lone span once, else as two halves (recursively), each told which proposals the verifier rejected (`rollback` returns that feedback). A part that still fails is SKIPPED (`empty`, reported via `onSkip`), never thrown: D-185 treats it as not processed. Grounding failures of single items are dropped by the callers, not here. */
+export async function withWindowRetry<T>(spans: RuntimeSpan[], run: (spans: RuntimeSpan[], hint?: string) => Promise<T>, join: (parts: T[]) => T, rollback: () => string, empty: T, onSkip: (error: Error) => void, hint?: string): Promise<T> {
+    try {
+        return await run(spans, hint);
+    }
+    catch (error) {
+        if (!(error instanceof RuntimeIncompleteError))
+            throw error;
+        const next = RETRY_HINT + rollback();
+        if (spans.length < 2 && hint !== undefined) {
+            onSkip(error);
+            return empty;
+        }
+        if (spans.length < 2)
+            return withWindowRetry(spans, run, join, rollback, empty, onSkip, next);
+        const mid = Math.ceil(spans.length / 2), first = await withWindowRetry(spans.slice(0, mid), run, join, rollback, empty, onSkip, next);
+        return join([first, await withWindowRetry(spans.slice(mid), run, join, rollback, empty, onSkip, next)]);
+    }
+}
+export type RuntimeVerdicts = RuntimeVerdict[] & { advisory?: string };
 export interface RuntimeVerdict { id: string; supported: unknown; categoryCorrect: unknown; answerRelevant: unknown }
 /** Runs the independent judge and returns the verdict records; protocol failures (coverage, completeness, missing/duplicate/unknown ids) still throw. */
 export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {
     id: string;
-}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<RuntimeVerdict[]> {
+}[], mode: "summary-extraction" | "claim-extraction" | "pending-qa" = kind === "claims" ? "claim-extraction" : "summary-extraction"): Promise<RuntimeVerdicts> {
     const citedIds = new Set(spans.map((s) => s.turnId));
     for (const item of items)
         for (const key of ["evidence", "questionEvidence", "answerEvidence"]) {
@@ -201,14 +242,14 @@ export async function runtimeVerdicts(complete: RuntimeComplete, kind: "summariz
     if (JSON.stringify(context).length > runtimeRequestBudget() * 3)
         throw new Error("full semantic context exceeds48K budget");
     const raw = runtimeRecord(await runtimeComplete(complete, kind, (mode === "pending-qa" ? 'Review exactly every pending question candidate; completeness is per-question judgment, not new insight extraction. ' : mode === "claim-extraction" ? 'Review factual claim extraction completeness; informative but fact-free source may have noClaims=true. ' : 'Review informative summary extraction completeness. ') +
-        'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions; noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 4));
+        'Independently check all submitted source spans and proposed extracts using full source and adjacent context. Return {processed: exact span inventory, complete: true|false, noContent: true|false, noClaims: true|false, verdicts:[{id,supported:boolean,categoryCorrect:boolean,answerRelevant:boolean}]}. Verdict every id exactly once. Negated/proposed adoption is not a decision; suggestions are not assigned actions. A quoted answer must answer its quoted question. Screen OCR/visual observations are unverified source observations, never verified speaker facts. complete=false for omissions of informative content INSIDE the submitted spans only: adjacent context turns outside the spans belong to other windows and never make complete=false. noContent=true only if these source spans contain no informative extract. No extra IDs.', { phase: "judge", mode, spans, context, items, inventory: runtimeInventory(spans) }, runtimeRequestBudget() * 4));
     assertRuntimeCoverage(raw.processed, spans);
-    if (raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)))
-        throw new Error("informative extraction gap or incomplete semantic review");
+    // D-185: completeness is ADVISORY. The omission verdict is reported on the result, never thrown; per-item verdicts below remain a hard gate.
+    const advisory = raw.complete !== true || (items.length === 0 && (mode === "claim-extraction" ? raw.noClaims !== true : mode === "summary-extraction" && raw.noContent !== true)) ? "coverage advisory: judge reported informative content not extracted (D-185)" : undefined;
     const verdicts = runtimeArray(raw.verdicts).map(runtimeRecord);
     if (verdicts.length !== items.length || new Set(verdicts.map((v) => v.id)).size !== verdicts.length || verdicts.some((v) => !items.some((item) => item.id === v.id)))
-        throw new Error("missing/failed/unknown semantic verdict");
-    return verdicts as unknown as RuntimeVerdict[];
+        throw new RuntimeIncompleteError("missing/failed/unknown semantic verdict");
+    return Object.assign(verdicts as unknown as RuntimeVerdict[], { advisory });
 }
 export const verdictPasses = (v: RuntimeVerdict | undefined) => v?.supported === true && v.categoryCorrect === true && v.answerRelevant === true;
 export async function runtimeJudge(complete: RuntimeComplete, kind: "summarize" | "claims", turns: Turns[], spans: RuntimeSpan[], items: {

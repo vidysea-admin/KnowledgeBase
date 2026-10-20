@@ -45,10 +45,10 @@ function retractsPrevious(seg: string): boolean {
  */
 const LOWER_ABBREVIATIONS = new Set([
   "etc", "vs", "viz", "cf", "approx", "est", "dept", "govt", "inc", "ltd", "co", "corp", "jr", "sr", "dr", "mr", "mrs", "ms", "mx", "prof", "st", "mt", "fig", "eq",
-  "min", "max", "avg", "sec", "hrs", "yrs", "rs", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "sept", "oct", "nov", "dec", "mon", "tue", "wed", "thu", "fri", "sat", "sun",
+  "pvt", "univ", "mgmt", "pg", "ug", "asst", "assoc", "qtr", "sch", "prin", "mins", "secs", "min", "max", "avg", "sec", "hrs", "yrs", "rs", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sep", "sept", "oct", "nov", "dec", "mon", "tue", "wed", "thu", "fri", "sat", "sun",
 ]);
 const LOWER = /\p{Ll}/u;
-const SHORT_TOKEN_LETTERS = 4;
+const SHORT_TOKEN_LETTERS = 2; // Coordinator ruling 2026-10-19: a lower-case word of >= 3 letters before ". " + capital is a break; unlisted abbreviations belong in LOWER_ABBREVIATIONS
 const APOS = new Set(["'", "’"]);
 const OPEN_OR_WS = (c: string) => WS.test(c) || OPENERS.has(c);
 
@@ -71,7 +71,10 @@ function isBoundary(t: string, i: number): boolean {
   let s = i; while (s > 0 && (/[\p{L}\p{N}.]/u.test(t[s - 1]!) || (APOS.has(t[s - 1]!) && s > 1 && /\p{L}/u.test(t[s - 2]!) && /\p{L}/u.test(t[s]!)))) s--;
   const word = t.slice(s, i);
   const letters = [...word].filter((c) => !APOS.has(c)).join("");
-  const ordinary = [...letters].length >= 2 && !word.includes(".") && [...letters].every((c) => LOWER.test(c)) && !LOWER_ABBREVIATIONS.has(word);
+  const lowerWord = [...letters].length >= 2 && !word.includes(".") && [...letters].every((c) => LOWER.test(c)) && !LOWER_ABBREVIATIONS.has(word);
+  // Coordinator ruling 2026-10-19 (T-040 live fix): an ALL-CAPS token of >= 2 letters ("GMAT.", "TOC.") ends a sentence when a capital follows; listed abbreviations never do.
+  const allCaps = [...letters].length >= 2 && !word.includes(".") && [...letters].every((c) => /\p{Lu}/u.test(c)) && !LOWER_ABBREVIATIONS.has(word.toLowerCase());
+  const ordinary = lowerWord || allCaps;
   const number = /^\p{Nd}+$/u.test(word);
   if (!ordinary && !number) return false;
   if (number && /^\p{Nd}{1,2}$/u.test(word)) { // "1. Apply" / "2. Fees": a list number opening a sentence; a number ending one ("detail 3. Next") is a real break
@@ -83,9 +86,10 @@ function isBoundary(t: string, i: number): boolean {
   // dictionary is available in node_modules. Fail closed WHERE IT MATTERS: do not break when the sentence so far holds a negation/qualifier marker (a wrong break there
   // would hide the marker from a quote that starts after it). ISS-T040GEN-012: the same holds for a marker AFTER the dot (up to the next strong mark): the left fragment would ship
   // and drop it, so that case merges too. With no marker on either side a wrong break cannot drop a negation, so it stays a break (recall).
-  if (!number && [...letters].length <= SHORT_TOKEN_LETTERS && n < t.length && /\p{Lu}/u.test(t[n]!) && (MARKER.test(t.slice(sentenceStart(t, i), i)) || MARKER.test(tailToStrongMark(t, n)))) return false;
+  if (!number && !allCaps && [...letters].length <= SHORT_TOKEN_LETTERS && n < t.length && /\p{Lu}/u.test(t[n]!) && (MARKER.test(t.slice(sentenceStart(t, i), i)) || MARKER.test(tailToStrongMark(t, n)))) return false;
   if (word === "no" && n < t.length && /\p{N}/u.test(t[n]!)) return false;
   if (n < t.length && LOWER.test(t[n]!)) return false;
+  if (allCaps && n < t.length && !/\p{Lu}/u.test(t[n]!)) return false;
   return true;
 }
 

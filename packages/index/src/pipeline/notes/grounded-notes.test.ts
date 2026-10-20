@@ -161,7 +161,6 @@ test("protocol failures still degrade the whole page (coverage, incomplete judge
   const ext = () => ({ items: [item("insight", "t1", FEE)] });
   const faults: [string, Script["mutate"]][] = [
     ["coverage hole", (ph, r) => { if (ph === "extract-summary") r.processed = []; }],
-    ["judge incomplete", (ph, r) => { if (ph === "judge") r.complete = false; }],
     ["judge missing verdict", (ph, r) => { if (ph === "judge") r.verdicts.pop(); }],
     ["judge unknown id", (ph, r) => { if (ph === "judge") r.verdicts[0].id = "zzz"; }],
     ["items not an array", (ph, r) => { if (ph === "extract-summary") r.items = "x"; }],
@@ -173,6 +172,12 @@ test("protocol failures still degrade the whole page (coverage, incomplete judge
   // every proposal fabricated while the judge says the window is informative: gap -> degraded, nothing emitted
   const r = await run(turns, model({ extract: () => ({ items: [item("insight", "t1", "Invented sentence that is not there.")] }), mutate: (ph, x) => { if (ph === "judge") x.noContent = false; } }));
   assert.ok(r.degraded); assert.equal(r.page.citedItems, undefined);
+});
+
+test("D-185: judge complete=false is advisory -- grounded items still ship and the omission is reported", async () => {
+  const r = await run(base(), model({ extract: () => ({ items: [item("insight", "t1", FEE)] }), mutate: (ph, x) => { if (ph === "judge") x.complete = false; } }));
+  assert.equal(r.degraded, null); assert.equal(r.page.citedItems!.length, 1);
+  assert.ok(r.dropped!.some((d) => /coverage advisory/.test(d.reason)));
 });
 
 test("default strict mode is unchanged: without dropUnverified a bad item degrades the page", async () => {
