@@ -1,0 +1,1087 @@
+{
+ "url": "https://cloudonair.withgoogle.com/events/apac-cts-gemini-at-work-q4-2026",
+ "title": "Home - Cloud Technical Series: Gemini at Work",
+ "signedOut": false,
+ "signIn": true,
+ "scrollH": 9494,
+ "hits": [
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    1849,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t1-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    1862,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t1-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    1862,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t1-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    1862,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    2164,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t2-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    2177,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t2-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    2177,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t2-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    2177,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    2588,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t3-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    2601,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t3-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    2601,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t3-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    2601,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3002,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t4-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3015,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t4-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3015,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t4-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    3015,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3516,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t6-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3529,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t6-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3529,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t6-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    3529,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3818,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t7-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3831,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t7-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    3831,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t7-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    3831,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    4307,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t8-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    4320,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t8-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    4320,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t8-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    4320,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    4858,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t9-d1-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    4871,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t9-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    4871,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t9-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    4871,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5246,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t11-d1-eng\">\n  <i _ngcon"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5259,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t11-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5259,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t11-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    5259,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5640,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t12-d1-eng\">\n  <i _ngcon"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5653,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t12-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5653,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t12-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    5653,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5942,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t13-d1-eng\">\n  <i _ngcon"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5955,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t13-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    5955,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t13-d1-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    5955,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    6404,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t1-d2-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    6417,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t1-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    6417,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t1-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    6417,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    6947,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t2-d2-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    6960,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t2-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    6960,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t2-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    6960,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    7385,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t3-d2-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    7398,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t3-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    7398,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t3-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    7398,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    7662,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t4-d2-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    7675,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t4-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    7675,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t4-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    7675,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    8252,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t5-d2-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    8265,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t5-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    8265,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t5-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    8265,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  },
+  {
+   "tag": "DIV",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    8529,
+    395,
+    52
+   ],
+   "html": "<div _ngcontent-c67=\"\" class=\"watch\">\n  <!----><app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t8-d2-eng\">\n  <i _ngcont"
+  },
+  {
+   "tag": "APP-WATCH-LINK",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    8542,
+    121,
+    24
+   ],
+   "html": "<app-watch-link _ngcontent-c67=\"\" _nghost-c70=\"\"><!---->\n\n<!---->\n\n<!---->\n\n<!----><a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t8-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">v"
+  },
+  {
+   "tag": "A",
+   "role": null,
+   "matchesSEL": true,
+   "raw": "\"video_youtube\\nWatch now\"",
+   "vis": true,
+   "rect": [
+    326,
+    8542,
+    121,
+    24
+   ],
+   "html": "<a _ngcontent-c70=\"\" class=\"on-demand\" href=\"/events/apac-cts-gemini-at-work-q4-2026/watch?talk=t8-d2-eng\">\n  <i _ngcontent-c70=\"\" class=\"icon google-material-icons\">video_youtube</i>\n  <span _ngcontent-c70=\"\" class=\"text\">Watch now</span>\n</a>"
+  },
+  {
+   "tag": "SPAN",
+   "role": null,
+   "matchesSEL": false,
+   "raw": "\"Watch now\"",
+   "vis": true,
+   "rect": [
+    360,
+    8542,
+    87,
+    24
+   ],
+   "html": "<span _ngcontent-c70=\"\" class=\"text\">Watch now</span>"
+  }
+ ],
+ "controls": [
+  "A::false",
+  "A:Home:false",
+  "A:Speakers:false",
+  "A:Resources:false",
+  "A:FAQ:false",
+  "BUTTON:Register to watch on demand:false",
+  "BUTTON:Sign in:false",
+  "BUTTON:menu:false",
+  "A:Navigate to homepage:true",
+  "A:Home:true",
+  "A:Speakers:true",
+  "A:Resources:true",
+  "A:FAQ:true",
+  "BUTTON:Sign in:true",
+  "BUTTON:Register to watch on demand:true",
+  "BUTTON:Register to watch on demand:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A:link\nCopy link to share sessio:true",
+  "A:video_youtube\nWatch now:true",
+  "BUTTON:keyboard_arrow_down:false",
+  "BUTTON:keyboard_arrow_up:true",
+  "A::true",
+  "A::true",
+  "A::true",
+  "A::true",
+  "A::true",
+  "A:About Google:true",
+  "A:Google products:true",
+  "A:Privacy:true",
+  "A:Terms:true",
+  "A:Code of Conduct:true",
+  "A::true",
+  "BUTTON:Continue with Google:false",
+  "BUTTON:Continue with email:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Back:false",
+  "BUTTON:Next:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Back:false",
+  "BUTTON:Sign in with Google:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Forgot Password?:false",
+  "BUTTON:Back:false",
+  "BUTTON:Next:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Back:false",
+  "BUTTON:Next:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Resend email:false",
+  "BUTTON:Done:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Back:false",
+  "BUTTON:Reset Password:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Back:false",
+  "A:Privacy Policy:false",
+  "BUTTON:Sign out:false",
+  "BUTTON:Sign out:false",
+  "BUTTON:Sign out:false",
+  "BUTTON:Sign out:false"
+ ],
+ "tail": "\nTransform your workflows with AI agents\n\n\nDiscover how organisations create agents that can reason, plan, and tackle complex tasks – all in a governed workflow.\nGet hands-on with the latest AI tools\n\nLevel-up your technical skills and build with the help of our expert trainers in live hands-on labs.\nAccess no-cost training \n\nGet free access to Google Cloud labs and learning pathways. Earn skills badges to prove your new expertise.\nShare\nAbout Google\nGoogle products\nPrivacy\nTerms\nCode of Conduct"
+}

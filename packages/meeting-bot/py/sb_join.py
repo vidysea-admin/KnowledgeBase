@@ -29,6 +29,8 @@ from sb_join_detect import (  # noqa: F401
     is_meet_url, platform_of, should_force_reload)
 from sb_join_loop import run_session
 from sb_join_onair import OnairRefused, onair_enabled, onair_play, onair_prepare  # noqa: F401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "agent"))  # generic page agent lives in py/agent/ (dirsize budget)
+from sb_join_agent import agent_enabled, agent_prepare  # noqa: E402
 from sb_join_ownership import kill_orphans as _kill_orphans
 from sb_join_profile import existing_profile_directory, selected_uc_profile, validate_uc_profile_support
 from sb_join_recorder import recorder_link
@@ -127,7 +129,10 @@ def main():
                 emit("opened", url=sb.get_current_url())
                 onair = onair_enabled(a.url)  # LKB_ONAIR_WATCH=1 + cloudonair.withgoogle.com only; otherwise untouched
                 if onair:
-                    onair_prepare(sb, time=time, emit=emit, session=os.environ.get("LKB_ONAIR_SESSION"))
+                    if agent_enabled():  # LKB_PAGE_AGENT=1: the generic vision agent replaces the hard-coded Watch-now logic
+                        agent_prepare(sb, time=time, emit=emit)
+                    else:
+                        onair_prepare(sb, time=time, emit=emit, session=os.environ.get("LKB_ONAIR_SESSION"))
                 if a.capture_extension:
                     link.arm(15)
                     targets = command("Target.getTargets", {"filter": [{"type": "tab", "exclude": False}, {"exclude": True}]}).get("targetInfos", [])
