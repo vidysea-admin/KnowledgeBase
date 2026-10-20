@@ -122,6 +122,7 @@ export async function extractClaims(turns: Turns[], complete: ClaimsCompleteFn, 
 async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, dropped?: DroppedNote[], jc?: JudgeContext): Promise<ExtractedClaim[]> {
   turns = runtimeChronologicalTurns(turns);
   const result = new Map<string, ExtractedClaim>();
+  let proposedTotal = 0, groundedTotal = 0; // raw claims the model proposed; grounding failure (not completeness) is judged on this
   for (const spans of runtimeWindows(turns)) {
     let mark = 0; // drop-log start of the CURRENT attempt, so a failed half rolls back only its own rejections
     const accepted = await withWindowRetry(spans, async (sp, hint) => {
@@ -130,11 +131,13 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
         'Read ALL supplied source spans; return {processed:exact inventory,claims:[{text,origin:speaker-statement|screen-ocr|visual-observation,verification:"unverified",evidence:[{turnId,sessionId,quote}]}]}. Extract atomic factual source statements only. Text equals literal evidence quotes joined by newline, and every quote lies entirely inside a submitted span. Preserve unverified screen origin. Return claims:[] only if no factual claim exists; no made-up facts or speaker identities.' + QUOTE_RULE,
         { phase: "extract-claims", spans: sp, inventory: runtimeInventory(sp), ...(hint ? { retry: hint } : {}) }));
       assertRuntimeCoverage(raw.processed, sp);
+      proposedTotal += runtimeArray(raw.claims).length;
       const proposed = dropped ? dropUnverifiedClaims(runtimeArray(raw.claims), turns, sp, dropped, !!jc) : runtimeArray(raw.claims).map((entry) => {
         const c = runtimeRecord(entry), evidence = runtimeEvidence(c.evidence, turns, sp), origin = runtimeEvidenceOrigin(evidence, turns);
         if (c.origin !== origin || c.verification !== "unverified") throw new Error("claim source origin mismatch");
         return { id: runtimeDigest(["claim", evidence]), text: runtimeExtractive(c.text, evidence), origin, verification: "unverified" as const, evidence };
       });
+      groundedTotal += proposed.length; // proposals that passed the quote/sentence/origin verification
       if (!dropped && new Set(proposed.map((c) => c.id)).size !== proposed.length) throw new Error("duplicate proposed claim");
       let accepted = proposed;
       if (dropped) {
@@ -151,6 +154,8 @@ async function strictRuntimeClaims(turns: Turns[], complete: ClaimsCompleteFn, d
     }, (parts) => parts.flat(), () => rejectedFeedback(dropped, mark), [] as never[], (e) => dropped?.push({ what: "unknown", reason: `window part skipped, not processed: ${e.message}`, excerpt: "" }));
     for (const c of accepted) result.set(c.id, { text: c.text, evidenceTurnIds: c.evidence.map((e) => e.turnId), evidence: c.evidence, origin: c.origin, verification: c.verification });
   }
+  // D-185 makes completeness advisory, NOT grounding: a stage whose every proposal failed quote verification emits nothing and is refused (typed degrade), never silently empty.
+  if (dropped && proposedTotal > 0 && groundedTotal === 0) throw new Error("every proposed claim failed grounding verification");
   return [...result.values()];
 }
 
