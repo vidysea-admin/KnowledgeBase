@@ -36,3 +36,6 @@ Registration fill against a live form (fixtures only). Any playback on a non-You
 - Tests: 30 agent tests (CheckerProbes class, one test per probe) + 22 OnAir = 52. D-020 mutations: form-owner gate (`el.get("form") or` -> `False or`) killed; provider refusal (generic `continue/sign/log ... with|using` alternative removed) killed by test_f2_unknown_provider_refused_even_with_the_submit_gate_open (a first attempt survived because the submit gate also refused those names on a play goal; a gate-open test was added). HEAD-blob hash matches after each.
 - Evidence: qa/evidence/w25-pageagent-live.md. The live test still hits YouTube's bot check after Umesh's sign-in; the full recordings were not started.
 - Not run again: tsc and lint-loc (no TS or budgeted file changes beyond py); not re-run live after the guard changes.
+
+## Post-PASS structural fix
+CI lint-dirsize failed (py/ had 33 files, budget 30). Mechanical move, no logic change: page_agent.py, page_agent_guard.py, page_agent_model.py, sb_join_agent.py and test_page_agent.py moved to packages/meeting-bot/py/agent/; sb_join.py adds that directory to sys.path before importing sb_join_agent; the test adds the parent directory. Unittests 52 pass, tsc 0, lint-loc --all all 10 stages exit 0.

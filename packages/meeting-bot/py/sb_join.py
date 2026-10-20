@@ -29,7 +29,8 @@ from sb_join_detect import (  # noqa: F401
     is_meet_url, platform_of, should_force_reload)
 from sb_join_loop import run_session
 from sb_join_onair import OnairRefused, onair_enabled, onair_play, onair_prepare  # noqa: F401
-from sb_join_agent import agent_enabled, agent_prepare
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "agent"))  # generic page agent lives in py/agent/ (dirsize budget)
+from sb_join_agent import agent_enabled, agent_prepare  # noqa: E402
 from sb_join_ownership import kill_orphans as _kill_orphans
 from sb_join_profile import existing_profile_directory, selected_uc_profile, validate_uc_profile_support
 from sb_join_recorder import recorder_link

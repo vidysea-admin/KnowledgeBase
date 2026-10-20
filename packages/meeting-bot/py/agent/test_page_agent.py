@@ -8,6 +8,7 @@ import unittest
 import urllib.error
 
 sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))  # sb_join_onair lives one level up
 import page_agent as pa  # noqa: E402
 import page_agent_guard as guard  # noqa: E402
 import page_agent_model as model  # noqa: E402
