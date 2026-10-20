@@ -14,7 +14,7 @@ import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, type TelegramNotifier } from "./notify/telegram-alerts.js";
 import { normalizeCapture, processRecordingArtifacts, finalizeRecordingWith, type FinalizeRecordingOverrides } from "./record-finalize.js";
 import { finalizeRecording, finalizedCaptureVideo } from "./workspace/finalize-workspace-recording.js";
-import { createTabBrowserDeps } from "./tab-browser.js"; import { assistedRecordDeps } from "./assisted/assisted-wiring.js";
+import { createTabBrowserDeps } from "./tab-browser.js"; import { assistedFlag, assistedRecordDeps } from "./assisted/assisted-wiring.js";
 import { tabReceiverGuardFromEnv } from "./tab-receiver-guard.js";
 import { createNativeCaptureRuntime, nativeCaptureSettings } from "./native/native-capture-runtime.js";
 import type { NativeCaptureClockQualifierOptions } from "./tiles/native-measurement.js";
@@ -80,7 +80,7 @@ export interface RecordInject {
 }
 export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const url = rest[0];
-  const assisted = rest.includes("--assisted"), untilArg = flag(rest, "--until") ?? (assisted ? new Date(Date.now() + 3 * 3600_000).toISOString() : undefined); // assisted: stops at media end; --until is only the ceiling
+  const assisted = assistedFlag(rest), untilArg = flag(rest, "--until") ?? (assisted ? new Date(Date.now() + 3 * 3600_000).toISOString() : undefined); // assisted: stops at media end; --until is only the ceiling
   if (!url || !untilArg) {
     throw new Error("usage: lkb record <url> --until HH:MM [--end-not-before HH:MM] [--title T] " +
       "[--session-id ID] [--onair-session TITLE] [--capture-slot ID [--seed-profile DIR]] [--backend tab|obs] [--assisted] [--native-tab-clock] [--lean-video] [--transcribe]"

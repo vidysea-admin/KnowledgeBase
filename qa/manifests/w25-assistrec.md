@@ -1,7 +1,7 @@
 # w25-assistrec: assisted recording of human-played media (YouTube replays)
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: KnowledgeBase-lanes/w25-assistrec  Branch: lane/w25-assistrec  Base: 50c320a6505a3d7d2802b42167b2a854355d5cd4
 Candidate SHA: see `git log -1 lane/w25-assistrec` (the commit that adds this file)
 
@@ -38,3 +38,9 @@ A HUMAN opens the video in a normal Chrome and presses play; the bot records wha
 ## Not verified
 - A full real recording to the end of a video (needs a human to press play). In-page MediaRecorder start/stop/ended path is covered by fakes only.
 - YouTube DRM/ad behaviour of `captureStream()`; `ended` may not fire on every ad transition (3-poll confirmation mitigates).
+
+## Fix cycle 1 (checker FAIL at 603e265f)
+- BLOCKING: added ended-debounce tests (2 consecutive ended then resume does not stop; exactly 3 stop), asserting poll counts. Mutations `ended >= 1` and `ended >= 2` each now fail 2 tests (killed); restored.
+- LOW: `--assisted` with `--backend obs` (flag or LKB_CAPTURE_BACKEND) now throws "tab backend only" (assistedFlag; tested).
+- LOW: a Chrome this run launched is closed (Browser.close) and its profile dir removed after stop or refusal, unless `--keep-browser`; a pre-existing Chrome is never touched. dispose path tested with fakes; real Chrome close not re-smoked.
+- Checks: assisted tests 11/11, record-commands 22/22, tsc 0, lint-loc 10 stages pass.

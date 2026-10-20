@@ -16,6 +16,8 @@ export interface AssistedPage {
   startRecording(onChunk: (bytes: Buffer) => void): Promise<void>;
   stopRecording(): Promise<void>;
   close(): Promise<void>;
+  /** Optional: close a Chrome this run launched and remove its temp profile (skipped by --keep-browser). */
+  dispose?(): Promise<void>;
 }
 export interface AssistedConfig {
   recordDir: string; sessionId?: string; tenantId?: string;
@@ -54,7 +56,7 @@ export function createAssistedDeps(cfg: AssistedConfig) {
         const cur = await page.snapshot();
         if (isPlaying(prev, cur)) break;
         if (now() >= deadline) {
-          await page.close().catch(() => {});
+          await page.close().catch(() => {}); await page.dispose?.().catch(() => {});
           throw new Error(`assisted: nothing played within ${Math.round(timeoutMs / 600) / 100} minutes; refusing, no recording made`);
         }
         prev = cur ?? undefined;
@@ -82,7 +84,7 @@ export function createAssistedDeps(cfg: AssistedConfig) {
     async stop(handle) {
       const run = runs.get(handle); if (!run || run.stopped) return;
       run.stopped = true;
-      try { await run.page.stopRecording(); } finally { await run.page.close().catch(() => {}); } // detaches only; the human's Chrome stays open
+      try { await run.page.stopRecording(); } finally { await run.page.close().catch(() => {}); await run.page.dispose?.().catch(() => {}); } // close detaches only; dispose closes a Chrome we launched
       emit(handle, "capture-stopped", { failed: false });
       if (!run.bytes || statSync(run.output).size === 0) throw new Error("assisted: no media bytes were recorded");
     },

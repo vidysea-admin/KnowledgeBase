@@ -3,6 +3,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
+import { assistedFlag } from "./assisted-wiring.js";
 import { createAssistedDeps, isEnded, isPlaying, type AssistedPage, type AssistedMediaState } from "./assisted-record.js";
 
 const st = (o: Partial<AssistedMediaState> = {}): AssistedMediaState => ({ hasVideo: true, paused: false, ended: false, currentTime: 0, duration: 100, readyState: 4, ...o });
@@ -69,4 +70,38 @@ test("refuses with no recording when nothing plays within the timeout", async ()
 test("the bot never reloads the human's page", () => {
   const { a } = harness([st()]);
   assert.equal(a.triggerReload(), undefined);
+});
+test("ended debounce: 2 consecutive ended polls then resume does NOT stop (resolves only at tab close)", async () => {
+  const E = st({ ended: true });
+  const { a, fp } = harness([st({ currentTime: 1 }), st({ currentTime: 2 }), E, E, st({ currentTime: 5 }), st({ currentTime: 6 }), null]);
+  const { sessionHandle } = await a.deps.launch("u", {} as never);
+  await a.browserExited(sessionHandle);
+  assert.equal(fp.state().polls, 7);
+  await a.deps.stop!(sessionHandle);
+});
+test("ended debounce: exactly 3 consecutive ended polls stop", async () => {
+  const E = st({ ended: true });
+  const { a, fp } = harness([st({ currentTime: 1 }), st({ currentTime: 2 }), E, E, E, st({ currentTime: 9 })]);
+  const { sessionHandle } = await a.deps.launch("u", {} as never);
+  await a.browserExited(sessionHandle);
+  assert.equal(fp.state().polls, 5);
+  await a.deps.stop!(sessionHandle);
+});
+test("dispose runs on stop and on the no-play refusal", async () => {
+  let disposed = 0;
+  const mk = (script: Array<AssistedMediaState | null>) => { const f = fakePage(script); f.page.dispose = async () => { disposed++; }; return f.page; };
+  const dir = mkdtempSync(path.join(tmpdir(), "assisted-")); let t = 0;
+  const base = { recordDir: dir, now: () => (t += 1000), sleep: async () => {}, pollMs: 1, log: () => {} };
+  const r = createAssistedDeps({ ...base, playTimeoutMs: 5000, connect: async () => mk([st({ paused: true })]) });
+  await assert.rejects(() => r.deps.launch("u", {} as never), /refusing/);
+  const ok = createAssistedDeps({ ...base, connect: async () => mk([st({ currentTime: 1 }), st({ currentTime: 2 }), st({ currentTime: 3 })]) });
+  const { sessionHandle } = await ok.deps.launch("u", {} as never);
+  await ok.deps.stop!(sessionHandle);
+  assert.equal(disposed, 2);
+});
+test("--assisted with a non-tab backend is refused, not ignored", () => {
+  assert.throws(() => assistedFlag(["u", "--assisted", "--backend", "obs"]), /tab backend only/);
+  assert.throws(() => assistedFlag(["u", "--assisted"], { LKB_CAPTURE_BACKEND: "obs" }), /tab backend only/);
+  assert.equal(assistedFlag(["u", "--assisted"], {}), true);
+  assert.equal(assistedFlag(["u"], { LKB_CAPTURE_BACKEND: "obs" }), false);
 });

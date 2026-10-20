@@ -3,7 +3,7 @@
  * stealth, no UA changes. Read-only page inspection plus an in-page MediaRecorder on the <video>
  * element; it never dispatches input events. */
 import { spawn } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import type { AssistedPage, AssistedMediaState } from "./assisted-record.js";
 
 const CHROME_CANDIDATES = ["C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe", "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"];
@@ -15,15 +15,16 @@ mr.onstop=()=>setTimeout(()=>window.lkbChunk('END'),500);mr.start(1000);return t
 const STOP_JS = `(()=>{const m=window.__lkbMr;if(m&&m.state!=='inactive')m.stop();else window.lkbChunk('END');return true})()`;
 const GONE: AssistedMediaState = { hasVideo: false, paused: true, ended: false, currentTime: 0, duration: 0, readyState: 0 };
 
-export async function connectAssistedChrome(url: string, o: { port: number; userDataDir: string; executable?: string }): Promise<AssistedPage> {
+export async function connectAssistedChrome(url: string, o: { port: number; userDataDir: string; executable?: string; keepBrowser?: boolean }): Promise<AssistedPage> {
   const base = `http://127.0.0.1:${o.port}`;
   const list = async (): Promise<Array<{ url: string; type: string; webSocketDebuggerUrl?: string }>> => {
     try { return await (await fetch(`${base}/json/list`)).json() as never; } catch { return []; }
   };
   const key = (u: string) => { try { const x = new URL(u); return x.host + (x.searchParams.get("v") ?? x.pathname); } catch { return u; } };
   const find = async () => (await list()).find((t) => t.type === "page" && key(t.url) === key(url));
-  let tab = await find();
+  let tab = await find(), launched = false;
   if (!tab && !(await list()).length) {
+    launched = true;
     const exe = o.executable ?? CHROME_CANDIDATES.find(existsSync);
     if (!exe) throw new Error("Chrome not found; set LKB_BROWSER_EXECUTABLE");
     spawn(exe, [`--remote-debugging-port=${o.port}`, `--user-data-dir=${o.userDataDir}`, url], { detached: true, stdio: "ignore" }).unref();
@@ -62,5 +63,15 @@ export async function connectAssistedChrome(url: string, o: { port: number; user
     async startRecording(cb) { onChunk = cb; await send("Runtime.addBinding", { name: "lkbChunk" }); await evalJs(START_JS); },
     async stopRecording() { const done = new Promise<void>((r) => { endWaiter = r; setTimeout(r, 10_000); }); await evalJs(STOP_JS).catch(() => {}); await done; },
     async close() { if (open) ws.close(); },
+    async dispose() { // only a Chrome this run launched; a browser the human already had open is never touched
+      if (!launched || o.keepBrowser) return;
+      try {
+        const v = await (await fetch(`${base}/json/version`)).json() as { webSocketDebuggerUrl: string };
+        const b = new WebSocket(v.webSocketDebuggerUrl);
+        await new Promise<void>((res) => { b.onopen = () => { b.send(JSON.stringify({ id: 1, method: "Browser.close" })); res(); }; b.onerror = () => res(); });
+      } catch { /* already gone */ }
+      for (let i = 0; i < 20 && (await list()).length; i++) await new Promise((r) => setTimeout(r, 250));
+      rmSync(o.userDataDir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
+    },
   };
 }
