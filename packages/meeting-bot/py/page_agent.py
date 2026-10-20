@@ -32,7 +32,7 @@ for (const e of document.querySelectorAll(SEL)) {
   const trail = []; for (let n = e.parentElement, k = 0; n && n !== document.body && k < 6; n = n.parentElement, k++) trail.push((n.id + ' ' + n.className).toLowerCase());
   e.setAttribute('data-lkb-agent', String(i));
   const tx = ((e.innerText || e.value || '') + '').trim().toLowerCase().replace(/\s+/g, ' ').slice(0, 80);
-  out.push({index: i++, tag: e.tagName.toLowerCase(), role: e.getAttribute('role') || '', type: (e.type || '').toLowerCase(),
+  out.push({index: i++, form: !!(e.form || e.closest('form')), submit: (e.type === 'submit' || (e.tagName === 'BUTTON' && !e.getAttribute('type') && !!(e.form || e.closest('form')))), tag: e.tagName.toLowerCase(), role: e.getAttribute('role') || '', type: (e.type || '').toLowerCase(),
     name: (e.getAttribute('aria-label') || lab || e.title || e.placeholder || tx || '').trim().toLowerCase().slice(0, 80), text: tx,
     href: (e.href || '').toLowerCase().slice(0, 200), src: (e.src || '').toLowerCase().slice(0, 200), id: e.id || '',
     label: (lab || '').toLowerCase().slice(0, 60), placeholder: (e.placeholder || '').toLowerCase(), autocomplete: (e.getAttribute('autocomplete') || '').toLowerCase(),
@@ -40,6 +40,7 @@ for (const e of document.querySelectorAll(SEL)) {
 }
 return out;
 """
+TEXT_JS = "return (document.body.innerText || '').slice(0, 4000);"
 PLAYER_JS = "return !!document.querySelector('video') || [...document.querySelectorAll('iframe')].some(f => /youtube|vimeo|brightcove/i.test(f.src));"
 
 
@@ -51,6 +52,24 @@ def _log(entry):
                 f.write(json.dumps(entry) + "\n")
         except OSError:
             pass
+
+
+def page_text(sb):
+    """Top document text plus the text of each iframe (WebDriver can enter cross-origin frames)."""
+    parts = [sb.execute_script(TEXT_JS) or ""]
+    try:
+        for frame in sb.driver.find_elements("css selector", "iframe"):
+            try:
+                sb.driver.switch_to.frame(frame)
+                try:
+                    parts.append(sb.execute_script(TEXT_JS) or "")
+                finally:
+                    sb.driver.switch_to.default_content()
+            except Exception:
+                continue
+    except Exception:
+        pass
+    return "\n".join(parts)
 
 
 def screenshot(sb):
@@ -67,6 +86,7 @@ def run_agent(sb, goal, *, time, emit, ask=model.ask, profile=None, allow_submit
             raise guard.AgentRefused("page agent timed out after %ds" % timeout_s)
         guard.check_location(sb.driver.current_url, start_host)
         elements = sb.execute_script(ELEMENTS_JS)
+        guard.check_page(page_text(sb), elements)  # code-level bot-check detector, independent of the model
         jpeg = shot(sb)
         label, action = ask(PROMPT.format(goal=goal, profile=json.dumps(sorted((profile or {}).keys())), step=step, max=max_steps,
                                           elements=json.dumps([{k: e[k] for k in ("index", "tag", "role", "type", "name", "href", "src")} for e in elements])), jpeg)

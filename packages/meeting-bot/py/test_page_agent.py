@@ -30,7 +30,10 @@ PAGE = [el(0, "a", "home", href=BASE), el(1, "a", "video_youtube watch now", hre
         el(7, "a", "elsewhere", href="https://evil.example/x"), el(8, "button", "allow all cookies"), el(9, "a", "account", href="https://accounts.google.com/x"),
         el(10, "button", "register to watch"), el(11, "button", "buy ticket"), el(12, "iframe", "", src="https://www.youtube.com/embed/abc"),
         el(13, "input", "full name", type="text", label="full name")]
+REG = None
 CTX = {"start_host": HOST, "profile": {"name": "Test User", "email": "t@example.test"}, "goal": "play", "allow_submit": False}
+
+REG = {**CTX, "goal": "register"}
 
 
 def refused(action, ctx=CTX, page=PAGE):
@@ -98,19 +101,19 @@ def run(sb, *actions, goal="get the webinar replay playing", **kw):
 
 class Guardrails(unittest.TestCase):
     def test_password_field_never_typed(self):
-        self.assertIn("password", refused({"action": "type", "index": 4, "text": "Test User"}))
+        self.assertIn("password", refused({"action": "type", "index": 4, "text": "Test User"}, REG))
 
     def test_one_time_code_and_card_fields_never_typed(self):
         for i in (5, 6):
-            self.assertRegex(refused({"action": "type", "index": i, "text": "Test User"}) or "", "one-time-code or card|payment")
+            self.assertRegex(refused({"action": "type", "index": i, "text": "Test User"}, REG) or "", "one-time-code, card|payment")
 
     def test_type_value_must_be_in_profile(self):
-        self.assertIn("allowlisted profile", refused({"action": "type", "index": 13, "text": "Someone Else"}))
-        self.assertIn("allowlisted profile", refused({"action": "type", "index": 13}))
-        self.assertIsNone(refused({"action": "type", "index": 13, "text": "Test User"}))
+        self.assertIn("allowlisted profile", refused({"action": "type", "index": 13, "text": "Someone Else"}, REG))
+        self.assertIn("allowlisted profile", refused({"action": "type", "index": 13}, REG))
+        self.assertIsNone(refused({"action": "type", "index": 13, "text": "Test User"}, REG))
 
     def test_select_value_must_be_in_profile(self):
-        self.assertIn("allowlisted profile", refused({"action": "select", "index": 13, "text": "India"}))
+        self.assertIn("allowlisted profile", refused({"action": "select", "index": 13, "text": "India"}, REG))
 
     def test_sign_in_consent_and_account_controls_refused(self):
         for i in (2, 8, 9):
@@ -126,8 +129,8 @@ class Guardrails(unittest.TestCase):
 
     def test_register_and_submit_need_explicit_approval(self):
         self.assertIn("without explicit approval", refused({"action": "click", "index": 10}))
-        self.assertIn("without explicit approval", refused({"action": "click", "index": 10}, {**CTX, "goal": "register"}))
-        self.assertIsNone(refused({"action": "click", "index": 10}, {**CTX, "goal": "register", "allow_submit": True}))
+        self.assertIn("without explicit approval", refused({"action": "click", "index": 10}, REG))
+        self.assertIsNone(refused({"action": "click", "index": 10}, {**REG, "allow_submit": True}))
 
     def test_bad_actions_and_indexes_refused(self):
         for a in ({"action": "eval"}, {"action": "click"}, {"action": "click", "index": 99}, {"action": "click", "index": True}, {"action": "click", "index": -1}, "x"):
@@ -140,6 +143,67 @@ class Guardrails(unittest.TestCase):
         for bad in ("https://accounts.google.com/o/oauth2", "https://login.example.com/", "https://evil.example/", "http://%s/x" % HOST):
             with self.assertRaises(guard.AgentRefused):
                 guard.check_location(bad, HOST)
+
+
+class CheckerProbes(unittest.TestCase):
+    """The probes from verdict 1bd56f26 (w25-pageagent cycle 0), one test each."""
+
+    def one(self, **kw):
+        return [el(0, "a", "home", href=BASE), el(1, **kw)]
+
+    def test_f1_non_keyword_submit_controls_refused_on_a_play_goal(self):
+        for kw in ({"name": "reserve my spot", "type": "submit"}, {"name": "continue", "type": "submit"}, {"name": "rsvp"}, {"name": "next"},
+                   {"name": "get access"}, {"tag": "input", "name": "go", "type": "submit"}, {"name": "go", "submit": True}, {"name": "go", "form": True},
+                   {"name": "let me in", "type": "submit"}):
+            page = self.one(**kw)
+            self.assertIn("without explicit approval", refused({"action": "click", "index": 1}, CTX, page) or "", kw)
+            self.assertIn("without explicit approval", refused({"action": "click", "index": 1}, REG, page) or "", kw)  # register without approval
+            self.assertIsNone(refused({"action": "click", "index": 1}, {**REG, "allow_submit": True}, self.one(**{**kw, "name": "go"})) if kw.get("form") else None)
+
+    def test_f1_typing_and_selecting_refused_unless_goal_is_register(self):
+        for kind in ("type", "select"):
+            self.assertIn("unless the goal is registration", refused({"action": kind, "index": 13, "text": "Test User"}, CTX))
+        self.assertIsNone(refused({"action": "type", "index": 13, "text": "Test User"}, REG))
+
+    def test_f2_provider_buttons_refused_before_the_click(self):
+        for name in ("continue with facebook", "continue with apple", "sign in with microsoft", "continue with linkedin", "log in with github",
+                     "continue with x", "sign up using twitter", "single sign-on", "sso"):
+            self.assertIn("refused", refused({"action": "click", "index": 1}, CTX, self.one(name=name)) or "", name)
+        self.assertIn("refused", refused({"action": "click", "index": 1}, CTX, self.one(tag="a", name="idp", href="https://login.okta.com/x")) or "")
+
+    def test_f3_secret_field_spellings(self):
+        for name in ("pin", "ssn", "secret answer", "p4ssw0rd", "pass word", "p@ssw0rd", "security code", "passcode", "social security number"):
+            page = self.one(tag="input", name=name, type="text")
+            self.assertRegex(refused({"action": "type", "index": 1, "text": "Test User"}, REG, page) or "", "secret|password|card", name)
+
+    def test_f3_bot_check_detector_is_code_level(self):
+        for text in ("Sign in to confirm you're not a bot", "Sign in to confirm you’re not a bot", "Please verify you are human", "Complete the CAPTCHA", "unusual traffic from your network"):
+            with self.assertRaises(guard.AgentRefused, msg=text):
+                guard.check_page(text, [])
+        with self.assertRaises(guard.AgentRefused):
+            guard.check_page("fine", [el(0, "iframe", src="https://www.google.com/recaptcha/api2/anchor")])
+        with self.assertRaises(guard.AgentRefused):
+            guard.check_page("fine", [el(0, "iframe", src="https://newassets.hcaptcha.com/captcha/v1")])
+        guard.check_page("Welcome and Introduction. Watch now", PAGE)
+
+    def test_f3_bot_check_inside_a_player_frame_stops_the_loop_before_the_model(self):
+        class Sb(FakeSb):
+            in_frame = False
+
+            def execute_script(self, js, *a):
+                if js is pa.TEXT_JS:
+                    return "Sign in to confirm you're not a bot" if self.in_frame else "Welcome"
+                return super().execute_script(js, *a)
+
+            def find_elements(self, by, css):
+                return ["frame"]
+            switch_to = None
+        sb = Sb(PAGE)
+        sb.switch_to = type("S", (), {"frame": lambda _, f: setattr(sb, "in_frame", True), "default_content": lambda _: setattr(sb, "in_frame", False)})()
+        asked = []
+        with self.assertRaisesRegex(guard.AgentRefused, "bot check"):
+            pa.run_agent(sb, "g", time=Clock(), emit=lambda *a, **k: None, ask=lambda p, j: asked.append(1), shot=lambda s: b"j")
+        self.assertEqual(asked, [])
 
 
 class Loop(unittest.TestCase):
