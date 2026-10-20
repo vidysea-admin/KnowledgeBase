@@ -14,7 +14,7 @@ import { collectGapEvent, type GapWindow } from "./reconnect-gaps.js";
 import { createTelegramNotifier, type TelegramNotifier } from "./notify/telegram-alerts.js";
 import { normalizeCapture, processRecordingArtifacts, finalizeRecordingWith, type FinalizeRecordingOverrides } from "./record-finalize.js";
 import { finalizeRecording, finalizedCaptureVideo } from "./workspace/finalize-workspace-recording.js";
-import { createTabBrowserDeps } from "./tab-browser.js";
+import { createTabBrowserDeps } from "./tab-browser.js"; import { assistedRecordDeps } from "./assisted/assisted-wiring.js";
 import { tabReceiverGuardFromEnv } from "./tab-receiver-guard.js";
 import { createNativeCaptureRuntime, nativeCaptureSettings } from "./native/native-capture-runtime.js";
 import type { NativeCaptureClockQualifierOptions } from "./tiles/native-measurement.js";
@@ -80,10 +80,10 @@ export interface RecordInject {
 }
 export async function runRecord(rest: string[], inject: RecordInject = {}): Promise<void> {
   const url = rest[0];
-  const untilArg = flag(rest, "--until");
+  const assisted = rest.includes("--assisted"), untilArg = flag(rest, "--until") ?? (assisted ? new Date(Date.now() + 3 * 3600_000).toISOString() : undefined); // assisted: stops at media end; --until is only the ceiling
   if (!url || !untilArg) {
     throw new Error("usage: lkb record <url> --until HH:MM [--end-not-before HH:MM] [--title T] " +
-      "[--session-id ID] [--onair-session TITLE] [--capture-slot ID [--seed-profile DIR]] [--backend tab|obs] [--native-tab-clock] [--lean-video] [--transcribe]"
+      "[--session-id ID] [--onair-session TITLE] [--capture-slot ID [--seed-profile DIR]] [--backend tab|obs] [--assisted] [--native-tab-clock] [--lean-video] [--transcribe]"
     );
   }
   const envFile = path.join(REPO_ROOT, ".env");
@@ -140,7 +140,7 @@ export async function runRecord(rest: string[], inject: RecordInject = {}): Prom
   const nativeRuntime = nativeSettings ? createNativeCaptureRuntime({settings:nativeSettings,recordDir,tenantId,sessionId,platform,
     extensionDir:path.join(path.dirname(JOIN_SCRIPT),"tab-capture"),verifyPlatformQualification:inject.nativeQualificationVerifier}) : undefined;
   if(nativeRuntime){tabConfig.native=nativeRuntime.config;tabConfig.browserExecutable=nativeRuntime.browserExecutable;}
-  const tab = backend === "tab" ? (inject.tab ? inject.tab(onEvent, tabConfig) : createTabBrowserDeps(tabConfig)) : undefined;
+  const tab = backend === "tab" ? (inject.tab ? inject.tab(onEvent, tabConfig) : assisted ? assistedRecordDeps(rest, tabConfig, recordDir) : createTabBrowserDeps(tabConfig)) : undefined;
   const bot = tab ?? createObsBrowserDeps({
     obsUrl: process.env.OBS_WS_URL ?? "ws://127.0.0.1:4455",
     obsPassword, obsExe: OBS_EXE,
