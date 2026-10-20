@@ -1,9 +1,38 @@
 # Verdict: w25-pageagent
 
-VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: b395fb6845ae3c4c51f148b9ae9c701673764efa
-Base: 50c320a6505a3d7d2802b42167b2a854355d5cd4 (merge-base with origin/master)
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: e9d1d70b86b298248b93a90b8b0a4d016ea655d2
+Base: 50c320a6505a3d7d2802b42167b2a854355d5cd4
+Prior: cycle 0 FAIL at b395fb68 (section below, superseded by this cycle-1 PASS)
+
+## Cycle 1 evidence (independently produced)
+- `.venv python -m unittest test_page_agent test_sb_join_onair`: exit 0, Ran 52 OK.
+- `tsc --noEmit -p packages/meeting-bot/tsconfig.json`: exit 0. `node scripts/lint-loc.mjs`: exit 0 (1778 files).
+- Re-run of my cycle-0 probes (page_agent_guard.check_action/check_page on synthetic elements):
+  - F1 fixed: "reserve my spot", "go" (submit/form flags or type=submit), "rsvp", "next", "get access", input type=image all refused with the gate closed; register click allowed only with goal=register AND allow_submit; typing and selecting refused on non-register goals; typed value outside the profile refused.
+  - F2 fixed: continue with facebook/apple/microsoft, sign in with sso, login with okta, github all refused before the click.
+  - F3 fixed: pin, ssn, secret, p4ssw0rd, "pass word", p@ssw0rd, pa$$word, passwd, "social security number" and type=password refused. Bot-check detector (`check_page`, run before the model in `run_agent`, including iframe text) refuses "Sign in to confirm you're not a bot", "verify you are human", "unusual traffic", "I'm not a robot", captcha.
+  - Action-time re-verification unchanged and still re-runs all guards on the fresh element.
+- D-020 mutation (fresh): in `check_page`, the BOT_RE test replaced with `if False and any(`. Killed: test_f3_bot_check_detector_is_code_level FAIL plus 1 ERROR (30 tests, exit 1). Absolute-path backup, trap EXIT/INT/TERM/ERR, timeout 300. After: `git -c core.autocrlf=true hash-object` d1675eba... equals `git rev-parse HEAD:` blob; git status clean.
+- Live evidence qa/evidence/w25-pageagent-live.md is maker-produced and not re-run (no Chrome allowed); it shows two fail-closed refusals at the YouTube bot check with no profile or submit flag set. Fail-closed path is confirmed by code and tests.
+
+## Residual notes (low, not issues)
+- Bot-check wording gaps: "confirm you are not a bot", "verify you're a  human" (double space), "Are you human?" are not matched by BOT_RE; the model prompt and AUTH_RE ("not a bot", "captcha" on elements) still cover the common YouTube case.
+- A `div role=button`/`[onclick]` control outside a form with a non-keyword name (JS-handled submit) is not structurally gated; cannot be detected from the DOM list.
+- Iframe click still clicks the centre of an embedded player (model-only decision for content inside); step timeout still only checked at step start; popups not location-checked.
+- Legacy OnAir path changed in a363e7c4 (flag-off, LKB_ONAIR_WATCH=1) was not separately security-reviewed; 22 legacy tests pass.
+- Mutation harness note from cycle 0 (relative path) was my own error and is not repeated.
+
+Ledger rows: may be flipped for w25-pageagent. ISSUES-WRITTEN: none
+
+---
+# Cycle 0 record (superseded)
+
+Cycle-0 outcome: FAIL
+Cycle-0 checked: 0
+Cycle-0 reviewed SHA: b395fb6845ae3c4c51f148b9ae9c701673764efa
+
 Checker: independent, security class (credential and consent handling)
 
 ## Independently produced evidence
@@ -47,4 +76,4 @@ Live run and its log; registration fill on a live form; second mutation on the s
 ## Ledger rows
 No rows may be flipped. Maker must fix F1 and F2 (F3 recommended) and resubmit as Fix cycle 1.
 
-ISSUES-WRITTEN: none
+
