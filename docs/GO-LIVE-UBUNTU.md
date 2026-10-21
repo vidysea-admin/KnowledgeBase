@@ -20,11 +20,15 @@ git checkout master            # use ae5e2e71 or later
 cp .env.example .env && chmod 600 .env
 ```
 Set in `.env` (names only; get values from the owner):
-- `MONGODB_URL` required. Mongo connection URI.
-- `MONGODB_DB` required, no default. Staging is `lkb_staging` and also needs
-  `LKB_ALLOW_STAGING=lkb_staging`. Production `lkb` additionally needs
-  `LKB_I_KNOW_THIS_IS_PRODUCTION=1` (see decisions below).
-- `OLLAMA_API_KEY` required. Runtime only, never a build arg.
+- `MONGODB_URL` required. Mongo connection URI with the product's dedicated user
+  (section 6a). Placeholder: `mongodb://lkb_app:<PASSWORD>@<mongo-host>:27017/lkb_prod?authSource=lkb_prod`.
+- `MONGODB_DB=lkb_prod` required, no default. Authorized for the deployed app by D-186
+  (supersedes the D-117 no-production-writes stance for the app only). The guards still
+  refuse `lkb`, `global_university_db` and unflagged `lkb_staging` (D-173), so `lkb_prod`
+  needs no extra opt-in flag. Set `MONGO_WORK_DB=lkb_prod` too when running scripts
+  from section 6.
+- `OLLAMA_API_KEY` required. Copy it from the bot machine's `.env` into the server `.env`
+  by hand; never commit it, paste it in chat or print it. Runtime only, never a build arg.
 - `CORS_ORIGINS` the exact browser origin(s) of the web UI, with scheme,
   e.g. `http://<server-ip>`. nginx does not proxy the API, so the browser calls the API
   cross-origin and an unlisted origin is blocked.
@@ -74,15 +78,27 @@ Compose never migrates by itself. Run it once, deliberately, against the chosen 
 ```sh
 docker compose --profile migrate run --rm migrate
 ```
-It writes to `MONGODB_DB`. For production (`lkb`) it is refused unless
-`LKB_I_KNOW_THIS_IS_PRODUCTION=1` is also set: the owner must approve first (D-117).
+It writes to `MONGODB_DB` (`lkb_prod`, D-186). The legacy `lkb` stays refused unless
+`LKB_I_KNOW_THIS_IS_PRODUCTION=1`; do not use it.
 Then mint an API key for the UI/API (printed once, store it safely):
 ```sh
 pnpm install --frozen-lockfile
 node scripts/mint-key.mjs --tenant toc --label first-key
 ```
-(`lkb` needs `--i-know-this-is-production` plus `MONGODB_DB=lkb`.) Data from other
-machines is not copied by deploying; import the corpus separately if required.
+(Run it with `MONGODB_DB=lkb_prod MONGO_WORK_DB=lkb_prod`; the legacy `lkb` is not used.)
+Data from other machines is not copied by deploying; import the corpus separately.
+
+### 6a. Dedicated Mongo user for the product (D-186)
+Create it once on the Mongo host as an admin; the team picks the password, which goes
+only into the server `.env`, never into git, chat or logs. Placeholders only:
+```js
+use lkb_prod
+db.createUser({ user: "lkb_app", pwd: "<PASSWORD>", roles: [{ role: "readWrite", db: "lkb_prod" }] })
+```
+Then enable authentication (`security.authorization: enabled` in `mongod.conf`, restart
+mongod; managed clusters already enforce it), bind Mongo to the server's IP only, and set
+`MONGODB_URL` with the credentials as in section 2 (URL-encode special characters in the
+password). Check: `mongosh "<MONGODB_URL>" --eval 'db.runCommand({ping:1})'`.
 
 ## 7. Smoke test
 ```sh
@@ -98,15 +114,34 @@ confirm pages load with no CORS errors in the console (if they appear, fix
 
 ## 8. Owner decisions the team must make before real traffic
 1. Domain and public hostnames (web and API). Then update `CORS_ORIGINS`, rebuild web.
-2. TLS: no TLS is built in. Terminate it at a reverse proxy/load balancer (Caddy,
-   nginx, cloud LB) and use `https://` in `VITE_API_BASE_URL` and `CORS_ORIGINS`.
-   Do not expose plain HTTP to the internet with real keys.
-3. Production DB name and authorization: use `lkb_staging` until the owner approves
-   writing `lkb` (D-117, D-173). Never point a test deploy at `lkb`.
-4. MongoDB auth/network: the URI must carry credentials, the cluster should accept only
-   the server's IP, and Mongo is not run by this compose file (the `local-dev` profile is
-   an empty throwaway DB only).
-5. Where the bot runs (section 5) and who owns the signed-in Chrome profile.
+2. TLS (decided: Let's Encrypt behind the team's proxy): no TLS is built in. Put Caddy
+   (automatic Let's Encrypt, `app.example.org { reverse_proxy localhost:80 }` plus an
+   API host `api.example.org { reverse_proxy localhost:3300 }`) or nginx with
+   `certbot --nginx -d app.example.org -d api.example.org` in front. Open 80/443 for
+   the ACME challenge. Use `https://` in `VITE_API_BASE_URL` and `CORS_ORIGINS`, rebuild
+   web, and do not expose plain HTTP to the internet with real keys.
+3. Database (decided, D-186): `lkb_prod`, with the dedicated user of section 6a. Never
+   point a test deploy at it.
+4. MongoDB network: accept only the server's IP. Mongo is not run by this compose file
+   (the `local-dev` profile is an empty throwaway DB only).
+5. The bot stays on the current Windows machine (section 5), pointed at the same
+   `MONGODB_URL`/`MONGODB_DB`; the team owns the signed-in Chrome profile.
+
+## 9. Launch feature flags (D-189)
+At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
+- T-028 is enabled by environment on the api container. All five must be set, else
+  the feature fails closed (key checks return 503, no accounts):
+  `LKB_HOSTING_STATE_DIR` (absolute path, a mounted volume),
+  `LKB_COUNSELLOR_STATE_DIR` (absolute, a different path from the hosting dir),
+  `LKB_HOSTING_ENCRYPTION_KEY` (64 hex characters, generate with `openssl rand -hex 32`),
+  `LKB_HOSTING_BOOTSTRAP_ADMINS` (JSON `{"toc":["<key-id>"]}`, key ids from `mint-key`),
+  `LKB_HOSTING_WEBHOOK_ORIGINS` (JSON array of `https://` origins, may be `["https://app.example.org"]`).
+  Honest gap: `docker-compose.yml` forwards none of these names, so add them to the api
+  `environment:` and mount the two state dirs as volumes (compose override file). Keep
+  the key in `.env` only.
+- T-014 championship: leave `LKB_CHAMPIONSHIP` unset (it is on only when `=1`).
+- T-013 avatar: no environment flag exists; leave it unannounced. The `/counsellor` page
+  ships in the web bundle either way.
 
 ## Update / rollback
 `git pull && docker compose build api web && docker compose up -d api web`.
