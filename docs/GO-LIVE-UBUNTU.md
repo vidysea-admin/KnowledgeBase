@@ -8,7 +8,9 @@ and the package scripts. The images were NOT built or run on the machine that wr
 (no Docker there). Run the checks below once and report anything that fails.
 
 ## 1. Prerequisites
-- Ubuntu 22.04+ with Docker Engine and the compose plugin (`docker compose version`).
+- Ubuntu 22.04+ with Docker Engine and Docker Compose v2.24 or newer (`docker compose version`).
+  Older compose cannot parse `docker-compose.yml` (`env_file` with `required: false`). Upgrade:
+  `sudo apt-get update && sudo apt-get install --only-upgrade docker-compose-plugin` (Docker's apt repo).
 - Outbound HTTPS (npm, GitHub release download of yt-dlp during build, Ollama Cloud).
 - A reachable MongoDB (NOT containerized by default) and an Ollama Cloud key.
 - Node/pnpm on the host only if you run the key-minting script (section 6).
@@ -141,6 +143,8 @@ At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 champions
   with `openssl rand -hex 32`, NOT base64, which is rejected),
   `LKB_HOSTING_BOOTSTRAP_ADMINS='{"toc":["<key-id>"]}'` (key ids from `mint-key`),
   `LKB_HOSTING_WEBHOOK_ORIGINS='["https://app.example.org"]'` (https origins only).
+  WARNING: a partially filled `.env.t028` makes every authenticated route return 503: fill all five or
+  none (delete the file to turn T-028 off).
   Single-quote the JSON values. Back the key up with the volumes; losing it makes stored account
   data unreadable. Never commit it. Then `docker compose up -d --build api`.
 - T-014 championship: leave `LKB_CHAMPIONSHIP` unset (it is on only when `=1`).

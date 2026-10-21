@@ -1,7 +1,7 @@
 # w26-composeenv: forward T-028 env to the api container without breaking auth when unset
 
 Status: ready-for-check
-Fix cycle: 1
+Fix cycle: 2
 Lane: KnowledgeBase-lanes/w26-composeenv  Branch: lane/w26-composeenv  Base: 96463791
 Candidate SHA: see `git log -1 lane/w26-composeenv` (the commit that adds this file)
 Prior verdict: qa/verdicts/w26-composeenv.md (0906fc68), cycle 0 FAIL, reviewed 9113881b.
@@ -12,6 +12,10 @@ Prior verdict: qa/verdicts/w26-composeenv.md (0906fc68), cycle 0 FAIL, reviewed 
 - State-dir defaults dropped (the code treats a set dir without the key as misconfigured); the guide now gives the exact paths to put in `.env.t028`. Named volumes and the Dockerfile node-owned mkdir are unchanged.
 - `.env.example` documents the five names as comments only. Guide section 9 rewritten: use `.env.t028`, single-quote JSON, all five together, back up volumes and key, key is 64 hex.
 - Auth code untouched. migrate, web and local-mongo services untouched (env_file is on api only).
+
+## Fix cycle 2 (verdict 2d40f787, docs only)
+- Guide prerequisites now require Docker Compose v2.24+ (older compose cannot parse `env_file` `required: false`), with an Ubuntu upgrade hint.
+- Section 9 warns that a partially filled `.env.t028` makes every authenticated route 503: fill all five or none.
 
 ## Changed paths
 docker-compose.yml, .env.example, docs/GO-LIVE-UBUNTU.md, qa/manifests/w26-composeenv.md (Dockerfile unchanged since cycle 0)
