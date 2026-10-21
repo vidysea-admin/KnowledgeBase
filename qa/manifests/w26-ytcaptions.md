@@ -1,7 +1,7 @@
 # w26-ytcaptions: import captions from the owner's own YouTube channel (official API)
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: KnowledgeBase-lanes/w26-ytcaptions  Branch: lane/w26-ytcaptions  Base: 60cf1f683dbd5dcc0163b668df111d62ba4a2563
 Candidate SHA: see `git log -1 lane/w26-ytcaptions` (the commit that adds this file)
 
@@ -18,12 +18,12 @@ Umesh chose the captions-download route: the official API works only for videos 
 - CLI refuses any database except `lkb_staging` (D-117).
 
 ## Changed paths
-- apps/api/src/youtube-import/{http,captions,quota,client,adapter,run,oauth,cli}.ts and {captions,oauth,import}.test.ts
+- apps/api/src/youtube-import/{http,captions,quota,client,adapter,run,oauth,cli,staging-guard}.ts and {captions,oauth,import,staging-guard}.test.ts
 - docs/youtube-owner-captions.md (36 lines); .gitignore (+2 lines: token and quota files)
 - Not touched: package.json, composition, schema, contracts, DECISIONS.
 
 ## Checks a checker must run (from apps/api)
-- `node --test --import tsx src/youtube-import/*.test.ts` -> pass 17
+- `node --test --import tsx src/youtube-import/*.test.ts` -> pass 19 (also green with --test-force-exit, 3 runs)
 - `node ../../node_modules/typescript/lib/tsc.js --noEmit -p tsconfig.json` -> exit 0
 - `node scripts/lint-loc.mjs --all` (repo root) -> all stages pass
 - Review: no other host/path reachable; tokens never printed; staging-only refusal in cli.ts.
@@ -33,6 +33,12 @@ Umesh chose the captions-download route: the official API works only for videos 
 - tsc exit 0 (apps/api).
 - D-020 mutation (script outside the repo, per-mutation backup + trap, cmp restore): replace the already-imported pre-check in run.ts with `false &&` -> "idempotent by videoId" FAILED (pass 6 / fail 1); restored.
 - lint-loc --all: OK (10 stages, 0 failed), exit 0.
+
+## Fix cycle 1 (checker FAIL e6e60402 at 22edd1bc)
+- Token endpoint failure test (refresh and login paths; fake returns 400 with access_token/refresh_token/client_secret strings): error and printed logs must carry none. Surviving mutant (append res.body to the tokenCall error) now KILLED (pass 5 / fail 1); restored, no `res.body}` left in oauth.ts.
+- Staging guard factored to pure staging-guard.ts (cli.ts calls it before any connect); test covers lkb, lkb+opt-in, global_university_db, LKB_STAGING, missing/invalid opt-in, unset/blank DB (all refuse) and lkb_staging+opt-in (allowed). D-020 mutation (`if (false)` for the non-staging check) KILLED; restored.
+- oauth teardown: listener awaits server close and closeAllConnections, timer unref; tests use non-pooled node:http GET instead of fetch. 19/19 under --test-force-exit x3 (it asserted in libuv before).
+- tsc exit 0; lint-loc --all: OK (10 stages, 0 failed).
 
 ## Not verified
 - No live OAuth consent and no live YouTube call (needs Umesh's browser approval and the YouTube Data API v3 enabled in the OAuth client's Google project).

@@ -11,7 +11,7 @@ import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "n
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { connect, close } from "@lkb/db";
-import { isStagingName, requireDatabaseName } from "../db-name.js";
+import { requireStagingDatabase } from "./staging-guard.js";
 import { createMongoIntakeSink } from "../source-intake/store.js";
 import { createYoutubeApi } from "./client.js";
 import { fetchHttp } from "./http.js";
@@ -47,8 +47,8 @@ export async function main(argv: string[], env: NodeJS.ProcessEnv = process.env)
   if (!tenantId) { console.error("youtube-import: --tenant (or LKB_TENANT_ID) is required"); return 2; }
   const since = flag(args, "--since");
   if (since && !/^\d{4}-\d{2}-\d{2}$/.test(since)) { console.error("youtube-import: --since must be YYYY-MM-DD"); return 2; }
-  const dbName = requireDatabaseName(env);
-  if (!isStagingName(dbName) || dbName !== "lkb_staging") { console.error("youtube-import: writes to lkb_staging only (D-117); set MONGODB_DB=lkb_staging and LKB_ALLOW_STAGING=lkb_staging"); return 2; }
+  let dbName: string;
+  try { dbName = requireStagingDatabase(env); } catch (e) { console.error(e instanceof Error ? e.message : String(e)); return 2; }
 
   const store: QuotaStore = {
     async load() { const t = readText(quotaFile); return t ? JSON.parse(t) : undefined; },

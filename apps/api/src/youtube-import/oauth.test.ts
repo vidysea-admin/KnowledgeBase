@@ -1,9 +1,15 @@
 import { test } from "node:test";
+import { get as httpGet } from "node:http";
 import assert from "node:assert/strict";
 import { assertOfficialUrl } from "./http.js";
 import type { Http } from "./http.js";
 import { buildAuthUrl, createTokenProvider, loadClient, pkcePair, runLogin, YT_SCOPE } from "./oauth.js";
 
+/** Plain node:http GET with its own non-pooled agent: no shared fetch pool left open at exit (--test-force-exit). */
+const fetch = (url: string, _?: unknown) => new Promise<{ status: number }>((resolve, reject) => {
+  httpGet(url, { agent: false, headers: { connection: "close" } }, (res) => { res.resume(); res.on("end", () => resolve({ status: res.statusCode ?? 0 })); }).on("error", reject);
+});
+const CLOSE = undefined;
 const client = { clientId: "cid", clientSecret: "csecret" };
 
 test("official-host guard: only Google OAuth and YouTube Data API v3 are reachable", () => {
@@ -52,7 +58,7 @@ test("login: prints URL (never tokens), checks state over real loopback, stores 
   const auth = new URL(printed[1]!);
   const redirect = auth.searchParams.get("redirect_uri")!;
   const rejected = assert.rejects(done, /denied|state/);
-  const bad = await fetch(`${redirect}?code=c&state=WRONG`);
+  const bad = await fetch(`${redirect}?code=c&state=WRONG`, CLOSE);
   assert.equal(bad.status, 400);
   await rejected;
   // a fresh login with the right state succeeds
@@ -60,10 +66,28 @@ test("login: prints URL (never tokens), checks state over real loopback, stores 
   const ok = runLogin({ client, http, print: (l) => printed.push(l), store: { load: async () => undefined, save: async (t) => { saved = t; } } });
   while (printed.length < 2) await new Promise((r) => setTimeout(r, 5));
   const u2 = new URL(printed[1]!);
-  const res = await fetch(`${u2.searchParams.get("redirect_uri")}?code=thecode&state=${u2.searchParams.get("state")}`);
+  const res = await fetch(`${u2.searchParams.get("redirect_uri")}?code=thecode&state=${u2.searchParams.get("state")}`, CLOSE);
   assert.equal(res.status, 200);
   await ok;
   assert.equal(saved?.refreshToken, "SECRET_RT");
   assert.match(tokenBody, /code=thecode/); assert.match(tokenBody, /code_verifier=/);
   assert.ok(!printed.join("\n").includes("SECRET"), "tokens must never be printed");
+});
+
+test("token endpoint failure: neither the thrown error nor any log carries the response body", async () => {
+  const body = JSON.stringify({ error: "invalid_grant", access_token: "LEAK_AT", refresh_token: "LEAK_RT", client_secret: "LEAK_CS" });
+  const http: Http = async () => ({ status: 400, body });
+  const leaks = (s: string) => /LEAK_|access_token|refresh_token|client_secret/.test(s);
+  const get = createTokenProvider({ client, http, store: { load: async () => ({ refreshToken: "rt" }), save: async () => {} } });
+  await assert.rejects(get(), (e: Error) => { assert.match(e.message, /HTTP 400 invalid_grant/); assert.ok(!leaks(e.message)); return true; });
+
+  const printed: string[] = [];
+  const login = runLogin({ client, http, print: (l) => printed.push(l), store: { load: async () => undefined, save: async () => {} } });
+  const outcome = login.then(() => undefined, (e: Error) => e);
+  while (printed.length < 2) await new Promise((r) => setTimeout(r, 5));
+  const u = new URL(printed[1]!);
+  await fetch(`${u.searchParams.get("redirect_uri")}?code=c&state=${u.searchParams.get("state")}`, CLOSE);
+  const err = await outcome;
+  assert.ok(err instanceof Error && /HTTP 400/.test(err.message) && !leaks(err.message));
+  assert.ok(!leaks(printed.join("\n")));
 });

@@ -69,6 +69,7 @@ export function listenForCode(state: string, timeoutMs = 300_000): { server: Ser
   let finish!: (r: { code?: string; error?: Error }) => void;
   const done = new Promise<{ code?: string; error?: Error }>((r) => { finish = r; });
   const timer = setTimeout(() => finish({ error: new Error("youtube-import: consent timed out") }), timeoutMs);
+  timer.unref();
   server.on("request", (req, res) => {
     const u = new URL(req.url ?? "/", "http://127.0.0.1");
     if (u.pathname !== "/callback") { res.writeHead(404).end(); return; }
@@ -80,7 +81,12 @@ export function listenForCode(state: string, timeoutMs = 300_000): { server: Ser
     server.once("error", reject);
     server.listen(0, "127.0.0.1", () => resolve(`http://127.0.0.1:${(server.address() as AddressInfo).port}/callback`));
   });
-  const result = done.then((r) => { clearTimeout(timer); server.close(); if (r.error) throw r.error; return r.code!; });
+  const result = done.then(async (r) => {
+    clearTimeout(timer);
+    await new Promise<void>((closed) => { server.close(() => closed()); server.closeAllConnections(); }); // fully closed before the caller continues
+    if (r.error) throw r.error;
+    return r.code!;
+  });
   return { server, ready, result };
 }
 
