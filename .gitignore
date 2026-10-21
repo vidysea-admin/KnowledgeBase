@@ -3,6 +3,8 @@
 **/.env.*
 !**/.env.example
 /config/client_secret.json
+/config/youtube-token.json
+/config/youtube-quota.json
 
 # node
 **/node_modules/
