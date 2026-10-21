@@ -1,8 +1,6 @@
 # Verdict: w26-composeenv
 
-VERDICT: FAIL
-Cycle checked: 1
-Reviewed SHA: 9352d626fb34dde6f1872e289e86ae7a5e8086a7
+VERDICT: PASSCycle checked: 2Reviewed SHA: c1ef44feae6fe3fc1d668657e8c4b74c1a381ed6
 (History: cycle 0 verdict FAIL at 9113881ba5b81ea438f33e6adeed802dd208b1bd, section "Cycle 0" below, kept unchanged.)
 ## Cycle 0 (FAIL, reviewed 9113881b)
 Base: origin/master (diff `origin/master...HEAD`, 4 files: .env.example, Dockerfile, docker-compose.yml, docs/GO-LIVE-UBUNTU.md)
@@ -57,3 +55,20 @@ Add to docs/GO-LIVE-UBUNTU.md section 9 (and prerequisites at line 11) that Dock
 
 ISSUES-WRITTEN: none
 Ledger rows may NOT be flipped yet. Not verified: docker compose config / container start (no docker); `ci` job outcome.
+
+---
+
+# Cycle 2 (candidate c1ef44feae6fe3fc1d668657e8c4b74c1a381ed6, diff 9352d626..c1ef44fe)
+
+VERDICT: PASS
+Cycle checked: 2
+Reviewed SHA: c1ef44feae6fe3fc1d668657e8c4b74c1a381ed6
+
+- Only docs/GO-LIVE-UBUNTU.md (plus qa/ files) changed since 9352d626; `git diff 9352d626 c1ef44fe -- . ':!qa'` shows no code, compose, Dockerfile or env change.
+- Compose 2.24+ statement: accurate. `env_file` long syntax with `required: false` was introduced in Docker Compose 2.24.0. It is now in prerequisites with an upgrade command.
+- Partial `.env.t028` warning: accurate against hosting.ts:59 (any defined name with incomplete config sets failedAuthentication, so authenticated routes return 503). "Fill all five or none" is correct.
+- CI (`gh pr checks 22`, waited to completion): ci, images, build-targets (api) and (web) all pass on both runs.
+- Cycle 0 and cycle 1 findings are closed. Not verified: real docker compose config or container start (no docker).
+
+ISSUES-WRITTEN: none
+Ledger rows may be flipped for w26-composeenv.
