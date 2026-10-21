@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os';
 import { resolve, relative, join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
+import { visionPlan, flagOff } from './vision/plan.mjs';
 import { slideFrameSpans, buildScreenEvidenceTurns, analyzeSlideFrame } from './slides/slide-knowledge.mjs';
 
 const VERSION = 3;
@@ -122,8 +123,9 @@ export function buildNotes(sessionId, frames, turns, ocrErrors = []) {
 export function screenEvidenceTurns(sessionId, tenantId, evidence) {
   return buildScreenEvidenceTurns(sessionId, tenantId, evidence, validateVision);
 }
-/** T-041: optional keyframe -> OCR -> slide/turn alignment stage (flag-gated by the caller; absent = nothing runs).
- * Writes slide-alignment.json (ids and ranges only, never slide text). A failing stage never fails the video stage. */
+/** T-041: keyframe -> OCR -> slide/turn alignment stage (default ON when a vision provider exists, see vision/plan.mjs;
+ * absent hook = nothing runs). Writes slide-alignment.json (ids and ranges only); the slide TEXT with timestamps is
+ * persisted by the screen stage in screen-evidence.json + knowledge-turns.json, which sync-session indexes for /ask. A failing stage never fails the video stage. */
 async function runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) {
   const outDir = mkdtempSync(join(tmpdir(), 'lkb-keyframes-'));
   try {
@@ -142,6 +144,8 @@ async function runSlideAlignment(slideAlignment, { dir, media, sessionId, turns,
 export async function keyframeOcrHook(env, transport, load = () => Promise.all([
   import('../../packages/core/src/keyframes/post-process.ts'), import('../../packages/core/src/keyframes/vision-ocr.ts')]), routed) {
   const [{ runKeyframeOcrPostProcess }, { createGeminiVisionOcr, KEYFRAME_OCR_PROMPT }] = await load();
+  // Default ON: the core flag is exact "1", so an unset flag is normalised here; an explicit off value stays off.
+  if (!flagOff(env.LKB_KEYFRAME_OCR) && env.LKB_KEYFRAME_OCR !== '1') env = { ...env, LKB_KEYFRAME_OCR: '1' };
   const make = (model) => createGeminiVisionOcr({ transport, apiKey: env.GEMINI_API_KEY, model });
   // ollamafirst: with a routed { lib, backends, tally, log } the primary OCR goes through the Ollama-first chain.
   const ocr = routed ? async (frame) => {
@@ -261,25 +265,30 @@ if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.m
     let vision, visionFallback, slideAlignment, routedReport;
     if (!dryRun) {
       await import('dotenv/config');
-      if (process.env.LKB_VISION_ROUTED === '1') {
+      const plan = visionPlan(process.env);
+      if (plan.reason) console.error(`slide text: skipped (${plan.reason})`);
+      if (plan.vision) {
         const { register } = await import('tsx/esm/api'); register();
         const { realTransport } = await import('../../apps/api/src/ai-transport.ts');
-        const lib = await import('../../packages/ai/src/vision/chain.ts');
-        const order = visionOrderFromYaml(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../config/ai-routing.yaml'), 'utf8'));
-        const backends = lib.buildVisionBackends(process.env, realTransport, order);
-        const tally = lib.newVisionTally(), log = (line) => console.error(line);
-        vision = routedVision(lib, backends, { tally, log });
-        if (process.env.LKB_KEYFRAME_OCR_FALLBACK_MODEL) visionFallback = geminiVision(realTransport,
-          { apiKey: process.env.GEMINI_API_KEY, model: process.env.LKB_KEYFRAME_OCR_FALLBACK_MODEL });
-        if (process.env.LKB_KEYFRAME_OCR === '1') slideAlignment = await keyframeOcrHook(process.env, realTransport, undefined, { lib, backends, tally, log });
-        routedReport = () => ({ order, backends: backends.map((b) => `${b.provider}/${b.model}`), ...tally });
-      } else if (process.env.GEMINI_API_KEY && process.env.WEBINAR_VISION_MODEL) {
-        const { register } = await import('tsx/esm/api'); register();
-        const { realTransport } = await import('../../apps/api/src/ai-transport.ts');
-        vision = geminiVision(realTransport, { apiKey: process.env.GEMINI_API_KEY, model: process.env.WEBINAR_VISION_MODEL });
-        if (process.env.LKB_KEYFRAME_OCR_FALLBACK_MODEL) visionFallback = geminiVision(realTransport,
-          { apiKey: process.env.GEMINI_API_KEY, model: process.env.LKB_KEYFRAME_OCR_FALLBACK_MODEL });
-        if (process.env.LKB_KEYFRAME_OCR === '1') slideAlignment = await keyframeOcrHook(process.env, realTransport);
+        const fb = () => process.env.LKB_KEYFRAME_OCR_FALLBACK_MODEL ? geminiVision(realTransport,
+          { apiKey: process.env.GEMINI_API_KEY, model: process.env.LKB_KEYFRAME_OCR_FALLBACK_MODEL }) : undefined;
+        if (plan.routed) {
+          const lib = await import('../../packages/ai/src/vision/chain.ts');
+          const order = visionOrderFromYaml(readFileSync(resolve(dirname(fileURLToPath(import.meta.url)), '../../config/ai-routing.yaml'), 'utf8'));
+          const backends = lib.buildVisionBackends(process.env, realTransport, order);
+          const tally = lib.newVisionTally(), log = (line) => console.error(line);
+          if (!backends.length) console.error('slide text: skipped (no usable vision backend in the configured order)');
+          else {
+            vision = routedVision(lib, backends, { tally, log });
+            visionFallback = fb();
+            if (plan.keyframeOcr) slideAlignment = await keyframeOcrHook(process.env, realTransport, undefined, { lib, backends, tally, log });
+            routedReport = () => ({ order, backends: backends.map((b) => `${b.provider}/${b.model}`), ...tally });
+          }
+        } else {
+          vision = geminiVision(realTransport, { apiKey: process.env.GEMINI_API_KEY, model: process.env.WEBINAR_VISION_MODEL });
+          visionFallback = fb();
+          if (plan.keyframeOcr) slideAlignment = await keyframeOcrHook(process.env, realTransport);
+        }
       }
     }
     const result = await processVideo({ root: resolve(dirname(fileURLToPath(import.meta.url)), '../..'),
