@@ -1,7 +1,9 @@
 # Verdict: w26-composeenv
 
-VERDICT: PASSCycle checked: 2Reviewed SHA: c1ef44feae6fe3fc1d668657e8c4b74c1a381ed6
-(History: cycle 0 verdict FAIL at 9113881ba5b81ea438f33e6adeed802dd208b1bd, section "Cycle 0" below, kept unchanged.)
+VERDICT: PASS
+Cycle checked: 2
+Reviewed SHA: c1ef44feae6fe3fc1d668657e8c4b74c1a381ed6
+(History: earlier cycle 0 and cycle 1 sections below are superseded FAIL records; the header above is authoritative.)
 ## Cycle 0 (FAIL, reviewed 9113881b)
 Base: origin/master (diff `origin/master...HEAD`, 4 files: .env.example, Dockerfile, docker-compose.yml, docs/GO-LIVE-UBUNTU.md)
 Method: static review plus CI (`gh pr checks 22`: ci, images, build-targets api and web all pass). No docker available; no tests run (no source changed).
