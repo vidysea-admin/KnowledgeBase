@@ -8,7 +8,9 @@ and the package scripts. The images were NOT built or run on the machine that wr
 (no Docker there). Run the checks below once and report anything that fails.
 
 ## 1. Prerequisites
-- Ubuntu 22.04+ with Docker Engine and the compose plugin (`docker compose version`).
+- Ubuntu 22.04+ with Docker Engine and Docker Compose v2.24 or newer (`docker compose version`).
+  Older compose cannot parse `docker-compose.yml` (`env_file` with `required: false`). Upgrade:
+  `sudo apt-get update && sudo apt-get install --only-upgrade docker-compose-plugin` (Docker's apt repo).
 - Outbound HTTPS (npm, GitHub release download of yt-dlp during build, Ollama Cloud).
 - A reachable MongoDB (NOT containerized by default) and an Ollama Cloud key.
 - Node/pnpm on the host only if you run the key-minting script (section 6).
@@ -129,16 +131,22 @@ confirm pages load with no CORS errors in the console (if they appear, fix
 
 ## 9. Launch feature flags (D-189)
 At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
-- T-028 is enabled by environment on the api container. All five must be set, else
-  the feature fails closed (key checks return 503, no accounts):
-  `LKB_HOSTING_STATE_DIR` (absolute path, a mounted volume),
-  `LKB_COUNSELLOR_STATE_DIR` (absolute, a different path from the hosting dir),
-  `LKB_HOSTING_ENCRYPTION_KEY` (64 hex characters, generate with `openssl rand -hex 32`),
-  `LKB_HOSTING_BOOTSTRAP_ADMINS` (JSON `{"toc":["<key-id>"]}`, key ids from `mint-key`),
-  `LKB_HOSTING_WEBHOOK_ORIGINS` (JSON array of `https://` origins, may be `["https://app.example.org"]`).
-  Honest gap: `docker-compose.yml` forwards none of these names, so add them to the api
-  `environment:` and mount the two state dirs as volumes (compose override file). Keep
-  the key in `.env` only.
+- T-028: put all five in a separate file `.env.t028` next to `docker-compose.yml` (chmod 600,
+  gitignored), NOT in `.env`. Compose reads it only if it exists, so without the file the
+  five names stay undefined and everything works with T-028 off. Never create the file with
+  blank or partial values: the API treats a defined-but-incomplete set (even an empty string) as a
+  misconfiguration and answers every authenticated route 503. All five are required together:
+  `LKB_HOSTING_STATE_DIR=/var/lib/lkb/hosting` and `LKB_COUNSELLOR_STATE_DIR=/var/lib/lkb/counsellor`
+  (exactly these paths; they are the named volumes `lkb-hosting-state` and `lkb-counsellor-state`, so
+  state survives restarts; back the volumes up too),
+  `LKB_HOSTING_ENCRYPTION_KEY` (the code requires exactly 64 hex characters = 32 bytes; generate
+  with `openssl rand -hex 32`, NOT base64, which is rejected),
+  `LKB_HOSTING_BOOTSTRAP_ADMINS='{"toc":["<key-id>"]}'` (key ids from `mint-key`),
+  `LKB_HOSTING_WEBHOOK_ORIGINS='["https://app.example.org"]'` (https origins only).
+  WARNING: a partially filled `.env.t028` makes every authenticated route return 503: fill all five or
+  none (delete the file to turn T-028 off).
+  Single-quote the JSON values. Back the key up with the volumes; losing it makes stored account
+  data unreadable. Never commit it. Then `docker compose up -d --build api`.
 - T-014 championship: leave `LKB_CHAMPIONSHIP` unset (it is on only when `=1`).
 - T-013 avatar: no environment flag exists; leave it unannounced. The `/counsellor` page
   ships in the web bundle either way.

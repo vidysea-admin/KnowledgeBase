@@ -63,6 +63,15 @@ services:
       OLLAMA_CLOUD_VERIFIER_MODEL: ${OLLAMA_CLOUD_VERIFIER_MODEL:-deepseek-v4.1-flash}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       PORT: 3300
+    # T-028 (D-189): the five LKB_HOSTING_* / LKB_COUNSELLOR_STATE_DIR names are read from the optional file
+    # .env.t028 ONLY. When the file is absent they stay UNDEFINED in the container: the API treats any
+    # defined-but-incomplete value (even an empty string) as a misconfiguration and answers auth routes 503.
+    env_file:
+      - path: .env.t028
+        required: false
+    volumes:
+      - lkb-hosting-state:/var/lib/lkb/hosting
+      - lkb-counsellor-state:/var/lib/lkb/counsellor
     restart: unless-stopped
 
   # Static SPA behind nginx (root Dockerfile's `web` target). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
@@ -90,4 +99,6 @@ services:
       - lkb-local-mongo:/data/db
 
 volumes:
+  lkb-hosting-state:
+  lkb-counsellor-state:
   lkb-local-mongo:
