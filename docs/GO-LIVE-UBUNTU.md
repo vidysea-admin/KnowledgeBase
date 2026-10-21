@@ -90,6 +90,7 @@ pnpm install --frozen-lockfile
 node scripts/mint-key.mjs --tenant toc --label first-key
 ```
 (Run it with `MONGODB_DB=lkb_prod MONGO_WORK_DB=lkb_prod`; the legacy `lkb` is not used.)
+For the first operator admin key (every scope, incl. `answer-policy:*`, `automation:*`, `hosting`, `jobs`), add `--all-scopes`; for a narrower key use `--scopes answer-policy:read,jobs`.
 Data from other machines is not copied by deploying; import the corpus separately.
 
 ### 6a. Dedicated Mongo user for the product (D-186)
