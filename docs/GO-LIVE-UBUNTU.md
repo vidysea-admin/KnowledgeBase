@@ -108,9 +108,23 @@ password). Check: `mongosh "<MONGODB_URL>" --eval 'db.runCommand({ping:1})'`.
 read through a snapshot transaction (`apps/api/src/visibility/read-snapshot.ts`, no fallback). On a
 standalone `mongod` every one of them fails with `Transaction numbers are only allowed on a replica
 set member or mongos`, and Ask returns 503 `answer_history_unavailable` (the generic wrapper hides
-the cause; `/health` stays 200). A one-node set is enough: start `mongod` with `--replSet rs0` (or
-`replication.replSetName` in `mongod.conf`), run `rs.initiate()` once, and add `replicaSet=rs0` to
-`MONGODB_URL`. Check: `mongosh "<MONGODB_URL>" --eval 'db.hello().setName'` prints the set name.
+the cause; `/health` stays 200). A one-node set is enough. Set it up in this order (the order matters, so you cannot lock yourself out):
+1. Before you start: converting an existing standalone needs one `mongod` restart (brief downtime) and
+   a backup first: `mongodump --uri "<MONGODB_URL>" --out /backup/pre-rs`. No data is lost.
+2. Create the keyFile (required for `--replSet` once auth is on):
+   `openssl rand -base64 756 > /etc/mongo-keyfile && chmod 400 /etc/mongo-keyfile && chown mongodb:mongodb /etc/mongo-keyfile`
+   (use the real mongod user and group).
+3. In `mongod.conf` set `replication.replSetName: rs0` and `security.keyFile: /etc/mongo-keyfile`.
+   Do NOT set `security.authorization: enabled` yet. Restart mongod.
+4. Initiate with an explicit host that the API container can reach (not `localhost`):
+   `rs.initiate({_id:"rs0",members:[{_id:0,host:"<host-or-ip-reachable-from-the-api-container>:27017"}]})`.
+5. Create the `lkb_app` user (section 6a above) on the primary, then set
+   `security.authorization: enabled` and restart mongod. (If auth was already on, use the localhost
+   exception from a shell on the Mongo host for `rs.initiate`, then authenticate as an admin.)
+6. Recommended: add `replicaSet=rs0` to `MONGODB_URL` (with the explicit host above). Only if the member
+   host cannot be made reachable from the API, use `directConnection=true` instead; it still supports
+   the transaction, but then do not add `replicaSet`.
+Check: `mongosh "<MONGODB_URL>" --eval 'db.hello().setName'` prints the set name.
 Ask does NOT depend on the T-028 env in section 9.
 
 ## 7. Smoke test
@@ -142,8 +156,8 @@ confirm pages load with no CORS errors in the console (if they appear, fix
 
 ## 9. Launch feature flags (D-189)
 At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
-- T-028 gates only key lifecycle (`GET/POST /keys`) and counsellor accounts. Without the five names, `/keys`
-  answers 503 `hosting_unavailable` by design; Ask and the rest of the API are unaffected.
+- T-028 hosting env gates `/keys`, `/hosting`, `/webhooks`, operations schedules, automation and capture
+  readiness. Without the five names, `/keys` answers 503 `hosting_unavailable` by design. Ask is unaffected.
 - T-028: put all five in a separate file `.env.t028` next to `docker-compose.yml` (chmod 600,
   gitignored), NOT in `.env`. Compose reads it only if it exists, so without the file the
   five names stay undefined and everything works with T-028 off. Never create the file with
