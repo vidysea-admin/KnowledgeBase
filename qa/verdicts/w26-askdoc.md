@@ -1,8 +1,31 @@
 # Verdict: w26-askdoc
 
 VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 8c1f0ecfea5d2456e8b6acb5d016bb2838c4cb4b
+Cycle checked: 1
+Reviewed SHA: 19bd805a0dc27905275adfb3d2b5a88608ab161c
+(History: the cycle 0 section below is a superseded FAIL record, reviewed 8c1f0ecfea5d2456e8b6acb5d016bb2838c4cb4b; this header is authoritative.)
+
+## Cycle 1 (FAIL, reviewed 19bd805a)
+Method: static review of `git diff origin/master...19bd805a` (docs/GO-LIVE-UBUNTU.md only). No mongod/mongosh on this machine; auth behaviour below rests on documented MongoDB behaviour plus the repo's own proposal files, not a live run.
+
+Cycle 0 findings re-checked:
+- F1 keyFile: FIXED (step 2 creates it, `openssl rand -base64 756` is valid size, chmod 400, mongod owner; step 3 sets `security.keyFile`).
+- F2 explicit host: FIXED (step 4 `rs.initiate` with a reachable host:port; step 6 recommends `replicaSet=rs0`, `directConnection=true` as fallback without `replicaSet`).
+- F3 T-028 scope: FIXED. The new list (/keys, /hosting, /webhooks, operations schedules, automation, capture readiness) matches `hosting.ts` / `production.ts:291-297` / `routes.ts:55,79` / `automation.ts:35`; "Ask is unaffected" is true.
+- Data loss: none. Step 1 mongodump backup, one brief restart; conversion to a replica set and `rs.initiate` keep existing data files.
+
+New blocking finding F4 (step order does not do what it claims):
+- Step 3 says "Do NOT set security.authorization yet" and the heading says the order means "you cannot lock yourself out". Per MongoDB documentation, setting `security.keyFile` implicitly enables client authorization, so auth IS on after step 3. The guide's mental model is wrong. The repo's own proposal (`qa/coordination/knowledge-brain-20261015/staging-replica-proposal/compose.yml:29`) passes both `--auth --keyFile`.
+- With auth on and no users, the localhost exception applies, so `rs.initiate` in step 4 works (this matches MongoDB's keyfile deployment tutorial). But the exception only lets you create the FIRST user, and step 5 creates only `lkb_app` (readWrite on lkb_prod, no createUser or replSetConfigure rights). The localhost exception then closes and nobody holds an admin or cluster role: the exact lock-out the guide says it prevents. Recovery needs a restart with auth disabled. No data loss, but an avoidable outage on a fresh set-up. The repo's proposal always creates a root/admin identity first (`replica-init.js`).
+- If users already exist (the normal case for the existing deployment, where section 6a already ran), the localhost exception does NOT apply. Then step 4 needs an authenticated admin with cluster privileges; the parenthetical "use the localhost exception ... then authenticate as an admin" is wrong in that case.
+Required fix (doc only): after step 3 say authorization is already enforced by the keyFile; for a fresh set-up, via localhost run `rs.initiate`, then create an admin first (`use admin; db.createUser({user:"<ADMIN>",pwd:"<PASSWORD>",roles:["root"]})`), authenticate, then create `lkb_app`; for an existing deployment with users, authenticate as an existing admin that holds cluster privileges (e.g. root) for `rs.initiate`, and do not mention the localhost exception. Drop the "cannot lock yourself out" claim or make it true. Step 5's "then set authorization: enabled and restart" is then unnecessary.
+
+Secrets: none in the cycle 1 diff (placeholders only).
+Remaining gates: re-check at cycle 2; ideally one live run against a throwaway mongod to confirm the order.
+
+---
+
+## Cycle 0 (FAIL, reviewed 8c1f0ecf)
 Base: origin/master fd471686d0f8b0b225da2c07563d1a3342fbc385 (diff `origin/master...HEAD`: 1 file, docs/GO-LIVE-UBUNTU.md, +13)
 Method: static code review only (docs-only unit; no tests or builds run; no mongod/mongosh on this machine, so no live standalone-vs-replica-set run). Checker metrics: not measured (BOOTSTRAP_REVIEW scope, ratio unverified).
 
