@@ -16,42 +16,49 @@ function badgeClass(status: Gap["status"]): string {
   return "badge badge-bad";
 }
 
-interface Counts {
-  sessions: number;
-  sources: number;
-  activeKeys: number;
+type Panel<T> = { state: "loading" } | { state: "ok"; data: T } | { state: "error"; note: string };
+
+/** One short inline note per failed panel. 503 is the unconfigured-hosting case (`hosting_unavailable`). */
+function failureNote(label: string, err: unknown): string {
+  if (err instanceof ApiError && err.status === 503) return `${label} unavailable (hosting not configured)`;
+  const detail = err instanceof ApiError ? err.message : "failed to load";
+  return `${label} unavailable (${detail})`;
+}
+
+function Note({ text }: { text: string }): React.ReactElement {
+  return <div className="card error-note" role="note">{text}</div>;
 }
 
 export function DashboardPage(): React.ReactElement {
   const { apiKey } = useAuth();
-  const [counts, setCounts] = useState<Counts | null>(null);
-  const [recentSessions, setRecentSessions] = useState<SessionSummary[] | null>(null);
-  const [gaps, setGaps] = useState<Gap[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<Panel<SessionSummary[]>>({ state: "loading" });
+  const [sources, setSources] = useState<Panel<number>>({ state: "loading" });
+  const [keys, setKeys] = useState<Panel<number>>({ state: "loading" });
+  const [gaps, setGaps] = useState<Panel<Gap[]>>({ state: "loading" });
 
   useEffect(() => {
     let cancelled = false;
     // Every number here comes from an already-real, already-checker-PASSed route (GET
-    // /sessions, /sources, /keys, /gaps) -- no new backend, no aggregate endpoint, just the
-    // real per-resource lists this dashboard reads the length/contents of. Real data or an
-    // honest error, never a placeholder number.
-    Promise.all([listSessions(apiKey), listSources(apiKey), listKeys(apiKey), listGaps(apiKey)])
-      .then(([sessionsRes, sourcesRes, keysRes, gapsRes]) => {
-        if (cancelled) return;
-        const sorted = [...sessionsRes.sessions].sort((a, b) => b.date.localeCompare(a.date));
-        setRecentSessions(sorted.slice(0, 5));
-        setCounts({
-          sessions: sessionsRes.sessions.length,
-          sources: sourcesRes.sources.length,
-          activeKeys: keysRes.keys.filter((k) => !k.revokedAt).length,
-        });
-        setGaps(gapsRes.gaps);
-      })
-      .catch((err: unknown) => { if (!cancelled) setError(err instanceof ApiError ? err.message : "failed to load dashboard data"); });
+    // /sessions, /sources, /keys, /gaps). Each panel loads and fails on its own: one failing
+    // route (e.g. /keys 503 when hosting is not configured) must not blank the others.
+    // Real data or an honest per-panel note, never a placeholder number.
+    const track = <T, U>(label: string, load: Promise<T>, pick: (v: T) => U, set: (p: Panel<U>) => void): void => {
+      load.then(
+        (v) => { if (!cancelled) set({ state: "ok", data: pick(v) }); },
+        (err: unknown) => { if (!cancelled) set({ state: "error", note: failureNote(label, err) }); },
+      );
+    };
+    setSessions({ state: "loading" }); setSources({ state: "loading" }); setKeys({ state: "loading" }); setGaps({ state: "loading" });
+    track("Sessions", listSessions(apiKey), (r) => r.sessions, setSessions);
+    track("Sources", listSources(apiKey), (r) => r.sources.length, setSources);
+    track("API keys", listKeys(apiKey), (r) => r.keys.filter((k) => !k.revokedAt).length, setKeys);
+    track("Knowledge health", listGaps(apiKey), (r) => r.gaps, setGaps);
     return () => { cancelled = true; };
   }, [apiKey]);
 
-  if (error) return <div className="card error-note">{error}</div>;
+  const recentSessions = sessions.state === "ok" ? [...sessions.data].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5) : null;
+  const openGaps = gaps.state === "ok" ? gaps.data.filter((g) => g.status === "open").length : 0;
+  const notes = [sessions, sources, keys].flatMap((p) => (p.state === "error" ? [p.note] : []));
 
   return (
     <>
@@ -60,15 +67,14 @@ export function DashboardPage(): React.ReactElement {
         <p>A real, at-a-glance view of this tenant's knowledge base &mdash; every number below is live.</p>
       </div>
 
-      {!counts && <div className="card empty-note">Loading&hellip;</div>}
-      {counts && gaps && (
-        <div className="stat-grid">
-          <StatCard icon={<SessionsIcon />} label="Sessions" value={counts.sessions} tone="accent" />
-          <StatCard icon={<SourcesIcon />} label="Sources" value={counts.sources} tone="accent" />
-          <StatCard icon={<KeyIcon />} label="Active API keys" value={counts.activeKeys} tone="good" />
-          <StatCard icon={<GapIcon />} label="Open gaps" value={gaps.filter((g) => g.status === "open").length} tone={gaps.some((g) => g.status === "open") ? "warn" : "good"} />
-        </div>
-      )}
+      {[sessions, sources, keys, gaps].some((p) => p.state === "loading") && <div className="card empty-note">Loading&hellip;</div>}
+      {notes.map((n) => <Note key={n} text={n} />)}
+      <div className="stat-grid">
+        {sessions.state === "ok" && <StatCard icon={<SessionsIcon />} label="Sessions" value={sessions.data.length} tone="accent" />}
+        {sources.state === "ok" && <StatCard icon={<SourcesIcon />} label="Sources" value={sources.data} tone="accent" />}
+        {keys.state === "ok" && <StatCard icon={<KeyIcon />} label="Active API keys" value={keys.data} tone="good" />}
+        {gaps.state === "ok" && <StatCard icon={<GapIcon />} label="Open gaps" value={openGaps} tone={openGaps > 0 ? "warn" : "good"} />}
+      </div>
 
       {recentSessions && (
         <>
@@ -88,15 +94,15 @@ export function DashboardPage(): React.ReactElement {
       )}
 
       <div className="section-title">Knowledge health</div>
-      {gaps === null && <div className="card empty-note">Loading&hellip;</div>}
-      {gaps && gaps.length === 0 && (
+      {gaps.state === "error" && <Note text={gaps.note} />}
+      {gaps.state === "ok" && gaps.data.length === 0 && (
         <div className="card empty-note">
           No gaps recorded for this tenant &mdash; either everything is covered, or gap-tracking hasn't logged anything yet.
         </div>
       )}
-      {gaps && gaps.length > 0 && (
+      {gaps.state === "ok" && gaps.data.length > 0 && (
         <div className="card">
-          {gaps.map((g) => (
+          {gaps.data.map((g) => (
             <div key={g._id} className="row-card">
               <div className="row-title">
                 {g.kind} <span className={badgeClass(g.status)}>{g.status}</span>
