@@ -108,22 +108,26 @@ password). Check: `mongosh "<MONGODB_URL>" --eval 'db.runCommand({ping:1})'`.
 read through a snapshot transaction (`apps/api/src/visibility/read-snapshot.ts`, no fallback). On a
 standalone `mongod` every one of them fails with `Transaction numbers are only allowed on a replica
 set member or mongos`, and Ask returns 503 `answer_history_unavailable` (the generic wrapper hides
-the cause; `/health` stays 200). A one-node set is enough. Set it up in this order (the order matters, so you cannot lock yourself out):
-1. Before you start: converting an existing standalone needs one `mongod` restart (brief downtime) and
-   a backup first: `mongodump --uri "<MONGODB_URL>" --out /backup/pre-rs`. No data is lost.
-2. Create the keyFile (required for `--replSet` once auth is on):
-   `openssl rand -base64 756 > /etc/mongo-keyfile && chmod 400 /etc/mongo-keyfile && chown mongodb:mongodb /etc/mongo-keyfile`
-   (use the real mongod user and group).
-3. In `mongod.conf` set `replication.replSetName: rs0` and `security.keyFile: /etc/mongo-keyfile`.
-   Do NOT set `security.authorization: enabled` yet. Restart mongod.
-4. Initiate with an explicit host that the API container can reach (not `localhost`):
+the cause; `/health` stays 200). A one-node set is enough. Follow this order exactly. `security.keyFile` turns authorization on by
+implication, so the admin user must exist BEFORE the keyFile is added, or the localhost exception
+closes with no admin and you are locked out:
+1. Back up first: `mongodump --uri "<MONGODB_URL>" --out /backup/pre-rs`. Converting an existing
+   standalone needs mongod restarts (brief downtime); no data is lost.
+2. Set `replication.replSetName: rs0` in `mongod.conf` (or `--replSet rs0`), with NO `security.keyFile`
+   and no authorization yet. Restart mongod.
+3. Initiate with an explicit host the API container can reach (not `localhost`):
    `rs.initiate({_id:"rs0",members:[{_id:0,host:"<host-or-ip-reachable-from-the-api-container>:27017"}]})`.
-5. Create the `lkb_app` user (section 6a above) on the primary, then set
-   `security.authorization: enabled` and restart mongod. (If auth was already on, use the localhost
-   exception from a shell on the Mongo host for `rs.initiate`, then authenticate as an admin.)
-6. Recommended: add `replicaSet=rs0` to `MONGODB_URL` (with the explicit host above). Only if the member
-   host cannot be made reachable from the API, use `directConnection=true` instead; it still supports
-   the transaction, but then do not add `replicaSet`.
+4. On the primary create an admin user, then the app user:
+   `use admin` then `db.createUser({user:"admin",pwd:"<ADMIN-PASSWORD>",roles:["root"]})`
+   (or `userAdminAnyDatabase` + `clusterAdmin`), then `use lkb_prod` and create `lkb_app` with
+   `readWrite` on `lkb_prod` as in the block above. If users already exist, skip creating the admin and
+   use your existing admin.
+5. Create the keyFile: `openssl rand -base64 756 > /etc/mongo-keyfile && chmod 400 /etc/mongo-keyfile && chown mongodb:mongodb /etc/mongo-keyfile`
+   (use the real mongod user and group). Add `security.keyFile: /etc/mongo-keyfile` to `mongod.conf`
+   (this implies `authorization`). Restart mongod.
+6. Verify: `mongosh -u admin -p --authenticationDatabase admin --eval 'rs.status().ok'` prints 1.
+7. Set `MONGODB_URL` with `replicaSet=rs0` and the explicit host above (recommended). Only if the member
+   host cannot be made reachable from the API, use `directConnection=true` instead of `replicaSet`.
 Check: `mongosh "<MONGODB_URL>" --eval 'db.hello().setName'` prints the set name.
 Ask does NOT depend on the T-028 env in section 9.
 
