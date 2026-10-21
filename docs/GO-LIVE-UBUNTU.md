@@ -129,17 +129,20 @@ confirm pages load with no CORS errors in the console (if they appear, fix
 
 ## 9. Launch feature flags (D-189)
 At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
-- T-028: set these in `.env`; `docker-compose.yml` now forwards them to the api. All five
-  must be set, else the feature fails closed (key checks return 503, no accounts):
-  `LKB_HOSTING_STATE_DIR` and `LKB_COUNSELLOR_STATE_DIR` (absolute, different paths; leave
-  EMPTY to use the defaults `/var/lib/lkb/hosting` and `/var/lib/lkb/counsellor`, which are
-  the named volumes `lkb-hosting-state` and `lkb-counsellor-state`, so they survive restarts),
+- T-028: put all five in a separate file `.env.t028` next to `docker-compose.yml` (chmod 600,
+  gitignored), NOT in `.env`. Compose reads it only if it exists, so without the file the
+  five names stay undefined and everything works with T-028 off. Never create the file with
+  blank or partial values: the API treats a defined-but-incomplete set (even an empty string) as a
+  misconfiguration and answers every authenticated route 503. All five are required together:
+  `LKB_HOSTING_STATE_DIR=/var/lib/lkb/hosting` and `LKB_COUNSELLOR_STATE_DIR=/var/lib/lkb/counsellor`
+  (exactly these paths; they are the named volumes `lkb-hosting-state` and `lkb-counsellor-state`, so
+  state survives restarts; back the volumes up too),
   `LKB_HOSTING_ENCRYPTION_KEY` (the code requires exactly 64 hex characters = 32 bytes; generate
-  with `openssl rand -hex 32`, NOT base64, which is rejected and disables the feature),
-  `LKB_HOSTING_BOOTSTRAP_ADMINS` (JSON `{"toc":["<key-id>"]}`, key ids from `mint-key`),
-  `LKB_HOSTING_WEBHOOK_ORIGINS` (JSON array of `https://` origins, e.g. `["https://app.example.org"]`).
-  Back the key up with `.env`; losing it makes stored account data unreadable. Never commit it.
-  After editing: `docker compose up -d api` (rebuild api once so the state dirs exist).
+  with `openssl rand -hex 32`, NOT base64, which is rejected),
+  `LKB_HOSTING_BOOTSTRAP_ADMINS='{"toc":["<key-id>"]}'` (key ids from `mint-key`),
+  `LKB_HOSTING_WEBHOOK_ORIGINS='["https://app.example.org"]'` (https origins only).
+  Single-quote the JSON values. Back the key up with the volumes; losing it makes stored account
+  data unreadable. Never commit it. Then `docker compose up -d --build api`.
 - T-014 championship: leave `LKB_CHAMPIONSHIP` unset (it is on only when `=1`).
 - T-013 avatar: no environment flag exists; leave it unannounced. The `/counsellor` page
   ships in the web bundle either way.
