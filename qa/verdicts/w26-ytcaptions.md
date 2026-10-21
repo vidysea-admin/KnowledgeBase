@@ -1,8 +1,28 @@
 # Verdict: w26-ytcaptions
 
-VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 22edd1bc8db45e61b6edf305ff25fa1fd15d61cb
+VERDICT: PASS
+Cycle checked: 1
+Reviewed SHA: deceb87c0d63163e1da9d6dd4e07de4cc963b1c5
+Base: 60cf1f683dbd5dcc0163b668df111d62ba4a2563
+Class: security (credential handling, data writes)
+
+## Cycle 1 evidence (independent)
+- Diff 22edd1bc..deceb87c reviewed: oauth.ts (timer.unref, listener fully closed incl. closeAllConnections), new staging-guard.ts (requireStagingDatabase = requireDatabaseName + exact lkb_staging) used by cli.ts which returns 2 before connect, new tests, manifest. No other product change.
+- Tests (from apps/api, `timeout 600 node --test --test-force-exit --import tsx` on captions, oauth, import, staging-guard): 19 pass / 0 fail, exit 0; the cycle 0 libuv teardown crash is gone.
+- tsc --noEmit -p tsconfig.json: exit 0.
+- Mutant M1 (cycle 0 finding 1, append ${res.body} to the tokenCall error in oauth.ts): now KILLED by "token endpoint failure: neither the thrown error nor any log carries the response body" (18 pass / 1 fail).
+- Mutant M2 (new, staging-guard.ts: disable the lkb_staging exact check): KILLED by "staging guard refuses every non-staging target..." (18 pass / 1 fail).
+- D-020: per-mutation byte backup, trap INT/TERM/ERR, timeout 300; after both, `git -c core.autocrlf=true hash-object` equals `git rev-parse HEAD:<file>` for oauth.ts (2ca072bf7d3f7b5569ea36b6f0f5d0be735da963) and staging-guard.ts (ebbab168ce3522b41cbeafac339e5ba6cffc417e); working tree clean.
+- Cycle 0 findings 1 and 2 resolved; notes 3 (teardown) resolved, note 4 (Windows 0600 best-effort, JSON.parse snippet, .dockerignore) remain optional.
+- Not verified: live Google/OAuth, Mongo, lint-loc; maker/checker token ratios not recorded (unverified).
+
+ISSUES-WRITTEN: none. Ledger rows for w26-ytcaptions may be flipped; maker may close out to checked-PASS.
+
+## Cycle 0 record
+
+Cycle 0 result (historical, superseded by cycle 1 above): FAIL
+Cycle 0 checked: 0
+Cycle 0 reviewed SHA: 22edd1bc8db45e61b6edf305ff25fa1fd15d61cb
 Base: 60cf1f683dbd5dcc0163b668df111d62ba4a2563
 Class: security (credential handling, data writes)
 
