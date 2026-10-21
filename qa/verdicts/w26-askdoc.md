@@ -1,9 +1,24 @@
 # Verdict: w26-askdoc
 
-VERDICT: FAIL
-Cycle checked: 1
-Reviewed SHA: 19bd805a0dc27905275adfb3d2b5a88608ab161c
-(History: the cycle 0 section below is a superseded FAIL record, reviewed 8c1f0ecfea5d2456e8b6acb5d016bb2838c4cb4b; this header is authoritative.)
+VERDICT: PASS
+Cycle checked: 2
+Reviewed SHA: 6203f224adc1f0d1199148c5241c3e093134f37c
+(History: the cycle 1 and cycle 0 sections below are superseded FAIL records; this header is authoritative.)
+
+## Cycle 2 (PASS, reviewed 6203f224)
+Method: static review of `git diff d4e58489 6203f224` and `git diff origin/master...6203f224` (docs/GO-LIVE-UBUNTU.md plus maker manifest only; no source). No mongod on this machine; MongoDB behaviour below is documented behaviour and the repo's own proposal files, not a live run. Checker metrics not measured (ratio unverified).
+
+F4 (lockout) re-checked: RESOLVED. New order: backup; `replSetName` with no keyFile and no authorization; `rs.initiate` with explicit reachable host; create `admin` (root) then `lkb_app` on the primary while auth is still off (creating users on an auth-less primary is allowed and replicates); only then add `security.keyFile` (implies authorization) and restart; verify with `mongosh -u admin ... rs.status().ok`. An admin with root exists before auth turns on, so nobody is locked out. The "skip the admin if users exist" note is consistent because auth is off during steps 2-4.
+Earlier findings stay fixed: keyFile creation/size/mode (`openssl rand -base64 756`, chmod 400, mongod owner); explicit member host; T-028 scope matches `hosting.ts` / `production.ts:291-297` / `routes.ts:55,79` / `automation.ts:35`.
+Data loss: none. Step 1 mongodump; restarts only; `replSetName` plus `rs.initiate` keep existing data files; no drop, delete or reinit step.
+Connection string: step 7 adds `replicaSet=rs0` with the explicit host; `directConnection=true` (without `replicaSet`) only as fallback. The section 2 placeholder already carries `authSource=lkb_prod`, matching where `lkb_app` is created. Correct.
+Secrets: none (placeholders only: `<ADMIN-PASSWORD>`, `<PASSWORD>`).
+Read/ask path claims from cycle 0 (snapshot transactions, 503 masking) unchanged and still correct.
+
+Non-blocking notes (not backlog): (a) a deployment that already runs with `security.authorization: enabled` must remove it for step 2, because replSet plus auth without a keyFile refuses to start (recoverable, no data loss); step 2 says "no authorization yet" but could say so explicitly, and the DB is unauthenticated during steps 2-4, so keep it bound to the server IP/firewalled. (b) Snapshot use also exists in speaker-profiles and whatsapp-review.
+Remaining gates: none for this docs-only unit; a live run on a throwaway mongod was not done.
+
+---
 
 ## Cycle 1 (FAIL, reviewed 19bd805a)
 Method: static review of `git diff origin/master...19bd805a` (docs/GO-LIVE-UBUNTU.md only). No mongod/mongosh on this machine; auth behaviour below rests on documented MongoDB behaviour plus the repo's own proposal files, not a live run.
