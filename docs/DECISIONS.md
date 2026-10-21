@@ -2474,3 +2474,48 @@ fourth would have left real decisions idle behind an unrelated unit.
 - qa/manifests/w25-t040fix.md
 **Approved-by:** Umesh (verbatim quote in What)
 **Links:** T-040, D-162, D-144, D-151, qa/manifests/w25-t040fix.md
+
+## D-186 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** Production database `lkb_prod` is authorized for the deployed app
+**What:** Umesh (Approver) accepted the go-live owner defaults in chat on 2026-10-21, verbatim: "go on defaults ok". Defaults covered by this entry: #3 TLS via Let's Encrypt behind the team's proxy; #4 production database name `lkb_prod` on the same Mongo host; #5 a dedicated Mongo user and password for the product, created by the team and never stored in the repo; #6 OLLAMA_API_KEY copied from this machine into the server .env by the team and never printed; #9 the meeting bot stays on this Windows machine.
+- Rule 1, the deployed app may write to the Mongo database `lkb_prod` (MONGODB_DB=lkb_prod).
+- Rule 2, the script and migration database guards stay staging-only: `lkb`, `global_university_db` and unflagged `lkb_staging` remain refused as before. Only a later decision changes the guards.
+- Rule 3, no secret enters the repo: the Mongo password, the Mongo URL with credentials and OLLAMA_API_KEY live only in the server .env.
+**Why:** The team needs a named production database to go live, and the Approver accepted the proposed defaults as presented.
+**Result:** docs/GO-LIVE-UBUNTU.md documents lkb_prod, dedicated-user creation, Let's Encrypt and key handling. No code or guard change is made.
+**Supersedes:** D-117 -- its "no production writes" stance no longer applies to the deployed app, which may now write to lkb_prod; D-117 still holds for local, test and script work.
+**Changes-authorized:**
+- docs/GO-LIVE-UBUNTU.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** D-117, D-173, D-150, T-051, T-052
+
+## D-187 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** U2.4 accuracy gate is scoped to the 11 sessions that have human gold
+**What:** Umesh (Approver) accepted default #10 in chat on 2026-10-21, verbatim: "go on defaults ok". The U2.4 accuracy gate is measured on the 11 sessions that have human gold labels, not on the whole corpus.
+**Why:** Only those 11 sessions carry human gold, so only they can be scored without substituting machine labels for human judgment. ISS-290 records that the phase-3 measurement harness has no corpus pin and silently degrades gold coverage when the corpus changes; the 11-session scope is the pin.
+**Result:** Gate runs and reports name the 11 gold sessions explicitly. ISS-290 stays open until the harness pins the corpus to them. No contract edit is authorized by this entry.
+**Changes-authorized:**
+- none
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** U2.4, ISS-290, D-163, D-183
+
+## D-188 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** T-041 slide text is stored and feeds search
+**What:** Umesh (Approver) accepted default #11 in chat on 2026-10-21, verbatim: "go on defaults ok". Text recognised from slide keyframes (T-041 OCR) is stored with its session and time alignment and is indexed so that search can return it.
+**Why:** Slide text carries content that is often not spoken aloud, and the Approver accepted storing it and using it for search.
+**Result:** T-041 may persist slide text and feed it to the search index. Tenant scoping and the existing retention and consent rules apply to it like any other stored text. No contract edit is authorized by this entry.
+**Changes-authorized:**
+- none
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-041, G4, T-040
+
+## D-189 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** Launch feature set: counsellor accounts on, avatar and championship later
+**What:** Umesh (Approver) accepted default #12 in chat on 2026-10-21, verbatim: "go on defaults ok". At launch only T-028 counsellor accounts is enabled. T-013 avatar and T-014 championship are enabled later.
+**Why:** Counsellor accounts are needed for real users on day one, while the avatar client and the championship run are not ready for launch and stay off.
+**Result:** The go-live guide sets the T-028 environment and leaves LKB_CHAMPIONSHIP unset. T-028 moves from deferred to a launch item. T-013 has no environment flag. The /counsellor page ships with the web bundle and is not gated by a flag.
+**Amends:** None superseded. Changes the earlier "T-028 deferred" note in TASKS.md for launch only.
+**Changes-authorized:**
+- docs/GO-LIVE-UBUNTU.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-028, T-013, T-014, D-186
