@@ -1,8 +1,10 @@
 # Verdict: w26-composeenv
 
 VERDICT: FAIL
-Cycle checked: 0
-Reviewed SHA: 9113881ba5b81ea438f33e6adeed802dd208b1bd
+Cycle checked: 1
+Reviewed SHA: 9352d626fb34dde6f1872e289e86ae7a5e8086a7
+(History: cycle 0 verdict FAIL at 9113881ba5b81ea438f33e6adeed802dd208b1bd, section "Cycle 0" below, kept unchanged.)
+## Cycle 0 (FAIL, reviewed 9113881b)
 Base: origin/master (diff `origin/master...HEAD`, 4 files: .env.example, Dockerfile, docker-compose.yml, docs/GO-LIVE-UBUNTU.md)
 Method: static review plus CI (`gh pr checks 22`: ci, images, build-targets api and web all pass). No docker available; no tests run (no source changed).
 
@@ -31,3 +33,27 @@ Real `docker compose config` / container start (no docker); runtime behaviour wa
 
 ISSUES-WRITTEN: none
 Ledger rows may NOT be flipped. Maker should fix Finding 1 and resubmit as Fix cycle 1.
+
+---
+
+# Cycle 1 (candidate 9352d626, diff 9113881b..9352d626)
+
+VERDICT: FAIL
+Cycle checked: 1
+Reviewed SHA: 9352d626fb34dde6f1872e289e86ae7a5e8086a7
+
+Narrow, documentation-only failure. Finding 1 from cycle 0 is resolved.
+
+## Checks
+1. No `.env.t028`: compose `env_file` with `required: false` adds nothing, and the five `environment:` lines are gone, so all five names are undefined in the container. hosting.ts:59 and source-jobs.ts:48 only act when a name is `!== undefined`, so auth is unchanged. PASS (static; no docker).
+2. Complete `.env.t028` (paths /var/lib/lkb/hosting and /var/lib/lkb/counsellor, matching the volume mounts and Dockerfile node-owned dirs from cycle 0; 64-hex key; JSON admins; https origins): satisfies config.ts:13-29 and hosting.ts:66 (absolute, distinct, no public/static segment). PASS (static).
+3. Partial file: hosting is undefined and a defined name is present, so `keyStore = failedAuthentication` (hosting.ts:59) and every authenticated route returns 503; source-jobs.ts:48 returns forbidden. That is a clear, fail-closed failure, but it is NOT isolated from unrelated auth. It is existing code behaviour, and the guide now says so explicitly ("answers every authenticated route 503"). Accepted as documented, not a blocker. Note only.
+4. `git check-ignore -v .env.t028` matches `.gitignore:3 **/.env.*`; no tracked `.env.t028`; the diff contains no real values (names, paths and placeholders only). PASS.
+5. Compose 2.24+ requirement: NOT stated in docs/GO-LIVE-UBUNTU.md, docker-compose.yml or .env.example. It appears only in qa/manifests/w26-composeenv.md. The guide (line 11) only says "Docker Engine and the compose plugin". The `required: false` syntax is rejected by older compose, which would break EVERY service's `docker compose up`, not only T-028. FAIL.
+6. Other services (migrate, web, local-mongo) are untouched; env_file is only on api. CI at check time: build-targets (api, web) and images pass on both runs; `ci` was still pending on both runs. ci result not confirmed by me.
+
+## Required fix (cycle 2, docs only)
+Add to docs/GO-LIVE-UBUNTU.md section 9 (and prerequisites at line 11) that Docker Compose v2.24 or newer is required (`docker compose version`), and say what happens on older versions (compose file fails to parse). A one-line comment next to `env_file:` in docker-compose.yml is also advisable.
+
+ISSUES-WRITTEN: none
+Ledger rows may NOT be flipped yet. Not verified: docker compose config / container start (no docker); `ci` job outcome.
