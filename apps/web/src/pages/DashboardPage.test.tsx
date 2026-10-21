@@ -69,6 +69,28 @@ describe("DashboardPage", () => {
     vi.spyOn(keysApi, "listKeys").mockResolvedValue({ keys: [] });
     vi.spyOn(gapsApi, "listGaps").mockResolvedValue({ gaps: [] });
     renderPage();
-    await waitFor(() => expect(screen.getByText("missing sessions scope")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Sessions unavailable (missing sessions scope)")).toBeInTheDocument());
+  });
+
+  test("a 503 on /keys shows one inline note and the other panels still render", async () => {
+    mockAll();
+    vi.spyOn(keysApi, "listKeys").mockRejectedValue(new ApiError(503, "hosting unavailable", { code: "hosting_unavailable" }));
+    renderPage();
+    await waitFor(() => expect(screen.getByText("API keys unavailable (hosting not configured)")).toBeInTheDocument());
+    expect(screen.getByText("Sessions")).toBeInTheDocument();
+    expect(screen.getByText("Sources")).toBeInTheDocument();
+    expect(screen.getByText("Open gaps")).toBeInTheDocument();
+    expect(screen.queryByText("Active API keys")).not.toBeInTheDocument();
+    expect(screen.getByText("Newer Session")).toBeInTheDocument();
+    expect(screen.getByText(/no recording yet/)).toBeInTheDocument();
+  });
+
+  test("a failed /gaps only blanks the knowledge-health panel", async () => {
+    mockAll();
+    vi.spyOn(gapsApi, "listGaps").mockRejectedValue(new ApiError(500, "boom"));
+    renderPage();
+    await waitFor(() => expect(screen.getByText("Knowledge health unavailable (boom)")).toBeInTheDocument());
+    expect(screen.getByText("Newer Session")).toBeInTheDocument();
+    expect(screen.getByText("Active API keys")).toBeInTheDocument();
   });
 });
