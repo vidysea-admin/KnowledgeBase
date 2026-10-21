@@ -13,6 +13,8 @@ and the package scripts. The images were NOT built or run on the machine that wr
   `sudo apt-get update && sudo apt-get install --only-upgrade docker-compose-plugin` (Docker's apt repo).
 - Outbound HTTPS (npm, GitHub release download of yt-dlp during build, Ollama Cloud).
 - A reachable MongoDB (NOT containerized by default) and an Ollama Cloud key.
+  The MongoDB MUST be a replica set (a single-node replica set is fine); a standalone
+  `mongod` is not enough, see the REQUIRED note in section 6a.
 - Node/pnpm on the host only if you run the key-minting script (section 6).
 
 ## 2. Clone and configure
@@ -102,6 +104,15 @@ mongod; managed clusters already enforce it), bind Mongo to the server's IP only
 `MONGODB_URL` with the credentials as in section 2 (URL-encode special characters in the
 password). Check: `mongosh "<MONGODB_URL>" --eval 'db.runCommand({ping:1})'`.
 
+**REQUIRED for Ask: Mongo must be a replica set.** `POST /ask` (and `/graph`, session decisions)
+read through a snapshot transaction (`apps/api/src/visibility/read-snapshot.ts`, no fallback). On a
+standalone `mongod` every one of them fails with `Transaction numbers are only allowed on a replica
+set member or mongos`, and Ask returns 503 `answer_history_unavailable` (the generic wrapper hides
+the cause; `/health` stays 200). A one-node set is enough: start `mongod` with `--replSet rs0` (or
+`replication.replSetName` in `mongod.conf`), run `rs.initiate()` once, and add `replicaSet=rs0` to
+`MONGODB_URL`. Check: `mongosh "<MONGODB_URL>" --eval 'db.hello().setName'` prints the set name.
+Ask does NOT depend on the T-028 env in section 9.
+
 ## 7. Smoke test
 ```sh
 curl -fsS  http://localhost:3300/health                      # 200
@@ -131,6 +142,8 @@ confirm pages load with no CORS errors in the console (if they appear, fix
 
 ## 9. Launch feature flags (D-189)
 At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
+- T-028 gates only key lifecycle (`GET/POST /keys`) and counsellor accounts. Without the five names, `/keys`
+  answers 503 `hosting_unavailable` by design; Ask and the rest of the API are unaffected.
 - T-028: put all five in a separate file `.env.t028` next to `docker-compose.yml` (chmod 600,
   gitignored), NOT in `.env`. Compose reads it only if it exists, so without the file the
   five names stay undefined and everything works with T-028 off. Never create the file with
