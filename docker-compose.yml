@@ -62,7 +62,17 @@ services:
       OLLAMA_CLOUD_MODEL: ${OLLAMA_CLOUD_MODEL:-glm-5.3-flash}
       OLLAMA_CLOUD_VERIFIER_MODEL: ${OLLAMA_CLOUD_VERIFIER_MODEL:-deepseek-v4.1-flash}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      # T-028 counsellor accounts (D-189). Off unless ALL five are set; the key and JSON values come from .env.
+      # The two state dirs default to the named volumes below (created node-owned in the image).
+      LKB_HOSTING_STATE_DIR: ${LKB_HOSTING_STATE_DIR:-/var/lib/lkb/hosting}
+      LKB_COUNSELLOR_STATE_DIR: ${LKB_COUNSELLOR_STATE_DIR:-/var/lib/lkb/counsellor}
+      LKB_HOSTING_ENCRYPTION_KEY: ${LKB_HOSTING_ENCRYPTION_KEY:-}
+      LKB_HOSTING_BOOTSTRAP_ADMINS: ${LKB_HOSTING_BOOTSTRAP_ADMINS:-}
+      LKB_HOSTING_WEBHOOK_ORIGINS: ${LKB_HOSTING_WEBHOOK_ORIGINS:-}
       PORT: 3300
+    volumes:
+      - lkb-hosting-state:/var/lib/lkb/hosting
+      - lkb-counsellor-state:/var/lib/lkb/counsellor
     restart: unless-stopped
 
   # Static SPA behind nginx (root Dockerfile's `web` target). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
@@ -90,4 +100,6 @@ services:
       - lkb-local-mongo:/data/db
 
 volumes:
+  lkb-hosting-state:
+  lkb-counsellor-state:
   lkb-local-mongo:
