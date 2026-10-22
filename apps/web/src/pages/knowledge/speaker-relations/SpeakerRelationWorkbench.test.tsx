@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { SpeakerRelationWorkbench, type SpeakerRelationAuthority } from "./SpeakerRelationWorkbench.js";
@@ -48,6 +48,23 @@ test("proposal sends selected exact evidence and stays suggested", async () => {
   await screen.findByText("Proposal saved for human review. It is not an accepted relationship.");
   const post = fetchMock.mock.calls.find(([, options]) => options.method === "POST")!;
   expect(JSON.parse(post[1].body)).toEqual({ id: "proposal:00000000-0000-4000-8000-000000000001", personId: "person:one", fromClaimId: "a", toClaimId: "b", type: "agrees_with", sourceRevisionDigest: revision, evidence: [evidence] });
+});
+test("picks survive authority settling but are cleared when a defined digest is replaced by a different one", async () => {
+  fetchMock.mockImplementation(() => Promise.resolve(response({ relationships: [] })));
+  const evidence = { sessionId: "s", turnId: "t", quote: "Source quotation", transcriptHash: "c".repeat(64) };
+  const claims = [{ id: "a", text: "First claim", evidence: [evidence] }, { id: "b", text: "Second claim", evidence: [{ ...evidence, turnId: "t2" }] }];
+  const full = { ...authority, canPropose: true, claims };
+  const ui = (a: SpeakerRelationAuthority) => <MemoryRouter><SpeakerRelationWorkbench apiKey="k" authSession={1} personId="person:one" authority={a} /></MemoryRouter>;
+  const view = render(ui(full));
+  await screen.findByText("No pending proposals in the current source view.");
+  fireEvent.change(screen.getByLabelText("From claim"), { target: { value: "a" } }); fireEvent.change(screen.getByLabelText("To claim"), { target: { value: "b" } });
+  view.rerender(ui({ ...full, sourceRevisionDigest: undefined })); // authority unsettled: form hidden, nothing to compare
+  view.rerender(ui({ ...full }));                                  // same digest settles again: picks are kept
+  expect((screen.getByLabelText("From claim") as HTMLSelectElement).value).toBe("a");
+  expect((screen.getByLabelText("To claim") as HTMLSelectElement).value).toBe("b");
+  view.rerender(ui({ ...full, sourceRevisionDigest: "d".repeat(64) })); // real change: fail closed
+  await waitFor(() => expect((screen.getByLabelText("From claim") as HTMLSelectElement).value).toBe(""));
+  expect((screen.getByLabelText("To claim") as HTMLSelectElement).value).toBe("");
 });
 test("malformed cross-person inventory fails closed", async () => {
   fetchMock.mockResolvedValue(response({ relationships: [{ ...row, to: { ...row.to, personId: "person:other" } }] })); mount(authority);
