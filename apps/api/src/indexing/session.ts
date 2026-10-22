@@ -136,7 +136,7 @@ async function indexSessionWithinPublication(
         preparedTreeBase = root;
         if (!sessions.some((s) => s._id === sessionId && s.tenantId === tenantId)) throw new Error("required tree session unavailable");
         const prospective = [...pages.filter((p) => p.sessionId !== sessionId), preparedPage];
-        const eligible = await eligibleTreeInput(db, tenantId, sessions, prospective, root);
+        const eligible = await eligibleTreeInput(db, tenantId, sessions, prospective, root, { rebuildOnNewEligible: [sessionId] });
         const topicIndex = await buildTopicIndex(tenantId, eligible.sessions, eligible.pages, deps.complete,
           {existingRoot: eligible.existingRoot, changedSessionIds: [sessionId]});
         preparedTree = topicIndex.root;
@@ -276,7 +276,7 @@ async function indexSessionWithinPublication(
     sessionPagesColl(tenantId).find({}).toArray() as Promise<SessionPages[]>,
     loadTreeRoot(tenantId, db),
   ]);
-  const eligible = await eligibleTreeInput(db, tenantId, allSessions, allPages, existingRoot);
+  const eligible = await eligibleTreeInput(db, tenantId, allSessions, allPages, existingRoot, { rebuildOnNewEligible: [sessionId] });
   const topicIndex = preparedTree ? undefined : await buildTopicIndex(tenantId, eligible.sessions, eligible.pages, deps.complete,
     {existingRoot: eligible.existingRoot, changedSessionIds: [sessionId]});
   const newRoot = preparedTree ?? topicIndex?.root;

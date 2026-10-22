@@ -12,10 +12,13 @@ import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
 import { requireScope } from "../../auth.js";
 import { AnswerWorkflowError, answerGraphSelection, parseAnswerInput, type AnswerWorkflow } from '../../answer-policy/answer-workflow.js';
 import { answerWorkflowFailure } from '../../answer-policy/answer-router.js';
+import type { TreeExclusions } from '../../indexing/eligible-tree.js';
 
 /** Injected dependency (C3) — production impl in `store.ts` is Mongo-backed; tests use a fake. */
 export interface TreeStore {
   load(tenantId: string): Promise<TreeIndexNode | null>;
+  /** Same tree plus how many of the tenant's sessions were left out as ineligible (D-190). Counts only. */
+  loadWithExclusions?(tenantId: string): Promise<{ tree: TreeIndexNode | null; excluded: TreeExclusions }>;
 }
 
 export interface AskRouteDeps {
@@ -52,7 +55,10 @@ export function createAskRouter(deps: AskRouteDeps): Router {
     const selection = answerGraphSelection(input.filters);
     if ((selection?.speakerRefs?.length || selection?.topicRefs?.length) && !deps.requestDepsFor)
       throw new BoundedAskError("selected graph authority unavailable");
-    const tree = await deps.tree.load(tenantId);
+    const loaded = deps.tree.loadWithExclusions
+      ? await deps.tree.loadWithExclusions(tenantId)
+      : { tree: await deps.tree.load(tenantId), excluded: { total: 0, reasons: {} } as TreeExclusions };
+    const { tree, excluded } = loaded;
     if (!tree) {
       res.status(404).json({ error: "not_found", message: "no tree index built for this tenant yet" });
       return;
@@ -66,7 +72,8 @@ export function createAskRouter(deps: AskRouteDeps): Router {
     const result = deps.answerWorkflow
       ? await deps.answerWorkflow.execute(tenantId, req.body, { actor: `api-key:${req.auth!.keyId ?? tenantId}` }, tree, requestDeps)
       : await askV2(input.query, tree, requestDeps);
-    res.status(200).json(result);
+    res.status(200).json(result && typeof result === "object" && !Array.isArray(result)
+      ? { ...result, excludedSessions: excluded.total, exclusionReasons: excluded.reasons } : result);
     } catch (error) {
       if (error instanceof BoundedAskError) {
         res.status(503).json({ error: error.code, message: error.message });

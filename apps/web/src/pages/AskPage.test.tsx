@@ -240,3 +240,16 @@ test("exact source quotes link to actual turn anchors and preserve raw speaker/t
   expect(screen.getByRole("link", { name: "spk:0 · 516–546s" })).toHaveAttribute("href", "/sessions/s1#turn-s1-t1");
   expect(screen.queryByText("Professor spk:0")).not.toBeInTheDocument();
 });
+
+test("shows how many sessions were excluded from answers, and nothing when none were", async () => {
+  vi.spyOn(askApi, "ask").mockResolvedValue(response({ excludedSessions: 4, exclusionReasons: { "not-visible": 2, "identity-invalid": 2 } }));
+  renderPage(); await submit("careers in law?");
+  await waitFor(() => expect(screen.getByText("4 sessions not yet indexed and excluded from answers")).toBeInTheDocument());
+});
+
+test("no exclusion note when the response excludes no session", async () => {
+  vi.spyOn(askApi, "ask").mockResolvedValue(response({ excludedSessions: 0, exclusionReasons: {} }));
+  renderPage(); await submit("careers in law?");
+  await waitFor(() => expect(screen.getByText("Applications open in October.")).toBeInTheDocument());
+  expect(screen.queryByTestId("ask-excluded-note")).not.toBeInTheDocument();
+});

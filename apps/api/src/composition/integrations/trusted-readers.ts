@@ -86,7 +86,7 @@ export function trustedCitationReads(database: () => Db): CitationsDeps {
 }
 
 export function trustedTreeReads(database: () => Db, nativeEvidence?: NativeEvidenceResolver): TreeStore {
-  return { async load(tenant) {
+  const read = async (tenant: string) => {
     try {
       return await withKnowledgeReadSnapshot(database(), async db => {
         const readNative = nativeEvidence?.forReadView ? nativeEvidence.forReadView(db) : nativeEvidence;
@@ -98,13 +98,14 @@ export function trustedTreeReads(database: () => Db, nativeEvidence?: NativeEvid
         const transcript = eligible.existingRoot;
         const root = transcript ? { ...transcript, children: [...transcript.children.filter(child => child.level !== 'native-source'), ...nativeBranches] }
           : nativeBranches.length ? { node_id: `tenant:${tenant}`, tenantId: tenant, title: 'Current knowledge', level: 'tenant' as const, summary: '', children: nativeBranches } : null;
-        return createKnowledgeVisibility(db, readNative).trustedTree(tenant, root);
+        return { tree: await createKnowledgeVisibility(db, readNative).trustedTree(tenant, root), excluded: eligible.excluded };
       });
     } catch (cause) {
       logServerCause('trusted-tree-read', cause);
       throw Object.assign(new Error('Current knowledge tree unavailable'), { status: 503 });
     }
-  } };
+  };
+  return { async load(tenant) { return (await read(tenant)).tree; }, loadWithExclusions: read };
 }
 
 async function currentTreeInput(db: Pick<Db, 'collection'>, tenant: string) {
@@ -135,7 +136,8 @@ export function trustedGraphReads(database: () => Db): GraphReadDeps {
         });
         const treeRoot = await createKnowledgeVisibility(db).trustedTree(tenant, eligible.existingRoot ?? null);
         if (!treeRoot && !safeEdges.length) return null;
-        return buildKnowledgeGraph({ treeRoot, entityEdges: safeEdges, sessions: eligible.sessions.map(publicSession) });
+        return { ...buildKnowledgeGraph({ treeRoot, entityEdges: safeEdges, sessions: eligible.sessions.map(publicSession) }),
+          excludedSessions: eligible.excluded.total, exclusionReasons: eligible.excluded.reasons };
       });
     } catch (cause) {
       logServerCause('trusted-graph-read', cause);

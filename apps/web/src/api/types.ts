@@ -168,4 +168,7 @@ export interface AskResponse {
   insufficient_coverage: boolean;
   sources: { internal: AskInternalSource[]; web: AskWebSource[] };
   auditLog: { step: string; provider?: string; model?: string; costUsd?: number; costStatus?: "unknown" | "reported"; inputTokens?: number; outputTokens?: number }[];
+  /** D-190: sessions left out of the answer as ineligible; counts only. */
+  excludedSessions?: number;
+  exclusionReasons?: Record<string, number>;
 }
