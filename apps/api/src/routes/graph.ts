@@ -25,8 +25,11 @@ import { Router, type Request, type Response } from "express";
 import type { KnowledgeGraph } from "@lkb/index";
 import { requireScope } from "../auth.js";
 
+/** D-190: counts of sessions left out of the graph as ineligible; never session ids. */
+export type ExclusionAwareGraph = KnowledgeGraph & { excludedSessions?: number; exclusionReasons?: Record<string, number> };
+
 export interface GraphReadDeps {
-  loadGraph(tenantId: string): Promise<KnowledgeGraph | null>;
+  loadGraph(tenantId: string): Promise<ExclusionAwareGraph | null>;
 }
 
 export function createGraphRouter(deps: GraphReadDeps): Router {

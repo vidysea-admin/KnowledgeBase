@@ -2519,3 +2519,17 @@ fourth would have left real decisions idle behind an unrelated unit.
 - docs/GO-LIVE-UBUNTU.md
 **Approved-by:** Umesh (verbatim quote in What)
 **Links:** T-028, T-013, T-014, D-186
+
+## D-190 | 2026-10-22 | type: decision | status: ACTIVE
+**Title:** Ask and graph build the tenant tree from eligible sessions and report exclusions
+**What:** Umesh (Approver) ruled in chat on 2026-10-22, verbatim: "Yes: Ask should build the tree from eligible sessions and exclude ineligible ones (show how many are excluded)." The tenant tree used by /ask and /graph is built from the sessions that pass the existing per-page fail-closed gate; sessions that fail it are excluded, never cited and never given graph nodes. Responses report the excluded count and reason categories (counts only).
+**Why:** On staging tenant toc, 18 of 22 sessions were eligible and 4 were not (2 with an uncertain index attempt, 2 with invalid transcript identity). The tenant-level rule kept a cached root only if every session passed, so /ask and /graph returned 404 for the whole tenant because of four sessions.
+**Result:** T-043 ask path: eligibleTreeInput keeps each page gate as strict as before and drops only the tenant-level all-or-nothing retention rule. A cached root is still served only while every session it cites is currently eligible, and the index-write path rebuilds when an eligible session is missing from the cache. Zero eligible sessions still returns 404. /ask and /graph add excludedSessions and exclusionReasons (counts, no session ids); the web Ask page shows "N sessions not yet indexed and excluded from answers". No earlier decision mandated all-or-nothing, so there is no Supersedes field.
+**Changes-authorized:**
+- apps/api/src/indexing/eligible-tree.ts
+- apps/api/src/composition/integrations/trusted-readers.ts
+- apps/api/src/routes/ask/ask.ts
+- apps/api/src/routes/graph.ts
+- apps/web/src/pages/AskPage.tsx
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-043, G5

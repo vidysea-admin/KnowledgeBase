@@ -57,7 +57,11 @@ export function createMongoApiKeyStore(): ApiKeyStore {
 /** One root node per tenant, `level: "tenant"`, `node_id` == tenantId (buildTree's output shape). */
 export function createMongoTreeStore(nativeEvidence?: Parameters<typeof trustedTreeReads>[1]): TreeStore {
   const guarded = trustedTreeReads(getDb, nativeEvidence);
-  return { async load(tenantId) { try { assertValidTenantId(tenantId, 'treeStore.load'); } catch { return null; } return guarded.load(tenantId); } };
+  const valid = (tenantId: string): boolean => { try { assertValidTenantId(tenantId, 'treeStore.load'); return true; } catch { return false; } };
+  return {
+    async load(tenantId) { return valid(tenantId) ? guarded.load(tenantId) : null; },
+    async loadWithExclusions(tenantId) { return valid(tenantId) ? guarded.loadWithExclusions!(tenantId) : { tree: null, excluded: { total: 0, reasons: {} } }; },
+  };
 }
 
 /** Mongo-backed `EvalRunStore` (T-012 C3) — thin wrapper over `@lkb/db`'s `eval-runs.ts`

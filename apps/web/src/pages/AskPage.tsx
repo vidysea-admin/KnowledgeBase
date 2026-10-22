@@ -59,6 +59,7 @@ export function AskPage(): React.ReactElement {
   const { query, setQuery, result, error, loading, handleSubmit } = useAskHandoff();
 
   const internal = result?.sources.internal ?? [];
+  const excluded = typeof result?.excludedSessions === "number" && result.excludedSessions > 0 ? result.excludedSessions : 0;
   const web = result?.sources.web ?? [];
   // ISS-274: the seam is now wired unconditionally (apps/api/src/production.ts), so
   // `web_used: false` no longer means "no fallback was configured" -- it can also mean "the
@@ -110,6 +111,11 @@ export function AskPage(): React.ReactElement {
                   : webFallbackUnavailable
                     ? "; the web fallback was reached but is currently unavailable."
                     : "; no web fallback is configured."}
+              </div>
+            )}
+            {excluded > 0 && (
+              <div className="empty-note" data-testid="ask-excluded-note">
+                {excluded} {excluded === 1 ? "session" : "sessions"} not yet indexed and excluded from answers
               </div>
             )}
             <div className="row-meta">
