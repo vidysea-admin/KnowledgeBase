@@ -20,14 +20,19 @@ function acknowledged(value: unknown): boolean { return value !== null && typeof
 interface Coll<T> {
   find(filter: object): { toArray(): Promise<T[]> };
   insertOne(doc: T): Promise<unknown>;
+  replaceOne?(filter: object, doc: T): Promise<unknown>;
   insertMany(docs: T[]): Promise<unknown>;
   deleteMany(filter: object): Promise<unknown>;
 }
 
 export async function replacePageInsertFirst(coll: Coll<SessionPages>, sessionId: string, page: SessionPages, generation?: GroundedGenerationWrite): Promise<void> {
-  const oldIds = (await coll.find({ sessionId }).toArray()).map((p) => p._id).filter((id) => id !== page._id);
+  const existing = await coll.find({ sessionId }).toArray();
+  const oldIds = existing.map((p) => p._id).filter((id) => id !== page._id);
   await generation?.assertOwned();
-  const saved = await coll.insertOne(page);
+  // session_pages is unique per (tenantId, sessionId) in a deployed database, so insert-first would collide with the previous
+  // page. When the caller reused the previous page's _id the replacement is ONE atomic single-document replace.
+  const saved = existing.some((p) => p._id === page._id) && coll.replaceOne
+    ? await coll.replaceOne({ _id: page._id, sessionId }, page) : await coll.insertOne(page);
   if (generation && !acknowledged(saved)) throw new Error("page generation write unconfirmed");
   if (oldIds.length) {
     await generation?.assertOwned();

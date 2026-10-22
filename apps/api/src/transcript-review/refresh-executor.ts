@@ -7,6 +7,7 @@ import type { IndexSessionResult } from "../indexing/types.js";
 import type { RefreshExecutor } from "./service.js";
 import { headId, type ReviewHead } from "./store.js";
 import type { ReviewTurn } from "./planner.js";
+import { isStandaloneMongo } from "../visibility/topology.js";
 import { transactionReviewDb } from "./transaction-db.js";
 
 export interface TranscriptRefreshDeps {
@@ -20,12 +21,15 @@ export interface TranscriptRefreshDeps {
 export function createTranscriptRefreshExecutor(deps: TranscriptRefreshDeps): RefreshExecutor {
   return async ({ tenantId, sessionId, revision, target }) => {
     if (!["claims", "session-page", "chunks", "tree", "graph"].includes(target)) throw new Error("Unknown refresh target");
-    const session = deps.db.client.startSession();
+    // STANDALONE mongod (w27-standalone): no transaction. Index publication inside is the generation protocol (conditional
+    // head flip, fail-closed readers); the final conditional write to the review head at this revision is the fence, and a
+    // crash before it leaves refresh incomplete so the refresh simply runs again. Graph edge rewrites are idempotent.
+    const session = await isStandaloneMongo(deps.db) ? undefined : deps.db.client.startSession();
     let unknownCommit = false;
     try {
       // Provider work is not transactional. Never use the driver's callback retry here:
       // a transient write/commit failure would rerun already charged indexing/judge calls.
-      session.startTransaction({ readConcern: { level: "snapshot" }, writeConcern: { w: "majority" }, maxCommitTimeMS: 15000 });
+      session?.startTransaction({ readConcern: { level: "snapshot" }, writeConcern: { w: "majority" }, maxCommitTimeMS: 15000 });
       await (async () => {
         const db = transactionReviewDb(deps.db, session, tenantId);
         const heads = scopedCollection<ReviewHead>(db as Db, "transcript_reviews")(tenantId);
@@ -81,6 +85,7 @@ export function createTranscriptRefreshExecutor(deps: TranscriptRefreshDeps): Re
         const fence = await heads.updateOne({ _id: head._id, sessionId, revision }, { $set: { refresh } });
         if (fence.matchedCount !== 1) throw new Error("Transcript refresh superseded");
       })();
+      if (!session) return;
       for (let attempt = 0; attempt < 3; attempt++) {
         try { await session.commitTransaction(); unknownCommit = false; return; }
         catch (error) {
@@ -92,8 +97,8 @@ export function createTranscriptRefreshExecutor(deps: TranscriptRefreshDeps): Re
     } catch (error) {
       // An uncertain commit may already be durable. Do not issue an abort or repeat work;
       // the caller must reconcile the durable head before an explicit later refresh.
-      if (!unknownCommit) try { await session.abortTransaction(); } catch { /* Preserve the original failure. */ }
+      if (!unknownCommit && session) try { await session.abortTransaction(); } catch { /* Preserve the original failure. */ }
       throw error;
-    } finally { await session.endSession(); }
+    } finally { await session?.endSession(); }
   };
 }

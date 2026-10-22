@@ -197,7 +197,9 @@ async function indexSessionWithinPublication(
         actionItems: summary.actionItems,
         evidence: toEvidenceTuple(turns.map((t) => ({ turnId: t._id, sessionId }))),
       };
-      const stampedPage = { ...page, indexArtifact: { ...binding } };
+      // Re-index keeps the previous page's _id (one atomic replace; see replacePageInsertFirst) when exactly one exists.
+      const priorPages = preserveReviewed ? await sessionPagesColl(tenantId).find({ sessionId }).toArray() : [];
+      const stampedPage = { ...page, ...(priorPages.length === 1 ? { _id: priorPages[0]!._id } : {}), indexArtifact: { ...binding } };
       pageRef = indexArtifactRef(stampedPage);
       if (preserveReviewed) await replacePageInsertFirst(sessionPagesColl(tenantId) as never, sessionId, stampedPage, { assertOwned });
       else {

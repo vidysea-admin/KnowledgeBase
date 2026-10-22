@@ -119,11 +119,19 @@ new tree root with the previous session page). Every read is still tenant-scoped
 gates still re-check authority per read, so the risk is a momentarily stale or incomplete answer, not a
 cross-tenant read. Use a replica set when you need the stricter guarantee.
 
-What still needs a replica set (these refuse with a 503 on standalone rather than risk a half-written
-state): native publication and indexing commits (`runNativePublicationTransaction`,
-`publishIndexWithCommit`), transcript-review refresh, WhatsApp review store/invalidate/quarantine, and
-speaker attribute/relationship edits. Ask, graph, session decisions, speaker profile reads and the
-WhatsApp native-evidence reads do not need one.
+Writes on standalone: index publication (`publishIndexWithCommit`), native publication
+(`runNativePublicationTransaction`) and the transcript-review refresh run without a transaction. They are
+safe because publication is a pointer flip, not a multi-document commit: artifacts are written under a
+fresh generation id, `sessions.indexAttempt` is flipped to complete by ONE conditional single-document update,
+and readers (`verifyIndexGeneration`) serve only a complete generation whose artifacts match the manifest
+digests. A crash before the flip leaves the session hidden (fail closed); a crash after it leaves the new
+generation live. A crashed or failed run leaves the attempt `uncertain`/`running`, and a new attempt for that
+session is refused until an operator recovers it (unchanged rule: no automatic takeover of possibly-written
+state). Re-indexing a live session rewrites its artifacts in place, so that session is briefly hidden.
+
+Still refuse with a 503 on standalone (a half-applied write there would be visible, so they need a replica
+set): WhatsApp review store/decide, invalidation and the quarantine audit, and speaker attribute and
+relationship edits. They are not needed for Ask.
 
 Unknown store failures on Ask now return 503 `store_unavailable` (the real cause is logged server-side,
 secrets redacted) instead of the misleading `answer_history_unavailable`.
