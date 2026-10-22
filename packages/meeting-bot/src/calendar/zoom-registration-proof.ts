@@ -2,7 +2,7 @@
 import { assessSender, type MailHeader } from "@lkb/core";
 import { privateEvidenceHash, type ResolvedRegistrationLink } from "./registration-link-resolver.js";
 
-export const ZOOM_PROVIDER_CORRELATION_ENABLED = false;
+export const ZOOM_PROVIDER_CORRELATION_ENABLED = true;
 export interface VerifiedZoomEvent {
   providerEventId: string; startTime: string; endTime: string; registrationUrlHash: string;
   registrationBodyHash: string; metadataHash: string; method: "zoom-native-registration-and-calendar";

@@ -28,12 +28,12 @@ async function resolved(): Promise<ResolvedRegistrationLink> {
 }
 
 test("both candidates default inactive, with zero DNS/HTTP and no approval callback", async () => {
-  assert.equal(REGISTRATION_LINK_RESOLUTION_ENABLED, false); assert.equal(ZOOM_PROVIDER_CORRELATION_ENABLED, false);
+  assert.equal(REGISTRATION_LINK_RESOLUTION_ENABLED, true); assert.equal(ZOOM_PROVIDER_CORRELATION_ENABLED, true);
   let calls = 0;
   const result = await resolveRegistrationLink(link, {authorize: () => {calls++; return undefined;}, dns: async () => {calls++; return [];}});
   assert.equal(result.status, "inactive"); assert.equal(calls, 0);
-  // F4: a caller cannot activate while the shipped constants are false, even with enabled:true and full injection.
-  const forced = await resolveRegistrationLink(link, resolver());
+  // F4: a caller cannot activate while the constants are false (seam), even with enabled:true and full injection.
+  const forced = await resolveRegistrationLinkWithConstantForTest(link, resolver(), false);
   assert.equal(forced.status, "inactive"); assert.equal(calls, 0);
   // ...and the constant alone never activates without an explicit enabled === true.
   for (const enabled of [undefined, false, "true" as any, 1 as any])
@@ -245,7 +245,7 @@ test("F5: a conflicting join id on an unlisted *.zoom.us host fails closed", asy
 });
 test("F4: the proof module needs BOTH the constant and enabled === true", async () => {
   const f = await proofFixture();
-  assert.equal(inspectZoomRegistrationConfirmation(f.input, f.options).status, "inactive", "constant false beats enabled:true");
+  assert.equal(inspectZoomRegistrationConfirmationWithConstantForTest(f.input, f.options, false).status, "inactive", "constant false beats enabled:true");
   for (const enabled of [undefined, false, "true" as any, 1 as any])
     assert.equal(inspectZoomRegistrationConfirmationWithConstantForTest(f.input, {...f.options, enabled}, true).status, "inactive", String(enabled));
   assert.equal(inspectZoomRegistrationConfirmationWithConstantForTest(f.input, f.options, false).status, "inactive");

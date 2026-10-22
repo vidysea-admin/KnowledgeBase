@@ -34,10 +34,10 @@ const record = (over: Partial<RegistrationApprovalRecord> = {}): RegistrationApp
 const resolve = (lookup: RegistrationApprovalLookup, input = link) =>
   resolveRegistrationLinkWithConstantForTest(input, {enabled: true, authorize: approvalResolverAuthorize(lookup, clock), ...transport}, true);
 
-test("activation constants stay false and the shipped entry point stays inactive even with a valid approval", async () => {
-  assert.equal(REGISTRATION_LINK_RESOLUTION_ENABLED, false); assert.equal(ZOOM_PROVIDER_CORRELATION_ENABLED, false);
+test("activation constants are true; with the constant forced false (seam) the entry stays inactive even with a valid approval", async () => {
+  assert.equal(REGISTRATION_LINK_RESOLUTION_ENABLED, true); assert.equal(ZOOM_PROVIDER_CORRELATION_ENABLED, true);
   const lookup = memoryLookup([record()]);
-  assert.equal((await resolveRegistrationLink(link, {enabled: true, authorize: approvalResolverAuthorize(lookup, clock), ...transport})).status, "inactive");
+  assert.equal((await resolveRegistrationLinkWithConstantForTest(link, {enabled: true, authorize: approvalResolverAuthorize(lookup, clock), ...transport}, false)).status, "inactive");
   assert.deepEqual(lookup.calls, []);
 });
 test("resolver: a valid same-tenant approval is accepted and its decision id is carried into the proof", async () => {
