@@ -23,9 +23,7 @@ test("answer generates from refined context and passes sources through unchanged
   assert.match(complete.calls[0]!.messages[0]!.content, /what color are apples\?/);
 });
 
-// D-191: the grounding judge drops only the sentences it rejects; refuse only if none remain.import { BoundedAskError } from "./source-context.js";
-import { contextStrips, type ContextSource } from "./bounded-refine.js";
-import type { CompleteFn } from "./select-nodes.js";
+// D-191: the grounding judge drops only the sentences it rejects; refuse only if none remain.
 
 const sources: ContextSource[] = ["A", "B", "C"].map((k) => ({ id: "src-" + k, origin: "speech", text: "Fact " + k + " is explicit." }));
 const strips = JSON.stringify(contextStrips(sources));

@@ -1,6 +1,6 @@
 # Manifest - w27-dropsentences
 **Status:** ready-for-check
-**Fix cycle:** 0
+**Fix cycle:** 1
 **Contract:** none (owner decision D-191, Umesh 2026-10-22)
 **Lane:** w27-dropsentences (branch lane/w27-dropsentences, from origin/master c7574a5e)
 **Backlog tier:** orchestrator-assigned (wave 27)
@@ -21,7 +21,7 @@
 - `packages/ask`: answer, ask-graph, bounded-ask, source-context, ask-v2, bounded-evidence/*, -> tests 152 / pass 152 / fail 0 (5 new in answer.test.ts + 1 new askV2 integration test in bounded-ask.test.ts; rerun after merging into answer.test.ts: answer.test 6/6, mutation runs below use the final files).
 - `apps/api`: routes/ask/ask, answer-policy/answer-workflow, answer-policy/routes, ask-tenant-hostile, ask-tenant-isolation, evaluation-flywheel/composition -> 120/120. ask/source-context, ask/source-exclusion, routes/compete/compete, native-evidence/vertical, native-evidence/message-vertical -> 56/56.
 - `apps/web`: vitest run src/pages/AskPage.test.tsx -> 15/15 (2 new).
-- tsc --noEmit: packages/ask, apps/api, apps/web all clean.
+- tsc --noEmit (cycle 0 claim "clean" was wrong: answer.test.ts had duplicate imports, TS2300). Cycle 1 fix: removed the duplicate imports in answer.test.ts only. Exit codes after fix: packages/ask 0, apps/api 0, apps/web 0 (output files empty).
 - D-020 mutations (per-mutation backup + trap, script outside repo, hash fidelity pre==post):
   - M1 `verdicts.get(s.id) === true` -> `true` (filter off): KILLED (7 failures).
   - M2 `if (!kept.length) throw` -> `if (false) throw` (no zero-remaining refusal): KILLED (4 failures).
