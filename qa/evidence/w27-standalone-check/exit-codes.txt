@@ -1,0 +1,16 @@
+src/visibility/standalone-publication.test.ts exit=0
+src/visibility/standalone-mongo.test.ts exit=0
+src/indexing/generation.test.ts exit=0 ℹ pass 8 ℹ fail 0 ℹ skipped 0 
+src/indexing/post-commit.test.ts exit=0 ℹ pass 2 ℹ fail 0 ℹ skipped 0 
+src/indexing/vectorless-publication.test.ts exit=0 ℹ pass 12 ℹ fail 0 ℹ skipped 0 
+src/indexing/session.test.ts exit=0 ℹ pass 26 ℹ fail 0 ℹ skipped 0 
+src/answer-policy/answer-router.test.ts exit=0 ℹ pass 5 ℹ fail 0 ℹ skipped 0 
+src/answer-policy/routes.test.ts exit=0 ℹ pass 7 ℹ fail 0 ℹ skipped 0 
+src/ask/graph-context.test.ts exit=0 ℹ pass 10 ℹ fail 0 ℹ skipped 0 
+src/ask/ask-tenant-isolation.test.ts exit=0 ℹ pass 16 ℹ fail 0 ℹ skipped 0 
+src/native-evidence/whatsapp-authority.test.ts exit=0 ℹ pass 8 ℹ fail 0 ℹ skipped 0 
+src/native-evidence/publication.test.ts exit=0 ℹ pass 5 ℹ fail 0 ℹ skipped 0 
+src/visibility/read-side-quarantine.test.ts exit=0 ℹ pass 17 ℹ fail 0 ℹ skipped 0 
+src/visibility/knowledge.test.ts exit=0 ℹ pass 27 ℹ fail 0 ℹ skipped 0 
+tsc apps/api exit=0
+tsc packages/db exit=0

@@ -1,0 +1,13 @@
+✔ direct answer read returns original metadata only under authenticated tenant and ask scope (148.1007ms)
+✔ human-authorized history/answer-review endpoints preserve scope, tenant, revision and duplicate boundaries (202.743ms)
+✔ API-key scopes and claimed human labels cannot approve, prefer sources or label usefulness without trusted authority (61.6473ms)
+✔ human verification fails closed on absent, foreign, nonhuman, malformed and unavailable authority (173.7595ms)
+✔ trusted human authority receives each action and persists source preference attribution (44.9423ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2505.6354

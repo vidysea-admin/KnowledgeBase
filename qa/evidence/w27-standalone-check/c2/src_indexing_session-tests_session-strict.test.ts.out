@@ -1,0 +1,12 @@
+✔ ISS-WEBINARRELEASE-002 strict provider/parser/embedding degradation preserves prior knowledge (46.9602ms)
+✔ strict index persists validated item and claim quotations plus real candidate session tree (24.2843ms)
+✔ strict preflight never replaces prior knowledge for source, coverage, support, context or missing-session root failures (16.7031ms)
+✔ strict nonempty question/answer and screen citations survive the persistence boundary (16.1086ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1260.4223

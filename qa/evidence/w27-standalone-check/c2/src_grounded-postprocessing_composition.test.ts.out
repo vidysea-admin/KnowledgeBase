@@ -1,0 +1,13 @@
+✔ actual buildIndexer grounded opt-in produces and persists cited summary/facts/Q&A/actions without a separate strict option (268.2611ms)
+✔ actual buildIndexer environment flag alone enables grounded production; explicit false preserves legacy (68.216ms)
+✔ actual configured judge failure refuses strict completion before knowledge replacement (8.0939ms)
+✔ composition preserves OFF strict choice and a grounded opt-in cannot silently select legacy (0.7926ms)
+✔ actual grounded factory rejects foreign transcript scope before model or knowledge writes (3.2681ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3253.4662

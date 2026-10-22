@@ -1,0 +1,19 @@
+✔ judge on: notes persisted, judge totals reported, every note citation resolves to a real turn and time (80.3018ms)
+✔ judge rejects a polarity-flipped decision: dropped from page and claims, never persisted (16.5898ms)
+✔ judge that throws fails closed: nothing persisted, existing notes untouched, status failed (6.2213ms)
+✔ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (17.4647ms)
+✔ a failing claims insert leaves every old claim in place (no delete is issued) (7.7916ms)
+✔ flag OFF: legacy delete-then-insert path and result shape are unchanged; a judge alone does not switch grounded mode on (20.2823ms)
+✔ flag resolution: OFF unless the caller or KB_GROUNDED_NOTES=1 turns it on; cost cap parsing (0.4994ms)
+✔ GET /citations/:claimId renders a claim written by grounded indexSession with the cited turn id and times (130.7238ms)
+✔ when the judge rejects every fresh claim, old machine claims are kept and the new generation is refused (7.5208ms)
+✔ judgeMaxCostUsd:0 through indexSession never calls the judge (injected judge and judge-model provider), nothing written (25.4749ms)
+✔ control: without a cap the same run does call the judge (the counter is live) (48.3189ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3788.9982

@@ -2,6 +2,7 @@
 import type { ClientSession, Db } from "mongodb";
 import type { SpeakerSuggestions } from "@lkb/core";
 import { assertValidTenantId } from "./tenantScope.js";
+import { isStandaloneMongo } from "./topology.js";
 
 type RecordRow = Record<string, any>;
 type DbRow = RecordRow & { _id: string };
@@ -12,7 +13,17 @@ const fail = (): never => { throw new Error("native_publication_stale_or_unavail
 /** Explicit transaction: never replay a callback containing decisions or publication side effects. */
 export async function runNativePublicationTransaction<T>(db: Db, tenantId: string, work: (txDb: Db) => Promise<T>): Promise<T> {
   assertValidTenantId(tenantId, "native publication");
-  if (transactions.has(db) || typeof db.client?.startSession !== "function") throw new Error("native_publication_transaction_required");
+  if (transactions.has(db)) throw new Error("native_publication_transaction_required");
+  // STANDALONE mongod (w27-standalone): no transactions exist. Same tenant-pinned, serialized operation view without a
+  // session. There is no rollback, so correctness rests on ordering the callers already follow: the publication
+  // revision / index-head is bumped or invalidated FIRST (readers then fail closed), data is written, and the single
+  // fence document is flipped LAST with a conditional update. A crash leaves the old or an invalidated (hidden) state.
+  if (await isStandaloneMongo(db)) {
+    const view = transactionView(db, undefined, tenantId);
+    try { const result = await work(view.db); await view.drain(); return result; }
+    finally { await view.drain().catch(() => undefined); view.close(); }
+  }
+  if (typeof db.client?.startSession !== "function") throw new Error("native_publication_transaction_required");
   const session = db.client.startSession();
   const view = transactionView(db, session, tenantId);
   const txDb = view.db;
@@ -78,11 +89,11 @@ export async function assertNativeSuggestionCurrent(db: Db, tenantId: string, ro
   if (h.revision !== b.reviewRevision || !object(r) || r.status !== "complete" || r.revision !== b.reviewRevision || !Array.isArray(r.targets) || !Array.isArray(r.completed) || !["claims", "session-page", "chunks", "tree", "graph"].every(target => r.targets.includes(target) && r.completed.includes(target)) || r.targets.some((target: unknown) => !r.completed.includes(target))) return fail();
 }
 
-function transactionView(db: Db, session: ClientSession, tenantId: string) {
+function transactionView(db: Db, session: ClientSession | undefined, tenantId: string) {
   let tail: Promise<unknown> = Promise.resolve();
   let active = true;
   const serial = <R>(fn: () => Promise<R>): Promise<R> => {
-    if (!active || !session.inTransaction()) return Promise.reject(new Error("native_publication_transaction_closed"));
+    if (!active || (session && !session.inTransaction())) return Promise.reject(new Error("native_publication_transaction_closed"));
     const result = tail.then(fn); tail = result; return result;
   };
   // Local input refusal never reaches Mongo and must not poison an otherwise healthy
@@ -141,9 +152,9 @@ function transactionView(db: Db, session: ClientSession, tenantId: string) {
 
 }
 /** For an existing explicit snapshot/majority transaction owned by the API refresh executor. */
-export function nativePublicationTransactionView(db: Db, session: ClientSession, tenantId: string): Db {
+export function nativePublicationTransactionView(db: Db, session: ClientSession | undefined, tenantId: string): Db {
   assertValidTenantId(tenantId, "native publication");
-  if (transactions.has(db) || !session.inTransaction()) throw new Error("native_publication_transaction_required");
+  if (transactions.has(db) || (session && !session.inTransaction())) throw new Error("native_publication_transaction_required");
   return transactionView(db, session, tenantId).db;
 }
 

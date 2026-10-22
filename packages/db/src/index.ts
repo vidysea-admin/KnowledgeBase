@@ -34,3 +34,4 @@ export * from "./collections/automation-runs.js";
 export * from "./collections/application-operations.js";
 export * from "./collections/operations-schedules.js";
 export * from "./lib/native-publication.js";
+export * from "./lib/topology.js";

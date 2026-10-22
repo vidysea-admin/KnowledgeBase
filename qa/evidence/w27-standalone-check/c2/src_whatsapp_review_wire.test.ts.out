@@ -1,0 +1,16 @@
+✔ ingest stores raw source and pending candidates only; no trusted row, no indexer (29.2ms)
+✔ approving one candidate materialises exactly one claim; sibling and rejected stay out (46.8604ms)
+✔ quarantine audit finds planted unapproved claim, chunk, page and tree leak (4.8686ms)
+✔ unchanged re-ingest keeps decisions and creates no duplicates (8.6179ms)
+✔ source edit removes pending proposals and revokes an approved claim (10.708ms)
+✔ failed materialisation leaves the candidate pending and publishes nothing (3.0581ms)
+✔ another tenant cannot read or decide a candidate (1.7749ms)
+✔ personal/excluded candidate cannot be approved or materialised (1.8733ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1451.6464

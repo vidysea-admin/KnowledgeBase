@@ -13,8 +13,8 @@ and the package scripts. The images were NOT built or run on the machine that wr
   `sudo apt-get update && sudo apt-get install --only-upgrade docker-compose-plugin` (Docker's apt repo).
 - Outbound HTTPS (npm, GitHub release download of yt-dlp during build, Ollama Cloud).
 - A reachable MongoDB (NOT containerized by default) and an Ollama Cloud key.
-  The MongoDB MUST be a replica set (a single-node replica set is fine); a standalone
-  `mongod` is not enough, see the REQUIRED note in section 6a.
+  A MongoDB replica set (a single-node replica set is fine) is RECOMMENDED but no longer required: a
+  standalone `mongod` works for Ask with a consistency caveat, see section 6a.
 - Node/pnpm on the host only if you run the key-minting script (section 6).
 
 ## 2. Clone and configure
@@ -105,11 +105,45 @@ mongod; managed clusters already enforce it), bind Mongo to the server's IP only
 `MONGODB_URL` with the credentials as in section 2 (URL-encode special characters in the
 password). Check: `mongosh "<MONGODB_URL>" --eval 'db.runCommand({ping:1})'`.
 
-**REQUIRED for Ask: Mongo must be a replica set.** `POST /ask` (and `/graph`, session decisions)
-read through a snapshot transaction (`apps/api/src/visibility/read-snapshot.ts`, no fallback). On a
-standalone `mongod` every one of them fails with `Transaction numbers are only allowed on a replica
-set member or mongos`, and Ask returns 503 `answer_history_unavailable` (the generic wrapper hides
-the cause; `/health` stays 200). A one-node set is enough. Follow this order exactly. `security.keyFile` turns authorization on by
+**Replica set RECOMMENDED; a standalone mongod also works for Ask (w27-standalone).** `POST /ask`
+(and `/graph`, session decisions) read through a snapshot transaction
+(`apps/api/src/visibility/read-snapshot.ts`). MongoDB refuses transactions on a standalone `mongod`
+(`Transaction numbers are only allowed on a replica set member or mongos`). The API now detects the
+topology once per connection (`hello`: no `setName` and not a mongos means standalone; override with
+`LKB_MONGO_STANDALONE=1` to force standalone or `=0` to force replica-set behaviour) and on a standalone
+runs the SAME tenant-scoped queries without a session or transaction, at readConcern `local`.
+
+Consistency caveat on standalone: the reads of one request are no longer a single point-in-time
+snapshot across collections, so a request racing a publication may see it half-applied (for example a
+new tree root with the previous session page). Every read is still tenant-scoped and the visibility
+gates still re-check authority per read, so the risk is a momentarily stale or incomplete answer, not a
+cross-tenant read. Use a replica set when you need the stricter guarantee.
+
+Writes on standalone: index publication (`publishIndexWithCommit`), native publication
+(`runNativePublicationTransaction`) and the transcript-review refresh run without a transaction. They are
+safe because publication is a pointer flip, not a multi-document commit: artifacts are written under a
+fresh generation id, `sessions.indexAttempt` is flipped to complete by ONE conditional single-document update,
+and readers (`verifyIndexGeneration`) serve only a complete generation whose artifacts match the manifest
+digests. A crash before the flip leaves the session hidden (fail closed); a crash after it leaves the new
+generation live. A crashed or failed run leaves the attempt `uncertain`/`running`, and a new attempt for that
+session is refused until an operator recovers it (unchanged rule: no automatic takeover of possibly-written
+state). Re-indexing a live session rewrites its artifacts in place, so that session is briefly hidden.
+
+Non-atomic on standalone (they run, but without all-or-nothing):
+- Transcript-review `mutate` bumps the native publication revision before the review-head compare-and-swap, so a lost swap leaves the bump: native publications are hidden (availability only).
+- Speaker-suggestions `decide` checks currency, bumps, then confirms without a transaction, so a concurrent root-only source swap can interleave in a narrow window.
+- Refresh executor: a crash mid-refresh can show partially rewritten graph edges until the refresh retries.
+
+`LKB_MONGO_STANDALONE=1` can only confirm a standalone: if `hello` reports a replica set or mongos it is ignored with a warning and transactions stay in use. `=0` forces transactions.
+
+Still refuse with a 503 on standalone (a half-applied write there would be visible, so they need a replica
+set): WhatsApp review store/decide, invalidation and the quarantine audit, and speaker attribute and
+relationship edits. They are not needed for Ask.
+
+Unknown store failures on Ask now return 503 `store_unavailable` (the real cause is logged server-side,
+secrets redacted) instead of the misleading `answer_history_unavailable`.
+
+To convert to a one-node replica set anyway, follow this order exactly. `security.keyFile` turns authorization on by
 implication, so the admin user must exist BEFORE the keyFile is added, or the localhost exception
 closes with no admin and you are locked out:
 1. Back up first: `mongodump --uri "<MONGODB_URL>" --out /backup/pre-rs`. Converting an existing

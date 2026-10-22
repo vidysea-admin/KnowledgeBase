@@ -5,6 +5,7 @@ import { AnswerWorkflowError, type AnswerWorkflow } from "./answer-workflow.js";
 import { PolicyServiceError } from "./service.js";
 import { PolicyInputError } from "./rules.js";
 import type { Actor } from "./types.js";
+import { logServerCause } from "../visibility/safe-cause.js";
 
 export type HumanReviewAction = "answer-review" | "source-preference" | "usefulness";
 /** Server-owned identity verification, never a request's claimed actor or API-key scope. */
@@ -22,7 +23,10 @@ export function answerWorkflowFailure(res: Response, error: unknown): void {
   if (error instanceof PolicyServiceError) {
     res.status(error.code === "not_found" ? 404 : error.code === "invalid_policy" ? 400 : 409).json({ error: error.code, message: error.message }); return;
   }
-  res.status(503).json({ error: "answer_history_unavailable", message: "Answer history or review is unavailable." });
+  // Unknown failure: never present it as a history problem. The accurate generic code is store_unavailable and the
+  // real (secret-free) cause goes to the server log only.
+  logServerCause("answer-router", error);
+  res.status(503).json({ error: "store_unavailable", message: "The knowledge store is temporarily unavailable." });
 }
 
 export function createAnswerHistoryRouter(workflow: AnswerWorkflow, authority?: AnswerReviewAuthority): Router {

@@ -7,7 +7,7 @@ const WRITES = new Set(["insertOne", "insertMany", "updateOne", "updateMany", "r
 /** Minimal explicit Mongo view for the real indexer. Every operation is bound to one transaction
  * and tenant. Serialization avoids parallel Mongo operations in a transaction, even when callers
  * use Promise.all. Turns are overlaid on reads and physically immutable in this view. */
-export function transactionReviewDb(db: Db, session: ClientSession, tenantId: string): Pick<Db, "collection"> {
+export function transactionReviewDb(db: Db, session: ClientSession | undefined, tenantId: string): Pick<Db, "collection"> {
   let pending: Promise<unknown> = Promise.resolve();
   const enqueue = <T>(work: () => Promise<T>): Promise<T> => {
     const result = pending.then(work);

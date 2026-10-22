@@ -1,0 +1,21 @@
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (103.4725ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (36.4988ms)
+✔ correction publication never replays paid work on transient body or commit errors (63.7642ms)
+✔ correction unknown commit retries only commit with bounded uncertainty and paid work once (33.6107ms)
+✔ runRefresh reconciles unknown committed head without downgrade or superseded revision leakage (43.2188ms)
+✔ review refresh refuses legacy/vector completion and missing lexical or provenance proof (43.3419ms)
+✔ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (4.9606ms)
+✔ text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score (33.4407ms)
+✔ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (2.7402ms)
+✔ head audit remains readable after secondary history failure without another human correction (2.0922ms)
+✔ complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation (3.071ms)
+✔ effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes (1.6172ms)
+﹣ retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection (0.2489ms) # SKIP
+ℹ tests 13
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 1480.6186

@@ -5,6 +5,7 @@ import { verifyIndexGeneration } from "./generation.js";
 import { headId, type ReviewHead } from "../transcript-review/store.js";
 import type { CommittedIndexBinding, IndexCommittedHook } from "./types.js";
 import type { IndexSessionResult } from "./types.js";
+import { isStandaloneMongo } from "../visibility/topology.js";
 import { transactionReviewDb } from "../transcript-review/transaction-db.js";
 
 /** Manual transaction retries commit acknowledgement only, never paid publication work. */
@@ -12,6 +13,18 @@ export async function publishIndexWithCommit(
   db: Db, tenantId: string, sessionId: string, hook: IndexCommittedHook | undefined,
   work: (db: Pick<Db, "collection">) => Promise<IndexSessionResult>,
 ): Promise<IndexSessionResult> {
+  // STANDALONE mongod (w27-standalone): no transaction. The generation protocol in generation.ts is the publication
+  // pointer: artifacts are written under a fresh generation id, finishIndexAttempt flips sessions.indexAttempt to
+  // complete with one conditional single-document update, and readers (verifyIndexGeneration) resolve only a complete
+  // generation whose artifacts match the manifest digests. Before the flip the previous state is what readers see (or
+  // nothing, fail closed); a crash leaves attempt state failed/uncertain/running, which keeps refusing a new attempt
+  // until an explicit recovery (unchanged contract: no automatic takeover of possibly-written state).
+  if (await isStandaloneMongo(db)) {
+    const result = await work(transactionReviewDb(db, undefined, tenantId));
+    if (!result.completion?.complete) throw new Error("vectorless atomic publication incomplete");
+    await notifyIndexCommitted(db, tenantId, sessionId, hook, { generation: result.completion.generation });
+    return result;
+  }
   const session = db.client.startSession(); let unknownCommit = false;
   try {
     session.startTransaction({ readConcern: { level: "snapshot" }, writeConcern: { w: "majority" }, maxCommitTimeMS: 15000 });

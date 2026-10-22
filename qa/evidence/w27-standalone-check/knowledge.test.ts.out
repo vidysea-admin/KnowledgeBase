@@ -1,0 +1,35 @@
+✔ pending WA material contributes to no trusted turn, citation, claim or aggregate (27.4358ms)
+✔ only approved candidate turn is eligible, with literal substring citations and no sibling (6.7521ms)
+✔ unrelated source behavior retains current validated session, turns and claim (3.1202ms)
+✔ actual materialized approved WA loses every trusted projection when source consent is withdrawn (16.1818ms)
+✔ every lookup is tenant-qualified and foreign input never becomes visible (3.0532ms)
+✔ fresh eligibility refuses rejected without a durable allow cache (3.1315ms)
+✔ fresh eligibility refuses pending without a durable allow cache (2.5571ms)
+✔ fresh eligibility refuses withdrawn without a durable allow cache (4.2358ms)
+✔ fresh eligibility refuses pending-invalidation without a durable allow cache (4.6535ms)
+✔ current source text drift invalidates old WA approval (1.6423ms)
+✔ current source speakerRef drift invalidates old WA approval (1.6731ms)
+✔ current source speakerLabel drift invalidates old WA approval (1.5559ms)
+✔ current source occurredAt drift invalidates old WA approval (5.672ms)
+✔ tampered materialized claim text cannot grant trust (1.0608ms)
+✔ tampered materialized claim status cannot grant trust (0.6739ms)
+✔ tampered materialized claim audit cannot grant trust (0.9125ms)
+✔ tampered materialized claim evidence cannot grant trust (0.6676ms)
+✔ review provenance cannot be bypassed through source relabelling or session repointing (0.9885ms)
+✔ withdrawal during evidence validation cannot survive an earlier claim snapshot (1.4834ms)
+✔ database errors and malformed tenants fail closed without exposing an error (0.7662ms)
+✔ safe approved citation session omits raw title, participants and arbitrary metadata (1.2125ms)
+✔ metadata attachment approval does not publish unrelated source-message content (3.7667ms)
+✔ trusted tree drops legacy WA nodes and mixed parent summaries, then admits only reviewed facts (3.4986ms)
+✔ trusted tree does not borrow foreign tenant identities or absent source associations (1.1016ms)
+✔ a valid nonWA parent cannot retain tainted cached title/summary after WA descendants are pruned (2.4736ms)
+✔ nonWA eligibility consumes the real corrected projection without rewriting immutable originals (3.0111ms)
+✔ an effective WA correction withdraws old approval even while raw source evidence still matches (6.0802ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1373.8487

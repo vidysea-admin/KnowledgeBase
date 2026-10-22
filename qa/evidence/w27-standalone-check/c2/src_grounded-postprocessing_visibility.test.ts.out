@@ -1,0 +1,10 @@
+✔ actual grounded factory refuses withdrawn recording consent before model requests or knowledge writes (22.159ms)
+✔ actual review composition rechecks recording consent and foreign scope instead of caching prior permission (16.4873ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2576.3322
