@@ -63,6 +63,8 @@ export interface AskV2Deps {
 
 export interface AskV2Result extends AskResult {
   answer: string;
+  /** D-191: grounding-judge rejected sentences dropped from `answer` (count only; absent when nothing was removed). */
+  removedSentences?: number;
   /** append-only per-query audit trail — one entry per external (LLM/score) call this run made. */
   auditLog: AuditEntry[];
 }

@@ -162,3 +162,19 @@ test("indivisible oversized packed answer still refuses before provider invocati
   assert.ok(sizes[0]! > 65536);
   t.diagnostic(JSON.stringify({ deniedSerializedJobBytes: sizes[0], providerInvocations: providers }));
 });
+test("D-191: askV2 returns the supported sentences, reports removedSentences, and keeps source citations", async () => {
+  const { deps } = fixture();
+  const base = deps.complete;
+  deps.complete = async (job) => {
+    if (job.kind === "ask.answer") return result({ sentences: [
+      { text: "The source says a visa requires a form.", sourceIds: ["q1"] }, { text: "Fees are waived for everyone.", sourceIds: ["q1"] }] });
+    if (job.kind === "ask.answer_grounding") return result({ decisions: [
+      { id: "sentence-0", supported: true, answersQuery: true }, { id: "sentence-1", supported: false, answersQuery: true }] });
+    return base(job);
+  };
+  const actual = await askV2("visa form", tree, deps);
+  assert.equal(actual.answer, "The source says a visa requires a form.");
+  assert.equal(actual.removedSentences, 1);
+  assert.deepEqual(actual.sources.internal[0]!.evidence!.sourceQuotes, [quote]);
+  assert.ok(!JSON.stringify(actual).includes("Fees are waived"));
+});

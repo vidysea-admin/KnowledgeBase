@@ -60,6 +60,7 @@ export function AskPage(): React.ReactElement {
 
   const internal = result?.sources.internal ?? [];
   const excluded = typeof result?.excludedSessions === "number" && result.excludedSessions > 0 ? result.excludedSessions : 0;
+  const removed = typeof result?.removedSentences === "number" && result.removedSentences > 0 ? result.removedSentences : 0;
   const web = result?.sources.web ?? [];
   // ISS-274: the seam is now wired unconditionally (apps/api/src/production.ts), so
   // `web_used: false` no longer means "no fallback was configured" -- it can also mean "the
@@ -102,6 +103,11 @@ export function AskPage(): React.ReactElement {
           <div className="card">
             <div className="section-title">Answer</div>
             <p style={{ whiteSpace: "pre-wrap" }}>{result.answer}</p>
+            {removed > 0 && (
+              <div className="empty-note" data-testid="ask-removed-note">
+                {removed} unsupported {removed === 1 ? "sentence was" : "sentences were"} removed from this answer.
+              </div>
+            )}
             <AiUsageSummary entries={result.auditLog} />
             {result.insufficient_coverage && (
               <div className="empty-note">

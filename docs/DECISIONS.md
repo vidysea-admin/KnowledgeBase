@@ -2533,3 +2533,17 @@ fourth would have left real decisions idle behind an unrelated unit.
 - apps/web/src/pages/AskPage.tsx
 **Approved-by:** Umesh (verbatim quote in What)
 **Links:** T-043, G5
+
+## D-191 | 2026-10-22 | type: decision | status: ACTIVE
+**Title:** Ask drops sentences the grounding judge rejects and returns the rest
+**What:** Umesh (Approver) ruled in chat on 2026-10-22, verbatim: "Yes: drop only the sentences that fail the grounding/relevance judge and return the rest; refuse only if nothing supported remains. Show that some sentences were removed." On the bounded Ask path, packages/ask/src/answer.ts keeps only sentences whose ask.answer_grounding decision has supported=true and answersQuery=true. A missing, duplicate, unknown or malformed decision drops that sentence. If no sentence remains, the same BoundedAskError (source_context_unavailable, HTTP 503) is thrown as before.
+**Why:** The judge is non-deterministic: one rejected sentence out of nine discarded the whole answer and returned 503.
+**Result:** /ask adds removedSentences (count only) to the response. The web Ask page shows "N unsupported sentences were removed from this answer." Saved answer history and review store the kept text plus the count, because the stored candidate is the response. Dropped sentences are not returned in any field. No earlier decision mandated whole-answer refusal by name, so nothing is superseded.
+**Changes-authorized:**
+- packages/ask/src/answer.ts
+- packages/ask/src/ask-graph.ts
+- packages/ask/src/ask-shared.ts
+- apps/web/src/pages/AskPage.tsx
+- apps/web/src/api/types.ts
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-043, D-190, apps/api/src/routes/ask/ask.ts, packages/ask/src/answer.ts, qa/manifests/w27-dropsentences.md

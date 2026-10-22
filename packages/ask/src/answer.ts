@@ -7,7 +7,7 @@ import type { CompleteFn } from "./select-nodes.js";
 import { packContext, type ContextSource, type ContextStrip } from "./bounded-refine.js";
 import { BoundedAskError } from "./source-context.js";
 
-export interface AnswerResult<Sources> { text: string; sources: Sources }
+export interface AnswerResult<Sources> { text: string; sources: Sources; /** Bounded path only: sentences the grounding judge rejected (count). */ removedSentences?: number }
 function buildPrompt(query: string, refinedContext: string): string {
   return ["Query: " + query, "Context (already refined — decomposed, filtered, recomposed):",
     refinedContext, "Answer the query using only the context above."].join("\n");
@@ -68,13 +68,16 @@ export async function answer<Sources>(
   });
   const parsed = judged.json ?? parseJsonLoose(judged.text);
   const decisions = (parsed as { decisions?: unknown } | null)?.decisions;
-  if (!Array.isArray(decisions) || decisions.length !== sentences.length) throw new BoundedAskError("incomplete answer grounding judgment");
-  const expected = new Set(sentences.map((s) => s.id));
-  const seen = new Set<string>();
-  for (const d of decisions as { id?: unknown; supported?: unknown; answersQuery?: unknown }[]) {
-    if (typeof d.id !== "string" || !expected.has(d.id) || seen.has(d.id)
-      || d.supported !== true || d.answersQuery !== true) throw new BoundedAskError("answer support or relevance refused");
-    seen.add(d.id);
+  // D-191: a sentence is kept only on an explicit {supported:true, answersQuery:true} decision for its id.
+  // A missing, duplicated, unknown or malformed decision drops that sentence (never fail open).
+  const verdicts = new Map<string, boolean>();
+  if (Array.isArray(decisions)) {
+    for (const d of decisions as { id?: unknown; supported?: unknown; answersQuery?: unknown }[]) {
+      if (!d || typeof d !== "object" || typeof d.id !== "string") continue;
+      verdicts.set(d.id, !verdicts.has(d.id) && d.supported === true && d.answersQuery === true);
+    }
   }
-  return { text: sentences.map((s) => s.text).join("\n"), sources };
+  const kept = sentences.filter((s) => verdicts.get(s.id) === true);
+  if (!kept.length) throw new BoundedAskError("answer support or relevance refused");
+  return { text: kept.map((s) => s.text).join("\n"), sources, removedSentences: sentences.length - kept.length };
 }
