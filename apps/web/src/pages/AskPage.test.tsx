@@ -253,3 +253,20 @@ test("no exclusion note when the response excludes no session", async () => {
   await waitFor(() => expect(screen.getByText("Applications open in October.")).toBeInTheDocument());
   expect(screen.queryByTestId("ask-excluded-note")).not.toBeInTheDocument();
 });
+
+test("tells the person how many unsupported sentences were removed, and nothing when none", async () => {
+  vi.spyOn(askApi, "ask").mockResolvedValue(response({ removedSentences: 2 }));
+  renderPage(); await submit("careers in law?");
+  await waitFor(() => expect(screen.getByTestId("ask-removed-note")).toHaveTextContent("2 unsupported sentences were removed from this answer."));
+});
+
+test("singular and zero removed-sentence notes", async () => {
+  const spy = vi.spyOn(askApi, "ask").mockResolvedValue(response({ removedSentences: 1 }));
+  const { unmount } = renderPage(); await submit("careers in law?");
+  await waitFor(() => expect(screen.getByTestId("ask-removed-note")).toHaveTextContent("1 unsupported sentence was removed from this answer."));
+  unmount();
+  spy.mockResolvedValue(response({ removedSentences: 0 }));
+  renderPage(); await submit("careers in law?");
+  await waitFor(() => expect(screen.getByText("Applications open in October.")).toBeInTheDocument());
+  expect(screen.queryByTestId("ask-removed-note")).not.toBeInTheDocument();
+});

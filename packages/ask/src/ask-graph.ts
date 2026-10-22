@@ -193,7 +193,8 @@ const answerNode: AskGraphNode = {
     const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources } : undefined);
     s.budget?.assertHealthy();
     if (nativeNodes.length) await revalidate!(nativeNodes);
-    s.result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog };
+    s.result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog,
+      ...(answerResult.removedSentences ? { removedSentences: answerResult.removedSentences } : {}) };
   },
 };
 

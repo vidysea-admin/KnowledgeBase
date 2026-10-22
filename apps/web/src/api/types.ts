@@ -170,5 +170,7 @@ export interface AskResponse {
   auditLog: { step: string; provider?: string; model?: string; costUsd?: number; costStatus?: "unknown" | "reported"; inputTokens?: number; outputTokens?: number }[];
   /** D-190: sessions left out of the answer as ineligible; counts only. */
   excludedSessions?: number;
+  /** D-191: answer sentences removed by the grounding judge; count only. */
+  removedSentences?: number;
   exclusionReasons?: Record<string, number>;
 }
