@@ -217,6 +217,17 @@ At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 champions
 - T-013 avatar: no environment flag exists; leave it unannounced. The `/counsellor` page
   ships in the web bundle either way.
 
+## Recovering a stuck index attempt
+A session whose index attempt is `uncertain` (or `running` after a crash) stays hidden and the next index run refuses it
+(`index_attempt_requires_recovery`). Recover ONE session at a time (no bulk mode); dry run first:
+`node scripts/operations/recover-index-attempt.mjs --tenant <t> --session <s>` shows the attempt state, generation, age
+and any artifacts tagged with that generation. Then add `--apply --reason "<why>"` to reset it to `failed/preflight` so a
+fresh index run can claim it (one conditional update; a changed attempt gives `conflict` and writes nothing; who/when/why
+are stored in `sessions.indexRecovery`). A `running` attempt under 30 min old is refused unless `--force-running`.
+Database rules are the usual script guard (`lkb_staging` with `MONGO_WORK_DB`/`LKB_ALLOW_STAGING`; production only with
+`--i-know-this-is-production` and `MONGODB_DB=lkb`). Nothing is deleted: leftover artifacts of the abandoned generation
+stay invisible and the next index run rewrites them.
+
 ## Update / rollback
 `git pull && docker compose build api web && docker compose up -d api web`.
 Roll back by checking out the previous commit and repeating. Migrations are not
