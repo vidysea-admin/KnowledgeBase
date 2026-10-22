@@ -3,6 +3,7 @@ import type { Db, ClientSession } from "mongodb";
 import type { Claims, MessageSourceLocator, Sessions, Sources, Turns } from "@lkb/core";
 import { assertValidTenantId, withTenant } from "@lkb/db";
 import { createKnowledgeVisibility, type VisibilityClaim } from "../visibility/knowledge.js";
+import { isStandaloneMongo } from "../visibility/topology.js";
 import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
 import type { WhatsAppReviewCandidate } from "../whatsapp/review/detection.js";
 import type { NativeCurrentUnit } from "./resolver.js";
@@ -23,8 +24,11 @@ export function createWhatsAppNativeAuthority(db: Db, options: { session?: Clien
       if (options.session && options.readView) throw unavailable();
       // A trusted outer snapshot view already pins its active session on every read.
       // It must not create or end a second transaction while that view is in use.
-      if (!options.readView) session = options.session ?? db.client.startSession();
+      // Standalone mongod (w27-standalone): no transaction exists, so read directly at readConcern "local".
+      const standalone = !options.session && !options.readView && await isStandaloneMongo(db);
+      if (!options.readView && !standalone) session = options.session ?? db.client.startSession();
       const currentSession = session;
+      const readOpts = standalone ? { readConcern: { level: "local" as const } } : { session: currentSession };
       if (options.session && (typeof options.session.inTransaction !== "function" || !options.session.inTransaction())) throw unavailable();
       // The capability deliberately exposes no write methods or session escape hatch.
       const reads = new Proxy(db, { get(target, key) {
@@ -33,12 +37,12 @@ export function createWhatsAppNativeAuthority(db: Db, options: { session?: Clien
           const collection = (options.readView ?? target).collection(name);
           return new Proxy(collection, { get(coll, method) {
             if (method === "findOne") return async (filter: object, options: object = {}) => {
-              try { return await coll.findOne(filter, { ...options, session: currentSession }); }
+              try { return await coll.findOne(filter, { ...options, ...readOpts }); }
               catch { readFailed = true; throw unavailable(); }
             };
             if (method === "find") return (filter: object, options: object = {}) => {
               let cursor: ReturnType<typeof coll.find>;
-              try { cursor = coll.find(filter, { ...options, session: currentSession }); }
+              try { cursor = coll.find(filter, { ...options, ...readOpts }); }
               catch { readFailed = true; throw unavailable(); }
               const view: unknown = new Proxy(cursor, { get(actual, member) {
                 if (member === "toArray") return async () => {
@@ -54,14 +58,14 @@ export function createWhatsAppNativeAuthority(db: Db, options: { session?: Clien
         };
       } });
       const execute = async () => {
-        if (!options.readView && (!currentSession || typeof currentSession.inTransaction !== "function" || !currentSession.inTransaction())) throw unavailable();
+        if (!options.readView && !standalone && (!currentSession || typeof currentSession.inTransaction !== "function" || !currentSession.inTransaction())) throw unavailable();
         readFailed = false;
         const value = await run(reads);
         if (readFailed) throw unavailable(); // guarded reader must not hide infrastructure failure.
         return { value };
       };
       let result: { value: T } | undefined;
-      if (options.readView || options.session) result = await execute();
+      if (options.readView || options.session || standalone) result = await execute();
       else {
         if (!session) throw unavailable();
         result = await session.withTransaction(execute, { readConcern: { level: "snapshot" }, readPreference: "primary" });

@@ -6,6 +6,7 @@ import { expandAuthorizedGraph, GRAPH_ROUTING_LIMITS, type AcceptedGraphEdge, ty
   type GraphRetrievalSelection } from "../../../../packages/index/src/graph/authorized-expansion.js";
 import { readSpeakerKnowledgeAuthority } from "../speaker-profiles/store.js";
 import { isValidTenantId } from "../auth.js";
+import { isStandaloneMongo } from "../visibility/topology.js";
 import { createKnowledgeVisibility } from "../visibility/knowledge.js";
 import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
 import { speakerTranscriptHash } from "../../../../packages/index/src/pipeline/speaker-profiles/profile.js";
@@ -143,19 +144,23 @@ async function selectedTopicSnapshot(db: Pick<Db, "collection">, tenant: string,
 export function createMongoGraphSnapshotReader(db: Db): GraphContextDeps["readSnapshot"] {
   return async (tenantId, selection) => {
     validate(selection); if (!isValidTenantId(tenantId)) throw new BoundedAskError("invalid graph tenant");
-    if (!db.client?.startSession) throw new BoundedAskError("graph snapshot unavailable");
-    const session = db.client.startSession({ causalConsistency: false });
+    // Standalone mongod (w27-standalone): no transactions exist, so read without a session at readConcern "local".
+    // Tenant scope checks below are unchanged; only cross-collection point-in-time consistency is weaker.
+    const standalone = await isStandaloneMongo(db);
+    if (!standalone && !db.client?.startSession) throw new BoundedAskError("graph snapshot unavailable");
+    const session = standalone ? undefined : db.client.startSession({ causalConsistency: false });
+    const readOptions = session ? { session } : { readConcern: { level: "local" as const } };
     let tail = Promise.resolve();
     const serial = <T>(run: () => Promise<T>) => { const next = tail.then(run); tail = next.then(() => {}, () => {}); return next; };
     const snapshotDb = { collection(name: string) {
       const collection = db.collection(name);
       const scope = (filter: Record<string, unknown>) => { if (filter.tenantId !== tenantId) throw new BoundedAskError("invalid graph scope"); };
-      return { find(filter: Record<string, unknown>) { scope(filter); const cursor = collection.find(filter, { session });
+      return { find(filter: Record<string, unknown>) { scope(filter); const cursor = collection.find(filter, readOptions);
         const safe = { limit(n: number) { cursor.limit(n); return safe; }, sort(order: Record<string, 1 | -1>) { cursor.sort(order); return safe; }, toArray: () => serial(() => cursor.toArray()) }; return safe; },
-        findOne(filter: Record<string, unknown>) { scope(filter); return serial(() => collection.findOne(filter, { session })); } };
+        findOne(filter: Record<string, unknown>) { scope(filter); return serial(() => collection.findOne(filter, readOptions)); } };
     } } as unknown as Pick<Db, "collection">;
     try {
-      const result = await session.withTransaction(async () => {
+      const body = async () => {
         const topicSnapshot = await selectedTopicSnapshot(snapshotDb, tenantId, selection.topicRefs ?? []);
         if (!selection.speakerRefs?.length) return { edges: topicSnapshot.edges, visibleSources: topicSnapshot.visibleSources, turns: topicSnapshot.turns };
         const edges: AcceptedGraphEdge[] = [], visibleSources = new Map<string, CurrentGraphSource>();
@@ -190,9 +195,10 @@ export function createMongoGraphSnapshotReader(db: Db): GraphContextDeps["readSn
           }
         }
         return { edges, visibleSources: [...visibleSources.values()], turns: [...turns.values()] };
-      }, { readConcern: { level: "snapshot" }, maxCommitTimeMS: 10000 });
+      };
+      const result = session ? await session.withTransaction(body, { readConcern: { level: "snapshot" }, maxCommitTimeMS: 10000 }) : await body();
       if (!result) throw new BoundedAskError("graph snapshot unavailable");
       return result;
-    } finally { await session.endSession(); }
+    } finally { await session?.endSession(); }
   };
 }

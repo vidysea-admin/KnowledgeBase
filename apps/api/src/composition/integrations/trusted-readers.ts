@@ -10,6 +10,7 @@ import type { TreeStore } from '../../routes/ask/ask.js';
 import { createKnowledgeVisibility } from '../../visibility/knowledge.js';
 import { readEffectiveTurns } from '../../transcript-review/effective-reader.js';
 import { withKnowledgeReadSnapshot } from '../../visibility/read-snapshot.js';
+import { logServerCause } from '../../visibility/safe-cause.js';
 import { eligibleTreeInput } from '../../indexing/eligible-tree.js';
 import type { NativeEvidenceResolver } from '../../native-evidence/resolver.js';
 
@@ -99,7 +100,8 @@ export function trustedTreeReads(database: () => Db, nativeEvidence?: NativeEvid
           : nativeBranches.length ? { node_id: `tenant:${tenant}`, tenantId: tenant, title: 'Current knowledge', level: 'tenant' as const, summary: '', children: nativeBranches } : null;
         return createKnowledgeVisibility(db, readNative).trustedTree(tenant, root);
       });
-    } catch {
+    } catch (cause) {
+      logServerCause('trusted-tree-read', cause);
       throw Object.assign(new Error('Current knowledge tree unavailable'), { status: 503 });
     }
   } };
@@ -135,7 +137,8 @@ export function trustedGraphReads(database: () => Db): GraphReadDeps {
         if (!treeRoot && !safeEdges.length) return null;
         return buildKnowledgeGraph({ treeRoot, entityEdges: safeEdges, sessions: eligible.sessions.map(publicSession) });
       });
-    } catch {
+    } catch (cause) {
+      logServerCause('trusted-graph-read', cause);
       throw Object.assign(new Error('Current knowledge graph unavailable'), { status: 503 });
     }
   } };
