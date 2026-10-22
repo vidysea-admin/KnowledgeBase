@@ -4,7 +4,7 @@ import { lookup } from "node:dns/promises";
 import { request } from "node:https";
 import { isIP } from "node:net";
 
-export const REGISTRATION_LINK_RESOLUTION_ENABLED = false;
+export const REGISTRATION_LINK_RESOLUTION_ENABLED = true;
 export const privateEvidenceHash = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
 export interface LinkResolutionInput {
   tenantId: string; sourceId: string; messageId: string; sourceHash: string; policyHash: string;
