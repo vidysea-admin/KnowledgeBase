@@ -1,4 +1,4 @@
-import { render, screen, cleanup, fireEvent } from "@testing-library/react";
+import { render, screen, cleanup, fireEvent, waitFor } from "@testing-library/react";
 import { beforeEach, afterEach, expect, test, vi } from "vitest";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "../../../auth/AuthContext.js";
@@ -30,7 +30,11 @@ test("mounted speaker workbench consumes trusted source and submits a pending pr
   render(<MemoryRouter initialEntries={["/knowledge/speakers/person%3Aanita"]}><AuthProvider><Routes><Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} /></Routes></AuthProvider></MemoryRouter>);
   await screen.findAllByRole("option", { name: "First claim" });
   expect(mock.mock.calls.some(([url]) => String(url).includes("/speaker-relations/source?personId=person%3Aanita"))).toBe(true);
-  fireEvent.change(screen.getByLabelText("From claim"), { target: { value: "claim:a" } }); fireEvent.change(screen.getByLabelText("To claim"), { target: { value: "claim:b" } });
+  // Select inside waitFor so a late source-settle effect on a slow runner cannot wipe the picks before the assertion.
+  await waitFor(() => {
+    fireEvent.change(screen.getByLabelText("From claim"), { target: { value: "claim:a" } }); fireEvent.change(screen.getByLabelText("To claim"), { target: { value: "claim:b" } });
+    expect(screen.getByRole("checkbox", { name: "First source" })).toBeInTheDocument();
+  });
   fireEvent.click(screen.getByRole("checkbox", { name: "First source" })); fireEvent.click(screen.getByRole("button", { name: "Submit proposal for human review" }));
   await screen.findByText("Proposal saved for human review. It is not an accepted relationship.");
   const post = mock.mock.calls.find(([, options]) => options.method === "POST")!;
