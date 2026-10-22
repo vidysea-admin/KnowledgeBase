@@ -1,0 +1,20 @@
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (56.3373ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (1.0974ms)
+✔ reviewed substring cannot bypass meaning verification of full negated source context (1.3211ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (16.9941ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (20.8619ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (16.1544ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (12.8559ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.6685ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (16.743ms)
+✔ index hook runs after acknowledged commit and callback failure cannot replay publication (12.1203ms)
+✔ caller-owned index transaction does not notify before its outer commit (6.3835ms)
+✔ failed outer index commit never invokes post-commit work (6.6179ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1429.6272

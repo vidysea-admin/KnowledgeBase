@@ -1,9 +1,9 @@
 # Verdict: w27-standalone
 
 VERDICT: PASS
-Cycle checked: 0
-Reviewed SHA: 49bead49961b45e3fabcd58a12935043e8c9257c
-Base: f9c35927 (diff f9c35927..49bead49, commits 2b86539b + 49bead49)
+Cycle checked: 1
+Reviewed SHA: 9a8ea805585d8d408c616aeddfc01005316041e0
+Base: f9c35927 (cycle 1 diff 49bead49..9a8ea805 on top of cycle 0 candidate 49bead49; cycle 0 sections below are historical, cycle 0 was PASS at 49bead49 / verdict b4c6d6e9)
 Class: SECURITY (tenancy, data writes), full ceremony.
 Checker: independent, fresh context. Maker claims treated as untrusted; no candidate code edited, no DB touched (fakes only).
 
@@ -37,3 +37,19 @@ Live staging claims, lint-loc --all, the maker's mutations M1-M5, broader or ful
 ## Ledger
 No ledger issue rows are tied to this unit; none to flip. ISSUES-WRITTEN: none.
 Maker may close out the manifest to checked-PASS.
+
+---
+# Cycle 1 (authoritative, Cycle checked: 1, Reviewed SHA 9a8ea805585d8d408c616aeddfc01005316041e0)
+
+VERDICT: PASS
+
+Re-checked independently (raw outputs in qa/evidence/w27-standalone-check/c1/, exit codes in c1/exit-codes.txt).
+- Diff 49bead49..9a8ea805 reviewed: grounded-write.ts (new reusablePageId, used by session.ts), topology.ts (override guard), two test files, docs, manifest.
+- Focused tests, each under timeout 600, all exit 0: standalone-publication 10/10, standalone-mongo 11/11, indexing/session 26, vectorless-publication 12, generation 8. tsc --noEmit apps/api exit 0, packages/db exit 0.
+- F1 CLOSED: my cycle-0 mutant (native-publication.ts transactionView `filter()` tenant check removed) now FAILS the new "F1 standalone native view" test (9 pass, 1 fail). Trap used an ABSOLUTE path. HEAD fidelity: `git -c core.autocrlf=true hash-object` = bacb57423abcc9a08c123dd1240c3ed43a468e38 = `git rev-parse HEAD:` for that file; no .bak left, git status clean of tracked changes.
+- F2 CLOSED (partly by test): "F2 re-index replaces the existing session page atomically" proves replacePageInsertFirst does a replace with a reused _id and that a new _id would hit E11000. The session.ts wiring through reusablePageId is covered only indirectly (session.test 26 pass); matchedCount of replaceOne is still unchecked but fails closed at finishIndexAttempt (note, not a defect).
+- F5 CLOSED: topology.ts now ignores LKB_MONGO_STANDALONE=1 when hello reports a replica set or mongos (one warning per client); =0 still forces transactional behaviour. My mutant disabling the `forced === true && !detected` guard FAILS the new F5 test (10 pass, 1 fail); file restored, hash = HEAD blob 1de4f7bf79eace4afb39a558ca0a11c13bae57f6. Residual note: with override=1 and a failed hello the override is honoured (operator intent).
+- F3, F4: documentation only, accepted as documented limits (non-transactional decide/mutate and refresh edge-rewrite window); no ledger entry.
+- Not verified: live staging, lint-loc, full suites.
+
+ISSUES-WRITTEN: none. No ledger rows to flip. Maker may close out the manifest to checked-PASS.

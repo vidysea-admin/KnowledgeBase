@@ -1,0 +1,26 @@
+✔ simulation runs real Ask composition for each authenticated tenant and ignores submitted answer/tenant (310.2147ms)
+✔ missing credentials and missing Ask scope prevent all retrieval (83.9213ms)
+SyntaxError: Unexpected token 'n', "null" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at createStrictSyntaxError (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:137:10)
+    at parse (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:86:15)
+    at C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1736:12)
+✔ invalid drafts and query budget fail before retrieval (197.6323ms)
+✔ missing tenant tree and bounded source failures report honest errors (21.0912ms)
+✔ actual createServer mounts simulation behind shared auth and existing Ask dependencies (50.0471ms)
+✔ graph selector mounted policy simulation forwards normalized hints, never claimed tenant or top-level selectors (17.7197ms)
+✔ graph selector policy simulation rejects invalid filters before retrieval and preserves tenant authority on foreign hints (77.561ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4643.4873

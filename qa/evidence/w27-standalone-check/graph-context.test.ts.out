@@ -1,0 +1,18 @@
+✔ API graph consumer calls actual bounded helper with dimension intersection and request-local authority (36.8521ms)
+✔ API graph consumer refuses malformed selections before source reads (0.7633ms)
+✔ API graph consumer omits suggested foreign stale and tree-excluded graph proofs (3.4677ms)
+✔ API graph consumer sanitizes snapshot failures and copies trusted mutable projection (1.1153ms)
+✔ Mongo graph reader refuses unavailable snapshots without any collection access (2.6393ms)
+✔ topic-only actual Mongo reader and request factory consume current published exact source without embeddings (79.9395ms)
+✔ topic-only current publication withholds stale foreign unpublished and ungrounded canonical topics (22.1608ms)
+✔ API graph consumer applies OR within topic IDs and AND across speaker and topic dimensions (1.6635ms)
+✔ Mongo graph reader opens read-only snapshot and loads only explicit speaker identities (1.8126ms)
+✔ topic graph snapshot withholds a published topic once its session source is an unreviewed WhatsApp batch (20.4968ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1803.1148

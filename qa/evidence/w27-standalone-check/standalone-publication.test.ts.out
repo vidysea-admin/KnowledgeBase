@@ -1,0 +1,16 @@
+✔ standalone index publication runs the indexer once, with no session, and a tenant-pinned view (4.3075ms)
+✔ standalone index publication: an incomplete result is refused, never reported as published (3.1349ms)
+✔ replica set index publication is unchanged: one transaction, committed (2.1871ms)
+✔ standalone native publication: sessionless, tenant-pinned, foreign-tenant write refused, replica set still transactional (2.4128ms)
+✔ crash AFTER the flip: the new generation is live without any later step (61.7403ms)
+✔ crash BEFORE the flip: a half-rewritten session is hidden (fail closed), never torn, and needs explicit recovery (11.5879ms)
+✔ a stale generation id never verifies, and another tenant never verifies (9.9874ms)
+✔ concurrent publish race: two writers on the same tree head, exactly one conditional flip wins (14.155ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2054.3375

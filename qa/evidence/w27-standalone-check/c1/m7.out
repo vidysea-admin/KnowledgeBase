@@ -1,0 +1,36 @@
+✔ standalone index publication runs the indexer once, with no session, and a tenant-pinned view (2.9259ms)
+✔ standalone index publication: an incomplete result is refused, never reported as published (0.4856ms)
+✔ replica set index publication is unchanged: one transaction, committed (1.3029ms)
+✔ standalone native publication: sessionless, tenant-pinned, foreign-tenant write refused, replica set still transactional (1.628ms)
+✔ crash AFTER the flip: the new generation is live without any later step (49.9589ms)
+✔ crash BEFORE the flip: a half-rewritten session is hidden (fail closed), never torn, and needs explicit recovery (10.4059ms)
+✔ a stale generation id never verifies, and another tenant never verifies (8.2141ms)
+✔ concurrent publish race: two writers on the same tree head, exactly one conditional flip wins (7.6066ms)
+✖ F1 standalone native view: tenant B cannot read or query tenant A's rows through the view (4.9267ms)
+✔ F2 re-index replaces the existing session page atomically (unique tenantId+sessionId index cannot collide) (1.5522ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1733.5566
+
+✖ failing tests:
+
+test at src\visibility\standalone-publication.test.ts:1:6381
+✖ F1 standalone native view: tenant B cannot read or query tenant A's rows through the view (4.9267ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async <anonymous> (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\apps\api\src\visibility\standalone-publication.test.ts:119:5)
+      at async runNativePublicationTransaction (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\packages\db\src\lib\native-publication.ts:23:26)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\apps\api\src\visibility\standalone-publication.test.ts:116:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tenant_mismatch/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

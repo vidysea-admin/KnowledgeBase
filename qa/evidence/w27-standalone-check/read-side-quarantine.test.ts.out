@@ -1,0 +1,25 @@
+✔ lexical /search never returns pending WhatsApp turns, but still serves public turns (23.6575ms)
+✔ semantic corpus excludes pending WhatsApp turns, sessions and chunks (5.9132ms)
+✔ semantic search ranks a pending WhatsApp chunk nowhere even when its vector is the nearest (7.4778ms)
+✔ /ask lexical and vector arms never propose the pending WhatsApp session node (3.5342ms)
+✔ claims list hides the old-wiring needs-review WhatsApp claim while pending (3.9799ms)
+✔ knowledge outputs refuse a pending WhatsApp session and expose none of its claims or turns (12.4387ms)
+✔ eligible tree input drops the pending WhatsApp session and its page, and never retains a stale root (3.3944ms)
+✔ topic catalog hides pending WhatsApp claims and sessions (3.535ms)
+✔ lexical /search never returns rejected WhatsApp turns, but still serves public turns (2.7881ms)
+✔ semantic corpus excludes rejected WhatsApp turns, sessions and chunks (4.0018ms)
+✔ semantic search ranks a rejected WhatsApp chunk nowhere even when its vector is the nearest (4.9318ms)
+✔ /ask lexical and vector arms never propose the rejected WhatsApp session node (3.5432ms)
+✔ claims list hides the old-wiring needs-review WhatsApp claim while rejected (6.6793ms)
+✔ knowledge outputs refuse a rejected WhatsApp session and expose none of its claims or turns (6.3443ms)
+✔ eligible tree input drops the rejected WhatsApp session and its page, and never retains a stale root (1.5377ms)
+✔ topic catalog hides rejected WhatsApp claims and sessions (0.6801ms)
+✔ approved WhatsApp text is the only WhatsApp text any trusted reader serves; the sibling turn and group title never leave (12.112ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1785.7539
