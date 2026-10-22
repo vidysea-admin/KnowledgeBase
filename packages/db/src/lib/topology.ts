@@ -24,14 +24,25 @@ export function isStandaloneHello(hello: unknown): boolean {
   return typeof h.setName !== "string" && h.msg !== "isdbgrid";
 }
 
+const warned = new WeakSet<object>();
+
+/** LKB_MONGO_STANDALONE=1 can only ever CONFIRM standalone. If hello reports a replica set or mongos the override is ignored with a
+ * warning (once per client), so a stale env var cannot make a transactional deployment run without transactions. */
 export async function isStandaloneMongo(db: Pick<Db, "collection"> & { client?: unknown; command?: unknown }): Promise<boolean> {
   const forced = standaloneOverride();
-  if (forced !== null) return forced;
-  if (typeof db.command !== "function") return false;
+  if (forced === false) return false;
+  if (typeof db.command !== "function") return forced === true;
   const key = (db.client && typeof db.client === "object" ? db.client : db) as object;
-  const hit = cache.get(key);
-  if (hit) return hit;
-  const probe = (db.command as (c: Record<string, unknown>) => Promise<unknown>).call(db, { hello: 1 }).then(isStandaloneHello);
-  cache.set(key, probe);
-  try { return await probe; } catch { cache.delete(key); return false; }
+  let probe = cache.get(key);
+  if (!probe) {
+    probe = (db.command as (c: Record<string, unknown>) => Promise<unknown>).call(db, { hello: 1 }).then(isStandaloneHello);
+    cache.set(key, probe);
+  }
+  let detected: boolean;
+  try { detected = await probe; } catch { cache.delete(key); return forced === true; }
+  if (forced === true && !detected) {
+    if (!warned.has(key)) { warned.add(key); console.warn("[topology] LKB_MONGO_STANDALONE=1 ignored: hello reports a replica set or mongos; transactions stay in use"); }
+    return false;
+  }
+  return detected;
 }

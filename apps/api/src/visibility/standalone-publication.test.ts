@@ -109,3 +109,31 @@ test("concurrent publish race: two writers on the same tree head, exactly one co
   assert.equal(f.rows("tree_index").length, 1);
   assert.equal(f.rows("tree_index")[0]!.indexRevision, (base as { indexRevision?: number }).indexRevision! + 1);
 });
+
+test("F1 standalone native view: tenant B cannot read or query tenant A's rows through the view", async () => {
+  const s = fakeServer("standalone");
+  s.rows.sessions = [{ _id: "a", tenantId: "tenant-a", secret: "A" }, { _id: "b", tenantId: "tenant-b", secret: "B" }];
+  await runNativePublicationTransaction(s.db, "tenant-b", async tx => {
+    const sessions = tx.collection("sessions") as unknown as { findOne(f: Row): Promise<Row | null>; find(f: Row): unknown };
+    assert.equal((await sessions.findOne({ _id: "b", tenantId: "tenant-b" }))?.secret, "B");
+    await assert.rejects(sessions.findOne({ _id: "a", tenantId: "tenant-a" }), /tenant_mismatch/);
+    await assert.rejects(sessions.findOne({ _id: "a" }), /tenant_mismatch/);
+    assert.throws(() => sessions.find({ tenantId: "tenant-a" }), /tenant_mismatch/);
+  });
+});
+
+test("F2 re-index replaces the existing session page atomically (unique tenantId+sessionId index cannot collide)", async () => {
+  const { replacePageInsertFirst } = await import("../indexing/grounded-write.js");
+  const rows: Row[] = [{ _id: "old", tenantId: "t", sessionId: "s", summary: "v1" }];
+  const unique = (doc: Row) => { if (rows.some(r => r._id !== doc._id && r.tenantId === doc.tenantId && r.sessionId === doc.sessionId)) throw Object.assign(new Error("E11000 duplicate key"), { code: 11000 }); };
+  const coll = {
+    find: () => ({ toArray: async () => structuredClone(rows) }),
+    insertOne: async (d: Row) => { unique(d); rows.push(d); return { acknowledged: true }; },
+    replaceOne: async (f: Row, d: Row) => { const i = rows.findIndex(r => r._id === f._id); rows[i] = d; return { acknowledged: true }; },
+    insertMany: async () => ({ acknowledged: true }),
+    deleteMany: async (f: { _id?: { $in: string[] } }) => { for (const id of f._id?.$in ?? []) rows.splice(rows.findIndex(r => r._id === id), 1); return { acknowledged: true }; },
+  };
+  await replacePageInsertFirst(coll as never, "s", { _id: "old", tenantId: "t", sessionId: "s", summary: "v2" } as never);
+  assert.deepEqual(rows.map(r => r.summary), ["v2"]);
+  await assert.rejects(replacePageInsertFirst(coll as never, "s", { _id: "other", tenantId: "t", sessionId: "s", summary: "v3" } as never), /E11000/, "a page with a new _id would still collide, which is why re-index reuses the previous _id");
+});

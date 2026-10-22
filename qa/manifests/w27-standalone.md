@@ -1,7 +1,7 @@
 # w27-standalone: make the read side (Ask, graph, session decisions) work on a STANDALONE MongoDB
 
 Status: ready-for-check
-Fix cycle: 0
+Fix cycle: 1
 Lane: KnowledgeBase-lanes/w27-standalone  Branch: lane/w27-standalone  Base: f9c35927
 Candidate SHA: see `git log -1 lane/w27-standalone` (the commit that adds this file)
 Decision: Umesh 2026-10-22 "db essa hi rhegaa isko ko use krna hai". Mongo 13.202.206.101 is a standalone mongod (hello has no setName), and stays one.
@@ -52,6 +52,14 @@ Design: publication is already a pointer flip. `sessions.indexAttempt` (fresh ge
 - Tests (visibility/standalone-publication.test.ts, 8): standalone/replica publication, crash after flip, crash before flip (hidden, needs recovery), stale generation/other tenant never verify, concurrent tree-head flip (one winner), native tenant isolation. 89/89 related pass (1 skipped). tsc apps/api and packages/db 0 errors; lint-loc 10/10.
 - D-020: M3 drop CAS expected-revision in persistIndexTree: race test FAILS; M4 drop generation check in verifyIndexGeneration: stale-generation test FAILS; M5 drop tenant check on native insert: isolation test FAILS; all restored.
 - Recovery: an `uncertain`/stale `running` attempt keeps refusing a new attempt (pinned by generation.test.ts). No supported recovery command exists; only `mutateNativeCaptureSource` clears `indexAttempt` as part of a source swap. Two toc staging sessions (funding-dreams, uniaccess) are `uncertain` after the E11000 failure and were left untouched.
+
+## Fix cycle 1 (checker b4c6d6e9 findings)
+- F1: standalone native-view tenant test added (visibility/standalone-publication.test.ts "F1"); the checker's mutant (disable the tenant throw in `filter()`, native-publication.ts) is now KILLED (9 pass, 1 fail).
+- F2: regression test "F2" for the session_pages replace (unique tenantId+sessionId: same-_id replaceOne succeeds, new-_id insert would collide).
+- F3: runNativePublicationTransaction is also used by speaker-suggestions `decide` and transcript-review `mutate`; on standalone they are NON-ATOMIC. `mutate`: the revision bump precedes the head CAS, so a lost CAS leaves the bump (native publications hidden, availability only). `decide`: currency check, bump, confirm without a transaction, so a concurrent root-only source swap can interleave in a narrow window (not a tenant-isolation issue; a replica set removes it). Guide updated.
+- F4 (note): refresh-executor on standalone: index publication is generation-guarded, but graph_edges rewrites (delete spoke_in then insert, changed-text pruning) are not gated by head.refresh status in graph readers, so a crash mid-refresh can show partially rewritten edges until the service retries (idempotent, not tenant-affecting).
+- F5: `LKB_MONGO_STANDALONE=1` is now ignored with a one-time warning when `hello` reports a setName or mongos (topology.ts); test "F5"; mutation (drop the guard) KILLED.
+- Live: remaining toc sessions indexed one at a time on standalone (see reply); the 2 uncertain sessions and the visa session were skipped.
 
 ## STILL REFUSES on standalone (needs a replica set)
 WhatsApp review store insert/decide (whatsapp/review/store.ts), invalidate.ts, quarantine audit; speaker attribute store and speaker relationship store. A half-applied write there would be visible (approved without claim, revoked-claim races, CAS plus authority read), and none is needed for Ask. Also any caller that needs an `uncertain` attempt recovered.

@@ -25,6 +25,12 @@ interface Coll<T> {
   deleteMany(filter: object): Promise<unknown>;
 }
 
+/** Re-index keeps the previous page's _id when exactly one exists (one atomic replace instead of a unique-index collision). */
+export async function reusablePageId(coll: Coll<SessionPages>, sessionId: string): Promise<{ _id?: string }> {
+  const existing = await coll.find({ sessionId }).toArray();
+  return existing.length === 1 ? { _id: existing[0]!._id } : {};
+}
+
 export async function replacePageInsertFirst(coll: Coll<SessionPages>, sessionId: string, page: SessionPages, generation?: GroundedGenerationWrite): Promise<void> {
   const existing = await coll.find({ sessionId }).toArray();
   const oldIds = existing.map((p) => p._id).filter((id) => id !== page._id);

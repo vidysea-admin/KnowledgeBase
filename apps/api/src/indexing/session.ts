@@ -14,7 +14,7 @@ import type { IndexEmbedFn, IndexSessionResult, IndexSessionDeps } from "./types
 import { notifyIndexCommitted, publishIndexWithCommit } from "./post-commit.js";
 import { toEvidenceTuple, toCitedItems, toQaEntries } from "./evidence-tuples.js";
 import { writeSessionChunks, writeSessionLexicalChunks, legacyChunkProvenance } from "./chunk-write.js";
-import { replacePageInsertFirst, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
+import { replacePageInsertFirst, reusablePageId, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
 import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
 import { eligibleTreeInput } from './eligible-tree.js';
 import { createKnowledgeVisibility } from '../visibility/knowledge.js';
@@ -197,9 +197,7 @@ async function indexSessionWithinPublication(
         actionItems: summary.actionItems,
         evidence: toEvidenceTuple(turns.map((t) => ({ turnId: t._id, sessionId }))),
       };
-      // Re-index keeps the previous page's _id (one atomic replace; see replacePageInsertFirst) when exactly one exists.
-      const priorPages = preserveReviewed ? await sessionPagesColl(tenantId).find({ sessionId }).toArray() : [];
-      const stampedPage = { ...page, ...(priorPages.length === 1 ? { _id: priorPages[0]!._id } : {}), indexArtifact: { ...binding } };
+      const stampedPage = { ...page, ...(preserveReviewed ? await reusablePageId(sessionPagesColl(tenantId) as never, sessionId) : {}), indexArtifact: { ...binding } };
       pageRef = indexArtifactRef(stampedPage);
       if (preserveReviewed) await replacePageInsertFirst(sessionPagesColl(tenantId) as never, sessionId, stampedPage, { assertOwned });
       else {

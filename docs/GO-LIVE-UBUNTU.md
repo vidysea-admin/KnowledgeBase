@@ -129,6 +129,13 @@ generation live. A crashed or failed run leaves the attempt `uncertain`/`running
 session is refused until an operator recovers it (unchanged rule: no automatic takeover of possibly-written
 state). Re-indexing a live session rewrites its artifacts in place, so that session is briefly hidden.
 
+Non-atomic on standalone (they run, but without all-or-nothing):
+- Transcript-review `mutate` bumps the native publication revision before the review-head compare-and-swap, so a lost swap leaves the bump: native publications are hidden (availability only).
+- Speaker-suggestions `decide` checks currency, bumps, then confirms without a transaction, so a concurrent root-only source swap can interleave in a narrow window.
+- Refresh executor: a crash mid-refresh can show partially rewritten graph edges until the refresh retries.
+
+`LKB_MONGO_STANDALONE=1` can only confirm a standalone: if `hello` reports a replica set or mongos it is ignored with a warning and transactions stay in use. `=0` forces transactions.
+
 Still refuse with a 503 on standalone (a half-applied write there would be visible, so they need a replica
 set): WhatsApp review store/decide, invalidation and the quarantine audit, and speaker attribute and
 relationship edits. They are not needed for Ask.

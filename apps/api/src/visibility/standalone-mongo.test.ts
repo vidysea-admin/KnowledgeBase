@@ -146,3 +146,16 @@ test("error mapping: typed workflow errors keep their own status and code", () =
   answerWorkflowFailure(res as never, new AnswerWorkflowError("not_found", "x"));
   assert.deepEqual([out.status, out.body!.error], [404, "not_found"]);
 });
+
+test("F5 LKB_MONGO_STANDALONE=1 cannot override a replica set or mongos: ignored with one warning; confirms a real standalone", async () => {
+  const saved = process.env.LKB_MONGO_STANDALONE; process.env.LKB_MONGO_STANDALONE = "1";
+  const warnings: string[] = []; const orig = console.warn; console.warn = (...a: unknown[]) => { warnings.push(a.join(" ")); };
+  try {
+    const r = fakeMongo("replica"), m = fakeMongo("mongos"), s = fakeMongo("standalone");
+    assert.deepEqual([await isStandaloneMongo(r.db), await isStandaloneMongo(r.db), await isStandaloneMongo(m.db), await isStandaloneMongo(s.db)], [false, false, false, true]);
+    assert.equal(warnings.length, 2, "one warning per client, not per call");
+    assert.match(warnings[0]!, /ignored/);
+    process.env.LKB_MONGO_STANDALONE = "0";
+    assert.equal(await isStandaloneMongo(s.db), false, "=0 still forces transactional behaviour");
+  } finally { console.warn = orig; if (saved === undefined) delete process.env.LKB_MONGO_STANDALONE; else process.env.LKB_MONGO_STANDALONE = saved; }
+});
