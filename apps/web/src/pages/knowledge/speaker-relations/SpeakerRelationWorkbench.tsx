@@ -68,7 +68,14 @@ function Workbench({ apiKey, personId, authority, onChanged }: SpeakerRelationWo
   const sourceReady = digest(a?.sourceRevisionDigest) && claims.length >= 2;
   const canPropose = a?.canPropose === true && sourceReady;
   const key = (e: RelationEvidence) => JSON.stringify([e.sessionId, e.turnId]);
-  useEffect(() => { setFrom(""); setTo(""); setSelected([]); setChoice(null); }, [a?.sourceRevisionDigest]);
+  // Fail closed only when one defined digest is replaced by a different one; first settle (undefined -> value) keeps the user's picks.
+  const lastDigest = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    const next = a?.sourceRevisionDigest, prev = lastDigest.current;
+    if (next === undefined) return;
+    lastDigest.current = next;
+    if (prev !== undefined && prev !== next) { setFrom(""); setTo(""); setSelected([]); setChoice(null); }
+  }, [a?.sourceRevisionDigest]);
   useEffect(() => {
     let cancelled = false; setInventory(null); setError(""); setChoice(null); setBlocked(false);
     if (!apiKey) return;
