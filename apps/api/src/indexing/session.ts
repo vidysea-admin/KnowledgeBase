@@ -14,7 +14,7 @@ import type { IndexEmbedFn, IndexSessionResult, IndexSessionDeps } from "./types
 import { notifyIndexCommitted, publishIndexWithCommit } from "./post-commit.js";
 import { toEvidenceTuple, toCitedItems, toQaEntries } from "./evidence-tuples.js";
 import { writeSessionChunks, writeSessionLexicalChunks, legacyChunkProvenance } from "./chunk-write.js";
-import { replacePageInsertFirst, reusablePageId, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
+import { replacePageInsertFirst, replaceClaimsPreserving, judgeTotals } from "./grounded-write.js";
 import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
 import { eligibleTreeInput } from './eligible-tree.js';
 import { createKnowledgeVisibility } from '../visibility/knowledge.js';
@@ -197,7 +197,7 @@ async function indexSessionWithinPublication(
         actionItems: summary.actionItems,
         evidence: toEvidenceTuple(turns.map((t) => ({ turnId: t._id, sessionId }))),
       };
-      const stampedPage = { ...page, ...(preserveReviewed ? await reusablePageId(sessionPagesColl(tenantId) as never, sessionId) : {}), indexArtifact: { ...binding } };
+      const stampedPage = { ...page, indexArtifact: { ...binding } };
       pageRef = indexArtifactRef(stampedPage);
       if (preserveReviewed) await replacePageInsertFirst(sessionPagesColl(tenantId) as never, sessionId, stampedPage, { assertOwned });
       else {

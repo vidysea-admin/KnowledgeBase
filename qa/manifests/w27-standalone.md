@@ -61,6 +61,9 @@ Design: publication is already a pointer flip. `sessions.indexAttempt` (fresh ge
 - F5: `LKB_MONGO_STANDALONE=1` is now ignored with a one-time warning when `hello` reports a setName or mongos (topology.ts); test "F5"; mutation (drop the guard) KILLED.
 - Live: remaining toc sessions indexed one at a time on standalone (see reply); the 2 uncertain sessions and the visa session were skipped.
 
+## Fix cycle 2 (CI failure on PR #28)
+CI failed `session-grounded-wire.test.ts` "re-run preserves verified claims, inserts before deleting..." (expected one `session_pages` deleteMany of the old page `p1`; got 0). Cause: my cycle-0 page fix reused the previous page `_id` and used `replaceOne`, which bypassed the pinned insert-before-delete shape. Fix: reverted session.ts to base and removed `reusablePageId`/`replaceOne`; `replacePageInsertFirst` keeps insert-first and only on E11000 (unique tenantId+sessionId) prunes the old page by `_id` then inserts (generation still "running", so readers see nothing either way); any other insert error deletes nothing. Claims path untouched. F2 test rewritten for that behaviour. The pinned test is unchanged. Re-run: 202 indexing/transcript-review/visibility tests, 200 pass, 0 fail, 2 skipped; tsc 0; lint-loc 10/10.
+
 ## STILL REFUSES on standalone (needs a replica set)
 WhatsApp review store insert/decide (whatsapp/review/store.ts), invalidate.ts, quarantine audit; speaker attribute store and speaker relationship store. A half-applied write there would be visible (approved without claim, revoked-claim races, CAS plus authority read), and none is needed for Ask. Also any caller that needs an `uncertain` attempt recovered.
 

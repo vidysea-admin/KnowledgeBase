@@ -20,25 +20,27 @@ function acknowledged(value: unknown): boolean { return value !== null && typeof
 interface Coll<T> {
   find(filter: object): { toArray(): Promise<T[]> };
   insertOne(doc: T): Promise<unknown>;
-  replaceOne?(filter: object, doc: T): Promise<unknown>;
   insertMany(docs: T[]): Promise<unknown>;
   deleteMany(filter: object): Promise<unknown>;
 }
 
-/** Re-index keeps the previous page's _id when exactly one exists (one atomic replace instead of a unique-index collision). */
-export async function reusablePageId(coll: Coll<SessionPages>, sessionId: string): Promise<{ _id?: string }> {
-  const existing = await coll.find({ sessionId }).toArray();
-  return existing.length === 1 ? { _id: existing[0]!._id } : {};
-}
-
 export async function replacePageInsertFirst(coll: Coll<SessionPages>, sessionId: string, page: SessionPages, generation?: GroundedGenerationWrite): Promise<void> {
-  const existing = await coll.find({ sessionId }).toArray();
-  const oldIds = existing.map((p) => p._id).filter((id) => id !== page._id);
+  const oldIds = (await coll.find({ sessionId }).toArray()).map((p) => p._id).filter((id) => id !== page._id);
   await generation?.assertOwned();
-  // session_pages is unique per (tenantId, sessionId) in a deployed database, so insert-first would collide with the previous
-  // page. When the caller reused the previous page's _id the replacement is ONE atomic single-document replace.
-  const saved = existing.some((p) => p._id === page._id) && coll.replaceOne
-    ? await coll.replaceOne({ _id: page._id, sessionId }, page) : await coll.insertOne(page);
+  let saved: unknown;
+  try { saved = await coll.insertOne(page); }
+  catch (error) {
+    // session_pages is unique per (tenantId, sessionId) in a deployed database, so a second page cannot coexist with the old one
+    // (E11000). Only then fall back to prune-then-insert. The session's index attempt is still "running" here, so its previous
+    // generation is already unverifiable and a reader sees nothing either way; the claims keep strict insert-before-delete.
+    if ((error as { code?: unknown })?.code !== 11000 || !oldIds.length) throw error;
+    await generation?.assertOwned();
+    const pruned = await coll.deleteMany({ sessionId, _id: { $in: oldIds } });
+    if (generation && !acknowledged(pruned)) throw new Error("page generation prune unconfirmed");
+    await generation?.assertOwned();
+    saved = await coll.insertOne(page);
+    oldIds.length = 0;
+  }
   if (generation && !acknowledged(saved)) throw new Error("page generation write unconfirmed");
   if (oldIds.length) {
     await generation?.assertOwned();
