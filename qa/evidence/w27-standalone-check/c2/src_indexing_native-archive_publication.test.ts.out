@@ -1,0 +1,15 @@
+✔ real batch accessor commits a stamped suggestion and a real session increment; duplicate leaves row intact (73.1289ms)
+✔ concurrent actual first review insert wins; entire publication rolls back (13.8063ms)
+✔ replacement and every refresh state update participate in the same session fence (15.1513ms)
+✔ DB-first consent revocation conflicts with in-flight publication; callback failure restores prior source (18.5704ms)
+✔ second batch insert failure, stale binding, malformed/overflow fence, shared owner and unsupported transaction refuse (35.8732ms)
+✔ caller-forged reserved publication metadata is refused before insertion (7.9418ms)
+✔ source swap refuses caller reset of server-owned revision and rolls back (10.5424ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1373.7691

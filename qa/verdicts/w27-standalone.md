@@ -1,8 +1,8 @@
 # Verdict: w27-standalone
 
 VERDICT: PASS
-Cycle checked: 1
-Reviewed SHA: 9a8ea805585d8d408c616aeddfc01005316041e0
+Cycle checked: 2
+Reviewed SHA: 879293478a562151c4eaac8d9eccedfeda4b0e53
 Base: f9c35927 (cycle 1 diff 49bead49..9a8ea805 on top of cycle 0 candidate 49bead49; cycle 0 sections below are historical, cycle 0 was PASS at 49bead49 / verdict b4c6d6e9)
 Class: SECURITY (tenancy, data writes), full ceremony.
 Checker: independent, fresh context. Maker claims treated as untrusted; no candidate code edited, no DB touched (fakes only).
@@ -53,3 +53,19 @@ Re-checked independently (raw outputs in qa/evidence/w27-standalone-check/c1/, e
 - Not verified: live staging, lint-loc, full suites.
 
 ISSUES-WRITTEN: none. No ledger rows to flip. Maker may close out the manifest to checked-PASS.
+
+---
+# Cycle 2 (authoritative, Cycle checked: 2, Reviewed SHA 879293478a562151c4eaac8d9eccedfeda4b0e53)
+
+VERDICT: PASS
+
+Cycle 2 reverts cycle 1's reusable-_id replace (it broke the pinned insert-then-delete expectation in session-grounded-wire.test.ts). Diff 9a8ea805..87929347 reviewed: grounded-write.ts, session.ts (back to base content), F2 test. Raw outputs: qa/evidence/w27-standalone-check/c2/.
+
+1. Crash between the E11000 prune and the re-insert: FAIL-CLOSED, NOT auto-recoverable. The index attempt is `running`/`writing` at that point, so verifyIndexGeneration returns null (state != complete) and the session is hidden; page-less sessions are not eligible in eligible-tree. No wrong data is served. The next index run is refused by acquireIndexAttempt (index_attempt_requires_recovery) until an explicit recovery, which is the same behaviour as every other mid-write crash point on standalone (documented in the manifest; no recovery command exists). On a replica set the transaction rolls back instead. Accepted as the documented limit.
+2. Tenant scope on the prune: `sessionPagesColl = scopedCollection(db, "session_pages")` (tenantId ANDed in) over the tenant-scoped transactionReviewDb; oldIds come from the same tenant-scoped find; filter `{sessionId, _id:{$in: oldIds}}`. Only E11000 with a non-empty oldIds list triggers it; any other error rethrows and deletes nothing (tested).
+3. Claims untouched: replaceClaimsPreserving is not in the diff; claims keep strict insert-before-delete; tests pass.
+4. Tests (each timeout 600, exit codes in c2/exit-codes.txt): session-grounded-wire 11/11 pass; notes 3, strict 4, decisions 5, legacy-provenance 4, session 26, public-preserved-review 4, vectorless-publication 12, generation 8, eligible-tree 9, native-archive/publication 7, promote-entities 20, cached-root-taint 13, refresh-executor 12 (1 skipped by own guard), grounded-postprocessing 5+6+2, connector workflow 16, native-evidence/vertical 4, whatsapp review wire 8, tenant-guards/scoped-write 3, read-side-quarantine 17 + trusted 9, standalone-publication 10, standalone-mongo 11. tsc apps/api exit 0, packages/db exit 0.
+   Environment note: session-grounded-wire.test.ts intermittently prints the Windows libuv teardown assertion `!(handle->flags & UV_HANDLE_CLOSING), src\winsync.c:94` under --test-force-exit (a file-level `fail 1` with all 11 tests passing). Seen on 2 of 4 runs; 11/11 pass every time and a run without --test-force-exit exits 0. Treated as an environment flake, not a candidate defect (the pinned deleteMany expectation at its lines 91 and 109 passes).
+5. D-020 mutation M9: grounded-write.ts E11000-only condition weakened to `if (!oldIds.length) throw error;` (any error now prunes). Killed: the F2 test fails (9 pass, 1 fail). Per-mutation backup, trap with ABSOLUTE path, timeout 600. HEAD fidelity: `git -c core.autocrlf=true hash-object` = 77f6d940326c3b88b014a4f6137a1337eddbaa99 = `git rev-parse HEAD:apps/api/src/indexing/grounded-write.ts`; no .bak left.
+
+Not verified: live staging, lint-loc, full suites. ISSUES-WRITTEN: none. No ledger rows to flip. Maker may close out the manifest to checked-PASS.

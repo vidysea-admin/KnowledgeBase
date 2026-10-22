@@ -1,0 +1,19 @@
+✔ topology detection: standalone only without setName and not mongos (2.0729ms)
+✔ topology is probed once per client and cached (2.2474ms)
+✔ standalone: snapshot read runs with no session or transaction, readConcern local, filters untouched (1.5643ms)
+✔ standalone: tenant B cannot read tenant A through the snapshot facade (0.6002ms)
+✔ standalone: a callback returning undefined is still refused like the transactional path (1.1795ms)
+✔ replica set and mongos: unchanged, one snapshot transaction with the session on every read (1.2456ms)
+✔ standalone tree read succeeds (was masked as 503) and every query stays tenant-scoped (4.763ms)
+✔ standalone graph snapshot reader: no session, topic query pinned to the caller's tenant, B sees nothing of A (3.6038ms)
+✔ error mapping: an unknown failure is store_unavailable with the real cause only in the server log (1.4832ms)
+✔ error mapping: typed workflow errors keep their own status and code (0.7973ms)
+✔ F5 LKB_MONGO_STANDALONE=1 cannot override a replica set or mongos: ignored with one warning; confirms a real standalone (0.7962ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1456.7393

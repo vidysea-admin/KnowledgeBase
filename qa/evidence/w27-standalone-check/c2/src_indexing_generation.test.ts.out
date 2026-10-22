@@ -1,0 +1,16 @@
+✔ accepted session routing summaries are source-derived and truncated on UTF8 codepoint boundaries (4.0324ms)
+✔ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (66.7786ms)
+✔ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (25.2641ms)
+✔ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (10.569ms)
+✔ durable session CAS admits one same-session owner, allows preflight retry, and never takes over uncertain writes (10.3982ms)
+✔ tree revision CAS preserves a legacy root id and refuses a stale expected root without upsert (2.2426ms)
+✔ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (13.8078ms)
+✔ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (36.7224ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1627.6363

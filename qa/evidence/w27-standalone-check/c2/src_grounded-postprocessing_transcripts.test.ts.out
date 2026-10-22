@@ -1,0 +1,14 @@
+✔ real transcript factory is lazy and enforces D168 exact production database opt-in (2.7535ms)
+✔ actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction (160.4082ms)
+✔ unsupported transactions explicitly refuse refresh and retain committed correction/pending intent without derived knowledge or provider calls (4.2579ms)
+✔ actual review factory judge outage retains the correction and rolls back all derived targets (15.8791ms)
+✔ refresh notifies only after its outer commit and hook failure preserves completed knowledge (34.2171ms)
+✔ failed refresh never calls the archive hook (7.7774ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1471.764

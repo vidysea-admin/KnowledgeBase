@@ -1,0 +1,27 @@
+✔ judge on: notes persisted, judge totals reported, every note citation resolves to a real turn and time (53.9046ms)
+✔ judge rejects a polarity-flipped decision: dropped from page and claims, never persisted (16.2829ms)
+✔ judge that throws fails closed: nothing persisted, existing notes untouched, status failed (5.6212ms)
+✔ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (10.3208ms)
+✔ a failing claims insert leaves every old claim in place (no delete is issued) (5.1269ms)
+✔ flag OFF: legacy delete-then-insert path and result shape are unchanged; a judge alone does not switch grounded mode on (12.6635ms)
+✔ flag resolution: OFF unless the caller or KB_GROUNDED_NOTES=1 turns it on; cost cap parsing (0.4105ms)
+✔ GET /citations/:claimId renders a claim written by grounded indexSession with the cited turn id and times (88.532ms)
+✔ when the judge rejects every fresh claim, old machine claims are kept and the new generation is refused (6.8106ms)
+✔ judgeMaxCostUsd:0 through indexSession never calls the judge (injected judge and judge-model provider), nothing written (9.8108ms)
+✔ control: without a cap the same run does call the judge (the counter is live) (10.6976ms)
+Assertion failed: !(handle->flags & UV_HANDLE_CLOSING), file src\win\async.c, line 94
+✖ src\indexing\session-tests\session-grounded-wire.test.ts (3519.7241ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3538.3052
+
+✖ failing tests:
+
+test at src\indexing\session-tests\session-grounded-wire.test.ts:1:1
+✖ src\indexing\session-tests\session-grounded-wire.test.ts (3519.7241ms)
+  'test failed'

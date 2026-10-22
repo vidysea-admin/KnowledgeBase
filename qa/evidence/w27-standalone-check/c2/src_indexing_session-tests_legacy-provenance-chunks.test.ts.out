@@ -1,0 +1,12 @@
+✔ vectorless: legacy-unbound session stamps every chunk it writes (40.1009ms)
+✔ vectorless: session without a stamp (or with a foreign status) leaves chunks unstamped (28.3935ms)
+✔ vector: legacy-unbound session stamps every chunk it writes (10.193ms)
+✔ vector: session without a stamp (or with a foreign status) leaves chunks unstamped (19.0932ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1166.1397

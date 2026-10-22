@@ -1,0 +1,45 @@
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): summary degraded — existing session_pages left unchanged: summarize provider call failed: provider down
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: chunk 0 has 3 dims, batch reports 99
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: chunk 0 has 2 dims, batch reports 3
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: embedder returned 2 vector(s) for 1 chunk(s)
+✔ standing fixture uses real recording provenance and refuses foreign or wrong source identities (6.3285ms)
+✔ stateful fixture confirms only matched generation CAS and reads back actual inserted artifacts (2.2275ms)
+✔ a DEGRADED claims extraction must NOT delete the session's existing claims (38.9327ms)
+✔ a SUCCESSFUL extraction still replaces the session's claims (delete then insert) (5.1309ms)
+✔ EVERY query AND every write indexSession issues is confined to its own tenant (ISS-060, ISS-061) (4.3105ms)
+✔ a DEGRADED run's writes are tenant-scoped too — the guard must not be a bypass (3.9952ms)
+✔ session_pages are still written on a degraded CLAIMS run — the two paths are independent (4.2814ms)
+✔ a DEGRADED summarize run with NO existing page still writes the labelled fallback (ISS-059) (5.5ms)
+✔ a DEGRADED summarize run with a REAL existing page must NOT touch it (ISS-059, criterion 1a) (4.1289ms)
+✔ a SUCCESSFUL summarize run always replaces the page, even when one already exists (4.6034ms)
+✔ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (5.4114ms)
+✔ a FAILED embed must NOT delete the session's existing chunks (the ISS-056 shape) (5.7679ms)
+✔ a failed embed does not take the rest of indexing down with it (5.3654ms)
+✔ no embed dep at all leaves chunks completely untouched — an install without embeddings still indexes (3.2131ms)
+✔ a SUCCESSFUL embed upserts stable chunks BEFORE pruning obsolete rows (7.225ms)
+✔ indexSession SURFACES an embedding failure in its return — a skip must not look like success (4.0727ms)
+✔ indexSession reports 'no-embedder' distinctly from a failure — an install without embeddings is not broken (3.0765ms)
+✔ indexSession reports a real chunk write, so success is positively evidenced and not merely un-thrown (7.0683ms)
+✔ writeSessionChunks reports a provider failure as skipped, never as a silent success (0.7991ms)
+✔ writeSessionChunks reports a contradictory batch (the ISS-112 assertion) as skipped, not as success (0.5591ms)
+✔ writeSessionChunks reports a real write with the count it actually inserted (0.673ms)
+✔ writeSessionChunks reports a session with no chunkable turns distinctly from a failure (0.3124ms)
+✔ chunk rows carry a real vector, a matching dims, and turnRefs — never an embeddingRef pointer (6.3316ms)
+✔ REFUSES to write a vector whose length contradicts dims, and still finishes indexing (ISS-112) (8.1388ms)
+✔ REFUSES a batch with the wrong NUMBER of vectors, rather than pairing by index (ISS-112) (3.5826ms)
+✔ every chunk write is tenant-scoped — the same guard the claims path needed (5.5878ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1248.4676

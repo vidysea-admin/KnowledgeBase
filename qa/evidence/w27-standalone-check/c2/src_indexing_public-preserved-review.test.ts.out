@@ -1,0 +1,12 @@
+✔ public exact T040 reviewed fee paraphrase survives actual grounded writer and current generation reader (55.3286ms)
+✔ public current-bound invalid reviewed evidence refuses while a detached foreign row stays unconsumed (21.8532ms)
+✔ public completed reviewed receipt refuses edited canonical digest and changed current source provenance (18.2457ms)
+✔ public freshly generated fee paraphrase fails the extractive gate despite synthetic same judge (4.0907ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1202.1006

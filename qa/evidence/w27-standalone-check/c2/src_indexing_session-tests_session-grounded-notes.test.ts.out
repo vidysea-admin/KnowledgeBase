@@ -1,0 +1,11 @@
+✔ dropUnverified persists only verified item-level citations; fabricated proposals never reach the database (55.2676ms)
+✔ without dropUnverified the same fabricated proposal still fails the strict index and writes nothing (unchanged) (3.706ms)
+✔ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (4.7581ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1088.4469

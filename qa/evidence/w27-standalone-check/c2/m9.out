@@ -1,0 +1,41 @@
+✔ standalone index publication runs the indexer once, with no session, and a tenant-pinned view (4.6659ms)
+✔ standalone index publication: an incomplete result is refused, never reported as published (0.6322ms)
+✔ replica set index publication is unchanged: one transaction, committed (1.8331ms)
+✔ standalone native publication: sessionless, tenant-pinned, foreign-tenant write refused, replica set still transactional (1.8705ms)
+✔ crash AFTER the flip: the new generation is live without any later step (48.3362ms)
+✔ crash BEFORE the flip: a half-rewritten session is hidden (fail closed), never torn, and needs explicit recovery (10.7993ms)
+✔ a stale generation id never verifies, and another tenant never verifies (9.245ms)
+✔ concurrent publish race: two writers on the same tree head, exactly one conditional flip wins (8.2761ms)
+✔ F1 standalone native view: tenant B cannot read or query tenant A's rows through the view (1.0895ms)
+✖ F2 re-index replaces an existing session page even when a unique (tenantId, sessionId) index rejects a second page (6.0737ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 9
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1694.7947
+
+✖ failing tests:
+
+test at src\visibility\standalone-publication.test.ts:1:7043
+✖ F2 re-index replaces an existing session page even when a unique (tenantId, sessionId) index rejects a second page (6.0737ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   'v2'
+  - ]
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\apps\api\src\visibility\standalone-publication.test.ts:140:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ 'v2' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
