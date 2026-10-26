@@ -1,7 +1,7 @@
 # U2.3 cached-root provenance taint repair
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/goal-u23-cached-root-taint.md)
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/goal-u23-cached-root-taint.md)
 Fix cycle: 2
 Issue: ISS-U23-CACHED-ROOT-001, qa/issues.u23-cached-root.jsonl
 Task: U2.3; priority tier 2, reproduced security/data-write provenance finding.

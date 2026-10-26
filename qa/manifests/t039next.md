@@ -1,6 +1,6 @@
 # t039next
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/t039next.md)
 Status: checked-PASS
 Fix cycle: 1
 Tier: 3 (next unblocked roadmap task, T-039). Lane: lane/t039next (base 99f4fed9). Class: new authenticated endpoint on the send-now scope, tenant-scoped read of launch state: FULL ceremony.

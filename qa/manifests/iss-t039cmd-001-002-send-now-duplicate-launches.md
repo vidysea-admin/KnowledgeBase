@@ -50,7 +50,7 @@ Real `cli.ts record`, Chrome, OBS: never run. Recordings running before deploy h
 
 ## Cycle 2 (fix of the checker's findings on cycle 1: flaky real-process race test; never-reap mutant survived; cycle 0/1 sections above kept)
 
-**Handshake status:** ready-for-check (Fix cycle: 2). Tests only; no product code changed.
+**Handshake status:** checked-PASS (Fix cycle: 2). Tests only; no product code changed. — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/iss-t039cmd-001-002-send-now-duplicate-launches.md)
 
 - `stale-race-worker.ts` / `live-recording-stale-race.test.ts` redesign: the worker used to hold its claim ~1.5 s, so a process starting late under load legitimately took over after the release and was counted as a second winner. Now every worker that wins holds the claim until a STOP file appears; the parent writes it only after ALL workers have answered (also in `finally`, then waits for exits). A late starter can therefore only ever see a live holder, so `winners !== 1` now means a genuine exclusivity break. Assertion unchanged (exactly one winner per run, stale-seeded and fresh); per-worker 30 s fast-fail kept; worker hard-capped at 60 s so a dead parent leaves no orphan.
 - New test in `live-recording.test.ts`: a takeover claim file (keyed by the seeded entry's content) left by a dead taker pid is reaped and a contender still wins within 5 s, leaving no temp files.

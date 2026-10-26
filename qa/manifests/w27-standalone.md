@@ -1,7 +1,7 @@
 # w27-standalone: make the read side (Ask, graph, session decisions) work on a STANDALONE MongoDB
 
-Status: ready-for-check
-Fix cycle: 1
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/w27-standalone.md)
+Fix cycle: 2
 Lane: KnowledgeBase-lanes/w27-standalone  Branch: lane/w27-standalone  Base: f9c35927
 Candidate SHA: see `git log -1 lane/w27-standalone` (the commit that adds this file)
 Decision: Umesh 2026-10-22 "db essa hi rhegaa isko ko use krna hai". Mongo 13.202.206.101 is a standalone mongod (hello has no setName), and stays one.

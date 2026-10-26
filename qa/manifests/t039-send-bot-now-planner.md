@@ -63,7 +63,7 @@ Test coverage: 9 platform shapes (meet, teams x2, zoom x2, webex, zoho x2, cloud
 
 ## Fix cycle 1
 
-Handshake: `Status: ready-for-check`, `Fix cycle: 1` (top of file). Responds to `qa/verdicts/t039-send-bot-now-planner.md` (FAIL, cycle 0): ISS-T039-001 and ISS-T039-002 (both medium) plus two low notes (fail-open status, raw URL in request).
+Handshake: `Status: checked-PASS`, `Fix cycle: 1` (top of file). Responds to `qa/verdicts/t039-send-bot-now-planner.md` (FAIL, cycle 0): ISS-T039-001 and ISS-T039-002 (both medium) plus two low notes (fail-open status, raw URL in request). — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/t039-send-bot-now-planner.md)
 
 **Root cause.** Identity was pattern-guessed: Meet took the first path segment, every other platform keyed on host+path+sorted query. So Meet `lookup/<id>` collapsed to `meet:lookup`, non-meeting pages got plans, and Teams passcode (`p`) / `context` JSON order produced different keys for one meeting.
 
@@ -99,7 +99,7 @@ Not run: full suite, monorepo build, browsers, network. Low notes still open: fa
 
 ## Fix cycle 2
 
-Handshake: `Status: ready-for-check`, `Fix cycle: 2`. Responds to the cycle-1 FAIL: ISS-T039-003 (medium).
+Handshake: `Status: checked-PASS`, `Fix cycle: 2`. Responds to the cycle-1 FAIL: ISS-T039-003 (medium). — closed out 2026-10-26 (resume reconcile; latest verdict section PASS at this cycle, qa/verdicts/t039-send-bot-now-planner.md)
 
 **What failed.** cloudonair was the one platform still keyed from the bare path (`id = path ? path : undefined`): `/landing` and `/events` were planned (`cloudonair:/landing`, `cloudonair:/events`), `/events/foo/bar` too. Same non-meeting-page defect as cycle 0.
 
