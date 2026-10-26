@@ -1,7 +1,7 @@
 # T039 canonical manual-job operation authority
 
-**Handshake status:** ready-for-check
-Status: ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 by maker resume (unit-scoped; live clauses 1-2,6,8,9 and parent T-039 stay HOLD), citing qa/verdicts/t039-manual-jobs-operation-authority.md
+Status: checked-PASS — closed out 2026-10-26 by maker resume (unit-scoped; live clauses 1-2,6,8,9 and parent T-039 stay HOLD), citing qa/verdicts/t039-manual-jobs-operation-authority.md
 Fix cycle: 1
 Tier: 3 — authorized roadmap task, D-170/D-173/D-174; security/ownership class.
 Maker: /root/manual_jobs_maker. Independent checker pending broker evidence.
