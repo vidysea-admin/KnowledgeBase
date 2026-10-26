@@ -1,0 +1,4 @@
+# Checkpoint t022-review-dirty-guard (checker, cycle 1, 2026-10-26)
+Result: PASS, all mandatory checks complete.
+Evidence identity: candidate files (LF-normalised sha256) scripts/eval/t022-offline-review.mjs f3e971cd0bdee3853813a4b490ae317781898ef0622c347c75238699f5752357; scripts/eval/t022-offline-review.test.mjs 0b55e774cd9115255778741e125f8ba76ed96aba2d20a2ef8d792c924904faa9; data/eval/t022-offline-review.html 918af50de6aad75e50729343faf0bb3556f738d97fc551a480776ba3c6d237f1. Git blobs d4a4c90b, ce6932e9, 026dc17b. HEAD a8d3c0f4 (descends from master b3eabbee). Node v24.13.1, win32, jsdom from apps/web/node_modules, Chrome headless. Env KB_T022_PRIVATE_REVIEW_TESTS unset.
+Checks: focused tests 2/2; regeneration equality; diff-scope read; falsification F1 F2 F3 + mutants M1 M2 (green-before/red-after in copies); real-browser Mode D scenario. Details in qa/verdicts/t022-review-dirty-guard.md and qa/evidence/t022-review-dirty-guard/.
