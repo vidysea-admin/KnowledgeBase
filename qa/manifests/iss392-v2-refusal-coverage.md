@@ -1,7 +1,7 @@
 # Manifest — iss392-v2-refusal-coverage
 
-**Status:** ready-for-merge (test-lane)
-**Handshake status:** ready-for-merge (test-lane)
+**Status:** merged-no-check (test-lane) — merged 2026-10-26 by maker as 64be471e; main-tree rerun 14/14 pass
+**Handshake status:** merged-no-check (test-lane) — merged 2026-10-26 by maker as 64be471e; main-tree rerun 14/14 pass
 **Fix cycle:** 0
 **Dual check:** no
 **Issues addressed:** **ISS-392** (medium, test-coverage)
