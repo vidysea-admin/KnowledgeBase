@@ -1,0 +1,16 @@
+(node:36692) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical queued/recording operations without scheduled files block their own meeting across restart (35.3371ms)
+✔ readLiveJobs: missing state is no jobs; corrupt or wrong-shape state throws (cannot tell) (18.2354ms)
+✔ all durable routes require exact scope and owning tenant; forged body/query/path cannot control jobs (133.6912ms)
+✔ managed adapter does not disclose base reader paths or tokens in planner refusals (0.4566ms)
+✔ default authority is canonical operations: expired scheduled file cannot hide an active operation (37.291ms)
+✔ duplicate through the REAL live-job reader: a scheduled job file for the meeting -> 409; a corrupt one -> 503 (cannot tell), nothing launched (7.572ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5369.662
