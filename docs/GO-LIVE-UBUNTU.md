@@ -7,6 +7,44 @@ Status of this guide: written from a static review of `Dockerfile`, `docker-comp
 and the package scripts. The images were NOT built or run on the machine that wrote it
 (no Docker there). Run the checks below once and report anything that fails.
 
+## 0. Live deployment: state and remaining DevOps steps (as of 2026-10-26)
+The app is deployed and reachable over HTTPS; nginx serves the UI and proxies the API under `/api`
+on the same origin. Checked from outside on 2026-10-26: `/api/health` returns `{"db":"ok"}`.
+
+Already done (do NOT redo):
+- `lkb_prod` was populated on 2026-10-26 by copying `lkb_staging` (all collections and their indexes,
+  including `migrations_changelog`; `api_keys` NOT copied). Counts matched source: 23 sessions,
+  3238 turns, 1828 chunks, 1768 claims, 105 topics. Section 6 `migrate` therefore finds the DB
+  already migrated. The local pipeline still writes `lkb_staging`; new data does not reach live
+  until it writes `lkb_prod`.
+- An operator admin key (all scopes, tenant `toc`, label `umesh-admin`) exists in `lkb_prod`. Its key
+  id, for `LKB_HOSTING_BOOTSTRAP_ADMINS` in section 9, is `ab8eb0de-d7c9-43cc-8b3d-b1122065a943`.
+  The raw key is held by the owner only. Do not mint another `first-key` unless the owner asks.
+
+Remaining, in this order:
+1. **MongoDB security, urgent.** On 2026-10-26 the Mongo host accepted connections from the internet
+   with no credentials, and contained a database named `READ__ME_TO_RECOVER_YOUR_DATA` holding a
+   ransom note (an automated attack on open MongoDB). Do not pay or contact the sender. Do:
+   firewall port 27017 to the app server and office IPs only; create the `lkb_app` user and enable
+   authorization (section 6a); update `MONGODB_URL` on the server and on the bot machine; check
+   every database on that host for missing data and restore from backup where needed. The same
+   host holds other Vidysea databases, so their owners must be told.
+2. **Hosting (T-028), optional.** Without it, Settings → Keys and the Dashboard key tile show
+   "API keys unavailable (hosting not configured)" (`/api/keys` → 503); everything else works.
+   To enable, create `.env.t028` with all five names from section 9, using
+   `LKB_HOSTING_BOOTSTRAP_ADMINS='{"toc":["ab8eb0de-d7c9-43cc-8b3d-b1122065a943"]}'` and the app's
+   https origin in `LKB_HOSTING_WEBHOOK_ORIGINS`, then `docker compose up -d --build api`.
+   All five or none: a partial file makes every authenticated route return 503.
+3. **Provider keys.** Setup wizard (`/setup`) reports `GEMINI_API_KEY` and `TAVILY_API_KEY` unset on the
+   server. Without Tavily, Ask has no web fallback. Add them to the server `.env`, restart api.
+4. **WhatsApp.** `/api/whatsapp/groups` returns 500; set `WHATSAPP_MONGO_URL` (and `WHATSAPP_MONGO_DB`)
+   or leave the page unused.
+5. Verify (with the owner's key):
+   `curl -s -H "Authorization: Bearer <key>" https://<server>/api/system-status` shows non-zero
+   `sessions`, and `/api/keys` returns 200 once step 2 is done.
+
+Full page-by-page audit of the live app: `references/portals/lkb-live.knowledge.md`.
+
 ## 1. Prerequisites
 - Ubuntu 22.04+ with Docker Engine and Docker Compose v2.24 or newer (`docker compose version`).
   Older compose cannot parse `docker-compose.yml` (`env_file` with `required: false`). Upgrade:
