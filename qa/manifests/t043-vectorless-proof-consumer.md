@@ -3,8 +3,8 @@
 dual-trigger: tenancy packages/meeting-bot/src/workspace/index-proof-consumer.ts:21
 Policy-Version: proportional-verification/2026-10-19.17
 
-**Handshake status:** ready-for-check
-**Status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 by maker resume, dual check: A qa/verdicts/t043-vectorless-proof-consumer.md + B qa/verdicts/t043-vectorless-proof-consumer.b.md (ff4c89b8)
+**Status:** checked-PASS — closed out 2026-10-26 by maker resume, dual check: A qa/verdicts/t043-vectorless-proof-consumer.md + B qa/verdicts/t043-vectorless-proof-consumer.b.md (ff4c89b8)
 **Fix cycle:** 0
 **Priority tier:** 3 — D-173 vectorless roadmap; tenant/source/current-readiness security boundaries uncapped.
 **Authority:** root exclusive consumer/test lease, extended explicitly to existing fixture. Maker capture_maker. No pre-READY checker dispatched.
