@@ -37,3 +37,17 @@ knowledge outputs 422.
 - t011-live-consent-orchestration: re-run on a quiet host after the current checker wave (SERIAL: CPU load).
 - t039-manual-jobs-operation-authority: fix cycle = repin stale hashes + rerun broker, after the wave (SERIAL: CPU load).
 - Server access (SSH/gcloud for 34.47.136.12) is an access request, not a decision.
+
+## Q5. Enforcement-path fixes found by the 2026-10-26 governance triage (a2be9007) — each needs `Approved-by: Umesh`
+Bugs are verified still live; the maker cannot touch these files without an approved DECISIONS entry.
+1. `delivery-gate-stop.ps1`: round-cap misses a seam named in prose (ISS-A035913-003) + canonical Handshake widening (ISS-A035913-001 ratification).
+2. `mc-precommit.ps1:43`: silent on a manifest that has only the canonical `**Handshake status:**` (ISS-A035913-011).
+3. `mc-sessionstart.ps1`: prints "Checks pending: 0" for a FAIL at the current cycle (ISS-267, ISS-350 repro 2, ISS-178 reader half).
+4. `aios-write-guard.ps1:195-198`: allowlists `\qa\` and `\.goal\` anywhere in a path (ISS-219).
+5. `append_decision.ps1`: no lock/uniqueness check, two D-050 entries exist (ISS-362).
+- a) **(recommended)** Approve all five; maker writes one D-entry per file with `Approved-by: Umesh`, builds, dual-checks.
+- b) Approve a subset (name the numbers).
+- c) Leave as is.
+
+## Q6. qa/gates/d015-generalisation-scope.md (ISS-220) is still unanswered
+Answer A, B, both or neither in that file (or here).
