@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createCanonicalAlerts} from './lifecycle-alerts.mjs';
+const NOW = '2026-10-14T12:00:00.000Z';
+test('probe: outbox bound of eight refuses with truthful log, no silent loss', async () => {
+  const filler = Array.from({length: 8}, (_, n) => ({kind: 'capture-failed', sessionKey: `x-${n}`, title: 't'}));
+  const state = {operations: {'session-a': {tenantId: 'tenant', status: 'recording', updatedAt: NOW, careerGuidance: true, testData: false, schedulerAlertOutbox: filler}}};
+  const logs = []; let saves = 0, notices = 0, raised = 0;
+  const a = createCanonicalAlerts({state, tenantId: 'tenant', autojoin: () => ({raise: async () => {raised++;}}), assertOwned: () => {}, save: () => {saves++;},
+    enqueueNotification: () => {notices++;}, log: l => logs.push(l), now: () => NOW});
+  assert.throws(() => a.update('session-a', {status: 'ready'}), /outbox capacity reached/);
+  await a.wait();
+  assert.equal(state.operations['session-a'].schedulerAlertOutbox.length, 8);
+  assert.ok(logs.some(l => l.includes('backlog full')));
+  assert.equal(saves, 0); assert.equal(notices, 0); assert.equal(raised, 0);
+  // foreign tenant / invalid id never stage
+  state.operations.foreign = {tenantId: 'other', status: 'ready', updatedAt: NOW};
+  a.operation('foreign'); a.operation('../bad'); await a.wait(); assert.equal(raised, 0);
+  assert.equal(state.operations.foreign.schedulerAlertOutbox, undefined);
+});

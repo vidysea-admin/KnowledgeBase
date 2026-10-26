@@ -1,0 +1,32 @@
+(node:34164) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ probe: persistence failure inside artifact-start callback is not swallowed by path catch (135.7826ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2074.5723
+
+✖ failing tests:
+
+test at scripts\webinar\scheduler\probe-catch.test.mjs:6:1
+✖ probe: persistence failure inside artifact-start callback is not swallowed by path catch (135.7826ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /persist-fixture-failure/. Input:
+  
+  'Child exited without a completed index marker; session is not ready'
+  
+      at file:///C:/Users/Lenovo/AppData/Local/Temp/claude/d--KnowledgeBase/c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f/scratchpad/c4/scripts/webinar/scheduler/probe-catch.test.mjs:19:46
+      at async withFixture (file:///C:/Users/Lenovo/AppData/Local/Temp/claude/d--KnowledgeBase/c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f/scratchpad/c4/scripts/webinar/run-pipeline-fixtures.mjs:26:30)
+      at async Test.run (node:internal/test_runner/test:1110:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Child exited without a completed index marker; session is not ready',
+    expected: /persist-fixture-failure/,
+    operator: 'match',
+    diff: 'simple'
+  }
+exit=1

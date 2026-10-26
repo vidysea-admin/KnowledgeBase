@@ -1,0 +1,34 @@
+✖ saturated started event survives real durable write, terminal transition, old lookback and restart replay (303.6568ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 861.5612
+
+✖ failing tests:
+
+test at scripts\webinar\scheduler\lifecycle-alerts.test.mjs:61:1
+✖ saturated started event survives real durable write, terminal transition, old lookback and restart replay (303.6568ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+  + []
+  - [
+  -   'capture-started',
+  -   'capture-done'
+  - ]
+  
+      at TestContext.<anonymous> (C:\Users\Lenovo\AppData\Local\Temp\claude\d--KnowledgeBase\c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f\scratchpad\c2\scripts\webinar\scheduler\lifecycle-alerts.test.mjs:79:12)
+      at async Test.run (node:internal/test_runner/test:1110:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ 'capture-started', 'capture-done' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+exit=1

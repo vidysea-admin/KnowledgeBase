@@ -1,0 +1,19 @@
+✖ first durable transition save includes its event and restart replays after crash before enqueue (12.2527ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 573.9866
+
+✖ failing tests:
+
+test at scripts\webinar\scheduler\lifecycle-alerts.test.mjs:96:1
+✖ first durable transition save includes its event and restart replays after crash before enqueue (12.2527ms)
+  TypeError: Cannot read properties of undefined (reading 'map')
+      at TestContext.<anonymous> (C:\Users\Lenovo\AppData\Local\Temp\claude\d--KnowledgeBase\c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f\scratchpad\c1\scripts\webinar\scheduler\lifecycle-alerts.test.mjs:117:53)
+      at async Test.run (node:internal/test_runner/test:1110:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3)
+exit=1
