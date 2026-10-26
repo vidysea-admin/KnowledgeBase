@@ -38,4 +38,4 @@ Logic changed, so affected tests plus one falsification per criterion. No UI, pr
 - Full goal-t038 remains HOLD (live overlap, downstream delivery, Windows/Ubuntu hosts, seven days). This PASS closes only this atomic outbox unit.
 
 EXPLANATION: The missing C3 runner evidence now exists and is green on the current bytes (15/15, plus the ledger's literal argv), and every criterion has a green-before / red-after falsification in a throwaway copy. The earlier HOLD was missing evidence, not a defect; the source drift it cited is moot because this check judged the current tree.
-Metrics: start=2026-10-26T16:20:35Z end=2026-10-26T16:31:00Z wall_min=10 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=4 cycle=1 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=625 mutants=1 defects_unit=0 defects_6c=0
+Metrics: start=2026-10-26T16:20:35Z end=2026-10-26T16:29:30Z wall_min=9 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=4 cycle=1 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=535 mutants=1 defects_unit=0 defects_6c=0
