@@ -1,7 +1,7 @@
 # dockerfile-targetarch-fallback
 
 **Handshake status:** ready-for-check
-Status: ready-for-check
+Status: checked-PASS — qa/verdicts/dockerfile-targetarch-fallback.md (8ebd2f03)
 **Date:** 2026-10-27
 **Fix cycle:** 0 of max 2
 **Dual check:** not required (tier L config: Dockerfile build stage plus a test; one checker, no dual)
