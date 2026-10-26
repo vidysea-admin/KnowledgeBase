@@ -559,3 +559,22 @@ TICK 2026-09-28T19:26:43+05:30 ADVANCED wave=3 concurrent-peak=3 serial=[]
 2026-10-05T17:13:58+05:30 "CONTINUE tier2 ISS-373/T-052 riskL policy proportional-verification/2026-10-05.1 check0; worker lifecycle72tests reported; mandatory browser cleanup/proof/checker outstanding; no live activation"
 2026-10-05T20:09:41+05:30 --help
 2026-10-05T21:15:21+05:30 ADVANCED D104-D109: goal active; system GWS authenticated; local work API/Mongo and Calendar/source/search/citation proof; T052 48Python/47TS maker green; deps8to0; U2.2 BUILDING; no release PASS
+2026-10-26T21:41:41+05:30 RESUMED by Umesh (/maker resume 2026-10-26); first tick = reconcile 1683-commit fast-forward backlog
+2026-10-26T21:44:17+05:30 ADVANCED resume-reconcile: 51 PASS close-outs; 34 units in triage (3 Sonnet agents parallel: noverdict 12 / stale+fail 14 / hold 8); wave=3 binding=none evidence=34054b6411eda1cf13bf3ed6479ad023bc6f218d
+2026-10-26T21:51:31+05:30 ADVANCED reconcile: +4 superseded-slug close-outs (a8d3c0f4), +13 stale/dup (96da57dc), gate batch; wave=9 checkers in flight (ci-ref, extraction-receipts, t022x3, t034, t043, u22, t038); SERIAL: t011+t039-manual-jobs wait on CPU load (t011's last HOLD was load-induced) evidence=96da57dcaad4b5745c555d1f40e8dc34e6cd0350
+2026-10-26T22:00:23+05:30 closed out t038 + t022-offline-transfer; t043 coordinator B dispatched; 4 checkers running evidence=bd1971f8
+2026-10-26T22:01:54+05:30 closed out t034-startup-owned-cleanup evidence=485bd083
+2026-10-26T22:02:22+05:30 closed out t022-executed-provenance evidence=ab05ed57
+2026-10-26T22:04:18+05:30 closed out extraction-stage-receipts evidence=2ed4230f
+2026-10-26T22:04:36+05:30 closed out t043 dual PASS evidence=73008a08
+2026-10-26T22:06:51+05:30 closed out u22-extraction-review-ui; wave done evidence=fd894426
+2026-10-26T22:13:48+05:30 closed out t011 non-live evidence=7eb2b358
+2026-10-26T22:24:59+05:30 closed out t039 recheck evidence=6d895ab9
+2026-10-26T22:26:00+05:30 synced legacy status lines evidence=3233f747
+2026-10-26T22:42:33+05:30 product high triage: 5 verified, 2 superseded, 4 still-open evidence=e3273d71
+2026-10-26T22:57:51+05:30 merged iss392 test-lane evidence=b64d900a
+2026-10-26T23:01:35+05:30 merged wavectorless002 race test (test-lane) evidence=12570e4e
+2026-10-26T23:02:42+05:30 merged + closed out ISS-394 dual PASS evidence=0573214e
+2026-10-26T23:38:03+05:30 dispatched builder iss390-packet-crlf-drift (tier-4 medium ledger); HOLD-live units await Q1-Q6
+2026-10-26T23:45:58+05:30 built iss390-packet-crlf-drift f17cfda6; checker dispatched (L config, single) evidence=f17cfda6
+2026-10-27T00:08:55+05:30 ADVANCED close-out iss390-packet-crlf-drift checked-PASS; ISS-390 fixed; ISS-399 medium + ISS-400 low filed evidence=qa/verdicts/iss390-packet-crlf-drift.md

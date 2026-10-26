@@ -1,7 +1,7 @@
 # iss390-packet-crlf-drift
 
 **Handshake status:** ready-for-check
-Status: ready-for-check
+Status: checked-PASS — qa/verdicts/iss390-packet-crlf-drift.md (c80d7d53)
 **Date:** 2026-10-26
 **Fix cycle:** 0 of max 2
 **Dual check:** not required (tier L config: .gitattributes line-ending rules plus a test; one checker, no dual)
