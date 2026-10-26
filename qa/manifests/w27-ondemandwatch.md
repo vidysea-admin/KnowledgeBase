@@ -1,6 +1,6 @@
 # Manifest: w27-ondemandwatch
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-ondemandwatch.md
 Fix cycle: 0
 Base: a9b202b422af6436c52f61dc9850ecb12fd21fc4 (origin/master)
 Lane: lane/w27-ondemandwatch (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-ondemandwatch)

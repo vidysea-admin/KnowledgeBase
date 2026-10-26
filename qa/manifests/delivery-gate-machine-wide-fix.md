@@ -38,7 +38,7 @@ registration did not need to change.
 
 `delivery-gate-stop.ps1:253, 318, 323, 367-369, 376`. **The defect was found by reading and measuring
 the code, not taken from the brief's description.** The MAKER predicate had exactly two outcomes for a
-manifest at `Status: ready-for-check`:
+manifest at `Status: checked-PASS`: — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/delivery-gate-machine-wide-fix.md
 
 - verdict older than the manifest's `Fix cycle` → `pend++`
 - a **PASS** at the current cycle → `unclosed++`

@@ -1,6 +1,6 @@
 # w27-spkcue
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-spkcue.md
 Fix cycle: 0
 Lane: lane/w27-spkcue (worktree KnowledgeBase-lanes/w27-spkcue) · Base: 4264418c (origin/master) · Candidate: the lane HEAD commit "w27-spkcue cycle 0" · Tier: critical (ISS-104), medium (ISS-110, ISS-104CC-3). Ledger rows NOT flipped.
 

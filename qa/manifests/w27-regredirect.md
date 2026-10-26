@@ -1,6 +1,6 @@
 # w27-regredirect
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-regredirect.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-regredirect (branch lane/w27-regredirect)
 Base: 4264418c (origin/master). Candidate: the commit carrying this manifest (HEAD of the lane).

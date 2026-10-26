@@ -1,6 +1,6 @@
 # w27-askbudget
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-askbudget.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-askbudget (branch lane/w27-askbudget)
 Base SHA: 4264418c7488d95e76bc0d86e3920efb0e0ccd72

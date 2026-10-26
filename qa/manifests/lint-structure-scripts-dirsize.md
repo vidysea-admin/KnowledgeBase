@@ -1,6 +1,6 @@
 # lint-structure-scripts-dirsize
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/lint-structure-scripts-dirsize.md
 Fix cycle: 0
 Tier: 3 (roadmap hygiene; D-124/D-125 red `lint:structure`). Class: no code or data write. Verdict by the checker only.
 Lane: lane/dirsize. Lane ledger `qa/issues.dirsize.jsonl`: no findings filed (file not created). Existing ledger rows untouched.

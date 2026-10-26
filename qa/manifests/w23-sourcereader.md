@@ -1,6 +1,6 @@
 # w23-sourcereader: ISS-SOURCEREADER-001 (POST /ingest path)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-sourcereader.md
 Fix cycle: 1
 Base: 3c99337f (origin/master)
 Branch: lane/w23-sourcereader

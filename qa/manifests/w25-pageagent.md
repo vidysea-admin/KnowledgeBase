@@ -1,6 +1,6 @@
 # w25-pageagent (verdict 1bd56f26 FAIL at b395fb68; fix cycle 1 below): generic vision page agent (replaces the hard-coded OnAir Watch-now logic)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w25-pageagent.md
 Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w25-onairfix (branch lane/w25-onairfix), base origin/master 50c320a6
 Candidate: the commit that adds this file (`git log -1 lane/w25-onairfix`); earlier lane commits a363e7c4 (diagnosis) and 5624ca60 (agent).

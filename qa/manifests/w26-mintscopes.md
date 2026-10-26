@@ -1,6 +1,6 @@
 # w26-mintscopes: mint-key can issue every scope the API enforces
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w26-mintscopes.md
 Fix cycle: 0
 Lane: KnowledgeBase-lanes/w26-mintscopes  Branch: lane/w26-mintscopes  Base: fd471686
 Candidate SHA: see `git log -1 lane/w26-mintscopes` (the commit that adds this file)

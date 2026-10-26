@@ -1,6 +1,6 @@
 # w29-wafetch: real WhatsApp archiver fetcher (flag OFF) + D-184
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w29-wafetch.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w29-wafetch (branch lane/w29-wafetch)
 Base: 4ca0271e (origin/master)

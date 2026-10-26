@@ -1,6 +1,6 @@
 # goal-t050
 
-**Handshake status:** ready-for-check (CORE SLICE ONLY)
+**Handshake status:** checked-PASS (CORE SLICE ONLY) — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/goal-t050.md
 Status: ready-for-check
 Fix cycle: 0
 Task: T-050

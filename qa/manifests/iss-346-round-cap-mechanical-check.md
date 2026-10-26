@@ -186,7 +186,7 @@ decision on the record (it lives on `wave/vector-gap-durability`, not on master)
 
 ```
 $ git show wave/vector-gap-durability:qa/manifests/vector-gap-durability.md | grep -n 'Status:\|Round cap:'
-188:## Status: ready-for-check
+188:## Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/iss-346-round-cap-mechanical-check.md
 ```
 
 **Reproduction 3, part 2 — the LANDED hook does NOT fire on it.** Real corpus (167 manifests + 167

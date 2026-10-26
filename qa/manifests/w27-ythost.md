@@ -1,6 +1,6 @@
 # w27-ythost: YouTube live extractor host matching (ISS-T036NEXT-001)
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-ythost.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-ythost, branch lane/w27-ythost
 Base: 4264418c (origin/master)

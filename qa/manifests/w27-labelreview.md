@@ -1,6 +1,6 @@
 # Manifest - w27-labelreview
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-labelreview.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-labelreview (lane/w27-labelreview)
 Base: a9b202b4 (origin/master). Unit A commit: the D-183 entry commit after the merge of w27-onairexpiry. Unit B candidate: the commit following it on the lane (SHA reported in the handback; a manifest cannot contain its own commit id).

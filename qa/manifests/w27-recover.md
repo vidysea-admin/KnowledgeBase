@@ -1,6 +1,6 @@
 # w27-recover: explicit recovery command for stuck index attempts
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-recover.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-recover  Branch: lane/w27-recover
 Base: 2ff2b7f3 (origin/master)  Candidate: see git log (this commit)

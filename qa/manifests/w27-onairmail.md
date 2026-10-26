@@ -1,6 +1,6 @@
 # w27-onairmail: join Google Cloud OnAir webinars announced by mail
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-onairmail.md
 Fix cycle: 2
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-onairmail (lane/w27-onairmail)
 Base SHA: a9b202b422af6436c52f61dc9850ecb12fd21fc4

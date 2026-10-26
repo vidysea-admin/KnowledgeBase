@@ -1,6 +1,6 @@
 # w27-judgecost
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-judgecost.md
 Fix cycle: 0
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w27-judgecost (branch lane/w27-judgecost)
 Base: 4264418c (origin/master)

@@ -1,6 +1,6 @@
 # w23-legacyseed: DB-write guard for join-rules host and sync-session, provenance on indexSession chunks
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w23-legacyseed.md
 Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w23-legacyseed (branch lane/w23-legacyseed)
 Base: 3c99337f (origin/master)

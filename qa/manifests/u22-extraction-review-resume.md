@@ -31,7 +31,7 @@ Two sources remain untracked at HEAD37e51f95; formal readiness stays false until
 Cycle0/rawcandidate c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483 unchanged. Formal managed-review readiness false pending actual Git binding/root release; no checker verdict or whole-parent acceptance. Human reviews remain0.
 
 ## Committed source admission — 2026-10-16
-Handshake status: ready-for-check
+Handshake status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/u22-extraction-review-resume.md
 Fix cycle: 0
 Actual Git candidate: d0f6f2eff242f98a85ba4ccde483db08030ba3c8; base:37e51f95c367594bddb422c39c11415674ecf001. See qa/coordination/resume-20261015/u22-resume-prep/managed-review.ready.json and committed-source-binding.json. Current broker3/3 and vacuous verifier0 qualified by exact raw/current clean-filter Gitblob proof; commands actually ran at parent37, never claimed ond0. Formal validation0 and assessment0; BOOTSTRAP180s/24000 includes30s/4000completion, unknown actual ratios. Root-only fresh checker dispatch pending broker availability; upfront15s independent boundary request remains checker-accounted. No source edits/staging/commit by preparer. U2.2 in_progress, genuine labels0; no independent verdict.
 

@@ -1,5 +1,5 @@
 # Manifest - w27-dropsentences
-**Status:** ready-for-check
+**Status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w27-dropsentences.md
 **Fix cycle:** 1
 **Contract:** none (owner decision D-191, Umesh 2026-10-22)
 **Lane:** w27-dropsentences (branch lane/w27-dropsentences, from origin/master c7574a5e)

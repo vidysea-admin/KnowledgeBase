@@ -1,6 +1,6 @@
 # w24-onairplay: play Google Cloud OnAir replays in the recorder
 
-Status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/w24-onairplay.md
 Fix cycle: 1
 Lane: C:\Users\product\Desktop\KnowledgeBase-lanes\w24-onairplay (branch lane/w24-onairplay)
 Base: origin/master 8029be9f (cycle 0 candidate 22e07643, verdict f4cb4fe9 FAIL)
