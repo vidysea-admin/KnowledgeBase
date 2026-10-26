@@ -1,0 +1,6 @@
+import { verifyPrivateDirectory } from "file:///D:/KnowledgeBase/packages/meeting-bot/src/capture/record-consent/private-acl.ts";
+import { spawnSync } from "node:child_process";
+const dir=process.env.LKB_PRIVATE_ACL_PROBE_DIR!;
+for(let i=0;i<5;i++){let launches=0;const t=performance.now();
+ verifyPrivateDirectory(dir,((...a:any[])=>{launches++;const s=performance.now();const r=(spawnSync as any)(...a);console.log(" launch",launches,"ms",Math.round(performance.now()-s));return r;}) as any);
+ console.log("probe",i+1,"total_ms",Math.round(performance.now()-t),"launches",launches);}

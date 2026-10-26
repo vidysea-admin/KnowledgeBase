@@ -1,0 +1,66 @@
+[T011 known-clock] fixture child readiness begin +7ms
+[T011 known-clock] fixture child readiness complete +258ms
+[T011 known-clock] publish native ACL and sealed readiness begin +258ms
+[T011 known-clock] publish native ACL and sealed readiness complete +1230ms
+[T011 known-clock] list actual owner begin +1233ms
+[T011 known-clock] list actual owner complete +3247ms
+[T011 known-clock] list foreign owner begin +3247ms
+[T011 known-clock] list foreign owner complete +3617ms
+[T011 known-clock] reject foreign generation begin +3618ms
+[T011 known-clock] reject foreign generation complete +4322ms
+[T011 known-clock] persist private-start ACK begin +4323ms
+[T011 known-clock] persist private-start ACK complete +5423ms
+[T011 known-clock] restarted API durable private state begin +5426ms
+[T011 known-clock] restarted API durable private state complete +7157ms
+[T011 known-clock] persist private-end ACK begin +7157ms
+[T011 known-clock] persist private-end ACK complete +8262ms
+[T011 known-clock] reject forged HMAC begin +8265ms
+[T011 known-clock] reject forged HMAC complete +8270ms
+[T011 known-clock] reject foreign descriptor host begin +8270ms
+[T011 known-clock] reject foreign descriptor host complete +10086ms
+[T011 known-clock] revoke owned bridge begin +10087ms
+[T011 known-clock] revoke owned bridge complete +10088ms
+[T011 known-clock] revoked descriptor unavailable begin +10089ms
+[T011 known-clock] revoked descriptor unavailable complete +10789ms
+[T011 known-clock] cleanup child graceful exit begin +10789ms
+[T011 known-clock] child exit code=0 signal=null +10802ms
+[T011 known-clock] cleanup child graceful exit complete +10802ms
+[T011 unknown-clock] fixture child readiness begin +6ms
+✔ actual Node child + private API host bridge known-clock (10804.7168ms)
+[T011 unknown-clock] fixture child readiness complete +258ms
+[T011 unknown-clock] publish native ACL and sealed readiness begin +258ms
+[T011 unknown-clock] publish native ACL and sealed readiness complete +1356ms
+[T011 unknown-clock] list actual owner begin +1356ms
+[T011 unknown-clock] list actual owner complete +3013ms
+[T011 unknown-clock] list foreign owner begin +3013ms
+[T011 unknown-clock] list foreign owner complete +3360ms
+[T011 unknown-clock] reject foreign generation begin +3361ms
+[T011 unknown-clock] reject foreign generation complete +4002ms
+[T011 unknown-clock] persist private-start ACK begin +4002ms
+[T011 unknown-clock] persist private-start ACK complete +5015ms
+[T011 unknown-clock] restarted API durable private state begin +5017ms
+[T011 unknown-clock] restarted API durable private state complete +6718ms
+[T011 unknown-clock] persist private-end ACK begin +6718ms
+[T011 unknown-clock] persist private-end ACK complete +7746ms
+[T011 unknown-clock] sticky conservative durable state begin +7748ms
+[T011 unknown-clock] sticky conservative durable state complete +9403ms
+[T011 unknown-clock] reject forged HMAC begin +9404ms
+[T011 unknown-clock] reject forged HMAC complete +9405ms
+[T011 unknown-clock] reject foreign descriptor host begin +9405ms
+[T011 unknown-clock] reject foreign descriptor host complete +11075ms
+[T011 unknown-clock] revoke owned bridge begin +11075ms
+[T011 unknown-clock] revoke owned bridge complete +11077ms
+[T011 unknown-clock] revoked descriptor unavailable begin +11077ms
+[T011 unknown-clock] revoked descriptor unavailable complete +11756ms
+[T011 unknown-clock] cleanup child graceful exit begin +11756ms
+[T011 unknown-clock] child exit code=0 signal=null +11766ms
+[T011 unknown-clock] cleanup child graceful exit complete +11766ms
+✔ actual Node child + private API host bridge unknown-clock (11766.1901ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22785.552
