@@ -1,6 +1,6 @@
 # iss390-packet-crlf-drift
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Status: checked-PASS — qa/verdicts/iss390-packet-crlf-drift.md (c80d7d53)
 **Date:** 2026-10-26
 **Fix cycle:** 0 of max 2

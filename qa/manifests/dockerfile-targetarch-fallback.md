@@ -1,6 +1,6 @@
 # dockerfile-targetarch-fallback
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS
 Status: checked-PASS — qa/verdicts/dockerfile-targetarch-fallback.md (8ebd2f03)
 **Date:** 2026-10-27
 **Fix cycle:** 0 of max 2
