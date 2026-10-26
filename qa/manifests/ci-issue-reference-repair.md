@@ -1,7 +1,7 @@
 # CI issue-reference repair
 
 **Handshake status:** checked-PASS — closed out 2026-10-26 citing qa/verdicts/ci-issue-reference-repair.md
-Status: ready-for-check
+Status: checked-PASS — synced to canonical handshake 2026-10-26
 Fix cycle: 0
 Priority: tier3 directed release/CI prerequisite, rootauthorized all40 goal.
 Scope: qualify16 proven lane issue references in qa/manifests/wa-review-wire.md only.

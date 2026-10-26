@@ -308,4 +308,4 @@ Reproductions 3-4 deliberately left open, out of D-043 item 3's scope.**
 - Does not claim a PASS. Only `/checker` can PASS this unit.
 
 ## **Status:** checked-PASS (cycle 0)
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — synced 2026-10-26 to the closed-out cycle-0 handshake earlier in this file

@@ -1,7 +1,7 @@
 # T-056 full cited-answer policies, conflicts and answer review
 
 **Handshake status:** checked-PASS (API slice only; parent T-056 stays in_progress) — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/goal-t056-api-slice.md (cycle-1 PASS, API slice ONLY; parent T-056 stays in_progress)
-**Status:** ready-for-check
+**Status:** checked-PASS (API slice only; parent T-056 stays in_progress) — synced to canonical handshake 2026-10-26
 **Fix cycle:** 1
 **Task:** T-056 — full parent; remains in_progress
 **Priority tier:** 3 — D-170 remaining-roadmap authorization

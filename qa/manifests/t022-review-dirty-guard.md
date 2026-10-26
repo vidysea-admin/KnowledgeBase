@@ -1,7 +1,7 @@
 # T022 offline review dirty guard
 
 **Status:** checked-PASS — closed out 2026-10-26 citing qa/verdicts/t022-review-dirty-guard.md (repair only; T-022 parent stays open)
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t022-review-dirty-guard.md (238a8cf0)
 **Fix cycle:** 1
 **Candidate ID:** sha256:a0a31ab35f22e6c407c36652844f86c4685383836d67bc4223d4b0aaa41d443b
 **Task:** T-022 (scoped repair only)
