@@ -1,6 +1,6 @@
 # retention-ruling5-api-consumer
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/retention-ruling5.md (cycle-0 PASS on the same change)
 Status: ready-for-check
 Fix cycle: 0
 Lane: lane/w17-retentionapi. Base 42a50b648d98d347faeb86c5e046c436fd33d08f (lane/w17-retention tip, ruling 5). Class: test-only consumer fix.

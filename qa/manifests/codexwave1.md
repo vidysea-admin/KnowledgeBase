@@ -1,6 +1,6 @@
 # codexwave1 execution-wave1 takeover (lane/codexwave1)
 
-**Handshake status:** ready-for-check
+**Handshake status:** checked-PASS — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/codexwave1-build.md (cycle-1 PASS section, line 43)
 Status: ready-for-check
 Fix cycle: 1
 Responds to: qa/verdicts/codexwave1-build.md (cycle 0 FAIL, b3479a07), issues ISS-CODEXWAVE1-003..007.
