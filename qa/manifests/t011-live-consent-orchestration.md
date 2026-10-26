@@ -1,7 +1,7 @@
 # T-011 live consent and private capture orchestration
 
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS — closed out 2026-10-26 by maker resume (non-live criteria only; live criteria and parent T-011 stay HOLD), citing qa/verdicts/t011-live-consent-orchestration.md
+**Handshake status:** checked-PASS — closed out 2026-10-26 by maker resume (non-live criteria only; live criteria and parent T-011 stay HOLD), citing qa/verdicts/t011-live-consent-orchestration.md
 **Fix cycle:** 1
 **Task:** T-011 (full bot remains open)
 **Priority tier:** 3 — assigned remaining roadmap task under D-170.
