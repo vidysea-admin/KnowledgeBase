@@ -23,6 +23,17 @@ test('legacy v2 combined proof remains supported with its existing core guarante
   assert.equal(validateIndexProof(f.dir, 'session-a').generation, 'current-generation');
 });
 
+test('legacy v2 refuses selected-turn count mismatch and non-integer count (ISS-392)', t => {
+  const f = producedProofFixture(t, 'knowledge-turns.json', 'legacy');
+  const { sourceId, sourceHash, workDb, inputArtifact, ...legacy } = f.proof;
+  f.write('index-proof.json', { ...legacy, version: 2 });
+  assert.equal(validateIndexProof(f.dir, 'session-a').generation, 'current-generation');
+  for (const patch of [{ turnCount: 0 }, { turnCount: 2 }, { turnCount: '1' }, { turnCount: 1.5 }, { turnCount: undefined }]) {
+    f.write('index-proof.json', { ...legacy, version: 2, ...patch });
+    assert.throws(() => validateIndexProof(f.dir, 'session-a'), /strict index proof/, JSON.stringify(patch));
+  }
+});
+
 test('v3 refuses wrong source, database, bytes, generation, selected count and stage status', t => {
   const f = producedProofFixture(t, 'knowledge-turns.json', 'legacy');
   const attacks = [{ sourceId: 'foreign' }, { sourceHash: '0'.repeat(64) }, { workDb: 'lkb_other' },
