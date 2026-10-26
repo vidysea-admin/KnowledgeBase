@@ -1,4 +1,7 @@
 # T-043 explicit vectorless proof consumer
+**Dual check:** required
+dual-trigger: tenancy packages/meeting-bot/src/workspace/index-proof-consumer.ts:21
+Policy-Version: proportional-verification/2026-10-19.17
 
 **Handshake status:** ready-for-check
 **Status:** ready-for-check
