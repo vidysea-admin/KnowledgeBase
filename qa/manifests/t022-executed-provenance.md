@@ -1,7 +1,7 @@
 # T022 executed local provenance
 
-Status: ready-for-check
-Handshake status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t022-executed-provenance.md
+Handshake status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/t022-executed-provenance.md
 Fix cycle: 0
 Task: T-022 / U0.10
 Priority tier: 3, next unblocked roadmap capability; scoped provenance behavior only.
