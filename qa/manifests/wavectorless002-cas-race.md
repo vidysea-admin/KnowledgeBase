@@ -1,7 +1,7 @@
 # Manifest — wavectorless002-cas-race
 
-Status: ready-for-check
-**Handshake status:** ready-for-check
+Status: merged-no-check (test-lane) — test-only diff, merged 2026-10-26 by maker; main-tree rerun 12 pass / 2 skipped (opt-in mongo) / 0 fail; builder real-mongo run 14/14
+**Handshake status:** merged-no-check (test-lane) — test-only diff, merged 2026-10-26 by maker; main-tree rerun 12 pass / 2 skipped (opt-in mongo) / 0 fail; builder real-mongo run 14/14
 **Contract:** none (advances ledger row ISS-WAVECTORLESS-002, qa/issues.WAVECTORLESS.jsonl line 2; row not edited)
 **Goal task:** none
 **Date:** 2026-10-26
