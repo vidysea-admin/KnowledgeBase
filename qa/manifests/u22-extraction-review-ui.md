@@ -1,7 +1,7 @@
 # U2.2 authenticated extraction review UI
 
-Status: ready-for-check
-Handshake status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/u22-extraction-review-ui.md
+Handshake status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/u22-extraction-review-ui.md
 Fix cycle: 0
 Task: U2.2
 Priority tier: 3 — approved actual human-review application continuation
