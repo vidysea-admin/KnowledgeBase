@@ -1,0 +1,360 @@
+﻿== delivery-gate-stop.ps1 ==
+  PASS  blocks once: 3 edits, nothing touched
+  PASS  second stop same session is silent (marker)
+  PASS  stop_hook_active=true is silent
+  PASS  learning file touched today -> silent
+  PASS  malformed input -> silent exit 0
+  PASS  design question with no brain consult -> block naming /brain
+  PASS  second stop same session is silent (brain marker)
+  PASS  design question WITH a brain consult -> silent
+  PASS  non-design turn -> no brain block
+  PASS  system-reminder noise does not read as a design question
+  PASS  'cleanest way to wire X' reads as a design question -> block
+  PASS  channel-wrapped forwarded text does not trip the brain gate
+  PASS  reading CLAUDE.md/settings.json is not a config edit -> silent
+  PASS  editing CLAUDE.md still blocks for the config audit
+  PASS  portal exploration with no source registry -> block naming /discovering-sources
+  PASS  second stop same session is silent (sources marker)
+  PASS  collection WITH a source registry consulted -> silent
+  PASS  writing a portal knowledge file also counts as collection -> block
+  PASS  READING a portal knowledge file is not collection -> silent
+  PASS  a real firecrawl crawl counts as collection -> block
+  PASS  merely mentioning firecrawl crawl in a shell string -> silent
+  PASS  no collection work -> no sources block
+  PASS  3 edits + a recorded brain mark -> learning gate satisfied
+  PASS  uncollected background Agent -> block naming toolu_orphan1 only
+  PASS  same session after orphan block -> review block still fires once
+  PASS  same session third stop -> silent (both markers set)
+  PASS  collected background + foreground Agents -> silent
+  PASS  code edited, no review agent -> block asking for senior-software-engineer
+  PASS  code edited + review agent dispatched -> no review block (learning file touched -> silent)
+  PASS  review dispatched BEFORE the code edit does not count -> block
+  PASS  code edited + /checker Mode A dispatched after -> no review block
+  PASS  /checker dispatched BEFORE the code edit does not count -> block
+  PASS  SERIAL-MC: 3 maker/checker agents strictly one at a time -> block
+  PASS  SERIAL-MC: pipeline (check of unit 1 dispatched while unit 2 builds) -> silent
+  PASS  SERIAL-MC: 3 sequential + a stated SERIAL: reason -> silent
+  PASS  SERIAL-MC: only 2 sequential agents (one unit build + check) -> silent
+  PASS  SERIAL-MC: SERIAL: inside loaded skill text (not assistant) does not excuse -> block
+  PASS  SERIAL-MC: quoting the SERIAL: <template> is not a reason -> block
+  PASS  SERIAL-MC: dispatch text quoted inside a tool_result (escaped) is not a dispatch -> silent
+  PASS  SERIAL-MC: reason line, then 3 more solo agents dispatched AFTER it -> block
+  PASS  SERIAL-MC: 3 solo agents, then a SERIAL: reason line after them -> silent
+  PASS  SERIAL-MC: reason line, then only 2 solo agents after it -> silent
+  PASS  LEGWORK: 10 Bash calls in one turn, no Agent -> block naming the legwork budget
+  PASS  LEGWORK: second stop same session is silent (marker)
+  PASS  LEGWORK: 10 Bash calls + 1 Agent call same turn -> silent
+  PASS  LEGWORK: two turns of 2 Bash calls each -> silent (each turn under threshold)
+  PASS  LEGWORK: sidechain-only Bash calls over threshold -> silent (sidechain excluded)
+  PASS  LEGWORK: AIOS_LEGWORK_THRESHOLD=5 fires on 6 calls
+  PASS  LEGWORK: AIOS_LEGWORK_THRESHOLD=abc falls back to default 10 (6 calls stays silent)
+  PASS  LEGWORK: AIOS_LEGWORK_DISABLE=1 stays silent even on a 10-call violation
+  PASS  LEGWORK: cwd containing worktrees-agent -> silent (treated as a subagent session)
+  PASS  LEGWORK: first transcript line isSidechain:true -> silent (session treated as a subagent's own)
+  PASS  LEGWORK: realistic tool_use/tool_result interleaving still blocks
+  PASS  LEGWORK: violation in a non-final turn (2 clean turns after it) still blocks
+  PASS  LEGWORK: >40MB transcript, real first line isSidechain:true -> silent
+  PASS  maker project, pending check, no ScheduleWakeup -> block naming /maker continue
+  PASS  maker: second stop still blocks (budget is 3, not 1)
+  PASS  same backlog + ScheduleWakeup called -> silent
+  PASS  qa/.paused present -> silent (the user's pause beats the gate)
+  PASS  verdict landed but manifest never flipped -> block (PASS not closed out)
+  PASS  queue TODO row only (no manifests) -> block (1 queue row)
+  PASS  config edited, no auditor -> block naming aios-config-auditor
+  PASS  config block fires once per session (marker)
+  PASS  config edited + auditor run after -> silent
+  PASS  auditor run BEFORE the config edit does not count -> block
+  PASS  ordinary non-config edits never trip the config gate
+  PASS  hook .ps1 edit -> review block first
+  PASS  hook .ps1 edit -> config block on the next stop (not swallowed by review)
+  PASS  Bash-mediated config edit (sed -i) -> block
+  PASS  PowerShell Set-Content on a config file -> block
+  PASS  reading a config file (grep, 2>&1) does NOT demand an audit
+  PASS  naming the auditor in prose does NOT satisfy the gate
+  PASS  the user typing /aios-config-auditor DOES satisfy the gate
+  PASS  config path with trailing shell noise -> blocks
+  PASS  ...and names guard.ps1 without dragging in [IO.Path or C:\Users\Lenovo\AppData\Local\Temp\aios-hook-fixtures-43c7a33e
+  PASS  backslash .claude rules *.md edit -> config block (REVIEW ignores .md)
+  PASS  backslash .claude hooks *.ps1 edit -> review block first
+  PASS  backslash .claude hooks *.ps1 edit -> config block on the next stop
+  PASS  backslash path via PowerShell Set-Content -> config block
+== precompact-snapshot.ps1 ==
+  PASS  NON-git cwd writes a .md snapshot (regression: EAP=Stop + git stderr)
+  PASS  non-git snapshot says so
+  PASS  git cwd (no commits, dirty) writes snapshot with branch + dirty file
+== config-protection.ps1 ==
+  PASS  settings.json -> ask
+  PASS  ordinary file -> silent
+  PASS  Lab root owns it -> silent (no double prompt)
+== external-skill-guard.ps1 (project-level; fails CLOSED by design) ==
+  PASS  benign Write parses and passes (regression: ConvertFrom-Json -Depth threw on PS 5.1 -> exit 2 blocked every tool)
+  PASS  benign Bash passes
+powershell.exe : External skill guard blocked this action:
+At line:5 char:6
++ $o = & powershell -NoProfile -File D:\ai_os\.claude\hooks\tests\hook- ...
++      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (External skill ...ed this action::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+- This write into .claude/skills promotes quarantined or externally-sourced content. Run /external-skill-intake, record the review, then promote the reviewed copy.
+Use /external-skill-intake and the quarantine path first.
+  PASS  unsafe skill write is blocked (exit 2)
+  PASS  first-party skill edit passes (regression: blanket block froze all skill work)
+External skill guard blocked this action:
+- This write into .claude/skills promotes quarantined or externally-sourced content. Run /external-skill-intake, record the review, then promote the reviewed copy.
+Use /external-skill-intake and the quarantine path first.
+  PASS  promotion straight from quarantine is blocked (exit 2)
+== lab-session-start.ps1: non-ASCII content must survive the OEM-codepage stdout (0x1a bug, 2026-09-05) ==
+  PASS  lab-session-start under chcp 437: no raw control bytes in stdout
+  PASS  lab-session-start under chcp 437: stdout is valid JSON with → escaped
+== evaluate-due-session-start.ps1 ==
+  PASS  fresh/old stamp -> valid JSON or silent
+  PASS  token diet: before due date -> silent
+  PASS  token diet: due, no stamp -> TOKEN DIET CHECK DUE (valid JSON, names token_scan.py)
+  PASS  token diet: stamped -> silent
+== aios-write-guard.ps1 ==
+  PASS  DECISIONS.md is DENIED (append-only wall)
+  PASS  Lab .claude/settings.json asks
+  PASS  Lab .claude/CLAUDE.md asks
+  PASS  Lab .claude/rules/* asks
+  PASS  Lab scripts/append_decision.ps1 asks
+  PASS  ISS-165 nested .claude/hooks/*.ps1 asks
+  PASS  ISS-165 nested .claude/settings.json asks
+  PASS  ISS-165 nested .claude/CLAUDE.md asks
+  PASS  I2 decision independent of parent existence
+  PASS  ordinary source is silent
+  PASS  file with only a .test sibling is silent
+  PASS  a manifest/doc is silent
+  PASS  drift foo_v2.ts beside foo.ts asks
+  PASS  drift foo-v2.ts beside foo.ts asks
+  PASS  solo7.ts with no solo.ts is silent
+  PASS  .work/run2.py silent even beside run.py
+  PASS  ISS-172 dot-dot spelling is DENIED
+  PASS  ISS-172 dot spelling is DENIED
+  PASS  ISS-172 up-and-back spelling is DENIED
+  PASS  ISS-172 trailing-separator spelling is DENIED
+  PASS  ISS-173 non-.ps1 hook asks
+  PASS  ISS-173 hook in a subdirectory asks
+  PASS  non-Lab CLAUDE.md is silent (was ask)
+  PASS  non-Lab .claude/settings.json is silent (was ask)
+  PASS  non-Lab .claude/hooks/*.ps1 is silent (was ask)
+  PASS  non-Lab .claude/rules/* is silent (was ask)
+  PASS  maker: wakeup EARLIER but not in this turn -> block
+  PASS  maker: wakeup IN this turn -> silent
+  PASS  maker: blocks 3 times in one session
+  PASS  maker: 4th stop is silent (budget spent)
+  PASS  maker: no user boundary -> falls back, stays silent
+  PASS  maker: wakeup made, then a subagent returned -> still silent (the wakeup is still pending)
+  PASS  ISS-176 BOLDED '**Status:**' manifest is seen as pending
+  PASS  ISS-176 highest Cycle checked wins (not the first)
+  PASS  ISS-185 the middle-dot heading form is unreachable -> biases to PENDING, never closed
+  PASS  ISS-185 list-marker '- **Fix cycle:** 6' vs verdict 3 -> PENDING
+  PASS  ISS-192 a stamp quoted across a newline in a table cell is NOT a stamp
+  PASS  ISS-193 BOM-less UTF-8 heading form never reads as CLOSED
+  PASS  ISS-186 a FAIL verdict is not reported as PASS-not-closed-out (it is a fix-gap)
+  PASS  ISS-186 a PASS verdict IS reported as not closed out
+  PASS  ISS-205 a digit on the NEXT line is not adopted as the cycle
+  PASS  ISS-205 a digit ON the stamp line IS still read
+  PASS  ISS-205 an erased value cannot adopt a later digit on the same line
+  PASS  ISS-205 C7 Fix cycle does not adopt the next line's digit
+  PASS  ISS-205 the paren alternative is load-bearing
+  PASS  ISS-205 list-marker class + optional colon are load-bearing
+  PASS  ISS-205 clause 1 (no span): a bare label cannot reach the next line's digit
+  PASS  ISS-205 C7 (no span): Fix cycle cannot reach the next line's digit
+  PASS  ISS-205 a stamp inside a FENCED block is not a stamp
+  PASS  D-029 extended-length prefix cannot reach docs/DECISIONS.md
+  PASS  D-029 device-form prefix cannot reach docs/DECISIONS.md
+  PASS  D-029 forward-slash extended form cannot reach docs/DECISIONS.md
+  PASS  D-029 extended-length prefix still asks on an enforcement path in a Lab root
+  PASS  D-029 control: plain docs/DECISIONS.md still denies (no regression)
+  PASS  D-029 control: dot-dot spelling still denies (ISS-172 not regressed)
+  PASS  D-029 control: an ordinary source file is still silent (guard did not become paranoid)
+== delivery-gate-stop.ps1: fixgap, ISS-205 clause 3, ROUNDCAP + verdict reader ==
+  PASS  ISS-266/267 fixgap: a FAIL at the manifest's cycle is backlog (1 fix-gapped, 0 pending, 0 PASS not closed out)
+  PASS  ISS-266/267 fixgap control: a FAIL at an OLDER cycle is pending, not fix-gapped
+  PASS  ISS-266/267 fixgap control: a PASS at the cycle is 'not closed out', not fix-gapped
+  PASS  ISS-205 clause 3: a stamp inside an INDENTED (4 spaces) block is not a stamp (stays PENDING)
+  PASS  ISS-205 clause 3: a stamp inside an INDENTED (tab) block is not a stamp (stays PENDING)
+  PASS  ISS-205 clause 3: a stamp inside an ~~~ fence block is not a stamp (stays PENDING)
+  PASS  ISS-205 clause 3: a stamp inside an UNCLOSED ` fence block is not a stamp (stays PENDING)
+  PASS  ISS-205 clause 3 control: a 3-space-indented stamp is NOT code and is still read
+  PASS  ISS-205 clause 3 control: a CLOSED ~~~ fence ends at its closer, the real stamp after it is read
+  PASS  ISS-205 clause 3 control (CRLF): a CLOSED ~~~ fence in a CRLF verdict ends at its closer, the real stamp after it is read
+  PASS  ISS-205 clause 3 control: a CLOSED backtick fence ends at its closer, the real stamp after it is read
+  PASS  ROUNDCAP: 2 prior PASSes on the candidate's seam -> block naming the cap and the count
+  PASS  ROUNDCAP: fires once per session (second stop same session does not repeat the cap)
+  PASS  ROUNDCAP control: ONE prior PASS is under the cap (no cap block; the pending MAKER gate speaks instead)
+  PASS  ROUNDCAP control: a written 'Round cap:' class decision lifts the cap
+  PASS  ROUNDCAP control: 2 PASSes on a DIFFERENT seam do not cap this one
+  PASS  ROUNDCAP reader: a PASS written as a FENCED block (the checker's canonical result block) counts toward the cap
+  PASS  ROUNDCAP reader: a PASS written as a HEADING then bold token counts toward the cap
+  PASS  ROUNDCAP reader: a PASS written as a BOLD field with bold token counts toward the cap
+  PASS  ROUNDCAP reader control: FAIL verdicts are not prior PASSes
+  PASS  ROUNDCAP reader control: the word PASS mid-prose is not a result line
+  PASS  ROUNDCAP seam: a prior PASS with NO extractable seam does not make the predicate fail open (still capped)
+  PASS  ROUNDCAP seam: a one-path seam is matched whole-path, not as a substring (xx/a/b.ts is not a/b.ts)
+  PASS  ROUNDCAP seam control: the same one-path seam, exact match, IS capped
+== mc-sessionstart.ps1: resume/compact resets the MAKER block budget ==
+  FAIL  SessionStart source=resume deletes the session's maker.blocked marker (budget reset), exit 0  MAKER-CHECKER ACTIVE: substantive dev work routes through /maker (say 'normal' to opt out). Open issues: UNKNOWN (no ledger) | Checks pending: 0 | PASS not closed out: 0 | Queue TODO: 0 | Holds: 0 | Last tick: NEVER | Last sweep: NEVER | Ledger: qa/issues.jsonl
+  FAIL  SessionStart source=compact deletes the session's maker.blocked marker (budget reset), exit 0  MAKER-CHECKER ACTIVE: substantive dev work routes through /maker (say 'normal' to opt out). Open issues: UNKNOWN (no ledger) | Checks pending: 0 | PASS not closed out: 0 | Queue TODO: 0 | Holds: 0 | Last tick: NEVER | Last sweep: NEVER | Ledger: qa/issues.jsonl
+  PASS  SessionStart source=startup KEEPS the marker (only resume/compact reset the budget)
+  PASS  SessionStart source=clear KEEPS the marker (only resume/compact reset the budget)
+  FAIL  SessionStart reset uses the same sanitiser as the Stop hook (unsafe session id maps to the same marker name)  MAKER-CHECKER ACTIVE: substantive dev work routes through /maker (say 'normal' to opt out). Open issues: UNKNOWN (no ledger) | Checks pending: 0 | PASS not closed out: 0 | Queue TODO: 0 | Holds: 0 | Last tick: NEVER | Last sweep: NEVER | Ledger: qa/issues.jsonl
+  PASS  SessionStart resume with no marker present: exit 0 and the normal status line still prints
+  PASS  SessionStart reset e2e: with the 3-block budget spent, a pending unit does NOT block
+  FAIL  SessionStart reset e2e: after a resume the same session blocks again on the pending unit  
+== edit-in-place-guard.ps1 ==
+  PASS  EIP precondition: the fixture temp root is not itself under an allowlisted directory (else the control cannot ask)
+  PASS  EIP control: util_v2.py beside util.py in an ordinary directory asks
+  PASS  EIP allowlist: util_v2.py beside util.py under \qa\ is silent
+  PASS  EIP allowlist: util_v2.py beside util.py under \.goal\ is silent
+  PASS  EIP allowlist: util_v2.py beside util.py under \brainstorms\ is silent
+  PASS  EIP allowlist: util_v2.py beside util.py under \temp\claude\ is silent
+  PASS  EIP allowlist: util_v2.py beside util.py under \.playwright-mcp\ is silent
+  PASS  EIP allowlist: util_v2.py beside util.py under \.work\ is silent
+  PASS  EIP allowlist: util_v2.py beside util.py under \scratchpad\ is silent
+  PASS  EIP anchored: util_v2.py beside util.py under src\qa\ (not first-level) asks
+  PASS  EIP anchored: util_v2.py beside util.py under src\.goal\ (not first-level) asks
+  PASS  EIP anchored: util_v2.py beside util.py under src\brainstorms\ (not first-level) asks
+  PASS  EIP anchored: util_v2.py beside util.py under src\.work\ (not first-level) asks
+  PASS  EIP anchored: util_v2.py beside util.py under src\.playwright-mcp\ (not first-level) asks
+  PASS  EIP anchored: scratchpad and temp\claude still match at any depth (src\scratchpad\ is silent)
+  PASS  EIP anchored: scratchpad and temp\claude still match at any depth (src\temp\claude\ is silent)
+  PASS  EIP anchored: with no CLAUDE_PROJECT_DIR the hook input cwd is the root (src\qa\ asks)
+  PASS  EIP anchored: with the cwd as root, <root>\qa\util_v2.py is silent
+  PASS  EIP: a probe named run2.py (trailing digit, no sibling) is silent (the \d+ suffix rule was removed 2026-09-09)
+  PASS  EIP: patch18.py (trailing digits, no sibling) is silent
+  PASS  EIP heuristic 2 still alive: store_service.py beside store.py asks
+  PASS  EIP heuristic 1 still alive: store_new.py beside store.py asks
+  PASS  EIP: a non-source extension is always silent
+  PASS  EIP: the Edit tool (in-place) never asks
+  PASS  EIP: malformed input fails open (silent, exit 0)
+== lean arm: Stop-hook predicates (H1) ==
+  PASS  LEAN H1 SERIAL-MC: AIOS_LEAN unset, 3 solo agents -> block (unchanged)
+  PASS  LEAN H1 SERIAL-MC: AIOS_LEAN=1, same transcript -> silent
+  PASS  LEAN H1 LEGWORK: AIOS_LEAN unset, 12 Bash calls no Agent -> block (unchanged)
+  PASS  LEAN H1 LEGWORK: AIOS_LEAN=1, same transcript -> silent
+  PASS  LEAN H1 MAKER: AIOS_LEAN unset, pending check, no ScheduleWakeup -> block (unchanged)
+  PASS  LEAN H1 MAKER: AIOS_LEAN=1, same backlog + no ScheduleWakeup -> silent
+  PASS  LEAN H1: other predicates are NOT lifted (3 edits, nothing touched still blocks under AIOS_LEAN=1)
+  PASS  H3 Stop hook block: top-level decision+reason, no hookSpecificOutput
+  PASS  LEAN H6: early-exit path (stop_hook_active) traces lean=0
+  PASS  LEAN H6: predicate path (LEGWORK transcript) traces lean=0
+  PASS  LEAN H6: early-exit path (stop_hook_active) traces lean=1
+  PASS  LEAN H6: predicate path (LEGWORK transcript) traces lean=1
+  PASS  LEAN H6: empty-session-id early exit traces lean=1
+
+agent-model-default.ps1
+  PASS  AGENT-CONTEXT: real deliveryHandoff fixture built
+  PASS  AGENT-MODEL: no model defaults sonnet with expanded compact input
+  PASS  AGENT-MODEL: original UTF8 input fields preserved
+  PASS  AGENT-MODEL: verified rewrite never grants permission
+  PASS  AGENT-CONTEXT: UTF8 source preserved
+  PASS  AGENT-MODEL: opus without reason -> sonnet plus compact prompt
+  PASS  AGENT-MODEL: claude-opus-5-5 without reason -> sonnet plus compact prompt
+  PASS  AGENT-MODEL: inherit without reason -> sonnet plus compact prompt
+  PASS  AGENT-MODEL: downgrade note no longer lists 'multi-file build unit' as a valid OPUS reason (2026-10-17)
+  PASS  AGENT-MODEL: explicit opus preserved with expanded prompt
+  PASS  AGENT-MODEL: explicit opus grants no permission
+  PASS  AGENT-MODEL: explicit inherit preserved with expanded prompt
+  PASS  AGENT-MODEL: explicit inherit grants no permission
+  PASS  AGENT-MODEL: explicit haiku preserved with expanded prompt
+  PASS  AGENT-MODEL: explicit haiku grants no permission
+  PASS  AGENT-MODEL: explicit sonnet preserved with expanded prompt
+  PASS  AGENT-MODEL: explicit sonnet grants no permission
+  PASS  LEAN H2: Explore, no model -> haiku
+  PASS  LEAN H5: description starts READ:, no model -> sonnet (READ: route removed)
+  PASS  LEAN H5: Task tool with READ: -> sonnet (READ: route removed)
+  PASS  LEAN H2: ordinary call, no model -> still sonnet
+  PASS  LEAN H5: READ: in the middle of a description -> sonnet
+  PASS  LEAN H5: subagent_type 'explore' is not exactly Explore -> sonnet (case-sensitive)
+  PASS  LEAN H5: subagent_type 'EXPLORE' is not exactly Explore -> sonnet (case-sensitive)
+  PASS  LEAN H5: subagent_type 'Explore ' is not exactly Explore -> sonnet (case-sensitive)
+  PASS  LEAN H5: subagent_type 'ExploreX' is not exactly Explore -> sonnet (case-sensitive)
+  PASS  LEAN H5: Explore with a READ: description -> haiku (Explore alone decides)
+  PASS  LEAN H2: explicit sonnet on Explore is never overridden
+  PASS  LEAN H2: explicit haiku kept
+  PASS  LEAN H2: opus without OPUS: on Explore -> sonnet (downgrade rule untouched, not haiku)
+  PASS  LEAN H2: OPUS: escalation on Explore left alone
+  PASS  LEAN H2 off-arm: AIOS_LEAN unset, Explore -> sonnet (no haiku route)
+  PASS  LEAN H5 off-arm: AIOS_LEAN unset, READ: -> sonnet
+  PASS  LEAN H2 off-arm: unset arm opus downgrade unchanged
+  PASS  H3 agent-model-default: rewrite path emits hookEventName=PreToolUse and nothing but hookSpecificOutput
+  PASS  H3 agent-model-default: catch/deny path emits hookEventName=PreToolUse
+  PASS  H3 agent-model-default: Codex deny (helper-forwarded) emits hookEventName=PreToolUse
+  PASS  H3 agent-model-default: Codex allow (helper-forwarded) emits hookEventName=PreToolUse
+  PASS  H3 agent-model-default: malformed-event deny emits hookEventName=PreToolUse
+  PASS  AGENT-CONTEXT: Task supported with all fields preserved
+  PASS  AGENT-CONTEXT: raw or invalid reference denied
+  PASS  AGENT-CONTEXT: raw or invalid reference denied
+  PASS  AGENT-CONTEXT: raw or invalid reference denied
+  PASS  AGENT-CONTEXT: unrelated tool unchanged
+  PASS  CODEX-CONTEXT: spawn_agent V1 configured model preserved and fresh fork
+  PASS  CODEX-CONTEXT: collaboration.spawn_agent V1 configured model preserved and fresh fork
+  PASS  CODEX-CONTEXT: collaboration/spawn_agent V1 configured model preserved and fresh fork
+  PASS  CODEX-CONTEXT: collaborationspawn_agent V1 configured model preserved and fresh fork
+  PASS  CODEX-CONTEXT: V2 fresh fork without Claude model policy
+  PASS  CODEX-CONTEXT: followup target and interrupt preserved
+  PASS  CODEX-CONTEXT: collaboration.followup_task target preserved
+  PASS  CODEX-CONTEXT: collaboration/send_message target preserved
+  PASS  CODEX-CONTEXT: collaborationfollowup_task target preserved
+  PASS  CODEX-CONTEXT: collaborationsend_message target preserved
+  PASS  CODEX-CONTEXT: raw spawn denied
+  PASS  CODEX-CONTEXT: collaborationspawn_agent opaque message denied
+  PASS  CODEX-CONTEXT: collaborationfollowup_task opaque message denied
+  PASS  CODEX-CONTEXT: collaborationsend_message opaque message denied
+  PASS  CODEX-CONTEXT: unrelated flattened suffix unchanged
+  PASS  AGENT-GATE: stub hook copy points at the stub helper
+  PASS  AGENT-GATE: verified COMPACT_HANDOFF rewrite -> allow with the rewritten message
+  PASS  AGENT-GATE: allow output carries only hookEventName, permissionDecision, updatedInput (stray helper fields dropped)
+  PASS  AGENT-GATE: helper says allow but the original was not a COMPACT_HANDOFF reference -> deny, never allow
+  PASS  AGENT-GATE: COMPACT_HANDOFF with trailing text -> deny, never allow
+  PASS  AGENT-GATE: helper returned the message unrewritten -> deny, never allow
+  PASS  AGENT-GATE: rewrite lacks the managed marker -> deny, never allow
+  PASS  AGENT-GATE: spawn_agent with an unverified original never reaches allow
+  PASS  AGENT-GATE: collaboration.spawn_agent with an unverified original never reaches allow
+  PASS  AGENT-GATE: collaborationfollowup_task with an unverified original never reaches allow
+  PASS  AGENT-GATE: collaborationsend_message with an unverified original never reaches allow
+  PASS  AGENT-GATE: non-agent tool gives no decision
+  PASS  AGENT-CONTEXT: malformed event denied
+  PASS  AGENT-CONTEXT: missing helper executable fails closed
+  PASS  AGENT-CONTEXT: hung helper denied before installed 10s timeout
+== mc-sessionstart.ps1 + delivery-gate-stop.ps1: policy .4 ==
+  PASS  SS: open issues only, fresh tick+sweep -> no AUTO-CONTINUE
+  PASS  SS: open issues still printed in the status line
+  PASS  SS: open issues only, NO tick/sweep -> no AUTO-CONTINUE (goal met is not re-woken)
+  PASS  SS: TODO rows inside Candidates are not counted (Queue TODO: 0)
+  PASS  SS: Candidates-only queue -> no AUTO-CONTINUE
+  PASS  SS: TODO rows outside Candidates still counted (3: before + after the section)
+  PASS  SS: real queue TODO, no tick/sweep -> AUTO-CONTINUE (backlog still wakes)
+  PASS  SS: real queue TODO + stale sweep (fresh tick) -> AUTO-CONTINUE
+  PASS  STOP: TODO rows inside Candidates (table + checkbox) -> not counted, silent
+  PASS  STOP: TODO rows outside Candidates still counted (3 queue rows)
+  PASS  SS: Candidates ends at an H1 ('###' stays inside): only the row after '# Notes' counts
+  PASS  STOP: Candidates ends at an H1, the row after it blocks (1 queue row)
+  PASS  SS: HOLD line + no fresh tick -> AUTO-CONTINUE
+  PASS  SS: status line prints Holds: 1 (the HOLD inside Candidates is not counted)
+  PASS  SS: HOLD line + fresh tick+sweep -> no AUTO-CONTINUE (same as a TODO row)
+  PASS  STOP: HOLD line blocks like a TODO row (1 queue row)
+  PASS  SS: HOLD lines only inside Candidates -> Holds: 0, no AUTO-CONTINUE
+  PASS  STOP: HOLD lines only inside Candidates -> silent
+  PASS  SS: pending handshake, fresh tick+sweep -> AUTO-CONTINUE under the new $backlog
+  PASS  SS: unclosed PASS, fresh tick+sweep -> AUTO-CONTINUE
+  PASS  SS: bare 'Status:' lines count (vc t-052 + hei-sweep pending = 2, vc t-051 PASS not closed out = 1)
+  PASS  SS: a closing '## Status: checked-PASS', a fenced and a quoted bare line are NOT counted
+  PASS  STOP: bare 'Status:' pending units reach the MAKER predicate (2 check(s) pending)
+  PASS  SS: list-marker '- **Status:**' lines count (erp shape pending = 1, last-list-line-wins PASS not closed out = 1)
+  PASS  SS: list-marker negatives (closing line, a later STALLED, table row, prose) are NOT counted
+  PASS  STOP: list-marker pending units reach the MAKER predicate (1 check(s) pending)
+== lean arm: mc-sessionstart.ps1 (H7) ==
+  PASS  LEAN H7: AIOS_LEAN unset -> no LEAN ARM line
+  PASS  LEAN H7: AIOS_LEAN=1 -> exact LEAN ARM ACTIVE line
+  PASS  LEAN H7: AIOS_LEAN=1 output = unset output + exactly that one line
+  PASS  LEAN H7: AIOS_LEAN='0' (not exactly 1) -> output identical to unset
+  PASS  LEAN H7: AIOS_LEAN='true' (not exactly 1) -> output identical to unset
+  PASS  LEAN H7: AIOS_LEAN='11' (not exactly 1) -> output identical to unset
+  PASS  LEAN H7: AIOS_LEAN=' 1' (not exactly 1) -> output identical to unset
+  PASS  LEAN H7: AIOS_LEAN='' (not exactly 1) -> output identical to unset
+
+4 FAILED
+

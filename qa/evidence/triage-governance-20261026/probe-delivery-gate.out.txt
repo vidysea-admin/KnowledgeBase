@@ -1,0 +1,13 @@
+﻿A035913-001 canonical-only         blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+A035913-001 control legacy         blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+A035913-003 prose seam             blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+A035913-003 control backticked     blocked=True cap=True :: 
+ISS-184 bullet (expect 0 pending)  blocked=True cap=False :: 0 check(s) pending, 1 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+ISS-184 heading (expect 0 pending) blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+ISS-205(a) expect pending          blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+ISS-205(b) expect pending          blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+ISS-205(c) expect pending          blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+ISS-227 expect pending             blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+ISS-228 expect pending             blocked=True cap=False :: 1 check(s) pending, 0 PASS not closed out, 0 queue row(s), 0 fix-gapped handshake(s) - a non-PASS verdict at the manifest\u0027s current c
+temp=C:\Users\Lenovo\AppData\Local\Temp\triage-probe-460bc68c
+
