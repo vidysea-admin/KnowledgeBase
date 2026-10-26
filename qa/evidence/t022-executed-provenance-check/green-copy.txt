@@ -1,0 +1,11 @@
+✔ executed provenance binds local router adapters parser barrel lock resolver and runtime (1085.3554ms)
+✔ executed provenance predecessor consumer refuses stale missing runtime or after-run bindings (50.3412ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1583.8005
+c5 green exit=0
