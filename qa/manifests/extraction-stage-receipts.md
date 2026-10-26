@@ -1,7 +1,7 @@
 # Extraction stage receipts
 
-Status: ready-for-check
-Handshake status: ready-for-check
+Status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/extraction-stage-receipts.md
+Handshake status: checked-PASS — closed out 2026-10-26 by maker resume, citing qa/verdicts/extraction-stage-receipts.md
 Fix cycle: 0
 Candidate ID: sha256:e643ea586eb60cb67c979538244ef1c34cb89ac6ee2a68232ca13ada87b26899
 Candidate inventory: qa/packets/extraction-stage-receipts.candidate-inventory.txt
