@@ -1,0 +1,5 @@
+   × individual extraction gold review > shows CAS/source refusal without advancing coverage or preserving affirmation 118ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+Error: expect(element).not.toBeChecked()
+      Tests  1 failed | 8 passed (9)
+exit=1

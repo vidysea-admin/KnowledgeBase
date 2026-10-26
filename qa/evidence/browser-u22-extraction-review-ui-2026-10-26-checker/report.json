@@ -1,0 +1,10 @@
+{"unit":"u22-extraction-review-ui","date":"2026-10-26","browser":"Google Chrome headless (own process, CDP, fresh profile, killed after)","note":"Playwright MCP was held by another session (hunt-profile) and the claude-in-chrome extension was not connected, so the checker drove its own headless Chrome over CDP. API side: the REAL createExtractionReviewRouter + requireAuth + createReviewAdapters policy with an in-memory CAS store (synthetic data, no corpus). Web side: the real ExtractionReviewPage served by vite from a throwaway copy.",
+"driver":"qa/evidence/u22-extraction-review-ui-checker/modeD-cdp-driver.mjs","server":"qa/evidence/u22-extraction-review-ui-checker/modeD-mock-store-server.ts",
+"results":{
+"render":{"candidateLiteral":"Fictional candidate 0 <b>not bold</b>","boldElements":0,"nativeLabelInitial":"","saveDisabled":true,"coverage":"0/2 item reviews stored"},
+"amend":{"affirmedBefore":true,"affirmAfterRationaleAmend":false,"saveDisabled":true},
+"save":{"coverage":"1/2 item reviews stored","labelResetToUnset":true,"storedLine":"Stored label: {\"supported\":false} . Amended reason . trusted-human","auditDetailsShown":true,"serverBody":{"expectedRevision":0,"inputSha256":"1111...","label":{"supported":false},"affirmIndividualReview":true,"rationale":"Amended reason"},"serverActor":"trusted-human (server-derived, not in request)"},
+"casRefusal":{"alert":"HTTP 409 Your judgment was not accepted.","coverageBeforeAfter":"1/2 -> 1/2","affirmAfterRefusal":false,"labelAfterItemSwitch":""},
+"export":{"download":"extraction-reviewed-2-of-2.json (Blob 435 bytes, format extraction-authorized-export-v1)","coverageText":"2/2 reviewed; 0 pending. This export does not establish full gold or accepted thresholds.","remainingGateShown":true},
+"automationKey":{"alert":"HTTP 403","sourceTextLeaked":false},
+"consoleErrors":0}}

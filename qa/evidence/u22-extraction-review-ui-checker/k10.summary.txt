@@ -1,0 +1,6 @@
+✖ actual auth and shared human policy gate authoritative review/export (82.6144ms)
+✖ failing tests:
+✖ actual auth and shared human policy gate authoritative review/export (82.6144ms)
+    actual: 200,
+    expected: 403,
+exit=1
