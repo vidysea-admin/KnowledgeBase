@@ -67,3 +67,6 @@ data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/claims.json  text e
 data/toc-migrated/2026-08-24-uniaccess-leeds-arts-university/turns.json  text eol=crlf
 data/toc-migrated/2026-08-27-in-focus-4/claims.json  text eol=crlf
 data/toc-migrated/2026-08-27-in-focus-4/turns.json  text eol=crlf
+
+# Preserve the independently approved recovery review bytes across Windows/Linux checkouts.
+data/eval/extraction-reconciliation-reviewed.json  text eol=crlf
