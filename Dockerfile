@@ -40,6 +40,7 @@ RUN pnpm install --frozen-lockfile --prod --filter "@lkb/api..."
 
 FROM deps AS web-build
 COPY apps/web ./apps/web
+COPY packages/ingest/src/join-policy ./packages/ingest/src/join-policy
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN pnpm --filter @lkb/web build

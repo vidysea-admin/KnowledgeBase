@@ -7,9 +7,9 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { chmodSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { delimiter, dirname, join } from "node:path";
+import { delimiter, dirname, join, posix } from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -77,4 +77,23 @@ test("API precreates node-owned join-rules state before non-root runtime", () =>
   assert.match(command, /\/var\/lib\/lkb\/hosting/);
   assert.match(command, /\/var\/lib\/lkb\/counsellor/);
   assert.match(command, /&& chown -R node:node \/var\/lib\/lkb$/);
+});
+
+test("web-build copies the frontend policy and its complete relative dependency closure before build", () => {
+  const stage = DOCKERFILE.split("FROM deps AS web-build")[1]?.split(/^FROM /m)[0];
+  assert.ok(stage, "web-build stage exists");
+  const command = stage.indexOf("RUN pnpm --filter @lkb/web build");
+  assert.ok(command >= 0, "web build command exists");
+  const copies = [...stage.slice(0, command).matchAll(/^COPY (\S+) (\S+)$/gm)].map(m => [m[1], m[2].replace(/^\.\//, "")]);
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+  const pending = ["packages/ingest/src/join-policy/join-rules.ts"], seen = new Set();
+  while (pending.length) {
+    const file = pending.pop();
+    if (seen.has(file)) continue;
+    seen.add(file);
+    assert.ok(copies.some(([source, target]) => (file === target || file.startsWith(target + "/")) && existsSync(join(root, source, file.slice(target.length)))), "web-build source missing: " + file);
+    const content = readFileSync(join(root, file), "utf8");
+    for (const match of content.matchAll(/\bfrom\s+["'](\.[^"']+)["']/g)) pending.push(posix.normalize(posix.join(posix.dirname(file), match[1].replace(/\.js$/, ".ts"))));
+  }
+  assert.equal(seen.size, 5, "complete existing pure policy closure inspected");
 });

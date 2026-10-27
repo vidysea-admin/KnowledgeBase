@@ -1,6 +1,6 @@
 import test, {mock} from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtempSync, mkdirSync, writeFileSync, rmSync} from 'node:fs';
+import {mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync, readFileSync, readdirSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {register} from 'tsx/esm/api';
@@ -176,3 +176,21 @@ test('uncertain acquired time persists a refusal on old approved rows and never 
     const selected=selectAutoRecordItems({calendarEvents:[],candidates:[{...yearless,id:'yearless',title:yearless.subject,status:'approved'}],now:'2026-10-27T19:00:00Z',leadMinutes:5,trustedSenders:{emails:[],domains:[]},alreadyScheduled:[]});assert.equal(selected.toSchedule.length,0);
   } finally {mock.timers.reset();}
 });
+
+test('remote snapshots bind rotated and revoked credentials, keep readOnly pure, and tolerate persistence failure',()=>fixture(async f=>{
+  const {joinRulesFilePath}=await import('../../../packages/meeting-bot/src/calendar/join-rules/join-rules-store.ts');
+  let behavior='good',alerts=0,recoveries=0;const logs=[];
+  const config={mode:'last-valid',tenantId:'fixture',keyTenantId:'fixture',stateDir:join(f.root,'cache-test'),now:()=>1000000,log:m=>logs.push(m),onDegraded:()=>{alerts++;},onHealthy:()=>{recoveries++;},remote:{url:'https://policy.example.test',apiKey:'original-test-key',fetch:async()=>{
+    if(behavior==='offline')throw new TypeError('offline',{cause:{code:'ECONNREFUSED'}});
+    return new Response(JSON.stringify(remoteDocument),{status:behavior==='revoked'?401:200,headers:{'X-LKB-Tenant':'fixture','ETag':'"fixture"'}});
+  }}};
+  const cached=joinRulesFilePath(config.stateDir,'fixture').replace(/\.json$/,'.remote.json');
+  assert.equal((await enforceJoinRules(remoteSelection,config)).skipped[0].reason,'rule-denied');assert.equal(recoveries,1);assert.equal(existsSync(cached),true);assert.doesNotMatch(readFileSync(cached,'utf8'),/original-test-key|rotated-test-key/);
+  config.remote.apiKey='rotated-test-key';behavior='offline';assert.equal((await enforceJoinRules(remoteSelection,config)).skipped[0].reason,'rules-unevaluable','a different credential cannot use the previous credential snapshot');
+  config.remote.apiKey='original-test-key';behavior='revoked';assert.equal((await enforceJoinRules(remoteSelection,config)).skipped[0].reason,'rules-unevaluable');assert.equal(existsSync(cached),false);
+  behavior='offline';assert.equal((await enforceJoinRules(remoteSelection,config)).skipped[0].reason,'rules-unevaluable','known revocation cannot recover from stale cache');assert.ok(alerts>=3);
+  let dryAlerts=0,dryHealthy=0;const dry={...config,stateDir:join(f.root,'dry-test'),readOnly:true,onDegraded:()=>{dryAlerts++;},onHealthy:()=>{dryHealthy++;}};
+  behavior='good';assert.equal((await enforceJoinRules(remoteSelection,dry)).skipped[0].reason,'rule-denied');behavior='offline';assert.equal((await enforceJoinRules(remoteSelection,dry)).skipped[0].reason,'rules-unevaluable');assert.equal(existsSync(dry.stateDir),false);assert.equal(dryAlerts,0);assert.equal(dryHealthy,0);
+  const full={...config,stateDir:join(f.root,'blocked-test')},blocked=joinRulesFilePath(full.stateDir,'fixture').replace(/\.json$/,'.remote.json');mkdirSync(blocked,{recursive:true});const healthyBefore=recoveries;behavior='good';
+  assert.equal((await enforceJoinRules(remoteSelection,full)).skipped[0].reason,'rule-denied','current authenticated policy still enforced when snapshot persistence fails');assert.equal(recoveries,healthyBefore);assert.ok(logs.some(m=>m.includes('remote snapshot not persisted')));assert.deepEqual(readdirSync(join(blocked,'..')),['fixture.remote.json']);
+}));
