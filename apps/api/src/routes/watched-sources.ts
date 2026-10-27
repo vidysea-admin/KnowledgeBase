@@ -65,6 +65,7 @@ export interface WatchedSourceDeps {
    * re-derived or re-defaulted here, or a watcher could show healthy on this page and silent on
    * `/health` at the same instant. */
   heartbeatIntervalMs?: number;
+  workerHealth?(tenantId: string): Promise<import("./calendar.js").CalendarWorkerHealth>;
 }
 
 const TIERS = new Set(["official", "community", "blog"]);
@@ -158,7 +159,13 @@ export function createWatchedSourcesRouter(deps: WatchedSourceDeps): Router {
       deps.listHeartbeats(tenantId),
     ]);
     const heartbeats: HeartbeatStatus[] = heartbeatStatuses(tenantId, heartbeatRows, new Date(), deps.heartbeatIntervalMs);
-    res.status(200).json({ state, heartbeats });
+    const publicState = state.filter(row => row.tenantId === tenantId && row.workerSnapshot === undefined && row.workerReceipt === undefined && !row.sourceId.startsWith("worker-snapshot:")).map(row => {
+      const {_id, tenantId, sourceType, sourceId, status, seenAt, ingestedAt, failedAt, failureReason, sessionId} = row;
+      return {_id, tenantId, sourceType, sourceId, status, seenAt, ingestedAt, failedAt, failureReason, sessionId};
+    });
+    res.setHeader("Cache-Control", "private, no-store");
+    const worker = deps.workerHealth ? await deps.workerHealth(tenantId) : undefined;
+    res.status(200).json({ state: publicState, heartbeats, ...(worker ? {worker} : {}) });
   });
 
   return router;

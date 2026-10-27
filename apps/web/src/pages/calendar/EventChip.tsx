@@ -32,9 +32,10 @@ export function EventChip(props: EventChipProps): React.ReactElement {
       data-event-kind={event.kind}
       aria-label={`${event.kind}: ${event.title}, ${formatTimeRange(event)}`}
       aria-pressed={selected}
+      title={event.title}
       onClick={() => props.onSelect(event.id)}
       style={{
-        display: "block", width: "100%", textAlign: "left", cursor: "pointer",
+        display: "block", width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box", textAlign: "left", cursor: "pointer",
         background: colors.bg, color: colors.ink,
         border: `1px solid ${colors.border}`,
         borderLeft: `3px solid ${colors.border}`,

@@ -125,3 +125,16 @@ describe("approval / opt-out inputs and confirmation text", () => {
     expect(d.length).toBeGreaterThan(s.length);
   });
 });
+
+
+test("purpose fields survive GET, draft editing and request preview without silent loss", () => {
+  const view = {ruleSet:{...set([rule("purpose", {titleIncludes:["career"], descriptionIncludes:["students"], purposeAny:["career"]})]), attendanceMode:"rules", purposeGroups:[{id:"career", titleIncludes:["planning"], descriptionIncludes:["college"]}]}, state:{approvedSenders:[], approvedDomains:[], optedOutEventIds:[], optedOutMeetings:["url:meet:abc-defg-hij"]}};
+  const parsed = parseView(view)!;
+  expect(parsed).toEqual(view);
+  expect(ruleSetFromDraft(draftFromRuleSet(parsed.ruleSet))).toEqual(view.ruleSet);
+  expect(validateRuleSetClient(view.ruleSet as RuleSet)).toEqual([]);
+  expect(validateRuleSetClient({...view.ruleSet, attendanceMode:"invalid"} as unknown as RuleSet).length).toBeGreaterThan(0);
+  expect(parseView({...view, ruleSet:{...view.ruleSet, purposeGroups:[]}})).toBeNull();
+  expect(parseView({...view, ruleSet:{...view.ruleSet, rules:[rule("bad", {titleIncludes:[]})]}})).toBeNull();
+  expect(parseView({...view, ruleSet:{...view.ruleSet, rules:[rule("bad", {descriptionIncludes:["x".repeat(161)]})]}})).toBeNull();
+});

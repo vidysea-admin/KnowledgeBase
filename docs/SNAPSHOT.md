@@ -65,6 +65,8 @@ a client of that API — with the long-range goal of beating top human counsello
   - `qa/watch/`
 - `raw/` — Data and source repos
   - `raw/TOC/`
+- `references/`
+  - `references/portals/`
 - `schema/` — JSON Schemas + fixtures + Python validator
   - `schema/fixtures/`
 - `scripts/`
@@ -114,7 +116,7 @@ a client of that API — with the long-range goal of beating top human counsello
 | knowledge_collections | _id, tenantId, title, members, revision, updatedAt | no |
 | knowledge_outputs | _id, tenantId, kind, title, purpose, sessionIds, revision, createdAt, updatedAt, sourceDigest, provider, model, reviewState, sections, citations, sourceCoverage | no |
 | media | _id, tenantId, sourceRef, kind, retention | no |
-| meeting_candidates | _id, tenantId, messageId, subject, senderEmail, senderDomain, status, detectedAt | no |
+| meeting_candidates | _id, tenantId, messageId, subject, senderEmail, senderDomain, status, detectedAt | yes |
 | operations_schedules | _id, tenantId, kind, revision, enabled, intervalHours, nextRunAt, lastAttemptAt, lastSuccessAt, lastResult, lastErrorCode, runId, leaseToken, leaseUntil, audit | no |
 | orgs | _id, tenantId, name | no |
 | programs | _id, tenantId, name | no |

@@ -2547,3 +2547,25 @@ fourth would have left real decisions idle behind an unrelated unit.
 - apps/web/src/api/types.ts
 **Approved-by:** Umesh (verbatim quote in What)
 **Links:** T-043, D-190, apps/api/src/routes/ask/ask.ts, packages/ask/src/answer.ts, qa/manifests/w27-dropsentences.md
+
+## D-192 | 2026-10-27 | type: decision | status: ACTIVE
+**Title:** Implement the approved cross-host Calendar and meeting-bot operational completion
+**What:** Umesh explicitly instructed "PLEASE IMPLEMENT THIS PLAN" on 2026-10-27 and clarified the final target is the live hosted project with visible-browser validation. Implement C1-C8 in qa/manifests/calendar-bot-operational-completion.md under the independent plan approval qa/verdicts/calendar-bot-operational-completion.plan-r2.md. Windows retains Google credentials and capture; authenticated owner-bound snapshots connect discovery, rules and operation status to the hosted API. Initial explicit all-join test mode includes confirmed unanswered invitations, excludes declined/cancelled/unsafe links and preserves existing legacy defaults when absent. No per-meeting approval is introduced. Purpose phrase rules and timezone/capture/runtime repairs are included.
+**Why:** The real local Calendar adapter returns eleven upcoming events while the hosted Calendar is unavailable, local worker/task is absent, hosted operations reads a local file, and rules/privacy/runtime gaps prevent the approved operational flow.
+**Result:** Authorizes the existing schema/type, code and test changes listed below, in the isolated codex/calendar-bot-completion worktree. Implementation acceptance is not claimed; actual results and remaining parent gates stay in the manifest and independent verdicts. Production data repair/promotion, irreversible sending and activation without genuine AV proof remain excluded. Hosted rollout is authorized delivery scope subject to required verification and actual host access.
+**Changes-authorized:**
+- schema/watch_state.schema.json, schema/watch_heartbeat.schema.json, schema/api_keys.schema.json and their generated types; typed private snapshot staging and atomic active-key workerFence publication only
+- Existing API Calendar/operations/watch-store composition and scoped projections; existing worker, scheduler, rules, Gmail parser and Calendar UI functions/tests as owned in the manifest
+- TASKS.md and the parent manifest for truthful progress/evidence only
+- No ARCHITECTURE.md, contracts/, qa/contracts, AGENTS.md or enforcement-path change
+**Approved-by:** Umesh (explicit implementation request and hosted-target clarification in this chat)
+**Links:** T-036, T-037, T-038, T-039, T-051, T-052, T-053, T-054, T-056, T-057, T-060; qa/manifests/calendar-bot-operational-completion.md; qa/verdicts/calendar-bot-operational-completion.plan-r2.md
+
+## D-193 | 2026-10-27 | type: decision | status: ACTIVE
+**Title:** Recent meeting-only Gmail discovery and reusable exclusion feedback
+**What:** Umesh explicitly clarified in this chat: "saare mails nhi aanee chaiye aur meeting wale hi aane chaiye" and "office meeting wale nhi aayngee aur baaki bhi gradually it will learn"; also requested maximum useful parallel subagents. Continue the approved operational-completion feature in cycle1, repairing the canonical cycle0 defects and implementing recent bounded meeting-only discovery plus reusable operator feedback patterns. Office/internal meetings are excluded from Gmail and joining; complete Calendar inventory remains visible with skip state pending the user's explicit visibility answer.
+**Why:** The broad discovery query's 184 raw matches are not184 meetings; current UI imported general/office mail, and fresh reviewers found seven real integration gaps despite green selected tests.
+**Result:** Authorizes scoped existing code/type/test changes under qa/.delivery/requests/repair-cycle1-contract.md, with fresh independent delta-plan approval before new policy implementation. No raw mail bodies in shared snapshots; no inferred broad approval or new model/training pipeline. Parent live/capture/semantic gates remain open, no production repair/promotion or capture activation.
+**Changes-authorized:** Existing Gmail mapper, existing Calendar worker snapshot schema/generated type, acquisition loader/validator, runtime publisher, candidate store/routes, rules/control UI and corresponding existing tests. Add bounded sourceEvents/gmailSummary/evidenceIssue fields only within existing schema paths. No frozen contracts, ARCHITECTURE, AGENTS or enforcement-path changes.
+**Approved-by:** Umesh (explicit clarification and parallel-work request in this chat)
+**Links:** D-192; qa/manifests/calendar-bot-operational-completion.md; qa/.delivery/requests/repair-cycle1-contract.md

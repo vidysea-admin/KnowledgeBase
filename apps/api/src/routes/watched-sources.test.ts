@@ -376,3 +376,14 @@ test("U4d/R8: one tenant's watch-state read never returns another tenant's rows 
     await server.close();
   }
 });
+
+test("watch-state excludes private worker rows and uses an explicit metadata projection", async () => {
+  const base = {_id: "tenant-1:calendar:e", tenantId: "tenant-1", sourceType: "calendar" as const, sourceId: "e", status: "seen" as const, seenAt: new Date().toISOString()};
+  const rows = [{...base, arbitrarySecret: "never-public", description: "private-mail"},
+    {...base, _id: "private", workerSnapshot: {payload: "private-calendar-join-token"}},
+    {...base, _id: "receipt", workerReceipt: {keyId: "private-worker-key"}}];
+  const server = await startTestServer(buildTestDeps({keyStore: key(["sources"]), watchedSources: {...fakeWatchedSourceDeps(), ...fakeWatchStateReadDeps({"tenant-1": rows as unknown as WatchState[]})}}));
+  try { const response = await fetch(server.baseUrl+"/watch-state", {headers: {authorization: "Bearer ws-key"}});
+    assert.equal(response.status, 200); const body = await response.json() as {state: unknown[]}; assert.deepEqual(body.state, [base]);
+  } finally { await server.close(); }
+});

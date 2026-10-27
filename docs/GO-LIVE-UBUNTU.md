@@ -270,3 +270,27 @@ stay invisible and the next index run rewrites them.
 `git pull && docker compose build api web && docker compose up -d api web`.
 Roll back by checking out the previous commit and repeating. Migrations are not
 reversed by this.
+
+
+## D-192 cross-host Calendar and Gmail worker
+
+A hosted container cannot use the Windows Google CLI credentials. Deploying the code exposes the authenticated bridge; it does not configure or start its Windows worker.
+
+Set these names in the hosted compose environment (`.env`, not the optional hosting-only file):
+- `LKB_CALENDAR_WORKER_ENABLED=1`
+- `LKB_CALENDAR_WORKER_BINDINGS` to a JSON array of `{tenantId,keyId,account,hostId}`. Pin a deliberately issued active worker key, the connected Google account and the Windows host. The key must hold `calendar`, `gmail` and `operations:write`; do not grant these silently to existing keys.
+- `LKB_JOIN_RULES_ENABLED=1`. Compose persists the authoritative rules at `/var/lib/lkb/join-rules`.
+
+On the Windows worker set `LKB_TENANT_ID`, `LKB_API_URL=https://<host>/api`, the dedicated `LKB_API_KEY`, and the SAME `LKB_CALENDAR_WORKER_HOST_ID`. Google credentials remain on Windows. Start discovery without recording:
+
+```sh
+node scripts/webinar/run-pipeline.mjs --calendar-attendance-account umeshsugara@vidysea.com --discovery-only --watch
+```
+
+The loop polls every five minutes. Two missed cycles retain the inventory with a stale warning and hold new scheduling. A failed upload cannot renew old coverage. Calendar inventory starts at the verified Google Calendar's local day boundary; scan freshness uses actual acquisition time. Gmail defaults to the last 30 days, with bounded pagination and 10 body reads at once. Large messages are processed in bounded chunks; a content/link limit failure never becomes successful empty coverage.
+
+Choose `attendanceMode: all` explicitly in the existing Join Rules editor for initial all-join validation. Deny and opt-out take precedence. Recording still requires genuine audio/video proof, reviewed independent slots and an isolated work database. Discovery-only never invokes capture/readiness or registration submission. No test recording is promoted to counselling knowledge automatically.
+
+`POST /gmail/scan` retains its work-database fence. The web client now obtains the authenticated `X-LKB-Work-DB` binding before submitting it. A hosted app without an isolated scan database must report that missing configuration; never point a test scan at counselling production just to remove the error.
+
+CI code deployment, configured bridge, active Windows discovery, actual attendance and production data promotion are separate states. Verify the hosted Calendar against the SAME source snapshot after rollout; do not reuse an earlier event count after the source/window changes.

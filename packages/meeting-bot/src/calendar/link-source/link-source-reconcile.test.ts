@@ -6,7 +6,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { reconcileWebinarSources } from "../calendar-client.js";
 import { prepareWebinarSourceState, type WebinarCalendarAcquisition } from "../state/schedule-state.js";
-import { selectAutoRecordItems } from "../auto-join.js";
+import { selectAutoRecordItems, selectEventsToAutoJoin } from "../auto-join.js";
 
 const T1 = "2026-10-11T10:00:00.000Z", T2 = "2026-10-11T10:05:00.000Z", REV = "2026-09-30T10:00:00.000Z";
 const EMPTY = { emails: [], domains: [] };
@@ -113,4 +113,64 @@ test("persistence round trip: the stored source survives JSON serialisation and 
   const later = recon([], T2, JSON.parse(JSON.stringify(first.state)));
   assert.equal(storedSource(later), "location");
   assert.equal(select(later.calendarEvents as never).toSchedule.length, 0);
+});
+
+
+test("worker Calendar metadata survives reconciliation and scheduling for purpose rules", () => {
+  const description = "University admissions\nVisa guidance\tfor advisers";
+  const value = recon([ev(1, {description, status: "confirmed", responseStatus: "needsAction"})], T1);
+  assert.equal(value.calendarEvents[0]?.description, description);
+  assert.equal(value.calendarEvents[0]?.status, "confirmed");
+  assert.equal(value.calendarEvents[0]?.responseStatus, "needsAction");
+  assert.equal(select(value.calendarEvents as never).toSchedule[0]?.description, description);
+  const next = recon([ev(1, {description, status: "confirmed", responseStatus: "needsAction"})], T2, value.state);
+  assert.deepEqual(next.transitions, []);
+});
+
+test("worker Calendar metadata is bounded and rejects unknown authority fields", () => {
+  for (const extra of [{description: "x".repeat(32769)}, {description: "bad\u0000text"}, {status: "approved"},
+    {responseStatus: "owner"}, {workerAuthorized: true}]) {
+    assert.throws(() => recon([ev(1, extra)], T1), /Invalid webinar reconciliation/);
+  }
+});
+
+test("provider cancellations and declined RSVP cannot become scheduled items", () => {
+  for (const extra of [{status: "cancelled"}, {responseStatus: "declined"}]) {
+    const value = recon([ev(1, extra)], T1);
+    assert.equal(select(value.calendarEvents as never).toSchedule.length, 0);
+    assert.equal(select(value.calendarEvents as never).skipped[0]?.reason, "cancelled");
+  }
+});
+
+
+test("Calendar watch and registration evidence remain visible without granting capture", () => {
+  const watch = {url: "https://www.youtube.com/watch?v=abcDEF12345", videoId: "abcDEF12345", source: "description"};
+  const value = recon([ev(1, {meetingUrl: undefined, youtubeWatch: watch, meetingLinkIssue: "registration-only"})], T1);
+  assert.deepEqual(value.calendarEvents[0]?.youtubeWatch, watch);
+  assert.equal(value.calendarEvents[0]?.meetingLinkIssue, "registration-only");
+  assert.equal(select(value.calendarEvents as never).toSchedule.length, 0);
+  assert.throws(() => recon([ev(1, {youtubeWatch: {...watch, source: "body"}})], T1));
+  assert.throws(() => recon([ev(1, {youtubeWatch: {...watch, url: "https://evil.example/watch"}})], T1));
+});
+
+test('cycle1 MIME evidence survives reconciliation and blocks approved direct or correlated Calendar capture',()=>{
+  for(const evidenceIssue of ['unresolved-body','unsupported-attachment']) {
+    const event=ev(1), candidate={id:'mail',title:'Webinar',senderEmail:'host@example.org',senderDomain:'example.org',status:'approved',senderAuthenticated:true,startTime:event.startTime,endTime:event.endTime,meetingUrl:event.meetingUrl,evidenceIssue};
+    const r=reconcileWebinarSources({tenantId:'lane',checkedAt:T1,acquisition:{complete:true,historyComplete:true,scope:'available-connected-source-state'},calendarEvents:[event] as never,candidates:[candidate] as never});
+    assert.equal((Object.values(r.state.occurrences).find(row=>row.source==='gmail')!.snapshot as Row).evidenceIssue,evidenceIssue);
+    for(const calendarEvents of [[],r.calendarEvents]) {
+      const s=selectAutoRecordItems({calendarEvents,candidates:r.candidates,now:'2026-10-11T10:59:00.000Z',leadMinutes:120,trustedSenders:EMPTY,alreadyScheduled:[],everyWebinar:true},{parallel:true});
+      assert.equal(s.toSchedule.length,0);assert.ok(s.skipped.some(row=>row.reason==='needs-review'));
+    }
+    assert.throws(()=>reconcileWebinarSources({tenantId:'lane',checkedAt:T1,acquisition:{complete:true,historyComplete:true},calendarEvents:[],candidates:[{...candidate,evidenceIssue:'invented'}] as never}));
+  }
+});
+
+test('cycle1 raw all-day bounds are never scheduled by either Calendar selector',()=>{
+  const event=ev(1,{startTime:'2026-10-11',endTime:'2026-10-12'});
+  assert.equal(select([event]).toSchedule.length,0);
+  assert.equal(selectEventsToAutoJoin([event] as never,'2026-10-11T10:59:00.000Z',5).length,0);
+  const candidate={id:'mail',title:'Webinar',senderEmail:'host@example.org',senderDomain:'example.org',status:'approved',evidenceIssue:'unresolved-body'};
+  const r=selectAutoRecordItems({calendarEvents:[],candidates:[candidate] as never,now:T1,leadMinutes:5,trustedSenders:EMPTY,alreadyScheduled:[]});
+  assert.equal(r.toSchedule.length,0);assert.equal(r.skipped[0]?.reason,'needs-review');
 });

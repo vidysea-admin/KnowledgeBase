@@ -20,6 +20,7 @@
  */
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
+import { WhatsAppUnavailableError } from "../whatsapp/owner-config.js";
 
 export interface WhatsAppGroup {
   groupJid: string;
@@ -46,8 +47,13 @@ export function createWhatsAppRouter(deps: WhatsAppRouteDeps): Router {
   const router = Router();
 
   router.get("/whatsapp/groups", requireScope("whatsapp"), async (req: Request, res: Response) => {
-    const groups = await deps.listGroups(req.auth!.tenantId);
-    res.status(200).json({ groups });
+    try {
+      const groups = await deps.listGroups(req.auth!.tenantId);
+      res.status(200).json({ groups });
+    } catch (error) {
+      if (!(error instanceof WhatsAppUnavailableError)) throw error;
+      res.status(503).json({ error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+    }
   });
 
   router.post("/whatsapp/ingest", requireScope("whatsapp"), async (req: Request, res: Response) => {
@@ -60,6 +66,10 @@ export function createWhatsAppRouter(deps: WhatsAppRouteDeps): Router {
       const result = await deps.ingestGroup(req.auth!.tenantId, body.groupJid);
       res.status(201).json(result);
     } catch (err) {
+      if (err instanceof WhatsAppUnavailableError) {
+        res.status(503).json({ error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+        return;
+      }
       // A real fetch failure (whatsapp_msg's Mongo unreachable, unknown/untracked group) is an
       // environment/input problem, not a server bug -- 502, not 500, with the real error message.
       const message = err instanceof Error ? err.message : String(err);

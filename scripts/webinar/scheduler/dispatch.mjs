@@ -16,7 +16,7 @@ export async function runSchedulerCycle(c) {
   if (stopped()) return;
   let selection = select();
   // Also call on empty selections: rule degradation/recovery must remain visible.
-  if (deps.applyJoinRules) selection = await deps.applyJoinRules(selection, {readOnly: false, now: now()});
+  if (deps.applyJoinRules) selection = await deps.applyJoinRules(selection, {readOnly: false, now: now(), selectWithRules: select, remote: Boolean(deps.calendarAttendance)});
   if (stopped()) return;
   c.setPreview(selection);
   for (const id of Object.keys(state.operations)) c.notify(id);
@@ -89,7 +89,7 @@ export async function runSchedulerCycle(c) {
         if (stopped()) return;
         await deps.validateTenant();
         if (stopped()) return;
-        const ruled = deps.applyJoinRules ? await deps.applyJoinRules({toSchedule: [item], skipped: []}, {readOnly: false, now: now()})
+        const ruled = deps.applyJoinRules ? await deps.applyJoinRules({toSchedule: [item], skipped: []}, {readOnly: false, now: now(), remote: Boolean(deps.calendarAttendance)})
           : {toSchedule: [item], skipped: []};
         if (stopped()) return;
         if (!ruled.toSchedule.some(current => current.sessionKey === id)) {

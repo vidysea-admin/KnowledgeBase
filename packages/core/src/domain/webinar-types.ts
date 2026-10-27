@@ -1,4 +1,7 @@
 /** Canonical noncollection webinar transport and reconciliation types; no I/O. */
+import type { WatchState } from "../generated/watch_state.js";
+export type GmailScanSummary = NonNullable<NonNullable<WatchState["workerSnapshot"]>["state"]["gmailSummary"]>;
+
 export interface TrustedSenderConfig {
   emails: string[];
   domains: string[];
@@ -10,6 +13,13 @@ export type MeetingUrlSource = "conference" | "location" | "description";
 export interface CalendarEvent {
   id: string;
   title: string;
+  /** Bounded provider metadata used by operator inventory and literal purpose rules. */
+  description?: string;
+  status?: "confirmed" | "tentative" | "cancelled";
+  responseStatus?: "accepted" | "declined" | "tentative" | "needsAction";
+  youtubeWatch?: {url: string; videoId: string; source: "location" | "description"};
+  youtubeWatchIssue?: "ambiguous";
+  meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
   /** ISO datetime. */
   startTime: string;
   /** ISO datetime. */
@@ -32,7 +42,8 @@ export interface CalendarClient {
 }
 
 export type ReconciliationCalendarEvent = Pick<CalendarEvent, "id"> & Partial<CalendarEvent>;
-export type WebinarSnapshot = ReconciliationCalendarEvent & Partial<AutoRecordCandidateInput>;
+export type WebinarSnapshot = Omit<ReconciliationCalendarEvent, "status" | "youtubeWatch"> & Omit<Partial<AutoRecordCandidateInput>, "status" | "youtubeWatch"> &
+  {status?: CalendarEvent["status"] | AutoRecordCandidateInput["status"]; youtubeWatch?: CalendarEvent["youtubeWatch"] | AutoRecordCandidateInput["youtubeWatch"]};
 export type WebinarAlias = { key: string; identity: string };
 export type WebinarOccurrence = {
   source: "calendar" | "gmail"; snapshot: WebinarSnapshot; providerIds: string[]; aliases: WebinarAlias[]; accepted: boolean;
@@ -64,6 +75,7 @@ export interface AutoRecordCandidateInput {
   youtubeWatch?: { url: string; videoId: string; source: 'body' | 'snippet' };
   youtubeWatchIssue?: 'ambiguous';
   meetingLinkIssue?: 'ambiguous' | 'registration-only' | 'host-start-link';
+  evidenceIssue?: 'unresolved-body' | 'unsupported-attachment';
   status: "pending" | "approved" | "rejected" | "auto_approved";
   meetingUrl?: string;
   /** Set only when a calendar-linked snapshot supplied the URL (see CalendarEvent.meetingUrlSource). */
@@ -86,6 +98,7 @@ export interface AutoRecordItem {
   source: "calendar" | "gmail";
   sourceId: string;
   title: string;
+  description?: string;
   startTime: string;
   endTime: string;
   meetingUrl: string;

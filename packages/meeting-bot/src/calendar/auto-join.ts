@@ -25,7 +25,7 @@ export function selectEventsToAutoJoin(events: CalendarEvent[], now: string,
 
   return events
     .filter((e) => {
-      if (!e.meetingUrl) return false;
+      if (!e.meetingUrl || /^\d{4}-\d{2}-\d{2}$/.test(e.startTime) || /^\d{4}-\d{2}-\d{2}$/.test(e.endTime)) return false;
       if (e.meetingUrlSource !== undefined && e.meetingUrlSource !== "conference") return false; // T-036: free-text links are never auto-joined
       const startMs = new Date(e.startTime).getTime();
       const endMs = new Date(e.endTime).getTime();
@@ -46,6 +46,7 @@ interface NormalizedItem {
   source: "calendar" | "gmail";
   sourceId: string;
   title: string;
+  description?: string;
   startTime?: string;
   endTime?: string;
   meetingUrl?: string;
@@ -54,6 +55,7 @@ interface NormalizedItem {
   /** Acquired refusals remain barriers even when an older approved URL is retained. */
   meetingLinkIssue?: unknown;
   youtubeWatchIssue?: unknown;
+  evidenceIssue?: unknown;
   sourceRefusal?: boolean;
   sender?: string;
   senderDomain?: string;
@@ -73,15 +75,18 @@ function normalizeCalendarEvent(e: CalendarEvent): NormalizedItem {
     source: "calendar",
     sourceId: e.id,
     title: e.title,
-    startTime: e.startTime,
-    endTime: e.endTime,
+    ...(e.description !== undefined ? {description: e.description} : {}),
+    startTime: /^\d{4}-\d{2}-\d{2}$/.test(e.startTime) ? undefined : e.startTime,
+    endTime: /^\d{4}-\d{2}-\d{2}$/.test(e.endTime) ? undefined : e.endTime,
     meetingUrl: e.meetingUrl,
     meetingUrlSource: e.meetingUrlSource,
+    meetingLinkIssue: e.meetingLinkIssue,
+    youtubeWatchIssue: e.youtubeWatchIssue,
     sender: e.organizer,
     senderVerified: true,
     preTrusted: false,
     rejected: false,
-    cancelled: e.cancelled,
+    cancelled: e.cancelled || e.status === "cancelled" || e.responseStatus === "declined",
   };
 }
 
@@ -98,6 +103,7 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
     meetingUrlSource: c.meetingUrlSource,
     meetingLinkIssue: c.meetingLinkIssue,
     youtubeWatchIssue: c.youtubeWatchIssue,
+    evidenceIssue: c.evidenceIssue,
     sender: c.senderEmail,
     senderDomain: c.senderDomain,
     senderVerified: c.senderAuthenticated === true,
@@ -117,7 +123,7 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
 const isUntrustedSource = (item: NormalizedItem): boolean => item.meetingUrlSource !== undefined && item.meetingUrlSource !== "conference";
 /** Fail closed on present malformed issue values at the HTTP boundary as well as typed refusals. */
 const hasSourceRefusal = (item: NormalizedItem): boolean =>
-  item.sourceRefusal === true || item.meetingLinkIssue !== undefined || item.youtubeWatchIssue !== undefined;
+  item.sourceRefusal === true || item.evidenceIssue !== undefined || item.meetingLinkIssue !== undefined || item.youtubeWatchIssue !== undefined;
 /** Meeting identity used to share barriers and to collapse copies; undefined for an untrusted item (ISS-T036CAL-010). */
 const meetingIdentityOf = (item: NormalizedItem): string | undefined =>
   item.meetingUrl && item.startTime && !isUntrustedSource(item) ? webinarIdentity(item.meetingUrl, item.startTime) : undefined;
@@ -178,6 +184,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput, options
     const base = { sessionKey: item.sessionKey, source: item.source, sourceId: item.sourceId, title: item.title };
 
     if (item.cancelled) { skipped.push({ ...base, reason: "cancelled" }); continue; }
+    if (item.evidenceIssue !== undefined) { skipped.push({...base, reason: item.rejected ? "untrusted-sender" : "needs-review"}); continue; }
     if (input.everyWebinar) {
       const kind = input.classifyInvite ? input.classifyInvite({ title: item.title, meetingUrl: item.meetingUrl, sender: item.sender }) : classifyWebinarInvite(item.title);
       if (kind !== "webinar") {
@@ -305,6 +312,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput, options
       source: item.source,
       sourceId: item.sourceId,
       title: item.title,
+      ...(item.description !== undefined ? {description: item.description} : {}),
       startTime: item.startTime as string,
       endTime: item.endTime as string,
       meetingUrl: item.meetingUrl as string,

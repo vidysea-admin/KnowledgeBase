@@ -13,7 +13,7 @@ export const WRITE_SCOPES = ["send-now", "join-rules"];
 /** Scopes beyond DEFAULT_SCOPES that routes enforce via requireScope(...). Issuable only by name (--scopes) or --all-scopes. */
 export const EXTRA_SCOPES = [
   ...WRITE_SCOPES, "answer-policy:read", "answer-policy:write", "automation:read", "automation:write", "automation:operate",
-  "hosting", "jobs", "registration:approve",
+  "hosting", "jobs", "registration:approve", "operations:write",
 ];
 /** The canonical set: every scope a route in apps/api checks. mint-scopes.test.mjs fails if a requireScope literal is missing here. */
 export const ALL_SCOPES = [...DEFAULT_SCOPES, ...EXTRA_SCOPES];

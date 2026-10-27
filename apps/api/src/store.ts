@@ -28,7 +28,11 @@ import type { HealthDeps } from "./routes/health.js";
 import { probeMongoHealth } from "./health-probe.js";
 import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
-import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
+import { cleanGmailSummary, type MeetingCandidatesDeps, type MeetingCandidate } from "./routes/meeting-candidates.js";
+import type { GmailScanSummary } from "@lkb/core";
+import type { JoinRulesDeps } from "./join-rules/deps.js";
+import { evaluateJoinRules, normalizeDomain, normalizeEmail, validateJoinRuleSet, validateJoinRuleState } from "../../../packages/ingest/src/join-policy/join-rules.js";
+import { recognise } from "./join-rules/calendar-link-extract.js";
 import { scanGmailForMeetingCandidates } from "./gws/gws-gmail.js";
 import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
@@ -128,53 +132,65 @@ export function createMongoGraphReadDeps(): GraphReadDeps {
 
 export { createGwsCalendarReadDeps } from "./gws/gws-calendar.js";
 
-/** Real `MeetingCandidatesDeps` (routes/meeting-candidates.ts) — wraps the already-real
- * `@lkb/db` `meeting-candidates`/`trusted-senders` accessors plus the `gws`-backed Gmail scan.
- * `scanGmail`'s per-message trust check is why this composes the two collections here rather
- * than in the route: a candidate whose sender already crossed `AUTO_APPROVE_THRESHOLD` is filed
- * straight in as `auto_approved`, never sitting in the pending review queue Umesh has to clear
- * by hand for a sender he's already trusted three times over. */
+/** Acquisition, review and approval share canonical tenant policy; source rows remain private and unchanged. */
 export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName,
-  persistence = {getTrustedSender, createMeetingCandidateIfNew}): MeetingCandidatesDeps {
+  persistence: {getTrustedSender: typeof getTrustedSender; createMeetingCandidateIfNew: typeof createMeetingCandidateIfNew} & {listAllMeetingCandidates?: (tenant:string)=>Promise<MeetingCandidate[]>; decideMeetingCandidate?: (tenant:string,id:string,status:"approved"|"rejected")=>Promise<boolean>; recordSenderApproval?: (tenant:string,domain:string)=>Promise<unknown>} = {getTrustedSender, createMeetingCandidateIfNew},
+  remoteScan?: (tenantId: string) => ReturnType<typeof scanGmailForMeetingCandidates>,
+  policy?: {joinRules?: Pick<JoinRulesDeps,"load">; ownedDomains?: (tenantId: string) => readonly string[]; gmailSummary?: (tenantId: string) => Promise<GmailScanSummary | undefined>}): MeetingCandidatesDeps {
+  const list = persistence.listAllMeetingCandidates ?? listAllMeetingCandidates, decide = persistence.decideMeetingCandidate ?? decideMeetingCandidate;
+  const approval = persistence.recordSenderApproval ?? recordSenderApproval;
+  async function eligibility(tenant: string) {
+    if (policy && !policy.joinRules) throw new Error("Candidate policy unavailable");
+    const loaded = policy?.joinRules ? await policy.joinRules.load(tenant) : {ruleSet:{version:1,ownDomains:[],rules:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}};
+    const ruleSet = validateJoinRuleSet(loaded.ruleSet), state = validateJoinRuleState(loaded.state);
+    const rawDomains = policy?.ownedDomains ? policy.ownedDomains(tenant) : [];
+    if (!Array.isArray(rawDomains) || rawDomains.length > 20 || rawDomains.some(d => !normalizeDomain(d))) throw new Error("Candidate domain policy unavailable");
+    const domains = [...ruleSet.ownDomains,...rawDomains].map(d => normalizeDomain(d)!);
+    const eligible = (row: Pick<MeetingCandidate,"subject"|"senderEmail"|"senderDomain"> & Partial<MeetingCandidate>) => {
+      const email=normalizeEmail(row.senderEmail), domain=email?.split("@")[1];
+      if (!email || domain !== normalizeDomain(row.senderDomain) || domains.some(d => domain === d || domain?.endsWith("."+d))) return false;
+      if (row.kind === "past-recording" || row.recordingUrl || (row.startTime && (!Number.isFinite(Date.parse(row.startTime)) || Date.parse(row.startTime) <= Date.now()))) return false;
+      const link = row.meetingUrl && recognise(row.meetingUrl)?.kind === "join" || row.registrationUrl && /^https:\/\//.test(row.registrationUrl) || row.youtubeWatch || row.meetingLinkIssue || row.youtubeWatchIssue || row.evidenceIssue;
+      const invite = /\b(?:invit(?:ation|ed|e)|you(?:['’]re| are)\s+(?:in|registered|on the list))\b/i.test(row.subject) || /\b(?:webinar|seminar|webcast|workshop|conference|meeting|session)\b/i.test(row.subject) && (/\b(?:join|register|attend|registration|reminder|confirmation|confirmed|reserve|watch live)\b/i.test(row.subject) || Boolean(row.meetingUrl && recognise(row.meetingUrl)?.kind === "join"));
+      if (!link || !(invite || row.startTime || row.registrationOnly) || /\b(?:newsletter|digest|roundup|promotional|weekly update|product update|recording|recap|watch again)\b/i.test(row.subject)) return false;
+      const decision=evaluateJoinRules({id:row._id ?? row.messageId ?? "",senderEmail:email,title:row.subject,meetingUrl:row.meetingUrl},ruleSet,state);
+      return !["deny-rule","meeting-opt-out","invalid-rule-set"].includes(decision.reason);
+    }; return Object.assign(eligible,{ownDomains:[...new Set(domains)]});
+  }
+  const refused = (r: Partial<MeetingCandidate>) => Boolean(r.evidenceIssue || r.meetingLinkIssue || r.youtubeWatchIssue || r.registrationOnly);
+  async function summary(tenant: string) { return cleanGmailSummary(await policy?.gmailSummary?.(tenant)); }
   return {
     getWorkDatabase(tenantId) {
       if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
       const work = process.env.MONGO_WORK_DB?.trim(), actual = databaseName();
       return work && !isRefusedWorkDb(work) && actual === work ? actual : undefined;
     },
+    gmailSummary: summary,
     async scanGmail(tenantId) {
-      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) throw new Error("Connected Gmail owner mismatch");
-      const found = await scan();
+      if (!remoteScan && (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId)) throw new Error("Connected Gmail owner mismatch");
+      const eligible=await eligibility(tenantId); let nativeSummary: GmailScanSummary | undefined;
+      const found=remoteScan ? await remoteScan(tenantId) : await scan(500,undefined,{aliases:process.env.LKB_GMAIL_ALIASES,labelIds:process.env.LKB_GMAIL_LABEL_IDS,ownDomains:eligible.ownDomains,onSummary:value=>{nativeSummary=cleanGmailSummary(value);}});
+      const gmailSummary=nativeSummary ?? await summary(tenantId); if(gmailSummary?.complete === false)throw new Error("Candidate acquisition incomplete");
       let created = 0, autoApproved = 0;
-      // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
-      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly", "registrationUrl", "threadId", "senderAuthenticated", "receivedAt", "youtubeWatch", "youtubeWatchIssue", "meetingLinkIssue"] as const;
-      for (const candidate of found) {
-        // ISS-322/333: a From header is not trust. Only an authenticated sender can reach auto_approved; the rest wait for a human.
-        const trusted = candidate.senderAuthenticated === true ? await persistence.getTrustedSender(tenantId, candidate.senderDomain) : undefined;
-        const status = trusted?.autoApprove ? "auto_approved" : "pending";
-        const extra = Object.fromEntries(OPTIONAL_CANDIDATE_FIELDS.filter((k) => candidate[k] !== undefined).map((k) => [k, candidate[k]]));
-        const wrote = await persistence.createMeetingCandidateIfNew(tenantId, {
-          _id: randomUUID(),
-          messageId: candidate.messageId,
-          subject: candidate.subject,
-          senderEmail: candidate.senderEmail,
-          senderDomain: candidate.senderDomain,
-          status,
-          detectedAt: new Date().toISOString(),
-          ...extra,
-        });
-        if (wrote) { created += 1; if (status === "auto_approved") autoApproved += 1; }
+      const optional = ["meetingUrl","kind","startTime","endTime","recordingUrl","registrationOnly","registrationUrl","threadId","senderAuthenticated","receivedAt","youtubeWatch","youtubeWatchIssue","meetingLinkIssue","evidenceIssue"] as const;
+      for (const candidate of found.filter(eligible)) {
+        const trusted=candidate.senderAuthenticated === true && !refused(candidate) ? await persistence.getTrustedSender(tenantId,candidate.senderDomain) : undefined;
+        const status=trusted?.autoApprove ? "auto_approved" : "pending";
+        const extra=Object.fromEntries(optional.filter(k=>candidate[k]!==undefined).map(k=>[k,candidate[k]]));
+        const wrote=await persistence.createMeetingCandidateIfNew(tenantId,{_id:randomUUID(),messageId:candidate.messageId,subject:candidate.subject,senderEmail:candidate.senderEmail,senderDomain:candidate.senderDomain,status,detectedAt:new Date().toISOString(),...extra});
+        if(wrote){created++;if(status === "auto_approved")autoApproved++;}
       }
-      return { created, autoApproved };
+      return {created,autoApproved,...(gmailSummary ? {gmailSummary}: {})};
     },
-    listCandidates: (tenantId) => listAllMeetingCandidates(tenantId),
-    async approve(tenantId, id) {
-      const candidate = await listAllMeetingCandidates(tenantId).then((rows) => rows.find((r) => r._id === id));
-      const ok = await decideMeetingCandidate(tenantId, id, "approved");
-      if (ok && candidate) await recordSenderApproval(tenantId, candidate.senderDomain);
+    async listCandidates(tenantId) { const eligible=await eligibility(tenantId); return (await list(tenantId)).filter(eligible); },
+    async approve(tenantId,id) {
+      const eligible=await eligibility(tenantId), candidate=(await list(tenantId)).find(r=>r._id === id);
+      if(!candidate || !eligible(candidate) || refused(candidate) || candidate.status !== "pending")return false;
+      const ok=await decide(tenantId,id,"approved");
+      if(ok && candidate.senderAuthenticated === true)await approval(tenantId,candidate.senderDomain);
       return ok;
     },
-    reject: (tenantId, id) => decideMeetingCandidate(tenantId, id, "rejected"),
+    reject: (tenantId,id)=>decide(tenantId,id,"rejected"),
   };
 }
 

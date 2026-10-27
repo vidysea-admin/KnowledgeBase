@@ -17,7 +17,7 @@ export async function getJoinRules(apiKey: string): Promise<LoadedRules> {
  * A rule set is "stored" when it differs from the empty default. The API sends no ETag for an unstored set, so a non-empty set
  * WITHOUT an ETag means the server (or CORS) is not providing the validator: saving must then be unavailable, never unconditional.
  */
-export const looksStored = (v: JoinRulesView): boolean => v.ruleSet.rules.length > 0 || v.ruleSet.ownDomains.length > 0;
+export const looksStored = (v: JoinRulesView): boolean => v.ruleSet.rules.length > 0 || v.ruleSet.ownDomains.length > 0 || v.ruleSet.attendanceMode !== undefined || v.ruleSet.purposeGroups !== undefined;
 /** The precondition header for a PUT: If-Match with the loaded ETag, or If-None-Match: * to create the first rule set. Exactly one, always. */
 export const preconditionHeaders = (etag: string | null): Record<string, string> => etag !== null ? { "If-Match": etag } : { "If-None-Match": "*" };
 /** PUT: scope `join-rules`. The body is the rule set ONLY: no tenant, no state. Resolves to the ETag of the new version (null when the response carried none). */

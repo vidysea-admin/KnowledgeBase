@@ -3,15 +3,115 @@
   "$id": "kb://api_keys",
   "title": "api_keys",
   "type": "object",
-  "required": ["_id", "tenantId", "keyHash", "createdAt"],
+  "required": [
+    "_id",
+    "tenantId",
+    "keyHash",
+    "createdAt"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "keyHash": { "type": "string", "minLength": 8 },
-    "label": { "type": "string", "description": "Human-readable name so a tenant can tell their own keys apart in a list; never the raw key itself." },
-    "scopes": { "type": "array", "items": { "type": "string" } },
-    "revokedAt": { "type": ["string", "null"], "format": "date-time" },
-    "createdAt": { "type": "string", "format": "date-time" }
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "keyHash": {
+      "type": "string",
+      "minLength": 8
+    },
+    "label": {
+      "type": "string",
+      "description": "Human-readable name so a tenant can tell their own keys apart in a list; never the raw key itself."
+    },
+    "scopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "revokedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "workerFence": {
+      "type": "object",
+      "properties": {
+        "generation": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9._-]{1,128}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^([a-f0-9]{64})?$"
+        },
+        "ackAt": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        },
+        "complete": {
+          "type": "boolean"
+        },
+        "snapshotId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "snapshotDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "coverageGeneration": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "coverageSequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        },
+        "checkedAt": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        },
+        "submissionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400,
+          "description": "Latest immutable worker envelope for operations, including failed scans; snapshotId remains last complete coverage."
+        }
+      },
+      "required": [
+        "generation",
+        "sequence",
+        "digest",
+        "ackAt",
+        "complete"
+      ],
+      "additionalProperties": false,
+      "description": "D-192 active-key publication/lease fence. CAS contends with revokedAt on this same document; never exposed through /keys."
+    }
   },
   "additionalProperties": true
 }

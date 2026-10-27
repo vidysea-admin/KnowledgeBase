@@ -325,3 +325,31 @@ test("opt-outs: optional meetingUrl / sessionKey hints are passed to the store f
     assert.equal(s.log.filter(isWrite).length, saves);
   });
 });
+
+
+test("rules GET binds the authenticated tenant and mode edits retain CAS and state", async () => {
+  const s = fakeStore();
+  const {validateJoinRuleSet} = await import("../../../../packages/ingest/src/join-policy/join-rules.js");
+  s.deps.validateRuleSet = validateJoinRuleSet;
+  await withServer(s.deps, async (srv, call) => {
+    const res = await fetch(srv.baseUrl + URL_PATH, {headers:{authorization:"Bearer a-key", "x-lkb-tenant":"tenant-b"}});
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("x-lkb-tenant"), "tenant-a");
+    const ruleSet = {...RULES, attendanceMode:"rules", purposeGroups:[{id:"career", titleIncludes:["Career planning"]}],
+      rules:[{id:"purpose", effect:"allow", match:{purposeAny:["career"], descriptionIncludes:["students"]}}]};
+    const created = await call("PUT", URL_PATH, "a-key", ruleSet, NONE);
+    assert.equal(created.status, 200);
+    assert.equal(created.json.ruleSet.attendanceMode, "rules");
+    assert.deepEqual(created.json.ruleSet.rules[0].match.purposeAny, ["career"]);
+    await call("POST", URL_PATH + "/opt-outs", "a-key", {eventId:"keep-optout"});
+    const replaced = await call("PUT", URL_PATH, "a-key", {...ruleSet, attendanceMode:"all"}, {"if-match":created.etag!});
+    assert.equal(replaced.status, 200);
+    assert.deepEqual(replaced.json.state.optedOutEventIds, ["keep-optout"]);
+    assert.notEqual(replaced.etag, created.etag);
+    assert.equal((await call("PUT", URL_PATH, "a-key", ruleSet, {"if-match":created.etag!})).status, 412);
+    const invalid = {...ruleSet, rules:[{id:"bad", effect:"allow", match:{purposeAny:["unknown"]}}]};
+    assert.equal((await call("PUT", URL_PATH, "a-key", invalid, {"if-match":replaced.etag!})).status, 400);
+    const forbidden = await fetch(srv.baseUrl + URL_PATH, {headers:{authorization:"Bearer noscope-key"}});
+    assert.equal(forbidden.headers.get("x-lkb-tenant"), null);
+  });
+});

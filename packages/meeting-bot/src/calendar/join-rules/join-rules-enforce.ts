@@ -1,23 +1,10 @@
-/**
- * packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts — T-037 unit `t037-scheduler-wiring-behind-flag`.
- * The ONE place that decides whether the scheduler tick applies a tenant's join rules, and what happens when they cannot be read.
- *
- * Setting (read once, in schedule-tick.ts buildRealScheduleTickDeps, from env LKB_JOIN_RULES_ENFORCE; parsed only here):
- *   `off` (DEFAULT; also absent, empty, any other string, any non-string)  -> returns the selection UNTOUCHED (same reference);
- *        the store is never opened, `applyJoinRules` is never called. Nothing is logged for absent/empty/`off`; a non-empty STRING that is
- *        not exactly an accepted value logs ONE warning per process (ISS-T037WIRE-002) and stays off.
- *   `fail-closed` -> rules enforced; rules that cannot be evaluated => NONE of the tenant's meetings are scheduled (`rules-unevaluable`).
- *   `fail-open`   -> rules enforced when evaluable; otherwise the selection is left exactly as today's, with a loud warning.
- *   `last-valid` -> verified tenant's full validated rules/state snapshot for <1 hour after primary failure; otherwise refuse.
- * Enabling is a separate operational step. `last-valid` never treats an absent primary as empty rules.
- *
- * VETO ONLY: the result is always built from the INPUT selection by removing items (fail-closed / veto) or by putting back an
- * item the input already scheduled (fail-open); nothing the input did not schedule can be scheduled.
- * TENANCY (W4): a tick serves one tenant (its API key); rules are loaded for that tenant id only. A missing/invalid tenant id is
- * "cannot be evaluated", never a guess. Legacy modes retain missing rules FILE = "no rules"; last-valid does not.
- * TRANSIENT (`locked` / `lock-failed` / EBUSY-class read errors): the store's load takes NO lock (temp+rename writes), so it should not
- * occur on the read path; if it does it is retried within a small bounded budget, then treated as unevaluable (never as "no rules").
- */
+/** Tenant-bound rules enforcement. Hosted workers always fetch authenticated remote policy;
+ * only transient failures may use the original one-hour last-valid snapshot. Legacy
+ * local callers retain their existing explicitly configured enforcement modes. */
+import {readFileSync, lstatSync, mkdirSync, openSync, writeFileSync, fsyncSync, closeSync, renameSync, unlinkSync} from "node:fs";
+import {dirname} from "node:path";
+import {createHash, randomUUID} from "node:crypto";
+import {validateJoinRuleSet, validateJoinRuleState} from "./join-rules.js";
 import type { AutoRecordItem, SelectAutoRecordItemsResult, SkippedItem } from "@lkb/core";
 import { applyJoinRules, type JoinRuleEvaluator } from "./join-rules-select.js";
 import { loadJoinRules, JoinRulesStoreError, type StoredJoinRules } from "./join-rules-store.js";
@@ -55,6 +42,8 @@ export interface JoinRulesEnforceIo {
   wait?: (ms: number) => Promise<void>;
 }
 export interface JoinRulesEnforceConfig {
+  /** Hosted policy authority: never use divergent local files or permissive enforcement in this mode. */
+  remote?: {url: string; apiKey?: string; fetch?: typeof fetch};
   mode: unknown; tenantId?: string; stateDir: string; log: (msg: string) => void; io?: JoinRulesEnforceIo;
   /** The tenant of the API key whose candidates are filtered. A string different from `tenantId` => `tenant-mismatch`; `null` = the key's
    * tenant could not be verified => `tenant-unverified` (same handling per policy); `undefined` = not supplied (test seam). Production
@@ -117,6 +106,82 @@ async function readRules(c: JoinRulesEnforceConfig): Promise<ReadRulesSuccess | 
   }
 }
 
+const rejectedRemoteAuthorities = new Set<string>();
+const networkFailure = (error: unknown): boolean => {
+  const value = error as {name?: string; cause?: {code?: string}};
+  return ["AbortError", "TimeoutError"].includes(value?.name ?? "") ||
+    ["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "EHOSTUNREACH", "ENETUNREACH", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET", "UND_ERR_HEADERS_TIMEOUT"].includes(value?.cause?.code ?? "");
+};
+
+/** Remote snapshot is bound to the exact endpoint, key and tenant; source bytes never enter logs. */
+async function remoteRules(c: JoinRulesEnforceConfig): Promise<ReadRulesSuccess | {error: string}> {
+  const now = (c.now ?? Date.now)(), remote = c.remote!, cap = 1024 * 1024;
+  if (!c.tenantId || c.keyTenantId !== c.tenantId || !remote.apiKey || !Number.isSafeInteger(now) || now < 0)
+    return {error: REASON_TENANT_UNVERIFIED};
+  let file: string, url: URL;
+  try {
+    file = joinRulesFilePath(c.stateDir, c.tenantId).replace(/\.json$/, ".remote.json");
+    url = new URL(remote.url);
+    if (url.username || url.password || url.search || url.hash || (url.protocol !== "https:" &&
+      !(url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)))) throw new Error();
+  } catch { return {error: "invalid remote policy configuration"}; }
+  const authority = createHash("sha256").update(JSON.stringify([url.href, c.tenantId, remote.apiKey])).digest("hex");
+  const checked = (value: any): StoredJoinRules => {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some(k => !["ruleSet", "state"].includes(k))) throw new Error();
+    return {ruleSet: validateJoinRuleSet(value.ruleSet), state: validateJoinRuleState(value.state)};
+  };
+  const invalidate = () => { rejectedRemoteAuthorities.add(authority); if (!c.readOnly) { try { unlinkSync(file); } catch {} } };
+  let transient = false;
+  try {
+    let response: Response;
+    try { response = await (remote.fetch ?? fetch)(url.href.replace(/\/$/, "") + "/calendar/join-rules", {
+      headers: {authorization: "Bearer " + remote.apiKey}, redirect: "error", signal: AbortSignal.timeout(30000)}); }
+    catch (error) { transient = networkFailure(error); throw new Error(); }
+    if (!response.ok) {
+      const owner = response.headers.get("x-lkb-tenant");
+      transient = (owner === null || owner === c.tenantId) && ([408, 429].includes(response.status) || response.status >= 500);
+      await response.body?.cancel(); throw new Error();
+    }
+    if (response.headers.get("x-lkb-tenant") !== c.tenantId || !/^"[^"\r\n]{1,200}"$/.test(response.headers.get("etag") ?? "") || !response.body) {
+      await response.body?.cancel(); throw new Error();
+    }
+    const reader = response.body.getReader(), chunks: Uint8Array[] = []; let size = 0;
+    try { for (;;) { const {done, value} = await reader.read(); if (done) break;
+      size += value.byteLength; if (size > cap) throw new Error(); chunks.push(value); }
+    } catch (e) { transient = networkFailure(e); await reader.cancel().catch(() => {}); throw e; } finally { reader.releaseLock(); }
+    const stored = checked(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+    rejectedRemoteAuthorities.delete(authority);
+    let saved = false;
+    if (!c.readOnly) {
+      const temp = file + "." + randomUUID() + ".tmp";
+      try {
+        mkdirSync(dirname(file), {recursive: true});
+        const fd = openSync(temp, "wx", 0o600);
+        try {writeFileSync(fd, JSON.stringify({version: 1, authority, tenantId: c.tenantId, validatedAt: now, expiresAt: now + 3600000, stored})); fsyncSync(fd);} finally {closeSync(fd);}
+        renameSync(temp, file); saved = true;
+      } catch { c.log("schedule-tick: JOIN RULES WARNING: remote snapshot not persisted; current policy remains enforced"); }
+      finally {try {unlinkSync(temp);} catch {}}
+    }
+    return {stored, healthy: saved};
+  } catch {
+    if (!transient) invalidate();
+    if (transient && c.mode === "last-valid" && !rejectedRemoteAuthorities.has(authority)) {
+      try {
+        const stat = lstatSync(file); if (!stat.isFile() || stat.size > cap + 4096) throw new Error();
+        const cached = JSON.parse(readFileSync(file, "utf8"));
+        if (cached.version !== 1 || cached.authority !== authority || cached.tenantId !== c.tenantId ||
+          !Number.isSafeInteger(cached.validatedAt) || cached.validatedAt < 0 || cached.validatedAt > now ||
+          cached.expiresAt !== cached.validatedAt + 3600000 || now >= cached.expiresAt) throw new Error();
+        const stored = checked(cached.stored);
+        await degraded(c, {tenantId: c.tenantId, reason: "remote-unavailable", usingSnapshot: true, snapshotValidatedAt: cached.validatedAt, snapshotExpiresAt: cached.expiresAt});
+        return {stored, snapshot: {validatedAt: cached.validatedAt, expiresAt: cached.expiresAt}};
+      } catch {}
+    }
+    await degraded(c, {tenantId: c.tenantId, reason: transient ? "remote-unavailable" : "remote-invalid", usingSnapshot: false});
+    return {error: "authenticated remote rules unavailable or invalid; scheduling refused"};
+  }
+}
+
 const skipAll = (items: readonly AutoRecordItem[]): SkippedItem[] => items.map((i) => ({
   sessionKey: i.sessionKey, source: i.source, sourceId: i.sourceId, title: i.title, reason: "rules-unevaluable", detail: DETAIL_FAIL_CLOSED,
 }));
@@ -173,14 +238,14 @@ async function boundedRules(c: JoinRulesEnforceConfig): Promise<ReadRulesSuccess
 }
 
 export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c: JoinRulesEnforceConfig): Promise<SelectAutoRecordItemsResult> {
-  const mode = parseJoinRulesEnforce(c.mode);
+  const mode = c.remote ? (c.mode === "last-valid" ? "last-valid" : "fail-closed") : parseJoinRulesEnforce(c.mode);
   if (mode === "off") { warnUnrecognised(c.mode, c.log); return selection; }
   const warn = (why: string, effect: string) =>
     c.log(`schedule-tick: JOIN RULES WARNING (${mode}): ${why} — ${effect}`);
   const items = Array.isArray(selection?.toSchedule) ? selection.toSchedule : [];
   const skipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
 
-  const read = mode === "last-valid" ? await boundedRules(c)
+  const read = c.remote ? await remoteRules(c) : mode === "last-valid" ? await boundedRules(c)
     : typeof c.tenantId !== "string" || c.tenantId === "" ? { error: REASON_TENANT_UNSET }
     : c.keyTenantId === null ? { error: REASON_TENANT_UNVERIFIED }
     : c.keyTenantId !== undefined && c.keyTenantId !== c.tenantId ? { error: REASON_TENANT_MISMATCH }

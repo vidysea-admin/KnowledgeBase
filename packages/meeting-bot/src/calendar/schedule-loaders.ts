@@ -1,7 +1,7 @@
 /** HTTP acquisition and discovery-health loading for the schedule tick (split verbatim from schedule-tick.ts). */
 import type { CalendarEvent } from "./calendar-client.js";
 import type { AutoRecordCandidateInput } from "./auto-join.js";
-import { validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
+import { validateHttpCalendarSnapshot, validateWebinarCalendarAcquisition, type WebinarCalendarAcquisition } from "./state/schedule-state.js";
 
 /** The loaders `loadWebinarSourcesWithHealth` needs; structurally the same Pick of ScheduleTickDeps it took before. */
 export interface WebinarSourceLoaders {
@@ -31,6 +31,7 @@ interface MeetingCandidateApiRow {
   youtubeWatch?: AutoRecordCandidateInput['youtubeWatch'];
   youtubeWatchIssue?: AutoRecordCandidateInput['youtubeWatchIssue'];
   meetingLinkIssue?: AutoRecordCandidateInput['meetingLinkIssue'];
+  evidenceIssue?: AutoRecordCandidateInput['evidenceIssue'];
 }
 
 function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput {
@@ -53,6 +54,7 @@ function toCandidateInput(row: MeetingCandidateApiRow): AutoRecordCandidateInput
     youtubeWatch: row.youtubeWatch,
     youtubeWatchIssue: row.youtubeWatchIssue,
     meetingLinkIssue: row.meetingLinkIssue,
+    evidenceIssue: row.evidenceIssue,
   };
 }
 
@@ -158,7 +160,7 @@ export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefi
       query.set("changedSince", changedSince);
     }
     const res = await fetch(`${apiUrl}/calendar/upcoming?${query}`, {
-      headers: { authorization: `Bearer ${apiKey}` }, redirect: "error", signal: AbortSignal.timeout(30_000),
+      headers: { authorization: `Bearer ${apiKey}`, ...(native ? {"X-LKB-Calendar-Snapshot": "worker-v1"} : {}) }, redirect: "error", signal: AbortSignal.timeout(30_000),
     });
     if (!res.ok) { if (native) await res.body?.cancel(); throw new Error(`Calendar discovery failed: HTTP ${res.status}`); }
     if (native) {
@@ -171,7 +173,9 @@ export function createHttpCalendarLoader(apiUrl: string, apiKey: string | undefi
           chunks.push(value);
         }
         const body = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-        return validateWebinarCalendarAcquisition(body, native.tenantId, syncToken, startedAt);
+        return body?.snapshot !== undefined || res.headers.has("X-LKB-Calendar-Snapshot")
+          ? validateHttpCalendarSnapshot(body, native.tenantId, syncToken, startedAt, res.headers)
+          : validateWebinarCalendarAcquisition(body, native.tenantId, syncToken, startedAt);
       } catch (error) { await reader.cancel().catch(() => {}); throw error; }
       finally { reader.releaseLock(); }
     }

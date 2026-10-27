@@ -3,13 +3,12 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeMeetingCandidatesDeps } from "../fixtures.js";
 import { createMeetingCandidatesDeps } from "../store.js";
+import type { MeetingCandidate } from "./meeting-candidates.js";
 import { scanGmailForMeetingCandidates } from "../gws/gws-gmail.js";
 import {createConfiguredPublicWebinarDiscovery} from "../gws/public-webinar-config.js";
-
 test("public webinar scan requires auth, scope and bound safe work DB before acquisition", {timeout: 10_000}, async () => {
   let work: string | undefined = "fixture-work", calls = 0;
   const deps = fakeMeetingCandidatesDeps({getWorkDatabase: tenant => tenant === "tenant-1" ? work : undefined});
@@ -27,11 +26,9 @@ test("public webinar scan requires auth, scope and bound safe work DB before acq
       work = value;
       for (const binding of [undefined, "foreign-work"]) {const res = await scan("owner", binding); assert.equal(res.status, 503); await res.text();}
     }
-    work = "lkb"; const refused = await scan("owner", "lkb"); assert.equal(refused.status, 503); await refused.text();
-    assert.equal(calls, 0);
+    work = "lkb"; const refused = await scan("owner", "lkb"); assert.equal(refused.status, 503); await refused.text(); assert.equal(calls, 0);
   } finally {await server.close();}
 });
-
 test("public webinar scan mounts configured discovery without forging approval or sender identity", {timeout: 10_000}, async () => {
   const seen: string[] = [];
   const configured = createConfiguredPublicWebinarDiscovery("tenant-1", JSON.stringify([{id: "college", url: "https://college.example/events"}]), {
@@ -46,17 +43,12 @@ test("public webinar scan mounts configured discovery without forging approval o
   try {
     const response = await fetch(`${server.baseUrl}/public-webinars/scan?tenantId=foreign`, {method: "POST", headers: {authorization: "Bearer owner",
       "X-LKB-Work-DB": "fixture-work", "X-LKB-Tenant": "foreign", "content-type": "application/json"},
-      body: JSON.stringify({tenantId: "foreign", sources: [{id: "evil", url: "https://evil.example"}]}), signal: AbortSignal.timeout(3_000)});
-    assert.equal(response.status, 200); assert.equal(response.headers.get("x-lkb-tenant"), "tenant-1");
-    const body = await response.json() as {publicDiscovery: {tenantId: string; complete: boolean; candidates: Record<string, unknown>[]}};
-    assert.equal(body.publicDiscovery.tenantId, "tenant-1"); assert.equal(body.publicDiscovery.complete, true);
-    const candidate = body.publicDiscovery.candidates[0]!;
-    assert.equal(candidate.reviewRequired, true); assert.equal(candidate.personalJoinVerified, false);
-    for (const field of ["senderEmail", "senderDomain", "status"]) assert.equal(Object.hasOwn(candidate, field), false);
-    assert.deepEqual(seen, ["college.example"]); assert.deepEqual([...deps._rows.values()], before); assert.equal(deps._trust.size, 0);
+      body: JSON.stringify({tenantId: "foreign", sources: [{id: "evil", url: "https://evil.example"}]}), signal: AbortSignal.timeout(3_000)}); assert.equal(response.status, 200); assert.equal(response.headers.get("x-lkb-tenant"), "tenant-1");
+    const body = await response.json() as {publicDiscovery: {tenantId: string; complete: boolean; candidates: Record<string, unknown>[]}}; assert.equal(body.publicDiscovery.tenantId, "tenant-1"); assert.equal(body.publicDiscovery.complete, true);
+    const candidate = body.publicDiscovery.candidates[0]!; assert.equal(candidate.reviewRequired, true); assert.equal(candidate.personalJoinVerified, false);
+    for (const field of ["senderEmail", "senderDomain", "status"]) assert.equal(Object.hasOwn(candidate, field), false); assert.deepEqual(seen, ["college.example"]); assert.deepEqual([...deps._rows.values()], before); assert.equal(deps._trust.size, 0);
   } finally {await server.close();}
 });
-
 test("public webinar scan preserves incomplete coverage and sanitizes unavailable or foreign results", {timeout: 10_000}, async () => {
   let mode = "incomplete";
   const base = {version: 1 as const, checkedAt: "2026-10-15T10:00:00Z", complete: false, candidates: [], gaps: [{sourceId: "college", reason: "unavailable" as const}]};
@@ -67,8 +59,7 @@ test("public webinar scan preserves incomplete coverage and sanitizes unavailabl
   }}, keyStore: fakeKeyStore({"owner": {tenantId: "tenant-1", scopes: ["gmail"]}})}));
   const scan = () => fetch(`${server.baseUrl}/public-webinars/scan`, {method: "POST", headers: {authorization: "Bearer owner", "X-LKB-Work-DB": "fixture-work"}, signal: AbortSignal.timeout(3_000)});
   try {
-    const incomplete = await scan(); assert.equal(incomplete.status, 200);
-    assert.deepEqual(await incomplete.json(), {publicDiscovery: {...base, tenantId: "tenant-1"}});
+    const incomplete = await scan(); assert.equal(incomplete.status, 200); assert.deepEqual(await incomplete.json(), {publicDiscovery: {...base, tenantId: "tenant-1"}});
     for (mode of ["error", "foreign"]) {
       const response = await scan(); assert.equal(response.status, 503); assert.equal(response.headers.get("x-lkb-tenant"), null);
       const body = await response.text(); assert.equal(body.includes("secret"), false); assert.equal(body.includes("tenant-2"), false);
@@ -76,11 +67,9 @@ test("public webinar scan preserves incomplete coverage and sanitizes unavailabl
   } finally {await server.close();}
   const missing = await startTestServer(buildTestDeps({meetingCandidates: deps, keyStore: fakeKeyStore({"owner": {tenantId: "tenant-1", scopes: ["gmail"]}})}));
   try {
-    const response = await fetch(`${missing.baseUrl}/public-webinars/scan`, {method: "POST", headers: {authorization: "Bearer owner", "X-LKB-Work-DB": "fixture-work"}, signal: AbortSignal.timeout(3_000)});
-    assert.equal(response.status, 503); await response.text();
+    const response = await fetch(`${missing.baseUrl}/public-webinars/scan`, {method: "POST", headers: {authorization: "Bearer owner", "X-LKB-Work-DB": "fixture-work"}, signal: AbortSignal.timeout(3_000)}); assert.equal(response.status, 503); await response.text();
   } finally {await missing.close();}
 });
-
 function seededMeetingCandidates() {
   const deps = fakeMeetingCandidatesDeps();
   for (const [id, subject] of [["mc-weekly", "Weekly Ops Sync"], ["mc-ashoka", "Ashoka Educator Dialogues follow-up"]]) {
@@ -89,7 +78,6 @@ function seededMeetingCandidates() {
   }
   return deps;
 }
-
 test("ISS-TENANTSIG-001 / ISS-WIREPRE-001: gmail+calendar keys receive their authenticated tenant without sessions scope", { timeout: 10_000 }, async () => {
   const server = await startTestServer(buildTestDeps({ meetingCandidates: seededMeetingCandidates(), keyStore: fakeKeyStore({
     "one": { tenantId: "tenant-1", scopes: ["gmail", "calendar"] },
@@ -100,29 +88,21 @@ test("ISS-TENANTSIG-001 / ISS-WIREPRE-001: gmail+calendar keys receive their aut
     for (const [key, tenant, count] of [["one", "tenant-1", 2], ["two", "tenant-2", 0]] as const) {
       const res = await fetch(`${server.baseUrl}/meeting-candidates?tenantId=forged`, {
         headers: { authorization: `Bearer ${key}`, "X-LKB-Tenant": "forged" }, signal: AbortSignal.timeout(3_000),
-      });
-      assert.equal(res.status, 200); assert.equal(res.headers.get("x-lkb-tenant"), tenant);
-      assert.equal((await res.json() as { candidates: unknown[] }).candidates.length, count);
+      }); assert.equal(res.status, 200); assert.equal(res.headers.get("x-lkb-tenant"), tenant); assert.equal((await res.json() as { candidates: unknown[] }).candidates.length, count);
     }
     for (const [key, status] of [["no-gmail", 403], ["unknown", 401]] as const) {
       const res = await fetch(`${server.baseUrl}/meeting-candidates`, {
         headers: { authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(3_000),
-      });
-      assert.equal(res.status, status); assert.equal(res.headers.get("x-lkb-tenant"), null); await res.text();
+      }); assert.equal(res.status, status); assert.equal(res.headers.get("x-lkb-tenant"), null); await res.text();
     }
     const sessions = await fetch(`${server.baseUrl}/webinar-operations`, {
       headers: { authorization: "Bearer one" }, signal: AbortSignal.timeout(3_000),
-    });
-    assert.equal(sessions.status, 403); await sessions.text();
+    }); assert.equal(sessions.status, 403); await sessions.text();
   } finally { await server.close(); }
 });
-
 test("ISS-359 recorded reproduction 1: implicit tenant-1 fixture rows are invisible to tenant-2", async () => {
-  const deps = seededMeetingCandidates();
-  assert.equal((await deps.listCandidates("tenant-1")).length, 2, "owner positive control");
-  assert.deepEqual(await deps.listCandidates("tenant-2"), []);
+  const deps = seededMeetingCandidates(); assert.equal((await deps.listCandidates("tenant-1")).length, 2, "owner positive control"); assert.deepEqual(await deps.listCandidates("tenant-2"), []);
 });
-
 test("ISS-359 recorded reproduction 2: HTTP tenant-2 cannot see the two seeded tenant-1 titles", { timeout: 10_000 }, async () => {
   const deps = seededMeetingCandidates();
   const server = await startTestServer(buildTestDeps({ meetingCandidates: deps, keyStore: fakeKeyStore({
@@ -136,12 +116,10 @@ test("ISS-359 recorded reproduction 2: HTTP tenant-2 cannot see the two seeded t
     const positive = await owner.text();
     for (const subject of ["Weekly Ops Sync", "Ashoka Educator Dialogues follow-up"]) assert.ok(positive.includes(subject));
     const foreign = await read("two"); assert.equal(foreign.status, 200);
-    const body = await foreign.text();
-    assert.deepEqual(JSON.parse(body), { candidates: [] });
+    const body = await foreign.text(); assert.deepEqual(JSON.parse(body), { candidates: [] });
     for (const subject of ["Weekly Ops Sync", "Ashoka Educator Dialogues follow-up"]) assert.equal(body.includes(subject), false);
   } finally { await server.close(); }
 });
-
 test("ISS-359 recorded reproduction 3: cross-tenant assertions cover lists, decisions and sender trust", { timeout: 10_000 }, async () => {
   const deps = seededMeetingCandidates();
   deps._rowsFor("tenant-2").set("mc-other", { ...deps._rows.get("mc-weekly")!, _id: "mc-other",
@@ -157,58 +135,34 @@ test("ISS-359 recorded reproduction 3: cross-tenant assertions cover lists, deci
   });
   try {
     for (const [key, expected] of [["one", beforeA], ["two", beforeB]] as const) {
-      const res = await fetch(`${server.baseUrl}/meeting-candidates?tenantId=foreign`, { headers: headers(key), signal: AbortSignal.timeout(3_000) });
-      assert.equal(res.status, 200); assert.deepEqual(await res.json(), { candidates: expected });
+      const res = await fetch(`${server.baseUrl}/meeting-candidates?tenantId=foreign`, { headers: headers(key), signal: AbortSignal.timeout(3_000) }); assert.equal(res.status, 200); assert.deepEqual(await res.json(), { candidates: expected });
     }
     assert.deepEqual(await deps.listCandidates("tenant-2"), beforeB, "second tenant positive control excludes tenant-1");
     for (const action of ["approve", "reject"]) {
-      const denied = await decide("two", "mc-weekly", action, "tenant-1");
-      assert.equal(denied.status, 404); assert.equal((await denied.json() as { error: string }).error, "not_found");
-      const reverse = await decide("one", "mc-other", action, "tenant-2");
-      assert.equal(reverse.status, 404); assert.equal((await reverse.json() as { error: string }).error, "not_found");
-      const forbidden = await decide("unscoped", "mc-weekly", action, "tenant-1");
-      assert.equal(forbidden.status, 403); assert.equal((await forbidden.json() as { error: string }).error, "forbidden");
-      assert.deepEqual([...deps._rows.values()], beforeA); assert.deepEqual([...deps._rowsFor("tenant-2").values()], beforeB);
-      assert.equal(deps._trust.size, 0); assert.equal(deps._trustFor("tenant-2").size, 0);
+      const denied = await decide("two", "mc-weekly", action, "tenant-1"); assert.equal(denied.status, 404); assert.equal((await denied.json() as { error: string }).error, "not_found");
+      const reverse = await decide("one", "mc-other", action, "tenant-2"); assert.equal(reverse.status, 404); assert.equal((await reverse.json() as { error: string }).error, "not_found");
+      const forbidden = await decide("unscoped", "mc-weekly", action, "tenant-1"); assert.equal(forbidden.status, 403); assert.equal((await forbidden.json() as { error: string }).error, "forbidden"); assert.deepEqual([...deps._rows.values()], beforeA); assert.deepEqual([...deps._rowsFor("tenant-2").values()], beforeB); assert.equal(deps._trust.size, 0); assert.equal(deps._trustFor("tenant-2").size, 0);
     }
-    const approvedA = await decide("one", "mc-weekly", "approve", "tenant-2");
-    assert.equal(approvedA.status, 200); assert.deepEqual(await approvedA.json(), { ok: true });
-    assert.equal(deps._rows.get("mc-weekly")!.status, "approved");
-    assert.deepEqual([...deps._rowsFor("tenant-2").values()], beforeB);
-    assert.equal(deps._trust.get("example.org"), 1); assert.equal(deps._trustFor("tenant-2").size, 0);
-    const rejectedA = await decide("one", "mc-ashoka", "reject", "tenant-2");
-    assert.equal(rejectedA.status, 200); assert.deepEqual(await rejectedA.json(), { ok: true });
-    assert.equal(deps._rows.get("mc-ashoka")!.status, "rejected");
-    const approvedB = await decide("two", "mc-other", "approve", "tenant-1");
-    assert.equal(approvedB.status, 200); assert.deepEqual(await approvedB.json(), { ok: true });
-    assert.equal(deps._rowsFor("tenant-2").get("mc-other")!.status, "approved");
-    assert.equal(deps._trust.get("example.org"), 1); assert.equal(deps._trustFor("tenant-2").get("example.org"), 1);
+    const approvedA = await decide("one", "mc-weekly", "approve", "tenant-2"); assert.equal(approvedA.status, 200); assert.deepEqual(await approvedA.json(), { ok: true }); assert.equal(deps._rows.get("mc-weekly")!.status, "approved"); assert.deepEqual([...deps._rowsFor("tenant-2").values()], beforeB); assert.equal(deps._trust.get("example.org"), 1); assert.equal(deps._trustFor("tenant-2").size, 0);
+    const rejectedA = await decide("one", "mc-ashoka", "reject", "tenant-2"); assert.equal(rejectedA.status, 200); assert.deepEqual(await rejectedA.json(), { ok: true }); assert.equal(deps._rows.get("mc-ashoka")!.status, "rejected");
+    const approvedB = await decide("two", "mc-other", "approve", "tenant-1"); assert.equal(approvedB.status, 200); assert.deepEqual(await approvedB.json(), { ok: true }); assert.equal(deps._rowsFor("tenant-2").get("mc-other")!.status, "approved"); assert.equal(deps._trust.get("example.org"), 1); assert.equal(deps._trustFor("tenant-2").get("example.org"), 1);
     for (const [key, id] of [["one", "mc-weekly"], ["two", "mc-other"]]) {
-      const duplicate = await decide(key!, id!, "approve", "foreign");
-      assert.equal(duplicate.status, 404); await duplicate.json();
+      const duplicate = await decide(key!, id!, "approve", "foreign"); assert.equal(duplicate.status, 404); await duplicate.json();
     }
-    assert.equal(deps._trust.get("example.org"), 1); assert.equal(deps._trustFor("tenant-2").get("example.org"), 1);
-    assert.equal(deps._rows.size, 2); assert.equal(deps._rowsFor("tenant-2").size, 1);
+    assert.equal(deps._trust.get("example.org"), 1); assert.equal(deps._trustFor("tenant-2").get("example.org"), 1); assert.equal(deps._rows.size, 2); assert.equal(deps._rowsFor("tenant-2").size, 1);
   } finally { await server.close(); }
 });
-
 test("production factory preserves registration acquisition evidence without inventing absent fields", async () => {
   const writes: {tenant: string; doc: Record<string, unknown>}[] = [];
   const deps = createMeetingCandidatesDeps("tenant-1", async () => [
     {messageId: "mail1", subject: "Webinar", senderEmail: "host@example.org", senderDomain: "example.org",
       registrationUrl: "https://example.org/register", threadId: "thread_1", registrationOnly: true},
-    {messageId: "mail2", subject: "Webinar", senderEmail: "host@example.org", senderDomain: "example.org"},
+    {messageId: "mail2", subject: "Webinar", senderEmail: "host@example.org", senderDomain: "example.org", meetingUrl:"https://meet.google.com/abc-defg-hij"},
   ], () => "fixture-work", {getTrustedSender: async () => null, createMeetingCandidateIfNew: async (tenant, doc) => {
     writes.push({tenant, doc}); return true;
   }});
-  await assert.rejects(deps.scanGmail("foreign"), /owner/); assert.equal(writes.length, 0);
-  assert.deepEqual(await deps.scanGmail("tenant-1"), {created: 2, autoApproved: 0});
-  assert.equal(writes[0]?.tenant, "tenant-1"); assert.equal(writes[0]?.doc.threadId, "thread_1");
-  assert.equal(writes[0]?.doc.registrationUrl, "https://example.org/register");
-  assert.equal(writes[0]?.doc.registrationOnly, true); assert.equal(writes[0]?.doc.status, "pending");
-  assert.equal(Object.hasOwn(writes[1]!.doc, "threadId"), false); assert.equal(Object.hasOwn(writes[1]!.doc, "registrationUrl"), false);
+  await assert.rejects(deps.scanGmail("foreign"), /owner/); assert.equal(writes.length, 0); assert.deepEqual(await deps.scanGmail("tenant-1"), {created: 2, autoApproved: 0}); assert.equal(writes[0]?.tenant, "tenant-1"); assert.equal(writes[0]?.doc.threadId, "thread_1"); assert.equal(writes[0]?.doc.registrationUrl, "https://example.org/register"); assert.equal(writes[0]?.doc.registrationOnly, true); assert.equal(writes[0]?.doc.status, "pending"); assert.equal(Object.hasOwn(writes[1]!.doc, "threadId"), false); assert.equal(Object.hasOwn(writes[1]!.doc, "registrationUrl"), false);
 });
-
 test("POST /gmail/scan with the gmail scope returns a real scan summary", async () => {
   const server = await startTestServer(
     buildTestDeps({
@@ -217,16 +171,12 @@ test("POST /gmail/scan with the gmail scope returns a real scan summary", async 
     }),
   );
   try {
-    const res = await fetch(`${server.baseUrl}/gmail/scan`, { method: "POST", headers: { authorization: "Bearer gmail-key", "X-LKB-Work-DB": "fixture-work" } });
-    assert.equal(res.status, 200);
-    const body = (await res.json()) as { created: number; autoApproved: number };
-    assert.equal(body.created, 2);
-    assert.equal(body.autoApproved, 1);
+    const res = await fetch(`${server.baseUrl}/gmail/scan`, { method: "POST", headers: { authorization: "Bearer gmail-key", "X-LKB-Work-DB": "fixture-work" } }); assert.equal(res.status, 200);
+    const body = (await res.json()) as { created: number; autoApproved: number }; assert.equal(body.created, 2); assert.equal(body.autoApproved, 1);
   } finally {
     await server.close();
   }
 });
-
 test("production Gmail factory binds source owner and actual work DB before provider writes", async () => {
   const before = process.env.MONGO_WORK_DB; process.env.MONGO_WORK_DB = "fixture-work";
   let reads = 0, dbReads = 0;
@@ -234,29 +184,20 @@ test("production Gmail factory binds source owner and actual work DB before prov
   const databaseName = () => {dbReads++; return "fixture-work";};
   try {
     for (const owner of ["", "foreign", "invalid owner"]) {
-      const deps = createMeetingCandidatesDeps(owner, scan, databaseName);
-      assert.equal(deps.getWorkDatabase!("tenant-1"), undefined);
+      const deps = createMeetingCandidatesDeps(owner, scan, databaseName); assert.equal(deps.getWorkDatabase!("tenant-1"), undefined);
       await assert.rejects(deps.scanGmail("tenant-1"), /owner/);
     }
     assert.equal(reads, 0); assert.equal(dbReads, 0);
-    const deps = createMeetingCandidatesDeps("tenant-1", scan, databaseName);
-    assert.equal(deps.getWorkDatabase!("tenant-2"), undefined); assert.equal(dbReads, 0);
-    assert.equal(deps.getWorkDatabase!("tenant-1"), "fixture-work");
+    const deps = createMeetingCandidatesDeps("tenant-1", scan, databaseName); assert.equal(deps.getWorkDatabase!("tenant-2"), undefined); assert.equal(dbReads, 0); assert.equal(deps.getWorkDatabase!("tenant-1"), "fixture-work");
     for (const database of ["lkb", "global_university_db", "foreign-work"]) assert.equal(createMeetingCandidatesDeps("tenant-1", scan, () => database).getWorkDatabase!("tenant-1"), undefined);
     const server = await startTestServer(buildTestDeps({meetingCandidates: {...deps, listCandidates: async () => []}, keyStore: fakeKeyStore({
       "owner-key": {tenantId: "tenant-1", scopes: ["gmail"]}, "foreign-key": {tenantId: "tenant-2", scopes: ["gmail"]},
     })}));
     try {
-      const foreign = await fetch(`${server.baseUrl}/meeting-candidates`, {headers: {authorization: "Bearer foreign-key"}});
-      assert.equal(foreign.headers.get("x-lkb-work-db"), null);
-      assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer foreign-key", "X-LKB-Work-DB": "fixture-work"}})).status, 503);
-      assert.equal(reads, 0);
-      assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer owner-key", "X-LKB-Work-DB": "fixture-work"}})).status, 200);
-      assert.equal(reads, 1);
+      const foreign = await fetch(`${server.baseUrl}/meeting-candidates`, {headers: {authorization: "Bearer foreign-key"}}); assert.equal(foreign.headers.get("x-lkb-work-db"), null); assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer foreign-key", "X-LKB-Work-DB": "fixture-work"}})).status, 503); assert.equal(reads, 0); assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer owner-key", "X-LKB-Work-DB": "fixture-work"}})).status, 200); assert.equal(reads, 1);
     } finally { await server.close(); }
   } finally { if (before === undefined) delete process.env.MONGO_WORK_DB; else process.env.MONGO_WORK_DB = before; }
 });
-
 test("Gmail scan refuses unbound/production/foreign work DB before provider writes and sanitizes failures", async () => {
   let work: string | undefined = "fixture-work", calls = 0, fail = false;
   const server = await startTestServer(buildTestDeps({
@@ -270,31 +211,25 @@ test("Gmail scan refuses unbound/production/foreign work DB before provider writ
       work = value;
       for (const binding of [undefined, "foreign-work"]) {
         const headers: Record<string, string> = {authorization: "Bearer gmail-key"};
-        if (binding) headers["X-LKB-Work-DB"] = binding;
-        assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers})).status, 503);
+        if (binding) headers["X-LKB-Work-DB"] = binding; assert.equal((await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers})).status, 503);
       }
     }
     assert.equal(calls, 0);
     work = "fixture-work"; fail = true;
-    const response = await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer gmail-key", "X-LKB-Work-DB": work}});
-    assert.equal(response.status, 503); assert.ok(!(await response.text()).includes("secret")); assert.equal(calls, 1);
-    const read = await fetch(`${server.baseUrl}/meeting-candidates`, {headers: {authorization: "Bearer gmail-key"}});
-    assert.equal(read.headers.get("x-lkb-work-db"), work);
+    const response = await fetch(`${server.baseUrl}/gmail/scan`, {method: "POST", headers: {authorization: "Bearer gmail-key", "X-LKB-Work-DB": work}}); assert.equal(response.status, 503); assert.ok(!(await response.text()).includes("secret")); assert.equal(calls, 1);
+    const read = await fetch(`${server.baseUrl}/meeting-candidates`, {headers: {authorization: "Bearer gmail-key"}}); assert.equal(read.headers.get("x-lkb-work-db"), work);
   } finally { await server.close(); }
 });
-
 test("GET /meeting-candidates without the gmail scope returns 403", async () => {
   const server = await startTestServer(
     buildTestDeps({ keyStore: fakeKeyStore({ "ask-only-key": { tenantId: "tenant-1", scopes: ["ask"] } }) }),
   );
   try {
-    const res = await fetch(`${server.baseUrl}/meeting-candidates`, { headers: { authorization: "Bearer ask-only-key" } });
-    assert.equal(res.status, 403);
+    const res = await fetch(`${server.baseUrl}/meeting-candidates`, { headers: { authorization: "Bearer ask-only-key" } }); assert.equal(res.status, 403);
   } finally {
     await server.close();
   }
 });
-
 test("approving a pending candidate flips its status and records a sender approval", async () => {
   const meetingCandidates = fakeMeetingCandidatesDeps();
   meetingCandidates._rows.set("mc1", {
@@ -308,15 +243,11 @@ test("approving a pending candidate flips its status and records a sender approv
     }),
   );
   try {
-    const res = await fetch(`${server.baseUrl}/meeting-candidates/mc1/approve`, { method: "POST", headers: { authorization: "Bearer gmail-key" } });
-    assert.equal(res.status, 200);
-    assert.equal(meetingCandidates._rows.get("mc1")!.status, "approved");
-    assert.equal(meetingCandidates._trust.get("vidysea.com"), 1);
+    const res = await fetch(`${server.baseUrl}/meeting-candidates/mc1/approve`, { method: "POST", headers: { authorization: "Bearer gmail-key" } }); assert.equal(res.status, 200); assert.equal(meetingCandidates._rows.get("mc1")!.status, "approved"); assert.equal(meetingCandidates._trust.get("vidysea.com"), 1);
   } finally {
     await server.close();
   }
 });
-
 test("approving an already-decided candidate returns 404, never double-counts trust", async () => {
   const meetingCandidates = fakeMeetingCandidatesDeps();
   meetingCandidates._rows.set("mc1", {
@@ -330,14 +261,11 @@ test("approving an already-decided candidate returns 404, never double-counts tr
     }),
   );
   try {
-    const res = await fetch(`${server.baseUrl}/meeting-candidates/mc1/approve`, { method: "POST", headers: { authorization: "Bearer gmail-key" } });
-    assert.equal(res.status, 404);
-    assert.equal(meetingCandidates._trust.get("vidysea.com"), undefined);
+    const res = await fetch(`${server.baseUrl}/meeting-candidates/mc1/approve`, { method: "POST", headers: { authorization: "Bearer gmail-key" } }); assert.equal(res.status, 404); assert.equal(meetingCandidates._trust.get("vidysea.com"), undefined);
   } finally {
     await server.close();
   }
 });
-
 test("rejecting a pending candidate flips its status", async () => {
   const meetingCandidates = fakeMeetingCandidatesDeps();
   meetingCandidates._rows.set("mc1", {
@@ -351,21 +279,18 @@ test("rejecting a pending candidate flips its status", async () => {
     }),
   );
   try {
-    const res = await fetch(`${server.baseUrl}/meeting-candidates/mc1/reject`, { method: "POST", headers: { authorization: "Bearer gmail-key" } });
-    assert.equal(res.status, 200);
-    assert.equal(meetingCandidates._rows.get("mc1")!.status, "rejected");
+    const res = await fetch(`${server.baseUrl}/meeting-candidates/mc1/reject`, { method: "POST", headers: { authorization: "Bearer gmail-key" } }); assert.equal(res.status, 200); assert.equal(meetingCandidates._rows.get("mc1")!.status, "rejected");
   } finally {
     await server.close();
   }
 });
-
 // ISS-333 / ISS-322 / ISS-CAPTURE-003 (D-015): the ledger rows' recorded reproductions through the REAL scan
 // (gws-gmail.ts fetchOne) into the REAL store.ts filing logic; only the gws CLI and Mongo are faked.
-async function fileFrom(from: string, ...authResults: string[]): Promise<{ status?: unknown; authenticated?: unknown; n: number }> {
+async function fileFrom(from: string | {email:string;body:string}, ...authResults: string[]): Promise<{ status?: unknown; authenticated?: unknown; n: number }> {
   const run = async (args: string[]) => args.includes("list") ? JSON.stringify({ messages: [{ id: "m1" }] }) : JSON.stringify({ id: "m1",
-    payload: { headers: [{ name: "From", value: from }, { name: "Subject", value: "Webinar" },
+    payload: { headers: [{ name: "From", value: typeof from === "string" ? from : from.email }, { name: "Subject", value: "Webinar" },
       ...authResults.map((value) => ({ name: "Authentication-Results", value }))],
-    body: { data: Buffer.from("Join https://zoom.us/j/123456789").toString("base64url") } } });
+    body: { data: Buffer.from(typeof from === "string" ? "Join https://zoom.us/j/123456789" : from.body).toString("base64url") } } });
   const writes: Record<string, unknown>[] = [];
   const deps = createMeetingCandidatesDeps("tenant-1", () => scanGmailForMeetingCandidates(100, run, {}), () => "fixture-work",
     { getTrustedSender: async () => ({ autoApprove: true }) as never, createMeetingCandidateIfNew: async (_t, doc) => { writes.push(doc); return true; } });
@@ -373,16 +298,14 @@ async function fileFrom(from: string, ...authResults: string[]): Promise<{ statu
   return { status: writes[0]?.status, authenticated: writes[0]?.senderAuthenticated, n: writes.length };
 }
 const PASS = "mx.google.com; dkim=pass header.i=@ashoka.edu.in header.s=google; spf=pass (google.com: domain of host@ashoka.edu.in designates 1.2.3.4 as permitted sender) smtp.mailfrom=host@ashoka.edu.in; dmarc=pass (p=NONE sp=NONE dis=NONE) header.from=ashoka.edu.in";
-
 test("ISS-333 recorded reproductions (a)(b)(c) through scan -> store: unauthenticated never auto_approved, authenticated still is", async () => {
   const a = await fileFrom("host@ashoka.edu.in", "mx.google.com; dkim=fail header.i=@ashoka.edu.in");
   const b = await fileFrom("host@ashoka.edu.in");
-  const c = await fileFrom("host@ashoka.edu.in", PASS);
-  assert.equal(a.status, "pending"); assert.equal(b.status, "pending"); // (a) dkim=fail, (b) header absent
-  assert.equal(c.status, "auto_approved"); assert.equal(c.authenticated, true); // (c) real path, no regression
-  console.log(`ISS-333 (api side, a+b+c): ${[a.status === "pending", b.status === "pending", c.status === "auto_approved"].filter(Boolean).length}/3 behave as recorded`);
+  const c = await fileFrom("host@ashoka.edu.in", PASS); assert.equal(a.status, "pending"); assert.equal(b.status, "pending"); // (a) dkim=fail, (b) header absent
+  assert.equal(c.status, "pending"); assert.equal(c.authenticated, true); // Recorded undated case now safely pending; source authentication still verified.
+  const d=await fileFrom({email:"host@ashoka.edu.in",body:"Date: October 15, 2099 Time: 10 AM - 11 AM UTC. Join https://zoom.us/j/123456789"},PASS);assert.equal(d.status,"auto_approved");assert.equal(d.authenticated,true);
+  console.log(`ISS-333 original a+b+c: ${[a.status === "pending", b.status === "pending", String(c.status) === "auto_approved"].filter(Boolean).length}/3 historical statuses; undated authenticated case(c) deliberately pending under C4, dated positive auto_approved`);
 });
-
 test("ISS-322 / ISS-333 extra spoofs: pass for another domain, injected pass beside Gmail's fail, comment trick, foreign server", async () => {
   const gFail = "mx.google.com; dkim=neutral header.i=@evil.com; dmarc=fail (p=REJECT) header.from=ashoka.edu.in";
   const cases: Array<[string, string[]]> = [
@@ -395,9 +318,57 @@ test("ISS-322 / ISS-333 extra spoofs: pass for another domain, injected pass bes
   ];
   for (const [label, headers] of cases) assert.equal((await fileFrom("host@ashoka.edu.in", ...headers)).status, "pending", label);
 });
-
 test("ISS-CAPTURE-003 recorded reproduction: From x@ashoka.edu.in@evil.com is dropped, not given the first-@ domain", async () => {
-  const r = await fileFrom("x@ashoka.edu.in@evil.com", PASS);
-  assert.equal(r.n, 0);
+  const r = await fileFrom("x@ashoka.edu.in@evil.com", PASS); assert.equal(r.n, 0);
   console.log(`ISS-CAPTURE-003: ${r.n === 0 ? 1 : 0}/1 refused`);
+});
+test("cycle1 stored policy filters old/new classes, office mail and id approval without deleting barriers", async () => {
+  const row = (id: string, subject = "Invitation: join webinar", sender = "host@external.test") => ({_id:id,messageId:id,subject,senderEmail:sender,senderDomain:sender.split("@")[1]!,meetingUrl:"https://meet.google.com/abc-defg-hij",status:"pending" as const,detectedAt:"2026-10-27T00:00:00Z"});
+  const rows: MeetingCandidate[] = [row("ok"),row("generic","Weekly product newsletter"),row("office",undefined,"host@dept.office.test"),row("lookalike",undefined,"host@fakeoffice.test"),{...row("past"),kind:"past-recording" as const}, {...row("refused"), evidenceIssue:"unresolved-body" as const}, {...row("rejected"),status:"rejected" as const}];
+  rows.push({...row("office-approved",undefined,"host@office.test"),status:"approved"},{...row("office-auto",undefined,"host@sub.office.test"),status:"auto_approved"});
+  const original = structuredClone(rows); let writes=0, approvals=0, decisions=0;
+  let rules: any = {version:1,ownDomains:[],attendanceMode:"all",rules:[]};
+  const persistence = {getTrustedSender:async()=>({autoApprove:true}) as never,createMeetingCandidateIfNew:async()=>{writes++;return true;}, listAllMeetingCandidates:async()=>rows,decideMeetingCandidate:async()=>{decisions++;return true;},recordSenderApproval:async()=>{approvals++;}};
+  const policy = {joinRules:{load:async(tenant:string)=>{assert.equal(tenant,"tenant-1");return {ruleSet:rules,state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}};}},ownedDomains:()=>["OFFICE.test"]};
+  const deps = createMeetingCandidatesDeps("tenant-1",async()=>rows,()=>"fixture-work",persistence,undefined,policy); assert.deepEqual((await deps.listCandidates("tenant-1")).map(r=>r._id),["ok","lookalike","refused","rejected"]);
+  for (const id of ["generic","office","office-approved","office-auto","past","refused"]) assert.equal(await deps.approve("tenant-1",id),false); assert.equal(decisions,0); assert.equal(approvals,0); assert.equal(await deps.approve("tenant-1","ok"),true); assert.equal(approvals,0,"unauthenticated manual decisions cannot earn sender trust");
+  rules = {...rules,rules:[{id:"skip-class",effect:"deny",match:{email:"host@external.test"}}]}; assert.deepEqual((await deps.listCandidates("tenant-1")).map(r=>r._id),["lookalike"]); assert.equal(await deps.approve("tenant-1","ok"),false); assert.deepEqual(rows,original);
+  assert.deepEqual(await deps.scanGmail("tenant-1"),{created:1,autoApproved:0}); assert.equal(writes,1,"only unrelated eligible class can insert");
+});
+test("cycle1 eligible insert counters, canonical deny priority and sanitized summary", async () => {
+  const sample = {messageId:"a",subject:"Invitation: join webinar",senderEmail:"a@external.test",senderDomain:"external.test",meetingUrl:"https://meet.google.com/abc-defg-hij",senderAuthenticated:true};
+  const stored: any[]=[]; let denied=false;
+  const summary = {listed:4,fetched:4,candidates:2,excludedNonMeeting:1,excludedInternal:1,refusedSender:0,incompleteMessages:0,complete:true};
+  const policy = {joinRules:{load:async()=>({ruleSet:{version:1 as const,ownDomains:["office.test"],rules:denied?[{id:"class",effect:"deny" as const,match:{domain:"external.test"}}]:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}})},gmailSummary:async()=>({...summary,rawBody:"private"})};
+  const deps=createMeetingCandidatesDeps("tenant-1",async()=>[sample,{...sample,messageId:"b",subject:"Product newsletter"},{...sample,messageId:"c",senderEmail:"a@office.test",senderDomain:"office.test"}],()=>"fixture-work",{getTrustedSender:async()=>({autoApprove:true}) as never,createMeetingCandidateIfNew:async(_t,doc)=>{stored.push(doc);return true;}},undefined,policy); assert.deepEqual(await deps.scanGmail("tenant-1"),{created:1,autoApproved:1,gmailSummary:summary});
+  denied=true; assert.deepEqual(await deps.scanGmail("tenant-1"),{created:0,autoApproved:0,gmailSummary:summary}); assert.equal(stored.length,1);
+  const broken=createMeetingCandidatesDeps("tenant-1",async()=>[sample],()=>"fixture-work",undefined,undefined,{joinRules:{load:async()=>{throw new Error("private policy details");}}});
+  await assert.rejects(broken.scanGmail("tenant-1"));
+});
+test("cycle1 policy scope, title/domain classes, malformed authority and incomplete summary stay closed",async()=>{
+  const row={_id:"r",messageId:"m",subject:"Join webinar on Education",senderEmail:"a@external.test",senderDomain:"external.test",meetingUrl:"https://meet.google.com/abc-defg-hij",status:"pending" as const,detectedAt:"2026-10-27T00:00:00Z"};
+  let rules:any={version:1,ownDomains:[],rules:[]};let coverage:any=undefined;let writes=0;
+  const persistence={getTrustedSender:async()=>null,createMeetingCandidateIfNew:async()=>{writes++;return true;},listAllMeetingCandidates:async()=>[row]};
+  const policy={joinRules:{load:async(tenant:string)=>({ruleSet:tenant === "a"?rules:{version:1,ownDomains:[],rules:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}})},gmailSummary:async()=>coverage};
+  const deps=createMeetingCandidatesDeps("a",async()=>[row],()=>"fixture-work",persistence,undefined,policy);
+  for (const match of [{titleIncludes:["EDUCATION"]},{domain:"external.test",subdomains:false},{email:"a@external.test"}]){rules={...rules,attendanceMode:"all",rules:[{id:"deny",effect:"deny",match}]};assert.deepEqual(await deps.listCandidates("a"),[]);assert.equal((await deps.listCandidates("b")).length,1);}
+  rules={version:1,ownDomains:[],rules:[]};coverage={listed:1,fetched:1,candidates:1,excludedNonMeeting:0,excludedInternal:0,refusedSender:0,incompleteMessages:1,complete:false};
+  await assert.rejects(deps.scanGmail("a"),/incomplete/);assert.equal(writes,0);
+  rules={version:1,ownDomains:["bad-domain"],rules:[]};await assert.rejects(deps.listCandidates("a"));
+  const missing=createMeetingCandidatesDeps("a",async()=>[],()=>"fixture-work",persistence,undefined,{});await assert.rejects(missing.listCandidates("a"));
+  const server=await startTestServer(buildTestDeps({meetingCandidates:{...deps,listCandidates:async()=>{throw new Error("private source details");},approve:async()=>{throw new Error("private policy details");}},keyStore:fakeKeyStore({owner:{tenantId:"a",scopes:["gmail"]}})}));
+  try{for(const [url,method] of [["/meeting-candidates","GET"],["/meeting-candidates/r/approve","POST"]]){const response=await fetch(server.baseUrl+url,{method,headers:{authorization:"Bearer owner"}});assert.equal(response.status,503);assert.equal((await response.text()).includes("private"),false);}}finally{await server.close();}
+});
+
+test("cycle1 native intake receives canonical own domains and exposes counts through callback only",async()=>{
+  const summary={listed:1,fetched:1,candidates:0,excludedNonMeeting:0,excludedInternal:1,refusedSender:0,incompleteMessages:0,complete:true};
+  const scan:typeof scanGmailForMeetingCandidates=async(size,_run,intake)=>{assert.equal(size,500);assert.deepEqual(intake?.ownDomains,["office.test"]);intake?.onSummary?.(summary);return [];};
+  const deps=createMeetingCandidatesDeps("a",scan,()=>"fixture-work",undefined,undefined,{joinRules:{load:async()=>({ruleSet:{version:1,ownDomains:["office.test"],rules:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}})}});assert.deepEqual(await deps.scanGmail("a"),{created:0,autoApproved:0,gmailSummary:summary});
+});
+
+test("persisted attachment refusals stay pending despite sender trust and cannot be approved",async()=>{
+  const row={messageId:"refusal",subject:"Webinar invitation",senderEmail:"host@external.test",senderDomain:"external.test",evidenceIssue:"unsupported-attachment" as const,kind:"upcoming" as const,senderAuthenticated:true};
+  const stored:MeetingCandidate[]=[];let trustReads=0;
+  const deps=createMeetingCandidatesDeps("a",async()=>[row],()=>"fixture-work",{getTrustedSender:async()=>{trustReads++;return {autoApprove:true} as never;},createMeetingCandidateIfNew:async(_tenant,doc)=>{stored.push(doc as unknown as MeetingCandidate);return true;},listAllMeetingCandidates:async()=>stored},undefined,{joinRules:{load:async()=>({ruleSet:{version:1,ownDomains:[],rules:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}})}});
+  assert.deepEqual(await deps.scanGmail("a"),{created:1,autoApproved:0});assert.equal(trustReads,0);assert.equal(stored[0]?.evidenceIssue,"unsupported-attachment");assert.equal(stored[0]?.status,"pending");assert.equal(await deps.approve("a",stored[0]!._id),false);
 });

@@ -65,3 +65,16 @@ test("pins unchanged: ARG TARGETARCH, sha256sum --check", () => {
   assert.match(DOCKERFILE, /FROM node:24-slim AS media-tool-download\nARG TARGETARCH\n/);
   assert.match(DOCKERFILE, /sha256sum --check -;/);
 });
+
+test("API precreates node-owned join-rules state before non-root runtime", () => {
+  const apiStage = DOCKERFILE.slice(DOCKERFILE.indexOf("FROM worker-tools AS api"));
+  const rootUser = apiStage.indexOf("USER root");
+  const provision = apiStage.indexOf("RUN mkdir -p");
+  const nodeUser = apiStage.indexOf("USER node");
+  assert.ok(rootUser >= 0 && provision > rootUser && nodeUser > provision);
+  const command = apiStage.slice(provision, apiStage.indexOf("\n", provision));
+  assert.match(command, /^RUN mkdir -p (?:[^&]* )?\/var\/lib\/lkb\/join-rules(?: |$)/);
+  assert.match(command, /\/var\/lib\/lkb\/hosting/);
+  assert.match(command, /\/var\/lib\/lkb\/counsellor/);
+  assert.match(command, /&& chown -R node:node \/var\/lib\/lkb$/);
+});

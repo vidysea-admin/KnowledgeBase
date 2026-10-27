@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { complete as routeComplete, parseRoutingYaml, GeminiProvider, ClaudeCodeProvider, OllamaProvider, createOllamaCloudProviders, type Provider } from "@lkb/ai";
 import { treeSearch } from "@lkb/index";
-import { getDb, listHeartbeats, listWatchState } from "@lkb/db";
+import { getDb, listHeartbeats, scopedCollection } from "@lkb/db";
 import { createTelegramAlertSink } from "@lkb/core";
 import type { ServerDeps } from "../server.js";
 import type { WatchSilenceDeps } from "../routes/health.js";
@@ -15,7 +15,8 @@ import { createMongoIngestDeps } from "../ingest-store.js";
 import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
 import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
-import { buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
+import type { WatchState } from "@lkb/core";
+import { buildCalendarWorkerIntegrations, buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
 import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
@@ -82,18 +83,11 @@ export function createMongoWatchSilenceDeps(): WatchSilenceDeps {
   };
 }
 
-/** U4d (D-047/ISS-361/ISS-358): read-only `watch_state`/`watch_heartbeat` deps merged into
- * `ServerDeps.watchedSources` below, alongside the A13 create/listActive/run trio
- * (`routes/watched-sources.ts`). Both accessors are the SAME tenant-scoped `@lkb/db` functions R1's
- * alert (`markWatchState`) and R2's detector (`listHeartbeats` above) already read/write, and
- * `heartbeatIntervalMs` is the SAME number the detector uses — so the `/watch` page can never show
- * a watcher as healthy that `/health` would already have alerted on as silent. Lives here rather
- * than in `store.ts` for the same measured reason `createMongoWatchSilenceDeps` does: `store.ts` is
- * at 299/300 non-blank lines with no room, and this file already does this exact kind of env-driven
- * composition-root wiring. */
+/** Public watcher metadata excludes private staging before the bounded query.
+ * The interval stays shared with the watcher-silence detector. */
 function createMongoWatchStateReadDeps() {
   return {
-    listWatchState: (tenantId: string) => listWatchState(tenantId),
+    listWatchState: (tenantId: string) => scopedCollection<WatchState>(getDb(), "watch_state")(tenantId).find({workerSnapshot: {$exists: false}, workerReceipt: {$exists: false}}).sort({seenAt: -1}).limit(200).toArray(),
     listHeartbeats: (tenantId: string) => listHeartbeats(tenantId),
     heartbeatIntervalMs: watchHeartbeatIntervalMs(),
   };
@@ -192,10 +186,12 @@ export function buildIndexer(routing: ReturnType<typeof buildRouting> = buildRou
   };
 }
 
-export function buildProductionDeps(options: { onIndexCommitted?: IndexCommittedHook; captureReadinessHost?: HostCaptureReadinessAdapter } = {}): ServerDeps {
+export function buildProductionDeps(options: { onIndexCommitted?: IndexCommittedHook; captureReadinessHost?: HostCaptureReadinessAdapter; calendarWorkerDatabase?: Parameters<typeof buildCalendarWorkerIntegrations>[0]["db"] } = {}): ServerDeps {
   const db = createLazyDatabase(getDb);
+  const worker = buildCalendarWorkerIntegrations({db: options.calendarWorkerDatabase ?? db, env: process.env});
   const routing = buildRouting();
   const publicWebinars = createConfiguredPublicWebinarDiscovery(process.env.LKB_PUBLIC_WEBINAR_TENANT, process.env.LKB_PUBLIC_WEBINAR_SOURCES);
+  const capturePolicy = buildCapturePolicyIntegrations({root: fileURLToPath(new URL("../../../../", import.meta.url)), env: process.env});
   const { chains, providers, jobWrite } = routing;
 
   const tavilySearchFn = createTavilySearchFn();
@@ -206,7 +202,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
   const deps: ServerDeps = {
     keyStore: createMongoApiKeyStore(),
     evalRuns: createMongoEvalRunStore(),
-    brain: withSessionArtifacts(createMongoBrainReadDeps(), fileURLToPath(new URL("../../../../", import.meta.url))),
+    brain: withSessionArtifacts({...createMongoBrainReadDeps(), ...(worker ? {listWebinarOperations: worker.listWebinarOperations} : {})}, fileURLToPath(new URL("../../../../", import.meta.url))),
     citations: createMongoCitationsDeps(),
     claims: createMongoClaimsListDeps(),
     // U4b/R2: the same Mongo health deps as before, plus the injected watcher-silence detector.
@@ -219,8 +215,8 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     // D-173: dormant semantic routes cannot be enabled through an old environment flag.
     semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
-    calendar: createGwsCalendarReadDeps(),
-    meetingCandidates: { ...createMeetingCandidatesDeps(), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
+    calendar: worker?.calendar ?? createGwsCalendarReadDeps(),
+    meetingCandidates: { ...createMeetingCandidatesDeps(undefined, undefined, undefined, undefined, worker?.listGmailCandidates, worker || process.env.LKB_JOIN_RULES_ENABLED === "1" ? {joinRules: capturePolicy.joinRules, ownedDomains: worker?.ownedDomains, gmailSummary: worker?.gmailSummary} : undefined), ...(publicWebinars.configured ? { discoverPublicWebinars: publicWebinars.discover } : {}) },
     whatsapp: createMongoWhatsAppDeps(boundIndexer, { resolveOwner: createConfiguredWhatsAppOwnerResolver(process.env.WHATSAPP_TENANT_OWNER_MAP) }),
     keys: createMongoKeysDeps(),
     ingest: createMongoIngestDeps(boundIndexer),
@@ -278,6 +274,12 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
       },
     },
   };
+  if (worker) {
+    const workerHeartbeats = (tenantId: string) => listHeartbeats(tenantId).then(rows => worker.mergeHeartbeats(tenantId, rows));
+    deps.watchedSources.listHeartbeats = workerHeartbeats;
+    deps.watchedSources.workerHealth = worker.workerHealth;
+    if (deps.health.watchSilence) deps.health.watchSilence.listHeartbeats = workerHeartbeats;
+  }
   const sourceJobs = buildConfiguredSourceJobStore(process.env);
   const reviews = buildReviewIntegrations(db, process.env);
   const input = { db, env: process.env, root: fileURLToPath(new URL('../../../../', import.meta.url)),
@@ -291,7 +293,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
   const hosting = buildHostingIntegrations({ ...input, keyStore: deps.keyStore, keys: deps.keys,
     notifications: tenant => collectNotifications({ activityHealth: deps.activityHealth!, jobs: deps.jobs!, watchRuns: deps.watchRuns!, fileQueue: deps.fileQueue }, tenant, 50) });
   const automation = buildAutomationIntegrations({ ...input, hosting: hosting.hosting });
-  const capturePolicy = buildCapturePolicyIntegrations(input);
+
   const botPrivacy = process.env.LKB_CAPTURE_CONTROL_DIR ? createHostBotPrivacyDeps(process.env.LKB_CAPTURE_CONTROL_DIR) : undefined;
   const captureReadiness = hosting.hosting && input.env.LKB_CAPTURE_SLOTS && input.env.LKB_TENANT_ID && options.captureReadinessHost
     ? createHostCaptureReadinessDeps({ root: input.root, env: input.env, hosting: hosting.hosting.service, host: options.captureReadinessHost }) : undefined;

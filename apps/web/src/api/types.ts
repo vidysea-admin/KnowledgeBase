@@ -111,12 +111,23 @@ export interface GraphStats {
 }
 
 export interface UpcomingMeeting {
+  /** Derived by the authenticated operator inventory, never source scheduling authority. */
+  attendanceSkipReason?: "office-internal";
   id: string;
   title: string;
+  description?: string;
+  status?: "confirmed" | "tentative" | "cancelled";
+  responseStatus?: "accepted" | "declined" | "tentative" | "needsAction";
   startTime: string;
   endTime: string;
   meetingUrl?: string;
   organizer?: string;
+  cancelled?: boolean;
+}
+
+export interface GmailSummary {
+  listed: number; fetched: number; candidates: number; excludedNonMeeting: number; excludedInternal: number;
+  refusedSender: number; incompleteMessages: number; complete: boolean;
 }
 
 export interface MeetingCandidate {
@@ -126,6 +137,12 @@ export interface MeetingCandidate {
   senderEmail: string;
   senderDomain: string;
   meetingUrl?: string;
+  evidenceIssue?: "unresolved-body" | "unsupported-attachment";
+  meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+  youtubeWatchIssue?: "ambiguous";
+  registrationOnly?: boolean;
+  startTime?: string;
+  endTime?: string;
   status: "pending" | "approved" | "rejected" | "auto_approved";
   detectedAt: string;
   decidedAt?: string;

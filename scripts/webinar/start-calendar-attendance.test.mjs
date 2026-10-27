@@ -2,12 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {dirname, resolve} from 'node:path';
+import {dirname, resolve, isAbsolute} from 'node:path';
+import {resolveAttendanceExecutable} from './calendar-attendance-source.mjs';
 import {mkdtempSync, writeFileSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const launcher = resolve(root, 'scripts/webinar/start-calendar-attendance.ps1');
-const shell = 'C:\\Program Files\\PowerShell\\7\\pwsh.exe';
+const shell = resolveAttendanceExecutable('pwsh', process.env.LKB_PWSH_PATH);
 function invoke(args = []) {
   return spawnSync(shell, ['-NoProfile', '-File', launcher, ...args], {
     cwd: root, encoding: 'utf8', timeout: 10000, maxBuffer: 65536, windowsHide: true,
@@ -23,7 +24,8 @@ test('default preview names the existing runner, target account and absolute pat
   assert.equal(view.workingDirectory, root);
   assert.deepEqual(view.arguments, [resolve(root, 'scripts/webinar/run-pipeline.mjs'),
     '--calendar-attendance-account', 'umeshsugara@vidysea.com']);
-  for (const path of [view.executable, view.python, view.gws, view.mediaDirectory]) assert.match(path, /^[A-Z]:\\/i);
+  for (const path of [view.executable, view.python, view.gws, view.mediaDirectory].filter(Boolean)) assert.equal(isAbsolute(path), true);
+  assert.equal(view.executable, process.execPath); assert.ok(Array.isArray(view.missingPrerequisites));
 });
 test('Watch preview never adds run, and install cannot register or start a task', () => {
   const preview = invoke(['-Watch']);
@@ -86,4 +88,12 @@ Write-Output 'mock-boundary-pass'
   });
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /mock-boundary-pass/);
+});
+
+test('explicit separate media executable overrides are retained without starting a prerequisite',()=>{
+  const result=invoke(['-FfmpegPath','C:\\fixture-ffmpeg\\ffmpeg.exe','-FfprobePath','C:\\fixture-probe\\ffprobe.exe']);
+  assert.equal(result.status,0,result.stderr); const view=JSON.parse(result.stdout);
+  assert.equal(view.ffmpeg,'C:\\fixture-ffmpeg\\ffmpeg.exe'); assert.equal(view.ffprobe,'C:\\fixture-probe\\ffprobe.exe');
+  assert.ok(view.missingPrerequisites.includes('ffmpeg')); assert.ok(view.missingPrerequisites.includes('ffprobe'));
+  assert.equal(view.captureStarted,false); assert.equal(view.taskRegistered,false);
 });

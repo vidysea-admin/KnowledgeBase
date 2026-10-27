@@ -83,9 +83,10 @@ export function createSchedulerRuntime(root, env, log, verifiedTenant) {
       authority(); const enabled = reloadAutojoin(); reloadCapabilities(); return enabled;
     },
     flushSchedulerAlerts: () => serializeAlert(() => flushFailureDigest(alertDeps())),
-    applyJoinRules(selection, {readOnly = false, now} = {}) {
+    applyJoinRules(selection, {readOnly = false, now, selectWithRules, remote = false} = {}) {
       const verified = verifiedTenant();
-      return enforceJoinRules(selection, {mode: env.LKB_JOIN_RULES_ENFORCE, tenantId,
+      return enforceJoinRules(selection, {selectWithRules,
+        ...(remote || env.LKB_API_URL || env.LKB_CALENDAR_WORKER_HOST_ID ? {remote: {url: env.LKB_API_URL ?? 'http://localhost:3300', apiKey: env.LKB_API_KEY}} : {}), mode: env.LKB_JOIN_RULES_ENFORCE, tenantId,
         keyTenantId: verified === tenantId && env.LKB_TENANT_ID === tenantId ? verified : null, stateDir, log, readOnly,
         now: () => now === undefined ? Date.now() : Date.parse(now), onDegraded: autojoin.rulesDegraded, onHealthy: autojoin.rulesHealthy});
     },

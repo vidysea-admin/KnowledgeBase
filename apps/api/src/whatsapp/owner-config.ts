@@ -1,4 +1,9 @@
 /** Trusted deployment grants, never client input. Missing configuration denies all owners. */
+/** Expected missing owner/source availability. Never carries private provider diagnostics. */
+export class WhatsAppUnavailableError extends Error {
+  constructor() { super("WhatsApp source unavailable"); this.name = "WhatsAppUnavailableError"; }
+}
+
 export type WhatsAppOwnerResolver = (authenticatedTenantId: string) => Promise<string | null>;
 export function createConfiguredWhatsAppOwnerResolver(raw: string | undefined): WhatsAppOwnerResolver {
   if (raw === undefined || raw.trim() === "") return async () => null;
