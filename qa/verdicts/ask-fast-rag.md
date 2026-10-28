@@ -1,47 +1,50 @@
-# Verdict — ask-fast-rag (Mode A, dual-check coordinator A)
-Date: 2026-10-28 · Bound to D:/KnowledgeBase/.worktrees/ask-fast-rag · branch wave/ask-fast-rag · Head 8f493875 (code at f6b353b9) · Base 10635a57 (= merge-base with docs/devops-golive-2026-10-26)
-Cycle checked: 0 · Policy-Version: proportional-verification/2026-10-19.17
+# Verdict — ask-fast-rag (coordinator A, repair checker, cycle 1)
+Date: 2026-10-28 · bound to D:/KnowledgeBase/.worktrees/ask-fast-rag · head 6a9dbfc8 (code bd6af83b) · base 10635a57 (= merge-base with docs/devops-golive-2026-10-26) · Repair base feee65eb (ancestor of HEAD, verified)
+Cycle checked: 1 · Policy-Version: proportional-verification/2026-10-19.17 · Dual check: coordinator A (blind; other coordinator not read)
 
 ## Check plan
-Logic + tenancy (L, dual-trigger packages/ask/src/ask-graph.ts:93, apps/api/src/ask/ask-arms.ts:86) -> affected tests per file, own cross-tenant probe, one falsification per criterion in a copy, step 4c diff-scope read, HEAD-fidelity of builder-touched product files. No UI/web file in the diff -> Mode D not applicable. No live provider calls, no .env read, no DB writes.
+Logic + tenancy-scoped retrieval changed (repair diff touches ask-v2.ts, ask-graph.ts, answer.ts, passage-lexical.ts, application.ts, answer-workflow.ts). Plan: (1) read repair diff feee65eb..6a9dbfc8 in full; (2) scan whole-unit diff 10635a57...HEAD for out-of-scope files/deletions; (3) re-run every criterion's test file whose inputs the repair touched (one file per node --test invocation); (4) own tenant probe of the new tree arm; (5) one falsification per repaired criterion in a throwaway copy; (6) tsc.
+TIER: L (tenancy dual-trigger packages/ask/src/ask-graph.ts:93 membership guard, unchanged tier).
+
+## Results
+| Check | Evidence | Result |
+|---|---|---|
+| Repair diff read in full | 8 product files + 5 test files; no deletion/rename of an export, route, test or config key in the repair | ok |
+| Whole-unit scan | every file in `git diff --stat 10635a57...HEAD` is listed in manifest "What changed"; only deletion is the `export { askV2 }` line, replaced by the wider export in packages/ask/src/index.ts | in scope |
+| ask-fast (10), answer.test (6) | packages/ask | pass |
+| answer-fast (10), answer-workflow (18) | apps/api answer-policy | pass |
+| passage-lexical (5), vertical (4), message-vertical (4) | apps/api, default path, no `mode` knob | pass |
+| ask-tenant-isolation (17), ask-tenant-hostile (70) | apps/api ask | pass |
+| usage (14), server (10), routes/ask/ask (7) | apps/api | pass |
+| tsc --noEmit | packages/ask, apps/api | exit 0 / exit 0 |
+
+## Hint 1: the edited [C1] assertion (sources.internal length 2 -> 1)
+Judged a CORRECT BEHAVIOUR CHANGE, not a protected weakening. The old value counted every retrieved chunk although the answer cited one; contract C7 requires the shipped sources to be the valid internal chunks the answer cites, and C3 fixes the response SHAPE, not the count. The assertion got stricter, not looser: it now pins the exact cited node (`node_id === nodeA`), and a new [F4] test asserts an uncited retrieved chunk is not shipped. The edit is reachable only through F4: with the F4 narrowing disabled in a copy, both the [C1] and the [F4] tests go red (below). Every kept sentence must carry non-empty sourceIds (packages/ask/src/answer.ts:~60), so `cited` is never empty on a shipped bounded answer. Without `sourceContext` `citedSourceIds` stays undefined and the full set ships, as before.
+
+## Hint 2: tenant isolation of the new arm (my own probe)
+Code read: `treeLexicalIds` (apps/api/src/ask/passage-lexical.ts:~88) only walks the `tree` argument, which askForMode receives as the request's own tenant tree (routes/ask/ask.ts loads `deps.tree.load(tenantId)`; filteredTree prunes by sessionIds/exclusions first). Ids go through `deps.treeSearchFn(tree, ids)` (empty for graph-scoped asks, source-context.ts:276) and then `gatherCandidates`, whose membership guard (ask-graph.ts:~83-93 and the sourceContext block) resolves every candidate to the tenant tree's own node, followed by the tenant-bound hydrators. Probe (copy only, scratchpad probe-tree-arm.test.ts, real createSourceRequestDepsFor + BlindDb holding both tenants): P1 lexical ids are a subset of the handed tree; P2 foreign B ids injected as lexical ids resolve to nothing, no B marker in body/prompts; P3 a deliberately PERMISSIVE treeSearchFn returning B's topic/native-passage/session nodes is stopped by the guard; P4 production askForMode default path over A's tree (topic cross-referencing b-only-session) leaks no B content, every db query carries tenantId=tA. 4/4 pass. Falsification: removing both membership filters (`?? n`) makes P3 and ask-fast [C4] go red. No foreign tenant passage or topic can surface.
+
+## Falsifications (throwaway copy, green-before / red-after / restored; HEAD-fidelity `git hash-object` == `git rev-parse HEAD:<file>` after each)
+| Criterion / fix | edit | test | observed |
+|---|---|---|---|
+| C1/F1 tree arm | ask-v2.ts `lexicalIds.length ? treeSearchFn(...) : []` -> `[]` | ask-fast.test.ts | 10/0 -> 9/1, `[F1]` red |
+| C7+C1/F4 cited-only | ask-v2.ts `if (cited && s.result)` -> `if (false && ...)` | ask-fast, answer-fast | ask-fast 10/0 -> 8/2 (`[C1]`, `[F4]`); answer-fast 10/0 -> 9/1 (`[F4]`) |
+| C7/F3 guarded diagnosis | answer-workflow.ts guarded whyUnverified -> unguarded | answer-fast.test.ts | 10/0 -> 9/1, `[F3]` red |
+| C4 membership guard | ask-graph.ts both `byId.get(..)` filters -> `?? n` | probe P3 + ask-fast [C4] | 4/0 -> 3/1 (P3); 10/0 -> 9/1 (`[C4]`) |
+Note: vertical.test.ts is not runnable in the copy (relative fixtures), so its F1 red was not used; ask-fast `[F1]` carries F1.
+
+## Criteria
+C1-C7, I1, I2 evidenced on 6a9dbfc8. Criteria whose inputs the repair did not touch (none; all seven share ask-v2.ts/ask-graph.ts) were re-run anyway. I2: repair diff has no schema/migration/db-write change (read).
+
+PROPOSED-ISSUE: {"severity":"low","type":"quality","criterion":"C1","title":"treeLexicalIds admits level 'topic' nodes that the production hydrators cannot hydrate","detail":"apps/api/src/ask/passage-lexical.ts TREE_ARM_LEVELS includes 'topic'. createSourceHydrator keeps only level==='session' nodes (apps/api/src/ask/source-context.ts:~104) and the native hydrator only native nodes, so in production a lexically matched topic is dropped silently after it has consumed a top-k slot before hydrate (ask-graph.ts gatherCandidates cap). Only the usage.test.ts fixture hydrator accepts topics. Not reproduced end to end; read from code. Harmless to tenancy; can lower recall.","fix_direction":"Restrict the arm to levels the request hydrators accept, or hydrate topics through their sessionRef."}
 
 VERDICT: PASS
 SCOREBOARD: 7/7 criteria met, 2/2 invariants hold
-TIER: L (tenancy-scoped retrieval refactor: gatherCandidates extracted around the membership guard at packages/ask/src/ask-graph.ts:91-93; default path now retrieves arms-only)
-FAILURES (if any): none
-PROPOSED-ISSUE lines (non-blocking, no ledger writes; maker mints rows after both coordinators PASS):
-- P1 sev high · default path sets sources.internal = ALL top-5 retrieved chunks (ask-v2.ts `sources: { internal: s.candidates.map(internalSource) ...}`), not the cited ones, and answer() discards which chunks were cited. One retrieved-but-uncited chunk that fails verification makes the whole run stale: answer "", sources [] (the C7 symptom). Repro: copy-only probe (rig with a 2-node arm result, verifier rejecting internal:n2) -> `PROBE-STATE stale internal [] answer ""`. Deep mode only verified score>=lower good_docs, so exposure is wider on the default path. C7 text is satisfied as written (real reason surfaced, all-valid case ships); fix direction: bind sources to chunks cited by grounded sentences, or verify only cited. Needs a maker/Umesh scope call.
-- P2 sev medium · apps/api/src/answer-policy/answer-workflow.ts published(): `whyNot = await whyUnverified(t, run.evidence, verify)` sits in the catch with no guard. If the evidence verifier throws (db down), deep mode returns a stale answer but the default path throws out of execute (500) after store.create already persisted the run. Repro: copy-only probe, `PROBE-T2 fast THROWS db down` vs `PROBE-T2 deep state stale`. Fix: wrap whyUnverified in try/catch and fall back to the generic reason.
-- P3 sev medium · default path hard-codes verdict "correct" with scored [] whenever retrieval is non-empty (ask-v2.ts), so policy simulateAnswerPolicy (answer-policy.ts:97) can only hold for review on no-sources/missing-provenance; score-based review/refuse for weak retrieval no longer fires by default. This is inherent to D-203/C1 but the manifest's Known limits omit it; Umesh should confirm.
-- P4 sev low · C4 coverage: in bounded mode removing only the arms-branch guard (ask-graph.ts:93) is caught only by the `ask.candidates_dropped` audit assertion (the second guard at :104 still drops the node); the legacy no-sourceContext fast path has no committed test. My probe (9 cases, scratchpad/probe-tenant.test.mts) passes on real code, incl. legacy mode and a spoofed same-id node.
-- P5 sev low · the four native-evidence createServer/HTTP tests (vertical.test.ts x3, message-vertical.test.ts) and server.test.ts now run only in deep mode; no composition-level test drives the default path with real arms + native sources (the answerNode native revalidate path on the fast route is unexercised end to end). answer-policy/routes.ts, yaml-simulation.ts, evaluation-flywheel and compete still call askV2 directly, so policy simulation does not reflect the production default.
-- P6 sev low · filters.sources=internal strips tavily only inside the answer workflow (answer-workflow.ts:190); the legacy router without answerWorkflow ignores it (pre-existing, unchanged). LKB_ASK_FAST_DEADLINE_MS parsing has no unit test (works: probe 80 ms -> state refused, reason "deadline exceeded after 80 ms"). The abandoned run is not cancelled and may still write job rows or call web search after the response (documented limit).
-
-CAPABILITY-COVERAGE: 7/7 rows reproduced (C1 C2 C3 C4 C5 C6 C7), each green-before / red-after in a copy (+2 extra C4 mutants)
-LIVE-BROWSER: not-applicable (changed paths are packages/ask/src, apps/api/src only)
-ISSUES-WRITTEN: none (dual check: PROPOSED-ISSUE lines only)
+TIER: L (tenancy-scoped retrieval; dual-trigger packages/ask/src/ask-graph.ts:93)
+FAILURES: none
+CAPABILITY-COVERAGE: 4/4 repaired-criterion falsifications reproduced (F1, F4, F3, C4) in a copy
+LIVE-BROWSER: not-applicable (changed paths: packages/ask, apps/api; no UI surface)
+ISSUES-WRITTEN: none (dual coordinator: PROPOSED-ISSUE P1 above)
 EXECUTOR: claude-sonnet-subagent (checker: claude-sonnet-subagent)
-
-## Evidence (own runs, one file per node --test invocation)
-- packages/ask: ask-fast 8/8; full per-file sweep of all 29 test files under packages/ask/src (+bounded-evidence) green, incl. ask-graph 60, ask-v2 14, bounded-ask 12 (deep suites untouched, C2).
-- apps/api: answer-fast 8, answer-workflow 18, ask-tenant-isolation 17, ask-tenant-hostile 70, ask-web-fallback 4, routes/ask/ask 7, vertical 4, message-vertical 4, server 10, plus 21 other files that POST /ask or call execute (answer-persistence, answer-router, native-*, routes, service, stale-citation-refusal, ask-arms, source-context*, source-exclusion, composition x2, evaluation-flywheel, eligible-tree-partial, production, compete, pages, score, current-corpus): all pass, 0 fail.
-- `tsc --noEmit -p .` apps/api exit 0, packages/ask exit 0.
-- (a) Test migration: git diff shows only the request input changed (`deep()` helper, `filters.mode:"deep"`); no assertion line added, removed or reworded in answer-workflow, vertical, message-vertical, server tests. Judged a legitimate scope split, not a protected-test weakening: those tests assert graph mechanics (per-candidate score thresholds, select_nodes) that the default path deliberately no longer has, and the package-level deep suites are byte-untouched. Default path is covered at workflow level (answer-fast), HTTP level (ask-tenant-isolation new test, non-vacuous: A gets cited answer, <=2 model calls), and ask-tenant-hostile (arms wired via requestDepsFor). Gap noted as P5.
-- (b) Tenant guard on DEFAULT path: gatherCandidates diff is a pure extraction, deep behaviour byte-equivalent (limit undefined -> same cap, same return). My probe: foreign node id never reaches hydrate, model prompt or sources; same-id spoof resolved to the tree's own node; hydrate returning an extra foreign node is refused; no arms -> empty/insufficient; legacy mode also safe.
-- (c) C7: no unverified citation ships: sources reach the client only if verify(run.evidence) passes; web bindings fail without a web verifier (reason names it). Empty retrieval -> state refused, answer "", reason set; same as deep.
-- (d) Deadline: slow arms, slow web search, hung complete all return a degraded insufficient_coverage answer in ~90 ms at 80 ms deadline; late rejection after race loss is swallowed; env var path works through the workflow.
-- (e) Shape: answer-fast shape test + probe show identical keys in both modes.
-- (f) HEAD-fidelity: git hash-object == git rev-parse HEAD:<file> for all 8 builder-touched product files; tracked tree clean. My falsifications ran only in a copy (scratchpad/copy, git archive HEAD + node_modules junctions), restored by rewrite.
-
-| Row | Edit (copy only) | Test | green-before | red-after |
-|---|---|---|---|---|
-| C1 | application.ts askForMode always askV2 | answer-fast | 8/8 | 4 fail incl. [C1][C2] |
-| C2 | askForMode always askFastV2 | answer-fast | 8/8 | 1 fail [C1][C2] |
-| C3 | ask-v2.ts askResult insufficient_coverage -> true | ask-fast | 8/8 | 2 fail [C3],[C5] |
-| C4 | ask-graph.ts arms guard -> `?? n` (a); both guards (ab) | ask-fast | 8/8 | 1 fail [C4] (both); (b) second guard alone survives, redundant by design |
-| C5 | ask-v2.ts web gate -> `if (true)` | ask-fast | 8/8 | 4 fail incl. [C5] |
-| C6 | Promise.race -> await pending | ask-fast | 8/8 | [C6] timeout 8002 ms |
-| C7 | published(..., false) | answer-fast | 8/8 | 1 fail [C7] real reason |
-
-EXPLANATION: All seven criteria and both invariants are evidenced by my own runs, the falsification floor is met, and the diff touches only declared files (4c clean: no removed export/route/test, assertion-free test migration). Verdict is PASS with P1 and P2 filed as the two findings most worth a maker decision; P1 especially reads C7's "citations" as the response's sources list, so a reader of C7 who means only cited chunks would want it fixed before ship. Question for Umesh/maker, not a failure: should the default path restrict sources to cited chunks?
-Metrics: start=2026-10-28T14:11:20+05:30 end=2026-10-28T14:27:00+05:30 wall_min=16 agent_min=16 blocked_min=0 suite_runs=0 repeat_runs=0 mutations=9 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=940 mutants=2 defects_unit=0 defects_6c=0
+EXPLANATION: The repair adds a non-LLM tree arm, cited-only sources and a guarded diagnosis; all affected test files re-ran green, tsc is clean, and each repaired behaviour goes red when its code is mutated in a copy. The [C1] edit is a correct behaviour change tightened to a specific node, and the new arm cannot surface another tenant's passages or topics because it only walks the request's tenant tree and still passes the membership guard and tenant-bound hydration.
+Metrics: start=2026-10-28T09:16:41Z end=2026-10-28T09:27:30Z wall_min=11 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=4 cycle=1 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=649 mutants=0 defects_unit=0 defects_6c=0
