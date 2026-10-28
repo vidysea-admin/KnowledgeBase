@@ -5,8 +5,9 @@
 // ISS-SCRIPTGUARDS-001: `migrate-mongo up` is a data writer, so there is NO default database and NO default URL.
 // `lkb` (production) is reachable only with BOTH the explicit production opt-in (argv `--i-know-this-is-production`
 // or env LKB_I_KNOW_THIS_IS_PRODUCTION=1) AND MONGODB_DB exactly "lkb": a flag alone or an env alone is refused, and
-// the opt-in with any other database is refused too. This is the same rule as requireScriptDatabase
-// (scripts/lib/transcript-provenance.mjs); it is inlined because compose bind-mounts only this file into the container.
+// the opt-in with any other database is refused too. Unlike requireScriptDatabase, migration opt-in
+// does not enable lkb_prod; that production alias is always refused here. The guard is inlined because
+// compose bind-mounts only this file into the container.
 require("dotenv/config");
 
 const PRODUCTION_FLAG = "--i-know-this-is-production";
@@ -22,7 +23,7 @@ function resolveMigrateTarget(env, argv) {
     return { url, databaseName: "lkb" };
   }
   const lower = name.toLowerCase();
-  if (lower === "lkb" || lower === "global_university_db")
+  if (lower === "lkb" || lower === "lkb_prod" || lower === "global_university_db")
     throw new Error(`migrate: database "${name}" refused; production needs ${PRODUCTION_FLAG} (or LKB_I_KNOW_THIS_IS_PRODUCTION=1) AND MONGODB_DB=lkb`);
   if (lower === "lkb_staging" && !(name === "lkb_staging" && env.LKB_ALLOW_STAGING === "lkb_staging"))
     throw new Error("migrate: lkb_staging requires LKB_ALLOW_STAGING=lkb_staging; refused");

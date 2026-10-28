@@ -91,12 +91,12 @@ export function stagingRefused(name, env) {
 }
 export function isProtectedWorkDbName(name, env) {
   const n = String(name ?? "").trim();
-  return !n || ["lkb", "global_university_db"].includes(n.toLowerCase()) || stagingRefused(n, env);
+  return !n || ["lkb", "lkb_prod", "global_university_db"].includes(n.toLowerCase()) || stagingRefused(n, env);
 }
 export function requireWorkDatabase(env) {
   const work = env.MONGO_WORK_DB?.trim(), selected = env.MONGODB_DB?.trim();
   if (stagingRefused(work, env) || stagingRefused(selected, env)) throw new Error("lkb_staging requires LKB_ALLOW_STAGING=lkb_staging; production writes refused");
-  if (!work || !/^[a-zA-Z0-9_-]{1,64}$/.test(work) || ["lkb", "global_university_db"].includes(work.toLowerCase()) ||
+  if (!work || !/^[a-zA-Z0-9_-]{1,64}$/.test(work) || ["lkb", "lkb_prod", "global_university_db"].includes(work.toLowerCase()) ||
       (selected && selected !== work) || !valid(env.MONGODB_URL)) throw new Error("explicit isolated work database and Mongo URL required; production writes refused");
   return {url: env.MONGODB_URL, dbName: work};
 }
@@ -125,7 +125,7 @@ export function loadSessionArtifacts(dir, {legacyUnbound = false} = {}) {
 }
 /**
  * Target database for a `--legacy-unbound` live write. LKB_ALLOW_STAGING=lkb_staging selects the staging
- * path, which accepts ONLY database `lkb_staging`; anything else (lkb, empty, other names, mismatched
+ * path, which accepts ONLY database `lkb_staging`; anything else (lkb/lkb_prod, empty, other names, mismatched
  * MONGODB_DB) is refused. Without that env the existing requireWorkDatabase rules apply unchanged.
  */
 export function requireLegacyUnboundDatabase(env) {
@@ -138,7 +138,7 @@ export function requireLegacyUnboundDatabase(env) {
 }
 /**
  * DB guard for writers that previously defaulted to `lkb` (backfill, sync-speakers). No default database:
- * refuses lkb/empty/unset. LKB_ALLOW_STAGING selects the lkb_staging path and is honoured ONLY together
+ * refuses lkb/lkb_prod/empty/unset. LKB_ALLOW_STAGING selects the lkb_staging path and is honoured ONLY together
  * with the `--legacy-unbound` flag; otherwise the existing requireWorkDatabase rules apply.
  */
 export function requireBackfillDatabase(env, {legacyUnbound = false} = {}) {
@@ -151,14 +151,16 @@ export const PRODUCTION_FLAG = "--i-know-this-is-production";
 /**
  * ISS-LEGACYSEED-001/003/005/006 shared guard for scripts that used to default MONGODB_DB to `lkb`.
  * No default database. Isolated work DB / lkb_staging go through requireLegacyUnboundDatabase unchanged.
- * `lkb` itself is reachable ONLY when allowProduction is set by the script AND argv carries
- * --i-know-this-is-production AND MONGODB_DB is exactly "lkb" (a flag alone, or an env alone, is refused).
+ * Canonical `lkb` / `lkb_prod` are reachable ONLY when allowProduction is set by the script AND argv carries
+ * --i-know-this-is-production AND trimmed MONGODB_DB explicitly selects that canonical name.
+ * This capability does not authorize execution of a production write (D-196).
  */
 export function requireScriptDatabase(env, argv = [], {allowProduction = false} = {}) {
   if (allowProduction && argv.includes(PRODUCTION_FLAG)) {
-    if (env.MONGODB_DB?.trim() !== "lkb" || !valid(env.MONGODB_URL))
-      throw new Error(`${PRODUCTION_FLAG} requires an explicit MONGODB_DB=lkb and a Mongo URL`);
-    return {url: env.MONGODB_URL, dbName: "lkb"};
+    const selected = env.MONGODB_DB?.trim();
+    if (!["lkb", "lkb_prod"].includes(selected) || !valid(env.MONGODB_URL))
+      throw new Error(`${PRODUCTION_FLAG} requires an explicit MONGODB_DB=lkb or MONGODB_DB=lkb_prod and a Mongo URL`);
+    return {url: env.MONGODB_URL, dbName: selected};
   }
   return requireLegacyUnboundDatabase(env);
 }

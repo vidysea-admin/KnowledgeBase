@@ -147,6 +147,7 @@ export function evaluateJoinRules(event: JoinRuleEvent, rawRuleSet: JoinRuleSet,
   if (typeof event.meetingUrl !== "string" || event.meetingUrl.trim() === "") return skip("no-meeting-url", "precondition");
   if (!sender) return { action: "needs-approval", reason: "sender-unverifiable", ruleId: "precondition" };
 
+  if ((ruleSet.attendanceMode === "all" || ruleSet.attendanceMode === "rules") && internal) return skip("deny-rule", "office:internal");
   if (ruleSet.attendanceMode === "all") return { action: "join", reason: "all-mode", ruleId: "mode:all" };
   for (const rule of ruleSet.rules) {
     if (rule.effect === "allow" && ruleMatches(rule.match, sender, platform, internal, event, ruleSet.purposeGroups ?? [])) {

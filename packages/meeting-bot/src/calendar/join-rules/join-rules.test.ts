@@ -390,6 +390,8 @@ test("explicit attendance modes and literal purpose matching fail closed", () =>
   assert.equal(evaluateJoinRules(ev("a@x.com", {cancelled: true}), all).reason, "cancelled");
   assert.equal(evaluateJoinRules(ev("a@x.com", {meetingUrl: undefined}), all).reason, "no-meeting-url");
   assert.equal(evaluateJoinRules(ev("a@x.com", { description: "private" + "x".repeat(20000) }), all).action, "needs-approval");
+  for (const attendanceMode of ["all", "rules"] as const) for (const organizer of ["STAFF@OFFICE.EXAMPLE", "a@dept.office.example"])
+    assert.deepEqual(evaluateJoinRules(ev(organizer), {...set([allow("internal", {scope:"internal"})], ["Office.Example"]), attendanceMode}, {...EMPTY_JOIN_RULE_STATE,approvedSenders:[organizer.toLowerCase()]}), {action:"skip",reason:"deny-rule",ruleId:"office:internal"});
   const literal = { ...set([allow("literal", { titleIncludes: [".*"] })]), attendanceMode: "rules" };
   assert.notEqual(evaluateJoinRules(ev("a@x.com", {title: "anything"}), literal as JoinRuleSet).action, "join");
   assert.equal(evaluateJoinRules(ev("a@x.com", {title: "literal .* text"}), literal as JoinRuleSet).action, "join");

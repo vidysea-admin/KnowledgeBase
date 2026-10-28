@@ -64,11 +64,15 @@ cp .env.example .env && chmod 600 .env
 Set in `.env` (names only; get values from the owner):
 - `MONGODB_URL` required. Mongo connection URI with the product's dedicated user
   (section 6a). Placeholder: `mongodb://lkb_app:<PASSWORD>@<mongo-host>:27017/lkb_prod?authSource=lkb_prod`.
-- `MONGODB_DB=lkb_prod` required, no default. Authorized for the deployed app by D-186
-  (supersedes the D-117 no-production-writes stance for the app only). The guards still
-  refuse `lkb`, `global_university_db` and unflagged `lkb_staging` (D-173), so `lkb_prod`
-  needs no extra opt-in flag. Set `MONGO_WORK_DB=lkb_prod` too when running scripts
-  from section 6.
+- `MONGODB_DB=lkb_prod` required, no default. D-186 authorizes the deployed app.
+  D-196 protects both `lkb` and `lkb_prod` (case-insensitively) on shared work/test
+  paths: set `MONGO_WORK_DB` to a separate isolated database, never either production
+  alias. Capture children must select that work database independently of the app
+  parent. `global_university_db` remains refused; `lkb_staging` requires the exact
+  `LKB_ALLOW_STAGING=lkb_staging` opt-in. Production-enabled scripts require all three:
+  caller `allowProduction`, `--i-know-this-is-production`, and explicit canonical
+  `MONGODB_DB=lkb` or `MONGODB_DB=lkb_prod`. These select a capability; approval to
+  execute a production write is still a separate human gate (section 6).
 - `OLLAMA_API_KEY` required. Copy it from the bot machine's `.env` into the server `.env`
   by hand; never commit it, paste it in chat or print it. Runtime only, never a build arg.
 - `CORS_ORIGINS` the exact browser origin(s) of the web UI, with scheme,
@@ -113,21 +117,30 @@ Python transcription worker. They need their own host:
   UNTESTED; expect path overrides (`LKB_PYTHON`, `LKB_GWS_PATH`, `LKB_FFPROBE`) and a
   one-time manual sign-in of the profile (CAPTCHA / 2FA cannot be automated).
 - Recommendation: go live with api + web first; keep the bot on the current host,
-  pointed at the same `MONGODB_URL`/`MONGODB_DB`, until Linux is proven.
+  with an isolated `MONGO_WORK_DB` selected for capture children, until Linux is proven.
 
 ## 6. First-run database step
-Compose never migrates by itself. Run it once, deliberately, against the chosen DB:
+Compose never migrates by itself. After separate human approval for the specific
+migration and target database, run it deliberately:
 ```sh
 docker compose --profile migrate run --rm migrate
 ```
-It writes to `MONGODB_DB` (`lkb_prod`, D-186). The legacy `lkb` stays refused unless
-`LKB_I_KNOW_THIS_IS_PRODUCTION=1`; do not use it.
-Then mint an API key for the UI/API (printed once, store it safely):
+It writes to `MONGODB_DB`. D-186 deployed-app authority does not authorize this
+migration. Under D-197, `config/migrate-mongo-config.cjs` independently refuses
+`lkb_prod`, including case/whitespace variants, with or without production opt-in.
+Its existing production path accepts only explicit canonical `MONGODB_DB=lkb`
+with the required opt-in. The `lkb_prod` app configuration above therefore cannot
+run this migration; do not rename the target to get past the guard. A migration
+for that target remains blocked pending a separately authorized implementation.
+Neither supported configuration nor `LKB_I_KNOW_THIS_IS_PRODUCTION=1` is human approval.
+After separate approval to create the production key, mint it for the UI/API
+(printed once, store it safely):
 ```sh
 pnpm install --frozen-lockfile
-node scripts/mint-key.mjs --tenant toc --label first-key
+node scripts/mint-key.mjs --tenant toc --label first-key --i-know-this-is-production
 ```
-(Run it with `MONGODB_DB=lkb_prod MONGO_WORK_DB=lkb_prod`; the legacy `lkb` is not used.)
+Use explicit `MONGODB_DB=lkb_prod`; do not set `MONGO_WORK_DB=lkb_prod`. The script's
+production opt-in does not apply to work/test captures or authorize other writes.
 For the first operator admin key (every scope, incl. `answer-policy:*`, `automation:*`, `hosting`, `jobs`), add `--all-scopes`; for a narrower key use `--scopes answer-policy:read,jobs`.
 Data from other machines is not copied by deploying; import the corpus separately.
 

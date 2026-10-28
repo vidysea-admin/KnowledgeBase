@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import type { AutoRecordItem, SelectAutoRecordItemsResult, SkippedItem } from "@lkb/core";
 import { applyJoinRules, type JoinRuleEvaluator } from "./join-rules-select.js";
-import { EMPTY_JOIN_RULE_STATE, type JoinRule, type JoinRuleSet, type JoinRuleState } from "./join-rules.js";
+import { selectAutoRecordItems } from "../auto-join.js";
+import { evaluateJoinRules, EMPTY_JOIN_RULE_STATE, type JoinRule, type JoinRuleSet, type JoinRuleState } from "./join-rules.js";
 
 const item = (n: number, sender?: string): AutoRecordItem => ({ sessionKey: `cal:e${n}`, source: "calendar", sourceId: `e${n}`,
   title: `Webinar ${n}`, startTime: "2026-10-10T10:00:00Z", endTime: "2026-10-10T11:00:00Z", meetingUrl: `https://meet.google.com/abc-defg-hi${String.fromCharCode(97 + n)}`, sender });
@@ -137,4 +138,23 @@ test("property: 3000 seeded random cases keep the subset property", () => {
     if (ruleSet === undefined) assert.equal(out, input);
   }
   assert.ok(removedTotal > 500, `property run removed too little to be meaningful: ${removedTotal}`);
+});
+
+test("generic selector and shared rules exclude configured office domains only in explicit modes", () => {
+  for (const attendanceMode of ["all", "rules"] as const) for (const sender of ["STAFF@OFFICE.EXAMPLE", "staff@dept.office.example", "a@eviloffice.example", "a@office.example.evil", "a@external.example"]) {
+    const event = {id:"office-event", title:"Career webinar", organizer:sender, startTime:"2026-10-10T10:00:00Z", endTime:"2026-10-10T11:00:00Z", meetingUrl:"https://meet.google.com/abc-defg-hij"};
+    const selected = selectAutoRecordItems({calendarEvents:[event], candidates:[], now:event.startTime, leadMinutes:5, alreadyScheduled:[], trustedSenders:{emails:[],domains:[]}, everyWebinar:true});
+    assert.equal(selected.toSchedule.length, 1, "real selector reaches the shared veto");
+    const rules: JoinRuleSet = {...rs([{id:"any",effect:"allow",match:{platform:"meet"}}]),ownDomains:["Office.Example"],attendanceMode};
+    const context = {state:st({approvedSenders:[sender.toLowerCase()],approvedDomains:["office.example"]})};
+    const result = applyJoinRules(selected, rules, context), internal = ["STAFF@OFFICE.EXAMPLE", "staff@dept.office.example"].includes(sender);
+    assert.equal(result.toSchedule.length, internal ? 0 : 1, sender + "/" + attendanceMode);
+    if (internal) {assert.equal(result.skipped[0]!.reason,"rule-denied"); assert.match(result.skipped[0]!.detail!,/office:internal/);}
+    assert.equal(applyJoinRules(selected,rules,{state:st({optedOutEventIds:[event.id]})}).skipped[0]!.reason,"opted-out");
+    assert.equal(evaluateJoinRules({...event,cancelled:true},rules).reason,"cancelled");
+    assert.equal(evaluateJoinRules({...event,meetingUrl:undefined},rules).reason,"no-meeting-url");
+    assert.equal(applyJoinRules(selected,{...rules,rules:[deny("explicit",sender)]}).skipped[0]!.detail!.includes("rule explicit"),true);
+    const {attendanceMode:_mode,...legacy} = rules;
+    assert.equal(applyJoinRules(selected,legacy,context).toSchedule.length,1);
+  }
 });

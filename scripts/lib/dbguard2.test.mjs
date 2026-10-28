@@ -38,6 +38,9 @@ test("mint-key refuses (exit 1, before connecting) with no DB, lkb without flag,
     [[PRODUCTION_FLAG], {MONGODB_URL: URL_, MONGODB_DB: "lkb_work_x"}, /MONGODB_DB=lkb/],
     [[], {MONGODB_URL: URL_, MONGO_WORK_DB: "lkb_staging"}, /staging/],
   ];
+  for (const name of ["lkb_prod", "LKB_PROD", " LkB_PrOd "])
+    cases.push([[], {MONGODB_URL: URL_, MONGODB_DB: name, MONGO_WORK_DB: name}, /refused/]);
+  cases.push([[PRODUCTION_FLAG], {MONGODB_URL: URL_, MONGODB_DB: "LKB_PROD"}, /MONGODB_DB=lkb/]);
   for (const [args, env, re] of cases) {
     const r = mint(args, env);
     assert.equal(r.status, 1, JSON.stringify([args, env]));
@@ -49,6 +52,11 @@ test("mint-key guard (as invoked) accepts lkb only with flag + exact MONGODB_DB=
   const P = {allowProduction: true}, env = {MONGODB_URL: URL_, MONGODB_DB: "lkb"};
   assert.deepEqual(requireScriptDatabase(env, [PRODUCTION_FLAG, "--tenant", "toc"], P), {url: URL_, dbName: "lkb"});
   assert.throws(() => requireScriptDatabase(env, ["--tenant", "toc"], P), /refused/);
+  for (const dbName of ["lkb", "lkb_prod"]) {
+    const selected = {...env, MONGODB_DB: dbName};
+    assert.deepEqual(requireScriptDatabase(selected, [PRODUCTION_FLAG, "--tenant", "toc"], P), {url: URL_, dbName});
+    assert.throws(() => requireScriptDatabase(selected, ["--tenant", "toc"], P), /refused/);
+  }
   assert.deepEqual(requireScriptDatabase({MONGODB_URL: URL_, MONGO_WORK_DB: "lkb_work_x"}, [], P), {url: URL_, dbName: "lkb_work_x"});
 });
 
@@ -79,6 +87,11 @@ test("migrate config refuses: nothing set, URL only, lkb without opt-in, opt-in 
     [{MONGODB_URL: URL_, MONGODB_DB: "LKB_STAGING", LKB_ALLOW_STAGING: "lkb_staging"}, [], /LKB_ALLOW_STAGING/],
     [{MONGODB_URL: URL_, MONGODB_DB: "a b"}, [], /invalid/],
   ];
+  for (const name of ["lkb_prod", "LKB_PROD", " LkB_PrOd "]) {
+    refused.push([{MONGODB_URL: URL_, MONGODB_DB: name}, [], /refused/]);
+    refused.push([{MONGODB_URL: URL_, MONGODB_DB: name}, [PRODUCTION_FLAG], /MONGODB_DB=lkb exactly/]);
+    refused.push([{MONGODB_URL: URL_, MONGODB_DB: name, LKB_I_KNOW_THIS_IS_PRODUCTION: "1"}, [], /MONGODB_DB=lkb exactly/]);
+  }
   for (const [env, argv, re] of refused) {
     const r = load(env, argv);
     assert.notEqual(r.status, 0, JSON.stringify([env, argv]));

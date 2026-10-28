@@ -195,16 +195,18 @@ test('attendance configuration retains Gmail discovery and dashboard notificatio
 
 async function workerFixture(body) {
   const stateDir=mkdtempSync(join(tmpdir(),'lkb-worker-sample-')), generation='11111111-1111-4111-8111-111111111111';
-  let clock=Date.parse(NOW), loseAck=false, dropBeforeCommit=false, begun=false, wrongOwner=false, badDigest=false, fresh=false, seq=0, acknowledgement; const sent=[], methods=[];
+  let clock=Date.parse(NOW), loseAck=false, dropBeforeCommit=false, begun=false, wrongOwner=false, badDigest=false, fresh=false, seq=0, acknowledgement, putFailure, getOverride; const sent=[], methods=[], wire=[];
   const hash=value=>createHash('sha256').update(JSON.stringify(value,(_key,item)=>item&&typeof item==='object'&&!Array.isArray(item)?Object.fromEntries(Object.keys(item).sort().map(key=>[key,item[key]])):item)).digest('hex');
   const reply=value=>new Response(JSON.stringify(value),{headers:{'X-LKB-Tenant':wrongOwner?'foreign':'fixture'}});
   const transport=async (_url,options)=>{
     methods.push(options.method); assert.equal(options.redirect,'error'); assert.equal(options.headers.authorization,'Bearer test-key');
-    if(options.method==='GET') return reply({generation:begun?generation:null,sequence:seq,worker:{status:fresh?'fresh':'unavailable'}});
+    if(options.method==='GET') return getOverride ? getOverride() : reply({generation:begun?generation:null,sequence:seq,worker:{status:fresh?'fresh':'unavailable'}});
     const value=JSON.parse(options.body);
     if(options.method==='POST') {assert.deepEqual(value,{account:ATTENDANCE_ACCOUNT,hostId:'host-a',expectedGeneration:begun?generation:null}); begun=true; return reply({generation,sequence:0});}
-    sent.push(value);
+    sent.push(value); wire.push(options.body);
+    if(putFailure) return putFailure();
     if(dropBeforeCommit) {dropBeforeCommit=false; throw new TypeError('request not delivered');}
+    if(!validateWorkerWire(value)) return new Response('{}',{status:400,headers:{'X-LKB-Tenant':'fixture'}});
     if(value.complete && clock-Date.parse(value.checkedAt)>=600000 && value.sequence>seq) return new Response('{}',{status:422,headers:{'X-LKB-Tenant':'fixture'}});
     if(value.sequence>seq) {seq=value.sequence; acknowledgement={generation,sequence:seq,digest:hash(value),receivedAt:new Date(clock).toISOString(),complete:value.complete};}
     if(loseAck) {loseAck=false; throw new TypeError('lost acknowledgement');}
@@ -212,12 +214,12 @@ async function workerFixture(body) {
   };
   const factory=()=>createCalendarWorkerPublisher({stateDir,account:ATTENDANCE_ACCOUNT,hostId:'host-a',tenantId:'fixture',apiUrl:'https://operator.example.test',apiKey:'test-key',fetch:transport,now:()=>new Date(clock).toISOString()});
   const scan=(changes={})=>({checkedAt:NOW,complete:true,sourceEvents:[],meetings:[],candidates:[],operations:{},...changes});
-  try {await body({factory,scan,sent,methods,stateDir,transport,advance:ms=>{clock+=ms;},drop:()=>{dropBeforeCommit=true;},lose:()=>{loseAck=true;},foreign:()=>{wrongOwner=true;},bad:()=>{badDigest=true;},fresh:()=>{fresh=true;}});} finally {rmSync(stateDir,{recursive:true,force:true});}
+  try {await body({factory,scan,sent,wire,methods,stateDir,transport,failPut:fn=>{putFailure=fn;},readFence:fn=>{getOverride=fn;},generation,advance:ms=>{clock+=ms;},drop:()=>{dropBeforeCommit=true;},lose:()=>{loseAck=true;},foreign:()=>{wrongOwner=true;},bad:()=>{badDigest=true;},fresh:()=>{fresh=true;}});} finally {rmSync(stateDir,{recursive:true,force:true});}
 }
 test('worker lost-ack retry survives restart with identical generation, sequence, payload and original receipt', () => workerFixture(async f=>{
   const publisher=f.factory(); f.lose(); await assert.rejects(publisher.publish(f.scan()),/lost acknowledgement/);
   f.advance(1000); const ack=await f.factory().publish(f.scan());
-  assert.equal(ack.receivedAt,NOW); assert.equal(ack.sequence,1); assert.deepEqual(f.sent[0],f.sent[1]);
+  assert.equal(ack.receivedAt,NOW); assert.equal(ack.sequence,1); assert.deepEqual(f.sent[0],f.sent[1]); assert.equal(f.wire[0],f.wire[1]);
   assert.deepEqual(f.methods,['GET','POST','PUT','PUT']);
   f.advance(1000); assert.deepEqual(await f.factory().publish(f.scan()),ack); assert.equal(f.sent.length,2,'same scan never renews scheduling receipt');
 }));
@@ -352,4 +354,46 @@ test('office native acquisition blocks launch and refresh stops an active office
 test('malformed organizer domains never acquire attendance approval', () => {
   for (const organizer of ['host@vidysea.com.', 'host@bad_domain.test', 'Name <host@vidysea.com>', 'host@vidysea.com '])
     assert.equal(choose([raw({organizer: {email: organizer}})]).toSchedule.length, 0, organizer);
+});
+
+test('worker schema400 legacy incomplete retry recovers only for an advanced scan across restart',()=>workerFixture(async f=>{
+  f.drop(); await assert.rejects(f.factory().publish(f.scan({complete:false})),/not delivered/);
+  const file=join(f.stateDir,'calendar-worker.json'), legacy=JSON.parse(readFileSync(file,'utf8'));
+  delete legacy.pending.sourceEvents;
+  assert.equal(validateWorkerWire(legacy.pending),false); assert.ok(validateWorkerWire.errors.some(row=>row.keyword==='required'&&row.params.missingProperty==='sourceEvents'));
+  writeFileSync(file,JSON.stringify(legacy)); const before=readFileSync(file,'utf8');
+  await assert.rejects(f.factory().publish(f.scan({complete:false})),/refused/);
+  assert.equal(readFileSync(file,'utf8'),before); assert.equal(f.methods.filter(method=>method==='GET').length,1,'unchanged scan never abandons pending');
+  f.advance(1000); const ack=await f.factory().publish(f.scan({checkedAt:new Date(Date.parse(NOW)+1000).toISOString()}));
+  assert.equal(ack.sequence,2); assert.equal(ack.complete,true); assert.equal(validateWorkerWire(f.sent.at(-1)),true,JSON.stringify(validateWorkerWire.errors));
+  assert.equal(f.wire[1],f.wire[2],'persisted legacy retry is replayed exactly');
+  assert.deepEqual(f.sent.map(row=>row.sequence),[1,1,1,2]); assert.deepEqual(f.methods,['GET','POST','PUT','PUT','PUT','GET','PUT']);
+}));
+test('worker cannot discard rejected pending behind changed generation, invalid/equal/higher fence or refused read',async()=>{
+  for(const status of [400,422]) for(const fence of ['changed-generation','equal','higher','negative','fraction','unsafe','read-refused','read-foreign','read-network']) await workerFixture(async f=>{
+    f.drop(); await assert.rejects(f.factory().publish(f.scan({complete:false})),/not delivered/);
+    const file=join(f.stateDir,'calendar-worker.json'), before=readFileSync(file,'utf8');
+    f.failPut(()=>new Response('{}',{status,headers:{'X-LKB-Tenant':'fixture'}}));
+    f.readFence(()=>{
+      if(fence==='read-network') throw new TypeError('read failed');
+      const sequence={equal:1,higher:2,negative:-1,fraction:0.5,unsafe:Number.MAX_SAFE_INTEGER+1}[fence]??0;
+      return new Response(JSON.stringify({generation:fence==='changed-generation'?'22222222-2222-4222-8222-222222222222':f.generation,sequence}),{status:fence==='read-refused'?403:200,headers:{'X-LKB-Tenant':fence==='read-foreign'?'foreign':'fixture'}});
+    });
+    f.advance(1000); await assert.rejects(f.factory().publish(f.scan({checkedAt:new Date(Date.parse(NOW)+1000).toISOString()})));
+    assert.equal(readFileSync(file,'utf8'),before,status+'/'+fence); assert.deepEqual(f.sent.map(row=>row.sequence),[1,1]);
+  });
+});
+test('worker never discards on unauthenticated rejection, protocol/read failure, conflict or network error',async()=>{
+  for(const kind of ['foreign400','foreign422','missing400','missing422','empty400','empty422','bad-json400','stream422','401','403','409','network']) await workerFixture(async f=>{
+    f.drop(); await assert.rejects(f.factory().publish(f.scan({complete:false})),/not delivered/);
+    const file=join(f.stateDir,'calendar-worker.json'), before=readFileSync(file,'utf8');
+    f.failPut(()=>{
+      if(kind==='network') throw new TypeError('write failed');
+      const status=Number(kind.match(/\d+$/)?.[0]); const headers={'X-LKB-Tenant':kind.startsWith('foreign')?'foreign':'fixture'}; if(kind.startsWith('missing')) delete headers['X-LKB-Tenant'];
+      const body=kind.startsWith('empty')?null:kind.startsWith('bad-json')?'{':kind.startsWith('stream')?new ReadableStream({start(controller){controller.error(new Error('read failed'));}}):'{}';
+      return new Response(body,{status,headers});
+    });
+    f.advance(1000); await assert.rejects(f.factory().publish(f.scan({checkedAt:new Date(Date.parse(NOW)+1000).toISOString()})));
+    assert.equal(readFileSync(file,'utf8'),before,kind); assert.equal(f.methods.filter(method=>method==='GET').length,1,kind); assert.deepEqual(f.sent.map(row=>row.sequence),[1,1]);
+  });
 });

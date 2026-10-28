@@ -107,6 +107,18 @@ test("ISS-LEGACYSEED-010: every guard path refuses lkb_staging without the opt-i
     assert.throws(() => requireLegacyUnboundDatabase(env), /refused/, JSON.stringify(env));
     assert.equal(isProtectedWorkDbName(env.MONGO_WORK_DB, env), true);
   }
+  for (const name of ["lkb", "LKB", " lkb ", "lkb_prod", "LKB_PROD", " LkB_PrOd ", "global_university_db"]) {
+    assert.equal(isProtectedWorkDbName(name, {}), true, name);
+    assert.equal(isProtectedWorkDbName(name, ok), true, name);
+    for (const allow of [undefined, "lkb_staging"])
+      for (const selected of [undefined, name]) {
+        const env = {...base, MONGO_WORK_DB: name, MONGODB_DB: selected, LKB_ALLOW_STAGING: allow};
+        assert.throws(() => requireWorkDatabase(env), /refused/);
+        assert.throws(() => requireLegacyUnboundDatabase(env), /refused/);
+        assert.throws(() => requireBackfillDatabase(env), /refused/);
+        assert.throws(() => requireBackfillDatabase(env, {legacyUnbound: true}), /refused/);
+      }
+  }
   assert.equal(isProtectedWorkDbName("lkb_staging", ok), false);
   assert.equal(isProtectedWorkDbName("lkb_work_x", {}), false);
   assert.equal(isProtectedWorkDbName("lkb", ok), true);

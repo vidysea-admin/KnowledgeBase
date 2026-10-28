@@ -177,11 +177,13 @@ export function createCalendarWorkerPublisher({stateDir, account, hostId, tenant
   async function call(method, suffix = '', body) {
     const response = await request(endpoint + suffix, {method, headers: {authorization: 'Bearer ' + apiKey, ...(body ? {'content-type': 'application/json'} : {})},
       ...(body ? {body: JSON.stringify(body)} : {}), redirect: 'error', signal: AbortSignal.timeout(30000)});
-    if (!response.ok || response.headers.get('x-lkb-tenant') !== tenantId || !response.body) {await response.body?.cancel(); throw Object.assign(new Error('Bound worker API refused publication or ownership'), {statusCode: response.status});}
+    if (response.headers.get('x-lkb-tenant') !== tenantId || !response.body) {await response.body?.cancel(); throw new Error('Bound worker API refused publication or ownership');}
     const reader = response.body.getReader(), chunks = []; let size = 0;
     try {for (;;) {const {done, value} = await reader.read(); if (done) break; size += value.byteLength; if (size > 65536) throw new Error('Worker response too large'); chunks.push(value);}}
     catch (e) {await reader.cancel().catch(() => {}); throw e;} finally {reader.releaseLock();}
-    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    const result = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+    if (!response.ok) throw Object.assign(new Error('Bound worker API refused publication'), {statusCode: response.status});
+    return result;
   }
   function read() {
     if (!existsSync(file)) return undefined;
@@ -232,9 +234,12 @@ export function createCalendarWorkerPublisher({stateDir, account, hostId, tenant
       if (state.pending) {
         try {await sendPending();} // Lost acknowledgements retry exact bytes and retain the server's original receipt.
         catch (error) {
-          if (error.statusCode !== 422 || !state.pending.complete || Date.parse(now()) - Date.parse(state.pending.checkedAt) < 600000) throw error;
+          // Match the existing checkedAt/complete scan identity: unchanged or older scans cannot consume another sequence.
+          const laterScan = Date.parse(input.checkedAt) > Date.parse(state.pending.checkedAt) ||
+            (input.checkedAt === state.pending.checkedAt && input.complete !== state.pending.complete);
+          if (![400, 422].includes(error.statusCode) || !laterScan) throw error;
           const current = await call('GET');
-          // A stale payload that never committed may be abandoned only after reading the same generation's lower fence.
+          // A definitively rejected payload may be abandoned only after proving it never committed.
           if (current.generation !== state.generation || !Number.isSafeInteger(current.sequence) || current.sequence >= state.pending.sequence || current.sequence < 0) throw error;
           state = {...state, pending: undefined}; save(state, lockToken);
         }
