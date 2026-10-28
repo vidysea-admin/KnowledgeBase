@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { processVideo, geminiVision, validateVision, validateTurns, buildNotes, mediaCommand, screenEvidenceTurns } from './process-video.mjs';
 
@@ -154,4 +155,99 @@ test('real ffmpeg synthetic video yields timestamped playable frame evidence', {
   const evidence = JSON.parse(readFileSync(join(f.dir, 'screen-evidence.json')));
   assert.equal(evidence.frames[0].tStart, 0);
   assert.ok(readFileSync(join(f.dir, evidence.frames[0].file)).length > 100);
+});
+
+// ---- w9-webinar-qa-items / ISS-WEBINARRELEASE-001: structured Q&A and item-level grounded decisions/actions ----
+const qaTurn = (id, speakerRef, tStart, tEnd, text) => ({ _id: id, tenantId: 'test-tenant', sessionId: 's1', speakerRef, tStart, tEnd, text });
+const qaTurns = [
+  qaTurn('q1', 'Priya', 0, 5, 'Welcome everyone. What is the application deadline for the scholarship?'),
+  qaTurn('a1', 'Rahul', 5, 12, 'The deadline is 15 March. We have decided to open applications on 1 February.'),
+  qaTurn('c1', 'Priya', 12, 18, 'Great. I will send the eligibility checklist to all attendees by Friday.'),
+  qaTurn('n1', 'Rahul', 18, 22, 'We have not decided on the venue yet. If we decide to extend, we will tell you. I will think about it.'),
+  qaTurn('q2', 'Priya', 22, 26, 'Should we go with option B?'),
+];
+const resolves = (item, turns) => item.evidence.length === 1 && turns.some((t) => t._id === item.evidence[0].turnId &&
+  item.evidence[0].sessionId === t.sessionId && item.evidence[0].tStart === t.tStart && item.evidence[0].tEnd === t.tEnd &&
+  item.evidence[0].quote.length > 0 && t.text.includes(item.evidence[0].quote));
+test('ISS-WEBINARRELEASE-001 recorded repro: a turn set with a decision, an action and a question yields non-empty structured items', () => {
+  const notes = buildNotes('s1', [], qaTurns);
+  assert.equal(notes.decisions.length, 1);
+  assert.equal(notes.decisions[0].text, 'We have decided to open applications on 1 February.');
+  assert.equal(notes.decisions[0].evidence[0].turnId, 'a1');
+  assert.equal(notes.actionItems.length, 1);
+  assert.equal(notes.actionItems[0].text, 'I will send the eligibility checklist to all attendees by Friday.');
+  assert.equal(notes.actionItems[0].evidence[0].turnId, 'c1');
+  assert.ok(Array.isArray(notes.qa));
+});
+test('Q&A entries carry separate question and answer evidence; unanswered stays null with no answer evidence', () => {
+  const { qa } = buildNotes('s1', [], qaTurns);
+  assert.equal(qa.length, 2);
+  const [first, second] = qa;
+  assert.equal(first.question, 'What is the application deadline for the scholarship?');
+  assert.equal(first.status, 'answered');
+  assert.equal(first.questionEvidence.length, 1); assert.equal(first.questionEvidence[0].turnId, 'q1');
+  assert.equal(first.answerEvidence.length, 1); assert.equal(first.answerEvidence[0].turnId, 'a1');
+  assert.equal(first.answer, first.answerEvidence[0].quote);
+  assert.equal(second.question, 'Should we go with option B?');
+  assert.equal(second.status, 'unanswered'); assert.equal(second.answer, null); assert.deepEqual(second.answerEvidence, []);
+  assert.notEqual(first.id, second.id);
+});
+test('every item resolves to exactly its own turn with a literal quote; none carries all-turn evidence', () => {
+  const notes = buildNotes('s1', [], qaTurns);
+  for (const item of [...notes.decisions, ...notes.actionItems]) {
+    assert.ok(resolves(item, qaTurns), item.text);
+    assert.equal(item.text, item.evidence[0].quote); assert.equal(item.verified, false);
+  }
+  for (const q of notes.qa) {
+    assert.ok(resolves({ evidence: q.questionEvidence }, qaTurns)); assert.ok(q.answerEvidence.every((e) => resolves({ evidence: [e] }, qaTurns)));
+    assert.ok(q.questionEvidence.length + q.answerEvidence.length < qaTurns.length);
+  }
+});
+test('negated, conditional, proposal and vague-commitment sentences are not decisions or actions', () => {
+  for (const text of ['We have not decided on the venue yet.', 'If we decide to extend, we will tell you.', 'Maybe we decided too early.',
+    'I will think about it.', 'We will not send the report.', "I won't send anything.", "Let's go with option B?", 'Nobody has agreed yet.',
+    'Have we decided on the venue?', 'The committee had decided nothing.']) {
+    const notes = buildNotes('s1', [], [qaTurn('x', 'A', 0, 1, text)]);
+    assert.deepEqual([notes.decisions, notes.actionItems], [[], []], text);
+  }
+});
+test('no cues: arrays are empty and defined, qa is [] not undefined', () => {
+  const quiet = buildNotes('s1', [], [qaTurn('x', 'A', 0, 1, 'Plain statement about fees.')]);
+  assert.deepEqual([quiet.decisions, quiet.actionItems, quiet.qa], [[], [], []]);
+});
+test('an item whose evidence turn cannot be resolved is dropped and reported as a gap, never given other evidence', () => {
+  const broken = { tenantId: 'test-tenant', sessionId: 's1', speakerRef: 'A', tStart: 0, tEnd: 1, text: 'We have decided to launch in May.' };
+  const notes = buildNotes('s1', [], [broken, qaTurn('ok', 'B', 1, 2, 'I will send the notes tomorrow.')]);
+  assert.deepEqual(notes.decisions, []);
+  assert.deepEqual(notes.actionItems.map((i) => i.evidence[0].turnId), ['ok']);
+  assert.ok(notes.gaps.some((g) => g.reason === 'unresolvable-evidence'));
+});
+test('a question answered only by the same speaker is unanswered; answer is the next different-speaker turn', () => {
+  const { qa } = buildNotes('s1', [], [qaTurn('a', 'P', 0, 1, 'What is the fee?'), qaTurn('b', 'P', 1, 2, 'Let me look.'), qaTurn('c', 'R', 2, 3, 'It is 500 rupees.')]);
+  assert.equal(qa.length, 1); assert.equal(qa[0].status, 'answered'); assert.equal(qa[0].answerEvidence[0].turnId, 'c');
+  const own = buildNotes('s1', [], [qaTurn('a', 'P', 0, 1, 'What is the fee?'), qaTurn('b', 'P', 1, 2, 'Let me look.')]).qa;
+  assert.equal(own[0].status, 'unanswered');
+});
+test('processVideo writes structured items into notes.json and upgrades stale notes on reuse without calling vision again', async (t) => {
+  const f = fixture(t);
+  const speech = qaTurns.slice(0, 3).map((x, i) => ({ ...x, sessionId: 'session-1', tStart: i * 0.5, tEnd: i * 0.5 + 0.4 }));
+  writeFileSync(join(f.dir, 'turns.json'), JSON.stringify(speech));
+  await processVideo(f.input);
+  const path = join(f.dir, 'notes.json'), fresh = JSON.parse(readFileSync(path));
+  assert.equal(fresh.notesVersion, 2); assert.equal(fresh.decisions.length, 1); assert.equal(fresh.actionItems.length, 1); assert.equal(fresh.qa.length, 1);
+  const stale = { ...fresh, decisions: [], actionItems: [] }; delete stale.qa; delete stale.notesVersion;
+  writeFileSync(path, `${JSON.stringify(stale, null, 2)}\n`);
+  const sha = () => createHash('sha256').update(readFileSync(path)).digest('hex');
+  const state = JSON.parse(readFileSync(join(f.dir, 'video-stage.json')));
+  writeFileSync(join(f.dir, 'video-stage.json'), JSON.stringify({ ...state, outputs: { ...state.outputs, 'notes.json': sha() } }));
+  let visionCalls = 0;
+  const again = await processVideo({ ...f.input, vision: async () => { visionCalls += 1; throw new Error('vision must not run'); } });
+  assert.equal(again.reused, true); assert.equal(visionCalls, 0);
+  const upgraded = JSON.parse(readFileSync(path));
+  assert.equal(upgraded.notesVersion, 2); assert.equal(upgraded.decisions.length, 1); assert.equal(upgraded.qa.length, 1);
+  assert.equal(JSON.parse(readFileSync(join(f.dir, 'video-stage.json'))).outputs['notes.json'], sha());
+});
+test('the month May is not a modal hedge, but a lowercase modal may still is', () => {
+  assert.equal(buildNotes('s1', [], [qaTurn('x', 'A', 0, 1, 'We have decided to launch in May.')]).decisions.length, 1);
+  assert.deepEqual(buildNotes('s1', [], [qaTurn('x', 'A', 0, 1, 'We may have decided to launch.')]).decisions, []);
 });
