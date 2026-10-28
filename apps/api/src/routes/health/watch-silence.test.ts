@@ -1,19 +1,19 @@
 /**
- * apps/api/src/routes/health.test.ts — in-process HTTP requests against `routes/health.ts` with
- * `fakeHealthDeps`. Covers: healthy -> 200 with real shape; NO Authorization header still works
- * (the deliberate unauthenticated exception); an unhealthy db report -> 503, not 200.
+ * apps/api/src/routes/health/watch-silence.test.ts — the watcher-silence detector behind `/health`
+ * (split out of routes/health.test.ts to stay under the 400-line test budget; no test removed).
  *
  * U4b/R2 (D-048) adds the watcher-silence detector's cases below: a stale heartbeat alerts, a fresh
  * one does not, a MISSING row alerts (absence is the failure mode), only the stale source alerts,
  * tenants are read one scoped call at a time, the unauthenticated body never names a tenant, and the
  * local `isStale` agrees with scripts/watch/lib/heartbeat.mjs's `isHeartbeatStale` case for case.
  */
+
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { startTestServer } from "../testUtils.js";
-import { buildTestDeps, fakeHealthDeps } from "../fixtures.js";
-import { detectSilentWatchers, type HeartbeatRow, type WatchSilenceDeps } from "./health.js";
+import { startTestServer } from "../../testUtils.js";
+import { buildTestDeps, fakeHealthDeps } from "../../fixtures.js";
+import { detectSilentWatchers, type HeartbeatRow, type WatchSilenceDeps } from "../health.js";
 
 const NOW = new Date("2026-09-28T12:00:00.000Z");
 const HOUR = 60 * 60 * 1000;
@@ -48,45 +48,6 @@ const fresh = (tenantId: string, sourceType: string): HeartbeatRow => ({
 });
 const allFresh = (tenantId: string): HeartbeatRow[] =>
   ["drive", "gmail", "calendar"].map((s) => fresh(tenantId, s));
-
-test("GET /health with no Authorization header returns 200 and EXACTLY {db: ok} (ISS-T057SCREEN-001)", async () => {
-  const server = await startTestServer(buildTestDeps());
-  try {
-    const res = await fetch(`${server.baseUrl}/health`);
-    assert.equal(res.status, 200);
-    const raw = await res.text();
-    assert.deepEqual(JSON.parse(raw), { db: "ok" });
-    for (const leak of ["collections", "sessions", "claims", "watchSilent", "watchUnreadable"]) {
-      assert.equal(raw.includes(leak), false, `leaked ${leak}`);
-    }
-  } finally {
-    await server.close();
-  }
-});
-
-test("GET /health never serialises extra keys a checkHealth fake returns (body is whitelisted)", async () => {
-  const sneaky = { db: "ok", collections: { secret_tenant_coll: 99 }, tenantId: "t1" } as unknown as { db: "ok" };
-  const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => sneaky }) }));
-  try {
-    const res = await fetch(`${server.baseUrl}/health`);
-    assert.deepEqual(await res.json(), { db: "ok" });
-  } finally {
-    await server.close();
-  }
-});
-
-test("GET /health reports 503 with EXACTLY {db: error} when the db is unhealthy", async () => {
-  const server = await startTestServer(
-    buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => ({ db: "error" }) }) }),
-  );
-  try {
-    const res = await fetch(`${server.baseUrl}/health`);
-    assert.equal(res.status, 503);
-    assert.deepEqual(await res.json(), { db: "error" });
-  } finally {
-    await server.close();
-  }
-});
 
 test("R2: a watcher whose heartbeat is older than the interval produces exactly one alert", async () => {
   const stale = { tenantId: "toc", sourceType: "drive", lastHeartbeatAt: new Date(NOW.getTime() - 3 * HOUR).toISOString() };
@@ -241,7 +202,7 @@ test("health.ts's local isStale agrees with scripts/watch/lib/heartbeat.mjs case
   // would be a seventh (see health.ts's comment on `isStale`). This test is what keeps the two copies
   // honest: it drives the REAL heartbeat.mjs and the real detector over one case table and requires
   // the same verdict from both. If either implementation changes alone, this goes red.
-  const libUrl = new URL("../../../../scripts/watch/lib/heartbeat.mjs", import.meta.url);
+  const libUrl = new URL("../../../../../scripts/watch/lib/heartbeat.mjs", import.meta.url);
   // `libUrl.href`, not a filesystem path: Node's ESM loader rejects a bare Windows `D:\...` path.
   const lib = (await import(libUrl.href)) as {
     isHeartbeatStale: (l: string | null | undefined, n: Date, i: number) => boolean;
@@ -346,76 +307,6 @@ test("ISS-368: recovery re-reads heartbeats (503 then 200) without mutating a ca
     assert.deepEqual(reads, ["toc", "toc"]);
     assert.deepEqual(alerts, []);
   } finally { await server.close(); }
-});
-
-// ---- ISS-T057SCREEN-001 (Approver ruling 2026-10-12: liveness only) ----
-
-test("ISS-T057SCREEN-001 reproduction 1 replayed: an anonymous caller gets no counts or collection names from /health", async () => {
-  // The recorded reproduction: unauthenticated GET /health used to return every collection name -> all-tenant count.
-  const server = await startTestServer(buildTestDeps());
-  try {
-    const res = await fetch(`${server.baseUrl}/health`, { headers: {} });
-    assert.equal(res.status, 200);
-    const body = (await res.json()) as Record<string, unknown>;
-    assert.deepEqual(Object.keys(body), ["db"]);
-    assert.equal(JSON.stringify(body).match(/\d/), null, "no numbers at all in the public body");
-  } finally {
-    await server.close();
-  }
-});
-
-test("ISS-T057SCREEN-001: no countDocuments anywhere on the public /health path (source pin)", async () => {
-  const { readFileSync } = await import("node:fs");
-  const strip = (f: string) => readFileSync(new URL(f, import.meta.url), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
-  assert.doesNotMatch(strip("./health.ts"), /countDocuments|estimatedDocumentCount|\.collection\(/);
-  assert.doesNotMatch(strip("../health-probe.ts"), /countDocuments|estimatedDocumentCount|\.collection\(/);
-  const store = strip("../store.ts");
-  const fn = store.slice(store.indexOf("export function createMongoHealthDeps"), store.indexOf("export function createMongoHealthDeps") + 400);
-  assert.doesNotMatch(fn, /countDocuments|\.collection\(|schema\/index/);
-});
-
-test("Dockerfile HEALTHCHECK command still passes against a live /health (200) and fails when the server is down", async () => {
-  const { readFileSync } = await import("node:fs");
-  const { spawn } = await import("node:child_process");
-  // ASYNC spawn: the test server lives in this process, so a blocking spawnSync would starve it.
-  const run = (args: string[], port: string) => new Promise<number | null>((resolve) => {
-    const c = spawn(process.execPath, args, { env: { ...process.env, PORT: port }, stdio: "ignore" });
-    const t = setTimeout(() => c.kill(), 15000);
-    c.on("exit", (code) => { clearTimeout(t); resolve(code); });
-  });
-  const df = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
-  const m = df.match(/^\s*CMD (\["node", "-e", .*\])\s*$/m);
-  assert.ok(m, "HEALTHCHECK CMD found");
-  const cmd = JSON.parse(m![1]!) as string[];
-  assert.equal(cmd[0], "node");
-  const server = await startTestServer(buildTestDeps());
-  try {
-    const port = new URL(server.baseUrl).port;
-    assert.equal(await run(cmd.slice(1), port), 0);
-  } finally {
-    await server.close();
-  }
-  // Server closed: the probe must now exit 1 (connection refused), proving it is not vacuous.
-  assert.equal(await run(cmd.slice(1), new URL(server.baseUrl).port), 1);
-});
-
-test("Dockerfile HEALTHCHECK goes red (exit 1) when the db is down (503)", async () => {
-  const { readFileSync } = await import("node:fs");
-  const { spawn } = await import("node:child_process");
-  // ASYNC spawn: the test server lives in this process, so a blocking spawnSync would starve it.
-  const run = (args: string[], port: string) => new Promise<number | null>((resolve) => {
-    const c = spawn(process.execPath, args, { env: { ...process.env, PORT: port }, stdio: "ignore" });
-    const t = setTimeout(() => c.kill(), 15000);
-    c.on("exit", (code) => { clearTimeout(t); resolve(code); });
-  });
-  const df = readFileSync(new URL("../../Dockerfile", import.meta.url), "utf8");
-  const cmd = JSON.parse(df.match(/^\s*CMD (\["node", "-e", .*\])\s*$/m)![1]!) as string[];
-  const server = await startTestServer(buildTestDeps({ health: fakeHealthDeps({ checkHealth: async () => ({ db: "error" }) }) }));
-  try {
-    assert.equal(await run(cmd.slice(1), new URL(server.baseUrl).port), 1);
-  } finally {
-    await server.close();
-  }
 });
 
 test("AC-4: a throwing db probe or detector reports 503 degraded, never 200 or a hang, and leaks nothing", async () => {
