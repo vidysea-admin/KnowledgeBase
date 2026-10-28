@@ -301,17 +301,18 @@ test("a Gmail snippet cannot override full-body meeting or passcode conflicts", 
     assert.equal(row?.registrationOnly, true);
   }
 });
+// Event dates are far-future on purpose: classifyMeetingKind treats a past startTime as past-recording, so 2026 dates expired this test on 2026-10-28.
 test("actual Gmail acquisition requires source year for scheduling identity and refuses receipt-inferred time", async () => {
   const rows = await scanGmailForMeetingCandidates(100, async args => {
     const p = JSON.parse(args[args.indexOf("--params") + 1]!);
     if (args.includes("list")) return JSON.stringify({messages: [{id: "invite"}, {id: "reminder"}, {id: "next"}, {id: "unknown"}, {id: "different"}, {id: "yearless"}]});
     return JSON.stringify({id: p.id, internalDate: String(Date.parse("2026-10-20T16:00:00Z")), payload: {headers: [
       {name: "From", value: "host@example.org"}, {name: "Subject", value: p.id === "reminder" ? "Reminder: ClickUp webinar invitation" : "ClickUp webinar invitation"}],
-      body: {data: b64url((p.id === "unknown" ? "" : p.id === "next" ? "October 28, 2026 at 12 PM PT " : p.id === "yearless" ? "October 27 at 12 PM PT " : "October 27, 2026 at 12 PM PT ") +
+      body: {data: b64url((p.id === "unknown" ? "" : p.id === "next" ? "October 28, 2099 at 12 PM PT " : p.id === "yearless" ? "October 27 at 12 PM PT " : "October 27, 2099 at 12 PM PT ") +
         (p.id === "different" ? "https://zoom.us/j/9999999999?pwd=" : "https://zoom.us/j/1234567890?pwd=") + (p.id === "reminder" ? "changed" : "literal"))}}});
   }, {});
   assert.equal(rows.length, 6, "preserve source rows and their sender/opt-out provenance");
-  assert.equal(rows[0]?.startTime, "2026-10-27T19:00:00.000Z");
+  assert.equal(rows[0]?.startTime, "2099-10-27T19:00:00.000Z");
   assert.equal(rows[0]?.timeProvenance?.yearSource, "explicit"); assert.equal(rows[5]?.startTime, undefined); assert.equal(rows[5]?.evidenceIssue, "unresolved-body");
   assert.ok(rows[0]?.canonicalEventIdentity);
   assert.equal(rows[0]?.canonicalEventIdentity, rows[1]?.canonicalEventIdentity);
