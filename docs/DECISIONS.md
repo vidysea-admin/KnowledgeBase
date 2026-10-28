@@ -2607,3 +2607,15 @@ fourth would have left real decisions idle behind an unrelated unit.
 **Why:** The checked slice can be packaged independently without pretending the failed private-start runtime acceptance or live deployment is complete. Preserve other work, credentials and runtime artifacts.
 **Result:** Both O/P/G/M/F checker verdicts PASS; 13/13 current reviewed file hashes match. Isolated candidate integration and push are pending and must pass before release. Runtime R2, whole-branch master review, deployment and live capture remain open.
 **Links:** D-196, D-197, T-036, T-037, T-038, T-051; qa/manifests/calendar-final-policy-db-repairs.md
+
+## D-199 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** HLD/LLD for AI editors; ARCHITECTURE refreshed to current reality; Codex merge and claims-policy rulings
+**What:** Umesh (Approver) ruled in chat on 2026-10-28: (1) documentation first, written for AI code editors (Claude/Codex): docs/HLD.md and docs/LLD.md committed (13569ea7); (2) "Yes, update it" for ARCHITECTURE.md sections 1, 3 and 6 to match current decisions (it stopped at D-008); (3) Codex branch codex/calendar-bot-completion: "Review, then merge" -- senior review verdict Warning (no critical/high, two medium filed), merged as ab3e1932; (4) needs-review claims: "Let needs-review be used" by answers/outputs with a visible unverified label (implementation is a separate maker unit with its own authorizing entry); (5) server config will be rolled to live from the locally validated .env.
+**Why:** ARCHITECTURE.md still described a vector index (superseded by D-173 vectorless RAG) and a Gemini-first text chain (D-173 moved text to Ollama Cloud), so AI editors were reading a stale ground truth. Live audit (references/portals/lkb-live.knowledge.md) shows counsellor and knowledge outputs refusing because all 1768 claims are needs-review.
+**Result:** HLD/LLD written from three read-only code maps; an independent checker answered 4/5 probes correctly first pass and 9 corrections were applied. ARCHITECTURE sections 1/3/6 updated; section 2 (frozen) and section 4/5 unchanged. Pre-existing lint:structure failures (stale SNAPSHOT, scripts/qa 31/30 files) reproduced on clean HEAD and are not caused by this change.
+**Changes-authorized:**
+- ARCHITECTURE.md sections 1, 3, 6
+- docs/HLD.md
+- docs/LLD.md
+**Approved-by:** Umesh (chat rulings 2026-10-28, quoted in What)
+**Links:** merge ab3e1932, D-173, D-186, D-192, D-198, T-013, T-051, T-058, docs/HLD.md, docs/LLD.md, references/portals/lkb-live.knowledge.md

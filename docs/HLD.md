@@ -107,13 +107,16 @@ Root causes: (1) hosting env unset → every 503; (2) `GEMINI_API_KEY`/`TAVILY_A
 (3) WhatsApp Mongo unset; (4) all claims `needs-review` → outputs/counsellor refuse; (5) 0 speakers;
 (6) bot/watchers not configured on server; (7) code gaps: `/connector-workflow` not mounted, `/knowledge/profiles` empty.
 
-## 7. Work in flight outside this branch
+## 7. Codex calendar-bot work (merged `ab3e1932`, 2026-10-28)
 
-`codex/calendar-bot-completion` (+4 commits on `0c2edb14`, 132 files, D-192..D-198, **not merged**):
+`codex/calendar-bot-completion` (132 files, D-192..D-198, reviewed then merged per D-199):
 hosted Calendar/Gmail bridge (Windows worker publishes owner-bound snapshots to the API), meeting-only
 Gmail discovery with exclusion feedback, join-rule enforcement modes, timezone-aware dates, DB guards
 (`lkb_prod` protected in `config/migrate-mongo-config.cjs`). Self-declared open: runtime privacy refusal,
-live capture slots, restart/recovery, Ubuntu capture, 7-day scheduler observation, whole-branch review.
+live capture slots, restart/recovery, Ubuntu capture, 7-day scheduler observation. Review findings
+(medium): remote join-rules mode is forced whenever `LKB_API_URL` is set, so scheduling fails closed if the API has
+rules disabled (`scripts/webinar/scheduler/deps-runtime.mjs:89`); worker `watch_state` snapshots grow without
+pruning (`apps/api/src/composition/integrations/capture-policy.ts:127`).
 
 ## 8. Remaining work — recommended order
 
@@ -121,7 +124,7 @@ live capture slots, restart/recovery, Ubuntu capture, 7-day scheduler observatio
 2. **Make live fully work** — config only: hosting env + tenant row, Gemini/Tavily keys, WhatsApp URL,
    Mongo auth, re-index the 2 failed sessions.
 3. **Claims review policy** — 1768 `needs-review` claims block outputs and the counsellor.
-4. **R1 end-to-end** — review/merge Codex branch, configure bot + gws, prove one real webinar →
+4. **R1 end-to-end** — configure bot + gws (Codex bridge now merged), prove one real webinar →
    capture → transcript → index → visible on live.
 5. **R2 quality** — speakers (U2.4/T-042), extraction gold (U2.2), search UX (U3.2), evaluator calibration (T-022).
 6. **R3** — accounts (T-028), counsellor client (T-013), championship (T-014), platform (T-060/T-061).
