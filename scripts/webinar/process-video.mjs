@@ -8,11 +8,9 @@ import { resolve, relative, join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 import { visionPlan, flagOff } from './vision/plan.mjs';
-import { slideFrameSpans, buildScreenEvidenceTurns, analyzeSlideFrame } from './slides/slide-knowledge.mjs';
+import { slideFrameSpans, buildScreenEvidenceTurns, analyzeSlideFrame, NOTES_VERSION, buildNotes as buildNotesFor } from './slides/slide-knowledge.mjs';
 
 const VERSION = 3;
-/** Version of the notes.json item shape (decisions/actionItems/qa); a reused video stage with older notes is rebuilt in place. */
-const NOTES_VERSION = 2;
 const OUTPUTS = ['screen-evidence.json', 'notes.json', 'knowledge-turns.json'];
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const load = (path) => JSON.parse(readFileSync(path, 'utf8'));
@@ -98,97 +96,7 @@ export const routedVision = (lib, backends, o = {}) => (frame) => makeRoutedVisi
   backends.map((backend) => ({ ...backend, call: (request, context) => backend.call(request, { ...context, signal: frame.signal }) })),
   { prompt: VISION_PROMPT, validate: validateVision, schema: VISION_SCHEMA, ...o })(frame);
 export { visionOrderFromYaml };
-// ---- ISS-WEBINARRELEASE-001: deterministic, extractive, item-level grounded decisions / actions / Q&A ----
-// No model call. Every item is ONE literal sentence (or leading slice) of ONE real turn, so its evidence resolves to that
-// turn and nothing else. Cue words only nominate a sentence; negated, conditional, hedged or interrogative sentences never
-// become decisions or actions. The strict webinar index (summarize.ts + session.ts) remains the model-backed upgrade.
-const MAX_ITEMS = 100;
-const HEDGED = /\b(?:if|unless|whether|maybe|perhaps|might|could|should|would|probably|not|never|no|nobody|nothing|none|yet)\b|n['’]t\b/i;
-const MODAL_MAY = /\bmay\b/; // case-sensitive: the month May is not a hedge
-const DECISION_CUE = new RegExp([
-  String.raw`\b(?:we|they|i|everyone|(?:the\s+)?(?:team|board|committee|group|panel))(?:\s+\w+){0,2}?\s+(?:(?:have|has|had|all)\s+)?(?:decided|agreed|resolved|settled|concluded)\b`,
-  String.raw`\bit\s+(?:was|is)\s+(?:decided|agreed)\b`, String.raw`\bthe\s+decision\s+(?:is|was)\b`, String.raw`\bwe(?:['’]ll|\s+will)\s+go\s+with\b`].join('|'), 'i');
-const ACTION_VERBS = 'send|share|follow up|email|circulate|schedule|prepare|draft|update|review|submit|publish|post|write|forward|upload|provide|book';
-const ACTION_CUE = new RegExp([String.raw`\baction\s+items?\b`,
-  String.raw`\b(?:i|we)(?:['’]ll|\s+will|['’](?:m|re)\s+going\s+to|\s+(?:am|are)\s+going\s+to)\s+(?:${ACTION_VERBS})\b`].join('|'), 'i');
-const sentencesOf = (text) => text.split(/(?<=[.!?])\s+/).map((x) => x.trim()).filter(Boolean);
-const leadingSlice = (text, max = 280) => {
-  const t = text.trim();
-  if (t.length <= max) return t;
-  const cut = t.slice(0, max), boundary = cut.match(/^[\s\S]*[.!?](?=\s|$)/);
-  return boundary ? boundary[0] : cut;
-};
-const resolvableTurn = (t, sessionId) => t && typeof t._id === 'string' && t._id.trim() && typeof t.text === 'string' &&
-  Number.isFinite(t.tStart) && Number.isFinite(t.tEnd) && t.tEnd >= t.tStart && (t.sessionId === undefined || t.sessionId === sessionId);
-function extractSpeechItems(sessionId, turns) {
-  const gaps = [], decisions = [], actionItems = [], qa = [];
-  const evidenceOf = (turn, quote) => ({ sessionId, turnId: turn._id, tStart: turn.tStart, tEnd: turn.tEnd,
-    ...(turn.speakerRef ? { speakerRef: turn.speakerRef } : {}), quote });
-  const ordered = turns.map((turn, index) => ({ turn, index })).filter(({ turn }) => typeof turn?.text === 'string' && turn.text.trim())
-    .sort((a, b) => (Number(a.turn.tStart) - Number(b.turn.tStart)) || a.index - b.index).map(({ turn }) => turn);
-  const seen = new Set();
-  const truncated = (kind) => { if (!gaps.some((g) => g.kind === kind && g.reason === 'items-truncated')) gaps.push({ kind, reason: 'items-truncated' }); };
-  const push = (list, kind, turn, quote) => {
-    const key = `${kind}|${turn._id}|${quote}`;
-    if (seen.has(key)) return;
-    seen.add(key);
-    if (list.length >= MAX_ITEMS) return truncated(kind);
-    list.push({ kind, text: quote, verified: false, evidence: [evidenceOf(turn, quote)] });
-  };
-  let unresolvable = 0;
-  ordered.forEach((turn, position) => {
-    const sentences = sentencesOf(turn.text), sound = resolvableTurn(turn, sessionId);
-    const questions = sentences.filter((s) => s.endsWith('?') && s.split(/\s+/).length >= 3);
-    let nominated = questions.length > 0;
-    for (const sentence of sentences) {
-      if (sentence.endsWith('?') || HEDGED.test(sentence) || MODAL_MAY.test(sentence)) continue;
-      const kind = DECISION_CUE.test(sentence) ? 'decision' : ACTION_CUE.test(sentence) ? 'action-item' : undefined;
-      if (!kind) continue;
-      nominated = true;
-      if (sound) push(kind === 'decision' ? decisions : actionItems, kind, turn, sentence);
-    }
-    if (!sound) { if (nominated) unresolvable += 1; return; }
-    questions.forEach((question, i) => {
-      const entry = { id: `qa-${digest(JSON.stringify([sessionId, turn._id, question])).slice(0, 32)}`, question,
-        questionEvidence: [evidenceOf(turn, question)], answer: null, answerEvidence: [], status: 'unanswered',
-        link: 'adjacent-turn', verified: false };
-      // Only the last question of a turn can be paired with the reply that follows it: the next different-speaker
-      // turn within three turns. Adjacency is a pointer for a reader, never a verification of relevance.
-      if (i === questions.length - 1) {
-        const reply = ordered.slice(position + 1, position + 4).find((next) => next.speakerRef !== turn.speakerRef && resolvableTurn(next, sessionId));
-        if (reply) { const quote = leadingSlice(reply.text); Object.assign(entry, { answer: quote, answerEvidence: [evidenceOf(reply, quote)], status: 'answered' }); }
-      }
-      if (qa.length < MAX_ITEMS) qa.push(entry); else truncated('qa');
-    });
-  });
-  if (unresolvable) gaps.push({ reason: 'unresolvable-evidence', count: unresolvable });
-  return { decisions, actionItems, qa, gaps };
-}
-export function buildNotes(sessionId, frames, turns, ocrErrors = []) {
-  const excerpt = (text) => text.length > 280 ? `${text.slice(0, 277)}…` : text;
-  const nonempty = turns.filter((t) => t.text.trim());
-  const sampled = [...new Set([0, Math.floor(nonempty.length / 3), Math.floor(2 * nonempty.length / 3), nonempty.length - 1])]
-    .map((i) => nonempty[i]).filter(Boolean);
-  const speech = sampled.map((turn) => ({
-    kind: 'speaker-statement', text: excerpt(turn.text), verified: false,
-    evidence: [{ sessionId, turnId: turn._id, tStart: turn.tStart, tEnd: turn.tEnd,
-      ...(turn.speakerRef ? { speakerRef: turn.speakerRef } : {}) }],
-  }));
-  const screen = frames.flatMap((frame) => {
-    if (!frame.analysis?.readable) return [];
-    const evidence = [{ sessionId, frameId: frame.id, tStart: frame.tStart, file: frame.file }];
-    return [
-      ...(frame.analysis.ocrText ? [{ kind: 'screen-text', text: excerpt(frame.analysis.ocrText), verified: false, evidence }] : []),
-      ...(frame.analysis.visualDescription ? [{ kind: 'visual-observation', text: excerpt(frame.analysis.visualDescription), verified: false, evidence }] : []),
-    ];
-  });
-  const highlights = [...speech, ...screen.slice(0, 4)];
-  const items = extractSpeechItems(sessionId, turns);
-  return { version: VERSION, notesVersion: NOTES_VERSION, sessionId, method: 'deterministic-extractive-highlights', notes: highlights,
-    summary: { method: 'extractive', highlights },
-    decisions: items.decisions, actionItems: items.actionItems, qa: items.qa, gaps: [...frames.filter((f) => !f.analysis?.readable)
-      .map((f) => ({ frameId: f.id, tStart: f.tStart, reason: 'unreadable-screen' })), ...ocrErrors, ...items.gaps] };
-}
+export const buildNotes = (sessionId, frames, turns, ocrErrors = []) => buildNotesFor(sessionId, frames, turns, ocrErrors, VERSION);
 export function screenEvidenceTurns(sessionId, tenantId, evidence) {
   return buildScreenEvidenceTurns(sessionId, tenantId, evidence, validateVision);
 }
@@ -264,14 +172,10 @@ export async function processVideo({ root, sessionId, recording, tenantId, dryRu
       existsSync(join(dir, f)) && digest(readFileSync(confined(root, join(dir, f)))) === state.outputs?.[f]) &&
       load(join(dir, 'screen-evidence.json')).frames.every((f) => existsSync(join(dir, f.file)) &&
         digest(readFileSync(confined(root, join(dir, f.file)))) === f.hash)) {
-      // Stage outputs written before NOTES_VERSION lack decisions/actions/Q&A: rebuild notes.json from the stored evidence
-      // (no vision call, inputHash unchanged) and re-pin its digest so downstream integrity checks still pass.
-      let current = state;
-      const notesPath = join(dir, 'notes.json');
-      if (load(notesPath).notesVersion !== NOTES_VERSION) {
-        atomic(notesPath, buildNotes(sessionId, load(join(dir, 'screen-evidence.json')).frames, turns, []));
-        current = { ...state, outputs: { ...state.outputs, 'notes.json': digest(readFileSync(notesPath)) } };
-        atomic(statePath, current);
+      let current = state; // pre-NOTES_VERSION outputs lack decisions/actions/Q&A: rebuild notes from stored evidence (no vision call), re-pin digest
+      if (load(join(dir, 'notes.json')).notesVersion !== NOTES_VERSION) {
+        atomic(join(dir, 'notes.json'), buildNotes(sessionId, load(join(dir, 'screen-evidence.json')).frames, turns, []));
+        atomic(statePath, current = { ...state, outputs: { ...state.outputs, 'notes.json': digest(readFileSync(join(dir, 'notes.json'))) } });
       }
       if (!slideAlignment) return { ...current, reused: true };
       return { ...current, reused: true, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) };
