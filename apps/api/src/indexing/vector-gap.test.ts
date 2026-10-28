@@ -11,6 +11,8 @@ import assert from "node:assert/strict";
 import { indexSession } from "./session.js";
 import { recordVectorGap } from "./vector-gap.js";
 import { fakeDb, completeWith, embedOk, assertUpdateBodyConfined, type Call } from "./testutils.js";
+import { BlindDb, bindDb } from "../ask/tenant-test-kit.js";
+import { createMongoIngestDeps } from "../ingest-store.js";
 
 /* ── ISS-118: the DURABLE record of a missing vector index ────────────────────────────────────
  * U1.0b surfaced the skip in a return value and a console.warn. The checker then disabled BOTH
@@ -156,4 +158,41 @@ test("ISS-122: recordVectorGap returns false when the RESOLVE gap-write THROWS",
   } as never;
   const ok = await recordVectorGap("t", "s1", { written: 3, skipped: null }, exploding);
   assert.equal(ok, false);
+});
+
+// ISS-122 C4: the ingest boundary surfaces a failed gap write. Receipt is a stub with only the
+// field under test varied; the boundary code (ingest-store.ts) is the real one.
+async function warnsFor(gapRecorded: boolean): Promise<string[]> {
+  bindDb(new BlindDb({ sources: [], sessions: [], turns: [] }));
+  const urlSource = {
+    fetch: async () => ({ source: { _id: "src-1", tenantId: "tA", kind: "url", hash: "h1", path: "https://example.com/p", title: "p" }, media: [] }),
+    toTurns: async () => [{ speakerRef: "a", tStart: 0, tEnd: 5, text: "ok" }],
+  } as never;
+  const indexer = async (_t: string, sessionId: string) => ({ sessionId, summary: { degraded: null }, claims: { degraded: null }, entities: null,
+    chunks: { written: 0, skipped: "embedding-failed" as const }, gapRecorded });
+  const warns: string[] = [];
+  const orig = console.warn;
+  console.warn = (...a: unknown[]) => { warns.push(a.join(" ")); };
+  try { await createMongoIngestDeps(indexer as never, { urlSource }).ingestUrl("tA", "https://example.com/p"); }
+  finally { console.warn = orig; }
+  return warns;
+}
+
+test("ISS-122: ingestUrl warns that the gap bookkeeping FAILED when the receipt says gapRecorded=false", async () => {
+  const warns = await warnsFor(false);
+  assert.ok(warns.some((w) => /vector-gap bookkeeping FAILED/.test(w)), `expected the boundary warn, got: ${JSON.stringify(warns)}`);
+});
+
+test("ISS-122: ingestUrl stays quiet about gap bookkeeping when gapRecorded=true (the no-vectors warn still fires)", async () => {
+  const warns = await warnsFor(true);
+  assert.ok(!warns.some((w) => /vector-gap bookkeeping FAILED/.test(w)), `unexpected warn: ${JSON.stringify(warns)}`);
+  assert.ok(warns.some((w) => /NO vectors/.test(w)), "the pre-existing ISS-116 warn must still fire");
+});
+
+test("ISS-122 x vectorless: a skipped chunk write in vectorless mode opens NO gap and still reports the bookkeeping landed", async () => {
+  const seen: Array<{ upsert?: boolean }> = [];
+  const db = { collection: () => ({ updateOne: async (_f: unknown, _u: unknown, o?: { upsert?: boolean }) => { seen.push({ upsert: o?.upsert }); return { acknowledged: true }; } }) } as never;
+  const ok = await recordVectorGap("t", "s1", { written: 0, skipped: "no-embedder" }, db, "vectorless");
+  assert.equal(ok, true);
+  assert.ok(seen.every((c) => c.upsert !== true), "vectorless mode must never upsert an OPEN vector-pending gap");
 });
