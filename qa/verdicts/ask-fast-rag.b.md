@@ -1,39 +1,43 @@
-# Verdict (coordinator B) — ask-fast-rag, cycle 0
-Date: 2026-10-28 · Bound to D:/KnowledgeBase/.worktrees/ask-fast-rag · judged head 8f493875 (code 8f493875 = f6b353b9 product state) · Policy-Version: proportional-verification/2026-10-19.17
-Cycle checked: 0
-Dual check, second blind coordinator. Did not open the other coordinator's verdict or checkpoint (a directory listing incidentally showed a same-named file; not opened).
+# Verdict (coordinator B, repair checker) — ask-fast-rag, cycle 1
+Cycle checked: 1
+Judged head: 6a9dbfc8 (product files == bd6af83b). Repair base feee65eb (verified ancestor of HEAD). Unit base 10635a57 (merge-base with docs/devops-golive-2026-10-26).
+Policy-Version: proportional-verification/2026-10-19.17
 
-## Check plan
-Logic + tenancy + LLM path: affected tests (own runs, one file per invocation), tenant probe, deadline probe, fabricated-citation probe, one falsification per criterion (copy only), HEAD-fidelity of the builder's touched files, test-migration review (scrutiny point a), importer sweep. Mode D: not applicable (no web file in the diff).
+## Check plan (step 0)
+Signals: logic changed (retrieval arm, cited-only sources, guarded diagnosis), tenancy-scoped retrieval (L, dual: packages/ask/src/ask-graph.ts:93).
+Scope: failed C1 + regression usage.test.ts:110 + every criterion whose input files the repair diff touches (C7 via answer-workflow.ts/answer.ts/ask-v2.ts; C4/I1 via the new tree arm). Repair diff read in full (12 files); whole-unit diff (23 files) scanned for out-of-scope paths. No live calls, no DB, no .env.
 
-VERDICT: FAIL
-SCOREBOARD: 6/7 criteria met (C1 partly), 2/2 invariants hold
-TIER: L (tenancy: packages/ask/src/ask-graph.ts:93 membership guard; apps/api/src/ask/ask-arms.ts:86 tenant filter)
-FAILURES:
-- [C1] sev: high · The default path does not "retrieve via the same retrieval /search uses": it only uses the ask arms (lexical turns, no vector in production composition). Native document/message sources, which /search (createNativeSearch) and deep /ask reach, are unreachable on the default path. Reproduced: in a copy, removing only the `mode:"deep"` knob from the migrated existing tests gives native-evidence/vertical.test.ts pass 1 / fail 3 (answer "No supported internal source was retrieved for this question...", expected the Hindi document text) and message-vertical.test.ts pass 0 / fail 4. Those tests wire the real createSourceRequestDepsFor, so the manifest reason "no arms wired" is false for them. Fix direction: add a native arm / reuse the /search retrieval in the fast path, then move the vertical tests back to the default path. · issue: P1
-- [regression of an unmodified affected test] sev: medium · apps/api/src/usage/usage.test.ts "a throwing store never fails the request..." (line 110) expects "This is the fake answer." from a default POST /ask; now returns the empty-retrieval answer (fixtures.ts has no arms/sourceContext). Base (10635a57 product state, copy) 14/14 pass; HEAD 13/14. Builder never ran this file (affected set under-selected). Fix direction: opt the fixture request into mode deep or give buildTestDeps an arm. · issue: P2
-CAPABILITY-COVERAGE: 7/7 criteria falsified in a copy (table below); C4 needs both guards mutated (one alone survives: redundant guards)
-LIVE-BROWSER: not-applicable (no web file in diff)
-ISSUES-WRITTEN: none (dual check: PROPOSED-ISSUE only)
+## Findings per repaired item
+- **C1 / F1 PASS.** Default path now feeds `treeLexicalIds` (apps/api/src/ask/passage-lexical.ts:83-98, non-LLM, lexical scorer only) through `deps.treeSearchFn` into the existing `gatherCandidates` (membership guard ask-graph.ts:91-93 and :101-103, SOURCE_LIMITS, hydrate). vertical.test.ts 4/4 and message-vertical.test.ts 4/4 on the default path, no `mode:"deep"` knob (vertical.test.ts keeps one added deep case). LLM calls stay [ask.answer, ask.answer_grounding].
+- **Regression usage.test.ts:110 / F2 PASS.** usage.test.ts 14/14, file untouched by the repair (and by the unit).
+- **C7 / F4 PASS.** `answer()` reports kept-sentence citations via additive `options.onCited` (answer.ts:82); `askFastV2` narrows `sources.internal`/`web` to cited ones (ask-v2.ts:86-94). packages/ask answer.test.ts (key pin) 6/6; answer-fast.test.ts 10/10 incl. [F4], [F3], [C7] x3. F3 guard (answer-workflow.ts:147-151) verified by [F3] in both modes.
+- **Existing assertion edit (ask-fast.test.ts [C1], internal length 2 -> 1): correct behaviour change, not a protected weakening.** The old value pinned "every retrieved chunk is shipped" while the answer cited one, which is the defect F4 fixes (uncited chunks reached the verifier and wiped valid sources, contract C7). The new assertion is strictly stronger: length 1 AND `node_id === nodeA.node_id`, plus a new [F4] test pinning the cited second chunk. Response shape (C3) unchanged. Falsification below turns both red.
+- **Tenant isolation of the new arm (C4/I1) PASS.** `treeLexicalIds` walks only the tree passed in (the tenant tree, already session-filtered by `filteredTree` in answer-workflow.ts:79-90, which prunes sessionId-excluded and ref-less content nodes). The ids go through `treeSearchFn(tree, ids)` and then `gatherCandidates`' tree-membership resolve, so only that tenant's own node object reaches `hydrate`. Probe (own file, scratch): hostile lexical fn returning tenant B's id + tenant-blind `treeSearchFn` + a B node from an arm + an id collision (`shared/p1`) -> admitted set contains only A's own nodes (A's summary, never B's); real `treeLexicalIds` over A never returns B ids. Graph-scoped requests: composition returns `[]` from `treeSearchFn`, so no tree arm (ask-fast.test.ts [F1] covers it).
+- **Out-of-scope scan.** No change to apps/api/src/composition/production.ts, ask-web-fallback.ts, schema, migrations or any write path (I2). Whole-unit files are all in the declared set; qa/* are bookkeeping.
+
+## Evidence run by this coordinator (HEAD 6a9dbfc8, one file per invocation, node v24.13.1, tsx 4.23.13)
+ask-fast 10/10; answer-fast 10/10; vertical 4/4; message-vertical 4/4; usage 14/14; passage-lexical 5/5; answer-workflow 18/18; ask-tenant-isolation 17/17; ask-tenant-hostile 70/70; routes/ask 7/7; server 10/10; all 14 packages/ask/src/*.test.ts 0 fail; `tsc --noEmit -p .` exit 0 in packages/ask and apps/api.
+
+## Falsification (throwaway copy only; copy == worktree for the touched files before each edit; restore verified with cmp)
+| Item | Edit | Test | Observed |
+|---|---|---|---|
+| F4 / C7 | ask-v2.ts `if (cited && s.result)` -> `if (false && ...)` | ask-fast.test.ts; answer-fast.test.ts | 8/2 fail ([C1],[F4]); 9/1 fail ([F4]) |
+| F1 / C1 | ask-v2.ts tree-arm expression -> `[]` | vertical; message-vertical | 1 pass/3 fail; 0/4 fail |
+| F2 | application.ts drops `treeLexicalIds` wiring | usage.test.ts | 13/1 fail (the :110 test) |
+| tenant probe (extra) | ask-graph.ts membership resolve `?? n` (both sites) | probe | foreign id admitted -> red |
+Green-before in the copy for every row. Bound tree untouched (git status: no tracked changes besides other coordinator/bookkeeping files).
+
+## Non-blocking notes (PROPOSED-ISSUE, low)
+PROPOSED-ISSUE: {"sev":"low","criterion":"C3","title":"fast path ships cited-only sources, deep ships scored-good candidates","detail":"sources.internal membership semantics differ between modes; shape identical. Document in API notes if consumers diff modes.","kind":"note"}
+PROPOSED-ISSUE: {"sev":"low","criterion":"C6","title":"treeLexicalIds scans the whole tenant tree synchronously","detail":"apps/api/src/ask/passage-lexical.ts:86-98 is O(nodes x summary size) on the event loop before the deadline race can preempt it; consider a node cap for very large tenants.","kind":"perf"}
+
+VERDICT: PASS
+SCOREBOARD: 7/7 criteria met, 2/2 invariants hold (C1-C7, I1, I2; C2-C6 and I1/I2 unchanged by the repair and re-run green)
+TIER: L (tenancy-scoped retrieval: packages/ask/src/ask-graph.ts:93 membership guard; dual-trigger cited in the manifest)
+FAILURES: none
+CAPABILITY-COVERAGE: not-applicable (api only)
+LIVE-BROWSER: not-applicable (no UI paths changed)
+ISSUES-WRITTEN: none (dual check: PROPOSED-ISSUE lines only)
 EXECUTOR: claude-sonnet-subagent (checker: claude-sonnet-subagent)
-EXPLANATION: C1 call-count, C2, C3, C5, C6, C7 and I1/I2 hold on my own evidence; C4 holds (my probe: a foreign-id candidate is dropped and a forged same-id node is replaced by the tenant's own node). The unit fails on the default path losing native-source retrieval (masked by moving existing vertical tests to deep, which is not a legitimate scope split for those three files) and on one unmodified affected test going red.
-
-## Scrutiny points
-- (a) answer-workflow.test.ts moves (8 tests, assertions untouched): legitimate scope split (they drive per-candidate score thresholds, which the default path never produces). server.test.ts: fixture has no arms, legitimate. native vertical/message-vertical moves: NOT legitimate (see P1). Default HTTP coverage otherwise: tenant-hostile (70), tenant-isolation new test, answer-router, routes, source-context suites all green.
-- (b) tenant guard on default path: ask-graph.ts:91-93 and :102 both apply on gatherCandidates; probe packages/ask (copy): forged same-id foreign node replaced by tenant node, foreign-id dropped, zero model calls when only foreign candidates; no B text in output or prompts.
-- (c) C7: sources ship for valid internal citations (answer-fast, real verifier); a verification failure still returns empty sources but with the origin-specific reason (matches the contract wording). Fabricated sourceId in model output throws BoundedAskError (503), all sentences rejected by grounding throws (503): no unverified citation ships.
-- (d) deadline: hanging arms, hanging hydrate and hanging complete each return the degraded answer at the deadline (probe, 50 ms). Low note P3: LKB_ASK_FAST_DEADLINE_MS above 2147483647 makes setTimeout clamp to 1 ms (Node TimeoutOverflowWarning) so every request degrades.
-- (e) response shape identical both modes (test + code read).
-- (f) HEAD-fidelity: all 17 diff files `git hash-object` == `git rev-parse HEAD:<file>`, tracked tree clean; the 7 builder mutation sites are in original form at HEAD. No production.ts / ask-web-fallback.ts change.
-
-## Evidence (my runs, node --test --import tsx, one file each)
-packages/ask: ask-fast 8/8; all 35 other test files in packages/ask, zero failures. apps/api: answer-fast 8/8, answer-workflow 18/18, tenant-isolation 17/17, tenant-hostile 70/70, vertical 4/4, message-vertical 4/4, server 10/10, routes/ask 7/7, plus 31 importer files (answer-policy, ask/*, composition, production, score, visibility, tenant-guards, speaker-suggestions, standalone-mongo...) all green; usage.test.ts 13/14 (P2).
-Falsification (copy, green-before / red-after / restored to HEAD blob): C1 8/0 -> 4/4 · C2 8/0 -> 7/1 · C3 8/0 -> 5/3 · C4 (both guards) 8/0 -> 7/1, leak assertion fired · C5 8/0 -> 4/4 · C6 8/0 -> timeout 15 s on the C6 test · C7 (reason) 8/0 -> 7/1 · C7 (sources) 8/0 -> 5/3. mutants=0 beyond the floor.
-
-PROPOSED-ISSUE: {"id":"P1","severity":"high","type":"correctness","criterion":"C1","title":"Default /ask cannot retrieve native document/message sources; native vertical tests moved to mode deep mask it","repro":"copy of HEAD, delete the mode:deep knob in apps/api/src/native-evidence/vertical.test.ts and message-vertical.test.ts, node --test --import tsx each -> 3 and 4 failures with 'No supported internal source was retrieved'"}
-PROPOSED-ISSUE: {"id":"P2","severity":"medium","type":"regression","title":"usage.test.ts 'a throwing store never fails the request' red on default /ask","repro":"cd apps/api && node --test --import tsx src/usage/usage.test.ts -> 13 pass 1 fail; base product state 14/14"}
-PROPOSED-ISSUE: {"id":"P3","severity":"low","type":"robustness","title":"LKB_ASK_FAST_DEADLINE_MS > 2^31-1 clamps to 1 ms (setTimeout overflow), every default answer degrades","fix":"cap fastDeadlineMs at 2147483647"}
-PROPOSED-ISSUE: {"id":"P4","severity":"low","type":"process","title":"Affected-set under-selected: builder ran 6 test files, never usage.test.ts nor the importer sweep; manifest reason for the vertical-test migration is factually wrong"}
-PROPOSED-ISSUE: {"id":"P5","severity":"low","type":"question","title":"Production default path is lexical-only (createSourceRequestDepsFor passes no embed to the arms, 'vectorless'); confirm top-5 lexical retrieval is the intended D-203 quality bar"}
-
-Metrics: start=2026-10-28T08:42:00Z end=2026-10-28T08:57:00Z wall_min=15 agent_min=15 blocked_min=0 suite_runs=0 repeat_runs=0 mutations=10 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=900 mutants=0 defects_unit=2 defects_6c=0
+EXPLANATION: The repair restores native document/message reach on the default path through a non-LLM, tenant-tree-bound arm, and ships cited-only sources, which removes the 0-sources defect at its root. The single edited assertion is a justified, strengthened behaviour change. The tenant probe and six falsification runs confirm foreign passages cannot surface and the new tests bite.
+Metrics: start=2026-10-28T08:55:00Z end=2026-10-28T09:30:00Z wall_min=35 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=4 cycle=1 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=2100 mutants=1 defects_unit=0 defects_6c=0
