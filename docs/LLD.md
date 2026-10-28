@@ -111,6 +111,7 @@ answer-policy:{read,write} registration:approve webhooks operations`.
 | speakers | /sessions/:id/speaker-suggestions, /speaker-profiles/*, /speaker-attributes, /speaker-relations | sessions | `speaker-*/router.ts` | speaker_* |
 | transcript | /sessions/:id/transcript-review[/history,/refresh] | sessions | `transcript-review/router.ts` | transcript_review* |
 | calendar/bot | GET /calendar/upcoming; /calendar/join-rules/*; /calendar/send-now/*; /meeting-bot/{privacy,capture-readiness} | calendar / join-rules / send-now / jobs | `routes/calendar.ts`, `join-rules/*`, `bot-privacy/`, `capture-readiness/` | meeting_candidates, gaps |
+| calendar worker (D-192..198) | GET/PUT /calendar/worker-state, POST /calendar/worker-state/generation — Windows worker reads/publishes owner-bound snapshots; 503 `worker_unavailable` if not composed | calendar **and** `operations:write`, key must match the worker binding | `routes/calendar.ts:73`, `composition/integrations/capture-policy.ts` | watch_state (snapshots, unpruned — ISS-402), api_keys |
 | discovery | POST /gmail/scan, /public-webinars/scan; /meeting-candidates/* | gmail | `routes/meeting-candidates.ts` | meeting_candidates |
 | watch | /watched-sources[/run], /watch-state; /connector-workflow/* (`LKB_CONNECTOR_WORKFLOW`) | sources / ingest | `routes/watched-sources.ts`, `connector-workflow/router.ts` | watched_sources, watch_* |
 | whatsapp | GET /whatsapp/groups, POST /whatsapp/ingest, /whatsapp/review/* | whatsapp | `routes/whatsapp.ts`, `whatsapp/review/router.ts` | whatsapp_candidates, claims, … |
@@ -193,6 +194,10 @@ sequenceDiagram
 `selectAutoRecordItems` (`packages/meeting-bot/src/calendar/auto-join.ts`) → `applyJoinRules` (enforced only if
 `LKB_JOIN_RULES_ENFORCE` = `last-valid`/`fail-closed`) → registration (`registration-workflow.ts`, if needed) →
 record (5.1). Manual path: `POST /calendar/send-now` (needs a mounted launcher — 503 on live).
+Hosted mode (merged `ab3e1932`): the Windows worker runs `gws`, then `POST /calendar/worker-state/generation` (fence) →
+`PUT /calendar/worker-state` (snapshot + receipt); the API serves `/calendar/upcoming` from that snapshot. The scheduler
+uses remote join-rules mode whenever `LKB_API_URL` is set (`scripts/webinar/scheduler/deps-runtime.mjs:89`;
+`packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts`) — fails closed if the API has rules off (ISS-401).
 
 ## 6. Database targeting (read before any write)
 
