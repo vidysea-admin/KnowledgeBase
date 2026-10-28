@@ -69,12 +69,24 @@ services:
       LKB_JOIN_RULES_ENABLED: ${LKB_JOIN_RULES_ENABLED:-0}
       LKB_JOIN_RULES_STATE_DIR: /var/lib/lkb/join-rules
       PORT: 3300
-    # T-028 (D-189): the five LKB_HOSTING_* / LKB_COUNSELLOR_STATE_DIR names are read from the optional file
-    # .env.t028 ONLY. When the file is absent they stay UNDEFINED in the container: the API treats any
-    # defined-but-incomplete value (even an empty string) as a misconfiguration and answers auth routes 503.
-    env_file:
-      - path: .env.t028
-        required: false
+      # T-028 (D-189) and WhatsApp, read from the MAIN .env (gate 2026-10-28: "main .env mai hi rakho").
+      # Value-less pass-through ("NAME:" with no value): a name ABSENT from .env stays UNDEFINED in the container.
+      # Never write ${NAME:-} for these: that defines an empty string. The API treats a defined-but-incomplete
+      # T-028 value (even "") as a misconfiguration and answers auth routes 503, and WHATSAPP_MONGO_URL="" would
+      # defeat the 127.0.0.1:27018 default. Set all five T-028 names together or none, and never leave a blank NAME= line in .env
+      # (a blank line DEFINES an empty string; comment the line out or delete it instead).
+      LKB_HOSTING_STATE_DIR:
+      LKB_COUNSELLOR_STATE_DIR:
+      LKB_HOSTING_ENCRYPTION_KEY:
+      LKB_HOSTING_BOOTSTRAP_ADMINS:
+      LKB_HOSTING_WEBHOOK_ORIGINS:
+      WHATSAPP_MONGO_URL:
+      WHATSAPP_MONGO_DB:
+      WHATSAPP_TENANT_OWNER_MAP:
+    # No env_file on purpose. (1) Passing the whole .env would leak MONGO_WORK_DB and the
+    # LKB_I_KNOW_THIS_IS_PRODUCTION handling into the container. (2) The old optional .env.t028 file is retired: a
+    # value-less environment entry that is unresolved renders as null and SHADOWS an env_file value, so the file
+    # would silently do nothing. Move any .env.t028 lines into the main .env.
     volumes:
       - lkb-hosting-state:/var/lib/lkb/hosting
       - lkb-counsellor-state:/var/lib/lkb/counsellor

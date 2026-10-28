@@ -31,14 +31,16 @@ Remaining, in this order:
    host holds other Vidysea databases, so their owners must be told.
 2. **Hosting (T-028), optional.** Without it, Settings → Keys and the Dashboard key tile show
    "API keys unavailable (hosting not configured)" (`/api/keys` → 503); everything else works.
-   To enable, create `.env.t028` with all five names from section 9, using
+   To enable, add all five names from section 9 to the main server `.env`, using
    `LKB_HOSTING_BOOTSTRAP_ADMINS='{"toc":["ab8eb0de-d7c9-43cc-8b3d-b1122065a943"]}'` and the app's
    https origin in `LKB_HOSTING_WEBHOOK_ORIGINS`, then `docker compose up -d --build api`.
-   All five or none: a partial file makes every authenticated route return 503.
+   All five or none: a partial set makes every authenticated route return 503.
 3. **Provider keys.** Setup wizard (`/setup`) reports `GEMINI_API_KEY` and `TAVILY_API_KEY` unset on the
    server. Without Tavily, Ask has no web fallback. Add them to the server `.env`, restart api.
-4. **WhatsApp.** `/api/whatsapp/groups` returns 500; set `WHATSAPP_MONGO_URL` (and `WHATSAPP_MONGO_DB`)
-   or leave the page unused.
+4. **WhatsApp (ships at launch).** `/api/whatsapp/groups` returns 500 until the main `.env` has
+   `WHATSAPP_MONGO_URL` (and `WHATSAPP_MONGO_DB`); `WHATSAPP_TENANT_OWNER_MAP` grants each tenant its
+   owner (JSON array, see `docs/whatsapp/SETUP.md`). Compose forwards the three names from `.env`;
+   an absent name stays undefined in the container (then `docker compose up -d --build api`).
 5. Verify (with the owner's key):
    `curl -s -H "Authorization: Bearer <key>" https://<server>/api/system-status` shows non-zero
    `sessions`, and `/api/keys` returns 200 once step 2 is done.
@@ -47,7 +49,7 @@ Full page-by-page audit of the live app: `references/portals/lkb-live.knowledge.
 
 ## 1. Prerequisites
 - Ubuntu 22.04+ with Docker Engine and Docker Compose v2.24 or newer (`docker compose version`).
-  Older compose cannot parse `docker-compose.yml` (`env_file` with `required: false`). Upgrade:
+  Older compose is untested with `docker-compose.yml`. Upgrade:
   `sudo apt-get update && sudo apt-get install --only-upgrade docker-compose-plugin` (Docker's apt repo).
 - Outbound HTTPS (npm, GitHub release download of yt-dlp during build, Ollama Cloud).
 - A reachable MongoDB (NOT containerized by default) and an Ollama Cloud key.
@@ -84,6 +86,10 @@ Set in `.env` (names only; get values from the owner):
 - `WEB_PORT=80` (compose default is 8080).
 - Optional: `GEMINI_API_KEY` (audio transcription), `OLLAMA_CLOUD_MODEL`,
   `OLLAMA_CLOUD_VERIFIER_MODEL`.
+- WhatsApp (launch feature): `WHATSAPP_MONGO_URL`, `WHATSAPP_MONGO_DB`, `WHATSAPP_TENANT_OWNER_MAP`.
+  T-028: the five names of section 9. Compose forwards all of these from `.env` as value-less
+  pass-through: a name that is absent stays UNDEFINED in the container. Never leave a blank `NAME=`
+  line in `.env` for them (a blank line defines an empty string); comment the line out instead.
 The remaining names in `.env.example` belong to the meeting bot and scripts, not to
 the api/web containers (compose forwards only the names it lists).
 
@@ -248,11 +254,11 @@ confirm pages load with no CORS errors in the console (if they appear, fix
 At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
 - T-028 hosting env gates `/keys`, `/hosting`, `/webhooks`, operations schedules, automation and capture
   readiness. Without the five names, `/keys` answers 503 `hosting_unavailable` by design. Ask is unaffected.
-- T-028: put all five in a separate file `.env.t028` next to `docker-compose.yml` (chmod 600,
-  gitignored), NOT in `.env`. Compose reads it only if it exists, so without the file the
-  five names stay undefined and everything works with T-028 off. Never create the file with
-  blank or partial values: the API treats a defined-but-incomplete set (even an empty string) as a
-  misconfiguration and answers every authenticated route 503. All five are required together:
+- T-028: put all five in the main server `.env` (chmod 600, gitignored). Compose forwards them to the
+  api container as value-less pass-through, so when a name is absent from `.env` it stays undefined and
+  everything works with T-028 off. Never write blank or partial values: the API treats a
+  defined-but-incomplete set (even an empty string, i.e. a blank `NAME=` line) as a misconfiguration and
+  answers every authenticated route 503. All five are required together:
   `LKB_HOSTING_STATE_DIR=/var/lib/lkb/hosting` and `LKB_COUNSELLOR_STATE_DIR=/var/lib/lkb/counsellor`
   (exactly these paths; they are the named volumes `lkb-hosting-state` and `lkb-counsellor-state`, so
   state survives restarts; back the volumes up too),
@@ -260,8 +266,9 @@ At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 champions
   with `openssl rand -hex 32`, NOT base64, which is rejected),
   `LKB_HOSTING_BOOTSTRAP_ADMINS='{"toc":["<key-id>"]}'` (key ids from `mint-key`),
   `LKB_HOSTING_WEBHOOK_ORIGINS='["https://app.example.org"]'` (https origins only).
-  WARNING: a partially filled `.env.t028` makes every authenticated route return 503: fill all five or
-  none (delete the file to turn T-028 off).
+  WARNING: a partial set makes every authenticated route return 503: fill all five or none (comment
+  them out or delete them to turn T-028 off). The old optional `.env.t028` file is retired: compose no
+  longer reads it. If a server already has one, move its five lines into `.env` and delete the file.
   Single-quote the JSON values. Back the key up with the volumes; losing it makes stored account
   data unreadable. Never commit it. Then `docker compose up -d --build api`.
 - T-014 championship: leave `LKB_CHAMPIONSHIP` unset (it is on only when `=1`).
@@ -289,7 +296,7 @@ reversed by this.
 
 A hosted container cannot use the Windows Google CLI credentials. Deploying the code exposes the authenticated bridge; it does not configure or start its Windows worker.
 
-Set these names in the hosted compose environment (`.env`, not the optional hosting-only file):
+Set these names in the hosted compose environment (the main `.env`):
 - `LKB_CALENDAR_WORKER_ENABLED=1`
 - `LKB_CALENDAR_WORKER_BINDINGS` to a JSON array of `{tenantId,keyId,account,hostId}`. Pin a deliberately issued active worker key, the connected Google account and the Windows host. The key must hold `calendar`, `gmail` and `operations:write`; do not grant these silently to existing keys.
 - `LKB_JOIN_RULES_ENABLED=1`. Compose persists the authoritative rules at `/var/lib/lkb/join-rules`.

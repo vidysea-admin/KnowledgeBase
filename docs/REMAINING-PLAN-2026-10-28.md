@@ -10,7 +10,7 @@ Source: read-only plan sweep at HEAD 80b8db43 (branch docs/devops-golive-2026-10
 
 ## Wave 0: human / ops gates (Umesh)
 - H1 URGENT Mongo: firewall 27017, create the lkb_app user, enable authorization, update MONGODB_URL on the server and bot machine, audit the ransom-note host.
-- H2 .env.t028 on the server (all 5 vars or none).
+- H2 the five T-028 vars in the main server .env (all 5 vars or none; compose forwards them, .env.t028 is retired).
 - H3 GEMINI_API_KEY on the server (D-202; Tavily optional).
 - H4 WhatsApp Mongo URL/DB set, or hide the page.
 - H5 Cutover: when the pipeline writes lkb_prod; approve reindexing the 2 FAILED sessions.
