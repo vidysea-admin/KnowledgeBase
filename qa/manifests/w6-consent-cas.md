@@ -1,6 +1,6 @@
 # Manifest — w6-consent-cas
 
-Status: ready-for-check
+Status: checked-PASS (qa/verdicts/w6-consent-cas.md, 477d650f, cycle 0)
 **Handshake status:** ready-for-check
 **Contract:** none (advances ledger row ISS-WAVECTORLESS-002, qa/issues.WAVECTORLESS.jsonl line 2; row not edited)
 **Goal task:** none (Wave 2 W6, docs/REMAINING-PLAN-2026-10-28.md)
