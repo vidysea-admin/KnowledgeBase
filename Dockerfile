@@ -65,7 +65,7 @@ ARG TARGETARCH
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates curl \
   && rm -rf /var/lib/apt/lists/*
 RUN set -eu; \
-  case "$TARGETARCH" in \
+  case "${TARGETARCH:-amd64}" in \
     amd64) asset=yt-dlp_linux; digest=58162f9bfdc27458ea47bfcb311cf47028f17d8154a8bf7d689861d46399230a ;; \
     arm64) asset=yt-dlp_linux_aarch64; digest=b16e4dab368a816cd05d477d698a605a6ae87ccee1c8ffd38fa21d7254141fcc ;; \
     *) echo 'Unsupported media-tool architecture' >&2; exit 1 ;; \
