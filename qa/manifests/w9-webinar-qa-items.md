@@ -2,7 +2,7 @@
 **Contract:** none (issue-driven unit; acceptance floor is the recorded row of ISS-WEBINARRELEASE-001 in qa/issues.WEBINARRELEASE.jsonl, D-015)
 **Goal task:** none
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (dual: qa/verdicts/w9-webinar-qa-items.md 4ac2f69b + qa/verdicts/w9-webinar-qa-items.b.md 07b57190, cycle 0)
 **Fix cycle:** 0 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0
