@@ -5,7 +5,7 @@ import { useAuth } from "./AuthContext.js";
  * request (a wrong key still 401s from apps/api) -- this just avoids showing empty-shell pages
  * before the user has pasted a key at all. */
 export function LoginGate({ children }: { children: ReactNode }): ReactNode {
-  const { apiKey, setApiKey } = useAuth();
+  const { apiKey, authError, setApiKey } = useAuth();
   const [draft, setDraft] = useState("");
 
   if (apiKey) return children;
@@ -20,6 +20,7 @@ export function LoginGate({ children }: { children: ReactNode }): ReactNode {
       <div className="login-card">
         <h1>Living Knowledge Base</h1>
         <p>Paste your API key to continue.</p>
+        {authError && <p role="alert" className="error-note">{authError}</p>}
         <form onSubmit={handleSubmit}>
           <input
             type="password"

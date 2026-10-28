@@ -33,6 +33,8 @@ export const AUTH_KEY_STORAGE_KEY = "lkbApiKey";
 
 export interface AuthInvalidationEventDetail {
   apiKey: string;
+  /** The server's own 401 message, when the response body carried one. */
+  message?: string;
 }
 
 // A request belongs to the login session that sent it, even when a later login reuses the key.
@@ -40,7 +42,7 @@ export interface AuthInvalidationEventDetail {
 let authSession: object = {};
 export function advanceAuthSession(): void { authSession = {}; }
 
-function invalidateAuth(apiKey: string, sentSession: object): void {
+function invalidateAuth(apiKey: string, sentSession: object, message?: string): void {
   if (sentSession !== authSession) return;
   if (typeof window === "undefined" || !window.dispatchEvent) return;
 
@@ -56,7 +58,7 @@ function invalidateAuth(apiKey: string, sentSession: object): void {
     // LocalStorage access can fail in some browser states; treat it as non-fatal.
   }
 
-  const event = new CustomEvent<AuthInvalidationEventDetail>(AUTH_INVALIDATED_EVENT, { detail: { apiKey } });
+  const event = new CustomEvent<AuthInvalidationEventDetail>(AUTH_INVALIDATED_EVENT, { detail: message ? { apiKey, message } : { apiKey } });
   window.dispatchEvent(event);
 }
 
@@ -118,16 +120,17 @@ export async function apiFetch<T>(path: string, apiKey: string | null, options: 
   }
 
   if (!res.ok) {
-    if (res.status === 401) invalidateAuth(apiKey, sentSession);
     let message = `HTTP ${res.status}`;
+    let serverMessage: string | undefined;
     let code: string | undefined;
     try {
       const body = (await res.json()) as { message?: string; error?: unknown };
-      if (body.message) message = body.message;
+      if (body.message) { message = body.message; serverMessage = body.message; }
       if (typeof body.error === "string") code = body.error;
     } catch {
       // response wasn't JSON; keep the generic message
     }
+    if (res.status === 401) invalidateAuth(apiKey, sentSession, serverMessage);
     throw new ApiError(res.status, message, { code, retryAfterSeconds: parseRetryAfter(res.headers?.get?.("retry-after")) });
   }
   options.onResponseHeaders?.(res.headers);
