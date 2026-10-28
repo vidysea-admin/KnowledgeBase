@@ -6,7 +6,10 @@
  * lower-level primitive this builds on; imported and called, never reimplemented.
  */
 import type { TreeIndexNode } from "@lkb/core";
-import { askGraphV2 } from "./ask-graph.js";
+import { recordJob } from "@lkb/ai";
+import { ASK_GRAPH, askFailure, askGraphV2, boundedSourcesOf, gatherCandidates, initAskGraphState } from "./ask-graph.js";
+import { contextStrips } from "./bounded-refine.js";
+import { internalSource, type AskResult, type WebSource } from "./router.js";
 import type { AskV2Deps, AskV2Result } from "./ask-shared.js";
 export type { AuditEntry, AskV2Deps, AskV2Result } from "./ask-shared.js";
 
@@ -19,4 +22,69 @@ export type { AuditEntry, AskV2Deps, AskV2Result } from "./ask-shared.js";
  */
 export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps): Promise<AskV2Result> {
   return askGraphV2(query, tree, deps);
+}
+
+/** ask-fast-rag C6: total wall-clock budget of the default path (D-203). */
+export const FAST_DEADLINE_MS = 20_000;
+export interface AskFastOptions { /** Total deadline in ms; default FAST_DEADLINE_MS. */ deadlineMs?: number; /** Top-k candidate sessions; default 5. */ topK?: number }
+
+/**
+ * ask-fast-rag (D-203): the default `/ask` path, a standard RAG chatbot. Arms-only top-k retrieval (the same tenant-scoped
+ * arms `/search` ranks with; no tree-selection LLM) -> hydrate exact quotes -> ONE answer call that cites them -> at most ONE
+ * grounding check (both inside `answer()`, via the graph's own `answer` node). No per-candidate scoring, evaluator loop or
+ * refine. `askV2` (the multi-step graph) is untouched and reached with `filters.mode = "deep"`. Web search runs only when
+ * retrieval came back empty. Response shape is `AskV2Result`; `scored` is empty because nothing is LLM-scored here.
+ */
+export async function askFastV2(query: string, tree: TreeIndexNode, deps: AskV2Deps, options: AskFastOptions = {}): Promise<AskV2Result> {
+  const deadlineMs = options.deadlineMs ?? FAST_DEADLINE_MS;
+  const s = initAskGraphState(query, tree, deps);
+  const base = (over: Partial<AskResult>): AskResult => ({ verdict: "incorrect", reason: "", scored: [], web_used: false,
+    insufficient_coverage: true, sources: { internal: [], web: [] }, ...over });
+  const run = async (): Promise<AskV2Result> => {
+    s.trace.push("retrieve");
+    s.candidates = await gatherCandidates(s, [], options.topK ?? 5);
+    let web: WebSource[] = [];
+    s.boundedSources = deps.sourceContext ? boundedSourcesOf(s.candidates, []) : [];
+    if (deps.sourceContext ? !s.boundedSources.length : !s.candidates.length) {
+      s.candidates = [];
+      if (deps.tavilySearchFn) {
+        try {
+          web = await deps.tavilySearchFn(query);
+          const kind = web.length ? "ask.web_fallback" : "ask.web_fallback_empty";
+          await recordJob({ tenantId: deps.tenantId, kind, status: web.length ? "done" : "failed", ...(web.length ? {} : { error: "web search returned no evidence" }) }, deps.write);
+          s.auditLog.push({ jobKind: kind, step: web.length ? "web_fallback" : "web_fallback_unavailable: web search returned no evidence" });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err);
+          await recordJob({ tenantId: deps.tenantId, kind: "ask.web_fallback_unavailable", status: "failed", error: message }, deps.write);
+          s.auditLog.push({ jobKind: "ask.web_fallback_unavailable", step: `web_fallback_unavailable: ${message}` });
+        }
+      }
+      if (!web.length) {
+        return { ...base({ reason: "no supported internal source was retrieved for this question" }), auditLog: s.auditLog,
+          answer: "No supported internal source was retrieved for this question, and web search is unavailable or returned no evidence." };
+      }
+      s.boundedSources = deps.sourceContext ? boundedSourcesOf([], web) : [];
+    }
+    s.askResult = base({ verdict: web.length ? "incorrect" : "correct", web_used: web.length > 0, insufficient_coverage: false,
+      reason: web.length ? "internal retrieval was empty; answered from web fallback (fast path, no LLM scoring)"
+        : "fast path: top-k retrieval and one grounded answer; candidates are not LLM-scored",
+      sources: { internal: s.candidates.map(internalSource), web } });
+    s.refinedContext = deps.sourceContext ? JSON.stringify(contextStrips(s.boundedSources))
+      : [...s.candidates.map((n) => n.summary), ...web.map((w) => String(w.content ?? w.snippet ?? ""))].join(" ");
+    s.trace.push("answer");
+    await ASK_GRAPH.find((n) => n.name === "answer")!.run(s);
+    return s.result!;
+  };
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const pending = run();
+  pending.catch(() => {}); // a run that loses the race must not become an unhandled rejection
+  const deadline = new Promise<"deadline">((resolve) => { timer = setTimeout(() => resolve("deadline"), deadlineMs); });
+  try {
+    const won = await Promise.race([pending, deadline]);
+    if (won !== "deadline") return won;
+    s.auditLog.push({ jobKind: "ask.fast_deadline", step: `deadline exceeded after ${deadlineMs} ms; degraded answer returned` });
+    return { ...base({ reason: `deadline exceeded after ${deadlineMs} ms` }), auditLog: s.auditLog,
+      answer: "This question took longer than the time limit to answer. Retry, or ask again with filters.mode \"deep\" for the slower multi-step search." };
+  } catch (err) { throw await askFailure(err, deps); }
+  finally { if (timer) clearTimeout(timer); }
 }

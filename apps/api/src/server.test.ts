@@ -35,7 +35,7 @@ test("POST /ask with a valid key + ask scope returns 200 with an AskResult shape
     const res = await fetch(`${server.baseUrl}/ask`, {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer good-ask-key" },
-      body: JSON.stringify({ query: "topic one" }),
+      body: JSON.stringify({ query: "topic one", filters: { mode: "deep" } }),
     });
     assert.equal(res.status, 200);
     const body = (await res.json()) as Record<string, unknown>;

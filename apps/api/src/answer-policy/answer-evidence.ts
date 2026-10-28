@@ -92,3 +92,14 @@ export function createMongoEvidenceVerifier(db: Db, web?: VerifyEvidence,
     return true;
   };
 }
+
+/** Why a just-produced answer's evidence did not verify, split by origin so the reason names the real cause (never a generic wipe). */
+export async function whyUnverified(tenantId: string, bindings: EvidenceBinding[], verify: VerifyEvidence): Promise<string> {
+  const internal = bindings.filter((b) => b.origin === "internal"), web = bindings.filter((b) => b.origin === "web");
+  if (!bindings.length) return "No supporting source was retrieved or cited, so there is nothing to verify.";
+  if (internal.length && !(await verify(tenantId, internal)))
+    return "Internal source evidence changed, was withdrawn, or no longer matches the stored transcript turn; sources withheld.";
+  if (web.length && !(await verify(tenantId, web)))
+    return "Web evidence cannot be verified by this deployment (no web verifier is configured); web sources withheld.";
+  return "The effective answer policy changed while this answer was produced; ask again.";
+}
