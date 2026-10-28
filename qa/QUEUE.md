@@ -1,3 +1,5 @@
+> **2026-10-28 (D-200): row 0 is the only unit to run now.** Older rows below are historical.
+
 # QUEUE — maker tick 2026-09-28 (iss-346 cycle-1 FAIL, HELD; slug collision gated)
 
 > **iss-346-round-cap-mechanical-check is HELD, not stalled.** Cycle-1 verdict `8ac0582`: FAIL,
@@ -26,6 +28,7 @@
 
 | # | unit | tier | why now | cap check |
 |---|---|---|---|---|
+| 0 | `claims-citable-needs-review` — **TODO** | 1 (Approver-directed, D-200) | Umesh 2026-10-28: needs-review claims citable with visible `verification: "unverified"`, anchored to the evidence turn; rejected never cited; verified ranks first. Unblocks counsellor 0-sources (`answer-workflow.ts:144/157`) and knowledge-outputs 422 (`service.ts:32`). Local validation only; live rollout is a human step. **Stop the loop after this unit closes out.** | new seam — clear |
 | 1 | `iss-367-lint-structure-no-shortcircuit` (folds in ISS-371) | 2 (high) | **released** — it was `SERIAL` on the iss-346 check because it re-runs `lint-loc`; that check has returned. **CORRECTION to this tick's first draft: ISS-371 is severity `medium`, not high.** Under this repo's severity gate a medium gets a ledger entry and is "verified inside the next unit that touches the same file" — not its own ceremony. That unit is ISS-367, whose own `fix_direction` says to do the `testPatterns` entry FIRST because it drops `lint-loc` 5→4 and changes the masking picture. So they are one unit, not two | 0 prior PASSes on `package.json` / `structure.config.json` / `scripts/lint-*.mjs` — clear |
 | 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | a `listHeartbeats` throw is reported as zero silent watchers — byte-identical to "all fresh", contradicting D-048; its standing test pins the wrong answer and passes on the broken implementation | `apps/api/src/routes/health.ts` 1 prior PASS — under the cap |
 | 3 | `ledger-duplicate-id-guard` | 2 (high) | `SERIAL` this wave — see below | 0 prior PASSes — clear |

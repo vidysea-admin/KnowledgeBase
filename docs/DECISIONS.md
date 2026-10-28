@@ -2619,3 +2619,15 @@ fourth would have left real decisions idle behind an unrelated unit.
 - docs/LLD.md
 **Approved-by:** Umesh (chat rulings 2026-10-28, quoted in What)
 **Links:** merge ab3e1932, D-173, D-186, D-192, D-198, T-013, T-051, T-058, docs/HLD.md, docs/LLD.md, references/portals/lkb-live.knowledge.md
+
+## D-200 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** needs-review claims are citable with a visible unverified label; the citation anchors to the verbatim transcript turn
+**What:** Implements D-199 ruling (4), "Let needs-review be used" (Umesh, chat 2026-10-28). The counsellor answer workflow and knowledge outputs may cite claims with status needs-review. Every such citation carries verification: "unverified", shown in the UI, and links to the claim's evidence turn (speaker + timestamp + verbatim text). Verified/approved claims rank above needs-review ones. Rejected claims are never cited. A claim with no resolvable evidence turn is not cited. Tenant scoping is unchanged.
+**Why:** Live audit (references/portals/lkb-live.knowledge.md): all 1768 claims are needs-review, so the counsellor returns 0 sources (apps/api answer-workflow.ts:144/157) and knowledge outputs return 422 (knowledge-outputs service.ts:32). Brain (concepts/langgraph/self-rag.md): groundedness means traceable to retrieved evidence; a needs-review claim is an unreviewed paraphrase of a turn that is itself verbatim, so anchoring each citation to the turn keeps the answer grounded while the label tells the student the claim is not human-reviewed.
+**Result:** Pending. One maker unit `claims-citable-needs-review` (QUEUE tier 1), one scoped checker per brain patterns/proportional-verification-pattern.md; local validation only, live rollout is a separate human step.
+**Changes-authorized:**
+- apps/api answer workflow and knowledge-outputs claim filtering
+- apps/web citation rendering (unverified label)
+- tests for the above
+**Approved-by:** Umesh (chat ruling 2026-10-28, "Let needs-review be used"; "if really needed go with /maker continue")
+**Links:** D-199, D-173, T-013, T-058, references/portals/lkb-live.knowledge.md
