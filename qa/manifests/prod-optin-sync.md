@@ -2,7 +2,7 @@
 **Contract:** none specific (D-204 in docs/DECISIONS.md; qa/gates/d-entry-prod-optin-sync.md; Changes-authorized: scripts/webinar/sync-session.mjs production opt-in only, its tests, docs/GO-LIVE-UBUNTU.md cutover command)
 **Goal task:** none
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (dual: qa/verdicts/prod-optin-sync.md f42a9bc8 + qa/verdicts/prod-optin-sync.b.md b7ebafb3, cycle 0)
 **Fix cycle:** 0
 Fix cycle: 0
 **Dual check:** required
