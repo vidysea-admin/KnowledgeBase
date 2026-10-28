@@ -1,10 +1,12 @@
 import { randomUUID } from "node:crypto";
-import { evidenceFor, currentEvidence } from "./evidence.js";
+import { evidenceFor, currentEvidence, hasUnverifiedCitation } from "./evidence.js";
 import { synthesize, validateItems } from "./synthesis.js";
 import { OutputError, record, text, parseOutputInput, type OutputDeps, type OutputDraft } from "./types.js";
 import { renderOutputMarkdown } from "./markdown.js";
 
 const noUnsupported = (draft: OutputDraft): boolean => draft.sections.every((s) => s.items.length > 0 && s.items.every((i) => i.validation === "ai-supported"));
+/** D-201 [C5]: under onInsufficient=refuse, any needs-review citation is insufficient (stays as strict as before D-200). */
+const refusesDraft = (draft: OutputDraft): boolean => !noUnsupported(draft) || draft.sourceCoverage.status !== "ready" || hasUnverifiedCitation(draft.citations);
 export function createOutputService(deps: OutputDeps) {
   const now = () => (deps.now?.() ?? new Date()).toISOString();
   async function get(tenantId: string, id: string): Promise<OutputDraft> {
@@ -29,7 +31,7 @@ export function createOutputService(deps: OutputDeps) {
       const draft: OutputDraft = { _id: randomUUID(), tenantId, kind: input.kind, title: input.title, purpose: input.purpose,
         sessionIds: input.sessionIds, revision: 1, createdAt: timestamp, updatedAt: timestamp, reviewState: "draft",
         sourceDigest: source.sourceDigest, sourceCoverage: source.sourceCoverage, citations: source.citations, ...generated, ...(source.policy ? { policy: source.policy } : {}) };
-      if (source.policy?.onInsufficient === "refuse" && (!noUnsupported(draft) || draft.sourceCoverage.status !== "ready")) throw new OutputError("unavailable", 422);
+      if (source.policy?.onInsufficient === "refuse" && refusesDraft(draft)) throw new OutputError("unavailable", 422);
       // Re-read after both model calls: a source/policy change during generation cannot land an apparently current draft.
       await currentEvidence(deps, tenantId, draft);
       await deps.repository.insert(tenantId, draft);
@@ -69,7 +71,7 @@ export function createOutputService(deps: OutputDeps) {
       await currentEvidence(deps, tenantId, draft);
       if (draft.sections.some((s) => s.items.some((i) => i.validation !== "ai-supported"))) throw new OutputError("needs_review", 409);
       if (!draft.sections.some((s) => s.items.some((i) => i.validation === "ai-supported"))) throw new OutputError("unavailable", 422);
-      if (draft.policy?.onInsufficient === "refuse" && (!noUnsupported(draft) || draft.sourceCoverage.status !== "ready")) throw new OutputError("unavailable", 422);
+      if (draft.policy?.onInsufficient === "refuse" && refusesDraft(draft)) throw new OutputError("unavailable", 422);
       return { markdown: renderOutputMarkdown(draft), filename: `${draft.kind}-${draft._id}.md` };
     },
   };

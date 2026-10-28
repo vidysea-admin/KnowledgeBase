@@ -112,8 +112,9 @@ test("unsupported model interpretations remain withheld and cannot export", asyn
   assert.match(draft.sections[0]!.missing, /withheld/u);
   await assert.rejects(f.service.export("a", draft._id, 1), refuses("needs_review"));
 });
-test("excluded unverified source claims remain visible as partial coverage and refusal policy cannot call them ready", async () => {
-  const f = fixture(); f.sources().claims.push({ ...claim(), _id: "c2", status: "needs-review" });
+// D-201: needs-review is now citable (see the C1-C5 tests below); the withheld/partial path is pinned with a `conflicting` claim.
+test("excluded conflicting source claims remain visible as partial coverage and refusal policy cannot call them ready", async () => {
+  const f = fixture(); f.sources().claims.push({ ...claim(), _id: "c2", status: "conflicting" });
   const draft = await f.service.create("a", input());
   assert.deepEqual(draft.sourceCoverage, { status: "partial", withheldClaims: 1 });
   assert.match((await f.service.export("a", draft._id, 1)).markdown, /Source coverage: partial; 1 claims excluded/u);
@@ -306,7 +307,8 @@ test("removing a withheld item preserves other verified mappings and truthful co
   assert.equal(removed.sections[0]!.items.length, 1); assert.equal(removed.sections[0]!.items[0]!.validation, "ai-supported");
   assert.doesNotMatch((await f.service.export("a", draft._id, 3)).markdown, /Unsupported text/u);
 });
-test("actual TOC unreviewed sample refuses; a clearly synthetic verified copy demonstrates downstream consumption without raw mutation", async () => {
+// D-201 [C5]: the TOC sample's needs-review claims are citable without a refuse policy and still refuse under one.
+test("actual TOC needs-review sample: refuse policy refuses, no policy succeeds with unverified label; verified copy demonstrates downstream consumption without raw mutation", async () => {
   // Resolved from this file (repo-root data/), not the cwd: `pnpm -r test` runs with apps/api as cwd.
   const sample = new URL("../../../../data/toc-migrated/2026-08-27-in-focus-4/", import.meta.url);
   const path = new URL("turns.json", sample), claimsPath = new URL("claims.json", sample);
@@ -314,8 +316,14 @@ test("actual TOC unreviewed sample refuses; a clearly synthetic verified copy de
   const turns = JSON.parse(before.toString()) as Turns[], claims = JSON.parse(claimsBefore.toString()) as Claims[];
   const f = fixture();
   f.deps.readSources = async () => ({ sessions: [{ _id: "2026-08-27-in-focus-4", tenantId: "toc" } as Sessions], claims, turns });
+  const noPolicy = f.deps.policy;
+  f.deps.policy = async () => ({ status: "active", policy: { tenantId: "toc", policyId: "p1", version: 1, questionClass: "faq", mode: "internal-only", style: "concise", onInsufficient: "refuse", citations: "required", retired: false } as never });
   await assert.rejects(f.service.create("toc", { ...input(), sessionIds: ["2026-08-27-in-focus-4"] }), refuses("unavailable"));
   assert.equal(f.calls(), 0);
+  f.deps.policy = noPolicy;
+  const unreviewed = await f.service.create("toc", { ...input(), sessionIds: ["2026-08-27-in-focus-4"] });
+  assert.ok(unreviewed.citations.length > 0 && unreviewed.citations.every((c) => c.claimStatus === "needs-review"));
+  assert.equal(unreviewed.sourceCoverage.status, "partial");
   const first = turns.find((t) => t.text.trim()); assert.ok(first);
   const synthetic = fixture(); synthetic.sources().turns[0]!.text = first.text; synthetic.sources().claims[0]!.evidence[0]!.quote = first.text;
   const draft = await synthetic.service.create("a", input()); assert.equal(draft.citations[0]!.quote, first.text);
@@ -346,4 +354,57 @@ test("mounted router enforces authentication/scopes; provider error secrets rema
     f.setFailure(); const response = await fetch(url, { method: "POST", headers: { authorization: "Bearer full", "content-type": "application/json" }, body: JSON.stringify(input()) });
     assert.equal(response.status, 503); assert.doesNotMatch(await response.text(), /SECRET|source content/u);
   } finally { await new Promise<void>((resolve, reject) => server.close((e) => e ? reject(e) : resolve())); }
+});
+
+const refusePolicy = async () => ({ status: "active" as const, policy: { tenantId: "a", policyId: "p1", version: 1, questionClass: "faq", mode: "internal-only", style: "concise", onInsufficient: "refuse", citations: "required", retired: false } as never });
+const unverifiedOnly = (): OutputSources => ({ sessions: [{ _id: "s1", tenantId: "a" } as Sessions], claims: [{ ...claim(), status: "needs-review" }], turns: [turn()] });
+
+// D-200/D-201 [C1][C2][C5]: a draft built only on needs-review claims succeeds (no policy) and every citation carries claimStatus.
+test("needs-review-only evidence yields a draft with claimStatus citations and non-ready coverage (D-201)", async () => {
+  const f = fixture(); f.setSources(unverifiedOnly());
+  const draft = await f.service.create("a", input());
+  assert.deepEqual(draft.citations.map((c) => c.claimStatus), ["needs-review"]);
+  assert.deepEqual(draft.sourceCoverage, { status: "partial", withheldClaims: 0 });
+  assertOutputDraft(JSON.parse(JSON.stringify(draft)));
+  const exported = await f.service.export("a", draft._id, 1);
+  assert.match(exported.markdown, /Unverified \(needs review\)/u);
+});
+// [C2] verified citations carry claimStatus "verified", show no marker, and a verified<->needs-review flip makes the draft stale.
+test("verified citation is labelled verified without marker; verified<->needs-review flip is source_changed (D-201)", async () => {
+  const f = fixture(); const draft = await f.service.create("a", input());
+  assert.deepEqual(draft.citations.map((c) => c.claimStatus), ["verified"]);
+  assert.equal(draft.sourceCoverage.status, "ready");
+  assert.doesNotMatch((await f.service.export("a", draft._id, 1)).markdown, /Unverified/u);
+  f.sources().claims[0]!.status = "needs-review";
+  await assert.rejects(f.service.export("a", draft._id, 1), refuses("source_changed"));
+  const unv = fixture(); unv.setSources(unverifiedOnly()); const d2 = await unv.service.create("a", input());
+  unv.sources().claims[0]!.status = "verified";
+  await assert.rejects(unv.service.export("a", d2._id, 1), refuses("source_changed"));
+});
+// [C2] old stored documents (no claimStatus) stay schema-valid and are treated as verified.
+test("stored citations without claimStatus remain valid and current (additive field)", async () => {
+  const f = fixture(); const draft = await f.service.create("a", input());
+  const legacy = structuredClone(draft); for (const c of legacy.citations) delete (c as { claimStatus?: string }).claimStatus;
+  assertOutputDraft(legacy);
+  await f.repository.insert("a", { ...legacy, _id: "11111111-1111-4111-8111-111111111111" });
+  assert.match((await f.service.export("a", "11111111-1111-4111-8111-111111111111", 1)).markdown, /AI draft/u);
+});
+// [C4] verified citations are numbered before needs-review ones.
+test("verified claims rank before needs-review claims in output citations (D-201)", async () => {
+  const f = fixture(); f.sources().claims.unshift({ ...claim(), _id: "a0", status: "needs-review", evidence: [{ turnId: "t1", sessionId: "s1", quote: "The board decided to extend the deadline." }] });
+  const draft = await f.service.create("a", input());
+  assert.deepEqual(draft.citations.map((c) => [c.claimId, c.claimStatus]), [["c1", "verified"], ["a0", "needs-review"]]);
+});
+// [C5] strict refuse policy refuses a needs-review citation at create (before any provider call) and at export.
+test("refuse policy refuses needs-review citations on create and export; without policy a needs-review-only draft succeeds (D-201)", async () => {
+  const f = fixture(); f.setSources(unverifiedOnly()); f.deps.policy = refusePolicy;
+  await assert.rejects(f.service.create("a", input()), refuses("unavailable"));
+  assert.equal(f.calls(), 0);
+  f.deps.policy = async (_t, s) => ({ status: "none", questionClass: s.questionClass });
+  const draft = await f.service.create("a", input());
+  f.deps.policy = refusePolicy;
+  await assert.rejects(f.service.export("a", draft._id, 1));
+  // A refuse policy with verified-only evidence is unchanged.
+  const ok = fixture(); ok.deps.policy = refusePolicy;
+  assert.equal((await ok.service.create("a", input())).sourceCoverage.status, "ready");
 });

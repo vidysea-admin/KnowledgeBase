@@ -39,7 +39,7 @@ export function assertOutputDraft(value: unknown): asserts value is OutputDraft 
     || new Date(draft.updatedAt).getTime() < new Date(draft.createdAt).getTime()
     || new Set(draft.sessionIds).size !== draft.sessionIds.length || !draft.sessionIds.every(id)
     || !Number.isSafeInteger(draft.sourceCoverage.withheldClaims) || draft.sourceCoverage.withheldClaims > 200
-    || (draft.sourceCoverage.status === "ready") !== (draft.sourceCoverage.withheldClaims === 0)) fail();
+    || (draft.sourceCoverage.status === "ready") !== (draft.sourceCoverage.withheldClaims === 0 && !draft.citations.some((c) => c.claimStatus === "needs-review"))) fail();
   if (draft.policy && (!validPolicyId(draft.policy.policyId) || !Number.isSafeInteger(draft.policy.version)
     || !normalizeQuestionClass(draft.policy.questionClass)
     || classKey(normalizeQuestionClass(draft.policy.questionClass)!) !== classKey(normalizeQuestionClass(draft.kind)!))) fail();

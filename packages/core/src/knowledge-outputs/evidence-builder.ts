@@ -22,6 +22,8 @@ export interface OutputExcerpt {
   unit: "seconds" | "characters";
   quote: string;
   href: string;
+  /** D-201: `needs-review` claims are citable but must be labelled; `verified` is the default trust level. */
+  claimStatus: "verified" | "needs-review";
 }
 export interface OutputSection {
   title: string;
@@ -63,7 +65,7 @@ function unique<T extends { _id: string }>(rows: readonly T[]): Map<string, T> {
   return result;
 }
 
-function excerpt(claimId: string, evidence: unknown, turns: Map<string, Turns>, sessions: Set<string>): OutputExcerpt | null {
+function excerpt(claimId: string, claimStatus: OutputExcerpt["claimStatus"], evidence: unknown, turns: Map<string, Turns>, sessions: Set<string>): OutputExcerpt | null {
   if (!record(evidence) || !validId(evidence.turnId) || !validId(evidence.sessionId)
     || !sessions.has(evidence.sessionId)) return null;
   const turn = turns.get(evidence.turnId);
@@ -78,7 +80,7 @@ function excerpt(claimId: string, evidence: unknown, turns: Map<string, Turns>, 
     ...(typeof turn.speakerLabel === "string" && turn.speakerLabel.trim() ? { speakerLabel: turn.speakerLabel } : {}),
     start: turn.tStart, end: turn.tEnd,
     unit: turn.speakerRef === "url" || turn.speakerRef === "document" ? "characters" : "seconds",
-    quote, href: `/sessions/${component(turn.sessionId)}#turn-${component(turn._id)}`,
+    quote, href: `/sessions/${component(turn.sessionId)}#turn-${component(turn._id)}`, claimStatus,
   };
 }
 
@@ -102,12 +104,15 @@ export function buildEvidenceOutput(request: EvidenceOutputRequest): EvidenceOut
   const sessions = new Set(request.sessionIds);
   const sections = request.sections.map((section: EvidenceOutputRequest["sections"][number]): OutputSection => {
     const result: OutputSection = { title: section.title, excerpts: [], withheld: [] };
-    for (const claimId of new Set(section.claimIds)) {
+    // D-201 [C4]: verified claims rank before needs-review claims (stable otherwise), so they win dedupe and caps.
+    const ranked = [...new Set(section.claimIds)].sort((a, b) => Number(claims.get(a)?.status === "needs-review") - Number(claims.get(b)?.status === "needs-review"));
+    for (const claimId of ranked) {
       const claim = claims.get(claimId);
       if (!claim) { result.withheld.push({ claimId, reason: "claim-unavailable" }); continue; }
-      if (claim.status !== "verified") { result.withheld.push({ claimId, reason: "claim-unverified" }); continue; }
+      // D-200/D-201 [C1]: needs-review is citable (labelled); conflicting/rejected/other statuses stay withheld.
+      if (claim.status !== "verified" && claim.status !== "needs-review") { result.withheld.push({ claimId, reason: "claim-unverified" }); continue; }
       const evidence = Array.isArray(claim.evidence) ? claim.evidence : [];
-      const resolved = evidence.map((item) => excerpt(claimId, item, turns, sessions));
+      const resolved = evidence.map((item) => excerpt(claimId, claim.status as OutputExcerpt["claimStatus"], item, turns, sessions));
       if (resolved.length === 0 || resolved.some((item) => item === null)) {
         result.withheld.push({ claimId, reason: "evidence-unavailable" }); continue;
       }
@@ -122,7 +127,8 @@ export function buildEvidenceOutput(request: EvidenceOutputRequest): EvidenceOut
   });
   const available = sections.some((section) => section.excerpts.length > 0);
   const incomplete = sections.some((section) => section.withheld.length > 0 || section.excerpts.length === 0);
-  const status = !available ? "unavailable" : incomplete ? "partial" : "ready";
+  const unverified = sections.some((section) => section.excerpts.some((item) => item.claimStatus !== "verified"));
+  const status = !available ? "unavailable" : incomplete || unverified ? "partial" : "ready";
   const heading = { faq: "FAQ evidence draft", report: "Report evidence draft", "meeting-brief": "Meeting preparation evidence draft" }[request.kind];
   const lines = [`# ${line(request.title)}`, "", heading, "", "Literal source excerpts only. These excerpts do not establish an inferred answer, decision or recommendation."];
   for (const section of sections) {
@@ -130,7 +136,7 @@ export function buildEvidenceOutput(request: EvidenceOutputRequest): EvidenceOut
     if (section.excerpts.length === 0) lines.push("No verified evidence available for this section.");
     for (const item of section.excerpts) {
       lines.push(...item.quote.split(/\r\n|\r|\n/u).map((text) => `> ${literal(text)}`), "",
-        `[Source: ${line(item.sessionId)} / ${line(item.turnId)}](${item.href}) · ${line(item.speakerLabel ?? item.speakerRef)} (${line(item.speakerRef)}) · ${item.start}–${item.end} ${item.unit}`, "");
+        `[Source: ${line(item.sessionId)} / ${line(item.turnId)}](${item.href}) · ${line(item.speakerLabel ?? item.speakerRef)} (${line(item.speakerRef)}) · ${item.start}–${item.end} ${item.unit}${item.claimStatus === "needs-review" ? " · Unverified (needs review)" : ""}`, "");
     }
     if (section.withheld.length > 0) lines.push(`Withheld evidence requests: ${section.withheld.length}. Review their structured reasons before publishing.`);
   }
