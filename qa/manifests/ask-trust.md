@@ -2,7 +2,7 @@
 **Contract:** qa/contracts/ask-fast-rag.md (the unit is the follow-up of its checked-PASS cycle; ledger rows ISS-AFR-001..004 in qa/issues.afr.jsonl are the acceptance source; no new contract file, the maker never edits qa/contracts/)
 **Goal task:** none
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/ask-trust.md + .b.md, cycle 0, 2026-10-28)
 **Fix cycle:** 0 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0

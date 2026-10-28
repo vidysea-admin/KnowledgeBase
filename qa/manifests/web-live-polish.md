@@ -2,7 +2,7 @@
 **Contract:** none specific (QUEUE Wave 1 row web-live-polish, approved by Umesh 2026-10-28; scope G-A2 of docs/REMAINING-PLAN-2026-10-28.md; items taken only from references/portals/lkb-live.knowledge.md Findings)
 **Goal task:** none
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/web-live-polish.md + .b.md, cycle 0, 2026-10-28)
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/web/src/api/client.ts:133
