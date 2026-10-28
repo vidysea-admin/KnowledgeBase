@@ -8,7 +8,8 @@
 **Hold-reopens:** 0
 **Resume-reset:** unused
 **Capability-redispatch:** 0
-**Dual check:** no
+**Dual check:** required
+dual-trigger: tenancy packages/ask/src/ask-graph.ts:93
 **Persona walk:** skip (no new screen, flow or user type; the API default changes, response shape unchanged)
 **Issues addressed:** none
 **Executor:** claude-sonnet-subagent
@@ -30,6 +31,8 @@ Authority: D-203 (draft), quoted in qa/QUEUE.md row 0c.
 
 ## Verification scope
 Policy-Version: proportional-verification/2026-10-19.17
+Round: 17 files, 7 criteria, est 60 min — single builder, per-file node --test runs, 2 blind checkers (maker-added at dispatch)
+slow-plan: tier L tenancy unit with dual check; per-file test runs because multi-file node --test stalls on this machine
 Tier: L (touches tenancy-scoped retrieval; dual-trigger: tenancy packages/ask/src/ask-graph.ts:93 membership guard; apps/api/src/ask/ask-arms.ts:86 scopedCollection tenant filter)
 Base / checked state: code commits ca461c94 + f6b353b9 (HEAD f6b353b91f3fdb835139ab7c94c6885f06ea267e on wave/ask-fast-rag); the manifest commit follows and touches only qa/.
 Affected tests: packages/ask/src/*.test.ts; apps/api answer-policy/*, ask/*, routes/ask/ask.test.ts, native-evidence/*, server.test.ts, score.test.ts, composition and production tests that POST /ask. No full suite run.
@@ -44,14 +47,14 @@ Tests[C6]: ask-fast.test.ts::"[C6] total deadline returns a degraded answer inst
 Tests[C7]: answer-fast.test.ts::"[C7] a fresh default-path answer whose citations are valid internal chunks ships those sources" (real createMongoEvidenceVerifier), "[C7] a verification failure surfaces its real reason ...", "[C7] deep mode keeps the previous stale wording"
 Tests[I1]: ask-tenant-isolation.test.ts, ask-tenant-hostile.test.ts (unmodified, green)
 Tests[I2]: none needed — no repository write, schema or migration change
-Pre-check[C1]: f6b353b9 (cd packages/ask && node --test --import tsx src/ask-fast.test.ts); (cd apps/api && node --test --import tsx src/answer-policy/answer-fast.test.ts) -> exit 0, 8 passed + 8 passed t=2 blobs=packages/ask/src/ask-fast.test.ts:f84ec37a,apps/api/src/answer-policy/answer-fast.test.ts:17fb34d8
-Pre-check[C2]: f6b353b9 (cd apps/api && node --test --import tsx src/answer-policy/answer-workflow.test.ts); (cd packages/ask && node --test --import tsx src/*.test.ts) -> exit 0, 18 passed (workflow) + 176 passed (packages/ask) t=2 blobs=apps/api/src/answer-policy/answer-workflow.test.ts:a571e36c
+Pre-check[C1]: f6b353b9 node --test --import tsx packages/ask/src/ask-fast.test.ts; node --test --import tsx apps/api/src/answer-policy/answer-fast.test.ts -> exit 0, 8 passed + 8 passed t=2 blobs=packages/ask/src/ask-fast.test.ts:f84ec37a,apps/api/src/answer-policy/answer-fast.test.ts:17fb34d8
+Pre-check[C2]: f6b353b9 node --test --import tsx apps/api/src/answer-policy/answer-workflow.test.ts -> exit 0, 18 passed (deep-mode workflow; builder also reported packages/ask 176 passed per file) t=2 blobs=apps/api/src/answer-policy/answer-workflow.test.ts:a571e36c
 Pre-check[C3]: f6b353b9 answer-fast.test.ts (apps/api) + ask-fast.test.ts (packages/ask) via node --test --import tsx -> exit 0, 16 passed t=2 blobs=packages/ask/src/ask-fast.test.ts:f84ec37a,apps/api/src/answer-policy/answer-fast.test.ts:17fb34d8
-Pre-check[C4]: f6b353b9 (cd apps/api && node --test --import tsx src/ask/ask-tenant-isolation.test.ts; then src/ask/ask-tenant-hostile.test.ts) -> exit 0, 17 passed + 70 passed t=2 blobs=apps/api/src/ask/ask-tenant-isolation.test.ts:b45d6edd
+Pre-check[C4]: f6b353b9 node --test --import tsx apps/api/src/ask/ask-tenant-isolation.test.ts; node --test --import tsx apps/api/src/ask/ask-tenant-hostile.test.ts -> exit 0, 17 passed + 70 passed t=2 blobs=apps/api/src/ask/ask-tenant-isolation.test.ts:b45d6edd
 Pre-check[C5]: f6b353b9 ask-fast.test.ts (packages/ask), answer-fast.test.ts and ask/ask-web-fallback.test.ts (apps/api) via node --test --import tsx, one file per run -> exit 0, 8 + 8 + 4 passed t=3 blobs=packages/ask/src/ask-fast.test.ts:f84ec37a
-Pre-check[C6]: f6b353b9 (cd packages/ask && node --test --import tsx src/ask-fast.test.ts) -> exit 0, 8 passed t=1 blobs=packages/ask/src/ask-fast.test.ts:f84ec37a
-Pre-check[C7]: f6b353b9 (cd apps/api && node --test --import tsx src/answer-policy/answer-fast.test.ts; then src/answer-policy/answer-workflow.test.ts) -> exit 0, 8 + 18 passed t=2 blobs=apps/api/src/answer-policy/answer-fast.test.ts:17fb34d8
-Pre-check[I1]: f6b353b9 (cd apps/api && node --test --import tsx src/ask/ask-tenant-hostile.test.ts) -> exit 0, 70 passed t=1
+Pre-check[C6]: f6b353b9 node --test --import tsx packages/ask/src/ask-fast.test.ts -> exit 0, 8 passed t=1 blobs=packages/ask/src/ask-fast.test.ts:f84ec37a
+Pre-check[C7]: f6b353b9 node --test --import tsx apps/api/src/answer-policy/answer-fast.test.ts; node --test --import tsx apps/api/src/answer-policy/answer-workflow.test.ts -> exit 0, 8 + 18 passed t=2 blobs=apps/api/src/answer-policy/answer-fast.test.ts:17fb34d8
+Pre-check[I1]: f6b353b9 node --test --import tsx apps/api/src/ask/ask-tenant-hostile.test.ts -> exit 0, 70 passed t=1
 Pre-check[I2]: f6b353b9 git diff --stat ca461c94~1 HEAD -- schema migrations -> exit 0, empty t=1
 Metrics: builder_min=120 mutants=7 policy=proportional-verification/2026-10-19.17 cycle=0 suite_runs=0 repeat_runs=0 tokens=unavailable
 
