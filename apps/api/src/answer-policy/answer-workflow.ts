@@ -144,7 +144,11 @@ export function createAnswerWorkflow(policies: AnswerPolicyService, store: Answe
     // A saved answer is a release of the same candidate under the same policy,
     // not a permanent authorization to bypass later policy/evidence revisions.
     let current = true, inheritedConflict = false, whyNot: string | undefined;
-    try { await snapshotFreshness(t, run); } catch { current = false; if (fresh) whyNot = await whyUnverified(t, run.evidence, verify); }
+    try { await snapshotFreshness(t, run); } catch {
+      current = false;
+      // The diagnosis re-runs the verifier; if it throws too, degrade to the generic stale wording (as deep does), never a 500 after the run is persisted.
+      if (fresh) try { whyNot = await whyUnverified(t, run.evidence, verify); } catch { whyNot = undefined; }
+    }
     if (run.parentRunId && run.resolutionId) {
       try {
         const original = await runOf(t, run.parentRunId); await freshness(t, original);

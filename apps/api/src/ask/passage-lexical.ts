@@ -1,4 +1,5 @@
 /** Unicode passage slicing and query-time lexical scoring for transcript and native source hydration. */
+import type { TreeIndexNode } from "@lkb/core";
 import { lexicalQueryTokens } from "@lkb/index";
 
 export interface Span { charStart: number; charEnd: number }
@@ -77,4 +78,21 @@ export function passageLexicalScorer(query: string, turns: readonly { text: stri
     return { textContribution: textContribution / Math.max(1e-9, denominator),
       speakerContribution: speakerContribution / Math.max(1e-9, denominator) };
   };
+}
+
+/** Content-bearing tree levels the session arms cannot reach: native document/message passages and topics. */
+const TREE_ARM_LEVELS = new Set<TreeIndexNode["level"]>(["native-passage", "topic"]);
+/** ask-fast-rag F1/F2: the non-LLM tree arm of the default /ask path. Ranks those nodes by the same lexical scorer the passage hydrator uses
+ * (no model call) and returns their ids; the caller resolves them through the request's `treeSearchFn` and the usual membership/hydration guards. */
+export function treeLexicalIds(query: string, tree: TreeIndexNode, limit: number): string[] {
+  const nodes: TreeIndexNode[] = [], seen = new Set<string>(), stack: TreeIndexNode[] = [tree];
+  while (stack.length) {
+    const n = stack.pop()!;
+    if (TREE_ARM_LEVELS.has(n.level) && !seen.has(n.node_id) && typeof n.summary === "string" && n.summary.trim()) { seen.add(n.node_id); nodes.push(n); }
+    for (let i = n.children.length - 1; i >= 0; i--) stack.push(n.children[i]!);
+  }
+  const textOf = (n: TreeIndexNode) => n.title + " " + n.summary;
+  const score = passageLexicalScorer(query, nodes.map((n) => ({ text: textOf(n) })));
+  return nodes.map((n, order) => ({ id: n.node_id, order, score: score(textOf(n)).textContribution }))
+    .filter((row) => row.score > 0).sort((a, b) => b.score - a.score || a.order - b.order).slice(0, limit).map((row) => row.id);
 }

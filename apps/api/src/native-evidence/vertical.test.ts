@@ -208,8 +208,10 @@ test("native document vertical: actual mounted consent/upload/publication, Hindi
     assert.equal(citation.evidence.quote, HINDI); assert.deepEqual(citation.evidence.sourceLocator, hit.nativeSourceLocator);
     await f.json(await f.call("/citations/native/resolve", "POST", { sourceLocator: locators[0] }, "foreign"), 404, "foreign native citation refusal");
     await f.json(await f.call("/citations/native/resolve", "POST", { sourceLocator: locators[0] }, "limited"), 403, "native citation scope refusal");
-    const answer = await f.json(await f.call("/ask", "POST", { query: "आवेदन", filters: { mode: "deep" } }), 200, "actual createServer Ask request + native source context");
+    const answer = await f.json(await f.call("/ask", "POST", { query: "आवेदन" }), 200, "actual createServer Ask request + native source context");
     assert.equal(answer.answer, HINDI);
+    const deepAnswer = await f.json(await f.call("/ask", "POST", { query: "आवेदन", filters: { mode: "deep" } }), 200, "deep mode over the same native source");
+    assert.equal(deepAnswer.answer, HINDI);
     const proofs = answer.sources.internal.flatMap((node: Row) => node.evidence?.sourceQuotes ?? []);
     assert.ok(proofs.length); assert.ok(proofs.every((proof: Row) => proof.origin === "document-page" && proof.quote === HINDI));
     for (const proof of proofs) {
@@ -264,7 +266,7 @@ test("native Ask vertical: deletion after grounding refuses the completed answer
       triggered = true;
       await f.native.headStore.tombstone(TENANT, { sourceId, expectedHeadRevision: 1, status: "deleted" });
     });
-    const response = await f.call("/ask", "POST", { query: "आवेदन", filters: { mode: "deep" } });
+    const response = await f.call("/ask", "POST", { query: "आवेदन" });
     const body = await f.json(response, 503, "post-grounding native authority refusal");
     assert.equal(triggered, true, "Attack must reach real answer-grounding callback");
     assert.equal("answer" in body, false);
@@ -279,7 +281,7 @@ test("native policy vertical: actual policy release and mounted history refuse a
     try {
       const sourceId = await f.register(), doc = await f.upload(); await f.publish(sourceId, doc, null);
       const answer = await f.json(await f.call("/ask", "POST", { query: "आवेदन", questionClass: "career",
-        policyId: "native-career", policyVersion: 1, evidenceMode: true, filters: { sessionIds: [], sources: "internal", mode: "deep" } }),
+        policyId: "native-career", policyVersion: 1, evidenceMode: true, filters: { sessionIds: [], sources: "internal" } }),
       200, "actual native policy workflow release");
       assert.equal(answer.state, "allowed", "HOLD: native policy must independently authorize current exact source evidence");
       assert.equal(answer.answer, HINDI); assert.equal(answer.policy.policyId, "native-career");

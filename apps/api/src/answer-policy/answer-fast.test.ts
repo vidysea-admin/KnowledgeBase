@@ -17,19 +17,20 @@ const TEXT = "Fee is 100.";
 const input = (over: Record<string, unknown> = {}) => ({ query: "What is the fee?", questionClass: "fees", evidenceMode: true, filters: { sessionIds: [], sources: "all" }, ...over });
 const result = (json: unknown) => ({ json, text: JSON.stringify(json), provider: "offline", model: "fixture", costUsd: 0, usage: { inputTokens: 1, outputTokens: 1 } });
 
-function rig(o: { arms?: boolean; verify?: VerifyEvidence } = {}) {
+function rig(o: { arms?: boolean; extra?: boolean; verify?: VerifyEvidence } = {}) {
   const policies = createAnswerPolicyService(createInMemoryAnswerPolicyStore()), records = createInMemoryAnswerRecordStore();
   const kinds: string[] = []; let tavily = 0;
   const nodes: TreeIndexNode[] = [{ node_id: "n1", title: "Fee", level: "session", summary: "", evidence: { sessionRef: "s1" }, children: [] }];
+  if (o.extra) nodes.push({ node_id: "n2", title: "Other", level: "session", summary: "", evidence: { sessionRef: "s2" }, children: [] });
   const tree: TreeIndexNode = { node_id: "root", title: "Tenant", level: "tenant", summary: "", children: nodes };
-  const quote = { id: "q-n1", nodeId: "n1", sessionRef: "s1", turnId: "t1", speakerRef: "spk:0", tStart: 10, tEnd: 20, charStart: 0, charEnd: TEXT.length,
-    byteStart: 0, byteEnd: TEXT.length, turnTextSHA256: sha(TEXT), sliceSHA256: sha(TEXT), quote: TEXT, origin: "speech" as const };
+  const quoteOf = (n: TreeIndexNode) => ({ id: `q-${n.node_id}`, nodeId: n.node_id, sessionRef: n.evidence!.sessionRef as string, turnId: n.node_id === "n1" ? "t1" : "t2", speakerRef: "spk:0", tStart: 10, tEnd: 20, charStart: 0, charEnd: TEXT.length,
+    byteStart: 0, byteEnd: TEXT.length, turnTextSHA256: sha(TEXT), sliceSHA256: sha(TEXT), quote: TEXT, origin: "speech" as const });
   const deps: AskV2Deps = { tenantId: "tenant-a", scoreFn: () => [0.9, "offline"], write: async () => {},
     treeSearchFn: (root, ids) => root.children.filter((n) => ids.includes(n.node_id)),
     tavilySearchFn: async () => { tavily++; return [{ url: "https://example.test/fee", content: "Web says the fee is 100." }]; },
     extraCandidateArmsFn: async () => ({ arms: o.arms === false ? [[]] : [nodes], degraded: null }),
-    sourceContext: { hydrate: async (_q, admitted) => ({ nodes: admitted.map((n) => ({ ...n, summary: JSON.stringify([quote]),
-      evidence: { ...n.evidence, sourceQuotes: [quote], sourceSnapshotSHA256: sha("snap") } })), snapshotSHA256: sha("snap"), sourceBytes: 10 }) },
+    sourceContext: { hydrate: async (_q, admitted) => ({ nodes: admitted.map((n) => ({ ...n, summary: JSON.stringify([quoteOf(n)]),
+      evidence: { ...n.evidence, sourceQuotes: [quoteOf(n)], sourceSnapshotSHA256: sha("snap") } })), snapshotSHA256: sha("snap"), sourceBytes: 10 }) },
     complete: async (job) => {
       kinds.push(job.kind);
       if (job.kind === "ask.select_nodes") return result({ node_ids: ["n1"] });
@@ -122,4 +123,23 @@ test("[C7] deep mode keeps the previous stale wording (unchanged behavior)", asy
   const deep = rig({ verify: async () => false });
   const out = await run(deep, { filters: { sessionIds: [], sources: "all", mode: "deep" } });
   assert.equal(out.reason, "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified.");
+});
+
+test("[F4] sources.internal is what the answer cites: one uncited chunk that fails verification does not wipe the cited, valid one", async () => {
+  const r = rig({ extra: true, verify: async (_t, bindings) => bindings.every((e) => e.source.node_id === "n1") });
+  const out = await run(r);
+  assert.equal(out.state, "allowed"); assert.equal(out.answer, TEXT);
+  assert.deepEqual(out.sources.internal.map((s) => s.node_id), ["n1"]);
+  assert.equal(out.sourceEvidence.length, 1);
+  assert.deepEqual(r.kinds, ["ask.answer", "ask.answer_grounding"]);
+});
+
+test("[F3] a verifier that throws never turns a persisted default-path run into a 500; it degrades to the generic stale wording like deep", async () => {
+  for (const mode of [undefined, "deep"]) {
+    const r = rig({ verify: async () => { throw new Error("evidence store down"); } });
+    const out = await run(r, mode ? { filters: { sessionIds: [], sources: "all", mode } } : {});
+    assert.equal(out.state, "stale"); assert.equal(out.answer, ""); assert.deepEqual(out.sources, { internal: [], web: [] });
+    assert.equal(out.reason, "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified.");
+    assert.equal((await r.records.get("tenant-a", out.runId))?.id, out.runId, "the run was persisted before the verifier failed");
+  }
 });

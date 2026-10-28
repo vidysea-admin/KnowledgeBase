@@ -39,6 +39,8 @@ export interface AskGraphState {
   askResult?: AskResult;
   boundedSources: ContextSource[];
   refinedContext?: string;
+  /** Bounded answers only: source IDs cited by the sentences that survived grounding (read by the fast path). */
+  citedSourceIds?: string[];
   result?: AskV2Result;
   /** Names of nodes entered, in order (diagnostic only; never part of the output). */
   readonly trace: AskNodeName[];
@@ -202,7 +204,7 @@ const answerNode: AskGraphNode = {
     const revalidate = s.deps.sourceContext?.revalidate;
     if (nativeNodes.length && !revalidate) throw new BoundedAskError("native source revalidation is unavailable");
     if (nativeNodes.length) await revalidate!(nativeNodes);
-    const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources } : undefined);
+    const answerResult = await generateAnswer(s.query, s.refinedContext!, askResult.sources, s.loggingComplete("answer"), s.deps.sourceContext ? { boundedSources: s.boundedSources, onCited: (ids) => { s.citedSourceIds = ids; } } : undefined);
     s.budget?.assertHealthy();
     if (nativeNodes.length) await revalidate!(nativeNodes);
     s.result = { ...askResult, answer: answerResult.text, auditLog: s.auditLog,

@@ -198,7 +198,7 @@ async function fixture(testSignal?: AbortSignal) {
     return JSON.parse(text) as Row;
   };
   const ask = () => call("/ask", "POST", { query: QUERY, questionClass: "career", policyId: "message-career", policyVersion: 1,
-    evidenceMode: true, filters: { sessionIds: [], sources: "internal", mode: "deep" } });
+    evidenceMode: true, filters: { sessionIds: [], sources: "internal" } });
   const search = async (key = "owner") => json(await call("/search?q=" + encodeURIComponent(QUERY), "GET", undefined, key), 200, "actual native message search");
   let closing: Promise<void> | undefined;
   return { ...f, wiring, native, complete, call, json, ask, search,

@@ -16,7 +16,7 @@ interface Sentence { id: string; text: string; sourceIds: string[] }
 
 export async function answer<Sources>(
   query: string, refinedContext: string, sources: Sources, complete: CompleteFn,
-  options?: { boundedSources: ContextSource[] },
+  options?: { boundedSources: ContextSource[]; /** Receives the source IDs cited by the sentences the grounding judge KEPT (bounded path only). */ onCited?: (sourceIds: string[]) => void },
 ): Promise<AnswerResult<Sources>> {
   if (!options) {
     const completion = await complete({
@@ -79,5 +79,6 @@ export async function answer<Sources>(
   }
   const kept = sentences.filter((s) => verdicts.get(s.id) === true);
   if (!kept.length) throw new BoundedAskError("answer support or relevance refused");
+  options.onCited?.([...new Set(kept.flatMap((s) => s.sourceIds))]);
   return { text: kept.map((s) => s.text).join("\n"), sources, removedSentences: sentences.length - kept.length };
 }

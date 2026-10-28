@@ -51,7 +51,8 @@ test("[C1] default path: top-k retrieval then ONE answer call + ONE grounding ch
   assert.ok(f.calls.length <= 2);
   assert.deepEqual(f.counts(), { scored: 0, selected: 0, tavily: 0 });
   assert.match(out.answer, /visa requires a form/i);
-  assert.equal(out.sources.internal.length, 2);
+  assert.equal(out.sources.internal.length, 1, "sources.internal is the chunk the answer cites, not every retrieved chunk (F4)");
+  assert.equal(out.sources.internal[0]!.node_id, nodeA.node_id);
   assert.equal((out.sources.internal[0]!.evidence!.sourceQuotes as { quote: string }[])[0]!.quote, TEXT);
 });
 
@@ -115,4 +116,32 @@ test("[C6] total deadline returns a degraded answer instead of hanging", async (
 test("[C6] default deadline is 20 s and is configurable", async () => {
   const { FAST_DEADLINE_MS } = await import("./ask-v2.js");
   assert.equal(FAST_DEADLINE_MS, 20_000);
+});
+
+test("[F4] sources.internal is the chunks the answer cites; an uncited retrieved chunk is not shipped", async () => {
+  const citeSecond: CompleteFn = async (job) => {
+    if (job.kind === "ask.answer_grounding") return result({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
+    const ctx = JSON.parse(job.messages[1]!.content).context as { sources: { sourceId: string }[] };
+    return result({ sentences: [{ text: "A visa requires a form.", sourceIds: [ctx.sources[1]!.sourceId] }] });
+  };
+  const out = await askFastV2("visa form", tree, fixture({ complete: citeSecond }).deps);
+  assert.deepEqual(out.sources.internal.map((s) => s.node_id), [nodeB.node_id]);
+  assert.ok(!out.sources.internal.some((s) => s.node_id === nodeA.node_id));
+});
+
+test("[F1] topic/native-passage nodes (not reachable by the session arms) reach the default path through the injected non-LLM tree arm, via treeSearchFn", async () => {
+  const native: TreeIndexNode = { node_id: "tenant:t/topic:p1", title: "Visa forms", level: "topic", summary: TEXT,
+    evidence: { sessionRef: "p1" }, children: [] };
+  const withNative: TreeIndexNode = { ...tree, children: [nodeA, nodeB, native] };
+  const found: string[][] = [];
+  const f = fixture({ extraCandidateArmsFn: async () => ({ arms: [[]], degraded: null }),
+    treeSearchFn: (t, ids) => { found.push(ids); return t.children.filter((n) => ids.includes(n.node_id)); } });
+  const out = await askFastV2("visa form", withNative, f.deps, { treeLexicalIds: () => [native.node_id] });
+  assert.deepEqual(found, [[native.node_id]]);
+  assert.deepEqual(out.sources.internal.map((s) => s.node_id), [native.node_id]);
+  assert.deepEqual(f.calls, ["ask.answer", "ask.answer_grounding"], "no select_nodes LLM call");
+  // Where the request composition withholds tree selection (graph-scoped), treeSearchFn returns [] and nothing is admitted.
+  const gated = fixture({ extraCandidateArmsFn: async () => ({ arms: [[]], degraded: null }), treeSearchFn: () => [], tavilySearchFn: undefined });
+  const none = await askFastV2("visa form", withNative, gated.deps, { treeLexicalIds: () => [native.node_id] });
+  assert.equal(none.insufficient_coverage, true); assert.deepEqual(none.sources.internal, []);
 });

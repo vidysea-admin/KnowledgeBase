@@ -10,6 +10,7 @@ import { recordJob } from "@lkb/ai";
 import { ASK_GRAPH, askFailure, askGraphV2, boundedSourcesOf, gatherCandidates, initAskGraphState } from "./ask-graph.js";
 import { contextStrips } from "./bounded-refine.js";
 import { internalSource, type AskResult, type WebSource } from "./router.js";
+import { sourceQuotes } from "./source-context.js";
 import type { AskV2Deps, AskV2Result } from "./ask-shared.js";
 export type { AuditEntry, AskV2Deps, AskV2Result } from "./ask-shared.js";
 
@@ -26,7 +27,13 @@ export async function askV2(query: string, tree: TreeIndexNode, deps: AskV2Deps)
 
 /** ask-fast-rag C6: total wall-clock budget of the default path (D-203). */
 export const FAST_DEADLINE_MS = 20_000;
-export interface AskFastOptions { /** Total deadline in ms; default FAST_DEADLINE_MS. */ deadlineMs?: number; /** Top-k candidate sessions; default 5. */ topK?: number }
+export interface AskFastOptions {
+  /** Total deadline in ms; default FAST_DEADLINE_MS. */ deadlineMs?: number;
+  /** Top-k candidate sessions; default 5. */ topK?: number;
+  /** Non-LLM content arm over the tenant tree (native document/message passages, topics): returns node ids, resolved through
+   * `deps.treeSearchFn` so request composition can withhold tree selection (graph-scoped asks) exactly as it does for deep. */
+  treeLexicalIds?: (query: string, tree: TreeIndexNode) => string[];
+}
 
 /**
  * ask-fast-rag (D-203): the default `/ask` path, a standard RAG chatbot. Arms-only top-k retrieval (the same tenant-scoped
@@ -42,7 +49,10 @@ export async function askFastV2(query: string, tree: TreeIndexNode, deps: AskV2D
     insufficient_coverage: true, sources: { internal: [], web: [] }, ...over });
   const run = async (): Promise<AskV2Result> => {
     s.trace.push("retrieve");
-    s.candidates = await gatherCandidates(s, [], options.topK ?? 5);
+    const lexicalIds = options.treeLexicalIds?.(query, tree) ?? [];
+    const lexicalNodes = lexicalIds.length ? deps.treeSearchFn(tree, lexicalIds) : [];
+    const rank = new Map(lexicalIds.map((id, i) => [id, i] as const));
+    s.candidates = await gatherCandidates(s, [...lexicalNodes].sort((a, b) => (rank.get(a.node_id) ?? 0) - (rank.get(b.node_id) ?? 0)), options.topK ?? 5);
     let web: WebSource[] = [];
     s.boundedSources = deps.sourceContext ? boundedSourcesOf(s.candidates, []) : [];
     if (deps.sourceContext ? !s.boundedSources.length : !s.candidates.length) {
@@ -73,6 +83,15 @@ export async function askFastV2(query: string, tree: TreeIndexNode, deps: AskV2D
       : [...s.candidates.map((n) => n.summary), ...web.map((w) => String(w.content ?? w.snippet ?? ""))].join(" ");
     s.trace.push("answer");
     await ASK_GRAPH.find((n) => n.name === "answer")!.run(s);
+    // F4: ship only what the answer cites. The bounded answer reports the source ids its kept sentences cite; an uncited
+    // retrieved chunk must neither be shipped as a source nor be judged by the freshness verifier.
+    const cited = s.citedSourceIds;
+    if (cited && s.result) {
+      const ids = new Set(cited);
+      const internal = s.candidates.filter((n) => sourceQuotes(n).some((q) => ids.has(q.id))).map(internalSource);
+      const webCited = web.filter((_w, i) => ids.has(`web-${i}`));
+      s.result = { ...s.result, sources: { internal, web: webCited } };
+    }
     return s.result!;
   };
   let timer: ReturnType<typeof setTimeout> | undefined;
