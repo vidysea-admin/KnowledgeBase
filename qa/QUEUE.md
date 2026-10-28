@@ -1,4 +1,6 @@
 > **2026-10-28 (D-200): row 0 is the only unit to run now.** Older rows below are historical.
+> **2026-10-28 (D-202): row 0b `gemini-web-fallback` TODO, human-asked (Umesh: "use krro gemini", paid key). files: apps/api/src/ask/ask-web-fallback.ts, apps/api/src/composition/production.ts, setup-status.ts, setupModel.ts + tests · schema: no · lanes: code · after: none. Building in .worktrees/gemini-web-fallback.**
+**2026-10-28 (D-203): row 0c `ask-fast-rag` TODO, human-asked (Umesh via VC session: "let it work like how the rag based chatbot works"). Default /ask = top-k retrieval + 1 answer LLM call + <=1 grounding check; old graph behind filters.mode="deep"; response shape unchanged; target 5-10 s. files: apps/api/src/routes/ask/*, apps/api/src/answer-policy/*, packages/ask/src/* + tests · schema: no · not production.ts (gemini-web-fallback owns it). Building in .worktrees/ask-fast-rag.**
 
 # QUEUE — maker tick 2026-09-28 (iss-346 cycle-1 FAIL, HELD; slug collision gated)
 

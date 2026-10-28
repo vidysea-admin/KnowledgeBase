@@ -2643,3 +2643,23 @@ fourth would have left real decisions idle behind an unrelated unit.
 - packages/core/src/knowledge-outputs/*, apps/api/src/knowledge-outputs/*, apps/web knowledge-outputs page and api type, and their tests
 **Approved-by:** Umesh (chat rulings 2026-10-28, gate file above)
 **Links:** D-200, D-199, qa/gates/claims-citable-needs-review.md, T-058
+
+## D-202 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** Student questions may reach the hosted LLM; web fallback moves from Tavily to paid Gemini grounding; KB mints no per-student keys
+**What:** Umesh rulings (chat, 2026-10-28) on the Virtual Counsellor integration: (1) "hn student k sawaal bej sakte hai": student questions sent to POST /ask may be processed by the configured hosted LLM (config/ai-routing.yaml, ollama-cloud). (2) "why we are pllaing to use travily . free hai tho use kro vrna paid nhi lengee . use gemini live": Tavily is used only if its free tier covers us; no paid web-search plan. Follow-up ruling (same chat): "Travily chaiyee hi kyu use krro gemini . jo api key daali hai teri .env mai vo paid gemini api key hai": Tavily is dropped; the web fallback uses Gemini with Google Search grounding on the existing paid GEMINI_API_KEY (paid tier: content not used for Google product training per ai.google.dev/gemini-api/terms). (3) "student ki key hum nhi bnaynge it should be in that manner ki jaise pathlynks /voice": the KB does not mint keys per student; the VC integrates following the Pathlynks /voice pattern (to be documented after a read-only look at that pattern).
+**Why:** Unblocks the VC demo data-boundary question raised 2026-10-28 and reuses the Gemini key already paid for instead of adding a second web-search vendor; the free Gemini tier is not used because its terms allow human review of inputs and bar apps likely used by under-18s. Per-student keys in the KB would duplicate auth that the calling product already owns.
+**Result:** Pending: maker unit gemini-web-fallback; Pathlynks /voice auth pattern research.
+**Changes-authorized:**
+- apps/api/src/ask/ask-web-fallback.ts (Gemini grounded search fn), apps/api/src/composition/production.ts (wiring), apps/api/src/activity-health/setup-status.ts and apps/web/src/pages/setup-wizard/setupModel.ts (provider text), their tests
+**Approved-by:** Umesh (chat rulings 2026-10-28, quoted in What)
+**Links:** D-200, D-201, references/portals/lkb-live.knowledge.md, config/ai-routing.yaml
+
+## D-203 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** POST /ask default path becomes single-call RAG; multi-step pipeline moves behind filters.mode="deep"
+**What:** Umesh ruling relayed from the VC session (2026-10-28): "for the ask thing, let it work like how the rag based chatbot works like vo itnaa llm call nhi lgaate right". Default /ask = existing /search retrieval top-k, ONE answer LLM call with citations, at most one cheap grounding check. The current multi-step graph (section select, per-candidate scoring, evaluator, refine) runs only when filters.mode="deep". Response shape unchanged: {answer, verdict, reason, scored, web_used, insufficient_coverage, sources:{internal,web}}. Target 5-10 s.
+**Why:** Live /ask exceeded 90 s (up to 12 LLM calls, no total deadline, single write at the end); VC needs chatbot latency.
+**Result:** Pending: maker unit ask-fast-rag. Redeploy to live stays a separate human gate.
+**Changes-authorized:**
+- apps/api/src/routes/ask/ask.ts, apps/api/src/answer-policy/*, packages/ask/src/* (new fast path + mode switch), their tests
+**Approved-by:** Umesh (relayed ruling 2026-10-28, quoted in What; confirmed by appending this entry)
+**Links:** D-202, references/portals/lkb-live.knowledge.md

@@ -580,3 +580,14 @@ TICK 2026-09-28T19:26:43+05:30 ADVANCED wave=3 concurrent-peak=3 serial=[]
 2026-10-27T00:08:55+05:30 ADVANCED close-out iss390-packet-crlf-drift checked-PASS; ISS-390 fixed; ISS-399 medium + ISS-400 low filed evidence=qa/verdicts/iss390-packet-crlf-drift.md
 2026-10-27T00:37:19+05:30 DISPATCH build dockerfile-targetarch-fallback (human-asked 2026-10-27, tier L CI config, one checker)
 2026-10-27T00:41:18+05:30 ADVANCED close-out dockerfile-targetarch-fallback checked-PASS evidence=qa/verdicts/dockerfile-targetarch-fallback.md
+2026-10-27T01:43:19+05:30 HUMAN_GATE push approval (docs/devops-golive-2026-10-26 @144ecdd1; 6c evidence green, stamp refused by dirty tree) + qa/gates/resume-20261026-batch.md Q1-Q6; nothing else unblocked
+2026-10-27T02:15:03+05:30 HUMAN_GATE close-out sync 0c2edb14 (handshake fields); still waiting: push approval docs/devops-golive-2026-10-26 + qa/gates/resume-20261026-batch.md Q1-Q6
+2026-10-27T02:46:37+05:30 HUMAN_GATE user-invoked tick; no new answers on disk; waiting: push approval docs/devops-golive-2026-10-26 + qa/gates/resume-20261026-batch.md Q1-Q6
+2026-10-27T02:47:00+05:30 HUMAN_GATE heartbeat 8/8 reached; loop stopped; waiting: push approval docs/devops-golive-2026-10-26 + qa/gates/resume-20261026-batch.md Q1-Q6; resume with /maker continue
+2026-10-28T11:45:06+05:30 tick: claims-citable-needs-review planning; root-cause fact pass dispatched before build; sweep skipped (user scoped run to one unit)
+2026-10-28T12:28:29+05:30 BLOCKED claims-citable-needs-review: checker BLOCKED-CAPABILITY browser; probe 1 failed
+2026-10-28T12:34:19+05:30 BLOCKED claims-citable-needs-review: checker BLOCKED-CAPABILITY browser; probe 2 failed (list_connected_browsers=[])
+2026-10-28T12:40:13+05:30 HUMAN_GATE claims-citable-needs-review: probe 3 failed (no browser connected); heartbeat 1800s 1/8
+2026-10-28T12:59:32+05:30 tick: wave=3 (claims browser checker; gemini-web-fallback builder + contract); SERIAL: counsellor-0src local repro waits on claims checker (shared local demo port)
+2026-10-28T07:38:11Z closeout: claims-citable-needs-review checked-PASS merged locally (10635a57); branch deleted; no push. Gate answered.
+2026-10-28T07:53:49Z tick: gemini-web-fallback builder ready e0b938b2 -> checker dispatched (tier M, single); ask-fast-rag builder running (D-203 pending append); merge of both waits on D-202/D-203 append
