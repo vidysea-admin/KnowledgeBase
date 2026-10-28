@@ -63,3 +63,14 @@ test("source shape: mounted after requireAuth; reads only env presence, no reque
   const route = readFileSync(fileURLToPath(new URL("./setup-status.ts", import.meta.url)), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.doesNotMatch(route, /req\.(query|body|params|headers)/);
 });
+
+test("[C5] webSearch follows GEMINI_API_KEY alone (Gemini grounded web fallback); a Tavily key no longer counts", async () => {
+  await withEnv({ GEMINI_API_KEY: SECRETS.GEMINI_API_KEY }, async (url) => {
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: true, webSearch: true, langfuse: false } });
+  });
+  await withEnv({ TAVILY_API_KEY: SECRETS.TAVILY_API_KEY }, async (url) => {
+    const body = await (await get(url, "good-ask-key")).json() as { configured: Record<string, boolean> };
+    assert.equal(body.configured.webSearch, false);
+    assert.equal("tavily" in body.configured, false);
+  });
+});
