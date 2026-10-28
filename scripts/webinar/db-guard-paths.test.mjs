@@ -217,3 +217,81 @@ test('sync-session.mjs --emit-files with blank/mismatched Mongo env refuses befo
     rmSync(dir, {recursive: true, force: true});
   }
 });
+
+// D-204 (prod-optin-sync): sync-session.mjs may write lkb_prod ONLY through the three-part opt-in used by mint-key.mjs /
+// recover-index-attempt.mjs / backfill-document-consent.mjs: the script passes allowProduction, argv carries
+// --i-know-this-is-production, and MONGODB_DB=lkb_prod. Anything less keeps today's refusal. The real script runs against a local TCP
+// listener standing in for Mongo (it never answers), so no database is touched; "allowed" means "got past the guard and tried to connect".
+const PROD_FLAG = '--i-know-this-is-production';
+const PROD_LINE = /PRODUCTION WRITE ENABLED \(D-204\)/;
+const REFUSED_PROTECTED = /MONGO_WORK_DB must name an isolated work database; production writes refused/;
+async function runSyncOnFixture(extraEnv, flags = [], {testData = false} = {}) {
+  const sid = `zz-prodoptin-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, dir = join(root, 'data', 'toc-migrated', sid);
+  const attempts = [];
+  const server = createServer(sock => { attempts.push(sock.remoteAddress); sock.destroy(); });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  try {
+    mkdirSync(dir, {recursive: true});
+    writeFileSync(join(dir, 'source.json'), JSON.stringify({_id: `${sid}-src`, tenantId: 't-guard', title: 'guard fixture', createdAt: '2026-10-14T00:00:00Z', ...(testData ? {testData: true} : {})}));
+    writeFileSync(join(dir, 'turns.json'), JSON.stringify([{_id: `${sid}-t001`, tenantId: 't-guard', sessionId: sid, speakerRef: 'spk:0', tStart: 0, tEnd: 5, text: 'hello'}]));
+    const env = {...process.env, MONGODB_URL: `mongodb://127.0.0.1:${server.address().port}/?serverSelectionTimeoutMS=1500&connectTimeoutMS=1500`, ...extraEnv};
+    delete env.LKB_ALLOW_STAGING;
+    const child = spawn(process.execPath, ['--import', 'tsx', join(root, 'scripts/webinar/sync-session.mjs'), sid, ...flags], {env, cwd: root});
+    let out = '', err = '';
+    child.stdout.on('data', d => { out += d; });
+    child.stderr.on('data', d => { err += d; });
+    const exit = await new Promise(r => { const t = setTimeout(() => child.kill(), 120000); child.on('close', c => { clearTimeout(t); r(c); }); });
+    return {exit, out, err, attempts};
+  } finally {
+    server.close();
+    rmSync(dir, {recursive: true, force: true});
+  }
+}
+test('D-204: all three parts (script allowProduction, flag, MONGODB_DB=lkb_prod) take the production path, logged once, then connect', async () => {
+  const r = await runSyncOnFixture({MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'}, [PROD_FLAG]);
+  assert.match(r.out, PROD_LINE, r.err.slice(0, 300));
+  assert.equal(r.out.match(/PRODUCTION WRITE ENABLED/g).length, 1);
+  assert.doesNotMatch(r.err, /production writes refused|requires an explicit MONGODB_DB/);
+  assert.ok(r.attempts.length > 0, 'the guard passed, so the script must have tried to connect to the (fake) Mongo');
+});
+test('D-204: each single missing part keeps the existing refusal, with NO production line and NO Mongo connection', async () => {
+  const cases = [
+    ['flag missing', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'}, [], REFUSED_PROTECTED],
+    ['MONGODB_DB unset', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: ''}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGODB_DB=lkb (not lkb_prod)', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGODB_DB wrong case', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'LKB_PROD'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGO_WORK_DB not lkb_prod (work db + prod MONGODB_DB)', {MONGO_WORK_DB: 'lkb_work_x', MONGODB_DB: 'lkb_prod'}, [PROD_FLAG], /explicit isolated work database and Mongo URL required; production writes refused/],
+    ['flag spelled as =true', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'}, [`${PROD_FLAG}=true`], REFUSED_PROTECTED],
+    ['global_university_db with all flags', {MONGO_WORK_DB: 'global_university_db', MONGODB_DB: 'lkb_prod'}, [PROD_FLAG], REFUSED_PROTECTED],
+  ];
+  for (const [label, env, flags, refusal] of cases) {
+    const r = await runSyncOnFixture(env, flags);
+    assert.notEqual(r.exit, 0, `${label}: must exit non-zero`);
+    assert.match(r.err, refusal, `${label}: ${r.err.slice(0, 300)}`);
+    assert.doesNotMatch(r.out, PROD_LINE, label);
+    assert.deepEqual(r.attempts, [], `${label}: a Mongo connection was attempted`);
+  }
+});
+test('D-204: a testData source never takes the production path (routes to lkb_staging or refuses), even with all three parts', async () => {
+  const r = await runSyncOnFixture({MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'}, [PROD_FLAG], {testData: true});
+  assert.notEqual(r.exit, 0);
+  assert.match(r.err, /testData source: refusing to write it anywhere but lkb_staging/);
+  assert.doesNotMatch(r.out, PROD_LINE);
+  assert.deepEqual(r.attempts, []);
+});
+test('D-204: a non-production work DB is unchanged by the opt-in (no production line, with or without the flag)', async () => {
+  for (const flags of [[], [PROD_FLAG]]) {
+    const r = await runSyncOnFixture({MONGO_WORK_DB: 'lkb_work_x', MONGODB_DB: ''}, flags);
+    assert.doesNotMatch(r.out, PROD_LINE, flags.join(' '));
+    assert.doesNotMatch(r.err, /production writes refused/, `${flags.join(' ')}: ${r.err.slice(0, 300)}`);
+    assert.ok(r.attempts.length > 0, 'isolated work DB passes the guard and attempts to connect');
+  }
+});
+test('D-204 source: the opt-in is the shared requireScriptDatabase with allowProduction, ahead of connect; isProtectedWorkDbName is untouched', () => {
+  const s = code('scripts/webinar/sync-session.mjs');
+  assert.match(s, /import \{[^}]*PRODUCTION_FLAG[^}]*\} from "\.\.\/lib\/transcript-provenance\.mjs";/);
+  assert.match(s, /requireScriptDatabase\(process\.env, process\.argv\.slice\(2\), \{ allowProduction: true \}\)/);
+  assert.ok(s.indexOf('allowProduction: true') < s.indexOf('await connect('), 'opt-in must precede connect()');
+  assert.match(s, /if \(isProtectedWorkDbName\(workDb, process\.env\)\) throw new Error\("MONGO_WORK_DB must name an isolated work database; production writes refused"\);/);
+  assert.match(code('scripts/lib/transcript-provenance.mjs'), /\["lkb", "lkb_prod", "global_university_db"\]\.includes\(n\.toLowerCase\(\)\) \|\| stagingRefused\(n, env\)/);
+});

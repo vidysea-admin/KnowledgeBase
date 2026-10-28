@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { isProtectedWorkDbName, bindDerivedArtifacts, requireScriptDatabase } from "../lib/transcript-provenance.mjs";
+import { isProtectedWorkDbName, bindDerivedArtifacts, requireScriptDatabase, PRODUCTION_FLAG } from "../lib/transcript-provenance.mjs";
 import { resolveWorkDb } from "../watch/test-data-route.mjs";
 /**
  * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
@@ -33,6 +33,10 @@ import { resolveWorkDb } from "../watch/test-data-route.mjs";
  *   through (apps/api/src/indexing/session.ts, bound by production.ts's `buildIndexer`): LLM
  *   summary -> session_pages, claims, lexical source chunks, incremental tree_index, entity
  *   promotion, status.index -> done. With --dry-run it prints the plan and connects to nothing.
+ *
+ * Production (D-204): lkb_prod is refused unless ALL THREE hold - this script passes allowProduction to requireScriptDatabase, argv carries
+ *   --i-know-this-is-production, and MONGODB_DB=lkb_prod (with MONGO_WORK_DB=lkb_prod, not a testData source). Any part missing keeps the
+ *   isProtectedWorkDbName refusal below unchanged. The production path logs one "PRODUCTION WRITE ENABLED (D-204)" line.
  *
  * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]
  *
@@ -159,12 +163,19 @@ if (!DRY_RUN) {
   route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
   workDb = route.workDb;
   if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
-  if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
-  // ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
-  // resolved work database, refuses here, before any retention state or Mongo connection.
-  const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
-  if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
-  target = requireScriptDatabase(guardEnv, process.argv.slice(2));
+  // D-204: the three-part production opt-in (same shape as mint-key.mjs). A testData source can never reach it (resolveWorkDb above).
+  const productionOptIn = !route.testData && process.argv.includes(PRODUCTION_FLAG) && workDb === "lkb_prod" && process.env.MONGODB_DB?.trim() === "lkb_prod";
+  if (productionOptIn) {
+    target = requireScriptDatabase(process.env, process.argv.slice(2), { allowProduction: true });
+    console.log(`  PRODUCTION WRITE ENABLED (D-204): target database ${target.dbName} (${PRODUCTION_FLAG} + MONGODB_DB=lkb_prod + MONGO_WORK_DB=lkb_prod)`);
+  } else {
+    if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+    // ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
+    // resolved work database, refuses here, before any retention state or Mongo connection.
+    const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
+    if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
+    target = requireScriptDatabase(guardEnv, process.argv.slice(2));
+  }
 }
 register();
 const retentionWrites = !DRY_RUN && (INDEX || EMIT_FILES) ? await import("../../packages/ingest/src/retention/production/retention-processed-proof.ts") : undefined;

@@ -279,6 +279,25 @@ At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 champions
 - T-013 avatar: no environment flag exists; leave it unannounced. The `/counsellor` page
   ships in the web bundle either way.
 
+## Cutover: reindex the two FAILED sessions in lkb_prod (D-204, devops step)
+`scripts/webinar/sync-session.mjs` writes `lkb_prod` only through a three-part opt-in (the same one as `mint-key.mjs`,
+`recover-index-attempt.mjs` and `backfill-document-consent.mjs`): the script passes `allowProduction`, the command line
+carries `--i-know-this-is-production`, and the environment has `MONGODB_DB=lkb_prod`. It also requires
+`MONGO_WORK_DB=lkb_prod` (a disagreement between the two is refused), and a `testData` source never takes this path.
+With any part missing the old refusal ("MONGO_WORK_DB must name an isolated work database; production writes refused")
+applies unchanged. A run that does take the production path prints one `PRODUCTION WRITE ENABLED (D-204)` line.
+
+Run on the Ubuntu server, one session at a time, dry run first (a dry run connects to nothing):
+```
+node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-france-nz --dry-run --index
+node scripts/webinar/sync-session.mjs 2026-05-08-funding-dreams-loans-forex --dry-run --index
+# live, with MONGODB_URL (the lkb_app user, section 6a) already in the environment:
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-france-nz --index --i-know-this-is-production
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-05-08-funding-dreams-loans-forex --index --i-know-this-is-production
+```
+If an index attempt is stuck as `uncertain`, recover it first (next section). Not run by the build agent: this is a
+production write and stays a human/devops action.
+
 ## Recovering a stuck index attempt
 A session whose index attempt is `uncertain` (or `running` after a crash) stays hidden and the next index run refuses it
 (`index_attempt_requires_recovery`). Recover ONE session at a time (no bulk mode); dry run first:
