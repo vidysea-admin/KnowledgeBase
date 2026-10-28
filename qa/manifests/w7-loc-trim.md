@@ -2,7 +2,7 @@
 **Contract:** none (repair unit for the 6c pre-push RED, qa/verdicts/prepush-6c-2026-10-28-r5.md; no new behaviour, so no contract file; the maker never edits qa/contracts/)
 **Goal task:** none
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/w7-loc-trim.md, 7a12a214, cycle 0)
 **Fix cycle:** 0 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0
