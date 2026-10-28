@@ -2,7 +2,7 @@
 **Contract:** qa/contracts/ask-fast-rag.md
 **Goal task:** none
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (cycle 1; qa/verdicts/ask-fast-rag.md PASS 444ffb7d + qa/verdicts/ask-fast-rag.b.md PASS 22c34be3; ledger qa/issues.afr.jsonl)
 **Fix cycle:** 1 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0
