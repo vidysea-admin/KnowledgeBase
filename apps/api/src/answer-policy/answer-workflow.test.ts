@@ -189,7 +189,7 @@ test("all reported conflicts must be resolved and every rejected canonical sourc
 
 test("a new conflict reported while a resolution rerun is pending prevents saving its candidate", async () => {
   const r = setup(.9, ["100", "200", "300"]); await r.policies.save("tenant-a", "fees", body(), actor);
-  const app = r.workflow(), original = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+  const app = r.workflow(), original = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
   const first = await app.reportConflict("tenant-a", original.runId, { a: "internal:n1", b: "internal:n2", explanation: "100 conflicts with 200" }, actor);
   await app.resolveConflict("tenant-a", first.id, { keepSourceId: "internal:n1", note: "Prefer 100", evidenceDigest: first.evidenceDigest }, actor);
   let release!: () => void, entered!: () => void;
@@ -197,7 +197,7 @@ test("a new conflict reported while a resolution rerun is pending prevents savin
   const deps = { ...r.deps, complete: async (job: Parameters<typeof r.deps.complete>[0]) => {
     if (job.kind === "ask.select_nodes") { entered(); await pending; } return r.deps.complete(job);
   } };
-  const rerun = app.execute("tenant-a", input({ resolutionId: first.id }), actor, r.tree, deps);
+  const rerun = app.execute("tenant-a", deep({ resolutionId: first.id }), actor, r.tree, deps);
   await dispatched;
   await app.reportConflict("tenant-a", original.runId, { a: "internal:n1", b: "internal:n3", explanation: "New conflict arrived during generation" }, actor);
   release(); await assert.rejects(rerun, /Resolve every reported/);
@@ -208,7 +208,7 @@ test("saved allowed and approved answers fail closed after policy revision, reti
   for (const change of ["revision", "retirement", "contradiction"] as const) {
     for (const score of [.9, .6]) {
       const r = setup(score); await r.policies.save("tenant-a", "fees", body(), actor);
-      const app = r.workflow(), answer = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+      const app = r.workflow(), answer = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
       if (score === .6) await app.review("tenant-a", answer.runId, { decision: "approved", note: "Reviewed", candidateDigest: answer.candidateDigest, evidenceDigest: answer.evidenceDigest }, actor);
       if (change === "revision") await r.policies.save("tenant-a", "fees", body({ expectedVersion: 1, style: "concise", note: "Revised" }), actor);
       if (change === "retirement") await r.policies.retire("tenant-a", "fees", { expectedVersion: 1, note: "Retired" }, actor);
@@ -227,7 +227,7 @@ test("saved allowed and approved answers fail closed after policy revision, reti
 
 test("new saved policy invalidates a default-policy answer and its pending review", async () => {
   const r = setup(.6), app = r.workflow();
-  const answer = await app.execute("tenant-a", input({ policyId: undefined, policyVersion: undefined }), actor, r.tree, r.deps);
+  const answer = await app.execute("tenant-a", deep({ policyId: undefined, policyVersion: undefined }), actor, r.tree, r.deps);
   await r.policies.save("tenant-a", "fees", body(), actor);
   assert.equal((await app.get("tenant-a", answer.runId)).result.state, "stale");
   assert.equal((await app.queue("tenant-a"))[0]!.candidate.answer, "");
@@ -237,7 +237,7 @@ test("new saved policy invalidates a default-policy answer and its pending revie
 test("stored candidate and evidence digest corruption cannot release or expose review content", async () => {
   for (const target of ["candidate", "evidence"] as const) {
     const r = setup(.6); await r.policies.save("tenant-a", "fees", body(), actor);
-    const app = r.workflow(), answer = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+    const app = r.workflow(), answer = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
     const get = r.records.get.bind(r.records);
     r.records.get = async (tenant, id) => {
       const run = await get(tenant, id); if (!run) return null;
@@ -311,7 +311,7 @@ test("graph selector conflict replay refuses changed selection before provider c
 test("stored candidate or evidence bytes altered after storage are stale and cannot be approved (digest recheck)", async () => {
   for (const field of ["candidate", "evidence"] as const) {
     const r = setup(.6); await r.policies.save("tenant-a", "fees", body(), actor);
-    const run = await r.workflow().execute("tenant-a", input(), actor, r.tree, r.deps);
+    const run = await r.workflow().execute("tenant-a", deep(), actor, r.tree, r.deps);
     const forged = { ...r.records, get: async (t: string, id: string) => {
       const row = await r.records.get(t, id);
       if (row && field === "candidate") row.candidate.answer = "Fee is 999.";
