@@ -9,6 +9,7 @@ import type { Turns } from "@lkb/core";
 import type { CompleteResult } from "@lkb/ai";
 
 import { extractSpeakersRuleBased as extractSpeakers, type SpeakersCompleteFn } from "./speakers-llm.js";
+import { citesNameAsAnIntroduction, hasNamingCueAt } from "./speaker-name-rules.js";
 
 function turn(id: string, speakerRef: string, text: string): Turns {
   return { _id: id, tenantId: "t1", sessionId: "s1", speakerRef, tStart: 0, tEnd: 0, text };
@@ -56,4 +57,31 @@ test("ISS-255: handover markers do not block genuine direct self-naming in the s
     replies([{ speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t1"] }]),
   );
   assert.equal(resolved.length, 1, "self-naming overrides the handover refusal");
+});
+
+/**
+ * ISS-SPEAKER-001: the ISS-255 gate in `hasNamingCue` (a handover marker in the before-context leaves only a
+ * self-naming cue able to bind) was untested in isolation: deleting it left the three tests above green, because
+ * a later layer of `extractSpeakers` refuses the same sentences. These call the exported predicates directly.
+ * Each refused sentence carries a WEAK after-cue (`from`) that WOULD bind the name without the gate, and each is
+ * paired with a control that proves that cue is live when no handover marker precedes it.
+ */
+const HANDOVER_SENTENCES: [string, string][] = [
+  ["Thank you, Shagun. In the essence of time, again, I invite our next speaker, Ruby, from Uni-Italia, to take us forward and with the understanding of visa process in Italy.", "Ruby"],
+  ["I invite our next speaker, Ruby, from Uni-Italia, to take us forward.", "Ruby"],
+  ["Coming up next, Nilesh from the west zone.", "Nilesh"],
+];
+for (const [text, name] of HANDOVER_SENTENCES) {
+  test(`ISS-255 gate (predicate): a handover marker refuses the weak \`from\` cue for ${JSON.stringify(name)} in ${JSON.stringify(text.slice(0, 48))}`, () => {
+    assert.equal(hasNamingCueAt(text, name, text.indexOf(name)), false, "the handover gate must withhold the after-cue");
+    assert.equal(citesNameAsAnIntroduction(text, name), false, "and the public predicate must agree");
+  });
+}
+test("ISS-255 gate (predicate) control: the same `from` cue binds when no handover marker precedes it", () => {
+  assert.equal(citesNameAsAnIntroduction("Ruby, from Uni-Italia, will take questions.", "Ruby"), true, "the cue is live; only the gate suppressed it above");
+  assert.equal(citesNameAsAnIntroduction("Nilesh from the west zone.", "Nilesh"), true);
+});
+test("ISS-255 gate (predicate) control: a self-naming cue survives the handover gate", () => {
+  const text = "Before I invite our next speaker, I should say: call me Ruby.";
+  assert.equal(hasNamingCueAt(text, "Ruby", text.indexOf("Ruby")), true, "self-naming overrides the handover refusal");
 });
