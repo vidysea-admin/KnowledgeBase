@@ -268,10 +268,7 @@ async function indexSessionWithinPublication(
     : deps.embed
     ? await writeSessionChunks(tenantId, sessionId, turns, preparedEmbed ? async () => preparedEmbed! : deps.embed, db, true, chunkProvenance, chunkGeneration)
     : { written: 0, skipped: "no-embedder" as const };
-  // Disabled vector retrieval is intentional, so it must not create an embedding backlog.
-  // ISS-122: the write can fault same as anything else that touches Mongo, and `recordVectorGap`'s
-  // own catch never rethrows (ISS-121) — so without capturing this, a gap-write fault was
-  // observable only via a console.warn nobody asserts on, the exact ISS-118 shape one level down.
+  // Disabled vector retrieval is intentional (no backlog). ISS-122: capture the never-throwing gap write's outcome.
   const gapRecorded = await recordVectorGap(tenantId, sessionId, chunks, db, retrievalMode);
   if (strict && (chunks.skipped || !chunks.written)) throw new Error("strict webinar index incomplete: required chunks not persisted");
   const [allSessions, allPages, existingRoot] = await Promise.all([
