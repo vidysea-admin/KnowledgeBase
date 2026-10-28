@@ -49,4 +49,4 @@ Pre-check[C2]: 83c7b50e cd apps/api && node --test --import tsx src/routes/whats
 Pre-check[C3]: 83c7b50e cd apps/api && node --test --import tsx src/routes/stubs.test.ts -> exit 0 (1 test) t=28
 Pre-check[C4]: 83c7b50e cd apps/api && node --test --import tsx src/routes/health.test.ts -> exit 0 (25 tests) t=30; tsc --noEmit -p apps/api/tsconfig.json exit 0 t=90
 Metrics: start=2026-10-28T15:25:00Z end=2026-10-28T17:00:00Z wall_min=95 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=4 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=0 mutants=0 defects_unit=0 defects_6c=0 builder_min=95
-Status: ready-for-check
+Status: checked-PASS (qa/verdicts/api-honest-status.md, cycle 0, 2026-10-28)
