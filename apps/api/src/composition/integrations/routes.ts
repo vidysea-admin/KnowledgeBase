@@ -10,6 +10,7 @@ import { createChampionshipRouter } from '../../routes/championship/championship
 import { createEvaluationFlywheelRouter } from '../../evaluation-flywheel/router.js';
 import { createKnowledgeRouter } from '../../knowledge/collections-router.js';
 import { createConnectorWorkflowRouter } from '../../connector-workflow/router.js';
+import { notConfigured } from '../../routes/stubs.js';
 import { createOutputRouter } from '../../knowledge-outputs/router.js';
 import { createAnswerHistoryRouter } from '../../answer-policy/answer-router.js';
 import type { AnswerReviewAuthority } from '../../answer-policy/answer-router.js';
@@ -64,6 +65,7 @@ export function mountIntegratedWorkflows(app: Express, deps: IntegratedWorkflows
   if (deps.knowledge) app.use(createKnowledgeRouter(deps.knowledge));
   else app.use('/knowledge', requireScope('sessions'), unavailable);
   if (deps.connectorWorkflow) app.use(createConnectorWorkflowRouter(deps.connectorWorkflow));
+  else app.use('/connector-workflow', requireScope('sources'), notConfigured('connector-workflow')); // LKB_CONNECTOR_WORKFLOW off: 503 not_configured, not a raw 404 (G-A1)
   if (deps.whatsappReview) app.use(deps.whatsappReview);
   if (deps.speakerRelationSource) app.use(createSpeakerRelationSourceRouter(deps.speakerRelationSource));
   if (deps.nativeEvidence) app.use(createNativeEvidenceRouter(deps.nativeEvidence));

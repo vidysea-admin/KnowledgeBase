@@ -156,7 +156,9 @@ export function createHealthRouter(deps: HealthDeps): Router {
   const router = Router();
 
   router.get("/health", async (_req: Request, res: Response) => {
-    const report = await deps.checkHealth();
+    // A probe that throws is unknown health, never a hang or an unstructured 500 (ISS-368 family): answer degraded, leak nothing.
+    let report: HealthReport;
+    try { report = await deps.checkHealth(); } catch { res.status(503).json({db: "error"}); return; }
     // Whitelist the body: never spread `report`, so a future field on HealthReport (or a fake that
     // returns extra keys) cannot leak onto this unauthenticated route.
     let unreadable = 0;
@@ -165,7 +167,8 @@ export function createHealthRouter(deps: HealthDeps): Router {
     // over the private channel, but its counts are NOT in the body (tenant-fleet state, public
     // route); the only public trace is the 503 status when a heartbeat read failed (a boolean).
     if (deps.watchSilence && report.db === "ok") {
-      unreadable = (await detectSilentWatchers(deps.watchSilence)).unreadable;
+      try { unreadable = (await detectSilentWatchers(deps.watchSilence)).unreadable; }
+      catch { unreadable = 1; } // the detector itself failed: liveness is unknown, so report degraded, never "all fresh"
     }
     res.status(report.db === "error" || unreadable > 0 ? 503 : 200).json({db: report.db === "ok" ? "ok" : "error"});
   });

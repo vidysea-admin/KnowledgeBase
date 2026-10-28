@@ -20,7 +20,7 @@
  */
 import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
-import { WhatsAppUnavailableError } from "../whatsapp/owner-config.js";
+import { WhatsAppNotConfiguredError, WhatsAppUnavailableError } from "../whatsapp/owner-config.js";
 
 export interface WhatsAppGroup {
   groupJid: string;
@@ -43,6 +43,12 @@ export interface WhatsAppRouteDeps {
   ingestGroup(tenantId: string, groupJid: string): Promise<WhatsAppIngestResult>;
 }
 
+/** G-A1: a not-configured archive answers a fixed `not_configured` body; a configured-but-unreachable one keeps `whatsapp_unavailable`. */
+function sendUnavailable(res: Response, error: WhatsAppUnavailableError): void {
+  if (error instanceof WhatsAppNotConfiguredError) res.status(503).json({ error: "not_configured", feature: "whatsapp" });
+  else res.status(503).json({ error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+}
+
 export function createWhatsAppRouter(deps: WhatsAppRouteDeps): Router {
   const router = Router();
 
@@ -52,7 +58,7 @@ export function createWhatsAppRouter(deps: WhatsAppRouteDeps): Router {
       res.status(200).json({ groups });
     } catch (error) {
       if (!(error instanceof WhatsAppUnavailableError)) throw error;
-      res.status(503).json({ error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+      sendUnavailable(res, error);
     }
   });
 
@@ -67,7 +73,7 @@ export function createWhatsAppRouter(deps: WhatsAppRouteDeps): Router {
       res.status(201).json(result);
     } catch (err) {
       if (err instanceof WhatsAppUnavailableError) {
-        res.status(503).json({ error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+        sendUnavailable(res, err);
         return;
       }
       // A real fetch failure (whatsapp_msg's Mongo unreachable, unknown/untracked group) is an
