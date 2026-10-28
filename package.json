@@ -23,7 +23,7 @@
     "lint:structure": "node scripts/lint-loc.mjs --all",
     "lint:score": "node scripts/catalogue-score.mjs --check",
     "test": "pnpm -r test",
-    "test:lint": "node --test --import tsx scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/qa/unmerged-worktrees.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs scripts/eval/eval-recall.test.mjs scripts/lib/lint-codex-hooks.test.mjs scripts/watch/lib/heartbeat.test.mjs scripts/webinar/session-rows.test.mjs scripts/webinar/start-record-detached.test.mjs scripts/qa/calendar-link-differential.test.ts scripts/qa/join-rules-edit-api.test.ts scripts/qa/join-rules-single-writer.test.ts scripts/qa/calendar-optout-id-space.test.ts scripts/qa/ledger-alloc.test.mjs",
+    "test:lint": "node --test --import tsx scripts/lint.test.mjs scripts/snapshot.test.mjs scripts/catalogue.test.mjs scripts/catalogue-cli.test.mjs scripts/lib/tracker-audit.test.mjs scripts/qa/unmerged-worktrees.test.mjs scripts/lib/mutate.test.mjs scripts/lib/find-audio-file.test.mjs scripts/eval/eval-recall.test.mjs scripts/lib/lint-codex-hooks.test.mjs scripts/watch/lib/heartbeat.test.mjs scripts/webinar/session-rows.test.mjs scripts/webinar/start-record-detached.test.mjs scripts/qa/calendar-link-differential.test.ts scripts/qa/join-rules-edit-api.test.ts scripts/qa/join-rules-single-writer.test.ts scripts/qa/calendar-optout-id-space.test.ts scripts/qa/ledger-alloc.test.mjs scripts/operations/compose-t028-env.test.mjs",
     "typecheck": "pnpm -r typecheck"
   },
   "devDependencies": {
