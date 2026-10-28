@@ -173,6 +173,10 @@ export async function finalizeRecordingWith(
   writeFileSync(validationPath, JSON.stringify({ stage: "media", status: "processing" }, null, 2) + "\n");
   let measuredDuration: number;
   const consent=readRecordConsent(recordDir,{tenantId,sessionId});
+  // ISS-CAPTUREMAKER-002: a private window is anchored to the raw capture's own EOF. A raw->playable remux (or a caller that
+  // omitted originalVideo and so offered the remux as its own original) may expose a different, guessed clock; refuse before
+  // any probe, extraction, provider or publication.
+  if(consent.privateWindows.length&&/\.playable\.webm$/i.test(overrides.originalVideo??video))throw new Error("Private capture requires its raw original, not a remux");
   const {nativeAudio,nativeVideoReserve}=await prepareNativeFinalizerAudio({media:overrides.nativeMedia,maxTotalBytes:overrides.nativeMaxTotalBytes,
     canonicalClock:overrides.nativeCanonicalClock,recordDir,owner:{tenantId,sessionId},receipt:consent,video,probeMedia:overrides.probeMedia??defaultProbeMedia});
   const original=await bindOriginalCapture(overrides.originalVideo??video,video,recordDir);
