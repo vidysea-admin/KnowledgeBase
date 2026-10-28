@@ -417,3 +417,21 @@ test("Dockerfile HEALTHCHECK goes red (exit 1) when the db is down (503)", async
     await server.close();
   }
 });
+
+test("AC-4: a throwing db probe or detector reports 503 degraded, never 200 or a hang, and leaks nothing", async () => {
+  const cases: Array<[string, Parameters<typeof fakeHealthDeps>[0], unknown]> = [
+    ["checkHealth throws", {checkHealth: async () => { throw new Error("private mongodb://user:secret@host credential failure"); }}, {db: "error"}],
+    ["detector throws", {watchSilence: fakeWatchSilence({toc: []}, {now: () => { throw new Error("private clock failure"); }}).deps}, {db: "ok"}],
+    ["detector tenant list is broken", {watchSilence: {...fakeWatchSilence({toc: []}).deps, tenantIds: undefined as unknown as string[]}}, {db: "ok"}],
+  ];
+  for (const [label, overrides, body] of cases) {
+    const server = await startTestServer(buildTestDeps({health: fakeHealthDeps(overrides)}));
+    try {
+      const res = await fetch(`${server.baseUrl}/health`, {signal: AbortSignal.timeout(5000)});
+      assert.equal(res.status, 503, label);
+      const raw = await res.text();
+      assert.deepEqual(JSON.parse(raw), body, label);
+      for (const leak of ["secret", "private", "credential", "toc"]) assert.equal(raw.includes(leak), false, `${label}: leaked ${leak}`);
+    } finally { await server.close(); }
+  }
+});

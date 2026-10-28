@@ -7,7 +7,7 @@
  * its documented collection shapes (`src/db/types.ts` there: `PersonDoc`/`MessageDoc`/`GroupDoc`).
  */
 import { MongoClient, MongoNetworkError, MongoParseError, MongoServerSelectionError, ObjectId, type Db } from "mongodb";
-import { WhatsAppUnavailableError } from "./owner-config.js";
+import { WhatsAppNotConfiguredError, WhatsAppUnavailableError } from "./owner-config.js";
 import { getDb as getAppDb, assertValidTenantId, scopedCollection } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createWhatsAppSource, type WhatsAppFetcher, type WhatsAppMessage, type ConsentContext, type Turn } from "@lkb/ingest";
@@ -111,7 +111,8 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
     try { return await (options.listGroups ?? listTrackableGroups)(owner); }
     catch (error) {
       if (error instanceof MongoNetworkError || error instanceof MongoServerSelectionError || error instanceof MongoParseError) {
-        throw new WhatsAppUnavailableError();
+        // No archive URL configured: the default localhost archive is not there, which is a configuration gap, not an outage (G-A1).
+        throw process.env.WHATSAPP_MONGO_URL ? new WhatsAppUnavailableError() : new WhatsAppNotConfiguredError();
       }
       throw error;
     }
@@ -120,7 +121,7 @@ export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: Wh
   const appDb = options.appDb ?? getAppDb;
   async function ownerFor(tenantId: string): Promise<string> {
     const owner = await options.resolveOwner?.(tenantId);
-    if (!owner || !ObjectId.isValid(owner)) throw new WhatsAppUnavailableError();
+    if (!owner || !ObjectId.isValid(owner)) throw new WhatsAppNotConfiguredError();
     return owner;
   }
 

@@ -15,6 +15,16 @@ export interface StubRoute {
 
 export const STUB_ROUTES: StubRoute[] = [];
 
+/**
+ * G-A1: the stable answer for an integration this deployment has not configured: 503 with a fixed body naming only the feature,
+ * never a config key, URL, path or driver message. Mount it AFTER requireAuth/requireScope so it is never an unauthenticated probe.
+ */
+export function notConfigured(feature: string) {
+  return (_req: Request, res: Response) => {
+    res.status(503).json({ error: "not_configured", feature });
+  };
+}
+
 function notImplemented(label: string) {
   return (_req: Request, res: Response) => {
     res.status(501).json({ error: "not_implemented", message: `${label} is planned, not yet built — see TASKS.md` });

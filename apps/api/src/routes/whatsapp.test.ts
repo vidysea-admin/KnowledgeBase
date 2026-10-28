@@ -156,13 +156,15 @@ test("unavailable owner is sanitized503 before any archive access, including for
         `${server.baseUrl}/whatsapp/groups?tenantId=foreign&ownerUserId=111111111111111111111111`,
         { headers: { authorization: "Bearer wa-key" } });
       assert.equal(res.status, 503);
-      assert.deepEqual(await res.json(), { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+      assert.deepEqual(await res.json(), { error: "not_configured", feature: "whatsapp" });
       assert.equal(upstream, 0);
     } finally { await server.close(); }
   }
 });
 
 test("known source network/config errors become sanitized503 only after authenticated owner resolution", async () => {
+  const savedUrl = process.env.WHATSAPP_MONGO_URL; process.env.WHATSAPP_MONGO_URL = "mongodb://archive.invalid:27018"; // configured archive: outage, not a config gap (G-A1)
+  try {
   for (const error of [new MongoNetworkError("synthetic private diagnostic"),
     new MongoParseError("synthetic private diagnostic"),
     new MongoServerSelectionError("synthetic private diagnostic", {} as ConstructorParameters<typeof MongoServerSelectionError>[1])]) {
@@ -191,6 +193,7 @@ test("known source network/config errors become sanitized503 only after authenti
       assert.deepEqual(calls, ["tenant-1", "111111111111111111111111"]);
     } finally { await server.close(); }
   }
+  } finally { if (savedUrl === undefined) delete process.env.WHATSAPP_MONGO_URL; else process.env.WHATSAPP_MONGO_URL = savedUrl; }
 });
 
 test("unexpected group-list errors remain500; message/name spoofing does not become unavailable", async () => {
@@ -243,7 +246,28 @@ test("POST missing owner is sanitized503 with zero archive/message/app effects",
       body: JSON.stringify({ groupJid: "synthetic-group" }),
     });
     assert.equal(res.status, 503);
-    assert.deepEqual(await res.json(), { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+    assert.deepEqual(await res.json(), { error: "not_configured", feature: "whatsapp" });
     assert.equal(effects, 0);
   } finally { await server.close(); }
+});
+
+test("AC-1/AC-2: unreachable archive is not_configured only while WHATSAPP_MONGO_URL is unset; a configured-but-down archive stays whatsapp_unavailable", async () => {
+  const saved = process.env.WHATSAPP_MONGO_URL;
+  try {
+    for (const [url, expected] of [[undefined, { error: "not_configured", feature: "whatsapp" }],
+      ["mongodb://archive.invalid:27018", { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" }]] as const) {
+      if (url === undefined) delete process.env.WHATSAPP_MONGO_URL; else process.env.WHATSAPP_MONGO_URL = url;
+      const whatsapp = createMongoWhatsAppDeps(undefined, { resolveOwner: async () => "111111111111111111111111",
+        listGroups: async () => { throw new MongoNetworkError("mongodb://user:secret@host:1/db ECONNREFUSED"); } });
+      const server = await startTestServer(buildTestDeps({ whatsapp,
+        keyStore: fakeKeyStore({ "wa-key": { tenantId: "tenant-1", scopes: ["whatsapp"] } }) }));
+      try {
+        const res = await fetch(`${server.baseUrl}/whatsapp/groups`, { headers: { authorization: "Bearer wa-key" } });
+        const raw = await res.text();
+        assert.equal(res.status, 503);
+        assert.deepEqual(JSON.parse(raw), expected);
+        for (const leak of ["secret", "ECONNREFUSED", "mongodb://", "archive.invalid", "111111111111111111111111"]) assert.equal(raw.includes(leak), false, `leaked ${leak}`);
+      } finally { await server.close(); }
+    }
+  } finally { if (saved === undefined) delete process.env.WHATSAPP_MONGO_URL; else process.env.WHATSAPP_MONGO_URL = saved; }
 });

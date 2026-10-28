@@ -4,6 +4,11 @@ export class WhatsAppUnavailableError extends Error {
   constructor() { super("WhatsApp source unavailable"); this.name = "WhatsAppUnavailableError"; }
 }
 
+/** The deployment has no owner grant (or no archive URL) at all: a configuration gap, reported as `not_configured` (G-A1). */
+export class WhatsAppNotConfiguredError extends WhatsAppUnavailableError {
+  constructor() { super(); this.name = "WhatsAppNotConfiguredError"; }
+}
+
 export type WhatsAppOwnerResolver = (authenticatedTenantId: string) => Promise<string | null>;
 export function createConfiguredWhatsAppOwnerResolver(raw: string | undefined): WhatsAppOwnerResolver {
   if (raw === undefined || raw.trim() === "") return async () => null;
