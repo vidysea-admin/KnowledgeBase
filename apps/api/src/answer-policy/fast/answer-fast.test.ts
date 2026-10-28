@@ -4,13 +4,13 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import type { TreeIndexNode } from "@lkb/core";
 import type { AskV2Deps } from "@lkb/ask";
-import { createAnswerPolicyService } from "./service.js";
-import { createInMemoryAnswerPolicyStore } from "./store.js";
-import { createInMemoryAnswerRecordStore } from "./answer-record-store.js";
-import { createAnswerWorkflow, AnswerWorkflowError, parseAnswerInput } from "./answer-workflow.js";
-import { createMongoEvidenceVerifier } from "./answer-evidence.js";
-import { answerTestDb } from "./answer-testdb.js";
-import type { VerifyEvidence } from "./answer-records.js";
+import { createAnswerPolicyService } from "../service.js";
+import { createInMemoryAnswerPolicyStore } from "../store.js";
+import { createInMemoryAnswerRecordStore } from "../answer-record-store.js";
+import { createAnswerWorkflow, AnswerWorkflowError, parseAnswerInput } from "../answer-workflow.js";
+import { createMongoEvidenceVerifier } from "../answer-evidence.js";
+import { answerTestDb } from "../answer-testdb.js";
+import type { VerifyEvidence } from "../answer-records.js";
 
 const actor = { actor: "api-key:tenant-a" }, sha = (s: string) => createHash("sha256").update(s).digest("hex");
 const TEXT = "Fee is 100.";
@@ -142,4 +142,46 @@ test("[F3] a verifier that throws never turns a persisted default-path run into 
     assert.equal(out.reason, "Stored candidate, policy or source evidence changed, was withdrawn, or cannot be verified.");
     assert.equal((await r.records.get("tenant-a", out.runId))?.id, out.runId, "the run was persisted before the verifier failed");
   }
+});
+
+// ---- ask-trust (W-AFR): ISS-AFR-001..003 at the answer workflow -----------------------------------------------------------
+type Job = Parameters<AskV2Deps["complete"]>[0];
+/** Scripted provider: `keep(id, round)` is the grounding verdict; `round` counts answer calls (1 = internal, 2 = web fallback). */
+function script(r: ReturnType<typeof rig>, keep: (id: string, round: number) => boolean, sentences = [TEXT]) {
+  let round = 0;
+  r.deps.complete = async (job: Job) => {
+    r.kinds.push(job.kind);
+    const v = JSON.parse(job.messages.find((m) => m.role === "user")!.content);
+    if (job.kind === "ask.answer_grounding") return result({ decisions: v.sentences.map((s: { id: string }) => ({ id: s.id, supported: keep(s.id, round), answersQuery: keep(s.id, round) })) });
+    round++;
+    return result({ sentences: sentences.map((text) => ({ text, sourceIds: [v.context.sources[0].sourceId] })) });
+  };
+}
+
+test("[ISS-AFR-001] a default-path answer whose grounding check dropped sentences is verdict 'ambiguous' and goes to review, not straight to allowed", async () => {
+  const partial = rig(); script(partial, (id) => id === "sentence-0", [TEXT, "Extra claim."]);
+  const out = await run(partial);
+  assert.equal(out.verdict, "ambiguous"); assert.equal(out.state, "review"); assert.equal(out.answer, "");
+  const full = rig(); script(full, () => true, [TEXT, "Extra claim."]);
+  const ok = await run(full);
+  assert.equal(ok.verdict, "correct"); assert.equal(ok.state, "allowed");
+});
+
+test("[ISS-AFR-003] irrelevant retrieval is a persisted, honest refusal (insufficient coverage), never a thrown 503", async () => {
+  const r = rig(); r.deps.tavilySearchFn = undefined; script(r, () => false);
+  const out = await run(r);
+  assert.equal(out.insufficient_coverage, true); assert.equal(out.state, "refused"); assert.equal(out.answer, "");
+  assert.deepEqual(out.sources, { internal: [], web: [] });
+  assert.equal((await r.records.get("tenant-a", out.runId))?.id, out.runId);
+  const sourcesInternal = rig(); script(sourcesInternal, () => false);
+  const held = await run(sourcesInternal, { filters: { sessionIds: [], sources: "internal" } });
+  assert.equal(held.state, "refused"); assert.equal(sourcesInternal.tavily(), 0);
+});
+
+test("[ISS-AFR-002] irrelevant retrieval reaches the web fallback when filters.sources allows web", async () => {
+  const r = rig(); script(r, (_id, round) => round > 1);
+  const out = await run(r);
+  assert.equal(r.tavily(), 1);
+  assert.equal(out.web_used, true); assert.equal(out.state, "allowed"); assert.equal(out.sources.web.length, 1);
+  assert.deepEqual(out.sources.internal, []); assert.equal(out.answer, TEXT);
 });
