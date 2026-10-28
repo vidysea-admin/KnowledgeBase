@@ -98,7 +98,10 @@ export function audit(root = ROOT, { exec = execFileSync } = {}) {
   // does not parse is fully in the author's control and clearable in the same commit -- ISS-315.)
   const ledgerPaths = ledgerFiles(root);
   if (ledgerPaths.length > 0) {
-    const { rows, unparseable } = readLedgerRows(root);
+    const { rows, unparseable, duplicates } = readLedgerRows(root, { collectDuplicates: true });
+    // ---- G6: the same id on two ledger rows is not an id (D-019: the union IS the ledger). Ids are
+    // never renumbered on merge, so this names every collision and leaves the choice to a human.
+    for (const { id, locations } of duplicates) findings.push(`G6 Duplicate ledger id ${id}: ${locations.join(" and ")}`);
     const unverified = rows.filter((r) => r.status === "fixed" && !r.verified_date).map((r) => r.id);
     if (unparseable > 0) findings.push(`G5 ledger: ${unparseable} unparseable line(s) — a line-by-line consumer skips or crashes on them`);
     if (unverified.length > 0) {
@@ -128,7 +131,7 @@ export function audit(root = ROOT, { exec = execFileSync } = {}) {
   }
 
   // ---- G4: an issue id that resolves to two different findings is not a citation.
-  findings.push(...auditIssueRefs(root, readLedgerRows(root).rows));
+  findings.push(...auditIssueRefs(root, readLedgerRows(root, { collectDuplicates: true }).rows));
 
   return findings;
 }
@@ -263,5 +266,7 @@ export function parseGateArg(argv) {
 export function filterByGate(findings, gate) {
   if (!gate) return findings;
   const wanted = gate.split(",").map((g) => g.trim()).filter(Boolean);
-  return findings.filter((f) => wanted.some((g) => f.startsWith(g)));
+  // G6 (duplicate ledger id) survives EVERY gate selection: an id that names two rows corrupts the
+  // thing each other gate reads, so a narrowed `--gate` must not be able to hide it.
+  return findings.filter((f) => f.startsWith("G6") || wanted.some((g) => f.startsWith(g)));
 }

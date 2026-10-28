@@ -44,6 +44,18 @@ test("aggregate gate executes all ten stages despite first, middle and final fai
   assert.match(output.at(-1), /10 stages, 3 failed/);
 });
 
+test("package.json lint:structure is the single aggregate runner, never a short-circuiting && chain (iss-367)", () => {
+  const script = JSON.parse(readFileSync(join(SCRIPTS, "..", "package.json"), "utf8")).scripts["lint:structure"];
+  assert.equal(script, "node scripts/lint-loc.mjs --all");
+  assert.ok(!script.includes("&&"));
+});
+
+test("real structure.config.json testPatterns match .test.mjs, .test.ts and test_*.py (ISS-371)", () => {
+  const res = CONFIG.loc.testPatterns.map((p) => new RegExp(p));
+  for (const name of ["x.test.mjs", "x.test.ts", "test_x.py"]) assert.ok(res.some((re) => re.test(name)), name);
+  for (const name of ["x.mjs", "x.ts", "contest.py"]) assert.ok(!res.some((re) => re.test(name)), name);
+});
+
 test("aggregate gate clean success and execution error/signal cannot skip later stages", () => {
   for (const mode of ["clean", "throw", "signal", "error"]) {
     let count = 0;
