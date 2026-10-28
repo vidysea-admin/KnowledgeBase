@@ -6,3 +6,4 @@ Options:
   B — Umesh installs PowerShell 7 on this machine; re-run that one test; then stamp.
 Answer format: "pwsh: A" or "pwsh: B".
 Blocks: push of docs/devops-golive-2026-10-26 and the PR to master.
+Answered: 2026-10-28T18:31:30+05:30 — A (baseline as environment red, then stamp and push) — Umesh in chat ("go with recommended")
