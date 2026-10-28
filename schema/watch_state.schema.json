@@ -4,18 +4,885 @@
   "title": "watch_state",
   "description": "U2 source-watcher. One row per (tenantId, sourceType, sourceId) already seen by scripts/watch/run-watch.mjs — the dedup record that makes a watch run idempotent. `_id` is the composite key `<tenantId>:<sourceType>:<sourceId>`. A Drive recording is 'new' iff no row exists here for it AND it is not already present in the ingested-session manifest (see run-watch.mjs).",
   "type": "object",
-  "required": ["_id", "tenantId", "sourceType", "sourceId", "status", "seenAt"],
+  "required": [
+    "_id",
+    "tenantId",
+    "sourceType",
+    "sourceId",
+    "status",
+    "seenAt"
+  ],
   "properties": {
-    "_id": { "type": "string", "minLength": 1 },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "sourceType": { "type": "string", "enum": ["drive", "gmail", "calendar"] },
-    "sourceId": { "type": "string", "minLength": 1, "description": "Drive file id, Gmail message id, or a stable calendar-row key (date+agenda slug)." },
-    "status": { "type": "string", "enum": ["seen", "ingested", "failed"] },
-    "seenAt": { "type": "string", "format": "date-time" },
-    "ingestedAt": { "type": "string", "format": "date-time" },
-    "failedAt": { "type": "string", "format": "date-time" },
-    "failureReason": { "type": "string" },
-    "sessionId": { "type": "string", "description": "The data/toc-migrated session id this row's recording was ingested into, once status is 'ingested'." }
+    "_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "drive",
+        "gmail",
+        "calendar"
+      ]
+    },
+    "sourceId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Drive file id, Gmail message id, or a stable calendar-row key (date+agenda slug)."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "seen",
+        "ingested",
+        "failed"
+      ]
+    },
+    "seenAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "ingestedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "failedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "failureReason": {
+      "type": "string"
+    },
+    "sessionId": {
+      "type": "string",
+      "description": "The data/toc-migrated session id this row's recording was ingested into, once status is 'ingested'."
+    },
+    "workerSnapshot": {
+      "type": "object",
+      "properties": {
+        "keyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 150
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        },
+        "state": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "const": 1
+            },
+            "account": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 320
+            },
+            "hostId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            "generation": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9._-]{1,128}$"
+            },
+            "sequence": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 9007199254740991
+            },
+            "checkedAt": {
+              "type": "string",
+              "format": "date-time",
+              "maxLength": 64
+            },
+            "complete": {
+              "type": "boolean"
+            },
+            "meetings": {
+              "type": "array",
+              "maxItems": 2000,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 2000
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 32768
+                  },
+                  "startTime": {
+                    "anyOf": [
+                      {
+                        "const": ""
+                      },
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      }
+                    ]
+                  },
+                  "endTime": {
+                    "anyOf": [
+                      {
+                        "const": ""
+                      },
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      }
+                    ]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "confirmed",
+                      "tentative",
+                      "cancelled"
+                    ]
+                  },
+                  "responseStatus": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "declined",
+                      "tentative",
+                      "needsAction"
+                    ]
+                  },
+                  "meetingUrl": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "meetingUrlSource": {
+                    "type": "string",
+                    "enum": [
+                      "conference",
+                      "location",
+                      "description"
+                    ]
+                  },
+                  "meetingLinkIssue": {
+                    "type": "string",
+                    "enum": [
+                      "ambiguous",
+                      "registration-only",
+                      "host-start-link"
+                    ]
+                  },
+                  "youtubeWatch": {
+                    "type": "object",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192
+                      },
+                      "videoId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{11}$"
+                      },
+                      "source": {
+                        "type": "string",
+                        "enum": [
+                          "location",
+                          "description"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "videoId",
+                      "source"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "youtubeWatchIssue": {
+                    "const": "ambiguous"
+                  },
+                  "organizer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 320
+                  },
+                  "cancelled": {
+                    "type": "boolean"
+                  },
+                  "recurringEventId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "originalStartTime": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "format": "date"
+                          }
+                        },
+                        "required": [
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "dateTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "maxLength": 64
+                          }
+                        },
+                        "required": [
+                          "dateTime"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "providerUpdated": {
+                    "type": "string",
+                    "format": "date-time",
+                    "maxLength": 64
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "startTime",
+                  "endTime"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "candidates": {
+              "type": "array",
+              "maxItems": 500,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "messageId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "receivedAt": {
+                    "type": "string",
+                    "format": "date-time",
+                    "maxLength": 64
+                  },
+                  "threadId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 256
+                  },
+                  "registrationUrl": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "subject": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 2000
+                  },
+                  "senderEmail": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 320
+                  },
+                  "senderDomain": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 253
+                  },
+                  "senderAuthenticated": {
+                    "type": "boolean"
+                  },
+                  "meetingUrl": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "recordingUrl": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "youtubeWatch": {
+                    "type": "object",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192
+                      },
+                      "videoId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{11}$"
+                      },
+                      "source": {
+                        "type": "string",
+                        "enum": [
+                          "body",
+                          "snippet"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "videoId",
+                      "source"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "youtubeWatchIssue": {
+                    "const": "ambiguous"
+                  },
+                  "meetingLinkIssue": {
+                    "type": "string",
+                    "enum": [
+                      "ambiguous",
+                      "registration-only",
+                      "host-start-link"
+                    ]
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "past-recording",
+                      "upcoming"
+                    ]
+                  },
+                  "startTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "maxLength": 64
+                  },
+                  "endTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "maxLength": 64
+                  },
+                  "registrationOnly": {
+                    "type": "boolean"
+                  },
+                  "evidenceIssue": {
+                    "type": "string",
+                    "enum": [
+                      "unresolved-body",
+                      "unsupported-attachment"
+                    ]
+                  }
+                },
+                "required": [
+                  "messageId",
+                  "subject",
+                  "senderEmail",
+                  "senderDomain"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "operations": {
+              "type": "object",
+              "properties": {
+                "operations": {
+                  "type": "array",
+                  "maxItems": 2000,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "pattern": "^[a-z0-9][a-z0-9-]{0,63}$"
+                      },
+                      "title": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 2000
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "queued",
+                          "recording",
+                          "processing",
+                          "failed",
+                          "ready",
+                          "action_required"
+                        ]
+                      },
+                      "attempts": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "reason": {
+                        "type": "string",
+                        "minLength": 0,
+                        "maxLength": 100
+                      },
+                      "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      },
+                      "startTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      },
+                      "endTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "status",
+                      "attempts"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "omitted": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "discovery": {
+                  "type": "object",
+                  "properties": {
+                    "calendar": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "healthy",
+                            "failed"
+                          ]
+                        },
+                        "checkedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "maxLength": 64
+                        },
+                        "lastSuccessAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "maxLength": 64
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "checkedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "gmail": {
+                      "type": "object",
+                      "properties": {
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "healthy",
+                            "failed"
+                          ]
+                        },
+                        "checkedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "maxLength": 64
+                        },
+                        "lastSuccessAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "maxLength": 64
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "checkedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "calendar",
+                    "gmail"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "operations",
+                "omitted"
+              ],
+              "additionalProperties": false
+            },
+            "sourceEvents": {
+              "type": "array",
+              "maxItems": 2000,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 2000
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 32768
+                  },
+                  "startTime": {
+                    "anyOf": [
+                      {
+                        "const": ""
+                      },
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      }
+                    ]
+                  },
+                  "endTime": {
+                    "anyOf": [
+                      {
+                        "const": ""
+                      },
+                      {
+                        "type": "string",
+                        "format": "date"
+                      },
+                      {
+                        "type": "string",
+                        "format": "date-time",
+                        "maxLength": 64
+                      }
+                    ]
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "confirmed",
+                      "tentative",
+                      "cancelled"
+                    ]
+                  },
+                  "responseStatus": {
+                    "type": "string",
+                    "enum": [
+                      "accepted",
+                      "declined",
+                      "tentative",
+                      "needsAction"
+                    ]
+                  },
+                  "meetingUrl": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 8192
+                  },
+                  "meetingUrlSource": {
+                    "type": "string",
+                    "enum": [
+                      "conference",
+                      "location",
+                      "description"
+                    ]
+                  },
+                  "meetingLinkIssue": {
+                    "type": "string",
+                    "enum": [
+                      "ambiguous",
+                      "registration-only",
+                      "host-start-link"
+                    ]
+                  },
+                  "youtubeWatch": {
+                    "type": "object",
+                    "properties": {
+                      "url": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 8192
+                      },
+                      "videoId": {
+                        "type": "string",
+                        "pattern": "^[A-Za-z0-9_-]{11}$"
+                      },
+                      "source": {
+                        "type": "string",
+                        "enum": [
+                          "location",
+                          "description"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "url",
+                      "videoId",
+                      "source"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "youtubeWatchIssue": {
+                    "const": "ambiguous"
+                  },
+                  "organizer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 320
+                  },
+                  "cancelled": {
+                    "type": "boolean"
+                  },
+                  "recurringEventId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024
+                  },
+                  "originalStartTime": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "date": {
+                            "type": "string",
+                            "format": "date"
+                          }
+                        },
+                        "required": [
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "dateTime": {
+                            "type": "string",
+                            "format": "date-time",
+                            "maxLength": 64
+                          }
+                        },
+                        "required": [
+                          "dateTime"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
+                  },
+                  "providerUpdated": {
+                    "type": "string",
+                    "format": "date-time",
+                    "maxLength": 64
+                  },
+                  "recurrence": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 32,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 8192
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "title",
+                  "startTime",
+                  "endTime"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "gmailSummary": {
+              "type": "object",
+              "properties": {
+                "listed": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "fetched": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "candidates": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "excludedNonMeeting": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "excludedInternal": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "refusedSender": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "incompleteMessages": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 10000
+                },
+                "complete": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "listed",
+                "fetched",
+                "candidates",
+                "excludedNonMeeting",
+                "excludedInternal",
+                "refusedSender",
+                "incompleteMessages",
+                "complete"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "version",
+            "account",
+            "hostId",
+            "generation",
+            "sequence",
+            "checkedAt",
+            "complete",
+            "sourceEvents",
+            "meetings",
+            "candidates",
+            "operations"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "keyId",
+        "digest",
+        "receivedAt",
+        "state"
+      ],
+      "additionalProperties": false,
+      "description": "D-192 private immutable worker staging. Visible only through an active bound api_keys.workerFence; never public watch metadata or counselling knowledge."
+    },
+    "workerReceipt": {
+      "type": "object",
+      "description": "D-192 private immutable acknowledgement of an already published worker fence; allows exact historical retries without changing publication or freshness.",
+      "required": [
+        "keyId",
+        "account",
+        "hostId",
+        "generation",
+        "sequence",
+        "digest",
+        "receivedAt",
+        "complete"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "keyId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 150
+        },
+        "account": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 320
+        },
+        "hostId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "generation": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9._-]{1,128}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time",
+          "maxLength": 64
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      }
+    }
   },
   "additionalProperties": true
 }

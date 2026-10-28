@@ -195,3 +195,64 @@ describe("[C1]/[C3] ranges and navigation", () => {
     expect(cells.some((c) => c.inMonth && c.date.getDate() === 1)).toBe(true);
   });
 });
+
+
+describe("complete connected-calendar inventory", () => {
+  test("date-only meetings use their local all-day date and exclusive end", () => {
+    const events = toCalendarEvents([], [{ id: "roadmap", title: "Monthly roadmap", startTime: "2026-11-02", endTime: "2026-11-03" }]);
+    expect(events).toHaveLength(1);
+    expect(events[0]!.allDay).toBe(true);
+    expect(events[0]!.start.getDate()).toBe(2);
+    expect(events[0]!.start.getHours()).toBe(0);
+    expect(events[0]!.end.getDate()).toBe(2);
+    expect(events[0]!.end.getHours()).toBe(23);
+  });
+  test("cancelled and linkless inventory stays visible with original status", () => {
+    const events = toCalendarEvents([], [{ ...MEETINGS[0]!, cancelled: true }, MEETINGS[1]!] as UpcomingMeeting[]);
+    expect(events).toHaveLength(2);
+    expect(events.find(e => e.id === "meeting:m1")).toHaveProperty("cancelled", true);
+    expect(events.find(e => e.id === "meeting:m2")?.meetingUrl).toBeUndefined();
+  });
+});
+
+
+test("provider status, RSVP and purpose description remain on the operator event", () => {
+  const [row] = toCalendarEvents([], [{id: "rsvp", title: "Weekly sync", startTime: "2026-10-27T11:00:00+05:30", endTime: "2026-10-27T11:30:00+05:30",
+    status: "confirmed", responseStatus: "needsAction", description: "University guidance"}]);
+  expect(row).toMatchObject({status: "confirmed", responseStatus: "needsAction", description: "University guidance"});
+});
+
+
+test("undated cancellations never receive a calendar date and malformed all-day dates never roll over", () => {
+  expect(toCalendarEvents([], [
+    { id: "cancelled", title: "Source cancellation", cancelled: true, startTime: "", endTime: "" },
+    { id: "invalid", title: "Invalid date", startTime: "2026-02-31", endTime: "2026-03-01" },
+  ])).toEqual([]);
+});
+
+
+test("provider cancelled status alone keeps the dated source event visible and non-joinable", () => {
+  const [row] = toCalendarEvents([], [{...MEETINGS[0]!,status:"cancelled"}]);
+  expect(row?.cancelled).toBe(true);
+  expect(row?.status).toBe("cancelled");
+});
+
+ test('office inventory keeps the real event and server skip state without browser classification', () => {
+  const meetings = [{...MEETINGS[0]!, attendanceSkipReason: 'office-internal' as const}, MEETINGS[1]!];
+  const events = toCalendarEvents([], meetings);
+  expect(events).toHaveLength(2);
+  expect(events[0]!.attendanceSkipReason).toBe('office-internal');
+  expect(events[1]!.attendanceSkipReason).toBeUndefined();
+  expect(toCalendarEvents([], [MEETINGS[0]!])[0]!.attendanceSkipReason).toBeUndefined();
+});
+
+ test('office skip is visible in detail and agenda, while unknown organizers remain unclassified', async () => {
+  const {createElement} = await import('react'); const {renderToStaticMarkup} = await import('react-dom/server');
+  const {EventDetail} = await import('./EventDetail.js'); const {AgendaView} = await import('./AgendaView.js');
+  const meeting = {...MEETINGS[0]!, attendanceSkipReason: 'office-internal' as const};
+  const detail = renderToStaticMarkup(createElement(EventDetail, {event: toCalendarEvents([], [meeting])[0]!, onClose() {}}));
+  const agenda = renderToStaticMarkup(createElement(AgendaView, {sessions: [], sessionsError: null, meetings: [meeting, {...MEETINGS[1]!, startTime: '', endTime: '', attendanceSkipReason: 'office-internal'}], meetingsError: null}));
+  expect(detail).toContain('Skipped: office/internal'); expect(agenda.split('Skipped: office/internal').length - 1).toBe(1);
+  const unknown = renderToStaticMarkup(createElement(EventDetail, {event: toCalendarEvents([], [MEETINGS[1]!])[0]!, onClose() {}}));
+  expect(unknown).not.toContain('Skipped: office/internal');
+});

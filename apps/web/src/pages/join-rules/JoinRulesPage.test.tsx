@@ -356,3 +356,30 @@ test("503 join_rules_busy (the API's fixed busy message) shows 'busy, try again'
   expect(alerts()).toContain("Join rules are busy");
   expect(alerts()).not.toContain("not available");
 });
+
+
+test("mode and purpose editor saves reusable phrases and previews rules locally", async () => {
+  await ready();
+  fireEvent.change(screen.getByLabelText("Attendance mode"), {target:{value:"rules"}});
+  fireEvent.click(screen.getByRole("button", {name:"Add purpose group"}));
+  fireEvent.change(screen.getByLabelText("Purpose 1 id"), {target:{value:"career"}});
+  fireEvent.change(screen.getByLabelText("Purpose 1 title phrases"), {target:{value:"career planning"}});
+  fireEvent.change(screen.getByLabelText("Rule 1 sender"), {target:{value:""}});
+  fireEvent.change(screen.getByLabelText("Rule 1 purposes"), {target:{value:"career"}});
+  fireEvent.change(screen.getByLabelText("Rule 1 description phrases"), {target:{value:"students"}});
+  fireEvent.change(screen.getByLabelText("Preview sender"), {target:{value:"asha@example.com"}});
+  fireEvent.change(screen.getByLabelText("Preview meeting link"), {target:{value:"https://meet.google.com/abc-defg-hij"}});
+  fireEvent.change(screen.getByLabelText("Preview title"), {target:{value:"Career  Planning"}});
+  fireEvent.change(screen.getByLabelText("Preview description"), {target:{value:"For STUDENTS"}});
+  expect(screen.getByLabelText("Join rule preview")).toHaveTextContent("join: allow-rule");
+  fireEvent.change(screen.getByLabelText("Preview description"), {target:{value:"staff only"}});
+  expect(screen.getByLabelText("Join rule preview")).toHaveTextContent("needs-approval: no-matching-rule");
+  expect(writes()).toHaveLength(0);
+  fireEvent.click(screen.getByRole("button", {name:"Save rules"}));
+  await screen.findByText(/Saved. The rules shown/);
+  const saved = writes()[0]!.body as any;
+  expect(saved.attendanceMode).toBe("rules");
+  expect(saved.purposeGroups).toEqual([{id:"career", titleIncludes:["career planning"]}]);
+  expect(saved.rules[0].match).toEqual({purposeAny:["career"], descriptionIncludes:["students"]});
+  expect(putHeaders()).toEqual([{"If-Match":'"e1"'}]);
+});

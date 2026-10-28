@@ -44,7 +44,7 @@ test("native acquisition preserves separate evidence without altering coverage i
   assert.equal(result.sourceEvents[0]?.meetingUrl, undefined);
 });
 
-test("HTTP discovery exposes watch evidence while default joinable projection hides watch-only rows", async () => {
+test("operator inventory and HTTP discovery retain watch-only Calendar records without a join URL", async () => {
   const result = await listUpcomingGwsMeetings(14, provider([event()]), undefined, {}, {enabled: true});
   const server = await startTestServer(buildTestDeps({calendar: {
     listUpcoming: async () => result.meetings, acquire: async tenantId => ({...result, tenantId}),
@@ -53,7 +53,7 @@ test("HTTP discovery exposes watch evidence while default joinable projection hi
   try {
     const get = async (query: string) => {const response = await fetch(`${server.baseUrl}/calendar/upcoming${query}`, {headers});
       assert.equal(response.status, 200); return response.json() as Promise<{meetings: UpcomingMeeting[]; sourceEvents?: UpcomingMeeting[]; tenantId?: string}>;};
-    assert.deepEqual((await get("")).meetings, []);
+    assert.equal((await get("")).meetings[0]?.youtubeWatch?.url, url); assert.equal((await get("")).meetings[0]?.meetingUrl, undefined);
     assert.equal((await get("?discovery=1")).meetings[0]?.youtubeWatch?.url, url);
     const native = await get("?discovery=1&sync=1");
     assert.equal(native.tenantId, "tenant-1"); assert.equal(native.sourceEvents?.[0]?.youtubeWatch?.url, url);

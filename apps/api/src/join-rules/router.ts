@@ -179,6 +179,7 @@ export function createJoinRulesRouter(deps: JoinRulesDeps): Router {
       const { validator, ...stored } = await deps.loadWithValidator(req.auth!.tenantId);
       const etag = etagOf(validator);
       if (etag !== null) res.setHeader("ETag", etag);
+      res.setHeader("X-LKB-Tenant", req.auth!.tenantId);
       sendJson(res, 200, stored);
     } catch (e) { storeFailure(res, e); }
   });

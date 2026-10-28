@@ -7,10 +7,15 @@
  * satisfy these shapes with no import; PRODUCTION WIRING IS NOT DELIVERED (see the manifest).
  */
 export interface JoinRuleMatchValue {
+  titleIncludes?: readonly string[]; descriptionIncludes?: readonly string[]; purposeAny?: readonly string[];
   email?: string; domain?: string; subdomains?: boolean; platform?: "meet" | "teams" | "zoom" | "webex" | "zoho" | "cloudonair" | "unknown"; scope?: "internal" | "external";
 }
 export interface JoinRuleValue { id: string; effect: "allow" | "deny"; match: JoinRuleMatchValue }
-export interface JoinRuleSetValue { version: 1; ownDomains: readonly string[]; rules: readonly JoinRuleValue[] }
+export interface JoinRuleSetValue {
+  version: 1; ownDomains: readonly string[]; rules: readonly JoinRuleValue[];
+  attendanceMode?: "all" | "rules";
+  purposeGroups?: readonly {id: string; titleIncludes?: readonly string[]; descriptionIncludes?: readonly string[]}[];
+}
 export interface JoinRuleStateValue {
   approvedSenders: readonly string[]; approvedDomains: readonly string[]; optedOutEventIds: readonly string[];
   /** Optional: absent in documents written before ISS-T037W1-001; the store derives/validates the entries. */

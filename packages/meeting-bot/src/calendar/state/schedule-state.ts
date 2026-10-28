@@ -1,6 +1,6 @@
 
 import { existsSync, readFileSync, writeFileSync, statSync, renameSync, unlinkSync, openSync, closeSync, fsyncSync, lstatSync } from "node:fs";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import path from "node:path";
 import { reconcileWebinarSources, type CalendarEvent, type WebinarReconciliationState } from "../calendar-client.js";
 import type { AutoRecordCandidateInput } from "../auto-join.js";
@@ -12,6 +12,7 @@ export interface WebinarCalendarAcquisition {
   version: 1; tenantId: string; scope: "available-connected-source-state"; complete: true;
   mode: "baseline" | "sync" | "reset"; checkedAt: string; requestedSyncToken?: string; syncToken: string;
   sourceEvents: (CalendarEvent & {recurrence?: string[]})[]; meetings: CalendarEvent[];
+  snapshot?: {version: 1; kind: "worker-snapshot"; receivedAt: string; servedAt: string; digest: string};
 }
 type Operation = Record<string, any>;
 export interface WebinarOperationState {
@@ -40,12 +41,36 @@ function calendarRows(rows: unknown): asserts rows is WebinarCalendarAcquisition
   }
 }
 
+const trustedSnapshots = new WeakMap<object, {digest: string; requestStartedAt: string}>();
+const acquisitionDigest = (value: unknown) => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+/** Only the authenticated HTTP loader may admit a cached snapshot; JSON alone carries no trust. */
+export function validateHttpCalendarSnapshot(value: unknown, tenantId: string, requestedSyncToken: string | undefined, requestStartedAt: string, headers: Pick<Headers, "get">): WebinarCalendarAcquisition {
+  if (headers.get("X-LKB-Calendar-Snapshot") !== "worker-v1" || headers.get("X-LKB-Tenant") !== tenantId) invalid();
+  const acquired = validateCalendarAcquisition(value, tenantId, requestedSyncToken, requestStartedAt, true);
+  trustedSnapshots.set(acquired, {digest: acquisitionDigest(acquired), requestStartedAt});
+  return acquired;
+}
 export function validateWebinarCalendarAcquisition(value: unknown, tenantId: string, requestedSyncToken?: string, requestStartedAt?: string): WebinarCalendarAcquisition {
-  object(value, ["version", "tenantId", "scope", "complete", "mode", "checkedAt", "requestedSyncToken", "syncToken", "sourceEvents", "meetings"]);
+  const trusted = value && typeof value === "object" ? trustedSnapshots.get(value) : undefined;
+  return validateCalendarAcquisition(value, tenantId, requestedSyncToken, requestStartedAt, !!trusted &&
+    trusted.requestStartedAt === requestStartedAt && trusted.digest === acquisitionDigest(value));
+}
+function validateCalendarAcquisition(value: unknown, tenantId: string, requestedSyncToken?: string, requestStartedAt?: string, trustedHttpSnapshot = false): WebinarCalendarAcquisition {
+  object(value, ["version", "tenantId", "scope", "complete", "mode", "checkedAt", "requestedSyncToken", "syncToken", "sourceEvents", "meetings", "snapshot"]);
+  if (value.snapshot !== undefined) {
+    object(value.snapshot, ["version", "kind", "receivedAt", "servedAt", "digest"]);
+    const meta = value.snapshot;
+    if (!trustedHttpSnapshot || !stamp(requestStartedAt) || value.mode === "sync" ||
+      meta.version !== 1 || meta.kind !== "worker-snapshot" || !stamp(meta.receivedAt) || !stamp(meta.servedAt) || !stamp(value.checkedAt) ||
+      typeof meta.digest !== "string" || !/^[a-f0-9]{64}$/.test(meta.digest) || meta.digest !== value.syncToken ||
+      meta.servedAt < requestStartedAt || Date.parse(meta.servedAt) > Date.parse(requestStartedAt) + 60000 ||
+      value.checkedAt > meta.receivedAt || meta.receivedAt > meta.servedAt ||
+      Date.parse(meta.servedAt) - Date.parse(meta.receivedAt) >= 600000 || Date.parse(meta.servedAt) - Date.parse(value.checkedAt) >= 600000) invalid();
+  } else if (trustedHttpSnapshot) invalid();
   if (value.version !== 1 || value.tenantId !== tenantId || value.scope !== "available-connected-source-state" || value.complete !== true ||
     !stamp(value.checkedAt) || !token(value.syncToken) || (requestedSyncToken !== undefined && !token(requestedSyncToken)) ||
     value.requestedSyncToken !== requestedSyncToken || (requestedSyncToken ? !["sync", "reset"].includes(value.mode) : value.mode !== "baseline") ||
-    (requestStartedAt !== undefined && (!stamp(requestStartedAt) || value.checkedAt < requestStartedAt || Date.parse(value.checkedAt) > Date.parse(requestStartedAt) + 60000))) invalid();
+    (value.snapshot === undefined && requestStartedAt !== undefined && (!stamp(requestStartedAt) || value.checkedAt < requestStartedAt || Date.parse(value.checkedAt) > Date.parse(requestStartedAt) + 60000))) invalid();
   calendarRows(value.sourceEvents); calendarRows(value.meetings);
   if (value.sourceEvents.length + value.meetings.length > 20000 || Buffer.byteLength(JSON.stringify(value)) > CAP ||
     value.meetings.some(row => row.recurrence !== undefined)) invalid();
@@ -194,7 +219,7 @@ export function prepareWebinarSourceState(previous: WebinarOperationState, value
   }
   const all = Object.values(mirror).flat(); if (all.length > 20000) invalid();
   const fresh: WebinarCalendarAcquisition["sourceEvents"] = [...acquired.sourceEvents.filter(row => !row.recurrence || row.cancelled), ...acquired.meetings];
-  const origin = (row: Partial<CalendarEvent>) => row.originalStartTime?.date ? `date:${row.originalStartTime.date}` :
+  const origin = (row: Pick<CalendarEvent, "originalStartTime">) => row.originalStartTime?.date ? `date:${row.originalStartTime.date}` :
     row.originalStartTime?.dateTime ? new Date(row.originalStartTime.dateTime).toISOString() : undefined;
   const discontinuousCalendarIds: string[] = [];
   for (const row of Object.values(previous.source?.reconciliation.occurrences ?? {})) {

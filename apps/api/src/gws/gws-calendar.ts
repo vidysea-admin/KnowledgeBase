@@ -12,7 +12,7 @@
  * first `{`/`[`, same as `run_gws()` does in Python.
  *
  * Discovery retains cancelled tombstones and incomplete invites. The Calendar route separately
- * projects joinable positive rows for its default UI response.
+ * returns the complete inventory for its private operator UI response.
  *
  * Disclosed limitation: this only works on a machine with the `gws` CLI + its OAuth keyring
  * configured (Umesh's own machine today) — not yet portable to a hosted multi-tenant deployment,
@@ -39,9 +39,10 @@ interface GwsCalendarEvent {
   start?: { dateTime?: string; date?: string };
   end?: { dateTime?: string; date?: string };
   hangoutLink?: string;
-  /** Untrusted organiser free text: INPUT to link extraction only; never mapped onto the returned meeting. */
+  /** Untrusted organiser free text; private Calendar operator data and literal policy input. */
   description?: string;
   location?: string;
+  attendees?: {self?: boolean; responseStatus?: string}[];
   conferenceData?: { entryPoints?: { entryPointType: string; uri: string }[] };
   organizer?: { email?: string };
   recurringEventId?: string;
@@ -77,17 +78,33 @@ export function runGws(args: string[], exec = execFile): Promise<string> {
 }
 
 type CalendarRun = typeof runGws;
-export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string, acquisition?: undefined, watchDiscovery?: {enabled?: boolean}): Promise<UpcomingMeeting[]>;
-export function listUpcomingGwsMeetings(windowDays: number, run: CalendarRun | undefined, changedSince: undefined, acquisition: {syncToken?: string}, watchDiscovery?: {enabled?: boolean}): Promise<CalendarAcquisition>;
-export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string, acquisition?: {syncToken?: string}, watchDiscovery?: {enabled?: boolean}): Promise<UpcomingMeeting[] | CalendarAcquisition>;
-export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string, acquisition?: {syncToken?: string}, watchDiscovery: {enabled?: boolean} = {enabled: process.env.LKB_YOUTUBE_LIVE_DISCOVERY === "true"}): Promise<UpcomingMeeting[] | CalendarAcquisition> {
+export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string, acquisition?: undefined, watchDiscovery?: {enabled?: boolean; timeZone?: string}): Promise<UpcomingMeeting[]>;
+export function listUpcomingGwsMeetings(windowDays: number, run: CalendarRun | undefined, changedSince: undefined, acquisition: {syncToken?: string}, watchDiscovery?: {enabled?: boolean; timeZone?: string}): Promise<CalendarAcquisition>;
+export function listUpcomingGwsMeetings(windowDays?: number, run?: CalendarRun, changedSince?: string, acquisition?: {syncToken?: string}, watchDiscovery?: {enabled?: boolean; timeZone?: string}): Promise<UpcomingMeeting[] | CalendarAcquisition>;
+export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, changedSince?: string, acquisition?: {syncToken?: string}, watchDiscovery: {enabled?: boolean; timeZone?: string} = {enabled: process.env.LKB_YOUTUBE_LIVE_DISCOVERY === "true"}): Promise<UpcomingMeeting[] | CalendarAcquisition> {
   if (!Number.isFinite(windowDays) || windowDays <= 0 || windowDays > 366) throw new Error("Invalid calendar discovery window");
   if (changedSince !== undefined && (typeof changedSince !== "string" || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(changedSince) ||
       !Number.isFinite(Date.parse(changedSince)) || new Date(changedSince).toISOString() !== changedSince)) throw new Error("Invalid calendar change checkpoint");
   const safeToken = (value: unknown): value is string => typeof value === "string" && /^[A-Za-z0-9._~+/=-]+$/.test(value) && value.length <= 2048;
   if (acquisition && (changedSince !== undefined || Object.keys(acquisition).some(k => k !== "syncToken") ||
       (acquisition.syncToken !== undefined && !safeToken(acquisition.syncToken)))) throw new Error("Invalid calendar acquisition");
-  const timeMin = new Date().toISOString();
+  const checkedAt = new Date().toISOString();
+  let timeMin = checkedAt;
+  if (watchDiscovery.timeZone !== undefined) {
+    if (typeof watchDiscovery.timeZone !== "string" || watchDiscovery.timeZone.length > 100) throw new Error("Invalid Calendar timezone");
+    const formatter = new Intl.DateTimeFormat("en-GB", {timeZone: watchDiscovery.timeZone,
+      year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"});
+    const parts = (at: number) => Object.fromEntries(formatter.formatToParts(new Date(at)).filter(p => p.type !== "literal").map(p => [p.type, Number(p.value)]));
+    const today = parts(Date.parse(checkedAt)), target = Date.UTC(today.year!, today.month! - 1, today.day!);
+    let midnight = target;
+    for (let i = 0; i < 3; i++) {
+      const p = parts(midnight);
+      midnight += target - Date.UTC(p.year!, p.month! - 1, p.day!, p.hour!, p.minute!, p.second!);
+    }
+    const actual = parts(midnight);
+    if (actual.year !== today.year || actual.month !== today.month || actual.day !== today.day || actual.hour || actual.minute || actual.second) throw new Error("Unresolved Calendar day boundary");
+    timeMin = new Date(midnight).toISOString();
+  }
   const timeMax = new Date(Date.now() + windowDays * 24 * 60 * 60 * 1000).toISOString();
   const params = {
     calendarId: "primary", maxResults: 2500, orderBy: "startTime", singleEvents: true, showDeleted: true, timeMin, timeMax,
@@ -152,6 +169,9 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       if (!e || typeof e !== "object" || Array.isArray(e) || !text(e.id, 1024) ||
           (e.status !== undefined && !["confirmed", "tentative", "cancelled"].includes(e.status)) ||
           (e.summary !== undefined && (typeof e.summary !== "string" || e.summary.length > 2000)) ||
+          (e.description !== undefined && (typeof e.description !== "string" || e.description.length > 32768)) ||
+          (e.attendees !== undefined && (!Array.isArray(e.attendees) || e.attendees.length > 5000 || e.attendees.some(a => !a || typeof a !== "object" || Array.isArray(a) ||
+            (a.self !== undefined && typeof a.self !== "boolean") || (a.responseStatus !== undefined && !["accepted", "declined", "tentative", "needsAction"].includes(a.responseStatus))) || e.attendees.filter(a => a.self).length > 1)) ||
           !time(e.start) || !time(e.end) || !time(e.originalStartTime) ||
           (e.updated !== undefined && !dateTime(e.updated)) ||
           ((e.recurringEventId === undefined) !== (e.originalStartTime === undefined)) ||
@@ -165,6 +185,9 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
       return {
       id: e.id,
       title: e.summary ?? "(untitled)",
+      ...(e.description !== undefined ? {description: e.description} : {}),
+      ...(e.status ? {status: e.status as UpcomingMeeting["status"]} : {}),
+      ...(e.attendees?.find(a => a.self)?.responseStatus ? {responseStatus: e.attendees.find(a => a.self)!.responseStatus as UpcomingMeeting["responseStatus"]} : {}),
       startTime: e.start?.dateTime ?? e.start?.date ?? "",
       endTime: e.end?.dateTime ?? e.end?.date ?? "",
       meetingUrl,
@@ -182,7 +205,7 @@ export async function listUpcomingGwsMeetings(windowDays = 14, run = runGws, cha
     }; });
     // A live recurring master describes a series, not an expanded capture occurrence.
     // Validate it above, then omit it only from delta; deleted masters still drive cancellation.
-    if (acquisition) return {version: 1, mode, complete: true, checkedAt: timeMin, scope: "available-connected-source-state",
+    if (acquisition) return {version: 1, mode, complete: true, checkedAt, scope: "available-connected-source-state",
       ...(acquisition.syncToken ? {requestedSyncToken: acquisition.syncToken} : {}), syncToken: syncToken!,
       sourceEvents: mapped.slice(0, sourceCount), meetings: mapped.slice(sourceCount)};
     return mapped.filter((_row, index) => !liveDeltaMasters.has(events[index]!));

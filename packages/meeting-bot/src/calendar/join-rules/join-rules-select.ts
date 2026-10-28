@@ -45,7 +45,9 @@ export function describeInvalidRules(rules: unknown, state: unknown): string {
 }
 
 function toEvent(item: AutoRecordItem, id: string): JoinRuleEvent {
-  return { id, organizer: item.sender, meetingUrl: item.meetingUrl };
+  const event = {id, organizer: item.sender, meetingUrl: item.meetingUrl, title: item.title,
+    description: (item as AutoRecordItem & {description?: string}).description};
+  return event;
 }
 
 const isRec = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null;
@@ -104,7 +106,8 @@ function veto(item: AutoRecordItem, rules: JoinRuleSet, state: JoinRuleState | u
       if (d.reason === "invalid-rule-set") { onInvalid?.(); return out("rules-unevaluable", UNEVALUABLE); }
     }
     for (const d of decisions) {
-      if (d.action !== "skip") continue; // join / needs-approval never remove
+      const explicitMode = (rules as JoinRuleSet & {attendanceMode?: string}).attendanceMode;
+      if (d.action !== "skip" && !(d.action !== "join" && ["rules", "all"].includes(explicitMode ?? ""))) continue;
       const detail = `join-rules veto: ${d.reason} (rule ${d.ruleId})${d.reason === "meeting-opt-out" ? via : ""}`;
       const reason: SkipReason = d.reason === "cancelled" ? "cancelled" : d.reason === "no-meeting-url" ? "no-join-link"
         : d.reason === "meeting-opt-out" ? "opted-out" : "rule-denied";

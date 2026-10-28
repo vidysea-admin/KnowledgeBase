@@ -62,6 +62,12 @@ services:
       OLLAMA_CLOUD_MODEL: ${OLLAMA_CLOUD_MODEL:-glm-5.3-flash}
       OLLAMA_CLOUD_VERIFIER_MODEL: ${OLLAMA_CLOUD_VERIFIER_MODEL:-deepseek-v4.1-flash}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      TAVILY_API_KEY: ${TAVILY_API_KEY:-}
+      # Cross-host Calendar is explicitly bound to a dedicated active worker key (D-192).
+      LKB_CALENDAR_WORKER_ENABLED: ${LKB_CALENDAR_WORKER_ENABLED:-0}
+      LKB_CALENDAR_WORKER_BINDINGS: ${LKB_CALENDAR_WORKER_BINDINGS:-}
+      LKB_JOIN_RULES_ENABLED: ${LKB_JOIN_RULES_ENABLED:-0}
+      LKB_JOIN_RULES_STATE_DIR: /var/lib/lkb/join-rules
       PORT: 3300
     # T-028 (D-189): the five LKB_HOSTING_* / LKB_COUNSELLOR_STATE_DIR names are read from the optional file
     # .env.t028 ONLY. When the file is absent they stay UNDEFINED in the container: the API treats any
@@ -72,6 +78,7 @@ services:
     volumes:
       - lkb-hosting-state:/var/lib/lkb/hosting
       - lkb-counsellor-state:/var/lib/lkb/counsellor
+      - lkb-join-rules-state:/var/lib/lkb/join-rules
     restart: unless-stopped
 
   # Static SPA behind nginx (root Dockerfile's `web` target). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
@@ -102,3 +109,4 @@ volumes:
   lkb-hosting-state:
   lkb-counsellor-state:
   lkb-local-mongo:
+  lkb-join-rules-state:

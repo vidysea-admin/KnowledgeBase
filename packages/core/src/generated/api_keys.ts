@@ -15,5 +15,25 @@ export interface ApiKeys {
   scopes?: string[];
   revokedAt?: string | null;
   createdAt: string;
+  /**
+   * D-192 active-key publication/lease fence. CAS contends with revokedAt on this same document; never exposed through /keys.
+   */
+  workerFence?: {
+    generation: string;
+    sequence: number;
+    digest: string;
+    ackAt: string;
+    complete: boolean;
+    snapshotId?: string;
+    snapshotDigest?: string;
+    coverageGeneration?: string;
+    coverageSequence?: number;
+    receivedAt?: string;
+    checkedAt?: string;
+    /**
+     * Latest immutable worker envelope for operations, including failed scans; snapshotId remains last complete coverage.
+     */
+    submissionId?: string;
+  };
   [k: string]: unknown;
 }

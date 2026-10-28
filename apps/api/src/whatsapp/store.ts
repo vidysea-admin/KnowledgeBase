@@ -6,7 +6,8 @@
  * instead") — this file only ever reads, never writes, and never imports its source code, only
  * its documented collection shapes (`src/db/types.ts` there: `PersonDoc`/`MessageDoc`/`GroupDoc`).
  */
-import { MongoClient, ObjectId, type Db } from "mongodb";
+import { MongoClient, MongoNetworkError, MongoParseError, MongoServerSelectionError, ObjectId, type Db } from "mongodb";
+import { WhatsAppUnavailableError } from "./owner-config.js";
 import { getDb as getAppDb, assertValidTenantId, scopedCollection } from "@lkb/db";
 import type { Sources, Sessions, Turns } from "@lkb/core";
 import { createWhatsAppSource, type WhatsAppFetcher, type WhatsAppMessage, type ConsentContext, type Turn } from "@lkb/ingest";
@@ -106,12 +107,20 @@ export interface WhatsAppStoreOptions {
 }
 /** Trusted server-only resolver; omitted mappings fail before upstream/app database access. */
 export function createMongoWhatsAppDeps(indexSession?: BoundIndexer, options: WhatsAppStoreOptions = {}): WhatsAppRouteDeps {
-  const listGroups = options.listGroups ?? listTrackableGroups;
+  async function listGroups(owner: string): Promise<TrackableGroup[]> {
+    try { return await (options.listGroups ?? listTrackableGroups)(owner); }
+    catch (error) {
+      if (error instanceof MongoNetworkError || error instanceof MongoServerSelectionError || error instanceof MongoParseError) {
+        throw new WhatsAppUnavailableError();
+      }
+      throw error;
+    }
+  }
   const fetchMessages = options.fetchMessages ?? fetchWhatsAppMessages;
   const appDb = options.appDb ?? getAppDb;
   async function ownerFor(tenantId: string): Promise<string> {
     const owner = await options.resolveOwner?.(tenantId);
-    if (!owner || !ObjectId.isValid(owner)) throw new Error("WhatsApp owner authorization unavailable");
+    if (!owner || !ObjectId.isValid(owner)) throw new WhatsAppUnavailableError();
     return owner;
   }
 

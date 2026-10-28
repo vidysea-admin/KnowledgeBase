@@ -40,6 +40,7 @@ RUN pnpm install --frozen-lockfile --prod --filter "@lkb/api..."
 
 FROM deps AS web-build
 COPY apps/web ./apps/web
+COPY packages/ingest/src/join-policy ./packages/ingest/src/join-policy
 ARG VITE_API_BASE_URL=""
 ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN pnpm --filter @lkb/web build
@@ -111,7 +112,7 @@ RUN set -eux; \
     node --check apps/api/dist/source-worker.js; \
     echo "api bundle sanity OK"
 # T-028 state dirs: created node-owned so compose named volumes mounted here are writable by UID 1000.
-RUN mkdir -p /var/lib/lkb/hosting /var/lib/lkb/counsellor && chown -R node:node /var/lib/lkb
+RUN mkdir -p /var/lib/lkb/hosting /var/lib/lkb/counsellor /var/lib/lkb/join-rules && chown -R node:node /var/lib/lkb
 # Non-root runtime user: the image's `node` user (UID 1000). The CI smoke test
 # (scripts/qa/container-workflows/run.sh) chowns its state volumes to 1000, so the UID is kept
 # (the sibling autoTesting image uses 10001).

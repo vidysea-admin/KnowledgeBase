@@ -3,6 +3,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isProtectedWorkDbName } from '../lib/transcript-provenance.mjs';
 import { createSchedulerRuntime } from './scheduler/deps-runtime.mjs';
+import { resolveAttendanceExecutable } from './calendar-attendance-source.mjs';
 import { register } from 'tsx/esm/api';
 register();
 const {createHttpCalendarLoader, createHttpCandidateLoader} = await import('../../packages/meeting-bot/src/calendar/schedule-tick.ts');
@@ -20,6 +21,11 @@ export function safeText(text) {
   }).slice(0, 500);
 }
 export function createPipelineDeps(env = process.env) {
+  env = {...env}; // One resolved environment shared by capture, registration and alert transports.
+  for (const [name, key] of [['gws', 'LKB_GWS_PATH'], ['ffmpeg', 'LKB_FFMPEG'], ['ffprobe', 'LKB_FFPROBE'], ['python', 'LKB_PYTHON']]) {
+    try {env[key] = resolveAttendanceExecutable(name, env[key], env);}
+    catch {if (env[key]) throw new Error('Configured runtime executable is missing: ' + name);}
+  }
   const api = (env.LKB_API_URL ?? 'http://localhost:3300').replace(/\/$/, '');
   const log = (text) => console.log(safeText(text));
   let channel, channelInitialized = false;

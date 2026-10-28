@@ -1,28 +1,11 @@
-/**
- * packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts — T-037 unit `t037-scheduler-wiring-behind-flag`.
- * The ONE place that decides whether the scheduler tick applies a tenant's join rules, and what happens when they cannot be read.
- *
- * Setting (read once, in schedule-tick.ts buildRealScheduleTickDeps, from env LKB_JOIN_RULES_ENFORCE; parsed only here):
- *   `off` (DEFAULT; also absent, empty, any other string, any non-string)  -> returns the selection UNTOUCHED (same reference);
- *        the store is never opened, `applyJoinRules` is never called. Nothing is logged for absent/empty/`off`; a non-empty STRING that is
- *        not exactly an accepted value logs ONE warning per process (ISS-T037WIRE-002) and stays off.
- *   `fail-closed` -> rules enforced; rules that cannot be evaluated => NONE of the tenant's meetings are scheduled (`rules-unevaluable`).
- *   `fail-open`   -> rules enforced when evaluable; otherwise the selection is left exactly as today's, with a loud warning.
- *   `last-valid` -> verified tenant's full validated rules/state snapshot for <1 hour after primary failure; otherwise refuse.
- * Enabling is a separate operational step. `last-valid` never treats an absent primary as empty rules.
- *
- * VETO ONLY: the result is always built from the INPUT selection by removing items (fail-closed / veto) or by putting back an
- * item the input already scheduled (fail-open); nothing the input did not schedule can be scheduled.
- * TENANCY (W4): a tick serves one tenant (its API key); rules are loaded for that tenant id only. A missing/invalid tenant id is
- * "cannot be evaluated", never a guess. Legacy modes retain missing rules FILE = "no rules"; last-valid does not.
- * TRANSIENT (`locked` / `lock-failed` / EBUSY-class read errors): the store's load takes NO lock (temp+rename writes), so it should not
- * occur on the read path; if it does it is retried within a small bounded budget, then treated as unevaluable (never as "no rules").
- */
+/** Tenant-bound rules enforcement. Hosted workers always fetch authenticated remote policy;
+ * only transient failures may use the original one-hour last-valid snapshot. Legacy
+ * local callers retain their existing explicitly configured enforcement modes. */
 import type { AutoRecordItem, SelectAutoRecordItemsResult, SkippedItem } from "@lkb/core";
 import { applyJoinRules, type JoinRuleEvaluator } from "./join-rules-select.js";
 import { loadJoinRules, JoinRulesStoreError, type StoredJoinRules } from "./join-rules-store.js";
 import { joinRulesFilePath } from "./join-rules-store.js";
-import { JoinRulesSnapshotError, loadPrimaryJoinRules, loadLastValidJoinRules, saveLastValidJoinRules } from "./join-rules-last-valid.js";
+import { JoinRulesSnapshotError, loadPrimaryJoinRules, loadLastValidJoinRules, saveLastValidJoinRules, remoteRules, REASON_TENANT_UNVERIFIED } from "./join-rules-last-valid.js";
 import type { ApprovedTrustContext } from "./join-rules-approved-trust.js";
 
 export type JoinRulesEnforceMode = "off" | "fail-closed" | "fail-open" | "last-valid";
@@ -55,6 +38,8 @@ export interface JoinRulesEnforceIo {
   wait?: (ms: number) => Promise<void>;
 }
 export interface JoinRulesEnforceConfig {
+  /** Hosted policy authority: never use divergent local files or permissive enforcement in this mode. */
+  remote?: {url: string; apiKey?: string; fetch?: typeof fetch};
   mode: unknown; tenantId?: string; stateDir: string; log: (msg: string) => void; io?: JoinRulesEnforceIo;
   /** The tenant of the API key whose candidates are filtered. A string different from `tenantId` => `tenant-mismatch`; `null` = the key's
    * tenant could not be verified => `tenant-unverified` (same handling per policy); `undefined` = not supplied (test seam). Production
@@ -79,7 +64,6 @@ const RETRY_WAITS_MS = [150, 300];
 const TRANSIENT_CODES = new Set(["locked", "lock-failed", "EBUSY", "EPERM", "EACCES"]);
 const REASON_TENANT_UNSET = "tenant-unset: LKB_TENANT_ID is absent or not a valid tenant id (no default tenant); join rules not evaluated";
 const REASON_TENANT_MISMATCH = "tenant-mismatch: the API key's tenant differs from LKB_TENANT_ID; join rules not applied";
-const REASON_TENANT_UNVERIFIED = "tenant-unverified: the API key's tenant could not be verified against LKB_TENANT_ID; join rules not applied";
 const DETAIL_FAIL_CLOSED = "join rules could not be read or evaluated; failing closed (see the JOIN RULES log line)";
 
 /** Message safe for a log: control characters removed, path-like text redacted, bounded. */
@@ -173,14 +157,14 @@ async function boundedRules(c: JoinRulesEnforceConfig): Promise<ReadRulesSuccess
 }
 
 export async function enforceJoinRules(selection: SelectAutoRecordItemsResult, c: JoinRulesEnforceConfig): Promise<SelectAutoRecordItemsResult> {
-  const mode = parseJoinRulesEnforce(c.mode);
+  const mode = c.remote ? (c.mode === "last-valid" ? "last-valid" : "fail-closed") : parseJoinRulesEnforce(c.mode);
   if (mode === "off") { warnUnrecognised(c.mode, c.log); return selection; }
   const warn = (why: string, effect: string) =>
     c.log(`schedule-tick: JOIN RULES WARNING (${mode}): ${why} — ${effect}`);
   const items = Array.isArray(selection?.toSchedule) ? selection.toSchedule : [];
   const skipped = Array.isArray(selection?.skipped) ? selection.skipped : [];
 
-  const read = mode === "last-valid" ? await boundedRules(c)
+  const read = c.remote ? await remoteRules(c, event => degraded(c, event)) : mode === "last-valid" ? await boundedRules(c)
     : typeof c.tenantId !== "string" || c.tenantId === "" ? { error: REASON_TENANT_UNSET }
     : c.keyTenantId === null ? { error: REASON_TENANT_UNVERIFIED }
     : c.keyTenantId !== undefined && c.keyTenantId !== c.tenantId ? { error: REASON_TENANT_MISMATCH }

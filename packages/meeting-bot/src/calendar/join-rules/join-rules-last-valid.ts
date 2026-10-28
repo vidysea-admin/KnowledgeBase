@@ -105,3 +105,85 @@ export function loadLastValidJoinRules(stateDir: string, tenantId: string, now: 
   if (typeof r.hash !== "string" || r.hash !== digest(tenantId, at, stored)) throw new JoinRulesSnapshotError("integrity-mismatch");
   return { stored, validatedAt: at, expiresAt: at + JOIN_RULES_SNAPSHOT_TTL_MS };
 }
+
+export const REASON_TENANT_UNVERIFIED = "tenant-unverified: the API key's tenant could not be verified against LKB_TENANT_ID; join rules not applied";
+interface RemoteJoinRulesContext {
+  remote?: {url:string;apiKey?:string;fetch?:typeof fetch}; mode:unknown; tenantId?:string; keyTenantId?:unknown;
+  stateDir:string; now?:()=>number; readOnly?:boolean; log:(message:string)=>void;
+}
+
+const rejectedRemoteAuthorities = new Set<string>();
+const networkFailure = (error: unknown): boolean => {
+  const value = error as {name?: string; cause?: {code?: string}};
+  return ["AbortError", "TimeoutError"].includes(value?.name ?? "") ||
+    ["ENOTFOUND", "EAI_AGAIN", "ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "EHOSTUNREACH", "ENETUNREACH", "UND_ERR_CONNECT_TIMEOUT", "UND_ERR_SOCKET", "UND_ERR_HEADERS_TIMEOUT"].includes(value?.cause?.code ?? "");
+};
+
+/** Remote snapshot is bound to the exact endpoint, key and tenant; source bytes never enter logs. */
+export async function remoteRules(c: RemoteJoinRulesContext, notifyDegraded: (event: {tenantId?:string;reason:string;usingSnapshot:boolean;snapshotValidatedAt?:number;snapshotExpiresAt?:number}) => Promise<void>): Promise<{stored:StoredJoinRules;healthy?:boolean;snapshot?:{validatedAt:number;expiresAt:number}} | {error: string}> {
+  const now = (c.now ?? Date.now)(), remote = c.remote!, cap = 1024 * 1024;
+  if (!c.tenantId || c.keyTenantId !== c.tenantId || !remote.apiKey || !Number.isSafeInteger(now) || now < 0)
+    return {error: REASON_TENANT_UNVERIFIED};
+  let file: string, url: URL;
+  try {
+    file = joinRulesFilePath(c.stateDir, c.tenantId).replace(/\.json$/, ".remote.json");
+    url = new URL(remote.url);
+    if (url.username || url.password || url.search || url.hash || (url.protocol !== "https:" &&
+      !(url.protocol === "http:" && ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname)))) throw new Error();
+  } catch { return {error: "invalid remote policy configuration"}; }
+  const authority = createHash("sha256").update(JSON.stringify([url.href, c.tenantId, remote.apiKey])).digest("hex");
+  const checked = (value: any): StoredJoinRules => {
+    if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some(k => !["ruleSet", "state"].includes(k))) throw new Error();
+    return {ruleSet: validateJoinRuleSet(value.ruleSet), state: validateJoinRuleState(value.state)};
+  };
+  const invalidate = () => { rejectedRemoteAuthorities.add(authority); if (!c.readOnly) { try { unlinkSync(file); } catch {} } };
+  let transient = false;
+  try {
+    let response: Response;
+    try { response = await (remote.fetch ?? fetch)(url.href.replace(/\/$/, "") + "/calendar/join-rules", {
+      headers: {authorization: "Bearer " + remote.apiKey}, redirect: "error", signal: AbortSignal.timeout(30000)}); }
+    catch (error) { transient = networkFailure(error); throw new Error(); }
+    if (!response.ok) {
+      const owner = response.headers.get("x-lkb-tenant");
+      transient = (owner === null || owner === c.tenantId) && ([408, 429].includes(response.status) || response.status >= 500);
+      await response.body?.cancel(); throw new Error();
+    }
+    if (response.headers.get("x-lkb-tenant") !== c.tenantId || !/^"[^"\r\n]{1,200}"$/.test(response.headers.get("etag") ?? "") || !response.body) {
+      await response.body?.cancel(); throw new Error();
+    }
+    const reader = response.body.getReader(), chunks: Uint8Array[] = []; let size = 0;
+    try { for (;;) { const {done, value} = await reader.read(); if (done) break;
+      size += value.byteLength; if (size > cap) throw new Error(); chunks.push(value); }
+    } catch (e) { transient = networkFailure(e); await reader.cancel().catch(() => {}); throw e; } finally { reader.releaseLock(); }
+    const stored = checked(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+    rejectedRemoteAuthorities.delete(authority);
+    let saved = false;
+    if (!c.readOnly) {
+      const temp = file + "." + randomUUID() + ".tmp";
+      try {
+        mkdirSync(path.dirname(file), {recursive: true});
+        const fd = openSync(temp, "wx", 0o600);
+        try {writeFileSync(fd, JSON.stringify({version: 1, authority, tenantId: c.tenantId, validatedAt: now, expiresAt: now + 3600000, stored})); fsyncSync(fd);} finally {closeSync(fd);}
+        renameSync(temp, file); saved = true;
+      } catch { c.log("schedule-tick: JOIN RULES WARNING: remote snapshot not persisted; current policy remains enforced"); }
+      finally {try {unlinkSync(temp);} catch {}}
+    }
+    return {stored, healthy: saved};
+  } catch {
+    if (!transient) invalidate();
+    if (transient && c.mode === "last-valid" && !rejectedRemoteAuthorities.has(authority)) {
+      try {
+        const stat = lstatSync(file); if (!stat.isFile() || stat.size > cap + 4096) throw new Error();
+        const cached = JSON.parse(readFileSync(file, "utf8"));
+        if (cached.version !== 1 || cached.authority !== authority || cached.tenantId !== c.tenantId ||
+          !Number.isSafeInteger(cached.validatedAt) || cached.validatedAt < 0 || cached.validatedAt > now ||
+          cached.expiresAt !== cached.validatedAt + 3600000 || now >= cached.expiresAt) throw new Error();
+        const stored = checked(cached.stored);
+        await notifyDegraded({tenantId: c.tenantId, reason: "remote-unavailable", usingSnapshot: true, snapshotValidatedAt: cached.validatedAt, snapshotExpiresAt: cached.expiresAt});
+        return {stored, snapshot: {validatedAt: cached.validatedAt, expiresAt: cached.expiresAt}};
+      } catch {}
+    }
+    await notifyDegraded({tenantId: c.tenantId, reason: transient ? "remote-unavailable" : "remote-invalid", usingSnapshot: false});
+    return {error: "authenticated remote rules unavailable or invalid; scheduling refused"};
+  }
+}

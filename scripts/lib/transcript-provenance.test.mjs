@@ -77,6 +77,11 @@ test("failure before stale marker preserves originals and failure after marker b
 test("work database refuses missing, production and conflicting targets without defaults", () => {
   const base = {MONGODB_URL: "mongodb://fixture.invalid", MONGO_WORK_DB: "lkb_work_fixture"};
   assert.deepEqual(requireWorkDatabase(base), {url: base.MONGODB_URL, dbName: base.MONGO_WORK_DB});
+  for (const name of ["lkb", "LKB", " lkb ", "lkb_prod", "LKB_PROD", " LkB_PrOd "])
+    for (const selected of [undefined, name])
+      assert.throws(() => requireWorkDatabase({...base, MONGO_WORK_DB: name, MONGODB_DB: selected}), /production writes refused/);
+  for (const name of ["a b", "a.b", "x".repeat(65)])
+    assert.throws(() => requireWorkDatabase({...base, MONGO_WORK_DB: name}), /isolated work database/);
   for (const env of [{}, {...base, MONGO_WORK_DB: "lkb"}, {...base, MONGO_WORK_DB: "LKB"},
     {...base, MONGO_WORK_DB: "global_university_db"}, {...base, MONGODB_DB: "lkb"}, {...base, MONGODB_URL: undefined}])
     assert.throws(() => requireWorkDatabase(env), /isolated work database/);
@@ -145,7 +150,7 @@ function cliFixture(scriptName, hook = NODE_HOOK) {
   put(dir, "source.json", {_id: "source1", tenantId: "tenant2", audioPath: "fixture.m4a"});
   put(dir, "session.json", {_id: "session1", tenantId: "tenant2"}); writeFileSync(join(root, "fixture.m4a"), "fixture");
   const trace = join(root, "trace.jsonl");
-  const run = (args = [], env = {}) => spawnSync(process.execPath, ["--import", pathToFileURL(join(root, "hook.mjs")).href, join(scripts, scriptName), ...args],
+  const run = (args = [], env = {}) => spawnSync(process.execPath, [...(hook === DURATION_HOOK ? ["--experimental-transform-types"] : []), "--import", pathToFileURL(join(root, "hook.mjs")).href, join(scripts, scriptName), ...args],
     {encoding: "utf8", timeout: 20000, env: {...process.env, GEMINI_API_KEY: "fixture-no-network", MONGODB_URL: "mongodb://fixture.invalid", MONGODB_DB: "lkb_work_fixture", MONGO_WORK_DB: "lkb_work_fixture", PROVENANCE_TRACE: trace, ...env}});
   return {root, dir, trace, run};
 }
@@ -171,7 +176,7 @@ const DURATION_HOOK = NODE_HOOK
   .replace(/ if \(specifier==='node:child_process'\).*\n/, ` if (specifier==='node:child_process') return {url:moduleURL(${JSON.stringify(durationChildSource)}),shortCircuit:true};\n`)
   .replace(/ if \(specifier.endsWith\('gemini-file-upload.ts'\)\).*\n/, ` if (specifier.endsWith('gemini-file-upload.ts')) return {url:${JSON.stringify(new URL('../../packages/ai/src/stt/gemini-file-upload.ts', import.meta.url).href)},shortCircuit:true};\n`)
   .replace(/ if \(specifier.endsWith\('chunk-audio.ts'\)\).*\n/, ` if (specifier.endsWith('chunk-audio.ts')) return {url:${JSON.stringify(new URL('../../packages/ai/src/stt/chunk-audio.ts', import.meta.url).href)},shortCircuit:true};\n`)
-  .replace(" if (specifier==='undici')", ` if (specifier.endsWith('/real-upload-transport.mjs')) return {url:moduleURL(${JSON.stringify(durationTransportSource)}),shortCircuit:true};\n if (specifier==='undici')`);
+  .replace(" if (specifier==='undici')", ` if (specifier==='../gemini-quota.js') return {url:${JSON.stringify(new URL('../../packages/ai/src/gemini-quota.ts', import.meta.url).href)},shortCircuit:true};\n if (specifier.endsWith('/real-upload-transport.mjs')) return {url:moduleURL(${JSON.stringify(durationTransportSource)}),shortCircuit:true};\n if (specifier==='undici')`);
 
 test("duration-bound actual long-session CLI probes original and extracted media and preserves provenance", () => {
   for (const spanDuration of [15, 12.650958, 17]) {
@@ -190,7 +195,8 @@ test("duration-bound actual long-session CLI probes original and extracted media
       assert.deepEqual(readFileSync(join(f.dir,'.transcript-history',createHash('sha256').update(before).digest('hex')+'.json')),before);
       assert.equal(JSON.parse(readFileSync(join(f.dir,'derivation-provenance.json'))).status,'stale');
       const trace=readFileSync(f.trace,'utf8').trim().split('\n').map(JSON.parse);
-      assert.deepEqual(trace.filter(x=>x.kind==='probe').map(x=>[x.span,x.timeout]),[[false,15000],[true,15000]]);
+      // Original input, sealed snapshot recheck, then extracted span are all bounded.
+      assert.deepEqual(trace.filter(x=>x.kind==='probe').map(x=>[x.span,x.timeout]),[[false,15000],[false,15000],[true,15000]]);
       assert.equal(trace.filter(x=>x.kind==='provider').length,4);
     } finally {rmSync(f.root,{recursive:true,force:true});}
   }

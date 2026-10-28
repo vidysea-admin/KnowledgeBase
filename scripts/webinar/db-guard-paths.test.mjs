@@ -20,7 +20,7 @@ const OPT_IN = {LKB_ALLOW_STAGING: 'lkb_staging'};
 // M3a ---------------------------------------------------------------------------------------------------------------
 test('validateRunGate refuses unset, lkb, global_university_db and un-opted lkb_staging (any casing)', () => {
   const empty = mkdtempSync(join(tmpdir(), 'gate-'));
-  for (const work of [undefined, '', '  ', 'lkb', 'LKB', 'global_university_db', 'lkb_staging', 'LKB_STAGING', 'Lkb_Staging'])
+  for (const work of [undefined, '', '  ', 'lkb', 'LKB', ' lkb ', 'lkb_prod', 'LKB_PROD', ' LkB_PrOd ', 'global_university_db', 'lkb_staging', 'LKB_STAGING', 'Lkb_Staging'])
     assert.throws(() => validateRunGate(empty, {MONGO_WORK_DB: work}), /isolated work database; production writes refused/, String(work));
   // an opt-in for a different value, or a mis-cased name even WITH the opt-in, stays refused
   assert.throws(() => validateRunGate(empty, {MONGO_WORK_DB: 'lkb_staging', LKB_ALLOW_STAGING: 'yes'}), /production writes refused/);
@@ -47,7 +47,7 @@ async function preflight(env, headerValue, scanStatus = 500) {
   } finally { globalThis.fetch = real; }
 }
 test('Gmail preflight refuses a protected/unset work DB even when the API echoes the same name; no scan POST is sent', async () => {
-  for (const work of [undefined, 'lkb', 'global_university_db', 'lkb_staging', 'LKB_STAGING']) {
+  for (const work of [undefined, 'lkb', 'LKB', ' lkb ', 'lkb_prod', 'LKB_PROD', ' LkB_PrOd ', 'global_university_db', 'lkb_staging', 'LKB_STAGING']) {
     const {error, calls} = await preflight({MONGO_WORK_DB: work}, work ?? '');
     assert.match(String(error?.message), /Gmail work database not bound/, String(work));
     assert.equal(calls.some(c => c.startsWith('POST')), false, `${work}: scan must not run`);
@@ -86,7 +86,7 @@ test('resolveWorkDb returns only the configured DB or lkb_staging (staging needs
   assert.equal(resolveWorkDb({testData: true, workDb: 'lkb', env: OPT_IN}).workDb, STAGING_DB);
   assert.equal(resolveWorkDb({testData: true, workDb: 'lkb_work_x', env: OPT_IN}).workDb, STAGING_DB);
   // sync-session applies the guard to whatever came back: production names stay refused, staging only with the opt-in
-  for (const name of ['lkb', 'LKB', 'global_university_db', undefined, '']) assert.equal(isProtectedWorkDbName(name, OPT_IN), true, String(name));
+  for (const name of ['lkb', 'LKB', ' lkb ', 'lkb_prod', 'LKB_PROD', ' LkB_PrOd ', 'global_university_db', undefined, '']) assert.equal(isProtectedWorkDbName(name, OPT_IN), true, String(name));
   assert.equal(isProtectedWorkDbName(STAGING_DB, {}), true);
   assert.equal(isProtectedWorkDbName(STAGING_DB, OPT_IN), false);
 });
@@ -108,7 +108,7 @@ test('sync-session.mjs with MONGO_WORK_DB=lkb exits non-zero with the protected-
     mkdirSync(dir, {recursive: true});
     writeFileSync(join(dir, 'source.json'), JSON.stringify({_id: `${sid}-src`, tenantId: 't-guard', title: 'guard fixture', createdAt: '2026-10-14T00:00:00Z'}));
     writeFileSync(join(dir, 'turns.json'), JSON.stringify([{_id: `${sid}-t001`, tenantId: 't-guard', sessionId: sid, speakerRef: 'spk:0', tStart: 0, tEnd: 5, text: 'hello'}]));
-    for (const work of ['lkb', 'LKB', 'global_university_db']) {
+    for (const work of ['lkb', 'LKB', ' lkb ', 'lkb_prod', 'LKB_PROD', ' LkB_PrOd ', 'global_university_db']) {
       const env = {...process.env, MONGO_WORK_DB: work, MONGODB_URL: `mongodb://127.0.0.1:${server.address().port}/?serverSelectionTimeoutMS=1500&connectTimeoutMS=1500`};
       delete env.LKB_ALLOW_STAGING;
       const child = spawn(process.execPath, ['--import', 'tsx', join(root, 'scripts/webinar/sync-session.mjs'), sid], {env, cwd: root});

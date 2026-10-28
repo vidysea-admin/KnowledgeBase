@@ -1,9 +1,9 @@
 /** w17-wireapi item 4: T-056 answer policy, T-054 transcript review and T-008 vectorless search are reachable
  * through the shared createServer perimeter (requireAuth + rate limit), composed by the real builders, and
  * tenant-scoped. 401 without a key, cross-tenant 404/empty, 200 on the happy path. In-memory doubles only. */
-import { test } from "node:test";
+import { test, mock } from "node:test";
 import assert from "node:assert/strict";
-import type { Db } from "mongodb";
+import { MongoClient, Collection, type Db } from "mongodb";
 import { buildTestDeps, fakeKeyStore } from "../../fixtures.js";
 import { startTestServer } from "../../testUtils.js";
 import { answerTestDb } from "../../answer-policy/answer-testdb.js";
@@ -12,6 +12,8 @@ import { seed, SESSION } from "../../transcript-review/persist.testkit.js";
 import { buildAnswerIntegrations } from "./answers.js";
 import { buildTranscriptIntegrations, type TranscriptIntegrationInput } from "./transcripts.js";
 import { createMongoSearchDeps } from "../../search-store.js";
+import { buildProductionDeps } from "../production.js";
+import { buildCalendarWorkerIntegrations } from "./capture-policy.js";
 
 const keyStore = fakeKeyStore({
   "a": { tenantId: "tenant-A", scopes: ["sessions", "search", "answer-policy:read", "answer-policy:write"] },
@@ -110,4 +112,31 @@ test("T-008 vectorless search: composed Mongo search deps are mounted behind aut
     const theirs = await s.call("GET", "/search?q=zebrafish", "b");
     assert.equal(theirs.status, 200); assert.deepEqual(theirs.json!.hits, [], "tenant B never sees tenant A turn");
   } finally { await s.close(); }
+});
+
+test("cycle1 disabled Compose defaults preserve native integrations", async () => {
+  const db = {collection() { throw new Error("must be lazy"); }} as unknown as Db;
+  for (const bindings of [undefined, "", "   "]) assert.equal(buildCalendarWorkerIntegrations({db, env: {LKB_CALENDAR_WORKER_ENABLED: "0", LKB_CALENDAR_WORKER_BINDINGS: bindings}}), undefined);
+  const names = ["LKB_CALENDAR_WORKER_ENABLED", "LKB_CALENDAR_WORKER_BINDINGS", "LKB_JOIN_RULES_ENABLED", "LKB_JOIN_RULES_STATE_DIR"] as const;
+  const previous = Object.fromEntries(names.map(name => [name, process.env[name]])), {connect, close} = await import("@lkb/db");
+  const connection = mock.method(MongoClient.prototype, "connect", async function(this: MongoClient) {return this;}); let reads = 0;
+  const rows = mock.method(Collection.prototype, "find", function(this: Collection, filter: unknown) {
+    assert.equal(this.namespace, "calendar_default_policy.meeting_candidates"); assert.deepEqual(filter, {tenantId: "toc"}); reads++;
+    return {sort: () => ({toArray: async () => []})} as any;
+  });
+  try {
+    await connect("mongodb://127.0.0.1:1", "calendar_default_policy");
+    for (const configured of [false, true]) {
+      for (const name of names) delete process.env[name];
+      if (configured) Object.assign(process.env, {LKB_CALENDAR_WORKER_ENABLED: "0", LKB_CALENDAR_WORKER_BINDINGS: "", LKB_JOIN_RULES_ENABLED: "0"});
+      const production = buildProductionDeps();
+      const server = await startTestServer(buildTestDeps({meetingCandidates: production.meetingCandidates, keyStore: fakeKeyStore({operator: {tenantId: "toc", keyId: "operator", scopes: ["gmail"]}})}));
+      try {const response = await fetch(server.baseUrl + "/meeting-candidates", {headers: {Authorization: "Bearer operator"}}); assert.equal(response.status, 200); assert.deepEqual(await response.json(), {candidates: []});} finally {await server.close();}
+    }
+    assert.equal(reads, 2);
+    Object.assign(process.env, {LKB_JOIN_RULES_ENABLED: "1", LKB_JOIN_RULES_STATE_DIR: "relative/rules"});
+    await assert.rejects(buildProductionDeps().meetingCandidates!.listCandidates("toc"), /Candidate policy unavailable/);
+    Object.assign(process.env, {LKB_JOIN_RULES_ENABLED: "0", LKB_CALENDAR_WORKER_ENABLED: "1", LKB_CALENDAR_WORKER_BINDINGS: "invalid"});
+    await assert.rejects(buildProductionDeps().meetingCandidates!.listCandidates("toc"), /Candidate policy unavailable/); assert.equal(reads, 2);
+  } finally {await close(); rows.mock.restore(); connection.mock.restore(); for (const name of names) if (previous[name] === undefined) delete process.env[name]; else process.env[name] = previous[name];}
 });

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "kb://meeting_candidates",
   "title": "meeting_candidates",
-  "description": "A meeting-shaped email found by scanning Gmail (T-028: Gmail meeting-candidate approval workflow). Never auto-ingested as a real session — a human approves it first, or the sending pattern has already earned trust (see trusted_senders). One row per real Gmail message, deduped by messageId.",
+  "description": "A meeting-shaped email found by scanning Gmail (T-028: Gmail meeting-candidate approval workflow). Never auto-ingested as a real session \u2014 a human approves it first, or the sending pattern has already earned trust (see trusted_senders). One row per real Gmail message, deduped by messageId.",
   "type": "object",
   "required": [
     "_id",
@@ -25,7 +25,7 @@
     "messageId": {
       "type": "string",
       "minLength": 1,
-      "description": "The real Gmail message id — dedup key."
+      "description": "The real Gmail message id \u2014 dedup key."
     },
     "threadId": {
       "type": "string",
@@ -137,6 +137,13 @@
         "registration-only",
         "host-start-link"
       ]
+    },
+    "evidenceIssue": {
+      "enum": [
+        "unresolved-body",
+        "unsupported-attachment"
+      ],
+      "description": "Acquisition refusal. Retained across rescans; never authorizes attendance or sender trust."
     }
   },
   "additionalProperties": true

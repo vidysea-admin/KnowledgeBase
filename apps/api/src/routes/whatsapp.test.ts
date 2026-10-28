@@ -3,6 +3,9 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { MongoNetworkError, MongoParseError, MongoServerSelectionError } from "mongodb";
+import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
+import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeWhatsAppDeps } from "../fixtures.js";
@@ -134,4 +137,113 @@ test("POST /whatsapp/ingest without the whatsapp scope returns 403", async () =>
   } finally {
     await server.close();
   }
+});
+
+// Synthetic adapters only: no archive connection, app database or writes.
+test("unavailable owner is sanitized503 before any archive access, including foreign query authority", async () => {
+  for (const resolveOwner of [undefined, async () => null, async () => "bad-owner",
+    createConfiguredWhatsAppOwnerResolver(JSON.stringify([{ tenantId: "foreign", ownerUserId: "111111111111111111111111" }]))]) {
+    let upstream = 0;
+    const whatsapp = createMongoWhatsAppDeps(undefined, { resolveOwner,
+      listGroups: async () => { upstream++; throw new Error("must not access archive"); },
+      appDb: () => { throw new Error("must not access app database"); },
+    });
+    const server = await startTestServer(buildTestDeps({ whatsapp,
+      keyStore: fakeKeyStore({ "wa-key": { tenantId: "tenant-1", scopes: ["whatsapp"] } }),
+    }));
+    try {
+      const res = await fetch(
+        `${server.baseUrl}/whatsapp/groups?tenantId=foreign&ownerUserId=111111111111111111111111`,
+        { headers: { authorization: "Bearer wa-key" } });
+      assert.equal(res.status, 503);
+      assert.deepEqual(await res.json(), { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+      assert.equal(upstream, 0);
+    } finally { await server.close(); }
+  }
+});
+
+test("known source network/config errors become sanitized503 only after authenticated owner resolution", async () => {
+  for (const error of [new MongoNetworkError("synthetic private diagnostic"),
+    new MongoParseError("synthetic private diagnostic"),
+    new MongoServerSelectionError("synthetic private diagnostic", {} as ConstructorParameters<typeof MongoServerSelectionError>[1])]) {
+    const calls: string[] = [];
+    const whatsapp = createMongoWhatsAppDeps(undefined, {
+      resolveOwner: async tenant => { calls.push(tenant); return "111111111111111111111111"; },
+      listGroups: async owner => { calls.push(owner); throw error; },
+      fetchMessages: async () => { throw new Error("must not fetch messages"); },
+      appDb: () => { throw new Error("must not access app database"); },
+    });
+    const server = await startTestServer(buildTestDeps({ whatsapp,
+      keyStore: fakeKeyStore({ "wa-key": { tenantId: "tenant-1", scopes: ["whatsapp"] } }),
+    }));
+    try {
+      const res = await fetch(`${server.baseUrl}/whatsapp/groups`, { headers: { authorization: "Bearer wa-key" } });
+      assert.equal(res.status, 503);
+      assert.deepEqual(await res.json(), { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+      assert.deepEqual(calls, ["tenant-1", "111111111111111111111111"]);
+      calls.length = 0;
+      const ingest = await fetch(`${server.baseUrl}/whatsapp/ingest`, { method: "POST",
+        headers: { authorization: "Bearer wa-key", "content-type": "application/json" },
+        body: JSON.stringify({ groupJid: "synthetic-group" }),
+      });
+      assert.equal(ingest.status, 503);
+      assert.deepEqual(await ingest.json(), { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+      assert.deepEqual(calls, ["tenant-1", "111111111111111111111111"]);
+    } finally { await server.close(); }
+  }
+});
+
+test("unexpected group-list errors remain500; message/name spoofing does not become unavailable", async () => {
+  const error = new Error("WhatsApp owner authorization unavailable");
+  error.name = "WhatsAppUnavailableError";
+  const server = await startTestServer(buildTestDeps({
+    keyStore: fakeKeyStore({ "wa-key": { tenantId: "tenant-1", scopes: ["whatsapp"] } }),
+    whatsapp: createMongoWhatsAppDeps(undefined, {
+      resolveOwner: async () => "111111111111111111111111", listGroups: async () => { throw error; },
+    }),
+  }));
+  try {
+    const res = await fetch(`${server.baseUrl}/whatsapp/groups`, { headers: { authorization: "Bearer wa-key" } });
+    assert.equal(res.status, 500);
+    assert.deepEqual(await res.json(), { error: "internal_error", message: "internal error" });
+  } finally { await server.close(); }
+});
+
+test("auth and scope refuse before owner resolver or archive is called", async () => {
+  let effects = 0;
+  const server = await startTestServer(buildTestDeps({
+    keyStore: fakeKeyStore({ "ask-key": { tenantId: "tenant-1", scopes: ["ask"] } }),
+    whatsapp: createMongoWhatsAppDeps(undefined, {
+      resolveOwner: async () => { effects++; return null; },
+      listGroups: async () => { effects++; return []; },
+    }),
+  }));
+  try {
+    for (const [headers, status] of [[{}, 401], [{ authorization: "Bearer ask-key" }, 403]] as const) {
+      const res = await fetch(`${server.baseUrl}/whatsapp/groups`, { headers });
+      assert.equal(res.status, status);
+    }
+    assert.equal(effects, 0);
+  } finally { await server.close(); }
+});
+
+test("POST missing owner is sanitized503 with zero archive/message/app effects", async () => {
+  let effects = 0;
+  const server = await startTestServer(buildTestDeps({
+    keyStore: fakeKeyStore({ "wa-key": { tenantId: "tenant-1", scopes: ["whatsapp"] } }),
+    whatsapp: createMongoWhatsAppDeps(undefined, {
+      listGroups: async () => { effects++; return []; },
+      fetchMessages: async () => { effects++; return []; },
+      appDb: () => { effects++; throw new Error("app database must not be reached"); },
+    }),
+  }));
+  try {
+    const res = await fetch(`${server.baseUrl}/whatsapp/ingest`, { method: "POST",
+      headers: { authorization: "Bearer wa-key", "content-type": "application/json" },
+      body: JSON.stringify({ groupJid: "synthetic-group" }),
+    });
+    assert.equal(res.status, 503);
+    assert.deepEqual(await res.json(), { error: "whatsapp_unavailable", message: "WhatsApp source unavailable" });
+    assert.equal(effects, 0);
+  } finally { await server.close(); }
 });
