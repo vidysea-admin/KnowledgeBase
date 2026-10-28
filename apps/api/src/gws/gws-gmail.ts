@@ -150,7 +150,7 @@ async function fetchOne(messageId: string, run = runGws, onFetched = () => {}, o
   let parts: GwsMessagePart[];
   try { parts = findPart(msg.payload); } catch (error) {
     if (!(error instanceof Error) || error.message !== "Gmail unsupported attachment evidence") throw error;
-    if (!/\b(?:invit(?:ation|ed|e)|webinar|seminar|webcast|workshop|conference|meeting|session)\b/i.test(subject) || /\b(?:newsletter|digest|roundup|recording|recap|product update)\b/i.test(subject)) return "excludedNonMeeting";
+    if (!/\b(?:invit(?:ation|ed|e)|webinar|seminar|webcast|educator dialogues|in[- ]focus|workshop|conference|meeting|session)\b/i.test(subject) || /\b(?:newsletter|digest|roundup|recording|recap|product update)\b/i.test(subject)) return "excludedNonMeeting";
     return {messageId: msg.id, subject, ...sender, kind: "upcoming", evidenceIssue: "unsupported-attachment"};
   }
   if (!parts.length) throw new Error("Gmail body unresolved");
@@ -210,7 +210,7 @@ async function fetchOne(messageId: string, run = runGws, onFetched = () => {}, o
     (youtubeWatch && (!startTime || Date.parse(startTime) > Date.now()) && !RECORDING_HINT_RE.test(`${subject}\n${bodyText}`))) ? undefined : literalRecording;
   const kind = classifyMeetingKind({ subject, bodyText, recordingUrl, startTime, now: new Date() });
   const invitationText = [subject, bodyText, msg.snippet ?? ""].join("\n");
-  const directJoin = [...links].some(url => recognise(url)?.kind === "join"), eventTopic = /\b(?:webinar|seminar|webcast|online workshop|virtual conference|meeting|session)\b/i.test(invitationText);
+  const directJoin = [...links].some(url => recognise(url)?.kind === "join"), eventTopic = /\b(?:webinar|seminar|webcast|educator dialogues|in[- ]focus|online workshop|virtual conference|meeting|session)\b/i.test(invitationText);
   const invitation = /\binvit(?:ation|ed|e)\b/i.test(invitationText) && (directJoin || eventTopic) || eventTopic && /\b(?:join|register|attend|registration|reminder|confirmation|confirmed|reserve|watch live)\b/i.test(invitationText);
   const timedRegistration = Boolean(startTime && /\b(?:save (?:my|your) spot|register anyway|reserve (?:my|your) spot)\b/i.test(invitationText));
   if (kind === "past-recording" || !(directJoin || registrationUrl || youtubeIds.size || timedRegistration) ||
