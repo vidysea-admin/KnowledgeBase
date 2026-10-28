@@ -100,4 +100,4 @@ All six edits were restored from the worktree afterwards and the copy re-ran `â„
 ## Live browser evidence
 SKIP â€” no browser instrument available to this build subagent (playwright MCP failed to connect and the brief says the checker does the real browser check). The web marker is covered by the jsdom render test apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx only. A stated gap, not a pass. Changed UI paths: apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx, apps/web/src/api/knowledge-outputs.ts.
 
-## Status: ready-for-check
+## Status: checked-PASS (qa/verdicts/claims-citable-needs-review.md, cycle 0, commit 577eb5d2)
