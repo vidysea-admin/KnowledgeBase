@@ -269,6 +269,12 @@
           "occurredAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "claimStatus": {
+            "enum": [
+              "verified",
+              "needs-review"
+            ]
           }
         },
         "additionalProperties": false

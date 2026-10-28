@@ -9,7 +9,7 @@
   "createdAt": "2026-10-14T12:00:00.000Z",
   "updatedAt": "2026-10-14T12:00:00.000Z",
   "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
-  "sourceCoverage": { "status": "ready", "withheldClaims": 0 },
+  "sourceCoverage": { "status": "partial", "withheldClaims": 0 },
   "provider": "fixture-provider",
   "model": "fixture-model",
   "reviewState": "draft",
@@ -46,6 +46,7 @@
     "end": 9,
     "unit": "seconds",
     "quote": "Applications open Monday.",
-    "href": "/sessions/session-fixture#turn-turn-fixture"
+    "href": "/sessions/session-fixture#turn-turn-fixture",
+    "claimStatus": "needs-review"
   }]
 }

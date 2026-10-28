@@ -7,7 +7,7 @@ export interface KnowledgeOutputDraft {
   sourceCoverage: { status: "ready" | "partial"; withheldClaims: number };
   policy?: { policyId: string; version: number; questionClass: string; mode: "internal-only" | "internal-and-web"; style: "concise" | "detailed"; onInsufficient: "review" | "refuse"; citations: "required" };
   sections: { key: string; title: string; missing: string; items: { id: string; text: string; kind: "fact" | "suggestion" | "question"; citationIds: string[]; validation: "ai-supported" | "needs-review"; assessmentDigest: string }[] }[];
-  citations: { id: string; claimId: string; turnId: string; sessionId: string; speakerRef: string; speakerLabel?: string; occurredAt?: string; start: number; end: number; unit: "seconds" | "characters"; quote: string; href: string }[];
+  citations: { id: string; claimId: string; turnId: string; sessionId: string; speakerRef: string; speakerLabel?: string; occurredAt?: string; start: number; end: number; unit: "seconds" | "characters"; quote: string; href: string; claimStatus?: "verified" | "needs-review" }[];
 }
 export interface OutputSummary { id: string; title: string; kind: KnowledgeOutputDraft["kind"]; revision: number; updatedAt: string }
 const base = "/knowledge-outputs";

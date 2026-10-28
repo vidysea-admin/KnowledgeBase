@@ -23,7 +23,7 @@ test("literal evidence retains exact quote, stable identity, range and real sess
   assert.equal(result.status, "ready");
   assert.deepEqual(result.sections[0]!.excerpts[0], {
     claimId: "c1", turnId: "t1", sessionId: "s1", speakerRef: "spk:0", start: 4, end: 10,
-    unit: "seconds", quote: "applications open on Monday", href: "/sessions/s1#turn-t1",
+    unit: "seconds", quote: "applications open on Monday", href: "/sessions/s1#turn-t1", claimStatus: "verified",
   });
   assert.match(result.markdown, /> applications open on Monday/u);
   assert.doesNotMatch(result.markdown, /unsupported interpretation/u);
@@ -44,15 +44,40 @@ test("missing quote uses the literal whole turn, never the interpreted claim", (
   assert.equal(result.sections[0]!.excerpts[0]!.quote, turn().text);
 });
 
-test("review/conflicting/missing claims are visibly withheld", () => {
-  for (const status of ["needs-review", "conflicting"] as const) {
-    const result = buildEvidenceOutput(request({ claims: [claim({ status })] }));
+// D-200/D-201 [C1]: needs-review claims are now admitted as citable excerpts; only conflicting/other statuses stay withheld.
+test("needs-review claims are citable and labelled; conflicting/rejected/missing claims are visibly withheld (D-201)", () => {
+  const admitted = buildEvidenceOutput(request({ claims: [claim({ status: "needs-review" })] }));
+  assert.equal(admitted.sections[0]!.excerpts.length, 1);
+  assert.equal(admitted.sections[0]!.excerpts[0]!.claimStatus, "needs-review");
+  assert.equal(admitted.sections[0]!.withheld.length, 0);
+  assert.equal(admitted.status, "partial", "needs-review evidence is never reported as fully ready");
+  assert.match(admitted.markdown, /> applications open on Monday/u);
+  assert.match(admitted.markdown, /Unverified \(needs review\)/u);
+  for (const status of ["conflicting", "rejected"] as const) {
+    const result = buildEvidenceOutput(request({ claims: [claim({ status } as Partial<Claims>)] }));
     assert.equal(result.status, "unavailable");
     assert.equal(result.sections[0]!.withheld[0]!.reason, "claim-unverified");
     assert.match(result.markdown, /No verified evidence available/u);
     assert.doesNotMatch(result.markdown, /applications open/u);
   }
   assert.equal(buildEvidenceOutput(request({ claims: [] })).sections[0]!.withheld[0]!.reason, "claim-unavailable");
+  // [C1] a needs-review claim whose evidence turn cannot be resolved is not cited.
+  const unresolved = buildEvidenceOutput(request({ claims: [claim({ status: "needs-review", evidence: [{ turnId: "gone", sessionId: "s1" }] })] }));
+  assert.equal(unresolved.sections[0]!.excerpts.length, 0);
+  assert.equal(unresolved.sections[0]!.withheld[0]!.reason, "evidence-unavailable");
+  // Verified excerpts carry no marker.
+  assert.doesNotMatch(buildEvidenceOutput(request()).markdown, /Unverified/u);
+});
+
+// [C4] verified claims rank before needs-review claims regardless of input order.
+test("verified claims rank before needs-review claims", () => {
+  const result = buildEvidenceOutput(request({
+    sections: [{ title: "Mixed", claimIds: ["c1", "c2", "c3"] }],
+    claims: [claim({ _id: "c1", status: "needs-review", evidence: [{ turnId: "t1", sessionId: "s1", quote: "applications open" }] }),
+      claim({ _id: "c2", status: "verified", evidence: [{ turnId: "t1", sessionId: "s1", quote: "source says" }] }),
+      claim({ _id: "c3", status: "needs-review", evidence: [{ turnId: "t1", sessionId: "s1", quote: "on Monday" }] })] }));
+  assert.deepEqual(result.sections[0]!.excerpts.map((e) => [e.claimId, e.claimStatus]),
+    [["c2", "verified"], ["c1", "needs-review"], ["c3", "needs-review"]]);
 });
 
 test("foreign rows refuse the entire request, including unreferenced foreign rows", () => {
@@ -148,7 +173,8 @@ test("invalid request scope/sections refuse before producing output", () => {
   ]) assert.throws(() => buildEvidenceOutput(request(patch)), /invalid evidence output/u);
 });
 
-test("actual TOC sample remains unmodified and its unreviewed claims are withheld", () => {
+// D-201: the 3 needs-review TOC claims are now citable (labelled); the sample stays byte-identical.
+test("actual TOC sample remains unmodified and its needs-review claims are cited with a label (D-201)", () => {
   const base = new URL("../../../../data/toc-migrated/2026-08-27-in-focus-4/", import.meta.url);
   const claimsPath = new URL("claims.json", base);
   const turnsPath = new URL("turns.json", base);
@@ -158,9 +184,11 @@ test("actual TOC sample remains unmodified and its unreviewed claims are withhel
   const turns = JSON.parse(turnsBytes.toString()) as Turns[];
   const result = buildEvidenceOutput(request({ tenantId: "toc", sessionIds: ["2026-08-27-in-focus-4"],
     claims, turns, sections: [{ title: "TOC preparation", claimIds: claims.map((item) => item._id) }] }));
-  assert.equal(result.status, "unavailable");
-  assert.equal(result.sections[0]!.withheld.length, claims.length);
-  assert.equal(result.sections[0]!.excerpts.length, 0);
+  assert.equal(result.status, "partial");
+  // c03 cites a turn absent from turns.json: unresolved evidence is still not cited (C1).
+  assert.deepEqual(result.sections[0]!.withheld, [{ claimId: "2026-08-27-in-focus-4-c03", reason: "evidence-unavailable" }]);
+  assert.equal(result.sections[0]!.excerpts.length, claims.length - 1);
+  assert.ok(result.sections[0]!.excerpts.every((e) => e.claimStatus === "needs-review"));
   assert.deepEqual(readFileSync(claimsPath), claimsBytes);
   assert.deepEqual(readFileSync(turnsPath), turnsBytes);
 });
