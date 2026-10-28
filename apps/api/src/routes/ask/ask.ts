@@ -8,10 +8,11 @@
  */
 import { Router, type Request, type Response } from "express";
 import type { TreeIndexNode } from "@lkb/core";
-import { askV2, BoundedAskError, type AskV2Deps } from "@lkb/ask";
+import { BoundedAskError, type AskV2Deps } from "@lkb/ask";
 import { requireScope } from "../../auth.js";
 import { AnswerWorkflowError, answerGraphSelection, parseAnswerInput, type AnswerWorkflow } from '../../answer-policy/answer-workflow.js';
 import { answerWorkflowFailure } from '../../answer-policy/answer-router.js';
+import { askForMode } from '../../answer-policy/application.js';
 import type { TreeExclusions } from '../../indexing/eligible-tree.js';
 
 /** Injected dependency (C3) — production impl in `store.ts` is Mongo-backed; tests use a fake. */
@@ -71,7 +72,7 @@ export function createAskRouter(deps: AskRouteDeps): Router {
     };
     const result = deps.answerWorkflow
       ? await deps.answerWorkflow.execute(tenantId, req.body, { actor: `api-key:${req.auth!.keyId ?? tenantId}` }, tree, requestDeps)
-      : await askV2(input.query, tree, requestDeps);
+      : await askForMode(input.mode, input.query, tree, requestDeps);
     res.status(200).json(result && typeof result === "object" && !Array.isArray(result)
       ? { ...result, excludedSessions: excluded.total, exclusionReasons: excluded.reasons } : result);
     } catch (error) {

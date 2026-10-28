@@ -16,6 +16,8 @@ import { startTestServer } from "../testUtils.js";
 const actor = { actor: "api-key:tenant-a" }, sha = (s: string) => createHash("sha256").update(s).digest("hex");
 const body = (over: Record<string, unknown> = {}) => ({ questionClass: "fees", mode: "internal-only", style: "detailed", onInsufficient: "review", note: "initial", ...over });
 const input = (over: Record<string, unknown> = {}) => ({ query: "What is the fee?", questionClass: "fees", policyId: "fees", policyVersion: 1, evidenceMode: true, filters: { sessionIds: [], sources: "all" }, ...over });
+/** These tests exercise the multi-step graph (per-candidate scoring, select_nodes, evaluator) behind review/stale/conflict flows, so they opt in to `filters.mode:"deep"`; the default /ask path is the single-call fast RAG path (ask-fast-rag, D-203). */
+const deep = (over: Record<string, unknown> = {}) => input({ filters: { sessionIds: [], sources: "all", mode: "deep" }, ...over });
 function setup(score = .9, values = ["100", "200"]) {
   const policies = createAnswerPolicyService(createInMemoryAnswerPolicyStore()), records = createInMemoryAnswerRecordStore();
   let fresh = true, webCalls = 0;
@@ -114,7 +116,7 @@ test("stored policy reaches the actual bounded Ask provider; filter suppresses f
 });
 test("actual review candidate is held, fresh exact approval releases it, and concurrent/foreign reviews fail", async () => {
   const r = setup(.6); await r.policies.save("tenant-a", "fees", body(), actor);
-  const app = r.workflow(), result = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+  const app = r.workflow(), result = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
   assert.equal(result.state, "review"); assert.equal(result.answer, ""); assert.equal(r.webCalls(), 0);
   const queue = await app.queue("tenant-a"); assert.match(queue[0]!.candidate.answer, /Fee is 100/); assert.equal(queue[0]!.evidence.length, 2);
   const review = { decision: "approved", note: "Checked both original quoted statements", candidateDigest: result.candidateDigest, evidenceDigest: result.evidenceDigest };
@@ -128,7 +130,7 @@ test("actual review candidate is held, fresh exact approval releases it, and con
 });
 test("changed evidence or policy cannot authorize stale candidate approval; refusal cannot be approved", async () => {
   const r = setup(.6); await r.policies.save("tenant-a", "fees", body(), actor);
-  const run = await r.workflow().execute("tenant-a", input(), actor, r.tree, r.deps);
+  const run = await r.workflow().execute("tenant-a", deep(), actor, r.tree, r.deps);
   const decision = { decision: "approved", note: "reviewed", candidateDigest: run.candidateDigest, evidenceDigest: run.evidenceDigest };
   r.stale(); await assert.rejects(r.workflow().review("tenant-a", run.runId, decision, actor), /Source evidence changed/);
   const stale = await r.workflow().get("tenant-a", run.runId);
@@ -136,17 +138,17 @@ test("changed evidence or policy cannot authorize stale candidate approval; refu
   assert.deepEqual(stale.result.sources, { internal: [], web: [] });
   assert.equal((await r.workflow().queue("tenant-a"))[0]!.candidate.answer, "", "withdrawn snapshot is not exposed through candidate queue");
   const changed = setup(.6); await changed.policies.save("tenant-a", "fees", body(), actor);
-  const beforeChange = await changed.workflow().execute("tenant-a", input(), actor, changed.tree, changed.deps);
+  const beforeChange = await changed.workflow().execute("tenant-a", deep(), actor, changed.tree, changed.deps);
   await changed.policies.save("tenant-a", "fees", body({ expectedVersion: 1, note: "New policy", style: "concise" }), actor);
   await assert.rejects(changed.workflow().review("tenant-a", beforeChange.runId, { ...decision, candidateDigest: beforeChange.candidateDigest, evidenceDigest: beforeChange.evidenceDigest }, actor), /Policy changed/);
   const r2 = setup(.6); await r2.policies.save("tenant-a", "fees", body({ onInsufficient: "refuse" }), actor);
-  const refused = await r2.workflow().execute("tenant-a", input(), actor, r2.tree, r2.deps);
+  const refused = await r2.workflow().execute("tenant-a", deep(), actor, r2.tree, r2.deps);
   assert.equal(refused.state, "refused"); assert.equal(refused.answer, ""); assert.equal((await r2.workflow().queue("tenant-a")).length, 0);
   await assert.rejects(r2.workflow().review("tenant-a", refused.runId, { ...decision, candidateDigest: refused.candidateDigest, evidenceDigest: refused.evidenceDigest }, actor));
 });
 test("reported evidence uses server-cited sources, holds original, resolves with attribution and reruns without losing provenance", async () => {
   const r = setup(); await r.policies.save("tenant-a", "fees", body(), actor);
-  const app = r.workflow(), original = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+  const app = r.workflow(), original = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
   await assert.rejects(app.reportConflict("tenant-a", original.runId, { a: "fabricated", b: "internal:n2", explanation: "Conflict" }, actor));
   const conflict = await app.reportConflict("tenant-a", original.runId, { a: "internal:n1", b: "internal:n2", explanation: "One cited speaker says 100, another says 200." }, actor);
   assert.equal((await app.get("tenant-a", original.runId)).result.answer, "");
@@ -159,11 +161,11 @@ test("reported evidence uses server-cited sources, holds original, resolves with
     complete: async (job: Parameters<typeof r.deps.complete>[0]) => job.kind === "ask.select_nodes"
       ? { text: '{"node_ids":["n1","renamed-session-alias"]}', json: { node_ids: ["n1", "renamed-session-alias"] }, provider: "offline", model: "alias-fixture", costUsd: 0, usage: { inputTokens: 1, outputTokens: 1 } }
       : r.deps.complete(job) };
-  const rerun = await app.execute("tenant-a", input({ resolutionId: conflict.id }), actor, aliasTree, aliasDeps);
+  const rerun = await app.execute("tenant-a", deep({ resolutionId: conflict.id }), actor, aliasTree, aliasDeps);
   assert.equal(rerun.answer, "Fee is 100."); assert.deepEqual(rerun.sources.internal.map((s) => s.node_id), ["n1"]);
   assert.equal((await r.records.get("tenant-a", original.runId))!.evidence.length, 2, "original provenance never deleted");
   assert.equal((await app.get("tenant-a", original.runId)).result.state, "conflicted", "resolution does not relabel the old candidate");
-  r.stale(); await assert.rejects(app.execute("tenant-a", input({ resolutionId: conflict.id }), actor, r.tree, r.deps), /Source evidence changed/);
+  r.stale(); await assert.rejects(app.execute("tenant-a", deep({ resolutionId: conflict.id }), actor, r.tree, r.deps), /Source evidence changed/);
 });
 
 test("all reported conflicts must be resolved and every rejected canonical source is excluded", async () => {
@@ -187,7 +189,7 @@ test("all reported conflicts must be resolved and every rejected canonical sourc
 
 test("a new conflict reported while a resolution rerun is pending prevents saving its candidate", async () => {
   const r = setup(.9, ["100", "200", "300"]); await r.policies.save("tenant-a", "fees", body(), actor);
-  const app = r.workflow(), original = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+  const app = r.workflow(), original = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
   const first = await app.reportConflict("tenant-a", original.runId, { a: "internal:n1", b: "internal:n2", explanation: "100 conflicts with 200" }, actor);
   await app.resolveConflict("tenant-a", first.id, { keepSourceId: "internal:n1", note: "Prefer 100", evidenceDigest: first.evidenceDigest }, actor);
   let release!: () => void, entered!: () => void;
@@ -195,7 +197,7 @@ test("a new conflict reported while a resolution rerun is pending prevents savin
   const deps = { ...r.deps, complete: async (job: Parameters<typeof r.deps.complete>[0]) => {
     if (job.kind === "ask.select_nodes") { entered(); await pending; } return r.deps.complete(job);
   } };
-  const rerun = app.execute("tenant-a", input({ resolutionId: first.id }), actor, r.tree, deps);
+  const rerun = app.execute("tenant-a", deep({ resolutionId: first.id }), actor, r.tree, deps);
   await dispatched;
   await app.reportConflict("tenant-a", original.runId, { a: "internal:n1", b: "internal:n3", explanation: "New conflict arrived during generation" }, actor);
   release(); await assert.rejects(rerun, /Resolve every reported/);
@@ -206,7 +208,7 @@ test("saved allowed and approved answers fail closed after policy revision, reti
   for (const change of ["revision", "retirement", "contradiction"] as const) {
     for (const score of [.9, .6]) {
       const r = setup(score); await r.policies.save("tenant-a", "fees", body(), actor);
-      const app = r.workflow(), answer = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+      const app = r.workflow(), answer = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
       if (score === .6) await app.review("tenant-a", answer.runId, { decision: "approved", note: "Reviewed", candidateDigest: answer.candidateDigest, evidenceDigest: answer.evidenceDigest }, actor);
       if (change === "revision") await r.policies.save("tenant-a", "fees", body({ expectedVersion: 1, style: "concise", note: "Revised" }), actor);
       if (change === "retirement") await r.policies.retire("tenant-a", "fees", { expectedVersion: 1, note: "Retired" }, actor);
@@ -225,7 +227,7 @@ test("saved allowed and approved answers fail closed after policy revision, reti
 
 test("new saved policy invalidates a default-policy answer and its pending review", async () => {
   const r = setup(.6), app = r.workflow();
-  const answer = await app.execute("tenant-a", input({ policyId: undefined, policyVersion: undefined }), actor, r.tree, r.deps);
+  const answer = await app.execute("tenant-a", deep({ policyId: undefined, policyVersion: undefined }), actor, r.tree, r.deps);
   await r.policies.save("tenant-a", "fees", body(), actor);
   assert.equal((await app.get("tenant-a", answer.runId)).result.state, "stale");
   assert.equal((await app.queue("tenant-a"))[0]!.candidate.answer, "");
@@ -235,7 +237,7 @@ test("new saved policy invalidates a default-policy answer and its pending revie
 test("stored candidate and evidence digest corruption cannot release or expose review content", async () => {
   for (const target of ["candidate", "evidence"] as const) {
     const r = setup(.6); await r.policies.save("tenant-a", "fees", body(), actor);
-    const app = r.workflow(), answer = await app.execute("tenant-a", input(), actor, r.tree, r.deps);
+    const app = r.workflow(), answer = await app.execute("tenant-a", deep(), actor, r.tree, r.deps);
     const get = r.records.get.bind(r.records);
     r.records.get = async (tenant, id) => {
       const run = await get(tenant, id); if (!run) return null;
@@ -309,7 +311,7 @@ test("graph selector conflict replay refuses changed selection before provider c
 test("stored candidate or evidence bytes altered after storage are stale and cannot be approved (digest recheck)", async () => {
   for (const field of ["candidate", "evidence"] as const) {
     const r = setup(.6); await r.policies.save("tenant-a", "fees", body(), actor);
-    const run = await r.workflow().execute("tenant-a", input(), actor, r.tree, r.deps);
+    const run = await r.workflow().execute("tenant-a", deep(), actor, r.tree, r.deps);
     const forged = { ...r.records, get: async (t: string, id: string) => {
       const row = await r.records.get(t, id);
       if (row && field === "candidate") row.candidate.answer = "Fee is 999.";

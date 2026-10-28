@@ -1,6 +1,8 @@
 /** Stored policy selection is deterministic and always bound to the verified tenant. */
-import type { AskV2Deps } from "@lkb/ask";
+import { askFastV2, askV2, FAST_DEADLINE_MS, type AskV2Deps } from "@lkb/ask";
+import type { TreeIndexNode } from "@lkb/core";
 import { isValidTenantId } from "../auth.js";
+import { treeLexicalIds } from "../ask/passage-lexical.js";
 import { classKey, normalizeQuestionClass, parseSave, validPolicyId } from "./rules.js";
 import { PolicyServiceError, type AnswerPolicyService } from "./service.js";
 import type { ConflictFinding, PolicyRevision } from "./types.js";
@@ -45,4 +47,15 @@ export function policyAskDeps(deps: AskV2Deps, policy: PolicyRevision): AskV2Dep
       : "Give a detailed answer with relevant context and qualifications. Mandatory source grounding and output format remain unchanged." }] }
     : job);
   return { ...deps, complete, ...(policy.mode === "internal-only" ? { webFallbackFn: undefined, tavilySearchFn: undefined } : {}) };
+}
+
+/** Fast-path wall-clock budget: LKB_ASK_FAST_DEADLINE_MS (positive integer ms), default FAST_DEADLINE_MS (20 s). */
+export function fastDeadlineMs(env: NodeJS.ProcessEnv = process.env): number {
+  const n = Number(env.LKB_ASK_FAST_DEADLINE_MS);
+  return Number.isSafeInteger(n) && n > 0 ? n : FAST_DEADLINE_MS;
+}
+const FAST_TOP_K = 5;
+/** ask-fast-rag (D-203): default is the single-call RAG path; `mode: "deep"` is the unchanged multi-step graph. */
+export function askForMode(mode: "deep" | undefined, query: string, tree: TreeIndexNode, deps: AskV2Deps) {
+  return mode === "deep" ? askV2(query, tree, deps) : askFastV2(query, tree, deps, { deadlineMs: fastDeadlineMs(), treeLexicalIds: (q, t) => treeLexicalIds(q, t, FAST_TOP_K) });
 }

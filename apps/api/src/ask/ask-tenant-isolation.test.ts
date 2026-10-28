@@ -319,3 +319,16 @@ test("HTTP /answer-policy/simulate legacy arms path (extraCandidateArmsFor): arm
     assert.deepEqual(unscoped(db.queries, A), []);
   } finally { await server.close(); }
 });
+
+// ask-fast-rag C4: the default (single-call RAG) path keeps the key-derived tenant, and tenant B's chunk is never returned or cited.
+test("HTTP /ask default fast path as tenant A: at most 2 model calls, B's chunk/turn never returned, cited or sent to the model", async () => {
+  const db = new BlindDb(corpus());
+  const r = await runRoute({ db, tenantOfKey: A, body: { query: QUERY, filters: { sources: "all" } } });
+  assert.equal(r.status, 200, r.text);
+  assert.ok(r.prompts.length >= 1 && r.prompts.length <= 2, `model calls: ${r.prompts.length}`);
+  const body = JSON.parse(r.text) as { sources: { internal: { node_id: string; evidence: { sourceQuotes: { turnId: string }[] } }[] } };
+  assert.ok(body.sources.internal.length > 0, "non-vacuous: A got a cited answer");
+  assert.deepEqual(body.sources.internal.flatMap((s) => s.evidence.sourceQuotes.map((q) => q.turnId)).filter((t) => t !== "a-turn-1" && t !== "a-turn-2"), []);
+  for (const surface of [r.text, r.prompts, r.writes]) assert.deepEqual(leaks(surface), []);
+  assert.deepEqual(unscoped(db.queries, A), []);
+});

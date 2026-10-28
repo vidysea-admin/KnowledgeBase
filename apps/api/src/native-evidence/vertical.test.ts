@@ -210,6 +210,8 @@ test("native document vertical: actual mounted consent/upload/publication, Hindi
     await f.json(await f.call("/citations/native/resolve", "POST", { sourceLocator: locators[0] }, "limited"), 403, "native citation scope refusal");
     const answer = await f.json(await f.call("/ask", "POST", { query: "आवेदन" }), 200, "actual createServer Ask request + native source context");
     assert.equal(answer.answer, HINDI);
+    const deepAnswer = await f.json(await f.call("/ask", "POST", { query: "आवेदन", filters: { mode: "deep" } }), 200, "deep mode over the same native source");
+    assert.equal(deepAnswer.answer, HINDI);
     const proofs = answer.sources.internal.flatMap((node: Row) => node.evidence?.sourceQuotes ?? []);
     assert.ok(proofs.length); assert.ok(proofs.every((proof: Row) => proof.origin === "document-page" && proof.quote === HINDI));
     for (const proof of proofs) {
