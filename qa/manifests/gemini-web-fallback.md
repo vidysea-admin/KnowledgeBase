@@ -80,4 +80,4 @@ C5 note: its falsification is in-place (setup-status.ts is loaded through server
 ## Live browser evidence
 Not UI-touching is FALSE: apps/web/src/pages/setup-wizard/setupModel.ts and SetupWizardPage.tsx changed (one row's text and id). SKIP — no browser smoke was run by the builder (no browser instrument in this subagent); the gap is stated: the rendered wizard row is covered only by the jsdom/vitest wizard test (20 pass), not a live page. Also not run: any real Gemini grounded call (I1, no live API by instruction), so the real response shape of groundingMetadata is verified against the documented fields only, via mocks.
 
-## Status: ready-for-check
+## Status: checked-PASS (qa/verdicts/gemini-web-fallback.md, cycle 0, commit 3316dd82)
