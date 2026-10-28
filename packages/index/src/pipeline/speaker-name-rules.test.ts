@@ -10,6 +10,10 @@
  * ledger and recall against 14 self-chosen probes, claimed "zero recall loss", and had in fact
  * dropped ten recorded introductions. Refusal and recall are asserted together so tightening one
  * at the other's cost fails loudly.
+ *
+ * W-S step 1 (2026-10-28): the ISS-098/110 `speaking` cases, the ISS-255 handover cases and the ISS-104
+ * closed-class/collision cases moved, assertion for assertion, to speaker-name-rules-{speaking,handover,closed-class}.test.ts.
+ * This file keeps what shares ISS_093_CORPUS: the LLM-path replay, the ledger-fidelity check and the predicate replay.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -98,90 +102,6 @@ for (const [text, name] of ISS_093_CORPUS) {
 }
 
 /**
- * ISS-098's ten recorded recall regressions, verbatim from its `qa/issues.jsonl` evidence field.
- *
- * The cycle-2 `speaking` gate refused all ten. They are the self-identification idiom the cue
- * exists to admit, and the suite could not see the loss: reverting the whole gate reddened exactly
- * ONE test, so the gate was fully measured on refusal and completely unmeasured on recall.
- *
- * The manifest claimed "zero recall loss: all 14 probes correct". That was false, and the 14 probes
- * were ones I chose -- the same self-selected-denominator habit D-015 exists to stop, pointed at
- * recall instead of refusal. These cases are the checker's, not mine, which is the point.
- */
-for (const text of [
-  "Ruby speaking here.",
-  "Ruby speaking and I lead admissions.",
-  "Ruby speaking today from Pune.",
-  "Ruby speaking again.",
-  "Ruby speaking now.",
-  "Ruby speaking -- good to be here.",
-  "Ruby speaking as the panel chair.",
-  "Ruby speaking (admissions).",
-  "Ruby speaking\u2026 thanks all.",
-  "Ruby speaking over Zoom.",
-]) {
-  test(`ISS-098 recall: still resolves ${JSON.stringify(text)}`, async () => {
-    const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([
-      { speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t1"] },
-    ]));
-    assert.equal(resolved.length, 1, "the `speaking` idiom must keep resolving");
-    assert.equal(resolved[0]?.personId, "person:ruby");
-  });
-}
-
-test("ISS-098: a bare noun after `speaking` declines the cue WITHOUT vetoing later branches", async () => {
-  // The cycle-2 bug was an unconditional early return: the speaking branch refused the whole
-  // predicate, so no later cue could fire. Here the participle declines but the address comma
-  // still supplies a cue, which only works if the branch falls through.
-  // ISS-282 moved this assertion to the cue predicate it pins: the address names PRASANTI, so it
-  // can no longer identify the label SPEAKING it (spk:0) -- that refusal is asserted below.
-  const text = "Prasanti, what do you think of English speaking students?";
-  assert.equal(citesNameAsAnIntroduction(text, "Prasanti"), true, "a declining speaking branch must not veto the address cue");
-  const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([{ speakerRef: "spk:0", displayName: "Prasanti", turnIds: ["t1"] }]));
-  assert.deepEqual(resolved, [], "ISS-282: addressing Prasanti does not make the speaker Prasanti");
-});
-
-/**
- * ISS-255's own recorded reproductions (from its qa/issues.jsonl evidence field, measured live
- * 2026-09-21 on the visa session). The handover-inversion is the defect: a turn that ANNOUNCES
- * the next speaker must not credit that name to the CURRENT label.
- */
-test("ISS-255: a moderator's handover turn does NOT ship the introduced name as the moderator", async () => {
-  // The exact recorded case: spk:0's own turn invites the next speaker, Ruby.
-  const text =
-    "Thank you, Shagun. In the essence of time, again, I invite our next speaker, Ruby, from " +
-    "Uni-Italia, to take us forward and with the understanding of visa process in Italy.";
-  const { resolved } = await extractSpeakers([turn("t205", "spk:0", text)], replies([
-    { speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t205"] },
-  ]));
-  assert.deepEqual(resolved, [], "the handover inversion must be refused, not shipped");
-});
-
-test("ISS-255: the handover still lets the REAL speaker self-name in their own turn", async () => {
-  // Ground truth from the same session: spk:2's turn self-names; the handover must not stop that.
-  const turns = [
-    turn("t205", "spk:0", "I invite our next speaker, Ruby, from Uni-Italia, to take us forward."),
-    turn("t206", "spk:2", "Thank you. Hello everyone. My name is Ruby. I work at Uni-Italia."),
-  ];
-  const { resolved } = await extractSpeakers(turns, replies([
-    { speakerRef: "spk:2", displayName: "Ruby", turnIds: ["t206"] },
-    { speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t205"] },
-  ]));
-  const ruby = resolved.find((r) => r.displayName === "Ruby");
-  assert.ok(ruby, "Ruby still resolves");
-  assert.equal(ruby?.speakerRef, "spk:2", "and via the SELF-NAMING label, never the moderator");
-});
-
-test("ISS-255: handover markers do not block genuine direct self-naming in the same turn", async () => {
-  // "call me" + handover marker both present: the self-naming branch must survive the gate.
-  const { resolved } = await extractSpeakers(
-    [turn("t1", "spk:0", "Before I invite our next speaker, I should say: call me Ruby.")],
-    replies([{ speakerRef: "spk:0", displayName: "Ruby", turnIds: ["t1"] }]),
-  );
-  assert.equal(resolved.length, 1, "self-naming overrides the handover refusal");
-});
-
-/**
  * ISS-104 cycle 4 — D-015, ENFORCED BY THE SUITE rather than by good intentions.
  *
  * D-015 exists because cycle 3 measured 12/12 against a 12-case corpus it authored that same
@@ -240,84 +160,6 @@ test("D-015: the corpus above is byte-faithful to ISS-104's own recorded reprodu
 });
 
 /**
- * ISS-104 cycle 4 — the CLOSED-CLASS ENUMERATION, one standing case per class.
- *
- * The chargeable half of ISS-104 was `not`, a negation particle; the six rounds before this one
- * each added the single word they were shown. Adding `not` alone would have been the seventh.
- * Measured instead: of 406 words enumerated from the closed classes of English, 277 were absent
- * from `NEVER_A_PERSON` and ALL 277 shipped a fabricated person — every one through this exact
- * `"I am <Word> sure about that."` shape, the one ISS-104 recorded for `Not`.
- *
- * What is pinned here is the CLASS, not the words: one representative per class, so a future
- * refactor that drops a class reddens a named test instead of quietly reopening a whole grammar
- * category. The full 406 are the audit in the manifest; these are the sentinels.
- */
-const CLOSED_CLASS_SENTINELS: [string, string[]][] = [
-  ["pronoun (reflexive/possessive)", ["Myself", "Theirs", "Itself"]],
-  ["pronoun (indefinite)", ["Anything", "Another", "Nothing"]],
-  ["interrogative / relative", ["Whom", "Whatever", "Which"]],
-  ["conjunction / conjunctive adverb", ["Because", "However", "Although"]],
-  ["preposition", ["Between", "Despite", "Towards", "Via"]],
-  ["auxiliary / modal", ["Should", "Might", "Been"]],
-  ["adverbial particle", ["Away", "Together", "Aside"]],
-  ["negator", ["Nowhere", "Nope"]],
-  ["degree / focusing adverb", ["Hardly", "Entirely", "Rather"]],
-  ["deictic / temporal adverb", ["Tonight", "Already", "Always"]],
-  ["numeral / ordinal", ["Seven", "Twelve", "Third"]],
-  ["greeting / farewell", ["Namaste", "Goodbye", "Cheers"]],
-  ["acknowledgement", ["Indeed", "Certainly", "Noted"]],
-  ["interjection / filler", ["Hmm", "Oops", "Wow"]],
-  ["evaluative response", ["Perfect", "Brilliant", "Awesome"]],
-  ["calendar term", ["Weekend", "Hour", "Year"]],
-];
-
-for (const [className, words] of CLOSED_CLASS_SENTINELS) {
-  for (const word of words) {
-    test(`ISS-104 closed class — ${className}: refuses ${JSON.stringify(word)}`, async () => {
-      const text = `I am ${word} sure about that.`;
-      const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([
-        { speakerRef: "spk:0", displayName: word, turnIds: ["t1"] },
-      ]));
-      assert.deepEqual(resolved, [], `${word} is a ${className}, not a person`);
-    });
-  }
-}
-
-/**
- * ISS-104 cycle 4 — the NAME-COLLISION COST, pinned in both directions so it stays visible.
- *
- * `will`, `can`, `dare`, `need`, `day` and `true` are closed-class words that are also attested
- * personal names, so a BARE single-token "Will" is now refused. That cost is deliberate — C12
- * makes these guards the only barrier against a fabricated identity, so refusal is the safe
- * direction of error, and `may`/`march`/`june`/`august` have carried the same cost as month names
- * since cycle 3. It is pinned rather than merely documented because a silent recall loss is
- * exactly what ISS-098 was.
- *
- * The bound on the cost is `isDiscourseOnly`'s ALL-tokens rule: multi-token names are untouched.
- * If a later cycle changes that to ANY-token, the second test here goes red immediately.
- */
-test("ISS-104 collision cost: a bare closed-class name is refused (accepted, documented)", async () => {
-  const { resolved } = await extractSpeakers([turn("t1", "spk:0", "My name is Will and I lead admissions.")], replies([
-    { speakerRef: "spk:0", displayName: "Will", turnIds: ["t1"] },
-  ]));
-  assert.deepEqual(resolved, [], "bare 'Will' is refused — the accepted cost of the modal class");
-});
-
-for (const [text, name] of [
-  ["My name is Will Smith and I lead admissions.", "Will Smith"],
-  ["Good morning everyone, Doris Day here.", "Doris Day"],
-  ["This is Can Ozturk from the Istanbul office.", "Can Ozturk"],
-] as [string, string][]) {
-  test(`ISS-104 collision bound: multi-token ${JSON.stringify(name)} still resolves`, async () => {
-    const { resolved } = await extractSpeakers([turn("t1", "spk:0", text)], replies([
-      { speakerRef: "spk:0", displayName: name, turnIds: ["t1"] },
-    ]));
-    assert.equal(resolved.length, 1, "isDiscourseOnly requires EVERY token — a real surname rescues the name");
-    assert.equal(resolved[0]?.displayName, name);
-  });
-}
-
-/**
  * ISS-104, D-015 -- the SAME 20 recorded reproductions replayed at the bare naming-cue predicate (shape guard, discourse
  * guard, cue), with no extractSpeakers allow-list in front of it. The rule must never ship a fabricated person by itself:
  * the relation rules call `hasNamingCueAt` directly, so a hole here is a hole there. Before this unit 19/20 refused here
@@ -328,31 +170,3 @@ for (const [text, name] of ISS_093_CORPUS) {
     assert.equal(looksLikeAName(name) && !isDiscourseOnly(name) && citesNameAsAnIntroduction(text, name), false);
   });
 }
-
-/**
- * ISS-110's two recorded probes: a legitimate self-introduction refused because `very` / `first` were not in a hand-listed
- * set. The rule is now a following-NOUN test, so an intensifier or a sequencing adverb is looked THROUGH, and a noun after
- * it still refuses -- the controls pin the refusal direction so the fix cannot become "allow anything".
- */
-for (const text of ["Ruby speaking very briefly.", "Ruby speaking first, then Nilesh."]) {
-  test(`ISS-110 recorded: still resolves ${JSON.stringify(text)}`, () => {
-    assert.equal(citesNameAsAnIntroduction(text, "Ruby"), true);
-  });
-}
-for (const [text, name] of [
-  ["English speaking students may apply.", "English"], ["English speaking first graders may apply.", "English"],
-  ["Ruby speaking very good students.", "Ruby"], ["Ruby speaking first students.", "Ruby"], ["Ruby speaking staff are here.", "Ruby"],
-] as [string, string][]) {
-  test(`ISS-110 control: a following noun still refuses ${JSON.stringify(text)}`, () => {
-    assert.equal(citesNameAsAnIntroduction(text, name), false, "`speaking` modifies the noun, so it is a participle, not a cue");
-  });
-}
-
-/** ISS-104: "X speaking" binds only when X opens its clause; the greeting-led and sentence-initial forms keep resolving. */
-for (const text of ["Hello everyone, Ruby speaking.", "Good morning. Ruby speaking from Pune.", "Thanks. Ruby speaking again."]) {
-  test(`ISS-104 clause-opening recall: ${JSON.stringify(text)}`, () => { assert.equal(citesNameAsAnIntroduction(text, "Ruby"), true); });
-}
-test("ISS-104: a name inside a larger construction does not bind through `speaking`", () => {
-  assert.equal(citesNameAsAnIntroduction("This is Ruby speaking on the panel.", "Ruby"), false, "single-token; the multi-token form is a separate cue");
-  assert.equal(citesNameAsAnIntroduction("This is Ruby Mehta speaking on the panel.", "Ruby Mehta"), true);
-});
