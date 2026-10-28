@@ -343,3 +343,44 @@ test("ISS-315 an unparseable ledger line is a G5 finding that the commit gate (g
     assert.deepEqual(filterByGate(audit(root), "G1,G4,G5").filter((f) => f.startsWith("G5")), gated);
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
+
+// G-B3 (tooling-honest-lint): a duplicate id across the ledger UNION (qa/issues.jsonl + qa/issues.*.jsonl)
+// must be a reported G6 finding naming the id and every file:line, not an uncaught throw that hides
+// every other duplicate (and breaks `--json`). readLedgerRows itself still throws by default.
+test("G6 a duplicate ledger id across the union is a finding naming the id and BOTH files, not a throw", () => {
+  const root = fixtureRoot();
+  try {
+    writeFileSync(join(root, "qa", "issues.jsonl"), `${JSON.stringify({ id: "ISS-100", status: "open" })}\n`);
+    writeFileSync(join(root, "qa", "issues.lane.jsonl"), `${JSON.stringify({ id: "ISS-100", status: "open" })}\n`);
+    const g6 = filterByGate(audit(root), "G6");
+    assert.equal(g6.length, 1, g6.join(" | "));
+    assert.match(g6[0], /^G6 Duplicate ledger id ISS-100/);
+    assert.ok(g6[0].includes(`${join(root, "qa", "issues.jsonl")}:1`), g6[0]);
+    assert.ok(g6[0].includes(`${join(root, "qa", "issues.lane.jsonl")}:1`), g6[0]);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("G6 reports EVERY duplicated id (and a 3-way collision lists all locations), and no narrowed --gate can hide it", () => {
+  const root = fixtureRoot();
+  try {
+    const row = (id) => JSON.stringify({ id, status: "open" });
+    writeFileSync(join(root, "qa", "issues.jsonl"), `${row("ISS-1")}\n${row("ISS-2")}\n${row("ISS-1")}\n`);
+    writeFileSync(join(root, "qa", "issues.a.jsonl"), `${row("ISS-1")}\n${row("ISS-2")}\n${row("ISS-A-3")}\n`);
+    const g6 = filterByGate(audit(root), "G6");
+    assert.equal(g6.length, 2, g6.join(" | "));
+    const one = g6.find((f) => /^G6 Duplicate ledger id ISS-1:/.test(f));
+    assert.equal((one.match(/issues[^ ]*\.jsonl:\d+/g) ?? []).length, 3, one);
+    assert.ok(g6.some((f) => /ISS-2\b/.test(f)));
+    assert.ok(!g6.some((f) => /ISS-A-3/.test(f)), "a unique shard id is not a duplicate");
+    // Any narrowed gate (even one that names only G1) still carries every G6 finding.
+    assert.deepEqual(filterByGate(audit(root), "G1").filter((f) => f.startsWith("G6")), g6);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("G6 is silent when ids are unique across the union", () => {
+  const root = fixtureRoot();
+  try {
+    writeFileSync(join(root, "qa", "issues.lane.jsonl"), `${JSON.stringify({ id: "ISS-LANE-001", status: "open" })}\n`);
+    assert.deepEqual(filterByGate(audit(root), "G6"), []);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

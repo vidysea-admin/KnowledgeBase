@@ -8,12 +8,13 @@
 Vidysea's own `/brain` (operating-brain `INDEX.md` → deep pages → raw transcripts), moved from
 markdown-on-disk into MongoDB with an API. It ingests session recordings, documents, and
 messages (starting with TOC community webinars, then WhatsApp expert groups), transcribes and
-attributes every fact to a speaker + timestamp, indexes them as a vectorless tree (structured
-sessions) plus a vector index (unstructured chat), and answers questions through a CRAG-style
+attributes every fact to a speaker + timestamp, indexes every source type vectorless (provenance-
+bound trees + keyword retrieval + graph, D-173), and answers questions through a CRAG-style
 router that trusts internal knowledge first and falls back to the web only when internal
 coverage is insufficient, always citing sources separately. Output = a queryable, cited
 knowledge base served via a Developer API, and ultimately an **AI virtual counsellor** built as
 a client of that API — with the long-range goal of beating top human counsellors head-to-head.
+Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (data model, API, flows).
 
 ## Directory tree (depth 2)
 
@@ -164,9 +165,8 @@ unilaterally; they resolve only through /checkpoint verdicts)
   eval-harness work (T-012) starts. Question bank sources fixed by D-007.
 - **Q4:** ~~Consent rule~~ **CLOSED by D-002 → D-008:** provided-first capture (H8); silent
   capture last resort; provenance frozen. Legal exposure recorded once in D-002 and accepted.
-- **Q5:** ~~Dedicated vector DB?~~ **CLOSED by D-003 → D-021:** brute-force exact cosine in
-  `packages/index/src/vector/` over `chunks`, behind `vectorSearchFn`. Atlas Vector Search is
-  unavailable (self-hosted mongod, no `+srv`), and at 1452×3072 an exhaustive scan is exact.
+- **Q5:** ~~Dedicated vector DB?~~ **CLOSED by D-021, then moot by D-173:** retrieval is
+  vectorless; the brute-force cosine retriever in `packages/index/src/vector/` is dormant.
 - **Q6 (gated purge level):** what "processed to a defined level" means before media purge —
   D-008 fixes the gate (all citing claims verified + retained ±15 s evidence clips); the
   concrete retention values and purge job design are T-026, not yet decided.
