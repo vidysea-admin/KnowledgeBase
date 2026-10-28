@@ -17,7 +17,7 @@ export interface SetupItem { id: string; title: string; status: ItemStatus; mean
 export type Probe<T> = { ok: true; value: T } | { ok: false; status: number };
 export interface SetupProbes {
   systemStatus: Probe<{ db: "ok" | "error" }>;
-  integrations: Probe<{ gemini: boolean; tavily: boolean; langfuse: boolean }>;
+  integrations: Probe<{ gemini: boolean; webSearch: boolean; langfuse: boolean }>;
   joinRules: Probe<JoinRulesView>;
   watchedSources: Probe<number>;
 }
@@ -69,7 +69,7 @@ export function buildItems(p: SetupProbes): SetupItem[] {
   });
 
   const ig = p.integrations;
-  const integ = (id: string, title: string, key: "gemini" | "tavily" | "langfuse", required: boolean, on: string, off: string, action: string): SetupItem => {
+  const integ = (id: string, title: string, key: "gemini" | "webSearch" | "langfuse", required: boolean, on: string, off: string, action: string): SetupItem => {
     if (!ig.ok) return { id, title, status: "unknown", means: why(ig, null), action: "Re-check once the API is reachable and up to date.", source: "GET /setup/status" };
     return ig.value[key]
       ? { id, title, status: "ok", means: on, action: "Nothing to do.", source: "GET /setup/status" }
@@ -82,7 +82,7 @@ export function buildItems(p: SetupProbes): SetupItem[] {
     action: "Confirm the provider and model configured for the intended job, then verify an authorized sample job. A configured key alone does not establish readiness.",
     source: "not tested by these setup endpoints",
   });
-  items.push(integ("tavily", "Tavily configured (optional)", "tavily", false, "A Tavily key is set (its value is never shown).", "No Tavily key: Ask cannot fall back to web search.", "Optional: set TAVILY_API_KEY in .env, restart the API, then Re-check."));
+  items.push(integ("web-search", "Gemini web search configured (optional)", "webSearch", false, "Ask can fall back to Gemini web search (Google Search grounding) using the Gemini key (its value is never shown). This does not verify quota or model access.", "No Gemini key: Ask cannot fall back to Gemini web search.", "Optional: set GEMINI_API_KEY in .env (optionally LKB_WEB_GROUNDING_MODEL), restart the API, then Re-check."));
   items.push(integ("langfuse", "Langfuse configured (optional)", "langfuse", false, "All Langfuse tracing variables are set (values never shown).", "Langfuse tracing is off.", "Optional: set LANGFUSE_BASE_URL, LANGFUSE_PUBLIC_KEY and LANGFUSE_SECRET_KEY in .env, restart the API, then Re-check."));
 
   const jr = p.joinRules;

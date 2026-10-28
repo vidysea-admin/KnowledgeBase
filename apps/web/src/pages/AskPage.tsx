@@ -64,7 +64,7 @@ export function AskPage(): React.ReactElement {
   const web = result?.sources.web ?? [];
   // ISS-274: the seam is now wired unconditionally (apps/api/src/production.ts), so
   // `web_used: false` no longer means "no fallback was configured" -- it can also mean "the
-  // fallback was reached and honestly failed" (e.g. no TAVILY_API_KEY yet). ask-v2.ts logs that
+  // fallback was reached and honestly failed" (e.g. no GEMINI_API_KEY yet). ask-v2.ts logs that
   // case as an `ask.web_fallback_unavailable` audit entry; without checking for it here, this
   // page would keep telling the person "no web fallback is configured" even once one is wired,
   // which is the exact "far from the DOM" UI regression this unit was told to watch for.

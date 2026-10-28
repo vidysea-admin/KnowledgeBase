@@ -26,7 +26,7 @@ test("all configured: exact shape, literal booleans, no secret text anywhere in 
     const res = await get(url, "good-ask-key");
     const text = await res.text();
     assert.equal(res.status, 200);
-    assert.deepEqual(JSON.parse(text), { configured: { gemini: true, tavily: true, langfuse: true } });
+    assert.deepEqual(JSON.parse(text), { configured: { gemini: true, webSearch: true, langfuse: true } });
     for (const v of Object.values(SECRETS)) assert.ok(!text.includes(v) && !JSON.stringify([...res.headers]).includes(v), `leaked ${v}`);
     assert.equal(res.headers.get("cache-control"), "private, no-store");
   });
@@ -34,10 +34,10 @@ test("all configured: exact shape, literal booleans, no secret text anywhere in 
 
 test("nothing configured: all false; blank/whitespace values count as not configured", async () => {
   await withEnv({}, async (url) => {
-    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, tavily: false, langfuse: false } });
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, webSearch: false, langfuse: false } });
   });
   await withEnv({ GEMINI_API_KEY: "   ", TAVILY_API_KEY: "" }, async (url) => {
-    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, tavily: false, langfuse: false } });
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, webSearch: false, langfuse: false } });
   });
 });
 

@@ -21,7 +21,7 @@ import { createMongoWhatsAppDeps } from "../whatsapp/store.js";
 import { createConfiguredWhatsAppOwnerResolver } from "../whatsapp/owner-config.js";
 import { realTransport } from "../ai-transport.js";
 import { createLlmScorer } from "../score.js";
-import { createTavilySearchFn } from "../ask/ask-web-fallback.js";
+import { createGeminiWebSearchFn } from "../ask/ask-web-fallback.js";
 import { indexSession, type BoundIndexer, type IndexSessionDeps } from "../indexing/session.js";
 import type { IndexCommittedHook } from "../indexing/types.js";
 import { composeGroundedPostProcessing, readGroundedJudgeCostLimit } from '../grounded-postprocessing/composition.js';
@@ -194,7 +194,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
   const capturePolicy = buildCapturePolicyIntegrations({root: fileURLToPath(new URL("../../../../", import.meta.url)), env: process.env});
   const { chains, providers, jobWrite } = routing;
 
-  const tavilySearchFn = createTavilySearchFn();
+  const tavilySearchFn = createGeminiWebSearchFn();
 
   const boundIndexer = buildIndexer(routing, options);
   const native = buildNativeProductionIntegrations(db);
@@ -264,11 +264,11 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
           (job) => routeComplete("evaluator", job, { chains, providers, write: jobWrite, tenantId: ROUTER_TENANT_ID }),
         ),
         treeSearchFn: treeSearch,
-        // ISS-010 / ISS-274: ALWAYS wired now. createTavilySearchFn() (ask-web-fallback.ts) no
-        // longer returns undefined when TAVILY_API_KEY is empty -- it returns a real function that
-        // throws TavilyUnavailableError, so every off-corpus question actually reaches the
-        // web-fallback seam (D-041 ruling 2) and ask-v2.ts's catch logs the honest
-        // "unavailable" degradation instead of the seam being silently absent from askDeps.
+        // ISS-010 / ISS-274 / D-202: ALWAYS wired. createGeminiWebSearchFn() (ask-web-fallback.ts)
+        // is Gemini + Google Search grounding on GEMINI_API_KEY (Tavily is no longer called). It never
+        // returns undefined: without a key it returns a function that throws TavilyUnavailableError, so
+        // every off-corpus question reaches the web-fallback seam (D-041 ruling 2) and the ask graph's
+        // catch logs the honest "unavailable" degradation. The dep keeps its name `tavilySearchFn`.
         tavilySearchFn,
         write: jobWrite,
       },
