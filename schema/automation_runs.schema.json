@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://automation_runs",
+  "title": "AutomationRuns",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/StoredAutomationDefinition"
+    },
+    {
+      "$ref": "#/$defs/StoredAutomationRun"
+    }
+  ],
+  "$defs": {
+    "StoredAutomationDefinition": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordType": {
+          "const": "definition"
+        },
+        "kind": {
+          "const": "application-readiness"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "updatedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "actor": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "configured",
+                  "submitted",
+                  "claimed",
+                  "heartbeat",
+                  "succeeded",
+                  "handler-failed",
+                  "handler-timeout",
+                  "lease-expired-retry",
+                  "lease-expired-exhausted",
+                  "reconciliation-required",
+                  "operator-retry",
+                  "operator-cancel",
+                  "operator-reconcile"
+                ]
+              }
+            },
+            "required": [
+              "at",
+              "actor",
+              "action"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "_id",
+        "tenantId",
+        "recordType",
+        "kind",
+        "version",
+        "maxAttempts",
+        "timeoutMs",
+        "updatedAt",
+        "history",
+        "enabled"
+      ],
+      "additionalProperties": false,
+      "title": "StoredAutomationDefinition"
+    },
+    "StoredAutomationRun": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "tenantId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recordType": {
+          "const": "run"
+        },
+        "kind": {
+          "const": "application-readiness"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "maxAttempts": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 30000
+        },
+        "updatedAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "at": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "actor": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+              },
+              "action": {
+                "type": "string",
+                "enum": [
+                  "configured",
+                  "submitted",
+                  "claimed",
+                  "heartbeat",
+                  "succeeded",
+                  "handler-failed",
+                  "handler-timeout",
+                  "lease-expired-retry",
+                  "lease-expired-exhausted",
+                  "reconciliation-required",
+                  "operator-retry",
+                  "operator-cancel",
+                  "operator-reconcile"
+                ]
+              }
+            },
+            "required": [
+              "at",
+              "actor",
+              "action"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1,
+          "maxItems": 100
+        },
+        "definitionId": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+        },
+        "identityDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "payloadDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "payload": {
+          "type": "object",
+          "properties": {
+            "applicationRef": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+            },
+            "requiredDocuments": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "transcript",
+                  "identity",
+                  "statement"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "availableDocuments": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "transcript",
+                  "identity",
+                  "statement"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 3,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "applicationRef",
+            "requiredDocuments",
+            "availableDocuments"
+          ],
+          "additionalProperties": false
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "queued",
+            "running",
+            "waiting-for-operator",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "createdAt": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "ownerToken": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "leaseUntil": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "incident": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "handler-failed",
+                "handler-timeout",
+                "lease-expired",
+                "retry-exhausted",
+                "reconciliation-required"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "ready": {
+                  "type": "boolean"
+                },
+                "missingDocuments": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "enum": [
+                      "transcript",
+                      "identity",
+                      "statement"
+                    ]
+                  },
+                  "minItems": 0,
+                  "maxItems": 3,
+                  "uniqueItems": true
+                }
+              },
+              "required": [
+                "ready",
+                "missingDocuments"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "_id",
+        "tenantId",
+        "recordType",
+        "kind",
+        "version",
+        "maxAttempts",
+        "timeoutMs",
+        "updatedAt",
+        "history",
+        "definitionId",
+        "identityDigest",
+        "payloadDigest",
+        "payload",
+        "status",
+        "createdAt",
+        "attempts",
+        "ownerToken",
+        "leaseUntil",
+        "incident",
+        "outcome"
+      ],
+      "additionalProperties": false,
+      "title": "StoredAutomationRun"
+    }
+  }
+}

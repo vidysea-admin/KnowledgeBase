@@ -1,0 +1,77 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-final-seal.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "702a6dadba5c33bf9104d2f5db4e98dc54c6f77f2f983eeb9c35fade83cf5457",
+    "bytes": 1940033
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "elapsed_s": 59.21900000000096,
+    "pinsUnchanged": true,
+    "pinCount": 1890,
+    "fixtureRemoved": true,
+    "environment": {
+      "LKB_NATIVE_TEST_FFMPEG": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffmpeg.exe",
+      "LKB_NATIVE_TEST_FFPROBE": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+      "LKB_NATIVE_TEST_BROWSER": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+      "LKB_NATIVE_TEST_PRIVATE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acl-fixtures\\042d7d9b-7ea8-4ad9-94ea-1269da3b5dbd"
+    },
+    "accounting": "shared maker/integration, not checker",
+    "wholeFloorPASS": false,
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "5f7935ac2ae22611920971f23c55c48e9196110debc2cd4a8571decb3de11330",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-acl-create-receipt.json",
+        "rawBytes": 469102,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "4cb784814e19488d109207c95929d9b464135425d59977b7345eb8f90d34e295"
+      },
+      "logSha256": "cf84fefe0b4bfe3efce58f1b913b773c0e18599b52bf31ebf170931e52a04828",
+      "label": "genuine-seal-isolated-acl-create",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-seal-isolated-acl-create.log"
+    },
+    {
+      "canonicalJsonSha256": "c959952a7610c096e1c2c164bc33cd94a0db40016c3c5c9eee5fbc63d14dff5f",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-acl-verify-receipt.json",
+        "rawBytes": 469317,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "b52f46b5f0fc4d90a67d3a3ae8bc970fa7b9ff8d323a5672c9a08a577b807fcc"
+      },
+      "logSha256": "c66b6389bccb32c81c29944a178c896b4f2a3af5a2450d6f49ea70c4a57ede20",
+      "label": "genuine-seal-isolated-acl-verify",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-seal-isolated-acl-verify.log"
+    },
+    {
+      "canonicalJsonSha256": "6701508a687ae76e938ecfd3164f419191ac6b8d75967da28a88f6741aa8e661",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-original-positive-receipt.json",
+        "rawBytes": 470283,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "73d25b74967eff0732debbfc4a0a0ee52d08ac73a9366a0eb9eb185886091ff2"
+      },
+      "logSha256": "aa5d1c83e8753d67b01216ed5d66d419d0738e3b1b9ada7181bfb8d0819ce84d",
+      "label": "genuine-seal-isolated-original-positive",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-seal-isolated-original-positive.log"
+    },
+    {
+      "canonicalJsonSha256": "cc85572cf706185524a088843f194ac93ed7bfc17cacd37986108cfa50ed785a",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-acl-cleanup-receipt.json",
+        "rawBytes": 469203,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "06c68423d9c52118cc65c381df7c3cbb4872f32cea10077325de8592f4f95855"
+      },
+      "logSha256": "47640531506a8e3be99534444a5584c8ea09dc9b33e170aca79593d1490cdbc9",
+      "label": "genuine-seal-isolated-acl-cleanup",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-seal-isolated-acl-cleanup.log"
+    }
+  ]
+}

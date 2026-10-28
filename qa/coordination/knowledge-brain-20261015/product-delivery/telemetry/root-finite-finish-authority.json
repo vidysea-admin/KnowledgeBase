@@ -1,0 +1,12 @@
+{
+  "authority": "Root coordinator explicit finite escalation, current conversation",
+  "scope": ["collections-bounded-choice-retention", "product-transcript-refresh-warning", "product-speaker-relation-workbench", "product-operations-evaluation", "product-setup-login-fencing"],
+  "admission": "Only after independent probe and mandatory broker receipts are complete; remeasure each fresh idle telemetry baseline; earlier lower bounds are not exact baselines.",
+  "additional_actual_total_tokens_max": 200000,
+  "review": {"actual_total_tokens_max": 80000, "active_seconds_max": 50, "allocated_output_tokens_max": 1200},
+  "finalization": {"manual_reserved_actual_total_tokens_max": 120000, "active_seconds_max": 30, "allocated_output_tokens_max": 800},
+  "actual_metric_guard": "legacy_unreserved; companion ledger/manual reserve, global total-metric fix not installed",
+  "operations_additional_constraint": "Cumulative actual total <= 850000 AND <= fresh idle baseline + 200000",
+  "historical_accounting": "Retain all prior actuals, lower-bound qualifiers, per-unit scope attestations, retries and 40s/1000 allocated-output preparation debits separately. No target10% success claim before final actual measurements.",
+  "on_exhaustion": "Checkpoint NEEDS_EXTRA_REVIEW, no automatic PASS, no extra scan. Final source pins, verdict write and canonical parser readback in one tool call."
+}

@@ -1,0 +1,43 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--input-type=module",
+    "-e",
+    "import {createRequire} from 'node:module';import {realpathSync} from 'node:fs';import {fileURLToPath} from 'node:url';const r=createRequire(new URL('./apps/api/src/score.ts',import.meta.url));console.log(JSON.stringify({node:process.execPath,version:process.version,tsx:realpathSync(fileURLToPath(import.meta.resolve('tsx/esm/api'))),ai:realpathSync(r.resolve('@lkb/ai'))}))"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7.json",
+    "sha256": "33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7",
+    "count": 544
+  },
+  "environmentWhitelistSha256": "09ffbb912f998a41e3232f4f306d963810eefe3e794b2f837d63b89656b57267",
+  "environmentNames": [
+    "KB_T022_PRIVATE_REVIEW_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "LKB_APPLICATION_FORMS_ENABLED",
+    "LKB_AUTOMATION_ENABLED",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN",
+    "NODE_OPTIONS",
+    "PYTHONDONTWRITEBYTECODE",
+    "T054_AUTHENTIC_INPUT_OPT_IN",
+    "TEMP",
+    "TMP",
+    "TSX_TSCONFIG_PATH"
+  ],
+  "beforeMatch": true,
+  "maxJobSeconds": 15,
+  "accounting": "SHARED INTEGRATION, not checker",
+  "pid": 32172,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.4850000000005821,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-node-preflight.log",
+    "sha256": "8b6892bfd19ef833344e44c6dc1f30d07d56dcd7c44661021c775b52a41362d3"
+  },
+  "counts": {}
+}

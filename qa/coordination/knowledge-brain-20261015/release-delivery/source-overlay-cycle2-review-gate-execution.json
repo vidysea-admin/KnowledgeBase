@@ -1,0 +1,12 @@
+{
+  "command": [
+    "C:\\Program Files\\Python312\\python.exe",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+    "assess",
+    "--input",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\release-delivery\\source-overlay-cycle2-review-gate-metrics.json"
+  ],
+  "exit_code": 0,
+  "assessment": "source-overlay-cycle2-review-gate-assess.txt",
+  "review_resumed": false
+}

@@ -1,0 +1,17 @@
+{
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts"
+  ],
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-t035-fake",
+  "pins": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "dfe3591e452f4f9c40427d41eaa334060ef37b986f943040ca3b97868535e1a5",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "65ef4e9cd36c6202af72e0f5d4bef35d6a3658f7f7fa1fac80a4f340d6182db7"
+  }
+}

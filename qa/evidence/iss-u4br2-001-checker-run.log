@@ -1,0 +1,43 @@
+✔ ISS-U4BR2-001: repeated health probes send 1 alerts per minute (5.6081ms)
+✔ ISS-U4BR2-001: repeated health probes send 3 alerts per minute (1.2608ms)
+✔ GET /health with no Authorization header returns 200 with a real report shape (178.9974ms)
+✔ GET /health reports 503, not 200, when the db is unhealthy (107.8787ms)
+✔ R2: a watcher whose heartbeat is older than the interval produces exactly one alert (1.6172ms)
+✔ R2: all-fresh heartbeats produce NO alert (the detector is not a blanket alarm) (0.5197ms)
+✔ R2: a source type with NO row at all alerts — absence is the failure mode, not health (0.5891ms)
+✔ R2: an entirely empty collection alerts once per expected source type, and no more (0.7816ms)
+✔ R2: the exact interval boundary is fresh, one millisecond past it is silent (1.1948ms)
+✔ R8: each tenant is read through its own scoped call, and one tenant's staleness never alerts as another's (1.2179ms)
+✔ R2: an unreadable heartbeat collection for one tenant does not stop the others or throw (0.8621ms)
+✔ R2: a throwing alert sink is swallowed — the probe must not die of its own notifier (0.6896ms)
+✔ R2: /health reports watchSilent as an aggregate count and names no tenant or source type (57.7427ms)
+✔ R2: /health with an all-fresh watcher set reports watchSilent: 0 (27.7887ms)
+✔ R2: when the db ping fails the detector does not run — every watcher would look silent for that one reason (23.042ms)
+✔ R2: two probes in a row do not accumulate watchSilent on a shared health report object (49.5557ms)
+✔ R2: with no watchSilence wired, /health behaves exactly as before U4b (no watchSilent field) (26.9424ms)
+✔ health.ts's local isStale agrees with scripts/watch/lib/heartbeat.mjs case for case (drift pin) (9.1327ms)
+✔ ISS-368: HTTP distinguishes unreadable watchers from readable fresh watchers without leaks (33.7259ms)
+✔ ISS-368: partial reads still alert only known silent tenants and report 503 (20.1476ms)
+✔ ISS-368: recovery uses fresh counts without mutating a cached health report (30.7093ms)
+✔ createTelegramAlertSink satisfies the AlertSink shape WatchSilenceDeps.notifyWatchSilent requires (2.3302ms)
+✔ missing token/chatId disables the sink, logs once, never sends (8.9791ms)
+✔ configured sink sends the watch-silent alert with tenant, sourceType and interval (3.7313ms)
+✔ a null lastHeartbeatAt is worded as 'no run has ever completed', not a stale timestamp (3.091ms)
+✔ matches meeting-bot's TelegramNotifier.notifyWatchSilent wording for the same inputs (disclosed duplication, kept in sync by this assertion) (3.5158ms)
+✔ a send failure is caught, redacted and logged — never thrown to the caller (3.1585ms)
+✔ notifyWatchSilent never returns a Promise the caller could await/throw on (0.5447ms)
+✔ default throttle suppresses repeated attempts until the exact 60-second boundary (2.282ms)
+✔ throttle is independent for each tenant/source tuple including delimiter-containing IDs (2.1078ms)
+✔ failed transport attempts remain throttled and later failures are still redacted (2.3443ms)
+✔ explicit throttle interval remains injectable for deterministic consumers (4.0239ms)
+✔ synchronous transport throws remain fire-and-forget, throttled and redacted (2.6724ms)
+✔ ledger reproduction 1 verbatim: detector twice, one stale drive, recording notify fake still sees two calls (9.089ms)
+✔ independent pending transport: reservation keeps repeated real detector probes isolated by tenant (1.8797ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4541.9917

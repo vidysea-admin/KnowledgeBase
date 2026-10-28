@@ -1,0 +1,19 @@
+{
+  "command": [
+    "C:\\Users\\product\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\3dd31cfff853001c\\bin\\node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=15000",
+    "--import",
+    "tsx",
+    "packages/core/src/alerts/alert-sink.test.ts",
+    "apps/api/src/routes/health-alert-sink.test.ts",
+    "apps/api/src/routes/health.test.ts",
+    "qa/evidence/iss-u4br2-001-checker.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "started": "2026-10-09T10:42:33.260410+00:00",
+  "ended": "2026-10-09T10:42:38.051565+00:00",
+  "duration_s": 4.79142669995781,
+  "exit_code": 0
+}

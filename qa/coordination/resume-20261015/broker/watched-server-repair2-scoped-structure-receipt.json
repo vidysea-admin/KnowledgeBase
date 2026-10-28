@@ -1,0 +1,33 @@
+{
+  "label": "watched-server-repair2-scoped-structure",
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "import {countLoc,loadConfig} from './scripts/lib/walk.mjs';import {check} from './scripts/lint-dirsize.mjs';const c=loadConfig(process.cwd()),names=['scripts/native-capture/server.ts','scripts/native-capture/server-watched.test.ts','scripts/webinar/scheduler/service.d.mts'];const rows=names.map(p=>{const n=countLoc(p),limit=p.endsWith('.test.ts')?c.loc.testMax:c.loc.max;return {path:p,nonblank:n,limit,ok:n<=limit}});c.roots=['scripts/native-capture','scripts/watched-sources','scripts/webinar/scheduler'];const directory=check(process.cwd(),c);console.log(JSON.stringify({rows,directory},null,2));process.exitCode=rows.some(r=>!r.ok)||directory.violations.length?1:0;"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "canonicalPins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\83d54f4a5669c216d3330a3a42472c2fe8ed806466807c65ae2a73a5cc0e2363.json",
+    "sha256": "83d54f4a5669c216d3330a3a42472c2fe8ed806466807c65ae2a73a5cc0e2363",
+    "count": 1688
+  },
+  "pinsBeforeMatch": true,
+  "runtime": {
+    "path": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+  },
+  "lockSha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "supervisorSha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+  "pid": 16832,
+  "exit": 0,
+  "treeClosed": true,
+  "pinsAfterMatch": true,
+  "drift": [],
+  "active_s": 0.8600000000005821,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-scoped-structure.log",
+    "sha256": "808f2113a74f553e77f94579526a89c3fd17fa678e0f78a440fa7938ebba712a"
+  },
+  "counts": {}
+}

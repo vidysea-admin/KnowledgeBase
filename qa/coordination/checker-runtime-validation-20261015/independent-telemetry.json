@@ -1,0 +1,42 @@
+{
+  "schema": "independent-telemetry/1",
+  "observed_at": "2026-10-15T19:35:17.641Z",
+  "agent_path": "/root/checker_runtime_independent",
+  "bounded_files": 30,
+  "matches": [
+    {
+      "path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T19-34-13-01a1410e-d22e-7bb2-bd23-56030f097c68.jsonl",
+      "identity": {
+        "thread_id": "01a1410e-d22e-7bb2-bd23-56030f097c68",
+        "parent_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+        "agent_path": "/root/checker_runtime_independent"
+      },
+      "usage_timestamp": "2026-10-15T19:34:46.634Z",
+      "lifecycle": {
+        "type": "task_complete",
+        "timestamp": "2026-10-15T19:34:46.667Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 133052,
+        "cached_input_tokens": 127360,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 828,
+        "reasoning_output_tokens": 99,
+        "total_tokens": 133880
+      },
+      "status": "known",
+      "reasons": []
+    }
+  ],
+  "admission_actual_total_limit": 51981,
+  "actual_total_tokens": 133880,
+  "actual_total_breach": true,
+  "excess_tokens": 81899,
+  "actual_active_seconds": null,
+  "phase_allocated_active_seconds": 180,
+  "time_mode": "BOOTSTRAP_REVIEW",
+  "time_ratio_verified": false,
+  "native_hard_total_token_cap_established": false,
+  "retry_authorized": false,
+  "accounting": "Cached input and reasoning output are included subsets, never added again; support overhead separate."
+}

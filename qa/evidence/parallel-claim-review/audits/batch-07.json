@@ -1,0 +1,357 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 7,
+  "entries": [
+    {
+      "index": 35,
+      "claimId": "2026-07-03-inside-the-uc-session-c01",
+      "inputHash": "b55e3d84d91303b0a7eb242f04985d0cd8c9d20a1313eb7af2641a0c001d335c",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original directly states 10 campuses and nine undergraduate campuses; current only asks for poll results and supports neither count. Same ID changed content, times 208–262 to 169–178, and stored speaker unknown to Amrita. One match per supplied reference/version, with no missing or duplicate matches. Artifact raw and normalized-LF hashes are preserved separately and not verified on disk. Human semantic gold and external truth remain open.",
+      "evidenceHashes": {
+        "inputHash": "b55e3d84d91303b0a7eb242f04985d0cd8c9d20a1313eb7af2641a0c001d335c",
+        "claimRecordSha256": "684f064045708562cb74d40baea148b7a9e3daff7d107f7901775088a9b9e66a",
+        "claimTextSha256": "c55aa77d7757c56cba82255c6d9edd5354d7065eaafb735d902e5351d6603fab",
+        "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t011",
+            "textSha256": "38f08da35d554f1efda9024097da8aad0fac6f9c5c1372a655bad57cfa25045c",
+            "textHashVerified": true,
+            "contextSha256": "a09a1a2e4c1d371e7b5fda2fe59696d1217832b9af2436c86042022d7c050113",
+            "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 208,
+            "tEnd": 262,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t011",
+            "textSha256": "9af853d40355d83168cf402b34ff5ad50e54710ee9e5f5418e27665c6a047fe7",
+            "textHashVerified": true,
+            "contextSha256": "d08384ded6d4645bcfe870895ece30d3af0230f29043f421099f8c710a646b80",
+            "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+            "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+            "revision": null,
+            "speakerRef": "Amrita",
+            "tStart": 169,
+            "tEnd": 178,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true,
+        "all": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 36,
+      "claimId": "2026-07-03-inside-the-uc-session-c02",
+      "inputHash": "f6cd006f9bb02609dde201431eb7e748eb2f418db3f05d973944494b2578f96c",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original directly states over 300,000 students across UC campuses; current only asks for poll results and gives no enrolment number. No claim about external truth or current enrolment is established; same ID content/timing/speaker changed. One match per supplied reference/version, with no missing or duplicate matches. Artifact raw and normalized-LF hashes are preserved separately and not verified on disk. Human semantic gold and external truth remain open.",
+      "evidenceHashes": {
+        "inputHash": "f6cd006f9bb02609dde201431eb7e748eb2f418db3f05d973944494b2578f96c",
+        "claimRecordSha256": "ba7f6c2ef9efb23ae0460f3972934f55d08eb06d0ecfdea70d98682f426ec83d",
+        "claimTextSha256": "240122e206d891acb4d6628098f744ff8ab9d5857f211d2136fee23a7009044b",
+        "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t011",
+            "textSha256": "38f08da35d554f1efda9024097da8aad0fac6f9c5c1372a655bad57cfa25045c",
+            "textHashVerified": true,
+            "contextSha256": "a09a1a2e4c1d371e7b5fda2fe59696d1217832b9af2436c86042022d7c050113",
+            "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 208,
+            "tEnd": 262,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t011",
+            "textSha256": "9af853d40355d83168cf402b34ff5ad50e54710ee9e5f5418e27665c6a047fe7",
+            "textHashVerified": true,
+            "contextSha256": "d08384ded6d4645bcfe870895ece30d3af0230f29043f421099f8c710a646b80",
+            "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+            "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+            "revision": null,
+            "speakerRef": "Amrita",
+            "tStart": 169,
+            "tEnd": 178,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true,
+        "all": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 37,
+      "claimId": "2026-07-03-inside-the-uc-session-c03",
+      "inputHash": "4c66a265f0aa6feb7d9498b061a78c2b3dcfd94af38e215067fb59cc94772ed9",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original directly calls the entire UC system test-blind/test-free and says no ACT/SAT review for admission; current is a Merced representative introduction without testing policy. Same ID content/timing/speaker changed; historical stored speaker is unknown. One match per supplied reference/version, with no missing or duplicate matches. Artifact raw and normalized-LF hashes are preserved separately and not verified on disk. Human semantic gold and external truth remain open.",
+      "evidenceHashes": {
+        "inputHash": "4c66a265f0aa6feb7d9498b061a78c2b3dcfd94af38e215067fb59cc94772ed9",
+        "claimRecordSha256": "f0f01373ff459c58167d13b802026fda951393a0ddaf9b676eca21741f72f81b",
+        "claimTextSha256": "cefb3958e970a13fabcee677b6ed931b07504536cad9517a4e18ba03ce87ea56",
+        "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t019",
+            "textSha256": "5b72e552dcc31b7dc41680e91b325f72add0be6ff0c828e09c98654dcae484a3",
+            "textHashVerified": true,
+            "contextSha256": "1246b1b490d42572398ff74a84d9e984839c37395ce82168ca8e077513fecf34",
+            "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2124,
+            "tEnd": 2533,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t019",
+            "textSha256": "b66572529d34567acf2e14bf42643a06dc211a7b295ffea5cae87ece5977c53a",
+            "textHashVerified": true,
+            "contextSha256": "95b3279bd1337124f6544202bfad4acdcd824c3b446250c32cb070c5d5fd8b86",
+            "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+            "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+            "revision": null,
+            "speakerRef": "Vaishnavi",
+            "tStart": 336,
+            "tEnd": 352,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true,
+        "all": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 38,
+      "claimId": "2026-07-03-inside-the-uc-session-c04",
+      "inputHash": "74e703bc740ca39ede6a5667093fc16f8611d0025c9d4244cd5238db24b35ac1",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports Riverside's GPA-based Academic Merit Scholarship maximum $89,100 over four years. Its separate UC-system statement about scholarships for international/out-of-state students does not explicitly bind that eligibility or the non-resident designation to this particular award. Current is a handover/agenda and supports no scholarship component. Same ID content/timing/speaker changed. One match per supplied reference/version, with no missing or duplicate matches. Artifact raw and normalized-LF hashes are preserved separately and not verified on disk. Human semantic gold and external truth remain open.",
+      "evidenceHashes": {
+        "inputHash": "74e703bc740ca39ede6a5667093fc16f8611d0025c9d4244cd5238db24b35ac1",
+        "claimRecordSha256": "53e64545462cb62840491f0d4b4ffea681f6428caba0325e4c2abea0403d586d",
+        "claimTextSha256": "32de9fbc325ae8e3a2446ea33b64e7cc4c04fc3d71e8b3da66ce3818b3782732",
+        "sourceBindingSha256": "4b3636653f9d1c0d1bc486f7caefd4a67aa21cad4357a6ba529f6fa58c4e4e42",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t016",
+            "textSha256": "4da089f68573b982ffd1d89c280eea6d6930ac49f442659ffb031791f7d9def1",
+            "textHashVerified": true,
+            "contextSha256": "9aa57e7060b6774d8f039de74d92c26d43cb464fdb36224d87e8259b2dd5d238",
+            "artifactSha256": "db2faf243a3402ad77506a455ff8ab21f6bbb32b6b2092bce5f2b16b35d89488",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 353,
+            "tEnd": 893,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-07-03-inside-the-uc-session",
+            "turnId": "2026-07-03-inside-the-uc-session-t016",
+            "textSha256": "1159fc6a68bf0cf19fb3e5969867f4ad88d3c8d06bd9606f1ee148ec47cd0259",
+            "textHashVerified": true,
+            "contextSha256": "a9ddf0b42f812163ac7e3df8a6c2554dc85cf438d858bcaab8783342f547203b",
+            "artifactSha256": "15b8e978c194cf176843f37d47f615b41c20b34f3059482932fee8c69564bb1d",
+            "normalizedLfSha256": "cea1ea840042fee4572f42f4406ba7a0e30b5a184c1f2dc9f101d961a0581858",
+            "revision": null,
+            "speakerRef": "Amrita",
+            "tStart": 262,
+            "tEnd": 297,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true,
+        "all": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 39,
+      "claimId": "2026-07-08-beyond-black-robes-law-careers-c01",
+      "inputHash": "ae7305211511a115718ac592b563fc5063e81e40a91969c5b6b434dfba768434",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original describes going abroad for a three-year program, returning to work in India and needing the Bar Council of India two-year bridge course; supports the claim in its law-career context. Current is a session wrap-up without bridge-course duration or requirements. Same ID content/timing/speaker changed; unknown historical speaker does not establish person identity or external legal truth. One match per supplied reference/version, with no missing or duplicate matches. Artifact raw and normalized-LF hashes are preserved separately and not verified on disk. Human semantic gold and external truth remain open.",
+      "evidenceHashes": {
+        "inputHash": "ae7305211511a115718ac592b563fc5063e81e40a91969c5b6b434dfba768434",
+        "claimRecordSha256": "857067072e9c70c29f2af8ec59c521e276e31abe56c17e657cd2654b1efcbe63",
+        "claimTextSha256": "a7191eda095f09aab79d3f4006cb283ed42ed50c966eaec325787506d4e94770",
+        "sourceBindingSha256": "24e56f8e12b9d2aa9d492448f91033467d0bc4826699a53ff01f506930b49abf",
+        "checks": {
+          "inputHashMatchesIndex": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true
+        },
+        "failures": [],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+            "textSha256": "184d3d65cb1ba8ea034547eaaf02a1cc7cc93902f5d3194d872afb3ef50f7ab5",
+            "textHashVerified": true,
+            "contextSha256": "22c476f208b3a53b349ad7bc47b6785cb4c259146655fd2acaa68009bde9d13c",
+            "artifactSha256": "a49e75b8e3be9c856f3b69b5197d6aa502b26eec93992188052a7cf91207fc19",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3133,
+            "tEnd": 3164,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+            "turnId": "2026-07-08-beyond-black-robes-law-careers-t095",
+            "textSha256": "b9bdc447e343473fa00dac285ecf971bb0672773d44bfc5a7698fb6d01fd9163",
+            "textHashVerified": true,
+            "contextSha256": "2c918ae30d96dd76c5f5fb05ed1cdc5722ef2eaf328e84f50c3c47ce0f2fff8d",
+            "artifactSha256": "d2688e1dcf2c0e41872d8dda4dc41f1e10191dc4e6ea4395cee25ac2de535511",
+            "normalizedLfSha256": "75d65d97c41f237fe7b75a440fa932ce2001c2e0f1a8acb3e8ea2365c78975b8",
+            "revision": null,
+            "speakerRef": "Anchal",
+            "tStart": 3547,
+            "tEnd": 3552,
+            "matchCount": 1,
+            "sameIdContentChanged": true
+          }
+        ]
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": false,
+        "current": true,
+        "all": false
+      },
+      "disagreements": [
+        {
+          "contextVersion": "original",
+          "auditorLabel": "entailed",
+          "reviewerLabel": "unsupported",
+          "auditorReason": "Original describes going abroad for a three-year program, returning to work in India and needing the Bar Council of India two-year bridge course; supports the claim in its law-career context. Current is a session wrap-up without bridge-course duration or requirements. Same ID content/timing/speaker changed; unknown historical speaker does not establish person identity or external legal truth.",
+          "reviewerReason": "The original quote supports a required two-year Bar Council of India bridge course for working in India after an abroad three-year program. It does not explicitly identify that program as a completed undergraduate law degree or establish the claim's blanket applicability to foreign undergraduate law graduates.",
+          "retainedForHumanAdjudication": true
+        }
+      ]
+    }
+  ]
+}

@@ -4,7 +4,64 @@
  * Run `pnpm gen:types` after changing the schema.
  */
 
+export type SessionIndexAttempt = {
+  version: 1;
+  generation: string;
+  sessionId: string;
+  sourceId: string;
+  turnDigest: string;
+  strict: boolean;
+  state: "running" | "complete" | "failed" | "uncertain";
+  phase: "preflight" | "writing";
+  startedAt: string;
+  finishedAt?: string;
+  turnCount: number;
+  manifest?: {
+    page: {
+      id: string;
+      digest: string;
+    };
+    /**
+     * @minItems 1
+     * @maxItems 20000
+     */
+    chunks: [
+      {
+        id: string;
+        digest: string;
+      },
+      ...{
+        id: string;
+        digest: string;
+      }[]
+    ];
+    /**
+     * @maxItems 20000
+     */
+    claims: {
+      id: string;
+      digest: string;
+    }[];
+    /**
+     * @maxItems 20000
+     */
+    preservedClaims: {
+      id: string;
+      digest: string;
+    }[];
+    treeRevision: number;
+    /**
+     * Retrieval publication mode; absence retains legacy vector semantics.
+     */
+    retrievalMode?: "vectorless" | "vector";
+  };
+};
+
 export interface Sessions {
+  /**
+   * Server-owned transaction fence; missing legacy value is initialized by an exact missing-field compare-and-increment. Never accepted from capture/request JSON.
+   */
+  nativePublicationRevision?: number;
   _id: string;
   tenantId: string;
   sourceId: string;
@@ -19,5 +76,6 @@ export interface Sessions {
     index: "pending" | "processing" | "done" | "failed";
     [k: string]: unknown;
   };
+  indexAttempt?: SessionIndexAttempt;
   [k: string]: unknown;
 }

@@ -1,0 +1,62 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "source-overlay-checker-preparation",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "tokens": 1000,
+        "active_s": 40
+      }
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 50,
+    "tokens": 1200,
+    "cost": null
+  },
+  "bootstrap_scope": "Source-overlay bounded independent check only; base 5c4cbade2d1a8aa4815de13d587db8de3b01cc4a plus dirty overlay, no candidate commit SHA. Inspect packet source-overlay-maker.md and attributed nine-fixture receipt; no repository sweep. Initial reviewer zero values mean no reviewer dispatched, not measured usage. Unknown maker usage remains null.",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "source-overlay/cycle0/01254F655D023E28D330A92BCE6FB004C82D1D5D60BC73D3D7AC30ED46A5CA46/94B83C92A3CCB68281F3AB0E1563410AF141558D86E50786ACBD5159D60F1F7E",
+  "escalation": null,
+  "authority": "Root explicitly granted staged120active_s/3000tokens",
+  "phase_plan": [
+    {
+      "kind": "review",
+      "active_s": 40,
+      "tokens": 1000
+    },
+    {
+      "kind": "review",
+      "active_s": 50,
+      "tokens": 1200
+    },
+    {
+      "kind": "finalization",
+      "active_s": 30,
+      "tokens": 800
+    }
+  ],
+  "candidate": {
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": null,
+    "identity_type": "dirty-overlay-two-file-pins",
+    "pins": [
+      "01254F655D023E28D330A92BCE6FB004C82D1D5D60BC73D3D7AC30ED46A5CA46",
+      "94B83C92A3CCB68281F3AB0E1563410AF141558D86E50786ACBD5159D60F1F7E"
+    ]
+  },
+  "packet": "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-maker.md",
+  "receipt": "qa/goal-vectorless-2026-10-15/verification-source-overlay-nine.json"
+}

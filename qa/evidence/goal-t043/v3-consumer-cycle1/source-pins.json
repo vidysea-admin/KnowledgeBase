@@ -1,0 +1,8 @@
+{
+  "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs": "9ea8a3b811b71035746f70fb32b56a12e2cab69f68c69f8cfffb7b5190ad4527",
+  "packages/meeting-bot/src/workspace/index-proof-fixture.mjs": "01498ea293641a4df82ab472a0acb8ab0c9fdbb9f08ce38682055756ede2a844",
+  "scripts/webinar/sync-session.mjs": "9896eff9e8fdc9e6298aca5cf751c708c45e8c24cfd2acf8b42acb96fd5a4012",
+  "packages/meeting-bot/src/capture/record-finalize.ts": "9996474dedf2628151a5941b9a353fbe934c59a19348f87fd5e6bc682d64e056",
+  "scripts/webinar/index-proof.mjs": "7e548f2c2f643d6d3f6afba6c2360aaf225a7b531b6dc7e2d0fb2439283843eb",
+  "packages/ingest/src/retention/production/private-summary.ts": "e78e427ab662036994c846b62f9b904334ffb7d1a8270956b40035b24af50181"
+}

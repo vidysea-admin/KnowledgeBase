@@ -136,7 +136,7 @@ Until then the delivery gate should be treated as **unreliable in both direction
 most common manifest form, and separately satisfiable by prose on its BROWSER predicate
 (`D:/ai_os/audits/2026-09-09-delivery-gate-browser-predicate.md`, H1).
 
-**Answered:** (pending)
+**Answered:** 2026-09-28 — AUTHORIZED. Umesh, as Approver, granted `**Approved-by:** Umesh` for `.claude/hooks/delivery-gate-stop.ps1` and `.claude/hooks/mc-sessionstart.ps1`, recorded as **D-043**, covering all three instances this gate names: commits `4a71633` and `e5402d6` are retroactively ratified, and the third ("this cycle") is covered as item 1 of that entry — the delivery-gate `Fix cycle` predicate plus the ISS-205 stripper clause. Ratification is not absolution: this file's account of how those commits landed stays exactly as written, which is the property the authorization rule exists to protect. `scripts/append_decision.ps1` and `.claude/settings.json` are explicitly NOT authorized by D-043 and still need their own entry. Asked and answered in chat (AskUserQuestion, this session).
 
 
 ---
@@ -162,3 +162,12 @@ the file is covered.
 | *(this cycle)* | ISS-205 clauses 2 and 3 — the erased-value sentinel, the `Fix cycle` sibling, and the unreadable-cycle default |
 
 Answering this gate should therefore cover **all three**, not the first alone.
+
+**Gate status:** ANSWERED — 2026-09-28, authorized by D-043 (Approved-by: Umesh); all three instances covered
+
+Answered: 2026-09-27T17:2x+05:30 — PROCESS CHOSEN, approval still pending — Umesh first-hand,
+AskUserQuestion in session 21132795: "Audit them, then I approve what stays". Sequence: run
+/aios-config-auditor over .claude/hooks/*, present each hook's behaviour + what changed against the
+last approved state, then Umesh approves the final set in ONE decision, which becomes the
+Approved-by entry. NOTE: this is not yet an approval of the current hooks — nothing is committed as
+authorized on the strength of this line. Covers ISS-189/190/200/201/219/220.

@@ -1,0 +1,66 @@
+{
+  "budget_debits": {
+    "active_s": {
+      "known_lower_bound": 40,
+      "value": 40
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 294849,
+      "value": 294849
+    }
+  },
+  "completion_reserve": {
+    "allocation": null,
+    "id": null,
+    "phase_kind": null,
+    "status": "legacy_unreserved"
+  },
+  "escalated": true,
+  "exceeded": [],
+  "limits": {
+    "active_s": 100,
+    "cost": null,
+    "tokens": 494849
+  },
+  "observed_at": "2026-10-15T12:03:06.640794+00:00",
+  "ratio_verified": false,
+  "ratios": {
+    "active_s": null,
+    "cost": null,
+    "tokens": 0.048716746804073084
+  },
+  "status": "BOOTSTRAP_REVIEW",
+  "target_missed": [],
+  "totals": {
+    "active_s": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 294849,
+      "value": 294849
+    }
+  },
+  "unknown": [
+    "active_s",
+    "cost"
+  ],
+  "execution": {
+    "exitCode": 0,
+    "wallTimeSeconds": 0.5086203,
+    "stdout": "{\"budget_debits\": {\"active_s\": {\"known_lower_bound\": 40, \"value\": 40}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 294849, \"value\": 294849}}, \"completion_reserve\": {\"allocation\": null, \"id\": null, \"phase_kind\": null, \"status\": \"legacy_unreserved\"}, \"escalated\": true, \"exceeded\": [], \"limits\": {\"active_s\": 100, \"cost\": null, \"tokens\": 494849}, \"observed_at\": \"2026-10-15T12:03:06.640794+00:00\", \"ratio_verified\": false, \"ratios\": {\"active_s\": null, \"cost\": null, \"tokens\": 0.048716746804073084}, \"status\": \"BOOTSTRAP_REVIEW\", \"target_missed\": [], \"totals\": {\"active_s\": {\"known_lower_bound\": 0, \"value\": null}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 294849, \"value\": 294849}}, \"unknown\": [\"active_s\", \"cost\"]}\r\n",
+    "helper": "C:/Users/product/.agents/skills/checker/scripts/review_budget.py"
+  },
+  "authority": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-root-authority-30-30.json",
+  "local_only": false,
+  "global_install_claim": false,
+  "no_reviewer_launched": true
+}

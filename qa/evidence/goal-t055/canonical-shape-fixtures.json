@@ -1,0 +1,27 @@
+{
+  "purpose": "Synthetic transport/schema-authoring fixtures only. These are not extracted live documents, authorized real members, human gold or runtime acceptance evidence.",
+  "documentValid": {
+    "_id": "tenant-a:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "tenantId": "tenant-a",
+    "sourceId": "tenant-a:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "version": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "title": "Synthetic admissions document",
+    "format": "pdf",
+    "pages": [{ "pageNumber": 1, "text": "Exact page quote." }, { "pageNumber": 2, "text": "" }],
+    "highlights": [{ "id": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "pageNumber": 1, "quote": "Exact page quote.", "text": "Exact page quote.", "verification": "unverified" }],
+    "createdAt": "2026-10-14T00:00:00.000Z"
+  },
+  "collectionValid": {
+    "_id": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "tenantId": "tenant-a",
+    "title": "Synthetic curated collection",
+    "members": [{ "kind": "document", "id": "tenant-a:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" }, { "kind": "speaker", "id": "synthetic-speaker-row-id" }],
+    "revision": 1,
+    "updatedAt": "2026-10-14T00:00:00.000Z"
+  },
+  "invalidMutations": {
+    "document": ["remove tenantId", "format=txt", "pages=[]", "pages[0].pageNumber=0", "highlight.quote=''", "highlight.verification=verified"],
+    "collection": ["remove tenantId", "revision=0", "member.kind=foreign", "title=''"]
+  },
+  "serviceOnlyCrossFieldChecks": ["sourceId equals _id and original-byte-derived version", "actual positive unique PDF page numbers", "highlight quote is literal on its exact page and text equals quote", "highlight id hashes document/version/page/quote", "collection members exist under the authenticated tenant", "revision compare-and-set and stable creation key"]
+}

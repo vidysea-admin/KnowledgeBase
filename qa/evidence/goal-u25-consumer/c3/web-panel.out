@@ -1,0 +1,18 @@
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.8 [39m[90mC:/Users/product/Desktop/KnowledgeBase-lanes/w16-u25web/apps/web[39m
+
+[90mstderr[2m | src/pages/sessions/decisions/SessionDecisionsPanel.test.tsx[2m > [22m[2mactual stored producer→mounted-route artifact reaches shared client and panel with every source link
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/pages/sessions/decisions/SessionDecisionsPanel.test.tsx [2m([22m[2m11 tests[22m[2m | [22m[33m1 skipped[39m[2m)[22m[33m 2690[2mms[22m[39m
+   [33m[2m✓[22m[39m actual stored producer→mounted-route artifact reaches shared client and panel with every source link [33m887[2mms[22m[39m
+   [33m[2m✓[22m[39m actual reachable SessionDetailPage renders the isolated stored-decision consumer [33m390[2mms[22m[39m
+   [33m[2m✓[22m[39m sessionId change hides old populated state immediately and cancels old callbacks [33m387[2mms[22m[39m
+   [33m[2m✓[22m[39m sessionVersion change hides old populated state immediately and cancels old callbacks [33m350[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m10 passed[39m[22m[2m | [22m[33m1 skipped[39m[90m (11)[39m
+[2m   Start at [22m 14:44:51
+[2m   Duration [22m 46.33s[2m (transform 35.68s, setup 1.48s, collect 36.28s, tests 2.69s, environment 2.94s, prepare 1.06s)[22m
+

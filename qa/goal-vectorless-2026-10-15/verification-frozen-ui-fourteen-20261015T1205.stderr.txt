@@ -1,0 +1,394 @@
+stderr | src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx > mounted speaker workbench consumes trusted source and submits a pending proposal with hashed evidence
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/setup-wizard/SetupWizardPage.test.tsx > Setup wizard: route and nav > App registers /setup and the sidebar links to it
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/operations/OperationsPage.test.tsx > real clients power triage, saved replay, back navigation and encoded Explorer actions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/operations/EvaluationFlywheelPanel.test.tsx > reads persisted failure and source receipt distinctly without automatic writes
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx > pending and accepted inventories are separate and absent capability grants no decisions
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/knowledge/CuratedCollections.test.tsx > saved server collection and member links survive reload; create uses member choice data
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/knowledge/CuratedCollections.test.tsx > saved server collection and member links survive reload; create uses member choice data
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+
+stderr | src/pages/knowledge/CuratedCollections.test.tsx > lost create response retries the same stable draft id instead of creating a duplicate
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+
+stderr | src/pages/knowledge/CuratedCollections.test.tsx > editing preserves saved members outside bounded choices unless explicitly removed (remove=false)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+
+stderr | src/pages/knowledge/CuratedCollections.test.tsx > editing preserves saved members outside bounded choices unless explicitly removed (remove=true)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+Warning: An update to CuratedCollections inside a test was not wrapped in act(...).
+
+When testing, code that causes React state updates should be wrapped into act(...):
+
+act(() => {
+  /* fire events that update state */
+});
+/* assert on the output */
+
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://reactjs.org/link/wrap-tests-with-act
+    at CuratedCollections (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\pages\knowledge\CuratedCollections.tsx:13:60)
+    at AuthProvider (C:\Users\product\Desktop\KnowledgeBase\apps\web\src\auth\AuthContext.tsx:21:25)
+    at Router (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1207:17)
+    at MemoryRouter (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\react-router@6.28.0_react@18.3.1\node_modules\react-router\dist\umd\react-router.development.js:1101:7)
+
+stderr | src/pages/answer-policy/TrustedHumanRefusalConsumption.test.tsx > authority-unavailable approval keeps the candidate pending and saved Ask history withheld
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+stderr | src/pages/operations/OperationsIntegration.test.tsx > actual protected App/sidebar consumes workspace and navigates to scoped Explorer
+⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/transcript-review/ReviewHistory.test.tsx > failed refresh exposes retry; successful refresh invokes canonical reload
+AssertionError: expected 'Loading review operation…' to contain 'Knowledge refresh complete'
+
+Expected: "Knowledge refresh complete"
+Received: "Loading review operation…"
+
+ ❯ src/pages/transcript-review/ReviewHistory.test.tsx:19:59
+     17|   render(<ReviewHistory apiKey="k" sessionId="s1" revision="r1" refres…
+     18|   fireEvent.click(screen.getByRole("button", { name: "Retry knowledge …
+     19|   expect((await screen.findByRole("status")).textContent).toContain("K…
+       |                                                           ^
+     20|   await waitFor(() => expect(reload).toHaveBeenCalledTimes(1)); expect…
+     21| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

@@ -1,0 +1,22 @@
+{
+  "files": [
+    {
+      "sha256": "35D55527C8DBFC717774E6FCA16187CDD3A6FC6973E13A6C77B4DBDA3A13E09D",
+      "path": "apps/api/src/composition/integrations/reviews.test.ts",
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\compile-repair-three\\apps__api__src__composition__integrations__reviews.test.ts.bytes"
+    },
+    {
+      "sha256": "99EA968EB1655FB27ABDCFE6FF8ACAB3EAC9548B85CB215EE46F75E21036EB16",
+      "path": "apps/api/src/composition/integrations/source-jobs.ts",
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\compile-repair-three\\apps__api__src__composition__integrations__source-jobs.ts.bytes"
+    },
+    {
+      "sha256": "10C3C31BE05475EB8B8033554C1F2DC2C6085C5D0036E32D41F4C95C3978D9AB",
+      "path": "apps/api/src/transcript-review/origin.test.ts",
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\compile-repair-three\\apps__api__src__transcript-review__origin.test.ts.bytes"
+    }
+  ],
+  "startUtc": "2026-10-15T11:14:21.0734869Z",
+  "tokensActual": null,
+  "startMonotonic": 269509790895
+}

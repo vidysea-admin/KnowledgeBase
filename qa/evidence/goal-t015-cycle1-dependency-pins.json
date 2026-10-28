@@ -1,0 +1,26 @@
+[
+  {
+    "path": "scripts/lib/transcript-provenance.mjs",
+    "sha256": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301"
+  },
+  {
+    "path": "scripts/lib/turn-timing.mjs",
+    "sha256": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e"
+  },
+  {
+    "path": "scripts/webinar/session-rows.mjs",
+    "sha256": "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053"
+  },
+  {
+    "path": "scripts/webinar/process-video.mjs",
+    "sha256": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7"
+  },
+  {
+    "path": "scripts/webinar/slides/slide-knowledge.mjs",
+    "sha256": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef"
+  },
+  {
+    "path": "scripts/webinar/vision/routed-vision.mjs",
+    "sha256": "522486beff669eaa8e49f2ec6d85cebaf0fba7ecd1578d80ca84a318a287acc5"
+  }
+]

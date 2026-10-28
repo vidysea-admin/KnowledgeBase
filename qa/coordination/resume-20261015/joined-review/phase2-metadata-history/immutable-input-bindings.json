@@ -1,0 +1,118 @@
+[
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\packet-fragment.md",
+    "sha256": "db5e9013be73fe601042a1c110356bd7a39a58efef38aaae70995e9c117652fe"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t037-approved-trust\\packet.md",
+    "sha256": "857222734c5cf2d2c5570fe38176de9c8b0428793528ad5d4e77df766fef074a"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\packet.md",
+    "sha256": "2daf41590618364c285f69ab0b6feeb0b460ae42bc2d538a51b1c76a23a5ca4c"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t037-t056-checkpoint.md",
+    "sha256": "d350ed1f23c672cf2da43a5a48d965a006a07be2f0640c2cb9ac5452daf81312"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\broker-request.json",
+    "sha256": "97513d6af3cd59dcb59ab7d9e7bdd46b317ba6db1142d9aef79e74f3e2f77bb0"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\candidate-pins.json",
+    "sha256": "cac209e982025a84527f9b84ac9a3187799ce0716256251f224b23bfbc926737"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\current-contract-bindings.json",
+    "sha256": "5c5ae29a7cb657de464f77ad5217e4891db5bc9ad74a718665f459e33041b82a"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\final-envelope-fragment.json",
+    "sha256": "a942bce6a2e801c60ff7c1393c5a70e9a988bd3ad3b198979218b360c25b3b01"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\final-envelope-status.json",
+    "sha256": "252138fe39d6dc71ab523b02e74b4ddc6a0710a65bb805a35a7f07e60fe58a10"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t013-voice-conversation\\final-environment.json",
+    "sha256": "0c4146ea9b9d0ae3fb4fb2aee619b6a3b439b0dc3409f5518a9565e0e5aa59aa"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t037-approved-trust\\before.json",
+    "sha256": "6d83fe153b18feb6c53b1f79bc843d2d8bde1dec99766296b58be95c4fff54f8"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t037-approved-trust\\broker-request.json",
+    "sha256": "75fa474b8f42782515df4a1f18b6215ca6dfd6bab671ea532aa30e5e968d3528"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t037-approved-trust\\managed-review-fragment.json",
+    "sha256": "df87baa49abb7a16c12ab980dbed400ca9ed1d3f743248d2c81c0f638f336a10"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t037-approved-trust\\phase-metrics.json",
+    "sha256": "74f1bd8b3f15a5c15640c81cdda8e6cf96090dcc3f6174ba609cea3b3c7673f8"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t037-approved-trust\\pins.json",
+    "sha256": "1d9436be18ee250daa44c13f24eb60341c7641f1caef6bdde1375519b1ed896b"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\before-pins.json",
+    "sha256": "3cfa39e06fa0127acbf7ceb84c81472b6f875aca8bce7c523170b37f4ce7aca6"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\broker-request.json",
+    "sha256": "c242c4f4997b481219c48c1c7a2dc05f5cad802ed55c1c4da498cac02f61a6ab"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\checkpoint.json",
+    "sha256": "0ca6540610b5f3436fbc02fbf73a68053b3d45392f85ea6b515a4a380079ed49"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\dependency-pins.json",
+    "sha256": "258d2b485c2cfe5afc07503aefb30835102e2cfdbbcbd6f049db5e12a16bf106"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\managed-review-fragment.json",
+    "sha256": "111a430327fb7b858fd1146fc5db0b2b57826e2c1ffcfe24a33f167d73688ae6"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\t056-direct-answer\\source-pins.json",
+    "sha256": "2a6e89c0d29bd6626cce9c7812844d6ebe0c98edcdbdb3f6abbfaaf6026051dd"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\independent-telemetry.json",
+    "sha256": "4b714eb1f662e780f8075585b21f32d6cc1322459f86a110e38e7e3a99f327d8"
+  },
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\SKILL.md",
+    "sha256": "956b28aada9f51a723de1027d5c86f11d4dc6927a55b80ba7c4a086d8849aa99"
+  },
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\references\\managed-review-v1.md",
+    "sha256": "c5eefa07d872c2fd7d7932f651eb147310b2c96c2797e2fc241cd20dbae62ee9"
+  },
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_contract.py",
+    "sha256": "c1bddb992c5d6d102cba9c2ff36e95c3449f99e2bd7ac6bf702ed1f0ef37b592"
+  },
+  {
+    "path": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+    "sha256": "7dbe2e8593abf570f54646259231607017fb0bac062ce4ae87e49b3c295fce43"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t013.md",
+    "sha256": "0c89198cc6de12462c8d352d94911cf0661747ae78c80f1a6f560581cc8f540c"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t037.md",
+    "sha256": "b0f8aa0387ab4d04957ab2cf7dd4f0ecac4addd994e3816db97e2d0ddb886bda"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t056.md",
+    "sha256": "c100da8c60316b12c910c85e02914ad335133c06741fe7f67a44213a533bb1e8"
+  }
+]

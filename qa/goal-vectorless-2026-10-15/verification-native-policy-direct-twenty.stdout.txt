@@ -1,0 +1,28 @@
+✔ actual Mongo evidence verifier accepts native document/message bindings using fourth resolver and no audio reads (4.0121ms)
+✔ actual cached release verifier rereads current epoch/revision and withdrawal (5.8531ms)
+✔ mixed and forged native envelopes fail closed before authority or legacy DB reads (4.5239ms)
+✔ native binding requires exact joined excerpt, original fingerprint and current resolver capability (1.4244ms)
+✔ native authority infrastructure errors cannot release a cached binding (1.7288ms)
+✔ existing transcript verifier retains scoped turn/overlay checks and optional eligibility callback (2.4136ms)
+✔ web freshness remains supplied by the existing trusted web verifier (1.4044ms)
+✔ policy revisions are immutable detached values and preserve their owner (2.7295ms)
+✔ invalid versions and identities cannot form a policy (0.5513ms)
+✔ tenant mismatch refuses before observing answer or source content (0.9481ms)
+✔ grounded internal answers allow with separate counts and unchanged source data (2.2038ms)
+✔ internal-only refuses mixed and web-only answers without rewriting their text (0.4785ms)
+✔ web-enabled mode allows covered fallback and keeps source classes distinct (0.464ms)
+✔ insufficiency, missing session provenance and unsafe web provenance require review (0.6487ms)
+✔ malformed, empty, source-free and inconsistent results fail closed (0.3805ms)
+✔ existing answer output is consumed without another provider call or lost provenance (0.8976ms)
+✔ canonical native document and message provenance allow without fabricated session or audio fields (1.7466ms)
+✔ malformed or mismatched native provenance and within-source legacy mixtures require review (1.4623ms)
+✔ distinct authorized document, message and transcript sources coexist in one covered answer (0.5419ms)
+✔ native provenance does not relax coverage, internal-only web rules or tenant checks (0.569ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1622.2674

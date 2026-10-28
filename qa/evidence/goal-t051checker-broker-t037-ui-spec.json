@@ -1,0 +1,27 @@
+{
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/join-rules/RegistrationPolicyPanel.test.tsx",
+    "src/pages/join-rules/JoinRulesPage.test.tsx",
+    "--maxWorkers=1",
+    "--minWorkers=1"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase/apps/web",
+  "pins": {
+    "apps/api/src/join-rules/deps.ts": "d94290392bef332c38bcad2cb525f6a89c30640c1cd46b77eea32df79038c939",
+    "apps/api/src/join-rules/router.ts": "945e23d360913e1b25f598522a6491a9a9aa63c5647ec4b6a5bc54361a3ebd66",
+    "apps/web/src/pages/join-rules/JoinRulesPage.tsx": "d4ff683fda777ffbdd6aeda3be960981424f1dcfcc695169720c798687ab442c",
+    "scripts/webinar/join-rules-host.ts": "6153cd913d383194b5258e268636e31eda79a6fbf37dbf17c87c53339aebd6c8",
+    "packages/meeting-bot/src/calendar/join-rules/registration-policy.ts": "ef8199ebd050b76000321b27a5bbc6ced1275e1b47d367476a6664e0c3b44051",
+    "packages/meeting-bot/src/calendar/join-rules/registration-policy-store.ts": "f5d04ce65cecc26ddf4bdc6c72d8971852a150ab30eba6aeab5bdd5c42143e3c",
+    "packages/meeting-bot/src/calendar/join-rules/registration-policy.test.ts": "164fe32bee986140421cd3420320a46810b429fec48457f0803381d82a86c542",
+    "apps/api/src/join-rules/registration-policy-router.ts": "b4c0a40a41ce76005b5c5cce1ec34c41a65ac01125bce501ef49e6e6444a9761",
+    "apps/web/src/pages/join-rules/RegistrationPolicyPanel.tsx": "9eead17d8197fd23caff17ab1b0a91ad37a9f77f99e8c146de53d965c03e60f2",
+    "apps/web/src/pages/join-rules/RegistrationPolicyPanel.test.tsx": "bd79a567410b40d767cd21aa76c4871b225268a00f24e5cb3351c3b92c367f25",
+    "scripts/webinar/registration-policy-host.ts": "ab06553cb94627a7e91c5908fb2e21c8fde8403228c4d0867d60d3e47946af7e",
+    "scripts/webinar/registration-policy-host.test.ts": "7f3825bc5cee84d13be418572f331b86ce953e2be511bd4a013f6cdfcf24deb0"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/evidence/goal-t051checker-broker-t037-ui"
+}

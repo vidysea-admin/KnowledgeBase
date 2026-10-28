@@ -1,0 +1,72 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import type { Db } from "mongodb";
+import { sourceQuotes } from "@lkb/ask";
+import { planTranscriptReview, ReviewPlanningError, type ReviewTurn } from "./planner.js";
+import { readEffectiveTurns } from "./effective-reader.js";
+import { loadReviewHistory } from "./service.js";
+import { createMongoReviewStore, headId, type ReviewHead } from "./store.js";
+import { createSourceHydrator } from "../ask/source-context.js";
+
+const tenantId = "tenant-a", sessionId = "synthetic-slide", revision = "base-synthetic";
+const prefixes = ["[Screen OCR; unverified]", "[Visual observation; unverified]"];
+const trusted = { tenantId, sessionId, actorRef: "user:synthetic-reviewer", reviewedAt: "2026-10-14T22:30:00Z" };
+const original = (prefix = prefixes[0]!): ReviewTurn => ({ _id: "screen-turn", tenantId, sessionId, speakerRef: "screen", speakerLabel: "Screen",
+  tStart: 2, tEnd: 6, text: `${prefix} SLIDE_ONLY_1200 fee`, screenEvidence: { frameId: "synthetic-frame", file: "synthetic/frame.jpg", hash: "a".repeat(64), tStart: 2 } });
+type Row = Record<string, unknown>;
+function fixture(turn: ReviewTurn, head?: ReviewHead) {
+  const tables: Record<string, Row[]> = { turns: [{ ...turn }], transcript_reviews: head ? [{ ...head }] : [], transcript_review_revisions: [],
+    sessions: [{ _id: sessionId, tenantId, sourceId: "synthetic-source" }],
+    sources: [{ _id: "synthetic-source", tenantId, kind: "recording", path: "synthetic.webm", consent: { given: true } }],
+    whatsapp_candidates: [], claims: [], chunks: [] };
+  const select = (name: string, filter: Row) => {
+    assert.equal(filter.tenantId, tenantId); assert.ok(Object.hasOwn(tables, name));
+    return structuredClone(tables[name]!.filter((row) => Object.entries(filter).every(([key, wanted]) => wanted && typeof wanted === "object" && "$in" in wanted
+      ? (wanted.$in as unknown[]).includes(row[key]) : row[key] === wanted)));
+  };
+  const db = { collection(name: string) { return { find: (filter: Row) => ({ toArray: async () => select(name, filter) }),
+    findOne: async (filter: Row) => select(name, filter)[0] ?? null }; } } as unknown as Db;
+  return { db, tables };
+}
+const node = { node_id: `tenant:${tenantId}/session:${sessionId}`, title: "Synthetic slide", level: "session" as const, summary: "", evidence: { sessionRef: sessionId }, children: [] };
+function headFor(turn: ReviewTurn, text: string, speakerRef = "screen"): ReviewHead {
+  return { _id: headId(tenantId, sessionId), tenantId, sessionId, revision: "synthetic-overlay", parentRevision: revision,
+    committedAt: trusted.reviewedAt, overlay: [{ turnId: turn._id, text, speakerRef, speakerLabel: speakerRef === "screen" ? "Screen" : "Alice" }],
+    audit: { ...trusted, reason: "Synthetic review", changes: [{ turnId: turn._id, before: { text: turn.text, speakerRef: turn.speakerRef }, after: { text, speakerRef } }] },
+    refresh: { status: "pending", revision: "synthetic-overlay", targets: ["claims", "session-page", "chunks", "tree", "graph"], completed: [] } };
+}
+
+test("planner refuses visual-to-human mapping and OCR/visual marker removal without changing originals", () => {
+  for (const prefix of prefixes) {
+    const turn = original(prefix), snapshot = { tenantId, sessionId, revision, turns: [turn] }, before = structuredClone(turn);
+    for (const request of [
+      { expectedRevision: revision, reason: "Synthetic probe", corrections: [], mapping: { turnIds: [turn._id], speakerRef: "person:alice", speakerLabel: "Alice" } },
+      { expectedRevision: revision, reason: "Synthetic probe", corrections: [{ turnId: turn._id, text: "SLIDE_ONLY_1400 fee" }] },
+    ]) assert.throws(() => planTranscriptReview(snapshot, request, trusted), (error: unknown) => error instanceof ReviewPlanningError && error.code === "invalid");
+    assert.deepEqual(turn, before);
+  }
+});
+test("bounded OCR correction passes real planner, effective reader and source hydrator with immutable visual attribution", async () => {
+  const turn = original(), before = structuredClone(turn), text = `${prefixes[0]} SLIDE_ONLY_1400 corrected fee`;
+  const plan = planTranscriptReview({ tenantId, sessionId, revision, turns: [turn] },
+    { expectedRevision: revision, reason: "Synthetic OCR correction", corrections: [{ turnId: turn._id, text }] }, trusted);
+  const head = headFor(turn, plan.nextTurns[0]!.text); head.revision = plan.nextRevision;
+  const h = fixture(turn, head), [effective] = await readEffectiveTurns(h.db, tenantId, [turn], sessionId);
+  assert.equal(effective!.speakerRef, "screen"); assert.equal(effective!.text, text); assert.deepEqual(effective!.screenEvidence, turn.screenEvidence);
+  assert.equal(effective!.tStart, 2); assert.equal(effective!.tEnd, 6);
+  const hydrated = await createSourceHydrator(tenantId, { db: h.db })("SLIDE_ONLY_1400", [node]);
+  const quote = hydrated.nodes.flatMap(sourceQuotes).find((item) => item.turnId === turn._id);
+  assert.ok(quote); assert.equal(quote.origin, "screen-ocr-unverified"); assert.equal(quote.speakerRef, "screen");
+  assert.deepEqual(turn, before); assert.deepEqual(h.tables.turns, [{ ...before }]);
+});
+test("legacy human-mapped or origin-stripped overlay fails actual reader and hydrator while immutable audit remains accessible", async () => {
+  const turn = original();
+  for (const [text, speaker] of [["SLIDE_ONLY_1400 corrected fee", "person:alice"], [`${prefixes[0]} SLIDE_ONLY_1400 fee`, "person:alice"], ["SLIDE_ONLY_1400 fee", "screen"]]) {
+    const h = fixture(turn, headFor(turn, text!, speaker!));
+    await assert.rejects(readEffectiveTurns(h.db, tenantId, [turn], sessionId), /Screen review origin.*immutable source/);
+    await assert.rejects(createSourceHydrator(tenantId, { db: h.db })("SLIDE_ONLY_1400", [node]), /Screen review origin.*immutable source/);
+    const history = await loadReviewHistory(createMongoReviewStore(h.db), tenantId, sessionId);
+    assert.equal(history.length, 1); assert.equal(history[0]!.changes[0]!.after.text, text);
+    assert.deepEqual(h.tables.turns, [{ ...turn }]);
+  }
+});

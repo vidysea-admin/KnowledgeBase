@@ -38,5 +38,28 @@ export interface EvalRuns {
    */
   credibility: "internal" | "independent-human" | "calibrated-llm";
   createdAt: string;
+  flywheel?: {
+    version: 1;
+    originalEvalRunId: string;
+    gapId: string;
+    inputFingerprint: string;
+    requestId: string;
+    index: {
+      sourceId: string;
+      sessionId: string;
+      sourceDigest: string;
+      transcriptDigest: string;
+      turnCount: number;
+      /**
+       * @minItems 1
+       */
+      turnIds: [string, ...string[]];
+      generation: string;
+      treeDigest: string;
+      chunksDigest: string;
+      completedAt: string;
+    };
+    comparison: "needs-review";
+  };
   [k: string]: unknown;
 }

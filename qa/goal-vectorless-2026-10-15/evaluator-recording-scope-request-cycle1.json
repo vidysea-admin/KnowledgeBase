@@ -1,0 +1,84 @@
+{
+  "format": "bounded-broker-request-v1",
+  "status": "STAGED_NOT_EXECUTED",
+  "unit": "vectorless-production-evaluation",
+  "cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "candidateIdentityKind": "SHA256 of ordered evaluator source/test path+SHA256 entries, not whole-checkout equivalence",
+  "candidateSha256": "40852e5ea0cec9550f3600fe9bf7e6992aa1a5db96f30a6d4d837467d8629d65",
+  "executeAfterFinalFixFreeze": true,
+  "executionAuthorizedNow": false,
+  "dispatchGate": {
+    "authority": "Root approval relayed by quality_delivery_coordinator; stage only until named finite fixes freeze",
+    "requiredFrozenFixes": ["native hydrator source-identity fix", "HTTP vector-boundary fix"],
+    "freezeProof": "At dispatch, root/central supplies exact named-fix files, final raw-byte hashes and ownership freeze confirmation. Do not wait for unrelated whole-checkout work.",
+    "forbidDispatchBeforeFreeze": true,
+    "abortOnEvaluatorSourcePairMismatch": true
+  },
+  "expectedEvaluatorPins": [
+    {"path": "scripts/eval/vectorless-production-eval.mjs", "sha256": "5646b89f254a93f7d603ce8d6de7042c8b295a2babb0dd9c2d7d8f3b81f80915"},
+    {"path": "scripts/eval/vectorless-production-eval.test.mjs", "sha256": "a8c47e99a1961ab0eb2ee9963687ff0b0063dc5ff6961cf3cbb3ee435027fe33"}
+  ],
+  "runtimeFingerprint": {
+    "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "previousObservedVersion": "v24.19.0",
+    "captureAtDispatch": ["actual executable and version", "pnpm lock hash", "package export/alias resolution", "actual resolved transitive source/runtime import closure", "relevant public shared source pins", "named finite-fix freeze proof"],
+    "captureBeforeAndAfterEachCommand": true,
+    "requireZeroScopedRawByteDrift": true,
+    "historical215PinsAreNotFinalExpectedClosure": true,
+    "unresolvedImportOrUnclassifiedRelevantDrift": "HOLD; do not infer type-only or whole-candidate equivalence"
+  },
+  "commands": [
+    {
+      "id": "two-recording-visibility-citation-nodes",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "--test-isolation=none",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern",
+        "^(actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained|source drift/forged citation offsets fail through actual hydration validation)$",
+        "scripts/eval/vectorless-production-eval.test.mjs"
+      ],
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+      "outerTimeoutMs": 45000,
+      "requiredSelectedPasses": 2,
+      "expectedOtherNodes": "Nine filtered nodes are SKIP, not fresh PASS; do not repeat all eleven.",
+      "coverage": "Actual production graph over invented recording fixtures: correct and ambiguous paths, current recording visibility, exact cited quote/session, invalid forged quote-offset refusal. Import-only branches are not behavioral coverage."
+    },
+    {
+      "id": "current92-input-inspection",
+      "after": "two-recording-visibility-citation-nodes exit0 with both selected nodes PASS and zero scoped drift",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "scripts/eval/vectorless-production-eval.mjs",
+        "--inspect"
+      ],
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+      "outerTimeoutMs": 20000,
+      "coverage": "Authorized read-only real local input inspection. Print only question/candidate counts, current corpus hash and liveDispatch=false. No corpus text copy, provider or DB access."
+    }
+  ],
+  "historicalEvidenceDisposition": {
+    "retain": ["verification-evaluator-eleven.json", "verification-evaluator-current-inspect.json", "all older HOLD/verdict/debit/overrun records"],
+    "observedDrift": [
+      {"path": "packages/index/src/graph/authorized-expansion.ts", "classification": "Imported closure dependency; no direct graph-expansion call in these recording fixtures. Owner type-only claim still requires raw diff proof."},
+      {"path": "apps/api/src/visibility/knowledge.ts", "classification": "SEMANTIC drift; two selected recording/citation tests exercise relevant recording read behavior."},
+      {"path": "apps/api/src/native-evidence/message-publication.ts", "classification": "Imported branch, not message-publication behavioral coverage. Owner current79-green WhatsApp evidence needs exact current-pin validation if reused."}
+    ],
+    "separateNativeEvidence": "Expanded selector twelve had eleven passing and one legacy HTTP failure with original exit1 retained. Root permits explicit per-case current-pin reuse only; never relabel the whole command green. Current positive native binder waits for its source-identity fix and owner-selected affected native tests; this request does not run or certify them."
+  },
+  "bounds": {
+    "localCpuCommandsSerial": true,
+    "noProviderOrPaidCalls": true,
+    "noDatabaseOrBrowser": true,
+    "noEnvironmentCredentialReads": true,
+    "noCorpusCopyToQa": true,
+    "noFullElevenRerun": true,
+    "noHelperAdmissionOrReviewerDispatch": true,
+    "noHumanLabelsOrThresholdChanges": true
+  },
+  "receiptsRequired": "Immutable exact argv/exit/full stdout/stderr, own command elapsed and separately measured overhead, actual before/after scoped pins, selected PASS/SKIP counts, current inspect counts/hash, and finite-fix freeze authority. Do not stamp stale historical pins as current.",
+  "resultDisposition": "Metadata evidence refresh only. Independent review/full92 paid execution/human quality acceptance remain separate gates."
+}

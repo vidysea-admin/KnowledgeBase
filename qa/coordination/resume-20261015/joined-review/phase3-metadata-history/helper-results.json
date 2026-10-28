@@ -1,0 +1,30 @@
+[
+  {
+    "phase": "validate",
+    "argv": [
+      "C:\\Program Files\\Python312\\python.exe",
+      "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+      "validate",
+      "--input",
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\managed-review-input.json"
+    ],
+    "own_exit": 0,
+    "input_sha256": "0bb6fc0d105f664685990e2ceed8f7e08af091429d897c5f88d62556b88ca5cd",
+    "stdout": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\validate-stdout.log",
+    "stderr": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\validate-stderr.log"
+  },
+  {
+    "phase": "assess",
+    "argv": [
+      "C:\\Program Files\\Python312\\python.exe",
+      "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+      "assess",
+      "--input",
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\metrics.json"
+    ],
+    "own_exit": 0,
+    "input_sha256": "8dc0a60a3ae7422c8a1a005bee22d14244ce6a1c4bc02bbd43946fed4ea0ffc1",
+    "stdout": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\assess-stdout.log",
+    "stderr": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\joined-review\\assess-stderr.log"
+  }
+]

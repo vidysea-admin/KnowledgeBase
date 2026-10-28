@@ -1,0 +1,27 @@
+[
+  {
+    "path": "packages/db/src/lib/native-publication.ts",
+    "sha256": "1EA1DEBF845EFF86F4F170A8DBAECDBA7E97B44B42D74472D411386262A2FCDB",
+    "lines": 140
+  },
+  {
+    "path": "packages/db/src/index.ts",
+    "sha256": "2FA3D1AA5B4EFACBFE9F4B33F8F211FB464D003285EEA5C35E24531EF3572A32",
+    "lines": 36
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.ts",
+    "sha256": "7C74C981C49C740D454A831A246B09C87C753DC7A9D46A962F50F53FD8E67A8B",
+    "lines": 175
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "sha256": "5058A9DBAA4A780C521CF43FA90EBA5224B266B703D06A4146CC4D7C82B4012A",
+    "lines": 289
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "sha256": "C5AC29311C4FE2866CD679821AF2A26F360A45F868A733A8620FBF0847915920",
+    "lines": 69
+  }
+]

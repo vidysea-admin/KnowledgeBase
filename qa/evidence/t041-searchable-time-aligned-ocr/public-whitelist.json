@@ -1,0 +1,33 @@
+{
+  "ownedSourceAndTests": [
+    "scripts/webinar/process-video.mjs",
+    "scripts/webinar/process-video.test.mjs",
+    "scripts/webinar/slides/slide-knowledge.mjs",
+    "scripts/webinar/slides/slide-knowledge.test.mjs"
+  ],
+  "selectedPublicQa": [
+    "qa/contracts/goal-T041.md",
+    "qa/manifests/t041-searchable-time-aligned-ocr.md",
+    "qa/packets/t041-searchable-time-aligned-ocr.md",
+    "qa/evidence/t041-searchable-time-aligned-ocr/applicability-20261015.json",
+    "qa/evidence/t041-searchable-time-aligned-ocr/public-whitelist.json"
+  ],
+  "requiredSyntheticFloor": [
+    "scripts/webinar/process-video-slides.test.mjs",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/span-probe.mjs",
+    "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs"
+  ],
+  "preservedSyntheticRedReceipt": [
+    "qa/evidence/goal-t051checker-broker-t041-maker.json",
+    "qa/evidence/goal-t051checker-broker-t041-maker.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t041-maker.stderr.txt"
+  ],
+  "currentSyntheticGreenReceipt": [
+    "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.receipt.json",
+    "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.stdout.txt",
+    "qa/evidence/t041-searchable-time-aligned-ocr/maker-cycle1-current-20261014T234324Z.stderr.txt"
+  ],
+  "currentVerdict": [
+    "qa/verdicts/t041-searchable-time-aligned-ocr.md"
+  ]
+}

@@ -1,0 +1,184 @@
+"""T-042 / D-160: active-speaker tile capture. Static HTML fixtures, fake driver and clock, no browser."""
+import json
+import os
+import pathlib
+import sys
+from types import SimpleNamespace
+
+sys.path.insert(0, os.path.dirname(__file__))
+import sb_join  # noqa: E402
+import sb_join_tiles as T  # noqa: E402
+from sb_join_loop import run_session  # noqa: E402
+
+FIX = pathlib.Path(__file__).parent / "fixtures_tiles"
+html = lambda n: (FIX / n).read_text(encoding="utf-8")
+
+
+def test_one_speaking_tile_by_class():
+    assert T.speaking_names(html("meet_one_speaking.html")) == ["Priya Nair"]
+
+
+def test_two_speaking_tiles_by_data_attrs_sorted():
+    assert T.speaking_names(html("meet_two_speaking.html")) == ["Priya Nair", "Rahul Verma"]
+
+
+def test_nobody_speaking_and_hostile_input():
+    assert T.speaking_names(html("meet_silent.html")) == []
+    assert T.speaking_names(None) == [] and T.speaking_names(5) == [] and T.speaking_names("<div <<>") == []
+    long = '<div data-participant-id="a"><span data-self-name="%s"></span><i class="speaking"></i></div>' % ("A" * 500)
+    assert T.speaking_names(long) == []
+
+
+def test_tile_name_element_text():
+    page = '<div data-participant-id="a"><div data-tile-name="1">  Rahul   Verma </div><i data-is-speaking="true"></i></div>'
+    assert T.speaking_names(page) == ["Rahul Verma"]
+
+
+class _Clock:
+    def __init__(self, on_sleep=None):
+        self.now = 1000.0
+        self.on_sleep = on_sleep
+
+    def time(self):
+        return self.now
+
+    def monotonic(self):
+        return self.now - 900
+
+    def sleep(self, s):
+        self.now += s
+        if self.on_sleep:
+            self.on_sleep(self)
+
+
+class _SB:
+    def __init__(self, pages):
+        outer = self
+
+        class Driver:
+            window_handles = ["w"]
+            current_window_handle = "w"
+            page_source = property(lambda d: outer.page)
+
+        self.driver = Driver()
+        self.pages, self.clock = pages, None
+
+    @property
+    def page(self):
+        return self.pages(self.clock.now - 1000)
+
+    def execute_script(self, script, *a):
+        if "navigator.onLine" in script:
+            return True
+        if script.startswith("return document.title"):
+            return "LKB"
+        return None
+
+    def get_current_url(self):
+        return "https://meet.google.com/abc-defg-hij"
+
+    def uc_open_with_reconnect(self, *a):
+        pass
+
+
+def _run(tmp_path, pages, env, seconds=20):
+    stop = tmp_path / "stop"
+    a = SimpleNamespace(url="https://zoom.us/j/1", title="LKB", stop_file=str(stop), reload_file=str(tmp_path / "r"), no_click=True, admission_timeout=0)
+    events = []
+    clock = _Clock(lambda c: stop.write_text("x") if c.now - 1000 >= seconds else None)
+    sb = _SB(pages)
+    sb.clock = clock
+    fake_os = SimpleNamespace(path=os.path, environ={T.GENERATION_ENV: "11111111-1111-4111-8111-111111111111", **env}, remove=os.remove)
+    t = T.tile_clock(sb, fake_os, clock)
+    run_session(sb, a, os=fake_os, time=t, emit=lambda e, **kw: events.append((e, kw)))
+    return events, t, clock
+
+
+def _rows(path):
+    return [json.loads(l) for l in pathlib.Path(path).read_text(encoding="utf-8").splitlines()]
+
+
+def test_flag_off_returns_the_same_time_object_and_writes_nothing(tmp_path):
+    clock = _Clock()
+    assert T.tile_clock(object(), SimpleNamespace(environ={}), clock) is clock
+    assert T.tile_clock(object(), SimpleNamespace(environ={T.ENV_FLAG: ""}), clock) is clock
+    out = tmp_path / "t.jsonl"
+    events, t, _ = _run(tmp_path, lambda s: html("meet_one_speaking.html"), {})
+    assert not out.exists() and not any(tmp_path.glob("*.jsonl"))
+    assert [e for e, _ in events][-1] == "closed"
+
+
+def test_flag_on_writes_aligner_shaped_observations(tmp_path):
+    out = tmp_path / "t.jsonl"
+    pages = lambda s: html("meet_one_speaking.html") if s < 10 else html("meet_silent.html")
+    events, _, _ = _run(tmp_path, pages, {T.ENV_FLAG: str(out)})
+    rows = _rows(out)
+    assert rows[0]["kind"] == "meta" and rows[0]["startedAtEpoch"] == 1000.0
+    obs = rows[1:]
+    assert all(set(r) == {"tSec", "displayName", "source", "samplerClock"} for r in obs)
+    assert rows[0]["samplerClock"]["captureGeneration"] == "11111111-1111-4111-8111-111111111111"
+    assert rows[0]["samplerClock"]["monotonicSec"] == 100
+    named = [r for r in obs if r["displayName"] == "Priya Nair"]
+    assert named and named[0]["tSec"] == 0.0 and max(r["tSec"] for r in named) < 10
+    assert any(r["displayName"] is None and r["tSec"] >= 10 for r in obs)           # release when nobody is highlighted
+    ts = [r["tSec"] for r in obs]
+    assert ts == sorted(ts)
+    # unchanged state is not rewritten every 2 s tick: gap between writes of the same name is >= MIN_WRITE_GAP_S
+    assert all(b - a >= T.MIN_WRITE_GAP_S for a, b in zip([r["tSec"] for r in named], [r["tSec"] for r in named][1:]))
+    assert [e for e, _ in events][-1] == "closed"
+
+
+def test_two_highlighted_tiles_share_a_timestamp(tmp_path):
+    out = tmp_path / "t.jsonl"
+    _run(tmp_path, lambda s: html("meet_two_speaking.html"), {T.ENV_FLAG: str(out)}, seconds=2)
+    first = _rows(out)[1:3]
+    assert {r["displayName"] for r in first} == {"Priya Nair", "Rahul Verma"} and first[0]["tSec"] == first[1]["tSec"]
+
+
+def test_sampler_failure_never_breaks_the_hold_loop(tmp_path):
+    out = tmp_path / "missing-dir" / "t.jsonl"           # append fails every tick
+    events, _, _ = _run(tmp_path, lambda s: html("meet_one_speaking.html"), {T.ENV_FLAG: str(out)}, seconds=6)
+    assert [e for e, _ in events][-1] == "closed" and not out.exists()
+
+
+def test_entry_point_hooks_only_through_tile_clock():
+    src = (pathlib.Path(__file__).parent / "sb_join.py").read_text(encoding="utf-8")
+    assert "time=tile_clock(sb, os, time)" in src and sb_join.tile_clock is T.tile_clock
+
+
+def test_missing_generation_never_writes_evidence(tmp_path):
+    clock = _Clock()
+    out = tmp_path / "tiles.jsonl"
+    assert T.tile_clock(object(), SimpleNamespace(environ={T.ENV_FLAG: str(out)}), clock) is clock
+    assert not out.exists()
+
+
+def test_monotonic_elapsed_and_permanent_invalidation_on_clock_jump(tmp_path):
+    for jump in (-100, 100):
+        out = tmp_path / (str(jump) + ".jsonl")
+        state = {"epoch": 1000.0, "mono": 100.0}
+        sampler = T.TileSampler(str(out), lambda: state["epoch"], lambda: html("meet_one_speaking.html"),
+                                lambda: state["mono"], "11111111-1111-4111-8111-111111111111")
+        sampler.tick()
+        state.update(epoch=1004.1, mono=104)
+        sampler.tick()
+        assert _rows(out)[-1]["tSec"] == 4
+        state.update(epoch=1008 + jump, mono=108)
+        sampler.tick()
+        assert _rows(out)[-1] == {"kind": "sampler-clock-invalid", "source": T.SOURCE}
+        prior = out.read_bytes()
+        state.update(epoch=1012, mono=112)
+        sampler.tick()
+        assert out.read_bytes() == prior
+
+
+def test_backwards_monotonic_invalidates_and_attempts_have_distinct_instances(tmp_path):
+    state = [1000, 100]
+    samplers = [T.TileSampler(str(tmp_path / (str(i) + ".jsonl")), lambda: state[0], lambda: "",
+                             lambda: state[1], "11111111-1111-4111-8111-111111111111") for i in range(2)]
+    for sampler in samplers:
+        sampler.tick()
+    assert samplers[0].identity["samplerInstance"] != samplers[1].identity["samplerInstance"]
+    state[:] = [1001, 99]
+    samplers[0].tick()
+    assert _rows(samplers[0].path)[-1]["kind"] == "sampler-clock-invalid"

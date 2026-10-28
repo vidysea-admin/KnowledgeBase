@@ -1,0 +1,11 @@
+--- pristine.ps1	2026-09-28 18:31:33.121772500 +0530
++++ cand.ps1	2026-09-28 18:31:33.156782600 +0530
+@@ -377,7 +377,7 @@
+         $vt = Get-Content $v -Raw -ErrorAction SilentlyContinue
+         $vtPlain = Strip-Code ($vt -replace '\*\*', '')
+         $vc = -1
+-        foreach ($mm in [regex]::Matches($vtPlain, '(?m)(?:^|\()[\s\-*#>|]*Cycle checked:?[^\S\r\n]*(\d+)')) {
++        foreach ($mm in [regex]::Matches($vtPlain, '(?m)(?:^[\s\-*#>|]*|Status:?[^\S\r\n]*(?:PASS|FAIL)[^\S\r\n]*\()Cycle checked:?[^\S\r\n]*(\d+)')) {
+           $n = [int]$mm.Groups[1].Value; if ($n -gt $vc) { $vc = $n }
+         }
+         if ($vc -lt $mc) { $pend++ }   # MaxValue when the cycle is unreadable -> always pending

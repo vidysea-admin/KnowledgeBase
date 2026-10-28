@@ -1,0 +1,20 @@
+✔ old rejected source refreshes literal provenance without reviving or replacing any preserved field (5.0556ms)
+✔ all human and automatic statuses remain unchanged; refresh never changes creation counters (1.2025ms)
+✔ original pre-thread rows refresh source provenance without inventing thread or registration evidence (0.6754ms)
+✔ absent fresh fields retain prior receipt, auth, watch and refusal evidence without a write (0.3979ms)
+✔ wrong sender, domain, thread, subject or explicit owner refuses without changing stored rows (1.4474ms)
+✔ tenant scoping preserves foreign same-message rows while healthy new rows still insert (0.5698ms)
+✔ decision, identity, occurrence and concurrent provenance races each refuse atomically (5.2646ms)
+✔ absent decisions use existence guard so a concurrently stamped null is not treated as missing (0.7894ms)
+✔ Mongo array-element query equality cannot admit scalar-to-array decision or source races (2.0656ms)
+✔ invalid or conflicting receipt and authentication provenance refuses without partial refresh (0.9623ms)
+✔ watch ambiguity and older link refusals persist; conflicting or poisoned targets cannot be selected (1.7152ms)
+✔ a new ambiguity is recorded, never erased by a later scan, and identical provenance is idempotent (0.7366ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6386.1004

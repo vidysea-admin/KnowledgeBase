@@ -1,0 +1,16 @@
+{
+  "allocation_tokens": 1500,
+  "historical_debit_s": 180,
+  "active_s": 35.4404874,
+  "wait_s": 0,
+  "allocation_active_s": 90,
+  "utc_end": "2026-10-15T09:11:38.5837650Z",
+  "cost": null,
+  "historical_actual_s": null,
+  "start": 195530219032,
+  "end": 195884623906,
+  "ratio_verified": false,
+  "tokens": null,
+  "prior_active_s": 110.6927,
+  "historical_debit_tokens": 6000
+}

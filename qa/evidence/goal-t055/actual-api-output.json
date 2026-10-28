@@ -1,0 +1,41 @@
+{
+  "provenance": "Actual PDF parser -> actual scoped storage adapter with filter-enforcing fake DB -> authenticated API routes. Synthetic source PDF; no live corpus or real DB claim.",
+  "documentsList": {
+    "documents": [
+      {
+        "id": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+        "sourceId": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+        "version": "d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+        "title": "Sample admissions document",
+        "format": "pdf",
+        "pageCount": 2
+      }
+    ],
+    "truncated": false
+  },
+  "documentDetail": {
+    "id": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+    "sourceId": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+    "version": "d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+    "title": "Sample admissions document",
+    "format": "pdf",
+    "pageCount": 2,
+    "highlights": [
+      {
+        "id": "41598164dc55bafbd2122a95d401a65bae65769e074d5c6797f9bc16e9e3a06e",
+        "pageNumber": 2,
+        "quote": "Scholarships need evidence.",
+        "text": "Scholarships need evidence.",
+        "verification": "unverified"
+      }
+    ]
+  },
+  "page": {
+    "id": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+    "sourceId": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+    "version": "d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+    "title": "Sample admissions document",
+    "pageNumber": 2,
+    "text": "Scholarships need evidence."
+  }
+}

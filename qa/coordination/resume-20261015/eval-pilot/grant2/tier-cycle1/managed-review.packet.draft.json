@@ -1,0 +1,80 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "SOURCE_FROZEN_BROKER_AND_ADMISSION_PENDING",
+  "unit": {
+    "root": "C:/Users/product/Desktop/KnowledgeBase",
+    "slug": "vectorless-grant2-bound-output-tier",
+    "cycle": 1,
+    "base_sha": "d4e5d74be460db92c36c65cb330a4aa9f7d78853b5115de1fa2c9acc14c1eec5",
+    "candidate_sha": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+    "identity_kind": "sha256(JSON.stringify(ordered source/test byte pins))",
+    "files": [
+      {
+        "path": "C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.mjs",
+        "sha256": "6ed14cd055a0701dfc689fdd173a142b535a95e205015779072a6e28024886b1"
+      },
+      {
+        "path": "C:/Users/product/Desktop/KnowledgeBase/scripts/eval/vectorless-production-eval.test.mjs",
+        "sha256": "db70d69e7495eade222b2b736db10b062ca561c03464126870e04ee4df1ef0e7"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [],
+    "next_phase": null,
+    "completion_reserve": false,
+    "bootstrap_scope": null,
+    "bootstrap": null,
+    "escalation": null
+  },
+  "worker": null,
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [],
+    "remaining": [
+      "broker selected7 checks",
+      "same-SHA runtime/environment receipt",
+      "valid startup allowance and finite assessed reviewer phase",
+      "independent verdict; no reviewer dispatch authorized"
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "grant2 preserves legacy ceilings and rejects unbound scope, IDs and nonfinite limits",
+      "reason": "Default/full caps unchanged; explicit tier finite bounds",
+      "boundary": "admission"
+    },
+    {
+      "node": "grant2 authorization binds canonical artifact, actor, scope and current source corpus config",
+      "reason": "No arbitrary config ID or stale/foreign authorization; precredential gate",
+      "boundary": "authorization"
+    },
+    {
+      "node": "grant2 cumulative ledger permits only two physical calls across fresh transport instances",
+      "reason": "Cumulative IDs4/5 reserve before external I/O",
+      "boundary": "writes"
+    },
+    {
+      "node": "grant2 byte reservations and crash debits cannot reset with new authorization or directory",
+      "reason": "Aggregate bytes/output and crashes cannot refund allowance",
+      "boundary": "budget"
+    }
+  ],
+  "previous_receipt": null,
+  "prior_history_preserved": [
+    "../provider-request-ledger.jsonl",
+    "../receipt.probe-pilot-released.json",
+    "../receipt.remaining-probe.json",
+    "qa/coordination/resume-20261015/checker-admission-hold.json"
+  ],
+  "evidence_packet": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/eval-pilot/grant2/tier-cycle1/packet.md",
+  "dispatch_prohibited": true
+}

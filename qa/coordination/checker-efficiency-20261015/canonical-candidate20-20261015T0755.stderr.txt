@@ -1,0 +1,25 @@
+test_actual_overrun_cannot_hide_under_lower_debit (__main__.BudgetTests.test_actual_overrun_cannot_hide_under_lower_debit) ... ok
+test_bootstrap_exhaustion_is_needs_extra_review (__main__.BudgetTests.test_bootstrap_exhaustion_is_needs_extra_review) ... ok
+test_bootstrap_unknown_not_ratio_success (__main__.BudgetTests.test_bootstrap_unknown_not_ratio_success) ... ok
+test_children_retries_aggregate (__main__.BudgetTests.test_children_retries_aggregate) ... ok
+test_debits_do_not_reset_across_retry_children (__main__.BudgetTests.test_debits_do_not_reset_across_retry_children) ... ok
+test_duplicate_reviewers_rejected (__main__.BudgetTests.test_duplicate_reviewers_rejected) ... ok
+test_escalation_keeps_ratio_miss (__main__.BudgetTests.test_escalation_keeps_ratio_miss) ... ok
+test_historical_unknowns_conservatively_debited_not_fabricated (__main__.BudgetTests.test_historical_unknowns_conservatively_debited_not_fabricated) ... ok
+test_incomplete_escalation_rejected (__main__.BudgetTests.test_incomplete_escalation_rejected) ... ok
+test_invalid_numbers_rejected (__main__.BudgetTests.test_invalid_numbers_rejected) ... ok
+test_missing_phase_time_rejected (__main__.BudgetTests.test_missing_phase_time_rejected) ... ok
+test_missing_zero_and_invalid_debits_fail_closed (__main__.BudgetTests.test_missing_zero_and_invalid_debits_fail_closed) ... ok
+test_next_phase_allocation_before_execution (__main__.BudgetTests.test_next_phase_allocation_before_execution) ... ok
+test_preflight_checks_import_and_temp_then_cleans_probe (__main__.BudgetTests.test_preflight_checks_import_and_temp_then_cleans_probe) ... ok
+test_receipt_exact_identity_and_success_required (__main__.BudgetTests.test_receipt_exact_identity_and_success_required) ... ok
+test_ten_percent_all_dimensions (__main__.BudgetTests.test_ten_percent_all_dimensions) ... ok
+test_unknown_checker_active_is_not_admitted (__main__.BudgetTests.test_unknown_checker_active_is_not_admitted) ... ok
+test_unknown_tokens_and_missing_next_allocation_cannot_unlock (__main__.BudgetTests.test_unknown_tokens_and_missing_next_allocation_cannot_unlock) ... ok
+test_unknown_tokens_remain_unknown (__main__.BudgetTests.test_unknown_tokens_remain_unknown) ... ok
+test_zero_maker_requires_bootstrap_scope (__main__.BudgetTests.test_zero_maker_requires_bootstrap_scope) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.018s
+
+OK

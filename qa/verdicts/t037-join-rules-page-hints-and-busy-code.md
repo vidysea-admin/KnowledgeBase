@@ -1,0 +1,27 @@
+# Verdict: t037-join-rules-page-hints-and-busy-code
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: c58d458 (code 197f1c0, base 0cd9de0, lane/webhints)
+Scope: SOURCE SCOPE ONLY per D-024: not validated in a browser. Retry-delay behaviour seen only under jsdom fake timers. The D-024 live-browser check is still owed.
+
+## EXPLANATION
+
+1. Shared client (apps/web/src/api/client.ts): purely additive. ApiError's third constructor argument is optional; code/retryAfterSeconds are assigned only when defined. Every other `new ApiError(...)` in apps/web (client.ts, jobs.ts, sessions.ts, search/client.ts) uses two arguments, unchanged. The 16 test files touching ApiError/apiFetch (join-rules 4, client.test, search/client.test, Ask, Brain, Calendar, Dashboard, Ingest, Settings, Sources, Watch, WhatsApp, SessionsList) pass: 176/176.
+   `code` comes only from the parsed JSON body's `error` field and only when typeof string (HTML, malformed JSON, non-string error give undefined). It is never rendered, only compared with `===`. Length is unbounded, but it is only compared, so harmless.
+   Retry-After: `/^\d{1,6}$/` after trim. My matrix through the real apiFetch: absent, "", " ", "0x10", "-1", "1.5", "NaN", "1e3", "+5", "5, 10", HTTP-date, non-ASCII digit, 8-digit: all absent; "5" -> 5, " 7 " -> 7, "0" -> 0, "999999" -> 999999. The page caps at 60 s (scratch fake-timer test: disabled at 59 s, enabled at 60.5 s for 999999); a missing header leaves Retry enabled; no automatic retry (one GET only).
+2. Busy matrix, by my own scratch test through the real apiFetch with a stubbed fetch and the mounted page, across LOAD, SAVE, OPT-OUT and APPROVAL (36 cases): 503 + busy code -> busy text (load: enabled Retry); 503 + join_rules_unavailable, empty body, HTML body (even one containing the string), malformed JSON, upper-case code, padded code, code only in message -> unavailable, no crash; 500 + busy -> not busy. 200 unaffected. The LOAD path's message and Retry button are pinned now by committed test "ISS-JRLOCK-002 (c)/(d)" (mutants of busy detection died there). Approval and opt-out busy are exercised only by my scratch test, not committed; committed busy-on-write coverage is save only (all writes share writeProblem; low risk).
+3. ISS-JRLOCK-002 recorded reproductions: (a) api message changed, (b) BUSY_RETRY_AFTER_SECONDS 5 -> 50, (c) load catch without busy retry, (d) readText without busy branch. Web side: (a) moot for the web (detection no longer reads the message; verbatim test passes), (c) and (d) pinned. (b) is api-side and unaddressed; the api-side half of (a) (no api test asserts the busy body text/code) is also open, and the code literal "join_rules_busy" is still duplicated api/web with no pin. Ruling: NOT verified, stays open. Closing it needs an apps/api test asserting the router's busy body error === "join_rules_busy" and Retry-After === "5" (or a shared constant). A web-only pin (a web test reading apps/api/src/join-rules/router.ts via fs) is technically possible but a brittle cross-app source read; not added, the pin belongs in apps/api.
+4. Hints plumbing: optOutBody serialises {eventId} plus meetingUrl/sessionKey only when non-empty strings (trimmed); extra keys dropped; the page test pins the body to exactly {eventId}, and my scratch test checked the raw serialised string `{"eventId":"e1"}`. Key names match the router.ts allow-list. Unused plumbing is acceptable in a PASSed unit because it is tested and documented; it does NOT meet W7 gate (b). ISS-WEBHINTS-001 states the missing data (meetingUrl, sessionKey), where it lives (calendar page holds meetingUrl; sessionKey is in no web type) and two ways to supply it. ISS-T037OPT-002 stays open.
+5. Timer: RetryButton uses useEffect with clearTimeout cleanup; load() sets phase loading, which unmounts the button, so no stacked timers; unmount during a 30 s wait leaves 0 timers and no console error (scratch). Re-enable verified by a committed fake-timer test. No auto-retry.
+6. Edited assertions: 3 lines in JoinRulesPage.test.tsx (mock type, ApiError construction, busy fixture gaining the code); no expectation weakened. Legacy shape still covered: existing 503-without-code cases and "the old busy message text WITHOUT the code is not busy" use ApiError with no code.
+7. Mutations (8, per-mutation byte backup, restore in finally, hash-object == HEAD blob verified each time, git status clean): KILLED: busy on any 503; code includes(); timer never re-enables; hints serialised when empty; code from message text. SURVIVED: 60 s cap removed; cleanup-on-unmount removed; Retry-After regex widened to 12 digits (all unpinned; behaviour correct per scratch). Filed ISS-WEBHINTS-002 (medium). 5/8 killed.
+8. Gates: join-rules vitest 65/65; related 16 files 176/176; tsc --noEmit (apps/web) exit 0; lint-dirsize OK; largest touched file 322 lines (test), sources under 175; git merge-tree against codex/machine-migration-2026-10-09 clean; main has no apps/web change since 0cd9de0.
+
+ISSUES-WRITTEN: ISS-WEBHINTS-002 (medium, open)
+
+## Merge conditions
+- Merge lane/webhints; the PASS is source scope only, D-024 live-browser check still owed.
+- ISS-JRLOCK-002 stays open (api-side (b) and the code-literal pin); ISS-T037OPT-002 and W7 gate (b) stay unmet; ISS-WEBHINTS-001 open.
+- ISS-WEBHINTS-002 to be verified inside the next unit touching JoinRulesPage.tsx.
+- Maker closes out by flipping the manifest to checked-PASS (not done here).

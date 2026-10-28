@@ -1,0 +1,14 @@
+{
+  "receipt": "qa/goal-vectorless-2026-10-15/verification-quality-mjs-independent-four.json",
+  "reportedBy": "/root/verification_broker",
+  "reportedOutcome": "4 safe PASS markers; own exit0",
+  "reportedElapsedSeconds": 1.999,
+  "reportedStablePins": 47,
+  "reportedRuntimeEnvironmentLockMatchPrior26": true,
+  "independentCheckerVerdict": false,
+  "reviewerReactivated": false,
+  "reviewStatus": "HOLD",
+  "historicalActualTokens": 950992,
+  "wallBoundSeconds": 156.701271,
+  "authentication": "Deterministic broker preflight queued; broker report retained without inventing a reviewer PASS."
+}

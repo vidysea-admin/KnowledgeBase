@@ -1,54 +1,43 @@
+import { useAuth } from "../auth/AuthContext.js";
+import { listWebinarOperations, listSessions } from "../api/sessions.js";
+import { listUpcomingMeetings } from "../api/calendar.js";
+import { listBotEvents } from "../api/botEvents.js";
+import { BotActivity } from "./meeting-bot/BotActivity.js";
+import { useLoad } from "./meeting-bot/useLoad.js";
+import { UpcomingSection } from "./meeting-bot/UpcomingSection.js";
+import { PastSection } from "./meeting-bot/PastSection.js";
+import { OperationsSections } from "./meeting-bot/OperationsSections.js";
+import { DiscoveryStatus } from "./meeting-bot/DiscoveryStatus.js";
+import { SendNowForm } from "./meeting-bot/SendNowForm.js";
+import { BotPrivacyControls } from './meeting-bot/privacy/BotPrivacyControls.js';
+import { CaptureReadinessControls } from './meeting-bot/readiness/CaptureReadinessControls.js';
+import { RetentionSection, loadRetentionStatus } from './meeting-bot/RetentionSection.js';
+
+/**
+ * /meeting-bot: upcoming calendar meetings, live/in-progress operations, operations history and past recordings.
+ * Three requests per load, one per endpoint (calendar/upcoming, webinar-operations [polled], sessions); each section has its own
+ * loading/error/retry state so one failing endpoint never blanks the others. Wording is descriptive only: this page does not
+ * evaluate bot mode, trust, join rules or overlap, so it never promises that a listed meeting will be joined.
+ */
 export function MeetingBotPage(): React.ReactElement {
-  return (
-    <>
-      <div className="page-header">
-        <h1>Meeting Bot</h1>
-        <p>
-          One real joiner is live (a local browser on Windows, recorded with OBS) &mdash; here's exactly
-          what's real today and what isn't.
-        </p>
-      </div>
-
-      <div className="card">
-        <div className="section-title">Real and tested today</div>
-        <div className="row-card">
-          <div className="row-title">Platform detection</div>
-          <div className="row-meta">Meet / Teams / Zoom / Webex / Zoho (webinar &amp; meeting) / Google Cloud OnAir correctly identified from a real meeting URL.</div>
-        </div>
-        <div className="row-card">
-          <div className="row-title">Consent gate</div>
-          <div className="row-meta">D-008 provided-first ordering enforced before any capture path runs.</div>
-        </div>
-        <div className="row-card">
-          <div className="row-title">Join-strategy selection</div>
-          <div className="row-meta">Routes to the right joiner (Vexa / browser-profile / system-audio) per platform.</div>
-        </div>
-        <div className="row-card">
-          <div className="row-title">Private-segment exclusion</div>
-          <div className="row-meta">A marked-private time window is dropped from the transcript before it's ever stored.</div>
-        </div>
-      </div>
-
-      <div className="card">
-        <div className="section-title">Live since 2026-09-24</div>
-        <div className="row-card">
-          <div className="row-title">Browser joiner + OBS capture</div>
-          <div className="row-meta">
-            A headed Chrome on the bot's own signed-in profile joins the webinar (Zoho, Cloud OnAir), and OBS
-            records only that window and that browser's audio. First live run: a Zoho webinar on
-            2026-09-24, transcribed into 80 turns and indexed into the knowledge base.
-          </div>
-        </div>
-      </div>
-
-      <div className="card empty-note">
-        <strong>Known gaps:</strong> no auto-reconnect yet (T-029) &mdash; when the platform drops the
-        bot, the recording keeps running but the webinar audio is lost until someone reloads the
-        page; the first live run lost roughly 5&ndash;8 minutes this way, so its capture is not
-        complete. The captured window video is sometimes black (audio is unaffected). It runs on
-        one Windows machine, started by hand or by a scheduled task. The Vexa and system-audio
-        joiners are still tested-against-fakes stubs: no real Vexa instance is configured.
-      </div>
-    </>
-  );
+  const { apiKey } = useAuth();
+  const ops = useLoad(apiKey, listWebinarOperations, 10000);
+  const upcoming = useLoad(apiKey, listUpcomingMeetings);
+  const sessions = useLoad(apiKey, listSessions);
+  const botEvents = useLoad(apiKey, listBotEvents, 30000);
+  const retention = useLoad(apiKey, loadRetentionStatus);
+  return <>
+    <div className="page-header"><h1>Meeting bot</h1>
+      <p>Upcoming meetings, capture in progress, webinar operations and past recordings.</p></div>
+    <SendNowForm apiKey={apiKey} />
+    <BotPrivacyControls apiKey={apiKey} />
+    <CaptureReadinessControls apiKey={apiKey} />
+    <RetentionSection state={retention} />
+    <UpcomingSection state={upcoming} />
+    <DiscoveryStatus state={ops} />
+    <OperationsSections state={ops} />
+    <BotActivity state={botEvents} />
+    <PastSection state={sessions} />
+    <div className="card"><p>Portable audio/video capture is undergoing local validation. Unattended recording requires a verified real webinar on this machine. Windows OBS remains the fallback; Ubuntu support requires independent capture and restart proof.</p></div>
+  </>;
 }

@@ -1,0 +1,15 @@
+{
+  "actualCost": null,
+  "actualTokens": null,
+  "monotonicFrequency": 10000000,
+  "explicitWaitIntervals": [],
+  "startedAt": "2026-10-15T07:52:27.1614924Z",
+  "phase": "central-integration-resume-1",
+  "role": "maker",
+  "historicalUsage": "unknown, not reset or included as zero",
+  "monotonicStart": 148370435744,
+  "monotonicEnd": 149543934561,
+  "endedAt": "2026-10-15T07:54:24.5278731Z",
+  "activeSeconds": 117.3498817,
+  "outcome": "Compile join and distinct output verifier/generator fixed; provider transport and indexed summaries delegated. No tests run in this maker phase."
+}

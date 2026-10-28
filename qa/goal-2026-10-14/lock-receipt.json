@@ -1,0 +1,18 @@
+{
+  "phase": "lock",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\node_modules\\pnpm\\bin\\pnpm.mjs",
+    "install",
+    "--lockfile-only",
+    "--ignore-scripts",
+    "--no-frozen-lockfile"
+  ],
+  "pid": 14272,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "elapsedMs": 16765,
+  "stdout": "Scope: all 11 workspace projects\nProgress: resolved 1, reused 0, downloaded 0, added 0\n\n   ╭──────────────────────────────────────────╮\n   │                                          │\n   │   Update available! 10.33.0 → 12.11.2.   │\n   │   Changelog: https://pnpm.io/v/12.11.2   │\n   │     To update, run: pnpm add -g pnpm     │\n   │                                          │\n   ╰──────────────────────────────────────────╯\n\nProgress: resolved 29, reused 0, downloaded 0, added 0\nProgress: resolved 32, reused 0, downloaded 0, added 0\nProgress: resolved 185, reused 0, downloaded 0, added 0\nProgress: resolved 438, reused 0, downloaded 0, added 0\nProgress: resolved 495, reused 0, downloaded 0, added 0\n WARN  2 deprecated subdependencies found: crypto-js@4.2.0, whatwg-encoding@3.1.1\nProgress: resolved 499, reused 0, downloaded 0, added 0\nProgress: resolved 499, reused 0, downloaded 0, added 0, done\n\nDone in 7s using pnpm v10.33.0\n",
+  "stderr": ""
+}

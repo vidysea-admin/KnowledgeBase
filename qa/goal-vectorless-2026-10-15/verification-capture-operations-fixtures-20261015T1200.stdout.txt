@@ -1,0 +1,11 @@
+✔ absent evidence and self assertions remain HOLD (6.6244ms)
+✔ all operational gates are explicitly required (3.1629ms)
+✔ receipt signature binds role, payload and identity using separately supplied trust (11.9344ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 526.0051

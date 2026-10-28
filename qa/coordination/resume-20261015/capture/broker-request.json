@@ -1,0 +1,97 @@
+{
+  "owner": "/root/resume_capture_maker",
+  "maximum_outer_seconds": 180,
+  "unit": "resume-capture-sampler-clock",
+  "packet": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\capture\\packet.json",
+  "refreshed_at": "2026-10-15T20:08:29.6123096Z",
+  "scope": "source/fixture validation only; no source repair evidenced",
+  "tier": 3,
+  "commands": [
+    {
+      "reason": "sampler parsing, hold-loop consumer, disabled/missing authority, monotonic cadence/jumps, backwards clock and immutable instance/invalidation",
+      "args": [
+        "-B",
+        "-m",
+        "pytest",
+        "-q",
+        "packages/meeting-bot/py/test_sb_join_tiles.py",
+        "--basetemp",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\capture\\broker-pytest-fresh"
+      ],
+      "authored_cases": 12,
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "executable": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+      "timeout_seconds": 45
+    },
+    {
+      "reason": "5 complete clock stream/producer/privacy cases + 10 registry identity/calibration/physical/privacy/revocation boundaries + 2 immediate adapter/review/confirmation consumer cases",
+      "args": [
+        "--import",
+        "tsx",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "src/capture/tiles/sampler-clock.test.ts",
+        "src/capture/tiles/registry.test.ts",
+        "../../qa/evidence/t042-trusted-registry/downstream-probe.test.ts"
+      ],
+      "authored_cases": 17,
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+      "executable": "node",
+      "timeout_seconds": 90
+    }
+  ],
+  "environment": {
+    "PYTHONPATH": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py",
+    "PYTHONDONTWRITEBYTECODE": "1",
+    "LKB_SAMPLER_TEST_PYTHON": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+    "TEST_TMP_PARENT": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\capture"
+  },
+  "cycle": 0,
+  "receipt_reuse": "No matching successful clock/updated-registry receipt supplied. Prior clock packet explicitly unexecuted. Reuse only exact complete source/environment/command receipts authenticated by broker.",
+  "test_concurrency": 1,
+  "version": 1,
+  "safeguards": [
+    "Broker must allocate serial CPU grant before execution",
+    "Fresh basetemp child only; do not overwrite or recursively clear preexisting path",
+    "Python dependencies imported only: never launch Selenium browser",
+    "Stop once on unavailable dependency or import/temp failure",
+    "No live capture/provider/media/native database",
+    "Complete exit/output and before/after source pins required",
+    "Record executable/version/import root/lock hash/environment fingerprints without secrets",
+    "No checker dispatch or PASS claim"
+  ],
+  "preflight": [
+    {
+      "executable": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-B",
+        "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+        "preflight",
+        "--root",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase",
+        "--import-name",
+        "sb_join_tiles",
+        "--import-root",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py",
+        "--temp-parent",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\capture"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "timeout_seconds": 20
+    },
+    {
+      "executable": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-B",
+        "-c",
+        "import pathlib,sys,pytest,seleniumbase,sb_join,sb_join_tiles; p=pathlib.Path(sys.argv[1]).resolve(); assert pathlib.Path(sb_join.__file__).resolve().parent==p; assert pathlib.Path(sb_join_tiles.__file__).resolve().parent==p; print(\"compatible pytest/seleniumbase imports; local sb_join and sb_join_tiles\")",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "timeout_seconds": 20
+    }
+  ],
+  "state": "REQUESTED",
+  "executor": "root sole CPU broker"
+}

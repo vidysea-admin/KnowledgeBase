@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://tree_index",
+  "title": "tree_index root document",
+  "description": "One Mongo document per tenant -- the tenant's whole vectorless tree, root through leaves, nested via `children`. Only the TOP-LEVEL document is ever independently queried/replaced (apps/api/src/indexing.ts's replaceOne upsert); nested nodes are plain `TreeIndexNode` subdocuments (`$defs/node`, below), never fetched on their own and never carrying `tenantId`. `tenantId` is declared HERE, on the root document only -- this is what closes ISS-062: before this, tree_index had no tenantId field at all, so a tenant's whole knowledge tree was separated ONLY by the `tenant:<id>` string prefix inside `node_id` (see ISS-060/ISS-063). `packages/index/src/tree/build.ts`'s `treeIndexRootFilter` now includes this real field in its returned filter too -- both now agree, closing the gap that previously relied solely on the string convention.",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/$defs/node"
+    }
+  ],
+  "required": [
+    "tenantId"
+  ],
+  "properties": {
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "indexRevision": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 9007199254740991
+    }
+  },
+  "$defs": {
+    "node": {
+      "title": "tree_index node",
+      "description": "The recursive node shape (root AND every nested child share this, per T-004's original design) -- generates `TreeIndexNode`, the name every existing reader (search.ts, flatten-graph.ts, packages/ask's router/select-nodes, tests) already imports for a node ANYWHERE in the tree, unchanged by this unit. Only the root additionally satisfies `TreeIndexRootDocument` (this file's own top-level type) once persisted.",
+      "type": "object",
+      "required": [
+        "node_id",
+        "title",
+        "level",
+        "summary",
+        "children"
+      ],
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "tenant",
+            "year",
+            "month",
+            "session",
+            "topic",
+            "org"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "object",
+          "properties": {
+            "sessionRef": {
+              "type": "string"
+            }
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        },
+        "indexArtifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "version",
+            "generation",
+            "sessionId",
+            "sourceId",
+            "turnDigest"
+          ],
+          "properties": {
+            "version": {
+              "const": 1
+            },
+            "generation": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+            },
+            "sessionId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            },
+            "sourceId": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 400
+            },
+            "turnDigest": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "title": "TreeSessionIndexArtifact"
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

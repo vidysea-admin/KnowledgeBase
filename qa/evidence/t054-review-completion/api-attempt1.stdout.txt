@@ -1,0 +1,104 @@
+✔ search-store.ts delegates to buildTurnPrefilter instead of building a filter itself (3.6772ms)
+✔ search-store.ts contains no hand-rolled Mongo filter — the exact bypass ISS-074 recorded (0.4432ms)
+✔ search-store.ts does not re-derive query tokens (0.2787ms)
+✔ PROPERTY: the filter the store actually builds is a superset of what the scorer can score (1.4963ms)
+✔ every query token survives into the filter — no length filter, however short (1.3966ms)
+✔ an all-short-token query still builds a real filter, never an empty $or (0.3029ms)
+✔ a query with no tokens returns null, matching the scorer's own empty-query contract (0.2842ms)
+✔ escapeRegex neutralises every metacharacter Mongo's dialect would interpret (0.2469ms)
+✔ escaping is defence-in-depth: tokenization already strips every metacharacter first (0.5239ms)
+✔ the filter is case-insensitive, matching the scorer's lowercasing (0.453ms)
+✔ EVERY query is tenant-confined — the filter's tenantId, not just its $or (ISS-078) (9.1439ms)
+✔ no other tenant's turn or session can ever be returned (1.6461ms)
+✔ the filter sent to Mongo is a superset of what the scorer can score — over DERIVED queries (71.5901ms)
+✔ k is honoured — the store must not return more than asked (ISS-079, contract [I2]) (2.2867ms)
+✔ each hit carries ITS OWN turn and session, not another hit's (ISS-080) (0.8884ms)
+✔ hit.score matches what the scorer independently computes for that turn (ISS-083) (1.609ms)
+✔ each hit's (turnId, sessionId) pair matches what the scorer actually ranked at that position (ISS-084) (1.4599ms)
+✔ candidate turns load once; current-proof reads are explicit and final session labels stay deduplicated (ISS-080/085) (1.007ms)
+✔ a query with no usable tokens issues no database query at all (0.2137ms)
+✔ results still resolve through the injected handle end to end (0.5332ms)
+✔ production search retrieves corrected-only text and uses corrected scoring without changing originals (1.8292ms)
+✔ source privacy filters before k-limited scoring; unapproved WhatsApp source cannot displace eligible guidance (1.2307ms)
+✔ unknown source provenance fails closed instead of returning tenant-matching text (0.694ms)
+✔ actual source visibility denies every maintenance endpoint before raw/history/precondition/write access (144.0025ms)
+✔ verified tenant controls eligibility; recording review remains accessible and source withdrawal is rechecked (20.0083ms)
+✔ auth: no key 401, wrong scope 403, nothing written (116.7643ms)
+✔ GET serves the effective transcript with a strong ETag = revision, no-store, no tenant field (7.7068ms)
+✔ POST commits durably: receipt shape, new ETag, original turns untouched, overlay served, history row with before/after (40.5485ms)
+✔ history is append-only across revisions and the chain links parent to child (45.1186ms)
+✔ preconditions: missing If-Match 428; malformed or body-mismatched 400; stale 412; nothing written on any (126.8826ms)
+✔ tenant isolation: cross-tenant read, write, history and refresh all answer 404; the owner's data is unchanged (50.588ms)
+✔ same session id in two tenants stays separate; a tenant cannot name A's turn ids or smuggle a tenant/actor/time (141.5305ms)
+✔ invalid requests: bad body 400, unknown turn / no-op 422, bad session id 400; nothing written (75.437ms)
+✔ atomic: two saves racing on one ETag - exactly one commits, the loser is 409/412, one head, no lost update (454.4273ms)
+✔ a failed history write does not turn a durable commit into an error, and the next commit heals the gap (33.9162ms)
+✔ audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision (45.0403ms)
+✔ a store failure answers 503 with no internal message and no partial write (15.6732ms)
+✔ sample sanity: helper turn() carries extra fields that survive, uncorrected, through an overlay (8.5794ms)
+✔ ISS-T054-PERSIST-001: both tenants commit on the SAME session id: two heads, two history rows, neither disturbs the other (69.5576ms)
+✔ ISS-T054-PERSIST-001: head and history ids differ per tenant for the same session/revision (0.2843ms)
+✔ ISS-T054-PERSIST-001: recording the same revision id for two tenants keeps both rows (store level) (2.6837ms)
+✔ ISS-T054-PERSIST-001: tenant comes from the key only - a ?tenantId= query never switches tenant (44.3489ms)
+✔ ISS-T054-PERSIST-002: history rows are insert-once: a second record of the same id does not overwrite the first (2.6549ms)
+✔ immutable correction plan carries exact before/after audit and pending downstream revision (0.7594ms)
+✔ explicit contiguous speaker block changes only named turns, including simultaneous correction (0.4835ms)
+✔ revision and trusted scope preconditions refuse before producing writes (1.2025ms)
+✔ missing, duplicate, noncontiguous and mixed-label mapping cannot widen identity (0.7053ms)
+✔ client cannot inject tenant, actor, timing, provenance or unknown request fields (0.5063ms)
+✔ invalid reason/text/corpus/order and empty changes refuse (0.8363ms)
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (34.7728ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (7.5615ms)
+✔ text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score (18.741ms)
+✔ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (1.4067ms)
+✔ head audit remains readable after secondary history failure without another human correction (0.6701ms)
+✔ complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation (1.3394ms)
+✔ effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes (1.2167ms)
+{"retainedSource":"2026-04-21-visa-blueprint-part2-italy-france-nz","sourceTurns":291,"literalPrefixTurns":100,"correctedTurns":1,"rawPreserved":true,"chunkConsumerCorrected":true,"refresh":"pending"}
+✔ retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection (6.0871ms)
+✔ no executor configured: 503 and the refresh stays pending (never reported complete) (28.0101ms)
+✔ success: every target runs once, in order, for the committed revision; state becomes complete (30.2574ms)
+✔ failure is recorded (failed + failedTarget), earlier targets are kept, retry resumes at the failed target (47.8919ms)
+✔ a newer correction supersedes an in-flight refresh: the old run cannot overwrite the new revision's state (76.9603ms)
+✔ cross-tenant refresh cannot run or observe another tenant's refresh (36.4239ms)
+✔ search unions exact raw and corrected-only candidates; scorer sees corrected text and immutable originals (3.4798ms)
+✔ old raw match corrected away scores zero; duplicate overlay match and foreign tenants do not leak (1.5663ms)
+✔ overlay-only orphan fails reconciliation even when all physical source turns disappeared (0.785ms)
+✔ superseded matched review fails honestly instead of reporting old candidate generation (1.1976ms)
+✔ candidate and source-ID reconciliation ceilings refuse partial results (71.9972ms)
+✔ empty-token filter makes no queries; invalid tenant and malformed filters refuse (0.78ms)
+✔ racing writers (insertHead unique _id): exactly one commit, the loser gets a conflict, no lost update (17.5343ms)
+✔ racing writers (replaceHead CAS): exactly one commit, the loser gets a conflict, no lost update (25.3485ms)
+✔ revision of an untouched transcript changes when the source turns change; a committed head no longer depends on them (0.9178ms)
+✔ an overlay entry for a turn that no longer exists is ignored, not an error (0.8308ms)
+✔ snapshot/head re-read race (initial): stale writer cannot CAS a newer head (1.3955ms)
+✖ snapshot/head re-read race (reviewed): stale writer cannot CAS a newer head (3.06ms)
+ℹ tests 74
+ℹ suites 0
+ℹ pass 73
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5306.2652
+
+✖ failing tests:
+
+test at apps\api\src\transcript-review\service.test.ts:71:5
+✖ snapshot/head re-read race (reviewed): stale writer cannot CAS a newer head (3.06ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'base-02416769fae99d9c24d30bb55b7f7b887fec78406ca99168'
+  - '9d0fb4117113bb42b5241140129c43fa4cc720c7a857c37f46732e24b6d9b2bc'
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/transcript-review/service.test.ts:91:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'base-02416769fae99d9c24d30bb55b7f7b887fec78406ca99168',
+    expected: '9d0fb4117113bb42b5241140129c43fa4cc720c7a857c37f46732e24b6d9b2bc',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,16 @@
+✔ actual canonical approval becomes exact internal message evidence through single native resolver (34.8202ms)
+✔ pending/rejected/attachment/quarantine/withdrawn/deleted source never becomes native authority (49.7941ms)
+✔ foreign tenant and changed raw text invalidate old message revision without leaking original evidence (8.2552ms)
+✔ deleted source message and missing current materialized claim refuse authority (10.4543ms)
+✔ current consent provenance changes revision while a fresh approval fence alone does not (11.3831ms)
+✔ effective transcript correction invalidates raw-bound approval inside the same source snapshot (9.5279ms)
+✔ message slicing uses exact UTF16 offsets and refuses oversized passage inventory (54.9894ms)
+✔ infrastructure and unsupported snapshot transactions are sanitized failures, never empty-success fallback (26.6404ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1708.0653

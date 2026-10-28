@@ -1,0 +1,38 @@
+import { spawn } from 'node:child_process'; import fs from 'node:fs';
+const prof='C:/Users/Lenovo/AppData/Local/Temp/claude/d--KnowledgeBase/c2ef8d8a-4751-4a78-9ee6-bc8beb4a8c1f/scratchpad/chrome-prof';
+const ch=spawn('C:/Program Files/Google/Chrome/Application/chrome.exe',['--headless=new','--remote-debugging-port=9333','--user-data-dir='+prof,'--no-first-run','--disable-gpu','about:blank'],{stdio:'ignore'});
+fs.writeFileSync('chrome.pid',String(ch.pid));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let targets; for(let i=0;i<30;i++){try{targets=await (await fetch('http://127.0.0.1:9333/json')).json();if(targets.find(t=>t.type==='page'))break;}catch{}await sleep(500);}
+const ws=new WebSocket(targets.find(t=>t.type==='page').webSocketDebuggerUrl); await new Promise(r=>ws.onopen=r);
+let id=0; const pend=new Map(); const errs=[];
+ws.onmessage=e=>{const m=JSON.parse(e.data); if(m.id&&pend.has(m.id)){pend.get(m.id)(m);pend.delete(m.id);} else if(m.method==='Runtime.exceptionThrown')errs.push('EXC '+m.params.exceptionDetails.text+' '+(m.params.exceptionDetails.exception?.description||'').slice(0,150)); else if(m.method==='Runtime.consoleAPICalled'&&m.params.type==='error')errs.push('CONSOLE '+m.params.args.map(a=>a.value||a.description).join(' ').slice(0,200));};
+const send=(method,params={})=>new Promise(r=>{const i=++id;pend.set(i,r);ws.send(JSON.stringify({id:i,method,params}));});
+const ev=async(expr)=>{const r=await send('Runtime.evaluate',{expression:expr,awaitPromise:true,returnByValue:true});if(r.result.exceptionDetails)return 'ERR '+JSON.stringify(r.result.exceptionDetails).slice(0,300);return r.result.result.value;};
+await send('Runtime.enable'); await send('Page.enable');
+const nav=async u=>{await send('Page.navigate',{url:u});await sleep(2500);};
+const H=`
+window.$sleep=ms=>new Promise(r=>setTimeout(r,ms));
+window.$until=async(f,ms=8000)=>{const t=Date.now();while(Date.now()-t<ms){try{const v=f();if(v)return v;}catch{}await $sleep(50);}throw new Error('timeout '+f);};
+window.$setVal=(el,v)=>{const p=el.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLSelectElement.prototype;Object.getOwnPropertyDescriptor(p,'value').set.call(el,v);el.dispatchEvent(new Event(el.tagName==='SELECT'?'change':'input',{bubbles:true}));};
+window.$btn=t=>[...document.querySelectorAll('button')].find(b=>b.textContent.includes(t));
+window.$txt=()=>document.body.innerText;
+window.$cov=()=>$txt().match(new RegExp('[0-9]+/[0-9]+ item reviews stored'))[0];
+window.$cb=()=>document.querySelector('input[type=checkbox]');
+window.$dls=[];`;
+const out={};
+await nav('http://127.0.0.1:5199/'); await ev(`localStorage.setItem('lkbApiKey','human')`); await nav('http://127.0.0.1:5199/extraction-review');
+await ev(H+`URL.createObjectURL=b=>{window.$dls.push(b);return 'blob:x'};HTMLAnchorElement.prototype.click=function(){window.$dls.push('click:'+this.download)};1`);
+out.render=await ev(`(async()=>{await $until(()=>$txt().includes('Fictional source 0'));return {pre:document.querySelector('pre').innerText, boldEls:document.querySelectorAll('pre b').length, label:document.querySelector('#extraction-label').value, saveDisabled:$btn('Save this individual label').disabled, cov:$cov()}})()`);
+out.amend=await ev(`(async()=>{$setVal(document.querySelector('#extraction-label'),'1');await $sleep(100);$setVal(document.querySelector('#extraction-rationale'),'First reason');await $sleep(100);$cb().click();await $sleep(100);const c1=$cb().checked;$setVal(document.querySelector('#extraction-rationale'),'Amended reason');await $sleep(150);return {affirmedBefore:c1,affirmAfterAmend:$cb().checked,saveDisabled:$btn('Save this individual label').disabled}})()`);
+out.save=await ev(`(async()=>{$cb().click();await $sleep(100);$btn('Save this individual label').click();await $until(()=>$txt().includes('item-0 stored with its authenticated audit'));return {cov:$cov(),label:document.querySelector('#extraction-label').value,stored:$txt().split('\\n').find(l=>l.startsWith('Stored label:')),audit:$txt().includes('Authenticated review audit'),server:await (await fetch('http://127.0.0.1:3300/__last')).json()}})()`);
+out.cas=await ev(`(async()=>{await fetch('http://127.0.0.1:3300/extraction-review/items/item-1',{method:'POST',headers:{Authorization:'Bearer human','Content-Type':'application/json'},body:JSON.stringify({expectedRevision:0,inputSha256:'2'.repeat(64),label:{correct:true},affirmIndividualReview:true,rationale:'out-of-band'})});
+ $setVal(document.querySelector('#extraction-item'),'1');await $sleep(150);const lab=document.querySelector('#extraction-label').value;
+ $setVal(document.querySelector('#extraction-label'),'0');await $sleep(100);$setVal(document.querySelector('#extraction-rationale'),'stale attempt');await $sleep(100);$cb().click();await $sleep(100);const covBefore=$cov();$btn('Save this individual label').click();
+ await $until(()=>document.querySelector('[role=alert]'));return {labelAfterSwitch:lab,covBefore,alert:document.querySelector('[role=alert]').innerText,cov:$cov(),affirmAfterRefusal:$cb().checked}})()`);
+out.export=await ev(`(async()=>{$btn('Export reviewed coverage').click();await $until(()=>$txt().includes('Export coverage'));const b=window.$dls.find(x=>x instanceof Blob);return {dls:window.$dls.map(x=>x instanceof Blob?'Blob:'+x.size:x),json:b?JSON.parse(await b.text()).format:null,cov:$txt().split('\\n').find(l=>l.includes(' reviewed;')),gate:$txt().includes('Actual complete human gold')}})()`);
+await ev(`localStorage.setItem('lkbApiKey','robot')`); await nav('http://127.0.0.1:5199/extraction-review');
+out.robot=await ev(H+`(async()=>{await $until(()=>document.querySelector('[role=alert]'));return {alert:document.querySelector('[role=alert]').innerText,leak:$txt().includes('Fictional source')}})()`);
+out.consoleErrors=errs;
+console.log(JSON.stringify(out,null,1));
+ws.close(); try{process.kill(ch.pid)}catch{}; process.exit(0);

@@ -1,0 +1,331 @@
+indexSession(tenant-a/source): embedding failed — chunks left unchanged: provider down
+indexSession(tenant-a/source): embedding failed — chunks left unchanged: injected write failure
+indexSession(tenant-a/source): embedding failed — chunks left unchanged: invalid embedding model identity
+✔ content identities survive rerun and store reload; changed bytes and tenants cannot reuse identity (7.1157ms)
+✔ changed source plus provider failure leaves durable rows but zero trusted stale hits; retry prunes (2.8862ms)
+✔ partial write failure never prunes prior index; empty source clears only its tenant (1.4112ms)
+✔ missing embedding model identity cannot write or prune the durable corpus (0.4445ms)
+✔ accepted session routing summaries are source-derived and truncated on UTF8 codepoint boundaries (3.0578ms)
+✖ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (48.7396ms)
+✖ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (9.2754ms)
+✖ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (14.2246ms)
+✔ durable session CAS admits one same-session owner, allows preflight retry, and never takes over uncertain writes (8.0196ms)
+✔ tree revision CAS preserves a legacy root id and refuses a stale expected root without upsert (3.2532ms)
+✖ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (12.1411ms)
+✖ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (29.4087ms)
+promoteAndPersistEntities(t/s1): promotion failed, indexing continues: boom
+✔ ISS-126: topics and orgs are UPSERTED — a mutation to upsert:false must not pass unnoticed (4.8359ms)
+✔ ISS-126: promotion NEVER deletes — a topic row spans sessions, so delete-then-insert would drop other sessions' evidence (0.7941ms)
+✔ ISS-156: the ORG body carries tenantId too — the topic assertion alone left orgs unpinned (0.7547ms)
+✔ ISS-126: the written topic carries the UNIONED sessionRefs, not just the indexed session (0.7153ms)
+✔ ISS-126/ISS-202: every write is tenant-scoped on filter AND body (0.8295ms)
+✔ ISS-126: promotion NEVER THROWS — a write failure must not strand the session (ISS-121's lesson) (1.2743ms)
+✔ ISS-126: tagClaims:false issues NO claims operation at all (the ISS-056 invariant) (0.5726ms)
+✔ ISS-126: an empty tree writes nothing rather than writing empty rows (0.8366ms)
+✔ ISS-126(4): tagClaims writes the session's REAL topicRefs onto each of its claims (1.2956ms)
+✔ ISS-126(4): a session whose tree surfaced NO topics clears topicRefs rather than leaving them stale (1.1359ms)
+✔ ISS-C-TARGETING: the claims read is scoped to THIS session, not the whole collection (1.143ms)
+✔ ISS-C-TARGETING: each claim update targets ONE claim by _id, never an open filter (0.9836ms)
+✔ ISS-C-TARGETING: topic and org upserts target their own _id, not an open filter (0.3938ms)
+✔ ISS-C-TOPICREFS-ARG-001: a claim is tagged with the INDEXED session's topics, not the other session's (0.5868ms)
+✔ C6: two tenants promoting the SAME slug write to different _ids (0.548ms)
+✔ C6: org ids are namespaced too — the same collision applies to orgs (0.6701ms)
+✔ C6: a topicRef resolves to a real topics._id — namespaced through the SAME helper (0.6696ms)
+✖ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (20.5042ms)
+✖ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (1.5822ms)
+✔ ISS-155: the dry-run preview prints the NAMESPACED id the live path writes, not the bare slug (0.6666ms)
+✖ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (33.8844ms)
+✖ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (2.4671ms)
+✖ flag ON via env var (1.9351ms)
+✖ flag ON, degraded extraction: existing decisions untouched, indexing still completes (1.7684ms)
+✖ flag ON, decisions persistence refusal is reported degraded while indexing completes (2.3505ms)
+✔ dropUnverified persists only verified item-level citations; fabricated proposals never reach the database (65.7409ms)
+✔ without dropUnverified the same fabricated proposal still fails the strict index and writes nothing (unchanged) (5.3977ms)
+✖ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (2.5287ms)
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): summary degraded — existing session_pages left unchanged: summarize provider call failed: provider down
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: chunk 0 has 3 dims, batch reports 99
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: chunk 0 has 2 dims, batch reports 3
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: embedder returned 2 vector(s) for 1 chunk(s)
+✔ standing fixture uses real recording provenance and refuses foreign or wrong source identities (5.8453ms)
+✔ stateful fixture confirms only matched generation CAS and reads back actual inserted artifacts (2.0011ms)
+✔ a DEGRADED claims extraction must NOT delete the session's existing claims (31.5872ms)
+✔ a SUCCESSFUL extraction still replaces the session's claims (delete then insert) (4.0885ms)
+✔ EVERY query AND every write indexSession issues is confined to its own tenant (ISS-060, ISS-061) (3.6588ms)
+✔ a DEGRADED run's writes are tenant-scoped too — the guard must not be a bypass (2.8661ms)
+✔ session_pages are still written on a degraded CLAIMS run — the two paths are independent (3.1713ms)
+✔ a DEGRADED summarize run with NO existing page still writes the labelled fallback (ISS-059) (3.3984ms)
+✔ a DEGRADED summarize run with a REAL existing page must NOT touch it (ISS-059, criterion 1a) (4.7307ms)
+✔ a SUCCESSFUL summarize run always replaces the page, even when one already exists (3.3866ms)
+✖ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (13.2621ms)
+✔ a FAILED embed must NOT delete the session's existing chunks (the ISS-056 shape) (6.6806ms)
+✔ a failed embed does not take the rest of indexing down with it (7.0415ms)
+✔ no embed dep at all leaves chunks completely untouched — an install without embeddings still indexes (4.6908ms)
+✔ a SUCCESSFUL embed upserts stable chunks BEFORE pruning obsolete rows (9.8132ms)
+✔ indexSession SURFACES an embedding failure in its return — a skip must not look like success (3.5854ms)
+✔ indexSession reports 'no-embedder' distinctly from a failure — an install without embeddings is not broken (3.4289ms)
+✔ indexSession reports a real chunk write, so success is positively evidenced and not merely un-thrown (7.2935ms)
+✔ writeSessionChunks reports a provider failure as skipped, never as a silent success (0.9346ms)
+✔ writeSessionChunks reports a contradictory batch (the ISS-112 assertion) as skipped, not as success (0.7329ms)
+✔ writeSessionChunks reports a real write with the count it actually inserted (0.8589ms)
+✔ writeSessionChunks reports a session with no chunkable turns distinctly from a failure (0.3661ms)
+✔ chunk rows carry a real vector, a matching dims, and turnRefs — never an embeddingRef pointer (6.3671ms)
+✔ REFUSES to write a vector whose length contradicts dims, and still finishes indexing (ISS-112) (4.5393ms)
+✔ REFUSES a batch with the wrong NUMBER of vectors, rather than pairing by index (ISS-112) (5.2334ms)
+✔ every chunk write is tenant-scoped — the same guard the claims path needed (8.6774ms)
+✔ ISS-WEBINARRELEASE-002 strict provider/parser/embedding degradation preserves prior knowledge (10.3474ms)
+✔ strict index persists validated item and claim quotations plus real candidate session tree (8.8561ms)
+✔ strict preflight never replaces prior knowledge for source, coverage, support, context or missing-session root failures (14.4953ms)
+✔ strict nonempty question/answer and screen citations survive the persistence boundary (9.56ms)
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: down
+indexSession(t/s1): embedding failed — chunks left unchanged: down
+indexSession(t/s1): embedding failed — chunks left unchanged: down
+recordVectorGap(t/s1): gap bookkeeping failed, indexing continues: E11000 duplicate key
+✔ ISS-118: a session that gets NO vectors writes an OPEN vector-pending gap row (26.958ms)
+✔ ISS-118: the gap row is UPSERTED on a derived id, so a re-index cannot accumulate duplicates (4.7814ms)
+✔ ISS-118: a SUCCESSFUL run resolves a previous gap instead of leaving a stale open one (6.7181ms)
+✔ ISS-118: the gap write is tenant-confined on both filter and body (3.0069ms)
+✖ ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids (0.8469ms)
+✔ ISS-121: a FAILING gap write must not strand the session — the tree and status flip still run (2.9984ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (37.4169ms)
+✔ ordinary vectorless publication refuses unsupported derived text before replacing artifacts (2.7576ms)
+✔ source-native extractive ordinary publication has no embedding prerequisite (6.8716ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (14.5587ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (11.6597ms)
+ISS-W045-001: 6/6 refused
+ISS-W045-002 (turns): sources0 media0 sessions0 turns0
+ISS-W045-002 (media): sources0 media0 sessions0 turns0
+✔ ISS-W045-001: recorded private/loopback/metadata targets are refused before anything is forwarded (3.5952ms)
+✔ ISS-W045-001: extra spellings, non-http schemes and credentials are refused (1.1403ms)
+✔ ISS-W045-001: hostnames resolving to private addresses (any one of several) or failing/empty DNS are refused (0.7358ms)
+✔ ISS-W045-001: a public host is forwarded; the guard wraps the default and an injected fetcher via buildSourceIntakeAdapters (3.8504ms)
+✔ ISS-W045-002: turns insertMany writes a prefix then throws -> zero rows left; other tenants untouched (1.7882ms)
+✔ ISS-W045-002: media insertMany writes a prefix then throws -> zero rows left; other tenants untouched (0.7798ms)
+✔ ISS-SOURCEREADER-001: never-resolving transport is bounded even if it ignores abort (11.8362ms)
+✔ ISS-SOURCEREADER-001: stalled response body is cancelled on deadline (12.8534ms)
+✔ ISS-SOURCEREADER-001: chunked body above byte cap without content-length is refused (1.4669ms)
+✔ declared oversized body is refused before reading and errors hide provider secrets (4.4815ms)
+✔ bounded UTF-8 content survives guarded downstream fetch with manual redirects and scoped key (1.8211ms)
+✔ invalid or expanded resource limits cannot disable bounds (0.613ms)
+✔ unknown price omits monetary field even when provider supplies a zero placeholder (2.3265ms)
+✔ reported free and positive calls survive while invalid prices are unknown (0.4689ms)
+✔ legacy finite audit shape remains compatible and invalid counts are omitted (0.331ms)
+✔ Ask completion path emits persisted-safe unknown audit without changing result identity (1.631ms)
+✔ current committed proof stamps once, preserves audit, and never resets a prior valid processing clock (298.3995ms)
+✔ stale, foreign, prior generation, incomplete and wrong-lane proofs never stamp (584.2394ms)
+✔ changed source/input bytes, disk status, sourceId and future stamp fail closed (258.2762ms)
+✔ missing proof, existing lock and redirected/hardlinked state are refused without altering audit (168.8487ms)
+✔ invalid clocks/bindings and test-data lane mismatch refuse before writes (43.8617ms)
+✔ genuine speech-only input is explicitly bound without creating a combined transcript (156.9509ms)
+✔ real status and re-emission writers preserve prior processing/audit and refuse foreign identities (293.5127ms)
+✔ explicit vectorless generation stamps and is consumed by the retention gatherer without semantic proof (216.3257ms)
+✔ vectorless proof cannot downgrade missing readiness, hashes, generation or explicit mode binding (726.6588ms)
+✔ legacy v3 cannot claim vectorless mode to bypass its semantic requirement (177.3542ms)
+ℹ tests 107
+ℹ suites 0
+ℹ pass 92
+ℹ fail 15
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28672.7615
+
+✖ failing tests:
+
+test at apps\api\src\indexing\generation.test.ts:1:3275
+✖ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (48.7396ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  502 !== 201
+  
+      at consumed (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:42:10)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:48:59)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 502,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\generation.test.ts:1:4330
+✖ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (9.2754ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  502 !== 201
+  
+      at consumed (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:42:10)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:62:59)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 502,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\generation.test.ts:1:5439
+✖ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (14.2246ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  502 !== 201
+  
+      at consumed (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:42:10)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:80:59)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 502,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\generation.test.ts:1:8693
+✖ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (12.1411ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  502 !== 201
+  
+      at consumed (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:42:10)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:125:49)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 502,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\generation.test.ts:1:9431
+✖ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (29.4087ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  502 !== 201
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.test.ts:161:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 502,
+    expected: 201,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\promote-entities.test.ts:1:10911
+✖ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (20.5042ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\promote-entities.test.ts:386:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\promote-entities.test.ts:1:11431
+✖ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (1.5822ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\promote-entities.test.ts:396:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\session-decisions.test.ts:1:613
+✖ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (33.8844ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-decisions.test.ts:25:14)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at apps\api\src\indexing\session-decisions.test.ts:1:1279
+✖ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (2.4671ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-decisions.test.ts:35:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\session-decisions.test.ts:1:2240
+✖ flag ON via env var (1.9351ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-decisions.test.ts:58:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\session-decisions.test.ts:1:2597
+✖ flag ON, degraded extraction: existing decisions untouched, indexing still completes (1.7684ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-decisions.test.ts:66:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\session-decisions.test.ts:1:3019
+✖ flag ON, decisions persistence refusal is reported degraded while indexing completes (2.3505ms)
+  Error: vectorless claim lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:20:13)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-decisions.test.ts:78:18)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\session-grounded-notes.test.ts:1:4221
+✖ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (2.5287ms)
+  Error: vectorless page lacks exact current source support
+      at assertExtractivePublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vectorless-grounding.ts:15:11)
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:103:5)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-grounded-notes.test.ts:69:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\indexing\session.test.ts:1:7161
+✖ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (13.2621ms)
+  AssertionError [ERR_ASSERTION]: a summarize outage must not affect the claims write
+  + actual - expected
+  
+    [
+      'deleteMany',
+      'insertMany',
+  +   'updateOne'
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.test.ts:181:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ 'deleteMany', 'insertMany', 'updateOne' ],
+    expected: [ 'deleteMany', 'insertMany' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\indexing\vector-gap.test.ts:1:2356
+✖ ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids (0.8469ms)
+  Error: Session is unavailable for aggregate indexing; reviewed chat claims use their approved evidence materializer
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:75:87)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\vector-gap.test.ts:88:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)

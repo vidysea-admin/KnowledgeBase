@@ -1,0 +1,18 @@
+{
+  "baseCommit": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidateKind": "ordered scoped fingerprints, not commit",
+  "candidate": "7370a5e2a6e9b773dbfa1e6d67a8a6ef3963e85f1548958df213bae281ce6ac7",
+  "newOwnedFiles": [
+    "apps/api/src/composition/integrations/native.ts",
+    "apps/api/src/composition/integrations/native.test.ts"
+  ],
+  "pins": {
+    "apps/api/src/composition/integrations/native.ts": "e3809141c5bf25c06e4026db3f41066ea6e67a502aff980911a5119c0016c12b",
+    "apps/api/src/composition/integrations/native.test.ts": "a57ab9b859a300c6c8ea48c5baa607e2d361cd5dc987a9537e4e50cdf1d221a5",
+    "apps/api/src/native-evidence/head-store.ts": "7449eeaff7a4282adfca382cdb5ea33953d15dd63962ee13dc85422390c86be7",
+    "apps/api/src/native-evidence/publication.ts": "653b2e2ab976363705b10dc23a5717e9bed9885dde3a1fb1a64abd4fdfb4af15",
+    "apps/api/src/native-evidence/resolver.ts": "152f3a0dc2fdd5d55ebfae84e1e078504254bf2c813d69f7c503146dcf71e34a",
+    "apps/api/src/ask/native-source-context.ts": "64263bb8892a5aa4e5d3c9cb08742577b066b03631872fa3c42918d2a032ba0b",
+    "apps/api/src/answer-policy/native-evidence.ts": "9474928553f111a3df0597898b1ac9ac8ca2385ac3c7fafa9cfd108cba832a92"
+  }
+}

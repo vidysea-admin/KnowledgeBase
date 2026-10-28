@@ -122,3 +122,5 @@ $ curl http://localhost:3300/gaps -H "authorization: Bearer <real key>"
    fabricated or hardcoded.
 8. Confirm `TASKS.md`'s T-010 entry is untouched (`deferred, not near-term`) and no `apps/web`
    directory was created.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

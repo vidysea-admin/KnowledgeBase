@@ -1,0 +1,16 @@
+[
+    {
+        "ok":  true,
+        "node":  "powershell_parse/download-verified.ps1",
+        "errors":  [
+
+                   ]
+    },
+    {
+        "ok":  true,
+        "node":  "powershell_parse/extract-passive.ps1",
+        "errors":  [
+
+                   ]
+    }
+]

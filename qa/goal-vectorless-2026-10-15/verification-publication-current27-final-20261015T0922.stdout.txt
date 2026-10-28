@@ -1,0 +1,36 @@
+✔ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (69.3625ms)
+✔ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (31.194ms)
+✔ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (13.5935ms)
+✔ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (10.3314ms)
+✔ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (32.0184ms)
+✔ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (44.2307ms)
+✔ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (9.6848ms)
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (45.3669ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (7.9515ms)
+✔ flag ON via env var (7.3457ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (11.1011ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (8.3922ms)
+✔ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (28.4609ms)
+✔ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (50.5002ms)
+✔ when the judge rejects every fresh claim, old machine claims are kept and the new generation is refused (8.189ms)
+✔ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (31.0745ms)
+✔ ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids (4.7046ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (34.6499ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (0.814ms)
+✔ reviewed substring cannot bypass meaning verification of full negated source context (0.9844ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (8.6133ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (13.3427ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (11.2279ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (12.495ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.512ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (14.0914ms)
+✔ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (65.1944ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11600.6965

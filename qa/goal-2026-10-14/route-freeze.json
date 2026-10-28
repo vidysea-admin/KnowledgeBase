@@ -1,0 +1,15 @@
+{
+  "checkpoint": "ROUTE_FREEZE",
+  "at": "2026-10-14T21:21:38.423Z",
+  "scope": "Shared API mount/production entrypoints and App navigation. Authorized module implementations remain independently pinned; current compiled proof pending.",
+  "pins": {
+    "apps/api/src/server.ts": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+    "apps/api/src/composition/production.ts": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+    "apps/api/src/composition/integrations/routes.ts": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+    "apps/web/src/App.tsx": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+    "apps/web/src/layout/NavSidebar.tsx": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+    "apps/web/src/pages/MeetingBotPage.tsx": "b9bda3e6242631a2c53dc5b0c93000552f4935553e5ee7ac8dd4b06d571e5153",
+    "apps/web/src/pages/sessions/SessionDetailPage.tsx": "16bd213ad66f6c76b2555cce655fa7e2a880f0be5b170e2022aeb41db2620487"
+  },
+  "parentAcceptance": "NOT VERIFIED"
+}

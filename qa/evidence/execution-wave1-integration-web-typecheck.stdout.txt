@@ -1,0 +1,8 @@
+apps/web/src/pages/meeting-bot/SendNowForm.test.tsx(122,12): error TS2532: Object is possibly 'undefined'.
+apps/web/src/pages/meeting-bot/SendNowForm.test.tsx(123,12): error TS2532: Object is possibly 'undefined'.
+apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx(62,52): error TS2322: Type 'string' is not assignable to type 'null'.
+apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx(63,16): error TS2322: Type 'string' is not assignable to type 'null'.
+apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx(63,67): error TS2322: Type 'string' is not assignable to type 'null'.
+apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx(63,79): error TS2322: Type 'null' is not assignable to type 'string'.
+apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx(72,12): error TS2532: Object is possibly 'undefined'.
+apps/web/src/pages/meeting-bot/useSendNowStatus.test.tsx(72,82): error TS2532: Object is possibly 'undefined'.

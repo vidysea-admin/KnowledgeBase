@@ -1,0 +1,90 @@
+{
+  "supplements": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\cycle2-tree-summary.json",
+  "original_receipt_sha256": "fa1d7b7de556e33e50ec9b6b8026d82f10fe6e555ba1fdfd14b49d90ac908c7c",
+  "reason": "Decode Node log UTF8 explicitly; original Windows locale parser left empty counts. No tests rerun.",
+  "active_s": 21.40599999999995,
+  "results": [
+    {
+      "label": "deadline-cycle2-fixture-regressions",
+      "exit": 0,
+      "pid": 19692,
+      "counts": {
+        "tests": 3,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_s": 4.938000000000102,
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle2-fixture-regressions.log",
+      "log_sha256": "522c32137ca60f606c6cfda5a551e5a0d6653354546ea15d42b3469a3e0a6bd6",
+      "pins_unchanged": true,
+      "rows_restored": true,
+      "writer_intersection": [],
+      "tree_close_completed": true
+    },
+    {
+      "label": "deadline-cycle2-original-composition",
+      "exit": 1,
+      "pid": 12976,
+      "counts": {
+        "tests": 1,
+        "pass": 0,
+        "fail": 1,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_s": 6.453000000000429,
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle2-original-composition.log",
+      "log_sha256": "708b71888f2bdda24d41ca9e8bab47751ac961716ac4c165a0e205784c5dc466",
+      "pins_unchanged": true,
+      "rows_restored": true,
+      "writer_intersection": [],
+      "tree_close_completed": true
+    },
+    {
+      "label": "deadline-cycle2-immediate-consumers-and-ledger-floor",
+      "exit": 0,
+      "pid": 10248,
+      "counts": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_s": 4.733999999999469,
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-cycle2-immediate-consumers-and-ledger-floor.log",
+      "log_sha256": "e0b7fbd93e5751a663f0153151d1cc18da54e1b1e76371c7db68d1f9b97b43cd",
+      "pins_unchanged": true,
+      "rows_restored": true,
+      "writer_intersection": [],
+      "tree_close_completed": true
+    },
+    {
+      "label": "t052-cycle2-state",
+      "exit": 0,
+      "pid": 21832,
+      "counts": {
+        "tests": 1,
+        "pass": 1,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "duration_s": 4.061999999999898,
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t052-cycle2-state.log",
+      "log_sha256": "d389d29676b24354a2d8ed396e12a7d9fb9538fe6d1add349092ddff0ee46d6f",
+      "pins_unchanged": true,
+      "rows_restored": null,
+      "writer_intersection": [],
+      "tree_close_completed": true
+    }
+  ],
+  "actual_total_tokens": null,
+  "independent_verdict": null
+}

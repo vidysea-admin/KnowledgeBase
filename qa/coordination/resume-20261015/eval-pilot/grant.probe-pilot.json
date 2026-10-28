@@ -1,0 +1,26 @@
+{
+  "format": "root-single-question-pilot-binding-v1",
+  "actor": "root acting on explicit user-approved goal",
+  "id": "root-user-approved-ollama-single-question-20261015-probe-and-pilot",
+  "scope": "single-question-pilot",
+  "approvedAt": "2026-10-15T20:26:56.447Z",
+  "expiresAt": "2026-10-15T20:28:50.587Z",
+  "corpusSha256": "cbd1c84d1caf3b2f4a0c07808e10705411196aa93e19b875a0f66ccc39c19ebe",
+  "sourceCandidateSha256": "40852e5ea0cec9550f3600fe9bf7e6992aa1a5db96f30a6d4d837467d8629d65",
+  "configSha256": "a64bd71b467faf5a9a7badc5464fbb6562eb9d8bfaffa6bfe0bbc49059305b68",
+  "selection": "first approved question ID sorted lexically",
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "budget": {
+    "maxAttempts": 3,
+    "maxSeconds": 60,
+    "callTimeoutMs": 20000,
+    "maxInputBytes": 32000,
+    "maxRequestBytes": 32000,
+    "maxResponseBytes": 262144,
+    "outputLimit": 256,
+    "maxKnownInputTokens": 32768,
+    "maxKnownOutputTokens": 768
+  },
+  "availability": "probe current configured GLM exactID then pilot; first actual production inference is authenticated access probe; no aliases/catalog assumption",
+  "evidenceReference": "root explicit model-probe plus productionpilot authorization; no Umesh signature asserted"
+}

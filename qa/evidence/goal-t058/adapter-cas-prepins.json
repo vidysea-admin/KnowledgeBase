@@ -1,0 +1,29 @@
+{
+  "scope": "Proposed actual repository/scoped adapter boundary using captured fake driver only; no real Mongo durability/provider/UI proof",
+  "fixCycle": 0,
+  "pins": {
+    "apps/api/src/knowledge-outputs/repository-adapter.test.ts": "976893aa0d43ccd7261ee16bad116389d86d852689564cdd17210eac7afe0c8a",
+    "apps/api/src/knowledge-outputs/repository.ts": "657503bc407d80bb49463084dd0c7c53ddf858ca4de05d34a8c31765f7d82d38",
+    "apps/api/src/knowledge-outputs/validator.ts": "aeca988ff12d3ea69b6043ef48f45a87f6feeaaa15e694cdb1f0b3245faf4a43",
+    "apps/api/src/knowledge-outputs/assessment.ts": "f9217c2a74397356c96e13953c48e3166eebef9cc008eff6f7925fe2f1565c79",
+    "apps/api/src/knowledge-outputs/types.ts": "a806b11f8b780e0281a2abff014afbb337812b9425858e2a634d355e86fc6838",
+    "apps/api/src/db-name.ts": "8aecc3782e05724f70633e004bbfe8041ef0e75ee4793bc4629c175e02bf83c6",
+    "apps/api/src/answer-policy/rules.ts": "85235c6ecc2dc701d276ce5034ad681a6d2b90e560d4794b0ba2a7d36d53912b",
+    "apps/api/src/answer-policy/types.ts": "f12d49a6c9ebeaeb13ead1ffa6a4fb968e9e66fab5009dc1e87b7913f38872f6",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/core/src/generated/knowledge_outputs.ts": "a167d36fb0831e12ba81fb0dc3e94387edd55dc036966f8c1ee70b50f4eedb7c",
+    "schema/knowledge_outputs.schema.json": "abadc5330bd0f189e6fb064c4bbb315c78b0405455358394c70e202cc02434a1",
+    "qa/packets/t058-output-workbench.fixture.json": "568b8b466b0f01b5974cbbd6884fad354240a657a4a86b4a028c188dc4269c98",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+    "apps/api/src/knowledge-outputs/service.ts": "ef2e628119bb1267a2f36e2c95d226e4a9bef4d521a083abd8614a19ca53ad7b",
+    "apps/api/src/knowledge-outputs/evidence.ts": "2117a93784a48b75e39f1ff6570643981a0ebbf37d34f662f87a6359c34918b8",
+    "apps/api/src/knowledge-outputs/synthesis.ts": "ddc95220e65c160a85d7008415d91395ec5021836320a2b9e0169bdb91b5b00c",
+    "apps/api/src/knowledge-outputs/markdown.ts": "b08bffc6aecb055447e110a92f3bdef83f290cd2bccd8e8b31aa086febf90bb5",
+    "packages/core/src/knowledge-outputs/evidence-builder.ts": "6ce8503d40948feb875c4abb7996c5fcef7b16b56f468432ba75128a46ec0367",
+    "apps/api/src/answer-policy/application.ts": "de29bbf4667d4f345bc1c2d7bb6d5968ac9a5d3267b53f0229229aa514fb6bfb",
+    "apps/api/src/answer-policy/service.ts": "d79bfbf73b225a07da868f23e700665daed6627cc013c9f03f577df5000f35c1",
+    "apps/api/src/answer-policy/store.ts": "3a3dfc461e0b2abe9afedc780ae63027f739ec3cfee301f16159843a8623be74",
+    "apps/api/src/answer-policy/conflicts.ts": "ec8e3a9374a4bc6242ddb3fab9fae7265cc861ceab4116697998f6539f89e78c",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1"
+  }
+}

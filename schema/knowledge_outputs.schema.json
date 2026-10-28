@@ -1,0 +1,305 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://knowledge_outputs",
+  "title": "knowledge_outputs",
+  "type": "object",
+  "required": [
+    "_id",
+    "tenantId",
+    "kind",
+    "title",
+    "purpose",
+    "sessionIds",
+    "revision",
+    "createdAt",
+    "updatedAt",
+    "sourceDigest",
+    "provider",
+    "model",
+    "reviewState",
+    "sections",
+    "citations",
+    "sourceCoverage"
+  ],
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "enum": [
+        "faq",
+        "report",
+        "meeting-brief"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "sessionIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sourceDigest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "provider": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewState": {
+      "const": "draft"
+    },
+    "policy": {
+      "type": "object",
+      "required": [
+        "policyId",
+        "version",
+        "questionClass",
+        "mode",
+        "style",
+        "onInsufficient",
+        "citations"
+      ],
+      "properties": {
+        "policyId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "questionClass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "enum": [
+            "internal-only",
+            "internal-and-web"
+          ]
+        },
+        "style": {
+          "enum": [
+            "concise",
+            "detailed"
+          ]
+        },
+        "onInsufficient": {
+          "enum": [
+            "review",
+            "refuse"
+          ]
+        },
+        "citations": {
+          "const": "required"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "items",
+          "missing"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "kind",
+                "text",
+                "citationIds",
+                "validation",
+                "assessmentDigest"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "kind": {
+                  "enum": [
+                    "fact",
+                    "suggestion",
+                    "question"
+                  ]
+                },
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "citationIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1
+                },
+                "validation": {
+                  "enum": [
+                    "ai-supported",
+                    "needs-review"
+                  ]
+                },
+                "assessmentDigest": {
+                  "type": "string",
+                  "pattern": "^(?:[0-9a-f]{64})?$"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "missing": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "claimId",
+          "turnId",
+          "sessionId",
+          "speakerRef",
+          "start",
+          "end",
+          "unit",
+          "quote",
+          "href"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "claimId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "turnId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sessionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "speakerRef": {
+            "type": "string",
+            "minLength": 1
+          },
+          "speakerLabel": {
+            "type": "string"
+          },
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end": {
+            "type": "number",
+            "minimum": 0
+          },
+          "unit": {
+            "enum": [
+              "seconds",
+              "characters"
+            ]
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 1
+          },
+          "href": {
+            "type": "string",
+            "minLength": 1
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "claimStatus": {
+            "enum": [
+              "verified",
+              "needs-review"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "sourceCoverage": {
+      "type": "object",
+      "required": [
+        "status",
+        "withheldClaims"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "ready",
+            "partial"
+          ]
+        },
+        "withheldClaims": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

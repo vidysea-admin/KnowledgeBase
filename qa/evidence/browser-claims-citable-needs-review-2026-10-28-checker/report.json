@@ -1,0 +1,109 @@
+{
+ "unit": "claims-citable-needs-review",
+ "date": "2026-10-28",
+ "browser": "Google Chrome (visible, non-headless) over CDP, fresh profile, killed after",
+ "chromePid": 23340,
+ "pages": {
+  "knowledgeOutputs": {
+   "loaded": {
+    "h1": "Knowledge outputs"
+   },
+   "fill": {
+    "checked": true,
+    "submitDisabled": false
+   },
+   "generated": {
+    "status": "AI draft · revision 1 · Model grounding assessment completed; human review required.",
+    "partialNote": true,
+    "withheldNote": "1",
+    "citations": [
+     {
+      "text": "Admissions expert · 3–9 seconds | Applications open Monday.",
+      "hasMarker": false,
+      "href": "/sessions/s1#turn-t1"
+     },
+     {
+      "text": "Financial aid officer · 40–52 seconds Unverified (needs review) | Scholarship forms are due on the fifteenth.",
+      "hasMarker": true,
+      "href": "/sessions/s1#turn-t2"
+     }
+    ],
+    "markerCountOnPage": 1,
+    "conflictingQuoteShown": false
+   },
+   "exportMarkdown": {
+    "disabled": false,
+    "lines": [
+     "A: Applications open Monday\\.",
+     "> Applications open Monday\\.",
+     "A: Scholarship forms are due on the fifteenth\\.",
+     "> Scholarship forms are due on the fifteenth\\.",
+     "[s1 / t2](/sessions/s1#turn-t2) · Financial aid officer (speaker:2) · 40–52 seconds · Unverified (needs review)"
+    ],
+    "markerLines": 1
+   },
+   "consoleErrors": 0,
+   "errors": []
+  },
+  "citationClickTarget": {
+   "afterClick": {
+    "url": "/sessions/s1#turn-t2",
+    "h1": "Admissions briefing (synthetic)",
+    "turns": [
+     {
+      "id": "t1",
+      "text": "Admissions expert | 3s–9s | Applications open Monday. The board decided to extend the deadline.",
+      "border": "rgb(229, 229, 224)"
+     },
+     {
+      "id": "t2",
+      "text": "Financial aid officer | 40s–52s | Scholarship forms are due on the fifteenth. Bring two references.",
+      "border": "rgb(183, 121, 31)"
+     },
+     {
+      "id": "t3",
+      "text": "Registrar | 70s–80s | Transcripts are waived entirely this year.",
+      "border": "rgb(229, 229, 224)"
+     }
+    ],
+    "citedText": "Financial aid officer | 40s–52s | Scholarship forms are due on the fifteenth. Bring two references.",
+    "notFound": false,
+    "citedInViewport": true,
+    "citedHighlightedVsOthers": true
+   },
+   "consoleErrors": 0,
+   "errors": []
+  },
+  "reopenSaved": {
+   "markerCount": 1,
+   "consoleErrors": 0,
+   "errors": []
+  }
+ },
+ "seen": [
+  "GET /sessions",
+  "GET /knowledge-outputs",
+  "GET /sessions",
+  "GET /knowledge-outputs",
+  "POST /knowledge-outputs",
+  "GET /knowledge-outputs",
+  "POST /knowledge-outputs/cd7799ce-37f9-44ab-b388-078b93c64577/export",
+  "GET /sessions/s1",
+  "GET /sessions/s1",
+  "GET /sessions/s1/speaker-suggestions",
+  "GET /sessions/s1/grounded-content",
+  "GET /sessions/s1/decisions",
+  "GET /sessions/s1/transcript-review",
+  "GET /sessions/s1/speaker-suggestions",
+  "GET /sessions/s1/grounded-content",
+  "GET /sessions/s1/decisions",
+  "GET /sessions/s1/transcript-review",
+  "GET /sessions",
+  "GET /knowledge-outputs",
+  "GET /sessions",
+  "GET /knowledge-outputs",
+  "GET /knowledge-outputs/cd7799ce-37f9-44ab-b388-078b93c64577",
+  "GET /__seen"
+ ],
+ "totalConsoleErrors": 0
+}

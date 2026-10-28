@@ -1,0 +1,34 @@
+✔ actual extractor routes decisions; real readback survives into independent measurement consumer (5.8996ms)
+✔ fabricated citations remain in raw and parsed before actual filtering; degraded readback is skipped (0.8689ms)
+✔ actual JSON and literal text remain distinct; no raw text is manufactured from JSON (0.8443ms)
+✔ missing, inaccessible and malformed readback stay unknown; rows are never generated from proposals (1.2617ms)
+✔ provider failures and malformed output never become clean empty measurements (1.2624ms)
+✔ genuine provider empty remains distinct from empty source without a provider observation (0.6568ms)
+✔ scope refusal precedes provider/readback; actual invalid-source extraction remains degraded (1.2145ms)
+✔ captured stage snapshots resist later mutation and expose foreign storage citations (1.1152ms)
+✔ records exact source and completion artifacts through actual tree and evaluation consumers (6.1467ms)
+✔ disabled, missing and empty pages preserve distinct unavailable extraction and actual tree evidence (1.3877ms)
+✔ actual producer fallback and valid-empty results remain distinguishable (13.9768ms)
+✔ unknown or malformed usage and unpriced zero never become measured aggregate cost (3.6053ms)
+✔ foreign, mismatched, duplicate and invalid inputs refuse before completion (1.0149ms)
+✔ returned evidence stays immutable after late timed-out completion and caller mutation (7.1583ms)
+✔ exact-byte identity changes and actual regeneration are retained (2.2771ms)
+✔ unchanged migrated sample bytes feed producer and actual searchable topic nodes (1.6085ms)
+✔ resume restores saved controls and original date, pending items stay empty, export validates (8.103ms)
+✔ render binds exact input bytes, retains context and prevents script breakout (2.3818ms)
+✔ resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer (1.1194ms)
+✔ real bound source inventory retains acquisition and stage gaps without source text (572.7574ms)
+✔ requests reject malformed, duplicate and unknown stage names (0.7929ms)
+✔ alternate measurement and invalid CLI arguments fail closed without diagnostics (0.5835ms)
+✔ executed provenance binds local router adapters parser barrel lock resolver and runtime (1123.852ms)
+✔ executed provenance predecessor consumer refuses stale missing runtime or after-run bindings (17.5681ms)
+✔ dirty form retains edits across navigation, export and restore until explicit save or discard (138.3511ms)
+✔ async restore cannot overwrite edits or assertions made during file reading (52.4027ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5976.0348

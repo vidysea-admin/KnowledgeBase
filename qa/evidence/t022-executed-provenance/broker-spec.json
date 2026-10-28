@@ -1,0 +1,21 @@
+{
+  "unit": "t022-executed-provenance",
+  "cycle": 0,
+  "candidateId": "sha256:5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+  "kind": "read-only-actual-collector-inspection",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": ["qa/evidence/t022-executed-provenance/inspect-actual.mjs"],
+  "timeoutMs": 30000,
+  "exclusiveCpu": true,
+  "privateReviewOptIn": "must be genuinely unset",
+  "writes": "broker-owned immutable stdout/stderr/receipt only; inspection script writes nothing",
+  "outputs": "JSON counts, SHA256 digests and fixed statuses only; no source, corpus, option or environment values",
+  "directScope": {
+    "fixed": ["scripts/eval/human-calibration.mjs", "scripts/eval/calibration-review.mjs", "scripts/eval/llm-eval.mjs", "apps/api/src/score.ts", "packages/ask/src/eval/calibration.ts", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "tsconfig.base.json", "apps/api/package.json", "apps/api/tsconfig.json", "packages/ai/package.json", "packages/ai/tsconfig.json", "scripts/eval/human-calibration.test.mjs", "qa/evidence/t022-executed-provenance/inspect-actual.mjs", "qa/evidence/t022-executed-provenance/broker-spec.json"],
+    "membership": "recursively enumerate packages/ai/src/**/*.ts excluding *.test.ts, refuse symlinks, sort paths, compare complete before/after membership and raw-file pins",
+    "resolved": ["canonical @lkb/ai from apps/api/src/score.ts must equal packages/ai/src/index.ts", "canonical import.meta.resolve('tsx/esm/api') must be ESM API index.mjs", "canonical actual process.execPath"],
+    "beforeAfter": "script independently hashes entire direct scope before import/inspection and after; broker also pins script/spec, runtime, lock and source candidate in its immutable receipt"
+  },
+  "scopeLimits": "No provider imports/calls, private corpus, DB, browser, network, tests or source edits. Existing 26-case green receipt remains separately attributed. No full external transitive-byte closure claim. Missing/mismatched inventory/resolution fails closed with fixed refusal status."
+}

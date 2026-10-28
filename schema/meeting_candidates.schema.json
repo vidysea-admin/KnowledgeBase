@@ -2,26 +2,149 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "kb://meeting_candidates",
   "title": "meeting_candidates",
-  "description": "A meeting-shaped email found by scanning Gmail (T-028: Gmail meeting-candidate approval workflow). Never auto-ingested as a real session — a human approves it first, or the sending pattern has already earned trust (see trusted_senders). One row per real Gmail message, deduped by messageId.",
+  "description": "A meeting-shaped email found by scanning Gmail (T-028: Gmail meeting-candidate approval workflow). Never auto-ingested as a real session \u2014 a human approves it first, or the sending pattern has already earned trust (see trusted_senders). One row per real Gmail message, deduped by messageId.",
   "type": "object",
-  "required": ["_id", "tenantId", "messageId", "subject", "senderEmail", "senderDomain", "status", "detectedAt"],
+  "required": [
+    "_id",
+    "tenantId",
+    "messageId",
+    "subject",
+    "senderEmail",
+    "senderDomain",
+    "status",
+    "detectedAt"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "messageId": { "type": "string", "minLength": 1, "description": "The real Gmail message id — dedup key." },
-    "subject": { "type": "string" },
-    "senderEmail": { "type": "string", "minLength": 1 },
-    "senderDomain": { "type": "string", "minLength": 1 },
-    "meetingUrl": { "type": "string" },
-    "eventDate": { "type": "string", "format": "date-time" },
-    "status": { "type": "string", "enum": ["pending", "approved", "rejected", "auto_approved"] },
-    "detectedAt": { "type": "string", "format": "date-time" },
-    "decidedAt": { "type": "string", "format": "date-time" },
-    "kind": { "type": "string", "enum": ["past-recording", "upcoming"], "description": "U2 source-watcher: whether the body's own links/text describe a recording of a session already held, or an invite to one still to come." },
-    "startTime": { "type": "string", "format": "date-time", "description": "U2: parsed from the body's own stated date/time (e.g. 'Day & Date: ... Time: 11:00 AM - 12:00 PM IST'). Absent when the body states no time." },
-    "endTime": { "type": "string", "format": "date-time" },
-    "recordingUrl": { "type": "string", "description": "U2: a Drive/YouTube/Zoom-recording link found in the body, distinct from meetingUrl (the live join link)." },
-    "registrationOnly": { "type": "boolean", "description": "U2: true when the body carries only a registration link and no direct join link — stays a human decision (webinar registration forms are never auto-submitted)." }
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "messageId": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The real Gmail message id \u2014 dedup key."
+    },
+    "threadId": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{1,256}$",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Literal Gmail thread identity for registration-confirmation correlation."
+    },
+    "registrationUrl": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Literal registration URL from acquisition; not proof of submission or confirmed attendance."
+    },
+    "subject": {
+      "type": "string"
+    },
+    "senderEmail": {
+      "type": "string",
+      "minLength": 1
+    },
+    "senderDomain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "meetingUrl": {
+      "type": "string"
+    },
+    "eventDate": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "auto_approved"
+      ]
+    },
+    "detectedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decidedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "past-recording",
+        "upcoming"
+      ],
+      "description": "U2 source-watcher: whether the body's own links/text describe a recording of a session already held, or an invite to one still to come."
+    },
+    "startTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "U2: parsed from the body's own stated date/time (e.g. 'Day & Date: ... Time: 11:00 AM - 12:00 PM IST'). Absent when the body states no time."
+    },
+    "endTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "recordingUrl": {
+      "type": "string",
+      "description": "U2: a Drive/YouTube/Zoom-recording link found in the body, distinct from meetingUrl (the live join link)."
+    },
+    "registrationOnly": {
+      "type": "boolean",
+      "description": "Registration is required: scheduling stays barred until verified direct join evidence. Approved automated registration must retain this barrier until confirmation; this field grants no submission permission."
+    },
+    "receivedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "youtubeWatch": {
+      "type": "object",
+      "required": [
+        "url",
+        "videoId",
+        "source"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "videoId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "enum": [
+            "body",
+            "snippet"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "youtubeWatchIssue": {
+      "const": "ambiguous"
+    },
+    "meetingLinkIssue": {
+      "enum": [
+        "ambiguous",
+        "registration-only",
+        "host-start-link"
+      ]
+    },
+    "evidenceIssue": {
+      "enum": [
+        "unresolved-body",
+        "unsupported-attachment"
+      ],
+      "description": "Acquisition refusal. Retained across rescans; never authorizes attendance or sender trust."
+    }
   },
   "additionalProperties": true
 }

@@ -1,0 +1,468 @@
+{
+  "scope": "independent in-memory synthetic metadata and pure lexical refusal; no filesystem corpus, export or trainer",
+  "startedAt": "2026-10-14T20:55:30.467Z",
+  "completedAt": "2026-10-14T20:55:30.494Z",
+  "elapsedMs": 26.371700000000004,
+  "relatedThroughExcludedSession": {
+    "cases": 20,
+    "crossSplitViolations": 14,
+    "samples": [
+      {
+        "seed": "independent-0",
+        "groups": [
+          [
+            "a"
+          ],
+          [
+            "c"
+          ],
+          [
+            "d"
+          ],
+          [
+            "e"
+          ]
+        ],
+        "splitA": "evaluation",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-1",
+        "groups": [
+          [
+            "e"
+          ],
+          [
+            "a"
+          ],
+          [
+            "c"
+          ],
+          [
+            "d"
+          ]
+        ],
+        "splitA": "validation",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-2",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "e"
+          ],
+          [
+            "a"
+          ],
+          [
+            "c"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-3",
+        "groups": [
+          [
+            "a"
+          ],
+          [
+            "c"
+          ],
+          [
+            "e"
+          ],
+          [
+            "d"
+          ]
+        ],
+        "splitA": "evaluation",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-4",
+        "groups": [
+          [
+            "a"
+          ],
+          [
+            "e"
+          ],
+          [
+            "c"
+          ],
+          [
+            "d"
+          ]
+        ],
+        "splitA": "evaluation",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-5",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "e"
+          ],
+          [
+            "c"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-6",
+        "groups": [
+          [
+            "a"
+          ],
+          [
+            "c"
+          ],
+          [
+            "d"
+          ],
+          [
+            "e"
+          ]
+        ],
+        "splitA": "evaluation",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-7",
+        "groups": [
+          [
+            "e"
+          ],
+          [
+            "c"
+          ],
+          [
+            "d"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-8",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "c"
+          ],
+          [
+            "e"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-9",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "e"
+          ],
+          [
+            "c"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-10",
+        "groups": [
+          [
+            "c"
+          ],
+          [
+            "d"
+          ],
+          [
+            "a"
+          ],
+          [
+            "e"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "evaluation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-11",
+        "groups": [
+          [
+            "a"
+          ],
+          [
+            "c"
+          ],
+          [
+            "e"
+          ],
+          [
+            "d"
+          ]
+        ],
+        "splitA": "evaluation",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-12",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "e"
+          ],
+          [
+            "c"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-13",
+        "groups": [
+          [
+            "e"
+          ],
+          [
+            "d"
+          ],
+          [
+            "c"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-14",
+        "groups": [
+          [
+            "c"
+          ],
+          [
+            "d"
+          ],
+          [
+            "a"
+          ],
+          [
+            "e"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "evaluation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-15",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "e"
+          ],
+          [
+            "c"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-16",
+        "groups": [
+          [
+            "d"
+          ],
+          [
+            "c"
+          ],
+          [
+            "e"
+          ],
+          [
+            "a"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "validation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-17",
+        "groups": [
+          [
+            "c"
+          ],
+          [
+            "e"
+          ],
+          [
+            "a"
+          ],
+          [
+            "d"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "evaluation",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-18",
+        "groups": [
+          [
+            "a"
+          ],
+          [
+            "e"
+          ],
+          [
+            "d"
+          ],
+          [
+            "c"
+          ]
+        ],
+        "splitA": "evaluation",
+        "splitC": "train",
+        "splitReady": true
+      },
+      {
+        "seed": "independent-19",
+        "groups": [
+          [
+            "c"
+          ],
+          [
+            "d"
+          ],
+          [
+            "a"
+          ],
+          [
+            "e"
+          ]
+        ],
+        "splitA": "train",
+        "splitC": "evaluation",
+        "splitReady": true
+      }
+    ]
+  },
+  "privateNamespaceRefusals": {
+    "cases": 12,
+    "refused": 12,
+    "results": [
+      {
+        "path": "\\\\server\\share\\new",
+        "refused": true
+      },
+      {
+        "path": "//server/share/new",
+        "refused": true
+      },
+      {
+        "path": "\\\\?\\C:\\new",
+        "refused": true
+      },
+      {
+        "path": "\\\\.\\pipe\\new",
+        "refused": true
+      },
+      {
+        "path": "\\??\\C:\\new",
+        "refused": true
+      },
+      {
+        "path": "C:\\new:stream",
+        "refused": true
+      },
+      {
+        "path": "C:\\NUL",
+        "refused": true
+      },
+      {
+        "path": "C:\\CON.txt",
+        "refused": true
+      },
+      {
+        "path": "C:\\AUX",
+        "refused": true
+      },
+      {
+        "path": "C:\\LPT1",
+        "refused": true
+      },
+      {
+        "path": "C:new",
+        "refused": true
+      },
+      {
+        "path": "https://example.invalid/new",
+        "refused": true
+      }
+    ]
+  },
+  "foreignRefused": true,
+  "permissionRefused": true
+}

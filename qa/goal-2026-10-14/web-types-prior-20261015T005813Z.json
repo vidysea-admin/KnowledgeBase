@@ -1,0 +1,19 @@
+{
+  "phase": "web-types",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/web",
+    "typecheck"
+  ],
+  "pid": 13440,
+  "exit": 2,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-15T00:47:22.401Z",
+  "endedAt": "2026-10-15T00:47:33.701Z",
+  "elapsedMs": 11300,
+  "stdout": "\n> @lkb/web@0.0.0 typecheck C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\n> tsc --noEmit -p tsconfig.json\n\nsrc/pages/counsellor/Avatar.context-loss.test.tsx(23,5): error TS2322: Type 'Mock<() => WebGLProgram | null>' is not assignable to type '() => WebGLProgram'.\r\n  Type 'WebGLProgram | null' is not assignable to type 'WebGLProgram'.\r\n    Type 'null' is not assignable to type 'WebGLProgram'.\r\nsrc/pages/counsellor/Avatar.context-loss.test.tsx(23,63): error TS2322: Type 'Mock<() => WebGLBuffer | null>' is not assignable to type '() => WebGLBuffer'.\r\n  Type 'WebGLBuffer | null' is not assignable to type 'WebGLBuffer'.\r\n    Type 'null' is not assignable to type 'WebGLBuffer'.\r\nsrc/pages/counsellor/Avatar.context-loss.test.tsx(40,71): error TS2352: Conversion of type '{ VERTEX_SHADER: 35633; FRAGMENT_SHADER: 35632; COMPILE_STATUS: 35713; LINK_STATUS: 35714; ARRAY_BUFFER: 34962; STATIC_DRAW: 35044; FLOAT: 5126; DEPTH_TEST: 2929; COLOR_BUFFER_BIT: 16384; DEPTH_BUFFER_BIT: 256; ... 26 more ...; deleteBuffer: Mock<...>; }' to type 'WebGLRenderingContext' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.\r\n  Type '{ VERTEX_SHADER: 35633; FRAGMENT_SHADER: 35632; COMPILE_STATUS: 35713; LINK_STATUS: 35714; ARRAY_BUFFER: 34962; STATIC_DRAW: 35044; FLOAT: 5126; DEPTH_TEST: 2929; COLOR_BUFFER_BIT: 16384; DEPTH_BUFFER_BIT: 256; ... 26 more ...; deleteBuffer: Mock<...>; }' is missing the following properties from type 'WebGLRenderingContext': canvas, drawingBufferColorSpace, drawingBufferHeight, drawingBufferWidth, and 397 more.\r\nC:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web:\r\n ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/web@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`\nExit status 2\n",
+  "stderr": ""
+}

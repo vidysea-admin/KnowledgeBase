@@ -1,0 +1,65 @@
+{
+  "cycle": 2,
+  "candidate": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "request": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/probe-contract-request.json",
+    "sha256": "0c892bc46709baa7cbd5f9007d3de2ccd19b1968c15439f3a9ede835c2b418f4"
+  },
+  "narrowPins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af.json",
+    "sha256": "85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af",
+    "count": 23
+  },
+  "priorCanonicalSha256": "bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac",
+  "priorIndependentIdentitySha256": "7d28f230c8f15d6e758e6770cde183213000f8c07df1fca1c232af0c01a570e4",
+  "gitEightVerified": true,
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-identity-receipt.json",
+      "sha256": "c6175d16a10ef24250a27f447c993b769d85e234fa28b358c9aa202ec107353c",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.3440000000009604,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-identity.log",
+        "sha256": "8365a5ca3d812e358fc5d4af712549bf86109689b16922cad73a6c5cf292516e"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-boundary2-receipt.json",
+      "sha256": "2290c30407e826aaeceea43e386e5264e668d3cfb5625405ba132803cf4b844e",
+      "exit": 0,
+      "counts": {
+        "tests": 2,
+        "pass": 2,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 9.125,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-boundary2.log",
+        "sha256": "b277fa6585c6e6cde77bbfe79f5d4d15ee98a330aa8fb1ec6929087c2144721a"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-contracts-receipt.json",
+      "sha256": "68dc4322bbd5159cac23612393986a106dcc8a49ac532ba9cc6af30ef76272da",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.21900000000096043,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-checker-cycle2-contracts.log",
+        "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8"
+      }
+    }
+  ],
+  "contractVacuity": true,
+  "failure": null,
+  "elapsed_s": 10.234000000000378,
+  "allPinsFinalMatch": true,
+  "accounting": "CHECKER child aggregate; actual tokens/cost unknown, no maker transfer",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

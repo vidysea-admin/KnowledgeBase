@@ -19,6 +19,8 @@ export interface WatchedSources {
     fetchedAt: string;
     hash: string;
     diffFrom: string | null;
+    sourceRef?: string;
+    sessionId?: string;
     [k: string]: unknown;
   };
   [k: string]: unknown;

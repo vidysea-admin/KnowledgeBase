@@ -1,0 +1,38 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=145000",
+    "--test-name-pattern=^retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse$",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630.json",
+    "sha256": "d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630",
+    "count": 90
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 150,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 24796,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 107.625,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-original-node1-original1.log",
+    "sha256": "ffc6886068d0f6f3b7d6630f509429d9f93e6e62613f52160f47ac16efdca5a5"
+  },
+  "counts": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

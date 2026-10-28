@@ -1,0 +1,32 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "scope": "Vectorless webinar publication proof maker verification",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; temporary fixture filesystem only",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "scripts/webinar/index-proof.test.mjs"
+  ],
+  "testIDs": [
+    "scripts/webinar/index-proof.test.mjs"
+  ],
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-pipeline-proof-20261015T0802",
+  "pins": {
+    "scripts/webinar/index-proof.mjs": "704aa4c9a2cc85b32bfe85155c9c8bc0400cff42ec34d3c3c3c98dca4919f06a",
+    "scripts/webinar/index-proof.test.mjs": "346802359c79a662d1d7c015f239388f3d0a4617911b2bc191c72fc23ff4a3cf",
+    "scripts/webinar/sync-session.mjs": "95f970f5b43501064eddcd1f47d2be751825842a761465c40660a08020bb015b",
+    "qa/goal-vectorless-2026-10-15/verification-runner.mjs": "14b68b047ad469669923dac0197e3a26253e5ab36161d4503bc4ddfe69948a75",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  }
+}

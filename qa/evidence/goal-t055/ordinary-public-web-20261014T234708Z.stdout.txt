@@ -1,0 +1,23 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx (3 tests | 2 skipped) 139ms
+ ✓ src/pages/knowledge/KnowledgeDocumentsPage.test.tsx (5 tests) 284ms
+ ✓ src/pages/knowledge/CuratedCollections.test.tsx (4 tests) 268ms
+ ↓ src/pages/knowledge/GoalT055ProducerArtifact.test.tsx (1 test | 1 skipped)
+ ✓ src/pages/knowledge/catalog/KnowledgeTopicsPage.test.tsx (1 test) 146ms
+ ✓ src/pages/knowledge/DocumentPageEvidence.test.tsx (2 tests) 97ms
+ ✓ src/pages/knowledge/catalog/knowledgeCatalogClient.test.ts (2 tests) 7ms
+ ✓ src/pages/knowledge/GoalT055AppIntegration.test.tsx (1 test) 291ms
+ ✓ src/pages/knowledge/catalog/KnowledgeResourcesPage.test.tsx (1 test) 136ms
+ ✓ src/pages/knowledge/collectionsClient.test.ts (2 tests) 10ms
+ ✓ src/pages/knowledge/documentClient.test.ts (2 tests) 5ms
+ ✓ src/pages/knowledge/speakers/speakerProfileClient.test.ts (1 test) 3ms
+ ✓ src/pages/knowledge/documentPageModel.test.ts (1 test) 3ms
+
+ Test Files  12 passed | 1 skipped (13)
+      Tests  23 passed | 3 skipped (26)
+   Start at  23:47:08
+   Duration  26.79s (transform 1.97s, setup 2.46s, collect 7.66s, tests 1.39s, environment 10.61s, prepare 1.81s)
+
+

@@ -1,0 +1,30 @@
+{
+  "label": "t056-api",
+  "request_sha256": "c242c4f4997b481219c48c1c7a2dc05f5cad802ed55c1c4da498cac02f61a6ab",
+  "packet_sha256": "2daf41590618364c285f69ab0b6feeb0b460ae42bc2d538a51b1c76a23a5ca4c",
+  "actual_total_tokens": null,
+  "independent_verdict": null,
+  "original_command": "node --import tsx --test --test-name-pattern=\"direct older|direct legacy|direct answer read|reported evidence uses|all reported conflicts|graph selector conflict replay|changed evidence or policy\" apps/api/src/answer-policy/answer-workflow.test.ts apps/api/src/answer-policy/answer-router.test.ts",
+  "preflight": {
+    "argv": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--input-type=module",
+      "-e",
+      "import React from 'react';import {JSDOM} from 'jsdom';console.log(JSON.stringify({executable:process.execPath,version:process.version,react:React.version,jsdom:typeof JSDOM,vitest:import.meta.resolve('vitest')}))"
+    ],
+    "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+    "pid": 20884,
+    "started_utc": "2026-10-15T22:41:45Z",
+    "exit": 0,
+    "tree_close_completed": true,
+    "active_s": 2.0930000000007567,
+    "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t056-preflight.log",
+    "log_sha256": "8bbd5508c3eaec67ac8ae0040f8545a249acc46c5a11f4c7b4a7b8f0548833ff"
+  },
+  "active_intersection": [
+    "apps/api/src/indexing/chunk-integrity.ts"
+  ],
+  "checkpoint": "AssertionError: active central runtime closure",
+  "pins_after": {},
+  "pins_unchanged": false
+}

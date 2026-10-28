@@ -1,0 +1,46 @@
+diff --git a/apps/api/src/connector-workflow/watched.ts b/apps/api/src/connector-workflow/watched.ts
+index 2db7ed4d..648d0bbd 100644
+--- a/apps/api/src/connector-workflow/watched.ts
++++ b/apps/api/src/connector-workflow/watched.ts
+@@ -19,6 +19,9 @@ export interface ConnectorWatchOutcome {
+ /** One service instance owns an in-flight tenant lock. Distributed cadence remains an operational gate. */
+ export function createConnectorWatchVerifier(deps: ConnectorWorkflowDeps) {
+   const active = new Set<string>();
++  // One bounded sweep hint, never an authority or healthy-fetch receipt. A service host
++  // owns one verifier for its verified identity; another tenant starts a fresh sweep.
++  let cursor: { tenantId: string; afterId: string } | undefined;
+   return async function verify(tenantId: string, auth?: VerifiedKey): Promise<{ outcomes: ConnectorWatchOutcome[]; remaining: number }> {
+     assertValidTenantId(tenantId, "connector.verifyWatch");
+     deps.store.assertWritableTenant(tenantId);
+@@ -29,13 +32,30 @@ export function createConnectorWatchVerifier(deps: ConnectorWorkflowDeps) {
+     active.add(tenantId);
+     try {
+       const rows = await deps.store.listWatched(tenantId);
++      // Validate the entire result before selection: even an out-of-batch corrupt row
++      // must not cause another tenant's URL to be acquired or its ID to be disclosed.
++      const ids = new Set<string>();
++      for (const row of rows) {
++        if (row.tenantId !== tenantId) throw new ConnectorWorkflowError(503, "watched_tenant_mismatch");
++        if (typeof row._id !== "string" || !row._id || row._id.length > 4096 || ids.has(row._id)) {
++          throw new ConnectorWorkflowError(503, "watched_identity_invalid");
++        }
++        ids.add(row._id);
++      }
++      const ordered = [...rows].sort((a, b) => a._id < b._id ? -1 : a._id > b._id ? 1 : 0);
++      // Strict ordering also resumes after a deleted cursor. Exhaustion wraps on the
++      // next tick; failed/not-due rows advance the hint and are retried next sweep.
++      const afterId = cursor?.tenantId === tenantId ? cursor.afterId : undefined;
++      const start = afterId === undefined ? 0 : ordered.findIndex(row => row._id > afterId);
++      const selected = ordered.slice(start < 0 ? 0 : start);
+       const outcomes: ConnectorWatchOutcome[] = [];
+       const limit = 25;
+       const deadline = Date.now() + 120000;
+       let processed = 0;
+-      for (const row of rows) {
++      for (const row of selected) {
+         if (processed >= limit || Date.now() >= deadline) break;
+         processed++;
++        cursor = { tenantId, afterId: row._id };
+         // A corrupted store must never forward another tenant's URL or expose its id.
+         if (row.tenantId !== tenantId) throw new ConnectorWorkflowError(503, "watched_tenant_mismatch");
+         if (!isDueForCheck(row, deps.now())) { outcomes.push({ id: row._id, status: "not-due" }); continue; }

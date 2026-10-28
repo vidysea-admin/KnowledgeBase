@@ -1,0 +1,12 @@
+✔ independent real central factory/server lifecycle, role bypass and tenant consumer proof (2035.1632ms)
+✔ T060 independent mounted key authority and persisted pending commit fence across unrelated scopes (384.4267ms)
+✔ T060 independent real mounted registry/event/signed transport/status and restart replay (573.7221ms)
+✔ independent central unavailable/corrupt durable account metadata fails closed at unrelated consumer (121.2138ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6528.7908

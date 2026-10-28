@@ -1,0 +1,225 @@
+diff --git a/apps/web/src/pages/counsellor/CounsellorPage.test.tsx b/apps/web/src/pages/counsellor/CounsellorPage.test.tsx
+index 4bce7b42..c1db0900 100644
+--- a/apps/web/src/pages/counsellor/CounsellorPage.test.tsx
++++ b/apps/web/src/pages/counsellor/CounsellorPage.test.tsx
+@@ -34,6 +34,63 @@ describe("counsellor authenticated consumer", () => {
+     expect(adapter.speak.mock.calls[0]![0]).toContain("Internal knowledge was insufficient and the web fallback is unavailable.");
+     expect(screen.getByLabelText("Your question")).toHaveValue("spoken visa question");
+   });
++  test("conversation completes two spoken turns after one explicit start and never listens during readback", async () => {
++    const spy = vi.spyOn(askApi, "ask").mockResolvedValue(response());
++    mount(); fireEvent.click(screen.getByRole("checkbox")); fireEvent.click(screen.getByRole("button", { name: "Ask by voice" }));
++    act(() => adapter.listen.mock.calls[0]![0]("first spoken question"));
++    await waitFor(() => expect(adapter.speak).toHaveBeenCalledTimes(1));
++    act(() => adapter.notify!("idle")); expect(adapter.listen).toHaveBeenCalledTimes(1);
++    const firstEnd = adapter.speak.mock.calls[0]![2];
++    act(() => firstEnd()); expect(adapter.listen).toHaveBeenCalledTimes(2);
++    act(() => { firstEnd(); adapter.listen.mock.calls[1]![0]("second spoken question"); });
++    await waitFor(() => expect(adapter.speak).toHaveBeenCalledTimes(2));
++    expect(adapter.listen).toHaveBeenCalledTimes(2);
++    expect(spy.mock.calls).toEqual([["test", "first spoken question"], ["test", "second spoken question"]]);
++    act(() => adapter.speak.mock.calls[1]![2]()); expect(adapter.listen).toHaveBeenCalledTimes(3);
++  });
++  test.each(["stop", "mode off", "language", "account", "logout", "same key", "unmount"])("%s retires a captured readback completion", async (action) => {
++    const spy = vi.spyOn(askApi, "ask").mockResolvedValue(response()); const view = mount();
++    fireEvent.click(screen.getByRole("checkbox")); fireEvent.click(screen.getByRole("button", { name: "Ask by voice" }));
++    const transcript = adapter.listen.mock.calls[0]![0]; act(() => transcript("first question"));
++    await waitFor(() => expect(adapter.speak).toHaveBeenCalledTimes(1)); const end = adapter.speak.mock.calls[0]![2];
++    if (action === "stop") fireEvent.click(screen.getByRole("button", { name: "Stop voice and cancel answer" }));
++    if (action === "mode off") fireEvent.click(screen.getByRole("checkbox"));
++    if (action === "language") fireEvent.change(screen.getByLabelText("Voice language"), { target: { value: "hi-IN" } });
++    if (action === "account") fireEvent.click(screen.getByRole("button", { name: "Change account" }));
++    if (action === "logout") fireEvent.click(screen.getByRole("button", { name: "Logout" }));
++    if (action === "same key") fireEvent.click(screen.getByRole("button", { name: "Same key login" }));
++    if (action === "unmount") view.unmount();
++    act(() => { end(); transcript("stale question"); });
++    expect(adapter.listen).toHaveBeenCalledTimes(1); expect(spy).toHaveBeenCalledTimes(1);
++  });
++  test("old completion cannot restart a newly started conversation", async () => {
++    vi.spyOn(askApi, "ask").mockResolvedValue(response()); mount();
++    fireEvent.click(screen.getByRole("checkbox")); fireEvent.click(screen.getByRole("button", { name: "Ask by voice" }));
++    act(() => adapter.listen.mock.calls[0]![0]("first question"));
++    await waitFor(() => expect(adapter.speak).toHaveBeenCalledTimes(1)); const oldEnd = adapter.speak.mock.calls[0]![2];
++    fireEvent.click(screen.getByRole("button", { name: "Stop voice and cancel answer" }));
++    fireEvent.click(screen.getByRole("checkbox")); fireEvent.click(screen.getByRole("button", { name: "Ask by voice" }));
++    act(() => oldEnd()); expect(adapter.listen).toHaveBeenCalledTimes(2);
++  });
++  test.each(["recognition denied", "recognition unavailable", "synthesis failed", "voice unavailable"])("%s ends enabled conversation without rearming", async (failure) => {
++    vi.spyOn(askApi, "ask").mockResolvedValue(response()); mount();
++    fireEvent.click(screen.getByRole("checkbox")); fireEvent.click(screen.getByRole("button", { name: "Ask by voice" }));
++    if (failure.startsWith("recognition")) {
++      act(() => adapter.notify!("error", failure));
++    } else {
++      act(() => adapter.listen.mock.calls[0]![0]("question"));
++      await waitFor(() => expect(adapter.speak).toHaveBeenCalledTimes(1));
++      act(() => { adapter.notify!("error", failure); adapter.speak.mock.calls[0]![2](); });
++    }
++    expect(screen.getByRole("checkbox")).not.toBeChecked(); expect(adapter.listen).toHaveBeenCalledTimes(1);
++    expect(screen.getByRole("alert")).toHaveTextContent(failure);
++  });
++  test("API failure ends conversation rather than listening or reading a previous answer", async () => {
++    vi.spyOn(askApi, "ask").mockRejectedValue(new ApiError(503, "unavailable")); mount();
++    fireEvent.click(screen.getByRole("checkbox")); fireEvent.click(screen.getByRole("button", { name: "Ask by voice" }));
++    act(() => adapter.listen.mock.calls[0]![0]("question")); await screen.findByRole("alert");
++    expect(screen.getByRole("checkbox")).not.toBeChecked(); expect(adapter.listen).toHaveBeenCalledTimes(1); expect(adapter.speak).not.toHaveBeenCalled();
++  });
+   test("dictation is editable and blank input cannot call ask", () => {
+     const spy = vi.spyOn(askApi, "ask").mockResolvedValue(response()); mount(); submit("   "); expect(spy).not.toHaveBeenCalled();
+     fireEvent.click(screen.getByRole("button", { name: "Dictate question" })); act(() => adapter.listen.mock.calls[0]![0]("dictated question"));
+diff --git a/apps/web/src/pages/counsellor/CounsellorPage.tsx b/apps/web/src/pages/counsellor/CounsellorPage.tsx
+index 00057bac..eb12eee1 100644
+--- a/apps/web/src/pages/counsellor/CounsellorPage.tsx
++++ b/apps/web/src/pages/counsellor/CounsellorPage.tsx
+@@ -9,12 +9,15 @@ import { Avatar } from "./Avatar.js";
+ import { BrowserVoice, type VoiceState } from "./voice.js";
+ import { coverageNote, sessionRef, sourceQuotes, spokenAnswer } from "./provenance.js";
+ 
++type ConversationSession = { owner: string; language: string };
++
+ export function CounsellorPage(): React.ReactElement {
+   const { apiKey, sessionVersion } = useAuth();
+   const identity = `${sessionVersion}:${apiKey ?? ""}`;
+   const owner = useRef(identity); owner.current = identity;
+   const generation = useRef(0);
+   const voice = useRef<BrowserVoice | null>(null);
++  const conversationSession = useRef<ConversationSession | null>(null);
+   const [voiceState, setVoiceState] = useState<VoiceState>("idle");
+   const [question, setQuestion] = useState("");
+   const [language, setLanguage] = useState("en-IN");
+@@ -30,18 +33,20 @@ export function CounsellorPage(): React.ReactElement {
+     const adapter = new BrowserVoice((state, detail) => {
+       if (!mounted.current || owner.current !== sentOwner) return;
+       setVoiceState(state); if (detail) setError(detail);
++      if (state === "error") { conversationSession.current = null; setConversation(false); }
+     });
+     voice.current = adapter;
+     setViewOwner(sentOwner);
+     setQuestion(""); setResult(null); setPending(false); setError(null); setVoiceState("idle"); setConversation(false);
+-    return () => { mounted.current = false; generation.current++; adapter.stop(); voice.current = null; };
++    return () => { mounted.current = false; generation.current++; conversationSession.current = null; adapter.stop(); voice.current = null; };
+   }, [identity]);
+   function stop(): void {
+-    generation.current++; voice.current?.stop(); setPending(false); setConversation(false);
++    generation.current++; conversationSession.current = null; voice.current?.stop(); setPending(false); setConversation(false);
+   }
+-  async function submit(text: string, readback = false): Promise<void> {
++  async function submit(text: string, readback = false, session?: ConversationSession): Promise<void> {
+     const query = text.trim();
+     if (!query || !apiKey || pending) return;
++    if (!session) conversationSession.current = null;
+     voice.current?.stop();
+     const sentOwner = identity;
+     const sentGeneration = ++generation.current;
+@@ -51,23 +56,28 @@ export function CounsellorPage(): React.ReactElement {
+       const response = await ask(apiKey, query);
+       if (!current()) return;
+       setResult({ owner: sentOwner, value: response }); setPending(false);
+-      if (readback) voice.current?.speak(spokenAnswer(response), language);
++      if (readback) voice.current?.speak(spokenAnswer(response), language, session ? () => {
++        if (current() && conversationSession.current === session) listen(session);
++      } : undefined);
+     } catch (failure) {
+       if (!current()) return;
+-      setPending(false); setVoiceState("error");
++      conversationSession.current = null; setConversation(false); setPending(false); setVoiceState("error");
+       setError(failure instanceof ApiError ? failure.message : "The knowledge service could not answer. Try again.");
+     }
+   }
+-  function listen(): void {
+-    if (!apiKey || pending) return;
++  function listen(existingSession?: ConversationSession): void {
++    if (!apiKey || (!existingSession && pending)) return;
++    if (existingSession && (conversationSession.current !== existingSession || existingSession.owner !== owner.current)) return;
++    const session = existingSession ?? (conversation ? { owner: identity, language } : undefined);
++    conversationSession.current = session ?? null;
+     setError(null); setResult(null);
+     const sentOwner = identity;
+     const sentGeneration = ++generation.current;
+     voice.current?.listen((text) => {
+       if (!mounted.current || owner.current !== sentOwner || generation.current !== sentGeneration) return;
+       setQuestion(text);
+-      if (conversation) void submit(text, true);
+-    }, language);
++      if (session && conversationSession.current === session) void submit(text, true, session);
++    }, session?.language ?? language);
+   }
+   const answer = result?.owner === identity ? result.value : null;
+   const ownsView = viewOwner === identity;
+@@ -82,15 +92,15 @@ export function CounsellorPage(): React.ReactElement {
+         <select id="counsellor-language" value={language} onChange={(event) => { stop(); setLanguage(event.target.value); }}>
+           <option value="en-IN">English (India)</option><option value="en-US">English (US)</option><option value="hi-IN">Hindi (India)</option>
+         </select>
+-        <p><label><input type="checkbox" checked={conversation} disabled={pending || voiceState === "listening"} onChange={(event) => { voice.current?.stop(); setConversation(event.target.checked); }} /> Voice conversation: send each spoken question and read its answer automatically</label></p>
+-        <button type="button" disabled={!apiKey || pending || voiceState === "listening"} onClick={listen}>{conversation ? "Ask by voice" : "Dictate question"}</button>{" "}
++        <p><label><input type="checkbox" checked={conversation} onChange={(event) => { stop(); setConversation(event.target.checked); }} /> Voice conversation: send each spoken question and read its answer automatically</label></p>
++        <button type="button" disabled={!apiKey || pending || voiceState === "listening"} onClick={() => listen()}>{conversation ? "Ask by voice" : "Dictate question"}</button>{" "}
+         <button type="button" onClick={stop}>Stop voice and cancel answer</button>
+         <form onSubmit={(event) => { event.preventDefault(); void submit(question, conversation); }}>
+           <p><label htmlFor="counsellor-question">Your question</label></p>
+           <textarea id="counsellor-question" value={ownsView ? question : ""} disabled={!apiKey || pending} onChange={(event) => setQuestion(event.target.value)} rows={4} style={{ width: "100%", font: "inherit" }} />
+           <button type="submit" disabled={!apiKey || pending || !question.trim()}>{pending ? "Finding an answer…" : "Ask counsellor"}</button>
+         </form>
+-        <p>Dictation lets you edit the transcript before sending. In conversation mode, press Ask by voice for each new turn. Stop cancels local playback and ignores any pending answer.</p>
++        <p>Dictation lets you edit the transcript before sending. In conversation mode, press Ask by voice once; listening resumes after each spoken answer finishes. Stop ends the conversation and ignores any pending answer.</p>
+       </div>
+     </section>
+     {ownsView && error && <div className="card error-note" role="alert">{error}</div>}
+@@ -98,7 +108,7 @@ export function CounsellorPage(): React.ReactElement {
+       <section className="card"><h2>Answer</h2><p style={{ whiteSpace: "pre-wrap" }}>{answer.answer}</p>
+         {coverageNote(answer) && <p role="status">{coverageNote(answer)}</p>}
+         <p>Coverage verdict: {answer.verdict}{answer.reason ? ` — ${answer.reason}` : ""}</p>
+-        <button type="button" onClick={() => { setError(null); voice.current?.speak(spokenAnswer(answer), language); }}>Read answer aloud</button>
++        <button type="button" onClick={() => { stop(); setError(null); voice.current?.speak(spokenAnswer(answer), language); }}>Read answer aloud</button>
+       </section>
+       <section className="card"><h2>Internal sources ({answer.sources.internal.length})</h2>
+         {!answer.sources.internal.length && <p>No internal sources returned.</p>}
+diff --git a/apps/web/src/pages/counsellor/voice.test.ts b/apps/web/src/pages/counsellor/voice.test.ts
+index 99ea3062..8a63fb06 100644
+--- a/apps/web/src/pages/counsellor/voice.test.ts
++++ b/apps/web/src/pages/counsellor/voice.test.ts
+@@ -39,6 +39,23 @@ describe("browser voice lifecycle", () => {
+     const lateStart = env.utterance().onstart; lateStart(); expect(env.states.at(-1)).toBe("speaking");
+     env.utterance().onend(); lateStart(); expect(env.states.at(-1)).toBe("idle");
+   });
++  test("completion is emitted once only by the current successful synthesis end", () => {
++    const env = environment(), complete = vi.fn(); env.voice.speak("answer", "en-IN", complete);
++    const end = env.utterance().onend; expect(complete).not.toHaveBeenCalled();
++    env.utterance().onstart(); expect(complete).not.toHaveBeenCalled();
++    end(); end(); expect(complete).toHaveBeenCalledOnce();
++  });
++  test.each(["stop", "replacement", "error", "no voice", "unavailable", "throw"])("%s cannot emit a successful completion", (action) => {
++    const env = environment(), complete = vi.fn();
++    if (action === "no voice") env.host.speechSynthesis.getVoices.mockReturnValue([]);
++    if (action === "unavailable") delete env.host.SpeechSynthesisUtterance;
++    if (action === "throw") env.host.speechSynthesis.speak.mockImplementation(() => { throw new Error("failed"); });
++    env.voice.speak("answer", "en-IN", complete); const oldEnd = env.utterance()?.onend;
++    if (action === "stop") env.voice.stop();
++    if (action === "replacement") env.voice.speak("new answer", "en-IN");
++    if (action === "error") env.utterance().onerror();
++    oldEnd?.(); expect(complete).not.toHaveBeenCalled();
++  });
+   test("stop cancels synthesis and ignores old start/error events", () => {
+     const env = environment(); env.voice.speak("answer", "en-IN");
+     const old = env.utterance(), start = old.onstart, error = old.onerror; env.voice.stop();
+diff --git a/apps/web/src/pages/counsellor/voice.ts b/apps/web/src/pages/counsellor/voice.ts
+index 839a1347..258808cf 100644
+--- a/apps/web/src/pages/counsellor/voice.ts
++++ b/apps/web/src/pages/counsellor/voice.ts
+@@ -68,7 +68,7 @@ export class BrowserVoice {
+     try { recognition.start(); this.notify("listening"); }
+     catch { this.stop(); this.notify("error", "The microphone could not start. Try again or type your question."); }
+   }
+-  speak(text: string, lang: string): void {
++  speak(text: string, lang: string, onComplete?: () => void): void {
+     this.stop();
+     if (!this.canSpeak) { this.notify("error", "Spoken output is unavailable in this browser. The answer remains readable."); return; }
+     const synthesis = this.host.speechSynthesis;
+@@ -81,7 +81,7 @@ export class BrowserVoice {
+     const utterance = new this.host.SpeechSynthesisUtterance(text);
+     this.utterance = utterance; utterance.lang = lang; utterance.voice = voice;
+     utterance.onstart = () => { if (generation === this.generation) this.notify("speaking"); };
+-    utterance.onend = () => { if (generation === this.generation) { this.generation++; this.utterance = null; this.notify("idle"); } };
++    utterance.onend = () => { if (generation === this.generation) { this.generation++; this.utterance = null; this.notify("idle"); onComplete?.(); } };
+     utterance.onerror = () => { if (generation === this.generation) { this.generation++; this.utterance = null; this.notify("error", "Spoken output failed. The answer remains readable."); } };
+     synthesis.speak(utterance);
+     }

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "issue": "ISS-WAVECTORLESS-002",
+  "recordedDate": "2026-10-15",
+  "status": "IMPLEMENTED_UNVERIFIED_LEDGER_OPEN_NO_NEW_CODE_FIX_ESTABLISHED",
+  "sourceReadsOnly": true,
+  "originalReproduction": "Pause approval after checkEvidence source read; tenant owner commits sources.consent.given=false; resume approval. Ledger records conceptual reproduction only; no executed concurrent Mongo baseline.",
+  "finding": "Current store.ts already implements genuine same-source transactional fence. No evidence of still-missing CAS code after reading current source. Prior owner packet claiming no protocol is superseded by whatsapp-consent-race manifest/current bytes.",
+  "implementedProtocol": {
+    "path": "apps/api/src/whatsapp/review/store.ts",
+    "sha256": "EDE283F9F87666A4F93EE146900A796704AEADE851F784602573F08C4104BE37",
+    "function": "fenceApproval",
+    "filter": "tenantId + _id + kind=whatsapp-batch + path=groupJid + consent.given != false",
+    "write": "$set sourceMeta.whatsappReviewFence=fresh randomUUID per transaction attempt",
+    "receipt": "acknowledged===true && matchedCount===1 && modifiedCount===1",
+    "ordering": "Same ClientSession transaction: load candidate, checkEvidence, genuine source fence write, conditional candidate status write, materialize. Matching approved idempotent retries recheck evidence and write fresh fence without republishing.",
+    "linearization": "Owner consent withdrawal modifies same sources document. Mongo write conflict/retry prevents approving a pre-withdrawal snapshot after withdrawal wins; retry rechecks withdrawn consent. If approval wins first, subsequent withdrawal makes fresh trusted readers refuse. This is design/source assessment, not executed native proof.",
+    "rollback": "Materializer failure rolls source fence, candidate decision and claim back together; no standalone fallback."
+  },
+  "contracts": [
+    {
+      "path": "qa/contracts/whatsapp-ingestion-first-slice.md",
+      "clauses": "C9 quarantine, C10 atomic tenant-scoped review/retry, C11 preserved ingest state, C12 evidence, C14 real persistence/full checks"
+    },
+    {
+      "path": "qa/contracts/goal-t007-visibility.md",
+      "clauses": "1 tenant-qualified authority, 3 fresh revocation, 6 independent source+consumer verification"
+    }
+  ],
+  "schemaOrPivot": {
+    "required": false,
+    "reason": "Existing schema/sources.schema.json properties.sourceMeta explicitly allows additionalProperties=true; sourceMeta.whatsappReviewFence uses that existing extension slot. No schema/generated/migration/enforcement path required for this implementation. Do not invent a second revision schema. Any newly required consent endpoint is a separate behavior/scope decision, not established by this issue."
+  },
+  "leasePlan": {
+    "newImplementationLeaseNeeded": false,
+    "state": "SOURCE_FROZEN_PENDING_EXISTING_CANDIDATE_VERIFICATION",
+    "existingUnit": "qa/manifests/whatsapp-consent-race.md",
+    "paths": [
+      "apps/api/src/whatsapp/review/store.ts",
+      "apps/api/src/whatsapp/review/test-fixtures.ts",
+      "apps/api/src/whatsapp/review/wire-fixtures.ts",
+      "apps/api/src/whatsapp/review/consent-race.test.ts",
+      "apps/api/src/whatsapp/review/consent-race-mongo.test.ts"
+    ],
+    "sharedCollisions": "Review store and fixture paths are shared with current whatsapp-vectorless-integration candidate, standing review tests and downstream native publication fixtures. Reconcile/freeze exact current dependency pins before broker execution; no shared composition/schema changes required.",
+    "knownDrift": {
+      "path": "apps/api/src/whatsapp/review/test-fixtures.ts",
+      "oldRaceManifestSHA256": "9818A498C41CBE9E2363BE07738F27C84AC54A97E3398236A80E4A87D6F09713",
+      "currentSHA256": "F1BB0508854AF86BF5ADDE0197882D5BC09E7AD31081E2E2AEE24CD8874B098C",
+      "assessment": "Actual dependency drift found; cause not inspected. Requires owner reconciliation; not proof of production defect."
+    }
+  },
+  "minimalCommands": [
+    {
+      "classification": "ordinary fixture stage only, sole broker after freeze",
+      "cwd": "apps/api",
+      "outerTimeoutSeconds": 60,
+      "command": "node --import tsx --test --test-concurrency=1 --test-timeout=30000 src/whatsapp/review/consent-race.test.ts src/whatsapp/review/store.test.ts",
+      "measurement": "Five authored race protocol/rollback tests plus unchanged store regressions including ISSUE001 floor; actual count/own exit/source/environment fingerprints required; no native serialization claim."
+    },
+    {
+      "classification": "actual recorded reproduction; native writes only after separate explicit isolated replica-set authorization",
+      "cwd": "apps/api",
+      "outerTimeoutSeconds": 75,
+      "requiredEnvironmentNames": [
+        "LKB_WHATSAPP_CONSENT_MONGO_RUN=1",
+        "LKB_WHATSAPP_CONSENT_MONGO_URI",
+        "LKB_WHATSAPP_CONSENT_MONGO_DB=lkb_wa_consent_test_<unique_run>"
+      ],
+      "command": "node --import tsx --test --test-concurrency=1 --test-timeout=45000 src/whatsapp/review/consent-race-mongo.test.ts",
+      "measurement": "Original source-read pause/withdrawal-commit/resume interleaving; approval-first visibility/idempotent retry; publisher rollback. Native test demands hello.setName and explicit isolated database prefix; creates/deletes only random tenant rows. Disabled/skipped test is not proof."
+    }
+  ],
+  "nativeLimitation": "Existing staging Mongo previously established standalone. No Mongo connection or fresh topology inspection in this survey. Code is implemented despite native proof being blocked; existing native acceptance test refuses standalone. Do not convert/start Mongo, create test DB or enable env here. Issue stays open until independent matching-candidate evidence and required native proof.",
+  "nextAction": "Do not assign fresh CAS builder from old issue prose. Reconcile fixture drift and current frozen candidate, then broker existing ordinary protocol/consumer suite, then independent bounded review. Native gate remains separately named. If actual failed reproduction reveals residual logic, root may grant the five-file lease for a new fix cycle; no source change justified presently.",
+  "accounting": "No tests/providers/DB/children or source writes performed; metadata plan only. Original issue remains OPEN, no PASS/closure."
+}

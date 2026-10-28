@@ -1,0 +1,29 @@
+{
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts",
+    "apps/api/src/indexing/speaker-suggest.test.ts"
+  ],
+  "pins": {
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts": "D08F0DDFD618DC932BD0E1FAA67060CC85DF9F40C9D0C631A827CE34879837FA",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/router.test.ts": "8dcc08ac59fa440db22f847078db5c81249ba1a9fe7ea492303c75be1f64ba80",
+    "apps/api/src/speaker-profiles/router.ts": "18bac45b3d9316cbd9fe7866ad79d8fe8148fea4cc6dea3d351f23883bff37f7",
+    "apps/api/src/speaker-profiles/store.test.ts": "6eb5f5d9b7db008a51f56ea8e8e818f7e39b51b0eb41f6705777486aab68c662",
+    "apps/api/src/speaker-profiles/store.ts": "169d7a1d4f4d21964bace80516f2eda370b6d9cff7af65005eb638ec0297cb5d",
+    "apps/api/src/indexing/speaker-suggest.ts": "2b58a82039c070f0be158fed4df349e31e485e37893a7f578f2bd4a1c4b16667",
+    "apps/api/src/indexing/speaker-suggest.test.ts": "3ECF81D258E7ED79E7256821984E48B4CF5C4F32E6B2F2DFBA45DC9D954BAE86",
+    "apps/api/src/indexing/testutils.ts": "f3430a3135fbb14e5014e9368d60d6f56801a861e1fdfeca8f3dc21bb2bcfd62"
+  },
+  "timeoutMs": 60000,
+  "env": {
+    "U24_EVIDENCE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase/qa/evidence/u24-speaker-profile"
+  },
+  "output": "qa/evidence/goal-t051checker-broker-u24-maker-cycle1"
+}

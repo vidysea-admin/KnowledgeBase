@@ -1,0 +1,48 @@
+{
+  "maker": {
+    "tokens": null,
+    "cost": null,
+    "active_s": null
+  },
+  "reviewers": [
+    {
+      "budget_debit": {
+        "active_s": 120,
+        "tokens": 200000
+      },
+      "id": "runtime_usage_checker-prior",
+      "tokens": 209800,
+      "cost": null,
+      "active_s": null
+    }
+  ],
+  "next_phase": {
+    "tokens": 100000,
+    "cost": null,
+    "kind": "review",
+    "active_s": 60
+  },
+  "bootstrap_scope": "Explicit root SAMEchecker narrow continuation: write independent public probe only, stop queued. Prior actualTOTAL209800/output748 retained; no reread/new reviewer. Additional200000actualTOTAL in100k probe+100k final; outputremaining2250 separate; additionalactive90s includes60probe+30final.",
+  "bootstrap": {
+    "active_s": 210,
+    "tokens": 409800
+  },
+  "escalation": {
+    "limits": {
+      "tokens": 409800,
+      "cost": null,
+      "active_s": 210
+    },
+    "reason": "Mandatory independent metadata/privacy/unknown/refused-path probe after completed source reads; no duplicated broker request",
+    "authority": "Root explicit narrow continuation"
+  },
+  "completion_reserve": false,
+  "manual_completion_reserve": {
+    "units": "actual_total_input_plus_output",
+    "tokens": 100000,
+    "active_s": 30
+  },
+  "allocated_output_budget_remaining": 2250,
+  "prior_output_tokens": 748,
+  "ratio_verified": false
+}

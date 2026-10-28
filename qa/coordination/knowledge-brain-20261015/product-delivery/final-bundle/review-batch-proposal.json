@@ -1,0 +1,106 @@
+{
+  "kind": "TWO_UNIT_REVIEW_BATCH_PROPOSAL_NOT_ADMISSION",
+  "recorded_at": "2026-10-15T11:58:54.245Z",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "authority": "PARENT_FINITE_AUTHORITY_PENDING; proposal only, not grant/gate/dispatch",
+  "units": [
+    {
+      "slug": "t058-saved-summary-refresh",
+      "cycle": 0,
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "3b7d35f8801dd853b2898dd6302e5199ec8f2f4a8bd4bb8be4064f883876dc98",
+      "candidate_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "packet": "qa/coordination/knowledge-brain-20261015/product-delivery/outputs-maker-packet.md",
+      "note": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/t058-saved-summary-refresh.md",
+      "manifest": "qa/manifests/t058-saved-summary-refresh.md",
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "clauses": "qa/contracts/goal-t058.md C6,C8,C12",
+      "owned_current_sha256": {
+        "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080",
+        "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx": "5ec3d5f6568692749d2a0109b6037028e4877563b7ac849f8879420dcebc032f"
+      },
+      "direct_consumer_current_sha256": {
+        "apps/web/src/api/knowledge-outputs.ts": "40a2023787696bbafa67c91d78a8c356051800afa9beae467f79d1696a7af61d"
+      },
+      "all_named_pins_match_bundle": true
+    },
+    {
+      "slug": "product-transcript-refresh-warning",
+      "cycle": 1,
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+      "candidate_sha": "cfb521695c119fb407eb240ba11e6b07aa4b4edee40683e9eeac44ae25cd3173",
+      "candidate_kind": "SHA256 of owned paths in listed order; path TAB lowercase raw-file SHA256 LF, UTF8; working-tree content ID, not commit",
+      "packet": "qa/packets/product-transcript-refresh-warning.md",
+      "note": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/product-transcript-refresh-warning.md",
+      "manifest": "qa/manifests/product-transcript-refresh-warning.md",
+      "raw_diff": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+      "clauses": "qa/contracts/goal-T054.md clause10; AGENTS affected/downstream/validator",
+      "owned_current_sha256": {
+        "apps/web/src/pages/transcript-review/TranscriptReview.tsx": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca",
+        "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx": "cd93a30f56cb2302c779a5e4c2b89b4de0772d422ab62beec1840b959b4e1a55",
+        "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx": "23e6b64a803228deebeeaa683db4375e7e8d358126e94220dd82bf337dffd4c5"
+      },
+      "direct_consumer_current_sha256": {
+        "apps/web/src/pages/transcript-review/ReviewHistory.tsx": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+        "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx": "ea1f6f01d60f75cd43dde8c96725d46eb6a4fd1ad2b5f0753998e4a19299403e",
+        "apps/web/src/api/transcriptReview.ts": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7"
+      },
+      "all_named_pins_match_bundle": true
+    }
+  ],
+  "coherence": "Authoritative saved/reloaded UI state only: saved draft title/revision summary and canonical transcript freshness warning. Small changed logic; existing session/generation fences and immediate consumers remain review boundaries.",
+  "frozen_maker_actual_total_tokens": {
+    "source": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/content-free-token-snapshot-2026-10-15T10-55-06-953Z.json",
+    "saved_outputs_delivery": 2525301,
+    "t054_journey": 3527012,
+    "counter_semantics": "input+output; cached input/reasoning output subsets, never additive.",
+    "denominators_frozen": true
+  },
+  "historical_checker_charges": {
+    "transcript_whole_prep_actual_total": 294849,
+    "transcript_record_timestamp": "2026-10-15T10:49:34.555Z",
+    "transcript_thread_id": "01a13f2d-be39-7dc1-a4da-68fc574e8668",
+    "saved_summary_children": 0,
+    "authority_for_zero_children": "Root current proposal instruction; no saved-summary checker children launched",
+    "transcript_legacy_allocated_debit": {
+      "active_s": 40,
+      "allocated_output_tokens": 1000
+    },
+    "active_full_actual": null,
+    "cost_actual": null,
+    "qualifier": "Snapshot actual lifetime recorded totals are retained with completion/inflight/phase unknown qualifiers. No newly measured actual or ratio claim."
+  },
+  "future_shared_batch": {
+    "new_actual_total_token_ceiling": 200000,
+    "active_s": 60,
+    "allocated_output_tokens": 1800,
+    "record_actual_once": true,
+    "per_unit_allocation": null,
+    "per_unit_ten_percent_claim": false,
+    "proposed_flow": "One fresh fork_turns=none bounded read/source+receipt review; one paired verdict persistence/parser/readback batch. No idle loops. If required evidence cannot fit, HOLD, not omit.",
+    "grant_status": "PENDING_NOT_GRANTED",
+    "canonical_gate_run": false,
+    "checker_dispatched": false
+  },
+  "evidence": {
+    "index": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/index.json",
+    "saved_own": "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.json:1/1 ownexit0",
+    "transcript_composite": "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json:editor11 attribution plus History3 ownexit0 repair; original batchexit1 retained",
+    "transcript_independent": "qa/goal-vectorless-2026-10-15/independent-ui-twelve-perunit-attribution.json:selected3 passed; sharedexit1, no standalone manufactured",
+    "mandatory": [
+      "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json ownexit0",
+      "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json ownexit0",
+      "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.json ownexit0; empty registry/vacuous"
+    ],
+    "fingerprints": "Deduplicated exact receipt/runtime/lock/environment identities in common index; no broad module/App/stdout reread."
+  },
+  "status": "PROPOSAL_METADATA_READY_AUTHORITY_PENDING",
+  "gaps": [],
+  "exclusions": {
+    "collections": "Explicitly excluded. ALLchecker1399515/originalmaker3547712 and all children/debits/breaches untouched; never average away its miss.",
+    "other_seven_units": "Not part of proposed review batch. Root/broker reports original deadline one-case spec QUEUED/NOTEXECUTED; current Ask/source-context imports are actively changing during mixedsnapshot/vectorless repair. Keep deadline HOLD for exact freeze/receipt; no duplicate queue or wait. Safe two-unit UI closure unchanged.",
+    "parent_acceptance": "Live/provider/native/browser/human gates remain unaccepted."
+  },
+  "no_review_test_source_gate_or_resume": true,
+  "shared_coordination_helper_resources": "Separate, not added to maker denominators."
+}

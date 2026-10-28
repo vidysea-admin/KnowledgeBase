@@ -1,0 +1,40 @@
+{
+  "unit": "t022-executed-provenance",
+  "fix_cycle": 0,
+  "candidate_sha": "sha256:5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+  "candidate_kind": "exact maker-declared inventory SHA256; not Git commit",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "packet": "qa/packets/t022-executed-provenance.md",
+  "candidate_pins": "qa/packets/t022-executed-provenance.inventory",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "admission-origin-no-checker-phase-committed",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "reviewer_origin_note": "Prospective admission origin only. Coordinator reports no reviewer dispatched for this new unit; zero active/token charges mean no committed checker phase, not measured success. Additional discovered history must be retained as null actuals plus known committed debits before dispatch. Comparable maker actual active time/tokens/cost unknown; U23 partial source-only141.174s is not a complete maker denominator.",
+  "next_phase": {
+    "kind": "review",
+    "active_s": 150,
+    "tokens": 5200,
+    "cost": null
+  },
+  "bootstrap_scope": "t022-executed-provenance cycle0 exact declared packet identity only: independent changed-logic/direct-consumer and required boundary review after attributable broker evidence and current identity reconciliation. Missing required evidence means HOLD. Workflow preparation only; no dispatch permission.",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000,
+    "cost": null
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "t022-executed-provenance/cycle0/sha256:5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+  "escalation": null,
+  "dispatch_status": "BLOCKED_PENDING_GREEN_ATTRIBUTABLE_BROKER_RECEIPTS_AND_CURRENT_IDENTITY_RECONCILIATION",
+  "finalization_requirement": "After review, append actual metrics or null plus conservative committed budget_debit before assessing finalization. Allocate at most 30s/800 tokens with same completion_reserve_id; append phase_kind finalization exactly once. Never reset history. No finalization assessment is fabricated now."
+}

@@ -1,0 +1,14 @@
+✔ actual trusted tree reader admits current publisher head and resolver documents after transcript filtering (23.1581ms)
+✔ actual trusted tree reader prunes failed CAS physical candidates old heads and revocations (7.931ms)
+✔ actual trusted tree reader rejects forged foreign branch and never revives transcript session without page proof (2.4955ms)
+✔ native search reads actual tenant tree references and scores current Unicode quote only (6.9823ms)
+✔ native search current head/revoke/delete/foreign changes invalidate an unchanged tree reference (1.7321ms)
+✔ native search refuses malformed/duplicate/deep/oversized inventories before source disclosure (35.2427ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2299.5409

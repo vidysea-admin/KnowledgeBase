@@ -1,0 +1,2 @@
+9427A84A843331520DF08850BFA29C5D5DEADD33554AA79045607AE1A5615331  C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\native-archive\publication.ts
+5058A9DBAA4A780C521CF43FA90EBA5224B266B703D06A4146CC4D7C82B4012A  C:\Users\product\Desktop\KnowledgeBase\packages\db\src\collections\speaker-suggestions.test.ts

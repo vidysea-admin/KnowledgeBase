@@ -1,0 +1,1 @@
+New helper absent before root grant mutation. No existing test/producer source owned by C.

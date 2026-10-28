@@ -1,0 +1,28 @@
+# Checker/broker packet — source-delivery-public-webinar-config, cycle 0
+
+Root: C:/Users/product/Desktop/KnowledgeBase. Manifest: qa/manifests/source-delivery-public-webinar-config.md. New-only source lease plus explicit existing-route/test extension from source_delivery_coordinator; all four candidate source hashes, existing-file base hashes and observed base HEAD are in manifest. No schema, contract, enforcement or tracker edited. Related coordination report: qa/coordination/knowledge-brain-20261015/source-delivery/t036-t037-survey.md.
+
+## Behavior and boundary map
+
+`createConfiguredPublicWebinarDiscovery(owner, serializedSources, deps?)` returns frozen `{configured:false, reason:"not-configured"}` when sources are absent. Supplied config requires valid owner, <=16,384 UTF-8 bytes, nonempty JSON array <=10 entries before processing, exact id/url keys, bounded id/URL, HTTPS without credentials/nondefault port/fragment/control whitespace, and unique IDs plus normalized URLs. Invalid config throws one sanitized fixed error before discovery/provider calls. Frozen canonical source inventory is copied into existing `createPublicWebinarDiscovery`; that factory checks tenant equality before transport and preserves existing acquisition outputs including gaps and review-only status. The adapter neither grants admission nor fabricates personal links.
+
+Existing immediate dependency: apps/api/src/gws/public-webinars.ts, `createPublicWebinarDiscovery`/`discoverPublicWebinars`. Guarded DNS/transport remains its responsibility. Auth/tenant: YES owner-bound reads; credentials: URLs refused userinfo, errors sanitized; data writes: NONE. The new adapter is unmounted until central consumes it.
+
+Mounted immediate consumer now exists: apps/api/src/routes/meeting-candidates.ts `MeetingCandidatesDeps.discoverPublicWebinars?` and POST `/public-webinars/scan`. Existing gmail permission executes before handler; safe matching work-DB check and callback availability precede invocation. Authenticated tenant is the sole input, returned tenant must match, errors are sanitized 503, and successful response is explicitly acquisition-only `{publicDiscovery}` with tenant/work headers and original complete/gaps. No trust increment or persistent candidate writes. Three added tests exercise actual HTTP route with immutable-config factory, auth/scope/tenant/work fences, request-forged sources ignored, unchanged candidate/trust state, incomplete coverage, missing callback and sanitized provider/foreign results.
+
+Required central production consumer: apps/api/src/composition/production.ts currently sets `meetingCandidates: createMeetingCandidatesDeps()`; central will spread configured.discover into the new dependency only after review. apps/api/src/store.ts remains unchanged. Durable public/Gmail candidate merging requires canonical source discriminator and is explicitly NOT implemented; current MeetingCandidate requires personal sender identity and its approval mutates sender trust. Automatic poller and parent C3/C6/live gates remain separate evidence.
+
+## Sole-broker checks requested; do not run locally
+
+Current source typing correction: `invalid` changed from inferred const arrow to `function invalid(): never`, so terminating branches narrow parsed unknown and establish URL assignment. This addresses actual diagnostics in qa/goal-vectorless-2026-10-15/verification-api-types-final-public-epoch.stdout.txt without casts or weaker validation. New config source SHA256 3294CED718F03A3F23B96C0392A4B5BF9CC9BE9D23C2552F1952E9D698873CD9; other three pins unchanged. Previous receipts do not certify corrected bytes; broker compiler/test rerun remains required.
+
+Runtime observed: C:/Program Files/nodejs/node.exe. Existing apps/api/node_modules/tsx and root node_modules/typescript/bin/tsc present. Retain current environment; no install/rebuild requested. From repository root:
+
+1. `& 'C:/Program Files/nodejs/node.exe' --test --import tsx apps/api/src/gws/public-webinar-config.test.ts apps/api/src/gws/public-webinars.test.ts`
+2. `& 'C:/Program Files/nodejs/node.exe' node_modules/typescript/bin/tsc --noEmit -p apps/api/tsconfig.json`
+3. Run existing contracts/verify_contracts.py with broker's verified existing Python interpreter after containment/basetemp preflight; do not guess a replacement interpreter.
+4. Focused mounted route check, 30-second per-test bound: `& 'C:/Program Files/nodejs/node.exe' --test --test-timeout=30000 --test-name-pattern='public webinar scan' --import tsx apps/api/src/routes/meeting-candidates.test.ts` (3 selected new tests; 18 total declarations, remaining 15 filtered).
+
+Four new tests cover missing/malformed/overflow configuration; bad owner/shape/URL and normalized duplicate refusal before provider access; immutable inventory and foreign-tenant zero-access refusal; actual existing discovery consumer preserving incomplete and complete review-only outputs. All transport is injected synthetic lookup/request; no network/DB/browser/provider access required. Existing public discovery tests supply dependency regressions. Capture exact exit/count/duration/logs and same final hashes; do not infer success from authored tests. No local CPU grant, no tests executed, no same-SHA receipts available. Parent production consumer proof remains pending even after these commands pass.
+
+Independent checker must load C:/Users/product/.agents/skills/checker/SKILL.md, assess gate, use bounded BOOTSTRAP_REVIEW because actual maker tokens/cost/active-time denominator unknown, and persist its own verdict. Full T-036 acceptance cannot be inferred from this scoped source adapter.

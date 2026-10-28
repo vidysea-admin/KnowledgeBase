@@ -1,0 +1,9 @@
+# Scoped environment phase
+
+- Profile client Vitest was admitted outside the sandbox with existing plugins/config and supported singleThread setting. It printed `RUN v2.1.8`, then exceeded external60s deadline. No tests/counts or success established. All source/config pins remained unchanged. Receipt: profile-escalated-receipt.json; complete captured output: profile-escalated.log.
+- The timeout wrapper killed its direct process but did not record PID/start/descendant ownership. Therefore terminal descendant cleanup is unverified. A subsequent approved read-only CIM query of node/esbuild candidates matching Vitest/profile/esbuild-service command lines returned no matching rows. Its pipeline created no JSON and the following Get-Content exited1; this is not proof of historical process-tree cleanup. No processes were killed by that query, and no global cleanup was attempted.
+- Capture's exact previously failing actual-Python-producer Node node passed1/1, exit0,4.687 command seconds, outside sandbox. Same frozen source pins, existing .venv interpreter and safe synchronous bootstrap retained. Receipt: capture-escalated-receipt.json.
+- Root subsequently authorized original Python12 after separate process diagnosis. Original pytest/plugins/test file ran outside sandbox with fresh basetemp: exit0,12 passed,7.438 command seconds. All packet pins unchanged. Receipt: capture-python-escalated-receipt.json; raw output: capture-python-escalated.log.
+- No source/test-assertion/plugin changes, live browser/network/provider/database action, independent checker PASS or efficiency-success claim. Runtime token actuals unknown. T052/deadline new cycles not admitted in this phase.
+
+Future timeouts must use existing tested scripts/qa/scoped-check-runner.py Tree JobObject control; the broker loaded its Tree implementation following root's instruction. No further direct-process-only timeout wrapper is authorized.

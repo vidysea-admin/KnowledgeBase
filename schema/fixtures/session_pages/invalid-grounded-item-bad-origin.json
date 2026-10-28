@@ -1,0 +1,1 @@
+{"_id":"pg6","tenantId":"toc","sessionId":"sess1","summary":"x","evidence":[{"turnId":"t1","sessionId":"sess1"}],"citedItems":[{"id":"a1","kind":"opinion","text":"x","origin":"inferred","verification":"verified","evidence":[{"turnId":"t1","sessionId":"sess1","quote":"x"}]}]}

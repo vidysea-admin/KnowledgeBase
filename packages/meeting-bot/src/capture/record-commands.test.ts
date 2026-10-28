@@ -9,15 +9,22 @@
  * `--stop-obs` recovery path fails with a clear rejected error (not an unhandled rejection) and
  * never writes/overwrites source.json when OBS is unreachable (C5).
  */
+import { createHash } from "node:crypto";
 import { test } from "node:test";
+import { execFileSync, spawnSync } from "node:child_process";
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { finalizeRecordingWith, isSilentCapture, runFinalize, shouldAutoClick, todayAt } from "./record-commands.js";
-import type { ObsClientLike } from "./obs-windows.js";
+import { captureTenant, finalizeRecordingWith as finalizeRecordingRaw, isSilentCapture, runFinalize, shouldAutoClick, todayAt, validateIndexProof } from "./record-commands.js";
+import type { ObsClientLike } from "./obs/obs-windows.js";
+import {finalizeControllerRecording} from "./controller-state.js";
+import {webinarCompletionState} from "../calendar/state/schedule-state.js";
+import { createTabBrowserDeps } from "./tab-browser.js";
+import { createRecordConsent } from "./record-consent/context.js";
+import { writeRecordConsent } from "./record-consent/receipt-store.js";
 
 // Same derivation record-commands.ts uses for its own REPO_ROOT (this file lives in the same
 // directory) — used ONLY to assert absence, never to write; see the test below.
@@ -31,16 +38,67 @@ test("isSilentCapture: -50 dB (the boundary) is NOT silent, -50.1 dB IS", () => 
   assert.equal(isSilentCapture(-49.9), false, "above the boundary must not be silent");
 });
 
-// --- shouldAutoClick: U0 zoom autoClick selection (pure) ----------------------------------------
+test("native finalization rejects caller JSON media before extracting or uploading legacy audio", async () => {
+  const root=mkdtempSync(join(tmpdir(),"native-finalize-forged-")),recordDir=join(root,"raw","webinars");
+  mkdirSync(recordDir,{recursive:true});
+  try {
+    let extracted=0,uploaded=0;
+    // Consent must be a real owned receipt even on a forged capability attack.
+    const {writeRecordConsent}=await import("./record-consent/receipt-store.js");
+    writeRecordConsent(recordDir,{version:1,tenantId:"native-owner",sessionId:"native-session",generation:"00000000-0000-4000-8000-000000000001",
+      meetingHash:"a".repeat(64),captureMode:"silent",organizerConsent:"unknown",consent:{given:false,recordedBy:"fixture"},privateWindows:[],
+      operationalApproval:{approvedBy:"Umesh",reference:"synthetic-fixture",appliedAt:"2026-10-15T00:00:00.000Z"}});
+    await assert.rejects(finalizeRecordingWith({repoRoot:root,recordDir,tenantId:"native-owner",nativeMedia:{} as never,nativeMaxTotalBytes:1000000,
+      extractAudio:()=>{extracted++;},runTranscription:()=>{uploaded++;}},join(recordDir,"never-public.webm"),"native-session","fixture","synthetic",true),/native|unissued|capability/i);
+    assert.equal(extracted,0);assert.equal(uploaded,0);
+  }finally{rmSync(root,{recursive:true,force:true});}
+});
 
-test("shouldAutoClick: zoom and zoho get autoClick, everything else does not", () => {
+// --- shouldAutoClick: bounded platform join selection -----------------------------------------
+
+test("shouldAutoClick: meet, zoom and zoho get bounded join clicks", () => {
   assert.equal(shouldAutoClick("zoho"), true, "T-024b baseline — must not regress");
-  assert.equal(shouldAutoClick("zoom"), true, "U0 — the new capability this unit adds");
+  assert.equal(shouldAutoClick("zoom"), true, "existing Zoom joins must not regress");
   assert.equal(shouldAutoClick("webex"), false);
   assert.equal(shouldAutoClick("cloudonair"), false);
-  assert.equal(shouldAutoClick("meet"), false);
+  assert.equal(shouldAutoClick("meet"), true, "Meet must reach the existing Join now allowlist");
   assert.equal(shouldAutoClick("teams"), false);
   assert.equal(shouldAutoClick("unknown"), false);
+});
+
+test("shouldAutoClick forwards Meet join permission and preserves --no-click in the tab launcher", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "meet-join-argv-"));
+  const script = join(dir, "inspect-argv.mjs");
+  writeFileSync(script, 'console.log(JSON.stringify({event:"opened",argv:process.argv.slice(2)}));\n' +
+    'console.log(JSON.stringify({event:"fatal",error:"fixture stopped before browser"}));\n');
+  try {
+    for (const [platform, autoClick] of [["meet", shouldAutoClick("meet")], ["webex", shouldAutoClick("webex")], ["meet", false]] as const) {
+      const profile = join(dir, `profile-${platform}-${autoClick}`), record = join(dir, `record-${platform}-${autoClick}`);
+      let received: string[] | undefined;
+      const tab = createTabBrowserDeps({python: process.execPath, joinScript: script, profileDir: profile,
+        recordDir: record, extensionDir: join(REPO_ROOT, "packages/meeting-bot/py/tab-capture"), autoClick,
+        startupTimeoutMs: 15000, log: () => {}, onEvent: (_handle, event) => {
+          if (event.event === "opened") received = (event as unknown as {argv: string[]}).argv;
+        }});
+      const url = platform === "meet" ? "https://meet.google.com/abc-defg-hij" : "https://example.webex.com/fixture";
+      await assert.rejects(tab.deps.launch(url, {tenantId: "fixture", consentNote: "fixture capture only"}), /fixture stopped before browser/);
+      assert.ok(received, "inspect the actual child argv, without launching Chrome");
+      assert.equal(received[0], url);
+      assert.equal(received.includes("--no-click"), !autoClick);
+      assert.equal(received[received.indexOf("--profile") + 1], profile);
+      assert.equal(existsSync(join(profile, ".lkb-tab-capture.lock")), false);
+      const extensionIndex = received.indexOf("--capture-extension"), titleIndex = received.indexOf("--title");
+      assert.ok(extensionIndex >= 0 && titleIndex >= 0, "launcher must provide extension and title flags");
+      const extension = received[extensionIndex + 1], title = received[titleIndex + 1];
+      assert.ok(extension, "launcher must provide a capture-extension path");
+      assert.ok(title, "launcher must provide a title value");
+      assert.ok(title.startsWith("LKB-BOT "), "launcher title must identify the fixture capture");
+      assert.equal(existsSync(extension), false);
+      const output = tab.outputPath(title.slice("LKB-BOT ".length));
+      assert.ok(output && existsSync(output), "startup failure remains a registered capture attempt");
+      assert.equal(JSON.parse(readFileSync(`${output}.status.json`, "utf8")).state, "failed");
+    }
+  } finally { rmSync(dir, {recursive: true, force: true}); }
 });
 
 // --- todayAt: ISS-319 fix (u5-auto-record-scheduler, fix cycle 2) ----------------------------
@@ -84,24 +142,57 @@ test("todayAt: an unparseable non-HH:MM, non-ISO string still throws a clear err
 
 function fixtureRoot(): string {
   const root = mkdtempSync(join(tmpdir(), "lkb-finalize-"));
-  writeFileSync(join(root, "fake-video.mkv"), "fake-video-bytes");
   mkdirSync(join(root, "raw", "webinars"), { recursive: true }); // finalizeRecordingWith assumes this already exists (real RECORD_DIR is created by obs-windows.ts launch())
+  writeFileSync(join(root, "raw", "webinars", "fake-video.mkv"), "fake-video-bytes"); // the finalizer binds media to its actual slot
   return root;
+}
+/** The finalizer now requires an explicit tenant and a current consent receipt for the session (T-011);
+ * these legacy cases exercise unrelated finalizer behavior, so seed a fixture owner/receipt and delegate. */
+async function finalizeRecordingWith(overrides: Parameters<typeof finalizeRecordingRaw>[0], video: string, sessionId: string,
+  ...rest: unknown[]): Promise<string> {
+  const options = { tenantId: "lane", ...overrides }, recordDir = options.recordDir ?? join(options.repoRoot!, "raw", "webinars");
+  if (/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,149}$/.test(sessionId) && !existsSync(join(recordDir, "record-consent", options.tenantId, `${sessionId}.json`))) {
+    const owner = { tenantId: options.tenantId, sessionId, meetingUrl: "https://example.invalid/fixture" };
+    writeRecordConsent(recordDir, createRecordConsent([], owner,
+      { LKB_CAPTURE_RECORDED_BY: "fixture", LKB_CAPTURE_APPROVED_BY: "fixture", LKB_CAPTURE_APPROVAL_REF: "fixture" }, new Date(1000)));
+  }
+  return (finalizeRecordingRaw as (...args: unknown[]) => Promise<string>)(options, video, sessionId, ...rest);
 }
 
 /** Writes fake audio bytes to whatever path finalizeRecordingWith itself computed and passed in,
  * so the seam is exercised exactly as `defaultExtractAudio` would use it, just without ffmpeg. */
 const fakeExtractAudio = (_video: string, audioOut: string): void => writeFileSync(audioOut, "fake-audio-bytes");
 
+test("recovery re-finalization preserves validated managed control-tail evidence and refuses tampering", async () => {
+  const root=fixtureRoot(), sessionId="sess-control", video=join(root,"raw","webinars","fake-video.mkv"), source=join(root,"data/toc-migrated",sessionId,"source.json");
+  const overrides={repoRoot:root,tenantId:"lane",probeMedia:()=>60,extractAudio:fakeExtractAudio,measureVolume:()=>({maxDb:-20,meanDb:-30})};
+  const gap={start:Date.parse("2026-10-01T09:00:00.000Z")/1000,end:Date.parse("2026-10-01T10:00:00.000Z")/1000,reason:"capture-control-controller-disconnected",recovered:false};
+  const finalize=async(media:string,gaps:any[]):Promise<void>=>{await finalizeRecordingWith(overrides,media,sessionId,"Fixture","meet",false,gaps);};
+  const recover=()=>finalizeControllerRecording(video,{repoRoot:root,recordDir:join(root,"raw/webinars"),profileDir:join(root,"profile"),sessionId,tenantId:"lane",python:"unused",joinScript:"unused"},
+    {normalize:media=>media,finalize,processArtifacts:()=>{}});
+  try {
+    await finalize(video,[gap]); assert.equal(webinarCompletionState(source,"lane",sessionId,{},new Date().toISOString()).reason,"controller-disconnected");
+    await recover();
+    const retained=JSON.parse(readFileSync(source,"utf8")); assert.equal(retained.gaps.length,1);
+    assert.equal(webinarCompletionState(source,"lane",sessionId,{},new Date().toISOString()).status,"action_required");
+    await finalize(video,[gap]); assert.equal(JSON.parse(readFileSync(source,"utf8")).gaps.length,1);
+    for (const bad of [{...retained,tenantId:"foreign"},{...retained,_id:"foreign-src"},{...retained,gaps:[{...retained.gaps[0],recovered:true}]},
+      {...retained,gaps:[{...retained.gaps[0],start:"invalid"}]},{...retained,gaps:[{...retained.gaps[0],reason:"capture-control-arbitrary"}]}]) {
+      const bytes=JSON.stringify(bad); writeFileSync(source,bytes); await assert.rejects(recover()); assert.equal(readFileSync(source,"utf8"),bytes);
+    }
+  } finally {rmSync(root,{recursive:true,force:true});}
+});
+
 test("finalizeRecordingWith: silent capture (-50.1 dB) throws, still writes source.json with audioLevel.silent:true, never transcribes", async () => {
   const root = fixtureRoot();
   let transcribeCalled = false;
   try {
-    const video = join(root, "fake-video.mkv");
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
     await assert.rejects(
       () => finalizeRecordingWith(
         {
           repoRoot: root,
+          probeMedia: () => 60,
           extractAudio: fakeExtractAudio,
           measureVolume: () => ({ maxDb: -50.1, meanDb: -70 }),
           runTranscription: () => { transcribeCalled = true; },
@@ -120,17 +211,57 @@ test("finalizeRecordingWith: silent capture (-50.1 dB) throws, still writes sour
   }
 });
 
+test("finalizeRecordingWith: assumed admission + silent = degraded (error says so, source.json flags it); positively admitted silent is not flagged degraded", async () => {
+  const root = fixtureRoot();
+  try {
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
+    const base = { repoRoot: root, probeMedia: () => 60, extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -60, meanDb: -70 }) };
+    await assert.rejects(
+      () => finalizeRecordingWith({ ...base, admission: { assumed: true, reason: "no-lobby-signal" } }, video, "sess-assumed-silent", "T", "zoho", false),
+      /recording is silent.*\[degraded: admission was only assumed/);
+    const doc = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "sess-assumed-silent", "source.json"), "utf8"));
+    assert.deepEqual(doc.admission, { assumed: true, reason: "no-lobby-signal" });
+    assert.equal(doc.captureDegraded, true);
+    await assert.rejects(
+      () => finalizeRecordingWith({ ...base, admission: { assumed: false } }, video, "sess-seen-silent", "T", "zoho", false),
+      (e: Error) => /recording is silent/.test(e.message) && !/degraded/.test(e.message));
+    const seen = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "sess-seen-silent", "source.json"), "utf8"));
+    assert.equal(seen.captureDegraded, false);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test("finalizeRecordingWith: assumed admission with audible audio still succeeds and records admission.assumed", async () => {
+  const root = fixtureRoot();
+  try {
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
+    await finalizeRecordingWith({ repoRoot: root, probeMedia: () => 60, extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -20, meanDb: -30 }),
+      admission: { assumed: true, reason: "no-lobby-signal" } }, video, "sess-assumed-ok", "T", "zoho", false);
+    const doc = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "sess-assumed-ok", "source.json"), "utf8"));
+    assert.deepEqual([doc.admission.assumed, doc.captureDegraded], [true, false]);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test("finalizeRecordingWith: -50 dB exactly (the boundary) does NOT throw, source.json has audioLevel.silent:false, transcription runs", async () => {
   const root = fixtureRoot();
   let transcribeCalledWith: string | undefined;
   try {
-    const video = join(root, "fake-video.mkv");
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
     await finalizeRecordingWith(
       {
         repoRoot: root,
+        probeMedia: () => 60,
         extractAudio: fakeExtractAudio,
         measureVolume: () => ({ maxDb: -50, meanDb: -60 }),
-        runTranscription: (sessionId) => { transcribeCalledWith = sessionId; },
+        validateTranscription: () => {},
+        runTranscription: (sessionId) => {
+          transcribeCalledWith = sessionId;
+          writeFileSync(join(root, "data", "toc-migrated", sessionId, "turns.json"),
+            JSON.stringify([{ tStart: 0, tEnd: 60, text: "Boundary speech" }]));
+        },
       },
       video, "sess-boundary", "Boundary Session", "webex", /* transcribe */ true,
     );
@@ -149,10 +280,11 @@ test("finalizeRecordingWith: not silent and transcribe:false never calls runTran
   const root = fixtureRoot();
   let transcribeCalled = false;
   try {
-    const video = join(root, "fake-video.mkv");
+    const video = join(root, "raw", "webinars", "fake-video.mkv");
     await finalizeRecordingWith(
       {
         repoRoot: root,
+        probeMedia: () => 60,
         extractAudio: fakeExtractAudio,
         measureVolume: () => ({ maxDb: -10, meanDb: -20 }),
         runTranscription: () => { transcribeCalled = true; },
@@ -166,6 +298,81 @@ test("finalizeRecordingWith: not silent and transcribe:false never calls runTran
 });
 
 // --- runFinalize --stop-obs: OBS unreachable (C5) ----------------------------------------------
+
+test("finalization refuses media failure before extraction/transcription and records failure", async () => {
+  const root = fixtureRoot();
+  try {
+    for (const duration of [0, -1, NaN, Infinity]) {
+      await assert.rejects(finalizeRecordingWith({ repoRoot: root, probeMedia: () => duration,
+        extractAudio: () => { assert.fail("must not extract invalid media"); },
+        runTranscription: () => { assert.fail("must not transcribe invalid media"); } },
+      join(root, "raw", "webinars", "fake-video.mkv"), "invalid", "Invalid", "zoho", true), /duration/);
+    }
+    await assert.rejects(finalizeRecordingWith({ repoRoot: root,
+      probeMedia: () => { throw new Error("no readable video packets"); } },
+    join(root, "raw", "webinars", "fake-video.mkv"), "invalid", "Invalid", "zoho", true), /video packets/);
+    assert.equal(JSON.parse(readFileSync(join(root, "data", "toc-migrated", "invalid", "validation.json"), "utf8")).status, "failed");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("production probe accepts playable audio/video and refuses audio-only media", {
+  skip: spawnSync("ffmpeg", ["-version"]).status !== 0 || spawnSync("ffprobe", ["-version"]).status !== 0,
+}, async () => {
+  const root = fixtureRoot();
+  try {
+    const video = join(root, "raw", "webinars", "playable.mkv");
+    execFileSync("ffmpeg", ["-y", "-v", "error", "-f", "lavfi", "-i", "color=size=64x64:rate=2",
+      "-f", "lavfi", "-i", "sine=frequency=440", "-t", "1", "-c:v", "mpeg4", "-c:a", "aac", video]);
+    await finalizeRecordingWith({ repoRoot: root }, video, "playable", "Playable", "zoho", false);
+    const report = JSON.parse(readFileSync(join(root, "data", "toc-migrated", "playable", "validation.json"), "utf8"));
+    assert.equal(report.status, "passed");
+    assert.ok(report.durationSec >= 1);
+    const audioOnly = join(root, "raw", "webinars", "audio-only.m4a");
+    execFileSync("ffmpeg", ["-y", "-v", "error", "-f", "lavfi", "-i", "sine=frequency=440",
+      "-t", "1", "-c:a", "aac", audioOnly]);
+    await assert.rejects(finalizeRecordingWith({ repoRoot: root }, audioOnly, "audio-only", "Audio", "zoho", false), /video packets/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("failed re-finalization invalidates old passing report for extraction, volume and silence", async () => {
+  const root = fixtureRoot();
+  const video = join(root, "raw", "webinars", "fake-video.mkv"), report = join(root, "data", "toc-migrated", "repeat", "validation.json");
+  const good = { repoRoot: root, probeMedia: () => 60, extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -10, meanDb: -20 }) };
+  try {
+    for (const bad of [
+      { extractAudio: () => { throw new Error("extraction failure"); } },
+      { measureVolume: () => { throw new Error("volume failure"); } },
+      { measureVolume: () => ({ maxDb: NaN, meanDb: -20 }) },
+      { measureVolume: () => ({ maxDb: -91, meanDb: -91 }) },
+    ]) {
+      await finalizeRecordingWith(good, video, "repeat", "Repeat", "zoho", false);
+      assert.equal(JSON.parse(readFileSync(report, "utf8")).status, "passed");
+      await assert.rejects(finalizeRecordingWith({ ...good, ...bad }, video, "repeat", "Repeat", "zoho", false));
+      assert.equal(JSON.parse(readFileSync(report, "utf8")).status, "failed");
+    }
+    await assert.rejects(finalizeRecordingWith(good, video, "../escape", "Invalid", "zoho", false), /sessionId/);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+
+test("finalization rejects empty, malformed and out-of-media transcript times without success alert", async () => {
+  const root = fixtureRoot();
+  let notified = false;
+  try {
+    const invalid = [[], {}, [{ tStart: 0, tEnd: 61, text: "overrun" }],
+      [{ tStart: -1, tEnd: 1, text: "negative" }], [{ tStart: 2, tEnd: 1, text: "inverted" }],
+      [{ tStart: 1, tEnd: 1, text: "empty span" }], [{ tStart: "0", tEnd: 1, text: "string" }],
+      [{ tStart: null, tEnd: 1, text: "nonfinite JSON" }], [{ tStart: 0, tEnd: 1, text: " " }]];
+    for (const turns of invalid) {
+      await assert.rejects(finalizeRecordingWith({ repoRoot: root, probeMedia: () => 60,
+        extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -10, meanDb: -20 }),
+        runTranscription: (id) => writeFileSync(join(root, "data", "toc-migrated", id, "turns.json"), JSON.stringify(turns)) },
+      join(root, "raw", "webinars", "fake-video.mkv"), "timings", "Timings", "zoho", true, [],
+      { enabled: false, notifyFinished: () => { notified = true; } } as never), /transcript/);
+    }
+    assert.equal(notified, false);
+    assert.equal(JSON.parse(readFileSync(join(root, "data", "toc-migrated", "timings", "validation.json"), "utf8")).stage, "transcript");
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
 
 test("runFinalize --stop-obs: OBS unreachable rejects with a clear error and never creates a source.json", async () => {
   const sessionId = `t033-stop-obs-unreachable-${Date.now()}`;
@@ -194,3 +401,36 @@ test("runFinalize --stop-obs: OBS unreachable rejects with a clear error and nev
   const dataDir = join(REPO_ROOT, "data", "toc-migrated", sessionId);
   assert.equal(existsSync(dataDir), false, "a rejected OBS connect must never reach source.json registration");
 });
+
+test("ledger002 index proof refuses weak, stale, foreign and degraded generations",()=>{
+  const dir=mkdtempSync(join(tmpdir(),"strict-index-proof-"));
+  try{
+    const bytes=JSON.stringify([{text:"Source"}]);writeFileSync(join(dir,"knowledge-turns.json"),bytes);
+    writeFileSync(join(dir,"source.json"),JSON.stringify({tenantId:"tenant"}));
+    const proof={version:2,status:"done",strict:true,sessionId:"session",tenantId:"tenant",generation:"g1",inputHash:createHash("sha256").update(bytes).digest("hex"),summary:"done",claims:"done",chunks:"done",tree:"done",semanticSupport:"passed",turnCount:1};
+    for(const patch of [{version:1},{summary:"degraded"},{claims:"degraded"},{chunks:"skipped"},{semanticSupport:"missing"},{inputHash:"stale"},{tenantId:"foreign"},{sessionId:"other"}]){
+      writeFileSync(join(dir,"index-proof.json"),JSON.stringify({...proof,...patch}));assert.throws(()=>validateIndexProof(dir,"session"),/strict index proof/);
+    }
+    writeFileSync(join(dir,"index-proof.json"),JSON.stringify(proof));assert.equal(validateIndexProof(dir,"session").generation,"g1");
+  }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('capture tenant requires indexed owner and preserves non-index legacy', () => {
+  assert.equal(captureTenant([], {}), 'vidysea');
+  assert.throws(() => captureTenant(['--index'], {}), /explicit/);
+  assert.equal(captureTenant(['--index'], { LKB_TENANT_ID: 'tenant-two' }), 'tenant-two');
+  assert.equal(captureTenant(['--index', '--tenant', 'tenant-one'], {}), 'tenant-one');
+  assert.throws(() => captureTenant(['--tenant', '../other'], {}), /invalid/);
+});
+test('finalizer binds source to configured tenant and refuses other-tenant overwrite', async () => {
+  const root = fixtureRoot(), video = join(root, 'raw', 'webinars', 'fake-video.mkv');
+  try {
+    const overrides = { repoRoot: root, tenantId: 'tenant-two', probeMedia: () => 10, extractAudio: fakeExtractAudio, measureVolume: () => ({ maxDb: -10, meanDb: -20 }) };
+    await finalizeRecordingWith(overrides, video, 'tenant-recording', 'Tenant recording', 'unknown', false);
+    const file = join(root, 'data/toc-migrated/tenant-recording/source.json'), before = readFileSync(file, 'utf8');
+    assert.equal(JSON.parse(before).tenantId, 'tenant-two');
+    await assert.rejects(finalizeRecordingWith({ ...overrides, tenantId: 'tenant-one' }, video, 'tenant-recording', 'Other', 'unknown', false), /different tenant/);
+    assert.equal(readFileSync(file, 'utf8'), before);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
+

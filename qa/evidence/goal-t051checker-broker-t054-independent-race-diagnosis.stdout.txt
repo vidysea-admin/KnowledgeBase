@@ -1,0 +1,12 @@
+{"later":false,"originalAssertion":"PASS","loadedRevision":"base-02416769fae99d9c24d30bb55b7f7b887fec78406ca99168","winningRevision":"55c6a74b1a59a9a3042cc04d37c5d38e770c47c081a29615dcd6962de0ee7734","headRevision":"55c6a74b1a59a9a3042cc04d37c5d38e770c47c081a29615dcd6962de0ee7734","history":[{"revision":"55c6a74b1a59a9a3042cc04d37c5d38e770c47c081a29615dcd6962de0ee7734","parentRevision":"base-02416769fae99d9c24d30bb55b7f7b887fec78406ca99168","reviewedAt":"2026-10-14T09:00:00.000Z","after":["winning correction"]}],"staleWriterRefused":true,"staleOverwriteAuditAbsent":true}
+{"later":true,"originalAssertion":"RED","oldFailure":{"actual":"base-02416769fae99d9c24d30bb55b7f7b887fec78406ca99168","expected":"9d0fb4117113bb42b5241140129c43fa4cc720c7a857c37f46732e24b6d9b2bc"},"loadedRevision":"9d0fb4117113bb42b5241140129c43fa4cc720c7a857c37f46732e24b6d9b2bc","winningRevision":"01f025e28a963b963217a6fbc12607609a38c516ebda1b29342c8c4c98cff689","headRevision":"01f025e28a963b963217a6fbc12607609a38c516ebda1b29342c8c4c98cff689","history":[{"revision":"01f025e28a963b963217a6fbc12607609a38c516ebda1b29342c8c4c98cff689","parentRevision":"9d0fb4117113bb42b5241140129c43fa4cc720c7a857c37f46732e24b6d9b2bc","reviewedAt":"2026-10-14T09:00:00.000Z","after":["winning correction"]},{"revision":"9d0fb4117113bb42b5241140129c43fa4cc720c7a857c37f46732e24b6d9b2bc","parentRevision":"base-02416769fae99d9c24d30bb55b7f7b887fec78406ca99168","reviewedAt":"2026-10-14T09:00:00.000Z","after":["seed"]}],"staleWriterRefused":true,"staleOverwriteAuditAbsent":true}
+✔ independent archived race floor (initial) (7.8277ms)
+✔ independent archived race floor (reviewed) (14.9004ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1095.9011

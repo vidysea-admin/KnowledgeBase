@@ -1,0 +1,21 @@
+{
+  "program": "C:/Program Files/PowerShell/7/pwsh.exe",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "args": [
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "qa/coordination/checker-efficiency-20261015/install-canonical-remediation.ps1"
+  ],
+  "timeoutMs": 10000,
+  "output": "qa/coordination/checker-efficiency-20261015/installer-idempotent-20261015T0745",
+  "pins": {
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "C:/Users/product/.agents/skills/checker/SKILL.md": "45b1fd647cef4612d12a8ecb333129a8cf6ddeb2a78823f0cfaf4772a5d9a2d0",
+    "qa/coordination/checker-efficiency-20261015/checker-cycle1-input.json": "4bcf20571011fa0c8f2ce30d2d8d81357f328ef996b278ffe962acc79e7729a4",
+    "qa/coordination/checker-efficiency-20261015/install-canonical-remediation.ps1": "add0e60e33a81f4dbd879ab83712bd72fb956536ca877ce6f2ed186e6068d350",
+    "qa/coordination/checker-efficiency-20261015/canonical-candidate/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "qa/coordination/checker-efficiency-20261015/canonical-candidate/SKILL.md": "45b1fd647cef4612d12a8ecb333129a8cf6ddeb2a78823f0cfaf4772a5d9a2d0",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876"
+  }
+}

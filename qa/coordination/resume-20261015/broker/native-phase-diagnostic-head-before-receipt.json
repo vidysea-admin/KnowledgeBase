@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "C:\\Program Files\\Git\\cmd\\git.EXE",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\80fbc19f24f361aaffd1eab7377644ec51d31293507f3eda8732bf8f05d7569e.json",
+    "sha256": "80fbc19f24f361aaffd1eab7377644ec51d31293507f3eda8732bf8f05d7569e",
+    "count": 89
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 7,
+  "accounting": "SHARED INTEGRATION, not watched checker",
+  "pid": 27720,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.625,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-phase-diagnostic-head-before.log",
+    "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+  },
+  "counts": {}
+}

@@ -1,0 +1,192 @@
+{
+  "schema": "post-d50-size-audit/1",
+  "recordedAt": "2026-10-16T01:00:19.2274385Z",
+  "originalPaths": 420,
+  "originalBytes": 75631774.0,
+  "top10": [
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-gate-summary.json",
+      "bytes": 6292325
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-stage2-gate-summary.json",
+      "bytes": 6288363
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-final-seal.json",
+      "bytes": 3879256
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-split-repaired-final-seal.json",
+      "bytes": 3401183
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-stage3-gate-summary.json",
+      "bytes": 3389865
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-stage3-repair1-focused-summary.json",
+      "bytes": 1943455
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-final-seal.json",
+      "bytes": 1940033
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-split-exit-final-seal.json",
+      "bytes": 1939382
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-readonly-final-seal.json",
+      "bytes": 1939290
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-next-stage2-focused-summary.json",
+      "bytes": 1457580
+    }
+  ],
+  "duplicateGroups": [
+    {
+      "extraBytes": 920184,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/genuine-phase-observer-final-inventory.json",
+        "qa/coordination/resume-20261015/broker/native-next-readonly-final-inventory.json",
+        "qa/coordination/resume-20261015/broker/native-next-split-exit-final-inventory.json",
+        "qa/coordination/resume-20261015/broker/native-next-split-final-inventory.json",
+        "qa/coordination/resume-20261015/broker/native-next-split-repaired-final-inventory.json"
+      ],
+      "bytesPerCopy": 230046,
+      "sha256": "25f27c9f28f50f14dbd7edc276b92f51070333b4e1846f0d46cb436baa49d9ea",
+      "count": 5
+    },
+    {
+      "extraBytes": 229906,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/native-next-stage3-repair1-inventory-after.json",
+        "qa/coordination/resume-20261015/broker/native-next-stage3-repair1-inventory-before.json"
+      ],
+      "bytesPerCopy": 229906,
+      "sha256": "27157eb91f3d3fc98a345df54dd8d0858066fc9e1a225a5cdbfb070fbf19b691",
+      "count": 2
+    },
+    {
+      "extraBytes": 229906,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/native-next-stage3-inventory-after.json",
+        "qa/coordination/resume-20261015/broker/native-next-stage3-inventory-before.json"
+      ],
+      "bytesPerCopy": 229906,
+      "sha256": "711b3c94af5700b3ebb83bdf8c228d565232e72dce6950fe16c0f7de00231e1a",
+      "count": 2
+    },
+    {
+      "extraBytes": 230046,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/genuine-seal-isolated-final-inventory.json",
+        "qa/coordination/resume-20261015/broker/native-next-stage3-repair1-final-sealed-inventory.json"
+      ],
+      "bytesPerCopy": 230046,
+      "sha256": "730b42eec3647f5fad2b6fa8ca194d1dc4ae517a088c305d3cda487c6e03ca40",
+      "count": 2
+    },
+    {
+      "extraBytes": 1346,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/native-next-stage2-tsconfig.json",
+        "qa/coordination/resume-20261015/broker/native-next-stage3-tsconfig.json",
+        "qa/coordination/resume-20261015/broker/native-next-tsconfig.json"
+      ],
+      "bytesPerCopy": 673,
+      "sha256": "87f115f64525c46db1d3b1f5379595de674b862c3ef7786f7629a3e349ef5438",
+      "count": 3
+    },
+    {
+      "extraBytes": 1062,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/genuine-phase-observer-admission.json",
+        "qa/coordination/resume-20261015/broker/genuine-seal-isolated-admission.json"
+      ],
+      "bytesPerCopy": 1062,
+      "sha256": "989eb3c5f795608771f7e87ab385bc26dfe05618d12037f2a6e8fabff3e479ad",
+      "count": 2
+    },
+    {
+      "extraBytes": 229669,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/native-next-stage2-inventory-after.json",
+        "qa/coordination/resume-20261015/broker/native-next-stage2-inventory-before.json"
+      ],
+      "bytesPerCopy": 229669,
+      "sha256": "bfea29c0b56b3996d22df0146762a7b97bc03d8d63e0d80155920ac87db9ff0e",
+      "count": 2
+    },
+    {
+      "extraBytes": 4311,
+      "paths": [
+        "packages/db/src/collections/speaker-suggestions/testdb.ts",
+        "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.testdb.ts"
+      ],
+      "bytesPerCopy": 4311,
+      "sha256": "c5ac29311c4fe2866cd679821af2a26f360a45f868a733a8620fbf0847915920",
+      "count": 2
+    },
+    {
+      "extraBytes": 229657,
+      "paths": [
+        "qa/coordination/resume-20261015/broker/native-next-inventory-after.json",
+        "qa/coordination/resume-20261015/broker/native-next-inventory-before.json"
+      ],
+      "bytesPerCopy": 229657,
+      "sha256": "c80252b8296f4b24903b09a88a1068a17c8c0e8a27b8d3d5fb34568c5590e18c",
+      "count": 2
+    },
+    {
+      "extraBytes": 0,
+      "paths": [
+        "qa/coordination/resume-20261015/isolated-replica-prep/cycle1/adopted-assess.stderr",
+        "qa/coordination/resume-20261015/isolated-replica-prep/cycle1/adopted-validate.stderr",
+        "qa/coordination/resume-20261015/isolated-replica-prep/metadata-repair1-assess.stderr",
+        "qa/coordination/resume-20261015/isolated-replica-prep/metadata-repair1-validate.stderr"
+      ],
+      "bytesPerCopy": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "count": 4
+    }
+  ],
+  "duplicateExtraCopies": 16.0,
+  "duplicateExtraBytes": 2076087.0,
+  "actualMutationCount": 420,
+  "noLongerDirty": [],
+  "statuses": [
+    {
+      "Name": " D",
+      "Count": 3
+    },
+    {
+      "Name": " M",
+      "Count": 39
+    },
+    {
+      "Name": "??",
+      "Count": 378
+    }
+  ],
+  "leanPaths": 420,
+  "leanBytes": 45650702.0,
+  "omittedAggregateCount": 9,
+  "omittedAggregateBytes": 30039322.0,
+  "projectionCount": 9,
+  "projectionBytes": 58250.0,
+  "requiredPreserved": "Atomic raw original-failure/reproduction/terminal receipts and logs, source packets/manifests, final compact joined seal/checkpoint and210-case map, original replica FAIL and cycle1 source-only PASS retained. No vendor payload/source-map/private runtime included.",
+  "redundancy": "Native receipts repeat1890-entry pins_before and pins_after. Aggregate summaries/seals embed those whole receipts again. Lean proposal removes only aggregates whose EVERY embedded result canonical digest matches a retained atomic receipt. Non-results metadata retained in explicitly derived projections. Originals remain untouched locally with raw hash; links from old packets may point to external-local files, never claimed committed.",
+  "indexEmpty": true,
+  "actions": {
+    "tests": 0,
+    "database": 0,
+    "rawMutation": 0,
+    "push": 0,
+    "provider": 0,
+    "staging": 0,
+    "commit": 0
+  }
+}

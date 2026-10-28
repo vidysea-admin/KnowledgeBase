@@ -1,0 +1,17 @@
+✔ brain list/detail reads hide the pending WhatsApp session, source, page, claims and turns (13.4868ms)
+✔ grounded content returns nothing for the pending WhatsApp session (3.2719ms)
+✔ citations never resolve the old-wiring WhatsApp claim while pending (2.1456ms)
+✔ the /ask tree and /graph omit the pending WhatsApp node, title and edges (6.0053ms)
+✔ brain list/detail reads hide the rejected WhatsApp session, source, page, claims and turns (3.736ms)
+✔ grounded content returns nothing for the rejected WhatsApp session (1.7328ms)
+✔ citations never resolve the old-wiring WhatsApp claim while rejected (1.6695ms)
+✔ the /ask tree and /graph omit the rejected WhatsApp node, title and edges (1.7191ms)
+✔ approved WhatsApp: only the reviewed claim text is reachable through brain detail and citation; sibling turn and group title are not (6.5488ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1005.2081

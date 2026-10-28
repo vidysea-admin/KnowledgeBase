@@ -1,0 +1,36 @@
+{
+  "argv": [
+    "C:\\Program Files\\Git\\cmd\\git.EXE",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\1efc6f1875defe90964439123d5719eb743523ae3f7fb16d13c21fecd9abc6a1.json",
+    "sha256": "1efc6f1875defe90964439123d5719eb743523ae3f7fb16d13c21fecd9abc6a1",
+    "count": 323
+  },
+  "environmentWhitelistSha256": "3748cf94db2bdadd694fc7a6ebe175b9b0d0dc8d4c3583f32b4830b4787ba74b",
+  "environmentNames": [
+    "KB_T022_PRIVATE_REVIEW_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS_ALLOW_GENUINE_NATIVE",
+    "NODE_OPTIONS",
+    "PYTHONDONTWRITEBYTECODE",
+    "TEMP",
+    "TMP"
+  ],
+  "beforeMatch": true,
+  "maxJobSeconds": 7,
+  "accounting": "SHARED INTEGRATION, not checker",
+  "pid": 27264,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.23400000000037835,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-head-after.log",
+    "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+  },
+  "counts": {}
+}

@@ -212,3 +212,5 @@ end to end through the per-request-bound arms; it is **one question on one tenan
 recall measurement. The checker runs Mode D with its own script.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

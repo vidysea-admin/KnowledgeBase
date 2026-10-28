@@ -1,0 +1,28 @@
+{
+  "sourcePass": {
+    "parser": "scripts/qa/dispatch-state.mjs:verdictCycle",
+    "cycle": 1,
+    "verdict": "PASS",
+    "sha": "eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+    "runtime": "HOLD"
+  },
+  "sourceFilesRehashed": 17,
+  "sourceCandidate": "eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+  "binaryPath": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\vendor\\selected\\mongodb-win32-x86_64-windows-8.0.34\\bin\\mongod.exe",
+  "binarySha256": "4c9e9764cbac5be8eb92733e23ce7f70b52f8ae84b6879b4d5cc010c90ec6082",
+  "binaryBytes": 77756416,
+  "cycle1VerdictSha256": "7b509da8f1276141c72ecb15c44633c9467fbd3a892d67321e0641935747e542",
+  "officialArchiveSha256": "6b021a0864494e4decf278b36477a29eb36072432773e4e62c2f42c302630db0",
+  "existingLauncherSha256": "4f5efe44e0e402dea5c14c06cfeb661fb9a6b69ce10867b2f955cf1f3e186637",
+  "brokerSealPath": "qa/coordination/resume-20261015/broker/isolated-replica-cycle1-final-seal.json",
+  "actualFakeDiscovery": 11,
+  "actualFakePassed": 11,
+  "astFiles": 7,
+  "previousBrokerPins": 21,
+  "humanScopeRecorded": true,
+  "decisionAppended": false,
+  "jointHookReviewed": false,
+  "activationReady": false,
+  "serverStarted": false,
+  "databaseActions": 0
+}

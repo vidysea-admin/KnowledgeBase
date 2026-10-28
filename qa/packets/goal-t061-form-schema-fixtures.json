@@ -1,0 +1,50 @@
+{
+  "collection": "application_operations",
+  "valid": [
+    {
+      "_id": "formdef-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "tenantId": "tenant-a",
+      "recordType": "definition",
+      "targetId": "example-application",
+      "targetFingerprint": "9b931fa992f28f01b74dff8699058f41506868dee10afa0214329712a6a93ded",
+      "enabled": false,
+      "maxAttempts": 3,
+      "timeoutMs": 5000,
+      "version": 1,
+      "updatedAt": 1000,
+      "history": [{ "at": 1000, "actor": "key-admin", "action": "configured", "binding": { "payloadDigest": null, "targetFingerprint": "9b931fa992f28f01b74dff8699058f41506868dee10afa0214329712a6a93ded", "priorVersion": 0 } }]
+    },
+    {
+      "_id": "form-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "tenantId": "tenant-a",
+      "recordType": "operation",
+      "definitionId": "formdef-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "targetId": "example-application",
+      "targetFingerprint": "9b931fa992f28f01b74dff8699058f41506868dee10afa0214329712a6a93ded",
+      "identityDigest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "payloadDigest": "9018e1f5b98b753fea66726f1439147f5bc4866823cc47cda71655d0848ce680",
+      "fields": [{ "name": "courseRef", "value": "MATH", "source": { "documentId": "document-1", "page": 1, "start": 0, "end": 4, "revision": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" } }],
+      "status": "draft",
+      "approval": null,
+      "attempts": 0,
+      "maxAttempts": 3,
+      "timeoutMs": 5000,
+      "version": 1,
+      "createdAt": 1000,
+      "updatedAt": 1000,
+      "ownerToken": null,
+      "leaseUntil": null,
+      "receiptId": null,
+      "sideEffectUncertain": false,
+      "incident": null,
+      "history": [{ "at": 1000, "actor": "key-admin", "action": "submitted", "binding": { "payloadDigest": "9018e1f5b98b753fea66726f1439147f5bc4866823cc47cda71655d0848ce680", "targetFingerprint": "9b931fa992f28f01b74dff8699058f41506868dee10afa0214329712a6a93ded", "priorVersion": 0 } }]
+    }
+  ],
+  "invalidMutations": [
+    { "index": 0, "set": { "maxAttempts": 4 } },
+    { "index": 1, "set": { "status": "unknown" } },
+    { "index": 1, "set": { "approval": { "actor": "client-invented", "at": 1000, "payloadDigest": "not-a-hash", "targetFingerprint": "not-a-hash" } } },
+    { "index": 1, "set": { "unexpected": "arbitrary-handler" } }
+  ],
+  "note": "Synthetic canonical fixtures only. No destination, credential or real form/person data. Payload/target digests are real for this shape; natural operation/definition digests are synthetic. Runtime adds hash, approval and state invariants beyond JSON schema."
+}

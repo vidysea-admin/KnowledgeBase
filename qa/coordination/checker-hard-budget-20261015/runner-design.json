@@ -1,0 +1,18 @@
+{
+  "status": "DESIGN_ONLY_CAPABILITY_GAP",
+  "observed": [
+    "review_budget.assess gates allocations, not execution; actual_total tagging and cumulative debits already exist.",
+    "managed_review.run uses subprocess.run(timeout), which does not establish Windows descendant termination; startup input floor is explicitly not a cap.",
+    "review_contract.validate binds selected nodes with reasons, but does not execute or prove mandatory/security coverage. Existing token tests validate arithmetic, not runtime enforcement."
+  ],
+  "implementation_files": [
+    "qa/coordination/checker-hard-budget-20261015/candidate/scoped_runner.py",
+    "qa/coordination/checker-hard-budget-20261015/candidate/runtime_admission.py",
+    "qa/coordination/checker-hard-budget-20261015/candidate/test_scoped_runner.py",
+    "qa/coordination/checker-hard-budget-20261015/candidate/test_runtime_admission.py"
+  ],
+  "runner": "Seal candidate/base/tree and explicit file hashes, clause-to-required-node mappings and security boundaries. Reject omitted mandatory nodes. Preflight interpreter/import containment, dependencies and writable basetemp. Execute one explicit argv batch of selected nodes; no shell or arbitrary command strings. Preserve complete output, exit code, environment fingerprints and final byte identity. Validate candidate after execution.",
+  "time_enforcement": "Before launch, atomically reserve remaining 0.1*measured-maker-active minus cumulative checker charges, startup and finalization allowances. External supervisor launches suspended worker inside Windows Job Object with kill-on-close before resume; monotonic deadline covers startup, tests, descendants and finalization. Require observed supervisor/termination margin; reserve it inside budget. Unsupported controls refuse launch.",
+  "token_enforcement": "Require runtime-attested exact input including cached tokens plus server-enforced bounded cumulative output/tool-turn consumption, or exact-tokenized local inference with bounded prefill/generation. Atomically reserve every call before submission; append immutable actual receipts across children/retries. Unknown historical totals refuse measured-compliance admission. Output-only caps and startup floors are insufficient.",
+  "routing": "Native subagent startup has no demonstrated hard cumulative token/deadline controls: bypass that route. No inspected runtime establishes an alternative enforceable provider cap; report capability gap without model calls. Deterministic local checks can run bounded, but cannot replace independent semantic review or issue PASS. Stage repo-local only; retain global installation."
+}

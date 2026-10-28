@@ -1,0 +1,12 @@
+{
+  "parser": "scripts/qa/dispatch-state.mjs verdictCycle/manifestCycle; anchored authoritative Verdict/Status/Reviewed SHA",
+  "own_exit": 0,
+  "result": {
+    "verdict": "PASS",
+    "status": "PASS",
+    "cycle": 0,
+    "manifestCycle": 0,
+    "sha": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8"
+  },
+  "observed_utc": "2026-10-16T02:22:33.013253+00:00"
+}

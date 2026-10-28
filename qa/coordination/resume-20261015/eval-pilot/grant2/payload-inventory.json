@@ -1,0 +1,36 @@
+{
+  "endpoint": "https://ollama.com/api/chat",
+  "method": "POST",
+  "model": "glm-5.3-flash",
+  "bodyFields": [
+    "model",
+    "stream=false",
+    "messages[].role",
+    "messages[].content",
+    "options.num_predict=1024"
+  ],
+  "headerNames": [
+    "Authorization (value omitted)",
+    "Content-Type"
+  ],
+  "selectedQuestionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "questionStringSha256": "484335769f0957e252b9ae16e6372953344f0b951845b1598abcc51be83611c1",
+  "approvedCandidateSessions": 29,
+  "sourceBindings": 140,
+  "maxAggregateUtf8Input": 32000,
+  "maxInferenceRequests": 2,
+  "cumulativeRequestIDs": [
+    4,
+    5
+  ],
+  "maxOutputEach": 1024,
+  "maxAggregateOutput": 2048,
+  "rawContentPrinted": false,
+  "actualFuturePromptHash": "Recorded by unchanged boundedTransport immediately before each admitted request; future selected evidence not invented",
+  "configSha256": "a0d4ad094c1043f83c211ec24edeb56a0ae8e040bd6ba4af299fbc386b68e08a",
+  "sourceCandidateSha256": "b9d1f073c1cf97df70c6c82513d0d4539af2db2667cdecef5a8262de3d37470d",
+  "corpusSha256": "5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162",
+  "auditDisposition": "all original snapshots, audit and citations remain intact; additive receipts only",
+  "approvalEvidence": "root relayed explicit HUMAN approval of exact bounded selected question/private evidence to existing OllamaCloud; deletion not authorized",
+  "inventorySha256": "d13f83e328f2f5c8b62cff339dfd220d11dbdb1e7d4f35cf8c3baedc4dee64b8"
+}

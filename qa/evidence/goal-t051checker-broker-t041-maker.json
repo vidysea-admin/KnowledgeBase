@@ -1,0 +1,50 @@
+{
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register.mjs",
+    "scripts/webinar/slides/slide-knowledge.test.mjs",
+    "scripts/webinar/process-video-slides.test.mjs",
+    "scripts/webinar/process-video.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "LKB_HERMETIC_MEDIA_TESTS": "1"
+  },
+  "timeoutMs": 60000,
+  "startedAt": "2026-10-14T21:06:41.854Z",
+  "completedAt": "2026-10-14T21:06:46.435Z",
+  "elapsedMs": 4577.6762,
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "before": {
+    "scripts/webinar/process-video.mjs": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7",
+    "scripts/webinar/slides/slide-knowledge.mjs": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef",
+    "scripts/webinar/slides/slide-knowledge.test.mjs": "a4df31458134f4c29a669ba15597d280dbc62ab821f267cbb08d44e8a2d6db3f",
+    "scripts/webinar/process-video-slides.test.mjs": "b4f41b18f845cce2152d4201356953b5e2cb28f57b0034c0525c2b99ed3b22b5",
+    "scripts/webinar/process-video.test.mjs": "0bb78df51fd31878aabadf8a9f362b4e67db97c678175b2fe4a89164c4df6037",
+    "scripts/webinar/session-rows.mjs": "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053",
+    "scripts/webinar/sync-session.mjs": "d6a2d14b454651992b189cffbf612a8ac060679ae94640021b13c31bd3473a52",
+    "apps/api/src/ask/source-context.ts": "5343c1a8fa05bd8bd810032b21918be0374ef9026dda3ca28038c31bfaa0a872",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+  },
+  "after": {
+    "scripts/webinar/process-video.mjs": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7",
+    "scripts/webinar/slides/slide-knowledge.mjs": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef",
+    "scripts/webinar/slides/slide-knowledge.test.mjs": "a4df31458134f4c29a669ba15597d280dbc62ab821f267cbb08d44e8a2d6db3f",
+    "scripts/webinar/process-video-slides.test.mjs": "b4f41b18f845cce2152d4201356953b5e2cb28f57b0034c0525c2b99ed3b22b5",
+    "scripts/webinar/process-video.test.mjs": "0bb78df51fd31878aabadf8a9f362b4e67db97c678175b2fe4a89164c4df6037",
+    "scripts/webinar/session-rows.mjs": "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053",
+    "scripts/webinar/sync-session.mjs": "d6a2d14b454651992b189cffbf612a8ac060679ae94640021b13c31bd3473a52",
+    "apps/api/src/ask/source-context.ts": "5343c1a8fa05bd8bd810032b21918be0374ef9026dda3ca28038c31bfaa0a872",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t041-maker.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t041-maker.stderr.txt",
+  "hashesUnchanged": true
+}

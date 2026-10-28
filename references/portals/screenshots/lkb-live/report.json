@@ -1,0 +1,709 @@
+{
+ "nav": [
+  "Dashboard -> /",
+  "Operations workspace -> /operations",
+  "AI counsellor -> /counsellor",
+  "Calibration review -> /calibration-review",
+  "Extraction review -> /extraction-review",
+  "Label review -> /label-review",
+  "Championship -> /championship",
+  "Sessions -> /sessions",
+  "Ask -> /ask",
+  "Answer policy -> /answer-policy",
+  "Answer review -> /answer-review",
+  "Documents -> /knowledge/documents",
+  "Saved collections -> /knowledge/collections",
+  "Topics -> /knowledge/topics",
+  "Resources -> /knowledge/resources",
+  "Speaker profiles -> /knowledge/speakers",
+  "Knowledge outputs -> /knowledge-outputs",
+  "Transcript review -> /transcript-review",
+  "Counsellor accounts -> /accounts",
+  "Application automation -> /automation",
+  "Connectors -> /connectors",
+  "Search -> /search",
+  "Knowledge directory -> /knowledge",
+  "Brain -> /brain",
+  "Knowledge explorer -> /explorer",
+  "Confidence graph -> /graph-confidence",
+  "Knowledge gaps -> /gaps",
+  "Activity & Health -> /activity-health",
+  "Analytics -> /analytics",
+  "Calendar -> /calendar",
+  "Join rules -> /join-rules",
+  "Watch -> /watch",
+  "Sources -> /sources",
+  "Ingest -> /ingest",
+  "Meeting Bot -> /meeting-bot",
+  "WhatsApp -> /whatsapp",
+  "Settings -> /settings",
+  "Provider jobs -> /jobs",
+  "Claims -> /claims",
+  "System status -> /status",
+  "Setup wizard -> /setup",
+  "Operations health -> /ops-health",
+  "Notifications -> /notifications",
+  "Compete -> /api/compete",
+  "API Docs -> /api/docs-ui"
+ ],
+ "report": [
+  {
+   "route": "login (invalid key)",
+   "api": [
+    "GET /api/sources 401",
+    "GET /api/sessions 401",
+    "GET /api/gaps 401",
+    "GET /api/keys 401"
+   ],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)",
+    "Failed to load resource: the server responded with a status of 401 (Unauthorized)"
+   ],
+   "text": "Living Knowledge Base\n\nPaste your API key to continue.\n\nContinue"
+  },
+  {
+   "route": "/",
+   "finalUrl": "/",
+   "heading": "Dashboard",
+   "api": [
+    "GET /api/gaps 200",
+    "GET /api/keys 503",
+    "GET /api/sessions 200",
+    "GET /api/sources 200"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Dashboard A real, at-a-glance view of this tenant's knowledge base — every number below is live. API keys unavailable (hosting not configured) 0 Sessions 0 Sources 0 Open gaps RECENT SESSIONS No sessions yet. KNOWLEDGE HEALTH No gaps rec",
+   "file": "02-home.png"
+  },
+  {
+   "route": "/ask",
+   "finalUrl": "/ask",
+   "heading": "Ask",
+   "api": [
+    "GET /api/answer-history 200",
+    "GET /api/answer-policies 403",
+    "GET /api/answer-history/suggestions 200"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Ask Ask from cited internal knowledge, with separately attributed web fallback when permitted. Manage answer policies · Review candidate answers and evidence conflicts QuestionSaved policy Match by question class, or conservative default",
+   "file": "03-ask.png"
+  },
+  {
+   "route": "/search",
+   "finalUrl": "/search",
+   "heading": "Search",
+   "api": [],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Search Find passages in your transcripts and open their source. Search transcriptsSearch Enter a query to search your transcripts. Semantic matches Compare meaning-based passages with lexical results. This request uses an embedding provi",
+   "file": "04-search.png"
+  },
+  {
+   "route": "/explorer",
+   "finalUrl": "/explorer",
+   "heading": "Knowledge explorer",
+   "api": [
+    "GET /api/sessions 200",
+    "GET /api/graph 404"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "text": "Search all sessions Go Knowledge explorer Browse sessions by their recorded year and month, and explore topics, speakers and organizations in the knowledge graph. RefreshSession scope All returned sessions Entity tabs show the entire returned tenant graph. Ove",
+   "file": "05-explorer.png"
+  },
+  {
+   "route": "/brain",
+   "finalUrl": "/brain",
+   "heading": "Brain",
+   "api": [
+    "GET /api/graph 404"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "text": "Search all sessions Go Brain Every session, topic, org, person, country and date the knowledge base actually holds, and how they connect. Solid lines are stated relationships; dashed lines are derived (co-occurrence, or a keyword match below full confidence). ",
+   "file": "06-brain.png"
+  },
+  {
+   "route": "/counsellor",
+   "finalUrl": "/counsellor",
+   "heading": "AI counsellor",
+   "api": [],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go AI counsellor Ask the knowledge base by voice or text. Check the cited sources before making a decision. Ready for your question Microphone recognition is provided by your browser and may send audio to its speech service. Press the micro",
+   "file": "07-counsellor.png"
+  },
+  {
+   "route": "/sessions",
+   "finalUrl": "/sessions",
+   "heading": "Sessions",
+   "api": [
+    "GET /api/sessions 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Sessions Every real ingested session. Click one for its summary, claims, and transcript. No sessions found for this tenant.",
+   "file": "08-sessions.png"
+  },
+  {
+   "route": "/knowledge",
+   "finalUrl": "/knowledge",
+   "heading": "Knowledge directory",
+   "api": [
+    "GET /api/sessions 200",
+    "GET /api/sources 200",
+    "GET /api/graph 404"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "text": "Search all sessions Go Knowledge directory Explore recorded entities, their source references, session collections and available resources. Refresh 0 returned sessions; 0 returned entities; 0 returned sources. Counts describe returned records, not extraction q",
+   "file": "09-knowledge.png"
+  },
+  {
+   "route": "/knowledge/collections",
+   "finalUrl": "/knowledge/collections",
+   "heading": "Saved curated collections",
+   "api": [
+    "GET /api/knowledge/collections 200",
+    "GET /api/knowledge/members 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Saved curated collections Choose the exact tenant-owned records to keep together. Saved membership is separate from derived month and topic filters. Reload saved collections No saved collections yet. Create a collection Collection title ",
+   "file": "10-knowledge_collections.png"
+  },
+  {
+   "route": "/knowledge/documents",
+   "finalUrl": "/knowledge/documents",
+   "heading": "Document pages and highlights",
+   "api": [
+    "GET /api/knowledge/documents 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Document pages and highlights Page numbers come from the PDF pages or a rendered DOCX. Plain text and transcripts have no document page number. Refresh 0 returned document versions. No page-evidenced documents imported. Import PDF or DOC",
+   "file": "11-knowledge_documents.png"
+  },
+  {
+   "route": "/knowledge/profiles",
+   "finalUrl": "/knowledge/profiles",
+   "heading": "",
+   "api": [],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go",
+   "file": "12-knowledge_profiles.png"
+  },
+  {
+   "route": "/knowledge/resources",
+   "finalUrl": "/knowledge/resources",
+   "heading": "Resource and program directory",
+   "api": [
+    "GET /api/knowledge/resources 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Resource and program directory Recorded resources and program labels. Classification, institution role and endorsement are unverified; counts do not establish coverage or quality. Refresh resourcesFind resource or program Resource type A",
+   "file": "13-knowledge_resources.png"
+  },
+  {
+   "route": "/knowledge/speakers",
+   "finalUrl": "/knowledge/speakers",
+   "heading": "Speaker profiles",
+   "api": [
+    "GET /api/knowledge/members 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Speaker profiles Recorded aliases and suggested names do not confirm identity. Profiles use accepted source evidence and exact speaker blocks. Refresh speakers Recorded speaker entries No recorded speaker entries.",
+   "file": "14-knowledge_speakers.png"
+  },
+  {
+   "route": "/knowledge/topics",
+   "finalUrl": "/knowledge/topics",
+   "heading": "Topic profiles",
+   "api": [
+    "GET /api/knowledge/topics 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Topic profiles Profiles use the exact saved topic identity and source evidence. Categories and extraction quality remain unverified. Refresh topicsFind topic No saved topics returned.",
+   "file": "15-knowledge_topics.png"
+  },
+  {
+   "route": "/sources",
+   "finalUrl": "/sources",
+   "heading": "Sources",
+   "api": [
+    "GET /api/sources 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Sources Every raw source that has been ingested into the knowledge base. No sources recorded for this tenant yet.",
+   "file": "16-sources.png"
+  },
+  {
+   "route": "/ingest",
+   "finalUrl": "/ingest",
+   "heading": "Ingest",
+   "api": [],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Ingest Paste a URL to pull its content into the knowledge base as a real, real-time-fetched session — real extraction (Jina Reader), real storage, no fabricated content. URLIngest WHAT'S REAL HERE TODAY URL ingestion only, for now — a re",
+   "file": "17-ingest.png"
+  },
+  {
+   "route": "/watch",
+   "finalUrl": "/watch",
+   "heading": "Watch",
+   "api": [
+    "GET /api/meeting-candidates 200",
+    "GET /api/watched-sources 200",
+    "GET /api/watch-state 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Watch Is the watching alive, and what is it about to do — answered without reading a log. Everything here is read-only except “Poll now”. WATCHED SOURCES Poll now No watched sources are configured yet. That is different from every source",
+   "file": "18-watch.png"
+  },
+  {
+   "route": "/whatsapp",
+   "finalUrl": "/whatsapp",
+   "heading": "WhatsApp",
+   "api": [
+    "GET /api/whatsapp/review 200",
+    "GET /api/whatsapp/groups 500"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 500 (Internal Server Error)"
+   ],
+   "text": "Search all sessions Go WhatsApp Ingest captured group messages, inspect their source evidence, and explicitly approve or reject each knowledge candidate. Messages await review before publication. internal error Knowledge review Review each candidate independen",
+   "file": "19-whatsapp.png"
+  },
+  {
+   "route": "/calendar",
+   "finalUrl": "/calendar",
+   "heading": "Calendar",
+   "api": [
+    "GET /api/calendar/join-rules 503",
+    "GET /api/calendar/upcoming 503",
+    "GET /api/sessions 200",
+    "GET /api/meeting-candidates 200"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Calendar Past LKB sessions and real upcoming meetings from your connected calendar, on one timeline. Green is a recorded session, blue is an upcoming meeting. ‹ Today › October 2026 month week day list Kind all sessions meetings Source a",
+   "file": "20-calendar.png"
+  },
+  {
+   "route": "/join-rules",
+   "finalUrl": "/join-rules",
+   "heading": "Join rules",
+   "api": [
+    "GET /api/calendar/join-rules 503"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Join rules Edit the join rules. They are stored but not applied yet: Join rules are not enforced by the bot yet, so it may still join until enforcement is switched on. REGISTRATION PROFILE AND APPROVAL Allow automatic registration only f",
+   "file": "21-join-rules.png"
+  },
+  {
+   "route": "/meeting-bot",
+   "finalUrl": "/meeting-bot",
+   "heading": "Meeting bot",
+   "api": [
+    "GET /api/meeting-bot/privacy 403",
+    "GET /api/meeting-bot/capture-readiness 403",
+    "GET /api/webinar-operations 200",
+    "GET /api/calendar/upcoming 503",
+    "GET /api/sessions 200",
+    "GET /api/bot-events?limit=20 403",
+    "GET /api/retention/status 503"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Meeting bot Upcoming meetings, capture in progress, webinar operations and past recordings. Send bot now Send the bot to a meeting that is live now. Requires a key with the send-now scope. The server checks the link and end time and has ",
+   "file": "22-meeting-bot.png"
+  },
+  {
+   "route": "/notifications",
+   "finalUrl": "/notifications",
+   "heading": "Notifications",
+   "api": [
+    "GET /api/notifications?limit=50 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Notifications Recent failures for your own tenant, from the upload queue, provider jobs and watcher runs. Read marks are kept in this browser only. Notifications unavailable: this API key is not permitted to read them. Refresh",
+   "file": "23-notifications.png"
+  },
+  {
+   "route": "/automation",
+   "finalUrl": "/automation",
+   "heading": "Application automation",
+   "api": [
+    "GET /api/automation/definitions 403",
+    "GET /api/automation/runs 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Application automation Application forms Check application document readiness, monitor work and handle exceptions. This routine does not submit applications externally. Automation unavailable or permission denied. Enable readiness routin",
+   "file": "24-automation.png"
+  },
+  {
+   "route": "/automation/forms",
+   "finalUrl": "/automation/forms",
+   "heading": "Approved application routines",
+   "api": [
+    "GET /api/automation/forms/targets 403",
+    "GET /api/automation/forms/definitions 403",
+    "GET /api/automation/forms/operations 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Approved application routines Prepare evidence-backed fields, approve the exact request and run an administrator-configured application routine. Application operations unavailable or permission denied. No approved application target is c",
+   "file": "25-automation_forms.png"
+  },
+  {
+   "route": "/answer-review",
+   "finalUrl": "/answer-review",
+   "heading": "Answer review and evidence conflicts",
+   "api": [
+    "GET /api/answer-reviews 403",
+    "GET /api/answer-evidence-conflicts 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Answer review and evidence conflicts Review the exact saved candidate and original citations. Each decision records the verified tenant actor, reason and immutable evidence revision. Ask this key is missing the required \"answer-policy:re",
+   "file": "26-answer-review.png"
+  },
+  {
+   "route": "/answer-policy",
+   "finalUrl": "/answer-policy",
+   "heading": "Answer policies",
+   "api": [
+    "GET /api/answer-policies 403",
+    "GET /api/answer-policies/conflicts 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Answer policies Save immutable policy revisions, inspect conflicts and apply a selected policy on Ask. Citations are always required. this key is missing the required \"answer-policy:read\" scope Saved policies No saved policies. Policy YA",
+   "file": "27-answer-policy.png"
+  },
+  {
+   "route": "/answer-policies",
+   "finalUrl": "/answer-policies",
+   "heading": "Answer policies",
+   "api": [
+    "GET /api/answer-policies 403",
+    "GET /api/answer-policies/conflicts 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Answer policies Save immutable policy revisions, inspect conflicts and apply a selected policy on Ask. Citations are always required. this key is missing the required \"answer-policy:read\" scope Saved policies No saved policies. Policy YA",
+   "file": "28-answer-policies.png"
+  },
+  {
+   "route": "/claims",
+   "finalUrl": "/claims",
+   "heading": "Claims",
+   "api": [
+    "GET /api/claims?limit=25&offset=0 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Claims Claims extracted from sessions, each with the session and turn it cites. This page is read-only. Status All statuses verified needs-review conflicting Showing 0–0 No claims found for this tenant. Previous Next",
+   "file": "29-claims.png"
+  },
+  {
+   "route": "/gaps",
+   "finalUrl": "/gaps",
+   "heading": "Knowledge gaps",
+   "api": [
+    "GET /api/gaps 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Knowledge gaps Inspect the missing recordings, sources and vectors recorded for this tenant. Refresh 0 returned gaps: 0 open; 0 received; 0 expired; 0 unknown status. 0 overdue among 0 open gaps with a valid due date; 0 open gaps have no",
+   "file": "30-gaps.png"
+  },
+  {
+   "route": "/graph-confidence",
+   "finalUrl": "/graph-confidence",
+   "heading": "Confidence graph",
+   "api": [
+    "GET /api/graph 404"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "text": "Search all sessions Go Confidence graph Explore recorded relationships and the evidence behind them. Minimum confidence uses each relationship’s recorded score, from 0 to 1. Refresh No knowledge graph has been indexed for this tenant yet.",
+   "file": "31-graph-confidence.png"
+  },
+  {
+   "route": "/calibration-review",
+   "finalUrl": "/calibration-review",
+   "heading": "Evaluator calibration review",
+   "api": [
+    "GET /api/calibration-review 503"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Evaluator calibration review Review thirty query and summary pairs individually. No model score is preselected. Your API key identifies the tenant. The reviewer name Umesh is an assertion; genuine individual human judgments require indep",
+   "file": "32-calibration-review.png"
+  },
+  {
+   "route": "/extraction-review",
+   "finalUrl": "/extraction-review",
+   "heading": "Extraction gold review",
+   "api": [
+    "GET /api/extraction-review 503"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Extraction gold review A trusted human reviewer labels each displayed candidate against its source. Native evaluator choices start unset; no judgment or threshold is inferred. Reload extraction reviews HTTP 503",
+   "file": "33-extraction-review.png"
+  },
+  {
+   "route": "/label-review",
+   "finalUrl": "/label-review",
+   "heading": "Label review",
+   "api": [
+    "GET /api/label-review 503"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Label review These are AI-consensus labels from several models, shown with how much the models agree. They are the working labels and nothing waits for a human. You may review any item: accepting keeps it an AI-consensus label, overridin",
+   "file": "34-label-review.png"
+  },
+  {
+   "route": "/transcript-review",
+   "finalUrl": "/transcript-review",
+   "heading": "Transcript review and speaker mapping",
+   "api": [],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Transcript review and speaker mapping Select a session from the sessions library, or enter its session identifier. Session identifier Open transcript",
+   "file": "35-transcript-review.png"
+  },
+  {
+   "route": "/knowledge-outputs",
+   "finalUrl": "/knowledge-outputs",
+   "heading": "Knowledge outputs",
+   "api": [
+    "GET /api/knowledge-outputs 200",
+    "GET /api/sessions 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Knowledge outputs Create a cited FAQ, report or meeting brief from your knowledge. All generated content remains an AI draft for human review. Create a draft Output type FAQ Report Meeting preparation brief Title Audience and purpose Pol",
+   "file": "36-knowledge-outputs.png"
+  },
+  {
+   "route": "/championship",
+   "finalUrl": "/championship",
+   "heading": "Championship preparation",
+   "api": [],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go Championship preparation Use the existing Compete workflow to retain matched internal evidence. A real public championship still requires Umesh's roster, independent panel, reviewed bank and real event proof. Event ID Reload event Create",
+   "file": "37-championship.png"
+  },
+  {
+   "route": "/analytics",
+   "finalUrl": "/analytics",
+   "heading": "Analytics",
+   "api": [
+    "GET /api/sessions 200",
+    "GET /api/jobs?limit=50 403",
+    "GET /api/gaps 200",
+    "GET /api/usage?days=30 403",
+    "GET /api/graph 404"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "text": "Search all sessions Go Analytics Read-only figures computed from this tenant’s sessions, claims, graph, gaps, provider jobs and /ask and /search usage. Refresh SESSIONS INGESTED OVER TIME No sessions were returned for this tenant. CLAIMS AND SPEAKERS No sessio",
+   "file": "38-analytics.png"
+  },
+  {
+   "route": "/activity-health",
+   "finalUrl": "/activity-health",
+   "heading": "Activity & Knowledge Health",
+   "api": [
+    "GET /api/activity-health?limit=50 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Activity & Knowledge Health Inspect this tenant’s durable upload operations, queue activity, errors and automatic retries. Refresh This API key needs jobs permission to view activity.",
+   "file": "39-activity-health.png"
+  },
+  {
+   "route": "/ops-health",
+   "finalUrl": "/ops-health",
+   "heading": "Operations health",
+   "api": [
+    "GET /api/activity-health?limit=50 403",
+    "GET /api/watch-runs?limit=50 403",
+    "GET /api/jobs?limit=50 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Operations health Failures, errors and retries for your own tenant. Each figure covers the newest 50 rows of its source, not a lifetime total. Upload queue Upload queue health unavailable: this API key is not permitted to read it. Source",
+   "file": "40-ops-health.png"
+  },
+  {
+   "route": "/operations",
+   "finalUrl": "/operations",
+   "heading": "Operations workspace",
+   "api": [
+    "GET /api/watch-state 200",
+    "GET /api/operations-integrations 503",
+    "GET /api/sources 200",
+    "GET /api/activity-health?limit=50 403",
+    "GET /api/operations-integrations/preview 503",
+    "GET /api/sessions 200",
+    "GET /api/notifications?limit=50 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)",
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Operations workspace Find sessions needing attention, follow their processing and explore their grounded knowledge. Sessions · Knowledge explorer · Operations health · Provider jobs · Knowledge gaps · Analytics · System status · Setup wi",
+   "file": "41-operations.png"
+  },
+  {
+   "route": "/jobs",
+   "finalUrl": "/jobs",
+   "heading": "Provider jobs",
+   "api": [
+    "GET /api/jobs?limit=50 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Provider jobs Application provider-call audit records. Status describes a provider call; it does not establish end-to-end pipeline completion. Refresh This API key needs jobs permission to read provider audit records.",
+   "file": "42-jobs.png"
+  },
+  {
+   "route": "/status",
+   "finalUrl": "/status",
+   "heading": "System status",
+   "api": [
+    "GET /api/system-status 200"
+   ],
+   "blockedWrites": [],
+   "errors": [],
+   "text": "Search all sessions Go System status Setup check for your tenant. Counts are document totals for your own tenant only. Checks Database: reachable Watchers silent: unavailable (no tenant-scoped source) Watchers unreadable: unavailable (no tenant-scoped source) ",
+   "file": "43-status.png"
+  },
+  {
+   "route": "/connectors",
+   "finalUrl": "/connectors",
+   "heading": "Connectors and recordings",
+   "api": [
+    "GET /api/connector-workflow 404"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 404 (Not Found)"
+   ],
+   "text": "Search all sessions Go Connectors and recordings Bring in public content, track recording requests, and verify watched changes. HTTP 404",
+   "file": "44-connectors.png"
+  },
+  {
+   "route": "/accounts",
+   "finalUrl": "/accounts",
+   "heading": "Counsellor accounts",
+   "api": [
+    "GET /api/counsellor-accounts 403"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 403 (Forbidden)"
+   ],
+   "text": "Search all sessions Go Counsellor accounts Link counsellors to existing API key identities. Grant access after creating a profile. Hosting and account access requires a fresh role grant. forbidden Refresh accounts Audit Load profile and access audit",
+   "file": "45-accounts.png"
+  },
+  {
+   "route": "/settings",
+   "finalUrl": "/settings",
+   "heading": "Settings",
+   "api": [
+    "GET /api/keys 503"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Settings Manage real API keys for this tenant. A raw key is only ever shown once, right after you create it. CREATE A NEW KEY Label SCOPES ask compete sessions sources gaps graph search citations webhooks keys jobs hosting operations ing",
+   "file": "46-settings.png"
+  },
+  {
+   "route": "/setup",
+   "finalUrl": "/setup",
+   "heading": "Setup wizard",
+   "api": [
+    "GET /api/calendar/join-rules 503",
+    "GET /api/watched-sources 200",
+    "GET /api/system-status 200",
+    "GET /api/setup/status 200"
+   ],
+   "blockedWrites": [],
+   "errors": [
+    "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+   ],
+   "text": "Search all sessions Go Setup wizard What this system needs, and the live state of each item. Secret values are never shown; configuration is reported only as yes or no. Checklist 3 ready, 4 to do, 0 problem(s), 4 unknown API reachable: Ready The web app reache",
+   "file": "47-setup.png"
+  }
+ ]
+}

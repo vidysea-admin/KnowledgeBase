@@ -1,0 +1,12 @@
+# T-013 scoped context-loss readiness
+
+Tier 3; existing cycle 0 only. Metadata ownership: qa/manifests/t013-avatar-context-loss.md and qa/packets/t013-avatar-context-loss.md, granted by integration_control via release_delivery_coordinator. Repository skills/maker/SKILL.md read explicitly.
+
+Current test SHA256: DDD8B24B69F1746960589FAD4FA1F60E73CEE5F4F1B40283821EA40592292E10. Actual Avatar component remains 1502F4F5EA97202A76D5581B43F9399F445EC535E945563DDDEB4362B9FD5BC3. Existing packet/manifest EBE2F44-prefixed test pins describe an earlier candidate; preserve them as history and never relabel earlier execution evidence.
+
+Awaiting exact current broker proof and root queue authorization. Requested bounded execution, not performed by this lane: bundled Node, cwd apps/web, args node_modules/vitest/vitest.mjs run src/pages/counsellor/Avatar.context-loss.test.tsx --maxWorkers=1 --minWorkers=1, timeout 120000 ms. Need exact receipt, command/output/count/duration and unchanged current pre/post pins before READY reconciliation and independent checker dispatch.
+
+This lane has performed read/hash work only; no tests, browser, microphone, GPU, provider, database, mutation, deployment or publication. Full-parent qa/verdicts/goal-t013.md remains HOLD. Actual microphone, audible synthesis/stop, GPU rendering, established API/provider answer and authorized downstream source navigation still require live evidence. Text-model scope remains Ollama Cloud GLM/DeepSeek; recording Gemini STT retained; no training/embeddings. This note claims no PASS or completion.
+## Current close-out
+
+Evidence-only cycle1 now checked-PASS in both canonical manifest status fields after independent qa/verdicts/t013-avatar-context-loss.md PASS readback, exact sourcecandidate2e9e352329632b6ae58b1fe113965b8223db359db9948fc4f66e081a68548830, scoped C1–C6 only. Repository machine cycle parser verifies manifest/verdict1. Original cycle0HOLD/history retained separately at t013-checker-cycle0-hold-history.md. Mounted1test and independently authored boundaryprobe are actual central execution; no local rerun. Cumulative conservative reviewer210seconds/6800tokens; actual usage/cost unknown, ratioUNVERIFIED. Parent T013 remains HOLD; no live voice/GPU/provider/citation or integration completion claim. Earlier readiness paragraphs above are historical states, superseded by this scoped close-out.

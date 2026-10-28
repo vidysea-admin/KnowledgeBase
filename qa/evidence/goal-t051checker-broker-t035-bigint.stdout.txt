@@ -1,0 +1,39 @@
+✔ opt-in publishes complete verified derivative, preserves original and clears scratch (28.6894ms)
+✔ disabled option makes no filesystem/subprocess changes (0.3271ms)
+✔ existing output is preserved without invoking encoder (7.8254ms)
+✔ failed missing-tool derivative uses untouched original and publishes nothing (10.3613ms)
+✔ failed timeout derivative uses untouched original and publishes nothing (11.4267ms)
+✔ failed no-audio derivative uses untouched original and publishes nothing (15.2129ms)
+✔ failed zero-packets derivative uses untouched original and publishes nothing (15.2963ms)
+✔ failed truncated derivative uses untouched original and publishes nothing (12.5706ms)
+✔ failed wrong-fps derivative uses untouched original and publishes nothing (13.7962ms)
+✔ failed exact-target derivative uses untouched original and publishes nothing (12.4476ms)
+✔ failed corrupt-input derivative uses untouched original and publishes nothing (10.834ms)
+✔ failed corrupt-decode derivative uses untouched original and publishes nothing (11.9471ms)
+✔ source change during encode refuses publication (13.0157ms)
+✔ destination appearing during conversion is never overwritten (19.45ms)
+✔ protocol/relative paths and unsafe aliases are refused before probing (2.3397ms)
+✔ scratch replacement is never recursively deleted or published (10.2243ms)
+✔ candidate bytes changed during decoder verification are never certified (12.4949ms)
+﹣ symlink source cannot redirect into a different recording (2.7261ms) # host disallows file symlinks
+✔ hard-linked source alias is refused before probing (3.8681ms)
+✔ command keeps required AV, no overwrite/shell/shortest/cut, bounded encoder and file size (0.2665ms)
+✔ trusted private windows force black/muted output even with compression disabled (20.3518ms)
+✔ required privacy encoder fails closed and never returns original as sanitized (7.07ms)
+✔ required privacy missing-tool fails closed and never returns original as sanitized (3.9244ms)
+✔ required privacy unmasked-video fails closed and never returns original as sanitized (12.7671ms)
+✔ required privacy partial-video fails closed and never returns original as sanitized (13.646ms)
+✔ required privacy unmasked-audio fails closed and never returns original as sanitized (18.0208ms)
+✔ required privacy missing-proof fails closed and never returns original as sanitized (13.271ms)
+✔ required privacy unmasked-stereo fails closed and never returns original as sanitized (15.4515ms)
+✔ required privacy extra-track fails closed and never returns original as sanitized (11.5508ms)
+✔ missing/malformed/unbounded privacy windows are refused, never interpolated (17.766ms)
+✔ empty validated privacy list permits disabled public capture without conversion (0.1774ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 1
+ℹ todo 0
+ℹ duration_ms 622.1109

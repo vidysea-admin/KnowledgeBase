@@ -1,0 +1,7 @@
+[
+  "apps/api/src/indexing/tile-speaker-suggest.ts",
+  "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+  "qa/manifests/t042-capture-clock-suggestions.md",
+  "qa/evidence/t042-capture-clock-suggestions/maker-test.txt",
+  "qa/evidence/t042-capture-clock-suggestions/trusted-registry-proposal.md"
+]

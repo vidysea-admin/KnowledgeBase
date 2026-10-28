@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "index": 1,
+  "originalIndex": 2,
+  "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+  "inputHash": "a9b65fd0a4bb0194e5fdffb75c3bcd2cdc6834299311c4f7908de262955f8fc5",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "contradicted",
+    "reason": "The cited passage attributes the Classes Internationales foundation-year tuition cap of EUR 5,500 per year to an India-France initiative in a discussion of French education. The persisted claim instead assigns it to New Zealand and calls it an equivalent program, a material country/program conflation.",
+    "missingReferences": [],
+    "caveats": [
+      "The historical stored speakerRef is unknown; a speaker name in transcript text is not independently verified identity.",
+      "Tuition is described as an annual cap, not evidence of external current policy or a New Zealand equivalent.",
+      "The same cited ID now has different text and timing: historical 2396-2463 seconds versus current 462-472 seconds."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+        "contextVersion": "originalMigration",
+        "quote": "The Classes Internationales pathway program, the foundation year, is capped at €5,500 a year because it was an initiative that was launched between India and France",
+        "textSha256": "8d87fb1765e963f37a75e4f3443efd2c2432c170ac219d17415dea902279d4f9",
+        "contextSha256": "3aab5c14bf7fa76fcfc4d77c33882274445b4abb72a6068f8b1ce0c0eaad5f5c",
+        "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 2396,
+        "tEnd": 2463,
+        "supports": "Supports the named French foundation-year annual EUR 5,500 tuition cap; the explicit India-France initiative conflicts with the New Zealand attribution."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The only unchanged literal citation now discusses engineering skill shortages and IT growth, providing no support for the program, country attribution, foundation year or tuition cap. Historical text cannot substitute for current cited support.",
+    "missingReferences": [],
+    "caveats": [
+      "The reference exists exactly once but its same-ID content, timing and speakerRef changed.",
+      "The stored Kshitij speakerRef does not establish verified person identity.",
+      "Unsupported citation evidence does not establish external factual falsity."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+        "contextVersion": "current",
+        "quote": "We've got 15 branches of engineering under the skill shortage list. IT and computer science is our fastest growing industry, with the industry growing 75% year-on-year.",
+        "textSha256": "fc9aa8cfdc919c906ea7b4e853c9a0aed4060af2ca53e4215cd46f911b329d5b",
+        "contextSha256": "2f48b4fbf0ce024c6101706333980f69e930aa1bfe421ed5c319048527b45f5b",
+        "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+        "revision": null,
+        "speakerRef": "Kshitij",
+        "tStart": 462,
+        "tEnd": 472,
+        "supports": "Unrelated engineering and IT assertions; supports none of the persisted tuition/program components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original citation describes an India-France program, conflicting with the New Zealand attribution; current same-ID citation is unrelated. AI preliminary transcript-evidence assessment only; no external truth, human adjudication, repair or release acceptance."
+}

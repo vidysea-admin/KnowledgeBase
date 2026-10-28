@@ -81,3 +81,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (111 lines, budget 200)
 A future scheduled worker composes `listActive` + `isDueForCheck` + `checkWatchedSource` +
 `recordFetch` + T-023's `createUrlSource` (for actual re-ingestion on `changed: true`) + a real
 notification channel. Not built here.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

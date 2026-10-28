@@ -1,0 +1,45 @@
+✖ mixed transcript and native hydration stamps one combined proof including an empty transcript result (13.5883ms)
+✔ mixed hydration refuses forged child proof identity foreign source and altered quote before combined restamp (5.0415ms)
+✖ public Ask ignores explicit vector false and legacy ports while returning current exact cited source (118.7706ms)
+✔ public Ask never invokes the legacy arms fallback when request factory is absent (74.2235ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 2
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3692.1987
+
+✖ failing tests:
+
+test at apps\api\src\ask\source-context.test.ts:1:27621
+✖ mixed transcript and native hydration stamps one combined proof including an empty transcript result (13.5883ms)
+  Error [BoundedAskError]: Ask could not validate a bounded source context: admitted session has no source rows
+      at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\ask\source-context.ts:179:15)
+      at async Object.hydrate (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\ask\source-context.ts:280:28)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\ask\source-context.test.ts:438:20)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    reason: 'admitted session has no source rows',
+    code: 'source_context_unavailable',
+    budgetRefusal: undefined
+  }
+
+test at apps\api\src\routes\ask\ask.test.ts:1:2157
+✖ public Ask ignores explicit vector false and legacy ports while returning current exact cited source (118.7706ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  503 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\routes\ask\ask.test.ts:69:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

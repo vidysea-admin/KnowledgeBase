@@ -1,0 +1,12 @@
+{
+  "cycle": 1,
+  "base_source_sha256": "a4ac3716872f5d5490c01157500994c5524ab8f68b97376d758b730c206607c7",
+  "current_source_sha256": "694c7971c24abf1d0534808fa77772acae3d9b49ddc08ee03ddacbcad75582cb",
+  "base_test_sha256": "52da208d9a7fefe39be7b563ca75aa40c1b9ecb50ae1d5efc319b05bd8feacfc",
+  "current_test_sha256": "7e6c7e26f0d25b0247c39c779068d1d63b4341f7e1c6cc91d5e214e78c65d2bc",
+  "unchanged_tail_from": "export async function snapshot",
+  "unchanged_tail_sha256": "ae28c6ffa993438daf7dd22ff5153cf26d0125b5a9987185bf5f2dd9125c51a0",
+  "unchanged_tail_byte_count": 6807,
+  "unchanged_tail_equal": true,
+  "method": "Exact reconstructed baseline hash matches cycle0 pin; raw-byte equality of all source from snapshot through EOF. Not AST verification. No reconstructed source written."
+}

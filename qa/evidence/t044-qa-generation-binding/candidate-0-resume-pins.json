@@ -1,0 +1,28 @@
+{
+  "slug": "t044-qa-generation-binding",
+  "fixCycle": 0,
+  "sourceCandidate": "resumed exact-bound correction",
+  "executionState": "NOT RUN",
+  "expectedTests": 30,
+  "command": "node --import tsx --test --test-concurrency=1 --test-timeout=30000 scripts/lib/transcription/transcript-qa-generation.test.mjs scripts/webinar/validate/transcript-qa-binding.test.mjs scripts/webinar/validate/validate-session.test.mjs",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "filePins": {
+    "scripts/lib/transcription/transcript-qa-generation.mjs": "a3c01df4e602078e8c61e1744c7e75cfe3c39326a9a7c7798d8a1655e51530b5",
+    "scripts/lib/transcription/transcript-qa-generation.test.mjs": "b00fa3b56186c671b655db6baae5797345db1ab7c920d2a09e5e3cf9bbeb17ee",
+    "scripts/webinar/validate/transcript-qa-binding.mjs": "2384b5e2e355957d8097a46a15016baf91cd1b7ed86ed3be7588104cb79356d8",
+    "scripts/webinar/validate/transcript-qa-binding.test.mjs": "d4979907ec5583fb818f196590ed82256327873a527382fe5d9cf967bb64ceb3",
+    "scripts/webinar/validate/validate-session.mjs": "bd0d2ee2a44bc94867447c29b1409953d2c88f66bd0b1eb6a74f48096d24f6ee",
+    "scripts/webinar/validate/validate-session.test.mjs": "a8e86bbb59252c483cc213ee9baa6d0c9c58ba661aaa2ab85ecff7053e6c1ab1",
+    "scripts/webinar/session-rows.mjs": "3cc4de004a670f00683fa63a81627c2bde94c8c5416102cb66dc5995ba695401",
+    "scripts/transcribe-long-session.mjs": "8b5f8f7f02d27fb2aa1d3531a6a3d2bd810ab65f43307d1ba26937d46cb11913",
+    "scripts/lib/transcription/recording-dispatch.mjs": "f998aca09e973ac94576f62bc8b1441911727586e27370ca9069c25f7cd9fc8c",
+    "scripts/lib/transcription-wiring.mjs": "db487e94f01993ecbba94c8a313414a6489f1090db2964a27f66f4a53d0a676b",
+    "scripts/lib/transcript-provenance.mjs": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301",
+    "scripts/lib/turn-timing.mjs": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e",
+    "scripts/webinar/process-video.mjs": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7",
+    "packages/ai/src/stt/transcript-qa.ts": "06cc4ddf32b2ec80899ed2e3abc0f6cd179baf240c485c47b93fdb542e17c9bc",
+    "packages/ai/src/stt/chunk-audio.ts": "d85f0413ba027506bcc9d45a4499a365ec80db64175dbe3d722eb042d453f997",
+    "qa/contracts/goal-T044.md": "9adee19be3e67bcdc9c592928e0b14d19318847db5bfab2d20ac418c3b569bb6"
+  },
+  "capturedAt": "2026-10-14T20:09:05.0456377Z"
+}

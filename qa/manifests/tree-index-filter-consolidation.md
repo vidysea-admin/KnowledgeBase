@@ -126,3 +126,5 @@ commit `024cd43`. 5/5 criteria met · 1/1 invariant holds.
    distinction, not scope-dodging.
 4. Full suite 343/343, typecheck 10/10 clean, dependency-cruiser 712 deps no violations — all
    reproduced fresh, not pasted.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

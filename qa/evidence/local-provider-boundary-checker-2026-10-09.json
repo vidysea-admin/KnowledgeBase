@@ -1,0 +1,21 @@
+{
+  "unit":"local-provider-boundary","cycleChecked":0,"verdict":"PASS","scope":"native bounded transport/provider boundary only",
+  "completionUtc":"2026-10-09T10:16:15Z","launchUtc":null,"totalElapsedSeconds":null,"timingUncertainty":"Preliminary source scrutiny began before launch timestamp capture; per-command measured durations retained.",
+  "hashes":{
+    "packages/ai/src/providers/claude-code.ts":"53318dedcfe106f41c26b5275af8af4a1926119118f14d0f546fa3eafd73831d",
+    "packages/ai/src/providers/claude-code-boundary.test.ts":"3d0c38537049eacf18d3990c7a955aeafcdc264d40463c2f1b61403210a4d828",
+    "packages/ai/src/providers/ollama.ts":"7b12b3fe6798baf1316468c913066a19049b4fee244d412383fc076b8b5e99e0",
+    "packages/ai/src/providers/ollama-boundary.test.ts":"1cc5cb826a50f00fa742fbfd6722e9a53e1c40ac3d4a0440b425f0fad05a4c6f",
+    "apps/api/src/ai-transport.ts":"b63808f6a4e09a11252b2c39e9bc259b9a73522098f5aa8b7c361dd79b673f04",
+    "apps/api/src/ai-transport.test.ts":"9538620013222b7f105c7338c7019357401d54e24d3d3b930c3b5268ea0b687a"
+  },
+  "independent":[
+    {"command":"Node24 --test --import tsx packages/ai/src/providers/claude-code-boundary.test.ts packages/ai/src/providers/ollama-boundary.test.ts apps/api/src/ai-transport.test.ts","exitCode":0,"pass":22,"fail":0,"skipped":0,"cancelled":0,"durationMs":7330.0229},
+    {"command":"Node24 --import tsx work/check-provider-mixed-output.mjs","exitCode":0,"pass":1,"durationMs":3668,"boundary":"combined120bytes exceeds100cap; each60-byte stream fits"},
+    {"command":"Node24 --import tsx work/check-provider-orphan.mjs","exitCode":0,"durationMs":454,"configuredDeadlineMs":800,"result":"parent exit0; descendant absent; concern not reproduced on this Windows machine"},
+    {"command":"C:/Program Files/Python312/python.exe contracts/verify_contracts.py","exitCode":0,"durationSeconds":1.7037376,"output":"no frozen contracts; PASS by vacuity"},
+    {"command":"git diff --check -- packages/ai/src/providers/claude-code.ts packages/ai/src/providers/ollama.ts apps/api/src/ai-transport.ts","exitCode":0}
+  ],
+  "reusedMakerEvidence":{"affectedStage":{"pass":46,"fail":0,"skipped":0,"durationSeconds":8.61},"downstreamAdapterCases":24,"aiTypecheckExit":0,"apiTypecheckExit":0,"publicClaude":{"result":"KB_OK","elapsedMs":9925,"inputTokens":2,"outputTokens":7,"reportedCostMetricUsd":0.006942,"actualBillingNotAdjudicated":true},"localEmbedding":{"endpoint":"http://127.0.0.1:11435","documentCount":2,"queryCount":2,"dims":768,"finite":true,"nonzero":true,"numThread":1,"truncate":false,"manifestDigest":"sha256:0a109f422b47e3a30ba2b10eca18548e944e8a23073ee3f3e947efcf3c45e59f","allBlobHashesVerified":true}},
+  "limits":["no repeated provider call","no corpus or database changes","no live API reload","no corpus vector retrieval or Ask grounding acceptance","no human gold/threshold/fullroadmap claim","managed policies remain applicable","calendar changes excluded"],"issuesWritten":[]
+}

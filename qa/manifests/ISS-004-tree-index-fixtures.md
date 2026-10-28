@@ -39,3 +39,5 @@ exit: 0
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/ISS-004-tree-index-fixtures.md (Cycle checked: 1, commit 1ddadda) — 3/3 criteria; T-001 restored.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

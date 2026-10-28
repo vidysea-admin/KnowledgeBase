@@ -29,6 +29,8 @@ a client of that API — with the long-range goal of beating top human counsello
 - `docs/`
   - `docs/adr/`
   - `docs/archive/`
+  - `docs/features/`
+  - `docs/whatsapp/`
 - `migrations/`
 - `packages/` — Application logic, one exported symbol per concept
   - `packages/ai/`
@@ -38,56 +40,107 @@ a client of that API — with the long-range goal of beating top human counsello
   - `packages/index/`
   - `packages/ingest/`
   - `packages/meeting-bot/`
+- `product-delivery/`
 - `qa/`
+  - `qa/artifacts/`
+  - `qa/audits/`
+  - `qa/briefs/`
+  - `qa/checker-probes/`
+  - `qa/checkpoints/`
   - `qa/contracts/`
+  - `qa/coordination/`
   - `qa/debug/`
   - `qa/evidence/`
+  - `qa/fixtures/`
   - `qa/gates/`
+  - `qa/goal-2026-10-14/`
+  - `qa/goal-t046/`
+  - `qa/goal-vectorless-2026-10-15/`
   - `qa/manifests/`
+  - `qa/packets/`
   - `qa/probes/`
+  - `qa/publication/`
+  - `qa/tests/`
   - `qa/verdicts/`
+  - `qa/watch/`
 - `raw/` — Data and source repos
   - `raw/TOC/`
+- `references/`
+  - `references/portals/`
 - `schema/` — JSON Schemas + fixtures + Python validator
   - `schema/fixtures/`
 - `scripts/`
+  - `scripts/demo/`
+  - `scripts/eval/`
   - `scripts/lib/`
+  - `scripts/native-capture/`
+  - `scripts/operations/`
+  - `scripts/qa/`
+  - `scripts/retention/`
+  - `scripts/toc/`
+  - `scripts/training/`
+  - `scripts/upload/`
+  - `scripts/watch/`
+  - `scripts/watched-sources/`
   - `scripts/webinar/`
+- `skills/`
+  - `skills/checker/`
+  - `skills/maker/`
 - `sources/` — Data and source repos
   - `sources/whatsapp_msg/`
 - `workers/`
-  - `workers/transcribe/` — Python ML worker (Whisper/diarization) — talks to the TS packages via the job queue only. No TS code; package.json exists so pnpm sees the workspace member.
+  - `workers/transcribe/` — Isolated Python Gemini transcription transport worker — communicates through tenant-scoped jobs only; see README.md for worker and file-submission commands.
 
 ## Schema summary
 
 | Collection | Required fields | Evidence/provenance field |
 |---|---|---|
+| answer_policy_review_items | _id, tenantId, kind, status, createdAt, key, summary | no |
+| answer_policy_revisions | _id, tenantId, policyId, version, questionClass, mode, style, onInsufficient, citations, action, retired, changedBy, changedAt, note, previousVersion | no |
+| answer_runs | _id, id, tenantId, createdAt, actor, query, questionClass, filters, evidenceMode, state, reason, candidate, candidateDigest, evidenceDigest, evidence, policy, feedback | yes |
+| answer_source_conflicts | _id, id, tenantId, runId, createdAt, by, explanation, a, b, candidateDigest, evidenceDigest, status | yes |
 | api_keys | _id, tenantId, keyHash, createdAt | no |
+| application_operations |  | no |
+| automation_runs |  | no |
+| championship_events | _id, tenantId, revision, createdAt, title, questions, counsellors, judges, rubric, reviewReference, bankDigest, trials, evidenceStatus | yes |
 | chunks | _id, tenantId, sourceRef, turnRefs, chunkIndex | no |
 | claims | _id, tenantId, text, status, evidence | yes |
 | consent_policies | _id, tenantId, mode | no |
 | decisions | _id, tenantId, text, status, evidence | yes |
+| document_documents | _id, tenantId, sourceId, version, title, format, pages, highlights, createdAt | no |
 | eval_runs | _id, tenantId, question, counsellor, credibility, createdAt | no |
 | features_event | id, feature, event, date, unit, links | no |
 | gaps | _id, tenantId, kind, status | no |
 | graph_edges | _id, tenantId, from, to, type | no |
 | jobs | _id, tenantId, kind, status, createdAt | no |
+| knowledge_collections | _id, tenantId, title, members, revision, updatedAt | no |
+| knowledge_outputs | _id, tenantId, kind, title, purpose, sessionIds, revision, createdAt, updatedAt, sourceDigest, provider, model, reviewState, sections, citations, sourceCoverage | no |
 | media | _id, tenantId, sourceRef, kind, retention | no |
-| meeting_candidates | _id, tenantId, messageId, subject, senderEmail, senderDomain, status, detectedAt | no |
+| meeting_candidates | _id, tenantId, messageId, subject, senderEmail, senderDomain, status, detectedAt | yes |
+| operations_schedules | _id, tenantId, kind, revision, enabled, intervalHours, nextRunAt, lastAttemptAt, lastSuccessAt, lastResult, lastErrorCode, runId, leaseToken, leaseUntil, audit | no |
 | orgs | _id, tenantId, name | no |
 | programs | _id, tenantId, name | no |
+| registration_link_approvals | _id, tenantId, decisionId, linkHash, scopeHash, policyHash, approvedBy, approvedAt, expiresAt | no |
 | session_pages | _id, tenantId, sessionId, summary, evidence | yes |
 | sessions | _id, tenantId, sourceId, title, date, status | no |
 | sources | _id, tenantId, kind, hash, consent, createdAt, captureMode | no |
+| speaker_attributes | _id, tenantId, personId, field, value, revision, status, evidence, createdBy, sourceRevisionDigest, reviewHistory | yes |
+| speaker_relationships | _id, tenantId, revision, status, type, from, to, evidence, createdBy, sourceRevisionDigest | yes |
+| speaker_suggestions | _id, tenantId, sessionId, speakerRef, personId, displayName, status, provenance, evidence, suggestedAt | yes |
 | speakers | _id, tenantId, personId, aliases, evidence | yes |
 | tenants | _id, name | no |
 | topics | _id, tenantId, name | no |
+| transcript_review_revisions | _id, tenantId, sessionId, revision, parentRevision, actorRef, reviewedAt, reason, changes, refreshTargets | no |
+| transcript_reviews | _id, tenantId, sessionId, revision, parentRevision, overlay, audit, refresh, committedAt | no |
 | tree_index | tenantId | no |
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
-| turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | no |
+| turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | yes |
+| usage_events | _id, tenantId, kind, at, day, outcome, latencyMs | no |
+| watch_heartbeat | _id, tenantId, sourceType, lastHeartbeatAt | no |
 | watch_reports | _id, tenantId, runAt, mode, digestPath | no |
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
 | watched_sources | _id, tenantId, url, reputationTier, checkIntervalHours, active | no |
+| whatsapp_candidates | _id, tenantId, sourceId, groupJid, sessionId, kind, text, contentHash, evidence, flags, status, createdAt | yes |
 
 ## Recent feature events (last 20)
 

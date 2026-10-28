@@ -1,0 +1,14 @@
+✔ actual durable lifecycle and authoritative consumer survive reconstruction; inactive account loses access (811.7817ms)
+✔ tenant foreign IDs, lower role, unknown key, spoofed profile authority, stale revisions and duplicates refuse (340.2543ms)
+✔ audit sync failure refuses and quarantines state; deactivation profile failure retains durable role revocation (172.1751ms)
+✔ hosting audit failure prevents account callback; authority lock prevents stale concurrent grant (239.4478ms)
+✔ tombstone recreation requires explicit grant; revoked identity and corrupt durable metadata fail closed (522.9342ms)
+✔ mounted authenticated HTTP consumer uses verified key identity; source body cannot grant identity (477.1129ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3338.5545

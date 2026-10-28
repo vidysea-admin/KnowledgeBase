@@ -1,0 +1,163 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "PREPARED_FOR_INDEPENDENT_ADMISSION_NOT_DISPATCHED",
+  "unit": {
+    "slug": "source-delivery-registration-retry",
+    "historicalPacket": "qa/packets/source-delivery-registration-retry.md",
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "candidate_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "cycle": 1,
+    "files": [
+      {
+        "sha256": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_register.py"
+      },
+      {
+        "sha256": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\test_sb_join_registration_redirect.py"
+      },
+      {
+        "sha256": "7ebbcaa532878a22776c90b410e575fb69b1ca9911eda74525be6fc8f0cc6b29",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\joiners\\browser-joiner.ts"
+      },
+      {
+        "sha256": "267cd00f7855679c0a9ff07265f1ad6db8a35c5482d66eb39d63968258a7321a",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\joiners\\joiners.test.ts"
+      },
+      {
+        "sha256": "d13ffd0482213af47db8b876b20b642b56399bccce79e5c908eb1cb8cf0d562b",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\registration-workflow.ts"
+      },
+      {
+        "sha256": "f859ab60fd01ea8900431f7eb8f4747edf05b005f9d3d232bd20f0f1da108cff",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\registration-workflow.test.ts"
+      },
+      {
+        "sha256": "6c8512e461c8bea87d2dd9a63785e6f255a3b7d5cdf31203a050d2248d5f3408",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\auto-record-policy.ts"
+      },
+      {
+        "sha256": "33d02b724ee3fad0a029e1d6d6fe6976fb7672d3cd49a438731330246d5fa3eb",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\state\\schedule-state.ts"
+      },
+      {
+        "sha256": "06dfe7814403a8232e6df4f4be0651580fdcaa86ea4ab54b34846acc130c7865",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\calendar\\state\\schedule-state.test.ts"
+      }
+    ],
+    "contract": "qa/contracts/goal-t052.md",
+    "candidateIdentity": "Git HEAD plus raw per-file SHA256 overlay; three dirty leased test paths remain material",
+    "historical_base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "canonicalManifest": "qa/manifests/source-delivery-registration-retry.md",
+    "clauses": [
+      "C1",
+      "C3",
+      "C4",
+      "C7",
+      "C11",
+      "C12",
+      "C13"
+    ]
+  },
+  "bindings": [
+    {
+      "sha256": "18e631defd413cc832ba60fa10df390b5444bd53fff78d1cd4ec9f13a4384307",
+      "path": "packages/meeting-bot/src/calendar/calendar-client.ts"
+    },
+    {
+      "sha256": "6d6293f67d14706a003d1b9560e1df08841d0de95f7dd541ae2f13e6cba39ed9",
+      "path": "packages/meeting-bot/src/calendar/schedule-tick.ts"
+    },
+    {
+      "sha256": "f284aebd74bc3bf986bf641d196f3569a25d1068ff6e846e3006acaf038cc6c4",
+      "path": "packages/meeting-bot/src/calendar/auto-join.ts"
+    },
+    {
+      "sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+      "path": ".cache/coordination/safe-test-runtime/register.mjs"
+    },
+    {
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "path": "pnpm-lock.yaml"
+    },
+    {
+      "sha256": "1afb3852ab90198a20f38d363cf9f81cfce84d7ba2698ecee94095706fe697d8",
+      "path": "qa/contracts/goal-t052.md"
+    }
+  ],
+  "evidence": {
+    "stateReceiptSHA256": "642df7a1f6452346f2348268326a7c629f362cd1592dc49a59bb5119eccac6aa",
+    "historicalResult": "16 Node + 1 Python preserved; all their recorded source pins still match. Earlier runtime/environment remain attributed historical evidence, not silently relabeled to current runtime.",
+    "historicalPython": "qa/goal-vectorless-2026-10-15/verification-registration-retry-python.json",
+    "stateLog": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t052-cycle2-state.log",
+    "stateLogSHA256": "d389d29676b24354a2d8ed396e12a7d9fb9538fe6d1add349092ddff0ee46d6f",
+    "historicalNode": "qa/goal-vectorless-2026-10-15/verification-registration-retry-node.json",
+    "stateReceipt": "qa/coordination/resume-20261015/broker/t052-cycle2-state-receipt.json",
+    "stateResult": "1/1 pass; exit 0; zero skipped; 4.062 seconds; exact raw pins, runtime/bootstrap/lock/log hashes authenticated"
+  },
+  "selected_checks": [
+    {
+      "node": "registration attempt round-trips strictly and confirmation requires unique matching evidence",
+      "boundary": "durability/auth/freshness",
+      "action": "Do not rerun maker node",
+      "reason": "Current qualified maker receipt; strict receipt persistence plus missing/stale/future timestamps, source lineage and tenant barriers"
+    },
+    {
+      "node": "real confirmation consumer requires fresh exact lineage, authenticated evidence and literal direct join",
+      "boundary": "confirmation/read-to-write authority",
+      "action": "Independent checker submits only after root admission",
+      "reason": "Upfront independent contract-derived immediate-consumer probe using existing focused node; wrong lineage, old baseline and unauthenticated receipt refuse"
+    },
+    {
+      "node": "contracts/verify_contracts.py",
+      "boundary": "mandatory",
+      "action": "Root shared mandatory gate",
+      "reason": "Mandatory C13; disclosed vacuous/no frozen contracts. Root binds current exact verifier inputs or executes under shared gate"
+    },
+    {
+      "node": "meeting-bot direct tsc --noEmit -p tsconfig.json",
+      "boundary": "consumer integration",
+      "action": "Root shared integration gate",
+      "reason": "Mandatory immediate TypeScript consumer gate; historical green has later unrelated native-capture drift, so root must bind newer compatible exact receipt or retain gate"
+    }
+  ],
+  "readiness": {
+    "mutation_required": false,
+    "runtime": "Existing root verified JobObject + bundled Node + file URI safe bootstrap; no browser",
+    "independentAdmissionComplete": false,
+    "requiredIndependentProbe": "Current-source exact-scope test above plus independent reasoning of producer pre-submit boundary, unique clean close and persisted marker before execution; never trust maker claim",
+    "makerScopedEvidenceComplete": true,
+    "preserveHistoricalPolicy": true
+  },
+  "metrics": {
+    "maker": {
+      "active_s": null,
+      "cost": null,
+      "tokens": null
+    },
+    "efficiency": "Unverified; assess/validate managed-review admission required before dispatch; no paid launcher probe authorized",
+    "checker": {
+      "active_s": null,
+      "cost": null,
+      "priorUsage": "Unknown; retain existing unit reviewer/debit history at root admission, do not reset to zero",
+      "tokens": null
+    },
+    "token_metric": "actual_total"
+  },
+  "limits": [
+    "No new source edits or test execution",
+    "No checker dispatched",
+    "No task PASS or ready-for-check closeout",
+    "Full T052 real account/host/storage/registration/confirmation/downstream gates remain HOLD"
+  ],
+  "createdAt": "2026-10-16T02:57:40.5307492Z",
+  "cycle_reconciliation": {
+    "priorIndependentReview": "No launch evidence authenticated; no canonical verdict file. This maker launched none. Historical usage remains unknown, not zero.",
+    "repairAttemptLabel": "cycle-2 folder/broker labels identify second maker repair attempt only",
+    "canonicalUnit": "source-delivery-registration-retry",
+    "canonicalFixCycle": 1,
+    "manifest": "qa/manifests/source-delivery-registration-retry.md",
+    "historicalArtifacts": "Original cycle-2 filenames/receipts and prior packet snapshot retained unchanged; no implied prior independent FAIL or new formal fix cycle.",
+    "manifestSHA256": "86b36730b1e4a6d3562aca8f717b2234311dbf828bba50fb3301b2f5da0d25b2"
+  }
+}

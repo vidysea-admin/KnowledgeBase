@@ -1,0 +1,109 @@
+{
+  "status": "PREPARED_ONLY_NO_GIT_MUTATION",
+  "unit": "t022-executed-provenance",
+  "cycle": 0,
+  "candidateSha256": "5a4e4793d7850e980745c9f7c20b3fc1ace30f6cb6f5e6f79b8c9a198b5633d2",
+  "headBaseline": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "files": [
+    {
+      "path": "scripts/eval/human-calibration.mjs",
+      "sha256": "bb91820014da89802e0641a4a232551c32d0fce498fee7f37f45c0798df6aa6c",
+      "bytes": 22784
+    },
+    {
+      "path": "scripts/eval/human-calibration.test.mjs",
+      "sha256": "6d9766ea7f67fdcf8530423f108d45ec2b9299c379e3064461df4dcf5045df63",
+      "bytes": 16961
+    },
+    {
+      "path": "qa/manifests/t022-executed-provenance.md",
+      "sha256": "1df2e912f729d18d4d49848268989bfb61214328e18292d7a6184933c095ea9b",
+      "bytes": 5872
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/packet.md",
+      "sha256": "121f524376fc8f4c1cd5be06054085bd54a4f95cf4956d0e201df1d42de41724",
+      "bytes": 6043
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/managed-review.packet.json",
+      "sha256": "9387e4b9d4963fea70b758e7a73505a4ce2fa902ec8f489315711e6d816860da",
+      "bytes": 6349
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/source-runtime-authentication.json",
+      "sha256": "7c725d7e98d923e3ad2b92e5cd496978e4ab2c4d1274ec610bcc60164334b9c7",
+      "bytes": 11756
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/evidence-reconciliation.json",
+      "sha256": "a61d96e07bfcc5830bf2a411439b069ffb5f20b7a8da34a25c35a14fce19126c",
+      "bytes": 5036
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/clauses-C5-C8-C9-C10.md",
+      "sha256": "7f6c6a7775f9a1fc9506b0f9e04bf56f18d4ca5ddb5d9dd3aea1c5e446e22b8c",
+      "bytes": 3861
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/reviewer-prompt.txt",
+      "sha256": "6e2c279b4414adfe03472ca92b0506ab208da6d70432861d284b4ac412c2e9f8",
+      "bytes": 926
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/broker-request.json",
+      "sha256": "d879a53d174e8791bca8b23ebb83c230586162c2d2494ed0657833faeb24bf61",
+      "bytes": 5090
+    },
+    {
+      "path": "qa/coordination/resume-20261015/t022-provenance-current/broker-request.before-git-metadata-repair.json",
+      "sha256": "26eb2c7f0be4da55064a35f75e3ad3fcd0b34449a5c153e76040356d23e8ee73",
+      "bytes": 3125
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/t022-repair1-final-seal.json",
+      "sha256": "e2dac30fd6198369066fc50fc6e572aaab8a6c657e534de40f7086c3c8e8ce2e",
+      "bytes": 4772
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/t022-repair1-provenance2-receipt.json",
+      "sha256": "10ae164fbc7b3d4c02e7464f0a911a9ebe3a6c33abd7c02a210b1bca74ba6987",
+      "bytes": 1364
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/t022-repair1-provenance2.log",
+      "sha256": "3746a41334698b33ddbe74d1bd61b5c926fe66c7df5cf93ec501603e5924feb6",
+      "bytes": 328
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/163262f05ca48b9786acac31a437685e5c89394521574e363f25c75b32a6920d.json",
+      "sha256": "163262f05ca48b9786acac31a437685e5c89394521574e363f25c75b32a6920d",
+      "bytes": 8380
+    }
+  ],
+  "metadataSelfPath": "qa/coordination/resume-20261015/t022-provenance-current/wip-allowlist.json",
+  "wipOnly": true,
+  "noIndependentPASS": true,
+  "sourceFilesFrozenUneditedByPreparation": true,
+  "noProviderDBPrivateCorpusOrHumanLabels": true,
+  "historyReference": {
+    "sameUnitAndCandidate": true,
+    "sameSourceHashes": true,
+    "identityPath": "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/readiness-and-identity.json",
+    "identitySha256": "7609b34b30bbb006c254f83091bba114e1847d8fd617d41bbd06d17e1f0d9084",
+    "usagePath": "qa/coordination/knowledge-brain-20261015/review-runtime-current-batch.json",
+    "usageSha256": "10414fbfc6b01c1c189b92afc81c763a8a2beec7c459d3abf60046ca06c5f458",
+    "partialPath": "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-remaining/interrupted-phase-usage.json",
+    "partialSha256": "fba06df9f5e788f342f0e89ab33443daa575fd63ab86b404a581bbb53c50b1b9",
+    "settledSharedActualTotal": 950992,
+    "interruptedSharedActualTotal": 99903,
+    "knownSharedActualTotal": 1050895,
+    "sharedCostsChargedOnce": true,
+    "provenanceUnitActualSubtotal": null,
+    "activeSeconds": null,
+    "cost": null,
+    "scopeDisposition": "Same cycle0 candidate, not a fresh unit; mixed4unit prior review exists and unknown attribution cannot be reset to zero.",
+    "admissionNeeded": "Root-authorized continuation policy with complete shared history, known same-runtime startup/time allowance and finite assessed actual_total allocation/reserve; no new probe or checker dispatched."
+  },
+  "rootExplicitLocalWriterApprovalRequired": true
+}

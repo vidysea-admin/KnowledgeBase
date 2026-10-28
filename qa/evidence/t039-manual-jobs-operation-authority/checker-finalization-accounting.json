@@ -1,0 +1,17 @@
+{
+  "phase_kind": "finalization",
+  "completion_reserve_id": "t039-manual-jobs-operation-authority/c1/4815a0c0a70c8dfdc92e02a3468a31123ebd1cfab01b919b0a660fc31de6e650",
+  "active_s": null,
+  "tokens": null,
+  "cost": null,
+  "budget_debit": {
+    "active_s": 30,
+    "tokens": 800
+  },
+  "timingLimitation": "Initial finalization timing not captured; actuals unknown. Review partial prospective timing retained separately.",
+  "verdict": "HOLD",
+  "readback": "canonical Verdict HOLD, Cycle checked1, Reviewed SHA exact match",
+  "helperResult": "pending sole CPU broker",
+  "children": [],
+  "retries": []
+}

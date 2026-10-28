@@ -9,6 +9,8 @@ export interface Decisions {
   tenantId: string;
   text: string;
   owner?: string;
+  sourceEvidenceDigest?: string;
+  generationEvidenceDigest?: string;
   status: "proposed" | "verified" | "needs-review";
   /**
    * @minItems 1

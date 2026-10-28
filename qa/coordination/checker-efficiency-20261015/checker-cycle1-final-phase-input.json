@@ -1,0 +1,25 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [
+    {
+      "id": "canonical-adoption-checker",
+      "active_s": null, "tokens": null, "cost": null,
+      "budget_debit": {"active_s": 180, "tokens": 6000, "cost": null},
+      "prior_checkpoint": "checker-accounting-checkpoint-input.json"
+    },
+    {
+      "id": "canonical-adoption-checker-cycle1",
+      "active_s": 109.2066837, "tokens": null, "cost": null,
+      "budget_debit": {"active_s": 120, "tokens": 3000, "cost": null},
+      "measurement": "checker-cycle1-completion-metrics.json"
+    }
+  ],
+  "next_phase": {"active_s": 60, "tokens": 1500, "cost": null},
+  "bootstrap_scope": "Same independent checker, same cycle1: rerun only failed import/temp preflight case under established required permission; capture real environment fingerprints; final pins and verdict",
+  "bootstrap": {"active_s": 180, "tokens": 6000},
+  "escalation": {
+    "authority": "Root explicit final commissioning phase approval 2026-10-15: <=60 active seconds and1500 allocated tokens, cumulative360 seconds/10500 tokens",
+    "reason": "19 independent cases and source/probe/pins already passed; remaining failure is established Windows sandbox WinError5 on temporary fixture, requiring correct escalation rather than repeated default failures",
+    "limits": {"active_s": 360, "tokens": 10500, "cost": null}
+  }
+}

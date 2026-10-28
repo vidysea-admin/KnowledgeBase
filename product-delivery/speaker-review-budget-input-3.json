@@ -1,0 +1,10 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [{"id": "product-speaker-relation-workbench-checker-cycle-2-not-dispatched", "active_s": 0, "tokens": 0, "cost": null}],
+  "next_phase": {"kind": "review", "active_s": 90, "tokens": 2200, "cost": null},
+  "completion_reserve": true,
+  "completion_reserve_id": "product-speaker-relation-workbench/cycle-2/4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146",
+  "bootstrap_scope": "Four-file integrated speaker profile relationship workbench, eight isolated and four mounted broker cases plus immediate server bootstrap DTO consumer. Prior cycle had no reviewer dispatch/debit. Require all broker evidence before dispatch. Prospective zero usage means no work yet. Finalization reserve 30 seconds/800 tokens.",
+  "bootstrap": {"active_s": 120, "tokens": 3000},
+  "escalation": null
+}

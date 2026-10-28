@@ -40,11 +40,15 @@ test("search-store.ts contains no hand-rolled Mongo filter — the exact bypass 
   assert.doesNotMatch(src, /\$or\s*:/, "must not hand-roll an $or filter — build it in search-prefilter.ts");
 });
 
-test("search-store.ts does not re-derive query tokens", () => {
+test("search-store.ts does not re-derive query tokens for the Mongo turn search", () => {
   // Importing the tokenizer directly is the subtler bypass: it looks correct (it IS the scorer's
   // tokenizer) while stepping around the one function whose tests pin the superset property.
+  // Scoped to createMongoSearchDeps: the native-passage search (createNativeSearch) builds no Mongo filter and
+  // scores resolver-authorized passages in memory, so its tokenizer use cannot bypass the turn pre-filter.
+  const at = src.indexOf("export function createMongoSearchDeps");
+  assert.ok(at >= 0, "createMongoSearchDeps is still in search-store.ts");
   assert.doesNotMatch(
-    src, /\blexicalQueryTokens\b\s*\(/,
+    src.slice(at), /\blexicalQueryTokens\b\s*\(/,
     "token derivation belongs to buildTurnPrefilter, where search-prefilter.test.ts can fail on it",
   );
 });

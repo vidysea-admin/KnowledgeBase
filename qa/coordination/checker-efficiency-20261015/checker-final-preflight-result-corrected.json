@@ -1,0 +1,7 @@
+{
+  "exit_code": 0,
+  "duration_s": 0.4133302,
+  "required_permission": "require_escalated",
+  "outer_timeout_s": 20,
+  "timeout_note": "Test completed in0.4133302s; outer20s requested but process-level timeout wrapper was not actually applied. No timeout occurred; do not treat outer_timeout_s as enforced."
+}

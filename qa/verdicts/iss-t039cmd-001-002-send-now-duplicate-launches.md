@@ -1,0 +1,69 @@
+# Verdict: iss-t039cmd-001-002-send-now-duplicate-launches
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: 3a8af59 (lane/t039dupes)
+Scope: one machine, local filesystem; recordings that started before deploy have no entry (ISS-T039DUPES-001); real `cli.ts record`, Chrome and OBS never run.
+
+## EXPLANATION
+
+ISS-T039CMD-001 and -002 are verified (rows flipped in qa/issues.t039cmd.jsonl). One medium defect found in the new store (stale-entry replacement race, ISS-T039DUPES-004) and one medium on main (send-now-host test red, ISS-T039DUPES-005); neither defeats the two filed reproductions.
+
+- Launch paths (grep over ts/mjs/ps1/py/json, excluding tests): the only callers of `runRecord` are cli.ts (now `claimedRecordWithDefaults`), `defaultSendNowDeps` (claimed) and tests. `package.json webinar:record`, `start-record-detached.ps1` (Task Scheduler, via schedule-tick/task-scheduler), `launchControlledRecording` in reconnect-gaps.ts (poller, run-pipeline.mjs:56/224), and the send-now API child (send-now-host.ts spawns cli.ts) all end in `cli.ts record`. `start-calendar-attendance.ps1` only runs run-pipeline.mjs. cli.ts's fall-through branch uses fake joiners only; sb_join.py/bot-child/browser-joiner are reachable only from `runRecord`; `data/registration-d099-main-fault-probe.py` is a registration probe. No bypass found. Gap: a link with no meeting identity (Google redirect URL, `/lookup/` form) is not claimed (documented); a manual record with such a link is invisible, but send-now itself refuses embedded redirects.
+- Atomicity: claim is temp file + `linkSync` (EEXIST for the loser). My real-process probe (3 node processes, barrier start, fresh dir): 20/20 exactly one winner. Release is in `finally` and deletes only own pid+sessionId; a crash leaves a file that liveness ignores (pid gone, or OS start time differs, or past until + 10 min). A dead holder never blocks the reader and is replaced on the next claim. A leftover `.tmp-*` from a crash between write and link is skipped by the reader (clutter only).
+- DEFECT (ISS-T039DUPES-004, medium): replacing a STALE entry is not atomic (read dead holder, `rmSync`, link). With a stale file seeded and 3 real processes racing, 19/20 one winner; run 9 had two winners (the loser's `rmSync` deleted the winner's live entry). Needs a crash leftover plus near-simultaneous starts, so it does not affect either filed repro; fix direction in the row. Related fail-open: if the claim throws (including this loop's 3rd attempt, or an unreadable holder) `runClaimedRecord` warns and records anyway; this is the stated design (the reader is the strict side).
+- Identity: `meetingIdentity` (shared planner function) maps to one key: case, `authuser`/`pli`/`hs`, `#frag`, trailing and double slash, http vs https, percent-encoded letters (meet); `us02web`/`acme`/`zoom.us`, `/j/` `/s/` `/wc/<id>/join` `/wc/join/<id>`, `pwd`/`uname` (zoom); encoded vs raw `meetup-join` thread id, teams.live.com/teams.microsoft.com `/meet/<id>` (teams). Different ids stay different (`zoom:1234567890` vs `zoom:123456789`). Look-alike hosts (`meet.google.com.evil.com`, `evil.com/meet.google.com/..`) and the Google `url?q=` redirect give no identity. Observation (low, no row): `meet.google.com/lookup/<code>` keys as `meet:lookup:<code>`, distinct from `meet:<code>`. Hash is sha256 of the key, 32 hex chars (128 bits): no practical collision. Tenant in the path must match `^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$` (no separator, leading dot or `..`), checked by both claim and reader; the entry's own tenant tag is also verified.
+- Placement: `raw/webinars/` is gitignored (.gitignore:74; `git check-ignore` confirms `raw/webinars/live-recordings/x/y.json`), so no state is committed. D-119 is a landing decision for earlier work; no decision or contract found restricting files under raw/webinars.
+- Main-tree `send-now-host.test.ts` 11/12 (reproduced; ISS-T039DUPES-005, medium): the failing test 'duplicate through the REAL live-job reader' (line 77, actual `[false,'unreadable']`, expected `'duplicate'`) writes `scheduled/job-1.json` without `tenantId`. Merge 4360058 (lane/alerttenant, 12:09) made `readLiveJobs` call `assertTenantTag`, which refuses an untagged file. lane/sendnowapi was cut earlier and merged at 2504e81 (12:42) without the two ever being run together, so main has been red since that merge. Product behaviour is right; the fixture is stale (add `tenantId`). The unit's own change is not the cause (same failure in this worktree and in the main tree).
+- Tests re-run by me: live-recording 12/12, send-now-live-recordings 4/4, send-now-command 10/10, send-now 28/28, send-now-host 11/12 (the above); `tsc --noEmit -p packages/meeting-bot` exit 0. Imports read: fakes and temp dirs only.
+- Replay: ISS-T039CMD-001 1/1 (+3/3 spellings), ISS-T039CMD-002 1/1, from the unit tests, consistent with the ledger rows (neither records a larger corpus).
+- Mutations (own harness inside the worktree, backup restored in `finally`, hash changed on apply, hash == HEAD blob after each): skip claim -> red (test run hung until SIGKILL at 240 s, not an assertion failure); non-atomic claim (plain write instead of `linkSync`) -> red (same hang, so the exclusivity test only fails by timeout); ignore liveness (always live) -> red, 4 failures. 3/3 red; two by hang only (note, not an issue).
+- After: live-recording.ts blob 834dc9f and claimed-record.ts blob 5fa8d97 equal HEAD; harness deleted; worktree clean before my ledger edits; main tree clean.
+
+ISSUES-WRITTEN: ISS-T039DUPES-004 (medium), ISS-T039DUPES-005 (medium)
+
+---
+
+# Cycle 1
+
+VERDICT: PASS
+Cycle checked: 1
+Commit checked: 37838d3 (lane/t039dupes)
+Scope: same as cycle 0 (one machine, local filesystem, real `cli.ts record`/Chrome/OBS never run).
+
+## EXPLANATION
+
+ISS-T039DUPES-004 and ISS-T039DUPES-005 are verified (rows flipped in qa/issues.t039dupes.jsonl).
+
+- Takeover design (read in source): a contender that judged exact content `raw` dead links a claim file `.tmp-takeover-<sha256(raw)[0..24]>` (content `{pid}` already inside, so the link is atomic with content). Only the claim holder re-reads the entry; if bytes still equal `raw` it renames its temp over the entry and verifies by reading back; the claim is removed in `finally`. A loser sleeps 15 ms and re-reads, so it ends at `held`. A live entry is never moved (the re-read gate), and the entry is never absent. A claimer that raced a full replacement (cycle 0's double-winner interleaving) re-reads different bytes, does not rename, and returns `held`; the deterministic unit test covers exactly that.
+- 8-process stale race: the maker's own test at `STALE_RACE_RUNS=30 STALE_RACE_PROCS=8` FAILED when I ran it (stale: runs 1 and 15 had 3 and 2 "winners"; the FRESH variant, whose code path is unchanged `linkSync`, also showed 2 winners in run 4). Cause is the test, not the takeover: under the live Chrome worker's CPU load, `node --import tsx` startup of 8 children spreads by seconds past the 2.5 s barrier, and the worker exits 1.5 s after its claim, so a straggler legitimately sees a dead entry and takes over. I re-ran with my own worker (same `claimLiveRecording`, 4 s barrier, winner held 6 s so no legitimate takeover is possible): stale-seeded, 8 real processes, 30 runs: 30/30 exactly one winner, no `.tmp-*` leftovers. Default test settings (4 procs x 5 runs, both variants) 2/2 pass.
+- Crashed claim holder: pre-seeding a claim file with a dead pid (2147483001) and the correct content hash, 8 processes, 15 runs: 15/15 exactly one winner, no leftover claim. A contender removes a claim whose holder pid is dead. Not forever: a claim whose holder pid is ALIVE (hung, or the pid reused by an unrelated process) is respected, and contenders throw "could not replace a stale live-recording entry" after 100 attempts (about 1.5 s plus); `claimed-record` then fails open as cycle 0 described. That needs a crash inside a microsecond window plus pid reuse; low, not filed. A crash after the claim leaves only `.tmp-*` clutter, which the reader skips.
+- Survived mutant (check-then-plain-write, `writeFileSync` instead of `renameSync`): equivalent for exclusivity, because only the claim holder reaches that line. The difference is atomicity for readers: a concurrent reader can see a half-written entry, which `parseEntry` rejects with a throw (cannot tell, send-now refuses): fail-closed, transient. Not a double-winner risk.
+- Fixture (-005): the `send-now-host` job file is tagged `tenantId: "tenant-a"`; `scripts/webinar/send-now-host.test.ts` 12/12 on this lane. Fast-fail fakes: `holdOpen()` rejects after 4 s with a clear message instead of a 240 s hang.
+- Re-run by me: live-recording 15 tests incl. deterministic and stale-race (pass 15 / fail 0 with live-recording.test.ts and the race file together); `src/live-recording/*.test.ts` + `src/send-now*.test.ts` 53/53; send-now-host 12/12; `tsc --noEmit -p packages/meeting-bot` exit 0.
+- Mutations (own harness inside the worktree, per-mutation byte backup in `finally`, SIGKILL timeout, hash changed on apply, hash == HEAD blob after): M1 skip the re-read under the claim (`if (true)`) KILLED (1 fail, the deterministic test); M3 plain write SURVIVED, equivalent (above); M2 never reap a dead-pid claim SURVIVED the whole suite, and my 3-run probe with M2 applied failed all 3 runs (winners=0, every contender threw, claim left on disk). So the crashed-holder reaping works (15/15 above) but has no regression test. Note, low: add a test that seeds a dead-pid claim. Not filed.
+- Notes (low, not filed): the 8-proc env-var setting of the race test is load-sensitive because of the 1500 ms hold; raise the worker's hold when raising `STALE_RACE_PROCS`.
+- After: live-recording.ts blob equals `git rev-parse HEAD:<file>`; harness deleted; tree clean apart from the ledger flip.
+
+ISSUES-WRITTEN: none
+
+---
+
+# Cycle 2
+
+VERDICT: PASS
+Cycle checked: 2
+Commit checked: 1baa3adc (lane/t039dupes; af73f3b8 + 1baa3adc over 37838d3)
+Scope: one machine, local filesystem, live Chrome worker load present; real `cli.ts record`/Chrome/OBS never run.
+
+## EXPLANATION
+
+- Diff since 37838d3: tests (`live-recording-stale-race.test.ts`, `live-recording.test.ts`), the test worker `stale-race-worker.ts`, ledger and manifest only. `live-recording.ts` untouched.
+- Race test 10x at 8 processes (`STALE_RACE_PROCS=8 STALE_RACE_RUNS=10`): stale-seeded 10/10 and fresh 10/10 single winner (about 52 s each). Earlier 20-run probes under mutation also green for the unmutated shape; no late-starter takeover seen.
+- Never-reap mutant (`&& false` on the dead-taker reap) KILLED by the new deterministic test (`live-recording.test.ts`, exit 1). That is the cycle-1 survivor, now closed.
+- Mutants against the race test, 8 procs: check-then-plain-write on the PRIMARY claim (`existsSync` then `writeFileSync`): survived at 5 runs, KILLED at 20 runs (exit 1). Detection is probabilistic and weak at the default 5 runs. Check-then-plain-write on the TAKEOVER claim and skip-the-takeover-claim: both SURVIVED 20 runs and also the 14 unit tests (including the deterministic interleaving test). The first is equivalent for exclusivity (cycle 1 reasoning: only the claim holder reaches the rename). Skip-claim is not formally equivalent but the `again === raw` re-read narrows the window to where no process race or the existing interleaving test reaches it. This is not a cycle-2 regression (test-only change; cycle 1 had the same coverage). Recommendation, file-don't-fix: a deterministic test that injects a second contender between the re-read and the rename; and raise `STALE_RACE_RUNS` default for the primary-claim mutant.
+- STOP-file cleanup: killed the test runner mid-run. Workers exited within seconds (0 `stale-race-worker` processes remained); one temp dir `stale-race-*` is left by a SIGKILLed parent (its `finally` cannot run) and holds no STOP/claim state of consequence. Normal and failing runs remove their dirs. The 60 s worker cap bounds orphans.
+- `tsc --noEmit -p packages/meeting-bot` clean. `live-recording.test.ts` + `send-now*.test.ts` 52/52, plus the 2 race tests = 54.
+- After: live-recording.ts blob equals `git rev-parse HEAD:<file>` after every mutation; harness dir deleted; stray temp dir and processes removed.
+
+ISSUES-WRITTEN: none

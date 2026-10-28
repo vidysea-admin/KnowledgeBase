@@ -99,3 +99,5 @@ functions yet — they exist so a LATER unit, e.g. plan §10 U2.1, can write/rea
 by `git revert`. No production data touched.
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

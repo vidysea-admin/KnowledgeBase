@@ -1,0 +1,23 @@
+{
+  "status": "SCOPED_API_CONSUMER_CONTEXT_ONLY",
+  "receipts": [
+    "qa/goal-vectorless-2026-10-15/verification-api-types-diagnostic-repairs.json",
+    "qa/goal-vectorless-2026-10-15/verification-api-build-diagnostic-repairs.json"
+  ],
+  "exit_codes": [
+    0,
+    0
+  ],
+  "elapsed_ms": [
+    15736.195,
+    1857.4767
+  ],
+  "authenticated_current_consumers": [
+    "apps/api/src/join-rules/router.ts",
+    "apps/api/src/join-rules/deps.ts",
+    "apps/api/src/server.ts"
+  ],
+  "scope": "Those actual API join-rule route/server consumer bytes match receipt before pins. API tsconfig includes src/**/*.ts and production bundle entry src/index.ts.",
+  "limitation": "Broad receipt pin inclusion of scheduled-dispatch, scheduler, CLI files does not prove TypeScript compiler import membership. No static API import of new scheduled-dispatch route established; do not claim new CLI/helper compilation or global currentbuild acceptance from broad pins alone.",
+  "no_rerun": true
+}

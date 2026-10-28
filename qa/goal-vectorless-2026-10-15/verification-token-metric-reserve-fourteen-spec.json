@@ -1,0 +1,38 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "verification-token-metric-reserve-fourteen",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy",
+    "-p",
+    "test_completion_reserve.py",
+    "-v"
+  ],
+  "testIDs": [
+    "test_completion_reserve.py"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 20000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-token-metric-reserve-fourteen",
+  "pins": {
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy/review_budget.py": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy/test_completion_reserve.py": "87de2a3d0d38818376795cfe7f3c3c1e4a866af150bb40219d41d88fc7f293b8"
+  }
+}

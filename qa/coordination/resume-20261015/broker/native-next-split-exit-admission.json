@@ -1,0 +1,25 @@
+{
+  "title": "actual runRecord sealing child EXIT precedes fresh-process retained WAV/provider reproof",
+  "matchingOriginalDeclarations": 1,
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=120000",
+    "--test-name-pattern=^actual\\ runRecord\\ sealing\\ child\\ EXIT\\ precedes\\ fresh\\-process\\ retained\\ WAV/provider\\ reproof$",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+  ],
+  "oldVectorFlags": [
+    "--test-isolation=none",
+    "--test-timeout=65000"
+  ],
+  "newVectorFlags": [
+    "default per-file process isolation",
+    "--test-timeout=120000",
+    "positive anchored exact name"
+  ],
+  "authority": "root one diagnostic original genuine test;125s incl close; no whole-floor rerun",
+  "accounting": "shared maker/integration; not checker"
+}

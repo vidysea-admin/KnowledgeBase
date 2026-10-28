@@ -28,15 +28,18 @@ for (const path of PAGES) {
   });
 }
 
-test("GET /docs-ui lists both a real live route and a real still-stubbed route", async () => {
-  // /search was un-stubbed (plan §10 U0.7) — /webhooks/register is the only genuine stub left.
+test("GET /docs-ui documents webhook permission and configuration requirements", async () => {
   const server = await startTestServer(buildTestDeps());
   try {
     const res = await fetch(`${server.baseUrl}/docs-ui`);
     const text = await res.text();
     assert.match(text, /POST \/ask/);
     assert.match(text, /POST \/webhooks\/register/);
-    assert.match(text, /501 not_implemented/);
+    assert.match(text, /hosting \+ webhooks/);
+    assert.match(text, /201 configured; 503 unavailable/);
+    assert.match(text, /admin or owner hosting role/);
+    assert.match(text, /configured private hosting storage/);
+    assert.doesNotMatch(text, /501 not_implemented/);
   } finally {
     await server.close();
   }

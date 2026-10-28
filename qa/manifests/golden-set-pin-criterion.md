@@ -254,3 +254,5 @@ closed**. That is a smaller gap than cycle 1 found, and my wording should have s
 `writeLedger`, so the armed row survives. `assert-clean` then blocks the commit until restore is
 re-run — annoying, not dangerous. Recorded here rather than fixed, respecting its judgement not to
 file it.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

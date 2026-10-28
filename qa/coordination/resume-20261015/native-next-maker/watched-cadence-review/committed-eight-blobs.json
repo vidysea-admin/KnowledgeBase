@@ -1,0 +1,66 @@
+{
+  "candidate_git_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "base_git_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "actual_parent_git_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "source_count": 8,
+  "raw_content_manifest_sha256": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "method": "git rev-parse candidate:path compared with git hash-object --path=path -- path; normal repository clean filters explicitly applied, raw SHA256 independently unchanged",
+  "source_blobs": [
+    {
+      "path": "apps/api/src/connector-workflow/watched.ts",
+      "raw_sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+      "candidate_tree_blob": "648d0bbd8abac46286c7397cdbb34a5165d587bf",
+      "working_file_git_filtered_blob": "648d0bbd8abac46286c7397cdbb34a5165d587bf",
+      "matches": true
+    },
+    {
+      "path": "scripts/native-capture/server-watched.test.ts",
+      "raw_sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+      "candidate_tree_blob": "ac86f545a61a19e022ca9d12155bce81267b35aa",
+      "working_file_git_filtered_blob": "ac86f545a61a19e022ca9d12155bce81267b35aa",
+      "matches": true
+    },
+    {
+      "path": "scripts/native-capture/server.ts",
+      "raw_sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+      "candidate_tree_blob": "c2c6b1d90bffb8f33fc7a3f5a2e6f01b7e3fe441",
+      "working_file_git_filtered_blob": "c2c6b1d90bffb8f33fc7a3f5a2e6f01b7e3fe441",
+      "matches": true
+    },
+    {
+      "path": "scripts/watched-sources/host.test.ts",
+      "raw_sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+      "candidate_tree_blob": "229b5254a0daed5a800262300478fa0c43da1288",
+      "working_file_git_filtered_blob": "229b5254a0daed5a800262300478fa0c43da1288",
+      "matches": true
+    },
+    {
+      "path": "scripts/watched-sources/host.ts",
+      "raw_sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+      "candidate_tree_blob": "2eb922680b3804ce4724fa0442e237733fbd25d6",
+      "working_file_git_filtered_blob": "2eb922680b3804ce4724fa0442e237733fbd25d6",
+      "matches": true
+    },
+    {
+      "path": "scripts/watched-sources/README.md",
+      "raw_sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+      "candidate_tree_blob": "cf601804ca2f5dc9fc1b6e60b90983504a47218a",
+      "working_file_git_filtered_blob": "cf601804ca2f5dc9fc1b6e60b90983504a47218a",
+      "matches": true
+    },
+    {
+      "path": "scripts/watched-sources/supervisor.ts",
+      "raw_sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+      "candidate_tree_blob": "64dc76f3fd4aa0268f89118cdd5ae3ac195d1d40",
+      "working_file_git_filtered_blob": "64dc76f3fd4aa0268f89118cdd5ae3ac195d1d40",
+      "matches": true
+    },
+    {
+      "path": "scripts/webinar/scheduler/service.d.mts",
+      "raw_sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+      "candidate_tree_blob": "0ff676724d8455211d3f81ea74301585365388ac",
+      "working_file_git_filtered_blob": "0ff676724d8455211d3f81ea74301585365388ac",
+      "matches": true
+    }
+  ]
+}

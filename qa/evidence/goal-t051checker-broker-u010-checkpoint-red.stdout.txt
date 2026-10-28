@@ -1,0 +1,29 @@
+✖ A14 PID acquisition guards refuse live and ambiguous owners while verified dead guards recover (8.3269ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 56.7738
+
+✖ failing tests:
+
+test at qa\evidence\goal-u010-checker.test.mjs:112:1
+✖ A14 PID acquisition guards refuse live and ambiguous owners while verified dead guards recover (8.3269ms)
+  SystemError [ERR_FS_EISDIR]: Path is a directory: rm returned EISDIR (is a directory) C:\Users\product\Desktop\KnowledgeBase\qa\evidence\goal-u010-checker-tmp-RQCql7\owners\.acquire-lock-11920-00000000-0000-0000-0000-000000000000
+      at rmSync (node:fs:1281:16)
+      at file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/goal-u010-checker.test.mjs:117:41
+      at temporary (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/goal-u010-checker.test.mjs:30:22)
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/goal-u010-checker.test.mjs:112:110)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    code: 'ERR_FS_EISDIR',
+    info: { code: 'EISDIR', message: 'is a directory', path: 'C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\goal-u010-checker-tmp-RQCql7\\owners\\.acquire-lock-11920-00000000-0000-0000-0000-000000000000', syscall: 'rm', errno: 21 },
+    errno: [Getter/Setter: 21],
+    syscall: [Getter/Setter: 'rm'],
+    path: [Getter/Setter: 'C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\goal-u010-checker-tmp-RQCql7\\owners\\.acquire-lock-11920-00000000-0000-0000-0000-000000000000']
+  }

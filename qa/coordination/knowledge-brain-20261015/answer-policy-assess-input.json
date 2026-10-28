@@ -1,0 +1,29 @@
+{
+  "unit": "answer-policies-vectorless",
+  "cycle": 0,
+  "candidate_sha": "4d26285ce1dc2473016e66ec1eeb3c47db0166242f3f1b8cdfcf6ef70dff2705",
+  "candidate_identity": "Exact frozen workflow/test pins and linked four-node broker receipt in qa/packets/answer-policies-vectorless.md; not a Git commit",
+  "maker": { "active_s": null, "tokens": null, "cost": null },
+  "reviewers": [
+    {
+      "id": "vectorless_checker-wip-shared",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": { "active_s": 180, "tokens": 6000, "cost": null },
+      "note": "Prior shared historical review unknowns preserved. Central ledger charges this ID once. Repeated here solely as conservative unit admission, never additional actual spending. Shared input: provider-http-assess-input.json in this directory. No lane-specific checker has yet been dispatched."
+    }
+  ],
+  "next_phase": { "active_s": 180, "tokens": 6000, "cost": null },
+  "bootstrap_scope": "Fresh independent answer-policy security review only: two changed workflow/test files, relevant policy-lookup/durable-review/HTTP consumer boundaries, exact four mandatory fixture node receipt, and a contract-derived independent failure probe. No repository survey or whole parent acceptance. Preserve prior unknowns/debits. Reviewer alone may issue verdict.",
+  "bootstrap": { "active_s": 180, "tokens": 6000 },
+  "escalation": {
+    "authority": "Root explicit finite cumulative allocation, 2026-10-15: historical shared180s/6000 plus fresh policy security review180s/6000.",
+    "reason": "Mandatory current-revision and digest fail-closed security verification plus independent probe; historical reviewer actuals unknown and retained. The historical shared debit is de-duplicated centrally.",
+    "limits": { "active_s": 360, "tokens": 12000, "cost": null }
+  },
+  "ratio_claim": "UNVERIFIED: maker and historical reviewer actual active time/tokens unavailable; budget debits are allocations, not measured usage.",
+  "packet": "qa/packets/answer-policies-vectorless.md",
+  "maker_receipt": "qa/goal-vectorless-2026-10-15/verification-answer-policy-four-20261015T0950.json",
+  "mandatory_independent_probe": true
+}

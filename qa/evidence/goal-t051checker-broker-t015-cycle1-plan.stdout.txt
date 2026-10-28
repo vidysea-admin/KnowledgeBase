@@ -1,0 +1,1 @@
+{"status":"blocked-no-current-eligible-examples","fingerprint":"f3f16652777d957c473ee5697dbe155d62ea20cbfe18528803494073d66ee4a1","counts":{"selectedSessions":3,"acceptedSessions":0,"rows":0,"groups":0,"train":0,"validation":0,"evaluation":0},"splitReady":false}

@@ -1,0 +1,27 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "564DA5F635A47594F741CCA447926DB6D0BB3BEA34B0E571713B946D7CA5BCD3",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-executor.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "8254C8796C42AF3B0596035C653493F20E4AD9961CEDB164ECFF43EBE9FB72EF",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-executor.test.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "4AEC65F30C29278BD20167DFCAD5D4CC91C87146F8E21F4EE12C7F5CC125CE66",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-testkit.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "757B5298CDE4C098016380749612DB7CA324CB31D6E177D853DD60E4E44ED9D7",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\service.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "852B9B48E22367C42158F532A9EDE5CFB2305CC625887E78D0AD0C9DC3F5893C",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\store.ts"
+  }
+]

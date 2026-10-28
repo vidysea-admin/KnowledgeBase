@@ -1,0 +1,58 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "watched-native-server-join",
+  "fix_cycle": 0,
+  "seam_prior_passes": 0,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "status": "source-frozen-not-executed",
+  "broker_release": "Explicit root/central RELEASE after native-next-split-joined-final-seal1890pins/244.360s",
+  "source_pins": [
+    {
+      "path": "scripts/native-capture/server.ts",
+      "sha256": "af7a4657c4d85f6c42c63760aeca436c273cf65ebb3abb8acf70af6d63c8d678",
+      "nonblank_lines": 162
+    },
+    {
+      "path": "scripts/native-capture/server-watched.test.ts",
+      "sha256": "038f8c217e6980896156292d3a48c2a6e542129f1fb7ad42747635b490411f57",
+      "nonblank_lines": 103
+    }
+  ],
+  "dependency_pins": [
+    {
+      "path": "scripts/watched-sources/supervisor.ts",
+      "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583"
+    },
+    {
+      "path": "scripts/watched-sources/host.ts",
+      "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa"
+    },
+    {
+      "path": "apps/api/src/connector-workflow/watched.ts",
+      "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0"
+    }
+  ],
+  "preimage": {
+    "sha256": "f236a4c3d475c6c7f1d20e504c8a1825742b4435273432d00b0fdf5377c9a7c0",
+    "path": "backups/server.ts"
+  },
+  "new_path": "scripts/native-capture/server-watched.test.ts",
+  "token_metric": "actual_total",
+  "maker": {
+    "tokens": null,
+    "token_metric": "actual_total",
+    "active_s": null,
+    "cost": null
+  },
+  "required_checks": [
+    "Existing server.test.ts6 + NEW server-watched.test.ts6; actual imported supervisor/current-auth lifecycle included",
+    "Watched host7 + immediate watched-job5; source-identical receipts reuse only if governing broker permits",
+    "Affected explicit root types; full dependency graph; scoped LOC/directory gates"
+  ],
+  "not_required": "No native archive/genuine/EXIT/decode replay for launcher-only join",
+  "execution": "No tests/build/DB/ACL/provider/browser/decoder commands executed.",
+  "ownership": "Library+CLI default onStop noop; never infer sharedMongo ownership from successful connect. Explicit caller-owned disposer only."
+}

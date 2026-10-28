@@ -1,0 +1,16 @@
+{
+  "timeoutMs": 245000,
+  "pins": {
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-helper.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "scripts/qa/t035-lean-video-eof-probe.mjs": "73b652d83b71b0399821130e959af45290e7597a354395a07e31180769585788"
+  },
+  "args": [
+    "--import",
+    "tsx",
+    "scripts/qa/t035-lean-video-eof-probe.mjs",
+    "--phase",
+    "baseline"
+  ],
+  "output": "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline"
+}

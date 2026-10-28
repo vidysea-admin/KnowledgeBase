@@ -1,0 +1,38 @@
+✔ producer proof hashes exact committed bytes and detaches mutable audit input (3.6593ms)
+✔ invalid duration, legacy report and malformed counts refuse (1.5206ms)
+✔ attempt identities are unique including rejected retries, and retained evidence is required (1.1512ms)
+✔ index/count reconciliation rejects hidden dropped and fabricated clamp evidence (0.4313ms)
+✔ real repaired/past-end audit reports are retained without builder discarding their signals (0.3913ms)
+✔ clean selected generation accepts; same-count replacement and different audio duration refuse (4.5153ms)
+✔ accepted pre-clamp past-end evidence survives a clean merged report (0.6738ms)
+✔ exact committed audio bounds refuse tiny overshoot even when clamp tolerance counts no repair (0.7205ms)
+✔ rejected retry or discarded single-path anomalies are audit-only (0.4821ms)
+✔ finite clamping alone is repaired evidence, accepted dropped-invalid/repeats/nonmonotonic refuse (0.8307ms)
+✔ current turns are recomputed: a forged clean merged report cannot hide repeats or unordered turns (0.5578ms)
+✔ legacy/unbound/malformed proof and contradictory clamp/drop/overshoot claims refuse (0.6543ms)
+✔ failed -> re-transcribed -> validate -> passed -> sync gate accepts (and the pipeline's failed file is kept as history) (69.9929ms)
+✔ bad transcript -> validate fails with reasons -> sync gate still refuses (27.0615ms)
+✔ a hand-edited turns.json (non-canonical identity) fails; no turns fails (37.738ms)
+✔ partial coverage (e.g. --range 0:360) is recorded explicitly; failed unless --accept-partial (59.3906ms)
+✔ an internal gap > 30s is partial even when the tail reaches the end (24.314ms)
+✔ QA: flag on but report missing, stale report, hallucination signals all fail; clean report passes (106.4312ms)
+✔ ISS-REVALIDATE-001: stale same-count and contradictory audit metadata refuse downstream admission (66.1266ms)
+✔ retained span hallucination refuses; rejected retry metadata permits a clean bound generation (64.6157ms)
+✔ same output with a newly suspicious accepted QA artifact invalidates previous downstream acceptance (78.9676ms)
+✔ canonical bound turns with an uncounted sub-microsecond overshoot cannot pass the real gate (32.6983ms)
+✔ validation binds QA presence; removed, truncated or newly created reports cannot reuse a verdict (106.3451ms)
+✔ bound QA recomputes current repeated and swapped turns rather than trusting clean claims (61.9495ms)
+✔ --dry-run reports but writes nothing (18.114ms)
+✔ unsafe sessionId is refused (0.7109ms)
+✔ parseCliArgs: bare id, id with --root (either order), --dry-run, --accept-partial (0.4879ms)
+✔ parseCliArgs: no id or a dangling --root is a usage error (0.246ms)
+✔ parseCliArgs: a second positional id or a repeated --root is an error, not silently ignored (0.3868ms)
+✔ CLI: a bare session id reaches validation instead of printing usage (end to end) (1572.3983ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 30
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3044.1446

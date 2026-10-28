@@ -129,3 +129,5 @@ Screenshot evidence: `dashboard-fixed.png` (repo root, untracked — real dashbo
 25 sources, 1 active API key, 0 open gaps, 5 real recent sessions listed by title/date/org).
 
 ## Status: checked-PASS (see qa/verdicts/api-server-env-config-fix.md, Cycle checked: 2, commit b60353b)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

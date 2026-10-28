@@ -1,0 +1,20 @@
+{
+  "ready": [
+    "t036-independent",
+    "t037-capture-bridge",
+    "t058-api-corrected",
+    "t055-ingest",
+    "t055-api"
+  ],
+  "skipped": [
+    {
+      "n": "t041-maker-cycle1-imported",
+      "drift": [
+        [
+          "scripts/webinar/session-rows.mjs",
+          "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "cost": null
+  },
+  "phase": {
+    "clock": "Stopwatch/QPC",
+    "elapsed_s": 476.7732772,
+    "end_tick": 238646865013,
+    "wait_s": 0,
+    "limitations": "Initial design/lease reads before start are unmeasured. Whole comparable maker active time remains unknown; this measured source phase is a lower bound, not padded denominator.",
+    "start_tick": 233879132241,
+    "frequency": 10000000,
+    "name": "prospective-source-build",
+    "active_s": 476.7732772
+  },
+  "candidate_sha": "F226E3B85C5407BBA9CE00D108BB9BF53C27CEBF68B90252B4147E26277222F8",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_kind": "SHA256 ordered scoped file pins, not Git commit",
+  "source_freeze_utc": "2026-10-15T10:22:54.8042655Z",
+  "shared_suite_usage": "Broker executions separate; no local tests executed",
+  "corrective_phase": {
+    "frequency": 10000000,
+    "limitations": "First diagnostic read before measured checkpoint unmeasured; complete denominator remains null.",
+    "end_tick": 252278320679,
+    "name": "valid-fixture-url",
+    "clock": "Stopwatch/QPC",
+    "wait_s": 0,
+    "start_tick": 251267256363,
+    "active_s": 101.1064316
+  }
+}

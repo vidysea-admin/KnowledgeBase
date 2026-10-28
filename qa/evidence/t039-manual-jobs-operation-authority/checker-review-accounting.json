@@ -1,0 +1,22 @@
+{
+  "phase": "review",
+  "phase_kind": "review",
+  "reviewer_id": "/root/manual_jobs_maker/checker_t039_authority",
+  "startTick": 24018312,
+  "endTick": 24036921,
+  "startUtc": "2026-10-15T10:25:28.4496252Z",
+  "endUtc": "2026-10-15T10:25:47.0703698Z",
+  "measured_active_s": 18.609,
+  "waitIntervals": [],
+  "earlierSetupActualUnknown": true,
+  "active_s": null,
+  "tokens": null,
+  "cost": null,
+  "budget_debit": {
+    "tokens": 5200,
+    "active_s": 150
+  },
+  "outcome": "HOLD dependency fingerprint mismatch",
+  "children": [],
+  "retries": []
+}

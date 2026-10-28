@@ -1,0 +1,1389 @@
+{
+  "schema": "native-hydration-u22-frozen-final/1",
+  "base": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "entries": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+      "sha256": "aa1de5248f25f941890cb64ff9e89ab61dc4d58f2f3fb3044029aa8ad1869925",
+      "mutation": "modify",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Frozen267LOC test diagnostic changes; not native acceptance",
+      "owner": "native vertical diagnostic test maker",
+      "status": " M",
+      "bytes": 16914
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts",
+      "sha256": "099b181cf1178182dfb4c81563d662b37dbeded36c8e40aa3fd879592c3b8fad",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Frozen63LOC new diagnostic helper; not native acceptance",
+      "owner": "native vertical phase helper maker",
+      "status": "??",
+      "bytes": 3995
+    },
+    {
+      "sha256": "b2669e1e4378397c477d0931fdce636c8bf3ca56a2a33afccf8750606c539ee5",
+      "bytes": 1096,
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-all92-receipt.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-all92.log",
+      "sha256": "1a0e829d8f1b9d874765c68ff6d5ce79db7a9ae8ed7a429a92015a156dd5f27d",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct atomic log from already approved hydration seal; no raw corpus/results",
+      "owner": "quality exact compact proof raw log dependency",
+      "status": "!!",
+      "bytes": 363
+    },
+    {
+      "sha256": "707420f4aeb43397d248abe9c6ff35ac1f7253aea16fd9153104c4c79800904c",
+      "bytes": 1412,
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-compact-results.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "221f2a9758c69c33bc4578abcce3124f82ae818717fbd7eb43a911bce50a8558",
+      "bytes": 5609,
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-final-seal.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "fdd7635210dcbfa3a0ba8c98e39b10e12370bd93163df27b24e7dd2947520cfd",
+      "bytes": 1102,
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-focused4-receipt.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-focused4.log",
+      "sha256": "d0cf002782c6ad265236dfcbe183736ead21de68c7efbef6ef26805237e9f062",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct atomic log from already approved hydration seal; no raw corpus/results",
+      "owner": "quality exact compact proof raw log dependency",
+      "status": "!!",
+      "bytes": 369
+    },
+    {
+      "sha256": "f4733597fe642c5d9840ee798d33b993aa8a6d627dc8a977bf195c88356bb26b",
+      "bytes": 1173,
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-synthetic2-receipt.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-synthetic2.log",
+      "sha256": "3a42a477a98dd8c28b725fd3fd982f114413920012dd1f4f661a1c550d2260c2",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct atomic log from already approved hydration seal; no raw corpus/results",
+      "owner": "quality exact compact proof raw log dependency",
+      "status": "!!",
+      "bytes": 352
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-bot-types-receipt.json",
+      "sha256": "e73d18b26110f4dfa244e7833f85066b66f52b2b0a534b28720416d75d61afed",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 1077
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-bot-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "!!",
+      "bytes": 0
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "sha256": "b8ba6bc2c260cdf92bb3c98e5714c0a3c4ea03425fcf48efd40981d419bff5db",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact released terminal or historical proof selected by root",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 2946
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-after-receipt.json",
+      "sha256": "81cdc9bdf4b12a7edfbf1c12ca979269b4a10bc54995b43377c9059e09ef6c96",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 941
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "!!",
+      "bytes": 41
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-before-receipt.json",
+      "sha256": "0d17affb71898bf8e0b4c6574e7e7aada11cd39e565058d2f3780503c503c723",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 942
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "!!",
+      "bytes": 41
+    },
+    {
+      "sha256": "1c1dd0019c9595bf1b7e5e5040e9ecb6ee52e7f9bfc7ca76c2224bf417c54afd",
+      "bytes": 5195,
+      "path": "qa/coordination/resume-20261015/broker/native-bot-compiler60-run.py",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "1dcb1a3a0bd9821c8b84c25cbd544e9ac8637b064d011e515cf4e67d2199a5b2",
+      "bytes": 1302,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-cleanup-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "52a5c0e06fe7f6e58573d9c4c726fc0a707fa1b83368e322464bd4b849240435",
+      "bytes": 131,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-cleanup.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "d02f149daa1f6e612d53786407767a3ea09b6881e8e62e89eb04c7c416d8671a",
+      "bytes": 1149,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-create-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "3112f90210e5544cde627e75099cef62cf824032f65f0808efb434b9702de365",
+      "bytes": 191,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-create.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "506943aba2e88ee0c75b131cb1a6e02ce076d1cad9cc00ef97b1672e8ec5e7ac",
+      "bytes": 1537,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-verify-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "bytes": 30,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-acl-verify.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "da76bdfa57e6712d62f4e7870ae33f7bb28076ff7f8caa2847a447425780c437",
+      "bytes": 5807,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-final-seal.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "b79f2accbb3c27e9b2c88a7327e919dea0241350c0d0fd501c070e26daa4a28e",
+      "bytes": 1472,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-guards2-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-guards2.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "15a2e6569a7600c7fd2bd5959cf0125dcad69e332f18ce8fc80bf9301d2f7c5e",
+      "bytes": 938,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-after-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "bytes": 41,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-after.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "faf88fdb73ba3d1befa0f36eac1292604eca5cab975d69cbb0c03b0cc3c5a30d",
+      "bytes": 926,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-before-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "bytes": 41,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-head-before.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "358287aa0f5a13c609abb9d3585cdde2b4abe527d1cf8fb2a47556bfeab5c2ba",
+      "bytes": 8399,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-run.py",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-targeted-trace-helper-five-receipt.json",
+      "sha256": "ec59481d1e9e79e1c588c5b0668b21c50cc246214b2bf11251f3f655c569974d",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact released terminal or historical proof selected by root",
+      "owner": "native actual five helper checks",
+      "status": "??",
+      "bytes": 1434
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-targeted-trace-helper-five.log",
+      "sha256": "15bf7b899315fb64813056b02c05636b347a0a1a782ac179f56bc3698e759b55",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct log identity reference from qa/coordination/resume-20261015/broker/native-guard-trace-targeted-trace-helper-five-receipt.json",
+      "owner": "native actual five helper checks",
+      "status": "!!",
+      "bytes": 567
+    },
+    {
+      "sha256": "7a70f323d41fcfb728f6912bde225c5fb8e2aa4458e24d1568996cbb31f50c8e",
+      "bytes": 1761,
+      "path": "qa/coordination/resume-20261015/broker/native-guard-trace-trace.jsonl",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-cleanup-receipt.json",
+      "sha256": "019a75ceccf0966925445ffc2497c04bf60722460beb8a7c968ea432d962cce0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 1304
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-cleanup.log",
+      "sha256": "9af4684f1b35195354b989467ecaae33bdd0ba735425eeddb16278b140839ee5",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "!!",
+      "bytes": 131
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-create-receipt.json",
+      "sha256": "d0ed394b30c783ae9fb231ca78a966cd4182b1cce495bef6886306e98f6096d5",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 1152
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-create.log",
+      "sha256": "35c7ca805907feced57de83c25fa072d7831c2ee4423be70c7d2fbcd5721b6f6",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "!!",
+      "bytes": 191
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-verify-receipt.json",
+      "sha256": "a0e467742154dab10e98cf878787e76d44bda19b6328b9d66788a4201a14b623",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 1525
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-acl-verify.log",
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "!!",
+      "bytes": 30
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "sha256": "f421d7fff5e79ee8128308d55e31409ac259a921807430c587c301e906f78a19",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact released terminal or historical proof selected by root",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 5739
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-after-receipt.json",
+      "sha256": "336ff1653ea1b8e0c381f7a8098a6ca624b80a8b445149bba94fe41cbbf002f2",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 928
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "!!",
+      "bytes": 41
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-before-receipt.json",
+      "sha256": "a3e3de9f0c5863ac5fcd5558487ea8794a517b5b3c52c4bde00ea518eb7610ef",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 940
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "!!",
+      "bytes": 41
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-original1-receipt.json",
+      "sha256": "578ec7436ab30e2cd310179b066dedb4dd437afc66c3a0f45e3a793dcca1c13e",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 1476
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-original1.log",
+      "sha256": "ffc6886068d0f6f3b7d6630f509429d9f93e6e62613f52160f47ac16efdca5a5",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "!!",
+      "bytes": 227
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-run.py",
+      "sha256": "e75336fc047cffd608f4fe5edf07b95692ac1cf96df28949a7eaec29633d3230",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact admitted actual node1 runner; node2 still LIVE and excluded",
+      "owner": "native actual node1 reproduction",
+      "status": "??",
+      "bytes": 9351
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-original-node1-trace.jsonl",
+      "sha256": "13af88d3891d580d2b104d0b98d526f8409a1c8b5b4ae19263fac6831975304c",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct trace identity reference from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 3516
+    },
+    {
+      "sha256": "acfd1be01f90a918d586a90d660387d76dcf4262798797f8894ea46115e19cef",
+      "bytes": 1305,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-cleanup-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "3c4ba97aa3cfd0709827f565156829b0394981b3a0c640dc67d6fdbb72d96b9d",
+      "bytes": 131,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-cleanup.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "0a5f1e50c067e5b46a32dc84c91245e401a606615095ba4e3f9eda52f94d2e04",
+      "bytes": 1153,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-create-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "86cfc158f22463b13da5aab54e47a5fd5de9ff3767a0bc87b6b273be35713a74",
+      "bytes": 191,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-create.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "30ab619d9df1c6f942ad0b7be7082202d6d8ba79a4c31a62128bb532f3a7513b",
+      "bytes": 1540,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-verify-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576",
+      "bytes": 30,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-acl-verify.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "bea21fdc20250635f235b60faef2c63ac8817f4c15a858f8446ed104a062f4bf",
+      "bytes": 5749,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-final-seal.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "f49165d8267a60302d54f6850c5c5a2931bb17252f3caf7623262e57ec8c5fcf",
+      "bytes": 941,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-after-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "bytes": 41,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-after.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "051251ab754172398f0447a0eba0f3315dbdd6f45e1f2f791b0040305936130c",
+      "bytes": 929,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-before-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "bytes": 41,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-head-before.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "26b5f81108123ca4f89feb73b930830492e817b447a7d998d497a4842533b0a0",
+      "bytes": 1470,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-original1-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "a8f4b9393c48fc37593c1e719a1dff73c919943d127a034889ee43ac7d773d7c",
+      "bytes": 209,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-original1.log",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "!!",
+      "mutation": "add"
+    },
+    {
+      "sha256": "8edb3b531fb797bad799d8c4e50b307ff012ebcc71ee9298fa9a20474ec700ee",
+      "bytes": 9351,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-run.py",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "07bab4fce44682df0d036e15a9d8684a795bd4dd03a6eb50c480121f9885e014",
+      "bytes": 632,
+      "path": "qa/coordination/resume-20261015/broker/native-original-node2-trace.jsonl",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-affected-bot-types-receipt.json",
+      "sha256": "85293f78b6ec89b1ea8a7e28cf3957f5cc09b916ef43da835397d45043fa1c0f",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 1111
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-affected-bot-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "!!",
+      "bytes": 0
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "sha256": "54bde19552f0547c6ce34dcf735e021f43fbc4cbfa0e09cf75ea12363c0950ed",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact released terminal or historical proof selected by root",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 3014
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-head-after-receipt.json",
+      "sha256": "1603ec46d2b880346e84a951f8c12cc64dcfebc78188c833628a33896516ec37",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 943
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-head-after.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "!!",
+      "bytes": 41
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-head-before-receipt.json",
+      "sha256": "ab269d312fba898b71e6d61e3986f807d6d745e6484ee82e563ef3743aff3eb6",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 931
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/native-phase-diagnostic-head-before.log",
+      "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "!!",
+      "bytes": 41
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2.json",
+      "sha256": "2b3645bca48e5767748e2743d45bb0b7ee9075f831e8c866f43ed5aefca4b0d2",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct pins identity reference from qa/coordination/resume-20261015/broker/native-bot-compiler60-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 15046
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/80fbc19f24f361aaffd1eab7377644ec51d31293507f3eda8732bf8f05d7569e.json",
+      "sha256": "80fbc19f24f361aaffd1eab7377644ec51d31293507f3eda8732bf8f05d7569e",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct pins identity reference from qa/coordination/resume-20261015/broker/native-phase-diagnostic-final-seal.json",
+      "owner": "native prerequisite history",
+      "status": "??",
+      "bytes": 15050
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad.json",
+      "sha256": "8135f7186ce937251b71c3e857b6dfa5e62625fc167633f610b788ad2b3f49ad",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct pins identity reference from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "??",
+      "bytes": 3777
+    },
+    {
+      "sha256": "939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91",
+      "bytes": 59510,
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630.json",
+      "sha256": "d6c6c107d27f3e502974804e00b375e1b9380cbdde95b14faed0c0e06d0fa630",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct pins identity reference from qa/coordination/resume-20261015/broker/native-original-node1-final-seal.json",
+      "owner": "native actual original node1 scoped proof",
+      "status": "??",
+      "bytes": 15261
+    },
+    {
+      "sha256": "d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4",
+      "bytes": 15261,
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/d994957976635b0fbe0f68ed380d9bc87fb32a89825f0be60a5292577e616ee4.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3.json",
+      "sha256": "f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Direct pins identity reference from qa/coordination/resume-20261015/broker/native-guard-trace-targeted-trace-helper-five-receipt.json",
+      "owner": "native actual five helper checks",
+      "status": "??",
+      "bytes": 15040
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "sha256": "f900ca55faa59d8e86b9cdde088691294e8ef348625b99433dddb4e0eb68b603",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 3472
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-git-after-receipt.json",
+      "sha256": "94213951a32757dd6165c1b09af2a648481fd112ece485fb2626b6e80c0273dd",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "??",
+      "bytes": 1686
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-git-after.log",
+      "sha256": "a76d9407d7586cf9e5f7006ff54bb00f2b41be5f45a5544f1aecf286dbf0c9d1",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "!!",
+      "bytes": 315
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-probe1-receipt.json",
+      "sha256": "22d0d3df8360ba0d5dc20d2cb09ab340c2750626a1f564bc580cc2a60f019f15",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "??",
+      "bytes": 1310
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-probe1.log",
+      "sha256": "c9f2b15861d3b5ee861ac33c466fd20d0070489a0094879a229193056eca5cdb",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "!!",
+      "bytes": 229
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-python-git-preflight-receipt.json",
+      "sha256": "b2e19aeb2c62aa507d635474bf989e0ca2029660dd3908366b3e4700a5fa6cf5",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Atomic proof from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "??",
+      "bytes": 1711
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-python-git-preflight.log",
+      "sha256": "a76d9407d7586cf9e5f7006ff54bb00f2b41be5f45a5544f1aecf286dbf0c9d1",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact raw log from qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+      "owner": "u22 current independent boundary proof",
+      "status": "!!",
+      "bytes": 315
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/u22-checker-boundary-run.py",
+      "sha256": "493fa143998807d843f0b1afa330c692d97f2396ab035f4aba963906d5d04747",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Exact broker runner for checked boundary evidence",
+      "owner": "u22 checker proof reproduction",
+      "status": "??",
+      "bytes": 6107
+    },
+    {
+      "sha256": "4c3661b659c4dfacfdcd07144b8de659a406b0b657166f6e1d3dcfb5142a9851",
+      "bytes": 12215,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "1c3152fbd39d602f1c9be8e0f9a688bf243495445f50b0e676aee16f76649e18",
+      "bytes": 6299,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/terminal-report.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "30cb459ab0d909b7b0143d4d5857fb593466c6a0b7c92af0f997bc8ce874c661",
+      "bytes": 5861,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "origin": "Root-authorized sanitized actual results/CAS append; no raw questions/passages/keys",
+      "owner": "quality frozen12 metadata",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "a0cc779e50ed05a9361aa36500a68ccc42c86b7f21ad318d767321770f02c2a0",
+      "bytes": 2896,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "1ced3773c03ad443e3396a7983a1c09d729c39902f91ae4d28140c93ce7973c4",
+      "bytes": 2459,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "23af593a011b2c4e537069c993ec728e62e6c0b0787fa5ac448f7837f08aa51f",
+      "bytes": 250005,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.all92-repair2.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "8dff0e9d9baa22c30c8826722a45e879b6ca15f339812d031078393041cd650e",
+      "bytes": 58144,
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.focus-repair2.json",
+      "origin": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json",
+      "owner": "quality exact12 source-conditioned proof",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/local-wip-post-d50/u22-local-commit-receipt.json",
+      "sha256": "6be5a0ccc8a4cb207e52c7510a56cc4ea44c3582a59c266975341f6a871a45f1",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Actual d0 source WIP commit receipt; included verbatim",
+      "owner": "immutable local commit chain",
+      "status": "??",
+      "bytes": 1301
+    },
+    {
+      "sha256": "a125bb23755d9f51fb496b67bb0993415e3f2decec13949c9b8455cfef7db877",
+      "bytes": 11452,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/backups/native-archive-recovery.test.ts",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "ab18a762d96f9035f74055648830138ba7498a669eea6a99826ef0c9bda9f418",
+      "bytes": 6869,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/packet.md",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "546f073fcb86a2f999077d81c546da113bedb5b76e365702b90bf0d62dcf7fdd",
+      "bytes": 172,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/preimages.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "6e20c37a1216dd332fc6241a2d33e1a722d510b5e0a352dcd296d75bb5102194",
+      "bytes": 221,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/source-pins.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "3b4a63e28cf619d8ff41078f4d337e171c93daac0877c80bc7c9d68d6870ae45",
+      "bytes": 16607,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/native-archive-recovery.test.ts.preimage",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "e65c6ffbc5949f40ed8ad38ab204f74124daac06ac362dd8979856eb6daff4e5",
+      "bytes": 2045,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/packet.md",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "be143b163433707d4510635c571a478f20275a9a3f70f80ecbea4ba7d2abc150",
+      "bytes": 172,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/preimage.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "bda281f8df9a1f507b4d94a36c6047e5add878072a5057907e5d6c04e07a5e98",
+      "bytes": 418,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/b/trace-env-alignment/source-pins.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/broker-request.json",
+      "sha256": "3fdb35142ed7ae533642de3075a64af6d34d1dac545fe5983c460ecc99a6e6d6",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Root identified owned unit packet; no wholeQA glob",
+      "owner": "native exact diagnostic unit packet",
+      "status": "??",
+      "bytes": 6899
+    },
+    {
+      "sha256": "cc5fc4fa844cc51aa160dd3f3fc4381e929a25d9993f251c69d0b77159ae8815",
+      "bytes": 4013,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/backups/helper-before-explicit-trace.ts",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "97204ef71bb7d94b92fa950c0fbe1487b33fdbca5ccedb33ab374971381cf695",
+      "bytes": 2702,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/packet-before-explicit-trace.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "029a7b577a13e381caf6c5743ec7be4f97ec539eb0e30d960542ce2f41cc28fa",
+      "bytes": 3186,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/packet.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "96e1cc94d4af535262c0173e19d1362eb197381c4afbc0ab2d61e349df747714",
+      "bytes": 4030,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/packet.md",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "5937732516ceff6ad5770097318a42eb88fdd5c6f1b97a83e80d0be9ed36be89",
+      "bytes": 92,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/c/preimages.txt",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/node-specific-request.json",
+      "sha256": "fe57c6ebd502d74812bce162cf457c328721d020d474c90e6f478d68d1fac693",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Root identified owned unit packet; no wholeQA glob",
+      "owner": "native exact diagnostic unit packet",
+      "status": "??",
+      "bytes": 4960
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/packet.json",
+      "sha256": "cf28b538c4cd702f4429e6feb3929632391fee97155afba9053c7391490bfaa6",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Root identified owned unit packet; no wholeQA glob",
+      "owner": "native exact diagnostic unit packet",
+      "status": "??",
+      "bytes": 2242
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/packet.md",
+      "sha256": "7bbafb65626cd09cd28d11db55b6f50eea150d13706444a3a928fc589f3e66a1",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Root identified owned unit packet; no wholeQA glob",
+      "owner": "native exact diagnostic unit packet",
+      "status": "??",
+      "bytes": 4336
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/source-pins.json",
+      "sha256": "f26cda9bea35fbe6e5bd9fb5288fe6a4e09f130a12a7f4cfa4af6206a24e2ee7",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Root identified owned unit packet; no wholeQA glob",
+      "owner": "native exact diagnostic unit packet",
+      "status": "??",
+      "bytes": 418
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/stage-catalog.json",
+      "sha256": "54442d7c62e43564a49d6f38599ef3cfb3ca4afa168d6d6deee046c9aba997c4",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "Root identified owned unit packet; no wholeQA glob",
+      "owner": "native exact diagnostic unit packet",
+      "status": "??",
+      "bytes": 3149
+    },
+    {
+      "sha256": "8141abce8e1c227403ab54a038836cb81bbd9e52b9d6317c9ad3ab064b851c3c",
+      "bytes": 36768,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "origin": "Root authorized owner-self metadata, no recursive self hash",
+      "owner": "native frozen terminal allowlist",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "a0877028ae4d5050d6b7a05acb488b5ee3fb81423b1c85e488f07707783c3792",
+      "bytes": 4234,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-receipt.json",
+      "origin": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json",
+      "owner": "native owner exact46 terminal additions",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "sha256": "a889e860f6554a8cad3788f76b9c0a2447ef67e7a9bfe11f1c20b7eecdb53d1f",
+      "bytes": 2084,
+      "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-report.md",
+      "origin": "Owner final report; individual guard proofs not broader checkerPASS",
+      "owner": "native terminal report",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "status": "??",
+      "mutation": "add"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/admission-exits.json",
+      "sha256": "fca82cf15c64af6f62e44e892ece6b60509f77d321fb241ebbc49c17b5437ba4",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 47
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/assess-committed-result.json",
+      "sha256": "68e10e6ab180fa72508be7e811e42f69d91f879214100f297d2c47ce71282b0d",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1042
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-accounting.json",
+      "sha256": "63d7f3cdd8dbd8a54699240b5ec4228bcc396597f81695cfb73a50c22475cd5b",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 591
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-finalization-assess-input.json",
+      "sha256": "7c1f184b8f233170122f04b3eb495d03e42e9d3a400709c97ab10630693701cb",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1168
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-finalization-assess-result.json",
+      "sha256": "23386e9454d472d5df1ea4b5354a65211ee29b7753420af54bcb1f8fa2164d62",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1066
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-ready-prompt.txt",
+      "sha256": "7394474c594ea883d0e7430059a0c57fcbb8c0cae72946d402182eb280c838a5",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1499
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/checker-verdict-readback.json",
+      "sha256": "3d7e85ae6994e499e9dba105526c68d74deefea05500b0ea8b6ef05e764a4299",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 368
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/committed-source-binding.json",
+      "sha256": "2e109137058fccc10905a400d9fb37d634622d0c85f565c246cd1b272469dc14",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1741
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "sha256": "14fe9b037dfb756d49194be35c111f8b794f263a9adc8710061f90657dbb2307",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1544
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-gitproof.json",
+      "sha256": "d1d4c5c2cb57df8a55d240c96e2aab4a9fa546fbd63449d74e3c02650337a22b",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1642
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout.json",
+      "sha256": "46209d322532580e509c99ef511e161f61cd7e660779585a1ed399bf434c45c2",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1913
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout.mjs",
+      "sha256": "1561dd567e9e63e2378102db28962592637ff034fd6244c31d7d17f40fdcfa72",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 4482
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/managed-review.ready.json",
+      "sha256": "0078adab2b855f94ed7da84676ac81891e9739927e55d219c075a4ff2acaa616",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 7122
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/metrics-committed.json",
+      "sha256": "c92fd1721167d48e216b2ceaf6102401c39747e1092a525a3bd83d9f84265333",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 982
+    },
+    {
+      "path": "qa/coordination/resume-20261015/u22-resume-prep/validate-committed-result.json",
+      "sha256": "bcd522642eca3e348de5baa0ccd0a27a3cfc875005b3422c9a006c5ea7f9f8ff",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 1198
+    },
+    {
+      "path": "qa/manifests/u22-extraction-review-resume.md",
+      "sha256": "6cd357b69fd342585332817db94c3cd26b6d08e638c6924bdea644675859fbd3",
+      "mutation": "modify",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": " M",
+      "bytes": 5400
+    },
+    {
+      "path": "qa/verdicts/u22-extraction-review-resume.md",
+      "sha256": "30273a565a7a2e7faf2d92b1205649840dcdacf215ff5bcfad9a6bb5d990fc5d",
+      "mutation": "add",
+      "baseline": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+      "origin": "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+      "owner": "u22 independent cycle0 PASS metadata",
+      "status": "??",
+      "bytes": 3952
+    }
+  ],
+  "counts": {
+    "paths": 134,
+    "bytes": 771776
+  },
+  "prepared83": "qa/coordination/resume-20261015/local-wip-post-d50/next-after-u22-prepared.json",
+  "ownerNative": {
+    "sha256": "8141abce8e1c227403ab54a038836cb81bbd9e52b9d6317c9ad3ab064b851c3c",
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/terminal-evidence-paths.json"
+  },
+  "ownerQuality": {
+    "sha256": "30cb459ab0d909b7b0143d4d5857fb593466c6a0b7c92af0f997bc8ce874c661",
+    "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/admitted-snapshot-repair2/wip-allowlist.json"
+  },
+  "authorizedMetadataUpdates": [],
+  "unchangedOmitted": [],
+  "source2Native": {
+    "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts": "099b181cf1178182dfb4c81563d662b37dbeded36c8e40aa3fd879592c3b8fad",
+    "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts": "aa1de5248f25f941890cb64ff9e89ab61dc4d58f2f3fb3044029aa8ad1869925"
+  },
+  "unchangedWatch8U22source2": {
+    "scripts/watched-sources/supervisor.ts": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+    "scripts/webinar/scheduler/service.d.mts": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+    "scripts/native-capture/server-watched.test.ts": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+    "scripts/eval/extraction-review-resume.test.mjs": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb",
+    "apps/api/src/connector-workflow/watched.ts": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+    "scripts/watched-sources/host.ts": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+    "scripts/watched-sources/README.md": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+    "scripts/watched-sources/host.test.ts": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+    "scripts/native-capture/server.ts": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+    "scripts/eval/extraction-review-resume.mjs": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206"
+  },
+  "scope": "Native diagnostic-only test/helper changes; hydrated source-conditioned proof not primary-answerPASS; U22 resume scoped independentPASS, realhuman0/fullparentgatesOPEN",
+  "historical80of12": {
+    "availability": "EXTERNAL_LOCAL_RAW_UNMODIFIED; priorQAoracleerror, not production defect",
+    "sha256": "bb009a95474c7d555f4025e4c601649f1411147e42551402296bd2388e44725f",
+    "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.json"
+  },
+  "actions": {
+    "tests": 0,
+    "commit": 0,
+    "stage": 0,
+    "push": 0
+  }
+}

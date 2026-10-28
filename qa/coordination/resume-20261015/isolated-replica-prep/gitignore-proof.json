@@ -1,0 +1,16 @@
+{
+  "afterSha256": "1889112d1c0fb95d57faf75e3e3cf19756b8c5f6b024d747aa2a0af27d985e1e",
+  "actualBeforeBytes": 3914,
+  "negative": [
+    "PLAN.md",
+    "private-run-not-a-uuid/unrelated.txt"
+  ],
+  "positive": [
+    "vendor/mongodb-8.0.34.zip",
+    "private-run-0123456789abcdef0123456789abcdef/secrets/credentials.json",
+    "private-run-0123456789abcdef0123456789abcdef/data/WiredTiger"
+  ],
+  "reproducibleBrokerProof": "pending",
+  "directProofPerformed": true,
+  "rawByteBackup": ".gitignore.before.bin"
+}

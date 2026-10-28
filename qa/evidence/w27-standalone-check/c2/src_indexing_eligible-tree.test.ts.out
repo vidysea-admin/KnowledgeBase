@@ -1,0 +1,17 @@
+✔ rejected page invalidates cache and removes its session from tree/graph contributors (6.3657ms)
+✔ a disappeared effective page cannot preserve a cached old year or mixed parent summary (6.5002ms)
+✔ valid cache retains its exact reference and all safe contributors (1.4211ms)
+✔ cached single and plural contributor references cannot bypass safe-page membership (2.7442ms)
+✔ same-ID corrected evidence withholds unbound legacy summary and cached topic (1.3632ms)
+✔ generation binding must follow the exact current effective transcript and source (22.5917ms)
+✔ a corrected current page cannot make the same-ID stale cached summary readable (1.9862ms)
+✔ matching cached summary cannot retain unsupported stale topic or org display text (1.8756ms)
+✔ routingSummary is never built from a withdrawn or unapproved source and stays within 768 UTF-8 bytes (6.4923ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1187.6079

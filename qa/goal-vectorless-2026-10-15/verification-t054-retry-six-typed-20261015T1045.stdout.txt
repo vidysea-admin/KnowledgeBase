@@ -1,0 +1,14 @@
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (93.7432ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (36.6026ms)
+✔ correction publication never replays paid work on transient body or commit errors (44.9921ms)
+✔ correction unknown commit retries only commit with bounded uncertainty and paid work once (23.7281ms)
+✔ runRefresh reconciles unknown committed head without downgrade or superseded revision leakage (21.8666ms)
+✔ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (1.6522ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1519.7772

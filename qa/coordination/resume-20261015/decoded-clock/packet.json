@@ -1,0 +1,42 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "HOLD-PRODUCER-PREREQUISITE",
+  "tier": 3,
+  "unit": {
+    "slug": "t042-native-decoded-clock-producer",
+    "cycle": 0,
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": null,
+    "candidate_kind": "read-only-applicability-no-source-candidate",
+    "changed_source_paths": [],
+    "changed_qa_paths": [
+      "qa/coordination/resume-20261015/decoded-clock/checkpoint.md",
+      "qa/coordination/resume-20261015/decoded-clock/before-pins.json",
+      "qa/coordination/resume-20261015/decoded-clock/packet.json"
+    ]
+  },
+  "contract": {
+    "path": "qa/contracts/t042-trusted-registry-integration.md",
+    "clauses": ["R2", "R3", "R4", "R7", "R8", "R11", "R14"],
+    "scope": "Applicability checkpoint only. Actual decoded PTS-host and transformation producer receipts absent; no native acceptance implemented."
+  },
+  "evidence": { "pins": "before-pins.json", "analysis": "checkpoint.md", "execution_receipts": [] },
+  "readiness": {
+    "complete": false,
+    "missing": [
+      "Actual instrumented sample-to-encoded-media-to-host correspondence supported by existing decoder/capture path",
+      "Root selection of concrete capture producer design and expanded exclusive source leases",
+      "Actual transform receipts and physical media identity bindings",
+      "Implemented candidate, broker tests, independent checker and production call-chain evidence"
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": { "token_metric": "actual_total", "tokens": null, "active_s": null, "cost": null },
+    "reviewers": [],
+    "shared_suites": [],
+    "ratio_verified": false
+  },
+  "dispatch": { "ready": false, "reason": "No implementation candidate; do not dispatch review or run tests for this checkpoint." }
+}

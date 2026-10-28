@@ -1,0 +1,6 @@
+{
+  "exitCode": 1,
+  "reason": "Windows path separator mismatch during artifact assembly after static traversal; no production import/audit executed",
+  "repair": "Normalize artifact input keys to POSIX; rerun metadata traversal only",
+  "auditExecuted": false
+}

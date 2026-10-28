@@ -1,0 +1,11 @@
+{
+  "localTestProcesses": 0,
+  "priorReadSeconds": null,
+  "activeSeconds": null,
+  "status": "five-source-candidate-frozen-awaiting-broker-checker",
+  "end": "2026-10-15T09:08:40.6143607+00:00",
+  "elapsedWallSeconds": 285.0014772,
+  "tokens": null,
+  "money": null,
+  "firstRecordedCheckpoint": "2026-10-15T09:03:55.6128835+00:00"
+}

@@ -1,0 +1,23 @@
+{
+  "exit": 0,
+  "stable": true,
+  "pinMismatch": [],
+  "environment": "1c84569ca4a508b42d8b1c71e1dcb76c259b9f05b50cca20ff8f057e299ab8e2",
+  "lockCurrent": true,
+  "runtimeCurrent": true,
+  "elapsedMs": 1284.9139,
+  "testIDs": [
+    "correction publication never replays paid work on transient body or commit errors",
+    "runRefresh reconciles unknown committed head without downgrade or superseded revision leakage"
+  ],
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "--test-name-pattern=^(?:correction publication never replays paid work on transient body or commit errors|runRefresh reconciles unknown committed head without downgrade or superseded revision leakage)$",
+    "--import",
+    "tsx",
+    "apps/api/src/transcript-review/refresh-executor.test.ts"
+  ]
+}

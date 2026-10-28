@@ -4,20 +4,10 @@
  * right now. No I/O, no scheduling itself — `schedule-tick.ts` composes this with the real
  * scheduler.
  *
- * Composition (T-025 C3, documented not built): a future scheduler calls `CalendarClient.
- * listUpcomingEvents(...)`, passes the result through `selectEventsToAutoJoin`, then for each
- * returned event calls `capture(event.meetingUrl, {tenantId, consent}, deps)` (`../capture.js`,
- * T-024). That call already runs `assertProvidedFirst` (D-008) internally before joining — this
- * function only decides *when* to trigger a capture that was always going to run the same
- * consent check; it never bypasses it.
- *
- * U5 policy (Umesh, approved 2026-09-26, qa/feedback-inbox.md): FULLY AUTOMATIC — the bot
- * auto-joins meetings from trusted senders as Umesh without per-meeting approval. Registration
- * forms stay human (`registrationOnly` -> `needs-registration`, never auto-submitted). Real
- * outward sends need their own approval (not this unit's concern — no sends happen here).
+ * Webinar-release mode follows D-056: classify first, preserve rejection/registration.
  */
-import type { CalendarEvent } from "./calendar-client.js";
-import { isTrustedSender, type TrustedSenderConfig } from "./auto-record-policy.js";
+import type { CalendarEvent, TrustedSenderConfig, AutoRecordCandidateInput, AutoRecordItem, SkipReason, SkippedItem, SelectAutoRecordItemsInput, SelectAutoRecordItemsResult } from "@lkb/core";
+import { isTrustedSender, classifyWebinarInvite, webinarIdentity, webinarSessionKey } from "./auto-record-policy.js";
 // Re-exported so existing callers/tests that imported these from auto-join.js before the U5
 // LOC-budget split (see auto-record-policy.ts's header) keep working without an import-path change.
 export { redactJoinLink, loadTrustedSenderConfig } from "./auto-record-policy.js";
@@ -35,7 +25,8 @@ export function selectEventsToAutoJoin(events: CalendarEvent[], now: string,
 
   return events
     .filter((e) => {
-      if (!e.meetingUrl) return false;
+      if (!e.meetingUrl || /^\d{4}-\d{2}-\d{2}$/.test(e.startTime) || /^\d{4}-\d{2}-\d{2}$/.test(e.endTime)) return false;
+      if (e.meetingUrlSource !== undefined && e.meetingUrlSource !== "conference") return false; // T-036: free-text links are never auto-joined
       const startMs = new Date(e.startTime).getTime();
       const endMs = new Date(e.endTime).getTime();
       return nowMs >= startMs - leadMs && nowMs <= endMs;
@@ -43,98 +34,39 @@ export function selectEventsToAutoJoin(events: CalendarEvent[], now: string,
     .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
 }
 
-// ---------------------------------------------------------------------------------------------
+
 // U5 — selectAutoRecordItems: the richer sibling used by `cli schedule-tick`.
-// ---------------------------------------------------------------------------------------------
 
-/**
- * The subset of `MeetingCandidates` (schema/meeting_candidates.schema.json) this selection needs.
- * Kept as a narrow local type (not an `@lkb/db`/`@lkb/core` import) — `packages/meeting-bot` may
- * depend only on `ingest, core` (ARCHITECTURE.md §5); the caller (schedule-tick.ts, which reads
- * candidates over HTTP) maps the real generated `MeetingCandidates` shape onto this before calling
- * in, so this file itself stays free of new dependency edges.
- */
-export interface AutoRecordCandidateInput {
-  id: string;
-  title: string;
-  senderEmail: string;
-  senderDomain: string;
-  status: "pending" | "approved" | "rejected" | "auto_approved";
-  meetingUrl?: string;
-  startTime?: string;
-  endTime?: string;
-  kind?: "past-recording" | "upcoming";
-  registrationOnly?: boolean;
-}
 
-/** One item this tick decided to (attempt to) auto-record. `sessionKey` is the stable dedup
- * identity across ticks — `cal:<calendarEventId>` or `gmail:<candidateId>` — never the raw
- * `meetingUrl` (which can carry a rotating join token). */
-export interface AutoRecordItem {
-  sessionKey: string;
-  source: "calendar" | "gmail";
-  sourceId: string;
-  title: string;
-  startTime: string;
-  endTime: string;
-  meetingUrl: string;
-  sender?: string;
-}
-
-export type SkipReason =
-  | "no-join-link"
-  | "past"
-  | "untrusted-sender"
-  | "needs-registration"
-  | "duplicate-session"
-  | "overlap-lost";
-
-export interface SkippedItem {
-  sessionKey: string;
-  source: "calendar" | "gmail";
-  sourceId: string;
-  title: string;
-  reason: SkipReason;
-  /** Human-readable extra context — e.g. which session it lost to on "overlap-lost". Never
-   * contains a `meetingUrl` (see `redactJoinLink`). */
-  detail?: string;
-}
-
-export interface SelectAutoRecordItemsInput {
-  calendarEvents: CalendarEvent[];
-  candidates: AutoRecordCandidateInput[];
-  now: string;
-  leadMinutes: number;
-  trustedSenders: TrustedSenderConfig;
-  /** sessionKeys already scheduled by an earlier tick (from the persisted dedup state) —
-   * anything matching here is reported as `duplicate-session`, never re-scheduled. */
-  alreadyScheduled: ReadonlySet<string> | readonly string[];
-}
-
-export interface SelectAutoRecordItemsResult {
-  toSchedule: AutoRecordItem[];
-  skipped: SkippedItem[];
-}
+export type { AutoRecordCandidateInput, AutoRecordItem, SkipReason, SkippedItem, SelectAutoRecordItemsInput, SelectAutoRecordItemsResult } from "@lkb/core";
 
 interface NormalizedItem {
+  candidate?: AutoRecordCandidateInput;
   sessionKey: string;
   source: "calendar" | "gmail";
   sourceId: string;
   title: string;
+  description?: string;
   startTime?: string;
   endTime?: string;
   meetingUrl?: string;
+  /** T-036: provenance of `meetingUrl`. `unknown` on purpose: the value crosses an HTTP/JSON boundary and is judged at runtime. */
+  meetingUrlSource?: unknown;
+  /** Acquired refusals remain barriers even when an older approved URL is retained. */
+  meetingLinkIssue?: unknown;
+  youtubeWatchIssue?: unknown;
+  evidenceIssue?: unknown;
+  sourceRefusal?: boolean;
   sender?: string;
   senderDomain?: string;
+  /** ISS-322: sender identity is verified (authenticated Gmail scan, or a calendar organizer the Calendar API attests). */
+  senderVerified: boolean;
   registrationOnly?: boolean;
-  /** Candidates already vetted by the Gmail approval flow (approved/auto_approved) are trusted
-   * by construction, independent of the config allowlist — see the module doc comment. */
+  /** Approved Gmail candidates bypass the legacy sender allowlist. */
   preTrusted: boolean;
-  /** True iff a human explicitly rejected this candidate. A rejection is final and MUST NOT be
-   * overridden by the config trusted-sender allowlist — the allowlist is a bootstrap/fast-path
-   * for senders nobody has judged yet, never a way to out-rank an explicit human "no". Always
-   * false for a calendar event (no rejection workflow exists for those). */
+  /** Explicit Gmail rejection is final; calendar has no independent approval workflow. */
   rejected: boolean;
+  cancelled?: boolean;
 }
 
 function normalizeCalendarEvent(e: CalendarEvent): NormalizedItem {
@@ -143,17 +75,24 @@ function normalizeCalendarEvent(e: CalendarEvent): NormalizedItem {
     source: "calendar",
     sourceId: e.id,
     title: e.title,
-    startTime: e.startTime,
-    endTime: e.endTime,
+    ...(e.description !== undefined ? {description: e.description} : {}),
+    startTime: /^\d{4}-\d{2}-\d{2}$/.test(e.startTime) ? undefined : e.startTime,
+    endTime: /^\d{4}-\d{2}-\d{2}$/.test(e.endTime) ? undefined : e.endTime,
     meetingUrl: e.meetingUrl,
+    meetingUrlSource: e.meetingUrlSource,
+    meetingLinkIssue: e.meetingLinkIssue,
+    youtubeWatchIssue: e.youtubeWatchIssue,
     sender: e.organizer,
+    senderVerified: true,
     preTrusted: false,
     rejected: false,
+    cancelled: e.cancelled || e.status === "cancelled" || e.responseStatus === "declined",
   };
 }
 
 function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
   return {
+    candidate: c,
     sessionKey: `gmail:${c.id}`,
     source: "gmail",
     sourceId: c.id,
@@ -161,16 +100,33 @@ function normalizeCandidate(c: AutoRecordCandidateInput): NormalizedItem {
     startTime: c.startTime,
     endTime: c.endTime,
     meetingUrl: c.meetingUrl,
+    meetingUrlSource: c.meetingUrlSource,
+    meetingLinkIssue: c.meetingLinkIssue,
+    youtubeWatchIssue: c.youtubeWatchIssue,
+    evidenceIssue: c.evidenceIssue,
     sender: c.senderEmail,
     senderDomain: c.senderDomain,
+    senderVerified: c.senderAuthenticated === true,
     registrationOnly: c.registrationOnly,
     // Candidates the Gmail approval flow already decided are trusted; "pending" is not — a
     // pending candidate falls through to the same config-allowlist check a calendar organizer
     // gets, so a known-trusted sender's mail doesn't have to wait out a human click.
-    preTrusted: c.status === "approved" || c.status === "auto_approved",
+    // ISS-333: auto_approved is a header-derived trust claim, so it counts only with an authenticated sender;
+    // a human "approved" decision is not a header claim and stays trusted.
+    preTrusted: c.status === "approved" || (c.status === "auto_approved" && c.senderAuthenticated === true),
     rejected: c.status === "rejected",
+    cancelled: c.cancelled,
   };
 }
+
+/** A present source other than "conference". Such an item takes no part in the every-webinar identity logic (barriers, session-key collapse). */
+const isUntrustedSource = (item: NormalizedItem): boolean => item.meetingUrlSource !== undefined && item.meetingUrlSource !== "conference";
+/** Fail closed on present malformed issue values at the HTTP boundary as well as typed refusals. */
+const hasSourceRefusal = (item: NormalizedItem): boolean =>
+  item.sourceRefusal === true || item.evidenceIssue !== undefined || item.meetingLinkIssue !== undefined || item.youtubeWatchIssue !== undefined;
+/** Meeting identity used to share barriers and to collapse copies; undefined for an untrusted item (ISS-T036CAL-010). */
+const meetingIdentityOf = (item: NormalizedItem): string | undefined =>
+  item.meetingUrl && item.startTime && !isUntrustedSource(item) ? webinarIdentity(item.meetingUrl, item.startTime) : undefined;
 
 function overlaps(a: NormalizedItem, b: NormalizedItem): boolean {
   const aStart = new Date(a.startTime as string).getTime();
@@ -184,27 +140,11 @@ function durationMs(item: NormalizedItem): number {
   return new Date(item.endTime as string).getTime() - new Date(item.startTime as string).getTime();
 }
 
-/**
- * Merges calendar events + meeting candidates, applies the U5 auto-record policy, and returns
- * what to schedule now plus everything skipped (with a reason). Pure — no I/O, no clock reads
- * beyond the passed-in `now`.
- *
- * Order of checks per item (first match wins, matching the `SkipReason` union):
- * 1. `registrationOnly` -> `needs-registration` (webinar registration forms stay human, U5 policy).
- * 2. No `meetingUrl` -> `no-join-link` (nothing to join).
- * 3. No parseable `startTime`/`endTime` -> excluded silently (not enough information to schedule
- *    or report a reason against — e.g. a `past-recording` candidate with no live session at all).
- * 4. `now` after `endTime` -> `past`.
- * 5. `now` before `startTime - leadMinutes` -> excluded silently (not due yet; a later tick will
- *    see it again — reporting "skipped" every tick for hours would be noise, not a decision).
- * 6. Not pre-trusted (Gmail-approved) and sender/organizer not on the config allowlist ->
- *    `untrusted-sender`.
- * 7. `alreadyScheduled` contains this `sessionKey` -> `duplicate-session`.
- * 8. Remaining items that time-overlap each other -> OBS records one at a time, so the earliest
- *    `startTime` wins (tie-break: longest duration); every other member of that overlap cluster
- *    -> `overlap-lost`, `detail` names the winner's `sessionKey`.
- */
-export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): SelectAutoRecordItemsResult {
+/** Select due webinars, retain explicit refusals, deduplicate and report one-at-a-time overlaps. */
+export function selectAutoRecordItems(input: SelectAutoRecordItemsInput, options: { parallel?: boolean;
+  /** Server-local candidate-specific persisted approval; never shared across candidates. */
+  trustedSendersForCandidate?: (candidate: AutoRecordCandidateInput) => TrustedSenderConfig | undefined;
+} = {}): SelectAutoRecordItemsResult {
   const { calendarEvents, candidates, now, leadMinutes, trustedSenders, alreadyScheduled } = input;
   const nowMs = new Date(now).getTime();
   const leadMs = leadMinutes * 60 * 1000;
@@ -214,12 +154,43 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
     ...calendarEvents.map(normalizeCalendarEvent),
     ...candidates.map(normalizeCandidate),
   ];
+  if (input.everyWebinar) {
+    const barriers = new Map<string, { rejected: boolean; registration: boolean; cancelled: boolean; sourceRefusal: boolean }>();
+    for (const item of normalized) {
+      const identity = meetingIdentityOf(item);
+      if (!identity) continue;
+      const prior = barriers.get(identity);
+      barriers.set(identity, { rejected: item.rejected || Boolean(prior?.rejected),
+        registration: Boolean(item.registrationOnly || prior?.registration), cancelled: Boolean(item.cancelled || prior?.cancelled),
+        sourceRefusal: hasSourceRefusal(item) || Boolean(prior?.sourceRefusal) });
+    }
+    for (const item of normalized) {
+      const identity = meetingIdentityOf(item);
+      const barrier = identity ? barriers.get(identity) : undefined;
+      if (barrier) { item.rejected = barrier.rejected; item.registrationOnly = barrier.registration; item.cancelled = barrier.cancelled;
+        item.sourceRefusal = barrier.sourceRefusal; }
+    }
+  }
 
   const skipped: SkippedItem[] = [];
   const eligible: NormalizedItem[] = [];
+  const seenWebinars = new Set<string>();
 
   for (const item of normalized) {
+    if (input.everyWebinar && item.meetingUrl && item.startTime && !isUntrustedSource(item)) { // a free-text row keeps its own cal: key
+      const identity = webinarIdentity(item.meetingUrl, item.startTime);
+      if (identity) item.sessionKey = webinarSessionKey(identity);
+    }
     const base = { sessionKey: item.sessionKey, source: item.source, sourceId: item.sourceId, title: item.title };
+
+    if (item.cancelled) { skipped.push({ ...base, reason: "cancelled" }); continue; }
+    if (item.evidenceIssue !== undefined) { skipped.push({...base, reason: item.rejected ? "untrusted-sender" : "needs-review"}); continue; }
+    if (input.everyWebinar) {
+      const kind = input.classifyInvite ? input.classifyInvite({ title: item.title, meetingUrl: item.meetingUrl, sender: item.sender }) : classifyWebinarInvite(item.title);
+      if (kind !== "webinar") {
+        skipped.push({ ...base, reason: kind === "meeting" ? "not-webinar" : "needs-review" }); continue;
+      }
+    }
 
     if (item.registrationOnly) {
       skipped.push({ ...base, reason: "needs-registration" });
@@ -231,10 +202,12 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
     }
     if (!item.startTime || !item.endTime || Number.isNaN(new Date(item.startTime).getTime()) ||
       Number.isNaN(new Date(item.endTime).getTime())) {
-      continue; // not enough info to schedule or to report a reason against
+      if (input.everyWebinar) skipped.push({ ...base, reason: "invalid-time" });
+      continue;
     }
     const startMs = new Date(item.startTime).getTime();
     const endMs = new Date(item.endTime).getTime();
+    if (endMs <= startMs) { skipped.push({ ...base, reason: "invalid-time" }); continue; }
     if (nowMs > endMs) {
       skipped.push({ ...base, reason: "past" });
       continue;
@@ -248,13 +221,40 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
       skipped.push({ ...base, reason: "untrusted-sender" });
       continue;
     }
-    if (!item.preTrusted && !isTrustedSender(item.sender, item.senderDomain, trustedSenders)) {
+    if (hasSourceRefusal(item)) {
+      skipped.push({ ...base, reason: "needs-review" });
+      continue;
+    }
+    // T-036: a link taken from the invite's free text was chosen by whoever sent the invitation. It is never auto-joined, in
+    // any mode (record-every-webinar included). Absent source = a row from before the field existed, when only conference
+    // data could supply a link; any value other than "conference" (location, description, unknown) is untrusted.
+    if (item.meetingUrlSource !== undefined && item.meetingUrlSource !== "conference") {
+      skipped.push({ ...base, reason: "unverified-link-source" });
+      continue;
+    }
+    // ISS-376 (Approver ruling 1, hybrid): record-every-webinar still skips the sender allowlist, but a Gmail candidate nobody has
+    // approved needs an authenticated sender. Explicit authentication failure is refused; an unknown (unreported) one waits for a human.
+    if (input.everyWebinar && item.candidate && !item.preTrusted && !item.senderVerified) {
+      skipped.push(item.candidate.senderAuthenticated === false
+        ? { ...base, reason: "untrusted-sender", detail: "sender authentication failed (ISS-376)" }
+        : { ...base, reason: "needs-review", detail: "needs approval: sender authentication unknown (ISS-376)" });
+      continue;
+    }
+    const candidateTrust = !input.everyWebinar && item.candidate && item.senderVerified && !item.preTrusted
+      ? options.trustedSendersForCandidate?.(item.candidate) : undefined;
+    if (!input.everyWebinar && !item.preTrusted && !(item.senderVerified && isTrustedSender(item.sender, item.senderDomain, candidateTrust ?? trustedSenders))) {
       skipped.push({ ...base, reason: "untrusted-sender" });
       continue;
     }
     if (scheduledSet.has(item.sessionKey)) {
       skipped.push({ ...base, reason: "duplicate-session" });
       continue;
+    }
+    if (input.everyWebinar) {
+      const identity = webinarIdentity(item.meetingUrl, item.startTime);
+      if (!identity) { skipped.push({ ...base, reason: "unsafe-join-link" }); continue; }
+      if (seenWebinars.has(identity)) { skipped.push({ ...base, reason: "duplicate-session" }); continue; }
+      seenWebinars.add(identity);
     }
     eligible.push(item);
   }
@@ -264,17 +264,23 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
   // duration); everyone else in the cluster loses.
   eligible.sort((a, b) => new Date(a.startTime as string).getTime() - new Date(b.startTime as string).getTime());
 
+  const priority = (i: NormalizedItem): number => input.priorityOf?.({ source: i.source, sourceId: i.sourceId, title: i.title, sender: i.sender }) ?? 0;
   const winners: NormalizedItem[] = [];
   let cluster: NormalizedItem[] = [];
 
   const resolveCluster = () => {
     if (cluster.length === 0) return;
+    // Independent tab slots can capture every eligible member. Eligibility, canonical
+    // meeting deduplication and explicit refusals above are unchanged.
+    if (options.parallel) { winners.push(...cluster); cluster = []; return; }
     if (cluster.length === 1) {
       winners.push(cluster[0]!);
       cluster = [];
       return;
     }
     const [winner, ...losers] = [...cluster].sort((a, b) => {
+      const prioDiff = priority(b) - priority(a); // autojoin: higher topic priority first; 0 for everyone without priorityOf
+      if (prioDiff !== 0) return prioDiff;
       const startDiff = new Date(a.startTime as string).getTime() - new Date(b.startTime as string).getTime();
       if (startDiff !== 0) return startDiff;
       return durationMs(b) - durationMs(a); // longest duration wins the tie
@@ -283,7 +289,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
     for (const loser of losers) {
       skipped.push({
         sessionKey: loser.sessionKey, source: loser.source, sourceId: loser.sourceId, title: loser.title,
-        reason: "overlap-lost", detail: `lost to ${winner!.sessionKey} (earlier start, or longer on a tie)`,
+        reason: "overlap-lost", detail: `lost to ${winner!.sessionKey} (${priority(winner!) > priority(loser) ? "higher topic priority" : "earlier start, or longer on a tie"})`,
       });
     }
     cluster = [];
@@ -306,6 +312,7 @@ export function selectAutoRecordItems(input: SelectAutoRecordItemsInput): Select
       source: item.source,
       sourceId: item.sourceId,
       title: item.title,
+      ...(item.description !== undefined ? {description: item.description} : {}),
       startTime: item.startTime as string,
       endTime: item.endTime as string,
       meetingUrl: item.meetingUrl as string,

@@ -1,0 +1,9 @@
+# U3.2 navigation / Ask acceptance survey
+
+Read-only source survey; maker skill loaded. No tests, browsers, network or database actions performed. No new product/test change is warranted from this survey.
+
+The previously reported lexical lone-surrogate crash already has a direct regression: `apps/web/src/api/search/client.test.ts`, “rejects unencodable session and turn identifiers before source links can render”. It checks isolated high/low and embedded surrogates in both locator fields, expects HTTP-style 503 refusal, and preserves valid `世界/😀`. `qa/evidence/goal-u32/independent-boundaries.test.tsx` independently covers both fields too. Do not open a duplicate fix lease.
+
+Existing navigation coverage includes Search → actual SessionDetail, encoded source anchors, a late UUID target beyond the first 200 rows, bounded transcript windows, malformed/unknown anchors, session/key replacement and delayed-source refusal (`SearchPage.test.tsx`). URL tests cover same-key auth reset, Back/Forward, retry, malformed percent decoding and key changes. Ask tests cover composed App handoff, explicit authenticated POST, key/session/URL/draft freshness and late 401 isolation. Independent boundary cases exercise actual PolicyAskPage, including A→B→A and same-key reset. Semantic integration covers distinct lexical/semantic source anchors and explicit semantic requests.
+
+Freshness remains a delivery-evidence gap: `qa/manifests/u32-search-parent.md` and its packet still call the surrogate fix unresolved and require final pins/checks. Older global-bar/docs PASS verdicts describe older candidates; `qa/verdicts/goal-u32.md` is absent. Full current-candidate acceptance, filter behavior and required real two-persona browser/API/provider evidence cannot be inferred from this survey. Reconcile existing candidate receipts and actual route consumer before issuing a readiness claim.

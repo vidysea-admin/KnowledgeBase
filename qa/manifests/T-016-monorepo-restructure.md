@@ -160,3 +160,5 @@ workers/transcribe: package.json src/ | @lkb/transcribe   (Python worker — no 
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-016-monorepo-restructure.md (Cycle checked: 1, commit 66f1372) — 9/9 criteria; ISS-006, ISS-008 fixed.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

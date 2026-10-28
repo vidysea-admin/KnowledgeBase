@@ -1,0 +1,232 @@
+/** T-042: server-only private artifact registry bridge. JSON/wall time cannot mint calibration.
+ * Production requires native committed readback AND an actual decoder/sampler measurement authority.
+ * Missing authority is unavailable. The explicit synthetic constructor never certifies native capture.
+ */
+import { createHash } from "node:crypto";
+import { closeSync, createReadStream, fstatSync, lstatSync, openSync, readFileSync, realpathSync, type BigIntStats } from "node:fs";
+import path from "node:path";
+import type { SessionPageIndexArtifact, TileObservation } from "@lkb/core";
+import { TILE_DEFAULTS } from "../../../../core/src/domain/speaker-tile-alignment.js";
+import { readRecordConsent } from "../record-consent/receipt-store.js";
+import { validateRecordConsent, type RecordConsentReceipt } from "../record-consent/context.js";
+import { recordGuardedPrivacyMaskIntervals } from "../record-consent/coverage.js";
+import { verifyPrivateArtifact } from "../record-consent/private-acl.js";
+import { ingestSamplerClock } from "./sampler-clock.js";
+
+export interface TileCommittedCapture {
+  evidenceKind: "native" | "synthetic"; tenantId: string; sessionId: string;
+  indexBinding: SessionPageIndexArtifact; captureGeneration: string; hostId: string; samplerInstance: string;
+  platform: "meet"; durationSec: number;
+  audioPath: string; publicVideoPath: string; sourcePath: string; sidecarPath: string; clockPath: string;
+  audioSha256: string; publicVideoSha256: string; sourceSha256: string; sidecarSha256: string; receiptSha256: string; clockSha256: string;
+}
+/** Returned by the trusted actual measurement subsystem, not a body/sidecar/consent parser.
+ * Intervals bound decoded zero and the sampler's epoch/monotonic origin independently.
+ * trimStartSec describes a contiguous retained original timeline; arbitrary edits are unsupported.
+ */
+export interface TileDecodedClockMeasurement {
+  evidenceKind: "native" | "synthetic"; method: "decoded-first-sample";
+  captureGeneration: string; hostId: string; samplerInstance: string;
+  audioSha256: string; publicVideoSha256: string; sourceSha256: string; sidecarSha256: string; receiptSha256: string;
+  mediaZeroEpochSec: { earliest: number; latest: number };
+  samplerZeroEpochSec: { earliest: number; latest: number };
+  driftBoundSec: number; highlightLagBoundSec: number;
+  originalDurationSec: number; trimStartSec: number; durationSec: number;
+  monotonicMappingSha256: string; measurementSha256: string;
+}
+export interface TileMeasurementArtifacts {
+  binding: Readonly<TileCommittedCapture>; receipt: Readonly<RecordConsentReceipt>;
+  physical: Readonly<{ audio: string; publicVideo: string; source: string; sidecar: string; clock: string }>;
+}
+export interface TileRegistryOptions {
+  workspaceRoot: string; recordDir: string;
+  /** Composition must call actual native verifyIndexGeneration/effective-turn/source readback. */
+  readCommitted: (tenantId: string, sessionId: string) => Promise<TileCommittedCapture | null>;
+  /** Absent until actual instrumented producer exists. A signed unmeasured assertion is insufficient. */
+  measureDecodedClock?: (artifacts: TileMeasurementArtifacts) => Promise<TileDecodedClockMeasurement | null>;
+  clockBudget?: { uncertaintySec: number; driftSec: number };
+}
+export type TileRegistryUnavailableReason = "uncommitted" | "authority-unavailable" | "invalid-binding" | "clock-unavailable" | "clock-out-of-budget" | "privacy-unavailable" | "artifact-unavailable";
+const digest = (value: string | Buffer) => createHash("sha256").update(value).digest("hex");
+const SHA = /^[a-f0-9]{64}$/u, UUID = /^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/u;
+const safe = (s: unknown): s is string => typeof s === "string" && /^[A-Za-z0-9][A-Za-z0-9._:@-]{0,149}$/u.test(s);
+const finite = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v) && v >= 0;
+const object = (v: unknown): v is Record<string, unknown> => v !== null && typeof v === "object" && !Array.isArray(v);
+const unavailable = (reason: TileRegistryUnavailableReason) => ({ status: "unavailable" as const, reason });
+const canonicalPath = (v: string) => process.platform === "win32" ? v.toLowerCase() : v;
+const bytesIdentity = (s: BigIntStats) =>
+  [s.dev, s.ino, s.size, s.mtimeNs, s.ctimeNs].join(":");
+function stable(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
+  if (object(value)) return `{${Object.keys(value).sort().map(k => `${JSON.stringify(k)}:${stable(value[k])}`).join(",")}}`;
+  return JSON.stringify(value) ?? "null";
+}
+
+function rootPath(v: string): string {
+  if (typeof v !== "string" || !path.isAbsolute(v) || /^[/\\]{2}/u.test(v)) throw new Error("Local registry root required");
+  return path.resolve(v);
+}
+function confined(root: string, relative: string): string {
+  if (typeof relative !== "string" || !relative || path.isAbsolute(relative) || /[\x00-\x1f:]/u.test(relative)) throw new Error("Registry relative artifact required");
+  const file = path.resolve(root, relative), rel = path.relative(root, file);
+  if (!rel || path.isAbsolute(rel) || rel === ".." || rel.startsWith(`..${path.sep}`)) throw new Error("Artifact outside registry root");
+  for (let dir = path.dirname(file); ; dir = path.dirname(dir)) {
+    const stat = lstatSync(dir);
+    if (!stat.isDirectory() || stat.isSymbolicLink() || canonicalPath(realpathSync(dir)) !== canonicalPath(dir)) throw new Error("Redirected artifact ancestor");
+    if (canonicalPath(dir) === canonicalPath(root)) break;
+    if (path.dirname(dir) === dir) throw new Error("Registry root not reached");
+  }
+  return file;
+}
+async function artifact(root: string, relative: string, maxBytes: number, json: boolean, native: boolean) {
+  const file = confined(root, relative), before = lstatSync(file, { bigint: true });
+  if (!before.isFile() || before.isSymbolicLink() || before.nlink !== 1n || before.size <= 0n || before.size > BigInt(maxBytes)
+    || canonicalPath(realpathSync(file)) !== canonicalPath(file)) throw new Error("Unsafe registry artifact");
+  if (native) verifyPrivateArtifact(file);
+  const fd = openSync(file, "r");
+  try {
+    const opened = fstatSync(fd, { bigint: true });
+    if (bytesIdentity(opened) !== bytesIdentity(before)) throw new Error("Artifact replaced before open");
+    let text: string | undefined;
+    const hash = createHash("sha256");
+    if (json) { const bytes = readFileSync(fd); hash.update(bytes); text = bytes.toString("utf8"); }
+    else for await (const bytes of createReadStream(file, { fd, autoClose: false })) hash.update(bytes);
+    const after = lstatSync(file, { bigint: true });
+    if (after.isSymbolicLink() || bytesIdentity(after) !== bytesIdentity(before) || canonicalPath(realpathSync(file)) !== canonicalPath(file)) throw new Error("Artifact changed during read");
+    return { file, sha256: hash.digest("hex"), identity: bytesIdentity(after), text };
+  } finally { closeSync(fd); }
+}
+function validBinding(b: TileCommittedCapture, tenant: string, session: string, synthetic: boolean): boolean {
+  return object(b) && b.tenantId === tenant && b.sessionId === session && safe(tenant) && safe(session)
+    && (b.evidenceKind === "native" || synthetic && b.evidenceKind === "synthetic") && b.platform === "meet"
+    && safe(b.hostId) && safe(b.samplerInstance) && UUID.test(b.captureGeneration)
+    && object(b.indexBinding) && b.indexBinding.version === 1 && UUID.test(b.indexBinding.generation)
+    && b.indexBinding.sessionId === session && safe(b.indexBinding.sourceId) && SHA.test(b.indexBinding.turnDigest)
+    && finite(b.durationSec) && b.durationSec > 0
+    && [b.audioSha256, b.publicVideoSha256, b.sourceSha256, b.sidecarSha256, b.receiptSha256, b.clockSha256].every(s => typeof s === "string" && SHA.test(s));
+}
+function boundClock(m: TileDecodedClockMeasurement, b: TileCommittedCapture): boolean {
+  const range = (r: { earliest: number; latest: number }) => object(r) && finite(r.earliest) && finite(r.latest) && r.latest >= r.earliest;
+  return object(m) && m.evidenceKind === b.evidenceKind && m.method === "decoded-first-sample"
+    && m.captureGeneration === b.captureGeneration && m.hostId === b.hostId && m.samplerInstance === b.samplerInstance
+    && m.audioSha256 === b.audioSha256 && m.publicVideoSha256 === b.publicVideoSha256 && m.sourceSha256 === b.sourceSha256
+    && m.sidecarSha256 === b.sidecarSha256 && m.receiptSha256 === b.receiptSha256
+    && range(m.mediaZeroEpochSec) && range(m.samplerZeroEpochSec) && finite(m.driftBoundSec) && finite(m.highlightLagBoundSec)
+    && finite(m.trimStartSec) && finite(m.originalDurationSec) && m.durationSec === b.durationSec
+    && m.trimStartSec + m.durationSec <= m.originalDurationSec
+    && SHA.test(m.monotonicMappingSha256) && m.measurementSha256 === b.clockSha256;
+}
+function registryContext(b: TileCommittedCapture, m: TileDecodedClockMeasurement, jsonl: string) {
+  return { recordingSha256: b.audioSha256, captureSha256: digest(jsonl), captureId: `${b.captureGeneration}-${b.indexBinding.generation}`,
+    clockBasis: "shared-host-epoch" as const, recordingStartedAtEpoch: m.mediaZeroEpochSec.earliest,
+    captureStartedAtEpoch: m.samplerZeroEpochSec.latest + m.driftBoundSec, recordingDurationSec: b.durationSec };
+}
+function publicSidecar(text: string, receipt: RecordConsentReceipt, m: TileDecodedClockMeasurement, uncertaintySec: number): string | null {
+  // Sampler witness checks corroborate independently measured native facts. They do
+  // not replace the decoded-clock capability checked by resolve before this point.
+  const rows = ingestSamplerClock(text, { captureGeneration: m.captureGeneration, hostId: m.hostId,
+    samplerInstance: m.samplerInstance, samplerZeroEpochSec: m.samplerZeroEpochSec,
+    driftBoundSec: m.driftBoundSec, uncertaintySec });
+  if (!rows) return null;
+  const meta = rows[0];
+  if (!object(meta) || meta.kind !== "meta" || meta.source !== "meet-dom" || !finite(meta.startedAtEpoch)
+    || meta.startedAtEpoch < m.samplerZeroEpochSec.earliest || meta.startedAtEpoch > m.samplerZeroEpochSec.latest) return null;
+  // Upper-offset mapping makes remaining clock uncertainty an additional positive lag, never an early guess.
+  const width = m.mediaZeroEpochSec.latest - m.mediaZeroEpochSec.earliest + m.samplerZeroEpochSec.latest - m.samplerZeroEpochSec.earliest;
+  const guard = TILE_DEFAULTS.maxLagSec + TILE_DEFAULTS.maxHoldSec + width + 2 * m.driftBoundSec;
+  const originalZero = m.mediaZeroEpochSec.earliest - m.trimStartSec;
+  if (receipt.privateWindows.length && receipt.mediaStartedAt === undefined) return null;
+  const privacyOffset = (receipt.mediaStartedAt ?? originalZero * 1000) / 1000 - originalZero - m.trimStartSec;
+  const windows = recordGuardedPrivacyMaskIntervals(receipt, receipt, m.originalDurationSec, "audio")
+    .map(w => ({ start: Math.max(0, w.start + privacyOffset - guard), end: Math.min(m.durationSec, w.end + privacyOffset + guard) }))
+    .filter(w => w.end > w.start);
+  const offset = m.samplerZeroEpochSec.latest + m.driftBoundSec - m.mediaZeroEpochSec.earliest;
+  const out: TileObservation[] = []; let last = -1;
+  for (const r of rows.slice(1)) {
+    if (!object(r) || r.kind !== undefined || r.source !== "meet-dom" || !finite(r.tSec) || r.tSec < last
+      || (r.displayName !== null && typeof r.displayName !== "string") || r.confidence !== undefined && (!finite(r.confidence) || r.confidence > 1)) return null;
+    last = r.tSec;
+    const t = r.tSec + offset;
+    if (!Number.isFinite(t)) return null;
+    if (t < 0 || t >= m.durationSec) continue;
+    const privateTime = windows.some(w => t >= w.start && t <= w.end);
+    out.push({ tSec: r.tSec, displayName: privateTime ? null : r.displayName as string | null, source: "meet-dom",
+      ...(typeof r.confidence === "number" ? { confidence: r.confidence } : {}) });
+  }
+  for (const w of windows) for (const t of [w.start, w.end]) if (t - offset >= 0) out.push({ tSec: t - offset, displayName: null, source: "meet-dom" });
+  out.sort((a, b) => a.tSec - b.tSec || (a.displayName ?? "").localeCompare(b.displayName ?? ""));
+  return [JSON.stringify({ kind: "meta", startedAtEpoch: m.samplerZeroEpochSec.latest + m.driftBoundSec, source: "meet-dom" }), ...out.map(r => JSON.stringify(r))].join("\n") + "\n";
+}
+
+function construct(options: TileRegistryOptions, synthetic: boolean) {
+  options = { ...options, clockBudget: options.clockBudget ? { ...options.clockBudget } : undefined };
+  const root = rootPath(options.workspaceRoot), recordDir = rootPath(options.recordDir);
+  const recordRelative = path.relative(root, recordDir);
+  if (path.isAbsolute(recordRelative) || recordRelative === ".." || recordRelative.startsWith(`..${path.sep}`)) throw new Error("Receipt root outside registry");
+  // Constructors perform no I/O. Actual native readback/calibration callbacks are server-owned capabilities.
+  return { async resolve(tenantId: string, sessionId: string, flags: { enabled?: boolean } = {}) {
+    if (flags.enabled !== true) return { status: "disabled" as const };
+    const budget = options.clockBudget;
+    if (!options.measureDecodedClock || !budget || !finite(budget.uncertaintySec) || !finite(budget.driftSec)) return unavailable("authority-unavailable");
+    try {
+      const raw = await options.readCommitted(tenantId, sessionId);
+      if (!raw) return unavailable("uncommitted");
+      const b = structuredClone(raw);
+      if (!validBinding(b, tenantId, sessionId, synthetic)) return unavailable("invalid-binding");
+      const native = b.evidenceKind === "native";
+      const receipt = validateRecordConsent(readRecordConsent(recordDir, { tenantId, sessionId }), { tenantId, sessionId });
+      if (native) verifyPrivateArtifact(confined(root, path.relative(root, path.join(recordDir, "record-consent", tenantId, `${sessionId}.json`))));
+      if (receipt.generation !== b.captureGeneration || digest(JSON.stringify(receipt)) !== b.receiptSha256) return unavailable("invalid-binding");
+      const audio = await artifact(root, b.audioPath, 1024 ** 3, false, native);
+      const video = await artifact(root, b.publicVideoPath, 4 * 1024 ** 3, false, native);
+      const source = await artifact(root, b.sourcePath, 256 * 1024, true, native);
+      const sidecar = await artifact(root, b.sidecarPath, 16 * 1024 ** 2, true, native);
+      const clock = await artifact(root, b.clockPath, 128 * 1024, true, native);
+      if (audio.sha256 !== b.audioSha256 || video.sha256 !== b.publicVideoSha256 || source.sha256 !== b.sourceSha256 || sidecar.sha256 !== b.sidecarSha256 || clock.sha256 !== b.clockSha256) return unavailable("invalid-binding");
+      const src: unknown = JSON.parse(source.text!);
+      if (!object(src) || src._id !== b.indexBinding.sourceId || src.tenantId !== tenantId || src.kind !== "recording" || src.hash !== b.audioSha256
+        || !object(src.captureConsent) || src.captureConsent.sessionId !== sessionId || src.captureConsent.generation !== b.captureGeneration
+        || src.captureConsent.receiptSha256 !== b.receiptSha256 || src.captureConsent.publicVideoSha256 !== b.publicVideoSha256
+        || src.captureConsent.sanitizedAudioSha256 !== b.audioSha256 || src.captureConsent.meetingHash !== receipt.meetingHash
+        || src.platform !== b.platform || !object(src.guardedPrivateWindows)) return unavailable("invalid-binding");
+      const clockInput = () => ({ binding: Object.freeze(structuredClone(b)), receipt: Object.freeze(structuredClone(receipt)),
+        physical: Object.freeze({ audio: audio.file, publicVideo: video.file, source: source.file, sidecar: sidecar.file, clock: clock.file }) });
+      const measured = await options.measureDecodedClock(clockInput());
+      if (!measured) return unavailable("clock-unavailable");
+      const m = structuredClone(measured);
+      if (!boundClock(m, b)) return unavailable("clock-unavailable");
+      if (stable(src.guardedPrivateWindows.audio) !== stable(recordGuardedPrivacyMaskIntervals(receipt, receipt, m.originalDurationSec, "audio"))
+        || stable(src.guardedPrivateWindows.video) !== stable(recordGuardedPrivacyMaskIntervals(receipt, receipt, m.originalDurationSec, "video"))) return unavailable("privacy-unavailable");
+      const width = m.mediaZeroEpochSec.latest - m.mediaZeroEpochSec.earliest + m.samplerZeroEpochSec.latest - m.samplerZeroEpochSec.earliest;
+      if (width > budget.uncertaintySec || m.driftBoundSec > budget.driftSec || width + 2 * m.driftBoundSec + m.highlightLagBoundSec > TILE_DEFAULTS.maxLagSec) return unavailable("clock-out-of-budget");
+      const jsonl = publicSidecar(sidecar.text!, receipt, m, budget.uncertaintySec);
+      if (jsonl === null) return unavailable("privacy-unavailable");
+      const fingerprint = digest(stable(b));
+      const assertCurrent = async () => {
+        const current = await options.readCommitted(tenantId, sessionId);
+        if (!current || digest(stable(current)) !== fingerprint) throw new Error("Registry authority revoked");
+        const nowReceipt = readRecordConsent(recordDir, { tenantId, sessionId });
+        if (digest(JSON.stringify(nowReceipt)) !== b.receiptSha256) throw new Error("Privacy authority changed");
+        for (const [old, relative, max, json] of [[audio,b.audioPath,1024 ** 3,false],[video,b.publicVideoPath,4 * 1024 ** 3,false],
+          [source,b.sourcePath,256 * 1024,true],[sidecar,b.sidecarPath,16 * 1024 ** 2,true],[clock,b.clockPath,128 * 1024,true]] as const) {
+          const live = await artifact(root, relative, max, json, native);
+          if (live.identity !== old.identity || live.sha256 !== old.sha256) throw new Error("Registry artifact changed");
+        }
+        const liveMeasurement = await options.measureDecodedClock!(clockInput());
+        if (!liveMeasurement || stable(liveMeasurement) !== stable(m)) throw new Error("Clock authority revoked");
+      };
+      await assertCurrent();
+      const context = Object.freeze(registryContext(b, m, jsonl));
+      return { status: "ready" as const, evidenceKind: b.evidenceKind, context,
+        binding: Object.freeze({ ...b.indexBinding, captureGeneration: b.captureGeneration, measurementSha256: m.measurementSha256 }), assertCurrent,
+        readCapture: async (tenant: string, session: string, expectedContext: unknown) => {
+          if (tenant !== tenantId || session !== sessionId || stable(expectedContext) !== stable(context)) throw new Error("Registry owner/context mismatch");
+          await assertCurrent();
+          return { tenantId, sessionId, recordingSha256: b.audioSha256, captureId: context.captureId, jsonl };
+        } };
+    } catch { return unavailable("artifact-unavailable"); }
+  } };
+}
+export function createTileCaptureRegistry(options: TileRegistryOptions) { return construct(options, false); }
+/** Explicit synthetic filesystem/protocol seam; real composition must never use it or treat it as native proof. */
+export function createTileCaptureRegistryForTest(options: TileRegistryOptions) { return construct(options, true); }

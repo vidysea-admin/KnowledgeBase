@@ -1,0 +1,8 @@
+{
+  "note": "Completion timestamp captured after verdict write; total includes human pause and CPU/freeze wait; independent test count zero",
+  "launchAt": "2026-10-14T20:37:37Z",
+  "verdictSHA256": "2a0198a82690f516ad074d294b1db7d1767363016d2b538836b8f9a4e66ffb9b",
+  "elapsedSeconds": 1746.2210716,
+  "completedAt": "2026-10-14T21:06:43.2210716Z",
+  "verdict": "HOLD"
+}

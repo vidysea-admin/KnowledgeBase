@@ -140,3 +140,5 @@ the other lane's authored row** — and a one-line ledger note would have been t
 
 Still **MISSING**, not PARTIAL — no write has occurred yet. When rows exist it becomes PARTIAL, not
 REAL: rows prove intent to watch, not that anything was ever watched. Same error caught on B3/B10.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

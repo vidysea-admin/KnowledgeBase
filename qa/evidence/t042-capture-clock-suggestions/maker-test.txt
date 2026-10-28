@@ -1,0 +1,33 @@
+CPU authorization: /root/docker_checker explicit ROOT CPU LEASE GRANTED after T040 release.
+cwd: C:\Users\product\Desktop\KnowledgeBase\apps\api
+command: node --test --test-concurrency=1 --test-timeout=30000 --import tsx src/indexing/tile-speaker-suggest.test.ts
+permissions: require_escalated for the known tsx/esbuild subprocess sandbox restriction.
+exit: 0
+tool elapsed seconds: 2.8651266
+test elapsed milliseconds: 2203.0303
+No provider, network, real database or browser. Scripted synthetic capture and in-memory Db exercise the real scoped accessors.
+
+T-042 adapter sample: 4/4 suggestions; review consumed 4; auto-final 0; explicit confirmation final 1 (synthetic)
+PASS default/off performs no capture or database access; env opt-in is exact (3.51ms)
+PASS four synthetic panelists: measured offset -> suggestions -> review -> explicit human confirmation (34.5323ms)
+PASS tile/introduction agreement stays suggested; transcript text and timing unchanged (13.6994ms)
+PASS confirmed and rejected decisions survive rerun; no new names for confirmed labels/people (11.8699ms)
+PASS foreign tenant/session/media/capture instance refuses sidecar before any writes (4.9391ms)
+PASS populated foreign tenant with colliding session/label/person stays byte-identical (16.6317ms)
+PASS second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows (12.4198ms)
+PASS unknown clock, bad origins and foreign turns refuse before loader/database access (1.925ms)
+PASS exact digest, sole first metadata, source, monotonic time and confidence validation (4.4257ms)
+PASS pre-recording samples clipped, confidence preserved, samples beyond recording discarded (0.7336ms)
+PASS low-confidence, no overlap, conflicting tiles and tile-intro disagreement do not guess names (13.7488ms)
+PASS loader cannot change trusted origins; thrown failures return fixed safe reasons (3.9339ms)
+tests 12
+suites 0
+pass 12
+fail 0
+cancelled 0
+skipped 0
+todo 0
+duration_ms 2203.0303
+
+This proves only the source/fixture adapter slice. No real four-panelist webinar, platform capture/calibration,
+trusted registry producer, actual production hook, live database restart or full T-042 completion is established.

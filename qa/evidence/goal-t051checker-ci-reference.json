@@ -1,0 +1,10 @@
+{
+  "command": "node qa/evidence/goal-t051checker-ci-reference.mjs",
+  "exitCode": 0,
+  "changes": 16,
+  "distinctActualLedgerIds": 12,
+  "beforeSHA": "314b668279d5227e68ffe4d519dc9da30db1a69023acc7f17bbe9ecba38e7c1e",
+  "afterSHA": "8b98f7828d8e04c1b8b92f8752b15728c752a3a84e947dab30bf2e44b95d5c19",
+  "onlyNamespaceQualifications": true,
+  "enforcementChanged": false
+}

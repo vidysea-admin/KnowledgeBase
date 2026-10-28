@@ -1,0 +1,21 @@
+✔ positive control (current producer): valid cited old-year knowledge stays readable (34.8453ms)
+✔ security (current producer): rejected old page leaks through no reader path (9.8541ms)
+✔ positive control (original producer): valid cited old-year knowledge stays readable (3.834ms)
+✔ security (original producer): rejected old page leaks through no reader path (1.8875ms)
+✔ valid cache keeps untouched year references exactly (1.8216ms)
+✔ untouched year with tainted tenant summary is not reused (0.7013ms)
+✔ untouched year with tainted year summary is not reused (0.7738ms)
+✔ untouched year with tainted month summary is not reused (0.6531ms)
+✔ untouched year with tainted session summary differing from page is not reused (0.8561ms)
+✔ untouched year with tainted topic summary is not reused (1.2181ms)
+✔ untouched year with tainted topic title without current source is not reused (0.7546ms)
+✔ untouched year with tainted org title is not reused (0.4596ms)
+✔ cached session whose page was rejected is not served from the untouched year (0.5945ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1256.3388

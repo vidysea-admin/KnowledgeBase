@@ -1,0 +1,39 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "T052 Python pre-submit receipt producer selected fake-driver cases only",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+  "args": [
+    "-B",
+    "-m",
+    "pytest",
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py",
+    "-k",
+    "retry_receipt",
+    "--basetemp",
+    "C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/registration-pytest-owned-temp",
+    "-q"
+  ],
+  "testIDs": [
+    "retry_receipt"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-registration-retry-python",
+  "pins": {
+    "packages/meeting-bot/py/test_sb_join_registration_redirect.py": "fb3f8206d736e857c765c42fd984538ad9761b2e052e7945aa684d60cbe1ff93",
+    "packages/meeting-bot/py/sb_join.py": "bae07ab1186319b62938d6d791b8ceaafba86394d55bc1d32fb8e65ceb556cba",
+    "packages/meeting-bot/py/sb_join_register.py": "1effe057e670e4a3e2ef5ea12998ec0c0dffa45cdf5ec640fb4963a3701176b1"
+  }
+}

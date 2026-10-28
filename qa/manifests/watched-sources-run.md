@@ -279,3 +279,5 @@ scheduler.
 
 **Next unit recommended by the checker:** a Mode C live validation of A13, not another round on
 this seam.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

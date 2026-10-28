@@ -1,0 +1,25 @@
+{
+  "status": "PREPARATION_ONLY_BROKER_WAIT",
+  "unit": "product-operations-evaluation",
+  "cycle": 0,
+  "candidate_sha": "2e566870a470392da307395afd070bfe31d3668e983953995444cf466e25de13",
+  "verdict": null,
+  "actual_active_s": 37.089,
+  "tokens": null,
+  "cost": null,
+  "budget_debit": {
+    "active_s": 40,
+    "tokens": 1000
+  },
+  "probe": "operations-probe-spec.json",
+  "gate": "../staged-admission/product-operations-evaluation-prep-result.json",
+  "sourceReview": "Model and panel logic plus two tests and narrow keyed OperationsSnapshot mount inspected. Selected independent same-gap changed-question guard probe. Stable request bodies, no invented score, key/generation fencing present.",
+  "missing": [
+    "Ready manifest and packet",
+    "Broker independent probe receipt",
+    "Authenticated exact candidate/environment composite reuse",
+    "Required typecheck and invariant receipts",
+    "Final exact hashes and parser readback"
+  ],
+  "existingEvidence": "Operations43 passing attributable cases only; fourteen-file process original exit1 remains. No global green."
+}

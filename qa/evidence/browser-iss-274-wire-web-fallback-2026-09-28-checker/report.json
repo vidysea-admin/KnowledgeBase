@@ -1,0 +1,72 @@
+{
+  "unit": "iss-274-wire-web-fallback",
+  "mode": "D (re-dispatch, isolated own-browser instance -- shared mcp-chrome-dde8b72 profile was locked by another live session, per prior verdict)",
+  "date": "2026-09-28",
+  "harness": {
+    "why": "apps/api/src/index.ts requires a live Mongo connect() before listening, and this worktree has no .env / no reachable Mongo. This harness wires the REAL createServer()/createAskRouter()/askV2/createTavilySearchFn() (all unmodified, imported directly) with fake retrieval/scoring/LLM-completion stand-ins for the parts requiring live Mongo/LLM keys this unit did not touch. See harness-server.mts's own header comment for full detail.",
+    "api": "http://127.0.0.1:3399 (checker-owned qa/evidence/.../harness-server.mts, real ask-v2.ts + ask-web-fallback.ts code, fake retrieval/LLM only)",
+    "web": "http://127.0.0.1:5180 (real vite dev server, real unmodified AskPage.tsx, VITE_API_BASE_URL=http://127.0.0.1:3399)"
+  },
+  "pagesVisited": [
+    {
+      "url": "/",
+      "consoleErrors": 0,
+      "consoleErrorText": [],
+      "note": "LoginGate heading: Living Knowledge Base"
+    },
+    {
+      "url": "/ask",
+      "consoleErrors": 0,
+      "consoleErrorText": [],
+      "renderedHeading": "Ask",
+      "resolvedComponent": "AskPage"
+    },
+    {
+      "url": "/ask (after submit)",
+      "consoleErrors": 0,
+      "consoleErrorText": []
+    }
+  ],
+  "interactions": [
+    {
+      "did": "navigate directly to /ask (App.tsx declares this path twice: line 27 -> AskPage, line 35 -> DashboardPage)",
+      "expected": "React Router resolves the duplicate to the FIRST matching <Route> (AskPage), per React Router v6's route-ranking + declaration-order tie-break",
+      "observed": "rendered <h1>Ask</h1>; #ask-query input present: true; resolved component: AskPage",
+      "pass": true
+    },
+    {
+      "did": "submit off-corpus question \"What is the current weather forecast for Reykjavik tomorrow?\" with no TAVILY_API_KEY configured",
+      "expected": "response.insufficient_coverage=true, response.web_used=false, response.auditLog contains a \"web_fallback_unavailable\" entry, and the rendered page shows the ACCURATE \"the web fallback was reached but is currently unavailable\" text -- NOT the stale \"no web fallback is configured\" text (that would be a lie once the seam is wired)",
+      "observed": {
+        "apiResponse": {
+          "verdict": "incorrect",
+          "insufficient_coverage": true,
+          "web_used": false,
+          "auditLog": [
+            {
+              "jobKind": "ask.select_nodes",
+              "step": "select_nodes",
+              "provider": "checker-fake",
+              "model": "checker-fake",
+              "costUsd": 0
+            },
+            {
+              "jobKind": "ask.web_fallback_unavailable",
+              "step": "web_fallback_unavailable: web fallback unavailable: TAVILY_API_KEY not configured"
+            },
+            {
+              "jobKind": "ask.answer",
+              "step": "answer",
+              "provider": "checker-fake",
+              "model": "checker-fake",
+              "costUsd": 0
+            }
+          ]
+        },
+        "renderedAnswerCardText": "QUESTIONAsk",
+        "renderedEmptyNoteText": "The router judged internal coverage insufficient for this question; the web fallback was reached but is currently unavailable."
+      },
+      "pass": true
+    }
+  ]
+}

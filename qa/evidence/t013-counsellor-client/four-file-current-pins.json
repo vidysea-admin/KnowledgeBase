@@ -1,0 +1,42 @@
+{
+  "repo": "C:/Users/product/Desktop/KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+  "slug": "goal-t013",
+  "fixCycle": 0,
+  "manifestState": "building",
+  "command": "pnpm exec vitest run src/pages/counsellor/CounsellorPage.test.tsx src/pages/counsellor/voice.test.ts src/pages/counsellor/provenance.test.ts src/pages/counsellor/Avatar.test.tsx --maxWorkers=1 --minWorkers=1",
+  "outerTimeoutSeconds": 120,
+  "workerCount": 1,
+  "executionStatus": "not-run-awaiting-central-broker",
+  "handles": [],
+  "notes": [
+    "Pins use repository-relative paths below. No local CPU grant is implied.",
+    "Actual Avatar component is imported by Avatar.test.tsx for missing/throwing context and null GPU allocation/cleanup probes.",
+    "CounsellorPage.test.tsx isolates Avatar to test client lifecycle; that mock does not prove Avatar rendering.",
+    "Voice tests use fixture host; page tests use Ask and voice doubles. No real provider/browser/microphone/device/database action occurs.",
+    "Real microphone, speech output, GPU render, established provider/API answer and citation navigation remain full-parent live gates."
+  ],
+  "pins": {
+    "apps/web/src/pages/counsellor/Avatar.test.tsx": "B86152EE65185EFB3C369FDE08FAFE4E3328132B7356D62759F45DFD771D418B",
+    "apps/web/src/pages/counsellor/Avatar.tsx": "1502F4F5EA97202A76D5581B43F9399F445EC535E945563DDDEB4362B9FD5BC3",
+    "apps/web/src/pages/counsellor/CounsellorPage.test.tsx": "5A7651C42274062970B08629DD632B660ABEBA5D97CDB74DABB55AC2F58396FF",
+    "apps/web/src/pages/counsellor/CounsellorPage.tsx": "8522876933DC1098C8C030F0DE94C9D5C7694D2010C92E108FC8E2CBECDEE3F0",
+    "apps/web/src/pages/counsellor/provenance.test.ts": "22520357EB2CB49608E7A55959C43185F7DEEFB0C8E736956A19EC2081A35B34",
+    "apps/web/src/pages/counsellor/provenance.ts": "4C007F88788816B2634364BBB32F68F801891AE29E89C26266F1B1259B45C529",
+    "apps/web/src/pages/counsellor/voice.test.ts": "A63FA643FEA20766E245366011483ADC99E0D14C78DDAFE38751EF7F682C4484",
+    "apps/web/src/pages/counsellor/voice.ts": "29A3F92B465F51D48F855A547B3C04451FD6981AB4545CE8800C2CD767955844",
+    "apps/web/src/App.tsx": "EEF7AF89EB3C3C261678AED701F309D9399E0F77921B73E3B9CE97B1055571EA",
+    "apps/web/src/layout/NavSidebar.tsx": "39319E1CE324EC1110EE101528C08A56F88EB8D46032074CB54D69FBD4CA23F6",
+    "apps/web/src/pages/sessions/SessionDetailPage.tsx": "16BD213AD66F6C76B2555CCE655FA7E2A880F0BE5B170E2022AEB41DB2620487",
+    "apps/web/src/api/ask.ts": "B13C5D164CA261AB0C141580C1A64C9BAD2BA79B30BD316CB1D9A0F6E971416D",
+    "apps/web/src/api/client.ts": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802",
+    "apps/web/src/api/types.ts": "0C988730BD44A86A6674D8B92C8DB642988DB8A1BC54FC0DB0E46DACA7242547",
+    "apps/web/src/auth/AuthContext.tsx": "196181DC165208A35CB23C9D7F9B7AE5E293A7EB40135A7CD90686DDB4EC3E1C",
+    "apps/web/src/safe-url.ts": "607FCAF56D942752BD01A1C969457D97BDA5F7B5560DD83C8AB4161F3F2875C9",
+    "apps/web/vitest.config.ts": "7F76B80C8E788CBD3EA649DB2596B69852CA0719B7F6D483CADD6DFEC88300F8",
+    "apps/web/src/setupTests.ts": "2FDDD90FF11BED9CDA8302206EB123480FA8873E8FFD3B30BBD8E070973ADC08",
+    "docs/counsellor-client.md": "9ABAA1CB1563D2326D5037BAEBDABC37F3C5C19BD5F57AF75F662DAB9C3686EC",
+    "qa/contracts/goal-t013.md": "0C89198CC6DE12462C8D352D94911CF0661747AE78C80F1A6F560581CC8F540C",
+    "qa/manifests/goal-t013.md": "5F8E37357653EBB359E215B2272E47EE85F9489D2FCF567D63B8068DF97AD645"
+  }
+}

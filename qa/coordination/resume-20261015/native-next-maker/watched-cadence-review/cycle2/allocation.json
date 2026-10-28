@@ -1,0 +1,22 @@
+{
+  "cycle": 2,
+  "source_unchanged": true,
+  "prior_allocated": {
+    "tokens": 24000,
+    "active_s": 180
+  },
+  "additional_once": {
+    "active_s": 90,
+    "tokens": 12000,
+    "completion_tokens": 4000,
+    "completion_active_s": 30
+  },
+  "cumulative": {
+    "tokens": 36000,
+    "active_s": 270
+  },
+  "actual_usage": null,
+  "ratio": "UNVERIFIED",
+  "unused_late60": "Preserveddeniedunused;notconsumed",
+  "reviewer_dispatched": false
+}

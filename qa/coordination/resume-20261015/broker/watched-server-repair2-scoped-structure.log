@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "path": "scripts/native-capture/server.ts",
+      "nonblank": 208,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/server-watched.test.ts",
+      "nonblank": 168,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "scripts/webinar/scheduler/service.d.mts",
+      "nonblank": 21,
+      "limit": 300,
+      "ok": true
+    }
+  ],
+  "directory": {
+    "violations": [],
+    "scanned": 3
+  }
+}

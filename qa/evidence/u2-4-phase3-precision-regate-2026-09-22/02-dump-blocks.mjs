@@ -8,7 +8,7 @@ const POSITIONAL = /^spk:\d+$/;
 const OUT = "qa/evidence/u2-4-phase3-precision-regate-2026-09-22/corpus-dump";
 mkdirSync(OUT, { recursive: true });
 
-const dirs = readdirSync("data/toc-migrated", { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name).sort();
+const dirs = [...(await import("./corpus-lock.mjs")).verifyCorpus().sessions].sort() /* ISS-290: pinned, hash-verified list */;
 
 for (const s of dirs) {
   const turns = JSON.parse(readFileSync(join("data/toc-migrated", s, "turns.json"), "utf8"));

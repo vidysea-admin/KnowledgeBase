@@ -1,0 +1,22 @@
+{
+  "cumulative_tokens": {
+    "input_tokens": 472844,
+    "cached_input_tokens": 420736,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2914,
+    "reasoning_output_tokens": 35,
+    "total_tokens": 475758
+  },
+  "unit": "review-runtime-usage",
+  "usage_timestamp": "2026-10-15T11:15:06.029Z",
+  "cost": null,
+  "source_line": 68,
+  "root_authority": "Compose maker4 SOURCE+TEST receipt with independent TOOL+PROBE receipt and current source/test/probe identity; no test/probe reruns, no source reread; reviewer alone decides",
+  "observed_at": "2026-10-15T11:17:08.1624638+00:00",
+  "actual_active_seconds": null,
+  "phase": "receipt-composition-reconciliation",
+  "boundary": "baseline",
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl",
+  "cycle": 0,
+  "counter_scope": "Idle samechecker lifetime and prospective phase delta; all previous overruns retained"
+}

@@ -1,0 +1,56 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ❯ src/pages/search/SearchPage.test.tsx (17 tests | 2 failed) 3117ms
+   × SearchPage actual client/fake HTTP workflow > proposed real App/Nav seam mounts Search without querying and opens the actual transcript consumer 629ms
+     → expected "spy" to be called 2 times, but got 4 times
+   ✓ SearchPage actual client/fake HTTP workflow > unanchored transcript keeps its first 200 rows and unknown/malformed anchors remain safe 302ms
+   × SearchPage actual client/fake HTTP workflow > session navigation hides the old loaded transcript during the next source read 1021ms
+     → Unable to find an element with the text: New session source. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<button>[39m
+      [0mReplace key[0m
+    [36m</button>[39m
+    [36m<button>[39m
+      [0mNext session[0m
+    [36m</button>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card error-note"[39m
+    [36m>[39m
+      [0mfailed to load session[0m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+
+Ignored nodes: comments, script, style
+[36m<body>[39m
+  [36m<div>[39m
+    [36m<button>[39m
+      [0mReplace key[0m
+    [36m</button>[39m
+    [36m<button>[39m
+      [0mNext session[0m
+    [36m</button>[39m
+    [36m<div[39m
+      [33mclass[39m=[32m"card error-note"[39m
+    [36m>[39m
+      [0mfailed to load session[0m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+ ✓ src/pages/AskPage.test.tsx (11 tests) 2080ms
+   ✓ AskPage > native document-page citation rechecks current source instead of showing a cached quote or recording link 319ms
+ ✓ src/api/search/client.test.ts (8 tests) 29ms
+ ✓ src/components/NativeEvidence.test.tsx (11 tests) 340ms
+ ✓ src/api/nativeEvidence.test.ts (8 tests) 21ms
+ ✓ src/pages/answer-policy/AnswerSources.test.tsx (5 tests) 638ms
+   ✓ actual policy answer sources resolves 'document-page' only on explicit opening, never via session/audio 398ms
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  2 failed | 58 passed (60)
+   Start at  11:28:37
+   Duration  24.80s (transform 2.05s, setup 1.48s, collect 8.98s, tests 6.22s, environment 5.82s, prepare 855ms)
+

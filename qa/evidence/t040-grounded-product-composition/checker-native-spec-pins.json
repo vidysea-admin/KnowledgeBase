@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-14T22:43:55.3685051+00:00",
+  "producerPinCount": 49,
+  "totalPinCount": 50,
+  "knownDrifts": [
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "expected": "F2512AA5E2022F87EA4F9B9F6D71DDBABBB0ACC75D18598F3184BD11A6E3BE6F",
+      "actual": "9d56eb0a585c78faaa945e47ca5a4d6fbaea16fbe95f3e975d5b3f8bbfe09ade"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "expected": "1CF35BEA72EB9C90138969966A58526A06D34892B316DED5066576D91A4B7168",
+      "actual": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500"
+    }
+  ],
+  "probeSHA256": "013468edae74b1b8f57e3d296295c8709baa873b7be82f5abf3bb5a5cf33ff79",
+  "specSHA256": "FA3321C5C082456AE7779D4B1A23026A65C1442C5AD6CCA12CE5A94EA01F27CA"
+}

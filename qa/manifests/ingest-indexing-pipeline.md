@@ -88,3 +88,5 @@ branching worth testing) IS covered, both by 13 real unit tests and by two real 
 5. If `GEMINI_API_KEY` is available, independently re-run a live smoke test — strongest check.
 6. If main Mongo has recovered, a full `POST /ingest`/`POST /whatsapp/ingest` round-trip is a
    bonus, not required.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

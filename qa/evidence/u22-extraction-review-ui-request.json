@@ -1,0 +1,40 @@
+{
+  "unit": "u22-extraction-review-ui",
+  "cycle": 0,
+  "candidate_id": "sha256:62edcb30f4d62caa5b2d83caee2c63e5432f922006b4364a77bb19fb82477dcd",
+  "inventory": "qa/evidence/u22-extraction-review-ui-candidate.inventory.txt",
+  "status": "frozen-building-awaiting-broker-and-integrated-consumers",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "workdir": "apps/web",
+  "command": "node node_modules/vitest/vitest.mjs run src/pages/extraction-review/client.test.ts src/pages/extraction-review/ExtractionReviewPage.test.tsx --maxWorkers=1 --no-file-parallelism",
+  "outerTimeoutMs": 120000,
+  "expectedTests": 9,
+  "fixtureProvenance": "synthetic-only; zero authentic source packet or review reads",
+  "makerUsage": "unknown",
+  "pendingConsumers": [
+    "central App/LoginGate mount",
+    "server authority/export matching independent evidence and central shared freeze"
+  ],
+  "pins": {
+    "apps/web/src/pages/extraction-review/ExtractionReviewPage.tsx": "f2acc079555fb5403163f24269f31d7b9ef67c7f0cb61bcb9396b7795c3945f6",
+    "apps/web/src/pages/extraction-review/ExtractionReviewPage.test.tsx": "b45203cc6a098c990908d605c27732f70fd55ef19531e286cf9abff76702d18a",
+    "apps/web/src/pages/extraction-review/client.ts": "fa6f5da445c49183ba6a0e0aa5301d3393ca2fc9653cb3e70a17c768baf9360a",
+    "apps/web/src/pages/extraction-review/client.test.ts": "00a31ac75af10048e8819f3a23fb1fdf6c5e8cfb86319e669dea7541286bcaef",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/src/auth/AuthContext.tsx": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/src/setupTests.ts": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/tsconfig.json": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0",
+    "tsconfig.base.json": "6bc2d632c06e482b900c73f73dd6c703b3791bd5b02b05aaf7701cd9ba417c47",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/api/src/review-authority/policy.ts": "5f20356f010c9fc70600ab9c8b9a49a3398b6d49e93fc50d578c17f0e13bf790",
+    "apps/api/src/extraction-review/router.ts": "85ce418444fdad75d9cc8fac3d76d51fab80f38b4f3a00d92c453533c5572036",
+    "apps/api/src/extraction-review/file-store.ts": "6171585703a990e59cebb96c544df64113b8d171894ec176957d1ac99061eaa7",
+    "apps/api/src/extraction-review/seed.ts": "dfd3ebd4ea3559743e71a4f7c0611308dd328bbab7881aac74f53dd3ea9267f9",
+    "apps/api/src/extraction-review/types.ts": "308ac00aadfde225ae2d8fe98a5ac1c5d92eee644a3884b7b0439cab9618b4db",
+    "scripts/eval/extraction-authorized-import.mjs": "5b115f3a9f605cc1ff9544e6d933184a84f5bc2b900625be2bf945418a4183e4",
+    "packages/index/src/eval/extraction.ts": "f61db7de33998eb2e9bf5d27904b22f625672df002f35101a86a80675be11430"
+  }
+}

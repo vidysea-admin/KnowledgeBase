@@ -1,0 +1,96 @@
+{
+  "cycle": 1,
+  "checkedAt": "2026-10-14T21:15:55.0981165Z",
+  "pins": [
+    {
+      "path": "scripts/training/plan.mjs",
+      "expected": "14df232bde2f320c4937dbe733a6fdc235c3e2dc8c6e0b852ccb33f61b68669f",
+      "actual": "14df232bde2f320c4937dbe733a6fdc235c3e2dc8c6e0b852ccb33f61b68669f"
+    },
+    {
+      "path": "scripts/training/prepare.mjs",
+      "expected": "512163b25449684030e4e0a45d8d53e1a9119fb1d2e36683173df85a928ad18b",
+      "actual": "512163b25449684030e4e0a45d8d53e1a9119fb1d2e36683173df85a928ad18b"
+    },
+    {
+      "path": "scripts/training/validate.mjs",
+      "expected": "eb5cd898eba524c3b1d7093dbd914b92eedf6c98ddb8f2e9f33ba66f33691869",
+      "actual": "eb5cd898eba524c3b1d7093dbd914b92eedf6c98ddb8f2e9f33ba66f33691869"
+    },
+    {
+      "path": "scripts/training/export.mjs",
+      "expected": "1b64ef97817e59702257ea53ba8530ddf7b7d8a1600c6dac711cf51d47fc20d9",
+      "actual": "1b64ef97817e59702257ea53ba8530ddf7b7d8a1600c6dac711cf51d47fc20d9"
+    },
+    {
+      "path": "scripts/training/train.mjs",
+      "expected": "2bda09076bdd17a60d4c6710eff684b4466e56a1e741c57d5ec9a51254807f64",
+      "actual": "2bda09076bdd17a60d4c6710eff684b4466e56a1e741c57d5ec9a51254807f64"
+    },
+    {
+      "path": "scripts/training/private-path.mjs",
+      "expected": "bd7692baf6175dcf5541b0184c8380631fe298d3f2bb0d8bef7335274b10ec4c",
+      "actual": "bd7692baf6175dcf5541b0184c8380631fe298d3f2bb0d8bef7335274b10ec4c"
+    },
+    {
+      "path": "scripts/training/file-hash.mjs",
+      "expected": "aa7a76c7395ee9ac9d588f5dd5de86c55f3c4564628fcae63f3458bd8ffef271",
+      "actual": "aa7a76c7395ee9ac9d588f5dd5de86c55f3c4564628fcae63f3458bd8ffef271"
+    },
+    {
+      "path": "scripts/training/prepare.test.mjs",
+      "expected": "d9e78b897ca675f4596f27ad86ae1dc2c63b0c9d0e24a8547a41e3aa4e2e12f1",
+      "actual": "d9e78b897ca675f4596f27ad86ae1dc2c63b0c9d0e24a8547a41e3aa4e2e12f1"
+    },
+    {
+      "path": "docs/own-model-training.md",
+      "expected": "45ab58bac88d6823928db68fbf2f95b9ed037e51db5cc1a78ddec540206e8403",
+      "actual": "45ab58bac88d6823928db68fbf2f95b9ed037e51db5cc1a78ddec540206e8403"
+    },
+    {
+      "path": "qa/evidence/goal-t015-real-config.json",
+      "expected": "feeacf2108125c304c53267066477d5e03209f2289f36cb8247af4ecd82f7f84",
+      "actual": "feeacf2108125c304c53267066477d5e03209f2289f36cb8247af4ecd82f7f84"
+    },
+    {
+      "path": "qa/evidence/goal-t015-cycle1-ledger-replay.mjs",
+      "expected": "9a0405d0ff0ce0e39f6b6311ee19851f784a16fed34b0bcbb85e303e6256933b",
+      "actual": "9a0405d0ff0ce0e39f6b6311ee19851f784a16fed34b0bcbb85e303e6256933b"
+    },
+    {
+      "path": "scripts/lib/transcript-provenance.mjs",
+      "expected": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301",
+      "actual": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301"
+    },
+    {
+      "path": "scripts/lib/turn-timing.mjs",
+      "expected": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e",
+      "actual": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e"
+    },
+    {
+      "path": "scripts/webinar/session-rows.mjs",
+      "expected": "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053",
+      "actual": "3b70e6e8bd06da6747abe856ae5a37c998c190d5b8714d9b5d1e2e965f0ed053"
+    },
+    {
+      "path": "scripts/webinar/process-video.mjs",
+      "expected": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7",
+      "actual": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7"
+    },
+    {
+      "path": "scripts/webinar/slides/slide-knowledge.mjs",
+      "expected": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef",
+      "actual": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef"
+    },
+    {
+      "path": "scripts/webinar/vision/routed-vision.mjs",
+      "expected": "522486beff669eaa8e49f2ec6d85cebaf0fba7ecd1578d80ca84a318a287acc5",
+      "actual": "522486beff669eaa8e49f2ec6d85cebaf0fba7ecd1578d80ca84a318a287acc5"
+    }
+  ],
+  "fixtureVerbatimMatches": true,
+  "configVerbatimMatches": true,
+  "caseNamesMatch20": true,
+  "cycle0ArchiveSHA256": "3017cc15958dbcb85e0c3cea81a48a6a1c756b2e220e4e19bcc30af1bf9de8a1",
+  "staleReceiptSHA256": "c15b21c3058ffcb47cd04acef9fd6c51fee6787afca435db846b7fac298f16fc"
+}

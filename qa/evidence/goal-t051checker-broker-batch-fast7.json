@@ -1,0 +1,13 @@
+{
+  "ready": [
+    "t048-sealed-private",
+    "t044-privacy",
+    "t040-product-canonical",
+    "t054-independent-race-diagnosis",
+    "t058-independent",
+    "t014-api",
+    "t056-api-current",
+    "t050-core-A"
+  ],
+  "skipped": []
+}

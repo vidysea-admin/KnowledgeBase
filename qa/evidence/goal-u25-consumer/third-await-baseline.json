@@ -1,0 +1,7 @@
+{
+  "capturedAt": "2026-10-14T21:48:06.7404893Z",
+  "sourcePath": "apps/api/src/session-decisions/reader.ts",
+  "sha256": "2A21418901B6D7D88F84E1B583192AB962B29BA74C11810ED7069BEB4F7E0D57",
+  "backupPath": "qa/evidence/goal-u25-consumer/reader-before-third-await-fix.ts.txt",
+  "status": "byte-preserved before maker fix; RED execution pending"
+}

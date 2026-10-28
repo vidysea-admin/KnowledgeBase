@@ -1,0 +1,2073 @@
+{
+  "$comment": "ISS-104CC-1 fix (cycle 1) — the committed enumeration behind the closed-class-function-words audit in qa/manifests/iss-104-closed-class-function-words.md. Consumed by scripts/lib/audit-closed-class.mjs. Re-derived directly from packages/index/src/pipeline/speaker-name-rules.ts NEVER_A_PERSON (409 = 421 unique entries minus the 12 collective-address words — see excludedCollectiveAddress below, which are open-class common nouns, not one of C2b's closed grammatical classes (SET A) or its four role-bounded classes (SET B)). This file is the source of truth for the audit; if NEVER_A_PERSON changes, regenerate this list by the same method (parse the Set literal, drop the excluded words below) before trusting the audit numbers again.",
+  "method": "SET A = the grammatically CLOSED classes of English (membership does not grow with the language): pronouns, determiners, prepositions, conjunctions, auxiliary/modal verbs, adverbial particles, negators, degree/focusing adverbs, numerals/ordinals, deictic/temporal adverbs. SET B = the four classes [C2b] names by ROLE, bounded by enumeration not grammar: greetings/farewells, interjections/fillers, acknowledgement responses, calendar terms, plus evaluative responses.",
+  "excludedCollectiveAddress": {
+    "reason": "open-class common nouns for addressing a group (new ones are coined constantly — a platform could add \"panelists\" tomorrow), not part of either SET A (closed grammar) or SET B (C2b's four named role sets). Present in NEVER_A_PERSON for a different, independent reason (ISS-093's \"guys\"/\"folks\" cases) and out of scope for this enumeration.",
+    "words": [
+      "guys",
+      "folks",
+      "team",
+      "people",
+      "friends",
+      "members",
+      "gentlemen",
+      "ladies",
+      "audience",
+      "participants",
+      "attendees",
+      "colleagues"
+    ]
+  },
+  "totals": {
+    "words": 409,
+    "setA": 299,
+    "setB": 110
+  },
+  "words": [
+    {
+      "word": "i",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "you",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "he",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "she",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "it",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "we",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "they",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "me",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "him",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "her",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "us",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "them",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "everyone",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "everybody",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "somebody",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "someone",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "anyone",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "nobody",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "all",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "both",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "each",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "every",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "any",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "many",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "most",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "some",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "none",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "several",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "few",
+      "set": "A",
+      "class": "pronoun / quantifier"
+    },
+    {
+      "word": "hi",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "hello",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "hey",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "welcome",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "thanks",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "thank",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "please",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "sorry",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "okay",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "ok",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "right",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "yeah",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "yes",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "no",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "well",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "now",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "so",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "just",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "actually",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "basically",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "great",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "good",
+      "set": "B",
+      "class": "greeting / discourse filler"
+    },
+    {
+      "word": "not",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "nor",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "never",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "very",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "really",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "quite",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "too",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "also",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "still",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "even",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "morning",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "afternoon",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "evening",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "night",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "back",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "again",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "here",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "there",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "today",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "tomorrow",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "yesterday",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "next",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "last",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "first",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "second",
+      "set": "A",
+      "class": "negator / intensifier / temporal-deictic adverb"
+    },
+    {
+      "word": "the",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "a",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "an",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "and",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "but",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "or",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "if",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "then",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "than",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "that",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "this",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "these",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "those",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "to",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "from",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "with",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "without",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "for",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "of",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "in",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "on",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "at",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "by",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "as",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "about",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "into",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "over",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "under",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "up",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "down",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "out",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "off",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "our",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "your",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "my",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "his",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "their",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "its",
+      "set": "A",
+      "class": "determiner / preposition / conjunction"
+    },
+    {
+      "word": "monday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "tuesday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "wednesday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "thursday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "friday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "saturday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "sunday",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "january",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "february",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "march",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "april",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "may",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "june",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "july",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "august",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "september",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "october",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "november",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "december",
+      "set": "B",
+      "class": "calendar (day / month)"
+    },
+    {
+      "word": "thou",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "thee",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "ye",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "mine",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "yours",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "hers",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "ours",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "theirs",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "myself",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "yourself",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "himself",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "herself",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "itself",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "oneself",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "ourselves",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "yourselves",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "themselves",
+      "set": "A",
+      "class": "pronoun (personal/possessive/reflexive, archaic+modern)"
+    },
+    {
+      "word": "everything",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "something",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "anything",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "anybody",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "nothing",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "either",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "neither",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "another",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "other",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "others",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "much",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "enough",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "such",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "one",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "ones",
+      "set": "A",
+      "class": "pronoun (indefinite)"
+    },
+    {
+      "word": "who",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whom",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whose",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "what",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "which",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whatever",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whichever",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whoever",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whomever",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "whether",
+      "set": "A",
+      "class": "pronoun/determiner (interrogative + relative)"
+    },
+    {
+      "word": "yet",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "because",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "although",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "though",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "while",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "whereas",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "unless",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "until",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "till",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "since",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "once",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "lest",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "whereupon",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "however",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "therefore",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "thus",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "hence",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "moreover",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "furthermore",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "nevertheless",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "nonetheless",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "otherwise",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "meanwhile",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "besides",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "anyway",
+      "set": "A",
+      "class": "conjunction + conjunctive adverb"
+    },
+    {
+      "word": "onto",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "underneath",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "above",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "across",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "after",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "against",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "along",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "alongside",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "among",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "amongst",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "around",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "before",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "behind",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "below",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "beneath",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "beside",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "between",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "beyond",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "concerning",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "despite",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "during",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "except",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "inside",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "like",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "near",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "outside",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "past",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "per",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "regarding",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "through",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "throughout",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "toward",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "towards",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "unto",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "upon",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "within",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "amid",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "amidst",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "notwithstanding",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "barring",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "via",
+      "set": "A",
+      "class": "preposition"
+    },
+    {
+      "word": "am",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "is",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "are",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "was",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "were",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "be",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "been",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "being",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "do",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "does",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "did",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "done",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "have",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "has",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "had",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "having",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "will",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "would",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "shall",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "should",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "can",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "could",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "might",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "must",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "ought",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "need",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "dare",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "let",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "going",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "gonna",
+      "set": "A",
+      "class": "auxiliary + modal verb"
+    },
+    {
+      "word": "away",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "forward",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "ahead",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "aside",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "apart",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "together",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "onward",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "onwards",
+      "set": "A",
+      "class": "adverbial particle"
+    },
+    {
+      "word": "nowhere",
+      "set": "A",
+      "class": "negator"
+    },
+    {
+      "word": "nope",
+      "set": "A",
+      "class": "negator"
+    },
+    {
+      "word": "nah",
+      "set": "A",
+      "class": "negator"
+    },
+    {
+      "word": "rather",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "almost",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "nearly",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "hardly",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "barely",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "scarcely",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "only",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "merely",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "simply",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "totally",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "completely",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "entirely",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "fairly",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "pretty",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "somewhat",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "more",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "less",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "least",
+      "set": "A",
+      "class": "degree / focusing adverb"
+    },
+    {
+      "word": "when",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "where",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "why",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "how",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "tonight",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "noon",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "midnight",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "soon",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "later",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "already",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "ever",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "always",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "sometimes",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "often",
+      "set": "A",
+      "class": "deictic / temporal adverb"
+    },
+    {
+      "word": "two",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "three",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "four",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "five",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "six",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "seven",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "eight",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "nine",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "ten",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "eleven",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "twelve",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "twenty",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "thirty",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "hundred",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "thousand",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "million",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "billion",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "twice",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "third",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "fourth",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "fifth",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "sixth",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "seventh",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "eighth",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "ninth",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "tenth",
+      "set": "A",
+      "class": "numeral / ordinal"
+    },
+    {
+      "word": "hiya",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "howdy",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "greetings",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "namaste",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "namaskar",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "salaam",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "bye",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "goodbye",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "ciao",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "adios",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "hola",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "regards",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "cheers",
+      "set": "B",
+      "class": "greeting / farewell"
+    },
+    {
+      "word": "pardon",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "excuse",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "alright",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "sure",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "exactly",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "indeed",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "absolutely",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "definitely",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "certainly",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "correct",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "true",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "agreed",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "understood",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "noted",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "yep",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "yup",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "congrats",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "congratulations",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "bravo",
+      "set": "B",
+      "class": "acknowledgement"
+    },
+    {
+      "word": "um",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "uh",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "er",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "erm",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "hmm",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "hm",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "ah",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "aha",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "oh",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "ooh",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "oops",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "wow",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "huh",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "eh",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "alas",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "ouch",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "hurray",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "hooray",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "literally",
+      "set": "B",
+      "class": "interjection / filler"
+    },
+    {
+      "word": "nice",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "cool",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "fine",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "super",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "lovely",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "wonderful",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "amazing",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "awesome",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "excellent",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "perfect",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "brilliant",
+      "set": "B",
+      "class": "evaluative response"
+    },
+    {
+      "word": "week",
+      "set": "B",
+      "class": "calendar (time unit)"
+    },
+    {
+      "word": "weekend",
+      "set": "B",
+      "class": "calendar (time unit)"
+    },
+    {
+      "word": "month",
+      "set": "B",
+      "class": "calendar (time unit)"
+    },
+    {
+      "word": "year",
+      "set": "B",
+      "class": "calendar (time unit)"
+    },
+    {
+      "word": "day",
+      "set": "B",
+      "class": "calendar (time unit)"
+    },
+    {
+      "word": "hour",
+      "set": "B",
+      "class": "calendar (time unit)"
+    },
+    {
+      "word": "minute",
+      "set": "B",
+      "class": "calendar (time unit)"
+    }
+  ]
+}

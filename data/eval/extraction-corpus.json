@@ -1,0 +1,426 @@
+{
+  "version": 1,
+  "inventoryDirectory": "../toc-migrated",
+  "coverageNote": "Every current migrated directory declared, including synthetic/incomplete directories. Historical29 transcripts versus original23 TOC provenance reconciliation remains unresolved. Raw completions and independent semantic gold are unavailable.",
+  "baseline": {
+    "unresolvedReferences": [
+      {
+        "sessionId": "2026-05-20-telling-your-brand-story-better",
+        "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+        "turnId": "2026-05-20-telling-your-brand-story-better-t049"
+      },
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t161"
+      },
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+        "turnId": "2026-05-29-decoding-ever-expanding-cast-t190"
+      },
+      {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t092"
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051"
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060"
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059"
+      },
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t085"
+      },
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t073"
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+        "turnId": "2026-08-03-uk-beyond-offer-letters-t061"
+      },
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t106"
+      },
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t084"
+      },
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+        "turnId": "2026-08-12-uniaccess-ashoka-university-t058"
+      },
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "claimId": "2026-08-27-in-focus-4-c03",
+        "turnId": "2026-08-27-in-focus-4-t102"
+      }
+    ],
+    "inputHashes": {
+      "2026-05-20-telling-your-brand-story-better": {
+        "turnsSha256": "5c982fe673d5bdda527d6576cba6113327ab5e8284bc06be1837513ef0266b9e",
+        "claimsSha256": "159e46f0c93ff279270b0b3f52ff2a28f04362cc1e5f87b0320adc2ff50ee486"
+      },
+      "2026-05-29-decoding-ever-expanding-cast": {
+        "turnsSha256": "f93002ba741a978cd1e8fce7a9954896a14ae1e657a7d57eec41815ccf98db72",
+        "claimsSha256": "479f7b6bb6a3f88ad11dcc043e9694d5c55edeed6aff3dd62b7ffecbca8d47e9"
+      },
+      "2026-06-03-dual-enrollment-pathway": {
+        "turnsSha256": "0117d6be63f6d788167cd742299d69e694a61ee440e937128af89fbc2aef27d3",
+        "claimsSha256": "5bb0eeda41f1fadfbd49225f50827b88caa00a7a7662c5de50369e5ab8ac815a"
+      },
+      "2026-06-19-entrance-exams-pathways-india-part1": {
+        "turnsSha256": "3c065d7ce7860a08d1b87db0f4b2bf015cd2adfb3e36d10ee65a6a02abf18ed2",
+        "claimsSha256": "c49be3d05e6829f267f0644961d2da47d55094a5d1ed61e208f2c58e321f0e9a"
+      },
+      "2026-06-30-exploring-identity-success-counseling": {
+        "turnsSha256": "d3169ba6536072aa7e40872839c503bdcca9304c6167a55c67a7658a48d01c78",
+        "claimsSha256": "f446a1e98bf45d90cddc9080afaa8ccb62a71902941151366fa82a5e0fb421c5"
+      },
+      "2026-08-03-uk-beyond-offer-letters": {
+        "turnsSha256": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+        "claimsSha256": "a3246bf7e5e63030c485ac6e3c3177e2c9063037a2c555dc131fa23a8e74f421"
+      },
+      "2026-08-12-uniaccess-ashoka-university": {
+        "turnsSha256": "a0e8eabe5300cc91dd2cccf2b725c87200a4bfa86c23fb1106965f4d05bd0387",
+        "claimsSha256": "bc4d274d03b0a9ea788f293cd0ed4f14c295fcfb13d089faacc8b9156587e1a7"
+      },
+      "2026-08-27-in-focus-4": {
+        "turnsSha256": "1ade9c5ebf5792d320286d82ceba6b2785e3bba3c96490cdeb1e99f9b6d3c044",
+        "claimsSha256": "b0797f2bbde03e7545b3a606e697eac9788b620da172c4a47e1f636f8dd05d05"
+      }
+    },
+    "claims": 72,
+    "evidence": 80
+  },
+  "cases": [
+    {
+      "id": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "tenantId": "toc",
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/turns.json",
+        "persisted": "../toc-migrated/2026-04-21-visa-blueprint-part2-italy-france-nz/claims.json"
+      }
+    },
+    {
+      "id": "2026-05-08-funding-dreams-loans-forex",
+      "tenantId": "toc",
+      "sessionId": "2026-05-08-funding-dreams-loans-forex",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-08-funding-dreams-loans-forex/turns.json",
+        "persisted": "../toc-migrated/2026-05-08-funding-dreams-loans-forex/claims.json"
+      }
+    },
+    {
+      "id": "2026-05-20-telling-your-brand-story-better",
+      "tenantId": "toc",
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-20-telling-your-brand-story-better/turns.json",
+        "persisted": "../toc-migrated/2026-05-20-telling-your-brand-story-better/claims.json"
+      }
+    },
+    {
+      "id": "2026-05-22-uniaccess-xavier-university",
+      "tenantId": "toc",
+      "sessionId": "2026-05-22-uniaccess-xavier-university",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-22-uniaccess-xavier-university/turns.json",
+        "persisted": "../toc-migrated/2026-05-22-uniaccess-xavier-university/claims.json"
+      }
+    },
+    {
+      "id": "2026-05-23-uniaccess-atlas-skilltech",
+      "tenantId": "toc",
+      "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-23-uniaccess-atlas-skilltech/turns.json",
+        "persisted": "../toc-migrated/2026-05-23-uniaccess-atlas-skilltech/claims.json"
+      }
+    },
+    {
+      "id": "2026-05-28-in-focus-1",
+      "tenantId": "toc",
+      "sessionId": "2026-05-28-in-focus-1",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-28-in-focus-1/turns.json",
+        "persisted": "../toc-migrated/2026-05-28-in-focus-1/claims.json"
+      }
+    },
+    {
+      "id": "2026-05-29-decoding-ever-expanding-cast",
+      "tenantId": "toc",
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-05-29-decoding-ever-expanding-cast/turns.json",
+        "persisted": "../toc-migrated/2026-05-29-decoding-ever-expanding-cast/claims.json"
+      }
+    },
+    {
+      "id": "2026-06-03-dual-enrollment-pathway",
+      "tenantId": "toc",
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-06-03-dual-enrollment-pathway/turns.json",
+        "persisted": "../toc-migrated/2026-06-03-dual-enrollment-pathway/claims.json"
+      }
+    },
+    {
+      "id": "2026-06-19-entrance-exams-pathways-india-part1",
+      "tenantId": "toc",
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/turns.json",
+        "persisted": "../toc-migrated/2026-06-19-entrance-exams-pathways-india-part1/claims.json"
+      }
+    },
+    {
+      "id": "2026-06-25-in-focus-2",
+      "tenantId": "toc",
+      "sessionId": "2026-06-25-in-focus-2",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-06-25-in-focus-2/turns.json",
+        "persisted": "../toc-migrated/2026-06-25-in-focus-2/claims.json"
+      }
+    },
+    {
+      "id": "2026-06-30-exploring-identity-success-counseling",
+      "tenantId": "toc",
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-06-30-exploring-identity-success-counseling/turns.json",
+        "persisted": "../toc-migrated/2026-06-30-exploring-identity-success-counseling/claims.json"
+      }
+    },
+    {
+      "id": "2026-07-03-inside-the-uc-session",
+      "tenantId": "toc",
+      "sessionId": "2026-07-03-inside-the-uc-session",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-03-inside-the-uc-session/turns.json",
+        "persisted": "../toc-migrated/2026-07-03-inside-the-uc-session/claims.json"
+      }
+    },
+    {
+      "id": "2026-07-08-beyond-black-robes-law-careers",
+      "tenantId": "toc",
+      "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-08-beyond-black-robes-law-careers/turns.json",
+        "persisted": "../toc-migrated/2026-07-08-beyond-black-robes-law-careers/claims.json"
+      }
+    },
+    {
+      "id": "2026-07-15-creative-futures",
+      "tenantId": "toc",
+      "sessionId": "2026-07-15-creative-futures",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-15-creative-futures/turns.json",
+        "persisted": "../toc-migrated/2026-07-15-creative-futures/claims.json"
+      }
+    },
+    {
+      "id": "2026-07-22-uniaccess-cept-university",
+      "tenantId": "toc",
+      "sessionId": "2026-07-22-uniaccess-cept-university",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-22-uniaccess-cept-university/turns.json",
+        "persisted": "../toc-migrated/2026-07-22-uniaccess-cept-university/claims.json"
+      }
+    },
+    {
+      "id": "2026-07-28-metrics-and-mingling",
+      "tenantId": "toc",
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+        "persisted": "../toc-migrated/2026-07-28-metrics-and-mingling/claims.json"
+      }
+    },
+    {
+      "id": "2026-07-30-in-focus-3",
+      "tenantId": "toc",
+      "sessionId": "2026-07-30-in-focus-3",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-07-30-in-focus-3/turns.json",
+        "persisted": "../toc-migrated/2026-07-30-in-focus-3/claims.json"
+      }
+    },
+    {
+      "id": "2026-08-03-uk-beyond-offer-letters",
+      "tenantId": "toc",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+        "persisted": "../toc-migrated/2026-08-03-uk-beyond-offer-letters/claims.json"
+      }
+    },
+    {
+      "id": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "tenantId": "toc",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+        "persisted": "../toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/claims.json"
+      }
+    },
+    {
+      "id": "2026-08-10-ucas-what-changed-what-matters",
+      "tenantId": "toc",
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-08-10-ucas-what-changed-what-matters/turns.json",
+        "persisted": "../toc-migrated/2026-08-10-ucas-what-changed-what-matters/claims.json"
+      }
+    },
+    {
+      "id": "2026-08-12-uniaccess-ashoka-university",
+      "tenantId": "toc",
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-08-12-uniaccess-ashoka-university/turns.json",
+        "persisted": "../toc-migrated/2026-08-12-uniaccess-ashoka-university/claims.json"
+      }
+    },
+    {
+      "id": "2026-08-24-uniaccess-leeds-arts-university",
+      "tenantId": "toc",
+      "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-08-24-uniaccess-leeds-arts-university/turns.json",
+        "persisted": "../toc-migrated/2026-08-24-uniaccess-leeds-arts-university/claims.json"
+      }
+    },
+    {
+      "id": "2026-08-27-in-focus-4",
+      "tenantId": "toc",
+      "sessionId": "2026-08-27-in-focus-4",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-08-27-in-focus-4/turns.json",
+        "persisted": "../toc-migrated/2026-08-27-in-focus-4/claims.json"
+      }
+    },
+    {
+      "id": "2026-09-02-india-test-series-part2",
+      "tenantId": "toc",
+      "sessionId": "2026-09-02-india-test-series-part2",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-09-02-india-test-series-part2/turns.json",
+        "persisted": "../toc-migrated/2026-09-02-india-test-series-part2/claims.json"
+      }
+    },
+    {
+      "id": "2026-09-09-global-test-prep-pathways",
+      "tenantId": "toc",
+      "sessionId": "2026-09-09-global-test-prep-pathways",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-09-09-global-test-prep-pathways/turns.json",
+        "persisted": "../toc-migrated/2026-09-09-global-test-prep-pathways/claims.json"
+      }
+    },
+    {
+      "id": "2026-09-16-pathways-in-psychology",
+      "tenantId": "toc",
+      "sessionId": "2026-09-16-pathways-in-psychology",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-09-16-pathways-in-psychology/turns.json",
+        "persisted": "../toc-migrated/2026-09-16-pathways-in-psychology/claims.json"
+      }
+    },
+    {
+      "id": "2026-09-21-uniaccess-japan",
+      "tenantId": "toc",
+      "sessionId": "2026-09-21-uniaccess-japan",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-09-21-uniaccess-japan/turns.json",
+        "persisted": "../toc-migrated/2026-09-21-uniaccess-japan/claims.json"
+      }
+    },
+    {
+      "id": "2026-09-24-in-focus",
+      "tenantId": "toc",
+      "sessionId": "2026-09-24-in-focus",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-09-24-in-focus/turns.json",
+        "persisted": "../toc-migrated/2026-09-24-in-focus/claims.json"
+      }
+    },
+    {
+      "id": "2026-09-24-zoho-next-european-study-destinations",
+      "tenantId": "toc",
+      "sessionId": "2026-09-24-zoho-next-european-study-destinations",
+      "artifacts": {
+        "turns": "../toc-migrated/2026-09-24-zoho-next-european-study-destinations/turns.json",
+        "persisted": "../toc-migrated/2026-09-24-zoho-next-european-study-destinations/claims.json"
+      }
+    },
+    {
+      "id": "synthetic-cli-20260930",
+      "sessionId": "synthetic-cli-20260930",
+      "artifacts": {
+        "turns": "../toc-migrated/synthetic-cli-20260930/turns.json",
+        "persisted": "../toc-migrated/synthetic-cli-20260930/claims.json"
+      }
+    },
+    {
+      "id": "synthetic-controlled-1790797565149",
+      "sessionId": "synthetic-controlled-1790797565149",
+      "artifacts": {
+        "turns": "../toc-migrated/synthetic-controlled-1790797565149/turns.json",
+        "persisted": "../toc-migrated/synthetic-controlled-1790797565149/claims.json"
+      }
+    },
+    {
+      "id": "synthetic-controlled-1790798758779",
+      "sessionId": "synthetic-controlled-1790798758779",
+      "artifacts": {
+        "turns": "../toc-migrated/synthetic-controlled-1790798758779/turns.json",
+        "persisted": "../toc-migrated/synthetic-controlled-1790798758779/claims.json"
+      }
+    },
+    {
+      "id": "synthetic-controlled-1790799479728",
+      "sessionId": "synthetic-controlled-1790799479728",
+      "artifacts": {
+        "turns": "../toc-migrated/synthetic-controlled-1790799479728/turns.json",
+        "persisted": "../toc-migrated/synthetic-controlled-1790799479728/claims.json"
+      }
+    },
+    {
+      "id": "synthetic-production-cli-20260930",
+      "sessionId": "synthetic-production-cli-20260930",
+      "artifacts": {
+        "turns": "../toc-migrated/synthetic-production-cli-20260930/turns.json",
+        "persisted": "../toc-migrated/synthetic-production-cli-20260930/claims.json"
+      }
+    },
+    {
+      "id": "synthetic-production-interrupt-20260930",
+      "sessionId": "synthetic-production-interrupt-20260930",
+      "artifacts": {
+        "turns": "../toc-migrated/synthetic-production-interrupt-20260930/turns.json",
+        "persisted": "../toc-migrated/synthetic-production-interrupt-20260930/claims.json"
+      }
+    }
+  ]
+}

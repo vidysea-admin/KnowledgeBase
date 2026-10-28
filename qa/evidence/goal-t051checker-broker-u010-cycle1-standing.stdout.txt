@@ -1,0 +1,23 @@
+✔ ISS-U010CHECKPOINT-001 verbatim recorded frozen-clock reproduction: 1/1 owner preserved (16.9092ms)
+✔ checkpoint refusal preserves exact owner; replacement file identity and post-acquisition failure stay safe (148.6937ms)
+✔ full population has IDs even for duplicate question text; downstream arithmetic/control and no overwrite (236.4538ms)
+✔ cap stops partial ranking; resume reuses verified individual receipts and completes all IDs (197.545ms)
+✔ fallback HTTP failure contaminates a whole ranked question; pure subset gets its own control (155.6865ms)
+✔ deadline, cancellation and secret-bearing transport failures stay bounded and sanitized (241.577ms)
+✔ corrupt/drift/conflicting resume and live owner refuse before scorer factory (475.4133ms)
+✔ inflight attempt recovers as unknown; completed cells cannot be rewritten in deltas (263.6094ms)
+✔ pending human references and invalid caps refuse before paid I/O; model order refuses missing predecessor (1.3584ms)
+✔ unknown provider host and credential-bearing URLs refuse before corpus/provider transport (47.2534ms)
+✔ historical Ollama reports remain partial; derived calibration never becomes human gold (5.3319ms)
+✔ real corpus current inputs freeze29candidates and92distinct questions; pending actual human packet refuses (98.751ms)
+✔ actual production scorer and provider use fakeHTTP through the exact bounded paid path, with no key persistence (388.6926ms)
+✔ complete verified Ollama predecessors permit Gemini LAST; actual Gemini adapter receives bounded fakeHTTP (747.5215ms)
+✔ SYNTHETIC fractional approvals export exact30pairs and actual computeMAE consumes live-shaped scoring output (623.1791ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3701.7637

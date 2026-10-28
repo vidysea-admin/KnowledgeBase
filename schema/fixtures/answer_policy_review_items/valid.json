@@ -1,0 +1,17 @@
+{
+  "_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "tenantId": "fixture-tenant",
+  "kind": "change",
+  "status": "open",
+  "createdAt": "2026-10-14T00:00:00.000Z",
+  "key": "advice@1",
+  "summary": "Synthetic change",
+  "change": {
+    "policyId": "advice",
+    "version": 1,
+    "previousVersion": null,
+    "changedFields": [
+      "style"
+    ]
+  }
+}

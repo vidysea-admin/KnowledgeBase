@@ -84,7 +84,7 @@ Umesh's own words, verbatim (`qa/feedback-inbox.md`):
 - **`sources/whatsapp_msg/`** — a separate git submodule with its own Lab Protocol repo; referenced
   as a source, never duplicated here (`ARCHITECTURE.md` H6).
 - **`raw/TOC/`** — 23+ migrated webinar sessions, data not code.
-- **External integrations** — Google Drive/Gmail/Calendar (`gws`, `apps/api/src/gws-*.ts`), Zoom /
+- **External integrations** — Google Drive/Gmail/Calendar (`gws`, `apps/api/src/gws/gws-*.ts`), Zoom /
   Zoho / Google Meet via `packages/meeting-bot` + OBS, Telegram (status alerts, T-030), Tavily (web
   fallback, `qa/contracts/ask-web-fallback-tavily.md` — see Open questions, ISS-274).
 

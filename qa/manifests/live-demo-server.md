@@ -147,3 +147,5 @@ tenantId: toc
 6. Grep `compete-page.ts` for `innerHTML` — expect zero matches on any value built from
    server/LLM-derived data (a literal empty-state string via `textContent` is fine; there should
    be no string-concatenation into `innerHTML` at all in the current version).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

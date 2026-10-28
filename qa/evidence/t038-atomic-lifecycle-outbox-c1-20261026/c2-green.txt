@@ -1,0 +1,10 @@
+✔ saturated started event survives real durable write, terminal transition, old lookback and restart replay (264.9218ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1002.0808
+exit=0

@@ -10,7 +10,7 @@
 // fell back to localhost and failed with ECONNREFUSED against a host that was never the target.
 import "dotenv/config";
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join, dirname, resolve } from "node:path";
+import { basename, join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { register } from "tsx/esm/api";
 
@@ -34,6 +34,10 @@ function loadJson(path) {
   return JSON.parse(readFileSync(path, "utf8"));
 }
 
+import { computeFilterBias } from "./eval/filter-bias.mjs";
+import { parseLlmArgs, redactor, createEvalComplete, createLlmScoreFn, rankSessionsLlm, limitByQuestion, callSummary, fallbackWarning, resultsPath, writeResults } from "./eval/llm-eval.mjs";
+export { computeFilterBias };
+
 /**
  * Embeds every golden-set question in ONE batched call and loads the tenant's real chunk rows.
  *
@@ -45,9 +49,12 @@ function loadJson(path) {
 async function embedQuestionsAndLoadChunks(questions, tenantId, opts = {}) {
   const { connect, close, getDb, scopedCollection } = await import("../packages/db/src/index.ts");
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
-  const { buildRouting } = await import("../apps/api/src/production.ts");
+  const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
-  await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
+  // ISS-LEGACYSEED-006: no lkb default; read-only, but lkb needs --i-know-this-is-production + MONGODB_DB=lkb.
+  const { requireScriptDatabase } = await import("./lib/transcript-provenance.mjs");
+  const target = requireScriptDatabase(process.env, process.argv, {allowProduction: true});
+  await connect(target.url, target.dbName);
   try {
     const chunks = await scopedCollection(getDb(), "chunks")(tenantId).find({}).toArray();
     if (chunks.length === 0) {
@@ -98,7 +105,7 @@ async function main() {
   const tree = roots[tenantId];
   if (!tree) throw new Error(`eval-recall: no tree built for tenantId "${tenantId}"`);
 
-  const questions = loadJson(GOLDEN_SET_PATH);
+  let questions = loadJson(GOLDEN_SET_PATH);
 
   // `--retriever vector` (U1.4) scores the brute-force cosine retriever over the REAL `chunks`
   // rows instead of the tree heuristic, so both numbers come out of the same harness, the same
@@ -115,7 +122,23 @@ async function main() {
   let retrieverName = "heuristic";
   let latency = null;
   let retrieve = createHeuristicRetriever(tree);
-  if (useHybrid) {
+  // `--llm --model <id> --max-calls|--max-cost-usd <n>` (U0.10, D-164): rank every session with the real LLM evaluator
+  // (createLlmScorer, jobKind "evaluator"), then score with the SAME harness, golden set and question-blind control.
+  const llm = parseLlmArgs(process.argv.slice(2), process.env);
+  let llmRun = null;
+  if (llm.llm) {
+    if (llm.error) { console.error(llm.error); process.exitCode = 2; return; }
+    const sessionNodes = new Map();
+    (function collect(n) { if (n.level === "session" && n.evidence?.sessionRef) sessionNodes.set(n.evidence.sessionRef, n); n.children.forEach(collect); })(tree);
+    const { scoreFn, stats } = await createLlmScoreFn(await createEvalComplete(llm, process.env), llm);
+    const selected = limitByQuestion(questions, (q) => q.question, llm.limitQuestions);
+    const r = await rankSessionsLlm(selected, sessionNodes, scoreFn, K);
+    questions = selected.filter((q) => r.ranked.has(q.question)); // only whole, LLM-ranked questions are scored
+    retrieve = (question, kk) => (r.ranked.get(question) ?? []).slice(0, kk);
+    retrieverName = `llm (${llm.provider}/${llm.model}, jobKind evaluator, rank all ${sessionNodes.size} sessions per question)`;
+    llmRun = { stats, selected: selected.length, notScored: r.notScored, fallbackQuestions: r.fallbackQuestions, llm };
+  }
+  if (llm.llm) { /* skip the other retrievers */ } else if (useHybrid) {
     const { createVectorRetriever } = await import("../packages/index/src/vector/retriever.ts");
     const { createHeuristicRetriever: heur } = await import("../packages/index/src/eval/heuristic-retriever.ts");
     const { rrfMerge } = await import("../packages/ask/src/merge.ts");
@@ -197,44 +220,33 @@ async function main() {
    * moves with the filter. So score the rejected questions too and publish all three. This turns
    * a reviewer's one-off observation into a figure that is recomputed on every run.
    */
-  let filterBias = null;
+  let rejectedQs = [];
   if (existsSync(REJECTED_PATH)) {
     const rejectedRaw = loadJson(REJECTED_PATH);
-    const rejectedQs = rejectedRaw.map((r, i) => ({
+    rejectedQs = rejectedRaw.map((r, i) => ({
       id: `rejected-${String(i + 1).padStart(3, "0")}`,
       question: r.question,
       expectedSessionId: r.sessionId,
     }));
-    if (rejectedQs.length === 0) {
-      // Distinguish "no bias" from "not measured". A null here would read as the latter, and the
-      // whole point of ISS-092 was that an unstated bias is worse than a stated one.
-      filterBias = {
-        note:
-          "0 candidates rejected, so the kept set IS the candidate set and the filter introduces " +
-          "no selection bias on this run — kept === combined by construction",
-        kept: { n: result.total, recallAtK: result.recallAtK },
-        rejected: { n: 0, recallAtK: null },
-        combined: { n: result.total, recallAtK: result.recallAtK },
-      };
-      console.log("filter bias: none — 0 candidates rejected, so kept === combined");
-    } else {
-      const rejectedResult = computeRecallAtK(rejectedQs, retrieve, K);
-      const combined = computeRecallAtK([...questions, ...rejectedQs], retrieve, K);
-      filterBias = {
-        note:
-          "the post-filter removes questions the retriever tends to answer, so `kept` is a " +
-          "downward-biased floor; `combined` is the pre-filter figure",
-        kept: { n: result.total, recallAtK: result.recallAtK },
-        rejected: { n: rejectedResult.total, recallAtK: rejectedResult.recallAtK },
-        combined: { n: combined.total, recallAtK: combined.recallAtK },
-      };
-      console.log(
-        `filter bias: kept ${result.recallAtK.toFixed(3)} (n=${result.total}) | ` +
-          `rejected ${rejectedResult.recallAtK.toFixed(3)} (n=${rejectedResult.total}) | ` +
-          `combined ${combined.recallAtK.toFixed(3)} (n=${combined.total}) ` +
-          `— kept is a FLOOR, not an unbiased estimate`,
-      );
-    }
+  }
+  const filterBias = computeFilterBias({
+    rejectedPathExists: existsSync(REJECTED_PATH) && !llmRun, // --llm: rejected questions are not LLM-ranked, so bias is honestly NOT MEASURED
+    rejectedQs,
+    keptResult: result,
+    computeRejected: () => computeRecallAtK(rejectedQs, retrieve, K),
+    computeCombined: () => computeRecallAtK([...questions, ...rejectedQs], retrieve, K),
+  });
+  if (!filterBias.measured) {
+    console.log("filter bias: NOT MEASURED — golden-set-rejected.json is absent (see filterBias.measured)");
+  } else if (filterBias.rejected.n === 0) {
+    console.log("filter bias: none — 0 candidates rejected, so kept === combined");
+  } else {
+    console.log(
+      `filter bias: kept ${filterBias.kept.recallAtK.toFixed(3)} (n=${filterBias.kept.n}) | ` +
+        `rejected ${filterBias.rejected.recallAtK.toFixed(3)} (n=${filterBias.rejected.n}) | ` +
+        `combined ${filterBias.combined.recallAtK.toFixed(3)} (n=${filterBias.combined.n}) ` +
+        `— kept is a FLOOR, not an unbiased estimate`,
+    );
   }
 
   console.log(`recall@${K} = ${result.recallAtK.toFixed(3)} (${result.hits}/${result.total} hits)`);
@@ -271,11 +283,26 @@ async function main() {
         "uninterpretable until provenance exists.",
     filterBias,
   };
+  if (llmRun) {
+    const date = new Date().toISOString().slice(0, 10), o = llmRun.llm;
+    const out = { kind: "recall", date, generatedAt: report.generatedAt, model: o.model, provider: o.provider, baseUrl: o.provider === "ollama" ? o.baseUrl : undefined,
+      jobKind: "evaluator", k: K, questionsSelected: llmRun.selected, questionsScored: result.total, questionsNotScored: llmRun.notScored,
+      questionsWithHeuristicFallback: llmRun.fallbackQuestions, limitQuestions: o.limitQuestions ?? null,
+      summary: { recallAtK: result.recallAtK, hits: result.hits, total: result.total, misses: result.misses.length, controlRecallAtK: control.recallAtK, chanceFloor: assessment.chanceFloor, verdict: assessment.verdict, reason: assessment.reason },
+      ...fallbackWarning(llmRun.stats), goldenSetProvenance: report.goldenSetProvenance, calls: callSummary(llmRun.stats, o), report };
+    console.log(`llm calls=${llmRun.stats.calls} (ok ${llmRun.stats.ok}, failed ${llmRun.stats.failed}, fallbacks ${llmRun.stats.fallbacks}) p50=${out.calls.latency.p50Ms ?? "n/a"}ms p95=${out.calls.latency.p95Ms ?? "n/a"}ms; questions scored ${result.total}/${llmRun.selected}`);
+    console.log(`wrote ${writeResults(resultsPath("recall", o, date, o.limitQuestions !== undefined), out, redactor([process.env.OLLAMA_API_KEY, process.env.GEMINI_API_KEY]))}`);
+    return;
+  }
   writeFileSync(useHybrid ? HYBRID_REPORT_PATH : useVector ? VECTOR_REPORT_PATH : REPORT_PATH, JSON.stringify(report, null, 2) + "\n", "utf8");
   console.log(`wrote ${useHybrid ? HYBRID_REPORT_PATH : useVector ? VECTOR_REPORT_PATH : REPORT_PATH}`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exitCode = 1;
-});
+// Guarded (same pattern as scripts/lint-loc.mjs): a test file that imports `computeFilterBias`
+// must not also trigger the real Mongo/tree-build/network run just by importing this module.
+if (process.argv[1] && import.meta.url.endsWith(basename(process.argv[1]))) {
+  main().catch((err) => {
+    console.error(err);
+    process.exitCode = 1;
+  });
+}

@@ -1,0 +1,51 @@
+{
+  "policy_version": "managed-review/1",
+  "role": "maker-handoff-not-checker-ready",
+  "unit": "native-guard-phases",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "authoring_base_git_sha": "37e51f95c367594bddb422c39c11415674ecf001",
+  "current_base_git_sha": null,
+  "candidate_git_sha": null,
+  "candidate_identity": "Dirtytwo-testonlyrawfilesNOTGitcommit",
+  "changed_files": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+      "sha256": "aa1de5248f25f941890cb64ff9e89ab61dc4d58f2f3fb3044029aa8ad1869925",
+      "total_lines": 267
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/testsupport/native-guard-phase.ts",
+      "sha256": "099b181cf1178182dfb4c81563d662b37dbeded36c8e40aa3fd879592c3b8fad",
+      "total_lines": 63
+    }
+  ],
+  "two_file_content_sha256": "f26cda9bea35fbe6e5bd9fb5288fe6a4e09f130a12a7f4cfa4af6206a24e2ee7",
+  "combined_source_count": 74,
+  "combined_source_manifest": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-native-guard-phases.json",
+  "combined_source_sha256": "c2049221f58de313bb0a2b90984337c413232ecbb8b4c1a3683f0e966daf4df7",
+  "stage_catalog": {
+    "groups": 16,
+    "expected_records": 76,
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/stage-catalog.json",
+    "node2_records": 12,
+    "sha256": "54442d7c62e43564a49d6f38599ef3cfb3ca4afa168d6d6deee046c9aba997c4",
+    "node1_records": 64
+  },
+  "required_checks": "Solebroker affectedbottypes,5targetedhelperguards,freshoriginal2withinunchanged75sjob/120sphaseanddurabletracebeforecleanup",
+  "baseline_evidence": "Originaltimeout12470.594emptylogretained;NOreusedchangedtestproof",
+  "status": "SOURCE_FROZEN_PENDING_ACTUAL_BASE_BINDING_AND_BROKER",
+  "maker_usage": {
+    "active_s": null,
+    "cost": null,
+    "tokens": null,
+    "token_metric": "actual_total"
+  },
+  "independent_review": "Notdispatched;noPASS/noresetpriorpolicyhistory",
+  "old_versions_preserved": [
+    "b/preimages.json",
+    "b/trace-env-alignment/preimage.json",
+    "c/backups/helper-before-explicit-trace.ts",
+    "c/packet-before-explicit-trace.json"
+  ]
+}

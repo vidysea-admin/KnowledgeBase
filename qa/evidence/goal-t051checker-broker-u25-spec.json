@@ -1,0 +1,25 @@
+{
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "packages/index/src/pipeline/notes/decisions.test.ts",
+    "apps/api/src/indexing/decisions-persist.test.ts",
+    "apps/api/src/indexing/session-decisions.test.ts"
+  ],
+  "pins": {
+    "apps/api/src/indexing/decisions-persist.ts": "4e27dc1798c3707d871d90600089ffd119fc6566946d68bac8126693c38c3975",
+    "apps/api/src/indexing/decisions-persist.test.ts": "aa25549e8ed90f22f56df04f120c2c541ea4c92bb5e578f9f4d3622129c24eb7",
+    "apps/api/src/indexing/session-decisions.test.ts": "794b9df694b2e3ae5a1a6d3766183116b408ceadb1b017a7c6790a04e030b7f8",
+    "packages/index/src/pipeline/notes/decisions.ts": "30b050b886a17bdd8661af55f46c2a95d640a6c8f47077da555ce7b9cbd84ee0",
+    "packages/index/src/pipeline/notes/decisions.test.ts": "d8508665b65d66648e3d0b6592aece9ab6b80ef70f4d2567d6b3c05265c82eb7",
+    "apps/api/src/indexing/session.ts": "c3a37514a70eaba215b58ff66dc92a64c8a06faad5d44920780e8b1b3d17fa39",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "schema/decisions.schema.json": "f02702b771c152c1b93ea311a3419f1f8fb6dd03e5e55005bd9a4782839b7110",
+    "scripts/eval/extraction-review.mjs": "0eae318240d991b626ada193aa39fe9f213de068b50d2db22c5fed7358f08a44",
+    "data/toc-migrated/2026-08-27-in-focus-4/turns.json": "e831dc37eb547a4afcfec47287331d7785713f3116db6d8cda1486bcf04f243e"
+  },
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-u25"
+}

@@ -1,0 +1,37 @@
+{
+  "gate_status": "BOOTSTRAP_REVIEW",
+  "gate": "staged-admission/collections-bounded-choice-retention-prep-input.json",
+  "tokens": null,
+  "budget_debit": {
+    "active_s": 40,
+    "tokens": 1000
+  },
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "cycle": 0,
+  "protected_finalization": {
+    "active_s": 30,
+    "tokens": 800
+  },
+  "probe_dispatch": "/root/verification_broker",
+  "cost": null,
+  "gate_exit": 0,
+  "accounting_note": "No monotonic start was captured; actual active time and runtime token usage unknown. Full committed preparation allocation charged conservatively; no measured efficiency success claimed.",
+  "probe": "Different kinds share identical ID: deselect appended persisted document while preserving visible topic with same ID; assert exact PUT members and revision7.",
+  "unit": "collections-bounded-choice-retention",
+  "stopped_at_utc": "2026-10-15T10:49:24.5232407Z",
+  "missing": [
+    "independent broker probe receipt",
+    "independent source/base/candidate raw hash confirmation",
+    "same-byte receipt reuse authentication",
+    "mandatory final typecheck/build/contract verifier attribution",
+    "ready-for-check handshake"
+  ],
+  "phase": "preparation",
+  "remaining_review": {
+    "active_s": 50,
+    "tokens": 1200
+  },
+  "active_s": null,
+  "wait_note": "Stop now at broker queue; no further review until ready receipt and phase gate.",
+  "status": "WAITING_BROKER_RECEIPT_NO_VERDICT"
+}

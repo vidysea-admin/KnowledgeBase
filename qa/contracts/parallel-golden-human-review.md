@@ -1,0 +1,9 @@
+# Parallel golden human review packet — independent acceptance
+
+Scope: data/eval/golden-set-human-review.json, Fix cycle: 0. This contract accepts a review packet only; it cannot accept gold labels, threshold changes, retrieval performance, pipeline completion, or human gate closure.
+
+1. Packet is parseable and contains exactly the six unique misses recorded by recall-report-vector.json, in recorded order. Every id/question/expectedSessionId matches golden-set.json and golden-set-sibling-semantic.json exactly; top five IDs match the recorded report and exclude the expected ID.
+2. All three input source bindings match exact current bytes, byte lengths, and SHA-256. Historical baseline date/counts/recall/control reproduce the report. Historical semantic date, expected score, best rival ID/score, top ID/score, margins and ambiguous rival IDs reproduce sibling evidence without recalculation. Margins remain negative.
+3. Each case supplies expected and best-rival current transcript bindings. Paths map to the proper session, file byte hashes/lengths/counts match current files, and each selected excerpt maps to exactly one actual turn. Turn hash, tenant/session/speaker/time metadata, literal UTF-16 offset/length/text, and anchor bind to that turn. At least one candidate excerpt exists on each side.
+4. Human gate and case adjudication remain unreviewed; every approval, label, reviewer, answerability, threshold and gate-closure field remains null. Candidate status remains unreviewed. Current-source excerpts are explicitly incomplete candidate evidence, distinct from historical scoring.
+5. Independent checks consume the packet downstream using fresh checker code; no models, DB writes, gold changes or legacy diagnostic reruns are needed. A PASS means the bounded review packet is internally faithful and safe for human review, not that its questions have unique answers.

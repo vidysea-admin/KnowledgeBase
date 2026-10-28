@@ -1,0 +1,35 @@
+{
+  "program": "C:\\Program Files\\nodejs\\node.exe",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "src/visibility/knowledge.test.ts",
+    "../../qa/evidence/goal-t007/visibility-checker.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase/apps/api",
+  "timeoutMs": 90000,
+  "startedAt": "2026-10-14T20:43:27.803Z",
+  "completedAt": "2026-10-14T20:43:29.814Z",
+  "elapsedMs": 2007.3170999999998,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "apps/api/src/visibility/knowledge.ts": "d5e451c463d275d499ea56a62cc434002531617fd05d32dc68a2abbe7ea482a8",
+    "apps/api/src/visibility/knowledge.test.ts": "8ba6e9a77ec15a6d4a183acb965ec0c061818651f9845ce87ecdc39b1855e39d",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "qa/evidence/goal-t007/visibility-checker.test.ts": "5648fcfe9d34739e152b730d8630d27265c548b6eede35c483b376ea13719060"
+  },
+  "after": {
+    "apps/api/src/visibility/knowledge.ts": "d5e451c463d275d499ea56a62cc434002531617fd05d32dc68a2abbe7ea482a8",
+    "apps/api/src/visibility/knowledge.test.ts": "8ba6e9a77ec15a6d4a183acb965ec0c061818651f9845ce87ecdc39b1855e39d",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "qa/evidence/goal-t007/visibility-checker.test.ts": "5648fcfe9d34739e152b730d8630d27265c548b6eede35c483b376ea13719060"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t007-visibility.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t007-visibility.stderr.txt",
+  "hashesUnchanged": true
+}

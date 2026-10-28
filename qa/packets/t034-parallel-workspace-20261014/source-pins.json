@@ -1,0 +1,200 @@
+{
+  "cycle": 0,
+  "base": "ed542fd01c870e5d5b64e1d72b413062d595f675",
+  "owned": [
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts",
+      "sha256": "948FE17FB4B49C060A72D2682E87218B95480C3C9C892B18162881CB4EEADACB",
+      "lines": 162
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.test.ts",
+      "sha256": "FDE28F6BB74BC97CCAE57AA391C186F4FDE8DC61325DE5233B28CE28BAD58F38",
+      "lines": 234
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts",
+      "sha256": "0A18BA7A1C8772909D36B32C413F6C2CA8A133A84F819A7338DCAE7BD09EE3D2",
+      "lines": 114
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-readiness.test.ts",
+      "sha256": "CA65B91DFD8C672A71F1B04B08BC0872E20307C8E1C25BA90C17F1CB81411CDD",
+      "lines": 77
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-acceptance.ts",
+      "sha256": "89B3D1F255EBCF895EAC6FCE5E0BD004C323A119C351D6B9106DF31B511D1DFE",
+      "lines": 126
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-slot-acceptance.test.ts",
+      "sha256": "F66F2EA53043251A3AE2148E993F393FD38EA313D0DE2713A0FA1F8AA949112B",
+      "lines": 94
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-authority-acl.ts",
+      "sha256": "0BDC1FA4EE4EC52A68B90D7A2698938E40843F5C5DBF6C46692E0549273FB8CE",
+      "lines": 25
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-authority-acl.ps1",
+      "sha256": "998821B05B5F85CCD80DC1CC71D4E9508456B7346E00E046960AD82B789FE3E6",
+      "lines": 11
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.ts",
+      "sha256": "0ADCBDAF9772EA0235C1231E76FBE6DC1EF5D6BC302AA330439335F47C79320E",
+      "lines": 15
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/finalize-workspace-recording.test.ts",
+      "sha256": "DB37F681C56B355756446F751055223D38226FD37C732037BF8ED92E6742CC71",
+      "lines": 9
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/record-stop-regression.test.ts",
+      "sha256": "7D2CCDF525BA506B91BB5D4FF356C18B4DB57B7CC8CE69F2C8F547F2BD3514B8",
+      "lines": 77
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.ts",
+      "sha256": "83283B1CAB59D738F0DAAE5E5CCD76AE29DE3B6E21E2E9CF69394A701BD18552",
+      "lines": 294
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-commands.test.ts",
+      "sha256": "558EC4A652B98D50CE641AB097D5EE4B382542C95AA3B168F064A7318E1C21ED",
+      "lines": 371
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/recorder.js",
+      "sha256": "2124310057A5431D10F38254CF1BD39C405C04986C123A3C588CD28AD7D3A7B7",
+      "lines": 111
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/recorder.test.mjs",
+      "sha256": "AB097F192C42F765B982B4317E8B7289030BDD3CF5AA9B050FA91DF4BED99A8C",
+      "lines": 313
+    },
+    {
+      "path": "packages/meeting-bot/py/tab-capture/recorder-origin.test.mjs",
+      "sha256": "395A4839B968DD6C294327FFC92CE8437FDAD8A5EEC47D73995CCD9CB1E98AC0",
+      "lines": 34
+    },
+    {
+      "path": "apps/api/src/capture-readiness/types.ts",
+      "sha256": "EDD4CB47501596CED7F6245D445753F1ED26C5E18E5C2FD02F6BA065A973DE6C",
+      "lines": 12
+    },
+    {
+      "path": "apps/api/src/capture-readiness/router.ts",
+      "sha256": "E2A517074F0515EFD57DA9CC5DD0CAC5383D7739DD18B7792B551EB0243F71CC",
+      "lines": 46
+    },
+    {
+      "path": "apps/api/src/capture-readiness/host-connector.ts",
+      "sha256": "596405844C67309E68B6BF14162941EA245D415C171173482D171C89D62F4416",
+      "lines": 57
+    },
+    {
+      "path": "apps/api/src/capture-readiness/router.test.ts",
+      "sha256": "49CFB151C3C1E10B7C95A4DD5BF5B2704F5E6404C975048AE87F9F0830AA39CE",
+      "lines": 70
+    },
+    {
+      "path": "apps/web/src/pages/meeting-bot/readiness/api.ts",
+      "sha256": "FCBF38C224B1D3421AB6326743F7DF98582A490A3F061F53A09A5CB5A2D86092",
+      "lines": 22
+    },
+    {
+      "path": "apps/web/src/pages/meeting-bot/readiness/CaptureReadinessControls.tsx",
+      "sha256": "30530D429A80C7BBC8A0F83073A66B207435A300FDEE4AB7C447DF7438A61FD1",
+      "lines": 62
+    },
+    {
+      "path": "apps/web/src/pages/meeting-bot/readiness/CaptureReadinessControls.test.tsx",
+      "sha256": "0ADF773B78539E5EBB928E5B7ABD29EF1046540660498E92D3E616B976E1C289",
+      "lines": 45
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/caller-failure-readiness.test.ts",
+      "sha256": "C88E6C379B2DAE25238B3A5AA84880BE4F6DD42DAD124DCB72BA3F1A56596A18",
+      "lines": 34
+    }
+  ],
+  "dependencies": [
+    {
+      "path": "packages/meeting-bot/src/capture/record-finalize.ts",
+      "sha256": "9996474DEDF2628151A5941B9A353FBE934C59A19348F87FD5E6BC682D64E056"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+      "sha256": "AA8E635A1E49E619B9D095835C016189C5AD629F17A73226BFD56C241DB3FC2F"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/controller-state.ts",
+      "sha256": "491B42B03AB072EA416962721889D08F7665F864C64944A9F2045ECAD9F70638"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/runtime.ts",
+      "sha256": "140E6A16501A6F5CDDB785241B8C902B8A4C661ED5EDF9C7DBF2962ECF9E093F"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/privacy.ts",
+      "sha256": "D1BE5DF066B561BA2096491FB31780E2C1FDB9EC307D95D95F49A81E3D9594D2"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+      "sha256": "933F943B04176BCB6047FC6044C77459D6291D94659AFB620DD07A30DEE3BECB"
+    },
+    {
+      "path": "packages/meeting-bot/src/lean-video-ffmpeg.ts",
+      "sha256": "ACE429C916C8326DCBDC56C21585FD51EF6CF7637255FC4D1E259393894202C0"
+    },
+    {
+      "path": "scripts/webinar/scheduler/deps-runtime.mjs",
+      "sha256": "7D1ECB5FEC35717D68B2FD1491909EF4EB8945B1FFC69A2BAEF875E369B8B4B8"
+    },
+    {
+      "path": "qa/contracts/goal-t034.md",
+      "sha256": "A819BCCD04B70BD96E4BED9F1FD0BD0C568E62FA1307A1EB8EAA435E69761D4D"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/context.ts",
+      "sha256": "19B232DC6163FF8FA54215313DAB0A003579058470A9271AF0B1851FC12D954C"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/record-consent/receipt-store.ts",
+      "sha256": "9F07A805EF13895E72F3392071191E00759E2C58AA0A397AA709A16E832EFD4C"
+    },
+    {
+      "path": "packages/meeting-bot/py/sb_join_loop.py",
+      "sha256": "D21A821A343AEA09B46D9D3C423EA4B47B74C591CD44938D5C5908D0B5FD65C1"
+    },
+    {
+      "path": "packages/meeting-bot/py/sb_join_detect.py",
+      "sha256": "B935D7C533B7C7533144F5F6176D2D62D3CBF4F5DF6ECF489B459AF90C97C08B"
+    },
+    {
+      "path": "apps/api/src/auth.ts",
+      "sha256": "7492213E222053BB1E1120F0B5AFFC92639E4F913FCEAF7EE866CDB65FD62CF1"
+    },
+    {
+      "path": "apps/api/src/hosting/service.ts",
+      "sha256": "322F352C404B8DDF472E0A789824E5CD351E7F98D27E861CF112EB0AFCEFEFBB"
+    },
+    {
+      "path": "apps/api/src/hosting/policy.ts",
+      "sha256": "1A22C1DCCD26C7B1CFF96D02DDFEBDE9A6B6B06C95199C59205F4A68005B36FA"
+    },
+    {
+      "path": "apps/web/src/auth/AuthContext.tsx",
+      "sha256": "196181DC165208A35CB23C9D7F9B7AE5E293A7EB40135A7CD90686DDB4EC3E1C"
+    },
+    {
+      "path": "apps/web/src/api/client.ts",
+      "sha256": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802"
+    }
+  ]
+}

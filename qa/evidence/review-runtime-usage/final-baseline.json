@@ -1,0 +1,22 @@
+{
+  "actual_active_seconds": null,
+  "counter_scope": "Idle same checker prospective finalization baseline; all earlier overruns retained",
+  "cumulative_tokens": {
+    "input_tokens": 339078,
+    "cached_input_tokens": 303488,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1682,
+    "reasoning_output_tokens": 35,
+    "total_tokens": 340760
+  },
+  "source_line": 54,
+  "observed_at": "2026-10-15T11:14:20.6564934+00:00",
+  "cycle": 0,
+  "boundary": "baseline",
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl",
+  "thread_id": "01a13f32-e99c-7183-a6aa-3436fe3b5542",
+  "usage_timestamp": "2026-10-15T10:58:11.078Z",
+  "phase": "finalization",
+  "cost": null,
+  "unit": "review-runtime-usage"
+}

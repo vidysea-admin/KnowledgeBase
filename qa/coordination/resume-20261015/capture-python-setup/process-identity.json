@@ -1,0 +1,31 @@
+{
+  "queried_pid": 19420,
+  "found": true,
+  "rows": [
+    {
+      "pid": 19420,
+      "parent_pid": 8552,
+      "start_time": "2026-10-15T20:25:14.787097+00:00",
+      "executable": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "exact_owned_script_match": false,
+      "depth": 0
+    },
+    {
+      "pid": 22508,
+      "parent_pid": 19420,
+      "start_time": "2026-10-15T20:25:14.844657+00:00",
+      "executable": "C:\\Windows\\system32\\conhost.exe",
+      "exact_owned_script_match": false,
+      "depth": 1
+    },
+    {
+      "pid": 18380,
+      "parent_pid": 19420,
+      "start_time": "2026-10-15T20:25:18.049511+00:00",
+      "executable": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "exact_owned_script_match": false,
+      "depth": 1
+    }
+  ],
+  "queried_at": "2026-10-15T20:25:26.8727001Z"
+}

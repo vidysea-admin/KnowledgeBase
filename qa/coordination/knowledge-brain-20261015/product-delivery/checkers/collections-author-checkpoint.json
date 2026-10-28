@@ -1,0 +1,33 @@
+{
+  "token_ratio_status": "already_missed_10.1837_percent",
+  "probe_sha256": "49e5a98da85ebe3e3b67a30fa8127e85e89f8428c5c46f0511c705f5ad2b2179",
+  "cost": null,
+  "manual_final_reserve": {
+    "additional_actual_tokens": 100000,
+    "active_s": 30,
+    "output_tokens": 800
+  },
+  "actual_active_s": null,
+  "command": "pnpm exec vitest run src/__checker_probes__/collections-kind-identity.test.tsx --testNamePattern=\"checker collection kind identity\"",
+  "tokens": null,
+  "utc": "2026-10-15T11:12:06.3808337Z",
+  "status": "WAITING_BROKER",
+  "cwd": "apps/web",
+  "note": "No tests/build executed; post-idle telemetry owns actual token delta. Actual whole-phase active time unknown; tool write/hash elapsed measured separately.",
+  "prior_prep_debit": {
+    "output_tokens": 1000,
+    "active_s": 40
+  },
+  "probe_path": "apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+  "gate_result": "staged-admission/collections-bounded-choice-retention-actual-author-result.json",
+  "expected_selected": 1,
+  "phase": "independent-probe-author",
+  "committed_author_cap": {
+    "additional_actual_tokens": 100000,
+    "active_s": 50,
+    "output_tokens": 1200
+  },
+  "tool_material_phase_s": 0.1891209,
+  "unit": "collections-bounded-choice-retention",
+  "cycle": 0
+}

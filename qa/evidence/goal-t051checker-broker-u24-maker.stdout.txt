@@ -1,0 +1,107 @@
+✔ flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1 (1.5804ms)
+✔ suggest writes a status=suggested row with its quote, and NEVER a speakers row (16.2362ms)
+✔ a verifier that does not say yes yields no suggestion (2.7997ms)
+✔ an ungrounded name (quote not in the transcript) is not suggested (0.6114ms)
+✔ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (6.6635ms)
+✔ a model that throws never throws out of the hook and writes nothing (0.5744ms)
+✖ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (2.4363ms)
+✖ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (0.4232ms)
+✔ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (2.7389ms)
+✔ ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw (1.8449ms)
+✔ ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues (50.5796ms)
+✖ indexSession still completes when the suggestion hook fails (0.7654ms)
+✔ production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins (0.194ms)
+✔ route uses verified tenant, sessions scope, safe errors and private no-store (137.2268ms)
+✔ store errors hide credentials, transcript and raw exception (19.4884ms)
+{"sample":"actual-toc-mounted-api","personId":"person:ruby","identityStatus":"deterministic","sourceSessionId":"2026-04-21-visa-blueprint-part2-italy-france-nz","sourceIdentityCitations":1,"fixtureAuthTenant":"toc","sourceDataTenant":"toc","databaseWrites":0,"providerCalls":0,"artifact":"C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\u24-speaker-profile\\actual-toc-api-response.json"}
+✔ actual TOC deterministic persona traverses mounted API and produces a downstream response artifact (29.5331ms)
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (10.4029ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (2.2486ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (45.6587ms)
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (157.5832ms)
+✔ confirmed suggestion rehydrates quote and blocks; knowledge never bleeds into recurring labels (6.939ms)
+✔ suggested, rejected, forged confirmation and fabricated quote cannot establish identity (1.6037ms)
+✔ missing sessions, invalid ranges, mixed-label blocks and ambiguous chronological ties abstain (19.1607ms)
+✔ opposing confirmed block owners refuse overlapping scope (0.6604ms)
+✔ multi-speaker, unverified, visual, foreign and absent quotes cannot become this speaker's claim (1.2256ms)
+✔ org and role need accepted own attribute evidence, not just identity provenance (0.9703ms)
+✔ topic identifiers match exactly, never foreign/prefix labels (0.4906ms)
+✔ direct resolved refs require established identity; foreign speaker refused (0.5314ms)
+✔ old unanchored and stale re-indexed blocks never attribute another reused-label turn (0.6308ms)
+✔ same-named cross-session persona keeps merge ambiguity and recorded confidence (7.4579ms)
+✔ deterministic self-naming floor retains only its own block (0.6951ms)
+✖ quoted or reported legacy floor names cannot establish a live identity or spread into another block (4.4999ms)
+✖ real migrated TOC corpus identity citations survive the profile projection without writes (210.4313ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 28
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10101.6405
+
+✖ failing tests:
+
+test at apps\api\src\indexing\speaker-suggest.test.ts:1:4920
+✖ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (2.4363ms)
+  Error: Session is unavailable for aggregate indexing; reviewed chat claims use their approved evidence materializer
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:69:87)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\speaker-suggest.test.ts:110:17)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at apps\api\src\indexing\speaker-suggest.test.ts:1:5511
+✖ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (0.4232ms)
+  Error: Session is unavailable for aggregate indexing; reviewed chat claims use their approved evidence materializer
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:69:87)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\speaker-suggest.test.ts:122:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at apps\api\src\indexing\speaker-suggest.test.ts:1:8094
+✖ indexSession still completes when the suggestion hook fails (0.7654ms)
+  Error: Session is unavailable for aggregate indexing; reviewed chat claims use their approved evidence materializer
+      at indexSession (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:69:87)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\speaker-suggest.test.ts:172:15)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at packages\index\src\pipeline\speaker-profiles\profile.test.ts:1:7433
+✖ quoted or reported legacy floor names cannot establish a live identity or spread into another block (4.4999ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\index\src\pipeline\speaker-profiles\profile.test.ts:109:125)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at packages\index\src\pipeline\speaker-profiles\profile.test.ts:1:8156
+✖ real migrated TOC corpus identity citations survive the profile projection without writes (210.4313ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\product\Desktop\KnowledgeBase\data\toc-migrated\2026-10-13-zoom-webinar-p1\session.json'
+      at Object.openSync (node:fs:621:18)
+      at readFileSync (node:fs:487:35)
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\index\src\pipeline\speaker-profiles\profile.test.ts:124:26)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-10-13-zoom-webinar-p1\\session.json'
+  }

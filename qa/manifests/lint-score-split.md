@@ -106,3 +106,5 @@ ci.yml`)" — so a future reader of I7 alone doesn't read this unit as a violati
 4. **Resolved the I7 wording tension itself** — rewrote the stale "must be wired into
    `pnpm lint:structure`" text to match its own prior amendment-log ruling, with a new
    amendment-log entry. Wording only, no invariant weakened.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

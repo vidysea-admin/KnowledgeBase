@@ -1,0 +1,18 @@
+{
+  "_id": "def-0123456789abcdef0123456789abcdef01234567",
+  "tenantId": "tenant-a",
+  "recordType": "definition",
+  "kind": "application-readiness",
+  "enabled": true,
+  "maxAttempts": 4,
+  "timeoutMs": 5000,
+  "version": 1,
+  "updatedAt": 1000,
+  "history": [
+    {
+      "at": 1000,
+      "actor": "key-admin",
+      "action": "configured"
+    }
+  ]
+}

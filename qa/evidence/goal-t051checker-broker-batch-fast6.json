@@ -1,0 +1,31 @@
+{
+  "ready": [
+    "t040-product-frozen",
+    "t054-api-frozen",
+    "t022-independent-refresh",
+    "t059-cycle1-mounted",
+    "t059-cycle1-rows",
+    "t011-helpers",
+    "t011-api",
+    "t061-ui"
+  ],
+  "skipped": [
+    {
+      "n": "t055-web",
+      "drift": [
+        [
+          "apps/api/src/composition/integrations/knowledge.ts",
+          "35f4d99593c9304f4cfeb3ef86dbdea1375f4fdf7c17140efebca43f39e9b4d9"
+        ],
+        [
+          "apps/web/src/pages/whatsapp-review/ReviewSourcePage.tsx",
+          "f73db6eaae02a870dcc15ff6a21fd14b39b321fd9f810dcacc27f215289bb7e1"
+        ],
+        [
+          "apps/web/src/pages/sessions/decisions/client.ts",
+          "e9be5e6d094663902672bbdf4353fc4b6d7fcc9e33b5d419b37fb4c97e2bfa8a"
+        ]
+      ]
+    }
+  ]
+}

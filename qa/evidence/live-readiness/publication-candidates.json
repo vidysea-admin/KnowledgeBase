@@ -1,0 +1,2966 @@
+{
+  "version": 3,
+  "generatedAt": "2026-10-09T14:21:24.984805+00:00",
+  "reviewType": "read-only-minimal-code-publication-prerequisite-review",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "branch": "codex/machine-migration-2026-10-09",
+  "head": "87858c734f4928df7a141e8f17691f170719c76b",
+  "remote": {
+    "name": "origin",
+    "fetchAndPushTarget": "https://github.com/vidysea-admin/KnowledgeBase.git",
+    "currentVisibility": "PUBLIC",
+    "isPrivate": false,
+    "defaultBranch": "master",
+    "visibilityVerification": "Authenticated gh repo view --json nameWithOwner,url,isPrivate,visibility,defaultBranchRef succeeded with bounded 20s subprocess and approved read-only network escalation. Sandboxed first attempt failed at denied localhost proxy.",
+    "deploymentOwner": "Umesh; no deployment performed"
+  },
+  "counts": {
+    "dirtyFileEntries": 295,
+    "trackedDirtyFiles": 32,
+    "untrackedFiles": 263,
+    "closedScopedUnits": 9,
+    "primaryReviewedLeaves": 12,
+    "primaryCheckpointMatches": 12,
+    "primaryCheckpointMismatches": 0,
+    "primaryHashesNotFound": 0,
+    "candidateFilesIncludingQA": 0,
+    "minimalCodeCandidateFiles": 12,
+    "proposedCodeDeltaFiles": 13,
+    "totalProposedCodeFiles": 25,
+    "minimalQACompanions": 24,
+    "QACompanionsNeedingMetadataRedaction": 0,
+    "codeAndSupportCandidates": 67,
+    "askWipClosurePathsIncludingOverlap": 23,
+    "totalCodeAndSupportClosureIfOwnerAccepts": 67,
+    "QACompanionsWithPrivacyBlockers": 0,
+    "sourceHashMismatches": 0,
+    "ownerAcceptedAskExclusiveCodeAndTests": 22,
+    "pendingOwnerQACompanions": 5,
+    "unreviewedDirtyRuntimeDependenciesRemaining": 0
+  },
+  "closedScopedUnits": [
+    "parallel-claim-evidence-review",
+    "parallel-compete-tenant-coverage",
+    "parallel-extraction-adjudication",
+    "parallel-golden-human-review",
+    "parallel-heartbeat-tenancy",
+    "parallel-jobs-api",
+    "parallel-jobs-db",
+    "parallel-meeting-fixture-tenancy",
+    "parallel-sources-explorer"
+  ],
+  "candidates": [
+    {
+      "path": "apps/web/src/pages/SourcesPage.tsx",
+      "unit": "parallel-sources-explorer",
+      "role": "reviewed-source-or-packet",
+      "sha256": "0884d1b950adf62525fbc4e01efc1aef680f29dfaf77d39736f94995cb4f96f3",
+      "checkpointSha256": "0884d1b950adf62525fbc4e01efc1aef680f29dfaf77d39736f94995cb4f96f3",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/web/src/pages/SourcesPage.test.tsx",
+      "unit": "parallel-sources-explorer",
+      "role": "reviewed-source-or-packet",
+      "sha256": "237fabee5fabddb808ca2d209451a3d9347d3a6eaf5a4039d38af58023cc6793",
+      "checkpointSha256": "237fabee5fabddb808ca2d209451a3d9347d3a6eaf5a4039d38af58023cc6793",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "packages/db/src/collections/watch-heartbeat.ts",
+      "unit": "parallel-heartbeat-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "aa5dd715e2e49997c65ef7faac96a32889df428bbbf8d341bcf76f16ef3baf50",
+      "checkpointSha256": "aa5dd715e2e49997c65ef7faac96a32889df428bbbf8d341bcf76f16ef3baf50",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "packages/db/src/collections/watch-heartbeat.test.ts",
+      "unit": "parallel-heartbeat-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "c20829eddea92c65f75b0275df51ab7d0dbf9c2f6494fc49f101a4a9d5b550ef",
+      "checkpointSha256": "c20829eddea92c65f75b0275df51ab7d0dbf9c2f6494fc49f101a4a9d5b550ef",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS plus independent pin addendum; no release acceptance. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan.",
+      "independentCheckpointEvidence": "qa/evidence/parallel-heartbeat-tenancy-pin-addendum.md"
+    },
+    {
+      "path": "apps/api/src/fixtures.ts",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "checkpointSha256": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No new source transcript/claim quote or personal identifier in inspected code changes; synthetic tenant/test data only. Existing fixture addresses are baseline, not newly introduced."
+    },
+    {
+      "path": "apps/api/src/routes/meeting-candidates.test.ts",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "155b9f1a58f57510d8764b47b8eba1efed8f86c624aa714eba2c45ba9d334037",
+      "checkpointSha256": "155b9f1a58f57510d8764b47b8eba1efed8f86c624aa714eba2c45ba9d334037",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No new source transcript/claim quote or personal identifier in inspected code changes; synthetic tenant/test data only. Existing fixture addresses are baseline, not newly introduced."
+    },
+    {
+      "path": "packages/db/src/collections/jobs.ts",
+      "unit": "parallel-jobs-db",
+      "role": "reviewed-source-or-packet",
+      "sha256": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2",
+      "checkpointSha256": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "packages/db/src/collections/jobs.test.ts",
+      "unit": "parallel-jobs-db",
+      "role": "reviewed-source-or-packet",
+      "sha256": "12704e7e8187922d1676f7a01eb8bb7861e7ebdd4be71e5a28726d7e3b5a88f7",
+      "checkpointSha256": "12704e7e8187922d1676f7a01eb8bb7861e7ebdd4be71e5a28726d7e3b5a88f7",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/router.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "6c337958b7700638403e77d7006d4fd24d0b3393d9b81276cd58049d7d638131",
+      "checkpointSha256": "6c337958b7700638403e77d7006d4fd24d0b3393d9b81276cd58049d7d638131",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/router.test.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "7caa17695e232d7ee34d47fba8ed9cfae441439b1516c6f07ee18e4176115874",
+      "checkpointSha256": "7caa17695e232d7ee34d47fba8ed9cfae441439b1516c6f07ee18e4176115874",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/store.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+      "checkpointSha256": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/store.test.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "a1a4856c176ac672b21df925506c7806875cc7a34bc682e06ac8edf801f57b14",
+      "checkpointSha256": "a1a4856c176ac672b21df925506c7806875cc7a34bc682e06ac8edf801f57b14",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/web/src/api/jobs.ts",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "5565e99ec7da536249509e28053e8fb5c2bdf32a70be37b0a36eda707a93ab2b",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/api/jobs.test.ts",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "53cc8680677407c462aef453f5c6aa3e8549da3e6201a0ffda3e36a4d0e9cef5",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/jobs/JobsPage.tsx",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "ed15ee937652e376fb76a7c2e157e84a49e6ec57ea76afe2734bcdde155247e1",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/jobs/JobsPage.test.tsx",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "f65b6e998d80a3e952732220bcf840d5020339aa33d3c9deb4c4ebd27ac8d8bf",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "1aabc8ec568eb83972ac995aafd2cecc56de2ec0b2bff7cb18e7d7467636eefd",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/layout/NavSidebar.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "8adce878ee3d1998df8cc9e530af2363519781b708b1d5391c408eef563349b6",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/SettingsPage.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "7ae43f545697316d1f50ef16aad5f04a39b4c9a7a3ec1835381805fe059b290b",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/SettingsPage.test.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "b3864075f01f3a1d1da68057330bee20c4600e49ad29316a6bbe9be4ed293c16",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "f5797ab0860b99de1364c5e68de002b406d19133f07a0104469fbceb2803687b",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/jobs/fixture-store.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "6296490e14cd956ecf1779285046ef42d3d80ff77035848973917023119e129c",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/jobs/fixture-store.test.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "72259ead01eb6676458792708d5e485011ad11c88a0d5e007c59a5fb4c18120e",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "fa4129a968966c6cceb1c9adc6443f42bc9f584ac7cb2feb698c07da2218bef5",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/production.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "ff65725758a0ed858dda585f8ef469ffb32bf2a7afea375d0e650396b448ac1e",
+      "scope": "Jobs cycle0 PASS plus exact owner-frozen Ask WIP shared composition; exclusive Ask ownership not claimed.",
+      "ownerComposedScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20"
+    },
+    {
+      "path": "apps/api/src/routes/compete.ts",
+      "unit": "parallel-compete-bounded-context",
+      "role": "reviewed-code",
+      "sha256": "86fb7a0ef5155a4472486044bb5270cad8f9043d7527c6a7eceef77b50e21558",
+      "checkpointSha256": "86fb7a0ef5155a4472486044bb5270cad8f9043d7527c6a7eceef77b50e21558",
+      "checkpointMatch": true,
+      "scope": "cycle0 scoped PASS only"
+    },
+    {
+      "path": "apps/api/src/routes/compete.test.ts",
+      "unit": "parallel-compete-bounded-context",
+      "role": "reviewed-code",
+      "sha256": "354bd4b8dadaeaba88e3b9d62671a02fbb84339ad5f4cb4c9854c6f76d4610f6",
+      "checkpointSha256": "354bd4b8dadaeaba88e3b9d62671a02fbb84339ad5f4cb4c9854c6f76d4610f6",
+      "checkpointMatch": true,
+      "scope": "cycle0 scoped PASS only"
+    },
+    {
+      "path": "scripts/upload/security.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "0980cafb333d7025703330619e4bd0041728751877898de829ce8d302e0030fc",
+      "checkpointSha256": "0980cafb333d7025703330619e4bd0041728751877898de829ce8d302e0030fc",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/queue.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "267de11f43bfdb0b6294dd37699e7a60a08c504dfc49adc5fbac608a0d56f3d7",
+      "checkpointSha256": "267de11f43bfdb0b6294dd37699e7a60a08c504dfc49adc5fbac608a0d56f3d7",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/submit.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "be7e7cad736a9faba4361811d886a3f4b17148e3e864c824150941122f69b611",
+      "checkpointSha256": "be7e7cad736a9faba4361811d886a3f4b17148e3e864c824150941122f69b611",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/real-proof.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "e92bdea500c16d0203495faf1cdb3e4d819c7d5d50daae955ca6b2e15db5f221",
+      "checkpointSha256": "e92bdea500c16d0203495faf1cdb3e4d819c7d5d50daae955ca6b2e15db5f221",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/queue.test.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d8d6dc281561cf0f81ad6f372dd40f00af54654b88337c48bc4096fe3152a4ff",
+      "checkpointSha256": "d8d6dc281561cf0f81ad6f372dd40f00af54654b88337c48bc4096fe3152a4ff",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/google_transport.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d3cb7906deeeb50069a986131d15351b8bbbaf23b2ab77ec5168d4dd7243a54d",
+      "checkpointSha256": "d3cb7906deeeb50069a986131d15351b8bbbaf23b2ab77ec5168d4dd7243a54d",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/job_queue.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "5fe8a65123a65198f4a2ba05fe09ee7cce1d4499b56647d51ca5cf5932c65f91",
+      "checkpointSha256": "5fe8a65123a65198f4a2ba05fe09ee7cce1d4499b56647d51ca5cf5932c65f91",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/schema_check.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "a90f42a4bca1016935f6512907b2615db38f44f069fb09410a87449f28cf0e34",
+      "checkpointSha256": "a90f42a4bca1016935f6512907b2615db38f44f069fb09410a87449f28cf0e34",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/worker.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d90037d38f9b8434f634de7721861cc4103edc5f998892a040c6b6eeaeb92f1c",
+      "checkpointSha256": "d90037d38f9b8434f634de7721861cc4103edc5f998892a040c6b6eeaeb92f1c",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/test_worker.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "013c82f8d2af7b9aaf79dba940c141231c7d29ff91677f1ef8589c04252e77f2",
+      "checkpointSha256": "013c82f8d2af7b9aaf79dba940c141231c7d29ff91677f1ef8589c04252e77f2",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/index.ts",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "69a8aa46f47edda7c998e89af0237d985b34a857d34de7a2cc6ddc63f2636584",
+      "checkpointSha256": "69a8aa46f47edda7c998e89af0237d985b34a857d34de7a2cc6ddc63f2636584",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/package.json",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "ee84905a0c5f3665184f2886f59ed88ef381b7687e0b7081fa71c36c9b3dfc9c",
+      "checkpointSha256": "ee84905a0c5f3665184f2886f59ed88ef381b7687e0b7081fa71c36c9b3dfc9c",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/requirements.txt",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "82a952467cd4672ecf83402d10928d8064cf9dc7580db92acc6e942cb2fae4f9",
+      "checkpointSha256": "82a952467cd4672ecf83402d10928d8064cf9dc7580db92acc6e942cb2fae4f9",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/README.md",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d82e65bba9c05eace9472d690859f7a54dbccd4265ab7cb1e6357dea52bd402f",
+      "checkpointSha256": "d82e65bba9c05eace9472d690859f7a54dbccd4265ab7cb1e6357dea52bd402f",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.ts",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "00eb58ec23a0caf4401526622b4ce67cb037d64eeec1bf5e470c87132eadabf8",
+      "checkpointSha256": "00eb58ec23a0caf4401526622b4ce67cb037d64eeec1bf5e470c87132eadabf8",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.test.ts",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "9beaddeea40a80c55ed300470b4e7ca5d4f7f2a0ad2dd2572355cafe79e5606d",
+      "checkpointSha256": "9beaddeea40a80c55ed300470b4e7ca5d4f7f2a0ad2dd2572355cafe79e5606d",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/transcribe-long-session.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "58ebc6438bab1a28a733b4e4c61348c08ae962d98d5649bb4cb820870a070d94",
+      "checkpointSha256": "58ebc6438bab1a28a733b4e4c61348c08ae962d98d5649bb4cb820870a070d94",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/lib/transcript-provenance.test.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "b1744d9e091ff4f07e0cd4ca180a9d305fbb666554008efcd65499d30dbbc663",
+      "checkpointSha256": "b1744d9e091ff4f07e0cd4ca180a9d305fbb666554008efcd65499d30dbbc663",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927",
+      "checkpointSha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "15b5fa21efaef75581f8d99266cdb3fa7143884e99849f08bbb6f8867eed0d52",
+      "checkpointSha256": "15b5fa21efaef75581f8d99266cdb3fa7143884e99849f08bbb6f8867eed0d52",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "d2acfd87eb508c0bf2440c6cf2318433e711e1644a4db58e74a14087451a0757",
+      "checkpointSha256": "d2acfd87eb508c0bf2440c6cf2318433e711e1644a4db58e74a14087451a0757",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "scripts/backfill.mjs",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "b127a049ff9eae480cf38c295d744df7e91f82f66496516f7d9ad32c97ee9dd5",
+      "checkpointSha256": "b127a049ff9eae480cf38c295d744df7e91f82f66496516f7d9ad32c97ee9dd5",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "scripts/lib/toc-embedding-backfill.mjs",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "4ca19852fd7e8d4fb2dcef6c1873105c413c96b767fc00df150419851081bd8f",
+      "checkpointSha256": "4ca19852fd7e8d4fb2dcef6c1873105c413c96b767fc00df150419851081bd8f",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ai/src/providers/ollama.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "2906aa9be90ee95dff3e5d4f8c332b70ece875f8d5bbcdd8dcd5ce36e888e492",
+      "checkpointSha256": "2906aa9be90ee95dff3e5d4f8c332b70ece875f8d5bbcdd8dcd5ce36e888e492",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/ask-v2.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "2a795cf8b0cb45ac6f3c5cc7298c66cf14a7b3db2f89af31080d8ec896b56629",
+      "checkpointSha256": "2a795cf8b0cb45ac6f3c5cc7298c66cf14a7b3db2f89af31080d8ec896b56629",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/answer.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "482132ff75520f58ebce7e99ed3d15e56089da3f28a999faf46e8e675d2fabb4",
+      "checkpointSha256": "482132ff75520f58ebce7e99ed3d15e56089da3f28a999faf46e8e675d2fabb4",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/index.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "abed451dcd8ed8c6e545d9a6976c6d8d2e1c5774639eaaf9e2b746924c395315",
+      "checkpointSha256": "abed451dcd8ed8c6e545d9a6976c6d8d2e1c5774639eaaf9e2b746924c395315",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/source-context.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "27402b3e0f23aa74e79afd2a296a6a9f4c88e43c210b52375f2603f46a8267dc",
+      "checkpointSha256": "27402b3e0f23aa74e79afd2a296a6a9f4c88e43c210b52375f2603f46a8267dc",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/bounded-refine.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "8957fa3cc8a4514db13020683a6d7516031bc4c29938a4dff2fa1b8570524189",
+      "checkpointSha256": "8957fa3cc8a4514db13020683a6d7516031bc4c29938a4dff2fa1b8570524189",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/routes/ask.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "b9cea1cd3570651f8354c3fcc7607a5ac6e9194cece52987a2032cd126ec42e2",
+      "checkpointSha256": "b9cea1cd3570651f8354c3fcc7607a5ac6e9194cece52987a2032cd126ec42e2",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "e7516bb1133282431cbcb13b3dbc76e2fe50a1b178dc6cbc0b0d6d873ccfae98",
+      "checkpointSha256": "e7516bb1133282431cbcb13b3dbc76e2fe50a1b178dc6cbc0b0d6d873ccfae98",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/web/src/pages/AskPage.tsx",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "fa8a8d26dd974f2770d018eeaffc48307da4e3d527f07f039a266d59102e9b81",
+      "checkpointSha256": "fa8a8d26dd974f2770d018eeaffc48307da4e3d527f07f039a266d59102e9b81",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.test.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "test",
+      "sha256": "421cb4666a189202de077315d9172216e1dd2d449389925fdfbfe153187bd607",
+      "checkpointSha256": "421cb4666a189202de077315d9172216e1dd2d449389925fdfbfe153187bd607",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "scripts/lib/toc-embedding-backfill.test.mjs",
+      "unit": "recovery-embedding-backfill",
+      "role": "test",
+      "sha256": "28a71e59fac87a4b51958f5a1c0ad65913aff977808f020068f73cffe6d19856",
+      "checkpointSha256": "28a71e59fac87a4b51958f5a1c0ad65913aff977808f020068f73cffe6d19856",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ai/src/providers/ollama-boundary.test.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "test",
+      "sha256": "67579167462c48a5e19f942737e4013c150d9c44b3fda53b315b270fc205cb9e",
+      "checkpointSha256": "67579167462c48a5e19f942737e4013c150d9c44b3fda53b315b270fc205cb9e",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/source-context.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "731a933b2a8909f046e490040240938f40ee0fac7b02f58a7f7f6c706f6a9ab9",
+      "checkpointSha256": "731a933b2a8909f046e490040240938f40ee0fac7b02f58a7f7f6c706f6a9ab9",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/bounded-ask.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "e565bcbfd28e8ea35b96fb7dee2e382d7ffc32c60246ac91a4f03d88b1c45d45",
+      "checkpointSha256": "e565bcbfd28e8ea35b96fb7dee2e382d7ffc32c60246ac91a4f03d88b1c45d45",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/routes/ask.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "acb7f310303e9b6de01769a9577328fc13525de0b814798bcd65f8cb728f71c9",
+      "checkpointSha256": "acb7f310303e9b6de01769a9577328fc13525de0b814798bcd65f8cb728f71c9",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/ask/source-context.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "d59daec3ac6f9e6fc45defba8cfab79f00873d280ed576db56cc459a0502d35f",
+      "checkpointSha256": "d59daec3ac6f9e6fc45defba8cfab79f00873d280ed576db56cc459a0502d35f",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/web/src/pages/AskPage.test.tsx",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "851c5831238afaefbaa259d57d7bbe1c428fe1b84061e4ef41b3e504a76b15be",
+      "checkpointSha256": "851c5831238afaefbaa259d57d7bbe1c428fe1b84061e4ef41b3e504a76b15be",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    }
+  ],
+  "publicationDependencies": [
+    "Root concrete67-path whole-code allowlist approval and final rehash before publication; sole root Git publisher, no partial source selection.",
+    "STT18 exact source pins match scoped effective cycle3 PASS; final explicit owner publication ACK/closure response is still pending root receipt.",
+    "Five owner-frozen Ask/backfill QA companions need privacy review before publication; all evidence bodies excluded. Existing24 Sources/Heartbeat/ISS359/Jobs/Compete companions minimal candidate privacy scans safe.",
+    "scripts/lib current32/30 versus HEAD30/30 is a new directory overage from backfill helper/test; no code LOC overage detected in checked paths. WIP checkpoint must preserve this limitation, not claim global structure PASS.",
+    "No corpus/review packets, runtime/cache/env/keys/data/quote evidence, experimental ranking HOLD drafts, scheduler activation, provider/DB actions or release/acceptance promotion."
+  ],
+  "excludedUnits": [
+    "unadopted Ask ranking/hydration-selector HOLD drafts",
+    "private data review/claim-review/evidence quote bodies",
+    "runtime cache/env/keys/DB",
+    "unclosed backfill/retrieval execution and acceptance"
+  ],
+  "actionsPerformed": [
+    "read D116/D117 exact publication scope",
+    "authenticated GitHub metadata readback, bounded/read-only/no token output",
+    "lightweight candidate hashes and public-disclosure scans",
+    "inspect ISS-359 source/test exact diffs",
+    "replace own inventory with code-only allowlist",
+    "refresh final Jobs handshakes/integration verdict",
+    "inspect gitignore and git check-ignore",
+    "compare HEAD and working API composition markers",
+    "record proposed delta only; keep earlier12 candidates separate until root approval"
+  ],
+  "notAcceptance": true,
+  "historicalBroadInventoryCount": 198,
+  "publicationAuthorization": {
+    "D116": "Explicit Umesh informed public visibility consent for already tracked transcripts/processed data; visibility and handoff evidence only.",
+    "D117": "Approved-by Umesh: machine-migration Git checkpoint/ref publication and portable documentation/evidence, preserve in-progress states; no architecture/contract/enforcement edits, source-submodule visibility changes, secrets/cookies, production writes, paid calls or scheduler activation.",
+    "currentScope": "Parent requests minimum code-only candidate set. D117 does not certify current pending code, release acceptance, or blanket staging of newly generated transcript/claim-evidence review packets."
+  },
+  "redactionBlockers": [
+    "Private quote-bearing evidence/data/claim review packets remain excluded wholesale. Generic local command paths in the21 independently checked companions are not privacy blockers; preserve them."
+  ],
+  "minimalCompanionReview": [
+    {
+      "path": "qa/contracts/parallel-sources-explorer.md",
+      "unit": "parallel-sources-explorer",
+      "sha256": "8c9328faf9755c53bff3ea1935487e195fcab693c28bec5fdab26b42365e2879",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-sources-explorer.md",
+      "unit": "parallel-sources-explorer",
+      "sha256": "905b115de1dabcc8a3069f8ef5f11bed2123515bc0a139b2958a386ede0ad21d",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 2,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-sources-explorer.md",
+      "unit": "parallel-sources-explorer",
+      "sha256": "874c9f353d6137d2c27a11ed0d66a9d31b23c727fffa79b6a3ae85609d566250",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-sources-explorer",
+        "Cycle checked: 0",
+        "Verdict: PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-heartbeat-tenancy.md",
+      "unit": "parallel-heartbeat-tenancy",
+      "sha256": "737c59b0574af6d15b1ebce0721eb447c22377ee1ea82b71620575aa34193aae",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-heartbeat-tenancy.md",
+      "unit": "parallel-heartbeat-tenancy",
+      "sha256": "6c3a53952f8c76e69df83f5e065f52b95be0b714b7f0c0de4e9c30577469dcdd",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 2,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "**Status:** checked-PASS",
+        "**Fix cycle:** 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-heartbeat-tenancy.md",
+      "unit": "parallel-heartbeat-tenancy",
+      "sha256": "7d051bb003cab1fc01cd86024c73c9c524aec588ef88153560f5e2bae1de5595",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 4,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-heartbeat-tenancy",
+        "**VERDICT:** PASS",
+        "**Cycle checked:** 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-meeting-fixture-tenancy.md",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "sha256": "2bf901d05999cb9ae991912ae787f4623d9300c512f9702b28f677f7471cd6a2",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-meeting-fixture-tenancy.md",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "sha256": "5a9dbcfb880abf1df909aa0e912933af12ac6cb33ab7d5295ea45e3121b340ea",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 3,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 0",
+        "**Handshake status:** checked-PASS",
+        "`Cycle checked: 0` and PASS. Maker records that scoped verdict above; broader validation remains open."
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-meeting-fixture-tenancy.md",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "sha256": "4963474d10dcfb17bc59d61baab077037782649e1287b5263831e7c17a3ebd10",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 3,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-meeting-fixture-tenancy",
+        "**VERDICT:** PASS",
+        "**Cycle checked:** 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-db.md",
+      "unit": "parallel-jobs-db",
+      "sha256": "8663b5f747e136ccd8282153b9db06ed76da04429f210609a61d29fc00630354",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "verdict with Cycle checked N and independently derived DB1–DB5 evidence. Scoped DB"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-db.md",
+      "unit": "parallel-jobs-db",
+      "sha256": "0d5dd9fe5228c843686af02a1bf6ef59f212c3d456f4c61aa7b405e491749254",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 2,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "**Status:** checked-PASS",
+        "**Fix cycle:** 0",
+        "git status --short -- packages/db/src/collections/jobs.ts packages/db/src/collections/jobs.test.ts:"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-db.md",
+      "unit": "parallel-jobs-db",
+      "sha256": "3556e9de02d06603dea3146a48e69f296eb293758a29e3c43e0762d758ed4df8",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 1,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Cycle checked: 0",
+        "VERDICT: PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-api.md",
+      "unit": "parallel-jobs-api",
+      "sha256": "195db71eef0483cf651c7cc61175b0359cec5febd954fe0cde9c8a0bf68fb4c3",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-api.md",
+      "unit": "parallel-jobs-api",
+      "sha256": "fba241c2badeb6d132ba0285998bb970ce1f9e843accce6726264de911d5b906",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 1,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "**Fix cycle:** 1",
+        "**Status:** checked-PASS",
+        "**Handshake status:** checked-PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-api.md",
+      "unit": "parallel-jobs-api",
+      "sha256": "3dbf5cf0928dc76426e3346950900970e76a47ff69abba4e55c971fae79829b1",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-jobs-api",
+        "**VERDICT:** FAIL",
+        "**Cycle checked:** 0",
+        "VERDICT: PASS",
+        "Cycle checked: 1"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-web.md",
+      "unit": "parallel-jobs-web",
+      "sha256": "9e4cf24ad548af76f10bdbc4a1fb802d6ac290e2407dc5f7295c2bff57763a06",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "   status transformation. Preserve API order rather than inventing a sorting promise.",
+        "## Handshake"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-web.md",
+      "unit": "parallel-jobs-web",
+      "sha256": "36f84ed18cc2086eac7d8b4e6950e09a22ae8f5faf34403683de2c23ee068058",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 3,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 1"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-web.md",
+      "unit": "parallel-jobs-web",
+      "sha256": "a2f50dd77abc46b5f9fdf2d1536da655b7b14de564bbc3e54bc2842abd37c448",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-jobs-web",
+        "Cycle checked: 1",
+        "Verdict: PASS",
+        "status, envelope, optional-field and poison refusals remain. JobsPage application"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-read.md",
+      "unit": "parallel-jobs-integration",
+      "sha256": "e79b27526d4a0c21625bff94940bd7deff44d21142c93b5bf54166b47db9c00d",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "## Handshake and constraints"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-integration.md",
+      "unit": "parallel-jobs-integration",
+      "sha256": "9d36c062d34ea9c60b31bd98489dd7c4593484f78fde5e0d7e473b607c1bcddd",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 1,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-integration.md",
+      "unit": "parallel-jobs-integration",
+      "sha256": "bd9101ceae1a57a033e855fa8ae43f6a68ac94e294c61950f0c76af49e89871f",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-jobs-integration",
+        "Cycle checked: 0",
+        "VERDICT: PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-compete-bounded-context.md",
+      "unit": "parallel-compete-bounded-context",
+      "sha256": "347ca932f5478c5a2636442a82305ab920e5fd267f169f92c10a8352ada0b005",
+      "privacyScan": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedUrl": 0,
+        "transcriptData": 0
+      },
+      "publicationState": "minimal scoped handshake candidate; zero suspicious secret/email/credentialed URL/private transcript markers; final independent privacy approval optional",
+      "privacyBlocker": false,
+      "statusFields": []
+    },
+    {
+      "path": "qa/manifests/parallel-compete-bounded-context.md",
+      "unit": "parallel-compete-bounded-context",
+      "sha256": "d48bbc4e5cec2c59663fb6961fa188f2786034bb0a761057c905d50d0273ca0e",
+      "privacyScan": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedUrl": 0,
+        "transcriptData": 0
+      },
+      "publicationState": "minimal scoped handshake candidate; zero suspicious secret/email/credentialed URL/private transcript markers; final independent privacy approval optional",
+      "privacyBlocker": false,
+      "statusFields": [
+        "**Fix cycle:** 0",
+        "**Status:** checked-PASS",
+        "**Handshake status:** checked-PASS"
+      ]
+    },
+    {
+      "path": "qa/verdicts/parallel-compete-bounded-context.md",
+      "unit": "parallel-compete-bounded-context",
+      "sha256": "8237b797f8fd0ab6218774fdd05906b88e055934e50c4f2b47a8c47b11391750",
+      "privacyScan": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedUrl": 0,
+        "transcriptData": 0
+      },
+      "publicationState": "minimal scoped handshake candidate; zero suspicious secret/email/credentialed URL/private transcript markers; final independent privacy approval optional",
+      "privacyBlocker": false,
+      "statusFields": [
+        "# Verdict — parallel-compete-bounded-context",
+        "VERDICT: PASS",
+        "Cycle checked: 0"
+      ]
+    }
+  ],
+  "publicationCollision": {
+    "path": "apps/api/src/production.ts",
+    "headContainsAskSourceContext": false,
+    "workingDiffContainsAskSourceContext": true,
+    "risk": "Resolved source import dependency inventory using owner-frozen22-code/test WIP closure plus shared production exact pin. Root concrete whole-code allowlist approval and final owner publication ACK still required; no source staging performed."
+  },
+  "ignoreReview": {
+    "qaEvidenceGenerallyIgnored": false,
+    "companionsIgnored": false,
+    "actualRules": "Only qa/evidence/live-*/pages/, qa/evidence/live-*/api/, qa/evidence/*/cdp-profile/, senior capture temp and qa/dispatch excluded. Most QA evidence/claim tasks/results/packets/companions remain visible to broad git add.",
+    "baselineAskReview": "HEAD production.ts has neither source-context import nor requestDepsFor. Current owner preimage includes Ask additions not yet in Git HEAD."
+  },
+  "candidateState": "Root-approved exact96-path WIP staging candidate; recovery hash-only override recorded; main Ask BUILDING/HOLD and ranking exclusion preserved. No commit/push authorized.",
+  "askWipDependencyClosurePendingOwnerAck": [],
+  "structureReview": {
+    "directoryChecks": [
+      {
+        "directory": "apps/api/src",
+        "HEADTrackedDirectFiles": 35,
+        "currentDirectFiles": 33,
+        "limit": 31,
+        "withinLimit": false,
+        "classification": "baseline-overage"
+      },
+      {
+        "directory": "apps/api/src/ask",
+        "HEADTrackedDirectFiles": 0,
+        "currentDirectFiles": 2,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/api/src/indexing",
+        "HEADTrackedDirectFiles": 8,
+        "currentDirectFiles": 8,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/api/src/jobs",
+        "HEADTrackedDirectFiles": 0,
+        "currentDirectFiles": 6,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/api/src/routes",
+        "HEADTrackedDirectFiles": 31,
+        "currentDirectFiles": 32,
+        "limit": 30,
+        "withinLimit": false,
+        "classification": "baseline-overage"
+      },
+      {
+        "directory": "apps/web/src",
+        "HEADTrackedDirectFiles": 10,
+        "currentDirectFiles": 5,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/web/src/api",
+        "HEADTrackedDirectFiles": 16,
+        "currentDirectFiles": 18,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/web/src/layout",
+        "HEADTrackedDirectFiles": 2,
+        "currentDirectFiles": 2,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/web/src/pages",
+        "HEADTrackedDirectFiles": 22,
+        "currentDirectFiles": 20,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "apps/web/src/pages/jobs",
+        "HEADTrackedDirectFiles": 0,
+        "currentDirectFiles": 2,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/ai/src/providers",
+        "HEADTrackedDirectFiles": 8,
+        "currentDirectFiles": 8,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/ai/src/stt",
+        "HEADTrackedDirectFiles": 7,
+        "currentDirectFiles": 7,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/ask/src",
+        "HEADTrackedDirectFiles": 16,
+        "currentDirectFiles": 19,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/db/src",
+        "HEADTrackedDirectFiles": 4,
+        "currentDirectFiles": 2,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/db/src/collections",
+        "HEADTrackedDirectFiles": 19,
+        "currentDirectFiles": 22,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/index/src",
+        "HEADTrackedDirectFiles": 8,
+        "currentDirectFiles": 1,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "packages/index/src/chunk",
+        "HEADTrackedDirectFiles": 2,
+        "currentDirectFiles": 4,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "scripts",
+        "HEADTrackedDirectFiles": 37,
+        "currentDirectFiles": 34,
+        "limit": 32,
+        "withinLimit": false,
+        "classification": "baseline-overage"
+      },
+      {
+        "directory": "scripts/lib",
+        "HEADTrackedDirectFiles": 30,
+        "currentDirectFiles": 32,
+        "limit": 30,
+        "withinLimit": false,
+        "classification": "new-overage-needs-resolution"
+      },
+      {
+        "directory": "scripts/upload",
+        "HEADTrackedDirectFiles": 0,
+        "currentDirectFiles": 5,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "workers/transcribe",
+        "HEADTrackedDirectFiles": 2,
+        "currentDirectFiles": 3,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      },
+      {
+        "directory": "workers/transcribe/src",
+        "HEADTrackedDirectFiles": 1,
+        "currentDirectFiles": 6,
+        "limit": 30,
+        "withinLimit": true,
+        "classification": "within-budget"
+      }
+    ],
+    "LOCChecks": [
+      {
+        "path": "apps/api/src/ask/source-context.test.ts",
+        "nonblankLines": 225,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/ask/source-context.ts",
+        "nonblankLines": 208,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/fixtures.ts",
+        "nonblankLines": 300,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/jobs/fixture-store.test.ts",
+        "nonblankLines": 74,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/jobs/fixture-store.ts",
+        "nonblankLines": 5,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/jobs/router.test.ts",
+        "nonblankLines": 96,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/jobs/router.ts",
+        "nonblankLines": 65,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/jobs/store.test.ts",
+        "nonblankLines": 63,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/jobs/store.ts",
+        "nonblankLines": 24,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/production.ts",
+        "nonblankLines": 236,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/routes/ask.test.ts",
+        "nonblankLines": 86,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/routes/ask.ts",
+        "nonblankLines": 62,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/routes/compete.test.ts",
+        "nonblankLines": 307,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/routes/compete.ts",
+        "nonblankLines": 137,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/routes/meeting-candidates.test.ts",
+        "nonblankLines": 247,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/api/src/server.ts",
+        "nonblankLines": 100,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/web/src/App.tsx",
+        "nonblankLines": 45,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/api/jobs.test.ts",
+        "nonblankLines": 65,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/web/src/api/jobs.ts",
+        "nonblankLines": 42,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "apps/web/src/layout/NavSidebar.tsx",
+        "nonblankLines": 45,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/AskPage.test.tsx",
+        "nonblankLines": 197,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/AskPage.tsx",
+        "nonblankLines": 165,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/SettingsPage.test.tsx",
+        "nonblankLines": 91,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/SettingsPage.tsx",
+        "nonblankLines": 99,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/SourcesPage.test.tsx",
+        "nonblankLines": 112,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/SourcesPage.tsx",
+        "nonblankLines": 74,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/jobs/JobsPage.test.tsx",
+        "nonblankLines": 132,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "apps/web/src/pages/jobs/JobsPage.tsx",
+        "nonblankLines": 65,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": true
+      },
+      {
+        "path": "packages/ai/src/stt/gemini-file-upload.test.ts",
+        "nonblankLines": 269,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ai/src/stt/gemini-file-upload.ts",
+        "nonblankLines": 230,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/answer.ts",
+        "nonblankLines": 78,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/ask-v2.ts",
+        "nonblankLines": 256,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/bounded-ask.test.ts",
+        "nonblankLines": 161,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/bounded-refine.ts",
+        "nonblankLines": 97,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/index.ts",
+        "nonblankLines": 22,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/source-context.test.ts",
+        "nonblankLines": 121,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/ask/src/source-context.ts",
+        "nonblankLines": 127,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/db/src/collections/jobs.test.ts",
+        "nonblankLines": 114,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/db/src/collections/jobs.ts",
+        "nonblankLines": 58,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/db/src/collections/watch-heartbeat.test.ts",
+        "nonblankLines": 90,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/db/src/collections/watch-heartbeat.ts",
+        "nonblankLines": 63,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "packages/db/src/index.ts",
+        "nonblankLines": 26,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/lib/transcript-provenance.test.mjs",
+        "nonblankLines": 292,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/transcribe-long-session.mjs",
+        "nonblankLines": 199,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/upload/queue.mjs",
+        "nonblankLines": 86,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/upload/queue.test.mjs",
+        "nonblankLines": 172,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/upload/real-proof.mjs",
+        "nonblankLines": 62,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/upload/security.mjs",
+        "nonblankLines": 66,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "scripts/upload/submit.mjs",
+        "nonblankLines": 128,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "workers/transcribe/src/google_transport.py",
+        "nonblankLines": 178,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "workers/transcribe/src/index.ts",
+        "nonblankLines": 3,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "workers/transcribe/src/job_queue.py",
+        "nonblankLines": 58,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "workers/transcribe/src/schema_check.py",
+        "nonblankLines": 21,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "workers/transcribe/src/test_worker.py",
+        "nonblankLines": 215,
+        "limit": 400,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      },
+      {
+        "path": "workers/transcribe/src/worker.py",
+        "nonblankLines": 78,
+        "limit": 300,
+        "withinLimit": true,
+        "tsxOutsideCurrentMechanicalExtensionGate": false
+      }
+    ],
+    "method": "lightweight direct file/nonblank counts; HEAD tracked-file baseline, no whole lint/suite; existing untracked baseline files may make HEAD underestimate baseline"
+  },
+  "dirtyRuntimeDependenciesOutsideCandidateClosure": [
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "importedBy": [
+        "apps/api/src/ingest-store.ts",
+        "apps/api/src/production.ts",
+        "apps/api/src/whatsapp-store.ts"
+      ],
+      "sourceReviewScope": "Resolved in owner-frozen accepted preparation/WIP closure; exact hash matched.",
+      "sha256": "d2acfd87eb508c0bf2440c6cf2318433e711e1644a4db58e74a14087451a0757",
+      "inCandidateClosure": true
+    },
+    {
+      "path": "packages/ai/src/providers/ollama.ts",
+      "importedBy": [
+        "packages/ai/src/index.ts"
+      ],
+      "sourceReviewScope": "Resolved in owner-frozen accepted preparation/WIP closure; exact hash matched.",
+      "sha256": "2906aa9be90ee95dff3e5d4f8c332b70ece875f8d5bbcdd8dcd5ce36e888e492",
+      "inCandidateClosure": true
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.ts",
+      "importedBy": [
+        "packages/index/src/index.ts"
+      ],
+      "sourceReviewScope": "Resolved in owner-frozen accepted preparation/WIP closure; exact hash matched.",
+      "sha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927",
+      "inCandidateClosure": true
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "importedBy": [
+        "apps/api/src/ask-arms.ts",
+        "apps/api/src/ask/source-context.ts",
+        "apps/api/src/indexing/promote-entities.ts",
+        "apps/api/src/indexing/session.ts",
+        "apps/api/src/production.ts",
+        "apps/api/src/routes/graph.ts",
+        "apps/api/src/search-prefilter.ts",
+        "apps/api/src/search-store.ts",
+        "apps/api/src/store.ts"
+      ],
+      "sourceReviewScope": "Resolved in owner-frozen accepted preparation/WIP closure; exact hash matched.",
+      "sha256": "15b5fa21efaef75581f8d99266cdb3fa7143884e99849f08bbb6f8867eed0d52",
+      "inCandidateClosure": true
+    }
+  ],
+  "staticClosureReview": {
+    "visitedLocalModules": 249,
+    "method": "bounded static import/export relative and package-root source walk; excludes runtime execution and unsupported dynamically constructed imports",
+    "needsOwnerAck": true
+  },
+  "ownerAcceptedAskWipClosure": {
+    "artifactPath": "C:\\Users\\product\\Documents\\Codex\\2026-10-09\\what-is-the-current-update-and\\outputs\\knowledgebase-owned-scope-v2.json",
+    "artifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+    "exclusiveCodeAndTests": 22,
+    "exactHashesMatched": 22,
+    "sharedProductionHashMatched": true,
+    "scope": "D117 migration accepted source preparation/WIP; no main Ask/global/live acceptance promotion; separate ranking draft excluded."
+  },
+  "pendingOwnerQACompanionPrivacyReview": [
+    {
+      "path": "qa/manifests/recovery-embedding-backfill.md",
+      "sha256": "23bde7648df6ca852d4be37b0838bd9010c2df11cc5ee8fbc102d5ad759abea9",
+      "scope": "Root-approved exact Cycle1 scoped closeout after canonical PASS,9source/test pins verified and privacy scan clear; no global acceptance promotion."
+    },
+    {
+      "path": "qa/manifests/bounded-ask-source-context.md",
+      "sha256": "bcf4e56a9a21fb8f5f380f60b4bf6a06a92b3340f554165078e0357e0d36fb40",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    },
+    {
+      "path": "qa/verdicts/recovery-embedding-backfill.md",
+      "sha256": "be330f64a5103d54bdc3e6025ecef6b4f8cb67a988a7b7dd8f49dd62350899d6",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    },
+    {
+      "path": "qa/manifests/bounded-ask-context-packing.md",
+      "sha256": "6e4f87d37041cc304fbca5096e6760aaa46807cc290698e954df7bd98d5c1b07",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    },
+    {
+      "path": "qa/verdicts/bounded-ask-context-packing.md",
+      "sha256": "f8f3e6ae168975d5c12a3b2fc28857c149347be46f228879624e44af9ccc358d",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    }
+  ],
+  "finalCodePrivacyBoundedScan": {
+    "filesScanned": 67,
+    "realCredentialCandidates": 0,
+    "reviewedPatternFindings": [
+      {
+        "path": "scripts/upload/queue.test.mjs",
+        "line": 87,
+        "category": "credentialedURL",
+        "classification": "synthetic rejected credentialed-URL fixture; no real credential output or publication blocker"
+      }
+    ],
+    "falsePositiveCorrection": "Initial loose sk-prefix scan matched a structural rule name substring in production.ts; word-boundary scan removes it.",
+    "limits": "Pattern scan alone is not independent full privacy certification; controlled synthetic STT regression text remains code fixture; private evidence/cache/source transcripts excluded."
+  },
+  "rootApprovalAuditHistory": [
+    {
+      "baseApprovedInventorySHA256": "bcff92843e6e0a4809748ded0d4a838b395b0616ae329fa82bba9242e8a6199f",
+      "selectedFiles": 96,
+      "authorization": "Root-approved67 code/support+24 QA+5 privacy-cleared owner companions, WIP under D117; no commit/push authorization."
+    },
+    {
+      "path": "qa/manifests/recovery-embedding-backfill.md",
+      "oldApprovedSHA256": "63528b78028de976942619837edfed3188e38d18470c541efbfacbeb72bcafbf",
+      "newApprovedSHA256": "23bde7648df6ca852d4be37b0838bd9010c2df11cc5ee8fbc102d5ad759abea9",
+      "reason": "Expected owner scoped closeout; root exact override conditional verification fulfilled.",
+      "canonicalVerdict": "qa/verdicts/recovery-embedding-backfill.md",
+      "cycleChecked": 1,
+      "recordedSourceTestPinsMatched": 9,
+      "privacyScan": "zero credential/email/credentialed URL/private transcript markers; ordinary metadata only"
+    }
+  ],
+  "approvedExactStagingSelection": [
+    {
+      "path": "apps/web/src/pages/SourcesPage.tsx",
+      "unit": "parallel-sources-explorer",
+      "role": "reviewed-source-or-packet",
+      "sha256": "0884d1b950adf62525fbc4e01efc1aef680f29dfaf77d39736f94995cb4f96f3",
+      "checkpointSha256": "0884d1b950adf62525fbc4e01efc1aef680f29dfaf77d39736f94995cb4f96f3",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/web/src/pages/SourcesPage.test.tsx",
+      "unit": "parallel-sources-explorer",
+      "role": "reviewed-source-or-packet",
+      "sha256": "237fabee5fabddb808ca2d209451a3d9347d3a6eaf5a4039d38af58023cc6793",
+      "checkpointSha256": "237fabee5fabddb808ca2d209451a3d9347d3a6eaf5a4039d38af58023cc6793",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "packages/db/src/collections/watch-heartbeat.ts",
+      "unit": "parallel-heartbeat-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "aa5dd715e2e49997c65ef7faac96a32889df428bbbf8d341bcf76f16ef3baf50",
+      "checkpointSha256": "aa5dd715e2e49997c65ef7faac96a32889df428bbbf8d341bcf76f16ef3baf50",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "packages/db/src/collections/watch-heartbeat.test.ts",
+      "unit": "parallel-heartbeat-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "c20829eddea92c65f75b0275df51ab7d0dbf9c2f6494fc49f101a4a9d5b550ef",
+      "checkpointSha256": "c20829eddea92c65f75b0275df51ab7d0dbf9c2f6494fc49f101a4a9d5b550ef",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS plus independent pin addendum; no release acceptance. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan.",
+      "independentCheckpointEvidence": "qa/evidence/parallel-heartbeat-tenancy-pin-addendum.md"
+    },
+    {
+      "path": "apps/api/src/fixtures.ts",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "checkpointSha256": "a99dd8a2c9abf1864d9af6f26741e1d890da46fb9a4a1c0dbb2e0d762781639f",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No new source transcript/claim quote or personal identifier in inspected code changes; synthetic tenant/test data only. Existing fixture addresses are baseline, not newly introduced."
+    },
+    {
+      "path": "apps/api/src/routes/meeting-candidates.test.ts",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "role": "reviewed-source-or-packet",
+      "sha256": "155b9f1a58f57510d8764b47b8eba1efed8f86c624aa714eba2c45ba9d334037",
+      "checkpointSha256": "155b9f1a58f57510d8764b47b8eba1efed8f86c624aa714eba2c45ba9d334037",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No new source transcript/claim quote or personal identifier in inspected code changes; synthetic tenant/test data only. Existing fixture addresses are baseline, not newly introduced."
+    },
+    {
+      "path": "packages/db/src/collections/jobs.ts",
+      "unit": "parallel-jobs-db",
+      "role": "reviewed-source-or-packet",
+      "sha256": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2",
+      "checkpointSha256": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "packages/db/src/collections/jobs.test.ts",
+      "unit": "parallel-jobs-db",
+      "role": "reviewed-source-or-packet",
+      "sha256": "12704e7e8187922d1676f7a01eb8bb7861e7ebdd4be71e5a28726d7e3b5a88f7",
+      "checkpointSha256": "12704e7e8187922d1676f7a01eb8bb7861e7ebdd4be71e5a28726d7e3b5a88f7",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/router.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "6c337958b7700638403e77d7006d4fd24d0b3393d9b81276cd58049d7d638131",
+      "checkpointSha256": "6c337958b7700638403e77d7006d4fd24d0b3393d9b81276cd58049d7d638131",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/router.test.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "7caa17695e232d7ee34d47fba8ed9cfae441439b1516c6f07ee18e4176115874",
+      "checkpointSha256": "7caa17695e232d7ee34d47fba8ed9cfae441439b1516c6f07ee18e4176115874",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/store.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+      "checkpointSha256": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/api/src/jobs/store.test.ts",
+      "unit": "parallel-jobs-api",
+      "role": "reviewed-source-or-packet",
+      "sha256": "a1a4856c176ac672b21df925506c7806875cc7a34bc682e06ac8edf801f57b14",
+      "checkpointSha256": "a1a4856c176ac672b21df925506c7806875cc7a34bc682e06ac8edf801f57b14",
+      "checkpointMatch": true,
+      "limitation": "Scoped PASS only; no live/release approval. Rehash before publication.",
+      "credentialFormatScanMatches": 0,
+      "publicDisclosureReview": "No transcript/claim evidence, personal email, user path or credential-format match in bounded scan."
+    },
+    {
+      "path": "apps/web/src/api/jobs.ts",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "5565e99ec7da536249509e28053e8fb5c2bdf32a70be37b0a36eda707a93ab2b",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/api/jobs.test.ts",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "53cc8680677407c462aef453f5c6aa3e8549da3e6201a0ffda3e36a4d0e9cef5",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/jobs/JobsPage.tsx",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "ed15ee937652e376fb76a7c2e157e84a49e6ec57ea76afe2734bcdde155247e1",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/jobs/JobsPage.test.tsx",
+      "unit": "parallel-jobs-web",
+      "role": "reviewed-code",
+      "sha256": "f65b6e998d80a3e952732220bcf840d5020339aa33d3c9deb4c4ebd27ac8d8bf",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/App.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "1aabc8ec568eb83972ac995aafd2cecc56de2ec0b2bff7cb18e7d7467636eefd",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/layout/NavSidebar.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "8adce878ee3d1998df8cc9e530af2363519781b708b1d5391c408eef563349b6",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/SettingsPage.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "7ae43f545697316d1f50ef16aad5f04a39b4c9a7a3ec1835381805fe059b290b",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/web/src/pages/SettingsPage.test.tsx",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "b3864075f01f3a1d1da68057330bee20c4600e49ad29316a6bbe9be4ed293c16",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "f5797ab0860b99de1364c5e68de002b406d19133f07a0104469fbceb2803687b",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/jobs/fixture-store.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "6296490e14cd956ecf1779285046ef42d3d80ff77035848973917023119e129c",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/jobs/fixture-store.test.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "72259ead01eb6676458792708d5e485011ad11c88a0d5e007c59a5fb4c18120e",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "fa4129a968966c6cceb1c9adc6443f42bc9f584ac7cb2feb698c07da2218bef5",
+      "scope": "scoped Jobs PASS; shared production Ask preimage remains WIP closure gate"
+    },
+    {
+      "path": "apps/api/src/production.ts",
+      "unit": "parallel-jobs-integration",
+      "role": "reviewed-code",
+      "sha256": "ff65725758a0ed858dda585f8ef469ffb32bf2a7afea375d0e650396b448ac1e",
+      "scope": "Jobs cycle0 PASS plus exact owner-frozen Ask WIP shared composition; exclusive Ask ownership not claimed.",
+      "ownerComposedScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20"
+    },
+    {
+      "path": "apps/api/src/routes/compete.ts",
+      "unit": "parallel-compete-bounded-context",
+      "role": "reviewed-code",
+      "sha256": "86fb7a0ef5155a4472486044bb5270cad8f9043d7527c6a7eceef77b50e21558",
+      "checkpointSha256": "86fb7a0ef5155a4472486044bb5270cad8f9043d7527c6a7eceef77b50e21558",
+      "checkpointMatch": true,
+      "scope": "cycle0 scoped PASS only"
+    },
+    {
+      "path": "apps/api/src/routes/compete.test.ts",
+      "unit": "parallel-compete-bounded-context",
+      "role": "reviewed-code",
+      "sha256": "354bd4b8dadaeaba88e3b9d62671a02fbb84339ad5f4cb4c9854c6f76d4610f6",
+      "checkpointSha256": "354bd4b8dadaeaba88e3b9d62671a02fbb84339ad5f4cb4c9854c6f76d4610f6",
+      "checkpointMatch": true,
+      "scope": "cycle0 scoped PASS only"
+    },
+    {
+      "path": "scripts/upload/security.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "0980cafb333d7025703330619e4bd0041728751877898de829ce8d302e0030fc",
+      "checkpointSha256": "0980cafb333d7025703330619e4bd0041728751877898de829ce8d302e0030fc",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/queue.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "267de11f43bfdb0b6294dd37699e7a60a08c504dfc49adc5fbac608a0d56f3d7",
+      "checkpointSha256": "267de11f43bfdb0b6294dd37699e7a60a08c504dfc49adc5fbac608a0d56f3d7",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/submit.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "be7e7cad736a9faba4361811d886a3f4b17148e3e864c824150941122f69b611",
+      "checkpointSha256": "be7e7cad736a9faba4361811d886a3f4b17148e3e864c824150941122f69b611",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/real-proof.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "e92bdea500c16d0203495faf1cdb3e4d819c7d5d50daae955ca6b2e15db5f221",
+      "checkpointSha256": "e92bdea500c16d0203495faf1cdb3e4d819c7d5d50daae955ca6b2e15db5f221",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/upload/queue.test.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d8d6dc281561cf0f81ad6f372dd40f00af54654b88337c48bc4096fe3152a4ff",
+      "checkpointSha256": "d8d6dc281561cf0f81ad6f372dd40f00af54654b88337c48bc4096fe3152a4ff",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/google_transport.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d3cb7906deeeb50069a986131d15351b8bbbaf23b2ab77ec5168d4dd7243a54d",
+      "checkpointSha256": "d3cb7906deeeb50069a986131d15351b8bbbaf23b2ab77ec5168d4dd7243a54d",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/job_queue.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "5fe8a65123a65198f4a2ba05fe09ee7cce1d4499b56647d51ca5cf5932c65f91",
+      "checkpointSha256": "5fe8a65123a65198f4a2ba05fe09ee7cce1d4499b56647d51ca5cf5932c65f91",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/schema_check.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "a90f42a4bca1016935f6512907b2615db38f44f069fb09410a87449f28cf0e34",
+      "checkpointSha256": "a90f42a4bca1016935f6512907b2615db38f44f069fb09410a87449f28cf0e34",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/worker.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d90037d38f9b8434f634de7721861cc4103edc5f998892a040c6b6eeaeb92f1c",
+      "checkpointSha256": "d90037d38f9b8434f634de7721861cc4103edc5f998892a040c6b6eeaeb92f1c",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/test_worker.py",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "013c82f8d2af7b9aaf79dba940c141231c7d29ff91677f1ef8589c04252e77f2",
+      "checkpointSha256": "013c82f8d2af7b9aaf79dba940c141231c7d29ff91677f1ef8589c04252e77f2",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/src/index.ts",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "69a8aa46f47edda7c998e89af0237d985b34a857d34de7a2cc6ddc63f2636584",
+      "checkpointSha256": "69a8aa46f47edda7c998e89af0237d985b34a857d34de7a2cc6ddc63f2636584",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/package.json",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "ee84905a0c5f3665184f2886f59ed88ef381b7687e0b7081fa71c36c9b3dfc9c",
+      "checkpointSha256": "ee84905a0c5f3665184f2886f59ed88ef381b7687e0b7081fa71c36c9b3dfc9c",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/requirements.txt",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "82a952467cd4672ecf83402d10928d8064cf9dc7580db92acc6e942cb2fae4f9",
+      "checkpointSha256": "82a952467cd4672ecf83402d10928d8064cf9dc7580db92acc6e942cb2fae4f9",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "workers/transcribe/README.md",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "d82e65bba9c05eace9472d690859f7a54dbccd4265ab7cb1e6357dea52bd402f",
+      "checkpointSha256": "d82e65bba9c05eace9472d690859f7a54dbccd4265ab7cb1e6357dea52bd402f",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.ts",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "00eb58ec23a0caf4401526622b4ce67cb037d64eeec1bf5e470c87132eadabf8",
+      "checkpointSha256": "00eb58ec23a0caf4401526622b4ce67cb037d64eeec1bf5e470c87132eadabf8",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "packages/ai/src/stt/gemini-file-upload.test.ts",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "9beaddeea40a80c55ed300470b4e7ca5d4f7f2a0ad2dd2572355cafe79e5606d",
+      "checkpointSha256": "9beaddeea40a80c55ed300470b4e7ca5d4f7f2a0ad2dd2572355cafe79e5606d",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/transcribe-long-session.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "58ebc6438bab1a28a733b4e4c61348c08ae962d98d5649bb4cb820870a070d94",
+      "checkpointSha256": "58ebc6438bab1a28a733b4e4c61348c08ae962d98d5649bb4cb820870a070d94",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "scripts/lib/transcript-provenance.test.mjs",
+      "unit": "u4.1-recording-upload-worker",
+      "role": "reviewed-code-and-support",
+      "sha256": "b1744d9e091ff4f07e0cd4ca180a9d305fbb666554008efcd65499d30dbbc663",
+      "checkpointSha256": "b1744d9e091ff4f07e0cd4ca180a9d305fbb666554008efcd65499d30dbbc663",
+      "checkpointMatch": true,
+      "scope": "cycle3 effective U4.1 PASS C1-C10; global goals pending; final owner publication allowlist ACK pending"
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927",
+      "checkpointSha256": "7eb0196846bc3a77577606a8a97dc290ee601634e8107ee5ed12579e76046927",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/index/src/index.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "15b5fa21efaef75581f8d99266cdb3fa7143884e99849f08bbb6f8867eed0d52",
+      "checkpointSha256": "15b5fa21efaef75581f8d99266cdb3fa7143884e99849f08bbb6f8867eed0d52",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/indexing/session.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "d2acfd87eb508c0bf2440c6cf2318433e711e1644a4db58e74a14087451a0757",
+      "checkpointSha256": "d2acfd87eb508c0bf2440c6cf2318433e711e1644a4db58e74a14087451a0757",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "scripts/backfill.mjs",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "b127a049ff9eae480cf38c295d744df7e91f82f66496516f7d9ad32c97ee9dd5",
+      "checkpointSha256": "b127a049ff9eae480cf38c295d744df7e91f82f66496516f7d9ad32c97ee9dd5",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "scripts/lib/toc-embedding-backfill.mjs",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "4ca19852fd7e8d4fb2dcef6c1873105c413c96b767fc00df150419851081bd8f",
+      "checkpointSha256": "4ca19852fd7e8d4fb2dcef6c1873105c413c96b767fc00df150419851081bd8f",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ai/src/providers/ollama.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "production_code",
+      "sha256": "2906aa9be90ee95dff3e5d4f8c332b70ece875f8d5bbcdd8dcd5ce36e888e492",
+      "checkpointSha256": "2906aa9be90ee95dff3e5d4f8c332b70ece875f8d5bbcdd8dcd5ce36e888e492",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/ask-v2.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "2a795cf8b0cb45ac6f3c5cc7298c66cf14a7b3db2f89af31080d8ec896b56629",
+      "checkpointSha256": "2a795cf8b0cb45ac6f3c5cc7298c66cf14a7b3db2f89af31080d8ec896b56629",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/answer.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "482132ff75520f58ebce7e99ed3d15e56089da3f28a999faf46e8e675d2fabb4",
+      "checkpointSha256": "482132ff75520f58ebce7e99ed3d15e56089da3f28a999faf46e8e675d2fabb4",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/index.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "abed451dcd8ed8c6e545d9a6976c6d8d2e1c5774639eaaf9e2b746924c395315",
+      "checkpointSha256": "abed451dcd8ed8c6e545d9a6976c6d8d2e1c5774639eaaf9e2b746924c395315",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/source-context.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "27402b3e0f23aa74e79afd2a296a6a9f4c88e43c210b52375f2603f46a8267dc",
+      "checkpointSha256": "27402b3e0f23aa74e79afd2a296a6a9f4c88e43c210b52375f2603f46a8267dc",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/bounded-refine.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "8957fa3cc8a4514db13020683a6d7516031bc4c29938a4dff2fa1b8570524189",
+      "checkpointSha256": "8957fa3cc8a4514db13020683a6d7516031bc4c29938a4dff2fa1b8570524189",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/routes/ask.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "b9cea1cd3570651f8354c3fcc7607a5ac6e9194cece52987a2032cd126ec42e2",
+      "checkpointSha256": "b9cea1cd3570651f8354c3fcc7607a5ac6e9194cece52987a2032cd126ec42e2",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "e7516bb1133282431cbcb13b3dbc76e2fe50a1b178dc6cbc0b0d6d873ccfae98",
+      "checkpointSha256": "e7516bb1133282431cbcb13b3dbc76e2fe50a1b178dc6cbc0b0d6d873ccfae98",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/web/src/pages/AskPage.tsx",
+      "unit": "bounded-ask-source-context",
+      "role": "production_code",
+      "sha256": "fa8a8d26dd974f2770d018eeaffc48307da4e3d527f07f039a266d59102e9b81",
+      "checkpointSha256": "fa8a8d26dd974f2770d018eeaffc48307da4e3d527f07f039a266d59102e9b81",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/index/src/chunk/source-spans.test.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "test",
+      "sha256": "421cb4666a189202de077315d9172216e1dd2d449389925fdfbfe153187bd607",
+      "checkpointSha256": "421cb4666a189202de077315d9172216e1dd2d449389925fdfbfe153187bd607",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "scripts/lib/toc-embedding-backfill.test.mjs",
+      "unit": "recovery-embedding-backfill",
+      "role": "test",
+      "sha256": "28a71e59fac87a4b51958f5a1c0ad65913aff977808f020068f73cffe6d19856",
+      "checkpointSha256": "28a71e59fac87a4b51958f5a1c0ad65913aff977808f020068f73cffe6d19856",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ai/src/providers/ollama-boundary.test.ts",
+      "unit": "recovery-embedding-backfill",
+      "role": "test",
+      "sha256": "67579167462c48a5e19f942737e4013c150d9c44b3fda53b315b270fc205cb9e",
+      "checkpointSha256": "67579167462c48a5e19f942737e4013c150d9c44b3fda53b315b270fc205cb9e",
+      "checkpointMatch": true,
+      "owner": "/root/project_handoff",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/source-context.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "731a933b2a8909f046e490040240938f40ee0fac7b02f58a7f7f6c706f6a9ab9",
+      "checkpointSha256": "731a933b2a8909f046e490040240938f40ee0fac7b02f58a7f7f6c706f6a9ab9",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "packages/ask/src/bounded-ask.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "e565bcbfd28e8ea35b96fb7dee2e382d7ffc32c60246ac91a4f03d88b1c45d45",
+      "checkpointSha256": "e565bcbfd28e8ea35b96fb7dee2e382d7ffc32c60246ac91a4f03d88b1c45d45",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/routes/ask.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "acb7f310303e9b6de01769a9577328fc13525de0b814798bcd65f8cb728f71c9",
+      "checkpointSha256": "acb7f310303e9b6de01769a9577328fc13525de0b814798bcd65f8cb728f71c9",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/api/src/ask/source-context.test.ts",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "d59daec3ac6f9e6fc45defba8cfab79f00873d280ed576db56cc459a0502d35f",
+      "checkpointSha256": "d59daec3ac6f9e6fc45defba8cfab79f00873d280ed576db56cc459a0502d35f",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "apps/web/src/pages/AskPage.test.tsx",
+      "unit": "bounded-ask-source-context",
+      "role": "test",
+      "sha256": "851c5831238afaefbaa259d57d7bbe1c428fe1b84061e4ef41b3e504a76b15be",
+      "checkpointSha256": "851c5831238afaefbaa259d57d7bbe1c428fe1b84061e4ef41b3e504a76b15be",
+      "checkpointMatch": true,
+      "owner": "/root/u22_maker",
+      "ownerScopeArtifactSha256": "5041c2264254399abe29aca530f247b39ff6cfa8cd5666f4ab528e470d3d0e20",
+      "scope": "Owner-frozen accepted source preparation/WIP for D117 checkpoint; main Ask BUILDING/HOLD remains unchanged; packing PASS on its5 paths only."
+    },
+    {
+      "path": "qa/contracts/parallel-sources-explorer.md",
+      "unit": "parallel-sources-explorer",
+      "sha256": "8c9328faf9755c53bff3ea1935487e195fcab693c28bec5fdab26b42365e2879",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-sources-explorer.md",
+      "unit": "parallel-sources-explorer",
+      "sha256": "905b115de1dabcc8a3069f8ef5f11bed2123515bc0a139b2958a386ede0ad21d",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 2,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-sources-explorer.md",
+      "unit": "parallel-sources-explorer",
+      "sha256": "874c9f353d6137d2c27a11ed0d66a9d31b23c727fffa79b6a3ae85609d566250",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-sources-explorer",
+        "Cycle checked: 0",
+        "Verdict: PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-heartbeat-tenancy.md",
+      "unit": "parallel-heartbeat-tenancy",
+      "sha256": "737c59b0574af6d15b1ebce0721eb447c22377ee1ea82b71620575aa34193aae",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-heartbeat-tenancy.md",
+      "unit": "parallel-heartbeat-tenancy",
+      "sha256": "6c3a53952f8c76e69df83f5e065f52b95be0b714b7f0c0de4e9c30577469dcdd",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 2,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "**Status:** checked-PASS",
+        "**Fix cycle:** 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-heartbeat-tenancy.md",
+      "unit": "parallel-heartbeat-tenancy",
+      "sha256": "7d051bb003cab1fc01cd86024c73c9c524aec588ef88153560f5e2bae1de5595",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 4,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-heartbeat-tenancy",
+        "**VERDICT:** PASS",
+        "**Cycle checked:** 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-meeting-fixture-tenancy.md",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "sha256": "2bf901d05999cb9ae991912ae787f4623d9300c512f9702b28f677f7471cd6a2",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-meeting-fixture-tenancy.md",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "sha256": "5a9dbcfb880abf1df909aa0e912933af12ac6cb33ab7d5295ea45e3121b340ea",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 3,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 0",
+        "**Handshake status:** checked-PASS",
+        "`Cycle checked: 0` and PASS. Maker records that scoped verdict above; broader validation remains open."
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-meeting-fixture-tenancy.md",
+      "unit": "parallel-meeting-fixture-tenancy",
+      "sha256": "4963474d10dcfb17bc59d61baab077037782649e1287b5263831e7c17a3ebd10",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 3,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-meeting-fixture-tenancy",
+        "**VERDICT:** PASS",
+        "**Cycle checked:** 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-db.md",
+      "unit": "parallel-jobs-db",
+      "sha256": "8663b5f747e136ccd8282153b9db06ed76da04429f210609a61d29fc00630354",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "verdict with Cycle checked N and independently derived DB1–DB5 evidence. Scoped DB"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-db.md",
+      "unit": "parallel-jobs-db",
+      "sha256": "0d5dd9fe5228c843686af02a1bf6ef59f212c3d456f4c61aa7b405e491749254",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 2,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "**Status:** checked-PASS",
+        "**Fix cycle:** 0",
+        "git status --short -- packages/db/src/collections/jobs.ts packages/db/src/collections/jobs.test.ts:"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-db.md",
+      "unit": "parallel-jobs-db",
+      "sha256": "3556e9de02d06603dea3146a48e69f296eb293758a29e3c43e0762d758ed4df8",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 1,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Cycle checked: 0",
+        "VERDICT: PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-api.md",
+      "unit": "parallel-jobs-api",
+      "sha256": "195db71eef0483cf651c7cc61175b0359cec5febd954fe0cde9c8a0bf68fb4c3",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-api.md",
+      "unit": "parallel-jobs-api",
+      "sha256": "fba241c2badeb6d132ba0285998bb970ce1f9e843accce6726264de911d5b906",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 1,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "**Fix cycle:** 1",
+        "**Status:** checked-PASS",
+        "**Handshake status:** checked-PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-api.md",
+      "unit": "parallel-jobs-api",
+      "sha256": "3dbf5cf0928dc76426e3346950900970e76a47ff69abba4e55c971fae79829b1",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-jobs-api",
+        "**VERDICT:** FAIL",
+        "**Cycle checked:** 0",
+        "VERDICT: PASS",
+        "Cycle checked: 1"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-web.md",
+      "unit": "parallel-jobs-web",
+      "sha256": "9e4cf24ad548af76f10bdbc4a1fb802d6ac290e2407dc5f7295c2bff57763a06",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "   status transformation. Preserve API order rather than inventing a sorting promise.",
+        "## Handshake"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-web.md",
+      "unit": "parallel-jobs-web",
+      "sha256": "36f84ed18cc2086eac7d8b4e6950e09a22ae8f5faf34403683de2c23ee068058",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 3,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 1"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-web.md",
+      "unit": "parallel-jobs-web",
+      "sha256": "a2f50dd77abc46b5f9fdf2d1536da655b7b14de564bbc3e54bc2842abd37c448",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-jobs-web",
+        "Cycle checked: 1",
+        "Verdict: PASS",
+        "status, envelope, optional-field and poison refusals remain. JobsPage application"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-jobs-read.md",
+      "unit": "parallel-jobs-integration",
+      "sha256": "e79b27526d4a0c21625bff94940bd7deff44d21142c93b5bf54166b47db9c00d",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "## Handshake and constraints"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/manifests/parallel-jobs-integration.md",
+      "unit": "parallel-jobs-integration",
+      "sha256": "9d36c062d34ea9c60b31bd98489dd7c4593484f78fde5e0d7e473b607c1bcddd",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 1,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "Status: checked-PASS",
+        "Fix cycle: 0"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/verdicts/parallel-jobs-integration.md",
+      "unit": "parallel-jobs-integration",
+      "sha256": "bd9101ceae1a57a033e855fa8ae43f6a68ac94e294c61950f0c76af49e89871f",
+      "suspiciousMetadataCounts": {
+        "absoluteUserRuntimePath": 0,
+        "localWorkDbIdentifier": 0,
+        "emailIdentifier": 0,
+        "transcriptQuoteRiskMarkers": 0,
+        "credentialFormat": 0
+      },
+      "publicationState": "privacy-safe per independent extraction_packet_checker; preserve exact commands/hash/cycle/history",
+      "statusFields": [
+        "# Verdict — parallel-jobs-integration",
+        "Cycle checked: 0",
+        "VERDICT: PASS"
+      ],
+      "privacyBlocker": false
+    },
+    {
+      "path": "qa/contracts/parallel-compete-bounded-context.md",
+      "unit": "parallel-compete-bounded-context",
+      "sha256": "347ca932f5478c5a2636442a82305ab920e5fd267f169f92c10a8352ada0b005",
+      "privacyScan": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedUrl": 0,
+        "transcriptData": 0
+      },
+      "publicationState": "minimal scoped handshake candidate; zero suspicious secret/email/credentialed URL/private transcript markers; final independent privacy approval optional",
+      "privacyBlocker": false,
+      "statusFields": []
+    },
+    {
+      "path": "qa/manifests/parallel-compete-bounded-context.md",
+      "unit": "parallel-compete-bounded-context",
+      "sha256": "d48bbc4e5cec2c59663fb6961fa188f2786034bb0a761057c905d50d0273ca0e",
+      "privacyScan": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedUrl": 0,
+        "transcriptData": 0
+      },
+      "publicationState": "minimal scoped handshake candidate; zero suspicious secret/email/credentialed URL/private transcript markers; final independent privacy approval optional",
+      "privacyBlocker": false,
+      "statusFields": [
+        "**Fix cycle:** 0",
+        "**Status:** checked-PASS",
+        "**Handshake status:** checked-PASS"
+      ]
+    },
+    {
+      "path": "qa/verdicts/parallel-compete-bounded-context.md",
+      "unit": "parallel-compete-bounded-context",
+      "sha256": "8237b797f8fd0ab6218774fdd05906b88e055934e50c4f2b47a8c47b11391750",
+      "privacyScan": {
+        "credentialFormat": 0,
+        "email": 0,
+        "credentialedUrl": 0,
+        "transcriptData": 0
+      },
+      "publicationState": "minimal scoped handshake candidate; zero suspicious secret/email/credentialed URL/private transcript markers; final independent privacy approval optional",
+      "privacyBlocker": false,
+      "statusFields": [
+        "# Verdict — parallel-compete-bounded-context",
+        "VERDICT: PASS",
+        "Cycle checked: 0"
+      ]
+    },
+    {
+      "path": "qa/manifests/recovery-embedding-backfill.md",
+      "sha256": "23bde7648df6ca852d4be37b0838bd9010c2df11cc5ee8fbc102d5ad759abea9",
+      "scope": "Root-approved exact Cycle1 scoped closeout after canonical PASS,9source/test pins verified and privacy scan clear; no global acceptance promotion."
+    },
+    {
+      "path": "qa/manifests/bounded-ask-source-context.md",
+      "sha256": "bcf4e56a9a21fb8f5f380f60b4bf6a06a92b3340f554165078e0357e0d36fb40",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    },
+    {
+      "path": "qa/verdicts/recovery-embedding-backfill.md",
+      "sha256": "be330f64a5103d54bdc3e6025ecef6b4f8cb67a988a7b7dd8f49dd62350899d6",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    },
+    {
+      "path": "qa/manifests/bounded-ask-context-packing.md",
+      "sha256": "6e4f87d37041cc304fbca5096e6760aaa46807cc290698e954df7bd98d5c1b07",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    },
+    {
+      "path": "qa/verdicts/bounded-ask-context-packing.md",
+      "sha256": "f8f3e6ae168975d5c12a3b2fc28857c149347be46f228879624e44af9ccc358d",
+      "scope": "Owner-frozen QA companion, preserve BUILDING/HOLD; independent public privacy scan required before adding"
+    }
+  ]
+}

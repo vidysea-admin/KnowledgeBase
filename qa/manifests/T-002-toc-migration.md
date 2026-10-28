@@ -230,3 +230,5 @@ or `lint:structure`'s `snapshot.mjs --check` step fails on a clean checkout.)
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-002-toc-migration.md (Cycle checked: 1, commit b59e0ff) — 7/7 criteria met; content genuinely grounded, no fabrication found.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

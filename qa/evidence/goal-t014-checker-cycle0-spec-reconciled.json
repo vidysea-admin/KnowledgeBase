@@ -1,0 +1,134 @@
+{
+  "slug": "goal-t014-checker-cycle0-probe",
+  "cycle": 0,
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "qa/evidence/goal-t014-checker-cycle0-probe.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "LKB_ASK_GRAPH": "0"
+  },
+  "timeoutMs": 60000,
+  "outputPrefix": "qa/evidence/goal-t014-checker-cycle0-probe",
+  "pins": {
+    "apps/api/src/championship/model.ts": "7186304211f989df79c0dcf5a705a173b5d8fbc95f7895e752b6c83f39dcd190",
+    "apps/api/src/championship/runtime.ts": "e5f00441c246e1c34c6af4d380a67c39b528164031c9a1dfa5f8a03a4fbd293d",
+    "apps/api/src/championship/mongo-store.ts": "bbfa10fc5b5f0ddcdee0be70239cde441bde8285073ae86cabcc8544646d396a",
+    "apps/api/src/championship/runtime.test.ts": "557c3f8eb28f700bda456f5aaaedbf4394248f9f230b195fa64fd3596313195a",
+    "apps/api/src/championship/mongo-store.test.ts": "46d3631956c6fd4a563144316dbedcbc9b99d1ad24afc49dcb3e19726ee1e7d8",
+    "apps/api/src/routes/championship/championship.ts": "88cc87b254f7c7defd5204d30667b01b5e3625673f123f67a9ce59f62aceb022",
+    "apps/api/src/routes/championship/championship.test.ts": "e80a7dc2ec9fb62be8dec15327b4ce73491e63d8ee6ead7c0f47f6b0ecdfaa8b",
+    "apps/web/src/pages/championship/client.ts": "e139fe67c383b4e7ffe9c498a210cf3eece5d9f488a6b0f337df9280498a1383",
+    "apps/web/src/pages/championship/ChampionshipPage.tsx": "e76a0f0730d56c8b30a8ccc0e0e038b4c7340a5f3dd967d2ab08e06a16bd3809",
+    "apps/web/src/pages/championship/ChampionshipPlanForm.tsx": "05c20b40c741f8d87846be809333ba3460596c23cd11581581581ed1595d99ec",
+    "apps/web/src/pages/championship/client.test.ts": "c5fb9be67d391df21b55e59b716f8bb4008a10512a485afba153847d4545df86",
+    "apps/web/src/pages/championship/ChampionshipPage.test.tsx": "169ca58f3cd6c00f6416aaf6a4ab911fa56bb13bb5f7f48a9a0f26732d29cf3c",
+    "docs/championship-workflow.md": "31301cf49ae563b1c4b3255e87591eddc94a8bd7e58116dfe71d59352e9bc1cf",
+    "qa/contracts/goal-t014.md": "c70cdb8555ee59261907fd0319d380fa1143666e7d82453aa89accb3e364353f",
+    "schema/championship_events.schema.json": "79a6b85e3fc65713894047c70c9a214989ee65ac561bd4d0d284c634a3831797",
+    "schema/index.json": "846b3d698c7d16f58e00fcc4497600390c277c8095d811b8132c2f4ae2d170a3",
+    "packages/core/src/generated/championship_events.ts": "bc5844d6e03f40e40a69c0885a25e27552a7a0997705b5af8014844448649f18",
+    "packages/core/src/index.ts": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+    "migrations/20261014200000-knowledge-workflows.cjs": "f6841818a631749aa39a3b499c8a0ca8ced5dc8709734eb91e6d698b3edf62b2",
+    "apps/api/src/composition/integrations/evaluation.ts": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28",
+    "apps/api/src/composition/integrations/routes.ts": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+    "apps/api/src/composition/integrations/types.ts": "a03749ef65788b5b5893e70c518dacc51c8752c793023f090be59732149aea08",
+    "apps/api/src/composition/production.ts": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+    "apps/api/src/server.ts": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "apps/web/src/App.tsx": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+    "apps/web/src/layout/NavSidebar.tsx": "39319e1ce324ec1110ee101528c08a56f88eb8d46032074cb54d69fbd4ca23f6",
+    "contracts/verify_contracts.py": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3",
+    "contracts/contracts.json": "d31dad4c1fce135238169f48c18bc5ef68ea0deff7978d9323441330778cc940",
+    "qa/evidence/goal-t051checker-broker-t014-api.json": "64b04c78f10a174e565b12dd789c62727dc21621324188f5751dc5bd0c5dc0ec",
+    "qa/evidence/goal-t051checker-broker-t014-api.stdout.txt": "ce6fbdfa2e950671490ce2d7e9305f248d1f9379079d86de14f772b41616266f",
+    "qa/evidence/goal-t051checker-broker-t014-api.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "qa/evidence/goal-t051checker-broker-t014-web.json": "9cc7a8f897d321a0fc0daaf558b098bcbb25e4b159a3272615590307f223ffec",
+    "qa/evidence/goal-t051checker-broker-t014-web.stdout.txt": "86296c1e147570dba76bae7a968c5623cc549f756136d274f02050b2efb29993",
+    "qa/evidence/goal-t051checker-broker-t014-web.stderr.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "qa/evidence/goal-t051checker-validator.json": "53ef35f5204aea32db0a4701dd60ebeee10cbbf24ae5af9287f16eb7eed0d6db",
+    "qa/evidence/goal-t014/ready-cycle0-api-types-snapshot.json": "28cde10c6a2fdbab4b84fcbb168bbd8150ef98cac81995373ab9cfef8255eda3",
+    "qa/evidence/goal-t014/ready-cycle0-web-types-snapshot.json": "2fd4b5fab37429c3a3f89b4f71f4cecf5c7992d84a77a048fab38520918553fe",
+    "qa/evidence/goal-t014-checker-cycle0-probe.ts": "00e4ad3fd36ecc6a691343a2ffd274d0e6f00f6245b5fdc8be578cf0f608bcce",
+    "qa/evidence/goal-t014/ready-cycle0-pins.json": "8f903d6262236f002592860cc303f198bfd67be4eb9777615a013d39ff96aece",
+    "apps/api/src/fixtures.ts": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b",
+    "apps/api/src/routes/compete/compete.ts": "e3272ef9fa75cf28261bad901778a79cfe5df5c5b16b477b34cde045022cf7d0",
+    "apps/web/src/auth/AuthContext.tsx": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "packages/ask/src/index.ts": "4f04b30b8f3495bb426f31bbd9d55a44532c61ace75aa47103959cfe6152bb93",
+    "packages/ask/src/ask-v2.ts": "f21440832de515cb0b97a481530f8f872d4872f66a87122642f1194c0a7b5f8c",
+    "packages/ask/src/ask-graph.ts": "f9518a330fdf0324ef4952511187768adc4f48f6d856c6b1836a22e4562c1082",
+    "packages/ask/src/ask-shared.ts": "11734e285f8d7cb5dc05bb593864e347f355e58b63d712f451c74273e51a109f",
+    "packages/ask/src/answer.ts": "ba178ee1cf4cccea76c501676ee438c3b57abbe06aaefa793f075cc1b3685b0b",
+    "packages/ask/src/source-context.ts": "70ec5c33421b9f9eafb960e5c417a8d3525aeba12942df5e13ccd67fff09afb0",
+    "packages/ask/src/bounded-refine.ts": "0f16fb77e666699148c84c27b2efc329c5fcb77df8a42dfe9c8f75d8eb2f24d2",
+    "packages/ask/src/select-nodes.ts": "178e600821e156e6b3eb2610023812d343a47cb6f57c64b685bc95b04aada1d1",
+    "packages/ask/src/evaluator.ts": "02069c0be1aa416d80d90439d2906c2bd93d3f2ae69bc8d09aba0dc3709f2d67",
+    "packages/ask/src/router.ts": "c69120e648ae1d901b02c2d9d09eb914cc857d2131701aab997c76c6bee7d817",
+    "packages/ask/src/refine.ts": "67600ce072e3f6795be1338d3b85f7e25938c6759e5cfe99cbc842bd30dac2ec",
+    "packages/ask/src/merge.ts": "797ba2c11b59cab35324ce0b98a77ea39d98e0dddf046ab79d2962c2c67549d9",
+    "apps/api/src/ask/source-context.ts": "1f084b8f14764a097d4d826ab3ad431945fc35563c67d1eb9edab2b75009fb8f",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/indexing/chunk-integrity.ts": "e984e228e4b5873b7009c08d91b7b8491eb7a514887a70a725b2ddb4ee6547f0"
+  },
+  "scope": "One source-only mounted workflow, real auth/Compete/Ask/championship with offline fixtures and injected Db. No providers or real Mongo; imported trusted-reader/bounded source paths are pinned but not exercised by the declared legacy fixture. Current API/web typechecks and builds are GREEN per reconciled checkpoint; operational installation/live/browser/actual human/T013/public gates remain HOLD.",
+  "reconciliation": {
+    "originalSpec": "qa/evidence/goal-t014-checker-cycle0-spec.json",
+    "originalSpecSHA256": "a53e3d05ba5f1a7824179c778994bba86956e2fabfe7f269c2db1962dc01ac44",
+    "dependencyDeltas": [
+      {
+        "path": "apps/api/src/ask/source-context.ts",
+        "oldSHA256": "5343c1a8fa05bd8bd810032b21918be0374ef9026dda3ca28038c31bfaa0a872",
+        "newSHA256": "1f084b8f14764a097d4d826ab3ad431945fc35563c67d1eb9edab2b75009fb8f",
+        "applicability": "Current source reviewed. Trusted hydration/reviewed OCR provenance helpers are imported but not invoked by the exact probe: buildTestDeps supplies fakeAskDeps and no requestDepsFor/sourceContext. Existing Compete selects only that declared offline legacy branch. No public/production hydration evidence inferred; no API9/web7 replay justified."
+      },
+      {
+        "path": "apps/api/src/transcript-review/effective-reader.ts",
+        "oldSHA256": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+        "newSHA256": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+        "applicability": "Current source reviewed. Trusted hydration/reviewed OCR provenance helpers are imported but not invoked by the exact probe: buildTestDeps supplies fakeAskDeps and no requestDepsFor/sourceContext. Existing Compete selects only that declared offline legacy branch. No public/production hydration evidence inferred; no API9/web7 replay justified."
+      }
+    ],
+    "SOURCEINPUT_FREEZE": "Source and test bytes unchanged by checker. Only this new reconciliation JSON is written.",
+    "currentCoherence": {
+      "checkpoint": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T234014Z-verified.json",
+      "checkpointSHA256": "e745ef9417b05042ce820705aa0eb2ae41367886ccbba21c8c77e45c24f63e10",
+      "inputFiles": 1940,
+      "inputDrift": 0,
+      "stages": [
+        {
+          "phase": "api-types",
+          "receipt": "qa/goal-2026-10-14/api-types-ordinary-20261014T234014Z.json",
+          "sha256": "b6a9c5b944fc75d8ac87b3f3f86b356ee29663022bf1e7cac04b9beece927763",
+          "exit": 0
+        },
+        {
+          "phase": "web-types",
+          "receipt": "qa/goal-2026-10-14/web-types-ordinary-20261014T234014Z.json",
+          "sha256": "89840d1d43ce14dfc862a8465b1230920f36f0fed24cbbd9aa529efa40da2764",
+          "exit": 0
+        },
+        {
+          "phase": "api-build",
+          "receipt": "qa/goal-2026-10-14/api-build-ordinary-20261014T234014Z.json",
+          "sha256": "a89033b9a4601abd82948609895657a1f7526cc255504cb24337b9962847be2a",
+          "exit": 0
+        },
+        {
+          "phase": "web-build",
+          "receipt": "qa/goal-2026-10-14/web-build-ordinary-20261014T234014Z.json",
+          "sha256": "fc8ebdeaf744f440add6a19c31893a9447581a142a40c86b480d7272107ef547",
+          "exit": 0
+        }
+      ]
+    },
+    "execution": "NOT RUN; requires fresh sole coordinator preflight/grant. API9/web7 remain reused; real human/T013/public gates remain HOLD."
+  }
+}

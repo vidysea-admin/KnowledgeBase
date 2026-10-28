@@ -1,0 +1,17 @@
+{
+  "rawReceiptSha256": "7b6bc7154a3d56e9193220a379bb8f1af7482b1b30678f721b0653165e12d42d",
+  "unit": "T022 independent emitted-artifact consumer",
+  "artifactSha256": "2b617ff41ccc1fb1e3e68105d366da63b340237a9c8f1f263ddb585549d0c6e5",
+  "drift": 0,
+  "pinCount": 69,
+  "networkCalls": 0,
+  "humanJudgments": 0,
+  "displayedItems": 30,
+  "privateDataNotPublished": true,
+  "downloadedDraftRejectedByLiveIntake": true,
+  "exit": 0,
+  "pending": 30,
+  "timedOut": false,
+  "elapsedMs": 1025,
+  "sourceBindings": 44
+}

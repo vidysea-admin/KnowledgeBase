@@ -1,0 +1,17 @@
+{
+  "status": "SOURCE_FROZEN_AWAITING_BROKER",
+  "slug": "t056-direct-answer",
+  "cycle": 0,
+  "candidate_kind": "ordered-path-and-raw-sha256-scoped-working-tree",
+  "candidate_sha": "2ca22a90c161fc2c9e043940dbaa26d4b5da53cedcdb641d9738d64f689dbc01",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "source_count": 8,
+  "new_source": "apps/web/src/pages/answer-policy/directAnswer.test.ts",
+  "source_pins": "source-pins.json",
+  "broker_request": "broker-request.json",
+  "runtime_total_tokens": null,
+  "active_s": null,
+  "cost": null,
+  "execution_receipts": [],
+  "verification": "raw source fingerprint readback only, no tests/build"
+}

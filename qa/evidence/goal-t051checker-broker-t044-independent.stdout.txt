@@ -1,0 +1,63 @@
+{
+  "startedAt": "2026-10-14T20:43:23.390Z",
+  "completedAt": "2026-10-14T20:43:23.741Z",
+  "elapsedMs": 350.39290000000005,
+  "syntheticFixtureOnly": true,
+  "fixtureRoot": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t044-qa-generation-binding\\checker-fixture-9j29uE",
+  "tests": 10,
+  "passed": 10,
+  "failed": 0,
+  "issueCorpus": {
+    "id": "ISS-REVALIDATE-001",
+    "reconstructedRecordedTypesRefused": 3,
+    "totalReconstructedTypes": 3,
+    "unreplayed": [
+      "75 identical turns/no QA/flag unset: preserved D-162 baseline",
+      "monotonic overlaps: no approved blanket refusal policy"
+    ],
+    "limit": "Original standalone attack harness/commands absent from ledger; not a verbatim complete-corpus replay."
+  },
+  "fullTaskVerdict": "HOLD: real audio/provider, watcher and intentional privacy-exclusion acceptance missing",
+  "outcomes": [
+    {
+      "name": "clean generation traverses actual validator and consumer",
+      "outcome": "PASS"
+    },
+    {
+      "name": "same speech with newly accepted past-end tail cannot reuse passed validation",
+      "outcome": "PASS"
+    },
+    {
+      "name": "discarded anomalous retry remains audit-only",
+      "outcome": "PASS"
+    },
+    {
+      "name": "epsilon overshoot refuses despite uncounted clamp tolerance",
+      "outcome": "PASS"
+    },
+    {
+      "name": "ISS-REVALIDATE-001 same-count stale QA refuses",
+      "outcome": "PASS"
+    },
+    {
+      "name": "ISS-REVALIDATE-001 literal contradictory 20-clamp 5-drop 400-overshoot refuses",
+      "outcome": "PASS"
+    },
+    {
+      "name": "ISS-REVALIDATE-001 swapped turns recomputed despite claimed-clean metadata",
+      "outcome": "PASS"
+    },
+    {
+      "name": "removed and truncated QA invalidate previously passed same speech",
+      "outcome": "PASS"
+    },
+    {
+      "name": "QA creation after absence-bound baseline validation refuses",
+      "outcome": "PASS"
+    },
+    {
+      "name": "legacy validation cannot authorize newly hash-bound QA",
+      "outcome": "PASS"
+    }
+  ]
+}

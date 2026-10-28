@@ -1,0 +1,13 @@
+✔ independent: source mutation during generation refuses before any insert (15.6237ms)
+✔ independent: edited draft wins CAS against already-running revalidation (14.9112ms)
+✔ independent: assessed factual text, kind and references cannot retain stale fingerprint (2.6929ms)
+✔ independent: duplicate grounding verdict refuses complete draft persistence (0.9223ms)
+✔ independent: newly applicable policy invalidates default-policy draft export (1.9046ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1202.1881

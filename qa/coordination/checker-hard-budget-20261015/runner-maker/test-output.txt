@@ -1,0 +1,269 @@
+test_aggregate_reservations_and_immutable_plan (test_scoped_check_runner.ScopedRunnerTests.test_aggregate_reservations_and_immutable_plan) ... fatal: cannot mkdir C:\Users\product\AppData\Local\Temp\tmpk5q6s8zc: File exists
+ERROR
+test_changed_bytes_refused (test_scoped_check_runner.ScopedRunnerTests.test_changed_bytes_refused) ... fatal: cannot mkdir C:\Users\product\AppData\Local\Temp\tmp19n2vi3e: File exists
+ERROR
+test_llm_zero_execution (test_scoped_check_runner.ScopedRunnerTests.test_llm_zero_execution) ... fatal: cannot mkdir C:\Users\product\AppData\Local\Temp\tmpjaoyktqw: File exists
+ERROR
+test_missing_required_refused (test_scoped_check_runner.ScopedRunnerTests.test_missing_required_refused) ... fatal: cannot mkdir C:\Users\product\AppData\Local\Temp\tmp95lph_i8: File exists
+ERROR
+test_success_and_unknown_denominator (test_scoped_check_runner.ScopedRunnerTests.test_success_and_unknown_denominator) ... fatal: cannot mkdir C:\Users\product\AppData\Local\Temp\tmph1ep5q9w: File exists
+ERROR
+test_timeout_descendant_cleanup (test_scoped_check_runner.ScopedRunnerTests.test_timeout_descendant_cleanup) ... fatal: cannot mkdir C:\Users\product\AppData\Local\Temp\tmpcqybso_0: File exists
+ERROR
+
+======================================================================
+ERROR: test_aggregate_reservations_and_immutable_plan (test_scoped_check_runner.ScopedRunnerTests.test_aggregate_reservations_and_immutable_plan)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 19, in setUp
+    subprocess.run(['git', 'init', '-q', str(self.root)], check=True, timeout=5)
+  File "C:\Program Files\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'init', '-q', 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpk5q6s8zc']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_changed_bytes_refused (test_scoped_check_runner.ScopedRunnerTests.test_changed_bytes_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 19, in setUp
+    subprocess.run(['git', 'init', '-q', str(self.root)], check=True, timeout=5)
+  File "C:\Program Files\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'init', '-q', 'C:\\Users\\product\\AppData\\Local\\Temp\\tmp19n2vi3e']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_llm_zero_execution (test_scoped_check_runner.ScopedRunnerTests.test_llm_zero_execution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 19, in setUp
+    subprocess.run(['git', 'init', '-q', str(self.root)], check=True, timeout=5)
+  File "C:\Program Files\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'init', '-q', 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpjaoyktqw']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_missing_required_refused (test_scoped_check_runner.ScopedRunnerTests.test_missing_required_refused)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 19, in setUp
+    subprocess.run(['git', 'init', '-q', str(self.root)], check=True, timeout=5)
+  File "C:\Program Files\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'init', '-q', 'C:\\Users\\product\\AppData\\Local\\Temp\\tmp95lph_i8']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_success_and_unknown_denominator (test_scoped_check_runner.ScopedRunnerTests.test_success_and_unknown_denominator)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 19, in setUp
+    subprocess.run(['git', 'init', '-q', str(self.root)], check=True, timeout=5)
+  File "C:\Program Files\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'init', '-q', 'C:\\Users\\product\\AppData\\Local\\Temp\\tmph1ep5q9w']' returned non-zero exit status 128.
+
+======================================================================
+ERROR: test_timeout_descendant_cleanup (test_scoped_check_runner.ScopedRunnerTests.test_timeout_descendant_cleanup)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\scripts\qa\test_scoped_check_runner.py", line 19, in setUp
+    subprocess.run(['git', 'init', '-q', str(self.root)], check=True, timeout=5)
+  File "C:\Program Files\Python312\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'init', '-q', 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpcqybso_0']' returned non-zero exit status 128.
+
+----------------------------------------------------------------------
+Ran 6 tests in 3.579s
+
+FAILED (errors=6)
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpcqybso_0'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\weakref.py", line 666, in _exitfunc
+    f()
+  File "C:\Program Files\Python312\Lib\weakref.py", line 590, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 939, in _cleanup
+    cls._rmtree(name, ignore_errors=ignore_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpcqybso_0'
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmph1ep5q9w'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\weakref.py", line 666, in _exitfunc
+    f()
+  File "C:\Program Files\Python312\Lib\weakref.py", line 590, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 939, in _cleanup
+    cls._rmtree(name, ignore_errors=ignore_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmph1ep5q9w'
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmp95lph_i8'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\weakref.py", line 666, in _exitfunc
+    f()
+  File "C:\Program Files\Python312\Lib\weakref.py", line 590, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 939, in _cleanup
+    cls._rmtree(name, ignore_errors=ignore_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmp95lph_i8'
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpjaoyktqw'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\weakref.py", line 666, in _exitfunc
+    f()
+  File "C:\Program Files\Python312\Lib\weakref.py", line 590, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 939, in _cleanup
+    cls._rmtree(name, ignore_errors=ignore_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpjaoyktqw'
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmp19n2vi3e'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\weakref.py", line 666, in _exitfunc
+    f()
+  File "C:\Program Files\Python312\Lib\weakref.py", line 590, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 939, in _cleanup
+    cls._rmtree(name, ignore_errors=ignore_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmp19n2vi3e'
+Traceback (most recent call last):
+  File "<frozen os>", line 366, in walk
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpk5q6s8zc'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Program Files\Python312\Lib\weakref.py", line 666, in _exitfunc
+    f()
+  File "C:\Program Files\Python312\Lib\weakref.py", line 590, in __call__
+    return info.func(*info.args, **(info.kwargs or {}))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 939, in _cleanup
+    cls._rmtree(name, ignore_errors=ignore_errors)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 934, in _rmtree
+    _shutil.rmtree(name, onexc=onexc)
+  File "C:\Program Files\Python312\Lib\shutil.py", line 781, in rmtree
+    return _rmtree_unsafe(path, onexc)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\shutil.py", line 623, in _rmtree_unsafe
+    for dirpath, dirnames, filenames in results:
+                                        ^^^^^^^
+  File "<frozen os>", line 369, in walk
+  File "C:\Program Files\Python312\Lib\shutil.py", line 621, in onerror
+    onexc(os.scandir, err.filename, err)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 906, in onexc
+    _resetperms(path)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 286, in _resetperms
+    _dont_follow_symlinks(_os.chmod, path, 0o700)
+  File "C:\Program Files\Python312\Lib\tempfile.py", line 277, in _dont_follow_symlinks
+    func(path, *args)
+PermissionError: [WinError 5] Access is denied: 'C:\\Users\\product\\AppData\\Local\\Temp\\tmpk5q6s8zc'

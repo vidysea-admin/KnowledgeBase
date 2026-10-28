@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:lkb:qa:goal-t014:actual-event-prerequisite-intake",
+  "title": "T014 prerequisite intake, not an authorization or database schema",
+  "description": "Records unresolved or unverified evidence for human/checker review. Schema-valid input never verifies approval, independence or readiness and must not be posted to championship runtime.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "task", "packetKind", "asOf", "authorizationState", "fullTask", "softwareHandshake", "acceptedBaseline", "candidateSources", "actualInputs", "gates", "evidenceBoundary"],
+  "properties": {
+    "$schema": { "const": "goal-t014-actual-input.schema.json" },
+    "task": { "const": "T-014" },
+    "packetKind": { "const": "actual-event-prerequisite-intake" },
+    "asOf": { "type": "string", "format": "date" },
+    "authorizationState": { "const": "NOT_AUTHORIZED_TO_RUN" },
+    "fullTask": { "const": "HOLD" },
+    "softwareHandshake": { "type": "object", "additionalProperties": false, "required": ["cycle", "status", "manifest", "verdict"], "properties": { "cycle": { "const": 0 }, "status": { "const": "checked-PASS" }, "manifest": { "const": "qa/manifests/goal-t014.md" }, "verdict": { "const": "qa/verdicts/goal-t014.md" } } },
+    "acceptedBaseline": { "type": "object", "additionalProperties": false, "required": ["reference", "comparison", "win", "internalStreakCount", "tieMissingWithdrawalAggregationProtocol"], "properties": { "reference": { "$ref": "#/$defs/text" }, "comparison": { "$ref": "#/$defs/text" }, "win": { "const": "per-counsellor majority, >50% preferred, over 100+ real questions" }, "internalStreakCount": { "type": ["integer", "null"], "minimum": 1 }, "tieMissingWithdrawalAggregationProtocol": { "$ref": "#/$defs/pendingReference" } } },
+    "candidateSources": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["kind", "reference", "fileSha256", "locator", "topic", "status", "exactText", "humanReviewEvidence", "aiExposure"], "properties": { "kind": { "enum": ["toc", "pathlynks", "counsellor"] }, "reference": { "$ref": "#/$defs/text" }, "fileSha256": { "$ref": "#/$defs/digest" }, "locator": { "$ref": "#/$defs/text" }, "topic": { "$ref": "#/$defs/text" }, "status": { "const": "CANDIDATE_ONLY" }, "exactText": { "type": "null" }, "humanReviewEvidence": { "$ref": "#/$defs/pendingReference" }, "aiExposure": { "$ref": "#/$defs/text" } } } },
+    "actualInputs": {
+      "type": "object", "additionalProperties": false,
+      "required": ["eventTitle", "acceptedQuestions", "bankReviewer", "bankApprovalReference", "bankDigest", "frozenAt", "freezeReceiptReference", "exposureCustodian", "preExposureEvidenceReference", "counsellors", "judges", "panelAcceptanceReference", "rubric", "conditionsReference", "blindMappingCustodian", "blindMappingReference", "outcomeProtocolReference", "qualifyingInternalRunReferences", "t012RealAcceptanceReference", "t013FullAcceptanceReference", "mongoOperationalEvidenceReference", "eventAuthorizationReference", "scheduledAt", "mediumOrVenue", "publicationScopeReference", "actualTrialReferences", "actualPublicEventEvidenceReference"],
+      "properties": {
+        "eventTitle": { "$ref": "#/$defs/pendingReference" },
+        "acceptedQuestions": { "type": "array", "items": { "$ref": "#/$defs/question" }, "description": "Operator-supplied adopted entries require independent human review; this current packet has none. Actual bank must meet Q1 100+ requirement." },
+        "bankReviewer": { "$ref": "#/$defs/pendingReference" }, "bankApprovalReference": { "$ref": "#/$defs/pendingReference" },
+        "bankDigest": { "anyOf": [{ "$ref": "#/$defs/digest" }, { "type": "null" }] },
+        "frozenAt": { "$ref": "#/$defs/pendingTimestamp" }, "freezeReceiptReference": { "$ref": "#/$defs/pendingReference" },
+        "exposureCustodian": { "$ref": "#/$defs/pendingReference" }, "preExposureEvidenceReference": { "$ref": "#/$defs/pendingReference" },
+        "counsellors": { "type": "array", "items": { "$ref": "#/$defs/counsellor" }, "description": "Supplied consent references are unverified; current packet asserts no roster." },
+        "judges": { "type": "array", "items": { "$ref": "#/$defs/judge" }, "description": "Supplied independence/consent references are unverified; current packet asserts no panel." },
+        "panelAcceptanceReference": { "$ref": "#/$defs/pendingReference" },
+        "rubric": { "anyOf": [{ "type": "null" }, { "type": "object", "additionalProperties": false, "required": ["version", "reference", "sha256", "panelOwnershipReference", "approvalReference"], "properties": { "version": { "$ref": "#/$defs/text" }, "reference": { "$ref": "#/$defs/text" }, "sha256": { "$ref": "#/$defs/digest" }, "panelOwnershipReference": { "$ref": "#/$defs/text" }, "approvalReference": { "$ref": "#/$defs/text" } } }], "description": "Panel-owned rubric and actual approvals still require verification." },
+        "conditionsReference": { "$ref": "#/$defs/pendingReference" }, "blindMappingCustodian": { "$ref": "#/$defs/pendingReference" }, "blindMappingReference": { "$ref": "#/$defs/pendingReference" }, "outcomeProtocolReference": { "$ref": "#/$defs/pendingReference" },
+        "qualifyingInternalRunReferences": { "$ref": "#/$defs/referenceList" }, "t012RealAcceptanceReference": { "$ref": "#/$defs/pendingReference" }, "t013FullAcceptanceReference": { "$ref": "#/$defs/pendingReference" }, "mongoOperationalEvidenceReference": { "$ref": "#/$defs/pendingReference" }, "eventAuthorizationReference": { "$ref": "#/$defs/pendingReference" },
+        "scheduledAt": { "$ref": "#/$defs/pendingTimestamp" }, "mediumOrVenue": { "$ref": "#/$defs/pendingReference" }, "publicationScopeReference": { "$ref": "#/$defs/pendingReference" }, "actualTrialReferences": { "$ref": "#/$defs/referenceList" }, "actualPublicEventEvidenceReference": { "$ref": "#/$defs/pendingReference" }
+      }
+    },
+    "gates": { "type": "array", "minItems": 10, "maxItems": 10, "items": { "type": "object", "additionalProperties": false, "required": ["id", "status", "required", "evidence"], "properties": { "id": { "enum": ["authentic-reviewed-bank", "freeze-before-ai-exposure", "real-counsellor-roster", "independent-human-panel", "panel-rubric-and-blind-conditions", "internal-streak-and-outcome-protocol", "t012-t013-real-readiness", "real-mongo-operational-installation", "public-event-authorization", "actual-trials-and-public-outcome"] }, "status": { "enum": ["UNRESOLVED", "PROVIDED_NOT_VERIFIED"] }, "required": { "$ref": "#/$defs/text" }, "evidence": { "$ref": "#/$defs/referenceList" } }, "allOf": [{ "if": { "properties": { "status": { "const": "PROVIDED_NOT_VERIFIED" } } }, "then": { "properties": { "evidence": { "minItems": 1 } } } }] }, "description": "Require each ID exactly once during independent review; no provided record is automatically verified." },
+    "evidenceBoundary": { "$ref": "#/$defs/text" }
+  },
+  "$defs": {
+    "text": { "type": "string", "minLength": 1, "pattern": "\\S" },
+    "digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "pendingReference": { "anyOf": [{ "$ref": "#/$defs/text" }, { "type": "null" }] },
+    "pendingTimestamp": { "type": ["string", "null"], "format": "date-time" },
+    "referenceList": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/text" } },
+    "question": { "type": "object", "additionalProperties": false, "required": ["id", "exactText", "sourceKind", "sourceReference", "sourceVersionOrDigest", "sourceTurnOrLocator", "anonymisationRecordReference"], "properties": { "id": { "$ref": "#/$defs/text" }, "exactText": { "$ref": "#/$defs/text" }, "sourceKind": { "enum": ["toc", "pathlynks", "counsellor"] }, "sourceReference": { "$ref": "#/$defs/text" }, "sourceVersionOrDigest": { "$ref": "#/$defs/text" }, "sourceTurnOrLocator": { "$ref": "#/$defs/text" }, "anonymisationRecordReference": { "$ref": "#/$defs/text" } } },
+    "counsellor": { "type": "object", "additionalProperties": false, "required": ["id", "name", "nominationReference", "participationConsentReference", "publicIdentityScopeReference"], "properties": { "id": { "$ref": "#/$defs/text" }, "name": { "$ref": "#/$defs/text" }, "nominationReference": { "$ref": "#/$defs/text" }, "participationConsentReference": { "$ref": "#/$defs/text" }, "publicIdentityScopeReference": { "$ref": "#/$defs/text" } } },
+    "judge": { "type": "object", "additionalProperties": false, "required": ["id", "name", "participationConsentReference", "independenceDeclarationReference", "conflictReviewReference"], "properties": { "id": { "$ref": "#/$defs/text" }, "name": { "$ref": "#/$defs/text" }, "participationConsentReference": { "$ref": "#/$defs/text" }, "independenceDeclarationReference": { "$ref": "#/$defs/text" }, "conflictReviewReference": { "$ref": "#/$defs/text" } } }
+  }
+}

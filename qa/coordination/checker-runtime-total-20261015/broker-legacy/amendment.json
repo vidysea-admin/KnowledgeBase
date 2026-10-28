@@ -1,0 +1,13 @@
+{
+  "original20": "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/test_review_budget.py",
+  "original20Sha": "19b32f7fde950f692621aeb76565ee0a6dd5dc6bb6853ba7e86bebea2e59478f",
+  "original14": "qa/coordination/checker-completion-reserve-20261015/test_completion_reserve.py",
+  "original14Sha": "87de2a3d0d38818376795cfe7f3c3c1e4a866af150bb40219d41d88fc7f293b8",
+  "helperSha": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+  "changes": [
+    "copied20 helper hash pin only",
+    "single legacy untagged ratio_verified assertion True to False per intended metric policy",
+    "copied14 unchanged"
+  ],
+  "globalWrites": false
+}

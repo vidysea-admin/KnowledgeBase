@@ -1,0 +1,32 @@
+from broker_lib import *
+import os,sys
+phase=time.monotonic();old=load('qa/coordination/resume-20261015/broker/repair-four-final-sealed-inventory.json');pins=dict(old);t=load('qa/coordination/resume-20261015/transcript-verifier-order-maker/source-pins.json');w=load('qa/coordination/resume-20261015/workspace-cycle-repair/fixture-clock-pin.json');overlay={t['path']:t['sha256'],w['path']:w['after_sha256']};adoptions=[{'path':n,'before':pins.get(n),'after':v} for n,v in overlay.items()];pins.update(overlay);assert all(sha(ROOT/n)==v for n,v in pins.items()),'source freeze mismatch'
+helper=ROOT/'packages/meeting-bot/src/capture/record-consent/native-acl-fixture.ps1';aclverifier=ROOT/'packages/meeting-bot/src/capture/record-consent/private-acl.ts';adapter=ROOT/'qa/coordination/resume-20261015/runtime-alias-repair/register.mjs';pins[helper.relative_to(ROOT).as_posix()]=sha(helper);assert sha(adapter)=='e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d'
+(OUT/'secure-native-two-test-adoption.json').write_text(json.dumps({'authority':'root latest two test-only overlays, all production pins unchanged; existing helper creates new protected UUID only','adoptions':adoptions,'helper_sha256':sha(helper),'adapter_sha256':sha(adapter)},indent=2))
+temp=OUT/'secure-native-phase-temp';temp.mkdir(exist_ok=True);probe=temp/'owned-probe';probe.mkdir();(probe/'bytes').write_bytes(b'probe');assert (probe/'bytes').read_bytes()==b'probe';(probe/'bytes').unlink();probe.rmdir();os.environ.update(TMP=str(temp),TEMP=str(temp),KB_U24_PRIVATE_TOC_TESTS='0',T054_AUTHENTIC_INPUT_OPT_IN='0',LKB_WHATSAPP_CONSENT_MONGO_RUN='0')
+results=[];fixture=None
+def checked(label,argv,cwd=ROOT,limit=60,reserve=15):
+ left=140-reserve-(time.monotonic()-phase)
+ if left<2:return {'label':label,'checkpoint':'finite phase admission stopped; not launched'}
+ rec=run(label,argv,cwd,min(limit,left),pins);rec['environment']={k:os.environ.get(k) for k in ['TMP','TEMP','PSModulePath','LKB_NATIVE_TEST_FFMPEG','LKB_NATIVE_TEST_FFPROBE','LKB_NATIVE_TEST_BROWSER','LKB_NATIVE_TEST_PRIVATE_DIR','KB_U24_PRIVATE_TOC_TESTS','T054_AUTHENTIC_INPUT_OPT_IN','LKB_WHATSAPP_CONSENT_MONGO_RUN']};text=pathlib.Path(rec['log']).read_text(encoding='utf-8',errors='replace') if pathlib.Path(rec['log']).exists() else '';rec['tail']=text.splitlines()[-30:];(OUT/(label+'-receipt.json')).write_text(json.dumps(rec,indent=2));results.append(rec);return rec
+safe=adapter.as_uri()
+def nodes(label,files,cwd=ROOT,limit=65,pattern=None):
+ args=[NODE,'--test','--test-isolation=none','--test-concurrency=1','--test-timeout=30000','--import',safe]
+ if pattern:args.append('--test-name-pattern='+pattern)
+ return checked(label,[*args,*files],cwd,limit)
+try:
+ nodes('ordered-verifier-postcommit20',['apps/api/src/indexing/post-commit.test.ts','apps/api/src/indexing/vectorless-publication.test.ts','apps/api/src/grounded-postprocessing/transcripts.test.ts'],limit=50)
+ nodes('aligned-clock-workspace12',['src/capture/workspace/capture-slot-readiness.test.ts','src/capture/workspace/tab-session-workspace.test.ts','src/capture/workspace/caller-failure-readiness.test.ts'],ROOT/'packages/meeting-bot',50)
+ powershell=pathlib.Path(os.environ.get('SystemRoot','C:/Windows'))/'System32/WindowsPowerShell/v1.0/powershell.exe';assert powershell.is_file();os.environ['PSModulePath']=str(powershell.parent/'Modules')
+ created=checked('secure-native-acl-create',[str(powershell),'-NoProfile','-NonInteractive','-File',str(helper),'-Action','Create'],limit=15);assert created.get('exit')==0,'secure new fixture setup failed'
+ data=json.loads(pathlib.Path(created['log']).read_text(encoding='utf-8-sig').strip());fixture=pathlib.Path(data['fixtureDirectory']);ownedbase=ROOT/'qa/evidence/native-acl-fixtures';assert fixture.is_absolute() and fixture.resolve().parent==ownedbase.resolve() and fixture.resolve().is_relative_to(ROOT.resolve()) and re.fullmatch(r'[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}',fixture.name),'returned UUID path outside owned workspace'
+ proof=checked('secure-native-acl-production-verify',[NODE,'--input-type=module','--import',safe,'-e',"const {verifyPrivateDirectory}=await import(process.argv[1]);verifyPrivateDirectory(process.argv[2]);console.log('PASS actual protected private directory');",aclverifier.as_uri(),str(fixture)],limit=15);assert proof.get('exit')==0,'actual production ACL verifier refused new fixture'
+ bins=load('qa/coordination/resume-20261015/broker/native-binaries.json');b={j['Name']:j['Source'] for j in bins};known=load('qa/coordination/resume-20261015/broker/native-binary-hashes.json');assert all(sha(v)==known[k]['sha256'] for k,v in b.items());browser=pathlib.Path('C:/Program Files/Google/Chrome/Application/chrome.exe');assert browser.is_file();os.environ.update(LKB_NATIVE_TEST_FFMPEG=b['ffmpeg.exe'],LKB_NATIVE_TEST_FFPROBE=b['ffprobe.exe'],LKB_NATIVE_TEST_BROWSER=str(browser),LKB_NATIVE_TEST_PRIVATE_DIR=str(fixture))
+ pattern='broker synthetic actual runRecord reaches server native config, opaque close, awaited playback and canonical WAV|broker synthetic server runtime closes real spool and dispatches exact canonical WAV through actual finalizer guard'
+ nodes('secure-native-original-two-joins',['src/capture/native/native-capture-runtime.test.ts'],ROOT/'packages/meeting-bot',75,pattern)
+except BaseException as e:
+ results.append({'checkpoint':type(e).__name__+': '+str(e),'actual_total_tokens':None});print(type(e).__name__,str(e),flush=True)
+finally:
+ if fixture is not None:
+  cleanup=checked('secure-native-acl-owned-cleanup',[str(powershell),'-NoProfile','-NonInteractive','-File',str(helper),'-Action','Cleanup','-FixtureDirectory',str(fixture)],limit=15,reserve=0);cleanup['removed_verified_target']=not fixture.exists();(OUT/'secure-native-acl-owned-cleanup-receipt.json').write_text(json.dumps(cleanup,indent=2))
+ final={n:sha(ROOT/n) for n in pins};diff={n:{'before':pins[n],'after':final[n]} for n in pins if pins[n]!=final[n]};(OUT/'secure-native-final-sealed-inventory.json').write_text(json.dumps(final,indent=2));(OUT/'secure-native-two-test-phase-summary.json').write_text(json.dumps({'active_s':time.monotonic()-phase,'results':results,'inventory_count':len(pins),'inventory_unchanged':not diff,'drift':diff,'fixture_removed':fixture is not None and not fixture.exists(),'standing_unmet':'symlink privilege EPERM remains unmet; not repeated; production automatic private root creation not implemented/accepted','actual_total_tokens':None,'independent_verdict':None},indent=2))

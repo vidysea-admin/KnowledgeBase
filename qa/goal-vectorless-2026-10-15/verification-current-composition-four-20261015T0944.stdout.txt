@@ -1,0 +1,12 @@
+✔ http transport passes the AbortSignal to fetch: abort cancels a never-answered request and the server sees the close (176.4496ms)
+✔ production text routes bind distinct Cloud generators and verifiers without an embedding route (3.5902ms)
+✔ output verification cannot fall back to generation, even with an unsafe configured verifier chain (2.5049ms)
+✔ Compose requires an explicit database and does not bake provider secrets into web builds (0.8295ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2212.5015

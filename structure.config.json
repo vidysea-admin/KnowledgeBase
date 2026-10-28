@@ -6,11 +6,11 @@
     "extensions": [".ts", ".py", ".mjs"],
     "max": 300,
     "testMax": 400,
-    "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$"]
+    "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
   },
-  "dirsize": { "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31 } },
+  "dirsize": { "$comment": "D-180: schema/ allows 46 canonical collection schemas plus index.json and validate.py (D-176/D-177 speaker relationships and attributes, D-180 registration link approvals); other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 48 } },
   "root": {
-    "maxLooseFiles": 15,
+    "maxLooseFiles": 16,
     "architectureFile": "ARCHITECTURE.md",
     "architectureMaxLines": 150,
     "mdMaxLines": 200,
@@ -29,5 +29,18 @@
     "dir": "migrations",
     "pattern": "^migrate-.*\\.(mjs|js|ts|py)$",
     "extraIgnoreDirs": [".git", "sources"]
+  },
+  "codexHooks": {
+    "$comment": "D-050-CODEX parity-lint fallback (ISS-355/ISS-268): links (hard link + junction) do not survive git clone/worktree, so this is the durable check. Compares each named file byte-for-byte MODULO LINE ENDINGS only -- CRLF-vs-LF alone (e.g. features-snapshot-session-end.ps1) is not a defect.",
+    "mirrorDir": ".codex/hooks",
+    "sourceDir": ".claude/hooks",
+    "files": [
+      "decisions-append-guard.ps1",
+      "features-snapshot-session-end.ps1",
+      "lab-session-end.ps1",
+      "lab-session-start.ps1",
+      "mc-precommit.ps1",
+      "mc-sessionstart.ps1"
+    ]
   }
 }

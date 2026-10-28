@@ -1,0 +1,12 @@
+{
+  "originalReceipt": "verification-api-types-native-request-epoch.json",
+  "originalPinCount": 18,
+  "recoveredBeforePinCount": 1245,
+  "recoveredBeforeArtifact": "api-types-native-request-before-map-recovered.json",
+  "afterScanAt": "2026-10-15T12:32:17.757Z",
+  "afterScanConcurrentWithAuthorizedRepair": true,
+  "changesObservedSinceOriginalBefore": [
+    "apps/api/src/evaluation-flywheel/composition.test.ts"
+  ],
+  "limitation": "Original command did not authenticate full source after-map. This recovery is not proof of unchanged sources during compiler. Failed compiler diagnostics retained; next authorized compiler uses explicit output-map collector."
+}

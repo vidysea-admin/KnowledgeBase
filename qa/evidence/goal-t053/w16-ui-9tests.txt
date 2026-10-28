@@ -1,0 +1,22 @@
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.8 [39m[90mC:/Users/product/Desktop/KnowledgeBase-lanes/w16-t053conn/apps/web[39m
+
+[90mstderr[2m | src/pages/ConnectorsPage.test.tsx[2m > [22m[2msaved job link survives reload and requires an explicit checked receipt before showing consumption
+[22m[39m⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+
+ [32m✓[39m src/pages/ConnectorsPage.test.tsx [2m([22m[2m9 tests[22m[2m)[22m[33m 19136[2mms[22m[39m
+   [33m[2m✓[22m[39m saved job link survives reload and requires an explicit checked receipt before showing consumption [33m1279[2mms[22m[39m
+   [33m[2m✓[22m[39m queued public intake shows progress and only a checked consumer receipt becomes a session link [33m4786[2mms[22m[39m
+   [33m[2m✓[22m[39m recording job uncertainty preserves open request and does not offer a consumed session [33m3656[2mms[22m[39m
+   [33m[2m✓[22m[39m late prior-login job completion cannot show a consumed link in the next login [33m4958[2mms[22m[39m
+   [33m[2m✓[22m[39m opening a recording request relists the durable owner and SLA response [33m2445[2mms[22m[39m
+   [33m[2m✓[22m[39m receipt conflict preserves open request and watched failure renders action required [33m852[2mms[22m[39m
+   [33m[2m✓[22m[39m late prior tenant overview cannot overwrite current tenant inventory [33m382[2mms[22m[39m
+   [33m[2m✓[22m[39m late overview cannot cross a new login that reuses the same key [33m668[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 14:51:23
+[2m   Duration [22m 37.11s[2m (transform 1.91s, setup 1.71s, collect 10.35s, tests 19.14s, environment 3.21s, prepare 947ms)[22m
+

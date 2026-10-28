@@ -1,0 +1,70 @@
+{
+  "scope": "read-only acceptance readiness; no tests, providers, host actions or parent closures",
+  "sources": [
+    "qa/coordination/knowledge-brain-20261015/delivery-matrix.md",
+    "qa/goal-2026-10-14/acceptance-matrix.md",
+    "AGENTS.md"
+  ],
+  "includedUnfinished": 39,
+  "excluded": "T-015",
+  "offlineJoins": [
+    {
+      "parents": "T-007/T-008/U3.2/T-043/T-054/T-056",
+      "next": "Join approved source -> tree/keyword/graph -> passage -> cited Ask with absence/withdrawal refusals",
+      "prerequisite": "Current vectorless publication/correction generation visibility, policy freshness and mounted search/Ask consumers; preserve exact receipt pins"
+    },
+    {
+      "parents": "T-034/T-035/T-044/T-048/T-050",
+      "next": "Finish affected deterministic regressions before native media proof",
+      "prerequisite": "Original duration/private EOF finalizer provenance and privacy-safe STT/upload consumer binding"
+    },
+    {
+      "parents": "T-036/T-037/T-038/T-052/T-053",
+      "next": "Complete consumer joins and current-cycle evidence before real account actions",
+      "prerequisite": "Normalized provenance/refusal -> approved policy/profile -> lifecycle outbox -> confirmation/recording receipt -> ingestion"
+    },
+    {
+      "parents": "U2.2/T-022/U0.10/U2.3/U2.4/U2.5/T-040/T-059",
+      "next": "Prepare genuine-review and provider evaluation inputs; do not execute paid evaluation without authorization",
+      "prerequisite": "Covered gold manifest, authenticated item transfer/CAS, scorer provenance, production92 harness and current-source readers"
+    }
+  ],
+  "externalGates": [
+    {
+      "gate": "Native transactions",
+      "parents": "T-007/T-054 and transactional consumers",
+      "missing": "Existing staging Mongo is standalone; opt-in separate replica-set proposal exists but activation and bounded staging writes require explicit approval"
+    },
+    {
+      "gate": "Human labels/quality",
+      "parents": "T-022/U2.2/U0.10/U2.3/U2.4/U2.5/T-056/T-058",
+      "missing": "0/30 genuine owner reviews; item-level gold and accepted thresholds; real speaker confirmation and usefulness judgments"
+    },
+    {
+      "gate": "Real provider/corpus",
+      "parents": "T-008/T-040/T-041/T-043/T-044/T-048/T-050/T-055/T-058/T-059",
+      "missing": "Authorized authentic corpus/media, confirmed audio-capable STT, configured provider responses and native persisted consumer/citation evidence"
+    },
+    {
+      "gate": "Capture/operations",
+      "parents": "T-011/T-034/T-035/T-038/T-039/T-051",
+      "missing": "Approved meeting/profile/host and private ACL, actual >=60min and overlapping capture, restart/recovery, seven physical unattended days and separate Ubuntu host"
+    },
+    {
+      "gate": "External accounts/actions",
+      "parents": "T-036/T-037/T-045/T-046/T-052/T-053/T-057/T-060/T-061",
+      "missing": "Authorized inbox/calendar/connectors/targets, actual confirmation/effect delivery, retention dry run plus separate destructive approval, genuine deployment/onboarding"
+    },
+    {
+      "gate": "Human product/event",
+      "parents": "T-013/T-014/T-028",
+      "missing": "Real microphone/speech/avatar and human usability; independent panel/bank/held event; human account credentials and specifically authorized onboarding"
+    }
+  ],
+  "limitations": [
+    "Delivery matrix is planning evidence with chronological updates, not fresh runtime acceptance",
+    "Historical acceptance matrix contains superseded T-015/handshake states; prefer newer matching-cycle verdicts",
+    "Evidence-index target was not identified in bounded scope; receipt names inspected only as matrix references",
+    "No hashes or receipt reuse were independently validated"
+  ]
+}

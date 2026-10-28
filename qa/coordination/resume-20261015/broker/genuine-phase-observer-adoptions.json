@@ -1,0 +1,17 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+    "before": "b196a1d6d6415fceaee0dcc45d45293cf1220fbd08a3cf1d8a2bbf12513914aa",
+    "after": "a125bb23755d9f51fb496b67bb0993415e3f2decec13949c9b8455cfef7db877"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+    "before": "f504a9587920b4dd811aa1015b571c3bed494cad7db014153687461117606312",
+    "after": "9d96c19b487710be597a49136b02ee5d4910cc0addb6678ea408c1a36071f10b"
+  },
+  {
+    "path": "scripts/native-capture/production.test.ts",
+    "before": "07a64eae0b169a2d318d555cd91f445a7de443bfd897c600a6f5e11de7b5cf45",
+    "after": "dc8b0f7e2a52d48f1b84175cb996b001fac5ecc827d1fda0a32f43359cd37f68"
+  }
+]

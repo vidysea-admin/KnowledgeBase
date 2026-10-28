@@ -1,0 +1,50 @@
+[
+  {
+    "path": "apps/api/src/native-evidence/message-publication.ts",
+    "sha256": "CE139EE123D266F2B3A2276DD7C79A5D84B24BD97CBE71AFD903B435CF47C1B0"
+  },
+  {
+    "path": "apps/api/src/native-evidence/message-publication.test.ts",
+    "sha256": "590E2FA99A62DF1E82DA5C7036300277939590557C74F48783443A2252DF477C"
+  },
+  {
+    "path": "apps/api/src/native-evidence/message-publication-fixture.ts",
+    "sha256": "67CDD0B60123772F6C0D7CFE8CC2300A3A6367A6DF69311E2CDD6DD28EC9FEBF"
+  },
+  {
+    "path": "apps/api/src/native-evidence/message-revision.ts",
+    "sha256": "5E769520A06F753AF3AB84E13C063E66D65577A080ED36265CD4AB4D16E68895"
+  },
+  {
+    "path": "apps/api/src/native-evidence/whatsapp-authority.ts",
+    "sha256": "F9A46CE574DDE027724A5BA000151EC8734C2D2092B3538283816C9654C3B724"
+  },
+  {
+    "path": "apps/api/src/native-evidence/whatsapp-authority.test.ts",
+    "sha256": "4555A68B207AB9EF2DAC34F736BB5FCBE04ADE57EEBDD01ACC2EB33A604B9288"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/materializer.ts",
+    "sha256": "7FB6ED68352F9D6ECCD0AF49ABC10310DA972C56D5C0BA006037FB9CA8AA2EB9"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/quarantine.ts",
+    "sha256": "DCD52C9006C852A4EEDE5BF688EA561F1E7A4834F6F3CD0D059D8FECEB1F200D"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/quarantine-native.test.ts",
+    "sha256": "01F70B88B1136D6FE4D174EAA7DB5009935175CDA7A29405E4C4D410A6FE7CC4"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/test-fixtures.ts",
+    "sha256": "F1BB0508854AF86BF5ADDE0197882D5BC09E7AD31081E2E2AEE24CD8874B098C"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/wire-fixtures.ts",
+    "sha256": "64AFED1D08A8D919762FE7E700115F16D7A4DE86866828C648D5569472A7F3E7"
+  },
+  {
+    "path": "apps/api/src/whatsapp/review/wire-fix1.test.ts",
+    "sha256": "6C5170B42F05CD8C6CAC54D869605709AE1D49744CA9D0ED8FA6EA164EAAAFD2"
+  }
+]

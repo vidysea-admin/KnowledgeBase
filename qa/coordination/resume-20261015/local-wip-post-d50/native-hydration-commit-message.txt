@@ -1,0 +1,9 @@
+Record native guard and hydration verification with extraction review
+
+LOCAL WIP. Native source changes are diagnostic test instrumentation/helper only; product logic unchanged. Exact original node1 and node2 each pass1/1 with zero skips: node1 Job107.625s/phase118.078s/64trace records; node2 FIRST attempt Job65.797s/phase75.578s/12trace records. Both owned fixtures cleaned and source/HEAD proofs retained. Five helper checks and affected typing evidence retained. These engineering receipts are not a broader native checkerPASS.
+
+Hydration QA proof:92/92 source-conditioned hydrated results,238 verified quote proofs,zero tripwires. Original80/12 was QA oracle-stage error, not a repaired production defect. Raw3427/admitted3424 with3 DATAQUALITYOPEN timestamp rows; corpus unmodified. Actual sanitized compact results/CAS retained without raw passages/questions/keys. No primary-answerPASS or independent hydrationPASS.
+
+U22 resume wrapper independent cycle0 PASS and makercheckedPASS close only the scoped local behavior at d0f6f2eff242f98a85ba4ccde483db08030ba3c8. Its two source files and eight watched source files are unchanged. Real human reviews/gold remain0. Thirty-nine parents remain in_progress; four native prerequisite skips, unexplained intermittent recovery, host/Mongo/native/downstream/primary-paid human approvals and unverified usage/10%metrics remain open.
+
+All meaningful prior failure/HOLD evidence preserved verbatim; known raw proof whitespace remains advisory. No DATA/gold119 files, production evaluator changes, secret/config/enforcement changes, activation, deployment or push.

@@ -59,12 +59,44 @@ export const validCalls = () => {
  * This pins the surface in the package that OWNS it: remove or rename any of these three and
  * `pnpm -r typecheck` fails here, at the source of the drift rather than at 3am on a live run.
  */
+/**
+ * U4b/R2 (D-048). Same pin for `watch_heartbeat`: R8 says every read and write of watcher liveness
+ * is tenant-scoped, and the only mechanical version of that claim is "a tenant-less call does not
+ * compile". Without this line the accessor could be swapped for a raw `db.collection()` handle and
+ * every runtime test would still pass — the ISS-078 shape. `watchHeartbeat` is imported lazily here
+ * rather than at the top so this addition touches nothing above it.
+ */
+export const watchHeartbeatTenantPin = async () => {
+  const { watchHeartbeat } = await import("./watch-heartbeat.js");
+  // @ts-expect-error — tenantId is required; calling coll() with no argument must not compile.
+  watchHeartbeat();
+  const coll = watchHeartbeat("toc");
+  const _find = coll.find;
+  const _update = coll.updateOne;
+  void _find;
+  void _update;
+};
+
 export const speakerWriteSurface = () => {
   const coll = speakers("toc");
   const _count: (filter?: object) => Promise<number> = coll.countDocuments;
   const _delete: (filter: object) => Promise<{ deletedCount: number }> = coll.deleteMany;
   const _insert = coll.insertOne;
+  const _findOne = coll.findOne;   // D-141: writeSpeakerDocs reads a row before replacing it
   void _count;
   void _delete;
+  void _insert;
+  void _findOne;
+};
+
+/** T-057 D4. Same pin for `usage_events`: a tenant-less call must not compile. */
+export const usageEventsTenantPin = async () => {
+  const { usageEvents } = await import("./usage-events.js");
+  // @ts-expect-error - tenantId is required; calling coll() with no argument must not compile.
+  usageEvents();
+  const coll = usageEvents("toc");
+  const _find = coll.find;
+  const _insert = coll.insertOne;
+  void _find;
   void _insert;
 };

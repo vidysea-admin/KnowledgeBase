@@ -1,0 +1,12 @@
+{
+  "approvedBy": "Umesh",
+  "host": "127.0.0.1:27029",
+  "replicaSet": "lkbAcceptance",
+  "databases": [
+    "lkb_staging",
+    "lkb_t059_acceptance"
+  ],
+  "syntheticOnly": true,
+  "decisionId": null,
+  "status": "PENDING_APPEND_AND_REVIEWED_JOINT_HOOK_DO_NOT_ACTIVATE"
+}

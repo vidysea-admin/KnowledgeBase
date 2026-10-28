@@ -12,19 +12,21 @@
  * they already are. [C9] every date-only value goes through `calendar-model.ts`'s
  * `parseLocalDate`; nothing here constructs a Date from a bare `YYYY-MM-DD` string.
  */
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 import { listSessions } from "../api/sessions.js";
-import { listUpcomingMeetings } from "../api/calendar.js";
+import { listUpcomingMeetings, type CalendarWorkerHealth } from "../api/calendar.js";
 import { scanGmail, listMeetingCandidates, approveMeetingCandidate, rejectMeetingCandidate } from "../api/meeting-candidates.js";
 import { ApiError } from "../api/client.js";
-import type { SessionSummary, UpcomingMeeting, MeetingCandidate } from "../api/types.js";
+import type { SessionSummary, UpcomingMeeting, MeetingCandidate, GmailSummary } from "../api/types.js";
 import { CalendarToolbar } from "./calendar/CalendarToolbar.js";
 import { MonthGrid } from "./calendar/MonthGrid.js";
 import { TimeGrid } from "./calendar/TimeGrid.js";
 import { EventDetail } from "./calendar/EventDetail.js";
 import { AgendaView } from "./calendar/AgendaView.js";
+import { OptOutControl, GmailPatternControl } from "./calendar/OptOutControl.js";
+import { useOptedOutIds } from "./calendar/useOptedOutIds.js";
 import {
   activeCalendarFilterCount, filterEvents, isCalendarView, localTimeZoneName, monthMatrix,
   parseLocalDate, rangeFor, shiftRange, sourceOptions, toCalendarEvents, toDateParam,
@@ -33,21 +35,29 @@ import {
 
 export function CalendarPage(): React.ReactElement {
   const { apiKey } = useAuth();
-  const [sessions, setSessions] = useState<SessionSummary[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [meetings, setMeetings] = useState<UpcomingMeeting[] | null>(null);
-  const [meetingsError, setMeetingsError] = useState<string | null>(null);
-  const [candidates, setCandidates] = useState<MeetingCandidate[] | null>(null);
-  const [candidatesError, setCandidatesError] = useState<string | null>(null);
+  const activeKey = useRef(apiKey); activeKey.current = apiKey;
+  // Never render a previous signed-in key's source inventory while another request is pending.
+  const [sessionState, setSessionState] = useState<{ owner: string | null; rows: SessionSummary[] | null; error: string | null } | null>(null);
+  const [meetingState, setMeetingState] = useState<{ owner: string | null; rows: UpcomingMeeting[] | null; worker?: CalendarWorkerHealth; error: string | null } | null>(null);
+  const [candidateState, setCandidateState] = useState<{ owner: string | null; rows: MeetingCandidate[] | null; gmailSummary?: GmailSummary; error: string | null } | null>(null);
+  const sessions = sessionState?.owner === apiKey ? sessionState.rows : null;
+  const error = sessionState?.owner === apiKey ? sessionState.error : null;
+  const meetings = meetingState?.owner === apiKey ? meetingState.rows : null;
+  const meetingsError = meetingState?.owner === apiKey ? meetingState.error : null;
+  const worker = meetingState?.owner === apiKey ? meetingState.worker : undefined;
+  const candidates = candidateState?.owner === apiKey ? candidateState.rows : null;
+  const candidatesError = candidateState?.owner === apiKey ? candidateState.error : null;
+  const gmailSummary = candidateState?.owner === apiKey ? candidateState.gmailSummary : undefined;
   const [scanning, setScanning] = useState(false);
   const [scanNote, setScanNote] = useState<string | null>(null);
   const [params, setParams] = useSearchParams();
+  const optedOut = useOptedOutIds(apiKey);
 
   useEffect(() => {
     let cancelled = false;
     listSessions(apiKey)
-      .then((data) => { if (!cancelled) setSessions(data.sessions); })
-      .catch((err: unknown) => { if (!cancelled) setError(err instanceof ApiError ? err.message : "failed to load sessions"); });
+      .then((data) => { if (!cancelled) setSessionState({ owner: apiKey, rows: data.sessions, error: null }); })
+      .catch((err: unknown) => { if (!cancelled) setSessionState({ owner: apiKey, rows: null, error: err instanceof ApiError ? err.message : "failed to load sessions" }); });
     return () => { cancelled = true; };
   }, [apiKey]);
 
@@ -57,36 +67,37 @@ export function CalendarPage(): React.ReactElement {
     // honest "not connected" state below -- never a page-wide error, since past sessions still
     // work independently of this ([C7]).
     listUpcomingMeetings(apiKey)
-      .then((data) => { if (!cancelled) setMeetings(data.meetings); })
-      .catch((err: unknown) => { if (!cancelled) setMeetingsError(err instanceof ApiError ? err.message : "failed to load upcoming meetings"); });
+      .then((data) => { if (!cancelled) setMeetingState({ owner: apiKey, rows: data.meetings, worker: data.worker, error: null }); })
+      .catch((err: unknown) => { if (!cancelled) setMeetingState({ owner: apiKey, rows: null, error: err instanceof ApiError ? err.message : "failed to load upcoming meetings" }); });
     return () => { cancelled = true; };
   }, [apiKey]);
 
   const refreshCandidates = useCallback(() => {
     listMeetingCandidates(apiKey)
-      .then((data) => setCandidates(data.candidates))
-      .catch((err: unknown) => setCandidatesError(err instanceof ApiError ? err.message : "failed to load Gmail meeting candidates"));
+      .then((data) => { if (activeKey.current === apiKey) setCandidateState({ owner: apiKey, rows: data.candidates, gmailSummary: data.gmailSummary, error: null }); })
+      .catch((err: unknown) => { if (activeKey.current === apiKey) setCandidateState({ owner: apiKey, rows: null, error: err instanceof ApiError ? err.message : "failed to load Gmail meeting candidates" }); });
   }, [apiKey]);
 
-  useEffect(() => { refreshCandidates(); }, [refreshCandidates]);
+  useEffect(() => { setScanNote(null); setScanning(false); refreshCandidates(); }, [refreshCandidates]);
 
   function handleScan(): void {
     setScanning(true);
     setScanNote(null);
     scanGmail(apiKey)
       .then((result) => {
-        setScanNote(`Found ${result.created} new candidate(s), ${result.autoApproved} auto-confirmed (trusted sender).`);
+        if (activeKey.current !== apiKey) return;
+        setScanNote(`Found ${result.created} new candidate(s), ${result.autoApproved} auto-approved by the current policy.`);
         refreshCandidates();
       })
-      .catch((err: unknown) => setCandidatesError(err instanceof ApiError ? err.message : "Gmail scan failed"))
-      .finally(() => setScanning(false));
+      .catch((err: unknown) => setCandidateState(previous => previous?.owner === apiKey ? { ...previous, error: err instanceof ApiError ? err.message : "Gmail scan failed" } : previous))
+      .finally(() => { if (activeKey.current === apiKey) setScanning(false); });
   }
 
   function handleDecision(id: string, decision: "approve" | "reject"): void {
     const action = decision === "approve" ? approveMeetingCandidate : rejectMeetingCandidate;
     action(apiKey, id)
-      .then(() => refreshCandidates())
-      .catch((err: unknown) => setCandidatesError(err instanceof ApiError ? err.message : "failed to record decision"));
+      .then(() => { if (activeKey.current === apiKey) refreshCandidates(); })
+      .catch((err: unknown) => setCandidateState(previous => previous?.owner === apiKey ? { ...previous, error: err instanceof ApiError ? err.message : "failed to record decision" } : previous));
   }
 
   // --- URL-backed view state ([C1]/[C3]/[C5]) -------------------------------------------------
@@ -119,15 +130,23 @@ export function CalendarPage(): React.ReactElement {
   }, [setParams]);
 
   const allEvents = useMemo(() => toCalendarEvents(sessions ?? [], meetings ?? []), [sessions, meetings]);
+  // Rows without a valid source date belong outside the time grid; never give tombstones today's date.
+  const unplaced = useMemo(() => {
+    const placedIds = new Set(allEvents.filter(e => e.kind === "meeting").map(e => e.id));
+    return (meetings ?? []).filter(m => !placedIds.has(`meeting:${m.id}`));
+  }, [allEvents, meetings]);
+  const visibleUnplaced = unplaced.filter(m => filters.kind !== "session" && (!filters.source || m.organizer === filters.source) && (!filters.query.trim() || m.title.toLowerCase().includes(filters.query.trim().toLowerCase())));
   const visible = useMemo(() => filterEvents(allEvents, filters), [allEvents, filters.kind, filters.source, filters.query]);
   const range = useMemo(() => rangeFor(view === "list" ? "month" : view, anchor), [view, anchor]);
   const cells = useMemo(() => monthMatrix(anchor), [anchor]);
   const today = useMemo(() => new Date(), []);
   /** Sessions are the lane that must have answered before an empty grid means anything; the
    * meetings lane degrades on its own ([C7]) and its absence is reported separately. */
-  const loaded = sessions !== null;
+  const loaded = sessions !== null && meetings !== null;
   const selectedId = params.get("event");
   const selected = visible.find((e) => e.id === selectedId) ?? null;
+  /** The raw API meeting behind a selected meeting: its `id` is the opt-out record id (the grid id is `meeting:`-prefixed). */
+  const selectedMeeting = selected?.kind === "meeting" ? (meetings ?? []).find((m) => `meeting:${m.id}` === selected.id) : undefined;
 
   const inRange = useMemo(() => {
     if (view === "list") return visible;
@@ -153,7 +172,7 @@ export function CalendarPage(): React.ReactElement {
         rangeLabel={view === "list" ? "All sessions and meetings" : range.label}
         timeZone={localTimeZoneName()}
         filters={filters}
-        sourceOptions={sourceOptions(allEvents)}
+        sourceOptions={[...new Set([...sourceOptions(allEvents), ...unplaced.flatMap(m => m.organizer ? [m.organizer] : [])])].sort()}
         onView={(v) => setParam("view", v)}
         onShift={(d) => setParam("date", toDateParam(shiftRange(view === "list" ? "month" : view, anchor, d)))}
         onToday={() => setParam("date", toDateParam(new Date()))}
@@ -169,18 +188,25 @@ export function CalendarPage(): React.ReactElement {
           calendar is clear.
         </div>
       )}
+      {worker && worker.status !== "fresh" && (
+        <div className="card error-note" role="status" data-testid="calendar-worker-health">
+          Calendar worker is {worker.status}. Last-known events remain visible; new attendance is not scheduled until a complete fresh scan succeeds.
+          {worker.receivedAt && <div>Last snapshot received: <time dateTime={worker.receivedAt}>{worker.receivedAt}</time></div>}
+          {worker.checkedAt && <div>Provider checked: <time dateTime={worker.checkedAt}>{worker.checkedAt}</time></div>}
+        </div>
+      )}
       {!meetingsError && meetings !== null && meetings.length === 0 && view !== "list" && (
         <div className="card empty-note" data-testid="calendar-no-connection-note">
-          No upcoming meetings in the next two weeks — either your calendar is clear, or the
-          calendar connection (`gws`) isn&rsquo;t reachable from this server right now.
+          {worker?.status === "fresh" ? "No upcoming events in the connected calendar for the next two weeks." : <>No upcoming meetings in the next two weeks — either your calendar is clear, or the
+          calendar connection (`gws`) isn&rsquo;t reachable from this server right now.</>}
         </div>
       )}
 
       {view !== "list" && (
-        <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem", alignItems: "flex-start" }}>
+          <div style={{ flex: "1 1 32rem", minWidth: 0 }}>
             <div className="row-meta" data-testid="calendar-counts" style={{ marginBottom: "0.35rem" }}>
-              {inRange.length} event(s) in this range · {visible.length} of {allEvents.length} after filters
+              {inRange.length} event(s) in this range · {visible.length} of {allEvents.length} after filters{unplaced.length > 0 ? ` · ${visibleUnplaced.length} of ${unplaced.length} unplaced source records` : ""}
             </div>
             {/* Order matters, and it is the honesty rule: a page that has not LOADED yet, or whose
                 load failed, must never blame the user's filters for showing nothing. Found live by
@@ -189,12 +215,12 @@ export function CalendarPage(): React.ReactElement {
                 to a filter. The no-match note now requires data to be loaded AND non-empty. */}
             {sessions === null && !error ? (
               <div className="card empty-note" data-testid="calendar-loading">Loading&hellip;</div>
-            ) : loaded && allEvents.length === 0 ? (
+            ) : loaded && allEvents.length === 0 && unplaced.length === 0 ? (
               <div className="card empty-note" data-testid="calendar-no-data">
                 No sessions or meetings to show yet — this tenant has nothing indexed and no
                 connected-calendar events. Nothing is being filtered out.
               </div>
-            ) : loaded && inRange.length === 0 && activeCalendarFilterCount(filters) > 0 ? (
+            ) : loaded && inRange.length === 0 && visibleUnplaced.length === 0 && activeCalendarFilterCount(filters) > 0 ? (
               <div className="card empty-note" data-testid="calendar-no-match">
                 No events match these filters.
               </div>
@@ -218,15 +244,45 @@ export function CalendarPage(): React.ReactElement {
             )}
           </div>
           {selected && (
-            <div className="card" style={{ width: 300, flexShrink: 0 }}>
+            <div className="card" style={{ width: 300, maxWidth: "100%", flex: "0 1 300px" }}>
               <EventDetail event={selected} onClose={() => setParam("event", null)} />
+              {selectedMeeting && apiKey && (
+                <OptOutControl
+                  key={selectedMeeting.id}
+                  apiKey={apiKey}
+                  eventId={selectedMeeting.id}
+                  title={selectedMeeting.title}
+                  meetingUrl={selectedMeeting.meetingUrl}
+                  linkCount={optedOut.linkCount}
+                  optedOut={optedOut.ids?.has(selectedMeeting.id) ?? false}
+                  onOptedOut={optedOut.add}
+                />
+              )}
             </div>
           )}
         </div>
       )}
 
+      {visibleUnplaced.length > 0 && (
+        <section className="card" data-testid="calendar-unplaced" aria-label="Unplaced source records" style={{ minWidth: 0, overflowWrap: "anywhere" }}>
+          <div className="section-title">Unplaced source records</div>
+          {visibleUnplaced.map(m => (
+            <div className="row-card" key={m.id}>
+              <div className="row-title">{m.title}</div>
+              <div className="row-meta">No valid start date in the source. This record is not scheduled for attendance.</div>
+              {(m.cancelled || m.status === "cancelled") && <div className="row-meta">Status: cancelled. This event will not be joined.</div>}
+              {m.status && m.status !== "cancelled" && <div className="row-meta">Event status: {m.status}</div>}
+              {m.attendanceSkipReason && <div className="row-meta">Skipped: {m.attendanceSkipReason === "office-internal" ? "office/internal" : m.attendanceSkipReason}</div>}
+              {m.responseStatus && <div className="row-meta">RSVP: {m.responseStatus}</div>}
+              {m.organizer && <div className="row-meta">Organiser: {m.organizer}</div>}
+              {m.description && <div className="row-meta" style={{whiteSpace: "pre-wrap"}}>{m.description}</div>}
+            </div>
+          ))}
+        </section>
+      )}
+
       {view === "list" && (
-        <AgendaView sessions={sessions} sessionsError={error} meetings={meetings} meetingsError={meetingsError} />
+        <AgendaView sessions={sessions} sessionsError={error} meetings={meetings} meetingsError={meetingsError} worker={worker} />
       )}
 
       <div className="section-title" style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -236,9 +292,15 @@ export function CalendarPage(): React.ReactElement {
         </button>
       </div>
       <p className="row-meta" style={{ marginTop: "-0.4rem", marginBottom: "0.5rem" }}>
-        Meeting-shaped mail is held for your approval; once a sender has been approved 3 times, its future
-        meetings auto-confirm.
+        Scans the last 30 days in batches of 10. External meeting invitations enter review; internal office meetings are skipped.
+        Sender trust never overrides an ignore rule or unresolved meeting evidence.
       </p>
+      {gmailSummary ? (
+        <div className="card row-meta" data-testid="gmail-summary" role="status">
+          Last scan: {gmailSummary.listed} listed · {gmailSummary.fetched} fetched · {gmailSummary.candidates} meeting candidates · {gmailSummary.excludedNonMeeting} non-meeting · {gmailSummary.excludedInternal} internal · {gmailSummary.refusedSender} refused sender · {gmailSummary.incompleteMessages} incomplete.
+          {gmailSummary.complete ? " Scan complete." : " Scan incomplete; this summary does not authorize attendance."}
+        </div>
+      ) : <p className="row-meta" data-testid="gmail-summary-unknown">Gmail scan coverage is unavailable; no complete scan is implied.</p>}
       {scanNote && <div className="card empty-note">{scanNote}</div>}
       {candidatesError && <div className="card error-note">{candidatesError}</div>}
       {!candidatesError && candidates === null && <div className="card empty-note">Loading&hellip;</div>}
@@ -253,10 +315,13 @@ export function CalendarPage(): React.ReactElement {
               {c.senderEmail}
               {c.meetingUrl ? ` · ${c.meetingUrl}` : ""}
             </div>
+            {c.evidenceIssue && <div className="row-meta" role="status">Needs review: {c.evidenceIssue === "unresolved-body" ? "message body could not be resolved" : "attachment evidence is unsupported"}. This evidence cannot authorize attendance.</div>}
+            {(c.meetingLinkIssue || c.youtubeWatchIssue || c.registrationOnly) && <div className="row-meta">Needs review: {c.meetingLinkIssue ?? (c.youtubeWatchIssue ? "ambiguous watch target" : "registration-only")}. Attendance is not authorized by this evidence.</div>}
             <div style={{ marginTop: "0.4rem", display: "flex", gap: "0.5rem" }}>
-              <button type="button" onClick={() => handleDecision(c._id, "approve")} className="badge badge-good" style={{ border: "none", cursor: "pointer" }}>
+              <button type="button" disabled={Boolean(c.evidenceIssue)} onClick={() => handleDecision(c._id, "approve")} className="badge badge-good" style={{ border: "none", cursor: "pointer" }}>
                 Approve
               </button>
+              {apiKey && <GmailPatternControl apiKey={apiKey} candidate={c} onSaved={refreshCandidates} />}
               <button type="button" onClick={() => handleDecision(c._id, "reject")} className="badge badge-bad" style={{ border: "none", cursor: "pointer" }}>
                 Reject
               </button>

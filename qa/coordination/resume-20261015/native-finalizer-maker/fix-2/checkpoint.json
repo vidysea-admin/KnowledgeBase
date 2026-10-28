@@ -1,0 +1,39 @@
+{
+  "status": "SOURCE_FROZEN_AWAITING_BROKER",
+  "maker_usage": {
+    "tokens": null,
+    "token_metric": "actual_total",
+    "active_s": null,
+    "cost": null
+  },
+  "files": [
+    {
+      "sha256": "7e5ba947b14202fb8b3320e0c0ce8307873c6956a79ae91477de13b6d435db2d",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.ts"
+    },
+    {
+      "sha256": "8b188fd08fe43096453d9dd90444e3a718c37c06f1f6503fb8ad03f745824a4e",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-probe.test.ts"
+    },
+    {
+      "sha256": "8d9ad31e115ac906830f1210fc0ad878975aaa4bd19277e933e7f400109840c7",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.ts"
+    },
+    {
+      "sha256": "6963b4b5b9786f893cd0c2140e10dabdd6b2ac175eb9dce4089b69d4005cfe9d",
+      "path": "packages\\meeting-bot\\src\\capture\\native-media-finalize.test.ts"
+    }
+  ],
+  "required_receipts": [
+    "15 tests including original real FFmpeg integration",
+    "downstream privacy8",
+    "scoped TypeScript diagnostics"
+  ],
+  "fix_cycle": 2,
+  "tests_executed_by_maker": [],
+  "prior_checkpoint": "../fix-1/checkpoint.json",
+  "candidate_sha": null,
+  "unit": "t042-native-finalizer",
+  "prior_result": "13 pass 1 actual integration fail, diagnostic confirms WebM Opus timestamp grid mismatch",
+  "policy_version": "managed-review/1"
+}

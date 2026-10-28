@@ -1,0 +1,37 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "5A3A84F7D2431D23769015185CA7D2AEAE08268D5D9DE75CD7C0AFB2EA524982",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-executor.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "5DAE3627198D3CA0F86401BDDDF684D197F85AEB408FAE4ECCD880D30D1E74E0",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\refresh-executor.test.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "C63C81C2A454965ED99D4446EC6BED95B7554F9AA2648BD036D91818BB416324",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\mongodb.integration.test.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "36D426BDDA02C6D291BE4AF381701C182DA8954A6D6C0A9F206783AAB0F8E343",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\transaction-db.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "1FA9A35EE5393F63E4E4A3F9EA2BFF4AE15F706376A9379D029CC91704E55B28",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\service.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "532EFC0C0D2C3654C4013448BD73208C691120E501AE398533867B15EA9A8568",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\indexing\\session.ts"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "136DFB18F401DA4B2ECF4A519061CB5C1BDC02A8F6FB770AAB2DE7ECF76B3254",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\indexing\\types.ts"
+  }
+]

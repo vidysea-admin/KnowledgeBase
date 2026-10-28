@@ -1,0 +1,5 @@
+{
+  "command": "./.venv/Scripts/python.exe contracts/verify_contracts.py --repo-root C:/Users/product/Desktop/KnowledgeBase",
+  "exitCode": 0,
+  "durationSeconds": 0.133968
+}

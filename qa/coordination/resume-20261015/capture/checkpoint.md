@@ -1,0 +1,15 @@
+# Resume capture sampler clock — HOLD, broker requested
+Tier 3; cycle 0; source/fixture scope only. No source bytes edited this resume.
+All six leased candidate hashes exactly match capture-delivery/clock.md. Registry/downstream tests also match their older manifest pins, but updated registry/fixture invalidate old execution applicability. The old clock packet contains no green execution receipt.
+
+Static review found no evidenced missing authority/privacy/monotonic-refusal clause requiring repair. No nonsecurity refinement unit opened; nonsecurity seam cap is therefore not invoked. Security boundary checks remain required.
+
+Sole CPU broker request (root assigns):
+1. Existing interpreter candidate C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe. Preflight -B, local py import root and writable broker-approved basetemp parent with checker/scripts/review_budget.py preflight --root <repo> --import-name sb_join_tiles --import-root <repo>/packages/meeting-bot/py --temp-parent <existing-parent>. Set only explicit PYTHONPATH for this import. Confirm sb_join local import identity and seleniumbase/pytest compatibility without launching browser. Preserve compatible existing environment; do not create one.
+2. Python: -B -m pytest -q packages/meeting-bot/py/test_sb_join_tiles.py --basetemp <fresh-child-in-approved-parent>. Whole 12-case small file covers parsing, real hold-loop immediate consumer, off/no-authority, monotonic cadence and jumps, backwards monotonic, distinct instances and invalidation permanence.
+3. With absolute preflighted LKB_SAMPLER_TEST_PYTHON, cwd packages/meeting-bot: node --import tsx --test --test-concurrency=1 --test-timeout=30000 src/capture/tiles/sampler-clock.test.ts src/capture/tiles/registry.test.ts ../../qa/evidence/t042-trusted-registry/downstream-probe.test.ts
+   Five clock cases cover stripping, identity/witness refusal, clock numerical bounds, actual Python producer subprocess and registry privacy integration. Ten registry cases cover flag/authority, generation/platform/source substitution, calibration/uncertainty/drift, privacy trims/releases, physical byte/path/link bounds and revocation. Two downstream cases exercise actual adapter plus memory suggestion/review/confirmation and refusal before insertion. Fixture is synthetic; no native authority inferred.
+4. Bounded grant, sequential one CPU slot, outer deadline broker-owned. Capture each command exit and complete output; source/dependency pins before/after; Python/runtime/import/lock/environment identity without secrets. No live capture/browser/provider/media/native database.
+Missing prerequisite: stop after one observation and return narrow HOLD. Do not run own suites or checker while runtime HOLD remains.
+
+Packet is managed-review/1 preparation with readiness.complete=false, not validated READY and not a verdict. Candidate SHA is null because the candidate remains an uncommitted working tree; HEAD is recorded as base only. Actual maker usage unknown/null, no measured efficiency claim. Full R1/R3/R4/R10/R14 native/production edges and full parent acceptance remain open.

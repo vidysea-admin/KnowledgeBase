@@ -1,0 +1,17 @@
+{
+  "unit": "t035-lean-video-measured-encode",
+  "cycleChecked": 1,
+  "verdict": "PASS",
+  "scope": "Source-only local derivative/helper EOF behavior; full parent and shared consumer remain HOLD",
+  "reviewLaunchMeasuredUtc": "2026-10-14T23:06:09Z",
+  "readyObservedUtc": "2026-10-14T23:12:24Z",
+  "finalPrePersistReadbackUtc": "2026-10-14T23:12:56Z",
+  "persistStartUtc": "2026-10-14T23:14:49Z",
+  "completionConfirmedUtc": "2026-10-14 23:15:10 UTC",
+  "resumedElapsedSeconds": 541,
+  "earlierPhases": "unknown; prior independent reviews and root HOLD/resume intervals not measured",
+  "finalScopedPins": "14/14 match after verdict persistence",
+  "verdictSha256": "fbcf4b9bd41d3c98f27e2a10f1e013b51084644314f51e845163f8850c7aaa92",
+  "readbackExit": 0,
+  "readbackWallSeconds": 0.452449
+}

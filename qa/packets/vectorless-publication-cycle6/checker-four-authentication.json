@@ -1,0 +1,11 @@
+{
+  "current24ReceiptPinMismatch": [],
+  "runtimeMatch": true,
+  "lockMatch": true,
+  "importMatch": true,
+  "environmentMatch": true,
+  "exit": 0,
+  "stable": true,
+  "contractReceiptPinAbsent": true,
+  "contractIndependentlyCurrentHash": "08a8d2c363fb190f1ca021c4f68d556c2252ee3df3a01e54dd223288eff05efd"
+}

@@ -1,0 +1,27 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import type { Db } from "mongodb";
+import { runNativePublicationTransaction } from "@lkb/db";
+import { replacePageInsertFirst } from "../indexing/grounded-write.js";
+function fake() {
+  const seen: { op: string; filter: unknown }[] = [];
+  const coll = () => new Proxy({}, { get: (_t, op: string) => (...a: unknown[]) => { seen.push({ op, filter: a[0] }); return op === "find" ? { toArray: async () => [] } : Promise.resolve({ acknowledged: true, matchedCount: 1, deletedCount: 0 }); } });
+  return { db: { client: { startSession() { throw new Error("no session"); } }, collection: coll, command: async () => ({ isWritablePrimary: true }) } as unknown as Db, seen };
+}
+test("PROBE standalone native view: foreign/missing tenant in read/update/delete filter refused", async () => {
+  const f = fake();
+  await runNativePublicationTransaction(f.db, "tenant-a", async tx => {
+    const c = tx.collection("sessions") as any;
+    await assert.rejects(c.deleteMany({ tenantId: "tenant-b" }), /tenant_mismatch/);
+    await assert.rejects(c.updateOne({ _id: "x" }, { $set: { a: 1 } }), /tenant_mismatch/);
+    await assert.rejects(c.findOne({}), /tenant_mismatch/);
+  });
+  assert.equal(f.seen.filter(s => JSON.stringify(s.filter).includes("tenant-b")).length, 0);
+});
+test("PROBE replacePageInsertFirst: reuses _id with ONE replaceOne, no insert", async () => {
+  const calls: string[] = [];
+  const coll = { find: () => ({ toArray: async () => [{ _id: "p1", sessionId: "s" }] }), insertOne: async () => { calls.push("insert"); return { acknowledged: true }; },
+    replaceOne: async (f: unknown) => { calls.push("replace:" + JSON.stringify(f)); return { acknowledged: true, matchedCount: 1 }; }, insertMany: async () => ({}), deleteMany: async () => { calls.push("delete"); return { acknowledged: true }; } };
+  await replacePageInsertFirst(coll as never, "s", { _id: "p1", sessionId: "s" } as never, { assertOwned: async () => {} } as never);
+  assert.deepEqual(calls, ['replace:{"_id":"p1","sessionId":"s"}']);
+});

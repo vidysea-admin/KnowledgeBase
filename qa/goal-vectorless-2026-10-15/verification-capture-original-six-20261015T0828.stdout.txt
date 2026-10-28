@@ -1,0 +1,35 @@
+✔ original source binds only its exact physical slot/remux and refuses changed bytes (179.6634ms)
+✔ actual recovery caller forwards lean and exact original artifact after lossless normalization (67.1676ms)
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+[bot] recording until 8:06:14 AM (early stop on 'ended' only after 8:06:14 AM)
+[bot] --until reached
+[bot] stop failed: Recorder reported a failed stop; media is incomplete
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+✔ ISS-T034FIX-004: tab stop rejects (failed stop at end of recording) -> runRecord rejects with the reason, no finalize, partial kept, status failed (4159.7517ms)
+[bot] recording until 8:08:14 AM (early stop on 'ended' only after 8:08:14 AM)
+[bot] stop failed: lost audio
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+✔ ISS-T034FIX-004: a capture-error ends the record loop promptly and the capture fails (no finalize) (1812.4315ms)
+[bot] recording until 8:08:16 AM (early stop on 'ended' only after 8:08:16 AM)
+[bot] stop failed: Recorder reported a failed stop; media is incomplete
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+✔ ISS-T034FIX-004: an early capture-stopped failed:true ends the record loop promptly and the capture fails (no finalize) (1724.8557ms)
+[bot] recording until 8:06:21 AM (early stop on 'ended' only after 8:06:21 AM)
+[bot] --until reached
+✔ ISS-T034FIX-004 parity: a clean tab stop is not a capture failure (status stopped; proceeds past stop into normalize/finalize) (3136.299ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16785.5985

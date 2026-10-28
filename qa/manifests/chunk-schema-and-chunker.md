@@ -247,3 +247,5 @@ it. `TASKS.md` and `goal.json` both read U1.1 `done`; G1 green.
 collection stays **UNVERIFIED** — not converted into a verdict either way. It does not block the
 PASS because nothing in this unit writes a row, and contract **C8** remains open against U1.3,
 which is where rows first exist.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

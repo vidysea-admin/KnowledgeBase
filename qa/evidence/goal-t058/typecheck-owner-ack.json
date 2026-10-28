@@ -1,0 +1,28 @@
+{
+  "scope": "T058 writer ACK: no owned compiler diagnostics, no source/test changes; original global compiler failures and27 green isolated checks/full-parent HOLD preserved",
+  "ownedDrift": [],
+  "ownedPins": {
+    "apps/api/src/knowledge-outputs/assessment.ts": "f9217c2a74397356c96e13953c48e3166eebef9cc008eff6f7925fe2f1565c79",
+    "apps/api/src/knowledge-outputs/evidence.ts": "2117a93784a48b75e39f1ff6570643981a0ebbf37d34f662f87a6359c34918b8",
+    "apps/api/src/knowledge-outputs/markdown.ts": "b08bffc6aecb055447e110a92f3bdef83f290cd2bccd8e8b31aa086febf90bb5",
+    "apps/api/src/knowledge-outputs/persistence.integration.test.ts": "ea0863ed2c702fd86d816feec388dea17340087997aec3f2cdcb466a127020fb",
+    "apps/api/src/knowledge-outputs/reader.ts": "810da426aa683e1bc4be506fc251302b3222465a4c2f0670c3bbdbb5f7e33a43",
+    "apps/api/src/knowledge-outputs/repository.ts": "657503bc407d80bb49463084dd0c7c53ddf858ca4de05d34a8c31765f7d82d38",
+    "apps/api/src/knowledge-outputs/router.ts": "2066d47faed281e60981fb29dfcd055805d9fab24fd4d4b18fad7012eeb80c1c",
+    "apps/api/src/knowledge-outputs/service.ts": "ef2e628119bb1267a2f36e2c95d226e4a9bef4d521a083abd8614a19ca53ad7b",
+    "apps/api/src/knowledge-outputs/synthesis.ts": "ddc95220e65c160a85d7008415d91395ec5021836320a2b9e0169bdb91b5b00c",
+    "apps/api/src/knowledge-outputs/types.ts": "a806b11f8b780e0281a2abff014afbb337812b9425858e2a634d355e86fc6838",
+    "apps/api/src/knowledge-outputs/validator.ts": "aeca988ff12d3ea69b6043ef48f45a87f6feeaaa15e694cdb1f0b3245faf4a43",
+    "apps/api/src/knowledge-outputs/wiring.ts": "bd4088011097b2d50f160042b955df6b6146de8097f0e5f48b8856e4673f2782",
+    "apps/api/src/knowledge-outputs/workbench.test.ts": "a22b2c2f0d4265e5d41d6bc6b4bc37e1a1b0f6765c6683709abfd2a5ce8acbca",
+    "apps/web/src/api/knowledge-outputs.ts": "40a2023787696bbafa67c91d78a8c356051800afa9beae467f79d1696a7af61d",
+    "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx": "a78021d4d244fdf7f9f4267b0b48f842bff5abbae4ee63a3483dc62b988a646e",
+    "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx": "dda8bb00611cd93f74bb9d036cc3f251f12c52eedc9d228f40eb7236abab5d6a"
+  },
+  "sourceFreezeSHA256": "8a2ef55c4ac892d886d3bc0788b2de0f8070e1e48cd97df6178a0b9563421f9f",
+  "verdictSHA256": "b1d6fc76ba471b9024023d83e97123c041bbfaf39be958b804158d4316af1010",
+  "apiTypeReceiptSHA256": "28cde10c6a2fdbab4b84fcbb168bbd8150ef98cac81995373ab9cfef8255eda3",
+  "webTypeReceiptSHA256": "2fd4b5fab37429c3a3f89b4f71f4cecf5c7992d84a77a048fab38520918553fe",
+  "liveHandles": "NONE",
+  "cpuActions": "NONE"
+}

@@ -87,3 +87,5 @@ inspecting the local JSON files directly.
 The `lkb` database now has all 5 core collections fully populated for the first time:
 23 sources, 23 sessions, 2,907 turns, 72 claims, 23 session_pages. This is the first real,
 complete knowledge-base data in the actual production-reachable MongoDB instance.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

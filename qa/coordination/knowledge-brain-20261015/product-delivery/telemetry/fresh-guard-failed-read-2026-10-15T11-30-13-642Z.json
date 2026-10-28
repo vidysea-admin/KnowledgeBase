@@ -1,0 +1,101 @@
+{
+  "kind": "CONTENT_FREE_FRESH_GUARD_FAILED_PATH_READ",
+  "captured_at": "2026-10-15T11:30:13.642Z",
+  "mapping": {
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+    "id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+    "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+    "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher"
+  },
+  "read_one": {
+    "read_completed_at": "2026-10-15T11:30:12.126Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+    "source_sha256": "d14cfd827c194aef851c1d06f40dd543abc0346a05c2e01dcee6e0988b6548bd",
+    "meta": {
+      "id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher",
+      "timestamp": "2026-10-15T11:28:17.725Z"
+    },
+    "token_record_count": 10,
+    "latest": {
+      "timestamp": "2026-10-15T11:30:02.595Z",
+      "total_token_usage": {
+        "input_tokens": 406765,
+        "cached_input_tokens": 389632,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2013,
+        "reasoning_output_tokens": 307,
+        "total_tokens": 408778
+      },
+      "last_token_usage": {
+        "input_tokens": 46492,
+        "cached_input_tokens": 46208,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 21,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 46513
+      }
+    }
+  },
+  "read_two": {
+    "read_completed_at": "2026-10-15T11:30:13.642Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+    "source_sha256": "d14cfd827c194aef851c1d06f40dd543abc0346a05c2e01dcee6e0988b6548bd",
+    "meta": {
+      "id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher",
+      "timestamp": "2026-10-15T11:28:17.725Z"
+    },
+    "token_record_count": 10,
+    "latest": {
+      "timestamp": "2026-10-15T11:30:02.595Z",
+      "total_token_usage": {
+        "input_tokens": 406765,
+        "cached_input_tokens": 389632,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2013,
+        "reasoning_output_tokens": 307,
+        "total_tokens": 408778
+      },
+      "last_token_usage": {
+        "input_tokens": 46492,
+        "cached_input_tokens": 46208,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 21,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 46513
+      }
+    }
+  },
+  "counter_stable": true,
+  "source_hash_stable": true,
+  "root_attestation": "Actor holding, no edits after failed-before-edit ambiguous path shorthand interpreted literally. Root provided exact separate filenames. Collector did not resume actor or inspect message bodies.",
+  "failed_call_preserved": "Root reports failed path call using shorthand ...input/result.json; no exact call content read by telemetry collector.",
+  "fresh_phase_baseline": 0,
+  "fresh_recorded_actual_total": 408778,
+  "fresh_phase_actual_cap": 100000,
+  "status": "NEEDS_EXTRA_REVIEW",
+  "fresh_phase_remaining_arithmetic": 0,
+  "old_checker_actual_total": 850752,
+  "combined_recorded_unit_actual_total": 1259530,
+  "overall_actual_ceiling": 1150752,
+  "overall_remaining_arithmetic": -108778,
+  "manual_final_reserve": {
+    "actual_total_tokens": 200000,
+    "admitted": false,
+    "borrowable": false
+  },
+  "prior_breaches": {
+    "author_delta": 238500,
+    "author_cap": 100000,
+    "url_repair_delta": 250965,
+    "url_repair_cap": 200000,
+    "preserved": true
+  },
+  "qualifier": "Root holding/idle report plus two-read stability recorded. Theoretical completion/inflight and unrecorded usage remain unknown; latest recorded actual is a lower bound if further work is in flight. Arithmetic is not a grant.",
+  "maker_denominator_unchanged": 3547712,
+  "accounting_helper_excluded_from_maker_denominator": true,
+  "no_source_test_gate_or_resume": true
+}

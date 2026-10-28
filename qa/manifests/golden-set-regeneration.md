@@ -288,3 +288,5 @@ than trusted.
    the gate itself says must be re-set, and condition 4 is unexecuted; closing it would claim the
    gate work is finished. `ISS-071` is flipped to `fixed` because the saturation it names is
    genuinely gone — that is a narrower claim than the task being done.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

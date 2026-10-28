@@ -1,0 +1,50 @@
+node:internal/modules/esm/resolve:271
+    throw new ERR_MODULE_NOT_FOUND(
+          ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\node_modules\@lkb\core\src\domain\lean-video.js' imported from C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-finalize.ts
+    at finalizeResolution (node:internal/modules/esm/resolve:271:11)
+    at moduleResolve (node:internal/modules/esm/resolve:865:10)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:701:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:721:38)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolve (file:///C:/Users/product/Desktop/KnowledgeBase/.cache/coordination/safe-test-runtime/register.mjs:22:18)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveWithHooks (node:internal/modules/customization_hooks:417:10)
+    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:747:16) {
+  code: 'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/product/Desktop/KnowledgeBase/packages/meeting-bot/node_modules/@lkb/core/src/domain/lean-video.js'
+}
+
+Node.js v24.19.0
+✖ packages\meeting-bot\src\workspace\index-proof-consumer.test.mjs (2859.2107ms)
+✔ shutdown during acquisition, registration, rules, preparation or ownership recheck admits no new capture (5.7755ms)
+✔ canonical completion accepts bound legacy/v3 selected-artifact proofs and refuses mismatched marker/source/DB/validation (1840.531ms)
+✔ canonical autonomous acquisition continues during two owned captures; capacity and career priority are durable (459.5331ms)
+✔ autonomous rule vetoes are persisted even with no allowed schedule and cannot launch (45.9594ms)
+✔ automatic service refuses unenforced rules and absent real slot readiness before discovery (6.0004ms)
+✔ one owned capture failure never stops another owned slot or creates a false ready state (148.6527ms)
+✔ a completed index marker cannot bypass graph recovery acknowledgement after interrupted completion (113.1582ms)
+✔ shutdown after recording disposition but before child microtask prevents launch and retains queued work (68.2249ms)
+✔ autonomous recovery gates legacy default-workspace artifacts instead of allocating an unrelated slot (51.1996ms)
+✔ owned slot recovery passes the persisted slot to the child and preserves its durable identity (122.9165ms)
+✔ canonical recording publication failure stops its actual controller and prevents a false ready result (96.3586ms)
+✔ canonical pool uses only accepted matching capabilities and keeps unsupported coverage queued (115.4518ms)
+✔ fresh slot validation refuses capture when previously accepted evidence is revoked (52.1398ms)
+✔ disabled refreshed scheduler controls prevent discovery, registration and capture admissions (18.544ms)
+✔ active capture loses verified authority, stops its owned generation, and cannot become ready (115.4362ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 17376.0879
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\workspace\index-proof-consumer.test.mjs:1:1
+✖ packages\meeting-bot\src\workspace\index-proof-consumer.test.mjs (2859.2107ms)
+  'test failed'

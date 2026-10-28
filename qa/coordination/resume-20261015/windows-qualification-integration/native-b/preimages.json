@@ -1,0 +1,10 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/record-commands.test.ts",
+    "sha256": "896627b4f07e322b2e48ffc584e7309117d3e6938478d897a21cccf6a80ffa8c"
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/native-capture-runtime.test.ts",
+    "sha256": "033454814c587afcfafd4edc0a46e66a5d612f3ae0e10a3458dc8a49f1f2c2a9"
+  }
+]

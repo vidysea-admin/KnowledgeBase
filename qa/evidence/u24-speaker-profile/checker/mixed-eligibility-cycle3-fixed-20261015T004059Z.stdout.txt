@@ -1,0 +1,12 @@
+{"synthetic":true,"secondarySourceWithdrawnInBoth":true,"publicA":{"recordedConfidence":null,"withheldProfileFields":0},"publicB":{"recordedConfidence":null,"withheldProfileFields":0}}
+✔ healthy all-visible source allows supported attribute values and recorded metadata (35.4066ms)
+✔ public profile is invariant or refused when only withdrawn-source row metadata changes (9.8197ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 630.0833
+

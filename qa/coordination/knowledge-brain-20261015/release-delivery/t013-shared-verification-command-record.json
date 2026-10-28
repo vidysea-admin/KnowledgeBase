@@ -1,0 +1,14 @@
+{
+  "authority": "Root explicit SHAREDVERIFICATION authorization",
+  "classification": "separately accounted shared verification command",
+  "watchdog_s": 30,
+  "reviewer_allocation": {
+    "active_s": 0,
+    "tokens": 0
+  },
+  "execution_status": "not executed by this readiness agent",
+  "authorship": "existing independently authored probe; preserve existing probe hash and twenty input pins; broker must bind existing specification without reread or alteration",
+  "command_actual_s": null,
+  "tokens_actual": null,
+  "cost_actual": null
+}

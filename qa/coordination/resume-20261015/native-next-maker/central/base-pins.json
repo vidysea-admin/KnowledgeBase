@@ -1,0 +1,30 @@
+[
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "sha256": "b6b931c97ba3f39c5e7ee3007422f293a7f69ccb89a67e38c82a2658c7a326ce"
+  },
+  {
+    "path": "apps/api/src/production.test.ts",
+    "sha256": "5999f0e8557a675aa9d233ffb590aa1043993427c4e7f44f07df27305f364cb0"
+  },
+  {
+    "path": "apps/api/src/composition/integrations/transcripts.ts",
+    "sha256": "022a2c418777dadc1fe894b92e31a530541b94dd7f1ef7960f8ebe744d679a1c"
+  },
+  {
+    "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+    "sha256": "aae315a52c5afe0d2c72dcb6b1e2d932acd94876545d7550335594496edc99c1"
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.ts",
+    "sha256": "d3473147ab4010f533cac8ae5bb36918a6020f33dee2ca3ebb55b1d59ec5edde"
+  },
+  {
+    "path": "apps/api/src/indexing/tile-speaker-suggest.test.ts",
+    "sha256": "8600237450ff563feca024cc7d0a2a28cf56a7fd1c20c76f04279287be413f91"
+  },
+  {
+    "path": "scripts/webinar/sync-session.mjs",
+    "sha256": "95f970f5b43501064eddcd1f47d2be751825842a761465c40660a08020bb015b"
+  }
+]

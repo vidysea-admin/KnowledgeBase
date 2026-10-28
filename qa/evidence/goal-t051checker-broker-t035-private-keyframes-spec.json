@@ -1,0 +1,17 @@
+{
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts"
+  ],
+  "pins": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "2d913183653a577753aa3ebaea3696094c669e30654aefb17bbea710d5750321"
+  },
+  "timeoutMs": 60000,
+  "output": "qa/evidence/goal-t051checker-broker-t035-private-keyframes"
+}

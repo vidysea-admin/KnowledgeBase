@@ -1,0 +1,294 @@
+{
+  "kind": "POST_IDLE_AUTHOR_ACTUAL_TOTAL_TELEMETRY",
+  "recorded_at": "2026-10-15T11:13:21.718Z",
+  "baseline_artifact": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z.json",
+  "root_authority_artifact": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/idle-finish-baseline-2026-10-15T11-07-52-567Z-root-authority.json",
+  "records": [
+    {
+      "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+      "thread_id": "01a13f2d-9728-74b2-9e0b-515751426775",
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+      "read_one": {
+        "read_completed_at": "2026-10-15T11:13:20.206Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+        "source_sha256": "27b9f88074335b901cc21355eddf5265f62b0fa51097572907fcab74cbfa87c4",
+        "meta": {
+          "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+          "timestamp": "2026-10-15T10:48:35.605Z"
+        },
+        "token_record_count": 11,
+        "latest": {
+          "timestamp": "2026-10-15T11:12:21.117Z",
+          "total_token_usage": {
+            "input_tokens": 596508,
+            "cached_input_tokens": 561536,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3279,
+            "reasoning_output_tokens": 168,
+            "total_tokens": 599787
+          },
+          "last_token_usage": {
+            "input_tokens": 60545,
+            "cached_input_tokens": 60160,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 76,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 60621
+          }
+        }
+      },
+      "read_two": {
+        "read_completed_at": "2026-10-15T11:13:21.718Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-35-01a13f2d-9728-74b2-9e0b-515751426775.jsonl",
+        "source_sha256": "27b9f88074335b901cc21355eddf5265f62b0fa51097572907fcab74cbfa87c4",
+        "meta": {
+          "id": "01a13f2d-9728-74b2-9e0b-515751426775",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/collections_independent_checker",
+          "timestamp": "2026-10-15T10:48:35.605Z"
+        },
+        "token_record_count": 11,
+        "latest": {
+          "timestamp": "2026-10-15T11:12:21.117Z",
+          "total_token_usage": {
+            "input_tokens": 596508,
+            "cached_input_tokens": 561536,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3279,
+            "reasoning_output_tokens": 168,
+            "total_tokens": 599787
+          },
+          "last_token_usage": {
+            "input_tokens": 60545,
+            "cached_input_tokens": 60160,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 76,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 60621
+          }
+        }
+      },
+      "counter_stable": true,
+      "source_hash_stable": true,
+      "root_status_attestation": "Root reports same three completed/idle again after ONE author-only turn.",
+      "baseline_recorded_total": 361287,
+      "current_recorded_total": 599787,
+      "author_phase_recorded_actual_delta": 238500,
+      "author_phase_actual_cap": 100000,
+      "phase_breach": true,
+      "status": "NEEDS_EXTRA_REVIEW",
+      "cumulative_actual_ceiling": 561287,
+      "operations_extra_ceiling": null,
+      "cumulative_remaining_theoretical": -38500,
+      "author_phase_remaining_theoretical": 0,
+      "manual_final_reserve": {
+        "actual_total_tokens": 100000,
+        "active_s": 30,
+        "allocated_output_tokens": 800,
+        "borrowable_by_author_phase": false,
+        "note": "Preserved prior finite reserve. Remaining cumulative arithmetic is not a new grant or permission to borrow."
+      },
+      "historical_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000
+      },
+      "qualifier": "Latest recorded cumulative counters are known/stable across two reads; theoretical completion/inflight and finer phase boundaries remain unknown. Delta attribution relies on root one-author-turn idle attestation."
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+      "thread_id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+      "read_one": {
+        "read_completed_at": "2026-10-15T11:13:20.206Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+        "source_sha256": "db999d912b5304b6fc14878facc4d5c792ad59596bec7169524372f1b0383dc2",
+        "meta": {
+          "id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+          "timestamp": "2026-10-15T10:48:55.747Z"
+        },
+        "token_record_count": 10,
+        "latest": {
+          "timestamp": "2026-10-15T11:12:31.641Z",
+          "total_token_usage": {
+            "input_tokens": 576590,
+            "cached_input_tokens": 550016,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3260,
+            "reasoning_output_tokens": 32,
+            "total_tokens": 579850
+          },
+          "last_token_usage": {
+            "input_tokens": 65385,
+            "cached_input_tokens": 65024,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 118,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 65503
+          }
+        }
+      },
+      "read_two": {
+        "read_completed_at": "2026-10-15T11:13:21.718Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-48-55-01a13f2d-e59b-7202-9f33-42dd9f567ca6.jsonl",
+        "source_sha256": "db999d912b5304b6fc14878facc4d5c792ad59596bec7169524372f1b0383dc2",
+        "meta": {
+          "id": "01a13f2d-e59b-7202-9f33-42dd9f567ca6",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/speaker_independent_checker",
+          "timestamp": "2026-10-15T10:48:55.747Z"
+        },
+        "token_record_count": 10,
+        "latest": {
+          "timestamp": "2026-10-15T11:12:31.641Z",
+          "total_token_usage": {
+            "input_tokens": 576590,
+            "cached_input_tokens": 550016,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3260,
+            "reasoning_output_tokens": 32,
+            "total_tokens": 579850
+          },
+          "last_token_usage": {
+            "input_tokens": 65385,
+            "cached_input_tokens": 65024,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 118,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 65503
+          }
+        }
+      },
+      "counter_stable": true,
+      "source_hash_stable": true,
+      "root_status_attestation": "Root reports same three completed/idle again after ONE author-only turn.",
+      "baseline_recorded_total": 320912,
+      "current_recorded_total": 579850,
+      "author_phase_recorded_actual_delta": 258938,
+      "author_phase_actual_cap": 100000,
+      "phase_breach": true,
+      "status": "NEEDS_EXTRA_REVIEW",
+      "cumulative_actual_ceiling": 520912,
+      "operations_extra_ceiling": null,
+      "cumulative_remaining_theoretical": -58938,
+      "author_phase_remaining_theoretical": 0,
+      "manual_final_reserve": {
+        "actual_total_tokens": 100000,
+        "active_s": 30,
+        "allocated_output_tokens": 800,
+        "borrowable_by_author_phase": false,
+        "note": "Preserved prior finite reserve. Remaining cumulative arithmetic is not a new grant or permission to borrow."
+      },
+      "historical_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000
+      },
+      "qualifier": "Latest recorded cumulative counters are known/stable across two reads; theoretical completion/inflight and finer phase boundaries remain unknown. Delta attribution relies on root one-author-turn idle attestation."
+    },
+    {
+      "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+      "thread_id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+      "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+      "read_one": {
+        "read_completed_at": "2026-10-15T11:13:20.206Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+        "source_sha256": "e8a5d8b69bd54f19982281500a7ec66e4cfe50de13be4e2ff9bc8bea2af6ba67",
+        "meta": {
+          "id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+          "timestamp": "2026-10-15T10:49:04.933Z"
+        },
+        "token_record_count": 12,
+        "latest": {
+          "timestamp": "2026-10-15T11:12:32.776Z",
+          "total_token_usage": {
+            "input_tokens": 767423,
+            "cached_input_tokens": 732288,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3412,
+            "reasoning_output_tokens": 86,
+            "total_tokens": 770835
+          },
+          "last_token_usage": {
+            "input_tokens": 73907,
+            "cached_input_tokens": 73600,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 131,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 74038
+          }
+        }
+      },
+      "read_two": {
+        "read_completed_at": "2026-10-15T11:13:21.718Z",
+        "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T10-49-04-01a13f2e-08a6-7e42-9a0d-ab598400a2aa.jsonl",
+        "source_sha256": "e8a5d8b69bd54f19982281500a7ec66e4cfe50de13be4e2ff9bc8bea2af6ba67",
+        "meta": {
+          "id": "01a13f2e-08a6-7e42-9a0d-ab598400a2aa",
+          "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+          "agent_path": "/root/product_delivery_coordinator/operations_independent_checker",
+          "timestamp": "2026-10-15T10:49:04.933Z"
+        },
+        "token_record_count": 12,
+        "latest": {
+          "timestamp": "2026-10-15T11:12:32.776Z",
+          "total_token_usage": {
+            "input_tokens": 767423,
+            "cached_input_tokens": 732288,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 3412,
+            "reasoning_output_tokens": 86,
+            "total_tokens": 770835
+          },
+          "last_token_usage": {
+            "input_tokens": 73907,
+            "cached_input_tokens": 73600,
+            "cache_write_input_tokens": 0,
+            "output_tokens": 131,
+            "reasoning_output_tokens": 0,
+            "total_tokens": 74038
+          }
+        }
+      },
+      "counter_stable": true,
+      "source_hash_stable": true,
+      "root_status_attestation": "Root reports same three completed/idle again after ONE author-only turn.",
+      "baseline_recorded_total": 477854,
+      "current_recorded_total": 770835,
+      "author_phase_recorded_actual_delta": 292981,
+      "author_phase_actual_cap": 100000,
+      "phase_breach": true,
+      "status": "NEEDS_EXTRA_REVIEW",
+      "cumulative_actual_ceiling": 677854,
+      "operations_extra_ceiling": 850000,
+      "cumulative_remaining_theoretical": -92981,
+      "author_phase_remaining_theoretical": 0,
+      "manual_final_reserve": {
+        "actual_total_tokens": 100000,
+        "active_s": 30,
+        "allocated_output_tokens": 800,
+        "borrowable_by_author_phase": false,
+        "note": "Preserved prior finite reserve. Remaining cumulative arithmetic is not a new grant or permission to borrow."
+      },
+      "historical_debit_separate": {
+        "active_s": 40,
+        "allocated_output_tokens": 1000
+      },
+      "qualifier": "Latest recorded cumulative counters are known/stable across two reads; theoretical completion/inflight and finer phase boundaries remain unknown. Delta attribution relies on root one-author-turn idle attestation."
+    }
+  ],
+  "semantics": "Total=input+output; cached input/reasoning output remain subsets, never additive.",
+  "authority_report": "Root requires any100k author-phase breach NEEDS_EXTRA_REVIEW; no silent borrowing from manual final reserve and no automatic PASS. No new grant is issued here.",
+  "immutable_prior_inputs_preserved": true,
+  "shared_accounting_helper": {
+    "cost": "unknown/separate",
+    "excluded_from_maker_denominators": true
+  },
+  "probe_sha_handling": "Root states three independent-probe SHA checkpoints stable; no source rescan performed or independently claimed.",
+  "review_or_gate_performed": false,
+  "ratio_success_inferred": false
+}

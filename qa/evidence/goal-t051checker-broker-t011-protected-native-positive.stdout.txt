@@ -1,0 +1,11 @@
+✔ ACL semantics bind actual directory/current identity and reject broad/inherited permissions or foreign owner (1.9652ms)
+✔ native ACL uses fixed script and literal argument path with bounded output/time, never shell text (6.6862ms)
+✔ explicit real Windows ACL probe uses existing broker-configured private directory without mutations (747.6534ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1106.5449

@@ -1,0 +1,11 @@
+# Contract — T-040 grounded content consumer
+
+Independent checker ground truth, cycle 0, 2026-10-14. Scope is the new read-only API projection/router and actual React panel/client; shared mounts, full release, providers and live extraction remain separate acceptance.
+
+1. Authenticated tenant and existing sessions scope control reads; client-supplied tenant cannot alter them. Unknown/foreign session yields null/404. Invalid tenant must reach zero read operations, including through bypassed-auth handler execution.
+2. The real production BrainReadDeps/store preserves canonical citedItems and qa fields into the projection. Check this boundary with a hermetic driver fake that evaluates actual tenant/session filters and includes a second-tenant sentinel, rather than only a handcrafted read dependency.
+3. Only same-tenant, same-session pages/claims/turns are consumed. Quote resolution requires a nonempty literal substring of the current cited turn and finite times. Missing, foreign, fabricated or obsolete references remain explicit unavailable evidence, with null time/speaker and no UI navigation.
+4. DTO copies selected fields only, preserves claim review states and source-origin distinctions. Unanswered Q&A always has null answer and empty answer evidence; answered Q&A exposes separately labelled question and answer evidence. Canonical schema types remain the field authority; no new verification claim is inferred.
+5. Actual React component/client consumes the DTO, uses authenticated fetch and encoded existing transcript anchors, renders source content as text, and labels generated content unverified. Changing key/session hides former data immediately; late prior responses cannot overwrite current content. Errors and mismatched session responses remain visible.
+6. Verify affected projection on real sample transcript turns and consume its output through the actual panel. This may use mocked HTTP and DOM, with that limit explicit. Full browser, real provider/index/Ask, Mongo data, integrated mounts/typechecks and whole-task completion are not established by this scoped PASS.
+7. Exact cycle and final candidate hashes must match the packet; required frozen-contract validator evidence remains, with its vacuity disclosed if the registry is empty.

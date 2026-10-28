@@ -1,0 +1,62 @@
+{
+  "unit": "vectorless-production-evaluation",
+  "cycle": 0,
+  "candidate_sha": "4de31247efc975f1f103fb4afe7ab768f874e4d60665960cc881e7715f819f65",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "historical-shared-checker-allocation-root-centrally-deduplicated",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 180,
+        "tokens": 6000
+      },
+      "accounting": "Root supplied one centrally de-duplicated historical shared allocation. Not measured actual usage; do not add duplicate child rows for this allocation."
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 90,
+    "tokens": 2200,
+    "cost": null
+  },
+  "bootstrap_scope": "One frozen offline evaluator engineering unit. Review90seconds/2200allocated tokens plus protected finalization30seconds/800tokens, SAME total120seconds/3000, historical180seconds/6000 counted once; no calls, labels or parent acceptance. Finalization must assess separately then append one phase_kind finalization debit with this exact reserve identity.",
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "escalation": {
+    "authority": "Root explicit finite cumulative allocation in quality_delivery_maker task messages, 2026-10-15",
+    "reason": "Required independent review of new tenant/private-checkpoint/credential-budget boundaries after real production graph engineering checks; preserve historical unknown usage debit and unknown ratios.",
+    "limits": {
+      "active_s": 300,
+      "tokens": 9000,
+      "cost": null
+    }
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "vectorless-production-evaluation/cycle0/4de31247efc975f1f103fb4afe7ab768f874e4d60665960cc881e7715f819f65",
+  "protected_finalization": {
+    "kind": "finalization",
+    "active_s": 30,
+    "tokens": 800,
+    "cost": null
+  },
+  "supersedes_unstarted_admission": "qa/goal-vectorless-2026-10-15/vectorless-evaluator-review-admission-cycle0-input.json",
+  "helper_bindings": [
+    {
+      "path": "C:/Users/product/.agents/skills/checker/SKILL.md",
+      "sha256": "ede0ad4d5854a74a0f0ed55d2c450b927510d1fcbbe1bba3dc7874c0b04a2e37"
+    },
+    {
+      "path": "C:/Users/product/.agents/skills/checker/scripts/review_budget.py",
+      "sha256": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e"
+    }
+  ]
+}

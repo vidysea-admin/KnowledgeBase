@@ -1,0 +1,153 @@
+{
+  "kind": "t059-existing-metadata-live-prerequisites",
+  "asOfUtc": "2026-10-15T00:19:24.2882557Z",
+  "authority": "Root BECD source/existing-metadata-only resume; no provider/DB/browser/Git/private export",
+  "method": "Direct local source/contract/verdict/receipt metadata inspection; count saved review declarations; pin cited files. No current DB/runtime availability inference and no semantic judgment of answers.",
+  "sourceAcceptance": "cycle1 checked-PASS source/API foundation only; original cycle0 FAIL preserved",
+  "priorProofs": {
+    "exactIssueFloor": "1/1",
+    "standing": "18/18",
+    "mountedAssertions": 31,
+    "schemaValid": 3,
+    "schemaMalformedRefused": 2,
+    "currentCoherentStages": 4,
+    "inputFiles": 1939,
+    "inputDrift": 0,
+    "reruns": 0
+  },
+  "t022": {
+    "savedItems": 30,
+    "savedApprovedDeclarations": 0,
+    "genuineOwnerJudgments": "0/30 per independent verdict; declarations are not authenticated approvals",
+    "finalCurrentHumanCalibration": "MISSING",
+    "retrievalRubricIsAnswerComparison": false,
+    "derivedReferenceCalibration": "PROXY ONLY"
+  },
+  "t043": {
+    "existingRealAttempts": "DOCUMENTED: legacy-unbound staging cited Ask",
+    "fullParentAccepted": false,
+    "embeddedChunks": 751,
+    "plannedChunks": 1905,
+    "embeddedSessions": 9,
+    "seededSessions": 21,
+    "temporaryTreeSessions": 19,
+    "limitations": [
+      "query embedding quota failure/tree-only fallback",
+      "incomplete coverage",
+      "malformed legacy sessions excluded in old proof",
+      "new p2 input readiness is not index/Ask acceptance",
+      "legacy toc and newer vidysea inputs are distinct tenants",
+      "prior staging proof does not bind future T059 test namespace/capture"
+    ]
+  },
+  "actualTenantLoss": "UNVERIFIED: no current DB read or genuine comparable stored loss artifact established",
+  "calibratedHeadToHeadScores": "UNVERIFIED: no accepted actual before/after scorer provenance established",
+  "liveGates": {
+    "L1": "HOLD: final30-human calibration and full accepted T043 proof",
+    "L2": "HOLD: exact authorized DB/verified tenant; real loss lineage, comparable original scores, actual permitted source capture receipt",
+    "L3": "HOLD: that source index completion, healthy stored output digests and actual downstream cited Ask",
+    "L4": "HOLD: unchanged question, distinct child, same stated comparison policy and genuine scored before/after; loss/tie/gain/regression honest",
+    "L5": "HOLD: bounded live interrupted recovery, stable IDs/head and no duplicate/foreign effects; unproved modes explicit"
+  },
+  "futureArtifacts": [
+    "authorization/config namespace and verified tenant metadata",
+    "original eval and score-provenance reference without private export",
+    "immutable gap/input fingerprint receipt",
+    "consent/source/session/transcript capture receipt",
+    "actual index/tree/chunk digest readbacks",
+    "production Ask child/citation/coverage receipt",
+    "comparable before-after scorer-policy/calibration report",
+    "bounded interruption/recovery and duplicate-effects audit"
+  ],
+  "forbiddenInferences": [
+    "fixture becomes real tenant loss",
+    "derived labels become human gold",
+    "retrieval MAE becomes answer-comparison score",
+    "received or generated answer means improvement",
+    "prior partial staging run completes T043 or same-capture L3",
+    "manual internal score authenticates reviewer",
+    "source PASS completes parent"
+  ],
+  "newExecution": {
+    "providers": 0,
+    "db": 0,
+    "browser": 0,
+    "tests": 0,
+    "git": 0,
+    "privateExports": 0
+  },
+  "artifacts": [
+    {
+      "path": "qa/manifests/goal-t059.md",
+      "sha256": "9c2be2aa94baa993550301d251454d3d8500d2ff135fb5a638f37cc1103f2e62"
+    },
+    {
+      "path": "qa/verdicts/goal-t059.md",
+      "sha256": "dfa70e983bade1ecbf1f9bd4dcddcb80dc5348bdf8bb35dadd8a6510ba761176"
+    },
+    {
+      "path": "qa/evidence/goal-t059-checker-cycle1-pass.json",
+      "sha256": "ddd9d8db51761947e78bafdd70a872e75c04abc1e14783eae2452860a1df5ade"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t059-cycle1-ledger.json",
+      "sha256": "f948fe32395939a22ed050ab2458064da64f4d32a5345b59ce3bddc0d423a7e3"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t059-cycle1-standing.json",
+      "sha256": "b72249a532e9df71922b0b46c4a7403e7d2d291cf21d59a35424e3d31d478153"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t059-cycle1-mounted.json",
+      "sha256": "c45f2b4090f03b538cb9df7e7c16ee13dc53c4f72c0ad32b22d7f61872800f83"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t059-cycle1-rows.json",
+      "sha256": "e643c707cc471f3a449e32d8976453209534c97af23da9d4371b3cf6a1df698e"
+    },
+    {
+      "path": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T225425Z.json",
+      "sha256": "9901fc4b8ba492648072584796450e1c8ec3eedb87829e3e95b278750689ed68"
+    },
+    {
+      "path": "qa/verdicts/goal-t022.md",
+      "sha256": "9e627dc16a87b34d2bdf2d498b3fa7fdd40a4cde55ba0eebbd55285dd402dd96"
+    },
+    {
+      "path": "data/eval/calibration-human-review.json",
+      "sha256": "392086efc282a21bb62ea04e20f9e0893fb6e6a5aa48451092ba19768c225288"
+    },
+    {
+      "path": "data/eval/calibration-report.json",
+      "sha256": "45016e630aa8c9b75b2d9495a6ca19d3b84381ac0781d4149968d219c7940b8e"
+    },
+    {
+      "path": "data/eval/results/calibration-ollama-deepseek-v4.1-flash-2026-10-13.json",
+      "sha256": "749a58253a48f0164b0f3099a71a6706e7897bb7781f3378a91b948664112d25"
+    },
+    {
+      "path": "qa/contracts/goal-t043.md",
+      "sha256": "3173892ae16821611ab9ef441c2a9df1240ae63910f034e8c82e3ee26348b35d"
+    },
+    {
+      "path": "qa/evidence/t043-live-2026-10-12/summary.md",
+      "sha256": "0fa4d3c777b46454c84a6aaeb9e1ad13c6927ad0dda5c7d5dd341729ec723dfe"
+    },
+    {
+      "path": "qa/packets/goal-t043.md",
+      "sha256": "b89cedc20bdc86e8d176c54d34d1d1bb660f201df90385af361281cc05d525cb"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/evaluation.ts",
+      "sha256": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28"
+    },
+    {
+      "path": "apps/api/src/routes/compete/compete.ts",
+      "sha256": "e3272ef9fa75cf28261bad901778a79cfe5df5c5b16b477b34cde045022cf7d0"
+    },
+    {
+      "path": "docs/t059-evaluation-flywheel.md",
+      "sha256": "864534fd9953fa3b9d8689345874808ddf3e34e719258623c8446b3f879f2396"
+    }
+  ]
+}

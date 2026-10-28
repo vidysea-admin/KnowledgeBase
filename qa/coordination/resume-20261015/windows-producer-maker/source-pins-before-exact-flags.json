@@ -1,0 +1,32 @@
+[
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-capture-clock.ts",
+    "sha256": "e8c741aee7c755c5329a02a1753ba98f69c9e3248de90fa731e175be8690e830",
+    "bytes": 15380,
+    "lines": 195
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-capture-clock.test.ts",
+    "sha256": "c424c63b28fe4bd28dec741b569551c021f5f7f85a0c129bc664ce6737f5abcb",
+    "bytes": 3183,
+    "lines": 40
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/main.cpp",
+    "sha256": "8ef466165bec10872b51e2715e6294e63b2a85f64b13c060f56a35e019d0c383",
+    "bytes": 9462,
+    "lines": 143
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/CMakeLists.txt",
+    "sha256": "6ebad3cc9c06d14a380082c6d748fb3e7aa0cc3d083fe0a2305d2319cae54698",
+    "bytes": 631,
+    "lines": 13
+  },
+  {
+    "path": "packages/meeting-bot/src/capture/native/windows-loopback-helper/README.md",
+    "sha256": "a5f45f6bfb81af34118fa27ed12132846090fc6d8490d562071e8836fb506be2",
+    "bytes": 2526,
+    "lines": 35
+  }
+]

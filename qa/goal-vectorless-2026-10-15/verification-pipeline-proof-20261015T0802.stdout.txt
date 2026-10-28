@@ -1,0 +1,18 @@
+✔ vectorless source emits explicit lexical/provenance proof without claiming semantic support (23.3466ms)
+✔ vectorless proof refuses missing readiness and never downgrades to legacy semantic completion (23.8261ms)
+✔ vectorless proof preserves stale input and validation guards (16.103ms)
+✔ passed speech-only source emits a proof without a combined artifact (6.6443ms)
+✔ selected combined input is hashed; stray combined bytes do not change a speech proof (33.8796ms)
+✔ speech proof refuses failed, unvalidated, stale or missing validation (50.0388ms)
+✔ no proof for an incomplete, degraded, empty or foreign-session index result (23.1277ms)
+✔ changed source or validation during indexing cannot certify stale database input (18.7577ms)
+✔ loader disagreement and stale combined-stage hashes are refused before indexing (20.218ms)
+✔ prepared turn count remains fixed when caller mutates its loader array (7.1363ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 356.5775

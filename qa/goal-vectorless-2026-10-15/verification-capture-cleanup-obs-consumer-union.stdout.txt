@@ -1,0 +1,87 @@
+✔ ISS-CAPTUREMAKER-001: corrupt failure status cannot strand owned startup resources (1429.3607ms)
+✔ ISS-CAPTUREMAKER-001: foreign failure status cannot strand owned startup resources (1338.7679ms)
+✔ ISS-CAPTUREMAKER-003: stop-directory stop refusal cleans only owned resources and permits retry (2400.0897ms)
+✔ ISS-CAPTUREMAKER-003: corrupt-status stop refusal cleans only owned resources and permits retry (2333.9598ms)
+✔ ISS-CAPTUREMAKER-003: foreign-status stop refusal cleans only owned resources and permits retry (2322.4621ms)
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+[bot] recording until 11:04:12 AM (early stop on 'ended' only after 11:04:12 AM)
+[bot] --until reached
+[bot] stop failed: Recorder reported a failed stop; media is incomplete
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+✔ ISS-T034FIX-004: tab stop rejects (failed stop at end of recording) -> runRecord rejects with the reason, no finalize, partial kept, status failed (4136.9983ms)
+[bot] recording until 11:06:12 AM (early stop on 'ended' only after 11:06:12 AM)
+[bot] stop failed: lost audio
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+✔ ISS-T034FIX-004: a capture-error ends the record loop promptly and the capture fails (no finalize) (1887.8485ms)
+[bot] recording until 11:06:14 AM (early stop on 'ended' only after 11:06:14 AM)
+[bot] stop failed: Recorder reported a failed stop; media is incomplete
+[bot] capture backend: tab
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+[bot] captureMode is 'silent' but the caller did not confirm a provided/public/notes alternative was checked first (D-008 provided-first ordering, H8) — silent capture is meant to be the last resort.
+✔ ISS-T034FIX-004: an early capture-stopped failed:true ends the record loop promptly and the capture fails (no finalize) (1796.7005ms)
+[bot] recording until 11:04:18 AM (early stop on 'ended' only after 11:04:18 AM)
+[bot] --until reached
+✔ ISS-T034FIX-004 parity: a clean tab stop is not a capture failure (status stopped; proceeds past stop into normalize/finalize) (3132.5339ms)
+✔ OBS state security refuses arbitrary profile authority and malformed snapshots (52.3584ms)
+✔ OBS state security refuses hardlink aliases without overwriting original bytes (11.5481ms)
+✔ OBS state security refuses same-byte replacement before restoration (11.3174ms)
+✔ OBS state security preserves a foreign replacement during restore cleanup (23.0271ms)
+✔ applyLeanVideoToObs sends the exact lean defaults: SetVideoSettings then VBitrate then ABitrate (2.1288ms)
+✔ applyLeanVideoToObs honours overrides and reports a target-busting override without rewriting it (0.5385ms)
+✔ applyLeanVideoToObs is fail-soft: refused requests are listed, the rest are still sent, nothing throws (0.7754ms)
+✔ launch() with leanVideo {} applies lean settings after the scene is built and BEFORE GetVideoSettings and StartRecord (167.4519ms)
+✔ launch() with leanVideo overrides sends the overridden values (129.022ms)
+✔ launch() with leanVideo undefined or false leaves OBS video settings untouched (today's behaviour) (223.8364ms)
+[bot] capture backend: obs
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+✔ launch() still records when OBS refuses the lean settings (fail-soft), StartRecord is reached (112.509ms)
+✔ apply persists the previous values BEFORE the first Set call, restore puts every one back exactly and deletes the state (26.6415ms)
+✔ a parameter that was unset (null) is restored as null, not as a made-up value (25.2273ms)
+✔ restore does NOTHING while OBS is still recording and keeps the state; it restores once recording stopped (29.3904ms)
+✔ restore failure is loud (log + alert naming the failed keys) and keeps the state so a retry can finish (32.5806ms)
+✔ an unreadable state file is an alert, never a silent skip; no state file is a quiet no-op (12.854ms)
+✔ a leftover state from a crashed run keeps the ORIGINAL values: a second apply does not record the lean values as 'previous' (34.7556ms)
+✔ if the current video settings cannot be read or the state cannot be persisted, NOTHING is changed in OBS (2.745ms)
+✔ Advanced output mode: bitrate keys are SKIPPED with a warning, canvas/fps still apply, the mode is never changed (16.0328ms)
+✔ Simple mode with RecQuality HQ: bitrate keys skipped with a warning naming the quality; RecQuality untouched (0.3939ms)
+✔ Simple mode + Stream quality, or both unset (OBS defaults): bitrates ARE sent; unreadable mode: sent with a warning (0.5083ms)
+[bot] recording until 11:04:28 AM (early stop on 'ended' only after 11:04:28 AM)
+[bot] --until reached
+[bot] capture backend: obs
+[bot] 'meet' is Vexa-routed but no Vexa is deployed — using the local browser bot
+✔ runRecord (OBS): apply -> record -> stop -> restore runs in exactly that order and leaves the operator's profile as found (6615.9594ms)
+[bot] recording until 11:04:34 AM (early stop on 'ended' only after 11:04:34 AM)
+[bot] --until reached
+✔ runRecord (OBS): a restore that fails raises the alert through the notifier (and the recording still finalizes) (6631.793ms)
+[bot] recording stopped → C:\Users\product\AppData\Local\Temp\lkb-lean-crash-AI7skh\existing.mkv (8 bytes)
+[bot] lean video: previous OBS video settings and profile parameters restored
+[bot] OBS inputs unmuted; browser profile absent, cleanup skipped
+[bot] recording stopped → C:\Users\product\AppData\Local\Temp\lkb-lean-crash-GkGnxY\existing.mkv (8 bytes)
+[bot] lean video: restore SimpleOutput/ABitrate failed (Error: stuck (simulated))
+[bot] lean video: OBS profile NOT restored (failed: SimpleOutput/ABitrate); the lean video values may still be in the OBS profile. Restore state kept at C:\Users\product\AppData\Local\Temp\lkb-lean-crash-GkGnxY\record\.lean-video-restore.json; rerun lkb finalize --stop-obs or set them by hand.
+[bot] OBS inputs unmuted; browser profile absent, cleanup skipped
+✔ crash then `lkb finalize --stop-obs`: the leftover state restores the operator's profile after StopRecord; a stuck restore alerts (8136.9185ms)
+✔ record-commands.ts still passes leanVideo: {} to createObsBrowserDeps (the behaviour tests above fail without it; pin kept as a tripwire) (0.7454ms)
+✔ legacy sync v3 producer output is consumed by the actual finalizer (98.1728ms)
+✔ actual v4 selected speech-only producer input is consumed with its current passed validation (89.6345ms)
+✔ legacy v2 combined proof remains supported with its existing core guarantees (77.7877ms)
+✔ v3 refuses wrong source, database, bytes, generation, selected count and stage status (341.275ms)
+✔ v3 refuses changed source/session metadata and foreign selected turns (110.1548ms)
+✔ v3 database binding is independently expected and test-data sources remain staging only (67.7844ms)
+✔ actual sync v4 vectorless producer reaches finalizer without semantic/vector proof (81.3758ms)
+✔ v4 refuses missing mode, incomplete readiness and identity/input downgrade attacks (451.222ms)
+✔ v4 still refuses stale selected validation and foreign session metadata (65.7777ms)
+ℹ tests 43
+ℹ suites 0
+ℹ pass 43
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 73526.9798

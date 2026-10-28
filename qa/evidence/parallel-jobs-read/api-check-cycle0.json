@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "unit": "parallel-jobs-api",
+  "cycle": 0,
+  "reviewType": "independent-checker",
+  "humanAdjudication": null,
+  "tests": {
+    "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --test --test-concurrency=1 --test-timeout=20000 --experimental-test-isolation=none --import tsx apps/api/src/jobs/router.test.ts apps/api/src/jobs/store.test.ts",
+    "chunk_id": "24a208",
+    "wall_time_seconds": 1.643378,
+    "exit_code": 0,
+    "original_token_count": 254,
+    "output": "✔ jobs auth and dedicated scope refuse before reads with owner-positive path (86.2103ms)\n✔ jobs strict query accepts decimal boundaries and rejects selectors and malformed limits before store (102.3301ms)\n✔ jobs refuses nonempty GET JSON bodies before reading any tenant (36.5608ms)\n✔ jobs projects poisoned HTTP extras and refuses malformed summaries/envelopes with sanitized503 (49.822ms)\n✔ jobs actual accessor to adapter to HTTP keeps tenants separate with foreign row sorted first (25.3799ms)\n✔ jobs store requests only bounded sorted metadata and projects poisoned fields (0.8265ms)\n✔ jobs store empty/below/exact/extra pages and cap100 have truthful truncation (1.4226ms)\n✔ jobs store refuses invalid limits/tenants before accessor and rejects malformed fetched rows (3.4797ms)\n✔ real jobs accessor binds tenant filter before sorting and projection at DB boundary (3.3754ms)\nℹ tests 9\nℹ suites 0\nℹ pass 9\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1212.2951\n"
+  },
+  "typecheck": {
+    "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe node_modules/typescript/bin/tsc --noEmit -p apps/api/tsconfig.json",
+    "chunk_id": "6ad75c",
+    "wall_time_seconds": 4.0100188,
+    "exit_code": 0,
+    "original_token_count": 0,
+    "output": ""
+  },
+  "boundary": {
+    "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe --import tsx qa/evidence/parallel-jobs-read/api-independent-boundary.mjs",
+    "chunk_id": "086c4c",
+    "wall_time_seconds": 1.3609374,
+    "exit_code": 1,
+    "original_token_count": 44,
+    "output": "Independent auth/query/whitelist/private-cache boundary assertions passed.\nIndependent actual DB metadata -> API lowercase date-time preservation FAILED: Invalid job summary\n"
+  },
+  "sourceHashes": {
+    "router.ts": "bd892a34c3b11061de78e2e4bf2405ebc7b56bcf5aa850387ee7ac661b84f075",
+    "router.test.ts": "fed800d9d1ee273c98a67d998cbf3d08ba77a128dd50149d5ce6f302aa0f5b87",
+    "store.ts": "d28f40b17eddf581af62e7c973d91417571dc5b28ceb429dfc1e5658021fe03a",
+    "store.test.ts": "a1a4856c176ac672b21df925506c7806875cc7a34bc682e06ac8edf801f57b14",
+    "packages/db/src/collections/jobs.ts": "bd5c7e1bc5528022074a6c30b7111f21ffea1e086ebdb2de9718da6d97f880a2"
+  },
+  "limitations": [
+    "Source artifacts and semantic gold unrelated to this API unit.",
+    "Production/server/frontend mounting deferred to integration.",
+    "No live database/provider/browser/full-suite checks."
+  ]
+}

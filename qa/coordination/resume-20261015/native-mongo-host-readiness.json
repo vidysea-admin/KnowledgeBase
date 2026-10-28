@@ -1,0 +1,48 @@
+{
+  "phase": "native-mongo-binary-availability-only",
+  "startedAt": "2026-10-15T20:23:26.6202742Z",
+  "completedAt": "2026-10-15T20:23:27.3726946Z",
+  "commandLocations": {
+    "mongod": null,
+    "mongosh": null
+  },
+  "standardServerRootExists": false,
+  "packages": [
+    {
+      "package": "mongodb-memory-server",
+      "present": false
+    },
+    {
+      "package": "mongodb-memory-server-core",
+      "present": false
+    },
+    {
+      "package": "mongodb-memory-server-global",
+      "present": false
+    }
+  ],
+  "workspaceCaches": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.cache\\mongodb-memory-server",
+      "present": false
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\mongodb-memory-server",
+      "present": false
+    }
+  ],
+  "binaries": [],
+  "nativeServerAvailable": false,
+  "wsl": "not listed: no confirmed existing distro context; avoided possible startup",
+  "scope": "Narrow standard native install and workspace package/cache locations only; absence here does not establish machine-wide absence",
+  "actions": {
+    "processesLaunched": 0,
+    "databaseActions": 0,
+    "downloads": 0,
+    "installs": 0,
+    "networkCalls": 0,
+    "dockerQueries": 0,
+    "portQueries": 0,
+    "credentialReads": 0
+  }
+}

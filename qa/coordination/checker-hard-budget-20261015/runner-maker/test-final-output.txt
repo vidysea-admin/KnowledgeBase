@@ -1,0 +1,11 @@
+test_aggregate_reservations_and_immutable_plan (test_scoped_check_runner.ScopedRunnerTests.test_aggregate_reservations_and_immutable_plan) ... ok
+test_changed_bytes_refused (test_scoped_check_runner.ScopedRunnerTests.test_changed_bytes_refused) ... ok
+test_llm_zero_execution (test_scoped_check_runner.ScopedRunnerTests.test_llm_zero_execution) ... ok
+test_missing_required_refused (test_scoped_check_runner.ScopedRunnerTests.test_missing_required_refused) ... ok
+test_success_and_unknown_denominator (test_scoped_check_runner.ScopedRunnerTests.test_success_and_unknown_denominator) ... ok
+test_timeout_descendant_cleanup (test_scoped_check_runner.ScopedRunnerTests.test_timeout_descendant_cleanup) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 5.389s
+
+OK

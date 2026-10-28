@@ -1,0 +1,13 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/extraction-review/ExtractionReviewPage.test.tsx (6 tests) 369ms
+ ✓ src/pages/operations/evaluationFlywheelModel.test.ts (20 tests | 19 skipped) 11ms
+ ✓ src/pages/calibration-review/offline-transfer.test.ts (3 tests) 22ms
+ ✓ src/pages/extraction-review/client.test.ts (3 tests) 6ms
+
+ Test Files  4 passed (4)
+      Tests  13 passed | 19 skipped (32)
+   Start at  11:41:12
+   Duration  6.37s (transform 210ms, setup 766ms, collect 616ms, tests 408ms, environment 3.11s, prepare 577ms)
+

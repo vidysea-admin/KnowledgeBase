@@ -1,0 +1,26 @@
+[
+  {
+    "path": "apps/web/src/pages/counsellor/CounsellorPage.tsx",
+    "sha256": "4B423684C18C67391B72A530952CC874084C83C65B96E98F38792F3823E0160B",
+    "backup": "qa/coordination/resume-20261015/t013-voice-conversation/backup/CounsellorPage.tsx",
+    "backup_sha256": "8522876933DC1098C8C030F0DE94C9D5C7694D2010C92E108FC8E2CBECDEE3F0"
+  },
+  {
+    "path": "apps/web/src/pages/counsellor/voice.ts",
+    "sha256": "B3F7F92B676A2A4A9E3AB301AC361DD157C8A8AD4A679962B52753FD488B431D",
+    "backup": "qa/coordination/resume-20261015/t013-voice-conversation/backup/voice.ts",
+    "backup_sha256": "29A3F92B465F51D48F855A547B3C04451FD6981AB4545CE8800C2CD767955844"
+  },
+  {
+    "path": "apps/web/src/pages/counsellor/CounsellorPage.test.tsx",
+    "sha256": "7221647DB4D20A72FE600E1F20993A260F7DC44BB3F97FD881315E1069DA138E",
+    "backup": "qa/coordination/resume-20261015/t013-voice-conversation/backup/CounsellorPage.test.tsx",
+    "backup_sha256": "5A7651C42274062970B08629DD632B660ABEBA5D97CDB74DABB55AC2F58396FF"
+  },
+  {
+    "path": "apps/web/src/pages/counsellor/voice.test.ts",
+    "sha256": "95A89B6AF32087445B368DE9BF5DC81FFD044031DB73FC20A365700EDCBBBF6A",
+    "backup": "qa/coordination/resume-20261015/t013-voice-conversation/backup/voice.test.ts",
+    "backup_sha256": "A63FA643FEA20766E245366011483ADC99E0D14C78DDAFE38751EF7F682C4484"
+  }
+]

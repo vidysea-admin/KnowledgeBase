@@ -1,0 +1,66 @@
+{
+  "budget_debits": {
+    "active_s": {
+      "known_lower_bound": 90,
+      "value": 90
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 599787,
+      "value": 599787
+    }
+  },
+  "completion_reserve": {
+    "allocation": null,
+    "id": null,
+    "phase_kind": null,
+    "status": "legacy_unreserved"
+  },
+  "escalated": true,
+  "exceeded": [],
+  "limits": {
+    "active_s": 120,
+    "cost": null,
+    "tokens": 799787
+  },
+  "observed_at": "2026-10-15T11:18:28.006439+00:00",
+  "ratio_verified": false,
+  "ratios": {
+    "active_s": null,
+    "cost": null,
+    "tokens": 0.16906304683130988
+  },
+  "status": "BOOTSTRAP_REVIEW",
+  "target_missed": [
+    "tokens"
+  ],
+  "totals": {
+    "active_s": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 599787,
+      "value": 599787
+    }
+  },
+  "unknown": [
+    "active_s",
+    "cost"
+  ],
+  "execution": {
+    "exitCode": 0,
+    "wallTimeSeconds": 0.4300181,
+    "stdout": "{\"budget_debits\": {\"active_s\": {\"known_lower_bound\": 90, \"value\": 90}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 599787, \"value\": 599787}}, \"completion_reserve\": {\"allocation\": null, \"id\": null, \"phase_kind\": null, \"status\": \"legacy_unreserved\"}, \"escalated\": true, \"exceeded\": [], \"limits\": {\"active_s\": 120, \"cost\": null, \"tokens\": 799787}, \"observed_at\": \"2026-10-15T11:18:28.006439+00:00\", \"ratio_verified\": false, \"ratios\": {\"active_s\": null, \"cost\": null, \"tokens\": 0.16906304683130988}, \"status\": \"BOOTSTRAP_REVIEW\", \"target_missed\": [\"tokens\"], \"totals\": {\"active_s\": {\"known_lower_bound\": 0, \"value\": null}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 599787, \"value\": 599787}}, \"unknown\": [\"active_s\", \"cost\"]}\r\n"
+  },
+  "authority_companion": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/collections-url-repair-authority.json",
+  "no_source_test_or_launch": true,
+  "future_final_not_admitted": true
+}

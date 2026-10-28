@@ -1,0 +1,72 @@
+{
+  "status": "SCHEMA_VALIDATED_READY_PENDING_ROOT_MANUAL_ADMISSION_AND_FRESH_DEPENDENCY_SEAL",
+  "dispatch_allowed": false,
+  "semantic_verdict": null,
+  "created_utc": "2026-10-15T22:47:44.933138+00:00",
+  "candidate_sha256": "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+  "candidate_kind": "dirty-source-content-sha256-not-Git",
+  "required_pending": [
+    "Root next approval for ONE fresh instruction-aware manual checker under explicit finite180seconds/180000actual_total allocation; no optional managed launcher runtime controls or hardcap claimed",
+    "Fresh root dependency freeze/hash check after three active small fixture/receiver repairs; current_environment_bindings records exact observed drift",
+    "Fresh helper assess at dispatch and material phases; actual runtime totals/null accounting, reserved finalization and independent verdict obligations remain"
+  ],
+  "source_pin_mismatches": [],
+  "dependency_pin_mismatches": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+      "receipt_sha256": "119d23af7c90dfea17b4de7512b0c5427b75cb385d083202f0afc245e34aef16",
+      "current_sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+      "match": false
+    }
+  ],
+  "historical_usage": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\independent-telemetry.json",
+    "classification": "shared prior control-validation review; preserved not reset or charged to this new unit",
+    "actual_total_tokens": 133880,
+    "prior_limit": 51981,
+    "actual_active_s": null,
+    "breach": true
+  },
+  "ratio_status": "UNVERIFIED",
+  "native_hard_total_token_cap_established": false,
+  "helper_results": "helper-results.json",
+  "pure_validate_status": "READY exit0 at2026-10-15T23:02:33.994136+00:00",
+  "pure_assess_status": "BOOTSTRAP_REVIEW exit0; ratio UNVERIFIED; no exceeded allocation",
+  "updated_utc": "2026-10-15T22:57:59.904030+00:00",
+  "central_gate_binding": "central-gates.json",
+  "historical_phase": "phase1-metadata-history",
+  "current_dependency_drift": [
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "receipt_sha256": "eb80e828c2e4246b4fdd8bc769d983ce718ceed26e6a051ed4de040d849eba7a",
+      "current_sha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "match": false
+    },
+    {
+      "path": "packages/meeting-bot/py/test_sb_join_tiles.py",
+      "receipt_sha256": "88193970859c005fddea9f38b1440fdd598024e99d5a9afb32469e945919f6cd",
+      "current_sha256": "1e1dd317beae7b78b782c6159de4c4c0fadc09cd1be47b03ea9e10124631bdde",
+      "match": false
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+      "receipt_sha256": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64",
+      "current_sha256": "6afb1911a74c566af34db5af54d5ee22fcebb5eb6b5dc29a31cce632c95c7f3c",
+      "match": false
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tab-browser.test.ts",
+      "receipt_sha256": "a67793310befb5cfb3372ef7f4866afb07f97df471c370655d9e0ecc112f2f9b",
+      "current_sha256": "1f2911a063988df4bfc76ffce9761a7043445a5989afb0a8ef3dc58ba6859c7d",
+      "match": false
+    }
+  ],
+  "old_archive_mismatch": "Preserved in phase1/phase2; superseded by real current T03713+2 broker receipts, never classified unrelated",
+  "schema_readiness_complete": true,
+  "current_focused_binding": "current-focused-bindings.json",
+  "current_environment_binding": "current-environment-bindings.json",
+  "history": [
+    "phase1-metadata-history",
+    "phase2-metadata-history"
+  ]
+}

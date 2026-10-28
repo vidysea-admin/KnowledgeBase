@@ -1,0 +1,28 @@
+{
+  "schema": "selected-runtime-baseline/v1",
+  "unit": "source-overlay",
+  "cycle": 1,
+  "phase": "repair-review",
+  "boundary": "baseline",
+  "thread_id": "01a13f24-c5cc-7442-a8d9-0745f7d16095",
+  "agent_path": "/root/release_delivery_coordinator/source_overlay_checker",
+  "parent_thread_id": "01a13ef6-04e6-7310-8b64-e71b4a544a03",
+  "observed_at": "2026-10-15T10:53:30.2596444+00:00",
+  "usage_timestamp": null,
+  "cumulative_tokens": {
+    "input_tokens": null,
+    "cached_input_tokens": null,
+    "cache_write_input_tokens": null,
+    "output_tokens": null,
+    "reasoning_output_tokens": null,
+    "total_tokens": null
+  },
+  "lifecycle": null,
+  "completion_confirmed": false,
+  "counter_scope": "runtime-reported lifetime cumulative; baseline for prospective same-thread phase only",
+  "active_seconds": null,
+  "monetary_cost": null,
+  "maker_unit_usage": null,
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-38-59-01a13f24-c5cc-7442-a8d9-0745f7d16095.jsonl",
+  "source_content_exported": false
+}

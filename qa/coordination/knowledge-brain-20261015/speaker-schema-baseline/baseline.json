@@ -1,0 +1,24 @@
+{
+  "tokensActual": null,
+  "startMonotonic": 206629993030,
+  "files": [
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\speaker-schema-baseline\\schema__index.json.bytes",
+      "sha256": "846B3D698C7D16F58E00FCC4497600390C277C8095D811B8132C2F4AE2D170A3",
+      "path": "schema/index.json"
+    },
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\speaker-schema-baseline\\packages__core__src__index.ts.bytes",
+      "sha256": "B8823BA189D4C92ED4BDC44E9F654D317FA699654E5B0832F1EA7EACC5CE7174",
+      "path": "packages/core/src/index.ts"
+    },
+    {
+      "backup": "qa\\coordination\\knowledge-brain-20261015\\speaker-schema-baseline\\packages__db__src__index.ts.bytes",
+      "sha256": "6340DEC275001D1887558DA2CA067E0B90AE3F734B39A350F650A9E86E2B2189",
+      "path": "packages/db/src/index.ts"
+    }
+  ],
+  "phase": "source-build",
+  "frequency": 10000000,
+  "startUtc": "2026-10-15T09:29:33.1121412Z"
+}

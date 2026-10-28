@@ -1,0 +1,10 @@
+✔ actual production graph selects, hydrates current literal turns, refines and grounds an answer; all92 IDs retained (953.2296ms)
+✔ source drift/forged citation offsets fail through actual hydration validation (35.2223ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1029.495

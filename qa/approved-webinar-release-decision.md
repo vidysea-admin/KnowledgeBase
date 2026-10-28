@@ -1,0 +1,8 @@
+## D-056 | 2026-09-30 | type: decision | status: ACTIVE
+
+**Approved-by:** Umesh
+**What:** Implement the user-approved Useful Webinar -> Knowledge Base release: every classified webinar invite, audio/video capture, diarized transcript, screen-derived cited notes, indexing/search/Ask and operational visibility. Windows first; Ubuntu requires equivalent live verification.
+**Why:** The user selected only work-relevant features from the meeting transcript, explicitly required audio and video plus screen data, and then requested implementation of the complete plan. Existing real capture depends on Windows OBS; a portable tab-capture backend and media-quality safeguards are required before deployment claims.
+**Changes-authorized:** Existing meeting-bot join/capture/calendar functions, supporting browser extension/backend files and tests, scripts/webinar processing stages, setup requirements, existing API/web session surfaces and tests, schemas/generated types/migrations when required by evidence interfaces. No enforcement hooks, production promotion, or paused speaker-branch unpause authorized by this entry.
+**Result:** Implementation authorized; independent checker validation and real webinar proof required. Existing next-real-webinar proof and production-write boundaries remain binding. Every classified webinar supersedes the earlier trusted-sender-only scheduling choice for this release; explicit rejection and registration barriers remain respected.
+**Links:** docs/plan.md, docs/meeting-bot-roadmap.md, T-034, T-035, T-036, T-037, T-038, T-040, T-041, T-043, T-044, U4.1; user approved plan in current chat.

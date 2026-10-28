@@ -1,0 +1,80 @@
+[
+  {
+    "path": "qa/goal-vectorless-2026-10-15/verification-t054-retry-six-typed-20261015T1045.json",
+    "rawSha256": "19da4e4570fe0ed909c281ac1aca21a792ebe7b589f67dcdca7b74bdcfc19d84",
+    "candidate_sha": "147a2fa9a88a4f8bc3b0c04907f29e5946724eb99f18f422f8fcc2cefc0bbc3a",
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "command": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "--test",
+      "--test-concurrency=1",
+      "--test-timeout=30000",
+      "--test-name-pattern=^(?:correction\\ publication\\ never\\ replays\\ paid\\ work\\ on\\ transient\\ body\\ or\\ commit\\ errors|correction\\ unknown\\ commit\\ retries\\ only\\ commit\\ with\\ bounded\\ uncertainty\\ and\\ paid\\ work\\ once|real\\ indexer\\ refresh\\ consumes\\ corrections\\ and\\ atomically\\ publishes\\ all\\ targets,\\ preserves\\ reviewed\\ claims/originals|superseding\\ review\\ before\\ publication\\ aborts\\ every\\ derived\\ write\\ and\\ leaves\\ newer\\ refresh\\ pending|unsupported\\ Mongo\\ and\\ disappeared\\ reviewed\\ ids\\ fail\\ closed\\ with\\ durable\\ correction\\ truth|runRefresh\\ reconciles\\ unknown\\ committed\\ head\\ without\\ downgrade\\ or\\ superseded\\ revision\\ leakage)$",
+      "--import",
+      "tsx",
+      "apps/api/src/transcript-review/refresh-executor.test.ts"
+    ],
+    "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "runtime_version": "v24.19.0",
+    "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "environment_hash": "1c84569ca4a508b42d8b1c71e1dcb76c259b9f05b50cca20ff8f057e299ab8e2",
+    "exitCode": 0,
+    "hashesUnchanged": true,
+    "elapsedMs": 1631.3639999999998,
+    "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-t054-retry-six-typed-20261015T1045.stdout.txt",
+    "stderrPath": "qa/goal-vectorless-2026-10-15/verification-t054-retry-six-typed-20261015T1045.stderr.txt",
+    "fullPinInventory": "Read raw.before/raw.after programmatically; never dump logs/pins wholesale"
+  },
+  {
+    "path": "qa/goal-vectorless-2026-10-15/verification-api-types-t054-typed-20261015T1050.json",
+    "rawSha256": "e6375734306581add430c72dedf52d8a16438ee1b4678f67613324a69fe1e402",
+    "candidate_sha": "147a2fa9a88a4f8bc3b0c04907f29e5946724eb99f18f422f8fcc2cefc0bbc3a",
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "command": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+      "--filter",
+      "@lkb/api",
+      "typecheck"
+    ],
+    "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "runtime_version": "v24.19.0",
+    "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+    "exitCode": 0,
+    "hashesUnchanged": true,
+    "elapsedMs": 17895.2178,
+    "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-api-types-t054-typed-20261015T1050.stdout.txt",
+    "stderrPath": "qa/goal-vectorless-2026-10-15/verification-api-types-t054-typed-20261015T1050.stderr.txt",
+    "fullPinInventory": "Read raw.before/raw.after programmatically; never dump logs/pins wholesale"
+  },
+  {
+    "path": "qa/goal-vectorless-2026-10-15/verification-api-build-t054-typed-20261015T1052.json",
+    "rawSha256": "8f42c5b5ef78e9dbcf1b4a02e28f35ce5352675bdf1f5cce9801d1085be4158f",
+    "candidate_sha": "147a2fa9a88a4f8bc3b0c04907f29e5946724eb99f18f422f8fcc2cefc0bbc3a",
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "command": [
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+      "--filter",
+      "@lkb/api",
+      "build"
+    ],
+    "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "runtime_version": "v24.19.0",
+    "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "environment_hash": "d1fc847c40dcd6f5fed4f97a5e1be3dcf91b41180949d229ae6f05b90760a7ee",
+    "exitCode": 0,
+    "hashesUnchanged": true,
+    "elapsedMs": 3589.0161,
+    "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-api-build-t054-typed-20261015T1052.stdout.txt",
+    "stderrPath": "qa/goal-vectorless-2026-10-15/verification-api-build-t054-typed-20261015T1052.stderr.txt",
+    "fullPinInventory": "Read raw.before/raw.after programmatically; never dump logs/pins wholesale"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "monotonic_start": 13999.453,
+  "monotonic_end": 14359.921,
+  "phase_elapsed_s": 360.46800000000076,
+  "explicit_pause_intervals": [],
+  "known_recorded_wait_s": 0,
+  "actual_active_s": null,
+  "active_measurement_limitation": "No explicit pause was recorded around automatic approval review; elapsed phase is measured, exact active time remains unknown rather than inferred",
+  "tokens": null,
+  "cost": null,
+  "utc_end": "2026-10-15T07:44:30.076319+00:00"
+}

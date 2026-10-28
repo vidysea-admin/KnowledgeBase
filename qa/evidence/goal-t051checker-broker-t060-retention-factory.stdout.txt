@@ -1,0 +1,11 @@
+✔ production integration construction is passive and unavailable configuration never permits key mutation (25.8475ms)
+✔ production integration consumes verified actor for audited keys and global account lifecycle after fresh construction (322.2094ms)
+✔ configured production retention reader consumes actual private writer output with exact tenant and no global fallback (97.3236ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2028.2071

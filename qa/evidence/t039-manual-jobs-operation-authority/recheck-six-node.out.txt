@@ -1,0 +1,62 @@
+(node:32124) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical queued/recording operations without scheduled files block their own meeting across restart (29.3698ms)
+✔ readLiveJobs: missing state is no jobs; corrupt or wrong-shape state throws (cannot tell) (20.789ms)
+node:internal/modules/package_json_reader:301
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'pdfjs-dist' imported from D:\KnowledgeBase\packages\ingest\src\sources\document-pages.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
+    at packageResolve (node:internal/modules/esm/resolve:769:81)
+    at moduleResolve (node:internal/modules/esm/resolve:860:18)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:719:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:736:38)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveBaseSync (file:///D:/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:10932)
+    at resolveDirectorySync (file:///D:/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:12238)
+    at resolveTsPathsSync (file:///D:/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:13445) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v24.13.1
+✖ scripts\webinar\manual-jobs\host.test.ts (1225.6227ms)
+node:internal/modules/package_json_reader:301
+  throw new ERR_MODULE_NOT_FOUND(packageName, fileURLToPath(base), null);
+        ^
+
+Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'pdfjs-dist' imported from D:\KnowledgeBase\packages\ingest\src\sources\document-pages.ts
+    at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
+    at packageResolve (node:internal/modules/esm/resolve:769:81)
+    at moduleResolve (node:internal/modules/esm/resolve:860:18)
+    at defaultResolve (node:internal/modules/esm/resolve:992:11)
+    at #cachedDefaultResolve (node:internal/modules/esm/loader:719:20)
+    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:736:38)
+    at nextStep (node:internal/modules/customization_hooks:189:26)
+    at resolveBaseSync (file:///D:/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:10932)
+    at resolveDirectorySync (file:///D:/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:12238)
+    at resolveTsPathsSync (file:///D:/KnowledgeBase/node_modules/.pnpm/tsx@4.23.13/node_modules/tsx/dist/register-SoqaU4rg.mjs:2:13445) {
+  code: 'ERR_MODULE_NOT_FOUND'
+}
+
+Node.js v24.13.1
+✖ scripts\webinar\send-now\send-now-host.test.ts (1108.7322ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 2
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3590.3706
+
+✖ failing tests:
+
+test at scripts\webinar\manual-jobs\host.test.ts:1:1
+✖ scripts\webinar\manual-jobs\host.test.ts (1225.6227ms)
+  'test failed'
+
+test at scripts\webinar\send-now\send-now-host.test.ts:1:1
+✖ scripts\webinar\send-now\send-now-host.test.ts (1108.7322ms)
+  'test failed'

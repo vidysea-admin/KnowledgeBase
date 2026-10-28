@@ -1,0 +1,35 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Root-authorized product remaining-read mechanics only; no review/PASS",
+  "phase": "verification-support",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-preflight.mjs",
+    "--root",
+    "C:/Users/product/Desktop/KnowledgeBase",
+    "--spec",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-spec.json",
+    "--spec-sha",
+    "bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de",
+    "--out",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\product-delivery\\final-bundle\\remaining-read-mechanics-artifacts"
+  ],
+  "testIDs": [],
+  "expectedSelectedNames": 11,
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-product-remaining-read-preflight",
+  "pins": {
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight.mjs": "f9717064aaa48a4cd512644001bd7a9310c722bbc079b27189e22b0113ca45b8",
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec.json": "bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de"
+  }
+}

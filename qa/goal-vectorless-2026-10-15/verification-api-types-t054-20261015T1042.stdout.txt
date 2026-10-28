@@ -1,0 +1,9 @@
+
+> @lkb/api@0.0.0 typecheck C:\Users\product\Desktop\KnowledgeBase\apps\api
+> tsc --noEmit -p tsconfig.json
+
+src/transcript-review/refresh-executor.test.ts(94,56): error TS2339: Property 'level' does not exist on type 'ReadConcernLike'.
+  Property 'level' does not exist on type '"local"'.
+C:\Users\product\Desktop\KnowledgeBase\apps\api:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @lkb/api@0.0.0 typecheck: `tsc --noEmit -p tsconfig.json`
+Exit status 2

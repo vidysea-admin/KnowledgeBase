@@ -1,0 +1,37 @@
+✔ production automation factory grounds canonical sources, current hosting roles and credential/source approval generations (184.2762ms)
+✔ mounted approved-form consumer applies verified identity, live role/scope checks and protected evidence review (165.6851ms)
+✔ approved actual configured adapter flow, protected provenance, replay/conflict and fresh store reconstruction (15.1586ms)
+✔ missing/unknown fields, unverifiable source and unregistered target cannot execute (2.1724ms)
+✔ approval binds exact fields/target version and revision invalidates approval before effects (2.0809ms)
+✔ stable operation identity deduplicates a committed effect across an ambiguous safe retry (3.7575ms)
+✔ unsafe crash after effect before durable result quarantines and requires verified receipt proof (3.4704ms)
+✔ concurrent claims are exclusive and expired owners cannot commit after monitor recovery (2.6202ms)
+✔ configured adapter refuses unsafe destinations, redirects and wrong-operation receipts without external requests (3.001ms)
+✔ timeouts/exhaustion, failed writes and corrupt approval remain honest and do not fabricate success (318.2307ms)
+✔ shared createServer mounts approved form intake/execution/status behind auth and current hosting authority (264.2817ms)
+✔ mounted HTTP consumer enforces auth, current permissions, tenant ownership, replay and sanitized outcomes (211.2824ms)
+✔ durable adapter contract, definition CAS, replay, conflict and tenant isolation (8.1633ms)
+✔ unknown handlers, extra caller identities, malformed input and write failures are refused (1.8063ms)
+✔ disabled definitions block queued execution and cancelled work never executes (1.5805ms)
+✔ concurrent execution has one claim and stale workers cannot commit or heartbeat after recovery (3.3171ms)
+✔ timeout writes a durable operator handoff and retry obeys current version and attempt cap (314.974ms)
+✔ crash after unsafe side effect before durable commit parks reconciliation instead of blind retry (2.1415ms)
+✔ corrupt stored state, arbitrary upstream text and forged outcomes never become successful status (2.0006ms)
+✔ GET / serves HTML with no Authorization header (86.8921ms)
+✔ GET /sessions-ui serves HTML with no Authorization header (17.0948ms)
+✔ GET /sessions-ui/some-id serves HTML with no Authorization header (11.5164ms)
+✔ GET /dashboard-ui serves HTML with no Authorization header (11.7337ms)
+✔ GET /docs-ui serves HTML with no Authorization header (12.6878ms)
+✔ GET /docs-ui documents webhook permission and configuration requirements (9.0231ms)
+✔ GET /sessions-ui/:id with a script-breakout id never lets </script> reach the page unescaped (11.9716ms)
+✔ every page's inline script never assigns innerHTML with a variable (XSS discipline) (24.3676ms)
+✔ application routine validates typed bounded fields and canonicalizes without invoking I/O (2.691ms)
+✔ monitor exact lease boundary, bounded retry and reconciliation are explicit (1.6938ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8861.8943

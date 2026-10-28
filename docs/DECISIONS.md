@@ -493,3 +493,2173 @@ sweep, open); `D:/ai_os/audits/2026-09-09-delivery-gate-browser-predicate.md` H1
 **Result:** ISS-323, ISS-324 and lane rows ISS-LIVE-RECORD-REPAIR-002/-003 are fixed-and-verified; the live-proof method (throwaway Zoom vs next real webinar) stays a HUMAN_GATE. Disclosed, not filed: two timing-sensitive tests flake under concurrent CPU load (the ISS-323(a,b) liveness wait and a pre-existing ISS-324 timing test), 8/8 and 5/5 in isolation, a pre-existing tight-budget property. `scripts/lint-loc.mjs` still fails with exactly the 4 declared C1 violations, the state `qa/gates/obs-windows-loc-split.md` is waiting on. Two accuracy corrections are recorded rather than rewritten, because both were errors in the audit trail itself: U5's status line survived its own merge and was then read back to Umesh as a live blocker, and the tick's continuation clause claimed the wakeup was armed before the line when it was armed after -- the same defect class D-036 named, where writing the clause is mistaken for making the call.
 
 **Links:** ISS-323 - ISS-324 - ISS-LIVE-RECORD-REPAIR-002 - ISS-LIVE-RECORD-REPAIR-003 - qa/manifests/live-record-repair.md - qa/verdicts/live-record-repair.md - qa/gates/obs-windows-loc-split.md - U5 - D-015 - D-036 - D-038 - commits f01b47a, 2bbb37c, d1023d7, 3368454, 77497e2, 6b18060
+
+## D-040 | 2026-09-27 | type: fix | status: ACTIVE
+
+**What:** Dispatch briefs for a ledger-driven unit must be derived from the issue row's `evidence` and `fix_direction`, not from its `title`. The maker will read those two fields before writing a brief, and where a brief's framing and the row's evidence disagree, the row wins and the brief is corrected in the tick record rather than defended. Concretely, this turn: the unit `topicrefs-arg-guard` was dispatched with the instruction "the sessionId argument to topicRefsForSession is undefended - add a guard, and decide whether it belongs at the function boundary, the call site, or in the type system". That framing came from the row's title (ISS-C-TOPICREFS-ARG-001, "The sessionId ARGUMENT to topicRefsForSession is undefended"). The row's own evidence says the opposite about what to change: the checker who filed it had mutated the argument to a hard-coded "s2" and apps/api stayed 142/142 green, and the row states "Cause is the FIXTURE, not the assertions" and "the shipped argument is correct", with a fix_direction asking for one fixture line (a second topic node whose sessionRefs excludes s1) plus an assertion on the claims write's topicRefs. The builder read the row, reported the discrepancy back, added no guard anywhere, and changed only a test file.
+
+**Why:** A title compresses a finding to one line and the compression is lossy in a specific, predictable direction - it names the SYMPTOM's location ("the argument is undefended") rather than the DEFECT's location (the fixture cannot tell two sessions apart). A brief built from the title therefore points the builder at the wrong file and, worse, pre-commits it to a shape of fix. Here the brief offered three placements for a guard and asked the builder to choose among them; all three were wrong, because the correct answer was "no guard, the argument is already right". The only reason the unit did not ship a guard defending a call that was never wrong is that the builder disregarded the brief's framing after reading the row - which is the behaviour to want, but relying on it is relying on a subordinate agent to correct its instructions. Note the specific irony that makes this worth a standing rule rather than a one-off correction: the brief cited ISS-333 to warn the builder against "fixing a defect at one consumer when the real defect is upstream", and the brief was itself committing that error one level up. The same failure mode also explains a live risk in this repo's own process: a checker's finding is filed as a row by the checker, and every downstream reader - maker brief, manifest, commit message - then cites the id. If briefs are written from titles, the audit trail stays internally consistent while pointing at the wrong code, which is worse than an inconsistent trail because nothing looks wrong.
+
+**Result:** The unit is committed on wave/topicrefs-arg-guard (333c7f1) as a test-only change: a new treeRootExclusiveTopics() fixture (the shared treeRoot() was deliberately left alone, since 18 existing assertions pin its one-topic shape) plus one test asserting the claims write's topicRefs contains only the s1-exclusive topic. Reported evidence: 19/19 on the file, 196/196 apps/api, pnpm -r typecheck exit 0, depcruise clean, lint-loc unchanged at the same 4 violations. Its cycle-0 checker was dispatched in the same turn the build returned, briefed explicitly that the unit did something materially different from its brief, that the burden of proof is therefore HIGHER not lower, and that its first job is to rule on whether the builder's reframing of the row is correct at all - because if the row really does describe an undefended argument, this unit fixed the wrong thing and that is a FAIL. The checker was also asked to rule on a D-020 deviation the builder disclosed: the sandbox refused a chained shell trap construct, so arm/mutate/test/restore/verify ran as separate explicit calls, which does not satisfy D-020's requirement that restore fire on timeout and interrupt and error rather than only the success path. Whether mutate.mjs's arm/restore ledger plus assert-clean is equivalent protection is a genuine open question and is the checker's to answer, not the maker's. No claim is made here that the unit is correct - only that it is honestly framed.
+
+**Links:** ISS-C-TOPICREFS-ARG-001 - qa/manifests/topicrefs-arg-guard.md - qa/contracts/entity-promotion.md (C4, I2) - ISS-333 (the anti-pattern the brief cited while committing it) - D-015 (measure against the row's own recorded cases) - D-019 (ledger is the union of shards) - D-020 (mutation-run safety, the disclosed deviation) - apps/api/src/indexing/promote-entities.test.ts
+
+## D-041 | 2026-09-27 | type: decision | status: ACTIVE
+
+**What:** Eight Approver rulings taken in one sitting (Umesh first-hand, two AskUserQuestion rounds
+in session 21132795), settling the direction and several of the nine open gates.
+
+1. PRIORITY: recording capture comes first. Reason given: recordings are the raw material for
+   everything and are being lost now - the Ashoka Educator Dialogues webinar of 2026-09-27 was not
+   captured. (Noted at ruling time: the concurrent maker loop had already moved ISS-323 and ISS-324
+   to status fixed, so this ruling confirms the ordering rather than opening new work.)
+2. WEB FALLBACK: build it, do not amend the north star. ISS-274 is resolved as wire-it, not
+   sign-the-honest-limit. The Phase-1 exit clause stands as written and off-corpus questions must
+   reach a web search path. The QUEUE GRILL row for it is discharged.
+3. LEDGER UNION: approved. Every ledger-reading surface reads the union of qa/issues.jsonl and
+   qa/issues.*.jsonl. Closes the gate that had been open 19 days.
+4. SPEAKER SEAM: keep working until it is clean. This DELIBERATELY OVERRIDES the D-014 class-based
+   round cap for the speaker-resolution seam in this repo: that seam carries 6+ PASSed verdicts and
+   is a non-security (fabrication/correctness) class, so D-014 had closed it as file-don't-fix.
+   ISS-104 is pullable again on the Approver's instruction. The cap stands for every other
+   non-security seam.
+5. STUCK UNITS: retry with fresh attempts. The 4 STALLED and 2 BLOCKED units get their fix-cycle
+   counters reset rather than being closed as not-pursued.
+6. ZOOM SIGN-IN: re-confirmed done. The bot profile is signed in as umeshsugara@vidysea.com, done by
+   Umesh in plain Chrome on data/bot-profile and verified 08:30 through the bot's own driver path.
+   Consequence: plan.md unit 1 is NOT gated, and ISS-324's timeout was a code defect, not a
+   credential wall.
+7. ENFORCEMENT HOOKS: audit first, then one approval. /aios-config-auditor runs over .claude/hooks/*,
+   the diff against the last approved state is presented, and Umesh approves the surviving set in a
+   single later decision. This entry does NOT authorize the current hook contents.
+8. AUTO-RECORD SENDER AUTH: required, but auto-join keeps running. Sender authentication becomes a
+   hard [I*] in the U5 contract; the interim risk window on Umesh's own inbox is accepted knowingly.
+
+**Why:** The roadmap tier of the backlog priority (D-013 tier 3) was structurally unreachable while
+nine gates sat unanswered, three of them 18-19 days old, because each blocked a plan unit that no
+autonomous tick may build. Asking them in two batched rounds converted several gates into buildable
+work in one sitting instead of one gate per idle heartbeat. Rulings 4 and 6 also correct the record:
+the round cap was suppressing a seam the Approver wants finished, and plan.md's row for unit 1 still
+claims an OPEN gate that has carried an Answered line since 08:15 and a verification since 08:30.
+
+**Result:** Gates ledger-shard-union-hook, iss-322-sender-spoofing and
+enforcement-hooks-unauthorized-and-live-regressed carry Answered lines as of this entry;
+zoom-bot-signin re-confirmed. Buildable now with no human gate: ledger union (plan unit 19), web
+fallback, ISS-104 speaker precision, the U5 contract. Still open and NOT settled here:
+d015-generalisation-scope, handshake-liveness-contract-start, ui-surfaces-test-file-exclusion,
+write-guard-contract-contradiction. Two contracts still owed (ISS-328 U5 auto-record, ISS-329
+notify-channels); ISS-328's invariant question is answered by ruling 8.
+
+**Changes-authorized:** .claude/hooks/mc-sessionstart.ps1 (line 5 $LEDGER hardcode -> union glob over
+qa/issues.jsonl + qa/issues.*.jsonl, per ruling 3) - and no other enforcement path. The hook audit in
+ruling 7 authorizes no edit yet.
+
+**Approved-by:** Umesh
+
+**Links:** ISS-323, ISS-324, ISS-274, ISS-129, ISS-130, ISS-104, ISS-282, ISS-322, ISS-328, ISS-329,
+ISS-189, ISS-190, ISS-200, ISS-201, ISS-219, ISS-220; qa/gates/ledger-shard-union-hook.md,
+qa/gates/iss-322-sender-spoofing.md,
+qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md, qa/gates/zoom-bot-signin.md;
+docs/plan.md units 1, 12, 18, 19; D-013, D-014, D-019
+
+## D-042 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The maker-checker handshake state in this repo is recorded in one canonical, machine-readable
+field per manifest, `**Handshake status:**`, with the vocabulary
+`checked-PASS | ready-for-check | STALLED | BLOCKED | superseded | paused`. It is additive: the three
+pre-existing status forms (an inline `**Status:**` field in 30 files, a `## Status:` heading in 92, a
+third inline form in 37) are left exactly as written, because commit messages and verdicts cite them
+and repointing live references is the harm D-019 refused to accept when it rejected renumbering lane
+ids. The field's value is derived from ALL anchored status statements in the file and is written only
+when they agree; where they disagree, a hand adjudication is recorded inline with its evidence, and
+where nothing settles it, no field is written at all. Two further rules follow from this unit:
+(1) unit-handshake-state and issue-status are separate axes -- a unit may be `checked-PASS` while the
+issues it addressed stay open, and conflating the two is an error; (2) file position is not edit time
+in this repo, because a top status block is updated in place while narrative accumulates below it, so
+any claim about a manifest's current state must be settled with `git log`, not by reading downward.
+
+**Why:** Measured across all 159 manifests, `Status` was written three incompatible ways, so no single
+command could compute the handshake state. This was not cosmetic: the session-start hook printed
+`Checks pending: 0` while `delivery-gate-stamp-adoption` sat at `ready-for-check` over a cycle-1 FAIL
+and owed fix cycle 2. The handshake IS the maker-checker contract in this project (the pair communicates
+through files, never memory), so a contract whose state no reader can compute is one a session can
+silently skip -- which is what happened. This is ISS-176/ISS-183's bold-blindness generalised from one
+hook predicate to the whole substrate, and the twin of ISS-348 on the gate directory.
+
+Rule (2) is recorded because it caused a real false finding. The cycle-0 checker read `BLOCKED` below
+`checked-PASS` in `u2-fix1-ingest-guards.md` and filed ISS-351 (high) asserting a false PASS on an
+unfinished production-Mongo repair. `git log -S` shows the `checked-PASS` field was introduced by
+14f5771, later than 9f6b784 which wrote the BLOCKED evidence; the cycle-1 checker went further and
+showed e5ca83b explicitly rewrites the top field and relabels the old paragraph "Previous status
+(historical)". Position-as-time is a mistake a competent fresh reader made on the first attempt, so it
+belongs in writing.
+
+**Result:** 160 of 160 manifests carry the field; 0 ambiguous, 0 underivable; one recorded hand
+adjudication. Verified additive: 159 files, +320, -2, the two deletions being byte-identical
+trailing-newline artifacts. Cycle 0 FAILed and was fixed; cycle 1 PASSed with 6/6 manifest claims
+independently confirmed and `ISSUES-WRITTEN: none`. ISS-351 was flipped to `wontfix` by the checker
+that owns the ledger, with its evidence trail, neither deleted nor renumbered. ISS-350's reproduction
+1 of 4 is closed; 3 remain deliberately open and named -- the reader half (the session-start hook, the
+sweep, the tracker audit still miscount) is NOT done and touches `mc-sessionstart.ps1`, an enforcement
+path requiring `**Approved-by:** Umesh`, and the verdict side (`VERDICT:` vs `Verdict:`, verdict files
+ordered newest-cycle-first) is untouched. This decision makes the manifest side computable; it does
+not make anything read it.
+
+**Links:** ISS-350, ISS-351, ISS-348, ISS-176, ISS-183, D-019, D-015, ISS-304, ISS-305, ISS-306,
+qa/manifests/handshake-canonical-field.md, qa/verdicts/handshake-canonical-field.md, 1fe83d7, 50d7f7c
+
+## D-043 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Umesh, as this repo's named Approver, authorizes changes to two enforcement paths --
+`.claude/hooks/delivery-gate-stop.ps1` and `.claude/hooks/mc-sessionstart.ps1` -- for three specific
+fixes, and retroactively ratifies two commits that already changed `delivery-gate-stop.ps1` without an
+authorizing entry.
+
+The three authorized fixes:
+
+1. **The delivery-gate `Fix cycle` predicate + the ISS-205 stripper clause** (`delivery-gate-stop.ps1`).
+   Held as PASS items 1-2 of `delivery-gate-stamp-adoption`, which owes fix cycle 2.
+2. **The round-cap mechanical check** (ISS-346): the unit-selection path must count prior PASSed
+   verdicts naming a seam and refuse to open a non-security unit at >= 2, rather than relying on the
+   maker noticing. The breach recorded in `qa/gates/iss-122-round-cap-breach.md` was caught by hand,
+   after the build, which is exactly the failure mode a mechanical check exists to remove.
+3. **The session-start hook reading the canonical handshake field** (ISS-350 reproduction 2, and the
+   reader half D-042 explicitly left undone): `mc-sessionstart.ps1` must compute `Checks pending` and
+   `PASS not closed out` from `**Handshake status:**` rather than from a single bolded-`Status` grep.
+
+Retroactively ratified: commits `4a71633` and `e5402d6`, both of which modified
+`delivery-gate-stop.ps1` with no authorizing entry, as recorded in
+`qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`. Ratification is not absolution -- the
+gate file's account of how they landed stays as written, and the same gate's third instance ("this
+cycle") is covered by item 1 above.
+
+Out of scope: `scripts/append_decision.ps1` and `.claude/settings.json` are NOT authorized by this
+entry. Any change there needs its own entry with its own `Approved-by`.
+
+**Why:** Three separate fixes had been built or specified and then held, across multiple ticks, solely
+because they touch files this repo requires the Approver to authorize by name. That rule is correct and
+is not being weakened -- what it produced here, though, was a loop whose own miscounting was the thing
+it could not fix. The session-start hook printing `Checks pending: 0` over an unanswered cycle-1 FAIL
+(ISS-350) is a defect in the mechanism that decides what work exists; while it stands, every tick's
+inventory is computed by a reader that cannot see the contract. D-042 made the manifest side
+computable and said in terms that it did not make anything read it. This entry is what lets the readers
+be taught.
+
+The retro-ratification is the honest resolution of a worse state than either alternative. The gate file
+records that `delivery-gate-stop.ps1` ran uncommitted for a day and was modified three times without
+authorization; there is therefore no clean reviewed state to revert to, and reverting would restore a
+hook whose predicate is known to be wrong while leaving the repo pretending the history did not happen.
+Naming the two commits in an ACTIVE entry makes the unauthorized edits auditable, which is the property
+the authorization rule exists to protect.
+
+**Result:** Three fixes become buildable, each still subject to the normal manifest -> checker -> verdict
+handshake; authorization is not a PASS. Item 2 (ISS-346) is dispatched first, because it is the
+mechanical check that governs the D-044 cap waiver taken in the same session -- the check should exist
+before the exception it supervises is repeated. `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`
+is answered and closed by this entry. ISS-350 reproduction 2 becomes addressable; reproductions 3-4
+(the verdict-side `VERDICT:`/`Verdict:` split and newest-first ordering) remain open and touch no
+enforcement path.
+
+**Approved-by:** Umesh
+
+**Changes-authorized:** `.claude/hooks/delivery-gate-stop.ps1` (Fix-cycle predicate, ISS-205 stripper
+clause, round-cap mechanical check), `.claude/hooks/mc-sessionstart.ps1` (parse `**Handshake status:**`
+for the pending/closed-out counts)
+
+**Links:** D-042, D-014, ISS-346, ISS-350, ISS-205, ISS-176, ISS-183,
+qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md, qa/gates/iss-122-round-cap-breach.md,
+qa/manifests/delivery-gate-stamp-adoption.md, 4a71633, e5402d6
+
+## D-044 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The D-014 class-based round cap is waived ONCE, for the `vector-gap-durability` work already
+built on branch `wave/vector-gap-durability` against ISS-122. That branch may enter the normal
+manifest -> checker -> verdict handshake and, on a PASS, merge -- even though ISS-122 sits on the
+`vector-gap.ts` seam at 2 prior PASSes, where D-014 caps non-security units, and even though a prior
+verdict directed that ISS-122 "must not be promoted into a round-3 unit on its own".
+
+This waiver is narrow and does not generalise:
+
+- It covers **this branch, this issue, this seam, once.** A further finding on `vector-gap.ts` is
+  capped exactly as before, and the next one raises a HUMAN_GATE rather than a round 4.
+- It does **not** waive the checker. The code is mutation-verified by its author, which is worth
+  nothing as certification -- only a fresh `/checker` can PASS it.
+- The **mechanical cap check authorized in D-043 (item 2) is built first.** The exception is not
+  permitted to precede the mechanism that would have caught it.
+
+**Why:** The breach was procedural and the maker's own: the unit was selected, built and
+mutation-verified before anyone counted the prior PASSes on the seam, and the maker caught it itself,
+filed ISS-346 and ISS-347, opened `qa/gates/iss-122-round-cap-breach.md`, and correctly left the branch
+unmerged with no manifest filed and no checker dispatched -- dispatching one would itself have been the
+round the cap forbids. Shard 1 of this session's sweep independently confirmed that account: the branch
+is not on master and nothing in the range merges it.
+
+So the choice was between two costs. Discarding correct, verified work to honour a cap whose purpose is
+to stop *grinding on a seam* -- seven rounds in one day on the search-store seam is what D-013/D-014
+were written against -- pays the cap's price without buying its benefit, since the grind already did not
+happen here. Waiving it once, with the reason recorded and the mechanical check landing alongside, keeps
+the work and makes the failure mode non-repeatable, which discarding the branch would not.
+
+What makes this safe to waive is specifically that D-014 is **class**-based: the cap exists because
+severity was assumed to decay with round count, and the one time that assumption mattered in this repo
+it was wrong in the *opposite* direction -- ISS-078, a cross-tenant read disclosure, surfaced at round 5
+after four consecutive PASSes. ISS-122 is a durability issue, not security class. Had it been tenancy,
+auth, a data write or credential handling, D-014 would not have capped it at all and there would be
+nothing to waive.
+
+**Result:** `wave/vector-gap-durability` is unblocked in this order: (1) build and check the ISS-346
+mechanical cap check under D-043; (2) file the `vector-gap-durability` manifest citing this entry as its
+authorization; (3) dispatch a fresh checker; (4) merge only on PASS. `qa/gates/iss-122-round-cap-breach.md`
+is answered by this entry and closes. ISS-346 stays open until its check ships; ISS-347 (the D-020
+trap-construct sandbox conflict) is untouched by this decision and remains open.
+
+**Approved-by:** Umesh
+
+**Links:** D-014, D-013, D-020, D-043, ISS-122, ISS-346, ISS-347, ISS-078,
+qa/gates/iss-122-round-cap-breach.md, wave/vector-gap-durability, 91ee4ae
+
+## D-045 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Umesh consents to both things U6 needs that the maker cannot decide for itself:
+
+1. **A new file**, `scripts/watch/install-tasks.ps1`. This is the explicit "create a new file" authorization
+   the edit-in-place discipline requires. It goes in a NEW subdirectory `scripts/watch/` rather than
+   `scripts/` itself, because `scripts/` sits at exactly 32 of 32 entries against the C2 `lint-dirsize`
+   contract (ISS-345) and a 33rd entry there would fail the structure lint.
+2. **Registering Windows Scheduled Tasks on this machine** â€” an outward-facing action, in that it changes
+   machine state outside the repository and causes recordings to start with no human present.
+
+Constraints on the install path, which are part of the consent and not implementation detail:
+
+- **Dry-run first, always.** The script prints every task it would register -- name, trigger, command line,
+  working directory, run-as account -- and registers nothing without an explicit `-Apply`. The default
+  invocation is the preview.
+- **Idempotent.** Re-running it converges: an existing task with the same name is updated in place, never
+  duplicated, and the script reports created/updated/unchanged per task.
+- **Reversible by the script that created it.** A `-Remove` path unregisters exactly the tasks this script
+  owns, identified by a fixed name prefix, and touches nothing else in Task Scheduler.
+- **No credential capture.** Tasks run as the current interactive user; the script never prompts for or
+  stores a password, and never registers a task to run as SYSTEM.
+
+**Why:** U6 is the unit that makes the difference between capture that works and capture that happens.
+The Ashoka Educator Dialogues webinar on 2026-09-27 was not recorded, and the two defects behind it
+(ISS-323, ISS-324) were both in a path that only ever ran because a human remembered to run it. U4, the
+watch dashboard, tells Umesh what the system is doing; U6 is what removes the requirement that he be
+watching at all. Shipping U4 without U6 produces a dashboard whose honest reading is "nothing is
+scheduled".
+
+The consent is recorded rather than assumed because the maker is otherwise forbidden to take it. Creating
+a new file and changing machine state outside the repo are both gated to the human by construction, and
+an unattended recorder is precisely the kind of thing that should not appear on a machine because an
+autonomous loop judged it useful. The dry-run-by-default and `-Remove` constraints exist so that the first
+time it runs, its effect is legible before it is real, and so the consent can be withdrawn by running the
+same script.
+
+**Result:** U6 (`scripts/watch/install-tasks.ps1`) becomes buildable once U4's spec and plan gates are
+answered, per the feature rule -- this entry removes the new-file and machine-state blockers, not the plan
+gate. `qa/gates/u6-task-scheduler-consent.md` is opened and answered by this entry in the same motion. The
+install itself stays a human action: the maker may build and test the script and run it in preview, and
+Umesh runs `-Apply`. Verification is a registered task that fires on a throwaway schedule and produces a
+non-empty recording, which is also the live proof ISS-324 still owes.
+
+**Approved-by:** Umesh
+
+**Links:** D-032, ISS-323, ISS-324, ISS-345, U4, U6, docs/features/u4-watch-dashboard/,
+qa/gates/plan-approved-u4-watch-dashboard.md, qa/gates/u6-task-scheduler-consent.md,
+packages/meeting-bot/src/calendar/task-scheduler.ts
+
+## D-046 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** U4's spec and plan are approved, closing the PLAN gate
+(`qa/gates/plan-approved-u4-watch-dashboard.md`) that has blocked the capture wave. Four things are
+settled:
+
+1. **Spec approved as written**, all of R1-R8: alert on a failed poll (throttled per
+   `(tenantId, sourceType, sourceId)`), alert when polling stops happening at all, alert before a
+   recording starts, the `/watch` landing page with plain-language text on every state, read-only
+   "next up", "poll now" over the pre-existing `POST /watched-sources/run`, and tenant-scoped reads.
+2. **Plan approved**, all three units: U4a failure/upcoming alerts, U4b the heartbeat detector
+   (criticality high), U4c the `/watch` page. U4a and U4c dispatch as one parallel wave; U4b is
+   `after: U4a` because both touch `telegram-alerts.ts`, the only dependency edge.
+3. **New-file permission for exactly three files** â€” `apps/web/src/pages/WatchPage.tsx`,
+   `apps/web/src/pages/WatchPage.test.tsx`, `apps/web/src/api/watched-sources.ts`. `App.tsx` is edited
+   in place for the route and nav entry. No other new file is authorized.
+4. **U4b's heartbeat is a new `watch_heartbeat` collection**, one row per (tenant, source), overwritten
+   on each completed run â€” NOT a field on `watch_state`.
+
+**Why:** The wave has been unbuildable for several ticks because a new screen may not be built until
+intent, spec and plan are all approved, and the last two were pending. The alternatives were offered
+and declined: dropping R3, and building the page with no alerts. The second would have reversed the
+earlier alert-first answer and would not have caught the incident this feature exists for â€” a page
+someone must remember to visit is the same silence as no page.
+
+R2 is the requirement that carries the feature, and it is approved in full knowledge that it cannot be
+driven from `watch_state` rows, because the failure mode is the **absence** of rows. On 2026-09-27 the
+Ashoka Educator Dialogues webinar was not recorded, and the reason nobody noticed until afterwards is
+that a watcher which dies writes nothing, alerts nothing, and is indistinguishable from a quiet week.
+Detecting that requires a positive liveness signal and a separate reader of it.
+
+That is also the whole reason the heartbeat gets its own collection. A field on `watch_state` is
+cheaper today, and it couples liveness to per-poll history: a retention or pruning policy on that
+collection could then disable the silent-failure detector with nothing failing visibly. The one
+component in this feature that must never fail quietly is the one that detects quiet failure, so it
+does not share a lifecycle with data someone may reasonably decide to prune.
+
+**Result:** U4a and U4c are dispatched as a parallel wave this tick; U4b follows U4a. Each unit still
+owes its own manifest, a fresh checker and a verdict â€” approval is not a PASS â€” and U4c owes a Mode D
+live browser walk for both personas (`umesh-operator`, `vidysea-staff`), with every interaction
+asserted by its state change rather than by rendering. The gate file carries all three `Answered:`
+lines and `Gate status: ANSWERED`.
+
+Recorded in the same motion, because it changes what U6 may do: the live-recording proof method is
+answered as **wait for the next real webinar** (`qa/gates/live-recording-proof-method.md`). Umesh
+declined to stage a throwaway Zoom meeting. Two consequences are accepted deliberately â€” the next
+webinar must still be started **by a human, with instrumentation**, capturing the full progress-event
+chain and a non-empty file; and if that run fails, the webinar is lost too. U6 may therefore be built
+under D-045 but its `-Apply` install stays blocked until that proof exists. A green test suite is not
+evidence here: `obs-windows.test.ts:111` injects a fake node child, which is why the meeting-bot suite
+held 94/94 green through the period when live capture was broken.
+
+**Approved-by:** Umesh
+
+**Links:** D-045, D-032, D-024, D-014, ISS-323, ISS-324, ISS-078, ISS-335, ISS-336,
+qa/gates/plan-approved-u4-watch-dashboard.md, qa/gates/live-recording-proof-method.md,
+qa/gates/u6-task-scheduler-consent.md, docs/features/u4-watch-dashboard/spec.md,
+docs/features/u4-watch-dashboard/plan.md
+
+## D-047 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** ISS-358 is resolved by **extending scope, not by re-scoping R4**. A new unit **U4d** gives the
+`/watch` page visibility into the `watch_state` collection: a read-only, tenant-scoped API route serving
+`watch_state` to the web tier (none exists today), plus `WatchPage.tsx` rendering those rows alongside the
+`watched_sources` rows it already shows. The page becomes one surface over both the Drive/Gmail/Calendar
+watchers that actually fail and the URL bookmarks. R4's spec text is amended to say "both source families"
+rather than being narrowed. Options (b) re-scope R4 and (c) unify the two collections were both rejected.
+
+**Why:** U4c's checker established by reading merged code that R1's alert (`notifyPollFailed`, U4a) fires off
+`watch_state` while R4's page (`WatchPage.tsx`, U4c) reads only `watched_sources` and `meeting-candidates` --
+genuinely disjoint collections with zero code overlap. The consequence is that the wave's own motivating
+incident, a Drive/Gmail/Calendar watcher that stops, alerts correctly and then deep-links the reader to a
+page with no visibility into the failure class that triggered the alert. That is worse than having no page,
+because it invites the reader to conclude nothing is wrong. This is not a defect in U4c's build: D-046
+approved R4-R8 against `watched_sources` by name and R6 cites its route explicitly, so U4c built what was
+approved and disclosed the gap rather than working around it. The defect is one level up, in the spec the
+maker itself wrote, which was drafted against one collection while the alerting was built against another
+and nobody reconciled them. Option (b) was rejected because the cheap version is not actually cheap: it
+would also require removing the alert's deep link, since an alert must not point at a page that cannot show
+its subject, which makes the alert less useful to save one unit. Option (c) was rejected as correct but out
+of scope -- a schema and migration job touching U2's live watcher does not belong inside this wave.
+
+**Result:** U4d is authorized and queued as the next U4 unit. Umesh answered `iss-358: a` via AskUserQuestion
+on 2026-09-28. Two facts recorded for whoever builds it: `watched_sources` persists no failure state at all
+(`packages/ingest/src/watched/run.ts`'s catch branch never calls `recordFetch`, and the schema has no failure
+field) and has no scheduler, so today the only caller of `runWatchedSources` anywhere in the repo is the
+page's own "Poll now" button. A page whose sole data source is a button the reader presses is the state
+option (b) would have frozen. Per ISS-361, filed by U4b's checker, `watch_heartbeat` will be a **third**
+collection once D-048 lands, and U4d must surface it too rather than leaving a second round-trip.
+
+**Links:** ISS-358 (high), ISS-361 (low, the third-collection analysis), `qa/gates/iss-358-alert-and-page-disjoint.md`,
+`docs/features/u4-watch-dashboard/spec.md` R1/R4/R6, D-046, `qa/verdicts/u4c-watch-page.md`, close-out c2f339b
+
+**Changes-authorized:** `docs/features/u4-watch-dashboard/spec.md` (R4 wording, and the plan's unit list to
+add U4d); `docs/features/u4-watch-dashboard/plan.md`. No enforcement path is touched by this entry.
+
+## D-048 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The `watch_heartbeat` collection promised by D-046 is authorized **with the four files this repo
+requires for every collection**, which D-046 chose the collection without authorizing. Six new files in all:
+
+1. `schema/watch-heartbeat.schema.json` -- row shape `{_id: "<tenantId>:<sourceType>", tenantId, sourceType, lastHeartbeatAt}`
+2. its generated type under `packages/core/src/generated/`
+3. `packages/db/src/collections/watch-heartbeat.ts` -- a `scopedCollection()`-backed tenant-scoped accessor
+4. a `migrations/*.cjs` entry creating the collection, following `migrations/20260925090000-source-watcher.cjs`
+5. `scripts/watch/lib/heartbeat.mjs` -- the five pure functions U4b built, moved out of `run-watch.mjs`
+6. `scripts/watch/lib/heartbeat.test.mjs` -- their first committed test
+
+The staleness **detector extends `apps/api/src/routes/health.ts` in place** -- an existing separately-running
+server, edited rather than added to. The heartbeat **interval is 1 hour**, replacing U4b's `[ASSUMPTION]` 2h
+placeholder. The two-part key `tenantId:sourceType` is confirmed, deliberately unlike `watch_state`'s
+three-part key.
+
+**Why:** D-046 settled the heartbeat's shape as a new collection -- correctly, since R2's failure mode is the
+*absence* of `watch_state` rows and a field on the rows that stop being written cannot detect it -- and in the
+same entry capped new files at exactly three, all U4c's, stating "No other new file is authorized." Those two
+provisions conflict: `ARCHITECTURE.md:66-100` requires a schema file, a generated type, a tenant-scoped
+accessor and a migration entry for every collection, and U4b's checker verified independently that **every**
+existing collection on disk has all four with no exception, and that `packages/db/src/lib/tenantScope.ts`
+offers no raw escape hatch (removed per ISS-065). So the decision that chose a collection forbade the files a
+collection needs. U4b's builder stopped at that boundary and raised a gate rather than routing around it, and
+its checker ruled the blocker **real, not a rationalization**, having read ARCHITECTURE.md, the cited
+migration and D-046 itself rather than taking the manifest's word. The three workarounds were correctly
+rejected: a local JSON file reverses D-046's own Mongo choice; reusing `watch_reports` reintroduces exactly
+the prunability coupling D-046 rejected `watch_state` for; and hand-rolling raw untyped `db.collection()`
+calls would ship R8's tenancy guarantee without the scoped-accessor machinery every other collection has --
+the ISS-078 hazard class, and the one class this repo never round-caps.
+
+Files 5 and 6 are authorized for a second reason that is worth stating on its own. **Two units in a row have
+now been unable to commit a test for new logic because a test file is itself a new file** -- ISS-357 on U4a,
+and ISS-360 on U4b's five pure heartbeat functions, which shipped verified only by an uncommitted throwaway
+script. A new-file cap intended to stop scope creep was instead blocking tests, which inverts its purpose.
+`scripts/watch/lib/` already holds a `lib/*.mjs` + `lib/*.test.mjs` pair pattern, so this follows convention
+rather than inventing one, and it relieves `run-watch.mjs`, one of the repo's four standing `lint-loc`
+violators, which grew 522 -> 572 during U4b.
+
+**Result:** Umesh answered `u4b: 1=yes 2=health-route 3=1h 4=yes` via AskUserQuestion on 2026-09-28. R2
+remains **unmet** until this is built -- U4b PASSed cycle 0 (verdict af6037a) on the parts that do not touch
+the collection, and its verdict states R2 at 0/1 so no reader mistakes the PASS for the requirement. The
+detector must run in a different process from the writer or it dies with it, which is why `health.ts` was
+chosen over `run-watch.mjs`; U6's Task Scheduler work is gated separately and is not a prerequisite. Per
+ISS-361, `watch_heartbeat` becomes a third collection the `/watch` page does not surface, and D-047's U4d must
+cover it in the same pass.
+
+**Links:** ISS-360 (medium, uncommitted test), ISS-361 (low), ISS-357, ISS-065, ISS-078,
+`qa/gates/u4b-watch-heartbeat-collection.md`, `qa/manifests/u4b-watch-heartbeat-alert.md`,
+`qa/verdicts/u4b-watch-heartbeat-alert.md`, D-046, D-047, `ARCHITECTURE.md:66-100`,
+`migrations/20260925090000-source-watcher.cjs`, spec R2/R7/R8
+
+**Changes-authorized:** the six new files listed above, plus in-place edits to
+`apps/api/src/routes/health.ts`, `scripts/watch/run-watch.mjs` (removing the five moved functions) and
+`packages/db/src/collections/index.ts` if it carries a registry. This widens D-046's new-file cap for these
+files only; the cap otherwise stands. No enforcement path is touched by this entry.
+
+## D-049 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** The machine-wide Stop hook `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` is authorized for the two
+fixes D-043 described as items 1 and 2 -- the `Fix cycle` predicate bug, the ISS-205 stripper clause, and the
+ISS-346 mechanical round-cap check -- **and this decision is to be recorded in the shared AIOS log
+`D:/ai_os/decisions/log.md` as well as here**, so the other projects on this machine have a trace of why their
+Stop hook changed. D-043's scope error is corrected, not quietly absorbed: D-043 remains ACTIVE and correct
+for item 3 (`.claude/hooks/mc-sessionstart.ps1`, genuinely repo-local, built and PASSed as
+`ledger-shard-union-reader`), and its retro-ratification of commits `4a71633` and `e5402d6` is **re-authorized
+here at the correct scope** rather than resting on an entry that lacked the authority.
+
+**Why:** When the maker asked Umesh to authorize D-043, it presented all three items as touching "enforcement
+paths that **this repo** requires you to authorize by name." That is false for `delivery-gate-stop.ps1`, which
+does not exist in this repo at all: it lives at `D:/ai_os/.claude/hooks/` and is registered in the
+**user-level** `C:/Users/Lenovo/.claude/settings.json:124`, so it fires as a Stop hook in every project on
+this machine -- `d:/erp`, `d:/vc`, `d:/autoTesting`, `d:/vidysea/*` and every scratch directory. A decision of
+`D:/KnowledgeBase` cannot authorize that, because the blast radius reaches projects that never saw the
+decision, whose maker loops depend on the hook's current behaviour, and whose own Lab Protocol records would
+contain no trace of why it changed. The maker disclosed this against its own earlier question and opened
+`qa/gates/d043-machine-wide-scope.md` rather than proceeding on an authorization it had obtained by
+mis-describing the file.
+
+Machine-wide was chosen over keeping it repo-local because **the defects are genuinely generic and are live
+elsewhere right now.** Every maker-checker project has manifests with fix cycles, so the `Fix cycle` predicate
+bug misfires in all of them, including `d:/erp` where a loop is currently running. A repo-local copy would fix
+one project and leave the same bug in every other, while adding a second implementation of the same predicate
+-- which is precisely the drift-by-copy failure recorded in D-050 and ISS-355 on the same day. Fixing the one
+shared implementation is both smaller and the only option that does not create a divergence to police.
+
+**Why the rule did not catch this, which matters more than the instance:** the project CLAUDE.md names
+enforcement paths by filename **pattern** (`.claude/hooks/*`), not by resolved location.
+`delivery-gate-stop.ps1` matches that pattern in prose while living outside the repo, so the rule read as
+satisfied by an `Approved-by` line that had no authority over the file. The rule has no notion of scope: it
+cannot distinguish a hook this repo owns from a hook this repo merely runs. That is a defect in the rule, not
+only in this instance, and it is filed for its own fix regardless of this entry.
+
+**Result:** Umesh answered `d043-scope: 1=a 2=ratification-holds` via AskUserQuestion on 2026-09-28,
+authorizing the machine-wide change with a shared-log record and confirming the retro-ratification stands now
+that it is correctly scoped. This unblocks `delivery-gate-stamp-adoption` fix cycle 2 and the ISS-346 cap
+check, which D-044 requires to land **before** `wave/vector-gap-durability` gets a manifest. The stamp on
+`qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md` therefore stands rather than needing
+correction. Still to confirm during the build: whether the ISS-346 cap check has to live in the shared maker
+skill (`D:/ai_os/.claude/skills/maker/`, also machine-wide), which the maker has not yet verified -- if so it
+falls under this same authorization, and the shared-log entry must say so.
+
+**Links:** D-043 (corrected in scope, not superseded), D-044, ISS-205, ISS-346,
+`qa/gates/d043-machine-wide-scope.md`, `qa/gates/enforcement-hooks-unauthorized-and-live-regressed.md`,
+commits `4a71633` and `e5402d6`, `C:/Users/Lenovo/.claude/settings.json:124`, D-050
+
+**Changes-authorized:** `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1` (machine-wide), plus a matching entry
+in `D:/ai_os/decisions/log.md`, and `D:/ai_os/.claude/skills/maker/SKILL.md` if the ISS-346 check must live
+there.
+
+**Approved-by:** Umesh
+
+## D-050 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Four Approver rulings taken in one batched AskUserQuestion round (Umesh first-hand,
+session 21132795), all four answered as recommended.
+
+1. SPEAKER SEAM MECHANISM: move the NEVER_A_PERSON word list out of
+   packages/index/src/pipeline/speaker-name-rules.ts into its own data module. This is the explicit
+   "create a new file" authorization the user-global edit-in-place discipline requires, and it is
+   scoped to this extraction only. Zero behavior change is the acceptance condition.
+2. ISS-307 (false STALL banner): fix it now. This entry is the authorizing record for the
+   enforcement-path edit to .claude/hooks/mc-sessionstart.ps1 lines 47-49 -- read the NEWEST line of
+   the append-only oldest-first qa/.last-tick instead of the oldest, and match a real status field
+   instead of substring-matching STALLED/EXHAUSTED anywhere in that tick's prose.
+3. D-020 MUTATION SAFETY: amend it. The byte backup must be scoped PER-MUTATION rather than
+   per-run, and every mutation run must end with a post-run check that each touched file still
+   matches HEAD.
+4. ENFORCEMENT HOOK AUDIT (D-041 ruling 7): run it on the next tick. /aios-config-auditor over
+   .claude/hooks/* read-only, present the graded findings plus the diff against the last approved
+   state, then one Umesh approval. This entry still authorizes NO hook edit beyond ruling 2 above.
+
+**Why:** The speaker seam that D-041 ruling 4 ordered worked "until it is clean" had become
+unworkable rather than merely hard: speaker-name-rules.ts sits at exactly 300 non-blank lines, which
+is the loc.max ceiling with zero headroom, so not one further denylist word fits; and ISS-104's
+remaining residue (India, Mumbai, Google) is gazetteer-bound with person-valid twins of identical
+syntax, so no word list or syntactic gate can close it. Every way forward collided with a standing
+rule rather than with a technical limit -- the new-file discipline, a project-wide lint budget, or
+ruling 4 itself -- which is precisely the class of thing that must not be decided autonomously.
+Ruling 3 exists because a worktree silently lost a completed unit this session: a mutation-restore
+trap fired on normal shell exit (a trap on EXIT fires on success too) and overwrote finished work
+with a pre-fix backup, 28 files reverted across packages/index. D-020 as written permits exactly
+that shape, which makes it a rule defect and not just an incident.
+
+**Result:** Buildable now with no further gate: the NEVER_A_PERSON data-module extraction, and the
+ISS-307 hook fix. Gate qa/gates/speaker-seam-loc-ceiling.md carries the matching Answered line.
+ISS-104 stays open and critical -- the extraction unblocks the ceiling and closes nothing on its
+own. The hook audit is queued for the next tick and remains unauthorized to edit. Still open and
+NOT settled here: d015-generalisation-scope, handshake-liveness-contract-start,
+ui-surfaces-test-file-exclusion, write-guard-contract-contradiction, and ISS-355 (.codex/hooks
+committed with no Approver decision).
+
+**Changes-authorized:** .claude/hooks/mc-sessionstart.ps1 (lines 47-49 only: newest-line read plus a
+real status-field match, per ruling 2) -- and no other enforcement path.
+packages/index/src/pipeline/speaker-name-rules.ts plus one new sibling data module (ruling 1).
+This project CLAUDE.md's D-020 section (ruling 3).
+
+**Approved-by:** Umesh
+
+**Links:** ISS-104, ISS-104CC-1, ISS-104CC-2, ISS-307, ISS-355, ISS-360; D-013, D-014, D-019, D-020,
+D-041; qa/gates/speaker-seam-loc-ceiling.md, qa/debug/delivery-gate-manifest-blindness-cycle3.md,
+qa/debug/write-guard-enforcement-gaps-cycle3.md
+
+## D-050 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** `.codex/hooks/` -- the six-file mirror of this repo's `.claude/hooks/*.ps1` -- is **retained and
+authorized, with the copies replaced by links**. Each `.codex/hooks/<name>.ps1` becomes a Windows symlink or
+junction to its `.claude/hooks/` original, so there is exactly one implementation per hook and divergence is
+impossible by construction rather than policed by a lint someone must keep passing. `.codex/hooks.json` keeps
+its current wiring. **This entry also supplies the authorization the mirror never had**, closing the
+Update-Authorization violation in ISS-355 and the long-open disposition question in ISS-268. Deleting the
+mirror was rejected; a parity lint is the fallback only if links do not resolve.
+
+**One verification is required before all six are converted:** whether the Codex CLI resolves a Windows
+symlink or junction when PowerShell is invoked with `-File` against it. Convert **one** hook, prove it runs,
+then convert the rest. If it does not resolve, fall back to keeping the copies plus a structure-lint rule that
+fails on any divergence from the `.claude` original modulo line endings -- that fallback is authorized by this
+entry too, so a failed probe does not need a new decision.
+
+**Why:** Sweep shard 3 and the consolidation checker established at HEAD that `.codex/hooks/` carries **three
+defects that are live wrong in a configured hook right now**, not latent: it reads only `qa/issues.jsonl`
+instead of the union over `qa/issues.jsonl` + `qa/issues.*.jsonl` (the measured 132-vs-153 undercount D-041 was
+written to close), it uses the pre-D-034 naive `'Status: ready-for-check'` substring match, and it takes the
+**first** `Cycle checked` match rather than the maximum, which in a newest-first verdict file hands the reader
+the oldest verdict (the ISS-350 reproduction-3 trap). The maker then took the measurement it had said would
+decide the question: `.codex/hooks.json` exists and wires all six scripts by absolute path (`PreToolUse` on
+`Bash|PowerShell`, two `SessionStart` hooks, two `SessionEnd` hooks), and the Codex CLI is installed at
+`C:/Users/Lenovo/AppData/Local/Programs/OpenAI/Codex/bin/codex`. So any Codex session opened in this repo runs
+a SessionStart hook reporting a wrong open-issue count and matching manifest status with the superseded
+substring.
+
+**That measurement removed deletion as a free choice.** Removing the scripts without the wiring leaves a
+config pointing at absent files; removing both leaves Codex sessions in a Lab Protocol repo with **no
+governance hooks at all** -- no session-start directive, no pre-commit guard, no decisions-append guard. A
+stale mirror is bad; an unguarded session in this repo is worse, because the stale mirror at least still blocks
+what `mc-precommit.ps1` blocks.
+
+Links were chosen over a parity lint because of what the corrected provenance shows about the mechanism. All
+six files and `hooks.json` carry an identical mtime of 2026-09-24 23:08 -- the signature of a one-shot Codex
+setup, not of a loop authoring stale logic on top of a fix. They sat **untracked** for three days, which is
+exactly the state ISS-268 describes, and were then committed without authorization by `eff401b`, a maker tick
+about ISS-337, inside a commit about an unrelated unit. So the mirror did not reintroduce fixes that already
+existed; it froze a snapshot which has since been overtaken. **The problem is the copying, not the copier's
+care** -- a copy taken at any instant is stale from the next commit onward -- and that is an argument for
+removing the second copy rather than for adding a rule that detects when it drifts.
+
+**Result:** Umesh answered `iss-355: c` via AskUserQuestion on 2026-09-28. Two facts are settled by this entry
+regardless of how the link probe goes: the mirror now has the authorizing entry it lacked, and the three
+reintroduced defects stop being live the moment the links land, because the links point at the fixed
+originals. Recorded for its own fix, because it is the more general lesson: the authorization failure here was
+a **pathspec-discipline failure** -- a tick `git add`-ed enforcement-path files that had no authorizing entry,
+inside a commit about something else. A mechanical check refusing to commit any file under a hooks directory
+without a matching DECISIONS entry would have caught this **and** the `delivery-gate-stop.ps1` commits
+re-authorized in D-049 on the same day. That check is proposed, not authorized here.
+
+**Links:** ISS-355 (high), ISS-268, ISS-350, ISS-337, D-041, D-034, D-049, commit `eff401b`,
+`qa/gates/iss-355-codex-hooks-disposition.md`
+
+**Changes-authorized:** `.codex/hooks/decisions-append-guard.ps1`, `.codex/hooks/features-snapshot-session-end.ps1`,
+`.codex/hooks/lab-session-end.ps1`, `.codex/hooks/lab-session-start.ps1`, `.codex/hooks/mc-precommit.ps1`,
+`.codex/hooks/mc-sessionstart.ps1` (each replaced by a link to its `.claude/hooks/` original), and
+`scripts/lint-*.mjs` plus `structure.config.json` only if the parity-lint fallback is taken. `.codex/hooks.json`
+is unchanged. The `.claude/hooks/` originals are NOT modified by this entry.
+
+**Approved-by:** Umesh
+
+## D-051 | 2026-09-28 | type: fix | status: ACTIVE
+
+**What:** **`docs/DECISIONS.md` now contains two different entries both numbered `D-050`**, appended
+concurrently by two sessions working in the same checkout on 2026-09-28. Neither is withdrawn and neither is
+renumbered. From this entry onward they are cited as:
+
+- **D-050-SPEAKER** -- the earlier of the two by file position (line 980): four batched Approver rulings
+  (speaker-seam data-module extraction, the ISS-307 stall-banner fix, a D-020 per-mutation backup amendment,
+  and a read-only enforcement-hook audit), attributed to session 21132795.
+- **D-050-CODEX** -- the later by file position (line 1031): retain `.codex/hooks/` with the six copies
+  replaced by links, and supply the authorization that mirror never had.
+
+Every existing citation of a bare "D-050" is **ambiguous and must be re-read against this mapping**. Known
+instances: the comment block now committed in `.claude/hooks/mc-sessionstart.ps1` cites "D-050 ruling 2",
+which means **D-050-SPEAKER**; the `Answered:` stamps in `qa/gates/iss-355-codex-hooks-disposition.md` cite
+D-050 meaning **D-050-CODEX**.
+
+**Why:** The id collision is the interesting part, not the inconvenience. This repo's own project CLAUDE.md
+holds `docs/DECISIONS.md` up as the guarded counter-example to the issue ledger -- D-019 closes with
+*"`append_decision.ps1` refused a non-sequential id both times. That refusal is the whole difference between
+the two logs: DECISIONS is guarded, `qa/issues.jsonl` accepts whatever it is handed."* **That claim is now
+falsified.** The guard's V3 check computes `max + 1` by reading the log, then appends -- a
+time-of-check-to-time-of-use race. Two sessions that both read `max = D-049` both compute `D-050` and both
+append successfully, because nothing holds a lock across the read and the write and nothing re-validates
+uniqueness after the append. V1 ("exactly one `## D-` header, at line 1") validates the *entry file* being
+submitted, not the log it lands in, so a duplicate in the log is invisible to every validation the script
+runs.
+
+D-019 predicted this shape of failure for the ledger and explicitly exempted DECISIONS from it on the strength
+of two observed refusals. Those refusals were real, but they were **sequential** collisions -- a session
+submitting a stale id that was already taken, which V3 catches. A **simultaneous** collision is the opposite
+case and V3 cannot see it. The lesson is narrow and worth keeping: an id allocator that validates against a
+value it read earlier is not an allocator, and two observations of it working are not evidence that it holds
+under concurrency.
+
+Renumbering was rejected for the same reason D-019 rejected it for lane issue ids: it would rewrite an id that
+other entries, gates, manifests and commit messages already cite, and it would make an append-only log
+mutable to fix a problem that a new entry can describe. A stable ambiguous id with a published mapping is
+strictly better than a silently repointed one, because a reader who follows a citation to the wrong entry with
+no warning is worse off than one who is told to disambiguate.
+
+**Result:** The mapping above is the canonical disambiguation. Both entries stay ACTIVE and in force. The
+`.claude/hooks/mc-sessionstart.ps1` ISS-307 fix found uncommitted in the working tree **is** authorized -- by
+D-050-SPEAKER ruling 2, which names that file and those lines exactly and carries `Approved-by: Umesh` -- so
+it is committed rather than reverted, and its diff was checked against that scope before committing.
+
+**Two loose ends recorded rather than resolved, because they belong to the other session:**
+`qa/gates/speaker-seam-loc-ceiling.md` still reads `**Answered:** _(pending)_` although D-050-SPEAKER states
+that gate carries the matching Answered line; and this session cannot independently verify the first-hand
+Approver attribution of another session's batched round. Both are flagged for that session to close out, not
+adjudicated here -- a session must not ratify another session's Approver claim, which is exactly the
+authorization laundering the `Approved-by` rule exists to prevent.
+
+**Links:** D-019 (the falsified claim), D-050-SPEAKER, D-050-CODEX, D-049, ISS-307, ISS-355,
+`scripts/append_decision.ps1` (V1 and V3), `qa/gates/speaker-seam-loc-ceiling.md`,
+`.claude/hooks/mc-sessionstart.ps1`, commit 116e2fe (which committed both entries together)
+
+**Verdict:** The duplicate stands, disambiguated by name, and the allocator's race is filed for a real fix --
+an append that re-reads and re-validates uniqueness under a lock file, and a `lint`-level check that fails on
+any duplicate `## D-` id in the log. This entry authorizes neither; it records that the guard does not do what
+the repo's own documentation says it does.
+
+**Changes-authorized:** none. This entry is a record and a naming convention. The ISS-307 hook fix it clears
+for commit is authorized by D-050-SPEAKER, not by this entry.
+
+## D-052 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Umesh, as this repo's named Approver, answered a batched four-question round put to him on
+2026-09-28 (first-hand, via AskUserQuestion, after the previous session died with the questions
+pending). All four answers are recorded here verbatim in effect, with the two that grant new
+authority stated as such.
+
+**Ruling 1 â€” the `mc-sessionstart.ps1` round-cap decision: "Land ISS-346 first, then decide."**
+ISS-346 (the mechanical round-cap check, authorized by D-043 item 2, target
+`.claude/hooks/delivery-gate-stop.ps1`) is to be built BEFORE the cap question on
+`mc-sessionstart.ps1` is settled, so the decision is made against a working instrument rather than
+an argument. `qa/gates/mc-sessionstart-handshake-reader-round-cap.md` stays OPEN pending that.
+**No cap waiver is granted by this entry.**
+
+**Ruling 2 â€” ISS-104 closes with a place-vs-person signal. NEW AUTHORITY.** The remaining speaker
+bypasses (India, Mumbai, Google) are place/organisation names that are each also a real person's
+name, so no word list can separate them â€” only the surrounding sentence can. Umesh chose "add a
+place-vs-person signal" over accepting the residue, over a place-name lookup list, and over parking
+it. This authorizes contextual logic plus its own tests on the speaker seam, and supersedes the
+reading that D-041 ruling 4 had been satisfied by the data-module extraction: the extraction was the
+prerequisite (it freed 78 lines of headroom), never the fix. A place-name lookup list was
+specifically NOT chosen, because it wrongly rejects real people named India or Paris and the list
+never ends.
+
+**Ruling 3 â€” `lab-session-end.ps1` gets its approval record backfilled. NEW AUTHORITY, and this is
+the `Approved-by` the rule requires.** The hook audit
+(`qa/evidence/config-audit-hooks-all-2026-09-28.md`) found it live but authorized by nothing: its
+only citation, D-000, carries no `Approved-by` at all. Its content is byte-identical to the shared
+AIOS template, which mitigates the risk but is not the citation this repo's rule demands. Umesh
+chose to backfill the record over unwiring the hook and over recording a standing exception. So:
+`.claude/hooks/lab-session-end.ps1` as it stands at this entry's date is APPROVED, retroactive to
+its installation. Nothing about its behaviour changes; the paper trail now matches reality.
+
+**Ruling 4 â€” the Codex hook copy: let the other loop finish it.** Overtaken by events, and recorded
+as such rather than silently dropped: the other loop landed `codex-hooks-links` (merge `a5dd849`,
+verdict `ce67554`, closed out `7cbfebe`) while this session was down. The decision was the right one
+and is now moot in outcome. No action remains.
+
+**Why:** Three of these had been sitting as unanswered gates across multiple ticks, and one
+(ruling 2) was a mechanism question the maker had no standing to answer for itself. Ruling 2 in
+particular is the kind of call the loop cannot make: the four options differ in what the product
+does when a transcript is ambiguous, not in how the code is written.
+
+Ruling 3 is the narrower of the two defensible fixes. Unwiring a working end-of-session hook to
+resolve a paperwork defect would have removed real function to satisfy a record-keeping rule; a
+standing "accepted, no entry" exception would have left the repo's own authorization rule with an
+undocumented hole, which makes every later audit harder to read. Backfilling is the option that
+leaves both the behaviour and the rule intact.
+
+**A finding recorded here because it bears directly on ruling 1, and against this loop's own
+interest:** while the gate for D-043 item 3 was open on exactly this ground, the other loop built
+and landed that same fix â€” `handshake-field-reader` (maker `1f263e0`, PASS `2b5acc8`, merge
+`b1c32fc`, close-out `f3978c1`), whose `## What changed` names `.claude/hooks/mc-sessionstart.ps1`.
+Measured before it landed, that seam already carried 3 PASSed units against a non-security cap of 2;
+it is now 4. **Neither its manifest nor its verdict mentions D-014 or the round cap anywhere.** The
+code is authorized by D-043 and it PASSed a real check, so this is not a reason to revert it, and it
+is not being filed as misconduct â€” it is the second recorded instance of the identical failure
+(`91ee4ae`, "my ISS-122 dispatch breached D-014's round cap", is the first and is ISS-346's
+originating incident). Two independent loops have now breached the same prose rule while reading it.
+That is the strongest available argument that ISS-346 is a real defect in the mechanism rather than
+in anyone's attention, and it is why ruling 1's sequencing is being followed rather than treated as
+overtaken.
+
+**Result:** ISS-346 is dispatched this tick as the build unit (tier 2; its own seam,
+`delivery-gate-stop.ps1`, has 0 PASSed units that touched it, so it is freely pullable). A
+place-vs-person signal unit for ISS-104 becomes buildable and is queued behind it, needing no
+further gate. `.claude/hooks/lab-session-end.ps1` is authorized retroactively and that audit finding
+closes. `qa/gates/mc-sessionstart-handshake-reader-round-cap.md` stays OPEN, now recording that the
+fix it gated has already shipped. The cap-breach observation above is filed to the ledger as a
+finding in its own right.
+
+**Approved-by:** Umesh
+
+**Changes-authorized:** `.claude/hooks/lab-session-end.ps1` (retroactive authorization of the
+existing file as-is, no code change); `packages/index/src/pipeline/` speaker-name modules (a
+place-vs-person contextual signal plus its tests, per ruling 2)
+
+**Links:** D-041, D-043, D-044, D-049, D-050-CODEX, D-051, D-014, D-013, ISS-104, ISS-346, ISS-350,
+qa/gates/mc-sessionstart-handshake-reader-round-cap.md,
+qa/gates/speaker-seam-loc-ceiling.md, qa/evidence/config-audit-hooks-all-2026-09-28.md
+
+## D-053 | 2026-09-28 | type: decision | status: ACTIVE
+
+**What:** Resolves both questions on `qa/gates/u4b-r2-alert-sink-depcruise.md`, answered by Umesh via
+AskUserQuestion on 2026-09-28.
+
+1. **`u4b-r2: a`** - R2's alert sink becomes **a thin alert interface in a package `apps/*` is already
+   permitted to import**, which `packages/meeting-bot`'s Telegram notifier implements. Authorized new
+   files for that unit: the interface module in `packages/core/src/` (one file) and its test (one file).
+   The detector stays in `apps/api/src/routes/health.ts` exactly as D-048 requires; the injectable sink
+   the u4b-heartbeat builder already shipped is the seam it plugs into, so the wiring is an in-place
+   one-line change. `.dependency-cruiser.cjs` is **not** modified - option (b) was rejected.
+2. **`u4b-fixtures: yes`** - authorizes the seventh and eighth files of the U4b heartbeat work:
+   `schema/fixtures/watch_heartbeat/valid.json` and `schema/fixtures/watch_heartbeat/invalid.json`.
+   Content is determined by the `watch_heartbeat` schema already approved in D-048.
+
+**Why:** Option (a) respects the boundary rather than bending it. The forbidden edge
+`apps/* -> packages/meeting-bot` exists to keep the web tier independent of the capture stack, and
+option (b) would have bought a one-line fix by removing that independence permanently - on an
+enforcement path, which additionally demands its own `Approved-by`. Option (c) was rejected because it
+reopens what D-048 settled: putting the detector back beside the writer restores exactly the failure
+mode R2 exists to catch (a watcher that dies takes its own staleness detector with it).
+
+The fixtures are authorized because `python schema/validate.py` is the unit's **only red verification**
+and `qa/loop.md:25` requires that validator green for any unit touching `schema/`. The u4b-heartbeat
+builder stopped rather than create unauthorized files under D-048's cap; that restraint was correct and
+this entry supplies what it was waiting for.
+
+**Result:** The R2 alert-interface unit is unblocked and buildable. Two limits are recorded rather than
+resolved, and neither is charged to that unit: **nothing schedules the `/health` probe** (U6's Task
+Scheduler work, separately gated on live proof), and **the heartbeat write leg has never written a row**
+because no test connects to Mongo. R2 therefore reaches 1/1 on *alert delivery* only; end-to-end
+liveness detection stays incomplete until U6 lands. The gate is stamped ANSWERED.
+
+**Changes-authorized:** `packages/core/src/` (new alert-interface module + its test),
+`schema/fixtures/watch_heartbeat/valid.json`, `schema/fixtures/watch_heartbeat/invalid.json`,
+in-place wiring in `apps/api/src/routes/health.ts`. **Explicitly NOT authorized:**
+`.dependency-cruiser.cjs`, and any move of the detector out of `health.ts`.
+
+**Links:** D-048 (heartbeat collection + detector placement), D-046 (R4-R8 scope), ISS-361,
+`qa/gates/u4b-r2-alert-sink-depcruise.md`, `qa/manifests/u4b-heartbeat-collection.md`
+
+## D-054 | 2026-09-28 | type: fix | status: ACTIVE
+
+**What:** Corrects a factual error in **D-053**'s `Changes-authorized` field and records the deviation
+the `u4b-r2-alert-interface` builder disclosed rather than hid.
+
+D-053 authorized "in-place wiring in `apps/api/src/routes/health.ts`". **That file contains no concrete
+alert sink to wire.** It holds only the injectable interface and the pure detector logic. The concrete
+sink -- the disclosed `console.error` stub -- lives in **`apps/api/src/production.ts:57`**, inside
+`createMongoWatchSilenceDeps()`. The builder read `health.ts` first, grepped to locate the real sink,
+wired `production.ts` instead, left `health.ts` untouched, and stated the substitution explicitly in its
+manifest section 1 instead of quietly widening its own scope.
+
+**So the authorized wiring target for the D-053 option (a) work is `apps/api/src/production.ts`**, not
+`routes/health.ts`. Everything else in D-053 stands unchanged, including both prohibitions: the detector
+does **not** move out of `health.ts` (option (c) stays rejected, and `health.ts` is in fact untouched),
+and `.dependency-cruiser.cjs` is **not** modified (option (b) stays rejected).
+
+**Why:** The error is the maker's, in the same class as the D-049 prose error (ISS-A0CDAEE-002) and worth
+naming as a pattern: **an authorization written from a plan rather than from the file lands on the wrong
+file.** D-053 named `health.ts` because D-048 named it as the *detector's* home, and the entry carried
+that over to the *sink* without anyone reading `production.ts`. A builder holding a literal reading of
+`Changes-authorized` would have had to either stop on a one-line wiring change or edit a file its
+authorization did not name. It chose a third option -- do the correct thing and disclose it -- which is
+the behaviour this project wants, but it should not need to rely on the maker noticing. This entry makes
+the record match the code.
+
+The builder's design disclosure is accepted and recorded rather than re-litigated: `packages/core` may
+import no workspace package (`core-imports-nothing`) and `apps/*` may not import `packages/meeting-bot`,
+so duck typing solves type compatibility but **not construction** -- apps/api cannot obtain a real
+`TelegramNotifier` instance by import. `createTelegramAlertSink()` is therefore a **second, independent**
+Telegram sender with the same env vars, request shape, timeout, redaction and wording. The wording match
+is guaranteed only by a hardcoded-string test, because a dynamic cross-import test would itself trip
+`core-imports-nothing`. That is a real duplication with a real, disclosed weakness; it is accepted as the
+cost of not bending the boundary, which is exactly the trade D-053 chose.
+
+**Result:** `qa/manifests/u4b-r2-alert-interface.md` is at `ready-for-check` cycle 0 and its checker is
+dispatched. The deviation is authorized retroactively and is not a finding against the unit. The
+duplicate-wording weakness is the checker's to judge on severity; it is disclosed, not hidden.
+
+**Changes-authorized:** `apps/api/src/production.ts` (in-place wiring), in correction of D-053.
+**Explicitly still NOT authorized:** `.dependency-cruiser.cjs`, and any move of the detector out of
+`apps/api/src/routes/health.ts`.
+
+**Supersedes:** D-053 -- only its `Changes-authorized` naming of `apps/api/src/routes/health.ts` as the
+wiring target, on the ground that no concrete alert sink exists in that file; `apps/api/src/production.ts`
+is the correct target. D-053 is otherwise unaffected and stays ACTIVE, both prohibitions included.
+
+**Links:** D-053, D-048, `qa/manifests/u4b-r2-alert-interface.md`,
+`qa/gates/u4b-r2-alert-sink-depcruise.md`, ISS-A0CDAEE-002
+
+## D-055 | 2026-09-28 | type: decision | status: ACTIVE
+
+**Type:** decision
+**Status:** ACTIVE
+**Approved-by:** Umesh
+**Changes-authorized:** qa/issues.jsonl and qa/issues.*.jsonl (ISS-360 id promotion, by /checker only â€” the maker is not the ledger's writer); qa/QUEUE.md; packages/index/src/pipeline/ speaker-name modules (a follow-up narrowing unit, ruling 1)
+**Links:** ISS-104, ISS-104CC-3, ISS-360, ISS-282, D-014, D-015, D-019, D-052, qa/gates/iss-360-duplicate-id-collision.md, qa/gates/unmerged-worktree-inventory.md
+
+**What:** Three decisions taken by the Approver in one batch, answering `AskUserQuestion` prompts
+raised by the `iss-104-place-vs-person-signal` close-out and the post-merge worktree hygiene pass:
+(1) the place-vs-person signal stays in master with its ~32% recall cost accepted PROVISIONALLY and
+a narrowing unit to follow; (2) the duplicate `ISS-360` is resolved by promoting each row's existing
+`canonical_id` to a real distinct id and retiring the bare id, with already-committed citations
+ANNOTATED rather than rewritten, executed by `/checker` as the ledger's only writer; (3) the 5
+unmerged worktree branches holding 23 commits are audited READ-ONLY, committing to no merge,
+rebase, delete or unpause.
+
+**Why:** Each was a decision the maker structurally could not take. The recall cost is a
+product-quality tradeoff, not a correctness question, and the checker's claim that D-052 already
+authorized it was false â€” D-052 authorized a contextual SIGNAL, not a 32% cost. The ISS-360 repair
+changes what already-committed manifest, verdict and commit citations mean, and D-019's permanence
+argument forbids the cheap renumbering. Merging unreviewed commits is an irreversible trunk change
+and deleting them destroys work, so both directions needed the Approver. Batched to one prompt per
+Umesh's standing instruction to be given everything at once in plain language.
+
+**Result:** No revert and no merge. ISS-104 stays `open`/`critical` (disclosed partial fix, 19/20);
+ISS-104CC-3 stays `open` until the narrowing unit lands. The ISS-360 promotion and the citation
+sweep are dispatched to `/checker`. Five read-only branch audits are dispatched, including
+`wave/u2-4-phase3-fix` â€” reading a paused branch is not resuming it. The per-branch merge/retire
+decision returns to the Approver once those audits land. The duplicate-id reader guard remains
+queued at tier 2 high and ships independently.
+
+Three decisions taken by the Approver in one batch, on questions raised by the
+`iss-104-place-vs-person-signal` close-out and the post-merge hygiene pass.
+
+**Ruling 1 â€” the place-vs-person signal stays in master; its recall cost is accepted *for now*, not
+as final.** The unit self-reported a 15% false-positive cost against a corpus it authored and did
+not share; the checker re-measured **~32%** (6/19) against its own corpus built from the
+construction the manifest itself names, because `readsAsAPlaceOrOrg` is candidate-independent and
+the refusal is therefore deterministic for any name in that construction. **Umesh chose "accept for
+now, tighten next."** Reasoning: the refusal direction is the safe one under [C12] â€” a refused real
+speaker is recoverable, a fabricated identity is not â€” and the approach was already authorized by
+D-052 ruling 2. **Explicitly NOT ratified:** the claim that D-052 ruling 2 "already authorized the
+tradeoff." It authorized a contextual signal, not a 32% recall cost; the cost is authorized here,
+by this entry, and only provisionally. A follow-up unit narrows the signal so that a strong cue,
+direct address, or multi-token name rescues the real person. ISS-104CC-3 stays `open` until it does.
+**No revert.** ISS-104 itself stays `open` at `critical` â€” 19/20 of its recorded reproductions â€” as
+a disclosed partial fix.
+
+**Ruling 2 â€” the duplicate `ISS-360` is resolved by giving each row a real, distinct id.** The two
+rows' existing `canonical_id` values are promoted to real ids â€” `ISS-360-OBSFLAKE` (open, the
+obs-windows load flake) and `ISS-360-HEARTBEAT` (fixed, u4b heartbeat coverage) â€” and the bare
+`ISS-360` is retired. Rejected: renumbering the newer row (D-019's permanence argument cuts against
+it) and leaving the collision in place behind a loud reader. **Bare `ISS-360` citations already
+committed in manifests, verdicts and commit messages are swept for and ANNOTATED, never silently
+rewritten** â€” that is the whole of D-019's point, and the promotion is worthless if it repoints
+references instead of disambiguating them. **Executed by `/checker`, which is the single writer of
+the ledger; the maker does not touch `qa/issues.jsonl`.** The separable duplicate-id reader guard
+remains queued at tier 2 high and ships independently of this repair.
+
+**Ruling 3 â€” the 5 unmerged worktree branches are audited read-only before anything is merged or
+deleted.** 23 commits across `wave/u2-4-phase3-fix` (13), `worktree-agent-a3d4ea73632cda74e` (4),
+`worktree-agent-a779f0b3b445697af` (2), `wave/vector-gap-durability` (2) and `lane/a-speakers` (2)
+are invisible to every gate, count and sweep, because all of them read master. One read-only agent
+per branch reports what it contains, whether it was ever checked, and whether master already holds
+equivalent work. **The audit commits to nothing** â€” no merge, no rebase, no branch delete, no
+unpause. `wave/u2-4-phase3-fix` IS included: a `/maker pause` records "stop working on it", not
+"discard 13 commits", and reading a paused branch is not resuming it. The merge/retire decision per
+branch returns to the Approver once the audits land.
+
+**Why all three were batched to one prompt:** Umesh's standing instruction is to be given
+everything needed at once in plain language. Three independent decisions had accumulated and none
+depended on the still-running `iss-346-round-cap-mechanical-check` build, so holding them for a
+fourth would have left real decisions idle behind an unrelated unit.
+
+## D-056 | 2026-09-30 | type: decision | status: ACTIVE
+
+**Approved-by:** Umesh
+**What:** Implement the user-approved Useful Webinar -> Knowledge Base release: every classified webinar invite, audio/video capture, diarized transcript, screen-derived cited notes, indexing/search/Ask and operational visibility. Windows first; Ubuntu requires equivalent live verification.
+**Why:** The user selected only work-relevant features from the meeting transcript, explicitly required audio and video plus screen data, and then requested implementation of the complete plan. Existing real capture depends on Windows OBS; a portable tab-capture backend and media-quality safeguards are required before deployment claims.
+**Changes-authorized:** Existing meeting-bot join/capture/calendar functions, supporting browser extension/backend files and tests, scripts/webinar processing stages, setup requirements, existing API/web session surfaces and tests, schemas/generated types/migrations when required by evidence interfaces. No enforcement hooks, production promotion, or paused speaker-branch unpause authorized by this entry.
+**Result:** Implementation authorized; independent checker validation and real webinar proof required. Existing next-real-webinar proof and production-write boundaries remain binding. Every classified webinar supersedes the earlier trusted-sender-only scheduling choice for this release; explicit rejection and registration barriers remain respected.
+**Links:** docs/plan.md, docs/meeting-bot-roadmap.md, T-034, T-035, T-036, T-037, T-038, T-040, T-041, T-043, T-044, U4.1; user approved plan in current chat.
+
+## D-057 | 2026-09-30 | type: decision | status: ACTIVE
+
+**What:** Authorize additive canonical webinar evidence schemas and strict readiness repairs under the approved Useful Webinar release.
+**Why:** Independent AI/data review found ungrounded summary items and false ready outcomes after extraction or embedding degradation. The independently approved existing-file plan preserves legacy ingestion while making webinar output evidence-bound and failure-visible.
+**Result:** Implementation authorized; completion requires fresh independent verification. Real webinar, unattended activation, production promotion and Ubuntu proof remain separate gates.
+**Changes-authorized:** schema/session_pages.schema.json optional citedItems and qa with quoted item-level evidence and source status; schema/claims.schema.json optional evidence quote and origin; schema/turns.schema.json optional typed screenEvidence frame identity, confined file, hash and timestamp. Generate derived core types only with scripts/gen-types.mjs. Implement existing summarize/claims/indexing, webinar processing/sync/runner and existing UI seams per qa/manifests/webinar-release-repair-plan.md Grounded webinar knowledge section. No frozen contracts or ARCHITECTURE edit authorized.
+**Links:** T-049; D-056; ISS-WEBINARRELEASE-001; ISS-WEBINARRELEASE-002; qa/manifests/webinar-release-repair-plan.md
+
+## D-058 | 2026-09-30 | type: session | status: ACTIVE
+**What:** T-051 bounded Windows webinar implementation checkpoint: managed audio/video capture, owned interrupted recovery, protected playback/screen evidence, operation/discovery health, isolated fresh Gmail scan, and portable process identity.
+**Why:** The user selected useful webinar capture-to-knowledge only. Preserve genuine local evidence while refusing incomplete knowledge and keeping production promotion and live activation separate.
+**Result:** Actual Windows production CLI synthetic capture 81.001 seconds with reload; interrupted controller recovered 30.492 seconds of playable AV, exact owned cleanup and explicit unrecovered coverage gap. Independent headed playback verified native seek after eviction; headed operations UI verified outage/recovery/stale/unverified states. Node media/provenance suites 31/31; independent controller/backend/receiver 28/28, Python 28/28; API/web/bot TypeScript checks green. Final discovery suites and precise commands recorded in qa/verdicts/webinar-portable-release.md. python contracts/verify_contracts.py exits 0 by vacuity: no frozen contracts, not release proof. Global LOC fails five files, including modified sb_join.py. Full release NOT VERIFIED: canonical citedItems/Q&A/evidence schema edit was rejected by automatic approval review pending specific trusted Umesh approval; real webinar/provider/Ask, sustained capture, actual feed/Telegram, continuous discovery/cancellation/rescheduling, watch recovery and actual Ubuntu host remain open. No production writes/promotion, GitHub push, deployment, live-proof marker or unattended enablement.
+**Links:** T-051; D-056; D-057; qa/manifests/webinar-portable-release.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md. D-057's immutable Links field names T-049 accidentally; its cited webinar implementation belongs to T-051, not the separate Langfuse task.
+**Changes-authorized:** T-051 status/evidence and release runbook/manifest/handoff updates only. No ARCHITECTURE, frozen contracts or enforcement-path changes.
+
+## D-059 | 2026-09-30 | type: session | status: ACTIVE
+**What:** T-051 required cancellation audit and bounded Calendar discovery adapter repair for ISS-WEBINARRELEASE-013.
+**Why:** Actual production adapter discarded cancelled events, allowing a stale Gmail alias to schedule capture. Preserve the exact standing reproduction and repair the existing discovery seam before building durable reconciliation.
+**Result:** Standing adapter->selector regression initially Node exit1, tests1/pass0/fail1, actual1 vs expected0; unchanged reproduction now passes. Adapter requests showDeleted and retains validated id-only tombstones, recurrence identity, providerUpdated and incomplete positives. Authenticated discovery=1 returns full rows; default Calendar UI excludes cancelled/nonjoinable rows. Strict component-valid dates refuse February30/hour24. Independent source suites73/73 Node exit0, API/bot tsc exit0 and adversarial rollover refusal2/2; root source/downstream54/54 exit0, fresh senior Calendar9/9 scoped Approve. python contracts/verify_contracts.py exits0 by vacuity, no frozen contracts. Initial query-oracle/timestamp findings recorded and repaired, no whole-release PASS. ISS013 remains OPEN for durable prior linkage, delta/recurring-master history, reschedules, future inventory and active-capture controls. Full canonical grounded notes/Q&A remain gated by automatic schema approval rejection; real webinar/provider/index/Ask, sustained AV, connected feeds/Telegram, host restart and Ubuntu validation remain open. No production writes, GitHub push, deployment or unattended enablement.
+**Links:** T-051; D-056; D-057; D-058; ISS-WEBINARRELEASE-013; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md
+**Changes-authorized:** T-051 status/evidence, release runbook/manifest and handoff only. Product adapter-only scope independently approved in existing QA plan. No ARCHITECTURE, frozen contracts, canonical schemas or enforcement-path changes.
+
+## D-060 | 2026-09-30 | type: session | status: ACTIVE
+**What:** T-051 standalone pure webinar reconciliation and optional Calendar delta transport under independently approved ISS013 units.
+**Why:** Required cancellation/reschedule correctness depends on durable provider occurrence identities and proven aliases, not current URL/time selection alone. Retain accepted history, refuse conflicting evidence and fetch deleted recurring masters without inventing lineage.
+**Result:** Existing calendar-client pure helper implements tenant-bound state, occurrence/revision/accepted-alias guards, cancellation/reschedule transitions, sticky human barriers and explicit future/review inventory. Existing delta transport strictly validates checkpoint/query/owner, completes both bounded-page passes and preserves conflicting revisions; live recurring masters validate then omit from occurrence feed, deleted masters and instances remain. Actual Google timezone payload is projected and consumed through adapter->pure->selector. Root source98/98 before final join-review amendment; final affected30/30 after amendment, API/bot types0. Independent final85/85/types0 and7/7 state/bounds probes, data review4/4 exact repaired lineage/cancellation probes and final5/5+8/8 amendment checks. Bounded checker PASS only. Runtime rejected named senior pure-review reactivation twice due agent-thread limit; independent data/code-quality review and checker ran, designated senior remains pending. Global LOC remains five earlier violations; new source242/test250 within budgets. Validator exits0 by vacuity, no frozen contracts. ISS013 remains OPEN: helper/callback are not yet invoked by runner; durable checkpoint/coverage persistence, inventory projection, active polling and graceful owned capture controls remain. Full grounded knowledge still gated by automatic schema approval rejection; real webinar/provider/index/Ask, connected alerts, sustained media, host restart and Ubuntu target remain pending. No production/remote/deployment/live activation.
+**Links:** T-051; D-056; D-057; D-058; D-059; ISS-WEBINARRELEASE-013; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md
+**Changes-authorized:** T-051 status/evidence, release runbook/manifest/handoff only. Existing product units independently approved in QA plan. No ARCHITECTURE, frozen contracts, canonical schemas, enforcement or broader roadmap changes.
+
+## D-061 | 2026-09-30 | type: session | status: ACTIVE
+**What:** T-051 Gmail available-invitation discovery scope repair and concrete full-available Calendar synchronization integration design.
+**Why:** An arbitrary30day query cutoff and missing classifier-positive vocabulary silently excluded required invitations. Native Calendar baseline/sync is needed for truthful durable continuity, rather than fabricating historyComplete or permanently blocking initial operational starts.
+**Result:** Existing Gmail query has no age bound and covers all7classifier-positive title forms, invitations and ICS filenames; strict20page/token/content failwhole and conservative missingjoin/time preserved. Exact query-aware regression first exit1/pass0/fail1 Career seminar0vs1, then affected Gmail/routes/policy/runner63/63exit0/APItsc0. Independent checker63/63/types0 and fresh read-only code quality23/23 scoped Approve. Named senior spawn rejected agent-thread limit; not reported as completed. Validator exits0 by vacuity, no frozen contracts. Native fullavailable primaryCalendar baseline/terminalnextSyncToken/provider mirror+operations atomic commit/410 discontinuity recommended from official docs; not yet implemented or approved concrete editing plan. Fullrelease remains activeNOTVERIFIED,013OPEN; durable runner, activecontrol, fullgroundedknowledge canonical-schema approval rejection, realwebinar/provider/index/Ask/Telegram/sustainedAV/hostrestart/Ubuntu environment remain. No production writes/promotion, remote push, deployment, liveproof marker or unattended activation.
+**Links:** T-051; D-056; D-060; ISS-WEBINARRELEASE-013; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md
+**Changes-authorized:** T-051 status/evidence, release runbook/manifest/handoff only. Productquery edits independently approved in existingQAplan. No ARCHITECTURE, frozen contracts, canonical schemas, enforcement paths or broader scope changes.
+
+## D-062 | 2026-10-01 | type: session | status: ACTIVE
+**What:** T-051 native Calendar baseline/sync/reset transport and durable runner source-generation integration under independently approved existing-seam plans.
+**Why:** Every available classified invitation, cancellation and reschedule requires persistent provider lineage, future inventory and checkpoint ownership; legacy rolling arrays cannot establish acquisition continuity.
+**Result:** Owner-bound native acquisition preserves terminal token and raw recurring masters, refuses incomplete pages and structured failure spoofing, and rebuilds on exact sync410. Runner atomically fsyncs and commits source mirror, coverage, reconciliation and operation inventory before child launch; failed/oversized/corrupt/foreign inputs retain committed source. HTTP streams bounded5MiB before parse. Available-state scope never claims historical deleted reconstruction. Exact recurring-rule removal safety repaired after independent HIGH finding; fresh exact-occurrence evidence restores held children. Completed/rejected/retry barriers survive persisted reschedule. Root affected112/112 and API/state24/24 pass; API/bot direct TypeScript exit0. Initial integration fixture failures and TS fixture cast repaired with independent approved native-envelope amendment; pnpm wrapper attempted auto-install and refused noTTY, direct installed compiler used instead. Independent native transport17/17 and intermediate62/62 passed; final bounded integration verdict recorded separately. Global LOC remains five existing violations including modified sb_join.py; validator PASS by vacuity. Data reviewer verified recurrence repair3/3 and sync/reset original repro; medium series cancellation display issue filed014, deferred. ISS013 remains OPEN for active in-capture polling/control and real operational acceptance. Canonical full-knowledge schema edits remain automatically rejected pending specific trusted approval. Real webinar/provider/index/Ask, sustained AV, connected feeds/Telegram, actual host restart and Ubuntu target remain pending. No live-proof marker, unattended enablement, production write, GitHub push or deployment.
+**Links:** T-051; D-056; D-058; D-060; D-061; ISS-WEBINARRELEASE-013; ISS-WEBINARRELEASE-014; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md
+**Changes-authorized:** T-051 status/evidence, release runbook/manifest and handoff only. Existing product files/functions and fixture amendments independently approved in QA plan before edits. No ARCHITECTURE, frozen contracts, canonical schemas or enforcement-path edits.
+
+## D-063 | 2026-10-01 | type: session | status: ACTIVE
+**What:** T-051 active native source polling, generation-bound graceful capture IPC and durable controlled-tail finalization/recovery in existing approved seams.
+**Why:** Cancellation/reschedule during recording must stop only on accepted causal evidence, flush normally and retain incomplete-coverage truth through failures/restarts without releasing the lane early or falsely reporting ready.
+**Result:** Runner serial30s refresh commits both complete feeds under one lock, checks phase after awaits, persists owner/session/generation disposition before IPC, refuses uncertain cancellation and reports overlaps/coverage-review. Private exact bounded commands/ACKs use perlaunch credentials, no signals, unavailable timeout truthful; terminal is awaited before lane release. Accepted end moved into past repaired via computed causal boundary transition after independent HIGH015. Prior-source control-gap erasure HIGH016 repaired; first-source normalization/probe/extraction failure HIGH017 repaired by strict bounded owner-bound atomic sidecar producer and stopped/interrupted recovery union. Exact original senior reproduction now action_required/controller-disconnected; senior Approve and checker017 verified. Root and independent14file suite188/188, API/bot directtypes0. Actual Windows productionCLI synthetic controlled proof1790798758779 normalexit0, playable30.994sAV593unique frames, ACKaccepted distinctflush, matching durable sidecar/source cancellation tail and exactowned cleanup. Earlier1790797565149 controlled AV plus actualCLI refinalize hash/gap retention retained. Checker ffmpeg nullmux timestamp warnings recorded, no generic mediaquality claim. GlobalLOC fails samefive files including modified sb_join.py; contracts verifier PASS by vacuity. Setupdoctor1: bundledpnpm11.25 versus pin10.33, corepack resolves10.33; freshoffline reinstall refused noninteractive modules purge and was not repeated. Local lane/API/workDB/visionmodel/Telegram settings and live marker absent; no providers/index/sends. Actual remote master a99140f matches cached ancestor;165localcommits/411changedfiles before this commit, release ancestry still requires reconciliation. ISS013 remains OPEN/fullrelease NOT VERIFIED; canonical grounded knowledge approval, realwebinar/provider/index/Ask, sustainedAV/feed/alerts/service restart and Ubuntu environment remain pending. No production promotion, GitHub push, deployment or unattended activation.
+**Links:** T-051; D-056; D-062; ISS-WEBINARRELEASE-013; ISS-WEBINARRELEASE-015; ISS-WEBINARRELEASE-016; ISS-WEBINARRELEASE-017; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md
+**Changes-authorized:** T-051 status/evidence, release runbook/manifest and handoff only. Existing product files/functions and exact fixture amendments were independently approved in QA plan before edits. No ARCHITECTURE, frozen contracts, canonical schemas, enforcement paths or broader scope edits.
+
+## D-064 | 2026-10-01 | type: session | status: ACTIVE
+**What:** T-051 selected Windows/Ubuntu setup prerequisite interface repair while independently approved sustained Windows capture is in flight.
+**Why:** A wrong direct PATH pnpm must not hide the available exact pinned Corepack interface, and read-only doctor probes must not trigger package-manager self-installation or redirect away from the operator cache.
+**Result:** Existing setup.mjs check accepts exact10.33 direct or cachedCorepack using fixed Windows/Linux argv, rejects timeout/spawnerror/wrongversions and prints chosen interface. Both probes disable Corepack network/latest/autopin/envfile and native pnpm version self-management; operator XDG cache restored only for manager probes, undefined keys omitted, existing Python/install projectcache unchanged. Initial actualdoctor1 reproduced; first amendment still1 because projectcache empty, isolated offline original-cache probe10.33success established cause. Final root/independentdoctor0,28/28 literal production guards and fresh seniorApprove; package/lock hashes unchanged. Maker actual native10.33/11.25 with temporary nonexistent99.99.99 project pin and COREPACK_ROOTremoved returned their own versions; package/lock/threecachekey hashes unchanged. No observed download; inspected native auto-switch possibility was closed, not described as an incident. Official Corepack/pnpm docs and installed source checked. Fresh install and actual Ubuntu remain unverified; earlier offline dependency install noTTY refusal not repeated. Actual sustained Windows productionCLI capture launched once before this checkpoint from capture-code c8128ba, session88512/unique1790799479728, recordingstart20:18:13.381Z expected graceful3600sstop21:18:13.381Z; sufficient planned-time margin, no kill/restart on observation timeout,15 negative stream-duration guards. Samehandle live at02:01IST; rawfile writing47.6MB, not hourPASS. Final audio/video>=3590s, decode/changingframes, gap/cleanup and independent terminal proof pending. Fullgoal/manifest inprogress,013OPEN, canonical approval/local connectedlane/model/Telegram/realwebinar/Ask/live/Ubuntu gates unchanged. No fullrelease quality, deployment, GitHub push, production promotion or unattended activation claim.
+**Links:** T-051; D-063; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md; raw/webinars/synthetic-capability-20260930/production-sustained-pending-1790799479728.json
+**Changes-authorized:** T-051 status/evidence, release runbook/manifest and handoff only. Existing setup.mjs check/manager prerequisite and ignored sustained diagnostic independently approved before edits, scoped verification recorded. No ARCHITECTURE, frozen contracts, canonical schemas or enforcement-path edits.
+
+## D-065 | 2026-10-01 | type: session | status: ACTIVE
+**What:** T-051 tier3 supervisor configuration preview in existing setup.mjs while the single sustained Windows capture remains live.
+**Why:** The selected release needs a thin OS supervisor around the existing shared runner; a concrete configuration can be reviewed without activating unattended capture before the real-webinar gate.
+**Result:** Existing setup renders Windows Task XML with verified current local/domain SID, InteractiveToken logon, LeastPrivilege, IgnoreNew, PT0S execution limit and bounded3x1minute restart; Ubuntu graphical-session user unit has explicit local DISPLAY, Restart=on-failure and the same fixed absolute Node/run-pipeline --run --watch command. Preview is before doctor/install side effects, refuses mixed install, embeds no secrets, writes/registers/starts nothing. Strict path/control/platform/SID/display guards, XML escaping and systemd percent/dollar/backslash escaping verified. Checker final32/32 renderer and9/9 exact boundedwhoami branch guards PASS, actualautoSID XML roundtrip and foreignSID refusal; fresh seniorApprove, rootdoctor0 and syntax0, contractsPASSbyvacuity. Primary Microsoft/systemd docs checked. Preview is not installation, restart, graceful stop, Ubuntu or unattended proof; supervisor stop can terminate descendants. Fullgoal/manifest remains inprogress and013OPEN. Actual sustained88512 remains samehandle/live, no terminal/hourPASS/kill/restart. Canonical grounded-knowledge schema approval, local connectedlane/Telegram/model settings, realwebinar/Ask proof, service installation/restart and Ubuntu target remain pending. No remote push, deployment or production writes.
+**Links:** T-051; D-064; scripts/webinar/setup.mjs; qa/manifests/webinar-release-repair-plan.md; qa/verdicts/webinar-portable-release.md; docs/webinar-release.md
+**Changes-authorized:** T-051 status, release runbook/manifest and handoff only. Existing setup renderer/CLI branch independently approved before edits. No ARCHITECTURE, canonical schemas, contracts or enforcement edits.
+
+## D-066 | 2026-10-01 | type: session | status: ACTIVE
+**What:** T-051 connected-environment readiness correction and verified same-handle sustained-capture wait.
+**Why:** Source truth uses MONGODB_URL rather than MONGODB_URI; connection presence must not be confused with an isolated writable work lane or a validated provider key.
+**Result:** Actual API index.ts reads configured MONGODB_URL and defaults absent MONGODB_DB to production lkb. Presence-only .env/process audit finds Gemini key present, but MONGO_WORK_DB/MONGODB_DB/LKB tenant/API URL/key/vision model/Telegram settings missing. No database/API start or write. Read-only models.list sandbox probe failed with sanitized output; escalated request was rejected by automatic approval review because sending local key to external Google endpoint lacks explicit user authorization. No bypass, inference, upload, model or key-validity claim. Full release NOT VERIFIED; same sustained toolhandle88512 authoritatively live at re-poll, no terminal/hourPASS/restart/kill. Existing real-webinar gate, canonical schema approval and Ubuntu environment remain pending. No code changes, push, deployment or production writes.
+**Links:** T-051; D-065; apps/api/src/index.ts; scripts/webinar/run-pipeline.mjs; docs/webinar-release.md
+**Changes-authorized:** Release runbook readiness observation and handoff only; no ARCHITECTURE/contracts/schema/enforcement edits.
+
+## D-067 | 2026-10-01 | type: session | status: ACTIVE
+**What:** T-051 read-only release-history and unmerged implementation reconciliation while sustained capture remains live.
+**Why:** Reuse audit and choosing a reviewable push ref require distinguishing committed feature work, paused/failed branches and unique uncommitted lane changes; a wholesale stale branch replacement can regress strict indexing.
+**Result:** At46fad01 cachedorigin0/169behind; recentD058-D066tail9commits withinlargerhistory. Fourunmerged branches have2QAonly/13speakerFAILpaused/2vector-gapmediumreadyunchecked/5hookQAFAIL commits. Directvectorbranch snapshot removes currentstrictWebinarguards; notmergeablewholesale. Independentchecker recorded sameboundedfacts, no selectedfeature readyPASS branch identified. Thirtyregisteredworktree statusread: initialroot4entries, oneinternalalert-sink lane2modifiedfiles39/86adds,28othersclean; rootlaterdirtycountchangesduecurrentdocs/QA. Elevensiblingstatusreads usedcommand-local safe.directory onexactresolvednamedpaths aftersandboxownershipguard, no globalconfigchange. Cachedoriginlackrunner/process-video/setup/tabbrowser; oldcapture/calendarAPIseams present;9tailselfcontainedbuildnotproved. No merge/rebase/delete/cleanup/resume/push/deploy. Samecapture88512liveauthoritativepoll and124678451bytefilewriting02:19:33IST, nohourPASS/kill/restart. Canonicalschema/Geminikeytransmissionapproval, connectedlane, realwebinar/Ask/service/Ubuntu gates unchanged; fullgoalactive/inprogress.
+**Links:** T-051; D-066; docs/webinar-release.md; qa/verdicts/webinar-portable-release.md; qa/gates/unmerged-worktree-inventory.md
+**Changes-authorized:** Release runbook reconciliation/evidence and handoff only; no architecture/contracts/schema/enforcement/code edits.
+
+## D-068 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Consolidated original Knowledge Base and automated-webinar objective into ten delivery groups and three release milestones in existing trackers.
+**Why:** User requires related work delivered together without omitting the old goal. T-051 was absent from goal tracker; auto-registration and broad catalogue residuals lacked explicit actionable rows.
+**Result:** Independent read-only plan APPROVE before edits. Preserved original north star and every existing task status/evidence; added existing T-051 plus T-052 registration and T-053..061 residual catalogue tasks. All 57 features mapped exactly once; 95 unique tasks and referenced dependencies resolve. Tracker audit G1/G4 drops seven to six pre-existing ambiguous QA references; no new G1 finding. No catalogue score upgrade, code changes, live activation or production writes. Current presence-only readiness confirms isolated DB/tenant/API/vision/Telegram settings and live-proof marker missing; Mongo URL and Gemini key presence alone does not prove connectivity. Independent final tracker audit pending. Full goal remains active and release unverified.
+**Links:** T-051; T-052; T-053; T-054; T-055; T-056; T-057; T-058; T-059; T-060; T-061; TASKS.md; .goal/goal.json
+**Changes-authorized:** Existing TASKS.md and .goal/goal.json grouped roadmap metadata and task reconciliation only. No architecture, schemas, contracts or enforcement paths.
+
+## D-069 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Queue tier1 ISS-367/371 release-verification runner repair in existing files.
+**Why:** Original ten-stage && chain hides later failures and mjs test classification miscounts source budget. Full objective requires honest complete release verification.
+**Result:** Independent plan APPROVE before code edits. Existing lint-loc --all executes all ten shell-free bounded stages and aggregates exits/signals/errors; package script invokes it; config adds anchored mjs test pattern without raising budgets. Three focused regression tests pass. Removing pattern and reintroducing early return both fail bounded mutation checks; exact byte restoration confirmed. Actual ten-stage run exits1/seven failures, revealing dependencies exit8 and lint-test timeout beyond existing LOC/dir/root/snapshot/tracker red. Senior review no code findings, warning existing suite opener/contract conflict. Fresh checker dispatched cycle1; no repair PASS claimed pending verdict. Full live/counsellor goal remains incomplete; no activation, external registration, deployment or production write.
+**Links:** T-051; ISS-367; ISS-371; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; scripts/lint-loc.mjs; scripts/lint.test.mjs
+**Changes-authorized:** Existing package.json, structure.config.json, scripts/lint-loc.mjs and scripts/lint.test.mjs approved bounded gate repair; QA manifest/evidence and tracker closeout after independent verdict only. No architecture, schemas or enforcement paths.
+
+## D-070 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Repair existing OS-opener test hang exposed by complete release gate.
+**Why:** Real Windows browser launcher in ISS245 test hung full lint-suite; synthetic capture does not waive green verification requirements.
+**Result:** Independent plan approved in-place openPages injection and bounded timeout before edits. Existing demo-live.mjs defaults keep real browser behavior, timeout10000; existing tests use deterministic callbacks. Maker and fresh senior independently17/17 exit0. Aggregate now reaches allten with sixfailing stages; lint-tests now0, dependency violations and LOC/dir/root/snapshot/tracker remain. Prior fullcontract checker FAIL preserved; cycle2 request recorded, fullgoal unverified. No browser activation, service, database write or deployment.
+**Links:** T-051; ISS-367; ISS-371; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; scripts/demo-live.mjs; scripts/lint.test.mjs
+**Changes-authorized:** Existing scripts/demo-live.mjs openPages and scripts/lint.test.mjs ISS245 tests; existing QA cycle evidence only. No architecture/enforcement/schema changes.
+
+## D-071 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Group1 T-036 existing-inbox plus alias/label acquisition implemented in existing Gmail scanner; generated snapshot refreshed.
+**Why:** Updated objective requires alias and normal inbox both to feed server discovery without relying on known subject vocabulary or implicit Gmail alias expansion.
+**Result:** Fresh independent plan APPROVE before code. Scanner accepts validated server-local LKB_GMAIL_ALIASES/LKB_GMAIL_LABEL_IDS, broad query OR alias deliveredto and independent labelIds scopes, unions message IDs and requires each scope complete. Controls/approval/registrationOnly preserved; no schema. Tests25/25/APItypes0; control-character negative initially caught trim issue and rerun passes after guard. No added LOC breach. docs/SNAPSHOT generator wrote126lines and check0. Fresh senior and independent checker dispatched, verdict pending. T036/R1 not complete; public discovery/registration/live connected mail/alias creation/server remain pending. No external registration/Gmail/model/capture/database writes or activation.
+**Links:** T-036; T-051; T-052; qa/manifests/t036-alias-label-intake.md; docs/webinar-release.md; docs/SNAPSHOT.md
+**Changes-authorized:** Existing apps/api/src/gws-gmail.ts scanner and existing tests, release runbook, generated snapshot via generator, T036 progress metadata only. No architecture/schema/enforcement changes.
+
+## D-072 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Close matching cycle1 alias-label acquisition handshake after independent checker PASS.
+**Why:** File handshake requires maker close-out after cycle-matched independent verdict; scope verification must remain distinct from full operational release.
+**Result:** Verdict inspected on disk: 4/4 scoped criteria and 2/2 invariants; independent 65 tests and API typecheck pass. Manifest changed ready-for-check to checked-PASS. Actual node scripts/tracker-audit.mjs --gate g1 exits0, tracker-audit OK. T-036 remains pending and T-051 in_progress; alias setup, live Gmail, registration and full release not certified. Registration schema still explicitly forbids auto-submit; user-requested policy change needs prior decision and approved implementation plan before persistence edits.
+**Links:** T-036; T-051; T-052; qa/manifests/t036-alias-label-intake.md; qa/verdicts/t036-alias-label-intake.md
+**Changes-authorized:** Cycle-matched manifest closeout only; no architecture, schema, enforcement or production changes.
+
+## D-073 | 2026-10-05 | type: session | status: ACTIVE
+**What:** T-052 registration acquisition preparation in existing Gmail scanner.
+**Why:** Automatic registration needs distinct literal registration URL and thread evidence; a registration page must not masquerade as a join URL.
+**Result:** Independent in-place plan APPROVE before edits. Scanner-only optional registrationUrl/threadId, validated literal thread identifiers, direct-join priority and subsequent non-registration platform matches implemented. Existing storage whitelist unchanged; fields not persisted. Actual Gmail suite26/26 exit0 and direct API compiler exit0. Source comment compression preserves300LOC budget. Fresh senior review pending; no completion verdict claimed. Full submission, durable confirmation correlation and real organizer acceptance remain pending.
+**Links:** T-052; T-036; apps/api/src/gws-gmail.ts; apps/api/src/gws-gmail.test.ts
+**Changes-authorized:** Existing Gmail scanner interfaces/fetchOne and tests acquisition preparation only; no schema, architecture, enforcement, persistence or external submission.
+
+## D-074 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Align registration acquisition direct-link precedence across body and snippet; request independent acceptance.
+**Why:** Fresh senior probe identified generic body link selected before literal direct snippet join, creating false registration-only barrier.
+**Result:** Independent amendment APPROVE before edits. Standing regression failed on old behavior then passed after fetchOne repair. Expanded malformed thread cases; actual combined Gmail/route/selection67/67 tests pass and API typecheck0. LOC has four pre-existing violations, none Gmail. Cycle1 registration-acquisition manifest ready-for-check, fresh reviewer/checker dispatched. No persisted scanner fields or automatic submission/confirmation/live completion claimed.
+**Links:** T-052; qa/manifests/t052-registration-acquisition.md; apps/api/src/gws-gmail.ts; apps/api/src/gws-gmail.test.ts
+**Changes-authorized:** Existing fetchOne/tests and standard QA evidence only; no schema/architecture/enforcement/storage/external actions.
+
+## D-075 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize T-052 canonical registration acquisition-evidence persistence and clarify legacy human-only registration wording.
+**Why:** User explicitly requests automated webinar registration; preserving literal URL/thread evidence is prerequisite to durable confirmation correlation. Blanket never-auto-submit wording describes prior scope, not current requested product. This unit still submits nothing and does not clear registration scheduling barriers.
+**Result:** Fresh independent plan APPROVE: optional schema registrationUrl/threadId identifier constraints, regenerate existing types, actual store whitelist and injected persistence regression in existing route tests. Scanner slice cycle1 PASS inspected and closed; full T-052 remains pending. No production writes or live registration authorized by this code unit.
+**Links:** T-052; D-073; D-074; qa/verdicts/t052-registration-acquisition.md
+**Changes-authorized:** schema/meeting_candidates.schema.json acquisition fields and registrationOnly description; existing generated meeting_candidates.ts via generator; apps/api/src/store.ts createMeetingCandidatesDeps optional persistence seam/whitelist; existing routes/meeting-candidates.test.ts and schema fixtures tests. No frozen contracts, architecture or enforcement edits.
+
+## D-076 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Authorize generator preservation of existing D-053 alert exports exposed by T-052 regeneration.
+**Why:** Existing gen-types indexFile deletes required alert-sink barrel export, breaking production API compilation. Last-good barrel restored before repair.
+**Result:** Independent minimal repair plan APPROVE: existing discovery helper supports alerts subtree, deterministic exports and original explanatory comment; import-safe indexFile regression in existing lint.test.mjs. Current persistence35tests/schema27/API0; generator parity currently FAIL1. Independent final verification remains required.
+**Links:** T-052; D-075; scripts/gen-types.mjs; scripts/lint.test.mjs; qa/manifests/t052-registration-persistence.md
+**Changes-authorized:** Existing gen-types discovery/indexFile/CLI guard and existing lint.test.mjs regression; regenerated existing barrel via generator. No architecture, enforcement or dependency relaxation.
+
+## D-077 | 2026-10-05 | type: session | status: ACTIVE
+**What:** T-052 persistence ready-for-check and supported executable registration implementation dispatched.
+**Why:** Full goal needs real form submission/confirmation flow rather than acquisition-only completion. Persistence mapping needs falsification and generator stability proof before closeout.
+**Result:** Both new whitelist field removal mutations rejected under30s bounded processes, exactbyte restoration in finally verified. API/core typechecks exit0. Existing generator repaired per D076, twice0writes/check0/lint18pass; manifest ready-for-check. Fresh independent executor plan APPROVE: explicit real operator profile/host/form selectors, local actual submit proof, pre-submit durable attempt/uncertain no-resubmit and same-thread organizer/time/direct-link correlation; arbitraryforms remain future scope. Worker dispatched existing browser-joiner.ts/sb_join.py ownership only; root owns runner/state integration next. No external registration or live release claimed.
+**Links:** T-052; D-075; D-076; qa/manifests/t052-registration-persistence.md; packages/meeting-bot/src/joiners/browser-joiner.ts; packages/meeting-bot/py/sb_join.py
+**Changes-authorized:** Existing browser registration instruction/dispatch seams and existing tests per independent approved executable plan; subsequent runner/state integration requires precise pre-edit review. No new code files, production writes, live activation or enforcement changes.
+
+## D-078 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Close cycle1 T-052 acquisition persistence after independent checker PASS; executable integration continues.
+**Why:** Matching disk verdict and manifest handshake required; metadata persistence must not masquerade as full registration completion.
+**Result:** Inspected verdict PASS3/3criteria2/2invariants; independent68downstream22lint/snapshot/schema27/APIcore/generatorchecks pass. Manifest checked-PASS. Actual tracker-audit G1 exit0. Executor worker now has exact approved operator/host/formselector/JSONstdin mapping; root durable state/correlation precise plan requested. Full T052 pending; no actualMongo durability,externalregistration,confirmation or live release proof.
+**Links:** T-052; D-075; D-076; D-077; qa/manifests/t052-registration-persistence.md; qa/verdicts/t052-registration-persistence.md
+**Changes-authorized:** Matching manifest closeout/evidence only; executable browser amendment perD077 unchanged; runner/state precise plan pending.
+
+## D-079 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize precise T-052 durable registration and proof-bound confirmation integration in existing source pipeline.
+**Why:** Scanner evidence alone cannot submit or correlate; existing scheduler mapping drops evidence and reconciliation correctly retains registration barrier without explicit verified proof. User requests actual automated registration, not manual-only acquisition.
+**Result:** Independent release_gate_plan APPROVE for existing candidate types/mapping/normalization, runPipelineTick submitting-before-executor state under existing lock, no uncertain resubmit, validated owner/source/UUID phase state, same-thread distinct-message exact-organizer/time/direct-join confirmation and explicit per-source barrier resolution. Preserve source IDs/provenance/rejected/cancelled/rescheduled controls. Actual local browser fixture plus runner tests required before bounded PASS; external real organizer and arbitrary forms remain pending.
+**Links:** T-052; D-075; D-077; scripts/webinar/run-pipeline.mjs; packages/meeting-bot/src/calendar/schedule-state.ts
+**Changes-authorized:** Existing run-pipeline.mjs and calendar schedule-state.ts/schedule-tick.ts/calendar-client.ts/auto-join.ts types/functions, existing respective tests and standard QA manifest only. No new code files, architecture/frozencontracts/enforcement/budget increases or production/external writes.
+
+## D-080 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Executable registration local browser proof and strict confirmation review continue.
+**Why:** Full T052 needs actual form POST and safe confirmed join projection, not acquisition-only assertions. Known-platform webinar identity does not prove a direct join URL.
+**Result:** Root independently6joiner tests pass. Worker authoritative browserfixture89544 terminal0,1passed32.20s, exactserverPOSTonce/sixDOMblocks/wronghostzeroPOST reported; fresh senior review dispatched, root actualbrowser rerun pending. Root actual confirmation probe accepts Zoom registration URL as confirmed (registrationPageAcceptedAsConfirmed:true); durableworker notified to repair with standing red-green genuine-directjoin guard. Independent resolution-sidecar plan APPROVE: preserve raw native snapshots, fullconfirmedattempt bound originalsource, freshsource+distinctconfirmation exactidentity/thread/email/time/directURL and completeacq, reject/cancel/reschedule replay gates. No arbitraryboolean or fabricatedID workaround. Full product/live not proved.
+**Links:** T-052; D-079; packages/meeting-bot/src/calendar/schedule-state.ts; packages/meeting-bot/py/test_sb_join_iframe.py
+**Changes-authorized:** D079 existing schedule-state prepare/projection validation and tests sidecar clarification per independent review; originalrawsource/provenance immutable. No architecture/frozencontract/enforcement/budgetincrease/externalwrites.
+
+## D-081 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Registration adapter safety amendment for ISS-373: verified pre-navigation page-script isolation and native HTML forms.
+**Why:** Fresh senior BLOCK: DOM handlers can mutate destination/consent after validation; event suppression alone does not prevent page polling/prototype exfiltration. Independent plan rejected event-removal-only approach.
+**Result:** APPROVE stronger first supported adapter: disable pageJavaScript BEFORE navigation with verified browser enforcement; validate host/action/submitter overrides/method/target/encoding/exactcontrols before fill and after; native submit with explicit data. Never populate identity without verified isolation. CustomJSforms remain action_required and fullgoal pending, not dropped. Local malicious polling/setter/action fixtures zeroexfil plus native exactPOSTonce required; no external registrations. Root originalconfirmationbug4/4 nowrefused, broaderdurable integration continues.
+**Links:** T-052; ISS-373; D-077; D-079; packages/meeting-bot/py/sb_join.py; packages/meeting-bot/src/joiners/browser-joiner.ts
+**Changes-authorized:** Existing browser registration instructions/driver and existing localtests safetyrepair perindependentplan only; no newfiles,budgetincreases,architecture/enforcement edits or externalwrites.
+
+## D-082 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Root independently verifies new durable registration state/runner behavior; full executable gate remains open.
+**Why:** Worker assertions and local browser fixture before ISS373 repair do not prove current integrated operational safety.
+**Result:** Actual root schedule-state18/18 and run-pipeline19/19 pass, BOTcompiler0. Covers presubmit durable save, restartnoresubmit, confirmedoriginalsource scheduling and preview/missingprofile paths. Existingdriver scriptisolation/nativeadapter amendment implemented but new maliciousbrowser proof pending. LOC fails5: three other baseline plus driver789/budget300 and runner334/budget300; no greenstructure claim. Worker refuses compression and proposes cohesive lifecycle extraction into existingmodule; independentdependency-safe plan requested before extrafile edit. Fullgoalactive; externalregistration/deployment/Askchain unverified.
+**Links:** T-052; ISS-373; D-079; D-081; packages/meeting-bot/src/calendar/schedule-state.test.ts; scripts/webinar/run-pipeline.test.mjs
+**Changes-authorized:** Evidence record only; additional lifecycle extraction not yet authorized. Existing D079/D081 units continue.
+
+## D-083 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize cohesive existing-module registration lifecycle extraction and correlated-confirmation bypass prevention.
+**Why:** Runner334 exceeds300 budget; compression would obscure behavior. Existing policy has capacity, but schedule-state runtime import would create cycle. Confirmation freshmessage must not evade rejection or changed original source.
+**Result:** Independent plan APPROVE runWebinarRegistrations in existing auto-record-policy with injected validateAttempt/confirmAttempt/createAttemptId callbacks and durable update awaited before executor. No runtime schedule-state import. Preserve original lifecycle, prove save failure zeroexecutor/restart noresubmit/configfailure/confirmedproof. Suppress narrowly correlated confirmation scheduling when proof-bound original cannot revalidate; preserve raw snapshots, no unrelated invitation suppression. This authorizes proposed D082 work through new entry rather than rewriting history.
+**Links:** T-052; D-079; D-082; scripts/webinar/run-pipeline.mjs; packages/meeting-bot/src/calendar/auto-record-policy.ts
+**Changes-authorized:** Existing auto-record-policy lifecycle helper, run-pipeline delegation and existing tests; existing schedule-state correlated eligible-projection correction. No newfiles/budgetincrease/architecture/enforcement/externalwrites.
+
+## D-084 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize unchanged direct-join predicate move to existing policy module.
+**Why:** State module exceeds LOC after necessary confirmation projection; pure URL predicate belongs beside webinarIdentity. Avoid compression or newfile/cycle.
+**Result:** Fresh senior independent PLAN APPROVED exact unchanged directJoin guards/calls exported isDirectWebinarJoin in auto-record-policy, existing schedule-state import direction retained. State tests/typecheck required; plan approval not completion. Browser optionalcheckedconsent and ownedtimeoutcleanup still review warnings; maliciousactualproof pending.
+**Links:** T-052; D-083; packages/meeting-bot/src/calendar/auto-record-policy.ts; packages/meeting-bot/src/calendar/schedule-state.ts
+**Changes-authorized:** Existing directJoin predicate moved unchanged into existing policy module and state import/calls only; no schema/architecture/enforcement/budget/external changes.
+
+## D-085 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Root verifies confirmation bypass regressions and records remaining safety/review gates.
+**Why:** Passing lifecycle fixtures do not establish actual post-submission confirmation freshness or owned-browser cleanup.
+**Result:** Actual root latestrunner20/20pass including missing/rejected/cancelled/changedoriginalsource bypassrefusal. DirectBOTtypes0; LOC5fail driver794 and runner312 plus3baselineothers; statepredicate approvedD084 move nowunderbudget. Browser realchildtimeout exposes owned_cleanup_failed underpsutilAccessDenied; nofalsecleanupsuccess. Root inspected stdinerror path resolves withoutcleanup, worker repair notified. Proposed existingbrowserfactory extraction and baseline-acquiredmessage exclusion need freshindependentplan. Both reviewerfollowup and freshspawn dispatch fail agentthreadlimit; no implementation approval invented. Existing authorizedworkers continue tests. Fullgoalactive, operational release unproved.
+**Links:** T-052; ISS-373; D-083; D-084; scripts/webinar/run-pipeline.test.mjs; packages/meeting-bot/src/joiners/browser-joiner.ts
+**Changes-authorized:** Evidence record only; factory/baseline changes not yet authorized. Existing approvedunits continue.
+
+## D-086 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize fresh-reviewed remaining registration baseline, narrow suppression, cancellation lineage and browser factory seams.
+**Why:** Current attempts can confirm preexisting messages; unresolved wrongconfirmation may independentlyschedule; projectedcaptures lack acceptedoriginalstoplineage; runner exceedsLOC.
+**Result:** registration_gate_review PLAN APPROVED existingfiles only: boundedvalidunique baselineIDs beforedurablesubmit; legacy absentbaseline nonconfirmable/noresubmit; narrowly correlated invalidconfirmation suppression with inventoryreason; accepted originalcancel/reschedule aliases onto verifiedprojection only; browserfactory config/dispatch in existingowner no reverseimports. Actualbrowser currentstartupFAIL remains separategate. Planapproval not completion.
+**Links:** T-052; D-079; D-083; D-084; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing auto-record-policy lifecycle, schedule-state attemptvalidation/confirm/projection, browser-joiner factory and run-pipeline delegation; existing respective tests only. No newcodefiles,architecture/enforcement/budget/externalwrites.
+
+## D-087 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record current Windows cleanup diagnosis, independent containment-plan rejection and confirmation-boundary regression.
+**Why:** Unrelated inaccessible Chrome processes block current global cleanup; a post-bootstrap PID ledger leaves a crash window and cannot authorize safe timeout success.
+**Result:** Read-only process diagnosis Chrome38, cmdline AccessDenied35, no name denial. Full cleanup-only invocation exits1. Independent cleanup_ownership_plan rejects post-SB ledger and requires launch-time containment. No cleanup guard weakened. D-086 standing unresolved-confirmation test now includes same-thread different-organizer AND different-time positive alongside single-mismatch refusals; root focused node test1/1 exit0. Follow-up reviewer assesses pre-launch Windows self Job Object containment and independently verifies this test. Policy runtime drift observed and reread: proportional-verification/2026-10-05.2 targets4 drift0. No executable-registration PASS, external submission or live release claimed.
+**Links:** T-052; ISS-373; D-086; qa/manifests/t052-executable-registration.md; scripts/webinar/run-pipeline.test.mjs
+**Changes-authorized:** Evidence only. Existing D-086 remains authorization for its existing-file boundaries; proposed containment is not yet approved for implementation.
+
+## D-088 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently reviewed Windows pre-launch owned Job containment and exact-profile cleanup.
+**Why:** Global Chrome inspection fails on unrelated inaccessible processes; post-bootstrap PID persistence leaves a launch crash window. Actual independent nested Windows Job probes contain Python, ordinary Chrome and detached Chrome with zero surviving recorded descendants after owner death.
+**Result:** cleanup_ownership_plan revised Windows plan APPROVED after actual inline probes exit0. main acquires exact-profile lock and establishes noninheritable named kill-on-close Job before SB launch; atomically records bounded canonical ownership evidence before Chrome; verifies browser identity and job membership before navigation. kill_orphans uses exact ownership evidence/job accounting only, refuses malformed/redirected/incomplete/legacy occupied profiles, verifies active count zero before repairs. registerInBrowser awaits bounded parent termination then independent cleanup; failure remains uncertain. Linux equivalent containment and full release remain pending; approval is not PASS.
+**Links:** T-052; ISS-373; D-087; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/sb_join.py main and kill_orphans and packages/meeting-bot/src/joiners/browser-joiner.ts registerInBrowser only. Existing tests amended only by independent checker under current policy floor. No new application files, installed dependency edits, budget increases, architecture/enforcement edits or external registration.
+
+## D-089 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved cohesive registration policy extraction in existing state, runner and policy files.
+**Why:** Registration introduced state311, runner306 and runner-tests434 LOC violations; existing policy221 has cohesive lifecycle capacity. No budget increase, new files, compression or assertion removal.
+**Result:** cleanup_ownership_plan APPROVE: move unchanged proof projection from schedule-state.prepareWebinarSourceState into policy.projectWebinarRegistrations with injected validator/confirmation and explicit prior/raw inputs. Move runner refresh draft/confirmation-only/prepare/persist/commit into policy.reconcileWebinarRegistrationState with injected prepare/persist and await-beforecommit, preserve enclosing catch/assignment. No runtime policy reverse import. Checker-only intact relocation of persistence failure, missing profile/thread/preview, HTTP discovery failure tests into existing policy/tick suites after harness fidelity check. Plan approval not unit PASS. Root current meeting-bot TSsuite330/330, actual childtimeout1/1, pycompile0; full Python independent proof and fullrelease remain incomplete.
+**Links:** T-052; D-083; D-084; D-086; D-088; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/src/calendar/schedule-state.ts prepareWebinarSourceState, auto-record-policy.ts cohesive projection/reconciliation helpers and scripts/webinar/run-pipeline.mjs refresh delegation; existing tests relocated by independent checker only. No architecture, schema, enforcement, budget, newcodefiles or external writes.
+
+## D-090 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Restore last working registration layout after D-089 extraction introduced dependency-gate cycles.
+**Why:** Runtime-only independent approval missed committed dependency-cruiser no-circular counting type imports. Actual extracted tree showed11violations; exact in-place reversal to prior layout showed8. Existing Windows D-088 ownership fix untouched.
+**Result:** D-089 extraction initially root73/73affected/typecheck0; dependency gate11errors includes3new policy-to-state type cycles. Root restored only own3application edits in state/policy/runner; dependency gate now8baselineerrors,387modules1285dependencies. Independent reviewer notified to revise without reverse type imports, no rule weakening. Scope LOC gate remains red; no extracted-code completion claimed. Windows actualtimeout and TS330 remain separate partial evidence.
+**Supersedes:** D-089 -- Actual committed dependency gate rejects the new reverse type import cycles despite runtime-only approval; restore prior layout and require revised gate-compliant plan.
+**Links:** T-052; D-088; D-089; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence and exact rollback of this sessions D-089 application extraction only; revised extraction requires fresh independent plan approval. No Windows ownership rollback, dependency-rule edits, new files or external writes.
+
+## D-091 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved gate-aware replacement registration extraction.
+**Why:** D-089 reverse type import caused three additional committed dependency cycles and was rolled back by D-090. Revised plan introduces no new module edges while retaining canonical types and exact behavior.
+**Result:** cleanup_ownership_plan APPROVE: move unchanged canonical WebinarRegistrationAttempt interface from state into existing policy, state import/reexport preserves API; policy projection uses unknown raw attempts validated into canonical typed proof and existing reconciliation type, no policy-to-state import. Generic typed reconciliation derives callbacks from existing lifecycle input and awaits persist-beforecommit. Move pure output link-redaction projection into policy and update both runner calls; UUID injection retained. Require actual same8baseline dependency errors/no extras, compiler, affected tests and measured unchanged budgets before completion. Current real local-form fixture failed renderer startup before assertions; separate Windows proof remains incomplete.
+**Links:** T-052; D-088; D-090; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing schedule-state.ts canonical type move/reexport and prepareWebinarSourceState delegation; auto-record-policy.ts canonical type/typed projection/reconciliation/output projection; run-pipeline.mjs refresh/output delegation and duplicate-import consolidation only. Checker owns test relocation. No newfiles, dependency rules, schema, architecture, enforcement, budgets or external writes.
+
+## D-092 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Establish actual native local-form safety proof without weakening Chrome sandbox or standing assertions.
+**Why:** Repeated SessionNotCreated occurred before assertions; controlled contained subprocess diagnostic isolates command sandbox renderer restriction rather than form behavior.
+**Result:** Same installed CFT/headless flags default sandbox crashes; diagnostic no-sandbox rendererreadytrue. No production flag changes. Existing local registration fixture run with approved require_escalated outside command sandbox retains normalChrome sandbox:1passed14deselected6.75s exit0. Original fixture asserts one exact native POST, zero-POST refusal cases and malicious script isolation. Independent rerun dispatched. Full main ownership crash/concurrency,307/308redirect confinement,durable end-to-end/liveUbuntu remain incomplete. D091 extractionworker continues, fullgoal retained.
+**Links:** T-052; D-088; D-091; qa/manifests/t052-executable-registration.md; packages/meeting-bot/py/test_sb_join_iframe.py
+**Changes-authorized:** Evidence only; no Chrome production flag, test assertion, schema, architecture, enforcement, budget or externalwrite changes.
+
+## D-093 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record independently approved D091 extraction and actual full registration-main local submission/cleanup proof.
+**Why:** Standalone form safety and passing behavior tests do not establish main ownership/navigation integration or whole live goal.
+**Result:** Independent reviewer73/73/type0/dependency same8baseline/noextras and helpercommit/redaction checks green; appLOCpolicy291/state268/runner300. Root corrected inlinefixture HTMLContentType after firstform_mismatch(noPOST); fullnormalChrome main exits0 submitted awaitingconfirmation, exactonefixturePOST, browserownershipledgerphasebrowser and independentcleanup0phasecleaned. No production flags/assertions changed. Independent standing race/concurrency/identity,server307/308,fullPython/checker,testLOC/baselinegates and actualmailregistration-to-KB/Ubuntu remain incomplete; no unitPASS.
+**Links:** T-052; D-088; D-091; D-092; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence only; no schema, architecture, enforcement, budgets, newapplicationfiles or externalwrites.
+
+## D-094 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record independently reproduced HTTP redirect disclosure and actual Windows ownership isolation criteria.
+**Why:** DOM host checks/page-script isolation cannot constrain native HTTP redirect forwarding; browser success alone is not operator-data confinement. Ownership requires real OS lock and descendant behavior, not mock success.
+**Result:** Independent reviewer filedHIGH ISS-374 with307/308identicalbodyunapprovedlocalhost POST reproductions; finalnative-browser request-stage policy/service-worker bypass plan pending, no implementationapproval invented. Root actualboundedWindowsJob probeexit0: sameprofileduplicate+busycleanup refuse, ownerdeath allowsindependentcleanup0/containeddescendantexit, otherprofileowner survives, bothfinalcleanup0. No production/externaldata used; actualSBbootstrapstandingcriteria stillpending.
+**Links:** T-052; ISS-374; D-088; D-093; qa/manifests/t052-executable-registration.md; qa/issues.jsonl
+**Changes-authorized:** Evidence only; no browser networkguard implementation until independent finalplan approval. No newcodefiles,testassertion changes,productionflags,architecture,enforcement,budget or externalwrites.
+
+## D-095 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record native CSP redirect proof and falsified service-worker bypass assumption.
+**Why:** Data confinement must survive native redirects and alreadyinstalled workers; CDP acknowledgements do not prove browser request behavior.
+**Result:** Root normalChromeCSP4/4 distinctcases blockunapproved307/308 resends and preserveapprovednativePOST+hiddenCSRF. Root actuallegacySW positivecontrol observesbody; acknowledged prenavigationNetwork.setBypassServiceWorkertrue still observesbody, probeexit1. Independent reviewer independently reports identicalfailure. No implementationapproved; Networkactivation/postnavigationvariations next. Fullgoal/ISS374remainactive/open.
+**Links:** T-052; ISS-374; D-094; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence only; no newapplicationfiles, browserguardimplementation, productionflags, schema, architecture, enforcement,budget or externalwrites.
+
+## D-096 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved native CSP and activated service-worker bypass containment during registration build.
+**Why:** ISS-374 actual307/308 redirect reproductions disclose operator POST bodies. Independent six-case CSP probes block unapproved redirects while preserving approved native POST and CSRF. Actual installed-worker controls identify missing Network.enable as the cause of ineffective bypass acknowledgements.
+**Result:** cleanup_ownership_plan independently APPROVE intermediate implementation in existing main/register_form, not final security PASS. Acknowledge Network.enable then bypass and script disable on owned page target before navigation; reassert bypass before operator values/submission. Install additive safely constructed host/protocol form-action CSP before values, preserve native submit/cookies/hidden fields and policy lifetime. Remaining request-stage resource/redirect guard, target replacement and transport-loss confinement stay mandatory; ISS-374 remains open. Current policy .3 reread/check0 drift0; in-flight protocol provenance still requires attributable reconciliation, no invented pin or completion.
+**Links:** T-052; ISS-374; D-095; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/sb_join.py main and register_form only for demonstrated intermediate guard; no new application files, external submission, architecture, enforcement, budgets or test weakening. Unproven transport-loss behavior cannot be claimed contained.
+
+## D-097 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record D096 maker containment results and actual remaining reflected-resource disclosure.
+**Why:** Redirect refusal and service-worker bypass do not cover operator values reflected by an approved server into a new response document. Full goal requires complete data confinement and downstream acceptance, not a narrower passing form test.
+**Result:** Worker sourcefreeze compile0, existingactualChromefixture1pass,17input/ordercasespass; originalISS374307/308zero-unapprovedPOST2/2, approvedredirects preserveidenticalnativebodies+hiddenCSRF; installedcontrollingworker baselineobserves1, guardednativePOST1/workerobserves0, probeexit0 withreportedidleHTTPresetduringteardown. Root currentcode actualnormalChrome fixture proves approvedPOST response image URL leaks fixtureemail to unapprovedlocalhost GET, resultsubmitted; exactownedprofile cleanup-onlyexit0 cleanup-complete. Fresh registration_resource_plan successfully dispatched for read-only implementation plan, not acceptancecheck; prior threadquota no longer blocks this dispatch. ISS374 and fullT052 remainopen.
+**Links:** T-052; ISS-374; D-096; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence only. No additional guardimplementation until concrete independent planapproval; no newapplicationfiles, testweakening, externalregistration, architecture, enforcement orbudget edits.
+
+## D-098 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize bounded isolated capability proofs for independently reviewed persistent browser-side registration containment.
+**Why:** Actual D097 response image disclosure bypasses form-action policy; exactinstalledChromium interceptor detach resumes requests, so CDP kill-on-error is not an atomic safety boundary. Independent registration_resource_plan proposes native DNR plus persistent JavaScript contentsettings without changing native submission semantics.
+**Result:** Independent conditionalplan APPROVE names existing tab-capture manifest/background and sb_join main/register_form for futureimplementation only after actualcapabilityproof. DNRexclusivebrowser exactanchoredscheme/host/currentports networkdenyallow survivesnewtargets/control-loss; contentsettingsblock must independentlyprevent installedSWbodyobservation at approved /observed. APIack/source isnotbehaviorproof. Current authorization permits temporaryreproductioncopies/fixtureprofiles only for positive/negative actualnormalChrome tests, controlleddetach/reload/newtarget and nativecookie/CSRF positives. Shippedapplication implementation remains gated by measuredcapability and concretefinalauthorization; selectiveSWremoval/profilecookiewipe notauthorized.
+**Links:** T-052; ISS-374; D-096; D-097; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence and isolatedtemporary reproduction copies only, no trackedapplication/test/contract edits, no newshippedfiles, externalregistration, architecture, enforcement, budget orpermissionpolicy changes. Futureexistingextension applicationpermissions require separate precise decision after successfulproof; applicationmanifest isnotCodexenforcement.
+
+## D-099 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved persistent browser-side native registration confinement in existing extension and driver files.
+**Why:** D097 demonstrates actual post-submit reflected-resource disclosure; D098 isolated capability proof now demonstrates browser-side DNR plus JavaScript contentsetting blocks legacyworker observation and unapprovedresponseimage after newtarget/reload/controldetach while preserving nativecookie/CSRF submission. CDP-only enforcement cannot provide this lifetime boundary.
+**Result:** Fresh registration_resource_plan final implementation APPROVE after probe69291 terminalexit0 normalChrome154, baselineworker/body/image positive; guardedzeroadditionalworker/image leaks, exactnativePOSTcookie/CSRF preserved withbrowseralive afterCDPclose. Exactowned22212creation1791205106.7272303 teardown and cleanup-onlyexit0. Implement privilegedinstall/read/clear APIs, exactextensionpathIDworker ownership, independentlycomparedattempt/browser/profile/config receipt, browserwideexactanchoredscheme/host/currentport denyallow, persistentJSblock, blanktarget beforeallowlistchange. Retain policy through uncertainty, refuse identity on missingpermission/readback/transport mismatch. Recording clear onlyownnamespace afterpriorregistrationtargetsprovedgone. Relaunch/workerrestart/failure/pausedFetch/delayedredirect/recordingrestore builderproofs mandatorybeforefeature-ready; no finalsecurityPASS.
+**Links:** T-052; ISS-374; D-096; D-097; D-098; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/tab-capture/manifest.json add contentSettings/declarativeNetRequest only; existing background.js installRegistrationPolicy/readRegistrationPolicy/clearRegistrationPolicy preservingrecorderhandler; existing sb_join.py main ownedextensionbridge/lifetime and register_form receiptchecks only. No newshippedapplicationfiles, blanketstorage/cookiewipe, contracts/enforcement/budgets, externalregistration or productionwrites. Preserve nativePOST/currentallowedport semantics/customJSfuturegoal.
+
+## D-100 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize independently approved production-only canonical transport-type relocation to remove three calendar import cycles.
+**Why:** Actual dependency gate reports three cycles and five API-test boundary violations. Shared noncollection transport/reconciliation types currently create reverse type imports across runtime modules; one canonical public type home eliminates those cycles without duplicating fields, weakening validation, changing schema or masking imports. Existing core index has measured capacity.
+**Result:** Independent registration_resource_plan APPROVE: move eleven canonical declarations and their helper-type closure once from calendar-client5-44 and auto-join41-94 into existing core/src/index.ts, domain-specific names for formerly private Snapshot/Alias/Occurrence helpers with local aliases. Former public module exports reexport exact canonical types. Policy, auto-join and calendar-client import shared types from core while runtime decision/reconciliation functions remain in place. Expected three cycles removed, five existing API-test imports still fail; no full gate PASS. Existing standing assertions and application runtime behavior preserved. Test relocation remains separately gated by lawful ownership/capacity, not hidden inside this authorization.
+**Links:** T-051; ISS-367; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; D-091
+**Changes-authorized:** Existing packages/core/src/index.ts canonical noncollection transport types; existing packages/meeting-bot/src/calendar/calendar-client.ts, auto-join.ts and auto-record-policy.ts type import/reexport/declaration relocation only. No new files, test edits, contracts, schema collection changes, architecture/enforcement/budgets, production writes or T-052 Python/extension changes. Retain existing feature provenance/counters; no silent .3 test entitlement adoption.
+
+## D-101 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Revert the scoped D100 transport-type relocation because it violates the generated-core-barrel invariant.
+**Why:** Actual node scripts/gen-types.mjs --check exits1 with exactly core/src/index.ts drift. Existing generator explicitly owns the entire barrel and regenerates schema/domain/alert exports only, so handwritten transport declarations would disappear. The D100 plan incorrectly treated this generated file as a handwritten public type home. Typechecks/runtime identity cannot substitute for generator conformance.
+**Result:** Exact four-file pre-D100 byte restoration dispatched after matching frozen current hashes, preserving all unrelated edits. No generator exception, new schema, budget relaxation or stacked fix authorized. Actual restoration/byte comparison, gencheck and original eight dependency violations to be recorded on terminal output; not yet claimed completed. Proper cohesive core domain transport module and source-discovery test owner require explicit new-file authorization. Full release remains unverified; D100 three-cycle repair claim retracted pending rollback completion.
+**Supersedes:** D-100 -- measured generated-barrel regression makes the approved in-place relocation unsafe and nonpersistent under regeneration.
+**Links:** T-051; ISS-367; D-100; qa/manifests/iss-367-lint-structure-no-shortcircuit.md; scripts/gen-types.mjs
+**Changes-authorized:** Restore only the four D100 application files from matching prechange byte backups. No other edits, production writes, contracts, generator/schema/enforcement changes, tests or new files.
+
+## D-102 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Authorize existing-file ISS368 heartbeat read-failure observability feature under current .3 protocol.
+**Why:** Current detectSilentWatchers catch skips unreadable tenants and returns healthy-looking zero; independent next-action audit identifies this priority-tier1 high defect as unblocked while registration gates remain pending.
+**Result:** Independent registration_resource_plan APPROVE: return silent and unreadable counts; expose only aggregate watchUnreadable, return HTTP503 for unreadable probes, retain successful tenant evaluation and existing known-stale behavior. Strengthen recorded reproduction with mixed broken and stale tenants, HTTP unknown/fresh distinction, recovery and no sensitive data disclosure. No completion claim before checker acceptance.
+**Links:** ISS-368; qa/QUEUE.md; D-048; T-051
+**Changes-authorized:** Existing apps/api/src/routes/health.ts HealthReport, detectSilentWatchers and createHealthRouter; existing health.test.ts affected assertions and unreadable/recovery cases only. No new application files, contracts, architecture, enforcement, credentials, production writes or migration of T052 protocol.
+
+## D-103 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Authorize independently approved duplicate-ID refusal at the existing ledger union reader.
+**Why:** D055 keeps the queued guard independent of the now-completed canonical-ID repair; current union has 464 rows and no duplicate IDs, but the reader still permits conflicting identities to become usable rows. Guarding the shared reader preserves attributable issue evidence for the complete KB goal.
+**Result:** Independent registration_resource_plan APPROVE: detect repeated string IDs across canonical and sorted shard files, fail with ID and both one-based file locations, preserve parsing-error accounting and exact ordering; do not select a winner or rewrite ledger rows. Existing tests cover identical/conflicting samefile and crossfile collisions, positive qualified IDs, and nonzero CLI behavior. ISS368 cycle0 CONTRACT_MISMATCH is held separately; no code regression or PASS claim.
+**Links:** D-055; qa/QUEUE.md; qa/gates/iss-360-duplicate-id-collision.md; qa/manifests/iss-368-heartbeat-read-failure-is-not-health.md
+**Changes-authorized:** Existing scripts/lib/tracker-audit.mjs readLedgerRows and existing scripts/lib/ledger-union.test.mjs only. Required QA evidence artifacts permitted. No new application files, ledger rewrite, contracts, architecture, hooks/enforcement, budgets, production writes or T052 changes.
+
+## D-104 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Resume authorized full-goal implementation, explicitly migrate T-052 to the current complete .3 maker/checker protocol and authorize the four reviewed new code files.
+**Why:** Umesh responded to the enumerated Gmail configuration, T-052 migration/test repair and four-file approval gates: 'system se lee lee there is my gws credentails ... so continue and dont stop'. This directly authorizes the presented development scope and read-only use of existing system credentials; repeated permission requests are unnecessary.
+**Result:** Existing system authenticated GWS discovered by read-only agent; no credentials exported/copied or external write performed. Current installed policy synchronized through the existing tick tool, subsequent policy-check targets=2 drift=0. T-052 transitions at the current BUILDING safe boundary to full .3 with existing prior protocol provenance and counters preserved as history; original .1 provenance is not retroactively guessed. Independent repair-plan review precedes standing test adaptation. Full ten groups and three releases remain the objective, not a narrow fixture success.
+**Links:** T-051; T-052; D-101; qa/manifests/t052-executable-registration.md; docs/webinar-release.md
+**Approved-by:** Umesh
+**Changes-authorized:** T-052 manifest migration and independently reviewed existing-file Python test repairs preserving safety oracles. Create packages/core/src/domain/webinar-types.ts, scripts/webinar/source-discovery.test.mjs, packages/index/src/eval/extraction.ts and scripts/eval-extraction.mjs for their previously reviewed purposes after applicable plan review. Read existing system GWS authentication and perform authorized source discovery without exposing secrets. No contract weakening, architecture/enforcement edit, production promotion, sending, registration submission to external organizers, publishing, paid model run or training export is implied.
+
+## D-105 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Implement D104-approved canonical webinar transport module and cohesive source-discovery integration test ownership.
+**Why:** D101 proved handwritten generated-barrel types unsafe; generator already discovers handwritten domain modules. Independent system_gws_discovery corrects five forbidden import edges to seven complete integration tests, so all seven must relocate to eliminate cross-layer imports without weakening coverage.
+**Result:** Independent PLAN APPROVE: canonical eleven calendar/auto-join exports plus Snapshot/Alias/Occurrence and TrustedSenderConfig closure move once into domain/webinar-types.ts. Preserve original public type paths through reexports and leave runtime in place; regenerate index only through existing generator. Move Gmail tests starting89/108 and Calendar tests47/98/143/213/249 intact into source-discovery.test.mjs, retaining titles/assertions/fixture values/loops; remove only TypeScript syntax. Check generator parity, dependency8-to0, count/assertion parity, affected tests, API/bot types and unchanged LOC/directory limits. No acceptance PASS implied.
+**Links:** D-104; D-101; ISS-367; T-051; qa/manifests/iss-367-lint-structure-no-shortcircuit.md
+**Changes-authorized:** New packages/core/src/domain/webinar-types.ts and scripts/webinar/source-discovery.test.mjs, existing calendar-client.ts/auto-join.ts/auto-record-policy.ts type ownership, existing apps/api/src/gws-gmail.test.ts and routes/calendar.test.ts whole-test removal with equal relocation, generated packages/core/src/index.ts via existing generator. No runtime policy change, generator edit, contract/rule/budget relaxation, new other code files or production/external writes.
+
+## D-106 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Authorize one cohesive Python ownership-test file to preserve all T052 safety assertions within existing LOC limits.
+**Why:** Reviewed existing-file repairs exceed test_sb_join.py400-line ceiling; removing sufficient lines would require assertion loss or code compression. Umesh explicitly answered 'Haan, new test file create karo' to the exact proposed packages/meeting-bot/py/test_sb_join_ownership.py path.
+**Result:** Concrete maker proposal relocates Linux orphan identity/refusal, Windows exact Job ledger cleanup and cleanup-only tests intact; mocked registration-main owned-browser/blank-target/receipt ordering test also belongs this owner. Builtin fixtures and nested mocks move with functions, no shared fixture copying. Independent system_gws_discovery plan review requested; implementation occurs only after approval. Prior test safety intent retained, no acceptance PASS implied.
+**Links:** D-104; T-052; qa/manifests/t052-executable-registration.md
+**Approved-by:** Umesh
+**Changes-authorized:** Create packages/meeting-bot/py/test_sb_join_ownership.py and relocate the independently approved whole ownership/cleanup test cases from existing test_sb_join.py/test_sb_join_iframe.py. Add only their required imports and existing canonical sb_join module path setup; no duplicate functions, assertion weakening/skips, application changes, budgets, contracts or external writes.
+
+## D-107 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Establish isolated localhost work runtime and verify connected Calendar and deterministic KB downstream reads.
+**Why:** Existing system GWS credentials work, while configured remote Mongo repeatedly fails server selection. Cached local Docker mongo7 is available, so independent work can continue without production writes or image download.
+**Result:** Project-labelled container lkb-work-01a10ba6 id fa6b2875898f45c22e4b85e9489fbaa519bfc3d6777a323665c3f61b187f1a07 uses localhost27019 only and project data/mongo-work-01a10ba6,512MB/1CPU; ping ok1. Existing production API assembled on localhost3300 with exact isolated database lkb_work_webinar_20261005 and tenant toc, GWS authenticated operator umeshsugara@vidysea.com. Work credential stored privately without printing. Health200/dbok; actual Calendar acquisition209sources/13meetings complete; operations owner toc and candidate work-DB header match. Read-only runner preview succeeds13skips, no recording/registration/writes. Existing seed pipeline inserts one source/session/page,291turns,6claims with all6 references present, and deterministic tree; paid model calls0. August27 sample rejected from setup because1of3citations absent. This is bounded work evidence, not production/live-webinar/Ubuntu/Ask completion.
+**Links:** T-051; D-104; docs/webinar-release.md; qa/manifests/webinar-portable-release.md
+**Changes-authorized:** Project-local work runtime/evidence and isolated local work-data setup through existing scripts only. Existing .env/production credentials and databases not modified. Preserve full original goal and actual failed mail-body acquisition evidence.
+
+## D-108 | 2026-10-05 | type: decision | status: ACTIVE
+**What:** Implement the D104-authorized offline extraction measurement harness before later LLM enrichment.
+**Why:** Current extractClaims filters invalid citations before output, so filtered-only evaluation hides raw fabrication. Independent ai-engineer equivalent plan review by system_gws_discovery approves separate raw/effective/filtered/persisted measurement without invented semantic support or release thresholds.
+**Result:** PLAN APPROVE pure evaluateExtractionCase and aggregateExtractionReports, explicit versioned artifact formats, citation identity/time/optional attribution checks, summed numerator/denominator rates and null unavailable measurements. CLI replays bounded local artifact manifests with exact SHA256 identities and no providers/database/credentials. Optional reviewed labels require matching case/artifact hashes; no labels means semantic support unmeasured. Existing pipeline/claims.test.ts is cohesive test owner. Real72claim/14unresolvedreference corpus must replay with drift reported; absent raw stages remain absent. This permits building measurement only; initial checker-owned extraction contract/gold labels and release thresholds remain completion gates.
+**Links:** U2.2; D-104; docs/plan.md; docs/spec.md; qa/manifests/webinar-portable-release.md
+**Changes-authorized:** New packages/index/src/eval/extraction.ts and scripts/eval-extraction.mjs, existing packages/index/src/pipeline/claims.test.ts additive evaluator integration tests, generated local corpus/report evidence. No production extractor changes, other new codefiles, qa contracts, paid model calls, semantic gold fabrication, production/backfill writes or activation/export.
+
+## D-109 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record exact downstream work-KB citation and search evidence and correct D107 reference-count prose.
+**Why:** D107 counted six claims as six references before the actual route reconciliation; the six sample claims contain seven evidence references. Preserve immutable history and append the measured correction.
+**Result:** Existing authenticated work API returns HTTP200 for all six claims; evidence7/resolved7 with both actual turn and session. Lexical search visa k5 returns HTTP200/hits5/resolved5; sessionsHTTP200/count1; modelcalls0. D107 count six references is retracted, replaced by seven. No full-corpus semantic quality, real webinar, Ask model, production or Ubuntu completion follows.
+**Links:** D-107; T-051; U2.2; docs/webinar-release.md
+**Changes-authorized:** Evidence and existing task/manifest runtime notes only; no additional application, production, source artifact, contract or enforcement changes.
+
+## D-110 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Repair independently evidenced native registration origin-port confinement and watcher credential-safe observability.
+**Why:** Fresh senior t052_full_readiness_plan static source-derived regex accepts default443 organizer on444/8443 because CSP wildcard and DNR optional-anyport exceed D098/D099 currentport scope. Independently executed synthetic watcher prints raw registration and join tokens by serializing returned durable operations. Both are security-class blockers, not capped polish or obsolete-fixture failures.
+**Result:** Independent PLAN APPROVE ports: derive each approved host origin from currentregistration URL scheme/effectiveport; reject currentpage/action mismatches before values, exactCSP and anchoredDNR defaultcanonical/customport rules; preserve fullpersistentdeny/resource/JSblock/fingerprint/readback/receipt lifecycle and strictclear. Native secondserver307/308 and reflectedimage must have zero secondport traffic, wrongactionzero values/POST, allowedcurrentport cookieCSRF positive. Watcher projection plan is under independent final test-owner review before implementation; never strip private durable state to mask logs.
+**Links:** T-052; D-098; D-099; D-104; D-106; qa/manifests/t052-executable-registration.md; qa/feedback-inbox.md
+**Changes-authorized:** Existing packages/meeting-bot/py/sb_join.py register_form/main origin-policy blocks and existing authorized test_sb_join_ownership.py exactport/browser cases. Watcher existing scripts/webinar/run-pipeline.mjs runPipelineWatch and existing scripts/webinar/source-discovery.test.mjs privacy cases only after independent concrete plan approval. No other newcodefiles, blankethost/networkallow, skipped/assertionweakened tests, contracts/rules/budgets, architecture/enforcement, realexternalregistration or productionwrites.
+
+## D-111 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Repair the controlled native registration alias fixture host-only cookie oracle after independent protected-test review.
+**Why:** The local fixture sets auth=fixture without Domain on 127.0.0.1 and redirects positive-alias to localhost on the same approved port. RFC6265 host-only cookie matching requires identical request host; expecting this cookie on localhost is incorrect and would reward credential disclosure.
+**Result:** Fresh senior port_alias_cookie_review independently inspected test lines253/260/299/300 and PLAN APPROVE exact expected cookies [auth=fixture, None] only for positive-alias, while same-origin requires auth=fixture for every POST. Preserve both exact native POST bodies and CSRF, foreign traffic empty, wrong-page/action zero-values and zero-POST, all outcome and owned cleanup assertions. Prior normal Chrome run exit1 with6passed1failed remains recorded; it is not acceptance PASS.
+**Links:** T-052; D-106; D-110; qa/manifests/t052-executable-registration.md; https://www.rfc-editor.org/rfc/rfc6265
+**Changes-authorized:** Existing packages/meeting-bot/py/test_sb_join_ownership.py exact positive-alias cookie expectation only and evidence/task notes. No application behavior, other weakened assertions, new files, contract/budget changes, production writes or external submission.
+
+## D-112 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Preserve the native browser fixture host-mismatch oracle under the D110 localhost-only HTTP origin policy.
+**Why:** Existing different.example allowedHosts on an HTTP local fixture now fails earlier with request_policy_refused. Replacing its expected reason alone would lose the original host-mismatch coverage. Fresh senior native_fixture_failure_plan inspected actual127.0.0.1 URL and exact source policy ordering.
+**Result:** PLAN APPROVE existing test_registration_actual_local_form_and_safety_exceptions: use localhost as mismatched allowed host for the unchanged redirect_host assertion and add a separate original different.example request_policy_refused plus zero-POST assertion. All script isolation, exact native body, cookie, CSRF and redirect assertions remain intact. Full Python prior result89passed2failed91collected is retained; owned-process timeout has no established causal repair and remains open.
+**Links:** T-052; D-104; D-110; D-111; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/test_sb_join_iframe.py test_registration_actual_local_form_and_safety_exceptions only for this reviewed additive/refined fixture mapping and evidence/task notes. No application source, weakened assertions, timeouts, new files, contracts, budgets or external/production actions.
+
+## D-113 | 2026-10-05 | type: fix | status: ACTIVE
+**What:** Exercise existing strict owned-Job cleanup before the browser-death precondition in the controlled port fixture.
+**Why:** The fixture waits10seconds for browser death before invoking production cleanup, so a live verified owned Job cannot reach the safe termination path. Fresh senior native_fixture_failure_plan independently reviewed source502-530: exact identity/membership and containment before termination, ActiveProcesses zero, and refusal for missing Job with live browser.
+**Result:** PLAN APPROVE observe exact recorded PID/creation/executable before cleanup; invoke unchanged cleanup-only with unchanged15second refusal retry rule; require exit0 and cleaned ledger; then preserve exact recorded process death proof with original10second wait if present. No timeout increase or guessed transient cause. Focused real browser state/timing/attempt evidence and final current-identity suite required before completion. Prior89passed2failed and incomplete action-port restored floor remain retained.
+**Links:** T-052; D-106; D-110; D-111; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Existing packages/meeting-bot/py/test_sb_join_ownership.py test_registration_native_same_host_other_port_confinement cleanup ordering and bounded fixture-only diagnostic counters/evidence. No application source, weaker identity/death/cleanup assertions, timeout increase, skips, unrelated process kills, new shipped files or contract/budget changes.
+
+## D-114 | 2026-10-05 | type: session | status: ACTIVE
+**What:** Record the completed user-approved ownership test-file and reviewed T052 fixture-repair checkpoint.
+**Why:** User explicitly approved test_sb_join_ownership.py. D111/D112 preserve distinct cookie/host refusal oracles and D113 exercises strict existing owned cleanup before requiring death, without changing production source or extending deadlines. Exact verification must remain distinct from final feature acceptance and live deployment.
+**Result:** Ownership332, iframe374, base311 nonblank lines, each below400. Focused D112 native fixture1pass; D113 wrong-action1pass with strictcleanup1attempt2.641seconds/cleaned/death proof. Action-port isolated floor90490 green1 -> intended empty-values AssertionError red1 -> byte-restored green1, all exact ledgers cleaned. New-identity full Python84175 terminalexit0:91passed102.55seconds, no failfast/skips; prior8483 89passed2failed retained. Watcher affected Node union95583 terminal0:393passed, five completed isolated green/red/restored claims. Contract validator explicitly PASS by vacuity/no frozen contracts; not a quality gate. T052 remains in_progress; full contract/dual independent acceptance, global structure and actual live operational gates remain. No commit/push/deployment/production or external submission. App goal controller readback remains paused while repo tracker remains active; no tool resume capability is available.
+**Links:** T-052; D-106; D-110; D-111; D-112; D-113; TASKS.md; qa/manifests/t052-executable-registration.md
+**Changes-authorized:** Evidence and existing task/checkpoint notes only. No architecture, contracts, enforcement, source, timeout/budget or production changes.
+
+## D-115 | 2026-10-08 | type: session | status: ACTIVE
+**What:** Migrate the committed KnowledgeBase master and future default pushes to vidysea-admin/KnowledgeBase at Umesh's request.
+**Why:** Use the Vidysea-owned repository as the destination for future work and DevOps integration. Preserve the unrelated existing working changes and the independent whatsapp_msg source repository.
+**Result:** Source master and destination master are 614d78b8966428296f394b8bf3e6c547d41beca5, tree 1989e1bcee1c35b7ecf03675fd5b5ad508e1ea2d; all 170 commits ahead of the former origin/master copied. Reachable-history audit covered 962 commits, 3777 blobs, 1513 tracked leaves, two configured secret values and eight credential patterns; zero matches, eight positive and eight negative controls passed. The 215 tracked raw/processed data paths require the user's explicit public-data choice: destination is PRIVATE pending that answer. Root origin fetch/push is https://github.com/vidysea-admin/KnowledgeBase.git and remote.pushDefault is origin; prior origin retained as legacy. Existing 48 modified tracked files and untracked feature/runtime files were not committed or published. Exact command ".venv/Scripts/python.exe contracts/verify_contracts.py" returned "verify_contracts: no frozen contracts yet (research phase) -- PASS by vacuity"; this is not product acceptance. GitHub CI run 37734830843 on the copied SHA passed typecheck but FAILED meeting-bot unit tests at record-backend.test.ts:23 (ffmpeg spawn status null versus expected 0); missing FFmpeg is a hypothesis, not a confirmed diagnosis. No deployment or DevOps private access grant was configured. This append remains local with pre-existing uncommitted D068-D114; those peer entries must not be broadly committed to close this migration.
+**Links:** https://github.com/vidysea-admin/KnowledgeBase; https://github.com/vidysea-admin/KnowledgeBase/actions/runs/37734830843; .handoffs/knowledgebase-repo-migration-latest.md
+**Changes-authorized:** Git remote and push-default configuration plus operational migration evidence only. No application, contracts, architecture, enforcement, production data, source-submodule visibility or live activation changes.
+
+## D-116 | 2026-10-08 | type: session | status: ACTIVE
+**What:** Make vidysea-admin/KnowledgeBase public after Umesh explicitly answered the pending visibility choice.
+**Why:** Umesh requested "knowledgebase ko bhi public ... admin one" after being told that tracked transcripts and processed data become public with this repository. The private staging condition recorded in D115 is now resolved.
+**Result:** Exact command "gh repo edit vidysea-admin/KnowledgeBase --visibility public --accept-visibility-change-consequences" exited 0. Readback "gh repo view vidysea-admin/KnowledgeBase --json nameWithOwner,url,isPrivate,visibility,defaultBranchRef" returned nameWithOwner vidysea-admin/KnowledgeBase, isPrivate false, visibility PUBLIC, default branch master. Pre-change branch readback remained the audited 614d78b8966428296f394b8bf3e6c547d41beca5. This changes repository visibility only; existing dirty local feature work, CI failure, independent private whatsapp source and unconfigured deployment remain as recorded in D115. Future default pushes already target this repository.
+**Links:** D-115; https://github.com/vidysea-admin/KnowledgeBase; .handoffs/knowledgebase-repo-migration-latest.md
+**Changes-authorized:** Repository visibility and local migration handoff evidence only.
+
+## D-117 | 2026-10-09 | type: session | status: ACTIVE
+**What:** Umesh explicitly requested publication of all current KnowledgeBase work so development can continue on another machine. Preserve the current root working tree on codex/machine-migration-2026-10-09, the separate alert edits on codex/machine-migration-alerts-2026-10-09, all unique unmerged histories and a portable session handoff. Existing release master is not promoted by this backup.
+**Why:** This machine has RAM/runtime constraints; a Git-backed checkpoint must retain in-progress code, QA, goals, corpus artifacts and branch identities without misrepresenting unverified work as an accepted release.
+**Result:** Derived inventory: 30 worktrees, 42 original branch refs, root 48 modified tracked paths plus 20 new code/QA paths, one peer worktree with 2 modified alert files, 4 unmerged histories with 22 unique commits, and 8 additional corpus/source artifacts. Derived publication scan: 3838 history blobs, 78 working files, 2 configured secret values and 8 credential patterns; 8 positive/8 negative controls pass and zero findings. verify_contracts exits 0 by vacuity; fresh offline extraction replay exits 2 with 29 cases/3427 turns/72 claims/14 invalid references of 80 and no semantic labels. Existing U2.2/T-051/T-052 acceptance and CI/structure failures remain open. Remote publication and independent clone readback are pending until completed in the handoff evidence.
+**Approved-by:** Umesh
+**Changes-authorized:** Machine-migration Git checkpoint/ref publication and portable documentation/evidence only; existing HANDOFF.md and TASKS.md notes, append-only decision history and selected data artifacts. Preserve all existing working source/QA changes without behavioral edits or acceptance-status upgrades. No architecture, contract or enforcement edits, source-submodule visibility change, secret/cookie publication, production writes, paid model calls or scheduler activation.
+**Links:** U2.2, U2.4, U3.1, T-051, T-052; D-115, D-116; HANDOFF.md; .handoffs/machine-migration-inventory-2026-10-09.json; .handoffs/machine-migration-public-audit.json; parent 614d78b8966428296f394b8bf3e6c547d41beca5.
+
+## D-118 | 2026-10-09 | type: decision | status: ACTIVE
+
+**Approved-by:** Umesh
+**What:** Add explicit, verified-account Calendar meeting attendance for umeshsugara@vidysea.com on the interim Windows server, preserving the default webinar-only mode.
+**Why:** Umesh directly requested: "tu tho git repo mai push krr dee live mai khud krr lungaa aur iske alawa kyuki ye current system bhi windows server mai run ho rha hai tho 24*7 run hoga hi tho jabtakk vha run nhi ho rha tho jo koi bhi meeting hogi umeshsugara@vidysea.com prr tho vhaa ki meeting attend krni hai and also like join them". This is an additive account-specific selection exception to D-056, not a replacement of its existing release and safety requirements.
+**Result:** Implementation and scoped Git publication authorized. Actual account credentials, real meeting attendance, playable media/processing and Windows continuous operation remain to be verified; code changes alone provide no live acceptance.
+**Changes-authorized:** Explicit account opt-in in the existing portable runner, a focused policy/source adapter reusing existing Calendar acquisition, a Windows launcher, affected tests and new unit QA evidence. Preserve default webinar behavior, source/account/tenant refusal, declined/cancelled/unsafe-link barriers, serialized capture, native source controls, poller lock and real live-proof/isolated work database gates. No registration forms or organizer messages, fabricated credentials or proof, frozen architecture/contracts/schema changes, enforcement-path edits, production database writes or unrelated working-tree changes.
+**Links:** D-056; T-051; qa/contracts/umesh-calendar-attendance.md; qa/manifests/umesh-calendar-attendance.md; user authorization in current chat.
+
+## D-119 | 2026-10-09 | type: decision | status: ACTIVE
+
+**What:** Umesh approves the bounded final inferred STT duration correction and upload duration wiring despite the non-security two-PASS seam cap; retain U4.1/T-051/T-052 whole-task HOLD until independent and actual end-to-end evidence.
+**Why:** The captured 172-byte provider transcript is rejected because its inferred final end 30 seconds exceeds actual locally measured short media duration. The scoped correction preserves raw provider bytes, text, speaker labels and intermediate boundaries.
+**Result:** Explicit human approval verified directly in local coordinator chat 01a120a7-b6e2-7780-9f2d-6e7cb6829365, question call_afeaca7d54464d2e8cb8b8316fea9e2b. Reply 01a120d2-228f-74c3-8487-1ea14820e849: "Approve the scoped fix and independent check". Reply 01a120d2-499e-72f3-8ec3-fd36aaca98b5: "Done in the managed profile", answering dedicated umeshsugara@vidysea.com login/window-closed question. Reply 01a120d2-86a5-73b0-b818-182297fea082: "Safe to run the private proof now", answering permission for one private Meet capture proof outside hei-sweep A/B window. Maker build remains provider/browser-free; coordinated actual proof follows scoped ready-for-check evidence.
+**Approved-by:** Umesh
+**Changes-authorized:** packages/ai/src/stt/gemini-file-upload.ts; packages/ai/src/stt/gemini-file-upload.test.ts; scripts/transcribe-long-session.mjs; scripts/lib/transcript-provenance.test.mjs; scripts/upload/submit.mjs; scripts/upload/queue.test.mjs; scripts/upload/real-proof.mjs; qa/manifests/u4.1-recording-upload-worker.md; qa/packets/u4.1-recording-upload-worker* (maker handshake/immutable source inventory and evidence); .cache/coordination/u4.1-duration-* (bounded maker evidence).
+**Links:** T-051; T-052; U4.1; .cache/webinar/downstream-test-744a8c79-c671-4915-bc1c-804a2b079b99/duration-fix-proposal.md; qa/contracts/upload-transcribe-worker.md C9/C10; qa/contracts/gemini-audio-transcription.md; source chat and human reply IDs above.
+
+## D-120 | 2026-10-10 | type: session | status: ACTIVE
+
+**What:** Land the work committed since D-119 (57c6584) through e12c324 on branch codex/machine-migration-2026-10-09: (1) T-037 unit 1, a pure auto-join rules engine (bd2aa47), fail-closed on invalid rule data after fix cycle 2 (af90e13); (2) the ISS-CAPTURE-001 fix for trusted-sender spoofing via a supplied domain and multi-@ addresses (451edce); (3) T-043 proofs, namely a hermetic Ask citation proof over webinar sessions (86c69e1) and two-tenant isolation tests for apps/api Ask seams (8cac7b9); (4) T-044 pure transcript QA clamp and hallucination spot-check (cb91310); (5) web/API page and data work from the t057 line: session-scoped Knowledge Explorer (d334c6c), edge-confidence graph (8f5018e), read-only knowledge gaps dashboard (7f4b85d), six meeting-capture TypeScript fixes (ce04ddd), verified checker packet snapshot helper (54cbb93), real index corpus stage classification with tenant guards (f60f9a1), and activity-health wiring plus ISS-004 fixture fix (ae41401); (6) merges 197f754 (codex/t057-b8-knowledge-explorer, content already present, keeps ISS-004 ledger row), ece3d08 (lane/transcript) and 3c1b5d4 (lane/capture); (7) evidence commit e12c324: U2.2/T-021 human-review preparation packets (data/eval/extraction-adjudication-packet.json, data/eval/golden-set-human-review.json, qa/evidence/parallel-claim-review/), marked HUMAN_ADJUDICATION_PREPARATION_ONLY / HUMAN_REVIEW_REQUIRED; (8) tracker reconciliation 5eb4f67: T-037, T-043 and T-044 moved from open to in_progress in TASKS.md, and .goal/goal.json status synced for those three plus T-021 and U0.10 (progress now 51 done, 10 in_progress, 34 pending).
+**Why:** The work was committed and merged but not recorded under the Lab Protocol landplane step, leaving DECISIONS.md without an entry covering it. This entry records what exists and its checker status; it grants nothing new.
+**Result:** Checker verdict files with VERDICT: PASS: t037-auto-join-rules-engine (cycle 2; cycle 1 was FAIL, 9c3a9e2), t043-ask-webinar-citation-proof (cycle 1), t043-api-ask-tenant-scope-proof (cycle 1), t044-transcript-qa-clamp (cycle 1), iss-capture-001-trusted-sender-domain-spoof (cycle 1). These PASSes cover the named units only; no whole-task completion of T-037, T-043 or T-044 is claimed. The U2.2/T-021 packets are preparation only: they grant no gold labels and no task acceptance, and human adjudication remains required. The t057 page/data commits in item 5 have no verdict files added in this range; their status is whatever their existing qa/verdicts files record and is not asserted here. U4.1/T-051/T-052 HOLD from D-119 is unchanged. Nothing was pushed; the remote is public (D-116) and any push needs Umesh's explicit approval.
+**Changes-authorized:** none
+**Links:** T-037; T-043; T-044; T-021; U2.2; T-057; ISS-CAPTURE-001; ISS-004; D-116; D-119; qa/verdicts/t037-auto-join-rules-engine.md; qa/verdicts/t043-ask-webinar-citation-proof.md; qa/verdicts/t043-api-ask-tenant-scope-proof.md; qa/verdicts/t044-transcript-qa-clamp.md; qa/verdicts/iss-capture-001-trusted-sender-domain-spoof.md; qa/verdicts/t057-b7-confidence-graph.md; qa/verdicts/t057-b8-knowledge-explorer.md; qa/verdicts/t057-d3-knowledge-gaps.md; commits 57c6584..5eb4f67.
+
+## D-121 | 2026-10-10 | type: session | status: ACTIVE
+
+**What:** Land the work committed after D-120 (2942796) through bbd9c81 on branch codex/machine-migration-2026-10-09: (1) unit sweep-reports-unmerged-worktrees (176dbd4), from the qa/QUEUE.md TODO row: tracker-audit now reports commits ahead of master per registered worktree, report only, never a gate; closed out in 219a659; (2) ledger bookkeeping 67850f6: ISS-375 and ISS-U4BHB-001 set to verified, each citing the PASS verdict that replayed its own recorded reproduction; (3) unit t037-join-rules-persistence (1e3e911), backlog tier 3, task T-037: a tenant-scoped, atomic, fail-closed file store for the auto-join rule set and state, called by nothing yet; closed out in bbd9c81 with a TASKS.md note.
+**Why:** Session of 2026-10-10 following the status review. With queue rows either round-capped (speaker-name-rules seam, 2 PASSes) or blocked (ledger-duplicate-id-guard, CONTRACT_MISMATCH), and an audit of the 51 open critical/high rows finding none buildable without an Approver ruling, a browser or a live service except ISS-367, the next unit came from the roadmap as the backlog order requires.
+**Result:** Checker verdicts with VERDICT: PASS, both cycle 0, ISSUES-WRITTEN: none: sweep-reports-unmerged-worktrees (9d960bf; 21/21 targeted tests, 3/3 mutations killed) and t037-join-rules-persistence (a8a698d; 12/12, 24/24 and 18/18 targeted tests, 5/5 mutations killed, 42 hostile tenant ids refused, package tsc exit 0). T-037 stays in_progress: the edit API/UI and scheduler switch-over remain, the editor must load before save so approvals and opt-outs are kept, and wiring needs a single writer or a lock. ISS-227, ISS-228, ISS-229 and ISS-205 were NOT closed: their fix lives in D:/ai_os hooks and D:/ai_os does not exist on this machine, so the fix could not be confirmed in place. Open ledger counts after this session: critical 4, high 45, medium 98, low 54. No full test suite, build or browser run was made (shared-CPU constraint). Nothing was pushed; the branch is 49 commits ahead of its public remote and any push needs Umesh's explicit approval.
+**Changes-authorized:** none
+**Links:** T-037; ISS-375; ISS-U4BHB-001; ISS-227; ISS-228; ISS-229; ISS-205; ISS-367; D-116; D-119; D-120; qa/verdicts/sweep-reports-unmerged-worktrees.md; qa/verdicts/t037-join-rules-persistence.md; qa/contracts/t037-join-rules-persistence.md; qa/verdicts/u4.1-recording-upload-worker.md; qa/verdicts/parallel-heartbeat-tenancy.md; qa/gates/ai-os-enforcement-hooks-uncommitted.md; commits 2942796..bbd9c81.
+
+## D-122 | 2026-10-10 | type: decision | status: ACTIVE
+
+**What:** Umesh (Approver) ruled on 2026-10-10, answering a direct multiple-choice prompt in the orchestrating session: (1) iss-322-multifile-shape option (a): fix all three spoof routes in one unit, enforcing sender authentication where the unauthenticated header becomes trust; new file `sender-authentication.ts` explicitly OK; covers ISS-322 and ISS-333. (2) unmerged-worktree-inventory: resume `wave/u2-4-phase3-fix` (13 commits, behind critical ISS-282) through maker-checker with a fresh independent checker, merge on PASS; the other four branches are audited first and brought back with a recommendation, NOT approved for merge or retirement. (3) obs-windows-loc-split option (a): extract `bot-child.ts`, new file OK, no budget raise. (4) handshake-liveness-contract-start option A: start the contract with a canonical stamp format. (5) ui-surfaces-test-file-exclusion: approved, exclude `*.test.*` from the D-024 live-browser trigger. Also: Umesh approved pushing the branch, done as a fast-forward to 62a625d with an independent clone readback passing, discharging the publication/readback D-117 left pending; and for the U2.2/T-021 human adjudication he chose "draft for my sign-off": the agent prepares proposed rulings that become gold labels only when Umesh signs.
+**Why:** These gates blocked high-severity work (ISS-322/333 spoofing, critical ISS-282, a red LOC gate, nine-issue parser class ISS-196/199). Rulings were given first-hand and are recorded so the log, not chat, is the source.
+**Result:** Gate files updated with ruling sections (gates 1, 3, 4, 5; commit 1b52517). Gate 2's file was not updated: it dates from 2026-09-28 and lists `worktree-agent-a3d4ea73632cda74e` and `worktree-agent-a779f0b3b445697af`, while the remote on 2026-10-10 shows `worktree-agent-a035913864247fa58` and `codex/machine-migration-alerts-2026-10-09` beside `wave/u2-4-phase3-fix`, `wave/vector-gap-durability` and `lane/a-speakers`. Ruling 2 stands as recorded here for `wave/u2-4-phase3-fix`; a read-only audit of the current remote branches is in progress and the gate file is reconciled after it. Each ruling unblocks a unit; no gold label, merge or enforcement-path change has been made by this entry. The D-024 trigger lives in the machine-wide hook `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`, absent on this machine, so ruling 5 is not yet applied.
+**Changes-authorized:** none
+**Approved-by:** Umesh
+**Links:** qa/gates/iss-322-multifile-shape.md; qa/gates/unmerged-worktree-inventory.md; qa/gates/obs-windows-loc-split.md; qa/gates/handshake-liveness-contract-start.md; qa/gates/ui-surfaces-test-file-exclusion.md; ISS-322; ISS-333; ISS-282; ISS-196; ISS-199; D-117; D-119; D-121.
+
+## D-123 | 2026-10-10 | type: session | status: ACTIVE
+
+**What:** Land the parallel-lane wave committed after D-122 (af22d27) through 77a9f27 on branch codex/machine-migration-2026-10-09. Each unit was built in its own git worktree under KnowledgeBase-lanes/, checked by an independent checker in that worktree, merged with --no-ff on PASS, and closed out. Units merged, with the checker cycle that passed: iss-322-333-sender-authentication (0; D-122 ruling 1); machine-migration-hardcoded-paths (0); handshake-liveness contract (checker-authored; D-122 ruling 4); t049-ai-call-tracer (0); iss-260-retro-web-auth-review (0); t045-youtube-source-adapter (0); t044-transcript-qa-report (1); t057-analytics-page (0, source scope); obs-windows-bot-child-extraction (0; D-122 ruling 3); t039-send-bot-now-planner (2); medium-fix-batch-2026-10-10 (2; ISS-155, ISS-171, ISS-145, ISS-146); small-fix-batch-2026-10-10 (0, source scope; ISS-335); iss-367-structure-stages-green-c2 (2, partial); t046-retention-sweep-planner (1); structure-dupes-and-record-commands-loc (0); t037-join-rules-edit-api (1); web-auth-key-clear-and-href-scheme (1, source scope); medium-fix-batch-2-2026-10-10 (0; six fixes); record-commands-finalize-extraction (0). Two ledger close-out passes (5bc0342, cf34906) set 29 rows to verified from PASS verdicts. One design choice was made by the orchestrator without an Approver ruling and is recorded here for review: the three write routes of the join-rules edit API require a new dedicated scope `join-rules` (GET stays on `calendar`), following the existing convention that mutating routes carry their own scope; no existing key holds it and scripts/mint-key.mjs ALL_SCOPES was deliberately not changed.
+**Why:** With the Approver's instruction to proceed with maximum parallelism, work that did not need an Approver ruling, a browser, a live service or gold labels was fanned out across lanes. Independent checking was kept per unit because it is what caught the defects: six of the merged units FAILed at least one cycle before passing, and two more are still failing in their lanes.
+**Result:** An integration check on the merged branch (tsc exit 0 in core, meeting-bot, ai, ingest, api, web; 753 targeted tests across those packages and scripts, 0 failures, 1 skipped; no cross-lane symbol or import conflict) judged the branch internally consistent. Checker FAILs that changed the outcome: t046 (two inputs made a recording wrongly purge-eligible), t039 (wrong duplicate-meeting key and non-meeting pages planned; three cycles), t037 API (write routes on the read scope; tenant-source tests too weak), web-auth (a late 401 could log out a tab holding a newer key), t044 (an aliased output path replaced the input file), medium-fix batch 1 (a wrong status mapping; that commit was reverted and ISS-369 stays open). Issues filed by checkers and still open include ISS-376 (high: production runs in every-webinar mode, which skips the sender trust check by design, so the D-122 ruling 1 fix does not constrain production recording until the Approver decides that mode), ISS-T037API-003, ISS-T046-004, ISS-MEDFIX-001, ISS-MEDFIX2-001/002. Open ledger after this wave: critical 4, high 42, medium 74, low 57. lint:structure still red on three stages (loc: speakers-llm.ts, sb_join.py, run-watch.mjs; root: 18 loose files against 15; tracker: G4 bare-id citations), down from five; ISS-367 stays open. NOT landed here, still in lanes: u2-4-phase3-resume-c2 (lane/ph3; FAILed cycle 2 because the lane accepted 432 name links the base refused; cycle 3 is being checked; its live gate has not run) and iss-298-ledger-id-allocator (lane/alloc; FAILed cycle 0; cycle 1 is being checked). Not done anywhere: live-browser validation under D-024 for the analytics page, the web-auth fixes and the /ask route change; production wiring of the join-rules routes (they answer 503); any live run. T-037, T-039, T-044, T-045, T-046, T-049 and T-057 remain in progress: each merged unit is a slice. No full test suite, build or browser was run (shared-CPU constraint). The C: drive reached 0 bytes free during the wave and commits failed until space was recovered; a read-only survey attributed most usage to another project's evidence folder and to session scratch directories, not to these lanes (about 41 MB each).
+**Changes-authorized:** none
+**Links:** D-116; D-119; D-122; T-037; T-039; T-044; T-045; T-046; T-049; T-057; ISS-322; ISS-333; ISS-260; ISS-367; ISS-369; ISS-376; ISS-282; ISS-298; qa/contracts/handshake-liveness.md; qa/verdicts/iss-322-333-sender-authentication.md; qa/verdicts/t046-retention-sweep-planner.md; qa/verdicts/t039-send-bot-now-planner.md; qa/verdicts/t037-join-rules-edit-api.md; qa/verdicts/web-auth-key-clear-and-href-scheme.md; qa/verdicts/t044-transcript-qa-report.md; qa/verdicts/medium-fix-batch-2026-10-10.md; commits af22d27..77a9f27.
+
+## D-124 | 2026-10-11 | type: session | status: ACTIVE
+
+**What:** Land the second parallel-lane wave, commits 77a9f27..ebf58fe on branch codex/machine-migration-2026-10-09. Each unit was built in its own git worktree under KnowledgeBase-lanes/, checked by an independent checker, merged with --no-ff on PASS and closed out. Units merged, with the checker cycle that passed: iss-298-ledger-id-allocator (1; cycle 0 FAILed because the reader rejected D-019/D-055 ids on the real ledger); test-gaps-t046-004-t037api-003 (0; ISS-T046-004, ISS-T037API-003); t037-join-rules-editor-page (0, source scope only); t037-join-rules-veto-select (0; veto-only layer, not wired); ci-ffmpeg-and-env-example (1; cycle 0 FAILed because the encoder guard passed if either libvpx or libopus matched, ISS-CI-001; includes .env.example completion); t039-send-now-command (0; first caller of planSendNow); run-watch-loc-split (0; run-watch.mjs split into watch-* modules, 556 to 275 loc); t049-tracer-wiring (1; every ai provider routed through the tracer, off unless TELEMETRY_ENABLED; cycle 0 FAILed on an unbounded sink queue, ISS-T049WIRE-001); auth-require-scope-exact-match (0; requireScope exact array-element match, ISS-TESTGAPS-001; checker filed ISS-AUTHSCOPE-001: a tenantless key authenticates); t037-join-rules-store-lock (0; per-tenant cross-process lock); t037-join-rules-api-host (1; cycle 0 FAILed on a stale pid lock after a crash, ISS-T037HOST-001). Items listed in the dispatch brief that are not in this range and are not claimed: strict-record extraction (strict-webinar-runtime-extraction predates 77a9f27), tracker-audit advisory changes, and a third ledger close-out pass.
+**Why:** Continue maximum-parallelism work that needs no Approver ruling, browser, live service or gold label, keeping independent per-unit checking because it caught defects in four of these eleven units before merge.
+**Result:** Integration check on ebf58fe: tsc exit 0 in meeting-bot, ai, ingest, api, web. Targeted tests: meeting-bot 277/280 (2 environmental failures in record-backend.test.ts: no ffmpeg, symlink EPERM; 1 skipped), ai 102/102, ingest 41/41, core 13/13, api 159/159, web 230/230, scripts 257/259 in the combined run (two child-process crashes under memory pressure; both files pass when re-run alone). No cross-lane import or symbol conflict. lint:structure is still red on three stages (loc: speakers-llm.ts 313 and sb_join.py 1142; root: 18 loose files against 15; tracker: G4 on five manifests); dirsize, dupes, migrations, codex-hooks and dependencies are green; five directories sit exactly at their file budget. ledger-alloc verify: rows=509 findings=0. verify_contracts.py exits 0 by vacuity (no frozen contracts). docs/SNAPSHOT.md is current. Known follow-ups: a `locked` store error returns the same HTTP 500 as a permission failure instead of a retryable status; a stale comment at apps/api/src/join-rules/router.ts:14. Open ledger across qa/issues.jsonl and qa/issues.*.jsonl (status not fixed/verified/closed*/wontfix): critical 4, high 44, medium 83, low 59 (190 rows). NOT landed, still in lanes: u2-4 phase-3 speaker fix (lane/ph3; FAILed cycles 2 to 4, cycle 5 in progress, live gate never run); attention alerts (lane/r1alerts; FAILed cycles 0 and 1 because passcodes can leak into alert titles, cycle 2 in progress); tenant-on-key and accessor guard (lane/authtenant; cycle 0 FAILed on a weakened isolation test, cycle 1 being checked); join-rules veto skip reasons (lane/t037w1, being checked); lane/trackerg4 abandoned after a FAIL (branch kept, unmerged). Not done anywhere: any live run, any live-browser check under D-024 (web units pass at source scope only), production wiring of join-rules into the scheduler (needs an Approver ruling), production deployment. T-037, T-039, T-049 and the other touched tasks stay in_progress; each merged unit is a slice. No full test suite, build or browser was run (shared-CPU constraint).
+**Changes-authorized:** none
+**Links:** D-122; D-123; T-037; T-039; T-049; ISS-298; ISS-CI-001; ISS-T049WIRE-001; ISS-T037HOST-001; ISS-T046-004; ISS-T037API-003; ISS-TESTGAPS-001; ISS-AUTHSCOPE-001; qa/verdicts/iss-298-ledger-id-allocator.md; qa/verdicts/ci-ffmpeg-and-env-example.md; qa/verdicts/t049-tracer-wiring.md; qa/verdicts/t037-join-rules-api-host.md; commits 77a9f27..ebf58fe.
+
+## D-125 | 2026-10-11 | type: session | status: ACTIVE
+
+**What:** Land the third parallel-lane wave, commits ebf58fe..3ee94a2 on branch codex/machine-migration-2026-10-09. Each unit was built in its own git worktree under KnowledgeBase-lanes/, checked by an independent checker, merged with --no-ff on PASS and closed out. 38 units merged, with the checker cycle that passed and the scope qualifier of the verdict: t037-veto-skip-reasons-and-optout-identity (0); auth-require-tenant-on-key (2; cycles 0 and 1 FAILed on a weakened or vacuous isolation test, the tree store was a test replica); r1-attention-alerts (2, stated scope: unwired formatter that redacts by deny-list; ISS-R1ALERTS-009 stays open and gates wiring; cycles 0 and 1 FAILed because passcodes leaked into alert titles); skip-reason-vocabularies (0); t035-lean-video-settings-builder (0, pure and unwired); t037-join-rules-busy-status (0, web at source scope); ai-transport-cleanup-masks-timeout (0); tenant-filter-guards-outside-db (0); t037-optout-meeting-identity-store (1; library, store, API and host adapter, not end to end; the cycle-0 verdict passed a narrower scope); u2-4-phase3-resume-c2 (6, OFFLINE scope only: deterministic rules and offline replay; the live gate of 2,340 model calls was not run; cycles 2 to 5 FAILed; merged on the checker's merge recommendation); t035-lean-video-over-target-report (0); t045-onair-source-adapter (0, URL recognition only, unregistered); r1-alert-title-policy-and-reasons (1, unwired formatter, default title policy omit; cycle 0 FAILed because an inherited "masked" property switched the policy, ISS-ALERTFIX-002); t037-join-rules-page-hints-and-busy-code (0, source scope); t037-join-rules-un-opt (0); t040-strict-quote-verifier-and-windowing (2, pure helpers, unwired; cycles 0 and 1 FAILed because a quote cut at a punctuation joint inside a number or token verified, ISS-T040QUOTE-001/002/003); t057-system-status-page (0, source scope); t041-slide-turn-alignment (0, pure helper, unwired, no OCR); iss-pipefix-pipeline-dirsize (0); r1-alert-id-resolver (1, local read-only operator tool, security class; cycle 0 FAILed on ISS-ALERTID-003; the W8 and W11 sender gates stand); t045-zoom-recording-source-adapter (1, URL recognition only, unregistered; cycle 0 FAILed because current behaviour could mislead a downstream consumer); t048-transcription-path-chooser (0, pure, unwired); t050-resumable-pipeline-planner (0, pure planner, provisional stage list, unwired); t037-calendar-page-opt-out-with-hint (1, source scope; cycle 0 FAILed because the page copy asserted enforcement that does not exist, ISS-CALOPT-001); t037-scheduler-wiring-behind-flag (0; wiring present, DISABLED by default); u3-2-global-search-bar (0, source scope); t034-tab-capture-extension-logic-tests (0, logic tests with fakes, no real browser); t046-meeting-bot-page-sections (0, source scope); t049-langfuse-trace-sink (0, safety verified against a fake fetch, wire format unverified, off by default); t037-wiring-enable-preconditions (0, enforcement still disabled); t042-speaker-tile-alignment (1, pure alignment on synthetic data, unwired, thresholds uncalibrated); t037-join-rules-stale-lock-takeover (1; cycle 0 FAILed because a hard-linked takeover tombstone could let two holders exist, ISS-LOCKTAKE-004; merge condition ISS-LOCKTAKE-009 met by a pure move); t034-capture-failure-not-success (2, logic verified with fakes, not run in a real browser; cycle 1 FAILed on flaky new record-commands tests); t046-retention-dry-run-report (3, report-only; cycles 0 to 2 FAILed on paths that could mark a recording wrongly purge-eligible); t037-tick-verifies-key-tenant (0; enforcement still disabled; verified against a fake API); t036-calendar-description-link-scan (3, fixtures only, free-text links never auto-joined; cycle 0 FAILed on outsider-chosen text becoming joinable with no provenance, ISS-T036CAL-001, cycle 1 on a regression in persisted state, ISS-T036CAL-006/007, cycle 2 also FAILed; a post-merge edit made the alert-who production test cover the 15th skip reason); iss-scorefix-catalogue-check-and-ledger-union-fixture (0); iss-dupesfix-duplicate-export-names (0, rename only). Units needing more than one cycle (passing cycle in brackets): auth-require-tenant-on-key (2), r1-attention-alerts (2), u2-4-phase3-resume-c2 (6), r1-alert-title-policy-and-reasons (1), t040-strict-quote-verifier-and-windowing (2), r1-alert-id-resolver (1), t045-zoom-recording-source-adapter (1), t037-calendar-page-opt-out-with-hint (1), t037-join-rules-stale-lock-takeover (1), t042-speaker-tile-alignment (1), t034-capture-failure-not-success (2), t046-retention-dry-run-report (3), t036-calendar-description-link-scan (3); t037-optout-meeting-identity-store is recorded as cycle 1 but its cycle-0 verdict was a PASS at narrower scope. One ledger close-out pass (82fb980) set rows to verified from PASS verdicts.
+**Why:** Continue maximum-parallelism work that needs no Approver ruling, live service, browser or gold label, keeping independent per-unit checking because it caught defects in 13 of these 38 units before merge, several of them security class (tenant isolation, secret leakage into alerts, a wrongly purge-eligible recording, an outsider-controlled join link, a lock allowing two holders).
+**Result:** Integration check on a8c3872, then re-verified after three follow-up fixes: tsc exit 0 in core, db, ai, ingest, index, meeting-bot, api and web. Tests: core 125/125, ai 199/199, ingest 232/232, index 499/499, api 614/614, meeting-bot 540/558 in a combined run (10 files failed under memory pressure and each passes alone; the remaining failures are the known ffmpeg and symlink environmental ones; one joiners test fails because an untracked data directory is missing), web 591/592 (one activity-health integration test, environmental), scripts 470/479. Three checks were red on the merged tree and were fixed and re-verified green before this entry: the dupes lint stage (five duplicate export names introduced by parallel units; root cause: merges were followed by a directory-size run but not a dupes run), the catalogue score check (the route scraper did not look into route subfolders after a file move on 2026-10-10; no catalogue verdict was changed) and a stale ledger test fixture. Earlier in the wave one merge left packages/index/src/pipeline over its file budget (34 against 30); it was fixed by a checked pure move. Still red and waiting on the Approver: loc (packages/meeting-bot/py/sb_join.py, whose split was stopped because most of its tests need a real browser), root (18 loose files against 15) and tracker G4 (run once on 3ee94a2 with `node scripts/tracker-audit.mjs --gate g4`: 9 findings, all ambiguous bare issue ids in these manifests: medium-fix-batch-2-2026-10-10, r1-attention-alerts, t-031-audio-watchdog, t-033-bot-tests, t034-tab-capture-extension-logic-tests, t036-calendar-description-link-scan, t037-join-rules-stale-lock-takeover, u3-notify-channels, u4b-heartbeat-collection). `node scripts/catalogue-score.mjs --check` prints: "OK: docs/PROGRESS.md is current (28.1% of 57 features)". Open ledger rows across qa/issues.jsonl and qa/issues.*.jsonl (status not fixed, verified, closed*, wontfix): critical 8, high 50, medium 112, low 81 (251 rows), against critical 4, high 44, medium 83, low 59 (190 rows) in D-124. The count rose in this wave because checkers filed many new issues; filing is not fixing, and none of these were triaged here.
+**What is NOT true:** No production deployment exists. Nothing from this session has been pushed; `git rev-list --count origin/codex/machine-migration-2026-10-09..HEAD` is 288 before this entry. No roadmap task moved to done in this wave: every merged unit is a slice, a fix or an unwired component. Join-rules enforcement in the scheduler is present but DISABLED by default (LKB_JOIN_RULES_ENFORCE) and must not be enabled until the before-enable list in qa/contracts/t037-join-rules-veto-select.md holds; the items open there are: W3 (the Approver records fail-closed or fail-open in DECISIONS), tenant agreement in deployment (the tick's key must hold the `sessions` scope or GET /meeting-candidates must set X-LKB-Tenant; ISS-TENANTSIG-001, ISS-TENANTSIG-002), W6 (series ids), W7 gate (b) and Approver acceptance, the web flag JOIN_RULES_ENFORCED flipped in the same change, a live tick with enforcement on in a non-production tenant, and ISS-376. Alerts are not wired to any sender; the open wiring gates in qa/contracts/r1-attention-alerts.md are W8 (no sender until the Approver rules on ISS-R1ALERTS-009; only the default omit policy until then) and W11 (alert ids are an unsalted hash prefix and must become a per-tenant HMAC, or the gate be otherwise ruled on, before any sender), with W9 met only for a single-tenant operator machine and not validated against the real poller. There was no live run, no live-browser check under D-024 (web units pass at source scope only) and no live model run for the speaker fix; ISS-104 and ISS-282 stay open. The retention report cannot delete and no purge executor exists. The Langfuse sink's wire format is unverified against a real instance. One unit is still in a lane and being checked: calendar-unknown-tombstone-non-interference (lane/tombstone, security class: an outsider's cancelled invite can block recordings, ISS-T036CAL-011). No full test suite, build or browser was run for this entry. T-034, T-035, T-036, T-037, T-040, T-041, T-042, T-045, T-046, T-048, T-049, T-050, T-057, U2.4 and U3.2 are not done.
+**Process incidents (facts and corrective action):** (1) Parallel agents shared mutation-harness scripts in a common scratch folder and one ran another's script against a different lane's worktree; it was restored, hashes were verified and nothing shipped; briefs now require a lane-local harness. (2) A maker temporarily re-pointed a shared node_modules/@lkb/core link to its own lane, which made another lane's and one main-tree type-check fail until it was restored; briefs now forbid touching node_modules and a temporary tsconfig paths mapping is used instead. (3) A maker ran browser-launching Python tests for about three and a half minutes although browsers are not to run while the shared production worker is active; the unit was stopped unchanged.
+**Orchestrator design choice made without an Approver ruling, recorded for review:** scheduler wiring for join rules (t037-scheduler-wiring-behind-flag) was built ahead of the W3 ruling, behind a setting that defaults to off, with both policies (fail-closed and fail-open) implemented so the ruling is a configuration choice; nothing was enabled. Approver instructions actually given in this wave: for the speaker-fix lane, "go with the best possible recommendations" (the orchestrator then merged it at offline scope on the checker's merge recommendation); and the user ran/approved the GitHub login refresh being started by the orchestrator, which timed out twice without browser approval, so the push did not happen. No other approval is attributed to the Approver.
+**Changes-authorized:** none
+**Links:** D-119; D-122; D-123; D-124; T-034; T-035; T-036; T-037; T-040; T-041; T-042; T-045; T-046; T-048; T-049; T-050; T-057; U2.4; U3.2; ISS-104; ISS-282; ISS-376; ISS-T036CAL-011; ISS-R1ALERTS-009; ISS-TENANTSIG-001; qa/verdicts/auth-require-tenant-on-key.md; qa/verdicts/r1-attention-alerts.md; qa/verdicts/u2-4-phase3-resume-c2.md; qa/verdicts/r1-alert-title-policy-and-reasons.md; qa/verdicts/t040-strict-quote-verifier-and-windowing.md; qa/verdicts/r1-alert-id-resolver.md; qa/verdicts/t045-zoom-recording-source-adapter.md; qa/verdicts/t037-calendar-page-opt-out-with-hint.md; qa/verdicts/t037-join-rules-stale-lock-takeover.md; qa/verdicts/t042-speaker-tile-alignment.md; qa/verdicts/t034-capture-failure-not-success.md; qa/verdicts/t046-retention-dry-run-report.md; qa/verdicts/t036-calendar-description-link-scan.md; qa/contracts/t037-join-rules-veto-select.md; qa/contracts/r1-attention-alerts.md; commits ebf58fe..3ee94a2.
+
+## D-126 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12: live runs, merges, send-now scope, schema edit, push. Umesh answered in-session with these selections. (1) Live runs authorised on this machine now: "U2.4 speaker live gate" (local Ollama qwen3:8b, about 2,340 calls); "Browser page checks" (Playwright on localhost for U3.1 Ask, U3.2 Search, T-046 meeting-bot page, T-037 editor; D-024); "T-043 local work-DB run" (index a webinar session into the LOCAL work DB and get a cited /ask answer; production DB untouched; Gemini embedding calls allowed). (2) Merge: "alerttenant"; "send-now scope" = create a new dedicated API key scope `send-now` for the T-039 send-now endpoint; "rulesapi + rulesweb" = accepts amending contract qa/contracts/t037-join-rules-editor-page.md C1 (the single shared-code change in api/client.ts must be type-only) to allow the additive runtime options added to apiFetch, and criterion 11 of qa/contracts/t037-join-rules-edit-api.md (every other store code -> 500) so that `precondition-failed` maps to 412 and a missing precondition to 428; "regsafe abhi" = merge the registration redirect/consent fix now, accepting that sites answering a successful POST with a 302 now yield `uncertain` and approved-host redirects are refused until a CDP interceptor exists. (3) Canonical-schema edit: "Approve, aage badho" - the previously rejected canonical-schema edit that blocks T-040 (grounded notes/Q&A with timestamp citations) and T-051 is approved. No single concrete edit is named in the repo; this records the approval of "the canonical-schema edits referenced at qa/manifests/webinar-portable-release.md:64" (rejected twice by automatic approval review; narrow Umesh approval requested; also TASKS.md:141 T-051 and HANDOFF.md:115). (4) Push: "Wave ke baad push karo" - after this wave's merges, push the current branch codex/machine-migration-2026-10-09 to its upstream (not master).
+**Why:** These were open Approver gates: live runs and browser checks were withheld pending approval, the listed merges awaited rulings, and the schema edit was the stated blocker for full grounded knowledge/Q&A.
+**Result:** Rulings recorded; contract amendments folded by the checker role in the same commit (t037-join-rules-editor-page.md C1; t037-join-rules-edit-api.md criterion 11). Nothing else is attributed to the Approver. Authorisation is scoped to the items listed; the schema approval does not itself edit schema/ or ARCHITECTURE.md and the exact edit must still be named when made. Nothing has been run, merged or pushed by this entry.
+**Changes-authorized:** qa/contracts/t037-join-rules-editor-page.md C1; qa/contracts/t037-join-rules-edit-api.md criterion 11
+**Approved-by:** Umesh
+**Links:** U2.4; U3.1; U3.2; T-046; T-037; T-043; T-039; T-052; T-040; T-051; ISS-T037UI-001; ISS-UNOPTLOCK-002; ISS-373; ISS-374; ISS-ALERTID-006; D-024; D-125; qa/manifests/webinar-portable-release.md
+
+## D-127 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 phase-3 gate model: API model instead of local qwen3:8b. The documented model (qwen3:8b via local Ollama) is not installed (Ollama runs with no models). Asked whether to download it, Umesh answered verbatim: "kyu download krna hai use api keys . api wale models se kaam nhi ho skta hai kyaa, ollama models? if not gemini models". Ruling: do not download any model; run the U2.4 phase-3 live precision gate on an API model, preferring the model production routes speaker resolution to per config/ai-routing.yaml, else another Gemini model.
+**Why:** Avoids a large local model download on a CPU-constrained shared machine; an API model that matches production routing is arguably the more meaningful measurement.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED; only the model changes. Results are recorded as measured on the API model (model id stated in the evidence) and are not claimed as qwen3:8b results. A checker, not the runner, rules on ISS-104 / ISS-282. Nothing has been run by this entry.
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-126
+
+## D-128 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (2): job-queue retention 30 d, usage_events collection, send-now cap and lean default. Umesh answered in-session with these selections. (1) Job-queue retention: "30 din" - terminal jobs in the T-050 file job queue are pruned after 30 days; this resolves ISS-JOBQPRUNE-001 (the pruneTerminalAfterMs option exists and is currently off by default). (2) usage_events: "Haan, banao" - create a new tenant-scoped `usage_events` collection (schema + migration) recording /ask and /search usage for T-057 D4 usage analytics; no query text is stored. (3) Defaults: "Dono rakho" - keep the send-now `until` cap at 24 h ahead, and keep lean video (720p, 5 fps) ON by default for OBS recordings.
+**Why:** These were open Approver questions: the queue retention period blocked enabling pruning, the usage analytics needed a sanctioned collection, and the two defaults needed confirmation.
+**Result:** Rulings recorded only. Nothing has been built, enabled or changed by this entry; the 30-day pruning default, the usage_events schema/migration and any schema edit must still be made through their own units, with the exact edit named when made. No query text may be stored in usage_events.
+**Approved-by:** Umesh
+**Links:** T-050; T-057; T-039; T-035; ISS-JOBQPRUNE-001; ISS-JOBQLOST-001; ISS-T057OPS-001; ISS-SENDNOWAPI-005; ISS-LEANWIRE; D-126
+
+## D-129 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Approver rulings 2026-10-12 (3). Umesh answered in-session. (1) /health: "Counts hatao, sirf liveness" - the public, unauthenticated GET /health stops returning all-tenant collection counts and keeps only liveness (API up, DB reachable); tenant-scoped counts remain on authenticated GET /system-status. This amends qa/contracts/health-route.md C2 ("Counts are aggregate only ... countDocuments() with no filter") and every criterion requiring `collections` in the /health body (C1, C3, C6, I1 wording); C5 (unauthenticated, mounted before requireAuth) stays. Closes the open part of ISS-T057SCREEN-001. (2) Tombstone (calendar cancelled-invite handling, lane/tombstone): "Amend + live check allow". (a) The D-060 acceptance floor is amended for the changed webinar-policy assertion: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), which is the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), is relaxed for a proven pair only; this satisfies merge condition 4 ("Approver-recorded amendment of the D-060 floor for the changed webinar-policy assertion"). (b) An agent may run ONE read-only live check against Umesh's Google Calendar to confirm the shape of a cancelled event resource, satisfying merge condition 5 ("Live confirmation of Google's cancelled-resource shape (id-only vs start/conferenceData)").
+**Why:** /health exposed coarse business-volume counts to any caller; liveness is all an ops probe needs. The tombstone unit's proven-pair relaxation is semantically right but changed a floor assertion that only an Approver entry may amend; the live check removes the remaining doubt about Google's cancelled-resource shape.
+**Result:** Rulings recorded only. No code built or changed here: the /health route/store/fixture/test edits, the tombstone merge and the live check each still need their own unit. Only the /health amendment is folded into qa/contracts/health-route.md. Merge conditions 4 (and 5 once the single read-only check is run and its result recorded) remain for the tombstone unit's checker to verify; ISS-TOMBSTONE-008 (medium) and the sender-binding question stay open. No other D-060 assertion is amended.
+**Supersedes:** D-060 -- amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; every other D-060 acceptance floor item stands and D-060 stays otherwise in force.
+**Approved-by:** Umesh
+**Links:** T-057; T-036; ISS-T057SCREEN-001; ISS-T036CAL-011; ISS-TOMBSTONE-008; D-060; D-128
+
+## D-130 | 2026-10-12 | type: fix | status: ACTIVE
+
+**What:** Corrective clarification of D-129's `**Supersedes:** D-060` field, which was over-broad. D-060 remains in force IN FULL except the single assertion D-129 amended: in webinar-policy.test.ts "known actual-wire and id-only cancellations ...", the old expectation (blocked, empty feeds, replay blocked beside a proven pair), i.e. the D-060 floor text "unknown tombstone empty effective feeds/gate" (repair plan line 210), relaxed for a proven pair only. Every other D-060 assertion and acceptance-floor item stands unchanged.
+**Why:** The computed-status resolver (.claude/hooks/lab-session-start.ps1) treats any D-ids before ' -- ' in a Supersedes field as a full supersession and offers no partial/amends relation, so D-129 made D-060 compute as SUPERSEDED (by D-129) although D-129's own reasoning text says it "amends only the one webinar-policy cancelled-tombstone assertion for proven pairs; ... D-060 stays otherwise in force." Umesh's 2026-10-12 ruling "Amend + live check allow" authorised only that one amendment, not retirement of D-060.
+**Result:** Record only; no code or enforcement path changed. No partial-supersession syntax exists in append_decision.ps1 or the resolver, and a later entry cannot un-supersede, so the computed index may still print D-060 as SUPERSEDED (by D-129); readers must apply this entry: D-060 is ACTIVE except the one amended assertion. Adding an amends relation to the resolver would be an enforcement-path change needing its own Approved-by entry.
+**Approved-by:** Umesh (ruling 2026-10-12 "Amend + live check allow", which authorised only the single D-060 webinar-policy tombstone assertion amendment and one read-only live Google Calendar check)
+**Links:** D-060; D-129; T-051; T-036; ISS-TOMBSTONE-008
+
+## D-131 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 speaker model: Ollama Cloud via Umesh's paid Ollama API key instead of local qwen3:8b. Umesh ruled in-session 2026-10-12, verbatim: "ollama paid api key and we can use more advance model too . via api key. thik hai . tere paas hai naa ye key C:\Users\product\Desktop\KnowledgeBase\.env". Speaker naming (U2.4) may use an Ollama Cloud model (POST https://ollama.com/api/chat, bearer key read from .env) and a more capable model than qwen3:8b is acceptable. Transcript windows may be sent to ollama.com for this gate measurement.
+**Why:** qwen3:8b is not installed locally and is not offered on Ollama Cloud; D-127 ruled out downloading models and allowed an API model. Umesh has a paid Ollama key, so a more capable cloud model is available at known cost.
+**Result:** The gate's five bars, prompts, windows, 2-of-3 voting and scoring are UNCHANGED. Production config/ai-routing.yaml speakers routing is switched ONLY after a model passes the gate, in a separate unit. Results are recorded as measured on the named cloud model. A checker, not the runner, rules on ISS-104 / ISS-282. D-127 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; ISS-104; ISS-282; D-127
+
+## D-132 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction: speaker naming moves from rule-only evidence to model-judged attribution. Umesh ruled in chat 2026-10-12, verbatim: "use model intelligence. like agar vo khud nhi btaynge tho ... vo voice tho phchaan legaa and overall session record hoga tho khi naa khi se mil hi jayega. make it intelligent instead of rule based". The model reads the whole session per diarized voice label (diarization already clusters voices) and may name a label from any contextual evidence: being called on, address-adjacent, handover, thanks, role continuity, or self-introduction. Each accepted name must carry a verbatim transcript quote that is verified to exist in the transcript (grounding), and that quote is stored as provenance.
+**Why:** The phase-3 Ollama Cloud gate (D-131) failed bar 5 because acceptance requires self-naming evidence (speakers-llm.ts evidence gate, namingTurns; handover and thanks routes are OFF), and only 2 of 144 gold named blocks are self-naming. A rule-only evidence gate cannot reach the gold set.
+**Result:** Gate bars 1 (100% accepted-identity precision) and 2 (0 wrong links) stay unchanged as the safety floor; the floor is not contradicted. Next: a maker unit implements this, it is scored offline on the recorded D-131 proposals first, then re-gated on deepseek-v4-pro within the existing Ollama Cloud budget. D-131 stays as history (no Supersedes field).
+**Approved-by:** Umesh
+**Links:** U2.4; D-131
+
+## D-133 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-REGCDP-004: Umesh approves updating the D-110/D-111 protected positive-alias control from 2 POSTs to 1 POST (approved-alias 307 no longer re-sends the body to a second POST). The owner-approved positive behaviour "alias 307 re-sends body, 2 POSTs" is retired; the same-host-only 307/308 rule of T-052 is ratified.
+**Why:** regsafe 87df0d1f had already made the 2-POST path unreachable (redirect:'error'), and the checker (lane regcdp, cycle 1 verdict) judged the 1-POST expectation stricter, not a leak.
+**Result:** The protected positive-alias fixture asserts ONE POST and uncertain. No Supersedes field is used: D-110/D-111 remain in force in full except this single positive-alias 2-POST assertion, and the session-start resolver offers no partial relation (see D-130). ISS-REGCDP-004 is closed as resolved by this decision.
+**Approved-by:** Umesh
+**Links:** ISS-REGCDP-004; T-052; D-110; D-111
+
+## D-134 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-001: skipped-session records for `lkb alert-who` resolution are persisted as one tenant-tagged record per skipped item: {sessionKey, startTime, source, tenantId}, with NO join URL. Records accumulate keyed by sessionKey, and rows whose start time is older than 30 days are dropped (the same window as job-queue retention, D-128). Alert-id computation is unchanged; ISS-ALERTID-002 remains a separate open item. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** alert-who needs to resolve an alert id back to a skipped session without storing join URLs, and the record store must stay tenant-scoped and bounded.
+**Result:** One record per skipped item, keyed by sessionKey, pruned at 30 days by start time. No change to alert-id computation.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-001; ISS-ALERTID-007; D-128
+
+## D-135 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-045 re-ingest policy: re-ingesting media that is already ingested (same content-hash source _id) is idempotent. It returns the existing session id with an "already ingested" indication, and creates and deletes nothing. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A content-hash source _id identifies the media, so a repeat ingest must not duplicate or destroy existing data.
+**Result:** Re-ingest of the same content hash is a no-op that reports the existing session id as already ingested.
+**Approved-by:** Umesh
+**Links:** T-045
+
+## D-136 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Source identity is tenant-scoped for ALL ingest adapters (url, recording, document, whatsapp, as already done for youtube/onair/zoom): source `_id` = tenantSourceId(tenant, contentHash), with contentHash kept as its own field. Existing stored data gets a migrate-mongo migration that rewrites old bare-hash ids and every reference to them. The migration is built and tested locally only, and is run against any real database ONLY with Umesh's explicit approval at that time. Reads must accept both the old and new id forms until the migration has run. This also clarifies D-135: "content-hash source _id" means the tenant-scoped content-hash id, and the within-tenant idempotency policy is unchanged. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A bare content hash lets two tenants collide on one source id; tenant scoping closes ISS-T045TENANTID-001 consistently across every adapter.
+**Result:** All adapters use the tenant-scoped id; a local-only migration plus dual-form reads cover existing data; no real-database run without explicit approval.
+**Approved-by:** Umesh
+**Links:** ISS-T045TENANTID-001; ISS-T045INTAKE-001; T-045; D-135
+
+## D-137 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-041 OCR failure handling (assumption A5 in qa/manifests/t041-ocr-stage-alignment.md): when OCR fails on a keyframe, retry it a bounded number of times with backoff, then try a configured fallback OCR function if one is injected. Only if every attempt fails, omit the frame from alignment and report it in ocrErrors with its attempt count. A failed frame is never silently treated as blank text. Decided by Umesh (Approver) in chat 2026-10-12: "there must be a fallback or retry mechanism".
+**Why:** Silently treating a failed OCR frame as blank text would hide data loss and corrupt alignment; retry and fallback recover transient failures and the rest are reported.
+**Result:** Bounded retry with backoff, then optional injected fallback, then omit and report in ocrErrors with attempt count.
+**Approved-by:** Umesh
+**Links:** T-041; A5 (qa/manifests/t041-ocr-stage-alignment.md)
+
+## D-138 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** A WhatsApp owner may be mapped to exactly ONE tenant. Owner configuration that maps the same owner to two or more tenants is rejected at load with a clear error. WhatsApp session and turn ids stay as they are: no id change and no migration. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The only way the bare WhatsApp session id (hash of groupJid and ownerUserId) can collide across tenants is one owner under two tenants; forbidding that closes the collision without rewriting citation-bearing ids.
+**Result:** Owner-to-tenant is one-to-one at config load; session and turn ids and stored data are untouched.
+**Approved-by:** Umesh
+**Links:** ISS-TENANTSRCID-001; D-136
+
+## D-139 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** When a pipeline run fails terminally (retries exhausted), its queue job is marked FAILED, not done, so /system-status and notifications see it. A resubmit of the same runKey creates a new attempt. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Marking an exhausted run done would hide the failure from status and notifications; failed must be visible, and a resubmit must be able to retry without reusing the dead attempt.
+**Result:** Terminal failure maps to a FAILED queue job; resubmitting the same runKey starts a new attempt.
+**Approved-by:** Umesh
+**Links:** T-050; ISS-T050ADAPTER; qa/manifests/t050-runner-adapter.md
+
+## D-140 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh (Approver) approves amending the job-queue contract (qa/contracts/t050-job-queue.md) criterion 13 to: "13. `LeaseRef.tenantId` and `claim` `opts.tenantId` are REQUIRED. A missing, empty or malformed tenant returns `invalid-input` and writes nothing. A well-formed tenant that differs from the job's tenant makes heartbeat/complete/fail return `not-found`, deep-equal to the answer for a missing id, in every job state, writing nothing. A claim returns only the named tenant's jobs. (ISS-JOBQTENANT-001)". A tenant outside the queue charset (ASCII letters, digits, dot, underscore, hyphen) gets invalid-input. Decided in chat 2026-10-12.
+**Why:** The old wording made the tenant optional and let an omitted tenant match any tenant's job; the checker PASSed the fix that enforces it, so the contract must match.
+**Result:** Criterion 13 now requires the tenant on every owner-checked queue operation; no wildcard.
+**Approved-by:** Umesh
+**Links:** ISS-JOBQTENANT-001
+
+## D-141 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** U2.4 direction after the cycle-2 live gate. Model-proposed speaker names that pass deterministic grounding (verbatim quote containing the name, multi-name abstain, floor not contradicted), plus a verifier "yes" with single evidence, are shown as SUGGESTED. Each carries its quote and is never final until a human confirms it in the UI. Confirmed names become final with provenance "human-confirmed". Auto-final naming (no human) stays limited to the deterministic floor plus the independent-pair rule. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** The live gate (lane u24gate2, 2e621ece) showed 0 wrong and 0 additions in pair mode, so model proposals are useful as suggestions but not safe to finalize without a human.
+**Result:** Suggested names carry their quote and need human confirmation; auto-final stays at floor plus independent-pair.
+**Links:** U2.4; D-132; ISS-U24SMART-005
+
+## D-142 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-050 /ask graph shape. The /ask graph uses 4 coarse nodes: retrieve (selectNodes, candidate arms, rrfMerge, tree resolve, source hydrate) -> evaluate (ask() evaluation + web/tavily fallback + score audit) -> refine -> answer. It must be output-identical to runAskV2, unexported and off by default. Nodes may be split later. Umesh (Approver) delegated the choice in chat 2026-10-12 ("whatever is the best one").
+**Why:** Coarse nodes keep the graph a thin wrapper that can be proven output-identical to runAskV2; finer splits can follow once that is shown.
+**Result:** 4-node graph, unexported, off by default, output-identical to runAskV2.
+**Links:** T-050
+
+## D-143 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live and staging writes go to the Mongo server in .env MONGODB_URL, using a SEPARATE database named `lkb_staging`. The production database `lkb` is never written by agents. Every write path must set the database name explicitly and assert that it is not `lkb`. Migrations, including tenant-scoped-source-ids and speaker-suggestions, may run against lkb_staging only. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** A separate staging database lets live runs and migrations be exercised on the real server without any risk to production data.
+**Result:** All agent writes target lkb_staging with an explicit database name and a guard against `lkb`; migrations run on lkb_staging only.
+**Approved-by:** Umesh
+**Links:** D-117; T-043; D-136; D-141
+
+## D-144 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Negation safety in generated notes moves from rule-based detection to an LLM JUDGE. A second model checks each generated note or claim against its cited source sentence(s), and drops or flags any note whose meaning differs, including polarity and negation. Deterministic grounding stays: the citation must exist. The judge is injectable and fakeable, and its cost per session is recorded. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Rule-based negation detection cannot cover the ways meaning flips; a second model comparing note to cited source catches polarity and negation errors while citation existence stays deterministic.
+**Result:** An injectable LLM judge gates generated notes against their cited sentences; per-session judge cost is recorded.
+**Approved-by:** Umesh
+**Links:** T-040; ISS-T040GEN-012
+
+## D-145 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Retention: raw media (video and audio recordings and their derived media files) is purged 90 days after capture. Transcripts, notes, claims and citations are kept forever. The purge executor honours the existing dry-run vetoes, and logs what it deletes. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** Raw media is large and costly to keep, while the text artifacts carry the durable knowledge and the citations that reference it.
+**Result:** Media is purged at 90 days after capture; text artifacts are retained indefinitely; the executor respects dry-run vetoes and logs deletions.
+**Approved-by:** Umesh
+**Links:** T-046; Q6
+
+## D-146 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Live runs are approved: (1) T-043 indexing plus cited /ask against lkb_staging, with Gemini embeddings; (2) live browser checks for U3.1, U3.2, T-046 and the T-037 editor, using real local Chrome, up to 15 concurrent browsers on this machine; (3) the T-049 Langfuse live check; (4) a 60-minute live capture for T-034 and T-035, once Umesh provides a meeting link. Decided by Umesh (Approver) in chat 2026-10-12.
+**Why:** These items cannot be proven by local fakes alone; approving them against the staging database bounds the risk to production.
+**Result:** Agents may run the listed live checks, writing only to lkb_staging (D-143); the T-034/T-035 capture waits for a meeting link from Umesh.
+**Approved-by:** Umesh
+**Links:** D-024; T-043; T-049; T-034; T-035; U3.1; U3.2; T-046; T-037
+
+## D-147 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** Umesh approved raising the lint-dirsize budget for schema/ from 30 to 40 (2026-10-12). Schema files are one per collection and all tooling (gen-types, validate.py, kb:// resolver, CI) reads schema/ flat; relocation was rejected.
+**Why:** Splitting or relocating schema/ would break every tool that reads it flat, so the directory-size budget is raised instead.
+**Result:** lint-dirsize budget for schema/ is 40.
+**Approved-by:** Umesh
+**Links:** U2.4; D-141; lane u24suggest
+
+## D-148 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: Umesh chose to rebuild real derivation provenance by running the repo's own knowledge pipeline over raw/TOC/TOC-Materials (the 23 sessions), then seed and index lkb_staging (per D-143). Integrity checks (validation.json / derivation-provenance.json guards) stay in force; no forged or bypassed provenance. Model spend cap USD 10.
+**Why:** Provenance must be real, so staging data is derived by the repo's own pipeline rather than forged or the guards bypassed.
+**Result:** Staging is rebuilt from the 23 sessions with guards on and a USD 10 model spend cap.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146
+
+## D-149 | 2026-10-12 | type: decision | status: ACTIVE
+
+**What:** T-043 staging data: TOC audio is not on this machine (raw/TOC/TOC-Materials/Audio absent), so provenance cannot be regenerated by the pipeline (D-148 infeasible). Umesh chose: seed the 23 existing data/toc-migrated transcript sessions into lkb_staging labelled provenance status 'legacy-unbound' via an explicit --legacy-unbound flag plus LKB_ALLOW_STAGING=lkb_staging opt-in; never `lkb`; no manual bindDerivedArtifacts (no forged provenance); integrity checks stay on for all other data.
+**Why:** Without the audio the pipeline cannot produce real provenance, so the existing sessions are seeded with an honest legacy-unbound label rather than forged provenance.
+**Result:** 23 sessions seeded into lkb_staging as legacy-unbound behind an explicit flag and env opt-in; production lkb untouched.
+**Supersedes:** D-148 -- D-148 required regenerating provenance by running the pipeline over the TOC audio, which is absent on this machine, so that method is infeasible; this entry replaces it in full with the legacy-unbound seeding.
+**Approved-by:** Umesh
+**Links:** T-043; D-143; D-146; D-148
+
+## D-150 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Umesh ruled (2026-10-13) that scripts/mint-key.mjs and the scripts/watch watcher (ingest/reingest) MAY write the production database lkb, but only with the explicit --i-know-this-is-production flag plus an exact MONGODB_DB=lkb; with no DB they refuse; otherwise limited to work/staging DBs.
+**Why:** These scripts legitimately need production access, but production writes must be a deliberate, explicit act rather than a default.
+**Result:** mint-key and the watch ingest/reingest scripts write lkb only with --i-know-this-is-production and MONGODB_DB=lkb; no DB set means refuse; otherwise work/staging DBs only.
+**Approved-by:** Umesh
+**Links:** ISS-LEGACYSEED-002; ISS-LEGACYSEED-003; D-143
+
+## D-151 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-040: Umesh ruled (2026-10-13) that when the note judge (D-144) is enabled, the rule-based lexical negation checks ALSO run (defense in depth): a note is dropped if either the judge or the rules reject it. Resolves ISS-T040JUDGE-002.
+**Why:** Running both layers means a note must pass the judge and the rules, so a judge miss is still caught by the lexical checks.
+**Result:** With the judge enabled, a note ships only if both the judge and the rule-based negation checks accept it.
+**Approved-by:** Umesh
+**Links:** T-040; D-144; ISS-T040JUDGE-002
+
+## D-152 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** ISS-ALERTID-002: Umesh ruled (2026-10-13) to keep alert ids as they are (unsalted hash); the offline-guessing risk is accepted. ISS-ALERTID-002 is closed as accepted-risk (ledger status wontfix).
+**Why:** The risk of offline guessing of alert ids was weighed and accepted by the Approver, so no change to the id scheme is made.
+**Result:** Alert ids stay an unsalted hash; ISS-ALERTID-002 closed as accepted-risk.
+**Approved-by:** Umesh
+**Links:** ISS-ALERTID-002
+
+## D-153 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /ask with invalid source rows: Umesh chose (2026-10-13) to exclude invalid turns per-turn (e.g. tEnd<tStart legacy rows), record them in a warning, and answer from the remaining sessions; an excluded turn is never cited; if all rows are invalid the request is refused; foreign-tenant/foreign-session rows still refuse the whole request. New invalid timing is refused at write time.
+**Why:** A few bad legacy turns should not take down /ask (503) for every session, but cross-tenant rows remain a hard refusal and bad data must not be cited or newly written.
+**Result:** /ask answers from valid turns with a warning listing excluded ones; all-invalid or foreign rows refuse; new invalid timing is rejected at write.
+**Approved-by:** Umesh
+**Links:** T-043; lane badturns
+
+## D-154 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants confirmed: cancelled-meeting tombstones retained 14 days, match window +/-24 h (Umesh, 2026-10-13). Resolves the owner question in ISS-TOMBSTONE-001/-007 and ISS-T036CAL-011.
+**Why:** The retention and match-window constants were an open owner question on the tombstone issues; the Approver has now fixed them.
+**Result:** Tombstone retention is 14 days and the match window is +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; D-130
+
+## D-155 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Langfuse: hosted Langfuse Cloud (cloud.langfuse.com) Hobby free tier is allowed; traces carry metadata only (model, tokens, cost, tenant tag), no transcript text. If usage would exceed the free tier, switch to self-hosted rather than paying. This amends ONLY the self-hosted-only assertion for T-049: the 'Langfuse self-hosted' wording in the TASKS.md T-049 row and the self-hosted clause of criterion 3 (TENANT ID ruling) in qa/contracts/t049-langfuse-trace-sink.md. No DECISIONS entry required self-hosting, so nothing is superseded and no other part of T-049 changes.
+**Why:** T-049 live evidence ran against a hosted free tier; the Approver allows it provided traces stay metadata-only and the project never pays for overage.
+**Result:** T-049 may use Langfuse Cloud Hobby with metadata-only traces; exceeding the free tier means self-hosting, not paying.
+**Approved-by:** Umesh
+**Links:** T-049; qa/contracts/t049-langfuse-trace-sink.md criterion 3
+
+## D-156 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-021: Umesh ratifies gate condition 4 -- U1.4/U1.5 baselines re-point to the redesigned golden set (semantic leg recall@5 0.935, qa/verdicts/golden-set-semantic-leg.md).
+**Why:** Gate condition 4 required an Approver decision to move the U1.4/U1.5 baselines onto the redesigned golden set.
+**Result:** U1.4/U1.5 baselines now measure against the redesigned golden set; T-021 gate condition 4 is ratified.
+**Approved-by:** Umesh
+**Links:** T-021; qa/gates/golden-set-redesign.md
+
+## D-157 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U3.1: Umesh accepts the real-Chrome CDP browser proof (qa/verdicts/web-ask-page.md PASS 8/8, qa/evidence/u31-ask-proof-20260921/) in place of a literal Playwright run.
+**Why:** A real Chrome run over CDP exercised the actual page 8 of 8, which the Approver accepts as equivalent proof.
+**Result:** U3.1 browser proof is satisfied by the CDP real-Chrome evidence.
+**Approved-by:** Umesh
+**Links:** U3.1
+
+## D-158 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** /system-status contract (qa/contracts/t057-d2-activity-health.md C1/C4) amended: the DTO may include a `source` field (upload-queue | job-queue) and job-queue failures map to a fixed error-class allow-list; D-139 dead jobs appear tenant-scoped.
+**Why:** D-139 makes terminally failed runs dead jobs in the file job queue, which /system-status must be able to show without leaking raw error text or other tenants' jobs.
+**Result:** Contract C1 and C4 are amended accordingly; the source field and the fixed error-class allow-list are permitted.
+**Approved-by:** Umesh
+**Links:** D-139; ISS-FAILEDJOB-001; T-057
+
+## D-159 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Tombstone constants corrected: retention is 30 days (code MATCHED_HORIZON_MS, unchanged) and match window +/-24 h. D-154 stated 14 days because the owner question quoted the wrong current value; Umesh confirmed 30 days (2026-10-13).
+**Why:** D-154 recorded 14 days from a mis-quoted current value; the owner chose to keep the shipped 30-day horizon, so the record must match.
+**Result:** Tombstone retention is 30 days and the match window is +/-24 h; no code change.
+**Supersedes:** D-154 -- D-154's only assertion was the retention and window constants, and its 14-day figure was wrong; this entry replaces it in full with 30 days and +/-24 h.
+**Approved-by:** Umesh
+**Links:** D-060; D-129; ISS-TOMBSTONE-001; ISS-TOMBSTONE-007; ISS-T036CAL-011
+
+## D-160 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-042: build active-speaker tile capture in the meeting bot; tile-derived names (including tile+intro 'agree') are shown as SUGGESTED only and confirmed by a human, exactly like D-141 model suggestions; tile names never become auto-final. Capture is behind a flag, default off.
+**Why:** Tile names can be wrong or spoofed, so they get the same human-confirmation gate as model suggestions rather than being auto-final.
+**Result:** Tile capture is built behind a default-off flag; tile-derived names are SUGGESTED only until a human confirms.
+**Approved-by:** Umesh
+**Links:** T-042; D-141; ISS-T042FUSION-001
+
+## D-161 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** T-050: Umesh chose (2026-10-13) to use the real LangGraph library (official @langchain/langgraph, JS 1.x, exact pinned version) for the pipeline graph, replacing the minimal typed executor; behaviour, tests and the LKB_PIPELINE_GRAPH flag stay the same. The /ask graph (D-142) follows in a later unit.
+**Why:** The Approver prefers the official library over a hand-rolled executor, with identical behaviour, tests and flag so the swap is a pure replacement.
+**Result:** The pipeline graph moves to @langchain/langgraph (JS 1.x, exact pinned); the /ask graph follows in a later unit.
+**Approved-by:** Umesh
+**Links:** T-050; D-142
+
+## D-162 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** Lift the D-119 driver-file hold so T-044 (drift-clamp/QA wiring), T-048 (single-call chooser wiring) and T-040 (grounded notes and Q&A wiring) can be built. The hold covered scripts/transcribe-long-session.mjs, sync-session.mjs, scripts/ingest-chain.mjs, scripts/lib/transcript-provenance*, scripts/upload/* and gemini-file-upload.ts. Each of the three wirings must sit behind a flag that is OFF by default.
+**Why:** D-119 reserved those files until real end-to-end evidence existed. qa/verdicts/u4.1-recording-upload-worker.md now records "Effective U4.1 unit VERDICT: PASS", which supplies that evidence. Umesh approved the lift explicitly on 2026-10-13.
+**Result:** The hold on the listed driver files is lifted for T-044, T-048 and T-040 work only, with default-off flags. The rest of D-119 is unchanged.
+**Supersedes:** D-119 -- only D-119's hold on the listed driver files is superseded, because the U4.1 PASS verdict now provides the end-to-end evidence the hold was waiting for; the remainder of D-119 stands.
+**Approved-by:** Umesh
+**Links:** T-044; T-048; T-040; U4.1; D-119; qa/verdicts/u4.1-recording-upload-worker.md
+
+## D-163 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U2.2 golden labels: an agent may pre-fill the U2.2 adjudication fields in data/eval/extraction-adjudication-packet.json and data/eval/golden-set-human-review.json, clearly marked as AI drafts and never as humanGold. Each draft becomes gold only after Umesh reviews and approves it individually.
+**Why:** Pre-filling drafts reduces the human adjudication workload while keeping the human as the sole source of gold labels. Umesh gave this answer explicitly on 2026-10-13.
+**Result:** AI-drafted adjudication values are permitted but are not gold; no label counts as humanGold until Umesh approves that item.
+**Approved-by:** Umesh
+**Links:** U2.2; U2.3; U2.5; T-055
+
+## D-164 | 2026-10-13 | type: decision | status: ACTIVE
+
+**What:** U0.10 real-LLM baseline: spend approved. Run it on Ollama Cloud models first (Umesh: "ollama glm 5.3 flash, deepseek 4.1 flash"), then Gemini at the end, using the keys already in .env.
+**Why:** The real-LLM baseline needs paid model calls; Umesh approved the spend and the run order explicitly on 2026-10-13.
+**Result:** U0.10 may run against Ollama Cloud models first and Gemini last, using existing .env keys.
+**Approved-by:** Umesh
+**Links:** U0.10; T-022; D-156
+
+## D-165 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Enable automatic meeting discovery and auto-join (T-036, T-037, T-038). The bot joins webinars automatically. Career counselling and career guidance content has the highest priority, including on scheduling conflicts. Other webinars, e.g. Google Cloud OnAir, are test data and go to staging. Alerts go by email to umeshsugara@vidysea.com via gws AND appear on the web dashboard. This authorizes enabling the T-038 scheduler consent gate, and setting the relevant default flags ON for this deployment.
+**Why:** Umesh answered directly on 2026-10-14. Q: "Should the bot join meetings on its own? Which ones?" A: "webinars and all . most high priority should be given to career counselling, career guidance and all these kind of data . humko ussi ka knowlege base bnnana hai . ye google wala tho for testing and all hai". Q: "When the scheduler finds a meeting, how should it tell you?" A: "email, and web dashbaord both".
+**Result:** Auto-discovery and auto-join are authorized for this deployment, with career counselling and guidance webinars first, other webinars staged as test data, and alerts sent by email and shown on the dashboard.
+**Approved-by:** Umesh
+**Links:** T-036; T-037; T-038
+
+## D-166 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Umesh approved the execution plan's T-037 `last-valid` join-rules policy by asking to implement that plan. Only a successfully validated, actually present complete primary rules/state document may refresh the tenant-bound integrity-checked snapshot. On primary failure, fallback is allowed only for the currently verified equal configured/API-key tenant and only while snapshot age is nonnegative and strictly below one hour. Missing, expired, future, corrupt, foreign or invalid snapshots refuse joins. Fallback never renews its validation time; cached deny and opt-out rules remain effective.
+**Why:** A bounded last-valid policy maintains previously validated controls during transient rules failures while preventing unrestricted continuation or cross-tenant attribution. This settles the execution plan's policy choice without weakening independent cancellation, registration, rejection, identity or tenant safeguards.
+**Result:** The explicit `last-valid` mode and one-hour exclusive expiry are authorized. Degradation immediately records durable dashboard state and attempts email to umeshsugara@vidysea.com through the authorized gws channel; delivery failure stays visible and cannot widen selection. Recovery clears degradation only after successful primary validation, evaluation and snapshot persistence. The source unit's PASS does not prove delivered alerts or live deployment: real scheduler forwarding, verified tenant/key signal, truthful UI, notification delivery and nonproduction live enforcement evidence must pass before enabling. Existing ISS-376 sender-policy and recurring/id-only opt-out gates remain separate. D-165 career priority/staging/auto-discovery authorization remains unchanged.
+**Approved-by:** Umesh
+**Links:** D-165; T-037; T-038; qa/contracts/t037-last-valid.md; qa/manifests/t037-last-valid.md; qa/verdicts/t037-last-valid.md; ISS-TENANTSIG-001; ISS-WIREPRE-001; ISS-376
+
+## D-167 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Umesh explicitly confirmed D-166's `last-valid` join-rules policy on 2026-10-14. The orchestrator asked him in this session: "Do you approve D-166? It covers join-rules: if the rules fail to load or become invalid, the bot keeps using the last valid rules for 1 hour, then stops." His verbatim answer: "hnn bot ko try krna hai kese bhi krkee best posible manner mai meeting join krre. rules should be in this way". Interpretation: he confirms D-166's last-valid policy (one-hour bound, then stop) and states the governing intent that the bot should try its best, by any means, to join meetings. Future join-rule choices should favour attempting the join over skipping, within D-166's bounds.
+**Why:** D-166 recorded Approved-by: Umesh on the basis of an inferred approval (he asked to implement the plan), which ISS-CODEXWAVE1-001 flagged as self-asserted. This entry supplies the explicit, quoted confirmation without editing D-166.
+**Result:** D-166 stands as written and is now explicitly approved. Join-rule design leans toward attempting a join over skipping, but never beyond D-166's bounds: one-hour exclusive expiry, tenant-bound verified snapshots, cached deny and opt-out rules still effective, and ISS-376 gates unchanged. ISS-CODEXWAVE1-001 is closed by this entry.
+**Approved-by:** Umesh
+**Links:** D-166; T-037; ISS-CODEXWAVE1-001 (Supersedes: none, this entry confirms D-166)
+
+## D-168 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Extend the D-150 deliberate production opt-in to the T-054 transcript-review store and the T-056 answer-policy store. They may write to `lkb` only when MONGODB_DB=lkb AND LKB_I_KNOW_THIS_IS_PRODUCTION=1. docker-compose's api service sets that opt-in. Without the opt-in, these stores keep refusing `lkb`, with a 503.
+**Why:** Umesh was asked on 2026-10-14: "Transcript corrections (T-054) and answer policies (T-056) return 503 on the production database (lkb), so they won't work live. The other stores write to lkb. Should these be allowed to write to production too?" He selected "Yes, with the opt-in (Recommended)": same pattern as D-150, writing to lkb only when the API has MONGODB_DB=lkb and LKB_I_KNOW_THIS_IS_PRODUCTION=1 set, with that env added to docker-compose's api service.
+**Result:** T-054 and T-056 stores can work live on lkb under the explicit opt-in; the default remains a 503 refusal.
+**Approved-by:** Umesh
+**Links:** D-150; D-143; T-054; T-056; ISS-WAVE2MOUNT-002
+
+## D-169 | 2026-10-14 | type: decision | status: ACTIVE
+**What:** Authorize the user-requested root Docker/DevOps packaging unit: a root Dockerfile consumed by docker-compose.yml, focused deployment documentation and remote container CI. Set structure.config.json root.maxLooseFiles from 15 to 16 solely to accommodate the additional root Dockerfile.
+**Why:** The explicit rootDocker execution request selects deployable application packaging ahead of unrelated backlog. A root image entry point makes the Compose build discoverable from the repository root; its added root file must fit a reasoned declared budget instead of silently bypassing structure checks. This is a new packaging behavior and is not another polish round on previously capped lint or deployment seams.
+**Result:** The packaging source unit may proceed under maker/checker discipline. Existing test and structure gates remain binding; actual remote full CI and independent checker evidence are required for scoped PASS. This entry does not close T-051 or authorize enforcement changes, frozen-contract changes, live production deployment, host activation, additional data writes or secret disclosure. Local Windows ignore-probe behavior must be reported, with the root budget checked against the clean CI checkout.
+**Changes-authorized:** Dockerfile; docker-compose.yml; docs/docker-deployment.md; .github/workflows/docker.yml; structure.config.json root.maxLooseFiles only; qa/manifests/root-docker-devops.md. Checker-owned qa/contracts/root-docker-devops.md and qa/verdicts/root-docker-devops.md follow their independent workflow.
+**Links:** T-051; qa/manifests/root-docker-devops.md; docs/docker-deployment.md; D-003; D-168
+
+## D-170 | 2026-10-14 | type: session | status: ACTIVE
+
+**What:** Continue the explicitly requested implementation of all forty remaining catalogue tasks: T-022, T-007, T-008, T-011, T-013, T-014, T-028, T-015, U0.10, U2.2, U2.3, U2.4, U2.5, U3.2, T-034, T-035, T-036, T-037, T-038, T-039, T-040, T-041, T-042, T-043, T-044, T-045, T-046, T-050, T-048, T-051, T-052, T-053, T-054, T-055, T-056, T-057, T-058, T-059, T-060 and T-061. Use independent makers and checkers with exclusive source-file leases and one central integration writer.
+**Why:** Live TASKS.md and goal task counts agree on 55 done, 28 in_progress and 12 open across 95 tasks. The user selected the complete remaining implementation goal after the root Docker packaging unit, rather than treating that packaging foundation or earlier scoped PASS units as whole-product delivery. Concurrent work must preserve source ownership, citation/tenant safety and current human/host acceptance gates.
+**Result:** Unblocked application implementations, immediate downstream wiring, focused tests and deployment interfaces may proceed across the forty tasks. Makers propose their scoped source paths before writing; central integration owns shared API/web composition, dependency/lock/schema/generated/migration integration, append-only decisions, trackers and publication. Checker-owned contracts/verdicts remain independent. Individual task status becomes done only after its complete acceptance passes; human semantic approvals, counsellor judges, guarded exports, real credentials/accounts, production writes/promotion, supervisor activation and real Windows/Ubuntu/live/seven-day proofs remain separate existing gates. No evidence is inferred or manufactured and no old decision or historical verdict is rewritten.
+**Changes-authorized:** Application source modules under apps/ and packages/; workers/ source interfaces; scripts/ feature and deployment modules; ordinary schema/ and migrations/ plus generated-type integration; package.json and pnpm-lock.yaml only for required task dependencies; focused tests; feature/deployment documentation; qa/ manifests, packets, evidence, feedback and issue shards under the maker/checker ownership rules; TASKS.md and .goal/goal.json factual progress updates. Frozen contracts and architecture sections, project governance and enforcement paths are excluded from this authorization.
+**Links:** TASKS.md; .goal/goal.json; qa/QUEUE.md; D-169; T-051; full remaining-task list in What.
+
+## D-171 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Set only structure.config.json dirsize.overrides.schema from 40 to 43 for all-forty-task canonical schema integration: forty-one collection schemas plus index.json and validate.py.
+**Why:** D-170 authorizes ordinary schema-first implementation. The existing thirty-two collections and nine necessary durable collections for documents, collections, outputs, championship, automation and answer policies require one canonical schema file each. A precise directory override preserves the established one-schema-per-collection convention without weakening global file or source-length limits. The orchestrator explicitly approved this exact 40-to-43 source budget adjustment after the roadmap was delivered.
+**Result:** The central integration writer may add the six outstanding collection schemas, generated types and unapplied migration interfaces. This is a source directory budget only; no enforcement paths, frozen architecture/contracts, production writes, migration execution, deployment or acceptance gates change.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only.
+**Links:** D-170; T-014; T-055; T-056; T-058; T-061; schema/index.json.
+
+## D-172 | 2026-10-14 | type: decision | status: ACTIVE
+
+**What:** Set only structure.config.json dirsize.overrides.schema from 43 to 45 for forty-three canonical collection schemas plus index.json and validate.py.
+**Supersedes:** D-171 -- The verified T-061 form operation producer requires application_operations distinct from readiness runs, and the verified T-057 audited scheduling producer requires operations_schedules; the earlier nine-collection projection omitted these two concrete durable consumers.
+**Why:** The root orchestrator explicitly approved the necessary 44 or 45 file budget after inspecting actual producer definitions and synthetic fixture shapes. Form submission must not masquerade as read-only readiness; audited digest/Sheets schedules must persist independently of browser preferences. Both shapes are now documented by their real typed producers, with tenant scope and durable CAS/audit requirements. This exact directory-only adjustment preserves every other source and global budget.
+**Result:** The central writer may author these two canonical schemas, generated types, tenant-scoped accessors and unapplied migrations. No live form submission, email/Sheets dispatch, production write, deployment or acceptance proof is authorized by this source adjustment.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only.
+**Links:** D-170; D-171; T-057; T-061; apps/api/src/automation/form-types.ts; qa/packets/goal-t061-form-schema-fixtures.json; apps/api/src/operations-integrations/model.ts.
+
+## D-173 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Implement Umesh's explicitly approved Complete the Knowledge Brain with Vectorless RAG plan. All active source types use provenance-bound trees, keyword retrieval, graph relationships and bounded LLM navigation; no model training or fine-tuning. T-015 is not required and excluded from active scope, preserving its history without claiming completion. Text routing uses existing Ollama Cloud credentials, GLM 5.3 Flash primary and DeepSeek 4.1 Flash independent verifier/fallback. Audio remains on an explicitly audio-capable adapter. Preserve tenant scope, human-confirmed speaker identities, cited evidence and derived-revision invalidation.
+**Why:** Umesh explicitly requested vectorless RAG and individual speaker/session knowledge, rejected model training, authorized the existing Ollama key, and then pasted this full plan with PLEASE IMPLEMENT THIS PLAN. This replaces the old vector/embedding product direction and training work with one source-grounded knowledge brain while retaining historical implementation evidence.
+**Result:** The 39 included unfinished parents may proceed through exclusive maker leases, central integration, independent checker and broker-serialized verification. T-008 and U3.2 now target vectorless unstructured/global search, not active vector search. Existing scoped PASS is reused only when applicable. No parent is done without complete acceptance; human calibration, gold labels, actual capture/alerts, host acceptance and seven actual days remain real gates. Existing production, external-effect and enforcement approval boundaries remain unchanged. Unknown provider price is recorded as unknown with actual token counts, never as free.
+**Supersedes:** D-000, D-005, D-008, D-170 -- Only their active vector-index/training direction and default text-provider ordering are replaced by the user's explicit all-source vectorless, no-training and Ollama Cloud-first plan; their other provenance, provider-seam, governance, capture and acceptance requirements stand.
+**Approved-by:** Umesh
+**Changes-authorized:** Application modules and focused tests; config/ai-routing.yaml; root Docker/Compose staging configuration; ordinary schema and generated-type integration; TASKS.md and .goal/goal.json factual scope/progress; qa coordination, manifests, packets and evidence under maker/checker ownership. This entry does not authorize editing frozen architecture/contracts, governance/enforcement paths, production promotion, host activation or fabricated human/live evidence.
+**Links:** T-015; T-008; U3.2; D-170; D-164; TASKS.md; .goal/goal.json; qa/coordination/knowledge-brain-20261015/delivery-matrix.md.
+
+## D-174 | 2026-10-15 | type: fix | status: ACTIVE
+
+**What:** Correct D-173's over-broad Supersedes field. D-000, D-005, D-008 and D-170 remain authoritative in full except the narrowly approved changes stated here: active retrieval for all sources becomes vectorless rather than vector/embedding based; T-015 training is excluded as not required without claiming done; text-generation chains become Ollama Cloud GLM primary and DeepSeek verifier/fallback. All other requirements of those entries remain in force, including D-170's 39 included parent-task execution authority and complete independent human/live acceptance gates.
+**Why:** D-130 documents that the resolver treats every Supersedes target as a complete retirement and offers no partial/amends relation. D-173's prose intended only a narrow amendment but its field incorrectly made whole entries compute as superseded. Umesh approved the specific plan, not retirement of earlier governance, provenance, capture, provider capability, tenancy or acceptance requirements. This corrective record restores the intended authoritative interpretation without editing history or enforcement.
+**Result:** Readers must apply D-000, D-005, D-008 and D-170 as active except the three explicitly amended clauses above. The computed index may still print SUPERSEDED because the resolver cannot un-supersede; that limitation is disclosed and is not an authorization to change enforcement. D-173 remains historical proof of the approved plan and carries no broader retirement authority. No architecture, frozen contract or enforcement file is changed. Existing human/host/production/external-effect approvals and previously approved speaker gate requirements remain binding.
+**Approved-by:** Umesh (explicit PLEASE IMPLEMENT THIS PLAN request authorizes the three narrow changes; this record corrects the agent's over-broad representation).
+**Links:** D-173; D-130; D-000; D-005; D-008; D-170; T-015; T-008; U3.2; qa/coordination/knowledge-brain-20261015/decision-entry.md.
+
+## D-175 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Prioritize the user's systemwide checker-efficiency fix before further Knowledge Brain implementation. Build a focused checker-admission and review-budget mechanism, independently validate it once from a frozen minimal-context packet, then install the same validated skill for subsequent checks. Knowledge Brain source work and tests remain frozen until root explicitly resumes; the goal is not cancelled or falsely completed.
+**Why:** Umesh's latest priority mandate was relayed by the root orchestrator: freeze Knowledge Brain until the systemwide checker efficiency fix. The root explicitly approved this exact recording scope and a single bounded independent check, avoiding parallel duplicate contract-only reviewers. This is a distinct admission/budget mechanism, not another capped documentation-polish round. Design, maker and independent-review costs must be reported honestly, without reclassification to manufacture a target ratio.
+**Result:** The maker may implement and prepare one frozen review packet. A minimal-context independent checker later verifies user requirements and applicable contracts and may add the dedicated acceptance contract within the same bounded review. Global installation requires normal sandbox approval for paths outside the writable workspace, and only validated identical files may be installed. No hooks, settings, repository AGENTS.md, production state or protected enforcement path is changed. No earlier decision is superseded.
+**Approved-by:** Umesh (latest systemwide checker-efficiency-first mandate, relayed and exact scope confirmed by the root orchestrator).
+**Changes-authorized:** skills/checker-efficient/SKILL.md; skills/checker-efficient/scripts/checker-admission.mjs; skills/checker-efficient/scripts/checker-admission.test.mjs; qa/manifests/checker-efficiency-admission.md; qa/packets/checker-efficiency-admission.md; qa/coordination/checker-efficiency-20261015/*; checker-owned qa/contracts/checker-efficiency-admission.md and qa/verdicts/checker-efficiency-admission.md; append checker-efficiency rule only to C:\Users\product\.codex\AGENTS.md; install same independently validated files only under new C:\Users\product\.codex\skills\checker-efficient/*. Out-of-workspace writes retain normal approval requirements.
+**Links:** qa/manifests/checker-efficiency-admission.md; qa/packets/checker-efficiency-admission.md; qa/coordination/knowledge-brain-20261015/freeze-checkpoint.json; D-173; D-174.
+
+## D-176 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Increase only structure.config.json dirsize.overrides.schema from45 to46 for the already authorized speaker_relationships canonical collection:44collection schemas plus index.json and validate.py. Its explanatory comment may reflect that exact count. No other budget changes.
+**Why:** Umesh's approved Knowledge Brain architecture includes provenance-bound reviewed speaker relationships. The separate canonical collection keeps suggested/rejected/revoked proposals outside graph_edges, whose existing readers expose every row. The root orchestrator explicitly approved this precise one-file routine source/config increase after checking its location. structure.config.json is ordinary source configuration, not frozen contracts, checker-owned acceptance, project AGENTS or a protected hook/settings/append-script path. This retains one-schema-per-collection rather than bypassing structural checks.
+**Result:** Central integration may apply the exact45-to46 ordinary config change and author the separately approved schema/generated/accessor/unapplied-migration seam. No activation, migration execution, database write, frozen contract/architecture, governance or enforcement change is authorized. Native transaction acceptance and complete parent delivery remain open. D-172's other boundaries stand; this entry amends only its schema count and uses no broad Supersedes relation.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only, plus its count explanation; all other budgets unchanged.
+**Links:** D-172; D-173; D-174; T-055; qa/coordination/knowledge-brain-20261015/delivery-matrix.md; proposed schema/speaker_relationships.schema.json.
+
+## D-177 | 2026-10-15 | type: decision | status: ACTIVE
+
+**What:** Increase only structure.config.json dirsize.overrides.schema from46 to47 for the approved canonical speaker_attributes collection, with its exact count explanation.
+**Why:** The approved Knowledge Brain plan includes source-backed, human-reviewed organization and role attributes. A separate collection keeps unreviewed proposals outside accepted speaker profile and graph reads. The root orchestrator confirmed this exact ordinary source/config increase after approving the isolated U2.4 implementation. This is not permission to alter protected enforcement paths or frozen contracts.
+**Result:** Central integration may author the corresponding canonical schema, generated types, accessor and unapplied migration source, and apply only this one-count ordinary budget adjustment. No migration execution, host activation, native database writes, unrelated budget changes, frozen architecture or checker-owned acceptance edits are authorized. Earlier decisions and full parent acceptance gates remain intact.
+**Changes-authorized:** structure.config.json dirsize.overrides.schema only, plus its count explanation; separate canonical schema/generated/accessor/unapplied migration source follows the approved U2.4 implementation scope.
+**Links:** D-176; D-173; D-174; U2.4; qa/coordination/knowledge-brain-20261015/delivery-matrix.md; proposed schema/speaker_attributes.schema.json.
+
+## D-178 | 2026-10-17 | type: decision | status: ACTIVE
+**Title:** Approver rulings for the 40-task build wave (2026-10-17)
+**What:** Records the Approver's rulings for the 40-task build wave, plus the earlier D-153 malformed-turn fix.
+- D-153 malformed-turn handling (as approved): in apps/api source-context.ts, keep malformed turns only for sessions where sessionVisible is true, never cite them, and list them in excludedTurns with a per-turn warning.
+- Ruling 1, ISS-376 hybrid: in everyWebinar mode, a Gmail candidate whose sender authentication explicitly FAILED is not silently scheduled. Unknown-sender unauthenticated mail becomes "needs approval" and is auto-promoted when a human approves it. Authenticated, approved or calendar-sourced candidates stay schedulable.
+- Ruling 2, ISS-T037VETO-003: keep fail-closed plus the D-166 last-valid fallback (1h). Log the JoinRuleSetValidationError message once per tick and alert. The auto-join enforcement flag stays OFF until the t037-last-valid live conditions are met.
+- Ruling 3, ISS-TOMBSTONE-001: evidence-bounded expiry. Store a first-seen tick on the tombstone row and release the hold after the 30-day horizon (D-159). Also release it when the tombstone predates the Gmail row's message date. Rows lacking the field get a safe migration. Full ceremony applies.
+- Ruling 4, T-052 / D-079: activate the narrow, read-only Brevo/Zoom destination exception ONLY after an independent checker PASS on registration-link-resolver.ts and zoom-registration-proof.ts. No submissions.
+- Ruling 5, retention (T-046, ARCHITECTURE Q6): min-age-days=90, clip-padding-seconds=15. Agents run dry-runs only. Real deletion stays a human action.
+- Ruling 6, send-now: scripts/webinar/join-rules-api-host.ts is the single supported API host for send-now. A plain apps/api index.ts start intentionally answers 503 for send-now.
+**Why:** Open policy questions blocked the wave. The Approver ruled in chat on 2026-10-17. Verbatim: "Umesh approves rulings 1-5 as proposed (ISS-376 hybrid, tombstone 30-day expiry, T-052 activation after checker PASS, retention 90d/15s with dry-run only, join-rules-api-host as the send-now host). Record them and run all remaining work in parallel." Earlier the same day: "Umesh approves the D-153 fix in apps/api source-context.ts: keep malformed turns only for sessions where sessionVisible is true, never cite them, and list them in excludedTurns with a per-turn warning."
+**Result:** Rulings are recorded and authorize the paths below. Ruling 1 amends D-056 and contract C5; the contract text update follows via /graduate or a PIVOT checkpoint (makers never edit qa/contracts). Ruling 4 is a PIVOT of D-079 (amends it, does not retire it), limited to the narrow read-only Brevo/Zoom destination exception, gated on the checker PASS.
+**Amends:** D-056 and contract C5 (ruling 1; contract text update to follow via /graduate or PIVOT). D-079 (ruling 4, a PIVOT: D-079 "Authorize precise T-052 durable registration and proof-bound confirmation integration in existing source pipeline" stays in force; ruling 4 adds only a narrow, read-only Brevo/Zoom destination exception, activated after an independent checker PASS on registration-link-resolver.ts and zoom-registration-proof.ts, with no submissions). No decision is superseded.
+**Changes-authorized:**
+- packages/meeting-bot/src/calendar/** (rulings 1-3)
+- packages/meeting-bot/src/calendar/registration-* and zoom-registration-proof.ts (ruling 4)
+- packages/ingest/src/retention/** and the retention scheduler args (ruling 5)
+- ARCHITECTURE.md section 6 Q6 (ruling 5)
+- apps/api/src/ask/source-context.ts (D-153)
+**Approved-by:** Umesh
+**Links:** T-037, T-036, T-052, T-046, T-039, ISS-376, ISS-T037VETO-003, ISS-TOMBSTONE-001, ISS-SENDNOWAPI-004, D-153
+
+## D-179 | 2026-10-17 | type: decision | status: ACTIVE
+**Title:** PIVOT checkpoint: align contract C5 and tombstone clause 2 with rulings 1 and 3; U2.4 model-derived speaker names stay suggestion-only
+**Verdict:** PIVOT
+**What:** Approved PIVOT checkpoint that updates two contract clauses to match code already implemented and checker-PASSed under D-178, and records the U2.4 choice.
+- qa/contracts/webinar-portable-release.md [C5]: the sentence "Scheduler admits every positively classified webinar across Gmail and Calendar regardless of prior sender trust" is replaced by ruling 1 (ISS-376 hybrid). In everyWebinar mode a Gmail candidate whose sender authentication explicitly failed is skipped unless a human approved it; an unknown unauthenticated sender goes to needs-approval and is scheduled once a human approves it; authenticated, human-approved and calendar-sourced candidates are admitted. The rest of C5 is unchanged.
+- qa/contracts/calendar-unknown-tombstone.md clause 2: restated to carry ruling 3 (ISS-TOMBSTONE-001). The 30-day firstSeen horizon (D-159) applies to the id-only tier only; the id-only hold is also released when the tombstone predates the Gmail message; LINK/HOST/START holds, explicit rejections and real (known) cancellations are never released. A row lacking firstSeen is stamped on the migrating tick, so the 30-day rule cannot release it then, but the predates-the-mail rule still applies. Checker verdict b44dc2c8 (qa/verdicts/tombstone-expiry-ruling3.md, finding L3) flagged the old wording.
+- U2.4 (delegated by the Approver, chosen by the orchestrator): MODEL-derived speaker names (LLM or tile suggestions) stay suggestion-only. Each needs human confirmation, and there is no phase-4 write of them until a precision re-gate PASSes. The deterministic floor plus independent-pair auto-final in goal-U24 clause 3 is unchanged, so that clause needs no edit.
+**Why:** After D-178 rulings 1 and 3, the contract text contradicts implemented and checker-PASSed behaviour. The Approver approved this checkpoint in chat on 2026-10-17 with "go for it too", replying to this exact proposal, verbatim: "Contract update (/graduate ya PIVOT). Ruling 1 ke baad contract C5 ki line 'har webinar admit hoga, sender trust ke bina' galat ho gayi hai." and "Ruling 3 ke baad clause 2 bhi takrata hai, kyunki cancel hone ke baad aaya reminder mail release ho jaata hai." For U2.4 the Approver wrote, verbatim: "jo best hai go for it".
+**Result:** Both contract clauses now state the rulings and cite D-179; every other contract line is unchanged. U2.4 is recorded: model-derived names are suggestion-only with a precision re-gate before any phase-4 write; goal-U24 clause 3 is unchanged.
+**Amends:** contract C5 (qa/contracts/webinar-portable-release.md) and clause 2 of qa/contracts/calendar-unknown-tombstone.md, completing the contract update D-178 deferred. No decision is superseded.
+**Changes-authorized:**
+- qa/contracts/webinar-portable-release.md, clause [C5] only (ruling 1)
+- qa/contracts/calendar-unknown-tombstone.md, clause 2 only (ruling 3)
+- U2.4 ruling: MODEL-derived speaker names (LLM or tile suggestions) suggestion-only, human confirmation for each, no phase-4 write until a precision re-gate PASSes; goal-U24 clause 3 deterministic floor plus independent-pair auto-final unchanged
+**Approved-by:** Umesh
+**Links:** T-036, T-037, U2.4, D-178, ISS-376, ISS-TOMBSTONE-001, ISS-282
+
+## D-180 | 2026-10-17 | type: decision | status: ACTIVE
+**Title:** T-052 registration-link approval record schema; ISS-282 closed on precision, auto-final gate not met
+**What:** Records two rulings the Approver delegated to the orchestrator on 2026-10-17.
+- Ruling 1, T-052 registration-link approval record. New tenant-scoped collection `registration_link_approvals` with fields: tenantId; decisionId (ULID/UUID); linkHash (sha256 of the canonical URL); scopeHash; policyHash (hash of the current registration policy revision); for Zoom proof: bindingHash, policyRevision, hostScopeHash; approvedBy (a human user id, never a bot or service key); approvedAt; expiresAt (approvedAt + 30 days at most); revokedAt (optional). Records are created ONLY by an authenticated human through an API route that requires the dedicated scope `registration:approve`. The resolver (registration-link-resolver.ts) and the proof (zoom-registration-proof.ts) accept a link only if a matching, unexpired, unrevoked record exists for the same tenant and every hash matches. Read-only GET, no form submissions (D-079, D-178 ruling 4). The activation constants REGISTRATION_LINK_RESOLUTION_ENABLED and ZOOM_PROVIDER_CORRELATION_ENABLED flip to true only after an independent checker PASS on this unit.
+- Ruling 2, ISS-282. The precision defect is resolved: the grounded path scored 15/15 with 0 wrong links (checker verdict c10022da, qa/verdicts/u2-4-suggestion-regate-w17.md). The "at least one correct auto-final addition" gate (bar 5) is NOT met by suggestions. Auto-final writes of model-derived names therefore stay disabled per D-179, and model names remain suggestion-only. ISS-282 is closed as "resolved: precision; auto-final gate not met -> write path stays off".
+**Why:** Both questions were open Approver decisions. On 2026-10-17 the Approver was shown, verbatim: "T-052: approval-record ka schema kaisa ho, ye aapka policy faisla hai." and "ISS-282: kya 8 sahi suggestions ko gate ke liye kaafi maana jaye?" He replied, verbatim: "iska bhi permit le lee". That delegates both decisions to the orchestrator, which made the two rulings above; this entry records them exactly as relayed by the orchestrator. A durable, tenant-scoped, human-created and expiring approval record is what the resolver and proof already require from their trusted `authorize` seam ("never use a request body or a synthetic fixture as live authority"); it gives that seam a real source.
+**Result:** Rulings recorded. Ruling 1 authorizes the schema, store, route and trusted-lookup wiring listed below, with both activation constants kept false in the build commit. Ruling 2 closes ISS-282 on precision only; the D-179 suggestion-only rule and the phase-4 write block stand unchanged. No contract or ARCHITECTURE edit is authorized. No decision is superseded.
+**Amends:** D-178 ruling 4 (adds the approval-record source for the T-052 read-only exception; the checker-PASS activation gate is unchanged). D-179 is unchanged and confirmed for ISS-282.
+**Changes-authorized:**
+- schema/registration_link_approvals.schema.json, schema/fixtures/registration_link_approvals/*, and its schema/index.json entry (tenantId-leading indexes)
+- structure.config.json dirsize.overrides.schema 47 to 48, plus its count explanation only (precedent D-176, D-177)
+- packages/core/src/generated/registration_link_approvals.ts and packages/core/src/index.ts, generated only by scripts/gen-types.mjs (precedent D-057)
+- migrations/<timestamp>-registration-link-approvals.cjs as unapplied source only (precedent speaker_attributes); no migration execution
+- apps/api/src/registration-approvals/** (store, route, tests) and its mount in apps/api/src/composition/** (POST /registration-approvals behind requireAuth, scope registration:approve and a human-user check)
+- packages/meeting-bot/src/calendar/registration-* and zoom-registration-proof.ts: trusted approval lookup wiring; activation constants stay false until the independent checker PASS
+- qa/issues*.jsonl status of ISS-282 only
+**Approved-by:** Umesh (delegated on 2026-10-17, verbatim "iska bhi permit le lee"; the rulings were made by the orchestrator under that delegation)
+**Links:** T-052, U2.4, ISS-282, D-079, D-178, D-179, D-176, D-177, D-057, D-126, qa/verdicts/u2-4-suggestion-regate-w17.md
+
+## D-181 | 2026-10-18 | type: decision | status: ACTIVE
+**Title:** Legacy document consent: backfill consent-given sources rows on STAGING (ISS-T055STORE-001)
+**What:** The Approver ruled that consent for all legacy imports was already obtained and directed a backfill of a consent-given `sources` row for each legacy document that has none. Verbatim: "Consent for all legacy imports was already obtained. Backfill a consent-given sources row for each legacy document, then merge PR #7 once CI is green."
+- Scope: create a `sources` row (`_id` equal to the document's `sourceId`, `consent.given: true`) for each `document_documents` row whose `sourceId` has no `sources` row in the same tenant. This is exactly the lookup `sourceWithdrawn` performs in apps/api/src/knowledge/collections-store.ts, so it closes ISS-T055STORE-001.
+- Sessions: a session with no `sources` row is already fail-closed in apps/api/src/visibility/knowledge.ts (context() returns null), so the same gap does not apply and sessions are NOT backfilled by this decision; the script only reports their count.
+- Environment: STAGING only (`lkb_staging`). Production stays unauthorized (D-117); the script refuses any other database and no production flag is implemented.
+- Marking: every backfilled row carries `consent.recordedBy: "owner-attestation:D-181"` and `backfill: { decision: "D-181", at }`, so the rows stay distinguishable and revocable. Existing `sources` rows (including withdrawn ones) are never modified.
+- Execution gate: dry-run by default; writes need `--execute --confirm-backfill D-181`, and only after an independent checker PASS of the script.
+**Why:** ISS-T055STORE-001 (checker 8568a72d): document highlights and page routes fail open when a legacy document has no `sources` row. The Approver chose backfill over fail-closed, because consent for the legacy imports is already on record.
+**Result:** Backfill script scripts/operations/backfill-document-consent.mjs (dry-run default, tenant-scoped, idempotent, staging-only) is authorized. Writes against staging need the checker PASS first; any production run needs a new Approver decision.
+**Approved-by:** Umesh
+**Changes-authorized:**
+- scripts/operations/backfill-document-consent.mjs and its test (new files)
+- `sources` rows on lkb_staging only, inserted by that script with the markers above
+- qa/manifests/ entry for the unit
+**Links:** T-055, ISS-T055STORE-001, D-117, D-020, D-015
+
+## D-182 | 2026-10-19 | type: decision | status: ACTIVE
+**Title:** OnAir login permission expires 24h after the event; ISS-WEBINARRELEASE-013 resolved by ruling (keep trying to join)
+**What:** Records two Approver rulings given in chat on 2026-10-19.
+- Ruling 1, ISS-WEBINARRELEASE-013 (ID-only tombstone plus an old Gmail invite). Question, verbatim: "ISS-WEBINARRELEASE-013: when there's an ID-only tombstone plus an old Gmail invite, what should the bot do?" Answer, verbatim: "Keep trying to join (Recommended)". Current behaviour stays: the bot attempts to join, and the ended-detection stops it if the meeting was cancelled. The withdrawal part of the issue was verified separately (7c7e310b). The issue is closed as "resolved by ruling".
+- Ruling 2, OnAir login permission lifetime. Question, verbatim: "OnAir login permission: should it expire automatically?" Answer, verbatim: "Expire 24h after event (Recommended)". Each OnAir authority binding row (env LKB_ONAIR_SOURCE_BINDINGS, validated in apps/api/src/source-intake/jobs/source-privacy.ts) gains a required field `expiresAt` (ISO-8601 UTC timestamp, event end + 24h). Expiry is enforced at enqueue (approvedSourceSession) and at execution (sourceSessionStillApproved, and the media transport recheck that calls it). An expired binding is refused exactly like a removed binding: 0 page, tool or provider calls.
+- Migration, fail closed: an existing binding row that lacks `expiresAt` (or carries an unparseable one) is treated as expired and refused. Operators must add `expiresAt` to every live row; no row is grandfathered. The binding schema therefore changes from exactly 7 keys to exactly 8 keys (accountId, actorKeyIds, approvalRef, eventId, expiresAt, id, providerProcessing, tenantId). The bindings live in an operator env value, not a collection, so there is no schema/ file or generated type to change.
+**Why:** Both questions were open Approver decisions, answered by the Approver in chat as quoted above. A login permission that never lapses keeps a protected-source session usable long after the event it was granted for; a time-boxed grant fails closed by default.
+**Result:** Rulings recorded. Unit B (expiresAt field, enqueue and execution enforcement, fail-closed migration, tests) and Unit C (ledger row ISS-WEBINARRELEASE-013 to resolved) are authorized. No contract or ARCHITECTURE edit is authorized. No decision is superseded.
+**Amends:** D-167 and D-179 are unchanged; ruling 1 confirms the existing attempt-to-join behaviour and the tombstone handling of D-179. The T-045 OnAir binding rule (ISS-T045WORKER-002) gains the expiry field.
+**Changes-authorized:**
+- OnAir binding schema field `expiresAt` in apps/api/src/source-intake/jobs/source-privacy.ts and its tests (apps/api/src/source-intake/jobs/onair-binding.test.ts, privacy.test.ts) and docs/t045-source-worker.md
+- qa/issues.WEBINARRELEASE.jsonl: ISS-WEBINARRELEASE-013 status to resolved ("resolved by ruling") only
+**Approved-by:** Umesh
+**Links:** T-045, T-038, ISS-WEBINARRELEASE-013, ISS-T045WORKER-002, D-167, D-179
+
+## D-183 | 2026-10-19 | type: decision | status: ACTIVE
+**Title:** T-022 and U2.2 working labels are AI-consensus labels with confidence; human review is optional and overrides
+**What:** Records the Approver ruling given in chat on 2026-10-19. Verbatim: "screen mai ek windo bnaa krr de do teool mai hi krr denge but human dependency mat cnao, ai confidence k jaise dikhaa den a, huan can review". Meaning: build a review window in the tool for the T-022 judge items (30) and the U2.2 claims (72); no pipeline step may depend on a human; show the AI label with its confidence; a human can review.
+- Ruling 1, working labels. For T-022 and U2.2 the multi-model AI-consensus labels in data/eval/derived-drafts are the working labels. Each carries labelSource "ai-consensus" and a confidence derived from model agreement: all valid votes agree and no flags = high; majority = medium; disagree, no majority, or an invalid/failed vote = low. Confidence is computed server-side from the sidecar, never taken from a client.
+- Ruling 2, optional human review. A human reviewer may Accept AI (the label stays labelSource "ai-consensus" and reviewedBy is set) or Override with a chosen label and an optional note (the label becomes labelSource "human"). Nothing waits for a review.
+- Ruling 3, no humanGold. AI labels are NEVER stored as, or reported as, humanGold, and an Accept click never produces labelSource "human". Every metric that uses these labels must say "AI-consensus". The review packets and sidecars stay byte-pinned; reviews live in a separate tenant-scoped store keyed by item id.
+- This ruling does not make any contract humanGold criterion pass. The clauses below still require Umesh item-level human gold and are NOT edited here; a /graduate or approved PIVOT is needed to change them.
+**Why:** The Approver does not want the pipeline blocked on a human labelling queue. Showing the AI label with a confidence badge lets the pipeline proceed on AI-consensus labels while a human can still correct any of them. The D-163 rule that an AI draft is never humanGold is kept intact.
+**Result:** AI-consensus working labels, the optional-review screen and its store/route are authorized (Unit B of lane w27-labelreview). Metrics built on them are reported as "AI-consensus", never as human gold. The contract clauses requiring human gold remain open and unchanged.
+**Amends:** D-163 is NOT superseded: AI drafts remain never-humanGold. This entry adds a working-label tier below humanGold for T-022 and U2.2 and relaxes only the operational dependency on a human. Contract clauses that require human gold and would need a /graduate or PIVOT update before an AI-consensus label could stand in for them: qa/contracts/goal-t022.md C4 ("No batch `approve all`, background/model action, fixture import or forged local assertion creates human gold"), C6 (export needs exactly 30 individually authenticated review submissions), C7 ("Umesh actually reviews and individually approves all 30 displayed items. Machine-generated drafts ... are not individual human judgments"), C8 (calibration only after C7); qa/contracts/t022-calibration-human-review.md clauses 1 and 3 (human fields start null; reviewer assertion exactly `Umesh`); qa/contracts/goal-t022-offline-review.md clause 3 ("no approve-all ... or automatic human-gold promotion"); qa/contracts/goal-u22.md P3 ("D-163 requires actual individual Umesh review/approval before a draft becomes human gold") and S4; qa/contracts/goal-u23.md item 8 ("U2.2 must supply genuine item-by-item Umesh-approved ... human topic gold ... AI drafts are never humanGold"); qa/contracts/goal-u25.md P3 and P4 (Umesh approval and independently reviewed decision gold).
+**Changes-authorized:**
+- apps/api/src/label-review/** (new: source reader, tenant-scoped reviews store, router, tests) and its mount in apps/api/src/composition/integrations/** (central wiring, minimal)
+- apps/web/src/pages/label-review/** (new page, client, tests), its route in apps/web/src/App.tsx and nav item in apps/web/src/layout/NavSidebar.tsx, and the route list in apps/web/src/App.wiring.test.tsx
+- qa/manifests/w27-labelreview.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-022, U2.2, D-163, D-164, D-020, D-015, qa/manifests/w27-labelreview.md
+
+## D-184 | 2026-10-19 | type: decision | status: ACTIVE
+**Title:** WhatsApp groups become a webinar-discovery source through a minimal read-only path into the archiver
+**What:** Records two Approver statements given in chat on 2026-10-19. Question: "Where do the daily webinars actually come from?" Answer, verbatim: "WhatsApp groups". Later, verbatim: "whatsapp open krkee de ai connect krwa deta hu". The archiver runs at localhost:3000 and writes to the staging Mongo database `whatsapp_msg` (collections messages, groups, tracking).
+- Rule 1, new read path for webinar discovery only. Read only the archiver's `messages` from groups that are tracked AND listed in `WA_DISCOVERY_GROUPS` AND whose consent is not false.
+- Rule 2, minimal extraction. Extract only {url, ts, groupIdHash, messageIdHash}. Message text and sender are never stored or logged; the text exists only in memory inside the extractor and is discarded.
+- Rule 3, approval. WhatsApp candidates are needs-approval under D-178 ruling 1, unless the join link's host is a known meeting platform AND the group is allow-listed. In that case they are scheduled like an authenticated sender. This follows D-167 (try hardest to join).
+- Default stays off: enabled only by LKB_WA_DISCOVERY=1 plus a non-empty WA_DISCOVERY_GROUPS.
+**Why:** The Approver stated that the daily webinars come from WhatsApp groups and connected the archiver for this purpose. A narrow, allow-listed, text-discarding read path serves discovery without widening access to private chat content.
+**Result:** The real fetcher for the existing flag-off extractor and loader (packages/meeting-bot/src/calendar/whatsapp-discovery/) is authorized. No contract or ARCHITECTURE edit is authorized. No decision is superseded.
+**Amends:** D-178 ruling 1 is unchanged except for the allow-listed known-platform case in Rule 3. D-167 is unchanged.
+**Changes-authorized:**
+- the real archiver message fetcher and its wiring in packages/meeting-bot/src/calendar/ (whatsapp-discovery/, schedule-tick.ts) with tests
+- the LKB_WA_DISCOVERY flag wiring
+**Approved-by:** Umesh
+**Links:** T-036, T-038, D-167, D-178, ISS-WAVECTORLESS-001
+
+## D-185 | 2026-10-20 | type: decision | status: ACTIVE
+**Title:** T-040 summary completeness becomes advisory; quote grounding stays strict
+**What:** Records the Approver ruling given in chat on 2026-10-20. Question asked: "for summaries of dense sessions, either loosen the check that confirms nothing important was left out, or keep it strict and accept fewer summaries." Answer, verbatim: "nothing need to be mentioned and more summaries".
+- Rule 1, completeness is advisory. The independent judge's completeness/omission result (complete=false, noContent, noClaims) no longer fails a window or a session. It is stored as a coverage note on the output. A window with no verified item is skipped.
+- Rule 2, grounding unchanged. Every insight, decision, action, claim and Q&A answer must still be a verified verbatim quote with a timestamp citation, pass the sentence-span rules and the per-item judge verdicts (supported, category, relevance).
+- Rule 3, protocol noise. A malformed processed-span echo or non-object reply is retried once and then counts as not processed; it never crashes the session.
+**Why:** On a real 51-minute session the strict completeness gate rejected every attempt although the extracted items were grounded, so no summary was produced at all. The Approver prefers more summaries over exhaustive ones.
+**Result:** packages/index/src/pipeline completeness handling is made advisory (lane w25-t040fix). No grounding or quote-verification check is relaxed.
+**Amends:** None superseded. Narrows only the completeness requirement of the T-040 strict producer.
+**Changes-authorized:**
+- packages/index/src/pipeline/grounded.ts, grounded-summary.ts, claims.ts, notes/drop-mode.ts with tests
+- qa/manifests/w25-t040fix.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-040, D-162, D-144, D-151, qa/manifests/w25-t040fix.md
+
+## D-186 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** Production database `lkb_prod` is authorized for the deployed app
+**What:** Umesh (Approver) accepted the go-live owner defaults in chat on 2026-10-21, verbatim: "go on defaults ok". Defaults covered by this entry: #3 TLS via Let's Encrypt behind the team's proxy; #4 production database name `lkb_prod` on the same Mongo host; #5 a dedicated Mongo user and password for the product, created by the team and never stored in the repo; #6 OLLAMA_API_KEY copied from this machine into the server .env by the team and never printed; #9 the meeting bot stays on this Windows machine.
+- Rule 1, the deployed app may write to the Mongo database `lkb_prod` (MONGODB_DB=lkb_prod).
+- Rule 2, the script and migration database guards stay staging-only: `lkb`, `global_university_db` and unflagged `lkb_staging` remain refused as before. Only a later decision changes the guards.
+- Rule 3, no secret enters the repo: the Mongo password, the Mongo URL with credentials and OLLAMA_API_KEY live only in the server .env.
+**Why:** The team needs a named production database to go live, and the Approver accepted the proposed defaults as presented.
+**Result:** docs/GO-LIVE-UBUNTU.md documents lkb_prod, dedicated-user creation, Let's Encrypt and key handling. No code or guard change is made.
+**Supersedes:** D-117 -- its "no production writes" stance no longer applies to the deployed app, which may now write to lkb_prod; D-117 still holds for local, test and script work.
+**Changes-authorized:**
+- docs/GO-LIVE-UBUNTU.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** D-117, D-173, D-150, T-051, T-052
+
+## D-187 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** U2.4 accuracy gate is scoped to the 11 sessions that have human gold
+**What:** Umesh (Approver) accepted default #10 in chat on 2026-10-21, verbatim: "go on defaults ok". The U2.4 accuracy gate is measured on the 11 sessions that have human gold labels, not on the whole corpus.
+**Why:** Only those 11 sessions carry human gold, so only they can be scored without substituting machine labels for human judgment. ISS-290 records that the phase-3 measurement harness has no corpus pin and silently degrades gold coverage when the corpus changes; the 11-session scope is the pin.
+**Result:** Gate runs and reports name the 11 gold sessions explicitly. ISS-290 stays open until the harness pins the corpus to them. No contract edit is authorized by this entry.
+**Changes-authorized:**
+- none
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** U2.4, ISS-290, D-163, D-183
+
+## D-188 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** T-041 slide text is stored and feeds search
+**What:** Umesh (Approver) accepted default #11 in chat on 2026-10-21, verbatim: "go on defaults ok". Text recognised from slide keyframes (T-041 OCR) is stored with its session and time alignment and is indexed so that search can return it.
+**Why:** Slide text carries content that is often not spoken aloud, and the Approver accepted storing it and using it for search.
+**Result:** T-041 may persist slide text and feed it to the search index. Tenant scoping and the existing retention and consent rules apply to it like any other stored text. No contract edit is authorized by this entry.
+**Changes-authorized:**
+- none
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-041, G4, T-040
+
+## D-189 | 2026-10-21 | type: decision | status: ACTIVE
+**Title:** Launch feature set: counsellor accounts on, avatar and championship later
+**What:** Umesh (Approver) accepted default #12 in chat on 2026-10-21, verbatim: "go on defaults ok". At launch only T-028 counsellor accounts is enabled. T-013 avatar and T-014 championship are enabled later.
+**Why:** Counsellor accounts are needed for real users on day one, while the avatar client and the championship run are not ready for launch and stay off.
+**Result:** The go-live guide sets the T-028 environment and leaves LKB_CHAMPIONSHIP unset. T-028 moves from deferred to a launch item. T-013 has no environment flag. The /counsellor page ships with the web bundle and is not gated by a flag.
+**Amends:** None superseded. Changes the earlier "T-028 deferred" note in TASKS.md for launch only.
+**Changes-authorized:**
+- docs/GO-LIVE-UBUNTU.md
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-028, T-013, T-014, D-186
+
+## D-190 | 2026-10-22 | type: decision | status: ACTIVE
+**Title:** Ask and graph build the tenant tree from eligible sessions and report exclusions
+**What:** Umesh (Approver) ruled in chat on 2026-10-22, verbatim: "Yes: Ask should build the tree from eligible sessions and exclude ineligible ones (show how many are excluded)." The tenant tree used by /ask and /graph is built from the sessions that pass the existing per-page fail-closed gate; sessions that fail it are excluded, never cited and never given graph nodes. Responses report the excluded count and reason categories (counts only).
+**Why:** On staging tenant toc, 18 of 22 sessions were eligible and 4 were not (2 with an uncertain index attempt, 2 with invalid transcript identity). The tenant-level rule kept a cached root only if every session passed, so /ask and /graph returned 404 for the whole tenant because of four sessions.
+**Result:** T-043 ask path: eligibleTreeInput keeps each page gate as strict as before and drops only the tenant-level all-or-nothing retention rule. A cached root is still served only while every session it cites is currently eligible, and the index-write path rebuilds when an eligible session is missing from the cache. Zero eligible sessions still returns 404. /ask and /graph add excludedSessions and exclusionReasons (counts, no session ids); the web Ask page shows "N sessions not yet indexed and excluded from answers". No earlier decision mandated all-or-nothing, so there is no Supersedes field.
+**Changes-authorized:**
+- apps/api/src/indexing/eligible-tree.ts
+- apps/api/src/composition/integrations/trusted-readers.ts
+- apps/api/src/routes/ask/ask.ts
+- apps/api/src/routes/graph.ts
+- apps/web/src/pages/AskPage.tsx
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-043, G5
+
+## D-191 | 2026-10-22 | type: decision | status: ACTIVE
+**Title:** Ask drops sentences the grounding judge rejects and returns the rest
+**What:** Umesh (Approver) ruled in chat on 2026-10-22, verbatim: "Yes: drop only the sentences that fail the grounding/relevance judge and return the rest; refuse only if nothing supported remains. Show that some sentences were removed." On the bounded Ask path, packages/ask/src/answer.ts keeps only sentences whose ask.answer_grounding decision has supported=true and answersQuery=true. A missing, duplicate, unknown or malformed decision drops that sentence. If no sentence remains, the same BoundedAskError (source_context_unavailable, HTTP 503) is thrown as before.
+**Why:** The judge is non-deterministic: one rejected sentence out of nine discarded the whole answer and returned 503.
+**Result:** /ask adds removedSentences (count only) to the response. The web Ask page shows "N unsupported sentences were removed from this answer." Saved answer history and review store the kept text plus the count, because the stored candidate is the response. Dropped sentences are not returned in any field. No earlier decision mandated whole-answer refusal by name, so nothing is superseded.
+**Changes-authorized:**
+- packages/ask/src/answer.ts
+- packages/ask/src/ask-graph.ts
+- packages/ask/src/ask-shared.ts
+- apps/web/src/pages/AskPage.tsx
+- apps/web/src/api/types.ts
+**Approved-by:** Umesh (verbatim quote in What)
+**Links:** T-043, D-190, apps/api/src/routes/ask/ask.ts, packages/ask/src/answer.ts, qa/manifests/w27-dropsentences.md
+
+## D-192 | 2026-10-27 | type: decision | status: ACTIVE
+**Title:** Implement the approved cross-host Calendar and meeting-bot operational completion
+**What:** Umesh explicitly instructed "PLEASE IMPLEMENT THIS PLAN" on 2026-10-27 and clarified the final target is the live hosted project with visible-browser validation. Implement C1-C8 in qa/manifests/calendar-bot-operational-completion.md under the independent plan approval qa/verdicts/calendar-bot-operational-completion.plan-r2.md. Windows retains Google credentials and capture; authenticated owner-bound snapshots connect discovery, rules and operation status to the hosted API. Initial explicit all-join test mode includes confirmed unanswered invitations, excludes declined/cancelled/unsafe links and preserves existing legacy defaults when absent. No per-meeting approval is introduced. Purpose phrase rules and timezone/capture/runtime repairs are included.
+**Why:** The real local Calendar adapter returns eleven upcoming events while the hosted Calendar is unavailable, local worker/task is absent, hosted operations reads a local file, and rules/privacy/runtime gaps prevent the approved operational flow.
+**Result:** Authorizes the existing schema/type, code and test changes listed below, in the isolated codex/calendar-bot-completion worktree. Implementation acceptance is not claimed; actual results and remaining parent gates stay in the manifest and independent verdicts. Production data repair/promotion, irreversible sending and activation without genuine AV proof remain excluded. Hosted rollout is authorized delivery scope subject to required verification and actual host access.
+**Changes-authorized:**
+- schema/watch_state.schema.json, schema/watch_heartbeat.schema.json, schema/api_keys.schema.json and their generated types; typed private snapshot staging and atomic active-key workerFence publication only
+- Existing API Calendar/operations/watch-store composition and scoped projections; existing worker, scheduler, rules, Gmail parser and Calendar UI functions/tests as owned in the manifest
+- TASKS.md and the parent manifest for truthful progress/evidence only
+- No ARCHITECTURE.md, contracts/, qa/contracts, AGENTS.md or enforcement-path change
+**Approved-by:** Umesh (explicit implementation request and hosted-target clarification in this chat)
+**Links:** T-036, T-037, T-038, T-039, T-051, T-052, T-053, T-054, T-056, T-057, T-060; qa/manifests/calendar-bot-operational-completion.md; qa/verdicts/calendar-bot-operational-completion.plan-r2.md
+
+## D-193 | 2026-10-27 | type: decision | status: ACTIVE
+**Title:** Recent meeting-only Gmail discovery and reusable exclusion feedback
+**What:** Umesh explicitly clarified in this chat: "saare mails nhi aanee chaiye aur meeting wale hi aane chaiye" and "office meeting wale nhi aayngee aur baaki bhi gradually it will learn"; also requested maximum useful parallel subagents. Continue the approved operational-completion feature in cycle1, repairing the canonical cycle0 defects and implementing recent bounded meeting-only discovery plus reusable operator feedback patterns. Office/internal meetings are excluded from Gmail and joining; complete Calendar inventory remains visible with skip state pending the user's explicit visibility answer.
+**Why:** The broad discovery query's 184 raw matches are not184 meetings; current UI imported general/office mail, and fresh reviewers found seven real integration gaps despite green selected tests.
+**Result:** Authorizes scoped existing code/type/test changes under qa/.delivery/requests/repair-cycle1-contract.md, with fresh independent delta-plan approval before new policy implementation. No raw mail bodies in shared snapshots; no inferred broad approval or new model/training pipeline. Parent live/capture/semantic gates remain open, no production repair/promotion or capture activation.
+**Changes-authorized:** Existing Gmail mapper, existing Calendar worker snapshot schema/generated type, acquisition loader/validator, runtime publisher, candidate store/routes, rules/control UI and corresponding existing tests. Add bounded sourceEvents/gmailSummary/evidenceIssue fields only within existing schema paths. No frozen contracts, ARCHITECTURE, AGENTS or enforcement-path changes.
+**Approved-by:** Umesh (explicit clarification and parallel-work request in this chat)
+**Links:** D-192; qa/manifests/calendar-bot-operational-completion.md; qa/.delivery/requests/repair-cycle1-contract.md
+
+## D-194 | 2026-10-27 | type: fix | status: ACTIVE
+**Title:** Repair observed post-push packaging and CI integration gaps without weakening guards
+**What:** Continue Umesh's explicit request to push validated work and finish remaining functionality. After f6bf0597 was pushed, actual GitHub Docker/CI evidence exposed absent web-build policy sources and a WhatsApp VM dependency-map omission; existing root checks also exposed scripts/qa31/30 and direct remote-snapshot filesystem I/O in read-only enforcement. Apply independently approved existing-file repairs and preserve original parent acceptance/history.
+**Why:** Host-checkout builds and focused tests did not establish container packaging or all existing integration invariants. Reuse existing policy/snapshot/allocator code, preserve every test and auth boundary, and keep deployment/capture claims separate.
+**Result:** Docker source-context failure reproduced, repaired context TypeScript/Vite pass; Docker focused7/7 and existing UI54/54. Existing allocator corpus preserved110assertion sites and runtime31/31, directory30/30 without raised limits. Snapshot handler moved to existing snapshot I/O owner; unchanged single-writer6/6 and auth/cache closure72/72. WhatsApp snapshot/tenant19/19. Full structure10/10. Actual uncommitted-source catalogue refusals were tested honestly in a real temporary committed candidate: canonical source blobs matched, root lint suite176/176, with final EOF-only committed-input/single-writer follow-up19/19. Final independent CODE checks, branch follow-up push, actual new CI and hosted rollout remain pending at this record. No production data write or unattended activation.
+**Changes-authorized:** TASKS.md notes and CI repair manifests for truthful progress only. No ARCHITECTURE.md, contracts/, qa/contracts, AGENTS.md, validator, budget or enforcement-path edit.
+**Links:** T-017, T-036, T-037, T-051, T-060; f6bf0597; qa/manifests/calendar-bot-ci-packaging.md; qa/manifests/calendar-bot-ci-structure.md; qa/manifests/calendar-bot-ci-policy-cache.md
+
+## D-195 | 2026-10-27 | type: decision | status: ACTIVE
+**Title:** Complete server-owned capture using existing host and strict downstream evidence
+**What:** Umesh explicitly approved the hosted Calendar -> unattended server attendance -> verified knowledge implementation plan. Keep the existing full-checkout root API host as the capture-enabled deployment entrypoint; integrate canonical readiness/policy, isolated manual downstream processing and account-bearing Ubuntu supervision. The initial Windows-only placement in D-192/parent C2 is superseded for the final server-independent target; per-host credentials and authenticated tenant/account/host-bound state remain required.
+**Why:** Pushed Calendar code cannot make missing server processes or missing adapter composition operational. Existing engines already implement joining, consent, capture and indexing; wiring them avoids duplicate engines and reverse app-to-script dependencies. A recording child exit alone is insufficient evidence of a completed indexed session.
+**Result:** Independent plan qa/verdicts/calendar-server-runtime.plan.md APPROVED with binding pre-listen, tenant, work-DB, cancellation and public-health-header constraints. Source implementation is authorized; actual deployment and production data promotion remain separate approved steps. Full C1-C8, controlled AV, seven-day observation and semantic gates remain open.
+**Changes-authorized:** Existing root API/manual host and worker/completion functions, Ubuntu setup/supervisor and their tests, existing production/health composition, corresponding release documentation and governance records. No ARCHITECTURE, contracts, AGENTS, hooks or shared policy change. No production data write or service activation.
+**Links:** D-192, D-194, T-038, T-039, T-051, qa/.delivery/requests/server-runtime-minimal-implementation.md, qa/verdicts/calendar-server-runtime.plan.md
+
+## D-196 | 2026-10-28 | type: decision | status: ACTIVE
+**Title:** Complete approved office/publication repairs and protect the documented production alias
+**What:** Implement the independently approved Revision1 office/publication plan and production-alias helper plan under Umesh's explicit request to resume bounded reviews, fix, recheck and push. O preserves deny/opt-out precedence and adds configured office-domain exclusion in explicit automatic modes. P permits only authenticated definitively rejected older pending snapshots to recover behind a same-generation strictly-lower server fence. R independently authorizes the API parent and validates a capture-only work environment before connect/listen.
+**Why:** The existing code has these integration and isolation gaps; reuse its functions and tests. D-186 grants deployed-app authority for lkb_prod but expressly reserves script guard changes for a later decision. This is that later source-change decision: deny both lkb and lkb_prod on all shared work/fallback paths, while explicitly opted-in scripts may select only canonical lkb or lkb_prod through allowProduction, the existing exact flag, and explicit MONGODB_DB. This capability affects mint-key, watch, index recovery and read callers that honor the selected target; it is not permission to execute their production writes.
+**Result:** Plan approvals recorded in qa/verdicts/office-publication-repair.plan.md and qa/verdicts/production-alias-guard.plan.md. Implementation and final independent checks pending. Existing D-117 isolation and D-186 deployed-app authority remain. Separate migration-config duplicate guard exposure remains open outside this helper repair. No production mutation, deployment, master promotion or unattended activation authorized here.
+**Changes-authorized:** Existing join-rules evaluateJoinRules, worker publisher call/sendPending/publishOnce, root API main and trusted test seam; scripts/lib/transcript-provenance.mjs existing protection/work/script functions; existing associated tests including dbguard2, db-guard-paths and manual host refusals; docs/GO-LIVE-UBUNTU.md compatibility notes; matching manifests, task and issue evidence. No new product/test modules, ARCHITECTURE, contracts, AGENTS, hook, shared-policy or enforcement changes.
+**Links:** D-117, D-186, D-195, T-037, T-038, T-039, T-051; qa/gates/calendar-bounded-resume-20261028.md; qa/.delivery/requests/office-publication-repair-plan.md; qa/.delivery/requests/production-alias-guard-plan.md
+
+## D-197 | 2026-10-28 | type: decision | status: ACTIVE
+**Title:** Refuse documented production alias in migration work-target fallback
+**What:** Implement the independently approved migration-alias-repair.plan.md within the already authorized hosted completion and data-isolation goal. Add lkb_prod to the existing case-insensitive protected fallback names in config/migrate-mongo-config.cjs resolveMigrateTarget; extend its existing isolated refusal matrix in scripts/lib/dbguard2.test.mjs after its current maker finishes.
+**Why:** D-196 shared-helper repair does not cover the independent inlined migration guard. The current fallback accepts the documented deployed production alias without opt-in. Denial closes that exposure without expanding migration production capability.
+**Result:** Independent plan APPROVED. Keep the explicit migration production branch unchanged: canonical lkb only with existing argv/env opt-in. lkb_prod remains refused with or without opt-in. D-186 deployed-app authority and all human production execution gates remain unchanged. Local checks and final independent implementation review pending; no migration or database connection authorized.
+**Changes-authorized:** Existing config/migrate-mongo-config.cjs refusal branch/comment, existing scripts/lib/dbguard2.test.mjs migration refusal cases, matching release evidence. No new product/test files or enforcement, schema, architecture, contract changes.
+**Links:** D-117, D-186, D-196; qa/.delivery/requests/migration-alias-repair-plan.md; qa/verdicts/migration-alias-repair.plan.md
+
+## D-198 | 2026-10-28 | type: session | status: ACTIVE
+**What:** Prepare a separate feature-branch commit of the independently checked Calendar office/publication and database-isolation repairs after Umesh explicitly requested pushing validated work first. Reuse the existing candidate checkout and exact 13 reviewed source/test/document files; exclude unresolved runtime implementation.
+**Why:** The checked slice can be packaged independently without pretending the failed private-start runtime acceptance or live deployment is complete. Preserve other work, credentials and runtime artifacts.
+**Result:** Both O/P/G/M/F checker verdicts PASS; 13/13 current reviewed file hashes match. Isolated candidate integration and push are pending and must pass before release. Runtime R2, whole-branch master review, deployment and live capture remain open.
+**Links:** D-196, D-197, T-036, T-037, T-038, T-051; qa/manifests/calendar-final-policy-db-repairs.md
+
+## D-199 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** HLD/LLD for AI editors; ARCHITECTURE refreshed to current reality; Codex merge and claims-policy rulings
+**What:** Umesh (Approver) ruled in chat on 2026-10-28: (1) documentation first, written for AI code editors (Claude/Codex): docs/HLD.md and docs/LLD.md committed (13569ea7); (2) "Yes, update it" for ARCHITECTURE.md sections 1, 3 and 6 to match current decisions (it stopped at D-008); (3) Codex branch codex/calendar-bot-completion: "Review, then merge" -- senior review verdict Warning (no critical/high, two medium filed), merged as ab3e1932; (4) needs-review claims: "Let needs-review be used" by answers/outputs with a visible unverified label (implementation is a separate maker unit with its own authorizing entry); (5) server config will be rolled to live from the locally validated .env.
+**Why:** ARCHITECTURE.md still described a vector index (superseded by D-173 vectorless RAG) and a Gemini-first text chain (D-173 moved text to Ollama Cloud), so AI editors were reading a stale ground truth. Live audit (references/portals/lkb-live.knowledge.md) shows counsellor and knowledge outputs refusing because all 1768 claims are needs-review.
+**Result:** HLD/LLD written from three read-only code maps; an independent checker answered 4/5 probes correctly first pass and 9 corrections were applied. ARCHITECTURE sections 1/3/6 updated; section 2 (frozen) and section 4/5 unchanged. Pre-existing lint:structure failures (stale SNAPSHOT, scripts/qa 31/30 files) reproduced on clean HEAD and are not caused by this change.
+**Changes-authorized:**
+- ARCHITECTURE.md sections 1, 3, 6
+- docs/HLD.md
+- docs/LLD.md
+**Approved-by:** Umesh (chat rulings 2026-10-28, quoted in What)
+**Links:** merge ab3e1932, D-173, D-186, D-192, D-198, T-013, T-051, T-058, docs/HLD.md, docs/LLD.md, references/portals/lkb-live.knowledge.md
+
+## D-200 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** needs-review claims are citable with a visible unverified label; the citation anchors to the verbatim transcript turn
+**What:** Implements D-199 ruling (4), "Let needs-review be used" (Umesh, chat 2026-10-28). The counsellor answer workflow and knowledge outputs may cite claims with status needs-review. Every such citation carries verification: "unverified", shown in the UI, and links to the claim's evidence turn (speaker + timestamp + verbatim text). Verified/approved claims rank above needs-review ones. Rejected claims are never cited. A claim with no resolvable evidence turn is not cited. Tenant scoping is unchanged.
+**Why:** Live audit (references/portals/lkb-live.knowledge.md): all 1768 claims are needs-review, so the counsellor returns 0 sources (apps/api answer-workflow.ts:144/157) and knowledge outputs return 422 (knowledge-outputs service.ts:32). Brain (concepts/langgraph/self-rag.md): groundedness means traceable to retrieved evidence; a needs-review claim is an unreviewed paraphrase of a turn that is itself verbatim, so anchoring each citation to the turn keeps the answer grounded while the label tells the student the claim is not human-reviewed.
+**Result:** Pending. One maker unit `claims-citable-needs-review` (QUEUE tier 1), one scoped checker per brain patterns/proportional-verification-pattern.md; local validation only, live rollout is a separate human step.
+**Changes-authorized:**
+- apps/api answer workflow and knowledge-outputs claim filtering
+- apps/web citation rendering (unverified label)
+- tests for the above
+**Approved-by:** Umesh (chat ruling 2026-10-28, "Let needs-review be used"; "if really needed go with /maker continue")
+**Links:** D-199, D-173, T-013, T-058, references/portals/lkb-live.knowledge.md
+
+## D-201 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** Narrow D-200 to knowledge outputs after root-cause pass; authorize additive citations[].claimStatus; refuse policy stays strict
+**What:** A read-only root-cause pass found D-200's premise partly wrong. Knowledge outputs 422 is caused by the verified-only gate at packages/core/src/knowledge-outputs/evidence-builder.ts:108 (confirmed). The counsellor's 0 sources is NOT a claim-status problem: /ask cites tree nodes and turns, and apps/api/src/ask/graph-context.ts:77 already admits needs-review. Umesh rulings (chat, 2026-10-28, qa/gates/claims-citable-needs-review.md): (1) build the knowledge-outputs change end to end first; leave the 200-claim cap (reader.ts:18, evidence.ts:27) untouched for now and revisit after ("phle properly build krr lo end to end firr dekengee"); (2) onInsufficient=refuse treats needs-review citations as insufficient (stay strict); (3) add optional citations[].claimStatus ("verified"|"needs-review") to schema/knowledge_outputs.schema.json and regenerate types; (4) the counsellor gets a separate read-only diagnosis, no counsellor code in this unit.
+**Why:** Building D-200 as written would have changed the counsellor path for no effect. The schema field keeps the label in the stored citation, so a later status flip still changes sourceDigest and staleness detection keeps working.
+**Result:** Pending: maker unit claims-citable-needs-review.
+**Supersedes:** D-200 -- narrows its scope to knowledge outputs; the counsellor half rested on a refuted premise, while the label rule for outputs stands
+**Changes-authorized:**
+- schema/knowledge_outputs.schema.json (additive optional citations[].claimStatus) and its generated types and fixtures
+- packages/core/src/knowledge-outputs/*, apps/api/src/knowledge-outputs/*, apps/web knowledge-outputs page and api type, and their tests
+**Approved-by:** Umesh (chat rulings 2026-10-28, gate file above)
+**Links:** D-200, D-199, qa/gates/claims-citable-needs-review.md, T-058
+
+## D-202 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** Student questions may reach the hosted LLM; web fallback moves from Tavily to paid Gemini grounding; KB mints no per-student keys
+**What:** Umesh rulings (chat, 2026-10-28) on the Virtual Counsellor integration: (1) "hn student k sawaal bej sakte hai": student questions sent to POST /ask may be processed by the configured hosted LLM (config/ai-routing.yaml, ollama-cloud). (2) "why we are pllaing to use travily . free hai tho use kro vrna paid nhi lengee . use gemini live": Tavily is used only if its free tier covers us; no paid web-search plan. Follow-up ruling (same chat): "Travily chaiyee hi kyu use krro gemini . jo api key daali hai teri .env mai vo paid gemini api key hai": Tavily is dropped; the web fallback uses Gemini with Google Search grounding on the existing paid GEMINI_API_KEY (paid tier: content not used for Google product training per ai.google.dev/gemini-api/terms). (3) "student ki key hum nhi bnaynge it should be in that manner ki jaise pathlynks /voice": the KB does not mint keys per student; the VC integrates following the Pathlynks /voice pattern (to be documented after a read-only look at that pattern).
+**Why:** Unblocks the VC demo data-boundary question raised 2026-10-28 and reuses the Gemini key already paid for instead of adding a second web-search vendor; the free Gemini tier is not used because its terms allow human review of inputs and bar apps likely used by under-18s. Per-student keys in the KB would duplicate auth that the calling product already owns.
+**Result:** Pending: maker unit gemini-web-fallback; Pathlynks /voice auth pattern research.
+**Changes-authorized:**
+- apps/api/src/ask/ask-web-fallback.ts (Gemini grounded search fn), apps/api/src/composition/production.ts (wiring), apps/api/src/activity-health/setup-status.ts and apps/web/src/pages/setup-wizard/setupModel.ts (provider text), their tests
+**Approved-by:** Umesh (chat rulings 2026-10-28, quoted in What)
+**Links:** D-200, D-201, references/portals/lkb-live.knowledge.md, config/ai-routing.yaml
+
+## D-203 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** POST /ask default path becomes single-call RAG; multi-step pipeline moves behind filters.mode="deep"
+**What:** Umesh ruling relayed from the VC session (2026-10-28): "for the ask thing, let it work like how the rag based chatbot works like vo itnaa llm call nhi lgaate right". Default /ask = existing /search retrieval top-k, ONE answer LLM call with citations, at most one cheap grounding check. The current multi-step graph (section select, per-candidate scoring, evaluator, refine) runs only when filters.mode="deep". Response shape unchanged: {answer, verdict, reason, scored, web_used, insufficient_coverage, sources:{internal,web}}. Target 5-10 s.
+**Why:** Live /ask exceeded 90 s (up to 12 LLM calls, no total deadline, single write at the end); VC needs chatbot latency.
+**Result:** Pending: maker unit ask-fast-rag. Redeploy to live stays a separate human gate.
+**Changes-authorized:**
+- apps/api/src/routes/ask/ask.ts, apps/api/src/answer-policy/*, packages/ask/src/* (new fast path + mode switch), their tests
+**Approved-by:** Umesh (relayed ruling 2026-10-28, quoted in What; confirmed by appending this entry)
+**Links:** D-202, references/portals/lkb-live.knowledge.md

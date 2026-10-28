@@ -151,3 +151,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration
    strongest possible check, no mocks anywhere in this path.
 
 ## Status: checked-PASS (see qa/verdicts/whatsapp-chat-view-speaker-names.md, Cycle checked: 1, commit d43f3ab)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

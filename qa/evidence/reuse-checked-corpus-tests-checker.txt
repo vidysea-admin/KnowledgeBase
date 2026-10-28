@@ -1,0 +1,3 @@
+apps/api/src/ask/source-context.test.ts: 45/45 classifier boundaries, SHA256 1c0f348dff60516fa0e8bd3a381b42503aa7b6ff8533d218ed2f868dc80b795d
+packages/index/src/tree/tree-real-data.test.ts: 45/45 classifier boundaries, SHA256 820d6106cb3614f8e3faa68db6773524d10d39184e36eeda01c4d69708f40028
+independent boundaries: 90/90 PASS; retained API/index array divergence confirmed; no production/corpus mutations

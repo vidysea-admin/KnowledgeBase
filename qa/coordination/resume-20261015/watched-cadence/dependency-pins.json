@@ -1,0 +1,58 @@
+[
+  {
+    "sha256": "10d2f9048dfc5ab1dabca7117746f2921e0a5e6d0fe832327557e9a0c52e1e7b",
+    "path": "AGENTS.md"
+  },
+  {
+    "sha256": "8de51421af2c76cbbee113ee5ac035fe7e4b54b426202ca9ca316a31f2d6bb21",
+    "path": "qa/contracts/goal-t053.md"
+  },
+  {
+    "sha256": "339bd8ed5e54b8975512fefc9d95bbcbe9950cac340f2926cd74322057334af8",
+    "path": "apps/api/src/connector-workflow/types.ts"
+  },
+  {
+    "sha256": "2010087154fc5be42f010efac272ad04a9540f6e9e834a93d344856ce1fbfcc4",
+    "path": "apps/api/src/connector-workflow/jobs.ts"
+  },
+  {
+    "sha256": "1dafe811cfbf0520164555ef0586392a1dd4d90c69261bc3b49e9b025ae782e8",
+    "path": "apps/api/src/connector-workflow/watched-job.ts"
+  },
+  {
+    "sha256": "975da23ced2eeb414532fd965d7ca15d71ec931d3e15da3d15f20adf449bfc0a",
+    "path": "apps/api/src/connector-workflow/watched-job.test.ts"
+  },
+  {
+    "sha256": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "path": "apps/api/src/auth.ts"
+  },
+  {
+    "sha256": "4c2ed4e0d31b8387c6597aa0ee3ac608ce45169f5efa1b4a5e5992a8f54bc3a7",
+    "path": "apps/api/src/connector-workflow/wiring.ts"
+  },
+  {
+    "sha256": "4f1c4bac38fbb8f2c7d0e4bbbf891a1dcaaa2b03d520e667c74f05e5c05c842c",
+    "path": "apps/api/src/connector-workflow/mongo-store.ts"
+  },
+  {
+    "sha256": "61622e955d016ea3ba79862336a7f6429e88e985973a6b575639d8fbd920f5cf",
+    "path": "packages/ingest/src/watched/schedule.ts"
+  },
+  {
+    "sha256": "6aa0bf1a4b037cae61e0c6c7a9a0edca4c8692d30d2997c334b3a41ee19f3797",
+    "path": "scripts/webinar/scheduler/service.mjs"
+  },
+  {
+    "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "path": "pnpm-lock.yaml"
+  },
+  {
+    "sha256": "6bc2d632c06e482b900c73f73dd6c703b3791bd5b02b05aaf7701cd9ba417c47",
+    "path": "tsconfig.base.json"
+  },
+  {
+    "sha256": "e37d70f01dd85f180c1e3070dbed968acd2d610beb3ec9040a78259aa8ca1b03",
+    "path": "apps/api/tsconfig.json"
+  }
+]

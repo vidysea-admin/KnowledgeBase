@@ -114,6 +114,7 @@ export function buildSpeakerDocs(tenantId: string, sessions: SessionResolution[]
  * for a method that is not on this interface is now a compile error.
  */
 export interface SpeakerWriteTarget {
+  findOne(filter: Record<string, unknown>): Promise<Record<string, unknown> | null>;
   countDocuments(filter?: Record<string, unknown>): Promise<number>;
   deleteMany(filter: Record<string, unknown>): Promise<{ deletedCount: number }>;
   insertOne(doc: Omit<Speakers, "tenantId">): Promise<unknown>;
@@ -123,6 +124,14 @@ export interface SpeakerWriteResult {
   before: number;
   written: number;
   after: number;
+  /** Rows left exactly as they were because a human confirmed them (D-141). Never overwritten, never downgraded. */
+  preserved: number;
+}
+
+/** A row a human confirmed (U2.4 suggestions, D-141). Re-indexing must not touch it. */
+export function isHumanConfirmed(row: Record<string, unknown> | null | undefined): boolean {
+  if (!row) return false;
+  return row.provenance === "human-confirmed" || (Array.isArray(row.confirmations) && row.confirmations.length > 0);
 }
 
 /**
@@ -140,12 +149,15 @@ export async function writeSpeakerDocs(
 ): Promise<SpeakerWriteResult> {
   const before = await target.countDocuments({});
   let written = 0;
+  let preserved = 0;
   for (const doc of docs) {
+    // D-141: a human-confirmed row survives any re-index. Skip BEFORE the delete, so there is no window where it is gone.
+    if (isHumanConfirmed(await target.findOne({ personId: doc.personId }))) { preserved++; continue; }
     const { tenantId: _tenantId, ...rest } = doc;
     await target.deleteMany({ personId: doc.personId });
     await target.insertOne(rest as Omit<Speakers, "tenantId">);
     written++;
   }
   const after = await target.countDocuments({});
-  return { before, written, after };
+  return { before, written, after, preserved };
 }

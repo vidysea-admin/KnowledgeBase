@@ -1,0 +1,29 @@
+✔ old same-key session 401 cannot clear restored page/auth/storage (197.1857ms)
+✖ batched logout/same-key login discards snapshots before passive effects (84.3749ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2350.5037
+
+✖ failing tests:
+
+test at qa\evidence\t057-ops-health-key-boundary\checker.node.test.tsx:47:1
+✖ batched logout/same-key login discards snapshots before passive effects (84.3749ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  4 !== 3
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/t057-ops-health-key-boundary/checker.node.test.tsx:60:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 4,
+    expected: 3,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

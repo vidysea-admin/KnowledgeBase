@@ -1,0 +1,27 @@
+{
+  "task": "U3.2",
+  "cycle": 0,
+  "capturedAt": "2026-10-14T21:44:09.2813108Z",
+  "status": "unchanged-owned-source-freeze-ack",
+  "diagnosticReceipt": "qa/goal-2026-10-14/web-types-current-freeze.json",
+  "ownedDiagnostics": [],
+  "sourceFixes": [],
+  "rootConfirmation": "Runtime confirmed all five web errors belong to T034 fallback View; no U32 diagnostic or additional source fix authorized",
+  "handles": [],
+  "testsStarted": false,
+  "files": {
+    "apps/web/src/pages/search/SearchPage.tsx": "8AB469C8CD787378574D52B1EA508D10A219D299115A68F47B40123869CBD93C",
+    "apps/web/src/pages/search/SearchPage.test.tsx": "E47741CB66522BEB6EEE79087665FF39C26854175177CB711D69243D3371E36D",
+    "apps/web/src/pages/search/SearchPage.url.test.tsx": "45B17E720883A0C343A0D585ED24773341A877FA384733DD2EB9CFB65EF7026C",
+    "apps/web/src/pages/search/AskHandoff.test.tsx": "C539D9086A03AD849CD3A5E9AB13944D5705AA2ED50B5A0DB9F73622CE232676",
+    "apps/web/src/components/GlobalSearchBar.tsx": "AD9B32EECE7A006CD41FA4A71475176265D4B670E83BBB381ADDAEC67CD9F0C0",
+    "apps/web/src/components/GlobalSearchBar.test.tsx": "9F235F152749F3C424287ED48D24B396BAA708F8BBD3D5634F34E87F09FE4D4A",
+    "apps/web/src/api/search/client.ts": "D24BC4AD5E25A4709EFC777F66B787C93A3EA606B12E97ECDDC950BA1909BEDD",
+    "apps/web/src/api/search/client.test.ts": "713051E5E6F4DA1AF5FC85A615B203BA320C6B9392352D0A4B7059C6FE92B8E1",
+    "apps/web/src/pages/search/AskHandoff.tsx": "E695F45700A1D067B04C66ADF68D6186E9D7F4B13D6AF572D17EF6B84E985418",
+    "apps/web/src/App.tsx": "EEF7AF89EB3C3C261678AED701F309D9399E0F77921B73E3B9CE97B1055571EA",
+    "apps/web/src/pages/answer-policy/PolicyAskPage.tsx": "9CC996B3E3D174067C32686781CECE9790EBE0CEEE374581DEF23AB296C5DBC1",
+    "apps/web/src/pages/answer-policy/client.ts": "FBE49C33181BA7BA06906D9B5BFEA1BDA35C4AEAB8BB46C92448638028632F92",
+    "apps/web/src/pages/answer-policy/question.ts": "04E2FCA6E278C0D3FF8DC83469B8353C7EA44B570A40C556C230D2B18A56DA4C"
+  }
+}

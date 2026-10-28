@@ -1,0 +1,105 @@
+{
+  "request_sha256": "3f30a7d10d85bd3604831684fd42d6d9dea294652d47eb623c2e6f4e8ef5646e",
+  "started_utc": "2026-10-15T20:09:55Z",
+  "commands": [
+    {
+      "label": "fixture-regressions",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(memory fixture replaceOne reports insert match no-op miss and duplicate outcomes|memory fixture nin prunes stale scoped rows and preserves missing array and operator semantics)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/test-fixture.test.ts"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "exit": 1,
+      "duration_s": 1.0779999999999745,
+      "output_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-fixture-regressions.log",
+      "counts": {}
+    },
+    {
+      "label": "original-composition",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/composition.test.ts"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "exit": 1,
+      "duration_s": 0.9690000000000509,
+      "output_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-original-composition.log",
+      "counts": {}
+    },
+    {
+      "label": "immediate-consumers-and-ledger-floor",
+      "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "--test-name-pattern=^(stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers|concurrent attempt CAS and expired restart lock preserve exactly one accepted child|terminal CAS deadline preserves committed completion or fences a late CAS after recovery|ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head)$",
+        "--import",
+        "tsx",
+        "apps/api/src/evaluation-flywheel/workflow.test.ts"
+      ],
+      "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+      "exit": 1,
+      "duration_s": 3.1399999999998727,
+      "output_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\deadline-immediate-consumers-and-ledger-floor.log",
+      "counts": {}
+    }
+  ],
+  "actual_total_tokens": null,
+  "authority": "broker evidence only; no checker verdict",
+  "pins_before": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "7fb3b763a65b6c4ee2ba82b9ed822d116d111ebca352e3d92b5a3a7fcf06b279",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "82059ce5f050b28ea7ca09b10354d9ea4425701ef75c418b1d0649fa5de1d47e",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "preflight": {
+    "exit": 0,
+    "node_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+    "python": "C:\\Program Files\\Python312\\python.exe",
+    "python_version": "3.12.10",
+    "python_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+    "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "temp_parent": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\deadline-maker\\tmp",
+    "safe_env": {
+      "KB_U24_PRIVATE_TOC_TESTS": "0",
+      "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+      "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0"
+    }
+  },
+  "rows_before": {
+    "existed": true,
+    "sha256": "ec5793a344414606987b5acddbcca887e90cac28e05a987e3892e7407237bd25"
+  },
+  "rows_restored": true,
+  "pins_after": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "7fb3b763a65b6c4ee2ba82b9ed822d116d111ebca352e3d92b5a3a7fcf06b279",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "82059ce5f050b28ea7ca09b10354d9ea4425701ef75c418b1d0649fa5de1d47e",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "pins_unchanged": true,
+  "active_s": 8.407000000000153
+}

@@ -1,0 +1,28 @@
+{
+  "_id": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+  "version": "d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+  "tenantId": "a",
+  "sourceId": "a:d3fec1569350ea8da800b016abd2d920544537838e32c71823c94f6fe473f182",
+  "title": "Sample admissions document",
+  "format": "pdf",
+  "pages": [
+    {
+      "pageNumber": 1,
+      "text": "Admission deadline is October."
+    },
+    {
+      "pageNumber": 2,
+      "text": "Scholarships need evidence."
+    }
+  ],
+  "createdAt": "2026-10-14T00:00:00.000Z",
+  "highlights": [
+    {
+      "id": "41598164dc55bafbd2122a95d401a65bae65769e074d5c6797f9bc16e9e3a06e",
+      "pageNumber": 2,
+      "quote": "Scholarships need evidence.",
+      "text": "Scholarships need evidence.",
+      "verification": "unverified"
+    }
+  ]
+}

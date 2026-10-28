@@ -1,0 +1,56 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File 'd:\\KnowledgeBase\\.codex\\hooks\\mc-precommit.ps1'"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File 'd:\\KnowledgeBase\\.codex\\hooks\\lab-session-start.ps1'",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File 'd:\\KnowledgeBase\\.codex\\hooks\\mc-sessionstart.ps1'",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File 'd:\\KnowledgeBase\\.codex\\hooks\\lab-session-end.ps1'",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File 'd:\\KnowledgeBase\\.codex\\hooks\\features-snapshot-session-end.ps1'",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

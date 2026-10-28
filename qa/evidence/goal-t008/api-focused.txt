@@ -1,0 +1,75 @@
+Stage: api
+Cwd: C:\Users\product\Desktop\KnowledgeBase\apps\api
+Command: node --test --test-concurrency=1 --test-timeout=30000 --import tsx src/semantic-search/route.test.ts src/semantic-search/semantic-search-store.test.ts src/indexing/chunk-write.test.ts src/indexing/session.test.ts src/indexing/legacy-unbound-chunks.test.ts
+Exit: 0
+Elapsed seconds: 8.063
+indexSession(tenant-a/source): embedding failed — chunks left unchanged: provider down
+indexSession(tenant-a/source): embedding failed — chunks left unchanged: injected write failure
+✔ content identities survive rerun and store reload; changed bytes and tenants cannot reuse identity (4.24ms)
+✔ changed source plus provider failure leaves durable rows but zero trusted stale hits; retry prunes (1.5989ms)
+✔ partial write failure never prunes prior index; empty source clears only its tenant (0.8718ms)
+✔ chunks carry the legacy-unbound stamp when given one (D-149 pending append) (2.1406ms)
+✔ chunks are unchanged (no provenance key) when no stamp is given (0.2772ms)
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): claims left unchanged — claims provider call failed: provider down
+indexSession(t/s1): summary degraded — existing session_pages left unchanged: summarize provider call failed: provider down
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: all providers failed
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: chunk 0 has 3 dims, batch reports 99
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: chunk 0 has 2 dims, batch reports 3
+indexSession(t/s1): embedding failed — chunks left unchanged: indexSession: embedder returned 2 vector(s) for 1 chunk(s)
+✔ a DEGRADED claims extraction must NOT delete the session's existing claims (9.2886ms)
+✔ a SUCCESSFUL extraction still replaces the session's claims (delete then insert) (1.514ms)
+✔ EVERY query AND every write indexSession issues is confined to its own tenant (ISS-060, ISS-061) (1.4025ms)
+✔ a DEGRADED run's writes are tenant-scoped too — the guard must not be a bypass (1.2026ms)
+✔ session_pages are still written on a degraded CLAIMS run — the two paths are independent (1.3177ms)
+✔ a DEGRADED summarize run with NO existing page still writes the labelled fallback (ISS-059) (1.0174ms)
+✔ a DEGRADED summarize run with a REAL existing page must NOT touch it (ISS-059, criterion 1a) (1.0204ms)
+✔ a SUCCESSFUL summarize run always replaces the page, even when one already exists (0.7285ms)
+✔ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (0.8564ms)
+✔ a FAILED embed must NOT delete the session's existing chunks (the ISS-056 shape) (1.7467ms)
+✔ a failed embed does not take the rest of indexing down with it (0.92ms)
+✔ no embed dep at all leaves chunks completely untouched — an install without embeddings still indexes (0.8018ms)
+✔ a SUCCESSFUL embed upserts stable chunks BEFORE pruning obsolete rows (1.4066ms)
+✔ indexSession SURFACES an embedding failure in its return — a skip must not look like success (0.816ms)
+✔ indexSession reports 'no-embedder' distinctly from a failure — an install without embeddings is not broken (0.5428ms)
+✔ indexSession reports a real chunk write, so success is positively evidenced and not merely un-thrown (0.9127ms)
+✔ writeSessionChunks reports a provider failure as skipped, never as a silent success (0.382ms)
+✔ writeSessionChunks reports a contradictory batch (the ISS-112 assertion) as skipped, not as success (0.3892ms)
+✔ writeSessionChunks reports a real write with the count it actually inserted (0.4128ms)
+✔ writeSessionChunks reports a session with no chunkable turns distinctly from a failure (0.1856ms)
+✔ chunk rows carry a real vector, a matching dims, and turnRefs — never an embeddingRef pointer (0.6883ms)
+✔ REFUSES to write a vector whose length contradicts dims, and still finishes indexing (ISS-112) (0.9012ms)
+✔ REFUSES a batch with the wrong NUMBER of vectors, rather than pairing by index (ISS-112) (0.8617ms)
+✔ every chunk write is tenant-scoped — the same guard the claims path needed (0.7291ms)
+✔ ISS-WEBINARRELEASE-002 strict provider/parser/embedding degradation preserves prior knowledge (4.675ms)
+✔ strict index persists validated item and claim quotations plus real candidate session tree (3.3184ms)
+✔ strict preflight never replaces prior knowledge for source, coverage, support, context or missing-session root failures (6.5215ms)
+✔ strict nonempty question/answer and screen citations survive the persistence boundary (2.919ms)
+✔ explicit chunks mode reaches authenticated store and bad modes or oversized queries refuse (99.0341ms)
+✔ flag off (semanticSearch absent): route is not mounted, not a 200 (19.7755ms)
+✔ with deps: search scope returns hits; tenant comes from the key, k is capped, a client tenant param is ignored (21.2373ms)
+✔ missing scope 403, no key 401, empty q 400 — deps never called (25.732ms)
+✔ a throwing store yields 503 without leaking the error (12.8595ms)
+✔ every query carries the tenantId inside the filter (ISS-078) (4.0939ms)
+✔ another tenant's perfect match is never returned; ranking, dedupe, mismatch and missing vector handled (1.7351ms)
+✔ k limits results; invalid tenantId is refused before any read (0.8551ms)
+✔ embedder returning no vector throws instead of ranking garbage (0.4966ms)
+✔ flag is OFF unless exactly LKB_SEMANTIC_SEARCH=1 (0.2847ms)
+✔ hits carry turn/time/quote evidence (additive); turns are loaded tenant-pinned (0.9215ms)
+✔ a hit whose chunk references a missing turn makes the search throw, not ship uncited (0.4138ms)
+✔ chunk mode preserves multiple passages per source; default still dedupes before k (0.9215ms)
+✔ malformed query embeddings and foreign joined sessions fail closed (1.0428ms)
+✔ chunk mode refuses absent attribution or source session instead of inventing a citation (1.2377ms)
+✔ source text changed without a successful re-embedding cannot return an old vector hit (0.3192ms)
+ℹ tests 49
+ℹ suites 0
+ℹ pass 49
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7986.0013

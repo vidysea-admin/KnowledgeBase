@@ -1,0 +1,98 @@
+[
+  {
+    "path": "apps/api/src/semantic-search/route.ts",
+    "sha256": "68984FA167618C6A38BAD57D3ADF8B1C372D5F37393DAD315A8E0384ECC9D6B6"
+  },
+  {
+    "path": "apps/api/src/semantic-search/route.test.ts",
+    "sha256": "C7132687BB91B3E94520E63A518F454A66CA1D7F339E0D22EC9EAF8621EEC31B"
+  },
+  {
+    "path": "apps/api/src/semantic-search/semantic-search-store.ts",
+    "sha256": "07229B0869EC2C2EEA9CD9BDBE5926813ECC0A84903314C47F44716609780703"
+  },
+  {
+    "path": "apps/api/src/semantic-search/semantic-search-store.test.ts",
+    "sha256": "72A64DDA105BBB004050A7297AF9290BE1443638DAAFD4E1FE5D023345EE3C55"
+  },
+  {
+    "path": "apps/api/src/semantic-search/readiness.ts",
+    "sha256": "D80292CA4E9C46DC5D6CEEAF8AE6DF5BB1E5C0CBCE0F11DA5DC0E67AE57AF8D0"
+  },
+  {
+    "path": "apps/api/src/semantic-search/readiness.test.ts",
+    "sha256": "0E802CA25871EDBB01BE299ECB602F21F6AA1B20FF43FEE4A77C277E3C675826"
+  },
+  {
+    "path": "apps/api/src/semantic-search/source-quote.ts",
+    "sha256": "230C7AD0A19E2222B4483DECBB910E853FB708FB394D42E225C2EEAF03D4D3BA"
+  },
+  {
+    "path": "apps/api/src/semantic-search/source-quote.test.ts",
+    "sha256": "941D962276C31B372C33885CA111B55B99FAFDA70046F8B1D08CE2089CD71BAA"
+  },
+  {
+    "path": "apps/api/src/indexing/chunk-integrity.ts",
+    "sha256": "E984E228E4B5873B7009C08D91B7B8491EB7A514887A70A725B2DDB4EE6547F0"
+  },
+  {
+    "path": "apps/api/src/indexing/chunk-integrity.test.ts",
+    "sha256": "32372EA609DCD21747990FD8C9F70B56F1D8B6B5A19793519FF1ED14B58F502E"
+  },
+  {
+    "path": "apps/api/src/indexing/chunk-write.ts",
+    "sha256": "80B6AE5C866CC8DFAFB8C2FABB5872B52F702BD1F18C0B42EDC811D806A143AE"
+  },
+  {
+    "path": "apps/api/src/indexing/chunk-write.test.ts",
+    "sha256": "D4AEF99CD0409410721EE5703364C5E26D2F44B3D1C096216614971D03B393C6"
+  },
+  {
+    "path": "apps/api/src/indexing/session.test.ts",
+    "sha256": "7856FBD4F2521E4FBC1CBBD21BF52C2B9F4C7E1DD848EB72CA8B29B1E5694EE0"
+  },
+  {
+    "path": "apps/web/src/api/search/semanticClient.ts",
+    "sha256": "77B9D92811A8E6D33316E1BBBFB970BF9746CE7CB5A4D4B768C3CCBFBE1E814E"
+  },
+  {
+    "path": "apps/web/src/api/search/semanticClient.test.ts",
+    "sha256": "2B1ACC31E90C79A0591F6E65D49AD8F74CEC9B4F982B7E5982AAB2D98E719285"
+  },
+  {
+    "path": "apps/web/src/pages/search/semantic/SemanticResults.tsx",
+    "sha256": "F1B78A7ADC8A8563BE51D298B64D044873F950F1BAD3268966C6FDF105A57883"
+  },
+  {
+    "path": "apps/web/src/pages/search/semantic/SemanticResults.test.tsx",
+    "sha256": "EE3A1B0F3DDCF13825A43154E2893DFAF48910CF660601985B8F661857CA3B10"
+  },
+  {
+    "path": "apps/web/src/pages/search/semantic/SemanticSearchIntegration.test.tsx",
+    "sha256": "3B10B0898E4D2A25651479158A2CF9B37122C44C4A6988B26EE96610B409EAF9"
+  },
+  {
+    "path": "qa/evidence/goal-t008/live-source-proof.ts",
+    "sha256": "D466B28F2D06D9DC5CAB2B66F6CA574349D477629514DEBD79A98CB5D3F82082"
+  },
+  {
+    "path": "qa/evidence/goal-t008/run-focused.py",
+    "sha256": "E8C47E5A5CA55E1876E7077253AECB36FB0293E63086DC759A77CFC68A96E4B5"
+  },
+  {
+    "path": "apps/api/src/semantic-search/current-corpus.ts",
+    "sha256": "5CBEF23556A54E265A3CE1BBDBFA3D0C8979BF868787F8890B722EDA2460448D"
+  },
+  {
+    "path": "apps/api/src/semantic-search/current-corpus.test.ts",
+    "sha256": "34B0F365885CB9D66A56D1515455EA3AFD43109F9B7BC0D520E4E4D297BB1D9B"
+  },
+  {
+    "path": "apps/api/src/semantic-search/corpus-fixture.ts",
+    "sha256": "3E6A27418EC5E04B4053BE2C83B40A7A4C61571E4B191F6F2A87E1D97EA0BD53"
+  },
+  {
+    "path": "apps/api/src/indexing/testutils.ts",
+    "sha256": "B577F77299590A29FB93AD2563292A922A762F34E51135084F2FB473E09AC831"
+  }
+]

@@ -1,0 +1,50 @@
+{
+  "status": "checked-PASS",
+  "cycle": 0,
+  "candidate": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "base": "37e51f95c367594bddb422c39c11415674ecf001",
+  "parser": "scripts/qa/dispatch-state.mjs verdictCycle/manifestCycle/canonicalHandshakeStatus + anchored authoritative verdict fields",
+  "verdict": {
+    "path": "qa/verdicts/u22-extraction-review-resume.md",
+    "sha256": "30273a565a7a2e7faf2d92b1205649840dcdacf215ff5bcfad9a6bb5d990fc5d"
+  },
+  "manifest": {
+    "path": "qa/manifests/u22-extraction-review-resume.md",
+    "sha256": "6cd357b69fd342585332817db94c3cd26b6d08e638c6924bdea644675859fbd3"
+  },
+  "sourcePins": [
+    {
+      "path": "scripts/eval/extraction-review-resume.mjs",
+      "rawSha256": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206",
+      "committedBlob": "b40b67b11cbdc801724a2f66207b2b75a8d2dc66",
+      "currentCleanFilteredBlob": "b40b67b11cbdc801724a2f66207b2b75a8d2dc66",
+      "filterAwareEquivalent": true
+    },
+    {
+      "path": "scripts/eval/extraction-review-resume.test.mjs",
+      "rawSha256": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb",
+      "committedBlob": "1459696572ea000df685d1fc3ddfc13d4a21a028",
+      "currentCleanFilteredBlob": "1459696572ea000df685d1fc3ddfc13d4a21a028",
+      "filterAwareEquivalent": true
+    }
+  ],
+  "independent": {
+    "seal": "qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+    "sha256": "f900ca55faa59d8e86b9cdde088691294e8ef348625b99433dddb4e0eb68b603",
+    "pass": 1,
+    "fail": 0,
+    "skip": 0,
+    "active_s": 2.078,
+    "accounting": "CHECKER"
+  },
+  "makerEvidence": "3/3 at parent37, qualified exact bytes to d0; mandatory verifier0/vacuous",
+  "checkerActualUsage": null,
+  "ratioVerified": false,
+  "parentUnchanged": true,
+  "genuineHumanLabels": 0,
+  "actions": {
+    "sourceEdits": 0,
+    "gitWrites": 0,
+    "parentTrackerEdits": 0
+  }
+}

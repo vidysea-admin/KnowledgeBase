@@ -1,0 +1,99 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "u22-extraction-review-resume",
+    "cycle": 0,
+    "base_sha": "37e51f95c367594bddb422c39c11415674ecf001",
+    "candidate_sha": "c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+    "files": [
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\extraction-review-resume.mjs",
+        "sha256": "b16fb26f3f7f32b84ac030131a5366a8bbe7081c91aecff2db9b155604b41206"
+      },
+      {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\extraction-review-resume.test.mjs",
+        "sha256": "36f6d3478811d3f7954d6fcb84eb35f8724e4d821baf0b739dc415650642bddb"
+      }
+    ]
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    },
+    "reviewers": [
+      {
+        "id": "not-started",
+        "token_metric": "actual_total",
+        "active_s": 0,
+        "tokens": 0,
+        "cost": null
+      }
+    ],
+    "next_phase": {
+      "token_metric": "actual_total",
+      "kind": "review",
+      "active_s": 150,
+      "tokens": 20000,
+      "cost": null
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "u22-extraction-review-resume/0/c96d40e2e7294a341db29b67939647ea28b3866ebc79c642172f76aaca67f483",
+    "completion_reserve_tokens": 4000,
+    "bootstrap_scope": "Root authorized manual BOOTSTRAP: 180s/24000 total including completion30s/4000; startup/skill authentication, two sources, consumer and QA writes; ratios UNVERIFIED",
+    "bootstrap": {
+      "token_metric": "actual_total",
+      "active_s": 180,
+      "tokens": 24000,
+      "cost": null
+    },
+    "escalation": null
+  },
+  "worker": {
+    "provider": "codex",
+    "executable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+    "runtime_identity": {
+      "client": "manual native root dispatch; model inherited; no launcher/control assurance claimed"
+    },
+    "timeout_s": 150,
+    "max_turns": 12,
+    "phase_id": "u22-resume-initial-review",
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\u22-resume-prep\\checker-prompt.txt",
+      "sha256": "0687df899266b87dfc23f122667c56683cd3988846c4e855cf6ba3fd92823afa"
+    }
+  },
+  "readiness": {
+    "complete": false,
+    "mutation_required": false,
+    "receipts": [
+      {
+        "role": "environment",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\u22-resume-prep\\identity.json",
+        "sha256": "a212eb71274b8a8a883f42cfdbe20259596f1bb9caef39bd9eccbe82a2296f1c"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "node": "resume restores saved controls and original date, pending items stay empty, export validates",
+      "reason": "Restored declared controls/date survive reorder and full export; pending controls/reset retain honest coverage S1/S2",
+      "boundary": "positive/immediate editor export"
+    },
+    {
+      "node": "render binds exact input bytes, retains context and prevents script breakout",
+      "reason": "Exact input SHA and drift refusal plus single script boundary S1/S3",
+      "boundary": "script injection/input drift"
+    },
+    {
+      "node": "resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer",
+      "reason": "Actual validateExport rejects stale packet/index, foreign binding, incomplete inventory and gold/threshold promotion S3/S4",
+      "boundary": "strict consumer refusal"
+    }
+  ],
+  "previous_receipt": null
+}

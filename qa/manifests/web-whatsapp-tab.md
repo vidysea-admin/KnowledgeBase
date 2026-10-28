@@ -74,3 +74,5 @@ verified live.
 4. Read the 4 changed/new files — confirm no fabricated data.
 5. Real browser: `/whatsapp` renders with the nav tab; a full backend round-trip is a bonus if
    main Mongo has recovered by check time, not required.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

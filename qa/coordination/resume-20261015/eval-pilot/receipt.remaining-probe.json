@@ -1,0 +1,52 @@
+{
+  "status": "production-attempt-or-refusal",
+  "ownExit": 0,
+  "startedAt": "2026-10-15T20:35:04.190Z",
+  "completedAt": "2026-10-15T20:35:25.891Z",
+  "latencyMs": 21701,
+  "metadataHttpStatus": 200,
+  "errorCode": null,
+  "selectedModel": "glm-5.3-flash",
+  "exactModelPresent": true,
+  "catalogIsNotInferenceAccessProof": true,
+  "inferenceHttpStatus": 200,
+  "totalProviderRequestsReserved": 3,
+  "historicalUnknownUsage": null,
+  "totalInputBytes": 1448,
+  "productionStatus": "source-or-graph-refusal",
+  "productionUsage": {
+    "inputTokens": 151,
+    "outputTokens": 256
+  },
+  "productionFailure": null,
+  "citationCount": 0,
+  "answerPresent": false,
+  "noRawBodiesOrPromptsPrinted": true,
+  "noAliases": true,
+  "full92": false,
+  "acceptance": "HOLD",
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "sourcePinCount": 140,
+  "sourceDrift": [],
+  "sourceCandidateSha256": "40852e5ea0cec9550f3600fe9bf7e6992aa1a5db96f30a6d4d837467d8629d65",
+  "corpusSha256": "cbd1c84d1caf3b2f4a0c07808e10705411196aa93e19b875a0f66ccc39c19ebe",
+  "modelAccessConfirmedByActualInference": true,
+  "remainingProviderRequests": 0,
+  "knownNewInferenceUsage": {
+    "inputTokens": 151,
+    "outputTokens": 256
+  },
+  "aggregateUsage": null,
+  "aggregateUsageReason": "Historical request1 remains failed-or-unknown",
+  "attempts": [
+    {
+      "id": 1,
+      "status": "returned",
+      "inputBytes": 724,
+      "inputTokens": 151,
+      "outputTokens": 256,
+      "elapsedMs": 3589
+    }
+  ],
+  "requiredSoftwareJoin": "Production evaluator swallows source/graph exception at row catch; need content-free stage/error-code receipt to distinguish parsing/routing/hydration refusal. No exact cause inferred and no further paid requests."
+}

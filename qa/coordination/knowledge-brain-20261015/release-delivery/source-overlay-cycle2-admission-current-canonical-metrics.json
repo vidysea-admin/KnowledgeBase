@@ -1,0 +1,114 @@
+{
+  "unit": "source-overlay",
+  "cycle": 2,
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "source-overlay-checker-prior-cycles-runtime-baseline",
+      "active_s": null,
+      "tokens": 587634,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 120
+      },
+      "token_scope": "Dedicated checker lifetime cumulative as prospective same-thread baseline; not fabricated phase attribution",
+      "baseline": "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-cycle2-runtime-baseline.json"
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 50,
+    "tokens": 100000,
+    "cost": null,
+    "output_tokens": 1200
+  },
+  "completion_reserve": false,
+  "bootstrap": {
+    "active_s": 200,
+    "tokens": 837634
+  },
+  "bootstrap_scope": "Source-overlay cycle2 only, aggregate170a251ecf6409726231a853de5f41fc5e47f87192aee396a6c9df0e584f72f6; fresh same-checker baseline587634 actual total, prior120s preserved. Current twelve-plus-original-two receipt hashes match maker packet. Unknown maker usage and actual active time/cost remain null. No source reread, test or review performed by gate preparer.",
+  "escalation": {
+    "authority": "Root explicit cycle2 rebind of local finite manual-reserve exception; unchanged remaining allocation",
+    "reason": "Cycle1 reviewer never resumed; rebind existing unconsumed review50s/100000actual plus final30s/150000actual to cycle2 supplied aggregate. Preserve all prior120s/587634 actual charges and historical output allocations; cumulative limits remain200s/837634 actual tokens. Legacy_unreserved manual reserve, no global helper change.",
+    "limits": {
+      "active_s": 200,
+      "tokens": 837634,
+      "cost": null
+    }
+  },
+  "output_allocations": {
+    "prior_committed": 3000,
+    "incremental_review": 1200,
+    "incremental_finalization": 800,
+    "incremental_total": 2000,
+    "unit": "output tokens; not helper actual-total-token allocations or actual usage"
+  },
+  "external_manual_reserve": {
+    "authority": "Root explicit local manual-reserve exception, rebound to source-overlay cycle2 only; no new incremental allocation beyond unchanged remaining80s/250000actual/2000output",
+    "helper_protected": false,
+    "helper_status_expected": "legacy_unreserved",
+    "finalization": {
+      "active_s": 30,
+      "actual_total_tokens": 150000,
+      "output_allocation": 800
+    },
+    "review": {
+      "active_s": 50,
+      "actual_total_tokens": 100000,
+      "output_allocation": 1200
+    },
+    "enforcement": "Preserve external finalization reserve30s/150000 actual total tokens plus800 output allocation; assess each material phase against cumulative charges. No reviewer resume until twelve plus two green receipts."
+  },
+  "baseline_metadata": {
+    "path": "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-cycle2-runtime-baseline.json",
+    "sha256": "31bedd49f03bf0fbbba67e90ea741bf27a5585266a4da7d17f6b9547b13d0ea0",
+    "observed_at": "2026-10-15T12:00:48.5633453+00:00",
+    "usage_timestamp": "2026-10-15T10:48:23.549Z",
+    "idle_confirmed_task_complete": "2026-10-15T10:48:23.586Z",
+    "input_tokens": 584163,
+    "output_tokens": 3471,
+    "total_tokens": 587634,
+    "counter_growth": 0,
+    "cached_input_tokens": 531328,
+    "cached_tokens_already_subset_of_input": true
+  },
+  "review_dispatch_status": "gate assessed only; current twelve-plus-two receipts hash-authenticated; reviewer not resumed by readiness agent",
+  "actual_active_seconds": null,
+  "maker_unit_usage": null,
+  "candidate_identity": {
+    "kind": "maker-defined ordered two-file SHA256 aggregate; no candidate commit SHA",
+    "aggregate_sha256": "170a251ecf6409726231a853de5f41fc5e47f87192aee396a6c9df0e584f72f6",
+    "serialization": "SHA256 of UTF8/noBOM/noLF compact JSON ordered [{path:tool,sha256:lowercase},{path:test,sha256:lowercase}], exact paths/serialization in maker packet",
+    "tool_sha256": "af3f882df47320ec1fd5e8e28b714a7c47db2833da2e100832fc78afafe013cc",
+    "test_sha256": "b27438987649990f6e12e4712a8780ebd7773e07af01c279333ba33d0af16273",
+    "source": "Root supplied exact maker-packet aggregate; this gate does not independently certify source identity"
+  },
+  "predecessor_gate": {
+    "metrics": "source-overlay-cycle1-review-gate-metrics.json",
+    "sha256": "13e2048b0bc8b52491c4321c60deb294cfb34a29ee33a854724b28d6d5c9f8d9",
+    "reviewer_resumed": false,
+    "new_reviewer_allocation_consumed": false,
+    "authority": "Root confirms same checker remains idle; baseline T0 unchanged"
+  },
+  "current_receipts": [
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-source-overlay-cycle2-twelve.json",
+      "sha256": "90421ed7ab8929db458b6b3f6b0a8e4b6ccd31b41e784843f92aefab0938e3e7",
+      "identity_bound": "maker packet exact cycle2 evidence; no source reread"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-source-overlay-cycle2-original-two.json",
+      "sha256": "01ff2db38533779ff1c3425ca6f498bc56f545192b6640254465e37165826ec0",
+      "identity_bound": "maker packet exact cycle2 evidence; no source reread"
+    }
+  ],
+  "packet_metadata": {
+    "path": "qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-maker.md",
+    "sha256": "e22c1c9cbc07a104f1db6a947fa2f3750b4ac8751feb33e83c17e36d7821f086"
+  }
+}

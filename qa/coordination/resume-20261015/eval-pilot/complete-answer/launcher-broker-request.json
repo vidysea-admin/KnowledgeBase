@@ -1,0 +1,48 @@
+{
+  "format": "qa-complete-launcher-offline-request-v1",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "qa/coordination/resume-20261015/eval-pilot/complete-answer/launcher.test.mjs"
+  ],
+  "expectedTests": 4,
+  "outerTimeoutSeconds": 20,
+  "providerCallsAllowed": false,
+  "credentialReadAllowed": false,
+  "noProductionColdImport": true,
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "files": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/run.mjs",
+      "sha256": "17d579f5894a6e0dbfd68d5f0666aeccb2947154b363fd68b76adff81949ed1d"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/watchdog.py",
+      "sha256": "8bd422c748043fc0682954b78537d87d4efbbd016b170bf028ddb933c7d61c73"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/launcher.test.mjs",
+      "sha256": "882fb2a0d23c7defd107b43d71d596e84eb58c99941a6ab5eeb273e16f6d32ff"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/config.pending.json",
+      "sha256": "675b694667476bd4db76731cef18642300bbf578238aa142979963f23b0eec66"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/authorization.pending.json",
+      "sha256": "e300b8773b2e088f859f5a7f52af73d1df7e3c8f4387b211143c6b76c95b8bf9"
+    }
+  ],
+  "launchPinsSha256": "b95a844c58c49c34edd5abbd1a910b527722f7f1d6e83ebe0f2add957907b2bd",
+  "watchdogSyntaxCheck": {
+    "method": "Python ast.parse only; do not execute watchdog",
+    "path": "qa/coordination/resume-20261015/eval-pilot/complete-answer/watchdog.py"
+  },
+  "paidCommand": [
+    ".venv/Scripts/python.exe",
+    "qa/coordination/resume-20261015/eval-pilot/complete-answer/watchdog.py"
+  ],
+  "paidCommandAuthorizedNow": false,
+  "cpuBrokerOnly": true
+}

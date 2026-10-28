@@ -1,0 +1,31 @@
+{
+  "argv": [
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-c",
+    "import subprocess,json,sys;g=sys.argv[1];print(json.dumps({'python':sys.executable,'version':sys.version,'head':subprocess.run([g,'rev-parse','HEAD'],capture_output=True,text=True,check=True,timeout=2).stdout.strip(),'blobs':{p:subprocess.run([g,'rev-parse','HEAD:'+p],capture_output=True,text=True,check=True,timeout=2).stdout.strip() for p in sys.argv[2:]}}))",
+    "C:\\Program Files\\Git\\cmd\\git.EXE",
+    "scripts/eval/human-calibration.mjs",
+    "scripts/eval/human-calibration.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\ee03a5cbbea0faf72ccfd9a24ac9f0760b940c6e2bd38c3329d6dd9cecfc7767.json",
+    "sha256": "ee03a5cbbea0faf72ccfd9a24ac9f0760b940c6e2bd38c3329d6dd9cecfc7767",
+    "count": 56
+  },
+  "environmentWhitelistSha256": "fd9d581cf6d756ba0a7e663314c16ea6b8e93498c6dd2f80d0e029614eef7267",
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "MAKER ACCEPTANCE current T022, not checker",
+  "pid": 32992,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.4059999999990396,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t022-current-identity-before.log",
+    "sha256": "fb7d74b102bc7489ceb068da5ac3dc98d8b5584a8243dd5b3cb7fe476badb045"
+  },
+  "counts": {}
+}

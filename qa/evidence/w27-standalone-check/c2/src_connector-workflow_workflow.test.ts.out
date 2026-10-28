@@ -1,0 +1,24 @@
+✔ durable caller enqueue survives spool reopen, worker consumes once, and recording receipt waits for physical proof (493.6853ms)
+✔ durable jobs refuse unsafe inputs and bypasses before any direct intake; watched snapshot enqueues without inline indexing (67.1127ms)
+✔ durable worker indexing uncertainty creates one visible action gap and never confirms recording or retries providers (148.5835ms)
+✔ nonthrowing incomplete worker receipt cannot publish succeeded even after actual strict consumer writes (137.7944ms)
+✔ authenticated caller intake reaches real source/turn planner, Mongo sink and indexing consumer (16.1504ms)
+✔ cached receipt refuses partial chunk turn coverage or foreign claim evidence after real consumption (11.5683ms)
+✔ auth, scope, body tenancy and unsafe URLs cannot bypass caller boundaries (2.5759ms)
+✔ owner gap inventory pagination keeps all requests reachable and excludes other tenants (3.9548ms)
+✔ public indexing degradation is a source-linked gap and successful retry resolves it (10.6884ms)
+✔ production-shaped intake reuses successful receipt and never double-indexes (6.4737ms)
+✔ production-shaped intake failure is visible; deduped retry consumes once after recovery (7.5491ms)
+✔ producer done status without receipt cannot trigger success or seed a consumption proof (1.7696ms)
+✔ missing recording has durable owner/SLA and refuses nonexistent or unconsumed receipt (8.0618ms)
+✔ expiration requires overdue SLA and CAS loss is an explicit conflict (0.9714ms)
+✔ recording receipt URL cannot fabricate recording success from a generic page (0.8628ms)
+✔ hosted recording fixture receipt selects adapter, stores media and consumes indexed transcript (5.5002ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2501.1712

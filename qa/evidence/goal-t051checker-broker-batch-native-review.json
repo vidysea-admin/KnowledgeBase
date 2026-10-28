@@ -1,0 +1,7 @@
+{
+  "ready": [
+    "t011-native-script-diagnostic",
+    "t007-reviewer-independent-red"
+  ],
+  "skipped": []
+}

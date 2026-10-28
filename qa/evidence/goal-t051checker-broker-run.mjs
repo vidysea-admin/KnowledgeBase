@@ -1,0 +1,17 @@
+import {spawnSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {readFileSync,writeFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+const spec=JSON.parse(readFileSync(process.argv[2],'utf8'));
+const hash=file=>createHash('sha256').update(readFileSync(file)).digest('hex');
+const before=Object.fromEntries(Object.keys(spec.pins).map(file=>[file,hash(file)]));
+for(const [file,pin] of Object.entries(spec.pins))assert.equal(before[file],pin.toLowerCase(),'Candidate drift before run: '+file);
+const startedAt=new Date().toISOString(),start=performance.now();
+const child=spawnSync(spec.program??process.execPath,spec.args,{cwd:spec.cwd??process.cwd(),env:{...process.env,...(spec.env??{})},encoding:'utf8',timeout:spec.timeoutMs,maxBuffer:2097152,windowsHide:true,shell:false});
+const elapsedMs=performance.now()-start;
+const after=Object.fromEntries(Object.keys(spec.pins).map(file=>[file,hash(file)]));
+const receipt={program:spec.program??process.execPath,args:spec.args,cwd:spec.cwd??process.cwd(),environment:spec.env??{},timeoutMs:spec.timeoutMs,startedAt,completedAt:new Date().toISOString(),elapsedMs,exitCode:child.status,signal:child.signal,error:child.error?.code??null,before,after,stdoutPath:spec.output+'.stdout.txt',stderrPath:spec.output+'.stderr.txt',hashesUnchanged:JSON.stringify(before)===JSON.stringify(after)};
+writeFileSync(receipt.stdoutPath,child.stdout??'');writeFileSync(receipt.stderrPath,child.stderr??'');
+writeFileSync(spec.output+'.json',JSON.stringify(receipt,null,2)+'\n');
+console.log(JSON.stringify(receipt));console.log(child.stdout??'');
+process.exitCode=receipt.hashesUnchanged&&child.status===0&&!child.error?0:1;

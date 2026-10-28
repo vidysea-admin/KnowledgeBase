@@ -189,3 +189,5 @@ qa/manifests/T-017-structure-lint.md`. `.goal/` and `qa/.last-tick` deliberately
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-017-structure-lint.md (Cycle checked: 1, commit 4ccfcfd) — 10/10 criteria met.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

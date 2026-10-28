@@ -1,0 +1,221 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "files": [
+      {
+        "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\connector-workflow\\watched.ts"
+      },
+      {
+        "sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server-watched.test.ts"
+      },
+      {
+        "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server.ts"
+      },
+      {
+        "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.test.ts"
+      },
+      {
+        "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.ts"
+      },
+      {
+        "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\README.md"
+      },
+      {
+        "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\supervisor.ts"
+      },
+      {
+        "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\scheduler\\service.d.mts"
+      }
+    ],
+    "candidate_sha": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+    "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "candidate_git_sha": null,
+    "candidate_identity_kind": "dirty-eight-file-content-manifest-NOT-Git-commit",
+    "cycle": 1,
+    "slug": "watched-cadence-launcher"
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "reviewers": [
+      {
+        "id": "not-started",
+        "token_metric": "actual_total",
+        "active_s": 0,
+        "tokens": 0,
+        "cost": null,
+        "status": "No reviewer dispatched; zero means no execution, not unknown launched usage"
+      }
+    ],
+    "next_phase": {
+      "active_s": 150,
+      "tokens": 20000,
+      "cost": null,
+      "token_metric": "actual_total",
+      "kind": "review"
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "watched-cadence-launcher/1/6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+    "completion_reserve_tokens": 4000,
+    "bootstrap_scope": "One eight-file joined watched cadence/auth/lifecycle unit including exact unchanged-JS declaration; same manual review allocation",
+    "bootstrap": {
+      "active_s": 180,
+      "tokens": 6000,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "escalation": {
+      "reason": "Default6000 insufficient for skill/startup and seven-file auth/tenant/write/lifecycle security inspection; ratio remains unverified",
+      "limits": {
+        "active_s": 180,
+        "tokens": 24000,
+        "cost": null,
+        "token_metric": "actual_total"
+      },
+      "authority": "Root explicit once finite180s/24000 allocation including4000completion"
+    }
+  },
+  "worker": {
+    "max_turns": 10,
+    "prompt": {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\checker-prompt.txt",
+      "sha256": "be4aab5263a201a1396aaf1b8557f4691b81238e5b9314ea4f5b98f2bfb59fda"
+    },
+    "timeout_s": 150,
+    "provider": "codex",
+    "runtime_identity": {
+      "invocation": "manual-native-review-not-optional-managed-launcher",
+      "model": "inherit-root-approved-settings-no-substitution",
+      "native_control": "No optional managed runtime execution requested"
+    },
+    "executable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+    "phase_id": "watched-cadence-launcher-cycle1-review"
+  },
+  "readiness": {
+    "receipts": [
+      {
+        "role": "environment",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-cadence-final-seal.json",
+        "sha256": "c12cebe1bad4980937f72946a3417f61022b32d9806175da216648ad66c5cd8a"
+      },
+      {
+        "role": "host7",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-cadence-new7-receipt.json",
+        "sha256": "5cc7877620195f1cb053265c4a267aae4aed4c33a5cb64efc5075da8798c5fef"
+      },
+      {
+        "role": "downstream5",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-cadence-existing5-receipt.json",
+        "sha256": "74093d1804b3b8736a617416510f9ddb80482508d813f383ab0a780b499319f1"
+      },
+      {
+        "role": "watched-server-repair2-preflight",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-preflight-receipt.json",
+        "sha256": "f5ce2ea6c8b52bc44f32cbe13b21edb21d758e919bd22d04f1b0f9f11db73485"
+      },
+      {
+        "role": "watched-server-repair2-root-types",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-root-types-receipt.json",
+        "sha256": "e1e424f20d2b6e67eda1ed1e51ba102cbdc1ff10cb06dbebd4ba8f7165b9a9a8"
+      },
+      {
+        "role": "watched-server-repair2-full-graph",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-full-graph-receipt.json",
+        "sha256": "3bcbf025343b369730a649d66b0165698e069e3215bb26cd3695d973f7f9382e"
+      },
+      {
+        "role": "watched-server-repair2-scoped-structure",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-scoped-structure-receipt.json",
+        "sha256": "78b6c359ec23da0f083f0c2b71fea43e232250c868064ea6a3cd15e4ea76bdf0"
+      },
+      {
+        "role": "watched-server-repair2-focused16",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-focused16-receipt.json",
+        "sha256": "97800897d9165f5031ace4c752ec98ca2bd70cf895e03fee32f2207b9f111411"
+      },
+      {
+        "role": "current-final-seal",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-final-seal.json",
+        "sha256": "864b835ebc7097554fc1af3f4d964f950796a93d993fb273c7a8884281b110c0"
+      },
+      {
+        "role": "current-canonical-inputs",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\83d54f4a5669c216d3330a3a42472c2fe8ed806466807c65ae2a73a5cc0e2363.json",
+        "sha256": "83d54f4a5669c216d3330a3a42472c2fe8ed806466807c65ae2a73a5cc0e2363"
+      },
+      {
+        "sha256": "3aadf8ce7850f4de6ac10c631f1fa324378a3852d3b53b382652acfc1cb896d5",
+        "role": "maker-context-or-contract",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\packet.md"
+      },
+      {
+        "sha256": "8de51421af2c76cbbee113ee5ac035fe7e4b54b426202ca9ca316a31f2d6bb21",
+        "role": "maker-context-or-contract",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t053.md"
+      }
+    ],
+    "mutation_required": false,
+    "complete": false,
+    "pending_bindings": [
+      "Root upcoming WIP candidate Git SHA and exact8source-pin-to-commit verification; content digest remains NOTGit"
+    ],
+    "broker_scope": "Current launcher16/16 no skip, explicitroot7types/fullgraph1670modules7526dependencies/scopedLOC exit0,73unit1688canonicalinputs stable; upstream7/5eligible only exactunchanged scopes"
+  },
+  "selected_checks": [
+    {
+      "reason": "C2 validates whole inventory before any effect",
+      "boundary": "tenant/write",
+      "node": "scripts/watched-sources/host.test.ts :: whole result tenant/ID corruption refuses before acquisition, even past batch boundary"
+    },
+    {
+      "reason": "C2 current stored auth scopes revocation and serialization",
+      "boundary": "auth/tenant",
+      "node": "scripts/watched-sources/host.test.ts :: host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap"
+    },
+    {
+      "reason": "C6 bounded fair rotation",
+      "boundary": "boundedness",
+      "node": "scripts/watched-sources/host.test.ts :: 31-source cadence visits later due rows after 25 not-due rows, then wraps"
+    },
+    {
+      "reason": "C7 actual startup consumer and current-auth drain ordering",
+      "boundary": "integration/auth/lifecycle",
+      "node": "scripts/native-capture/server-watched.test.ts :: actual imported supervisor starts only after listening and stop drains initialized auth/tick before HTTP close"
+    },
+    {
+      "reason": "Explicit root30s finiteCLI disposition plus success/failure/secondsignal neighboring tests",
+      "boundary": "lifecycle",
+      "node": "scripts/native-capture/server-watched.test.ts :: CLI deadline finishes nonzero without claiming to cancel a hung tick"
+    },
+    {
+      "reason": "C6/C8 queued not completed and immediate durable consumer refusal",
+      "boundary": "auth/write/current-generation",
+      "node": "apps/api/src/connector-workflow/watched-job.test.ts :: partial index, missing physical proof and revoked actor never advance watched health"
+    },
+    {
+      "reason": "Mandatory applicable project integration/structure checks; exact source identity reuse only",
+      "boundary": "mandatory",
+      "node": "actual root explicit types/full configured graph/scoped LOC and contracts receipt"
+    },
+    {
+      "reason": "Compiler-boundary declaration must reflect actual exported values/callbacks without suppression or runtime changes",
+      "node": "scripts/webinar/scheduler/service.d.mts against adjacent service.mjs actual exports",
+      "boundary": "typed-integration"
+    }
+  ],
+  "previous_receipt": null
+}

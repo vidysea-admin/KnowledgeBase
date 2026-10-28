@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts",
+      "nonblank": 157,
+      "limit": 400,
+      "ok": true
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-recovery.ts",
+      "nonblank": 67,
+      "limit": 300,
+      "ok": true
+    },
+    {
+      "path": "scripts/native-capture/production.test.ts",
+      "nonblank": 138,
+      "limit": 400,
+      "ok": true
+    }
+  ],
+  "dirs": {
+    "violations": [],
+    "scanned": 2
+  }
+}

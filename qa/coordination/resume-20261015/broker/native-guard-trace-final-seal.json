@@ -1,0 +1,118 @@
+{
+  "request": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/broker-request.json",
+    "sha256": "3fdb35142ed7ae533642de3075a64af6d34d1dac545fe5983c460ecc99a6e6d6"
+  },
+  "candidate": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3.json",
+    "sha256": "f7359c50c5a0bcdc3852e765df93e335b1c2b08bd33587bc71877c48780c36e3",
+    "count": 89
+  },
+  "trace": {
+    "status": "DIAGNOSTIC_INCOMPLETE",
+    "validScalarMonotonic": true,
+    "records": 32,
+    "last": {
+      "stageId": "node1-artifact-start-2",
+      "elapsedMs": 66722
+    },
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-trace.jsonl",
+    "sha256": "7a70f323d41fcfb728f6912bde225c5fb8e2aa4458e24d1568996cbb31f50c8e"
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-head-before-receipt.json",
+      "sha256": "faf88fdb73ba3d1befa0f36eac1292604eca5cab975d69cbb0c03b0cc3c5a30d",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.625,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-head-before.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-targeted-trace-helper-five-receipt.json",
+      "sha256": "ec59481d1e9e79e1c588c5b0668b21c50cc246214b2bf11251f3f655c569974d",
+      "exit": 0,
+      "counts": {
+        "tests": 5,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 3.5309999999990396,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-targeted-trace-helper-five.log",
+        "sha256": "15bf7b899315fb64813056b02c05636b347a0a1a782ac179f56bc3698e759b55"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-acl-create-receipt.json",
+      "sha256": "d02f149daa1f6e612d53786407767a3ea09b6881e8e62e89eb04c7c416d8671a",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.110000000000582,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-acl-create.log",
+        "sha256": "3112f90210e5544cde627e75099cef62cf824032f65f0808efb434b9702de365"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-acl-verify-receipt.json",
+      "sha256": "506943aba2e88ee0c75b131cb1a6e02ce076d1cad9cc00ef97b1672e8ec5e7ac",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.9370000000017171,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-acl-verify.log",
+        "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-guards2-receipt.json",
+      "sha256": "b79f2accbb3c27e9b2c88a7327e919dea0241350c0d0fd501c070e26daa4a28e",
+      "exit": 124,
+      "counts": {},
+      "active_s": 70.56200000000172,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-guards2.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-acl-cleanup-receipt.json",
+      "sha256": "1dcb1a3a0bd9821c8b84c25cbd544e9ac8637b064d011e515cf4e67d2199a5b2",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.5470000000022992,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-acl-cleanup.log",
+        "sha256": "52a5c0e06fe7f6e58573d9c4c726fc0a707fa1b83368e322464bd4b849240435"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-head-after-receipt.json",
+      "sha256": "15a2e6569a7600c7fd2bd5959cf0125dcad69e332f18ce8fc80bf9301d2f7c5e",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.6090000000003783,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-guard-trace-head-after.log",
+        "sha256": "ee50bb5d09834eec1091160935843345943c41c623ce0fe36ab12f3c7a6b3ba0"
+      }
+    }
+  ],
+  "failure": "guard failure/timeout; inspect exact raw output; no retry",
+  "selectedTitles": "--test-name-pattern=^(?:retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse|fair bounded pages, quota-before-allocation and interrupted journal refuse)$",
+  "elapsed_s": 84.54699999999866,
+  "allPinsFinalMatch": true,
+  "headAfter": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "ownedFixtureRemoved": true,
+  "accounting": "SHARED INTEGRATION only; not watched checker",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

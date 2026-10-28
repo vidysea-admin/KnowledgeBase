@@ -1,0 +1,8 @@
+{
+  "allocated_active_s": 90,
+  "allocated_tokens": 2000,
+  "checker": "publication_checker-continuation",
+  "monotonic_start_ticks": 187912546439,
+  "utc_start": "2026-10-15T08:58:21.3769628Z",
+  "monotonic_frequency": 10000000
+}

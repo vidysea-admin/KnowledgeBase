@@ -1,0 +1,66 @@
+{
+  "kind": "APPROVED_SINGLE_SOURCE_OUTPUT_MATERIALIZATION_NOT_TEST",
+  "startedAt": "2026-10-15T10:57:34.965Z",
+  "completedAt": "2026-10-15T10:57:35.659Z",
+  "elapsedMs": 689.74,
+  "command": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "qa/coordination/knowledge-brain-20261015/answer-runs-filter-amendment/generate-target.mjs"
+  ],
+  "runtime": "v24.19.0",
+  "runtimeSha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "inputs": [
+    {
+      "path": "schema/answer_runs.schema.json",
+      "sha256": "5b19d4d92b594926d6ea4521c36c3c94a3dc038eb278d016e673f6000e2d7af0"
+    },
+    {
+      "path": "scripts/gen-types.mjs",
+      "sha256": "810c7994b1a571f6e18dea8d265a1e32df14d717d2e8aa76cf1e17d663e61d5d"
+    },
+    {
+      "path": "package.json",
+      "sha256": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": "qa/coordination/knowledge-brain-20261015/answer-runs-filter-amendment/generate-target.mjs",
+      "sha256": "12bfd41f6ad9f7371453eec77ff6fba2ad69f66558d8860159be7886a805f5cb"
+    }
+  ],
+  "before": {
+    "packages/core/src/generated/answer_runs.ts": {
+      "exists": true,
+      "sha256": "a25e65f337baef443ff0c7d0f4350015df558ee2d362f733083dfd2e6751ebce",
+      "bytes": 6976
+    }
+  },
+  "after": {
+    "packages/core/src/generated/answer_runs.ts": {
+      "exists": true,
+      "sha256": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110",
+      "bytes": 11070
+    }
+  },
+  "unexpectedGeneratedWrites": [],
+  "inputsStable": true,
+  "exitCode": 0,
+  "error": null,
+  "signal": null,
+  "success": true,
+  "ownOutputsRestoredOnFailure": false,
+  "onlyAllowedSourceOutputs": [
+    "packages/core/src/generated/answer_runs.ts"
+  ],
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a"
+  }
+}

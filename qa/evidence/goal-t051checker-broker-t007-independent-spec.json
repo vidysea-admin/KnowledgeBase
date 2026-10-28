@@ -1,0 +1,25 @@
+{
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "--config",
+    "../../qa/evidence/goal-t007/checker.config.mts",
+    "--maxWorkers=1",
+    "--minWorkers=1",
+    "--fileParallelism=false"
+  ],
+  "pins": {
+    "apps/web/src/api/whatsapp.ts": "be1b77720ea928402845728502dce314931ab07970b55dcc3cf0daa534e8210a",
+    "apps/web/src/pages/WhatsAppPage.tsx": "885f1af68ed4d21b00d141bb8ddd8631f732071621ed4471c5fbab7693b651cb",
+    "apps/web/src/pages/WhatsAppPage.test.tsx": "f10cf5883bfaa5b87b670aae119b3c950af077bd12864fdaad751fcc53070e61",
+    "apps/web/src/pages/whatsapp/ReviewQueue.tsx": "9fe70d1b8643a7878aa8a81650e85145e8002ec3d09ac4338a399ece4d223d63",
+    "apps/web/src/pages/whatsapp/ReviewQueue.test.tsx": "d9812d471a8203543cab8661cb9177662c00db8b8f4191641db2f73696019818",
+    "qa/evidence/goal-t007/checker.config.mts": "c6dd91771de88304267ef9b04818a7982b50245eed55deea2447706bc113c37a",
+    "qa/evidence/goal-t007/checker.test.tsx": "8aa461357f1a25de6dc998b4a28bb18a757ffe04fa47270ee4b40fb36f225b4b",
+    "apps/web/src/setupTests.ts": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802"
+  },
+  "timeoutMs": 90000,
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase/apps/web",
+  "output": "qa/evidence/goal-t051checker-broker-t007-independent"
+}

@@ -1,0 +1,92 @@
+{
+  "request": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/remaining-native-guards-request.json",
+    "sha256": "f33999d443226823a6ea345b1deb9a3910d2120e8dbac6e3e680c8aa6c6f565f"
+  },
+  "candidate": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\7492929ca47094b10e26bb2edd87ae04b615e72342672e294e13b078f86d5d8c.json",
+    "sha256": "7492929ca47094b10e26bb2edd87ae04b615e72342672e294e13b078f86d5d8c",
+    "count": 88
+  },
+  "atomicReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-head-before-receipt.json",
+      "sha256": "5c549dc0c074ddd1165ee2f7a8134a263c2c3e589cf2a603c297e2b00ba870cd",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.6100000000005821,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-head-before.log",
+        "sha256": "4864cf8fd8acb74440dc0c27a1fe4b406946866b2d76374c768ef3ff71904311"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-create-receipt.json",
+      "sha256": "e5bb22486bebec785150488ac7f391c01099bd9f72836c6997fef67f6e04c159",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.5159999999996217,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-create.log",
+        "sha256": "8f24b1bbc7f27cc3f2c1c7607ee6462a3fbb51e1d4f6482789f91fe1da9abdce"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-verify-receipt.json",
+      "sha256": "92ad991f88e6a9aa0034c834fc4a1ed72e89074cc0a47bff3de4edd94d296665",
+      "exit": 0,
+      "counts": {},
+      "active_s": 3.7179999999971187,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-verify.log",
+        "sha256": "aa9b8990a349ea7b18645a5a8f153884bee5e729c8dd3910c6272adb05eb3576"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-guards2-receipt.json",
+      "sha256": "1027f95c45f943a15db0eff8218a1c64555960a409ad4f8ca9dd5de22827bd29",
+      "exit": 124,
+      "counts": {},
+      "active_s": 70.59400000000096,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-guards2.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-cleanup-receipt.json",
+      "sha256": "884fec9baf13c28337a941bf9041804a0036e841df550437211e8c702094204e",
+      "exit": 0,
+      "counts": {},
+      "active_s": 1.4839999999967404,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-acl-cleanup.log",
+        "sha256": "bdbbc82541cdca2ad8557d7bcb54f3f6d56f59d996f215c40a98aa36119509af"
+      }
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-head-after-receipt.json",
+      "sha256": "1aaef9b9234d914f8a8276ab323dd76f78b2be0cbf27ad5c7727b011f8ac545c",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.7180000000007567,
+      "log": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-remaining-two-head-after.log",
+        "sha256": "4864cf8fd8acb74440dc0c27a1fe4b406946866b2d76374c768ef3ff71904311"
+      }
+    }
+  ],
+  "failure": "guard failure/timeout; inspect exact raw output; no retry",
+  "selectedTitles": [
+    "retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse",
+    "fair bounded pages, quota-before-allocation and interrupted journal refuse"
+  ],
+  "elapsed_s": 84.375,
+  "allPinsFinalMatch": true,
+  "headAfter": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "ownedFixtureRemoved": true,
+  "accounting": "SHARED INTEGRATION only; not watched checker",
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

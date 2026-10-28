@@ -1,0 +1,63 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/native-next-split-final-seal.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "17532637063309b12c8707b210664828699e567b223a1fc841ff9b16c9686f68",
+    "bytes": 969625
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "elapsed_s": 4.3439999999973224,
+    "currentFloorTerminalResults": 0,
+    "floorObservedCounts": {
+      "pass": 0,
+      "fail": 0,
+      "skip": 0
+    },
+    "floorAllOriginalTitlesTerminal": false,
+    "prerequisiteSkipsAreIncomplete": true,
+    "genuineReuse": {
+      "receipt": "broker/genuine-phase-observer-original-positive-receipt.json",
+      "logSha256": "3959af50396e05b73e09f4f9aa33d49d6e04252be13143e4a4f4bfe26aab239d",
+      "scope": "only exact genuine node"
+    },
+    "pinCount": 1890,
+    "pinsUnchanged": true,
+    "fixtureRemoved": true,
+    "pending": [
+      "AssertionError: reuse native environment drift"
+    ],
+    "priorUnavailableFailure": "UNEXPLAINED OPEN",
+    "wholeUnitPASS": false,
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "d56e56c1ed316d094ace93456800585a0444fbbe0350e2f6be6edffe26b80904",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-acl-create-receipt.json",
+        "rawBytes": 469107,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "5839bea5c24fa71d1e2cdd3f0352340b4f57674e1db61e14f6a08b20ef1ae138"
+      },
+      "logSha256": "12c5ddea7b98d662a4d4398cdb5d4b3035d3e4c9619e5868290e7a0609b79083",
+      "label": "native-next-split-acl-create",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-acl-create.log"
+    },
+    {
+      "canonicalJsonSha256": "160791a12e4e4480e41cbba2a6a4766f82500dde20f374e1ef6a747f2ae2378f",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-split-acl-cleanup-receipt.json",
+        "rawBytes": 469195,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "2ed529deda893c2215b022426e999d51a76f1ae939e3a410697381808858fc4c"
+      },
+      "logSha256": "b338f99c8f8a7108c5ea1edfa83b5940fae1fe35c8e439526f7c9550468ffe63",
+      "label": "native-next-split-acl-cleanup",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-split-acl-cleanup.log"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "qa/evidence/goal-t007/review-source-checker.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 90000,
+  "startedAt": "2026-10-14T21:46:13.209Z",
+  "completedAt": "2026-10-14T21:46:14.398Z",
+  "elapsedMs": 1185.062,
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "before": {
+    "apps/api/src/whatsapp-review/review-source.ts": "4991950a7d4684a7780fa2c4d275fc298143c4a70fd57d077fc7343b3345fc93",
+    "apps/api/src/whatsapp-review/review-source.test.ts": "2ffff96b2e96373949ecb93f060f67b4b93dd97c342150d29d2587f273f83a19",
+    "qa/evidence/goal-t007/review-source-checker.test.ts": "30d3d3b6720332fb1e993aa7f35d3a6ac25350a5a6e1e5dfc931e03ae9ad3f5a",
+    "apps/api/src/visibility/knowledge.ts": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/api/package.json": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede"
+  },
+  "after": {
+    "apps/api/src/whatsapp-review/review-source.ts": "4991950a7d4684a7780fa2c4d275fc298143c4a70fd57d077fc7343b3345fc93",
+    "apps/api/src/whatsapp-review/review-source.test.ts": "2ffff96b2e96373949ecb93f060f67b4b93dd97c342150d29d2587f273f83a19",
+    "qa/evidence/goal-t007/review-source-checker.test.ts": "30d3d3b6720332fb1e993aa7f35d3a6ac25350a5a6e1e5dfc931e03ae9ad3f5a",
+    "apps/api/src/visibility/knowledge.ts": "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/api/package.json": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t007-reviewer-independent-red.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t007-reviewer-independent-red.stderr.txt",
+  "hashesUnchanged": true
+}

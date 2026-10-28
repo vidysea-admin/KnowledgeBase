@@ -1,0 +1,4 @@
+{"timestamp":"2026-10-15T10:54:24.781Z","ordinal":0,"type":"session_meta","payload":{"id":"public-fixture-child","parent_thread_id":"public-fixture-root","agent_path":"/root/public-fixture"}}
+{"timestamp":"2026-10-15T11:17:21.354Z","ordinal":69,"type":"event_msg","payload":{"type":"task_started"}}
+{"timestamp":"2026-10-15T11:17:53.324Z","ordinal":81,"type":"event_msg","payload":{"type":"token_count","info":{"total_token_usage":{"input_tokens":610536,"cached_input_tokens":554752,"cache_write_input_tokens":0,"output_tokens":4413,"reasoning_output_tokens":35,"total_tokens":614949}}}}
+{"timestamp":"2026-10-15T11:17:53.366Z","ordinal":82,"type":"event_msg","payload":{"type":"task_complete"}}

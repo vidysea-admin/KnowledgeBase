@@ -1,0 +1,8 @@
+import pathlib
+p=pathlib.Path(__file__).with_name('watched-server-repair1-run.py');code=p.read_text(encoding='utf8')
+code=code.replace('watched-server-repair1','watched-server-repair2').replace('combined-source-pins-watched-server-join-repair1.json','combined-source-pins-watched-server-join-repair2.json').replace('4ad0bc94b0c858788e1e683b1ed9ff2e85e1cf95dc66bc3db3d7731de43eaf26','1ad28fd36efe8eb92c454949ed2305a29dac8c6760f51d0e4dbea2dfabb4c797').replace('len(unit)==72','len(unit)==73').replace("'count':72","'count':73")
+code=code.replace('paths=set()','paths={ROOT/p[\'path\'] for p in unit};paths.add(ROOT/\'scripts/webinar/scheduler/service.mjs\');assert sha(ROOT/\'scripts/webinar/scheduler/service.mjs\')==\'6aa0bf1a4b037cae61e0c6c7a9a0edca4c8692d30d2997c334b3a41ee19f3797\'')
+code=code.replace("assert pre['exit']==0","assert pre['exit']==0;identity=json.loads(pathlib.Path(pre['log']['path']).read_text(encoding='utf8'));assert all(identity[k].startswith((ROOT/'node_modules').as_uri()) for k in ['tsx','typescript']),'import outside existing workspace dependencies'")
+code=code.replace("names=['scripts/native-capture/server.ts','scripts/native-capture/server-watched.test.ts']","names=['scripts/native-capture/server.ts','scripts/native-capture/server-watched.test.ts','scripts/webinar/scheduler/service.d.mts']").replace("c.roots=['scripts/native-capture','scripts/watched-sources']","c.roots=['scripts/native-capture','scripts/watched-sources','scripts/webinar/scheduler']")
+code=code.replace("'finalPinsMatch':all(sha(ROOT/p)==h for p,h in pins.items())","'finalPinsMatch':all(sha(ROOT/p)==h for p,h in pins.items()),'unit73PinsFinalMatch':all(sha(ROOT/p['path'])==p['sha256'] for p in unit),'sourceFreezeReleased':True")
+exec(compile(code,str(p),'exec'))

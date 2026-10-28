@@ -381,3 +381,5 @@ Status-line correction, 2026-09-27 15:5x: this line read "merge HELD until after
 repeated the stale "merge HELD" to Umesh as a live blocker. The hold's reason (don't disturb the
 shared launcher file before a real run) expired when that run happened — it is the run that failed
 to record and produced ISS-323/324, whose fix is now merged too (`3368454`).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

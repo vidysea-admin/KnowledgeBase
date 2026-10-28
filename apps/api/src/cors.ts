@@ -13,8 +13,10 @@ export function createCors(allowedOrigins: string[]): RequestHandler {
     if (origin && allowedOrigins.includes(origin)) {
       res.setHeader("Access-Control-Allow-Origin", origin);
       res.setHeader("Vary", "Origin");
-      res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
-      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+      res.setHeader("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
+      res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, If-Match, If-None-Match, X-LKB-Work-DB");
+      // Browsers hide every non-safelisted response header from scripts unless it is exposed: the join-rules editor needs the ETag.
+      res.setHeader("Access-Control-Expose-Headers", "ETag, X-LKB-Work-DB, X-LKB-Tenant");
     }
     if (req.method === "OPTIONS") {
       res.status(204).end();

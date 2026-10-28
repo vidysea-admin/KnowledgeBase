@@ -1,0 +1,25 @@
+{
+  "paths": [
+    "qa/coordination/resume-20261015/broker/u22-checker-boundary-final-seal.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/admission-exits.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/assess-committed-result.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/checker-accounting.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/checker-finalization-assess-input.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/checker-finalization-assess-result.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/checker-ready-prompt.txt",
+    "qa/coordination/resume-20261015/u22-resume-prep/checker-verdict-readback.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/committed-source-binding.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-allowlist.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout-gitproof.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/maker-closeout.mjs",
+    "qa/coordination/resume-20261015/u22-resume-prep/managed-review.ready.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/metrics-committed.json",
+    "qa/coordination/resume-20261015/u22-resume-prep/validate-committed-result.json",
+    "qa/manifests/u22-extraction-review-resume.md",
+    "qa/verdicts/u22-extraction-review-resume.md"
+  ],
+  "QAOnly": true,
+  "stageCommitPerformed": false,
+  "noSourceParentTrackerDecisionPaths": true
+}

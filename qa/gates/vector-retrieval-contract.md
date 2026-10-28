@@ -88,3 +88,5 @@ else is watching the boundary.
 The constraint recorded above must survive into the vector contract: **recall@5 = 0.935 is a FLOOR,
 citable only with the sibling-session caveat, and may not by itself satisfy a `≥0.85` criterion**
 while `golden-set-redesign.md` precondition 1 is open.
+
+**Gate status:** ANSWERED — recorded inline: SUPERSEDED by the AMENDED section below — this stale `_(pending)_` belongs to the pre-amendment one-layer ques

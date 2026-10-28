@@ -1,0 +1,56 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "slug": "t053-watched-cadence",
+    "candidate_sha": null,
+    "cycle": 0,
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "candidate_identity_kind": "content-manifest-not-git-SHA",
+    "files": [
+      {
+        "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+        "path": "apps/api/src/connector-workflow/watched.ts"
+      },
+      {
+        "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+        "path": "scripts/watched-sources/host.ts"
+      },
+      {
+        "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+        "path": "scripts/watched-sources/host.test.ts"
+      },
+      {
+        "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+        "path": "scripts/watched-sources/supervisor.ts"
+      },
+      {
+        "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+        "path": "scripts/watched-sources/README.md"
+      }
+    ],
+    "candidate_content_manifest_sha256": "01b0a26ea7ab5658e80173a0616c874c8962aa8c24f32fdb50cf2acb45a1d317",
+    "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8"
+  },
+  "readiness": {
+    "receipts": [],
+    "mutation_required": false,
+    "complete": false
+  },
+  "metrics": {
+    "reviewers": [],
+    "token_metric": "actual_total",
+    "maker": {
+      "token_metric": "actual_total",
+      "cost": null,
+      "tokens": null,
+      "active_s": null
+    }
+  },
+  "remaining_gates": [
+    "broker focused7 plus existing watched-job5 immediate downstream checks",
+    "central reachable startup/shutdown integration source pins",
+    "API/script type coverage and applicable contract verifier",
+    "managed-review validate and assess before fresh independent checker; no admitted checker yet",
+    "P3/P4 real authorized Mongo/provider/host cadence acceptance"
+  ]
+}

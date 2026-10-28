@@ -1,0 +1,72 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": "windows-qualification-integration-native-c-tests",
+  "fix_cycle": 1,
+  "status": "authored-awaiting-broker",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "candidate_sha": null,
+  "candidate_identity": "base plus exact changed-file raw SHA256; shared production candidate owned by parent",
+  "changed_paths": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-clock-ledger.test.ts",
+      "sha256": "c595f5bbb74910f9aa7f8f6bef4deb8bcd8ce9def5479e86eb21c738612873c9",
+      "total_lines": 85,
+      "nonblank_lines": 84,
+      "test_count": 5,
+      "preimage": "qa/coordination/resume-20261015/windows-qualification-integration/native-c/backups/native-clock-ledger.test.ts",
+      "preimage_sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-spool.test.ts",
+      "sha256": "4c9e734ce02505a7bef030f6443ef2bda9637164e9eb807ec41685a5c8959b20",
+      "total_lines": 95,
+      "nonblank_lines": 95,
+      "test_count": 9,
+      "preimage": "qa/coordination/resume-20261015/windows-qualification-integration/native-c/backups/native-spool.test.ts",
+      "preimage_sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+      "sha256": "cc63d871043c33a4048c0fccd61265b335ae6b8c3f91511efc763442c01a1915",
+      "total_lines": 75,
+      "nonblank_lines": 74,
+      "test_count": 7,
+      "preimage": "qa/coordination/resume-20261015/windows-qualification-integration/native-c/backups/native-measurement.test.ts",
+      "preimage_sha256": "ff3a8d64d6451d90164412004a9cfe02c8306cc8eea337029a60dfcfe7af74c9"
+    }
+  ],
+  "untracked_source_paths": [],
+  "behavior": [
+    "Separate tagged WASAPI domain, copied nested descriptions and sample zero; no AudioContext fabrication",
+    "16 first-packet refusal mutations and six subsequent packet mutations; exact owner identity and both mixing directions",
+    "Real receiver hashes actual PCM bytes and refuses descriptive tag mismatch",
+    "Numeric residual zero cannot substitute corpus or five independent bounds tested undefined/null/NaN; legacy win32 and absent browser coverage refuse"
+  ],
+  "immediate_consumers": [
+    "NativeClockLedger.acceptAudio",
+    "createNativeSpoolReceiver.appendAudio/readNativeSpoolLedger",
+    "calculateNativeClock"
+  ],
+  "authority": "Parent exact three existing test leases; producer, schema, contracts and enforcement untouched by C",
+  "required_checks": [
+    "Sole broker: explicit bot typecheck against parent frozen combined production candidate",
+    "Sole broker: these three test files, 21 nodes total (7 added), bounded command and captured full receipts",
+    "Parent scoped graph and LOC checks on combined unit; independent checker dispatch after readiness validation"
+  ],
+  "executed_commands": [],
+  "evidence": "Raw preimages and exact authored pins only; no runtime claim",
+  "gaps": [
+    "Authentic finalized WASAPI fixture exercising early qualification refusal not available within these leases; no forged issued capability substituted",
+    "Real Windows WASAPI calibration, helper execution, private qualification and activation remain unproved",
+    "Types and runtime checks pending sole broker; source authored only"
+  ],
+  "maker_usage": {
+    "token_metric": "actual_total",
+    "cost": null,
+    "active_s": null,
+    "actual_total": null
+  },
+  "checker_usage": null,
+  "review_readiness": "Not dispatched; parent must assemble combined unit and validate managed-review input before independent review"
+}

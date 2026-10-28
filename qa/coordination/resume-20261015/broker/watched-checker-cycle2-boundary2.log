@@ -1,0 +1,10 @@
+✔ whole result tenant/ID corruption refuses before acquisition, even past batch boundary (3.0433ms)
+✔ host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap (2.3947ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8924.6141

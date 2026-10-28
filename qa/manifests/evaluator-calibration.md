@@ -89,3 +89,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (110 lines, budget 200)
 Once ISS-015 clears and a real human-scored set exists, re-run this exact harness (`computeMAE`
 already accepts any `ScoreFn`, including `apps/api/src/score.ts`'s `createLlmScorer`) for the
 plan's actual calibration target.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

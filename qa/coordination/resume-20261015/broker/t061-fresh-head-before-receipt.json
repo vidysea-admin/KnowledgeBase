@@ -1,0 +1,40 @@
+{
+  "argv": [
+    "C:\\Program Files\\Git\\cmd\\git.EXE",
+    "rev-parse",
+    "HEAD"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7.json",
+    "sha256": "33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7",
+    "count": 544
+  },
+  "environmentWhitelistSha256": "09ffbb912f998a41e3232f4f306d963810eefe3e794b2f837d63b89656b57267",
+  "environmentNames": [
+    "KB_T022_PRIVATE_REVIEW_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "LKB_APPLICATION_FORMS_ENABLED",
+    "LKB_AUTOMATION_ENABLED",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN",
+    "NODE_OPTIONS",
+    "PYTHONDONTWRITEBYTECODE",
+    "T054_AUTHENTIC_INPUT_OPT_IN",
+    "TEMP",
+    "TMP",
+    "TSX_TSCONFIG_PATH"
+  ],
+  "beforeMatch": true,
+  "maxJobSeconds": 7,
+  "accounting": "SHARED INTEGRATION, not checker",
+  "pid": 33432,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.2969999999986612,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-head-before.log",
+    "sha256": "e44e0f690fc46261198add02c28043f087282044ec247039a64e0c52eddab518"
+  },
+  "counts": {}
+}

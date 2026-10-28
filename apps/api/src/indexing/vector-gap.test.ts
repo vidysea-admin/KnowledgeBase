@@ -22,7 +22,7 @@ const gapCalls = (calls: Call[]) => calls.filter((c) => c.coll === "gaps");
 
 test("ISS-118: a session that gets NO vectors writes an OPEN vector-pending gap row", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", {
+  await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("all providers failed"); },
     db,
@@ -39,7 +39,7 @@ test("ISS-118: a session that gets NO vectors writes an OPEN vector-pending gap 
 
 test("ISS-118: the gap row is UPSERTED on a derived id, so a re-index cannot accumulate duplicates", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", {
+  await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("down"); },
     db,
@@ -52,7 +52,7 @@ test("ISS-118: the gap row is UPSERTED on a derived id, so a re-index cannot acc
 
 test("ISS-118: a SUCCESSFUL run resolves a previous gap instead of leaving a stale open one", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", { complete: completeWith() as never, embed: embedOk as never, db });
+  await indexSession("t", "s1", { retrievalMode: "vector", complete: completeWith() as never, embed: embedOk as never, db });
   const g = gapCalls(calls);
   assert.equal(g.length, 1);
   const set = (g[0]!.update as Record<string, Record<string, unknown>>).$set!;
@@ -67,7 +67,7 @@ test("ISS-118: a SUCCESSFUL run resolves a previous gap instead of leaving a sta
 
 test("ISS-118: the gap write is tenant-confined on both filter and body", async () => {
   const { db, calls } = fakeDb();
-  await indexSession("t", "s1", {
+  await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("down"); },
     db,
@@ -85,9 +85,8 @@ test("ISS-118: the gap write is tenant-confined on both filter and body", async 
 test("ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids", async () => {
   const a = fakeDb();
   const b = fakeDb();
-  const failing = async () => { throw new Error("down"); };
-  await indexSession("tenant-a", "s1", { complete: completeWith() as never, embed: failing, db: a.db });
-  await indexSession("tenant-b", "s1", { complete: completeWith() as never, embed: failing, db: b.db });
+  await recordVectorGap("tenant-a", "s1", { written: 0, skipped: "embedding-failed" }, a.db);
+  await recordVectorGap("tenant-b", "s1", { written: 0, skipped: "embedding-failed" }, b.db);
   const idA = (a.calls.find((c) => c.coll === "gaps")!.filter as Record<string, unknown>)._id;
   const idB = (b.calls.find((c) => c.coll === "gaps")!.filter as Record<string, unknown>)._id;
   assert.notEqual(idA, idB, "a globally-unique id makes the second tenant's write a duplicate-key error");
@@ -107,7 +106,7 @@ test("ISS-121: a FAILING gap write must not strand the session — the tree and 
       return { ...real, updateOne: async () => { throw new Error("E11000 duplicate key"); } };
     },
   } as never;
-  const res = await indexSession("t", "s1", {
+  const res = await indexSession("t", "s1", { retrievalMode: "vector",
     complete: completeWith() as never,
     embed: async () => { throw new Error("down"); },
     db: exploding,

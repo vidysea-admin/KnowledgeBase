@@ -1,0 +1,7 @@
+{
+  "command": "python contracts/verify_contracts.py",
+  "startUtc": "2026-10-14T09:02:33.0729573Z",
+  "endUtc": "2026-10-14T09:02:33.2337721Z",
+  "elapsedSeconds": 0.1467932,
+  "exitCode": 0
+}

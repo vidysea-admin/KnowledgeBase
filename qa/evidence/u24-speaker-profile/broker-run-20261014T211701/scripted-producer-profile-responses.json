@@ -1,0 +1,251 @@
+{
+  "proofClass": "synthetic-scripted-provider-in-memory-db",
+  "liveProviderCalls": 0,
+  "liveDatabaseWrites": 0,
+  "actualProducer": "suggestSpeakersForSession",
+  "actualDecisionWriter": "confirmSpeakerSuggestion",
+  "pendingProfile": null,
+  "confirmedProfile": {
+    "personId": "person:priya-nair",
+    "aliases": [
+      "Priya Nair"
+    ],
+    "identityStatus": "human-confirmed",
+    "ambiguity": null,
+    "recordedConfidence": 1,
+    "identityEvidence": [
+      {
+        "sessionId": "s1",
+        "sessionTitle": "Synthetic pipeline fixture",
+        "turnId": "t0",
+        "tStart": 0,
+        "tEnd": 9,
+        "quote": "Priya Nair, what do you think about the rules"
+      }
+    ],
+    "organizations": [],
+    "roles": [],
+    "unavailable": [
+      "organizations",
+      "roles",
+      "topics"
+    ],
+    "claims": [
+      {
+        "id": "good",
+        "text": "Visas require early preparation",
+        "status": "verified",
+        "evidence": [
+          {
+            "sessionId": "s1",
+            "sessionTitle": "Synthetic pipeline fixture",
+            "turnId": "t1",
+            "tStart": 10,
+            "tEnd": 19,
+            "quote": "Visas require early preparation"
+          }
+        ]
+      }
+    ],
+    "topics": [],
+    "sessions": [
+      {
+        "id": "s1",
+        "title": "Synthetic pipeline fixture",
+        "date": "2026-10-14"
+      }
+    ],
+    "attribution": [
+      {
+        "sessionId": "s1",
+        "speakerRef": "spk:1",
+        "startTurnIndex": 1,
+        "endTurnIndex": 1,
+        "turnIds": [
+          "t1"
+        ]
+      }
+    ],
+    "withheld": {
+      "claims": 1,
+      "identityEvidence": 0,
+      "blocks": 0,
+      "profileFields": 0
+    }
+  },
+  "staleProfile": {
+    "personId": "person:priya-nair",
+    "aliases": [
+      "Priya Nair"
+    ],
+    "identityStatus": "human-confirmed",
+    "ambiguity": null,
+    "recordedConfidence": 1,
+    "identityEvidence": [
+      {
+        "sessionId": "s1",
+        "sessionTitle": "Synthetic pipeline fixture",
+        "turnId": "t0",
+        "tStart": 0,
+        "tEnd": 9,
+        "quote": "Priya Nair, what do you think about the rules"
+      }
+    ],
+    "organizations": [],
+    "roles": [],
+    "unavailable": [
+      "organizations",
+      "roles",
+      "topics",
+      "claims"
+    ],
+    "claims": [],
+    "topics": [],
+    "sessions": [
+      {
+        "id": "s1",
+        "title": "Synthetic pipeline fixture",
+        "date": "2026-10-14"
+      }
+    ],
+    "attribution": [],
+    "withheld": {
+      "claims": 1,
+      "identityEvidence": 0,
+      "blocks": 1,
+      "profileFields": 0
+    }
+  },
+  "httpResponses": {
+    "pending": {
+      "status": 404,
+      "body": {
+        "error": "not_found"
+      },
+      "cacheControl": "private, no-store"
+    },
+    "confirmed": {
+      "status": 200,
+      "body": {
+        "profile": {
+          "personId": "person:priya-nair",
+          "aliases": [
+            "Priya Nair"
+          ],
+          "identityStatus": "human-confirmed",
+          "ambiguity": null,
+          "recordedConfidence": 1,
+          "identityEvidence": [
+            {
+              "sessionId": "s1",
+              "sessionTitle": "Synthetic pipeline fixture",
+              "turnId": "t0",
+              "tStart": 0,
+              "tEnd": 9,
+              "quote": "Priya Nair, what do you think about the rules"
+            }
+          ],
+          "organizations": [],
+          "roles": [],
+          "unavailable": [
+            "organizations",
+            "roles",
+            "topics"
+          ],
+          "claims": [
+            {
+              "id": "good",
+              "text": "Visas require early preparation",
+              "status": "verified",
+              "evidence": [
+                {
+                  "sessionId": "s1",
+                  "sessionTitle": "Synthetic pipeline fixture",
+                  "turnId": "t1",
+                  "tStart": 10,
+                  "tEnd": 19,
+                  "quote": "Visas require early preparation"
+                }
+              ]
+            }
+          ],
+          "topics": [],
+          "sessions": [
+            {
+              "id": "s1",
+              "title": "Synthetic pipeline fixture",
+              "date": "2026-10-14"
+            }
+          ],
+          "attribution": [
+            {
+              "sessionId": "s1",
+              "speakerRef": "spk:1",
+              "startTurnIndex": 1,
+              "endTurnIndex": 1,
+              "turnIds": [
+                "t1"
+              ]
+            }
+          ],
+          "withheld": {
+            "claims": 1,
+            "identityEvidence": 0,
+            "blocks": 0,
+            "profileFields": 0
+          }
+        }
+      },
+      "cacheControl": "private, no-store"
+    },
+    "stale": {
+      "status": 200,
+      "body": {
+        "profile": {
+          "personId": "person:priya-nair",
+          "aliases": [
+            "Priya Nair"
+          ],
+          "identityStatus": "human-confirmed",
+          "ambiguity": null,
+          "recordedConfidence": 1,
+          "identityEvidence": [
+            {
+              "sessionId": "s1",
+              "sessionTitle": "Synthetic pipeline fixture",
+              "turnId": "t0",
+              "tStart": 0,
+              "tEnd": 9,
+              "quote": "Priya Nair, what do you think about the rules"
+            }
+          ],
+          "organizations": [],
+          "roles": [],
+          "unavailable": [
+            "organizations",
+            "roles",
+            "topics",
+            "claims"
+          ],
+          "claims": [],
+          "topics": [],
+          "sessions": [
+            {
+              "id": "s1",
+              "title": "Synthetic pipeline fixture",
+              "date": "2026-10-14"
+            }
+          ],
+          "attribution": [],
+          "withheld": {
+            "claims": 1,
+            "identityEvidence": 0,
+            "blocks": 1,
+            "profileFields": 0
+          }
+        }
+      },
+      "cacheControl": "private, no-store"
+    }
+  }
+}

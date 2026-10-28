@@ -1,0 +1,12 @@
+*** Begin Patch
+*** Update File: apps/web/src/pages/search/AskHandoff.tsx
+@@
+   errorMessage?: (error: unknown) => string;
++  normalizeDraft?: (query: string) => string;
+@@
+-    setDraft({ ...empty<T>(owner, baseOwner, normalizeQuery(query)), result });
++    setDraft({ ...empty<T>(owner, baseOwner, options?.normalizeDraft?.(query) ?? normalizeQuery(query)), result });
+@@
+-    const query = normalizeQuery(current.query);
++    const query = options?.normalizeDraft?.(current.query) ?? normalizeQuery(current.query);
+*** End Patch

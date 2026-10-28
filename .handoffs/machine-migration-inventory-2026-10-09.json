@@ -1,0 +1,662 @@
+{
+  "root": "D:\\KnowledgeBase",
+  "worktrees": [
+    {
+      "path": "D:/KnowledgeBase",
+      "head": "614d78b8966428296f394b8bf3e6c547d41beca5",
+      "branch": "refs/heads/master",
+      "locked": null,
+      "tracked_changes": [
+        " M .goal/goal.json",
+        " M TASKS.md",
+        " M apps/api/src/gws-calendar.ts",
+        " M apps/api/src/gws-gmail.test.ts",
+        " M apps/api/src/gws-gmail.ts",
+        " M apps/api/src/routes/calendar.test.ts",
+        " M apps/api/src/routes/health.test.ts",
+        " M apps/api/src/routes/health.ts",
+        " M apps/api/src/routes/meeting-candidates.test.ts",
+        " M apps/api/src/store.ts",
+        " M docs/DECISIONS.md",
+        " M docs/SNAPSHOT.md",
+        " M docs/webinar-release.md",
+        " M package.json",
+        " M packages/core/src/generated/meeting_candidates.ts",
+        " M packages/core/src/index.ts",
+        " M packages/index/src/pipeline/claims.test.ts",
+        " M packages/meeting-bot/py/sb_join.py",
+        " M packages/meeting-bot/py/tab-capture/background.js",
+        " M packages/meeting-bot/py/tab-capture/manifest.json",
+        " M packages/meeting-bot/py/test_sb_join.py",
+        " M packages/meeting-bot/py/test_sb_join_iframe.py",
+        " M packages/meeting-bot/src/calendar/auto-join.ts",
+        " M packages/meeting-bot/src/calendar/auto-record-policy.ts",
+        " M packages/meeting-bot/src/calendar/calendar-client.ts",
+        " M packages/meeting-bot/src/calendar/schedule-state.test.ts",
+        " M packages/meeting-bot/src/calendar/schedule-state.ts",
+        " M packages/meeting-bot/src/calendar/schedule-tick.test.ts",
+        " M packages/meeting-bot/src/calendar/schedule-tick.ts",
+        " M packages/meeting-bot/src/joiners/browser-joiner.ts",
+        " M packages/meeting-bot/src/joiners/joiners.test.ts",
+        " M qa/.last-tick",
+        " M qa/contracts/gmail-meeting-candidates-approval.md",
+        " M qa/contracts/structure-lint.md",
+        " M qa/feedback-inbox.md",
+        " M qa/issues.jsonl",
+        " M qa/manifests/webinar-portable-release.md",
+        " M qa/verdicts/webinar-portable-release.md",
+        " M schema/meeting_candidates.schema.json",
+        " M scripts/demo-live.mjs",
+        " M scripts/gen-types.mjs",
+        " M scripts/lib/ledger-union.test.mjs",
+        " M scripts/lib/tracker-audit.mjs",
+        " M scripts/lint-loc.mjs",
+        " M scripts/lint.test.mjs",
+        " M scripts/webinar/run-pipeline.mjs",
+        " M scripts/webinar/run-pipeline.test.mjs",
+        " M structure.config.json"
+      ],
+      "untracked_code_evidence": [
+        "packages/core/src/domain/webinar-types.ts",
+        "packages/index/src/eval/extraction.ts",
+        "packages/meeting-bot/py/test_sb_join_ownership.py",
+        "qa/checkpoints/iss-368-heartbeat-read-failure-is-not-health.md",
+        "qa/manifests/iss-367-lint-structure-no-shortcircuit.md",
+        "qa/manifests/iss-368-heartbeat-read-failure-is-not-health.md",
+        "qa/manifests/ledger-duplicate-id-guard.md",
+        "qa/manifests/t036-alias-label-intake.md",
+        "qa/manifests/t052-executable-registration.md",
+        "qa/manifests/t052-registration-acquisition.md",
+        "qa/manifests/t052-registration-persistence.md",
+        "qa/manifests/u22-extraction-measurement-harness.md",
+        "qa/verdicts/iss-367-lint-structure-no-shortcircuit.md",
+        "qa/verdicts/iss-368-heartbeat-read-failure-is-not-health.md",
+        "qa/verdicts/ledger-duplicate-id-guard.md",
+        "qa/verdicts/t036-alias-label-intake.md",
+        "qa/verdicts/t052-registration-acquisition.md",
+        "qa/verdicts/t052-registration-persistence.md",
+        "scripts/eval-extraction.mjs",
+        "scripts/webinar/source-discovery.test.mjs"
+      ],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a035913864247fa58",
+      "head": "8ac058292ea1c263e728dcbc73536d774c266459",
+      "branch": "refs/heads/worktree-agent-a035913864247fa58",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 5
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a0cdaee537b2064d9",
+      "head": "2b5acc86e8716d173c1215439995004ff5138f10",
+      "branch": "refs/heads/worktree-agent-a0cdaee537b2064d9",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a2849bfcc8e96d3e0",
+      "head": "e76b3542677eda700403d790f5b6eb602a9d5c86",
+      "branch": "refs/heads/worktree-agent-a2849bfcc8e96d3e0",
+      "locked": "claude agent agent-a2849bfcc8e96d3e0 (pid 27848)",
+      "tracked_changes": [
+        " M packages/core/src/alerts/alert-sink.test.ts",
+        " M packages/core/src/alerts/alert-sink.ts"
+      ],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a32b49f2d8a553401",
+      "head": "341c7e07518a7f57c0e528163eae14c7bbb7ba04",
+      "branch": "refs/heads/wave/jobkey-collision-detection",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a39d65b2d77302c20",
+      "head": "28ff897509b6d07ecc1ddd81930a55a919e7e2db",
+      "branch": "refs/heads/worktree-agent-a39d65b2d77302c20",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a3d4ea73632cda74e",
+      "head": "2776aacb0f043add8e2fba13d6af01e0ec8fb264",
+      "branch": "refs/heads/worktree-agent-a3d4ea73632cda74e",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a4212610f22642380",
+      "head": "b87edfb43d58d68b71e6b830a594a12247eb09c3",
+      "branch": "refs/heads/worktree-agent-a4212610f22642380",
+      "locked": "claude agent agent-a4212610f22642380 (pid 46932)",
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a46ceda26ef357011",
+      "head": "f6426117069ff26917ffa89e7ca425af7c7eb451",
+      "branch": "refs/heads/worktree-agent-a46ceda26ef357011",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a4bf95ea22f117a7e",
+      "head": "0205123d768f47757db96541772b3c2ea9f88bce",
+      "branch": "refs/heads/wave/golden-set-silent-fabrication",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a6831e0acd90211ee",
+      "head": "ce67554feaaf92cdfe62114395ba93a6f7f84d63",
+      "branch": "refs/heads/worktree-agent-a6831e0acd90211ee",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a779f0b3b445697af",
+      "head": "126311c71a3fd17a95531bb1657c4b2d4a96370a",
+      "branch": "refs/heads/worktree-agent-a779f0b3b445697af",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a7bfb796d6769286b",
+      "head": "c1cb249bc205c011a5efee425aa42c332d97f415",
+      "branch": "refs/heads/worktree-agent-a7bfb796d6769286b",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a7e885f3597d16f27",
+      "head": "3e76bebedfcd68e047cbefde9d6a4d467a12b32b",
+      "branch": "refs/heads/worktree-agent-a7e885f3597d16f27",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-a88c5f234e881ab3c",
+      "head": "5d258374d71b2e12d715c7d9cf9b33cfe19bc160",
+      "branch": "refs/heads/wave/vector-gap-durability",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 2
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-ab604ab2206349e24",
+      "head": "fed71c8f9407e5db6f0f07ab170eed2bc024df9f",
+      "branch": "refs/heads/wave/topicrefs-arg-guard",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-ab6f3ae8da86f0ac8",
+      "head": "e76b3542677eda700403d790f5b6eb602a9d5c86",
+      "branch": "refs/heads/worktree-agent-ab6f3ae8da86f0ac8",
+      "locked": "claude agent agent-ab6f3ae8da86f0ac8 (pid 27848)",
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-ad21dc28a0fa5dc90",
+      "head": "e76b3542677eda700403d790f5b6eb602a9d5c86",
+      "branch": "refs/heads/worktree-agent-ad21dc28a0fa5dc90",
+      "locked": "claude agent agent-ad21dc28a0fa5dc90 (pid 27848)",
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase/.claude/worktrees/agent-ade446ac412280463",
+      "head": "af6037a55115c8f1b46d3f156c28d94a485e414a",
+      "branch": "refs/heads/worktree-agent-ade446ac412280463",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/a-speakers",
+      "head": "55b5469085829c21a2239087ea1fab08a4f84f35",
+      "branch": "refs/heads/lane/a-speakers",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 2
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/b-golden-set",
+      "head": "b66fa042d3e592f5e95a10d029ed412c0c9a14b4",
+      "branch": "refs/heads/lane/b-golden-set",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/c-unrun-writers",
+      "head": "821b70c73016b52301ad2b3b5fcf569264946a60",
+      "branch": "refs/heads/lane/c-unrun-writers",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/iss-104-speaker-closedclass",
+      "head": "083dcd956eaa18840d8759c4c2ec510bec2eec7d",
+      "branch": "refs/heads/wave/iss-104-speaker-closedclass",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/iss-291-sync-txn",
+      "head": "c21355ec78cbdce86960101de2c4054b0f9dcf86",
+      "branch": "refs/heads/wave/iss-291-sync-txn",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/live-record-repair",
+      "head": "d1023d7b0d9334c7c08f8fae2b9ed109b46e2092",
+      "branch": "refs/heads/wave/live-record-repair",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/obs-launch-error",
+      "head": "fed722b75fa50c21af12554943107ed14ada3bad",
+      "branch": "refs/heads/wave/obs-launch-error",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/t-047-controller",
+      "head": "8c1cfc18589b79c3e740c3b8466d0c3cc555c0ac",
+      "branch": "refs/heads/wave/t-047-controller",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/u2-4-phase3-fix",
+      "head": "5662426d5917b182f61708c892ab192bbfd75687",
+      "branch": "refs/heads/wave/u2-4-phase3-fix",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 13
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/u4-watch-dashboard",
+      "head": "3b14246b167f4e3fa5acd36fad6dee74987cb316",
+      "branch": "refs/heads/wave/u4-watch-dashboard",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    },
+    {
+      "path": "D:/KnowledgeBase-lanes/u5-auto-record",
+      "head": "28250af0452feb25369fafdc9e81c7a47b0c413b",
+      "branch": "refs/heads/wave/u5-auto-record",
+      "locked": null,
+      "tracked_changes": [],
+      "untracked_code_evidence": [],
+      "errors": [
+        "fatal: this operation must be run in a work tree"
+      ],
+      "ahead_of_master": 0
+    }
+  ],
+  "branches": [
+    {
+      "name": "__tmp_master_check",
+      "sha": "c2f339bc558d1ce7fb16a719bfc82bd97f4ccd61",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "feat/webinar-bot",
+      "sha": "1e3c0cd66cb16e7125149ada6fd9462494e6aa6e",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "lane/a-speakers",
+      "sha": "55b5469085829c21a2239087ea1fab08a4f84f35",
+      "ahead_of_master": 2
+    },
+    {
+      "name": "lane/b-golden-set",
+      "sha": "b66fa042d3e592f5e95a10d029ed412c0c9a14b4",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "lane/c-unrun-writers",
+      "sha": "821b70c73016b52301ad2b3b5fcf569264946a60",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "master",
+      "sha": "614d78b8966428296f394b8bf3e6c547d41beca5",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/golden-set-silent-fabrication",
+      "sha": "0205123d768f47757db96541772b3c2ea9f88bce",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/iss-104-speaker-closedclass",
+      "sha": "083dcd956eaa18840d8759c4c2ec510bec2eec7d",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/iss-291-sync-txn",
+      "sha": "c21355ec78cbdce86960101de2c4054b0f9dcf86",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/jobkey-collision-detection",
+      "sha": "341c7e07518a7f57c0e528163eae14c7bbb7ba04",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/live-record-repair",
+      "sha": "d1023d7b0d9334c7c08f8fae2b9ed109b46e2092",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/mc-hooks-bolded-status",
+      "sha": "655850809e20e9c867e5140dcfc998e6ae552f91",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/obs-launch-error",
+      "sha": "fed722b75fa50c21af12554943107ed14ada3bad",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/stamp-adoption-cycle2",
+      "sha": "3d3c71dc18b3b8dcf734c47d7a08401e1a0d7193",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/t-047-controller",
+      "sha": "8c1cfc18589b79c3e740c3b8466d0c3cc555c0ac",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/topicrefs-arg-guard",
+      "sha": "fed71c8f9407e5db6f0f07ab170eed2bc024df9f",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/u0-zoom-iframe",
+      "sha": "0bf7de1a75f75f3225c2aef6c98483afa2436d23",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/u2-4-phase3-fix",
+      "sha": "5662426d5917b182f61708c892ab192bbfd75687",
+      "ahead_of_master": 13
+    },
+    {
+      "name": "wave/u2-fix1-ingest-guards",
+      "sha": "14f5771e6810ef05fa652bfc7cafe62aa08bd4c1",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/u2-fix2-reingest-same-id",
+      "sha": "057779cb6a29741c731678fe19aa2a718e5575c8",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/u4-watch-dashboard",
+      "sha": "3b14246b167f4e3fa5acd36fad6dee74987cb316",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/u5-auto-record",
+      "sha": "28250af0452feb25369fafdc9e81c7a47b0c413b",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "wave/vector-gap-durability",
+      "sha": "5d258374d71b2e12d715c7d9cf9b33cfe19bc160",
+      "ahead_of_master": 2
+    },
+    {
+      "name": "worktree-agent-a035913864247fa58",
+      "sha": "8ac058292ea1c263e728dcbc73536d774c266459",
+      "ahead_of_master": 5
+    },
+    {
+      "name": "worktree-agent-a0cdaee537b2064d9",
+      "sha": "2b5acc86e8716d173c1215439995004ff5138f10",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a2849bfcc8e96d3e0",
+      "sha": "e76b3542677eda700403d790f5b6eb602a9d5c86",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a32b49f2d8a553401",
+      "sha": "a99140f261bcd03d065ac2f8ff088216958af790",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a39d65b2d77302c20",
+      "sha": "28ff897509b6d07ecc1ddd81930a55a919e7e2db",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a3d4ea73632cda74e",
+      "sha": "2776aacb0f043add8e2fba13d6af01e0ec8fb264",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a4212610f22642380",
+      "sha": "b87edfb43d58d68b71e6b830a594a12247eb09c3",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a46ceda26ef357011",
+      "sha": "f6426117069ff26917ffa89e7ca425af7c7eb451",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a4bf95ea22f117a7e",
+      "sha": "a99140f261bcd03d065ac2f8ff088216958af790",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a6831e0acd90211ee",
+      "sha": "ce67554feaaf92cdfe62114395ba93a6f7f84d63",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a779f0b3b445697af",
+      "sha": "126311c71a3fd17a95531bb1657c4b2d4a96370a",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a7bfb796d6769286b",
+      "sha": "c1cb249bc205c011a5efee425aa42c332d97f415",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a7e885f3597d16f27",
+      "sha": "3e76bebedfcd68e047cbefde9d6a4d467a12b32b",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a88c5f234e881ab3c",
+      "sha": "a99140f261bcd03d065ac2f8ff088216958af790",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-a8d1076ec05617f80",
+      "sha": "116e2fea29e80f7c5351346d1979166fa25c63a8",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-ab604ab2206349e24",
+      "sha": "a99140f261bcd03d065ac2f8ff088216958af790",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-ab6f3ae8da86f0ac8",
+      "sha": "e76b3542677eda700403d790f5b6eb602a9d5c86",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-ad21dc28a0fa5dc90",
+      "sha": "e76b3542677eda700403d790f5b6eb602a9d5c86",
+      "ahead_of_master": 0
+    },
+    {
+      "name": "worktree-agent-ade446ac412280463",
+      "sha": "af6037a55115c8f1b46d3f156c28d94a485e414a",
+      "ahead_of_master": 0
+    }
+  ],
+  "new_portable_data": [
+    {
+      "path": "data/eval/extraction-corpus.json",
+      "bytes": 17283
+    },
+    {
+      "path": "data/eval/extraction-report.json",
+      "bytes": 128034
+    },
+    {
+      "path": "data/toc-migrated/synthetic-controlled-1790797565149/source.json",
+      "bytes": 1046
+    },
+    {
+      "path": "data/toc-migrated/synthetic-controlled-1790797565149/validation.json",
+      "bytes": 82
+    },
+    {
+      "path": "data/toc-migrated/synthetic-controlled-1790798758779/source.json",
+      "bytes": 1046
+    },
+    {
+      "path": "data/toc-migrated/synthetic-controlled-1790798758779/validation.json",
+      "bytes": 82
+    },
+    {
+      "path": "data/toc-migrated/synthetic-controlled-1790799479728/source.json",
+      "bytes": 1045
+    },
+    {
+      "path": "data/toc-migrated/synthetic-controlled-1790799479728/validation.json",
+      "bytes": 83
+    }
+  ],
+  "tracked_count": 1513,
+  "tracked_sizes": [],
+  "diagnostic_source_files": [
+    "data/registration-d099-builder-probe.py",
+    "data/registration-d099-main-fault-probe.py",
+    "data/registration-d099-worker-idle-probe.py"
+  ],
+  "transport_files": [
+    "HANDOFF.md",
+    ".handoffs/2026-10-09-124413-previous-HANDOFF.md",
+    ".handoffs/2026-10-09-124413-HANDOFF.md",
+    ".handoffs/machine-migration-inventory-2026-10-09.json",
+    ".handoffs/machine-migration-public-audit.json",
+    ".handoffs/KnowledgeBase-Analytical-Report-2026-10-09.md",
+    ".handoffs/KnowledgeBase-Report-2026-10-09.html"
+  ]
+}

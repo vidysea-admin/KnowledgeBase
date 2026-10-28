@@ -1,0 +1,49 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=^(T036 |actual factory refresh reconstructed model retains rejected decision and zero counts$|healthy approved control remains eligible through actual loader and selector$|new refusal evidence on approved legacy link remains blocking after reconstructed factory refresh$)",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/calendar/auto-join.test.ts",
+    "qa/evidence/t036-provenance-refresh-independent-20261015.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\1efc6f1875defe90964439123d5719eb743523ae3f7fb16d13c21fecd9abc6a1.json",
+    "sha256": "1efc6f1875defe90964439123d5719eb743523ae3f7fb16d13c21fecd9abc6a1",
+    "count": 323
+  },
+  "environmentWhitelistSha256": "3748cf94db2bdadd694fc7a6ebe175b9b0d0dc8d4c3583f32b4830b4787ba74b",
+  "environmentNames": [
+    "KB_T022_PRIVATE_REVIEW_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS_ALLOW_GENUINE_NATIVE",
+    "NODE_OPTIONS",
+    "PYTHONDONTWRITEBYTECODE",
+    "TEMP",
+    "TMP"
+  ],
+  "beforeMatch": true,
+  "maxJobSeconds": 120.0,
+  "accounting": "SHARED INTEGRATION, not checker",
+  "pid": 34556,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 3.5320000000028813,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t036-fresh-selected.log",
+    "sha256": "34c15d1bd5218790e4936e3a21808cf83c67895f9a4f7d54612c4c898f3a473b"
+  },
+  "counts": {
+    "tests": 7,
+    "pass": 7,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

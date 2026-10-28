@@ -251,3 +251,5 @@ answered, and should be the unit that follows it.
 
 **ISS-129 remains open.** This PASS certifies the script reader and the gate record — **not** D-019
 being implemented. One of two readers honours the union.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

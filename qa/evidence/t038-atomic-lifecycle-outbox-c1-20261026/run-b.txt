@@ -1,0 +1,28 @@
+✔ shutdown during acquisition, registration, rules, preparation or ownership recheck admits no new capture (4.3663ms)
+(node:5608) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical completion accepts bound legacy/v3 selected-artifact proofs and refuses mismatched marker/source/DB/validation (636.4444ms)
+(node:9880) ExperimentalWarning: SQLite is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ canonical autonomous acquisition continues during two owned captures; capacity and career priority are durable (229.8529ms)
+✔ autonomous rule vetoes are persisted even with no allowed schedule and cannot launch (33.956ms)
+✔ automatic service refuses unenforced rules and absent real slot readiness before discovery (4.8581ms)
+✔ one owned capture failure never stops another owned slot or creates a false ready state (100.562ms)
+✔ a completed index marker cannot bypass graph recovery acknowledgement after interrupted completion (47.3418ms)
+✔ shutdown after recording disposition but before child microtask prevents launch and retains queued work (41.3656ms)
+✔ autonomous recovery gates legacy default-workspace artifacts instead of allocating an unrelated slot (26.4127ms)
+✔ owned slot recovery passes the persisted slot to the child and preserves its durable identity (60.6898ms)
+✔ canonical recording publication failure stops its actual controller and prevents a false ready result (96.9895ms)
+✔ canonical pool uses only accepted matching capabilities and keeps unsupported coverage queued (105.1829ms)
+✔ fresh slot validation refuses capture when previously accepted evidence is revoked (42.7612ms)
+✔ disabled refreshed scheduler controls prevent discovery, registration and capture admissions (7.3983ms)
+✔ active capture loses verified authority, stops its owned generation, and cannot become ready (48.5307ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6554.7732
+exit=0

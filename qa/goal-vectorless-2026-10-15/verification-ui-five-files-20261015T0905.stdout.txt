@@ -1,0 +1,15 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/answer-policy/PolicyAskPage.test.tsx (13 tests) 1239ms
+ ✓ src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx (4 tests | 1 skipped) 242ms
+ ✓ src/pages/AskPage.test.tsx (9 tests) 1716ms
+   ✓ AskPage > submits the trimmed query and renders the answer 416ms
+ ✓ src/pages/knowledge/speakers/speakerProfileClient.test.ts (2 tests) 4ms
+ ✓ src/components/AiUsageSummary.test.tsx (4 tests) 36ms
+
+ Test Files  5 passed (5)
+      Tests  31 passed | 1 skipped (32)
+   Start at  08:22:06
+   Duration  20.22s (transform 468ms, setup 6.16s, collect 4.09s, tests 3.24s, environment 3.82s, prepare 1.57s)
+

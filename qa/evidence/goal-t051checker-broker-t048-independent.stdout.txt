@@ -1,0 +1,27 @@
+{
+  "pass": 2,
+  "fail": 0,
+  "network": false,
+  "outcomes": [
+    {
+      "path": "single",
+      "protocolRequests": {
+        "upload": 2,
+        "poll": 1,
+        "generate": 1
+      },
+      "turns": 180,
+      "consumer": "accepted exact bytes; refused changed same-count text"
+    },
+    {
+      "path": "chunked",
+      "protocolRequests": {
+        "upload": 6,
+        "poll": 3,
+        "generate": 3
+      },
+      "turns": 180,
+      "consumer": "accepted exact bytes; refused changed same-count text"
+    }
+  ]
+}

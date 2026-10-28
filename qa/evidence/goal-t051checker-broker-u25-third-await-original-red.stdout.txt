@@ -1,0 +1,1 @@
+{"stage":"red","exitCode":1,"counts":{"tests":2,"pass":1,"fail":1,"cancelled":0,"skipped":0,"todo":0},"elapsedMs":1128.5166,"hashChanges":[]}

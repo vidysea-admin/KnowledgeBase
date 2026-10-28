@@ -223,3 +223,5 @@ earlier hand read sampled.
 
 Independent checker PASS recorded in `qa/verdicts/golden-set-sibling-ambiguity.md` (cycle 3: 7/7
 criteria, 3/3 invariants). ISS-241 was corrected during maker close-out.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

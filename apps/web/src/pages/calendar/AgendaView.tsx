@@ -9,7 +9,10 @@
  */
 import { Link } from "react-router-dom";
 import type { SessionSummary, UpcomingMeeting } from "../../api/types.js";
+import type { CalendarWorkerHealth } from "../../api/calendar.js";
+import { parseLocalDate, toCalendarEvents } from "./calendar-model.js";
 import { ExternalLinkIcon } from "../../components/icons.js";
+import { safeHttpUrl } from "../../safe-url.js";
 
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -30,9 +33,11 @@ function monthLabel(key: string): string {
 }
 
 function formatMeetingTime(startTime: string, endTime: string): string {
-  const start = new Date(startTime);
+  const allDay = /^\d{4}-\d{2}-\d{2}$/.test(startTime);
+  const start = allDay ? parseLocalDate(startTime) : new Date(startTime);
   const end = new Date(endTime);
   const dateStr = start.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+  if (allDay) return `${dateStr} - All day`;
   const startStr = start.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
   const endStr = end.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
   return `${dateStr} · ${startStr}–${endStr}`;
@@ -43,10 +48,13 @@ export interface AgendaViewProps {
   sessionsError: string | null;
   meetings: UpcomingMeeting[] | null;
   meetingsError: string | null;
+  worker?: CalendarWorkerHealth;
 }
 
 export function AgendaView(props: AgendaViewProps): React.ReactElement {
   const grouped = groupByMonth(props.sessions ?? []);
+  const placedIds = new Set(toCalendarEvents([], props.meetings ?? []).map(e => e.id));
+  const datedMeetings = props.meetings?.filter(m => placedIds.has(`meeting:${m.id}`));
   return (
     <div data-testid="agenda-view">
       <div className="section-title">Upcoming</div>
@@ -54,24 +62,31 @@ export function AgendaView(props: AgendaViewProps): React.ReactElement {
       {!props.meetingsError && props.meetings === null && <div className="card empty-note">Loading&hellip;</div>}
       {!props.meetingsError && props.meetings && props.meetings.length === 0 && (
         <div className="card empty-note">
-          No upcoming meetings found in the next two weeks &mdash; either your calendar is clear, or
-          the calendar connection (`gws`) isn&rsquo;t reachable from this server right now.
+          {props.worker?.status === "fresh" ? "No upcoming events in the connected calendar for the next two weeks." : <>No upcoming meetings found in the next two weeks &mdash; either your calendar is clear, or
+          the calendar connection (`gws`) isn&rsquo;t reachable from this server right now.</>}
         </div>
       )}
-      {props.meetings && props.meetings.length > 0 && (
+      {datedMeetings && datedMeetings.length > 0 && (
         <div className="card">
-          {props.meetings.map((m) => (
+          {datedMeetings?.map((m) => (
             <div key={m.id} className="row-card">
-              <div className="row-title">{m.title}</div>
+              <div className="row-title" style={{ overflowWrap: "anywhere" }}>{m.title}</div>
+              {m.attendanceSkipReason === "office-internal" && <div className="row-meta" role="status">Skipped: office/internal. The bot will not join this event.</div>}
+              {(m.status || m.responseStatus) && <div className="row-meta">{m.status ? `Event status: ${m.status}` : ""}{m.responseStatus ? ` · RSVP: ${m.responseStatus}` : ""}</div>}
+              {(m.cancelled || m.status === "cancelled") && <div className="row-meta">Status: cancelled. This event will not be joined.</div>}
               <div className="row-meta">
                 {formatMeetingTime(m.startTime, m.endTime)}
                 {m.organizer ? ` · ${m.organizer}` : ""}
-                {m.meetingUrl && (
+                {m.meetingUrl && !m.cancelled && m.status !== "cancelled" && (
                   <>
                     {" · "}
-                    <a href={m.meetingUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
-                      Join <ExternalLinkIcon className="row-meta" />
-                    </a>
+                    {safeHttpUrl(m.meetingUrl) ? (
+                      <a href={m.meetingUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}>
+                        Join <ExternalLinkIcon className="row-meta" />
+                      </a>
+                    ) : (
+                      <span data-testid="agenda-join-text">{m.meetingUrl}</span>
+                    )}
                   </>
                 )}
               </div>

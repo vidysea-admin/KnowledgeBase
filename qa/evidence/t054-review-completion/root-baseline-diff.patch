@@ -1,0 +1,379 @@
+diff --git a/apps/api/src/search-store.ts b/apps/api/src/search-store.ts
+index 7ca2c831..69ed7a8d 100644
+--- a/apps/api/src/search-store.ts
++++ b/apps/api/src/search-store.ts
+@@ -5,17 +5,18 @@
+  * rather than a new one.
+  */
+ import type { Db } from "mongodb";
+-import type { Sessions, Turns } from "@lkb/core";
+-import { getDb, scopedCollection } from "@lkb/db";
++import { getDb } from "@lkb/db";
+ import { lexicalSearchTurns } from "@lkb/index";
+ import { buildTurnPrefilter } from "./search-prefilter.js";
++import { readSearchCandidateTurns } from "./transcript-review/search-reader.js";
++import { createKnowledgeVisibility } from "./visibility/knowledge.js";
+ import type { SearchDeps, SearchHit } from "./routes/search.js";
+ 
+ /**
+  * Pre-filters candidates in Mongo, scores them with `@lkb/index`'s pure `lexicalSearchTurns`,
+- * then resolves each hit's own turn doc (already in hand from the fetch — no second turn query)
+- * plus its session (deduped: multiple hits can share a session, fetched once each via a Set of
+- * distinct ids, not once per hit).
++ * adds current review-overlay candidates, and checks source eligibility before scoring.
++ * Current proof reads are required by the visibility perimeter; each hit uses its own effective
++ * turn and final safe session labels are resolved once per distinct returned session.
+  *
+  * The pre-filter replaces an unbounded `find({})`. Measured against real data 2026-09-08
+  * (2118 turns, tenant `toc`): fetching every turn cost a median **1064ms** while scoring them
+@@ -56,13 +57,13 @@ export function createMongoSearchDeps(deps: SearchStoreDeps = {}): SearchDeps {
+       // Resolved per call, not at construction: production builds these deps at boot, before
+       // connect(). Tenant-scoping still runs through scopedCollection on the injected handle.
+       const db = deps.db ?? getDb();
+-      const turnsColl = scopedCollection<Turns>(db as never, "turns");
+-      const sessionsColl = scopedCollection<Sessions>(db as never, "sessions");
++      const visibility = createKnowledgeVisibility(db);
+       // buildTurnPrefilter owns the superset invariant and is pinned by search-prefilter.test.ts
+       // (ISS-072: this construction previously lived inline here, where no test could fail on it).
+       const prefilter = buildTurnPrefilter(query);
+       if (prefilter === null) return [];
+-      const turns = await turnsColl(tenantId).find(prefilter as never).toArray();
++      const candidates = await readSearchCandidateTurns(db, tenantId, prefilter);
++      const turns = await visibility.filterTurns(tenantId, candidates);
+       const scored = lexicalSearchTurns(
+         query,
+         turns.map((t) => ({ _id: t._id, sessionId: t.sessionId, text: t.text })),
+@@ -70,7 +71,7 @@ export function createMongoSearchDeps(deps: SearchStoreDeps = {}): SearchDeps {
+       );
+       const turnById = new Map(turns.map((t) => [t._id, t]));
+       const sessionIds = [...new Set(scored.map((s) => s.sessionId))];
+-      const sessions = await Promise.all(sessionIds.map((id) => sessionsColl(tenantId).findOne({ _id: id })));
++      const sessions = await Promise.all(sessionIds.map((id) => visibility.safeCitationSession(tenantId, id)));
+       const sessionById = new Map(sessionIds.map((id, i) => [id, sessions[i] ?? null]));
+       return scored.map((hit) => ({
+         turnId: hit.turnId,
+diff --git a/apps/api/src/transcript-review/persist.test.ts b/apps/api/src/transcript-review/persist.test.ts
+index 40b5588c..10e74400 100644
+--- a/apps/api/src/transcript-review/persist.test.ts
++++ b/apps/api/src/transcript-review/persist.test.ts
+@@ -77,7 +77,7 @@ test("POST commits durably: receipt shape, new ETag, original turns untouched, o
+     const [row] = hist.revisions;
+     assert.equal(row!.revision, receipt.revision);
+     assert.equal(row!.parentRevision, loaded.revision);
+-    assert.equal(row!.actorRef, "apikey:tenant-A");
++    assert.match(row!.actorRef, /^apikey:[0-9a-f]{64}$/);
+     assert.equal(row!.reason, REASON);
+     const c0 = row!.changes.find((c) => c.turnId === A0)!;
+     assert.equal(c0.before.text, "Alpha original 0");
+@@ -209,11 +209,29 @@ test("a failed history write does not turn a durable commit into an error, and t
+     const r1 = ((await first.json()) as { revision: string }).revision;
+     assert.equal(h.m.rows("transcript_review_revisions").length, 0, "history row missing right after the injected failure");
+     assert.equal((await h.get("key-a")).body.revision, r1);
++    const recovered = await (await h.call("GET", `/sessions/${SESSION}/transcript-review/history`, "key-a")).json() as { revisions: { revision: string; changes: { after: { text: string } }[] }[] };
++    assert.equal(recovered.revisions[0]!.revision, r1);
++    assert.equal(recovered.revisions[0]!.changes[0]!.after.text, "v1", "head audit is accessible before another edit");
+     assert.equal((await h.post("key-a", r1, fix(A0, "v2"))).status, 200);
+     assert.equal(h.m.rows("transcript_review_revisions").length, 2, "revision 1 was recovered from the head's audit entry");
+   } finally { await h.close(); }
+ });
+ 
++test("audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision", async () => {
++  let calls = 0;
++  const h = await boot({ refresh: async () => { calls++; } });
++  try {
++    const r0 = (await h.get("key-a")).body.revision;
++    const r1 = (await (await h.post("key-a", r0, fix(A0, "v1"))).json() as { revision: string }).revision;
++    await h.post("key-a-second", r1, fix(A0, "v2"));
++    const history = await (await h.call("GET", `/sessions/${SESSION}/transcript-review/history`, "key-a")).json() as { revisions: { actorRef: string }[] };
++    assert.equal(history.revisions.length, 2); assert.notEqual(history.revisions[0]!.actorRef, history.revisions[1]!.actorRef);
++    assert.ok(history.revisions.every((r) => /^apikey:[0-9a-f]{64}$/.test(r.actorRef)));
++    const stale = await h.call("POST", `/sessions/${SESSION}/transcript-review/refresh`, "key-a", {}, { "if-match": `"${r1}"` });
++    assert.equal(stale.status, 412); assert.equal(calls, 0);
++  } finally { await h.close(); }
++});
++
+ test("a store failure answers 503 with no internal message and no partial write", async () => {
+   const h = await boot();
+   try {
+diff --git a/apps/api/src/transcript-review/persist.testkit.ts b/apps/api/src/transcript-review/persist.testkit.ts
+index 7a7771b9..95280266 100644
+--- a/apps/api/src/transcript-review/persist.testkit.ts
++++ b/apps/api/src/transcript-review/persist.testkit.ts
+@@ -11,6 +11,7 @@ import type { RefreshExecutor } from "./service.js";
+ export const SESSION = "session-1";
+ export const keys = fakeKeyStore({
+   "key-a": { tenantId: "tenant-A", scopes: ["sessions"] },
++  "key-a-second": { tenantId: "tenant-A", scopes: ["sessions"] },
+   "key-b": { tenantId: "tenant-B", scopes: ["sessions"] },
+   "key-noscope": { tenantId: "tenant-A", scopes: ["ask"] },
+ });
+diff --git a/apps/api/src/transcript-review/router.ts b/apps/api/src/transcript-review/router.ts
+index edee251c..522bdcc4 100644
+--- a/apps/api/src/transcript-review/router.ts
++++ b/apps/api/src/transcript-review/router.ts
+@@ -1,5 +1,5 @@
+ /**
+- * apps/api/src/transcript-review/router.ts - T-054 durable transcript corrections (NOT mounted in server.ts).
++ * apps/api/src/transcript-review/router.ts - T-054 durable transcript corrections.
+  *   GET  /sessions/:sessionId/transcript-review            effective transcript + revision; `ETag: "<revision>"`
+  *   POST /sessions/:sessionId/transcript-review            commit corrections; needs `If-Match: "<revision>"` AND body.expectedRevision
+  *   GET  /sessions/:sessionId/transcript-review/history    append-only revision history (who/when/why/before/after)
+@@ -12,11 +12,17 @@
+  * until the refresh endpoint (or an operator) has actually run every target.
+  */
+ import { Router, type Request, type Response } from "express";
++import { createHash } from "node:crypto";
+ import { requireScope } from "../auth.js";
+-import { commitReview, loadReview, ReviewServiceError, runRefresh, type RefreshExecutor } from "./service.js";
++import { commitReview, loadReview, loadReviewHistory, ReviewServiceError, runRefresh, type RefreshExecutor } from "./service.js";
+ import type { ReviewStore } from "./store.js";
+ 
+-export interface TranscriptReviewDeps { store: ReviewStore; refresh?: RefreshExecutor; clock?: () => string }
++export interface TranscriptReviewDeps {
++  store: ReviewStore; refresh?: RefreshExecutor; clock?: () => string;
++  /** Trusted server-side eligibility. Production MUST bind its source visibility perimeter;
++   * omission exists only for independently injected fixtures/capabilities. Never client-controlled. */
++  authorizeSession?: (tenantId: string, sessionId: string) => Promise<boolean>;
++}
+ 
+ const SESSION_ID = /^[A-Za-z0-9][A-Za-z0-9._:@-]{0,399}$/;
+ const IF_MATCH = /^"([A-Za-z0-9._:-]{1,400})"$/;
+@@ -51,13 +57,26 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
+   const path = "/sessions/:sessionId/transcript-review";
+   const badId = (res: Response): void => send(res, 400, { error: "invalid_id", message: "Invalid session id" });
+ 
++  // Prefix middleware covers snapshot, history, commit and refresh BEFORE any store access
++  // or precondition state. Ordinary sessions scope does not grant raw quarantined chat review.
++  router.use(path, requireScope("sessions"), async (req, res, next) => {
++    const sessionId = req.params.sessionId as string;
++    if (!SESSION_ID.test(sessionId)) return badId(res);
++    try {
++      if (deps.authorizeSession && !await deps.authorizeSession(tenantOf(req), sessionId)) {
++        send(res, 404, { error: "not_found", message: "Transcript review not found" }); return;
++      }
++      next();
++    } catch (error) { fail(res, error); }
++  });
++
+   router.get(path, requireScope("sessions"), async (req, res) => {
+     const sessionId = req.params.sessionId as string;
+     if (!SESSION_ID.test(sessionId)) return badId(res);
+     try {
+-      const { snapshot, refresh } = await loadReview(deps.store, tenantOf(req), sessionId);
++      const { snapshot, refresh, orphanedTurnIds } = await loadReview(deps.store, tenantOf(req), sessionId);
+       send(res, 200, {
+-        sessionId, revision: snapshot.revision, refresh: refresh?.status ?? "complete",
++        sessionId, revision: snapshot.revision, refresh: refresh?.status ?? "complete", orphanedTurnIds,
+         turns: snapshot.turns.map((t) => ({ _id: t._id, text: t.text, speakerRef: t.speakerRef, tStart: t.tStart, tEnd: t.tEnd, ...(t.speakerLabel !== undefined ? { speakerLabel: t.speakerLabel } : {}) })),
+       }, snapshot.revision);
+     } catch (e) { fail(res, e); }
+@@ -76,7 +95,10 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
+       const tenantId = tenantOf(req);
+       const { snapshot } = await loadReview(deps.store, tenantId, sessionId);
+       if (snapshot.revision !== m[1]) { send(res, 412, { error: "precondition_failed", message: "Transcript changed; reload before saving", currentRevision: snapshot.revision }, snapshot.revision); return; }
+-      const receipt = await commitReview(deps.store, { tenantId, sessionId, actorRef: `apikey:${tenantId}`, now: now(), request: body });
++      const verifiedBearer = /^Bearer\s+(.+)$/i.exec(req.header("authorization") ?? "")?.[1];
++      if (!verifiedBearer) throw new Error("Missing verified principal");
++      const keyIdentity = createHash("sha256").update(JSON.stringify([tenantId, verifiedBearer])).digest("hex");
++      const receipt = await commitReview(deps.store, { tenantId, sessionId, actorRef: `apikey:${keyIdentity}`, now: now(), request: body });
+       send(res, 200, receipt, receipt.revision);
+     } catch (e) { fail(res, e); }
+   });
+@@ -86,8 +108,7 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
+     if (!SESSION_ID.test(sessionId)) return badId(res);
+     try {
+       const tenantId = tenantOf(req);
+-      await loadReview(deps.store, tenantId, sessionId); // 404 for a transcript that is not this tenant's
+-      const rows = await deps.store.listRevisions(tenantId, sessionId);
++      const rows = await loadReviewHistory(deps.store, tenantId, sessionId);
+       send(res, 200, { sessionId, revisions: rows.map((r) => ({ revision: r.revision, parentRevision: r.parentRevision, actorRef: r.actorRef, reviewedAt: r.reviewedAt, reason: r.reason, changes: r.changes })) });
+     } catch (e) { fail(res, e); }
+   });
+@@ -98,7 +119,13 @@ export function createTranscriptReviewRouter(deps: TranscriptReviewDeps): Router
+     if (!deps.refresh) { send(res, 503, { error: "refresh_unavailable", message: "No refresh executor is configured" }); return; }
+     try {
+       const tenantId = tenantOf(req);
+-      await loadReview(deps.store, tenantId, sessionId);
++      const loaded = await loadReview(deps.store, tenantId, sessionId);
++      const header = req.header("if-match");
++      if (header !== undefined) {
++        const m = IF_MATCH.exec(header);
++        if (!m) { send(res, 400, { error: "invalid_request", message: "Refresh requires one strong quoted revision" }); return; }
++        if (m[1] !== loaded.snapshot.revision) { send(res, 412, { error: "precondition_failed", message: "Transcript changed; reload before refreshing" }); return; }
++      }
+       await runRefresh(deps.store, deps.refresh, tenantId, sessionId);
+       // Report what is durably stored now (a superseded run reports the NEWER revision's state, never its own).
+       const state = (await deps.store.head(tenantId, sessionId))?.refresh;
+diff --git a/apps/api/src/transcript-review/service.test.ts b/apps/api/src/transcript-review/service.test.ts
+index 0d0acf01..a957435a 100644
+--- a/apps/api/src/transcript-review/service.test.ts
++++ b/apps/api/src/transcript-review/service.test.ts
+@@ -70,3 +70,29 @@ test("an overlay entry for a turn that no longer exists is ignored, not an error
+   assert.equal(after.turns.length, 3);
+   assert.equal(after.turns.some((t) => t._id === A0), false);
+ });
++
++for (const later of [false, true]) test(`snapshot/head re-read race (${later ? "reviewed" : "initial"}): stale writer cannot CAS a newer head`, async () => {
++  const m = memoryDb(); seed(m);
++  const original = createMongoReviewStore(m.db);
++  let revision = (await loadReview(original, "tenant-A", SESSION)).snapshot.revision;
++  if (later) revision = (await commitReview(original, input(revision, "seed"))).revision;
++  let intercept = true;
++  let winningRevision: string | undefined;
++  const store: ReviewStore = { ...original, head: async (tenant, id) => {
++    const captured = await original.head(tenant, id);
++    if (intercept) { intercept = false; winningRevision = (await commitReview(original, input(revision, "winning correction"))).revision; }
++    return captured;
++  } };
++  await assert.rejects(commitReview(store, input(revision, "stale overwrite")), (e: unknown) => e instanceof ReviewServiceError && e.code === "conflict");
++  assert.equal((await loadReview(original, "tenant-A", SESSION)).snapshot.turns[0]!.text, "winning correction");
++  const history = await original.listRevisions("tenant-A", SESSION);
++  assert.equal(history.length, later ? 2 : 1);
++  // Both fixture commits use the same reviewedAt, so history's hash tie-break is not
++  // causal order. Check the competing receipt's actual audit row, not its list position.
++  assert.ok(winningRevision);
++  const winningAudit = history.find((row) => row.revision === winningRevision);
++  assert.ok(winningAudit);
++  assert.equal(winningAudit.parentRevision, revision);
++  assert.equal(winningAudit.changes[0]!.after.text, "winning correction");
++  assert.equal(history.some((row) => row.changes.some((change) => change.after.text === "stale overwrite")), false);
++});
+diff --git a/apps/api/src/transcript-review/service.ts b/apps/api/src/transcript-review/service.ts
+index aeb02266..a02178cd 100644
+--- a/apps/api/src/transcript-review/service.ts
++++ b/apps/api/src/transcript-review/service.ts
+@@ -13,7 +13,7 @@ export type ReviewFailure = "not_found" | "conflict" | "invalid" | "unreviewable
+ export class ReviewServiceError extends Error {
+   constructor(public readonly code: ReviewFailure, message: string) { super(message); }
+ }
+-export interface LoadedReview { snapshot: ReviewSnapshot; refresh: RefreshState | null }
++export interface LoadedReview { snapshot: ReviewSnapshot; refresh: RefreshState | null; orphanedTurnIds: string[]; head: ReviewHead | null }
+ export interface CommitReceipt { sessionId: string; revision: string; commit: "committed"; refresh: RefreshState["status"] }
+ /** Re-derives ONE refresh target for a session at a revision. Must be idempotent: a crashed run is retried from the start. */
+ export type RefreshExecutor = (job: { tenantId: string; sessionId: string; revision: string; target: string }) => Promise<void>;
+@@ -42,17 +42,30 @@ const toRow = (head: ReviewHead): RevisionRow => ({
+ 
+ export async function loadReview(store: ReviewStore, tenantId: string, sessionId: string): Promise<LoadedReview> {
+   const originals = await store.originalTurns(tenantId, sessionId);
+-  if (!originals.length) throw new ReviewServiceError("not_found", "no such transcript");
+   const head = await store.head(tenantId, sessionId);
++  if (!originals.length && !head) throw new ReviewServiceError("not_found", "no such transcript");
+   const revision = head?.revision ?? baseRevision(tenantId, sessionId, originals);
+-  return { snapshot: { tenantId, sessionId, revision, turns: effectiveTurns(originals, head) }, refresh: head?.refresh ?? null };
++  const originalIds = new Set(originals.map((t) => t._id));
++  const orphanedTurnIds = (head?.overlay ?? []).filter((o) => !originalIds.has(o.turnId)).map((o) => o.turnId);
++  const refresh = head && orphanedTurnIds.length ? { ...head.refresh, status: "failed" as const, completed: [], failedTarget: "source-reconciliation" } : head?.refresh ?? null;
++  return { snapshot: { tenantId, sessionId, revision, turns: effectiveTurns(originals, head) }, refresh, orphanedTurnIds, head };
++}
++
++/** The durable head also contains its own audit, so a failed history insert never hides the
++ * current committed revision from reviewers. No read-side repair writes are necessary. */
++export async function loadReviewHistory(store: ReviewStore, tenantId: string, sessionId: string): Promise<RevisionRow[]> {
++  await loadReview(store, tenantId, sessionId);
++  const [rows, head] = await Promise.all([store.listRevisions(tenantId, sessionId), store.head(tenantId, sessionId)]);
++  if (head && !rows.some((r) => r.revision === head.revision)) rows.push(toRow(head));
++  return rows.sort((a, b) => a.reviewedAt.localeCompare(b.reviewedAt) || a.revision.localeCompare(b.revision));
+ }
+ 
+ export async function commitReview(store: ReviewStore, input: { tenantId: string; sessionId: string; actorRef: string; now: string; request: unknown }): Promise<CommitReceipt> {
+   const { tenantId, sessionId } = input;
+   try { parseReviewRequest(input.request); } catch { throw new ReviewServiceError("invalid", "Invalid transcript review request"); }
+-  const { snapshot } = await loadReview(store, tenantId, sessionId);
+-  const head = await store.head(tenantId, sessionId);
++  // The CAS baseline must be the SAME head used to construct the loaded snapshot.
++  // Reading it again here could authorize an old snapshot against a competitor's new head.
++  const { snapshot, head } = await loadReview(store, tenantId, sessionId);
+   // Heal first: the head carries its own audit entry, so a crash between "head swapped" and "history row written" can
+   // never leave a revision without history once a later commit has happened.
+   if (head) await store.recordRevision(tenantId, toRow(head));
+@@ -95,7 +108,14 @@ export function runRefresh(store: ReviewStore, execute: RefreshExecutor, tenantI
+   if (prior) return prior;
+   const run = (async (): Promise<RefreshState | null> => {
+     const head = await store.head(tenantId, sessionId);
+-    if (!head || head.refresh.status === "complete") return head?.refresh ?? null;
++    if (!head) return null;
++    const originalIds = new Set((await store.originalTurns(tenantId, sessionId)).map((t) => t._id));
++    if (head.overlay.some((o) => !originalIds.has(o.turnId))) {
++      const invalidated: RefreshState = { ...head.refresh, status: "failed", completed: [], failedTarget: "source-reconciliation" };
++      await store.setRefresh(tenantId, sessionId, head.revision, invalidated);
++      return invalidated;
++    }
++    if (head.refresh.status === "complete") return head.refresh;
+     let state: RefreshState = { ...head.refresh, status: "pending", completed: [...head.refresh.completed] };
+     delete state.failedTarget;
+     for (const target of state.targets) {
+@@ -106,6 +126,11 @@ export function runRefresh(store: ReviewStore, execute: RefreshExecutor, tenantI
+         await store.setRefresh(tenantId, sessionId, state.revision, state);
+         return state;
+       }
++      // A transactional executor can publish all targets and their completion together.
++      // Never overwrite that stronger durable state with this loop's per-target bookkeeping.
++      const published = await store.head(tenantId, sessionId);
++      if (!published || published.revision !== state.revision) return null;
++      if (published.refresh.status === "complete") return published.refresh;
+       state = { ...state, completed: [...state.completed, target] };
+       if (!(await store.setRefresh(tenantId, sessionId, state.revision, state))) return null; // superseded by a newer revision
+     }
+diff --git a/apps/web/src/pages/transcript-review/TranscriptReview.tsx b/apps/web/src/pages/transcript-review/TranscriptReview.tsx
+index 892a49d6..897d6fac 100644
+--- a/apps/web/src/pages/transcript-review/TranscriptReview.tsx
++++ b/apps/web/src/pages/transcript-review/TranscriptReview.tsx
+@@ -1,8 +1,9 @@
+ import { useEffect, useRef, useState } from "react";
+ import { ApiError } from "../../api/client.js";
+ import { getTranscriptReview, saveTranscriptReview, type TranscriptReviewSnapshot } from "../../api/transcriptReview.js";
++import { ReviewHistory } from "./ReviewHistory.js";
+ 
+-/** Standalone T-054 editor. Mount only when the audited canonical backend is available. */
++/** Revision-bound transcript correction and explicit contiguous speaker mapping. */
+ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
+   apiKey: string | null; sessionId: string; onCommitted?: () => void;
+ }): React.ReactElement {
+@@ -28,6 +29,7 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
+       if (!active()) return;
+       if (committedRevision && value.revision !== committedRevision) throw new Error("Reload did not return the committed revision; reload again before editing.");
+       setLoaded({ key: apiKey, sessionId, value }); setSelected(value.turns[0]?._id ?? "");
++      return value;
+     } catch (error) {
+       if (active()) setMessage((previous) => ({ key: apiKey, sessionId,
+         text: `${!reset && previous?.key === apiKey && previous.sessionId === sessionId ? `${previous.text} ` : ""}${error instanceof Error ? error.message : "Transcript review unavailable"}`, error: true }));
+@@ -59,7 +61,13 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
+       // Canonical reload is required: a commit receipt is not an authoritative transcript snapshot.
+       try { onCommitted?.(); } catch { /* callback cannot turn a committed write into a retry */ }
+       if (!active()) return;
+-      await load(false, result.revision);
++      const reloading = load(false, result.revision);
++      const reloadIdentity = { ...current.current };
++      const canonical = await reloading;
++      if (canonical && current.current.key === reloadIdentity.key && current.current.sessionId === reloadIdentity.sessionId && current.current.generation === reloadIdentity.generation) {
++        setMessage({ key: apiKey, sessionId, error: false, text: canonical.refresh === "complete" ? "Transcript saved. Knowledge refresh complete." :
++          canonical.refresh === "failed" ? "Transcript saved. Knowledge refresh failed; existing answers may be stale." : "Transcript saved. Knowledge refresh pending; existing answers may be stale." });
++      }
+     } catch (error) {
+       if (!active()) return;
+       setConflict(true);
+@@ -67,12 +75,24 @@ export function TranscriptReview({ apiKey, sessionId, onCommitted }: {
+         "Transcript changed. Your draft is retained. Reload before saving." : "Save could not be confirmed. Your draft is retained. Reload before saving again." });
+     } finally { if (active()) setBusy(false); }
+   }
++  async function reloadAfterRefresh() {
++    const pending = load(false);
++    const identity = { ...current.current };
++    const value = await pending;
++    if (current.current.key !== identity.key || current.current.sessionId !== identity.sessionId || current.current.generation !== identity.generation) return;
++    if (value) setMessage({ key: apiKey, sessionId, error: value.refresh === "failed", text: value.refresh === "complete" ? "Knowledge refresh complete." :
++      value.refresh === "failed" ? "Knowledge refresh failed; existing answers may be stale." : "Knowledge refresh pending; existing answers may be stale." });
++    try { onCommitted?.(); } catch { /* reload truth remains intact */ }
++  }
+   return <section className="card" aria-label="Transcript review">
+     <h2>Transcript review</h2>
+     {notice && <p role={notice.error ? "alert" : "status"}>{notice.text}</p>}
+     <button onClick={() => void load()} disabled={busy && !!snapshot}>Reload transcript</button>
+     {!snapshot ? <p>{busy ? "Loading transcript review…" : "Transcript review unavailable."}</p> : <>
+       <p>Knowledge refresh: {snapshot.refresh}</p>
++      {!!snapshot.orphanedTurnIds?.length && <p role="alert">Source passages changed after review. {snapshot.orphanedTurnIds.length} reviewed passage(s) no longer exist: {snapshot.orphanedTurnIds.join(", ")}. Their audit remains available; restore stable source passage identifiers before refreshing knowledge.</p>}
++      <ReviewHistory apiKey={apiKey} sessionId={sessionId} revision={snapshot.revision} refresh={snapshot.refresh} disabled={busy}
++        onRefreshed={reloadAfterRefresh} />
+       {snapshot.turns.length === 0 ? <p>No transcript turns to review.</p> : <>
+         <label>Passage <select aria-label="Passage" value={selected} onChange={(e) => setSelected(e.target.value)}>
+           {snapshot.turns.map((t) => <option key={t._id} value={t._id}>{t.tStart}s · {t.speakerLabel ?? t.speakerRef} · {t._id}</option>)}

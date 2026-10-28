@@ -1,0 +1,107 @@
+[T011 known-clock] fixture child readiness begin +126ms
+[T011 known-clock] fixture child readiness complete +396ms
+[T011 known-clock] publish native ACL and sealed readiness begin +396ms
+[T011 known-clock] publish native ACL and sealed readiness complete +1487ms
+[T011 known-clock] list actual owner begin +1490ms
+[T011 known-clock] list actual owner complete +3108ms
+[T011 known-clock] list foreign owner begin +3108ms
+[T011 known-clock] list foreign owner complete +3421ms
+[T011 known-clock] reject foreign generation begin +3422ms
+[T011 known-clock] reject foreign generation complete +4060ms
+[T011 known-clock] persist private-start ACK begin +4060ms
+[T011 known-clock] persist private-start ACK complete +5042ms
+[T011 known-clock] restarted API durable private state begin +5044ms
+[T011 known-clock] restarted API durable private state complete +6648ms
+[T011 known-clock] persist private-end ACK begin +6648ms
+[T011 known-clock] persist private-end ACK complete +7635ms
+[T011 known-clock] reject forged HMAC begin +7637ms
+[T011 known-clock] reject forged HMAC complete +7639ms
+[T011 known-clock] reject foreign descriptor host begin +7639ms
+[T011 known-clock] reject foreign descriptor host complete +9211ms
+[T011 known-clock] revoke owned bridge begin +9211ms
+[T011 known-clock] revoke owned bridge complete +9213ms
+[T011 known-clock] revoked descriptor unavailable begin +9213ms
+[T011 known-clock] revoked descriptor unavailable complete +9860ms
+[T011 known-clock] cleanup child graceful exit begin +9860ms
+[T011 known-clock] child exit code=0 signal=null +9869ms
+[T011 known-clock] cleanup child graceful exit complete +9869ms
+[T011 write-failure] fixture child readiness begin +3ms
+✔ actual Node child + private API host bridge known-clock (9870.9137ms)
+[T011 write-failure] fixture child readiness complete +222ms
+[T011 write-failure] publish native ACL and sealed readiness begin +222ms
+[T011 write-failure] publish native ACL and sealed readiness complete +1311ms
+[T011 write-failure] list actual owner begin +1311ms
+[T011 write-failure] list actual owner complete +3112ms
+[T011 write-failure] list foreign owner begin +3112ms
+[T011 write-failure] list foreign owner complete +3450ms
+[T011 write-failure] reject foreign generation begin +3450ms
+[T011 write-failure] reject foreign generation complete +4133ms
+[T011 write-failure] persist private-start ACK begin +4133ms
+[T011 write-failure] persist private-start ACK complete +10184ms
+[T011 write-failure] refuse retry after failed persistence begin +10186ms
+[T011 write-failure] refuse retry after failed persistence complete +16125ms
+[T011 write-failure] reject forged HMAC begin +16126ms
+[T011 write-failure] reject forged HMAC complete +16129ms
+[T011 write-failure] reject foreign descriptor host begin +16129ms
+[T011 write-failure] reject foreign descriptor host complete +17691ms
+[T011 write-failure] revoke owned bridge begin +17691ms
+[T011 write-failure] revoke owned bridge complete +17692ms
+[T011 write-failure] revoked descriptor unavailable begin +17692ms
+[T011 write-failure] revoked descriptor unavailable complete +18342ms
+[T011 write-failure] cleanup child graceful exit begin +18342ms
+[T011 write-failure] child exit code=0 signal=null +18353ms
+[T011 write-failure] cleanup child graceful exit complete +18353ms
+[T011 unknown-clock] fixture child readiness begin +5ms
+✔ actual Node child + private API host bridge write-failure (18354.4922ms)
+[T011 unknown-clock] fixture child readiness complete +235ms
+[T011 unknown-clock] publish native ACL and sealed readiness begin +235ms
+[T011 unknown-clock] publish native ACL and sealed readiness complete +1239ms
+[T011 unknown-clock] list actual owner begin +1239ms
+[T011 unknown-clock] list actual owner complete +2935ms
+[T011 unknown-clock] list foreign owner begin +2935ms
+[T011 unknown-clock] list foreign owner complete +3324ms
+[T011 unknown-clock] reject foreign generation begin +3324ms
+[T011 unknown-clock] reject foreign generation complete +4056ms
+[T011 unknown-clock] persist private-start ACK begin +4056ms
+[T011 unknown-clock] persist private-start ACK complete +5191ms
+[T011 unknown-clock] restarted API durable private state begin +5194ms
+[T011 unknown-clock] restarted API durable private state complete +6902ms
+[T011 unknown-clock] persist private-end ACK begin +6902ms
+[T011 unknown-clock] persist private-end ACK complete +8031ms
+[T011 unknown-clock] sticky conservative durable state begin +8033ms
+[T011 unknown-clock] sticky conservative durable state complete +9835ms
+[T011 unknown-clock] reject forged HMAC begin +9836ms
+[T011 unknown-clock] reject forged HMAC complete +9837ms
+[T011 unknown-clock] reject foreign descriptor host begin +9838ms
+[T011 unknown-clock] reject foreign descriptor host complete +11588ms
+[T011 unknown-clock] revoke owned bridge begin +11588ms
+[T011 unknown-clock] revoke owned bridge complete +11589ms
+[T011 unknown-clock] revoked descriptor unavailable begin +11590ms
+[T011 unknown-clock] revoked descriptor unavailable complete +12280ms
+[T011 unknown-clock] cleanup child graceful exit begin +12280ms
+[T011 unknown-clock] child exit code=0 signal=null +12289ms
+[T011 unknown-clock] cleanup child graceful exit complete +12290ms
+✔ actual Node child + private API host bridge unknown-clock (12290.7524ms)
+✔ validated private intervals become intentional gaps, never invented transcript turns (4.3222ms)
+✔ only inherited capability for exact owner marks a live private interval (4.0377ms)
+✔ finalization closes an active private interval; late controls cannot change it (0.4302ms)
+✔ malformed inherited capability fails before installing any listener (0.6388ms)
+✔ missing media origin excludes entire capture instead of guessing from controller launch (0.5705ms)
+✔ persistence failure exposes a stop condition and never acknowledges unsafe private state (0.7226ms)
+✔ failed private-end keeps durable conservative exclusion and duplicates never ACK (0.6427ms)
+✔ private ACK echoes the exact operation ID and conflicting ID reuse cannot alter windows (0.5398ms)
+✔ late actual clock checkpoint preserves an already accepted conservative open interval (0.6164ms)
+✔ wall-clock corrections cannot shift private intervals off the actual media timeline (0.4933ms)
+✔ clock jump before producer origin arrives cannot move private window beyond real media/provider range (0.4503ms)
+✔ ACL semantics bind actual directory/current identity and reject broad/inherited permissions or foreign owner (1.1548ms)
+✔ native ACL uses fixed script and literal argument path with bounded output/time, never shell text (5.8601ms)
+✔ explicit real Windows ACL probe uses existing broker-configured private directory without mutations (499.7916ms)
+✔ native ACL retries exactly once on ETIMEDOUT only and fails closed otherwise (4.2783ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 40760.7701

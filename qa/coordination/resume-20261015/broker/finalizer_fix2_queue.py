@@ -1,0 +1,19 @@
+import pathlib
+driver=pathlib.Path(__file__).with_name('finite_native_queue.py');prefix=driver.read_text(encoding='utf-8').split("\np=root/'qa/coordination/resume-20261015/native-codecledger/broker-request.json'")[0]
+prefix=prefix.replace("'qa/coordination/resume-20261015/native-current-writers.json'","'qa/coordination/resume-20261015/native-active-writers-current.json'").replace("leases=load(leasepath);active=","leases=load(leasepath);leases['sharedTypesSha256']='022057b6a629eec111c3bafc4d9fefe39119da55ee87a7f1f2eba7c3ee7f1b77';active=")
+prefix=prefix.replace("'finite-native-summary.json'","'fix2-frozen-summary.json'").replace("'finite-native-preflight.log'","'fix2-frozen-preflight.log'").replace('>190','>90').replace('220-(time.monotonic()-start)','105-(time.monotonic()-start)')
+prefix=prefix.replace("  expected={p:v.lower() for p,v in pins.items()};","  active={p for lane in load(leasepath)['activeWriters'] for p in lane['paths']};expected={p:v.lower() for p,v in pins.items()};")
+exec(compile(prefix,str(driver),'exec'))
+bins=load('qa/coordination/resume-20261015/broker/native-binaries.json');b={j['Name']:j['Source'] for j in bins};known=load('qa/coordination/resume-20261015/broker/native-binary-hashes.json');assert all(sha(v)==known[k]['sha256'] for k,v in b.items())
+benv={'LKB_NATIVE_TEST_FFMPEG':b['ffmpeg.exe'],'LKB_NATIVE_TEST_FFPROBE':b['ffprobe.exe']}
+codec=pins_from(load('qa/coordination/resume-20261015/native-codecledger/candidate-pins.json'));fix=load('qa/coordination/resume-20261015/native-finalizer-maker/fix-2/checkpoint.json');finalpins=pins_from(fix['files']);finalpins.update(codec)
+p=root/'qa/coordination/resume-20261015/native-finalizer-maker/fix-2/packet.md';run('native-finalizer-fix2',['--test','--import','tsx','src/capture/native-media-probe.test.ts','src/capture/native-media-finalize.test.ts'],root/'packages/meeting-bot',finalpins,45,p,envextra=benv)
+if summary[-1].get('exit')==0:
+ p=root/'qa/coordination/resume-20261015/native-privacy-audio-maker/packet.md';privacy=pins_from(load('qa/coordination/resume-20261015/native-privacy-audio-maker/checkpoint.json')['sources']);privacy.update(finalpins)
+ for n in ['provider-input.test.ts','finalizer-input.test.ts']:
+  rel='packages/meeting-bot/src/capture/record-consent/'+n;privacy[rel]=sha(root/rel)
+ run('native-privacy-audio-fix2-dep',['--test','--import','tsx','src/capture/record-consent/native-provider-audio.test.ts','src/capture/record-consent/provider-input.test.ts','src/capture/record-consent/finalizer-input.test.ts'],root/'packages/meeting-bot',privacy,40,p,envextra=benv)
+else:(out/'native-privacy-fix2-blocked.json').write_text(json.dumps({'state':'not executed','reason':'new finalizer real integration failure; no duplicate dependent failure run','upstream_receipt':'native-finalizer-fix2-receipt.json'},indent=2))
+p=root/'qa/coordination/resume-20261015/native-measurement/broker-request.json';packet=load('qa/coordination/resume-20261015/native-measurement/packet.json');old=load('qa/coordination/resume-20261015/native-measurement/pins.json');measurement={n:old[n] for n in packet['owned_paths']};measurement.update(finalpins)
+(out/'measurement-fix2-pin-adoption.json').write_text(json.dumps({'authority':'root explicit fix2 frozen combined dependency binding','old_probe_sha256':old['packages/meeting-bot/src/capture/native-media-probe.ts'],'new_probe_sha256':finalpins['packages/meeting-bot/src/capture/native-media-probe.ts'],'fix_checkpoint_sha256':sha(root/'qa/coordination/resume-20261015/native-finalizer-maker/fix-2/checkpoint.json'),'sampler':'omitted; active central producer'},indent=2))
+run('native-measurement-registry-fix2-dep',['--test','--import','tsx','--test-concurrency=1','--test-timeout=30000','src/capture/tiles/native-measurement.test.ts','src/capture/tiles/registry.test.ts'],root/'packages/meeting-bot',measurement,25,p)

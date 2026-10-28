@@ -1,0 +1,10 @@
+Warning: UnknownErrorException: Ensure that the `standardFontDataUrl` API parameter is provided.
+✔ native document vertical: actual mounted consent/upload/publication, Hindi source and request-bound Ask (883.1009ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3317.5267

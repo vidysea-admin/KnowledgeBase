@@ -1,0 +1,34 @@
+{
+  "ready": [
+    "t054-generation-focused",
+    "t054-isolated-history-dom",
+    "t054-isolated-editor-dom-standing"
+  ],
+  "skipped": [
+    {
+      "name": "t040-consent-withdrawal-current",
+      "drift": [
+        {
+          "path": "apps/api/src/indexing/session.ts",
+          "expected": "B48EBB3A0E5E2D65CE2004D939E8C3BAC11610CDCD410EBF5EE936851102DE79",
+          "actual": "6734738ce50f493bc27c9db7b4170ed4db590f3dba6bda47f47dcbaa6e2709f5"
+        },
+        {
+          "path": "apps/api/src/indexing/grounded-write.ts",
+          "expected": "BD0D5A06920EBF1F831EC542E67C6D1B5A16788AC794EA9EF2A7746E26B29886",
+          "actual": "c6fa3b092e4ce159ee6cfe738d8d24fde79581ed0eefe7494947ec078c39b247"
+        },
+        {
+          "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+          "expected": "EBE3DEF7A4F586E87AA1D9BCF389F5307E368318FDBB0A28180D189052887A1E",
+          "actual": "a5d509a2caa30cbf25982faccca1477f2171dbe0f0146ade0c9f872586494244"
+        },
+        {
+          "path": "packages/core/src/generated/sessions.ts",
+          "expected": "FE53A0A4EA7B989257F6BD3377415807CCFBB4C939794FEBE85AA8F456102B11",
+          "actual": "3977b5aaf6c516512974f727322f82751b19a2415b1a500b88a752aa54ce5516"
+        }
+      ]
+    }
+  ]
+}

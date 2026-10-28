@@ -8,5 +8,14 @@
     "test": "node --test --import tsx \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
-  "devDependencies": { "typescript": "5.9.3", "tsx": "4.23.13", "@types/node": "^24.0.0" }
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "tsx": "4.23.13",
+    "@types/node": "^24.0.0"
+  },
+  "dependencies": {
+    "@langchain/core": "1.1.49",
+    "@langchain/langgraph": "1.4.18",
+    "zod": "4.6.5"
+  }
 }

@@ -10,13 +10,16 @@
     powershell -NoProfile -ExecutionPolicy Bypass -File scripts\webinar\start-record-detached.ps1 `
       -Url <url> -Until HH:MM [-Title T] [-SessionId ID] [-EndNotBefore HH:MM] [-ExtraArgs "--transcribe"]
 
+  OnAir replay (cloudonair.withgoogle.com, signed-in bot profile): set LKB_ONAIR_WATCH=1, LKB_BOT_PROFILE_DIR and
+  LKB_ADMISSION_TIMEOUT_S=1 in the environment, pass -Until as an ISO datetime 4 h ahead (the player's media duration
+  + 2 min then replaces it) and optionally -OnairSession "<title substring>".
+
   Usage (U5 auto-record, fix cycle 2 / ISS-317): a Windows Scheduled Task built by
   task-scheduler.ts's scheduleOnce calls this script as -Job <jobKey> instead — a validated
   [a-z0-9-]{1,64} key, never raw title/url/sessionId text (those never reach the Task Scheduler
-  command line at all any more). This mode reads raw\webinars\scheduled\<jobKey>.json (written
-  by schedule-tick.ts's writeScheduledJob) for -Url/-Until/-Title/-SessionId, then falls straight
-  into the same code path below as a direct invocation. Any -Url/-Until/etc. passed alongside
-  -Job take precedence over the job file (so direct testing/overrides still work).
+  command line at all any more). This mode calls record-scheduled, which verifies saved source
+  identity, runtime/key/job tenant equality and current rules before the existing capture path.
+  Replacement capture arguments and replacement CLI entries are refused for -Job.
 
   Recovery if this machine's watchdog task also died: `pnpm --filter @lkb/meeting-bot cli watchdog`
   is idempotent and safe to run by hand any time — it no-ops when nothing is recording.
@@ -27,7 +30,16 @@ param(
   [string]$Title,
   [string]$SessionId,
   [string]$EndNotBefore,
+  # w24-onairplay: title substring picking which "Watch now" card to play on a cloudonair.withgoogle.com event page.
+  # Acts only with LKB_ONAIR_WATCH=1 in the environment; the first visible "Watch now" is used when omitted.
+  [string]$OnairSession,
   [string]$ExtraArgs = "",
+  # w24-signedslots: parallel signed-in recordings. -CaptureSlot gives the run its own user-data-dir;
+  # -SeedProfile copies the session files of an already signed-in Chrome profile into it (fail-closed
+  # if not signed in); -ProfileDirectory names the sub-profile inside it (e.g. "Profile 1").
+  [string]$CaptureSlot,
+  [string]$SeedProfile,
+  [string]$ProfileDirectory,
   # ISS-317 fix (cycle 2): the ONLY value a Task Scheduler-launched run passes. Validated below
   # against the same [a-z0-9-]{1,64} shape task-scheduler.ts's JOB_KEY_RE enforces on the maker
   # side — belt-and-suspenders, since this script trusts nothing about how it was invoked.
@@ -47,19 +59,13 @@ if ($Job) {
     Write-Error "invalid -Job '$Job' (must match ^[a-z0-9-]{1,64}$) - refusing to read a job file"
     exit 1
   }
-  $jobFile = Join-Path $logDir "scheduled\$Job.json"
-  if (-not (Test-Path $jobFile)) {
-    Write-Error "no job file found for -Job '$Job' at $jobFile"
+  if ($Url -or $Until -or $Title -or $SessionId -or $EndNotBefore -or $OnairSession -or $ExtraArgs -or $CliEntry -or $CaptureSlot -or $SeedProfile -or $ProfileDirectory) {
+    Write-Error "scheduled dispatch refuses replacement recording arguments"
     exit 1
   }
-  $jobData = Get-Content -Raw -Path $jobFile | ConvertFrom-Json
-  if (-not $Url) { $Url = $jobData.url }
-  if (-not $Until) { $Until = $jobData.until }
-  if (-not $Title) { $Title = $jobData.title }
-  if (-not $SessionId) { $SessionId = $jobData.sessionId }
 }
 
-if (-not $Url -or -not $Until) {
+if (-not $Job -and (-not $Url -or -not $Until)) {
   $usage = "usage: -Url <url> -Until <HH:MM|ISO datetime> [-Title T] [-SessionId ID] " +
     "[-EndNotBefore HH:MM] [-ExtraArgs '...'], OR -Job <jobKey> reading raw\webinars\scheduled\<jobKey>.json"
   Write-Error $usage
@@ -78,11 +84,19 @@ $errLog = Join-Path $logDir "record-$stamp.err.log"
 $node = (Get-Command node -ErrorAction Stop).Source
 if ($CliEntry) { $entry = $CliEntry } else { $entry = Join-Path $repoRoot "packages\meeting-bot\src\cli.ts" }
 
-$cliArgs = @("--import", "tsx", $entry, "record", $Url, "--until", $Until)
-if ($Title) { $cliArgs += @("--title", $Title) }
-if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
-if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
-if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
+if ($Job) {
+  $cliArgs = @("--import", "tsx", $entry, "record-scheduled", $Job)
+} else {
+  $cliArgs = @("--import", "tsx", $entry, "record", $Url, "--until", $Until)
+  if ($Title) { $cliArgs += @("--title", $Title) }
+  if ($SessionId) { $cliArgs += @("--session-id", $SessionId) }
+  if ($EndNotBefore) { $cliArgs += @("--end-not-before", $EndNotBefore) }
+  if ($OnairSession) { $cliArgs += @("--onair-session", $OnairSession) }
+  if ($CaptureSlot) { $cliArgs += @("--capture-slot", $CaptureSlot) }
+  if ($SeedProfile) { $cliArgs += @("--seed-profile", $SeedProfile) }
+  if ($ProfileDirectory) { $cliArgs += @("--profile-directory", $ProfileDirectory) }
+  if ($ExtraArgs) { $cliArgs += ($ExtraArgs -split ' ' | Where-Object { $_ -ne "" }) }
+}
 
 # Quote every argument so neither PowerShell's argument joining nor any downstream re-parse can
 # split a URL on `&` or a title on spaces. Windows PowerShell 5.1's `Start-Process -ArgumentList`

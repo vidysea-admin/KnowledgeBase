@@ -1,0 +1,6 @@
+test_preflight_checks_import_and_temp_then_cleans_probe (__main__.BudgetTests.test_preflight_checks_import_and_temp_then_cleans_probe) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.011s
+
+OK

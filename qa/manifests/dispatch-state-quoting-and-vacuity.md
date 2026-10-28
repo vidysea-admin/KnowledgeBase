@@ -121,3 +121,5 @@ MUTATIONS CLEAN: none outstanding
 `genuinely_not_user_facing`; nothing under `apps/` or `packages/` imports the module.
 
 ## Status: checked-PASS
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

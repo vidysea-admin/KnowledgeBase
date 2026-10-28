@@ -1,0 +1,122 @@
+{
+  "prior_candidate": "qa/coordination/knowledge-brain-20261015/capture-delivery/clock.md",
+  "prior_pins_match": true,
+  "unit": {
+    "cycle": 0,
+    "files": [
+      {
+        "length": 8153,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\sb_join_tiles.py",
+        "sha256": "1A7436579A6BFADE1C9C6AD94F5E47E6C04CD8779A90BAF8A993729A039FA7FD"
+      },
+      {
+        "length": 7645,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\test_sb_join_tiles.py",
+        "sha256": "8716A26C2F9C72A7CDBA1057F39234D6486976F3359AF95917D80EC234B5500E"
+      },
+      {
+        "length": 3829,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.ts",
+        "sha256": "3F583A0B203A5A6358019D39F97B0773471BE51F32A1CAD536105528168C6480"
+      },
+      {
+        "length": 5291,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.test.ts",
+        "sha256": "56DE6A8E9FF76B47544C5F2EA2718C36AAF75973A222C0AB77352A947007C4D4"
+      },
+      {
+        "length": 19037,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.ts",
+        "sha256": "B7E5DA4983192FBE4E029D35D36A523CC2D454EC25439B173F3CC3157B18F1A2"
+      },
+      {
+        "length": 7526,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-trusted-registry\\fixture.ts",
+        "sha256": "7802CF755EC8839814E320BFFC36E4EEF600294605911FB8E59F3930B901A827"
+      },
+      {
+        "length": 8641,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.test.ts",
+        "sha256": "90FCDA7C5AD5E5E0E795B75EBC7907B558DCFC5D94819B8A30992D9BE9D952CC"
+      },
+      {
+        "length": 2508,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t042-trusted-registry\\downstream-probe.test.ts",
+        "sha256": "92132FA4C53EAF213EAAC90738AD66138C06579A3582F250991C94EB1CBEDF2F"
+      },
+      {
+        "length": 12223,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\t042-trusted-registry-integration.md",
+        "sha256": "5DBAFD0000DE26AADF74AE0BEE0E707236E022E4D10D820042B59FF1A3BDC544"
+      },
+      {
+        "length": 147579,
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml",
+        "sha256": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD"
+      }
+    ],
+    "candidate_kind": "dirty-working-tree-byte-pins",
+    "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "candidate_sha": null,
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "resume-capture-sampler-clock"
+  },
+  "source_changes_this_resume": [],
+  "reuse": {
+    "eligible_execution_receipts": [],
+    "reason": "Six candidate pins match prior clock packet, which records checks pending. Registry/fixture old manifest hashes differ. Prior adapter PASS stays old scope and is not current sampler integration evidence."
+  },
+  "status": "HOLD-BROKER-READINESS",
+  "policy_version": "managed-review/1",
+  "contract": {
+    "path": "qa/contracts/t042-trusted-registry-integration.md",
+    "scope": "sampler/registry source-fixture only; actual producer/native/production/full-parent gates remain open",
+    "clauses": [
+      "R2",
+      "R3",
+      "R4",
+      "R8",
+      "R11",
+      "R14"
+    ]
+  },
+  "tier": 3,
+  "metrics": {
+    "token_metric": "actual_total",
+    "history": "Earlier maker actuals unknown. No checker dispatched or reset. This resume static source inspection only; no test/runtime allocation charged.",
+    "reviewers": [],
+    "maker": {
+      "token_metric": "actual_total",
+      "cost": null,
+      "tokens": null,
+      "active_s": null
+    }
+  },
+  "remaining_gates": [
+    "actual independent decoded-sample-zero calibration",
+    "production recorder/finalizer/committed-hook mounting",
+    "actual supported-platform/native applicability",
+    "actual panelists/human confirmation/persisted downstream proof",
+    "root central required validators and broad coherence",
+    "independent checker verdict"
+  ],
+  "readiness": {
+    "receipts": [],
+    "complete": false,
+    "missing": [
+      "broker environment/import/temp/dependency preflight",
+      "fresh focused sampler/registry/downstream execution receipts",
+      "exact candidate commit if checker policy requires SHA",
+      "root runtime HOLD release; no checker dispatch"
+    ],
+    "mutation_required": false
+  },
+  "boundaries": [
+    "Python monotonic elapsed and irreversible clock poisoning",
+    "server-invocation generation and distinct sampler identity",
+    "TS complete-stream identity/witness refusal and stripping",
+    "registry privacy releases before adapter input",
+    "default off performs no authority I/O; missing calibration unavailable"
+  ],
+  "updated_at": "2026-10-15T19:38:02.3692279Z"
+}

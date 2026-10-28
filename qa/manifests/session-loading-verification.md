@@ -60,3 +60,5 @@ session flow was NOT re-run in this unit (the trust-check session's own browser 
 2026-09-15 stands; Mongo was reachable but a fresh authenticated browser pass is Phase 5 U3.1
 work). The lint-root over-budget state is declared, not hidden.
 
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

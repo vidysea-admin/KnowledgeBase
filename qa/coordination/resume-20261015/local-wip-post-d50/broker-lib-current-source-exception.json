@@ -1,0 +1,6 @@
+{
+  "authority": "Root explicit current-source inclusion exception; no historical same-byte claim",
+  "sha256": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+  "historicalBinding": "UNKNOWN",
+  "scope": "Exact preexisting untracked broker_lib.py required for reproduction; no source edit or PASS upgrade"
+}

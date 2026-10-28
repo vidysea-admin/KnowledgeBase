@@ -1,0 +1,28 @@
+{
+  "escalation": null,
+  "bootstrap_scope": "Exact offline launcher/config/ignore safety review; no activation or vendor execution",
+  "completion_reserve": true,
+  "next_phase": {
+    "kind": "review",
+    "token_metric": "actual_total",
+    "active_s": 120,
+    "cost": null,
+    "tokens": 4000
+  },
+  "completion_reserve_tokens": 2000,
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "cost": null,
+    "tokens": null
+  },
+  "completion_reserve_id": "isolated-replica-prep/0/1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "reviewers": [],
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "cost": null,
+    "tokens": 6000
+  },
+  "token_metric": "actual_total"
+}

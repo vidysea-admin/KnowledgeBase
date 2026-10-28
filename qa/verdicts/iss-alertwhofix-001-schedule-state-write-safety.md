@@ -1,0 +1,22 @@
+# Verdict: iss-alertwhofix-001-schedule-state-write-safety
+
+VERDICT: PASS
+Cycle checked: 0
+Commit checked: 7fad5c85 (lane/schedstatesafe, on lane/alertwhofix 52cc01bd)
+
+EXPLANATION:
+Dedup-set argument, checked step by step in code:
+- The dedup set (alreadyScheduled) is read only in selectAutoRecordItems (auto-join.ts) and is the LAST gate before eligibility: cancelled (tombstoned), needs-registration, past, rejected and untrusted-source all run before it, so an empty set cannot re-admit a cancelled or rejected item. Join-rules opt-out is applied afterwards by enforceJoinRules from its own store (join-rules-store.ts), not from schedule-state.json. Nothing else reads schedule-state.json (alert-who reads it and tolerates corruption; send-now uses scheduled/*.json). So: no re-join of an opted-out or tombstoned meeting, and no send-now or live-recording register effect.
+- Duplicate join: a re-selected session derives the same jobKey; schtasks /create /f replaces the task. Probed on this machine (PowerShell, probe task, deleted afterwards): /sc once with /st 3 minutes in the past gives "WARNING: Task may not run because /ST is earlier than current time", Next Run Time N/A, never ran. So re-scheduling a session after its start cannot launch a second recording, and before start it only replaces the task. The maker's "residual" is harmless in practice. Behaviour with an empty set is unchanged from the base (corrupt used to read as {}); it is now loud and keeps the bytes.
+- Item 3: a failing dedup write now logs and continues. There is no guard against repeated attempts, but each repeat is the idempotent re-create above (replace before start, no-op after start). Cost is up to 5 s lock wait per item per tick plus a WARNING per tick. Not a duplicate-launch path. Before the change a failed write aborted the remaining items, which was worse.
+- Item 2: schedule-state.lock and skipped-sessions.lock are different files, taken sequentially in the tick (recordSkipped finishes before any recordScheduled), never nested, so no deadlock. The atomic write is the already-reviewed writeAtomic (temp+fsync, lockStillOwned before rename, renameReplacing retries EPERM/EACCES/EBUSY for 3 s). Stale-lock handling is the shared acquireLock (dead pid, same host, age). The tick's unlocked read re-reads under the lock before quarantining, so it cannot quarantine a file a writer is mid-replacing.
+
+Replay and runs:
+- ISS-ALERTWHOFIX-001 (single recorded case): 4 rows, file truncated to 60 bytes. Read throws ScheduleStateCorrupt with the file untouched; the next recordScheduled quarantines it byte-identical, one WARNING callback, live file holds the new row, no tmp or lock left. 1/1 fixed. Lost history is unrecoverable from a truncated file (named by the maker).
+- tsc --noEmit clean. Suites (schedule-state, schedule-state-safety, schedule-tick, alert-who x4, join-rules-enforce x2): 107 tests, 107 pass. schedule-state-safety 15 consecutive runs: 15/15 (6-process test included).
+- Mutations (own, harness untracked, per-mutation byte backup restored in finally, hash equals HEAD blob each time, harness deleted): C1 quarantine deletes instead of renames KILLED; C2 tick read swallows corrupt without quarantine KILLED; C3 non-object entries accepted KILLED; C4 dry-run ignores readOnly KILLED; C5 lock never released KILLED; C7 tick rethrows dedup-write failure KILLED; C6 tenant refusal swallowed in the tick's inner catch survived (effectively unreachable, equivalent); C8 owns() check dropped SURVIVED (real test gap, filed low).
+- Item 5: state-tenant-tag.test.ts on the MAIN tree (e3fda503): 9 tests, 8 pass, 1 fail. It is red on main. Bisected by reading: f9287b07 (ISS-ALERTID-001/-007, adds recordSkipped to the tick, merged 2026-10-12) changed schedule-tick.ts but not the test; the untagged-job case now writes an empty skipped-sessions.json, and the failing assertion aborts the test body so the missing/invalid-tenant loop never runs. Not caused by this unit. Raised to medium as ISS-SCHEDSTATESAFE-002 for the next tick-touching unit; this unit does not make it worse.
+
+Reasoning: the change closes the data-write defect with tests, mutations and a real-environment probe behind it. Remaining findings are low or pre-existing.
+
+ISSUES-WRITTEN: ISS-SCHEDSTATESAFE-002 (medium, red test on main, severity raise of -001), ISS-SCHEDSTATESAFE-003 (low, any read error treated as corruption), ISS-SCHEDSTATESAFE-004 (low, owns() check untested; empty-lock wedge note)

@@ -1,0 +1,1358 @@
+{
+  "version": 1,
+  "tool": "corpus-reconciliation-v1",
+  "readOnly": true,
+  "notice": "Proposals only. No citation, turn, claim, label or threshold was modified; applying any correction is an owner decision. Lexical hints are unreviewed and are not gold.",
+  "summary": {
+    "citations": {
+      "unresolved": 14,
+      "byReason": {
+        "turn-off-range": 14
+      },
+      "withReviewedProposal": 1,
+      "withUnreviewedLexicalProposal": 7,
+      "withoutProposal": 6,
+      "matchesCorpusBaseline": true
+    },
+    "missingArtifactCases": 6,
+    "invalidTimeSessions": 3,
+    "invalidTimeTurns": 3,
+    "provenance": {
+      "rawTranscripts": 23,
+      "sessions": 29,
+      "originals": 23,
+      "additions": 6,
+      "rawTranscriptsWithoutSession": 0
+    },
+    "undeclaredDirectories": []
+  },
+  "citations": [
+    {
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+      "citedTurnId": "2026-05-20-telling-your-brand-story-better-t049",
+      "citedSessionId": "2026-05-20-telling-your-brand-story-better",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 49,
+        "sessionTurnCount": 31,
+        "maxTurnIndex": 31,
+        "overshoot": 18
+      },
+      "proposal": {
+        "basis": "none",
+        "turnIds": [],
+        "boundToCurrentTurns": null,
+        "note": "No unambiguous target; owner/reviewer must choose or drop the claim."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "ambiguous",
+        "top": [
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t020",
+            "coverage": 0.545
+          },
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t001",
+            "coverage": 0.455
+          },
+          {
+            "turnId": "2026-05-20-telling-your-brand-story-better-t002",
+            "coverage": 0.273
+          }
+        ],
+        "margin": 0.09
+      }
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "citedTurnId": "2026-05-29-decoding-ever-expanding-cast-t161",
+      "citedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 161,
+        "sessionTurnCount": 15,
+        "maxTurnIndex": 15,
+        "overshoot": 146
+      },
+      "proposal": {
+        "basis": "none",
+        "turnIds": [],
+        "boundToCurrentTurns": null,
+        "note": "No unambiguous target; owner/reviewer must choose or drop the claim."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "ambiguous",
+        "top": [
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "coverage": 0.2
+          },
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t010",
+            "coverage": 0.067
+          },
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t015",
+            "coverage": 0.067
+          }
+        ],
+        "margin": 0.133
+      }
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "citedTurnId": "2026-05-29-decoding-ever-expanding-cast-t190",
+      "citedSessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 190,
+        "sessionTurnCount": 15,
+        "maxTurnIndex": 15,
+        "overshoot": 175
+      },
+      "proposal": {
+        "basis": "none",
+        "turnIds": [],
+        "boundToCurrentTurns": null,
+        "note": "No unambiguous target; owner/reviewer must choose or drop the claim."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "ambiguous",
+        "top": [
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t012",
+            "coverage": 0.1
+          },
+          {
+            "turnId": "2026-05-29-decoding-ever-expanding-cast-t015",
+            "coverage": 0.1
+          }
+        ],
+        "margin": 0
+      }
+    },
+    {
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+      "citedTurnId": "2026-06-03-dual-enrollment-pathway-t092",
+      "citedSessionId": "2026-06-03-dual-enrollment-pathway",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 92,
+        "sessionTurnCount": 90,
+        "maxTurnIndex": 90,
+        "overshoot": 2
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-06-03-dual-enrollment-pathway-t033"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t033",
+            "coverage": 0.6
+          },
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t004",
+            "coverage": 0.4
+          },
+          {
+            "turnId": "2026-06-03-dual-enrollment-pathway-t012",
+            "coverage": 0.4
+          }
+        ],
+        "margin": 0.2
+      }
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+      "citedTurnId": "2026-06-19-entrance-exams-pathways-india-part1-t051",
+      "citedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 51,
+        "sessionTurnCount": 38,
+        "maxTurnIndex": 38,
+        "overshoot": 13
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-06-19-entrance-exams-pathways-india-part1-t013"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t013",
+            "coverage": 0.938
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t007",
+            "coverage": 0.563
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t030",
+            "coverage": 0.313
+          }
+        ],
+        "margin": 0.375
+      }
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+      "citedTurnId": "2026-06-19-entrance-exams-pathways-india-part1-t060",
+      "citedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 60,
+        "sessionTurnCount": 38,
+        "maxTurnIndex": 38,
+        "overshoot": 22
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-06-19-entrance-exams-pathways-india-part1-t013"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t013",
+            "coverage": 0.9
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t007",
+            "coverage": 0.5
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t004",
+            "coverage": 0.2
+          }
+        ],
+        "margin": 0.4
+      }
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+      "citedTurnId": "2026-06-19-entrance-exams-pathways-india-part1-t059",
+      "citedSessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 59,
+        "sessionTurnCount": 38,
+        "maxTurnIndex": 38,
+        "overshoot": 21
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-06-19-entrance-exams-pathways-india-part1-t013"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t013",
+            "coverage": 0.714
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t007",
+            "coverage": 0.381
+          },
+          {
+            "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t030",
+            "coverage": 0.19
+          }
+        ],
+        "margin": 0.333
+      }
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+      "citedTurnId": "2026-06-30-exploring-identity-success-counseling-t085",
+      "citedSessionId": "2026-06-30-exploring-identity-success-counseling",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 85,
+        "sessionTurnCount": 16,
+        "maxTurnIndex": 16,
+        "overshoot": 69
+      },
+      "proposal": {
+        "basis": "none",
+        "turnIds": [],
+        "boundToCurrentTurns": null,
+        "note": "No unambiguous target; owner/reviewer must choose or drop the claim."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "ambiguous",
+        "top": [
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t005",
+            "coverage": 0.25
+          },
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t012",
+            "coverage": 0.25
+          },
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t014",
+            "coverage": 0.25
+          }
+        ],
+        "margin": 0
+      }
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+      "citedTurnId": "2026-06-30-exploring-identity-success-counseling-t073",
+      "citedSessionId": "2026-06-30-exploring-identity-success-counseling",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 73,
+        "sessionTurnCount": 16,
+        "maxTurnIndex": 16,
+        "overshoot": 57
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-06-30-exploring-identity-success-counseling-t014"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t014",
+            "coverage": 0.692
+          },
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t013",
+            "coverage": 0.154
+          },
+          {
+            "turnId": "2026-06-30-exploring-identity-success-counseling-t001",
+            "coverage": 0.077
+          }
+        ],
+        "margin": 0.538
+      }
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+      "citedTurnId": "2026-08-03-uk-beyond-offer-letters-t061",
+      "citedSessionId": "2026-08-03-uk-beyond-offer-letters",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 61,
+        "sessionTurnCount": 46,
+        "maxTurnIndex": 46,
+        "overshoot": 15
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-08-03-uk-beyond-offer-letters-t008"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t008",
+            "coverage": 0.778
+          },
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t007",
+            "coverage": 0.333
+          },
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t001",
+            "coverage": 0.222
+          }
+        ],
+        "margin": 0.445
+      }
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+      "citedTurnId": "2026-08-12-uniaccess-ashoka-university-t106",
+      "citedSessionId": "2026-08-12-uniaccess-ashoka-university",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 106,
+        "sessionTurnCount": 26,
+        "maxTurnIndex": 26,
+        "overshoot": 80
+      },
+      "proposal": {
+        "basis": "independently-reviewed-mapping",
+        "turnIds": [
+          "2026-08-12-uniaccess-ashoka-university-t014"
+        ],
+        "boundToCurrentTurns": true,
+        "note": "Replacement proposed by an independent reviewer (data/eval/extraction-reconciliation-reviewed.json); not applied."
+      },
+      "reviewedMapping": {
+        "present": true,
+        "originalEvidenceMatchesCitation": true,
+        "boundToCurrentTurns": true
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t014",
+            "coverage": 0.875
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t004",
+            "coverage": 0.625
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t005",
+            "coverage": 0.625
+          }
+        ],
+        "margin": 0.25
+      }
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+      "citedTurnId": "2026-08-12-uniaccess-ashoka-university-t084",
+      "citedSessionId": "2026-08-12-uniaccess-ashoka-university",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 84,
+        "sessionTurnCount": 26,
+        "maxTurnIndex": 26,
+        "overshoot": 58
+      },
+      "proposal": {
+        "basis": "none",
+        "turnIds": [],
+        "boundToCurrentTurns": null,
+        "note": "No unambiguous target; owner/reviewer must choose or drop the claim."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "ambiguous",
+        "top": [
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t011",
+            "coverage": 0.583
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t007",
+            "coverage": 0.333
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t013",
+            "coverage": 0.333
+          }
+        ],
+        "margin": 0.25
+      }
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+      "citedTurnId": "2026-08-12-uniaccess-ashoka-university-t058",
+      "citedSessionId": "2026-08-12-uniaccess-ashoka-university",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 58,
+        "sessionTurnCount": 26,
+        "maxTurnIndex": 26,
+        "overshoot": 32
+      },
+      "proposal": {
+        "basis": "lexical-hint-unreviewed",
+        "turnIds": [
+          "2026-08-12-uniaccess-ashoka-university-t011"
+        ],
+        "boundToCurrentTurns": null,
+        "note": "Deterministic token-overlap hint only; NOT reviewed, NOT gold. Needs a human/independent check before any use."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "unambiguous",
+        "top": [
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t011",
+            "coverage": 0.818
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t005",
+            "coverage": 0.455
+          },
+          {
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t017",
+            "coverage": 0.364
+          }
+        ],
+        "margin": 0.363
+      }
+    },
+    {
+      "sessionId": "2026-08-27-in-focus-4",
+      "claimId": "2026-08-27-in-focus-4-c03",
+      "citedTurnId": "2026-08-27-in-focus-4-t102",
+      "citedSessionId": "2026-08-27-in-focus-4",
+      "reason": "turn-off-range",
+      "detail": {
+        "citedIndex": 102,
+        "sessionTurnCount": 51,
+        "maxTurnIndex": 51,
+        "overshoot": 51
+      },
+      "proposal": {
+        "basis": "none",
+        "turnIds": [],
+        "boundToCurrentTurns": null,
+        "note": "No unambiguous target; owner/reviewer must choose or drop the claim."
+      },
+      "reviewedMapping": {
+        "present": false,
+        "originalEvidenceMatchesCitation": null,
+        "boundToCurrentTurns": null
+      },
+      "lexicalHint": {
+        "status": "ambiguous",
+        "top": [
+          {
+            "turnId": "2026-08-27-in-focus-4-t029",
+            "coverage": 0.364
+          },
+          {
+            "turnId": "2026-08-27-in-focus-4-t044",
+            "coverage": 0.273
+          },
+          {
+            "turnId": "2026-08-27-in-focus-4-t006",
+            "coverage": 0.182
+          }
+        ],
+        "margin": 0.091
+      }
+    }
+  ],
+  "missingArtifacts": [
+    {
+      "id": "synthetic-cli-20260930",
+      "sessionId": "synthetic-cli-20260930",
+      "artifacts": [
+        {
+          "kind": "persisted",
+          "expectedPath": "../toc-migrated/synthetic-cli-20260930/claims.json",
+          "exists": false
+        },
+        {
+          "kind": "turns",
+          "expectedPath": "../toc-migrated/synthetic-cli-20260930/turns.json",
+          "exists": false
+        }
+      ],
+      "directory": "../toc-migrated/synthetic-cli-20260930",
+      "directoryExists": false,
+      "directoryEntries": [],
+      "interpretation": "directory-absent"
+    },
+    {
+      "id": "synthetic-controlled-1790797565149",
+      "sessionId": "synthetic-controlled-1790797565149",
+      "artifacts": [
+        {
+          "kind": "persisted",
+          "expectedPath": "../toc-migrated/synthetic-controlled-1790797565149/claims.json",
+          "exists": false
+        },
+        {
+          "kind": "turns",
+          "expectedPath": "../toc-migrated/synthetic-controlled-1790797565149/turns.json",
+          "exists": false
+        }
+      ],
+      "directory": "../toc-migrated/synthetic-controlled-1790797565149",
+      "directoryExists": true,
+      "directoryEntries": [
+        "source.json",
+        "validation.json"
+      ],
+      "interpretation": "directory-present-artifact-absent"
+    },
+    {
+      "id": "synthetic-controlled-1790798758779",
+      "sessionId": "synthetic-controlled-1790798758779",
+      "artifacts": [
+        {
+          "kind": "persisted",
+          "expectedPath": "../toc-migrated/synthetic-controlled-1790798758779/claims.json",
+          "exists": false
+        },
+        {
+          "kind": "turns",
+          "expectedPath": "../toc-migrated/synthetic-controlled-1790798758779/turns.json",
+          "exists": false
+        }
+      ],
+      "directory": "../toc-migrated/synthetic-controlled-1790798758779",
+      "directoryExists": true,
+      "directoryEntries": [
+        "source.json",
+        "validation.json"
+      ],
+      "interpretation": "directory-present-artifact-absent"
+    },
+    {
+      "id": "synthetic-controlled-1790799479728",
+      "sessionId": "synthetic-controlled-1790799479728",
+      "artifacts": [
+        {
+          "kind": "persisted",
+          "expectedPath": "../toc-migrated/synthetic-controlled-1790799479728/claims.json",
+          "exists": false
+        },
+        {
+          "kind": "turns",
+          "expectedPath": "../toc-migrated/synthetic-controlled-1790799479728/turns.json",
+          "exists": false
+        }
+      ],
+      "directory": "../toc-migrated/synthetic-controlled-1790799479728",
+      "directoryExists": true,
+      "directoryEntries": [
+        "source.json",
+        "validation.json"
+      ],
+      "interpretation": "directory-present-artifact-absent"
+    },
+    {
+      "id": "synthetic-production-cli-20260930",
+      "sessionId": "synthetic-production-cli-20260930",
+      "artifacts": [
+        {
+          "kind": "persisted",
+          "expectedPath": "../toc-migrated/synthetic-production-cli-20260930/claims.json",
+          "exists": false
+        },
+        {
+          "kind": "turns",
+          "expectedPath": "../toc-migrated/synthetic-production-cli-20260930/turns.json",
+          "exists": false
+        }
+      ],
+      "directory": "../toc-migrated/synthetic-production-cli-20260930",
+      "directoryExists": false,
+      "directoryEntries": [],
+      "interpretation": "directory-absent"
+    },
+    {
+      "id": "synthetic-production-interrupt-20260930",
+      "sessionId": "synthetic-production-interrupt-20260930",
+      "artifacts": [
+        {
+          "kind": "persisted",
+          "expectedPath": "../toc-migrated/synthetic-production-interrupt-20260930/claims.json",
+          "exists": false
+        },
+        {
+          "kind": "turns",
+          "expectedPath": "../toc-migrated/synthetic-production-interrupt-20260930/turns.json",
+          "exists": false
+        }
+      ],
+      "directory": "../toc-migrated/synthetic-production-interrupt-20260930",
+      "directoryExists": false,
+      "directoryEntries": [],
+      "interpretation": "directory-absent"
+    }
+  ],
+  "invalidTurnTimes": [
+    {
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t141",
+      "tStart": 2008,
+      "tEnd": 213,
+      "problem": "end-before-start",
+      "durationSec": -1795
+    },
+    {
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "turnId": "2026-06-03-dual-enrollment-pathway-t026",
+      "tStart": 1644,
+      "tEnd": 1629,
+      "problem": "end-before-start",
+      "durationSec": -15
+    },
+    {
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "turnId": "2026-08-10-ucas-what-changed-what-matters-t114",
+      "tStart": 1883,
+      "tEnd": 1868,
+      "problem": "end-before-start",
+      "durationSec": -15
+    }
+  ],
+  "provenance": {
+    "rawTranscriptCount": 23,
+    "sessionCount": 29,
+    "originals": 23,
+    "additions": [
+      {
+        "sessionId": "2026-09-02-india-test-series-part2",
+        "date": "2026-09-02",
+        "title": "India Test Series – Part II: Navigating India's Top Entrance Exams",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/2nd Sep- India Test Series – Part II- Navigating India’s Top Entrance Exams.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-02-india-test-series-part2-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-09-global-test-prep-pathways",
+        "date": "2026-09-09",
+        "title": "Mastering Global Test Pathways: Navigating GRE, GMAT & UK Admission Tests",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/9th Sep- Mastering Global Test Pathways- Navigating GRE, GMAT & UK Admission Tests.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-09-global-test-prep-pathways-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-16-pathways-in-psychology",
+        "date": "2026-09-16",
+        "title": "Dear Psychology, What Can't You Do?",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/16th Sep- Dear Psychology, What Can't You Do-.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-16-pathways-in-psychology-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-21-uniaccess-japan",
+        "date": "2026-09-21",
+        "title": "UniAccess: Japan",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/video1968958572.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-21-uniaccess-japan-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-24-in-focus",
+        "date": "2026-09-24",
+        "title": "In-Focus",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Audio/24th Sep - InFocus.m4a",
+        "sourceCreatedAt": "2026-09-26T18:30:16.253Z",
+        "sourceId": "gdrive-1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "72c212f",
+          "date": "2026-09-27T13:50:22+05:30",
+          "subject": "recovery: land unlanded session state + stall diagnosis + mc-hooks close-out"
+        }
+      },
+      {
+        "sessionId": "2026-09-24-zoho-next-european-study-destinations",
+        "date": "2026-09-24",
+        "title": "The Next European Study Destinations to Watch: New Choices for Your Europe Portfolio",
+        "sourceKind": "recording",
+        "sourcePath": "raw/webinars/2026-09-24 15-55-54.mkv",
+        "sourceCreatedAt": "2026-09-24T11:47:18.364Z",
+        "sourceId": "2026-09-24-zoho-next-european-study-destinations-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "fd74864",
+          "date": "2026-09-24T18:26:23+05:30",
+          "subject": "feat(meeting-bot): live webinar bot (Zoho) + gemini-3.8 single-call transcript + first knowledge-graph rows"
+        }
+      }
+    ],
+    "rawTranscriptsWithoutSession": [],
+    "rows": [
+      {
+        "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+        "date": "2026-04-21",
+        "title": "Visa Blueprint Part 2: Italy, France, New Zealand",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/21st-April-Visa-Blueprint-Part2-Italy-France-NZ.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.475Z",
+        "sourceId": "2026-04-21-visa-blueprint-part2-italy-france-nz-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "21st-April-Visa-Blueprint-Part2-Italy-France-NZ.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-05-08-funding-dreams-loans-forex",
+        "date": "2026-05-08",
+        "title": "Funding Dreams: Loans, Scholarships & Financial Aid",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/8th-May-Funding-Dreams-Loans-Forex.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.520Z",
+        "sourceId": "2026-05-08-funding-dreams-loans-forex-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "8th-May-Funding-Dreams-Loans-Forex.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-05-20-telling-your-brand-story-better",
+        "date": "2026-05-20",
+        "title": "Telling Your Brand Story Better",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/20th-May-Telling-Your-Brand-Story-Better.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.471Z",
+        "sourceId": "2026-05-20-telling-your-brand-story-better-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "20th-May-Telling-Your-Brand-Story-Better.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-05-22-uniaccess-xavier-university",
+        "date": "2026-05-22",
+        "title": "UniAccess Live: Xavier University",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/22nd-May-UniAccess-Xavier-University.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.480Z",
+        "sourceId": "2026-05-22-uniaccess-xavier-university-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "22nd-May-UniAccess-Xavier-University.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-05-23-uniaccess-atlas-skilltech",
+        "date": "2026-05-23",
+        "title": "UniAccess Live: ATLAS SkillTech University",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/23rd-May-UniAccess-ATLAS-Skilltech.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.482Z",
+        "sourceId": "2026-05-23-uniaccess-atlas-skilltech-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "23rd-May-UniAccess-ATLAS-Skilltech.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "date": "2026-05-28",
+        "title": "In Focus #1 (inaugural)",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/28th-May-In-Focus.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.497Z",
+        "sourceId": "2026-05-28-in-focus-1-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "28th-May-In-Focus.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+        "date": "2026-05-29",
+        "title": "Decoding the Ever-Expanding Cast",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/29th-May-Decoding-Ever-Expanding-Cast.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.500Z",
+        "sourceId": "2026-05-29-decoding-ever-expanding-cast-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "29th-May-Decoding-Ever-Expanding-Cast.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "date": "2026-06-03",
+        "title": "Dual Enrollment as a Pathway",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/3rd-June-Dual-Enrollment-Pathway.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.513Z",
+        "sourceId": "2026-06-03-dual-enrollment-pathway-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "3rd-June-Dual-Enrollment-Pathway.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "date": "2026-06-19",
+        "title": "Entrance Exams & Pathways in India, Part 1",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/19th-June-Entrance-Exams-Pathways-India-Part1.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.468Z",
+        "sourceId": "2026-06-19-entrance-exams-pathways-india-part1-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "19th-June-Entrance-Exams-Pathways-India-Part1.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "date": "2026-06-25",
+        "title": "In Focus #2",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/25th-June-Infocus.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.489Z",
+        "sourceId": "2026-06-25-in-focus-2-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "25th-June-Infocus.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "date": "2026-06-30",
+        "title": "Exploring Identity and Success in Counseling",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/30th-June-Exploring-Identity-Success-Counseling.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.506Z",
+        "sourceId": "2026-06-30-exploring-identity-success-counseling-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "30th-June-Exploring-Identity-Success-Counseling.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-07-03-inside-the-uc-session",
+        "date": "2026-07-03",
+        "title": "Inside the UC (University of California) System",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/3rd-July-Inside-the-UC-Session.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.509Z",
+        "sourceId": "2026-07-03-inside-the-uc-session-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "3rd-July-Inside-the-UC-Session.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-07-08-beyond-black-robes-law-careers",
+        "date": "2026-07-08",
+        "title": "Beyond Black Robes: Rethinking Careers in Law",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/8th-July-Beyond-Black-Robes-Law-Careers.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.516Z",
+        "sourceId": "2026-07-08-beyond-black-robes-law-careers-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "8th-July-Beyond-Black-Robes-Law-Careers.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-07-15-creative-futures",
+        "date": "2026-07-15",
+        "title": "Creative Futures",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/15th-July-Creative-Futures.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.464Z",
+        "sourceId": "2026-07-15-creative-futures-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "15th-July-Creative-Futures.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-07-22-uniaccess-cept-university",
+        "date": "2026-07-22",
+        "title": "UniAccess Live: CEPT University",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/22nd-July-UniAccess-CEPT-University.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.478Z",
+        "sourceId": "2026-07-22-uniaccess-cept-university-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "22nd-July-UniAccess-CEPT-University.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "date": "2026-07-28",
+        "title": "Metrics & Mingling: Conference ROI & Networking",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/28th-July-Metrics-and-Mingling.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.495Z",
+        "sourceId": "2026-07-28-metrics-and-mingling-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "28th-July-Metrics-and-Mingling.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-07-30-in-focus-3",
+        "date": "2026-07-30",
+        "title": "In Focus #3",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/30th-July-In-Focus.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.503Z",
+        "sourceId": "2026-07-30-in-focus-3-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "30th-July-In-Focus.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "date": "2026-08-03",
+        "title": "UK: Beyond Offer Letters",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/03rd-August-UK-Beyond-Offer-Letters.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.448Z",
+        "sourceId": "2026-08-03-uk-beyond-offer-letters-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "03rd-August-UK-Beyond-Offer-Letters.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "date": "2026-08-03",
+        "title": "UK: Beyond Offer Letters (re-uploaded copy)",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/UK-Beyond-Offer-Letters.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.522Z",
+        "sourceId": "2026-08-03-uk-beyond-offer-letters-reupload-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "UK-Beyond-Offer-Letters.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "date": "2026-08-10",
+        "title": "What Changed, What Matters – Inside the New UCAS Application",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/10th-August-What-Changed-What-Matters-–-Inside-the-New-UCAS-Application-.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.454Z",
+        "sourceId": "2026-08-10-ucas-what-changed-what-matters-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "10th-August-What-Changed-What-Matters-–-Inside-the-New-UCAS-Application-.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-08-12-uniaccess-ashoka-university",
+        "date": "2026-08-12",
+        "title": "UniAccess Live: Meet Ashoka University",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/12th-August-UniAccess-Live-Meet-Ashoka-University.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.458Z",
+        "sourceId": "2026-08-12-uniaccess-ashoka-university-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "12th-August-UniAccess-Live-Meet-Ashoka-University.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-08-24-uniaccess-leeds-arts-university",
+        "date": "2026-08-24",
+        "title": "UniAccess Live: Meet Leeds Arts University",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/24th-August-UniAccess-Live-Meet-Leeds-Art-University.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.486Z",
+        "sourceId": "2026-08-24-uniaccess-leeds-arts-university-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "24th-August-UniAccess-Live-Meet-Leeds-Art-University.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-08-27-in-focus-4",
+        "date": "2026-08-27",
+        "title": "In Focus #4",
+        "sourceKind": "document",
+        "sourcePath": "raw/TOC/TOC-Materials/Transcripts/27th-August-In-Focus.content.md",
+        "sourceCreatedAt": "2026-09-03T06:13:39.491Z",
+        "sourceId": "2026-08-27-in-focus-4-src",
+        "origin": "original-transcript",
+        "matchedRawTranscript": "27th-August-In-Focus.content.md",
+        "firstCommit": {
+          "hash": "907c9c9",
+          "date": "2026-09-03T11:55:47+05:30",
+          "subject": "feat(T-002): migrate 23 real TOC sessions into schema v2"
+        }
+      },
+      {
+        "sessionId": "2026-09-02-india-test-series-part2",
+        "date": "2026-09-02",
+        "title": "India Test Series – Part II: Navigating India's Top Entrance Exams",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/2nd Sep- India Test Series – Part II- Navigating India’s Top Entrance Exams.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-02-india-test-series-part2-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-09-global-test-prep-pathways",
+        "date": "2026-09-09",
+        "title": "Mastering Global Test Pathways: Navigating GRE, GMAT & UK Admission Tests",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/9th Sep- Mastering Global Test Pathways- Navigating GRE, GMAT & UK Admission Tests.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-09-global-test-prep-pathways-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-16-pathways-in-psychology",
+        "date": "2026-09-16",
+        "title": "Dear Psychology, What Can't You Do?",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/16th Sep- Dear Psychology, What Can't You Do-.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-16-pathways-in-psychology-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-21-uniaccess-japan",
+        "date": "2026-09-21",
+        "title": "UniAccess: Japan",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Recordings/September/video1968958572.mp4",
+        "sourceCreatedAt": "2026-09-25T00:00:00.000Z",
+        "sourceId": "2026-09-21-uniaccess-japan-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "5760f5e",
+          "date": "2026-09-25T11:55:02+05:30",
+          "subject": "feat(data): u1-toc-sept-catchup — 4 real TOC September sessions transcribed + indexed into toc tenant"
+        }
+      },
+      {
+        "sessionId": "2026-09-24-in-focus",
+        "date": "2026-09-24",
+        "title": "In-Focus",
+        "sourceKind": "recording",
+        "sourcePath": "raw/TOC/TOC-Materials/Audio/24th Sep - InFocus.m4a",
+        "sourceCreatedAt": "2026-09-26T18:30:16.253Z",
+        "sourceId": "gdrive-1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "72c212f",
+          "date": "2026-09-27T13:50:22+05:30",
+          "subject": "recovery: land unlanded session state + stall diagnosis + mc-hooks close-out"
+        }
+      },
+      {
+        "sessionId": "2026-09-24-zoho-next-european-study-destinations",
+        "date": "2026-09-24",
+        "title": "The Next European Study Destinations to Watch: New Choices for Your Europe Portfolio",
+        "sourceKind": "recording",
+        "sourcePath": "raw/webinars/2026-09-24 15-55-54.mkv",
+        "sourceCreatedAt": "2026-09-24T11:47:18.364Z",
+        "sourceId": "2026-09-24-zoho-next-european-study-destinations-src",
+        "origin": "addition",
+        "matchedRawTranscript": null,
+        "firstCommit": {
+          "hash": "fd74864",
+          "date": "2026-09-24T18:26:23+05:30",
+          "subject": "feat(meeting-bot): live webinar bot (Zoho) + gemini-3.8 single-call transcript + first knowledge-graph rows"
+        }
+      }
+    ]
+  }
+}

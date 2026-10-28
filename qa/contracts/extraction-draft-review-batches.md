@@ -1,0 +1,9 @@
+# Extraction AI draft review batches — scoped acceptance
+
+Scope: additive offline preparation under D-163; Fix cycle 0. This contract preserves the previously checked original extraction packet. It does not replace its acceptance contract or authorize semantic gold, factual truth, entity gold, binding thresholds, repairs, production writes or full U2.2 acceptance.
+
+1. Eight batches contain the original 72 unique claims in order, in groups of at most ten (last group two). Claim records, 80 literal citation occurrences, 14 unresolved identities and seven existing replacement proposals remain unchanged.
+2. Each entry binds the original packet, claim and source session; complete current/historical citation contexts remain identical to that packet. Exact current artifact byte lengths/SHA-256, LF-normalized hashes and current matching records/text hashes must independently verify. Historical snapshots are preserved records, not newly adjudicated provenance.
+3. Each AI draft states current literal-citation support and its rationale. Replacement support is separate. Unsupported citations do not establish factual falsity or full-transcript absence. Factual truth, omissions and topic/person precision remain unknown.
+4. Every item remains individually unreviewed with null approver, approval date and decision; humanGold is false and binding thresholds null. No gold promotion, replacement application or acceptance import is included. D-163 requires individual Umesh approval before future gold creation.
+5. Original packets, source claims/transcripts and runtime remain untouched. The builder preserves existing equal output bytes and refuses changed review content. The immediate downstream verifier consumes batches with all identities/hash/approval checks intact. Independently verify the bounded stage, consumer and required frozen-contract validator.

@@ -1,0 +1,35 @@
+[codex/machine-migration-2026-10-09 d0f6f2ef] Checkpoint extraction review resume and current verification
+ 33 files changed, 1055 insertions(+)
+ create mode 100644 qa/coordination/resume-20261015/broker/pin-manifests/5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-contracts-receipt.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-contracts.log
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-final-seal.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-git-after-receipt.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-git-after.log
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-node-preflight-receipt.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-node-preflight.log
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-python-git-preflight-receipt.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-python-git-preflight.log
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-resume3-receipt.json
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-resume3.log
+ create mode 100644 qa/coordination/resume-20261015/broker/u22-current-three-run.py
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/assess-initial-invalid.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/assess-result.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/broker-request.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/checker-early-boundary-request.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/checker-prompt.txt
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/current-evidence-authentication.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/identity.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/managed-review.current.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/managed-review.draft.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/metrics-initial-invalid.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/metrics.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/packet.md
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/secret-scan.json
+ create mode 100644 qa/coordination/resume-20261015/u22-resume-prep/wip-allowlist.json
+ create mode 100644 qa/evidence/u22-extraction-review-resume-static.json
+ create mode 100644 qa/manifests/u22-extraction-review-resume.md
+ create mode 100644 qa/packets/u22-extraction-review-resume.candidate-inventory.txt
+ create mode 100644 qa/packets/u22-extraction-review-resume.md
+ create mode 100644 scripts/eval/extraction-review-resume.mjs
+ create mode 100644 scripts/eval/extraction-review-resume.test.mjs

@@ -5,6 +5,8 @@
   "type": "module",
   "main": "./src/index.ts",
   "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node dist/server.js",
     "dev": "tsx src/index.ts",
     "test": "node --test --import tsx \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit -p tsconfig.json"
@@ -19,10 +21,15 @@
     "mongodb": "7.6.0",
     "express": "5.2.1",
     "express-rate-limit": "8.6.2",
-    "dotenv": "17.4.2"
+    "dotenv": "17.4.2",
+    "@langchain/langgraph": "1.4.18",
+    "pdfjs-dist": "6.4.299",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
   },
   "devDependencies": {
     "typescript": "5.9.3",
+    "esbuild": "0.28.2",
     "tsx": "4.23.13",
     "@types/node": "^24.0.0",
     "@types/express": "5.0.6"

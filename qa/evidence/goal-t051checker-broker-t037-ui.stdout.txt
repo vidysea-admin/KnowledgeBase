@@ -1,0 +1,11 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/join-rules/JoinRulesPage.test.tsx (33 tests) 1978ms
+ ✓ src/pages/join-rules/RegistrationPolicyPanel.test.tsx (4 tests) 362ms
+
+ Test Files  2 passed (2)
+      Tests  37 passed (37)
+   Start at  21:21:03
+   Duration  11.82s (transform 1.74s, setup 715ms, collect 5.55s, tests 2.34s, environment 2.19s, prepare 380ms)
+

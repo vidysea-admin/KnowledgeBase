@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f.json",
+    "sha256": "770d0fe6560ac178a98b1450e2223783d8bc8df65af7a75706a15e843c77416f",
+    "count": 349
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "MAKER ACCEPTANCE offline hydration",
+  "pid": 29088,
+  "exit": 0,
+  "treeClosed": true,
+  "active_s": 0.25,
+  "afterMatch": true,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\hydration-repair1-guard1.log",
+    "sha256": "3442b4be399dda12aa978bd2d98a6ab616b22eea2ac2b8865578686514d3aeaa"
+  },
+  "counts": {
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

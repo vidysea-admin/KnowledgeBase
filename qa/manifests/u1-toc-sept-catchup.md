@@ -343,3 +343,5 @@ gemini-file-upload.ts` + its test (shared library bugfix, no UI surface).
   D-008 `"provided"` check — all pre-existing, none touching any file this unit changed.
 
 ## Status: checked-PASS — qa/verdicts/u1-toc-sept-catchup.md (Cycle checked: 0, 9c52a27); merged to master; @lkb/ai 75/75 on merged tree; debt ISS-U1-2 (main-tree breach, no damage), ISS-U1-3 (10 embedded timestamp fragments, cosmetic), ISS-U1-4 (retrieval miss on rephrased query)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

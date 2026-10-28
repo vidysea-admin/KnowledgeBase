@@ -1,0 +1,15 @@
+✔ real client sends revision precondition and editor consumes committed canonical revision (203.5383ms)
+✔ real client to editor refuses stale post-commit GET without losing commit truth (62.1031ms)
+✔ unmount invalidates real in-flight receipt, with no callback or canonical reload (26.326ms)
+✔ a synchronous unmount callback cannot start a canonical reload (33.6319ms)
+✔ real mapping wire names only the chosen block and requires reason (47.4202ms)
+✔ an invalid durable receipt retains draft and disables unsafe retry (36.4605ms)
+✔ a replaced key/session hides previous data and ignores its late receipt (32.2002ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2074.4071

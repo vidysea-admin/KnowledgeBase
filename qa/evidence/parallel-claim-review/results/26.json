@@ -1,0 +1,135 @@
+{
+  "version": 1,
+  "index": 26,
+  "originalIndex": 28,
+  "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c01",
+  "inputHash": "eafb6424774958e09202c44b3e5ebe316033ecc51c7cb2232eb936acd148e09d",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "Original t017 directly states roughly 12-13 lakh JEE students, close to 40,000 NIT/IIT government seats, and the framing that competition is for those seats rather than the full applicant pool; t018 reiterates the numbers conditionally.",
+    "missingReferences": [],
+    "caveats": [
+      "Both cited references have exactly one supplied match; no missing or duplicate references.",
+      "Stored speakerRef is unknown in both original records; embedded name text does not establish speaker identity.",
+      "Applicant and seat figures are approximate, undated speaker assertions; session calendar metadata does not establish their factual year or external truth.",
+      "Competition framing is the speaker interpretation, not an independently verified statistical conclusion.",
+      "Original timings are 465-524 and 524-573; the same IDs in current contexts have different content, speakers, and timings.",
+      "Artifact byte hashes are supplied only, not verified; current raw sha256 and normalizedLfSha256 remain distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+        "contextVersion": "originalMigration",
+        "quote": "If you talk about JEE, 12, 13 lakh students.",
+        "textSha256": "47a726a7dd30d88f77925b68b069dfcd657d95cd3c3ae88442a7b28fb3846a84",
+        "contextSha256": "a375e2b223e955c267882ae72eaab48d69450519102af2a3d389add27180c2ec",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 465,
+        "tEnd": 524,
+        "supports": "Supports approximate JEE applicant volume (12-13 lakh)."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+        "contextVersion": "originalMigration",
+        "quote": "specifically from government engineering colleges, NITs and IITs, these are close to 40,000 seats, right?",
+        "textSha256": "47a726a7dd30d88f77925b68b069dfcd657d95cd3c3ae88442a7b28fb3846a84",
+        "contextSha256": "a375e2b223e955c267882ae72eaab48d69450519102af2a3d389add27180c2ec",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 465,
+        "tEnd": 524,
+        "supports": "Supports approximately 40,000 government engineering seats across NITs and IITs."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+        "contextVersion": "originalMigration",
+        "quote": "you are going to fight for the 40,000 seats. So your competition is 40,000, no matter whether 12 lakh students are appearing",
+        "textSha256": "47a726a7dd30d88f77925b68b069dfcd657d95cd3c3ae88442a7b28fb3846a84",
+        "contextSha256": "a375e2b223e955c267882ae72eaab48d69450519102af2a3d389add27180c2ec",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 465,
+        "tEnd": 524,
+        "supports": "Supports the speaker framing competition around 40,000 seats rather than the full applicant pool."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+        "contextVersion": "originalMigration",
+        "quote": "If 12 lakh students are appearing and only 40,000 have to get the seat, right, in in government engineering colleges in NITs and IITs",
+        "textSha256": "9f2cb870563ab456d9432288b9509a2da90ab623c848f2269d716e547bcb3f76",
+        "contextSha256": "7c45ae06128461e9c29e69da70bdcd08e8b7d93790950e7e1f4a1d7ed5f912c8",
+        "artifactSha256": "498ad8dc047993cffe60091bfd281b7485816ae6cf53a030f8b8221ae188f357",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 524,
+        "tEnd": 573,
+        "supports": "Reiterates the approximate applicant-to-seat comparison; phrased conditionally."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t017 is an unfinished conversational fragment and t018 asks about postgraduate admissions in India. Neither supports any component of the approximately 40,000 NIT/IIT seats, roughly 12 lakh JEE candidates, or competition framing.",
+    "missingReferences": [],
+    "caveats": [
+      "Both cited references have exactly one supplied match; no missing or duplicate references.",
+      "Both unchanged citation IDs point to changed content; original support cannot substitute for current evidence.",
+      "Current stored speakerRef values Chirag and Ambika are labels only; identity is not established.",
+      "Current timings 3069-3071 and 3071-3075 differ substantially from the original contexts.",
+      "Unsupported does not mean false; external factual truth and human adjudication remain open.",
+      "Artifact byte hashes are supplied only, not verified; normalized hashes are not substituted for raw artifact hashes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t017",
+        "contextVersion": "current",
+        "quote": "Fine. Could you could you...",
+        "textSha256": "a3047a17fbde4b0786ec65f5273d5307afd51e2f8c8e34dceecf44e81f298834",
+        "contextSha256": "55b01e63cc2df1b425f63fbfa751f16d3bd4736dcb5cb062eee687bbae25b6f3",
+        "artifactSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+        "revision": null,
+        "speakerRef": "Chirag",
+        "tStart": 3069,
+        "tEnd": 3071,
+        "supports": "Unrelated fragment; supports none of the JEE volume, NIT/IIT seat count, or competition framing."
+      },
+      {
+        "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+        "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t018",
+        "contextVersion": "current",
+        "quote": "Yes, yes, please. How does one go for post-grad admissions in India?",
+        "textSha256": "79ccd6fd6faf8d6c875e633cf1045823499db6e7758beb9f9faea5eb70249d64",
+        "contextSha256": "9c5996347673b6d3def803072a7c112492e8118ec0fa9afccbe69c3a04862a2f",
+        "artifactSha256": "442eed358481e9e9836b9a6b5fb59079cce9422387ad1674b496615441dc84a4",
+        "revision": null,
+        "speakerRef": "Ambika",
+        "tStart": 3071,
+        "tEnd": 3075,
+        "supports": "Postgraduate-admissions question; supports none of the claimed seat count, JEE candidates, or competition framing."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original contexts support all claim components as approximate speaker assertions; current same-ID contexts contain unrelated dialogue and shifted timings. All required supplied-data hashes and identity bindings verify; artifact bytes and external truth remain unverified."
+}

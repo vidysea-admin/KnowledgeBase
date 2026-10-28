@@ -1,4 +1,588 @@
-# QUEUE — checker Mode B sweep 2026-09-27T13:4x+05:30 (3-shard wave, consolidated)
+> **2026-10-28 Wave 1 (approved: 2026-10-28, Umesh: "remaining run krr aur kaam khatam krr"; plan docs/REMAINING-PLAN-2026-10-28.md). TODO rows, parallel, file-disjoint:**
+> - W1-api-honest-status (G-A1+G-B2): unconfigured integrations answer 503 "not configured" (whatsapp/groups 500, calendar copy), mount connector-workflow router (/connectors 404); heartbeat read failure never reports "all fresh" (iss-368). files: apps/api/src/server.ts, apps/api/src/routes/{whatsapp*,connector-workflow*,health*} + tests · owner: server.ts
+> - W1-web-live-polish (G-A2): login shows the 401 message, /knowledge/profiles route, /analytics wiring, /api/graph 404 as empty state. files: apps/web/src/** + tests
+> - W1-tooling-honest-lint (G-B1+G-B3): lint:structure must not short-circuit (iss-367), .test.mjs in testPatterns (ISS-371), ledger duplicate-id guard over the issues*.jsonl union. files: package.json, structure.config.json, scripts/lint-*.mjs, scripts/tracker-audit* · owner: package.json
+> - W1-ask-trust (W-AFR): ISS-AFR-001..004 (default /ask verdict, web fallback reach, abstain, deadline orphan/auditLog). files: packages/ask/src/*, apps/api/src/answer-policy/*, apps/api/src/routes/ask/* (not production.ts)
+> - W1-speaker-rules-split (W-S step 1): split speaker-name-rules tests, no behaviour change. files: packages/index/src/pipeline/speaker-name-rules*
+> - W1-vector-gap-durability (W2, ISS-122): bring wave/vector-gap-durability onto current HEAD, tests green, ready-for-check. files: apps/api/src/indexing/*, ingest-store.ts, whatsapp-store.ts
+> **2026-10-28 (D-200): row 0 is the only unit to run now.** Older rows below are historical.
+> **2026-10-28 (D-202): row 0b `gemini-web-fallback` TODO, human-asked (Umesh: "use krro gemini", paid key). files: apps/api/src/ask/ask-web-fallback.ts, apps/api/src/composition/production.ts, setup-status.ts, setupModel.ts + tests · schema: no · lanes: code · after: none. Building in .worktrees/gemini-web-fallback.**
+**2026-10-28 (D-203): row 0c `ask-fast-rag` TODO, human-asked (Umesh via VC session: "let it work like how the rag based chatbot works"). Default /ask = top-k retrieval + 1 answer LLM call + <=1 grounding check; old graph behind filters.mode="deep"; response shape unchanged; target 5-10 s. files: apps/api/src/routes/ask/*, apps/api/src/answer-policy/*, packages/ask/src/* + tests · schema: no · not production.ts (gemini-web-fallback owns it). DONE 2026-10-28: dual check PASS cycle 1 (qa/verdicts/ask-fast-rag.md, .b.md), merged b348ab8b, not pushed. Candidates: ISS-AFR-001..012 in qa/issues.afr.jsonl (4 medium: verdict hard-coded correct, web fallback unreachable, no abstain, deadline orphan/auditLog) await human pick.**
+
+# QUEUE — maker tick 2026-09-28 (iss-346 cycle-1 FAIL, HELD; slug collision gated)
+
+> **iss-346-round-cap-mechanical-check is HELD, not stalled.** Cycle-1 verdict `8ac0582`: FAIL,
+> 7/9 criteria, 2/3 invariants. The checker ruled that C1 and I2 **cannot be satisfied by disclosure
+> at all** — both judge shipped behaviour, and every lawful fix is a `.claude/hooks/*` edit gated
+> behind `qa/gates/maker-predicate-canonical-field-and-prose-seam.md` (still OPEN). **No further fix
+> cycle from the builder alone can close them**, so cycle 2 was NOT opened; that would burn a cycle
+> on work the unit is not permitted to do.
+>
+> **New, and the reason this tick matters: a THIRD contract-named artifact has the same live defect.**
+> `ISS-A035913-011` (high, open) — `.claude/hooks/mc-precommit.ps1:43`'s pending-unit regex does not
+> match a manifest carrying only D-042's canonical `**Handshake status:**` field (verified live:
+> legacy `True`, canonical-only `False`). The cycle-1 audit had narrowed [C7]'s "every sibling hook
+> that shares the pattern" to "every sibling predicate in one file"; the checker extended it to the
+> two hooks the contract names, found `mc-sessionstart.ps1` genuinely clean, and found this. The gate
+> above is now about three artifacts, not two.
+>
+> **Second gate opened this tick — `qa/gates/iss-346-slug-collision-two-units.md`.** Merging the
+> worktree returned `CONFLICT (add/add)` on **both** the manifest and the verdict: master already
+> carries a *different* unit at the same two paths, PASSed and closed out at `97756f5`. Two loops
+> claimed one ledger row. I aborted the merge and overwrote nothing — resolving it either way deletes
+> a checked verdict. Only the lane ledger shard was landed (no conflict, same git blob
+> `45061ef0…`, so verbatim as the checker wrote it).
+>
+> **Tick state:** `wave=2 · concurrent peak=2 · ` see SERIAL lines below.
+
+| # | unit | tier | why now | cap check |
+|---|---|---|---|---|
+| 0 | `claims-citable-needs-review` — **TODO** | 1 (Approver-directed, D-200) | Umesh 2026-10-28: needs-review claims citable with visible `verification: "unverified"`, anchored to the evidence turn; rejected never cited; verified ranks first. Unblocks counsellor 0-sources (`answer-workflow.ts:144/157`) and knowledge-outputs 422 (`service.ts:32`). Local validation only; live rollout is a human step. **Stop the loop after this unit closes out.** | new seam — clear |
+| 1 | `iss-367-lint-structure-no-shortcircuit` (folds in ISS-371) | 2 (high) | **released** — it was `SERIAL` on the iss-346 check because it re-runs `lint-loc`; that check has returned. **CORRECTION to this tick's first draft: ISS-371 is severity `medium`, not high.** Under this repo's severity gate a medium gets a ledger entry and is "verified inside the next unit that touches the same file" — not its own ceremony. That unit is ISS-367, whose own `fix_direction` says to do the `testPatterns` entry FIRST because it drops `lint-loc` 5→4 and changes the masking picture. So they are one unit, not two | 0 prior PASSes on `package.json` / `structure.config.json` / `scripts/lint-*.mjs` — clear |
+| 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | a `listHeartbeats` throw is reported as zero silent watchers — byte-identical to "all fresh", contradicting D-048; its standing test pins the wrong answer and passes on the broken implementation | `apps/api/src/routes/health.ts` 1 prior PASS — under the cap |
+| 3 | `ledger-duplicate-id-guard` | 2 (high) | `SERIAL` this wave — see below | 0 prior PASSes — clear |
+| 4 | `iss-104cc-3-narrow-place-signal` | 2 (high) | D-055 ruling 1; hard prerequisite `speaker-rules-test-file-split` (test file at 392/400) not yet done | measurement pre-specified against BOTH ledger corpora by id |
+
+**SERIAL: `ledger-duplicate-id-guard` waits on a named edge** — D-055 ruling 2 assigns the `ISS-360`
+id promotion to **`/checker`**, and it rewrites the same `qa/issues*.jsonl` surface this guard would
+validate. Building the guard against a ledger that is about to change under it measures the wrong
+corpus. It goes in the next wave, after the promotion lands.
+
+**SERIAL: `iss-346-round-cap-mechanical-check` waits on two OPEN human gates** — named above. Not a
+stall: diagnosis is on disk in both gate files, and the checker's own verdict states no builder-only
+fix exists.
+
+---
+
+## TODO — narrow the place-vs-person signal (D-055 ruling 1)
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `iss-104cc-3-narrow-place-signal` | 2 (high) | D-055 ruling 1 accepted the ~32% false-positive cost **provisionally, not as final**, and requires a narrowing unit. `readsAsAPlaceOrOrg` is candidate-independent, so the refusal is deterministic for ANY name in a locative-self-mention construction. Make a strong naming cue, direct address, or a multi-token name RESCUE the real person, without reopening the fabrications ISS-104 closed. | `packages/index/src/pipeline/speaker-name-rules.ts` (`readsAsAPlaceOrOrg`, `citesNameAsAnIntroduction`), `speaker-name-rules.test.ts` | no | speaker resolution | `speaker-name-data.ts` (`LOCATIVE_GOVERNORS`) | none |
+
+**Measurement is pre-specified, so the unit cannot grade its own homework** (D-013's "Measuring a fix
+against the ledger", D-015): it reports BOTH corpora by id — **ISS-104's 20 recorded reproductions**
+(must not regress below the current 19/20 refused) and **ISS-104CC-3's recorded false-positive
+cases** (must improve on ~32%). A self-authored corpus may be added, never substituted. The 15%-vs-32%
+discrepancy is precisely what an author-chosen corpus produced last time.
+
+**Gate constraint, already measured:** `speaker-name-rules.test.ts` is at **392 of testMax 400**. This
+unit adds cases to that file, so `speaker-rules-test-file-split` is a hard prerequisite, not a
+nice-to-have. Do the split first or the gate reds.
+
+---
+## DONE — report unmerged-worktree commits in the sweep (checked-PASS cycle 0, qa/verdicts/sweep-reports-unmerged-worktrees.md)
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `sweep-reports-unmerged-worktrees` (DONE) | 4 (medium) | 23 commits across 5 worktrees are invisible to every gate, count and sweep, because all of them read master. `wave/u2-4-phase3-fix` alone is 13 commits behind a **critical open** row (ISS-282). Make the number appear every tick instead of being discovered during unrelated hygiene. | the sweep / session-start reader in `scripts/` | no | sweep report contract | `git worktree list`, `git log master..<branch>` | none |
+
+**Reporting is separable from deciding.** `qa/gates/unmerged-worktree-inventory.md` holds the
+per-branch merge/retire decision for the Approver. This unit only makes the debt visible and must
+not merge, rebase or delete anything.
+
+---
+## TODO — a duplicate-id guard over the ledger union
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `ledger-duplicate-id-guard` | 2 (high) | `qa/issues.jsonl` carries **two different issues both id `ISS-360`**, statuses `open` and `fixed` (lines 358-359, predates the iss-104 merge). Every reader silently takes one. D-015's measure-against-the-issue's-own-reproductions rule is only as strong as an id resolving to one row. The guard is separable from the repair and blocks the class recurring. | `scripts/` (the tracker-audit / ledger reader), not the ledger itself | no | ledger read contract | `qa/issues.jsonl` + `qa/issues.*.jsonl` union | none |
+
+**The repair is gated, the guard is not.** `qa/gates/iss-360-duplicate-id-collision.md` holds the
+repair for the Approver (it changes what committed citations mean). A reader that fails loudly on a
+duplicate id decides nothing and can ship first. Do not resolve the collision inside this unit.
+
+**Update 2026-09-28 (D-055 ruling 2, executed by `/checker`):** the repair landed on disk. Both
+rows' `canonical_id` was promoted to a real `id` (`ISS-360-OBSFLAKE` line 358 open,
+`ISS-360-HEARTBEAT` line 359 fixed) and the bare `ISS-360` no longer exists as an id anywhere in
+the ledger union. Every already-committed bare-`ISS-360` citation this repair found was ANNOTATED,
+never rewritten — see `qa/issues.360-citations.md` for the full disambiguation table (39 sites; 1
+marked genuinely `AMBIGUOUS`). **Commit deferred**: another loop holds an unresolved merge conflict
+in this checkout (`apps/api/src/production.ts`, `UU`) at the time of this repair, so
+`qa/issues.jsonl` and `qa/issues.360-citations.md` are on disk, uncommitted, pending that merge
+clearing. This TODO row (`ledger-duplicate-id-guard`) still stands — the mechanical duplicate-id
+guard is separate work and unaffected by the repair landing.
+
+---
+## TODO — speaker-name-rules.test.ts is 8 lines from its gate budget
+
+| unit | tier | why | files | schema | surface | consumes | runtime |
+|---|---|---|---|---|---|---|---|
+| `speaker-rules-test-file-split` | 5 (contract gap / gate budget) | `packages/index/src/pipeline/speaker-name-rules.test.ts` sits at **392 of testMax 400** after iss-104-place-vs-person-signal. The NEXT corpus added on this seam breaks the `lint-loc` gate, and this seam takes a corpus nearly every unit (D-015 requires each fix to carry its issue's recorded reproductions, which only grows the file). Split by concern before that happens, not after a red gate forces it. | `packages/index/src/pipeline/speaker-name-rules.test.ts` (+ the new sibling test files) | no | none — test-only | `speaker-name-rules.ts`, `speaker-name-data.ts` | none |
+
+Surfaced by the iss-104 build, not by a checker — recorded here rather than in the ledger because
+the maker is not the ledger's writer. **Depends on ISS-371** (`loc.testPatterns` omits `.test.mjs`)
+only in spirit, not mechanically: this file is `.test.ts` and is already correctly judged against
+`testMax` 400, so ISS-371 does not move this number.
+
+---
+# QUEUE — checker Mode B sweep 2026-09-28T23:5x+05:30 (consolidated, single agent)
+
+> **Terminal state: `FINDINGS: 5 new` (2 high, 3 medium) + `3 checker_note`s appended.** Range
+> `2a0d5f7..9219d96`, **72 commits**. The sweep ran consolidated rather than 3-sharded because it
+> was ~15 h overdue and the previous 3-shard attempt died with its session having written nothing.
+> **The tree moved mid-sweep** (64 commits at start, HEAD `b44a3a2`; the other loop added 8 more);
+> every check was re-derived and completed at `9219d96`, and the range above is the one actually
+> used — stated explicitly because a previous shard silently ran a superseded range and every one of
+> its findings had to be re-verified by hand.
+>
+> **Filed: ISS-367 (high), ISS-368 (high), ISS-369, ISS-370, ISS-371 (medium).**
+> **Appended: ISS-358, ISS-267, ISS-248.**
+>
+> **ISS-367 — `pnpm lint:structure` is an `&&` chain, and four of its ten stages have never been
+> observed.** This is the finding of the sweep. The chain short-circuits on `lint-loc`, which has
+> been red for a long time, so `lint-dirsize`, `lint-root`, `snapshot --check` and `tracker-audit`
+> have been dark. Run separately, **five** stages are red: `lint-loc` (5), `lint-dirsize` (1 —
+> `apps/api/src` 32 files against a budget of 31), `lint-root` (1 — 17 loose root files against 15),
+> `snapshot --check` (**`docs/SNAPSHOT.md` stale, 95 lines differ from a fresh regeneration**), and
+> `tracker-audit --gate G1,G4` (6 findings). The dirsize breach is *in range and attributable*:
+> `apps/api/src` went 31→32 via the sole added file `apps/api/src/ask-web-fallback.ts` in `d23d464`
+> (ISS-274) — a unit whose manifest is literally headed *"pre-existing failure, NOT a regression from
+> this unit"*, pasting only `lint-loc`'s output, and whose **verdict re-ran the command and
+> concurred**. Both conclusions rest on output that never reached stage 2. That is not a lapse by
+> either party: the command genuinely cannot show them stage 2.
+>
+> Filed as the **shared root cause** of a class, not another instance of it. ISS-058, ISS-100,
+> ISS-136 and ISS-222 are each a closed instance of "a manifest claimed `lint:structure` green or
+> mis-attributed its red"; all four are `fixed`/`verified`, and **none names this mechanism** — which
+> is exactly why the class kept recurring. It also bears directly on this project's own Definition of
+> done items 1 and 2.
+>
+> **`docs/SNAPSHOT.md` deserves its own line.** The user-level memory records it as the read-first
+> digest whose staleness is supposed to be gated by `pnpm lint:structure`. It was last regenerated at
+> `7616beb`, *before* this range. The gate that was meant to catch that is the one behind the
+> short-circuit.
+>
+> **ISS-371 is the cheap prerequisite and is ranked first for that reason.** `loc.testPatterns`
+> covers `.test.ts` and `^test_*.py` but **not** `.test.mjs`, while `.mjs` *is* in `loc.extensions` —
+> so all 12 `.mjs` test files are judged against the 300-line **source** budget instead of `testMax`
+> 400. `scripts/lib/dispatch-state.test.mjs` sits at 332 counted lines: over 300, comfortably under
+> 400. One pattern entry drops `lint-loc` from 5 violations to 4 **without touching a single source
+> file**, which materially changes ISS-367's masking picture. Fix it first, then re-measure.
+>
+> **ISS-368 — a read failure is being reported as health.** `detectSilentWatchers`
+> (`apps/api/src/routes/health.ts:102-106`) catches a `listHeartbeats` throw and `continue`s, so a
+> tenant whose heartbeat collection is unreadable contributes **zero** silent watchers — an output
+> byte-identical to "all watchers fresh". This contradicts D-048 as restated in that unit's own
+> header comment (*a missing row is treated as maximally stale, not as healthy*). The unit's standing
+> test **pins the wrong answer**: it asserts `detectSilentWatchers(deps) === 0` for a tenant that
+> under D-048 owes 3 stale alerts, so it passes on both the correct and the broken implementation.
+> This is the "a check asserting a state the bug also produces" trap, caught in the wild.
+>
+> **Two corrections recorded against this session's own earlier reporting, not buried:**
+> 1. I told the user `lint-loc` stood at **3** violations "down from 4". **It was 4.**
+>    `packages/index/src/pipeline/speakers-llm.ts:313` is a real violation my post-merge gate output
+>    dropped — I read a truncated tail and lost both the `FAIL — N violation(s)` header and the first
+>    file line. Re-derived directly: `node scripts/lint-loc.mjs` at HEAD prints **5**. The one thing
+>    that was right is that `speaker-name-rules.ts` did leave the list.
+> 2. The dispatch brief handed the sweep that same wrong baseline of 3. The sweep caught it and said
+>    so. Recorded here because a brief that ships a wrong baseline can launder it into a finding.
+>
+> **Not ranked, and why — `ISS-267` is the highest-value governance item on the board and is still
+> going to a HUMAN_GATE.** Its only fix site is `.claude/hooks/mc-sessionstart.ps1`, a non-security
+> seam now at **4** PASSed touching units against D-014's cap of 2, and D-052 ruling 1 sequences
+> ISS-346 ahead of any cap decision on that file. Per D-013's round cap that is a gate, not a unit —
+> `qa/gates/mc-sessionstart-handshake-reader-round-cap.md`. ISS-370's hook half is held for the same
+> reason; its `dispatch-state.mjs` half may be separable.
+>
+> **Verified clean and worth stating, since a sweep that only reports problems misleads:** zero
+> bypasses (every code-bearing commit in range traces to a manifest *and* a verdict); zero untracked
+> verdicts, manifests or ledger shards; all 12 hooks across `.claude/hooks/` and `.codex/hooks/`
+> wired, with no orphan, no dead entry and no double-wiring; **every** enforcement-path change in
+> range carries an authorizing entry with `Approved-by`, read from commit **bodies** not subjects
+> (`1f263e0`→D-043, `ca86e53`+`0cf1b17`→D-050-SPEAKER, `f8fc81e`+`398dfff`→D-050-CODEX,
+> `bdc755b`→comment-only under D-051); no checker touched code, a manifest or a contract outside
+> checker-owned paths; both `STALLED` units have their `qa/debug/` diagnosis on disk; and the ledger
+> reader and the disk agree at **17 shards**.
+>
+> **Tier-3 reachability, measured rather than asserted:** of the units PASSed in range, roughly half
+> (u4a, u4b, u4c, u4b-heartbeat, iss-274) are roadmap-derived and half are the loop's own machinery.
+> `.goal/goal.json`: **51 done, 2 in progress, 31 pending**. That is no longer the structurally
+> unreachable tier 3 of 2026-09-08, so no goal-coverage row was filed.
+>
+> **Honest gaps, named rather than implied:** `pnpm -r test` and `depcruise` were **not run** (the
+> suite is long and `packages/meeting-bot` carries the ISS-360 load flake, so no honest single-run
+> claim was available; `depcruise` is stage 10 and unreachable behind ISS-367 anyway) — **no
+> test-count or dependency-boundary claim is made anywhere in this sweep**. Contract staleness was
+> **sampled, not swept** (only the one contract amended in range was verified). Whether
+> `lint:structure`'s later stages were also red at `2a0d5f7` was not measured; only the
+> `apps/api/src` 31→32 breach is attributed in range.
+
+## Top 3 next units — strict D-013 tier order
+
+| # | unit | tier | why now | cap check |
+|---|---|---|---|---|
+| 1 | `iss-371-loc-testpatterns-mjs` then `iss-367-lint-structure-no-shortcircuit` | 2 (high) | ISS-371 is one config entry and drops `lint-loc` 5→4, changing ISS-367's picture; ISS-367 then un-masks four gate stages that back this project's own Definition of done | 0 prior PASSes on `package.json` / `scripts/lint-*.mjs` / `structure.config.json` — clear |
+| 2 | `iss-368-heartbeat-read-failure-is-not-health` | 2 (high) | the seam the last three units were built to deliver, and the defect makes R2's own guarantee unfalsifiable; its standing test currently passes on the broken implementation | `apps/api/src/routes/health.ts` has 1 prior PASS — under the cap of 2 |
+| 3 | `ISS-282` / U2.4 phase-3 precision re-gate | 2 (critical) → 3 | a critical row over a manifest at `ready-for-check` with two cycle-0 FAILs; U2.4 is the single roadmap item before the Phase-1 exit clause, so closing it turns a tier-2 critical into tier-3 progress | paused at `qa/.paused.u2-4-phase3-precision-regate` — resolve the pause first |
+
+**In flight at this stamp (not queue rows):** `iss-346-round-cap-mechanical-check` and
+`iss-104-place-vs-person-signal`, both dispatched this tick to worktrees, both authorized
+(D-043 item 2 / D-052 rulings 1–2).
+
+---
+
+# QUEUE — checker Mode B sweep 2026-09-28T02:xx+05:30 (shard-3 re-run against the correct range, consolidated)
+
+> **Correction to the 2026-09-28T00:0x pass below: shard 3 had run against the WRONG, already-
+> superseded range (`213d2ac..3869c83`) and its findings were folded as stale duplicates in that
+> pass.** Shard 3 has now returned against this consolidation's own range (`8669919..3c4d0d5`) with
+> three fresh claims. All three verified independently against HEAD (`3c4d0d5`) before filing —
+> none accepted on say-so. **Terminal state: 1 new id (ISS-355, high); 2 `checker_note`s appended
+> (ISS-268, ISS-350); 1 claim's headline fact CONFIRMED but its cited live instance REJECTED
+> (not reproduced) and corrected in place, not filed as a new row.**
+>
+> **Finding 1 — `.codex/hooks/*` (high, filed ISS-355).** CONFIRMED and escalated to its own row,
+> not folded into ISS-268 (different fact pattern: that row describes an UNTRACKED, byte-identical
+> shadow awaiting a disposition decision; this is a now-COMMITTED, tracked mirror, born already
+> diverged). `git ls-tree -r 8669919 -- .codex/hooks` is empty; `git show eff401b --stat` (inside
+> this range) adds `.codex/hooks.json` + 6 `.ps1` files. Direct diffs at HEAD confirm three real
+> regressions in `.codex/hooks/mc-sessionstart.ps1` against `.claude/hooks/mc-sessionstart.ps1`:
+> the pre-D-041 single-file `$LEDGER` (reintroducing the union undercount), the pre-D-034 naive
+> `Status: ready-for-check` substring match, and a `Select-Object -First 1` on `Cycle checked`
+> instead of the max-across-cycles fix (the ISS-350-repro-3 trap). `mc-precommit.ps1` carries the
+> same regex regression. **One correction to the brief:** `features-snapshot-session-end.ps1`
+> differs only by CRLF-vs-LF (`diff --strip-trailing-cr` shows zero content difference) — not a
+> real divergence. `decisions-append-guard.ps1` and both `lab-session-*.ps1` confirmed
+> byte-identical. `grep -rn codex docs/DECISIONS.md` — zero hits, no Approver decision covers this
+> commit. Whether anything currently invokes `.codex/hooks/*` remains unresolved either way (a
+> Codex-CLI-side question, outside this repo's own files) — recorded as open, not assumed either
+> direction.
+>
+> **Finding 2 — verdict-form census (ISS-350 reproduction 4, CONFIRMED and undercounted).**
+> Independently re-derived across all 161 `qa/verdicts/*.md` at HEAD (one more file than the
+> dispatch's 160 — `ledger-shard-union-reader.md` landed after that count was taken). Confirms at
+> least 8 distinct first-line forms, including a wholly different field name (`**Result: PASS**`,
+> 10+ files, spot-read to confirm) and a bare `**PASS**`/`**FAIL**` with no field label at all in
+> at least 9 files (`T-020-ingestion-source-seam.md:82` spot-read to confirm). 29 of 161 files
+> carry `Cycle checked` more than once (worst: `delivery-gate-manifest-blindness.md`, 40
+> occurrences — re-confirmed by direct count). Filed as a `checker_note` on ISS-350, not a new row
+> (this is that row's own reproduction 4, now measured rather than named). **One correction folded
+> in:** the session-start hook's `Select-String -Pattern 'VERDICT:\s*PASS'` IS case-insensitive by
+> PowerShell default and DOES catch `Verdict: PASS` — what it structurally cannot catch is the
+> `**Result:**` and bare-`**PASS**` forms, which contain no "VERDICT" substring in any case. The
+> dispatch's framing of this sub-point was corrected, not repeated.
+>
+> **Finding 3 — Handshake-status-only manifest blind spot: headline fact TRUE, cited instance
+> REJECTED (does not reproduce).** `grep -l Handshake .claude/hooks/mc-sessionstart.ps1
+> scripts/lib/dispatch-state.mjs` returns nothing — neither reader parses the canonical field,
+> confirming ISS-350's own fix_direction (d) is still fully undone, exactly as D-042 already
+> disclosed. But the cited live instance, `qa/manifests/u2-4-phase3-precision-regate.md`, does
+> **not** reproduce: direct read shows `## Status: ready-for-check` at line 159, a legacy heading
+> form the CURRENT D-034 regex matches (re-run live, confirmed). Running
+> `.claude/hooks/mc-sessionstart.ps1` at HEAD reports `Checks pending: 0` — the two remaining
+> Handshake-ready-for-check manifests both carry a FAIL verdict at their current cycle, which is
+> the separate, already-known ISS-267 gap, not this one. A full scan of all 161 manifests found
+> **zero** currently in a canonical-field-only, no-legacy-field state — structurally expected,
+> since the ISS-350 backfill only ever derives the canonical field FROM an existing legacy
+> statement (D-042: purely additive). The theoretical risk (a future manifest authored with only
+> the canonical field) is real but not live today, and is already the exact concern fix_direction
+> (d) names. Corrected in place via a `checker_note` on ISS-350, not filed as a new row, and not
+> presented as a live reproduced bug — a finding that does not reproduce at HEAD is not a finding.
+>
+> **Also corrected, not a ledger matter:** this range is NOT prose-only — `git diff --stat
+> 8669919..3c4d0d5` is 226 files, `+4560/-168`, independently re-confirmed, with real application
+> code among it (`packages/meeting-bot/src/calendar/{schedule-state,schedule-tick,task-scheduler}.ts`
+> + tests, `capture/{obs-guard,obs-windows}.ts` + test, `promote-entities.test.ts`,
+> `scripts/eval-recall.mjs` rewritten + `scripts/lib/eval-recall.test.mjs`,
+> `qa/probes/golden-set-sibling-semantic.mjs`, plus all of `.codex/hooks/*`).
+>
+> **Verified clean by shard 3 this pass, not re-filed:** `lint-loc` at exactly its 4 known
+> pre-existing violations (no new ones); `lint-dirsize` clean, `scripts/` at its 32/32 cap;
+> `qa/debug/` naming consistent; token ledger appended (`opus_sub_share` 0.0); code-graph correctly
+> SKIPped (no `graph.json`, a sweep never builds one).
+>
+> **HEAD moved during this addendum**, per the coordinator: `fa32181` (Umesh answers D-043..D-046)
+> and `36909f1` (checker PASS `ledger-shard-union-reader` cycle 0 — closes ISS-129, files
+> ISS-353/354) both landed on top of this consolidation's own `96048e4`. Neither touches this
+> file's owned surfaces. `qa/manifests/ledger-shard-union-reader.md` is being closed out by that
+> other session — not touched here, per instruction.
+>
+> **Open-issue counts, union of `qa/issues.jsonl` + `qa/issues.*.jsonl`, re-derived after this
+> addendum:** 400 rows total, **156 open — 2 critical / 31 high / 77 medium / 46 low** (ISS-355 new
+> high; ISS-129 closed out by the concurrent session, -1 high; ISS-353 medium / ISS-354 low filed
+> by that same session).
+
+## Ranked top 3 (this addendum, D-013 tier order)
+
+**Tier 1** empty (0 TODO rows). **Tier 2** governs picks 1–2 — both open criticals stay
+not-pullable, unchanged (ISS-104 round-capped file-don't-fix; ISS-282 deliberately paused).
+**Tier 3** stays at #3, per D-013's "not optional, not last."
+
+1. **ISS-346 (high)** — the D-014 round-cap mechanical check, authorized D-043 item 2, still
+   explicitly sequenced FIRST (D-044's waiver depends on it landing before that exception repeats).
+2. **ISS-355 (high, new this addendum)** — `.codex/hooks/*` committed with no Approver decision,
+   already reintroducing three separately-fixed defect classes (union undercount, pre-D-034 regex,
+   first-match-not-max cycle read). Umesh's own framing of this tick's most significant finding;
+   the disposition question (sanction-with-a-parity-rule vs remove/gitignore) may need a
+   HUMAN_GATE, but the maker should raise it rather than let it sit — it is the second time this
+   exact surface has gone unanswered (ISS-268 first asked in 2026-09-22).
+3. **U4.1 (tier 3, roadmap — TASKS.md:112 / goal.json, unblocked, no deps)** — Recording/file
+   upload wired to a real transcribe worker. Unchanged from the prior pick.
+
+**Also still queued:** `delivery-gate-stamp-adoption` fix cycle 2 (D-043 item 1) and the
+`mc-sessionstart.ps1` Handshake-status reader (D-043 item 3) — both authorized, both behind #1–#2
+above in this addendum's ordering, not dropped.
+
+---
+
+## Prior consolidation (2026-09-28T00:0x+05:30, 3-shard wave — superseded by the addendum above)
+
+> Bound to `D:/KnowledgeBase`, range `8669919..3c4d0d5` for shards 1-2; shard 3 ran against an
+> **older, already-superseded range** (`213d2ac..3869c83`) because it was dispatched in a prior
+> tick and only just returned. Invoked directly by Umesh, 3 read-only shards + this consolidation
+> as single writer. **Terminal state: 1 new id (ISS-352, medium); 1 `checker_note` appended
+> (ISS-348); 3 shard-3 findings REJECTED as stale duplicates of already-filed/already-fixed work;
+> 1 shard ruling CONFIRMED (handshake-canonical-field's [C7]-by-extension citation); shard 1's one
+> flagged-unverified item (the 577-vs-320 additivity trace) independently RE-VERIFIED and found
+> already reconciled.**
+>
+> **Shard 1 (pair-state/bypass/enforcement liveness) — CLEAN, re-confirmed.** All four unresolved
+> units (`delivery-gate-stamp-adoption` owing fix cycle 2, `u2-4-phase3-precision-regate` paused,
+> `delivery-gate-manifest-blindness` + `write-guard-enforcement-gaps` STALLED 3/3 with debug
+> reports) are legitimately disclosed, not new findings. The one thing shard 1 did NOT
+> independently re-execute — the cycle-1 checker's "577 vs the manifest's claimed 320" additivity
+> line-count trace on the handshake backfill — **was re-executed here**: `git show -S"Handshake
+> status" --all -- qa/manifests` finds exactly one commit that ever introduced the field,
+> `1fe83d7`, at `160 files changed, 577 insertions(+), 2 deletions(-)`. `qa/verdicts/
+> handshake-canonical-field.md:25-28` already traces this: the manifest's own pre-commit `320 2`
+> measurement excluded its own not-yet-`git add`ed 257-line self (untracked files are invisible to
+> `git diff`), and `257 + 320 = 577` exactly. D-042's "159 files, +320, -2" is therefore CORRECT —
+> 159 pre-existing manifests, excluding the handshake unit's own manifest file, which is the 160th.
+> No discrepancy; nothing to file.
+>
+> **Shard 2 (adapter/loop-spec/gates/GRILL) — two findings, both verified independently.**
+> - **Finding A (gate-status staleness) CONFIRMED, but folded into existing ISS-348, not a new id.**
+>   Read `qa/gates/ledger-shard-union-hook.md:48` directly: `**Gate status:** OPEN` sits above a
+>   real, dated `Answered:` line (50) backed by **D-041**. Two MORE live instances of the identical
+>   disease were found while checking Umesh's four gate answers this tick: `qa/gates/
+>   enforcement-hooks-unauthorized-and-live-regressed.md:166` still reads OPEN though **D-043**
+>   states it "is answered and closed by this entry", and `qa/gates/
+>   iss-122-round-cap-breach.md:78` still reads OPEN though **D-044** states it "is answered by
+>   this entry and closes". This is exactly ISS-348's own fix_direction (c)/(d) — a static field
+>   where a computed one is needed — recurring three times with today's own decisions. Filed as a
+>   `checker_note` on ISS-348, not a new row (same defect, same fix; the gate FILES themselves are
+>   being re-stamped by the Approver's session this tick, so no re-stamp requested here). **Count
+>   these three as ANSWERED/CLOSED for this tick's queue ranking below, not OPEN.**
+> - **Finding B (loop.md BACKLOG_EMPTY unqualified) CONFIRMED NEW — filed ISS-352 (medium).**
+>   `qa/loop.md:45-47`'s Stop line defines `BACKLOG_EMPTY` by unqualified "no open issues";
+>   project `.claude/CLAUDE.md`'s D-013 override reads "no open critical/high/medium issues ...
+>   open low issues do not keep the loop alive". Verified distinct from ISS-249 (fixed 2026-09-10 —
+>   that row was the missing-roadmap-tier clause, which the current text still has correctly).
+>   `.claude/CLAUDE.md` wins on conflict per its own header, so this is not currently a live
+>   mis-stop, but it is the same documentation-drift class as ISS-348/350, and 45 open low rows
+>   make the divergence a live, non-hypothetical state right now.
+> - **Handshake-canonical-field's "[C7] applies by extension" contract citation — shard 2's ruling
+>   CONFIRMED, not overturned.** Read `qa/manifests/handshake-canonical-field.md:3-4` directly: the
+>   citation is disclosed reasoning, not a blank field, and is legitimately different from
+>   ISS-328/329/341 (those units had NO contract anywhere for their domain per a `grep -rl` across
+>   all 71 `qa/contracts/*.md`; this unit's format is explicitly named as future work in **ISS-350's
+>   own fix_direction (a)**: "record the vocabulary in qa/contracts/ so it is checker-owned rather
+>   than convention"). No new `contract-not-cited` row opened; cite ISS-350 if this resurfaces.
+> - **Unverified, flagged rather than assumed:** the 22 gates carrying an inline `Answered:` line
+>   were NOT each cross-checked against a matching DECISIONS entry this tick (budget) — shard 2's
+>   own caveat, re-stated, not cleared.
+>
+> **Shard 3 (sibling-defect hunt) — ALL THREE findings REJECTED as stale duplicates.** Shard 3 ran
+> against an older range and did not see later work. Independently verified against HEAD:
+> - **"Finding C" (obs-windows.ts `launchObsNormally` unhandled spawn error) is ALREADY FILED AND
+>   ALREADY FIXED.** It is **ISS-337** (high, filed 2026-09-27, status `fixed`), built and merged as
+>   `wave/obs-launch-error` (`fed722b`, checked-PASS cycle 0, verdict `9a0174f`). Read
+>   `packages/meeting-bot/src/capture/obs-windows.ts:115-127` at HEAD: `launchObsNormally` now
+>   takes an `onError` callback and calls `child.on("error", (err) => onError?.(err))` before
+>   `.unref()`, with an inline comment citing ISS-337 by id. Shard 3's own `grep -rn
+>   launchObsNormally qa/issues*.jsonl` returning nothing was against its stale range's tree, not
+>   HEAD's. Two follow-on rows already track the residue of that same fix: **ISS-343** (medium,
+>   `obs-windows.ts` grew past its lint-loc budget, 352->359, disclosed) and **ISS-344** (low, an
+>   inert `setImmediate` yield in `obs-guard.ts`, filed by the maker on its own PASS report).
+> - **"Finding D" (demo-live.mjs spawn, no error handling) is ALREADY FILED** as **ISS-338** (low,
+>   file-don't-fix), verbatim.
+> - **"Finding E" (record-commands.ts `runLogin` spawn, no error handling) is ALREADY FILED** as
+>   **ISS-339** (low, file-don't-fix), verbatim.
+> - Shard 3's "not siblings" rulings (`task-scheduler.ts:131`, `gws-calendar.ts:53-60`,
+>   `ai-transport.ts:62-71`, `controller-state.ts:86-90`) and its ISS-334 mechanism confirmation
+>   (`delivery-gate-stop.ps1:376` independent-predicate co-firing) match the ledger's existing
+>   record — re-confirmed, not re-filed.
+> - Churn ratio (4.39->4.40, "flat") is informational only, not independently re-derived this tick;
+>   carried forward as shard 3's own reading, unverified-but-plausible per the prior sweep's own
+>   caveat on this exact metric.
+>
+> **This session's four Approver rulings (D-041, D-043, D-044, D-045) change what counts as
+> buildable.** D-043 authorizes (Approved-by Umesh) three named fixes to
+> `delivery-gate-stop.ps1`/`mc-sessionstart.ps1` and retro-ratifies `4a71633`/`e5402d6`; its own
+> Result explicitly sequences ISS-346's mechanical round-cap check FIRST, because it is what
+> D-044's waiver depends on existing before the exception it supervises repeats. D-044 waives the
+> D-014 round cap once, narrowly, for `wave/vector-gap-durability`/ISS-122, conditioned on ISS-346
+> landing first and a fresh checker PASS before merge. D-045 consents to the new file
+> `scripts/watch/install-tasks.ps1` and Windows Scheduled Task registration for U6, dry-run-first
+> and idempotent. None of these are self-executing — each still owes its own manifest -> checker ->
+> verdict handshake; the decisions remove blockers, not ceremony.
+
+## Ranked top 3 (this consolidation, D-013 tier order)
+
+**Tier 1** (`QUEUE.md` TODO rows): still empty. **Tier 2** (open critical/high): both open
+criticals stay not-pullable, unchanged (ISS-104 round-capped file-don't-fix; ISS-282 deliberately
+paused) — but this session's Approver rulings put fresh, unblocked HIGH-severity enforcement work
+at the top, ahead of everything else open at that severity. **Tier 3** (next unblocked roadmap
+task) is still "not optional, not last" per D-013 — named at #3 below, not omitted.
+
+1. **ISS-346 (high) — the D-014 round-cap mechanical check, authorized D-043 item 2, explicitly
+   sequenced FIRST.** No pull-selection step today counts prior PASSed verdicts per seam; D-044's
+   waiver for `wave/vector-gap-durability` is conditioned on this landing before that exception is
+   exercised again. Freely buildable now: `.claude/hooks/delivery-gate-stop.ps1` change is
+   Approved-by Umesh under D-043.
+2. **`delivery-gate-stamp-adoption` fix cycle 2 (D-043 item 1) — the Fix-cycle predicate + ISS-205
+   stripper clause.** Owed since the cycle-1 FAIL; ISS-267 raised this class of gap to high on
+   measured consequence (a fix-gapped unit invisible to the session-start hook for 3 days). Same
+   enforcement path, same Approved-by authorization as #1 — sequence together or immediately after.
+3. **U4.1 (tier 3, roadmap — TASKS.md:112 / goal.json, `open`/`pending`, no deps) — Recording/file
+   upload wired to a real transcribe worker.** Still genuinely unblocked: `workers/transcribe` is a
+   3-line placeholder; the real `packages/ingest` recording adapter exists and is unwired. Named
+   per D-013's rule that this tier is never skipped in favor of continuing tier 2 alone.
+
+**Also newly unblocked, not in the top 3:** (a) `mc-sessionstart.ps1` reading `**Handshake
+status:**` (D-043 item 3 / ISS-350 repro 2) — third in the D-043 sequence, after #1-#2 above; (b)
+`wave/vector-gap-durability`/ISS-122 merge sequence (D-044) — file the manifest citing D-044 once
+#1 lands, dispatch a fresh checker, merge only on PASS; (c) U6
+(`scripts/watch/install-tasks.ps1`, D-045) — still gated on U4's own plan/spec gates per the
+feature rule, D-045 only clears the new-file and machine-state blockers.
+
+**Open-issue counts, union of `qa/issues.jsonl` + `qa/issues.*.jsonl`, re-derived this tick:** 397
+rows total, 153 open — **2 critical / 30 high / 76 medium / 45 low**. (Both open criticals remain
+gated per above, not pullable.)
+
+- GRILL: web-fallback vs Phase-1 exit — still open, no ruling this tick, carried forward unchanged
+  (ISS-274).
+
+## Prior sweep (2026-09-27T17:1x+05:30, 3-shard wave, consolidated — superseded by the list above)
+
+> Bound to `D:/KnowledgeBase`, range `213d2ac..3869c83` (HEAD moved on to `dcf2b47`/`a99140f` by a
+> live maker session during this sweep; not this range's concern). Invoked directly by Umesh
+> ("you are /checker running the CONSOLIDATION pass"), 3 read-only shards + this consolidation as
+> single writer, ids starting at ISS-337 per dispatch (maker had already taken ISS-335/336). Mode A
+> not run: no manifest sat at `ready-for-check` with a missing/lower-cycle verdict at dispatch time
+> (a live maker session was concurrently writing `qa/gates/*.md`, `docs/features/u4-watch-dashboard/*`
+> and `qa/.last-tick` — none of those paths were touched by this sweep). **Terminal state: FINDINGS: 6
+> new (ISS-337 high `spawn-error-unhandled`; ISS-338 low file-don't-fix; ISS-339 low file-don't-fix;
+> ISS-340 high `gate-bypassed-and-untracked`; ISS-341 medium `contract-not-cited`; ISS-342 medium
+> `pause-violation`, closed-self-corrected) + evidence appended to ISS-214 (one half now stale, one
+> half still open) + ISS-326 flipped open→fixed (its manifest is now tracked).**
+>
+> **The finding worth reading first — ISS-337.** `packages/meeting-bot/src/capture/obs-windows.ts:112-120`
+> `launchObsNormally` spawns OBS with `{detached:true, stdio:"ignore"}).unref()` and registers no
+> `.on("error", ...)`; its only caller, `obs-guard.ts:87-114` `ensureObsReady`, calls it at line 103
+> with no surrounding try/catch. Node emits spawn `'error'` asynchronously, so a synchronous
+> try/catch could not have caught it anyway, and an unhandled `'error'` event crashes the process.
+> Verified independently (not accepted on the shard's say-so): `git diff 3368454^1 3368454^2 --
+> packages/meeting-bot/src/capture/obs-windows.ts` shows the merge that just fixed ISS-324 added
+> exactly this handler (`child.on("error", ...)` at line 253) to the SIBLING `launch()` function and
+> left `launchObsNormally` completely untouched. `grep -rn launchObsNormally qa/issues*.jsonl`
+> returns nothing pre-sweep. Filed **HIGH**, not medium, on the shard's own reasoning: it is the
+> unattended cold-start/reinstall path a scheduled recording depends on, same defect family as the
+> bug that already cost the Ashoka recording, surviving the very unit that hardened its sibling.
+>
+> **ISS-340 — a gate breach the maker's own DECISIONS entry disclosed but never ledgered.**
+> `qa/gates/obs-windows-loc-split.md` states plainly it **blocks** merging `wave/live-record-repair`
+> with a green `lint:structure`; the merge (`3368454`) happened anyway (D-039), the gate still has
+> no `Answered:` line (`grep -n Answered` — no match), and `node scripts/lint-loc.mjs` at HEAD
+> confirms 4 violations, the new one being `obs-windows.ts:352` (budget 300) — exactly what the gate
+> predicted (300→352). D-039 discloses the lint-loc failure in prose ("still fails with exactly the
+> 4 declared C1 violations") but no ledger row existed for it. This is the mirror of "gate answered
+> off-disk" (check 6): a gate left OPEN while the state it blocks landed anyway, narrated where no
+> ledger reader looks.
+>
+> **ISS-341 — adjudicating shard 1 vs shard 2's disagreement, explicitly, per the dispatch's ask.**
+> Shard 2 proposed folding `live-record-repair`'s missing-contract gap into the same pattern as
+> ISS-328/ISS-329 (both "no contract exists anywhere for this domain"). Shard 1 disagreed: fix-only
+> work under an existing contract's domain. **Ruled for shard 1.** `qa/contracts/meeting-bot-live-capture.md`
+> is STATUS: ADOPTED (2026-09-25) and its C3/C9/C10 already cover exactly the surface this unit
+> touched (`obs-windows.ts`, `obs-windows.test.ts`, `lint:structure`) — unlike ISS-328/329, where
+> `grep -rl` across all 71 `qa/contracts/*.md` for the relevant domain terms returned nothing at all.
+> The real, narrower defect: the manifest never cites the contract or maps its changes to C3/C9/C10,
+> so a PASS ships without a reader being able to tell what it was actually graded against. Filed
+> medium, type `contract-not-cited`, distinct from the `contract-gap` type ISS-328/329 use.
+>
+> **ISS-342 — adjudicating shard 1's punted question ("is a pause violation a ledger class here?").**
+> Ruled **yes**. D-038 fully self-documents the maker launching a paused eval (`qa/.paused.u2-4-phase3-precision-regate`,
+> "free RAM >= 8 GB", actual 1.71→0.52 GB) and its own clean self-correction (killed within ~35 min,
+> no contamination, unit left paused) — but a DECISIONS narrative is not what Mode B's own
+> bypass/liveness checks read, and D-038 itself names the failure mode ("writing the clause is
+> mistaken for making the call"). Filed **closed-self-corrected**: the point is a baseline for a
+> future recurrence, not chasing a defect that's already fixed.
+>
+> **ISS-214 evidence corrected, not duplicated.** Its `ledger-shard-union-hook.md` half is still
+> genuinely unanswered (19 days). Its `mc-hooks-manifest-blindness.md` half is now stale — that gate
+> carries `Answered: 2026-09-26T23:54:34+05:30 — APPROVED` — appended as a `checker_note`, row stays
+> open on the remaining half.
+>
+> **ISS-326 flipped open→fixed.** `qa/manifests/u2-4-phase3-precision-regate.md` is now tracked
+> (`git ls-files` confirms; landed in `72c212f`) — no longer one `git clean` from deletion. The
+> manifest legitimately stays paused; that is unrelated and unchanged.
+>
+> **Verified-safe from Shard 3, not filed:** `task-scheduler.ts:131` (already ISS-317, jobKey
+> regex-validated), `gws-calendar.ts:53-60` (array args, internal values), `ai-transport.ts:62-71`
+> (shell:false + error handler), `controller-state.ts:86-90` (documented intentional fallback).
+> `demo-live.mjs`'s `--up` path and `record-commands.ts`'s `runLogin` are real but LOW, filed
+> file-don't-fix (ISS-338/339) per D-013 — never pulled as units on their own.
+>
+> **Gate ages re-confirmed, nothing new filed:** `d015-generalisation-scope.md` 18d,
+> `handshake-liveness-contract-start.md` 18d, `ledger-shard-union-hook.md` 19d,
+> `obs-windows-loc-split.md` 0d (now ledgered as ISS-340), `iss-322-multifile-shape.md` 0d (fresh
+> HUMAN_GATE on the ISS-322/333 fix shape, status `pending`). `.goal/goal.json`'s uncommitted diff
+> is `updated`/`last_deterministic_tick` timestamps only — confirmed by `git diff`, north_star
+> unchanged since `9841ec9` — **not** goal drift. `qa/.regrill-due` confirmed absent.
+> `qa/gates/plan-approved-u4-watch-dashboard.md` — the live-recording... no, the **U4 plan** gate the
+> maker opened this turn for `u4-watch-dashboard` — confirmed **exists** (was mid-write by the
+> concurrent maker session; not touched or judged by this sweep).
+>
+> **Token line + qa-prose ratio.** Re-ran `token_scan.py` myself rather than trusting the pasted
+> figure (checker discipline: re-derive, don't trust): **main 226.4M / sub 347.0M / opus_sub_share
+> 0.0 / 40 sub_agents / 8 auto-compactions / 0 classifier outages** at 2026-09-27T17:07:16 (appended
+> to `qa/token-ledger.jsonl`), a few minutes later than shard 3's own 219.6M/337.8M/39 reading and
+> consistent with continued session activity in between — not a discrepancy. The qa-prose-to-source
+> ratio ("flat 4.39→4.40") was **not** independently reproduced with shard 3's exact method (a quick
+> re-derivation using a different file-glob got 2.69, almost certainly a denominator-set difference,
+> not a contradiction) — reported here as **unverified-but-plausible**, not re-derived fact. Code-graph
+> check confirmed **SKIP**, not zero: `python -c "import graphify"` → `ModuleNotFoundError`.
+
+- GRILL: web-fallback vs Phase-1 exit — ask-web-fallback-tavily records the unwired seam as production
+  default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
+  is an Approver amendment (ISS-274). **Still open, 5+ days, no ruling** — carried forward unchanged.
+
+## Prior top 3 (backlog-priority order, refreshed 2026-09-27T17:1x sweep; superseded by the 2026-09-28 list above)
+
+Tier stated per this repo's rule. **Tier 1** (top clear `QUEUE.md` TODO row): empty — 0 TODO rows.
+**Tier 2** (open critical/high) has live, freely-buildable material this time, so it governs picks
+1–2. Both open **criticals** remain not-pullable, unchanged from last sweep: **ISS-104**
+(round-capped at ≥6 PASSes on a non-security seam, file-don't-fix per D-014) and **ISS-282**
+(deliberately paused). **Tier 3 (next unblocked roadmap task) is stated per D-013's "not optional,
+not last"** — pick 3 below.
+
+1. **ISS-337 (high, new this sweep) — `launchObsNormally` (obs-windows.ts:112-120) can crash the
+   controller on an unattended cold start.** No `.on("error", ...)` on the spawned OBS process, no
+   try/catch at its only call site (`obs-guard.ts:103`). Freely buildable now — no gate blocks it.
+   Same defect family as ISS-323/324, in the same file the unit that fixed those just hardened, on
+   the sibling function nobody touched.
+2. **HUMAN_GATE: `obs-windows-loc-split.md` (ISS-340, high, new this sweep).** Blocks resolving the
+   live structural-lint regression (`obs-windows.ts:352` vs budget 300) the `live-record-repair`
+   merge left on master. Umesh's answer (a/b/c) is the only way to close it; option (a), the file
+   split, is the maker's own recommendation.
+3. **U4.1 (tier 3, roadmap — TASKS.md:112, goal.json, status `open`/`pending`, no deps) — Recording/
+   file upload wired to a real transcribe worker.** Genuinely unblocked: `workers/transcribe` is a
+   3-line placeholder, the real `packages/ingest` recording adapter already exists and is unwired.
+   Named per D-013's rule that this tier is never skipped in favor of only continuing tier 2.
+
+**Also gated, not neglected:** ISS-333/ISS-322 (the sender-spoofing fix) sits behind a *fresh*
+(0-day) HUMAN_GATE `qa/gates/iss-322-multifile-shape.md` — Umesh already answered the policy
+question; this second gate asks where in the code to enforce it (a 3-file, edit-in-place shape).
+Not yet answered; not stale enough to be a governance problem the way the 18–19-day gates are.
+
+**Footnote, not filed:** `.goal/goal.json` U0.10 reads `status: pending` while `TASKS.md:93` reads
+`in_progress` — the same tracker-divergence shape ISS-276 already tracks; left for that row's next
+refresh rather than minting a duplicate, since this sweep's dispatch did not ask for a fresh
+tracker audit.
+
+## Superseded top block (2026-09-27T13:4x+05:30 sweep — kept for its own findings below)
 
 > Bound to `D:/KnowledgeBase`, range `97674cb..213d2ac` (HEAD `213d2ac`, 45 commits), sweep due on
 > both triggers (`.last-sweep` 351 min old AND HEAD moved off its recorded SHA). Invoked directly by
@@ -68,7 +652,7 @@
   default while the north star's Phase-1 exit requires off-corpus web fallback; wire-it-or-sign-the-honest-limit
   is an Approver amendment (ISS-274). **Re-confirmed live this sweep, 5 days open, no ruling.**
 
-## Current top 3 (backlog-priority order, refreshed 2026-09-27T13:4x sweep)
+## Prior top 3 (backlog-priority order, refreshed 2026-09-27T13:4x sweep; superseded by the 2026-09-27T17:1x list above)
 
 Derivation, stated per this repo's rule that every tick names its tier. **Tier 1** (top clear
 `QUEUE.md` TODO row): empty — 0 TODO rows. **Tier 2** (open critical/high) therefore governs, and
@@ -565,3 +1149,52 @@ until then this note is the record.
   `git show 5fab76e:qa/QUEUE.md`.
 - Earlier sweeps: `git show d142628~1:qa/QUEUE.md` and prior history.
 > **ID correction 2026-09-27T07:29:29+05:30 (/checker):** the 2026-09-26 sweep's ISS-308 (ledger-schema) and ISS-309 (delegation-health) collided with maker-minted ISS-308/309 (22b6eb6). They are now **ISS-311** and **ISS-312**. ISS-310 is unchanged. The maker's ISS-308/309 (lane module instances, reingest orphan tree_index) keep their ids.
+
+## Current implementation wave checkpoint (2026-10-14)
+
+This checkpoint records the authorized parallel wave; earlier routing and historical evidence above are preserved. Existing TODO/high-issue rows require current ledger/source reconciliation before they are pulled again. No historical manifest or verdict was rewritten.
+
+- Tier 3: T-007, T-008, T-022, T-054, T-055, T-056 and T-058 are now in_progress on independently assigned foundations; full parent acceptance remains open.
+- Scoped checked-PASS cycle 0: t022-calibration-human-review, parallel-answer-policy and t058-evidence-builder. Candidate pins rechecked against their verdicts: 5/5, 9/9 and 2/2 match respectively.
+- U2.2 extraction-draft-review-batches cycle 0 is checked-PASS preparation only; individual human approval and threshold acceptance remain open. T-059/T-060 are not inferred started.
+- Current ready/in-progress units remain checker-owned: WhatsApp review, semantic web consumer, transcript review and evidence directory. See their matching manifests/packets for the current cycle rather than treating this timestamp as PASS.
+- T-051 remains in_progress/full release unverified; installation/restart, live full pipeline, seven-day observation and separate Ubuntu acceptance are not closed here.
+- Tracker audit before update: node scripts/tracker-audit.mjs --json --gate g1 -> exit 0, ok true, findings []. Post-update same command -> exit 0, ok true, findings [] (no tracker disagreement).
+
+## Current scoped source close-out and remaining acceptance (2026-10-14)
+
+Canonical manifest fields and same-slug verdict cycles currently establish 19/20 scoped checked-PASS units. This counts delivered foundations, not completed roadmap tasks or product percentage. Installer cycle 1 is still ready-for-check; its retained cycle-0 FAIL does not certify the revised candidate.
+
+| Unit | Current scoped state | Fix cycle |
+|---|---|---|
+| `t051-windows-supervisor-install` | checked-PASS | 1 |
+| `t055-evidence-directory` | checked-PASS | 0 |
+| `t039-send-now-status-polling` | checked-PASS | 0 |
+| `t041-probed-duration-alignment` | checked-PASS | 0 |
+| `u24-cloud-suggestion-routing` | checked-PASS | 0 |
+| `t052-registration-child-lifecycle` | checked-PASS | 1 |
+| `t038-durable-alert-retries` | checked-PASS | 1 |
+| `t037-least-privilege-tenant-signal` | checked-PASS | 0 |
+| `whatsapp-review-foundation-20261014` | checked-PASS | 2 |
+| `t050-langgraph-executor-replacement` | checked-PASS | 0 |
+| `t008-semantic-web-consumer` | checked-PASS | 0 |
+| `t040-grounded-content-consumer` | checked-PASS | 0 |
+| `t037-last-valid` | checked-PASS | 0 |
+| `t057-ops-health-key-boundary` | checked-PASS | 0 |
+| `t036-youtube-calendar-discovery` | checked-PASS | 0 |
+| `t054-transcript-review-planner-editor` | checked-PASS | 0 |
+| `parallel-answer-policy` | checked-PASS | 0 |
+| `t022-calibration-human-review` | checked-PASS | 0 |
+| `t058-evidence-builder` | checked-PASS | 0 |
+| `extraction-draft-review-batches` | checked-PASS | 0 |
+
+Candidate pins rechecked from current verdict/packet inventories for the 19 closed units; no product pin mismatch. T-041 and least-privilege tenant-signal Git blob hashes require the repository CRLF-to-LF clean normalization and match after that normalization. Integration cycle 0 and exact checked-corpus-test recovery are separately checked-PASS; neither is counted as one of these twenty new foundations.
+
+Remaining acceptance is explicitly split:
+
+- **Code/integration:** WhatsApp quarantine/intake and review UI, authenticated router/store mounting, real Mongo publication and approved-evidence search; canonical transcript persistence with audited concurrency, downstream refresh and SessionDetail editor mounting; saved/YAML policy versions/application, conflicts and answer-review queue; complete report/FAQ/brief integration, synthesis and persistence/export; searchable OCR storage/redaction decision; Ask official-graph migration and broader connector/platform/flywheel scope.
+- **Human quality:** T-022 thirty individually reviewed pairs and live final calibration; U2.2 individual extraction gold approvals/thresholds; speaker precision gates and human-confirmed suggested identities. AI drafts remain unapproved and default-off quality gates remain enforced.
+- **Live operations:** actual capture tenant/database/provider bindings, complete authenticated Gmail/Calendar acquisition, real registration and admitted capture, grounded extraction/index/cited Ask, received email/dashboard alerts, real supervisor installation/activation/restart/recovery, seven-day unattended observation, and separate Ubuntu acceptance. Existing synthetic hour-capture proof alone does not close these gates.
+- **Tracker state:** seven started parents remain in_progress, T-059/T-060 remain pending, and no parent is marked done here. `.goal/goal.json` project_path still stores the historical D:\KnowledgeBase value: repo-wide targeted reader search found no consumer proving it is a current runtime checkout selector, so it was preserved rather than guessing external semantics.
+
+Current source-table tracker verification: `node scripts/tracker-audit.mjs --json --gate g1` -> exit 0, `ok: true`, `findings: []`, after canonical source-state and acceptance-gate notes were updated.

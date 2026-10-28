@@ -1,0 +1,4 @@
+
+> @lkb/api@0.0.0 typecheck C:\Users\product\Desktop\KnowledgeBase\apps\api
+> tsc --noEmit -p tsconfig.json
+

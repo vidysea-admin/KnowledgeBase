@@ -1,0 +1,47 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "scope": "T013 Avatar context-loss isolated lifecycle regressions; mocked UI no live browser/avatar/provider",
+  "phase": "shared-integration-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; Vitest jsdom ONEforkworker; mocked API only",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/counsellor/Avatar.context-loss.test.tsx",
+    "--maxWorkers=1",
+    "--minWorkers=1"
+  ],
+  "testIDs": [
+    "src/pages/counsellor/Avatar.context-loss.test.tsx"
+  ],
+  "env": {
+    "NODE_ENV": "test"
+  },
+  "timeoutMs": 120000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-t013-avatar-context-20261015T1150",
+  "pins": {
+    "apps/web/src/pages/counsellor/Avatar.context-loss.test.tsx": "ddd8b24b69f1746960589fad4fa1f60e73cee5f4f1b40283821ea40592292e10",
+    "apps/web/src/pages/counsellor/Avatar.tsx": "1502f4f5ea97202a76d5581b43f9399f445ec535e945563dddeb4362b9fd5bc3",
+    "apps/web/src/pages/counsellor/voice.ts": "29a3f92b465f51d48f855a547b3c04451fd6981ab4545ce8800c2cd767955844",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/src/setupTests.ts": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\@testing-library+react@16.1_83fd9cd055ae3f809a6a1cf3a9f38faf\\node_modules\\@testing-library\\react\\dist\\index.js": "41e78e4a9bb806f2bb167bde3084489fa001f4fc8d9670f13d9a236da98f8cf6",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\vitest@2.1.8_@types+node@24.13.3_jsdom@25.0.1\\node_modules\\vitest\\index.cjs": "15a78ebcf7fc24ea0a829448d770ca486b7506fcf8fd696a2cbf8e17d25dc02b",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\react@18.3.1\\node_modules\\react\\index.js": "a216c390bf956cbb906c66d29fdb2e2ad6999464a5ca83e476533a6f25ad0ef3",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\vite@6.0.5_@types+node@24.13.3_tsx@4.23.13\\node_modules\\vite\\dist\\node\\index.js": "67eadbdb5c21104cf10a8dc022356ea972647d3ecf2bada2e88b2def3c2dd7b7",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\@vitejs+plugin-react@4.3.4__784c4c11a842474356e12a9be34b9a8f\\node_modules\\@vitejs\\plugin-react\\dist\\index.cjs": "5ece9f9c6f6a026f372bac4b8591b2cfd9ad35b4ca816ff2e8dc97362fa5b4aa",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\@testing-library+jest-dom@6.6.3\\node_modules\\@testing-library\\jest-dom\\dist\\vitest.js": "25f50973428285def938b377a041d5f081805ceafdb42df60137322046cdde2d",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/tsconfig.json": "f67d852a59376dc6d5a386f669d984d7b3133860b693ca00dfa59a3caf3596e0",
+    "tsconfig.base.json": "6bc2d632c06e482b900c73f73dd6c703b3791bd5b02b05aaf7701cd9ba417c47",
+    "apps/web/node_modules/vitest/vitest.mjs": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6"
+  }
+}

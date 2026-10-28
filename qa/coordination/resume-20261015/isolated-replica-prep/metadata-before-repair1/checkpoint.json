@@ -1,0 +1,8 @@
+{
+  "candidate_content_manifest_sha256": "1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "status": "HOLD",
+  "readinessComplete": false,
+  "reason": "Sole broker passive checks and independent startup/admission/review are missing",
+  "actualMakerUsage": null,
+  "reviewerDispatched": false
+}

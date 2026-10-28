@@ -158,3 +158,5 @@ The checker named this manifest as the counter-example to generalise: it decline
 contract and asked instead. That is the behaviour to keep — **draft a contract only when the unit
 genuinely has none, say so explicitly, and never treat silence as adoption.** The backfill itself
 is checker work (ISS-006 + ISS-055).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

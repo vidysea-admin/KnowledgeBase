@@ -4,15 +4,31 @@
   "title": "chunks",
   "description": "H1 unstructured vector index. Chunks reference turns by id only — text is derived from turns at embed time, never duplicated (ADR-0001). The embedding VECTOR is stored inline because brute-force cosine (D-021) must read the numbers; `embeddingRef`, a string pointer, could never be compared and is retired. Storing the vector is not a text duplication: it is a derived numeric artifact, not a second copy of the source.",
   "type": "object",
-  "required": ["_id", "tenantId", "sourceRef", "turnRefs", "chunkIndex"],
+  "required": [
+    "_id",
+    "tenantId",
+    "sourceRef",
+    "turnRefs",
+    "chunkIndex"
+  ],
   "properties": {
-    "_id": { "type": "string" },
-    "tenantId": { "type": "string", "minLength": 1 },
-    "sourceRef": { "type": "string", "minLength": 1 },
+    "_id": {
+      "type": "string"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceRef": {
+      "type": "string",
+      "minLength": 1
+    },
     "turnRefs": {
       "type": "array",
       "minItems": 1,
-      "items": { "type": "string" }
+      "items": {
+        "type": "string"
+      }
     },
     "chunkIndex": {
       "type": "integer",
@@ -21,7 +37,9 @@
     },
     "vector": {
       "type": "array",
-      "items": { "type": "number" },
+      "items": {
+        "type": "number"
+      },
       "minItems": 1,
       "description": "The embedding itself. minItems 1 because a zero-length vector has no direction: cosine against it is 0/0, so it would silently match nothing while the row looks populated (ISS-096)."
     },
@@ -33,6 +51,41 @@
     "embeddingModel": {
       "type": "string",
       "description": "Which model produced `vector`. Vectors from different models are not comparable, so this is what makes a mixed corpus diagnosable."
+    },
+    "indexArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "generation",
+        "sessionId",
+        "sourceId",
+        "turnDigest"
+      ],
+      "properties": {
+        "version": {
+          "const": 1
+        },
+        "generation": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$"
+        },
+        "sessionId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "sourceId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "turnDigest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "title": "ChunkIndexArtifact"
     }
   },
   "additionalProperties": true

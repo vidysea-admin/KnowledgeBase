@@ -1,0 +1,36 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "not-started",
+      "token_metric": "actual_total",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "token_metric": "actual_total",
+    "kind": "review",
+    "active_s": 150,
+    "tokens": 20000,
+    "cost": null
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "u22-extraction-review-resume/0/d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "completion_reserve_tokens": 4000,
+  "bootstrap_scope": "Root authorized manual BOOTSTRAP: 180s/24000 total including completion30s/4000; startup/skill authentication, two sources, consumer and QA writes; ratios UNVERIFIED",
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "tokens": 24000,
+    "cost": null
+  },
+  "escalation": null
+}

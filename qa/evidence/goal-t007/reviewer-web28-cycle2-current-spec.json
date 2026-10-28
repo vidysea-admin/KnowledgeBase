@@ -1,0 +1,33 @@
+{
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "args": [
+    "node_modules/vitest/vitest.mjs",
+    "run",
+    "src/pages/WhatsAppPage.test.tsx",
+    "src/pages/whatsapp/ReviewQueue.test.tsx",
+    "src/pages/whatsapp-review/ReviewSourcePage.test.tsx",
+    "--maxWorkers=1",
+    "--minWorkers=1",
+    "--fileParallelism=false"
+  ],
+  "pins": {
+    "apps/web/src/pages/WhatsAppPage.tsx": "885f1af68ed4d21b00d141bb8ddd8631f732071621ed4471c5fbab7693b651cb",
+    "apps/web/src/pages/WhatsAppPage.test.tsx": "f10cf5883bfaa5b87b670aae119b3c950af077bd12864fdaad751fcc53070e61",
+    "apps/web/src/pages/whatsapp/ReviewQueue.tsx": "1006c17696b628e5bbd156f1d20a7b730ca7aacfd12825a5292a967384e20614",
+    "apps/web/src/pages/whatsapp/ReviewQueue.test.tsx": "6a837c0bde141928c680f362d2299cf819173398d518652cc8820713d0cf5b1f",
+    "apps/web/src/pages/whatsapp-review/client.ts": "a761b2cb887bbf572045b8baeb804590a7030a2840d8d5c984c2fa99f61974ed",
+    "apps/web/src/pages/whatsapp-review/ReviewSourcePage.tsx": "136b04a65a1e65b5257e03c4857e9d0c4c263b21bf4d45de599b4c5c15359c58",
+    "apps/web/src/pages/whatsapp-review/ReviewSourcePage.test.tsx": "857bf7f8861b070fe8ea9adccc31d42909e6459bb52cd15ebf592bf4bb5a4781",
+    "apps/web/src/api/whatsapp.ts": "be1b77720ea928402845728502dce314931ab07970b55dcc3cf0daa534e8210a",
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/src/auth/AuthContext.tsx": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+    "apps/web/src/setupTests.ts": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/src/App.tsx": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "timeoutMs": 90000,
+  "output": "qa/evidence/goal-t007/reviewer-web28-cycle2-current",
+  "scope": "Ordinary synthetic jsdom only; shared HTTP wrapper with fixture Responses; no live browser/provider/owner data"
+}

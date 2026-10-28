@@ -1,0 +1,46 @@
+{
+  "scope": "T035 post-fix focused synthetic ordinary media fixtures",
+  "spec": "qa/evidence/t035-lean-video-measured-encode/eof-current-spec.json",
+  "specSHA256": "bce6490bfa3ab6535a66975d440bfaf0be79b884407690248507dbb664d00428",
+  "program": "C:/Program Files/nodejs/node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts"
+  ],
+  "pid": 24068,
+  "startedAt": "2026-10-14T23:03:09.2053079Z",
+  "completedAt": "2026-10-14T23:03:10.0831450Z",
+  "elapsedMs": 878.0,
+  "exitCode": 0,
+  "timedOut": false,
+  "timeoutMs": 60000,
+  "before": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "79b11336471e503b3e028ae4d865759c569a73b3782cd78858f39561e089cabc",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "9dd0095a3c2ca2aa74e51b538be78cfec6b8ac29135df3984947a309452e3526",
+    "scripts/qa/t035-lean-video-eof-probe.mjs": "ab56f6e9529ff1c93dbe029edd63fac813d131ed6f71ad80d799efe7c17fd845",
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-helper.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-probe.mjs": "73b652d83b71b0399821130e959af45290e7597a354395a07e31180769585788",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/stale-duration-source.mkv": "d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/report.json": "820a3012a67ae700a5b49dd9df21854e6a3c5341b0cc549726dc453fc4dbe2ed",
+    "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.json": "d5f146c932186eb2635e110d48cc3fa8992abe0f87df60f9d8bfc905e7863f44"
+  },
+  "after": {
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "79b11336471e503b3e028ae4d865759c569a73b3782cd78858f39561e089cabc",
+    "packages/meeting-bot/src/lean-video-ffmpeg.test.ts": "9dd0095a3c2ca2aa74e51b538be78cfec6b8ac29135df3984947a309452e3526",
+    "scripts/qa/t035-lean-video-eof-probe.mjs": "ab56f6e9529ff1c93dbe029edd63fac813d131ed6f71ad80d799efe7c17fd845",
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-helper.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-probe.mjs": "73b652d83b71b0399821130e959af45290e7597a354395a07e31180769585788",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/stale-duration-source.mkv": "d07c93e97ca281bf1c53c3aabf6a34d5ba56fd417256b9efdb75b9d432f42de7",
+    "qa/evidence/t035-lean-video-measured-encode/eof-baseline-zeYvkn/report.json": "820a3012a67ae700a5b49dd9df21854e6a3c5341b0cc549726dc453fc4dbe2ed",
+    "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.json": "d5f146c932186eb2635e110d48cc3fa8992abe0f87df60f9d8bfc905e7863f44"
+  },
+  "hashesUnchanged": true,
+  "stdoutPath": "qa/evidence/t035-lean-video-measured-encode/ordinary-focused-20261014T230309Z.stdout.txt",
+  "stderrPath": "qa/evidence/t035-lean-video-measured-encode/ordinary-focused-20261014T230309Z.stderr.txt",
+  "terminal": true
+}

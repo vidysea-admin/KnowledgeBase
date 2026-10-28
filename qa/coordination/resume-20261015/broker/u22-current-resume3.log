@@ -1,0 +1,11 @@
+✔ resume restores saved controls and original date, pending items stay empty, export validates (9.4004ms)
+✔ render binds exact input bytes, retains context and prevents script breakout (4.4965ms)
+✔ resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer (1.9142ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1147.819

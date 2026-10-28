@@ -1,0 +1,1 @@
+{"status":"AUDIT_COMPLETED","ownExit":0,"questions":92,"candidates":29,"expectedSessions":23,"coverage":{"hydrated":80,"noExcerpts":0,"refused":12},"tripwires":{"fetch":0,"http":0,"socket":0,"dns":0,"udp":0,"credentialFile":0,"provider":0,"embedding":0},"primaryPipelinePASS":false}

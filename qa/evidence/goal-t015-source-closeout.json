@@ -1,0 +1,45 @@
+{
+  "maker": "/root/roadmap_status/maker_t015",
+  "checker": "/root/roadmap_status/checker_t015",
+  "cycle": 2,
+  "status": "checked-PASS",
+  "closedAt": "2026-10-14T21:59:42.0866772Z",
+  "scope": "Named source/guard interfaces and current ordinary metadata consumer only",
+  "currentCandidatePinCount": 21,
+  "issue": "ISS-GOALT015-001",
+  "recordedCases": 20,
+  "recordedSafeCases": 20,
+  "standingTests": "8/8 attributed unchanged own source, not rerun for environment reconciliation",
+  "selectedRealSessions": 3,
+  "eligibleRealSessions": 0,
+  "actualExported": false,
+  "actualTrained": false,
+  "parentTaskDone": false,
+  "fullTask": "HUMAN/CORPUS/COMBINED-PRIVACY-ADMISSION/HOST/MODEL/INFERENCE/EVALUATION/PROMOTION HOLD",
+  "paths": [
+    {
+      "path": "qa/manifests/goal-t015.md",
+      "sha256": "cfc1b7f36d1cf92cc4338785fed0d5da002d953ddb9f2e3561d2a8263d304ad7"
+    },
+    {
+      "path": "qa/packets/goal-t015.md",
+      "sha256": "65eb859816ce0ef2a7e0355af7e63624d7be39b7a2270cf96ea58a1dc453aadc"
+    },
+    {
+      "path": "qa/verdicts/goal-t015.md",
+      "sha256": "fec01c6d596524daf57f6f14a2b3154a5c972a84801a87d439b39ec694839994"
+    },
+    {
+      "path": "qa/evidence/goal-t015-cycle2-current-pins.json",
+      "sha256": "b7568ff43b5fe39d69a8bf1d1eaed5dc4815239653559795a92835d51945e282"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t015-cycle2-import-current.json",
+      "sha256": "b4e4b5394a7f95a6bd22d622a76849710874f1220ca00e7d99505bd3f239bd26"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t015-cycle2-validate-current.json",
+      "sha256": "86b0b811e24ed498334bbd2314e9bb63e4641a865f0743fbe2dcd4a1579c4049"
+    }
+  ]
+}

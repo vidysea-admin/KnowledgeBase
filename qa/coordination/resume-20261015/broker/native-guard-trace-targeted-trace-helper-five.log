@@ -1,0 +1,13 @@
+✔ native guard phase helper absent environment has no sink effects (5.6238ms)
+✔ native guard phase helper refuses a mismatched sink before creation (1.7988ms)
+✔ native guard phase helper refuses an existing sink without changing bytes (15.3851ms)
+✔ native guard phase helper writes only fixed records and survives sink loss (26.2608ms)
+✔ native guard phase helper rejects unapproved stage event and ordinal without payload records (37.0306ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2849.5064

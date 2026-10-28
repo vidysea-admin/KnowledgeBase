@@ -1,0 +1,61 @@
+diff --git a/packages/meeting-bot/src/calendar/registration-link-resolver.ts b/packages/meeting-bot/src/calendar/registration-link-resolver.ts
+index e891b896..31136362 100644
+--- a/packages/meeting-bot/src/calendar/registration-link-resolver.ts
++++ b/packages/meeting-bot/src/calendar/registration-link-resolver.ts
+@@ -61,7 +61,8 @@ export function pinnedRegistrationGet(url: URL, pinned: {address: string; family
+   remainingBytes = 1024 * 1024): Promise<PinnedResponse> {
+   return new Promise((resolve, reject) => {
+     const req = request(url, {method: "GET", agent: false, rejectUnauthorized: true, servername: url.hostname,
+-      family: pinned.family, autoSelectFamily: false,
++      // Older HTTPS type declarations omit this supported net socket option.
++      family: pinned.family, ...{autoSelectFamily: false},
+       headers: {accept: "text/html,application/json", "accept-encoding": "identity", connection: "close"},
+       lookup: ((_host: string, lookupOptions: {all?: boolean}, callback: any) => lookupOptions.all
+         ? callback(null, [pinned]) : callback(null, pinned.address, pinned.family)) as any,
+diff --git a/packages/meeting-bot/src/capture/controller-state.test.ts b/packages/meeting-bot/src/capture/controller-state.test.ts
+index c7233fbc..77c76a38 100644
+--- a/packages/meeting-bot/src/capture/controller-state.test.ts
++++ b/packages/meeting-bot/src/capture/controller-state.test.ts
+@@ -281,10 +281,10 @@ test("first-source normalize/probe/extract failures retain stopped and interrupt
+     const recover=()=>finalizeControllerRecording(video,{repoRoot:root,recordDir,profileDir,sessionId,tenantId:"lane",python:"unused",joinScript:"unused"},{
+       normalize:media=>{if(failing&&failure==="normalize")throw new Error("first normalize failure");return media;},
+       pidProbe:()=>"dead",cleanup:()=>{},mediaDuration:()=>20,processArtifacts:()=>{processed++;},
+-      finalize:(media,gaps)=>finalizeRecordingWith({repoRoot:root,tenantId:"lane",
++      finalize:async(media,gaps)=>{await finalizeRecordingWith({repoRoot:root,tenantId:"lane",
+         probeMedia:()=>{if(failing&&failure==="probe")throw new Error("first probe failure");return 20;},
+         extractAudio:(_input,output)=>{if(failing&&failure==="extract")throw new Error("first extract failure");writeFileSync(output,"audio");},
+-        measureVolume:()=>({maxDb:-20,meanDb:-30})},media,sessionId,"Fixture","meet",false,gaps),
++        measureVolume:()=>({maxDb:-20,meanDb:-30})},media,sessionId,"Fixture","meet",false,gaps);},
+     });
+     try {
+       await assert.rejects(recover(),new RegExp("first "+failure+" failure"));
+diff --git a/packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts b/packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts
+index 20269c68..c59faae1 100644
+--- a/packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts
++++ b/packages/meeting-bot/src/capture/record-consent/controller-bridge.test.ts
+@@ -57,7 +57,8 @@ for(const scenario of ["known-clock","write-failure","unknown-clock"])test(`actu
+       if(unknown){assert.equal(closedWindow.tEnd,Number.MAX_SAFE_INTEGER);assert.equal((await step("sticky conservative durable state",()=>restarted.list("owned")))[0]!.privacy,"conservative");}
+       else assert.ok(closedWindow.tEnd<Number.MAX_SAFE_INTEGER);
+     }
+-    const file=path.join(controlDir,"owned",readdirSync(path.join(controlDir,"owned"))[0]),descriptor=JSON.parse(readFileSync(file,"utf8"));
++    const descriptorName=readdirSync(path.join(controlDir,"owned"))[0];assert.ok(descriptorName,"Owned bridge descriptor must exist");
++    const file=path.join(controlDir,"owned",descriptorName),descriptor=JSON.parse(readFileSync(file,"utf8"));
+     const response=await step("reject forged HMAC",()=>fetch(`${descriptor.origin}/privacy`,{method:"POST",signal:AbortSignal.timeout(12000),body:JSON.stringify({version:1,tenantId:"owned",sessionId:"capture",generation,requestId:randomUUID(),at:Date.now(),action:"private-start",mac:"0".repeat(64)})}));
+     assert.equal(response.status,503);
+     writeFileSync(file,JSON.stringify({...descriptor,host:"foreign-host"}));await step("reject foreign descriptor host",()=>assert.rejects(first.list("owned"),/Foreign/));
+diff --git a/packages/meeting-bot/src/manual-jobs/worker.ts b/packages/meeting-bot/src/manual-jobs/worker.ts
+index bc44ac7b..883e0f06 100644
+--- a/packages/meeting-bot/src/manual-jobs/worker.ts
++++ b/packages/meeting-bot/src/manual-jobs/worker.ts
+@@ -25,8 +25,9 @@ const defaults: ManualWorkerDeps = {
+ };
+ 
+ export async function runManualWorker(root: string, store: ManualJobStore, tenantId: string, jobId: string, deps: ManualWorkerDeps = defaults): Promise<void> {
+-  const req = store.readRequest(tenantId, jobId);
+-  if (!req) throw new Error("manual job not found");
++  const request = store.readRequest(tenantId, jobId);
++  if (!request) throw new Error("manual job not found");
++  const req = request;
+   store.claimWorker(req);
+   // Revalidate URL independently in the process which owns actual capture; persisted input is not authority.
+   const plan = planSendNow(req.meetingUrl, store.now(), []);

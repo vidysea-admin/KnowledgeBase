@@ -1,0 +1,81 @@
+{
+  "at": "2026-10-14T22:59:38.3939433Z",
+  "scope": "Actual current local typechecks and API/server-worker/web builds; no container/provider/native execution claim",
+  "stages": [
+    {
+      "phase": "api-types",
+      "receipt": "qa/goal-2026-10-14/api-types-ordinary-20261014T225425Z.json",
+      "sha256": "ea924c1c643ab2a119fd425586157cdba6998a93195e29f222055077c936ac8e",
+      "pid": 16652,
+      "exit": 0,
+      "elapsedMs": 12325
+    },
+    {
+      "phase": "web-types",
+      "receipt": "qa/goal-2026-10-14/web-types-ordinary-20261014T225425Z.json",
+      "sha256": "8d86e8aff8190748f9e4cdd0c369ea790f66ff53edbedc604fd714506633dc16",
+      "pid": 24160,
+      "exit": 0,
+      "elapsedMs": 11000
+    },
+    {
+      "phase": "api-build",
+      "receipt": "qa/goal-2026-10-14/api-build-ordinary-20261014T225425Z.json",
+      "sha256": "a7b46a3e65d50d5fb4ea39b699a625cd3e848a678b0b97d0a83de78f01edb9f1",
+      "pid": 9844,
+      "exit": 0,
+      "elapsedMs": 1718
+    },
+    {
+      "phase": "web-build",
+      "receipt": "qa/goal-2026-10-14/web-build-ordinary-20261014T225425Z.json",
+      "sha256": "87edab7b2841af78e70e58072a7cc693671cf1ccc96767ea055c0f6fb78a92a1",
+      "pid": 9716,
+      "exit": 0,
+      "elapsedMs": 16070
+    }
+  ],
+  "inputFiles": 1939,
+  "inputDrift": 0,
+  "before": "qa/goal-2026-10-14/ordinary-types-20261014T225425Z-before.json",
+  "after": "qa/goal-2026-10-14/ordinary-builds-20261014T225425Z-after.json",
+  "outputs": [
+    {
+      "path": "apps/api/dist/server.js",
+      "bytes": 1303859,
+      "sha256": "439048fef5cbde83f32e58e01f1b88b75d8f88a146d344c04397f963ce259091"
+    },
+    {
+      "path": "apps/api/dist/source-worker.js",
+      "bytes": 490775,
+      "sha256": "2c7ab5bb292a9b4e495d95790986d4bc7fb90d72d6b257f800f16ea249b45ce9"
+    },
+    {
+      "path": "apps/api/dist/runtime-externals.json",
+      "bytes": 150,
+      "sha256": "41fee98983c7f7312927688e407f17bb92b853acd2c7b353d6c4d9595027f302"
+    },
+    {
+      "path": "apps/api/dist/runtime-assets/8c3a5ba63746-private-acl.ps1",
+      "bytes": 764,
+      "sha256": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd"
+    },
+    {
+      "path": "apps/api/dist/runtime-assets/36a8f761a9d9-capture-authority-acl.ps1",
+      "bytes": 800,
+      "sha256": "998821b05b5f85ccd80dc1cc71d4e9508456b7346e00e046960ad82b789fe3e6"
+    },
+    {
+      "path": "apps/web/dist/index.html",
+      "bytes": 406,
+      "sha256": "34c86803caaada0d9ded19e25ce2b1794e196af6461f8d28ae7b1495d95eff19"
+    }
+  ],
+  "workerRealEntryGuardVerified": true,
+  "requiredGraphPowerShellAssetsMatchSource": true,
+  "externalImportsExecuted": false,
+  "containerExecuted": false,
+  "nativeAclExecuted": false,
+  "liveProviderStages": "permission-blocked before launch",
+  "handles": "NONE"
+}

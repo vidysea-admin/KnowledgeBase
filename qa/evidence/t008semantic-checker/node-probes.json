@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "node",
+    "--test",
+    "--test-isolation=none",
+    "--test-timeout=30000",
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register-react.mjs",
+    "qa/evidence/t008semantic-checker/semantic-boundaries.node.test.tsx"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "startedAt": "2026-10-14T09:01:24.637961+00:00",
+  "finishedAt": "2026-10-14T09:01:27.417515+00:00",
+  "durationSeconds": 2.7810000000026776,
+  "exitCode": 0,
+  "output": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\t008semantic-checker\\node-probes.log",
+  "candidateStatus": "provisional-in_progress"
+}

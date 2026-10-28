@@ -1,0 +1,84 @@
+{
+  "status": "REQUESTED_ROOT_SOLE_CPU_BROKER_NOT_EXECUTED",
+  "exclusions": [
+    "No network/provider/browser/real scheduler/native DB or source approval effects",
+    "No mutation runs without separate timeout/byte-backup/error-interrupt restore proof",
+    "No reviewer/PASS/parent closure"
+  ],
+  "selected_checks": [
+    {
+      "boundary": "durable downstream job identity",
+      "node": "saved approval reload schedules a distinct authenticated pending webinar and persists exact dispatch identity",
+      "reason": "durable downstream job identity"
+    },
+    {
+      "boundary": "auth/provenance/status integrity",
+      "node": "approve-once refuses absent approval, unauthenticated and inconsistent source identity without altering statuses",
+      "reason": "auth/provenance/status integrity"
+    },
+    {
+      "boundary": "tenant authority",
+      "node": "verified key, rules owner and persistence owner must agree before approval grants",
+      "reason": "tenant authority"
+    },
+    {
+      "boundary": "deny/opt-out precedence",
+      "node": "saved deny and both source/session opt-outs dominate persisted approval",
+      "reason": "deny/opt-out precedence"
+    },
+    {
+      "boundary": "cross-candidate isolation/global overlap",
+      "node": "candidate-specific approval does not admit another candidate and preserves global overlap selection",
+      "reason": "cross-candidate isolation/global overlap"
+    },
+    {
+      "boundary": "single resolved authority",
+      "node": "selection and veto consume one verified document despite an intervening primary replacement",
+      "reason": "single resolved authority"
+    },
+    {
+      "boundary": "snapshot expiry/no refresh",
+      "node": "last-valid approved snapshot keeps original lifetime and refuses expired or future authority",
+      "reason": "snapshot expiry/no refresh"
+    },
+    {
+      "boundary": "legacy policy compatibility",
+      "node": "off and everyWebinar retain their existing selection policy and do not project new approvals",
+      "reason": "legacy policy compatibility"
+    },
+    {
+      "boundary": "missing/corrupt authority",
+      "node": "missing or corrupt snapshot never supplies persisted approval after primary loss",
+      "reason": "missing/corrupt authority"
+    }
+  ],
+  "unit": "t037-approved-trust-tick",
+  "cycle": 0,
+  "output_directory": "qa/coordination/resume-20261015/t037-approved-trust",
+  "candidate": "6f50bfe0cb9a859eb8e52f78a7d76e8ce6e9444bd6c98044139657f613a48fce",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "readiness_complete": false,
+  "receipts_required": [
+    "complete stdout/stderr and own exit code/counts/duration",
+    "candidate/lock/executable/version/import-root/safe environment fingerprint before and after",
+    "source drift report"
+  ],
+  "timeout_s": 60,
+  "pins": "qa/coordination/resume-20261015/t037-approved-trust/pins.json",
+  "expected_tests": 13,
+  "prerequisites": [
+    "Root sole CPU lease; no maker-local execution",
+    "Existing compatible Node/tsx executable/import containment and sanitized environment identity receipt",
+    "Rehash leased and dependency paths; preserve baseline dirty bytes and stop on unexpected drift",
+    "Public synthetic local FS fixture only; no actual scheduler/DB/browser/provider/host activation"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot",
+  "version": 1,
+  "after_first_green": [
+    "Broker-select existing last-valid-enforce regressions covering changed enforcement and legacy no-callback behavior; do not repeat new13",
+    "Focused meeting-bot typecheck under current integration fingerprint; unrelated combined diagnostics remain separate",
+    "contracts/verify_contracts.py and applicable scoped structure gate; no full test suite"
+  ],
+  "immediate_consumer": "Four existing schedule-tick degradation/snapshot integration cases in second test file",
+  "command": "node --test --test-concurrency=1 --import tsx src/calendar/join-rules/join-rules-approved-trust-tick.test.ts src/calendar/schedule-tick-rules-integration.test.ts"
+}

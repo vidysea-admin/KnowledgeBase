@@ -1,0 +1,1 @@
+{"status":"current-import-interface-ready","importedInterfaces":6,"admissionExecuted":false,"exported":false,"trained":false,"evaluated":false,"promoted":false}

@@ -1,0 +1,96 @@
+{
+  "kind": "CONTENT_FREE_FRESH_FINISHER_POST_INTERRUPT_COUNTER",
+  "captured_at": "2026-10-15T11:32:53.479Z",
+  "mapping": {
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+    "id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+    "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+    "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher"
+  },
+  "read_one": {
+    "read_completed_at": "2026-10-15T11:32:51.924Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+    "source_sha256": "eb3197666744409dc8d3f91215c8effe29d3dbd297dd76ccd65a6646879d756a",
+    "meta": {
+      "id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher",
+      "timestamp": "2026-10-15T11:28:17.725Z"
+    },
+    "token_record_count": 13,
+    "latest": {
+      "timestamp": "2026-10-15T11:31:27.644Z",
+      "total_token_usage": {
+        "input_tokens": 546604,
+        "cached_input_tokens": 528512,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2159,
+        "reasoning_output_tokens": 337,
+        "total_tokens": 548763
+      },
+      "last_token_usage": {
+        "input_tokens": 46700,
+        "cached_input_tokens": 46336,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 21,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 46721
+      }
+    }
+  },
+  "read_two": {
+    "read_completed_at": "2026-10-15T11:32:53.479Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T11-28-17-01a13f51-effa-7862-b2b1-fd085d2ddad1.jsonl",
+    "source_sha256": "eb3197666744409dc8d3f91215c8effe29d3dbd297dd76ccd65a6646879d756a",
+    "meta": {
+      "id": "01a13f51-effa-7862-b2b1-fd085d2ddad1",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/collections_fresh_finisher",
+      "timestamp": "2026-10-15T11:28:17.725Z"
+    },
+    "token_record_count": 13,
+    "latest": {
+      "timestamp": "2026-10-15T11:31:27.644Z",
+      "total_token_usage": {
+        "input_tokens": 546604,
+        "cached_input_tokens": 528512,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 2159,
+        "reasoning_output_tokens": 337,
+        "total_tokens": 548763
+      },
+      "last_token_usage": {
+        "input_tokens": 46700,
+        "cached_input_tokens": 46336,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 21,
+        "reasoning_output_tokens": 0,
+        "total_tokens": 46721
+      }
+    }
+  },
+  "counter_stable": true,
+  "source_hash_stable": true,
+  "interrupt_observation": "Root reports interrupt_agent returned previous_status=running and halted turn; explicit interrupted/no further turns now. Distinct from theoretical completion.",
+  "prior_attestation_correction": "Prior holding/no-edits was NOT completion evidence. Actor still RUNNING in LLM idle-wait loop; prior408778 was LOWER BOUND. Preserve previous artifact unchanged.",
+  "prior_artifact": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/fresh-guard-failed-read-2026-10-15T11-30-13-642Z.json",
+  "prior_recorded_fresh_total": 408778,
+  "current_recorded_fresh_total": 548763,
+  "beyond_prior_recorded": 139985,
+  "old_checker_actual_total": 850752,
+  "combined_actual_total": 1399515,
+  "fresh_phase_cap": 100000,
+  "fresh_phase_overrun": 448763,
+  "fresh_grant_cap": 300000,
+  "fresh_grant_overrun": 248763,
+  "unit_cumulative_ceiling": 1150752,
+  "unit_cumulative_overrun": 248763,
+  "status": "NEEDS_EXTRA_REVIEW",
+  "wait_token_rule": "ALL LLM idle-loop calls count ACTUAL input+output; never exclude as wait tokens.",
+  "qualifier": "Two stable post-interruption recorded counters/source hashes; theoretical completion and unrecorded/residual in-flight usage unknown. No turn resumed.",
+  "maker_denominator_unchanged": 3547712,
+  "prior_breaches_preserved": true,
+  "manual_final_reserve_unadmitted": true,
+  "shared_accounting_helper_cost": "Separate; excluded from maker denominator.",
+  "no_source_test_gate_review_or_resume": true
+}

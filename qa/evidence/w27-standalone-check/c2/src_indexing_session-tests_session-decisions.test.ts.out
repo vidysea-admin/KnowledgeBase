@@ -1,0 +1,14 @@
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (55.8484ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (9.2572ms)
+✔ flag ON via env var (7.8171ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (8.7036ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (7.9262ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1191.2838

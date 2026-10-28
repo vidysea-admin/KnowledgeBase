@@ -1,0 +1,49 @@
+{
+  "schema": "qa-only-local-closeout-commit/1",
+  "base": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "status": "QA_ONLY_LOCAL_COMMITTED_NO_PUSH",
+  "actions": {
+    "commit": 1,
+    "config": 0,
+    "stage": 1,
+    "push": 0
+  },
+  "failures": [],
+  "beforeDirty": {
+    "total": 5222,
+    "tracked": 145,
+    "untracked": 5077
+  },
+  "newGuardScan": {
+    "bytes": 36833,
+    "valuesPersisted": false,
+    "files": 18,
+    "findings": []
+  },
+  "manifest": {
+    "bytes": 211388,
+    "path": "qa/coordination/resume-20261015/local-wip-post-d50/qa-closeout-final-allowlist.json",
+    "sha256": "08f3da1a9a3ea9d5fbb3c9604a8495f3237d314973957e3ab4cf38a8d0f807c5",
+    "paths": 80
+  },
+  "actualStagedScan": {
+    "findings": [],
+    "valuesPersisted": false,
+    "files": 80
+  },
+  "whitespaceExit": 0,
+  "whitespaceDisposition": "Preserve exact raw QA proof. No source staged; source prior37 warnings unchanged. Actual metadata diff check result recorded without disabling Git/hooks/config.",
+  "commitExit": 0,
+  "commit": "37e51f95c367594bddb422c39c11415674ecf001",
+  "unrelatedDirtyStatusDrift": [],
+  "remainingDirty": {
+    "total": 5162,
+    "tracked": 140,
+    "untracked": 5022
+  },
+  "source8Same": true,
+  "sourceCandidate": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "indexEmpty": true,
+  "committedQaPaths": 80,
+  "nativeGuardStatus": "INCOMPLETE timeout; actual terminal counts UNKNOWN"
+}

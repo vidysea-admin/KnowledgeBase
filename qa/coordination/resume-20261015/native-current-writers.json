@@ -1,0 +1,41 @@
+{
+  "authority": "root current dispatch; supersedes ACTIVE statuses in native-source-leases.json",
+  "primitiveStatus": "native codecledger/browser/finalizer and diagnostics/deadline-cycle3 FROZEN",
+  "sharedTypesSha256": "022057B6A629EEC111C3BAFC4D9FEFE39119DA55EE87A7F1F2EBA7C3EE7F1B77",
+  "activeWriters": [
+    {
+      "owner": "resume_delivery_inventory",
+      "paths": [
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/record-commands.ts",
+        "packages/meeting-bot/src/capture/record-commands.test.ts",
+        "packages/meeting-bot/src/capture/record-finalize.ts",
+        "packages/meeting-bot/src/capture/record-finalize.test.ts",
+        "packages/meeting-bot/src/capture/lean-finalize-alert.test.ts",
+        "packages/meeting-bot/src/capture/finalize-original-eof.test.mjs",
+        "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+        "packages/meeting-bot/src/capture/native-capture-runtime.test.ts"
+      ]
+    },
+    {
+      "owner": "native_privacy_audio_maker",
+      "paths": [
+        "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+        "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+        "packages/meeting-bot/src/capture/record-consent/provider-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/provider-input.test.ts",
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.test.ts"
+      ]
+    },
+    {
+      "owner": "native_measurement_maker",
+      "paths": [
+        "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+        "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+        "packages/meeting-bot/src/capture/tiles/registry.ts",
+        "packages/meeting-bot/src/capture/tiles/registry.test.ts"
+      ]
+    }
+  ]
+}

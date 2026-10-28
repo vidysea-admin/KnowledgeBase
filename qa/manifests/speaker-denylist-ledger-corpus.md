@@ -298,3 +298,5 @@ apply unit** with the three gazetteer residues.
 | ISS-099, ISS-100 | open, non-blocking, carried |
 | Deterministic yield | 78/494 (15.8%), unchanged |
 | Persisted | **nothing** — B3/B10 do not flip |
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

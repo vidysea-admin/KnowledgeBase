@@ -1,0 +1,80 @@
+# PROPOSAL ONLY: activation requires explicit owner approval. Never started by root Compose.
+name: lkb-vectorless-transaction
+services:
+  staging-key-init:
+    profiles: [activate]
+    image: ${LKB_STAGING_MONGO_IMAGE:?set an existing locally pinned Mongo image ID}
+    pull_policy: never
+    network_mode: none
+    user: root
+    entrypoint: [bash, -ec]
+    environment:
+      LKB_STAGING_MONGO_IMAGE: ${LKB_STAGING_MONGO_IMAGE:?set an existing immutable local image ID or digest}
+    command:
+      - |
+        image="$${LKB_STAGING_MONGO_IMAGE}"
+        [[ "$$image" =~ ^sha256:[a-f0-9]{64}$$ || "$$image" =~ ^[^[:space:]@]+@sha256:[a-f0-9]{64}$$ ]] || { echo 'Immutable staging image ID/digest required' >&2; exit 1; }
+        install -m 400 -o "$$(id -u mongodb)" -g "$$(id -g mongodb)" /run/secrets/replica-key /owned-key/replica.key
+    secrets: [replica-key]
+    volumes: [staging-key:/owned-key]
+    restart: "no"
+    cpus: "0.25"
+    mem_limit: 128m
+  mongo-staging:
+    profiles: [activate]
+    image: ${LKB_STAGING_MONGO_IMAGE:?set an existing locally pinned Mongo image ID}
+    pull_policy: never
+    depends_on:
+      staging-key-init: {condition: service_completed_successfully}
+    command: [mongod, --replSet, lkb-staging-rs, --bind_ip_all, --auth, --keyFile, /owned-key/replica.key, --wiredTigerCacheSizeGB, "0.25"]
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${LKB_STAGING_MONGO_ROOT_USERNAME:?set staging-only username}
+      MONGO_INITDB_ROOT_PASSWORD_FILE: /run/secrets/root-password
+    secrets: [root-password]
+    ports: ["127.0.0.1:27029:27017"]
+    volumes: [staging-data:/data/db, staging-key:/owned-key:ro]
+    networks: [staging-only]
+    healthcheck:
+      test: [CMD, mongosh, --quiet, --eval, "quit(db.adminCommand({ping:1}).ok ? 0 : 1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+    restart: "no"
+    cpus: "0.50"
+    mem_limit: 768m
+    logging: {driver: json-file, options: {max-size: 5m, max-file: "2"}}
+    labels: {lkb.owner: knowledge-brain-staging-proposal, lkb.database: lkb_staging}
+  replica-init:
+    profiles: [activate]
+    image: ${LKB_STAGING_MONGO_IMAGE:?set an existing locally pinned Mongo image ID}
+    pull_policy: never
+    depends_on:
+      mongo-staging: {condition: service_healthy}
+    # Outer process deadline covers stalled authentication/administrative commands too.
+    entrypoint: [timeout, --signal=TERM, --kill-after=5s, 90s, mongosh, --quiet, "mongodb://mongo-staging:27017/admin?serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=5000", --file, /proposal/replica-init.js]
+    environment:
+      LKB_STAGING_MONGO_ROOT_USERNAME: ${LKB_STAGING_MONGO_ROOT_USERNAME:?set staging-only username}
+      LKB_STAGING_FIXTURE_USERNAME: ${LKB_STAGING_FIXTURE_USERNAME:?set dedicated restricted staging fixture username}
+    secrets: [root-password, fixture-password]
+    volumes: [./replica-init.js:/proposal/replica-init.js:ro]
+    networks: [staging-only]
+    restart: "no"
+    cpus: "0.25"
+    mem_limit: 192m
+networks:
+  staging-only: {internal: true}
+volumes:
+  staging-data:
+    name: lkb-vectorless-transaction-data-v1
+    labels: {lkb.owner: knowledge-brain-staging-proposal, lkb.database: lkb_staging}
+  staging-key:
+    name: lkb-vectorless-transaction-key-v1
+    labels: {lkb.owner: knowledge-brain-staging-proposal}
+secrets:
+  root-password:
+    file: ${LKB_STAGING_MONGO_ROOT_PASSWORD_FILE:?set absolute private staging password-file path}
+  replica-key:
+    file: ${LKB_STAGING_MONGO_REPLICA_KEY_FILE:?set absolute private staging replica-key-file path}
+  fixture-password:
+    file: ${LKB_STAGING_FIXTURE_PASSWORD_FILE:?set absolute private restricted fixture password-file path}

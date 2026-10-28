@@ -1,0 +1,11 @@
+{
+  "cycle": 0,
+  "completedAt": "2026-10-14T21:20:05.8921830Z",
+  "verdictSHA256": "02f8c972ca0491ba12beb7756ab85634289727d9f49400dd8931602ab3acfa73",
+  "launchAt": "2026-10-14T20:37:37Z",
+  "receiptReviewAt": "2026-10-14T21:15:41Z",
+  "elapsedSeconds": 2548.892183,
+  "note": "Total includes pause/CPU queue; exact independent broker command durations in receipts; cycle0 historical tested bytes only",
+  "issue": "ISS-T059REPLAY-001",
+  "verdict": "FAIL"
+}

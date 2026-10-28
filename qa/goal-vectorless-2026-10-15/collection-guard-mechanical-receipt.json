@@ -1,0 +1,14 @@
+{
+  "phase": "shared-verification-support-not-maker",
+  "authorization": "root explicit one-operation QA source exception",
+  "path": "apps/web/src/__checker_probes__/collections-kind-identity.test.tsx",
+  "beforeSha": "14ac546c8de7fd65fb70126b0fcf81d3e04dd38e1ec6ec8d12dc150957f669a3",
+  "afterSha": "d0df06948303104901d26ca9cbce5bc09b3832c9c8a7a803020b431a16ed7ff0",
+  "insertedLine": "  if (!puts[0]) throw new Error('Expected collection PUT request');\n",
+  "inverseBytesEqual": true,
+  "assertionsUnchanged": true,
+  "otherSourceWrites": [],
+  "byteCountBefore": 2650,
+  "byteCountAfter": 2718,
+  "completedAt": "2026-10-15T11:33:45.244Z"
+}

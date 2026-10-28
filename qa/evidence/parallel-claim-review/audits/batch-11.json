@@ -1,0 +1,296 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 11,
+  "entries": [
+    {
+      "index": 55,
+      "claimId": "2026-08-10-ucas-what-changed-what-matters-c01",
+      "inputHash": "b2e79bc97cb7dbfe975bf9097a6ce130d6d024cb264dfb8faeb7eb563a0c4de6",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t005 directly describes the personal statement changing from one 4,000-character box to structured three questions. Current same-ID t005 concerns the letter of reference, not the personal statement. The content, timings and speakerRef changed; original speakerRef unknown cannot prove identity. No duplicate references or multiple matches are supplied. Transcript support does not establish external truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "f88c85a2832945f329dc683a4e88d734fd3f044f0e52d2403f2ef190fa555fe9",
+        "claimTextSha256": "441d3a96096d5d0e502b2105044d3e82f1ce0e72240588baead415cf0a623b82",
+        "sourceBindingSha256": "f6c408a19ea2e91e06381b11889070665291c6d53b1b4e4f9a127215d132eeae",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "claimIndexIdentity": true,
+          "context:originalMigration:2026-08-10-ucas-what-changed-what-matters-t005": true,
+          "context:current:2026-08-10-ucas-what-changed-what-matters-t005": true,
+          "duplicateReferences": true,
+          "uniqueMatches": true,
+          "reviewerInputHash": true,
+          "reviewerIdentity": true,
+          "reviewerHumanNull": true,
+          "reviewerCitation:original:0": true,
+          "reviewerCitation:current:0": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-10-ucas-what-changed-what-matters-t005",
+            "textSha256": "b8fc05c0a305c692949e8e54df834860dc4e8e5d28bcf44eafa88cf5e4c31767",
+            "contextSha256": "536eaed3d570fc50ca364d1a2f23c0dcef30dfe1bce6743b895668253934bba2",
+            "artifactSha256": "8aa7123b2862c2896763b7f675a477cece264fcb5441b675c519bdf28025fae8",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-10-ucas-what-changed-what-matters-t005",
+            "textSha256": "3f31b2b4a393d4245ef4115aa82afe89b9a5d3e820ac342a3f94b1b536bf573a",
+            "contextSha256": "b2ca4cb55d73109aa226241757548ab12af1abedec2771e60b523ee312554eb0",
+            "artifactSha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+            "normalizedLfSha256": "31fe2627aa9bf6287acb51401925a4563bd320600704c3bb624fcfe274c37d6f",
+            "revision": null
+          }
+        ],
+        "missingReferences": [],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 56,
+      "claimId": "2026-08-10-ucas-what-changed-what-matters-c03",
+      "inputHash": "34ef3bd88dbe5babb5931b74a138495394c6309d8be75254e5db50c2885957fe",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t069 advises avoiding external links but says the speaker is unsure how much time an admission officer would have; this does not establish officers will not click links or multiple panelists. Current t069 only says it is not useful/relevant with no referent, external-link guidance or click behavior. Same ID has changed content, timings and speakerRef. No duplicate references or multiple matches are supplied. Transcript support does not establish external truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "24ddf0c2049a0e722eb3a39cbc848d7d609c63643ef7e5311ef93201e3069e1e",
+        "claimTextSha256": "8f30aea8553d8812cfe06ca9a6fdd45f518dcb226ecc1fb93e4e0c86680474ab",
+        "sourceBindingSha256": "f6c408a19ea2e91e06381b11889070665291c6d53b1b4e4f9a127215d132eeae",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "claimIndexIdentity": true,
+          "context:originalMigration:2026-08-10-ucas-what-changed-what-matters-t069": true,
+          "context:current:2026-08-10-ucas-what-changed-what-matters-t069": true,
+          "duplicateReferences": true,
+          "uniqueMatches": true,
+          "reviewerInputHash": true,
+          "reviewerIdentity": true,
+          "reviewerHumanNull": true,
+          "reviewerCitation:original:0": true,
+          "reviewerCitation:current:0": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-10-ucas-what-changed-what-matters-t069",
+            "textSha256": "3a87fe8b1b80fb6ec2c89a64feb59566b64f4ebca5a2c6e128d6f58933420023",
+            "contextSha256": "157c69bf3dcce30544ec283d40ffcca072d9f00cbd48da1b2acff1d401cc773d",
+            "artifactSha256": "8aa7123b2862c2896763b7f675a477cece264fcb5441b675c519bdf28025fae8",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-10-ucas-what-changed-what-matters-t069",
+            "textSha256": "8215598c353ae23988488435d36cf92002a1542cd3a80806a5a1d61f703bde28",
+            "contextSha256": "b7cb0c429854b3f1172e7fde3c610957f72ce2a2aaf2c866a10ce47377b62853",
+            "artifactSha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+            "normalizedLfSha256": "31fe2627aa9bf6287acb51401925a4563bd320600704c3bb624fcfe274c37d6f",
+            "revision": null
+          }
+        ],
+        "missingReferences": [],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 57,
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+      "inputHash": "08426e2d46c26c8f97974845f53ab53ada0ccb83e01595b7b9b197747c64dd86",
+      "originalLabel": "entailed",
+      "currentLabel": "unresolvable",
+      "reason": "Original t084 reports about 43–44% of the class usually on scholarships and a target/vision of 50%; it supports the approximate share and target, not an achieved 50%. Current t084 is absent with zero matches. The replacement character separating the percentages and usual-class temporal wording remain caveats; unknown speakerRef proves no identity. No duplicate references or multiple matches are supplied. Transcript support does not establish external truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "5e15db235220269c8439dddcb528620f3cdd5318173ce83001989e881264f455",
+        "claimTextSha256": "db68d19ccb90fd5d481c24a17c237a426ff7d13d24c8c62c5e362b2374e74308",
+        "sourceBindingSha256": "81a5fbdbbdfcb9af245af33f22dea71dc5d0553ad732e1616bb29e920a54a23a",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "claimIndexIdentity": true,
+          "context:originalMigration:2026-08-12-uniaccess-ashoka-university-t084": true,
+          "duplicateReferences": true,
+          "uniqueMatches": true,
+          "reviewerInputHash": true,
+          "reviewerIdentity": true,
+          "reviewerHumanNull": true,
+          "reviewerCitation:original:0": true,
+          "reviewerCitation:original:1": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+            "textSha256": "cd63e793402a12ce683aba0398f703baf5bfcb577fc832886ef2db095a85a781",
+            "contextSha256": "60843b6ff532a1522c7977f6fb416aebb9bdaf87fdb18aa99630d1c69ea616e6",
+            "artifactSha256": "fa620ed6dd48b3976bc00f0990772ba496c76f2817e1caf253a81238d81c9865",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          }
+        ],
+        "missingReferences": [
+          {
+            "version": "current",
+            "sessionId": "2026-08-12-uniaccess-ashoka-university",
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t084",
+            "reason": "turn-absent"
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 58,
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+      "inputHash": "7dd6b494c2bc84e080f0d79fac3ab8da23d875ad0f0e087306a715286cb55212",
+      "originalLabel": "entailed",
+      "currentLabel": "unresolvable",
+      "reason": "Original t058 identifies the Ashoka Aptitude Assessment or the newly introduced Ashoka Mathematics Challenge, whichever exam the student gives, as weighted academic evaluation. This supports the alternative assessments without implying both or inferring mandatory participation. Current t058 is absent with zero matches. The contextual year and unknown speakerRef limit temporal and identity certainty. No duplicate references or multiple matches are supplied. Transcript support does not establish external truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "c7f6762b3f3557dfb4b414da05b2a135874b7a568224e9cadca8be1260f5a958",
+        "claimTextSha256": "13acfae29e77a49462a58644502d320d8b346b570966a7765cd8b0827a37b9b6",
+        "sourceBindingSha256": "81a5fbdbbdfcb9af245af33f22dea71dc5d0553ad732e1616bb29e920a54a23a",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "claimIndexIdentity": true,
+          "context:originalMigration:2026-08-12-uniaccess-ashoka-university-t058": true,
+          "duplicateReferences": true,
+          "uniqueMatches": true,
+          "reviewerInputHash": true,
+          "reviewerIdentity": true,
+          "reviewerHumanNull": true,
+          "reviewerCitation:original:0": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t058",
+            "textSha256": "5b790342255328d846bb89995ebbe143581c2ed03f663848c39571373d8e8128",
+            "contextSha256": "ce85b7a0cf0f808639181dbf22ad703a79ef7bad105da8c4da4b97fdd7274286",
+            "artifactSha256": "fa620ed6dd48b3976bc00f0990772ba496c76f2817e1caf253a81238d81c9865",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          }
+        ],
+        "missingReferences": [
+          {
+            "version": "current",
+            "sessionId": "2026-08-12-uniaccess-ashoka-university",
+            "turnId": "2026-08-12-uniaccess-ashoka-university-t058",
+            "reason": "turn-absent"
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unresolvable"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 59,
+      "claimId": "2026-08-24-uniaccess-leeds-arts-university-c01",
+      "inputHash": "cd76de926e755c7869bb12e597d3b53d1fd5a5db450ea6235e51e0b2b1af8f1a",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original t040 directly supports minimum 55% Foundation and 65% undergraduate, but PG is described as nearly 55% in any graduation with IELTS, and most of you all dealing with the PG describes the audience, not most postgraduate courses. The persisted claim strengthens approximate PG wording to an exact minimum and changes its quantifier. Current t040 concerns creative-industry growth and lacks all entry thresholds. Same ID has changed content, timings and speakerRef. No duplicate references or multiple matches are supplied. Transcript support does not establish external truth.",
+      "evidenceHashes": {
+        "claimRecordSha256": "8091ab42d81644822b2c574dec4e79cb3e0806eafcdc2e9b5913c72c0e96dc54",
+        "claimTextSha256": "c80db3cc6f671c10007475dd3527ace9f156421837fbaa5fcfb28e940747dc3b",
+        "sourceBindingSha256": "73e4fd249c6ce1b20b0cd116da0dc2737ac4b24b66578afb1d059995b657ec68",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "claimIndexIdentity": true,
+          "context:originalMigration:2026-08-24-uniaccess-leeds-arts-university-t040": true,
+          "context:current:2026-08-24-uniaccess-leeds-arts-university-t040": true,
+          "duplicateReferences": true,
+          "uniqueMatches": true,
+          "reviewerInputHash": true,
+          "reviewerIdentity": true,
+          "reviewerHumanNull": true,
+          "reviewerCitation:original:0": true,
+          "reviewerCitation:current:0": true
+        },
+        "failures": [],
+        "contexts": [
+          {
+            "version": "originalMigration",
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+            "textSha256": "2ba4f18ed48fefa83cf40973e3e20bfd1de9b3add8fba1a85572f64a5627158b",
+            "contextSha256": "3ad87f8999517542efb35cf69f775ca74969d0cb924fc79197ca0d0f2ea26cfc",
+            "artifactSha256": "fd835b78b01a869731e56e8de8775f0104f505f5f82e2272be9e8499917d60b8",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "version": "current",
+            "turnId": "2026-08-24-uniaccess-leeds-arts-university-t040",
+            "textSha256": "a94e33648ab6bce0b5d9b4064783e7bb370fb41692dca1d716cce3978a8bddec",
+            "contextSha256": "b2063c34d99e1e4aca08f9f455d2c6a7c4edb38ddd6993034bd1b2895f742bad",
+            "artifactSha256": "69e1be5a61cecd344422d130c12ed259c96112ffd9c553745a4de0d376ceb98c",
+            "normalizedLfSha256": "a195884b2c4f5131663d2d4c5df4d30b0b602c41bbd0dd4a0ed22caf2597a7ea",
+            "revision": null
+          }
+        ],
+        "missingReferences": [],
+        "artifactByteVerification": "not-performed-provided-context-only"
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+RUN v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+✓ src/pages/sessions/SessionDetailPage.test.tsx (8 tests) 578ms
+Test Files 1 passed (1)
+Tests 8 passed (8)
+Start at 09:31:47
+Duration 3.89s (transform 278ms, setup 491ms, collect 721ms, tests 578ms, environment 1.46s, prepare 236ms)
+stderr contained the existing React Router v7 future-flag warnings.
+Exit code 0; tool wall seconds 5.7205743.

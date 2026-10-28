@@ -1,0 +1,17 @@
+{"discovered": 11, "tests": ["test_connect_transition_competitor_receives_zero_bytes (__main__.Ownership.test_connect_transition_competitor_receives_zero_bytes)", "test_ipv6_competing_listener_refused (__main__.Ownership.test_ipv6_competing_listener_refused)", "test_missing_ownership_refuses_dispatch (__main__.Ownership.test_missing_ownership_refuses_dispatch)", "test_owned_connection_positive (__main__.Ownership.test_owned_connection_positive)", "test_released_probe_competitor_listener_refuses_dispatch (__main__.Ownership.test_released_probe_competitor_listener_refuses_dispatch)", "test_replacement_before_auth_or_shutdown_send_refused (__main__.Ownership.test_replacement_before_auth_or_shutdown_send_refused)", "test_both_receipt_writes_throw_reports_persistence_failure (__main__.Receipts.test_both_receipt_writes_throw_reports_persistence_failure)", "test_cleanup_success_recorded (__main__.Receipts.test_cleanup_success_recorded)", "test_job_close_timeout_never_attempts_delete_but_persists (__main__.Receipts.test_job_close_timeout_never_attempts_delete_but_persists)", "test_owner_write_read_json_or_rmtree_failure_keeps_receipt (__main__.Receipts.test_owner_write_read_json_or_rmtree_failure_keeps_receipt)", "test_primary_receipt_throw_uses_independent_fallback (__main__.Receipts.test_primary_receipt_throw_uses_independent_fallback)"], "unexpectedIOGuardsArmed": true}
+test_connect_transition_competitor_receives_zero_bytes (__main__.Ownership.test_connect_transition_competitor_receives_zero_bytes) ... ok
+test_ipv6_competing_listener_refused (__main__.Ownership.test_ipv6_competing_listener_refused) ... ok
+test_missing_ownership_refuses_dispatch (__main__.Ownership.test_missing_ownership_refuses_dispatch) ... ok
+test_owned_connection_positive (__main__.Ownership.test_owned_connection_positive) ... ok
+test_released_probe_competitor_listener_refuses_dispatch (__main__.Ownership.test_released_probe_competitor_listener_refuses_dispatch) ... ok
+test_replacement_before_auth_or_shutdown_send_refused (__main__.Ownership.test_replacement_before_auth_or_shutdown_send_refused) ... ok
+test_both_receipt_writes_throw_reports_persistence_failure (__main__.Receipts.test_both_receipt_writes_throw_reports_persistence_failure) ... ok
+test_cleanup_success_recorded (__main__.Receipts.test_cleanup_success_recorded) ... ok
+test_job_close_timeout_never_attempts_delete_but_persists (__main__.Receipts.test_job_close_timeout_never_attempts_delete_but_persists) ... ok
+test_owner_write_read_json_or_rmtree_failure_keeps_receipt (__main__.Receipts.test_owner_write_read_json_or_rmtree_failure_keeps_receipt) ... ok
+test_primary_receipt_throw_uses_independent_fallback (__main__.Receipts.test_primary_receipt_throw_uses_independent_fallback) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.003s
+
+OK

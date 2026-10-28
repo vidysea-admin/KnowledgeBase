@@ -1,0 +1,65 @@
+✔ all three kinds synthesize through provider and independent grounding pass, then editable Markdown consumer (24.4517ms)
+✔ unknown model citations refuse generation without persistence (1.3187ms)
+✔ unsupported model interpretations remain withheld and cannot export (1.7905ms)
+✔ excluded unverified source claims remain visible as partial coverage and refusal policy cannot call them ready (14.0519ms)
+✔ draft edits persist and need explicit revalidation; adversarial factual edits remain refused (3.2455ms)
+✔ supported saved edit revalidates then exports; citation replacement/removal and stale concurrent edits refuse (2.9723ms)
+✔ foreign tenant cannot read/list/edit/revalidate/export or select another tenant's source (1.0529ms)
+✔ tenant/evidence/provider fields in requests cannot replace server authority (0.4225ms)
+✔ current source edit/deletion/unverification blocks export and revalidation (3.9304ms)
+✔ protected databases refuse the new write store without borrowing other feature opt-ins (0.7419ms)
+✔ source snapshot cannot expose mixed tenants or duplicate identities (0.6939ms)
+✔ policy dependency forwards tenant/kind, style and insufficiency; conflicts cannot widen grounding (0.7117ms)
+✔ policy revision changes and cached citation tampering refuse reopen/export (2.8163ms)
+✔ actual schema and cross-field validator refuse damaged stored identities, references, ranges and shape (3.949ms)
+✔ actual T056 service lookup applies saved tenant policy and refuses its changed revision (4.0853ms)
+✖ actual T007 approval capability excludes raw WhatsApp and rechecks current source drift before output/export (25.0131ms)
+✔ actual T054 reader consumes corrected source projection and invalidates the prior draft without raw mutation (6.1575ms)
+✔ document offsets and hostile user text stay safe in source-linked Markdown (1.005ms)
+✔ removing a withheld item preserves other verified mappings and truthful coverage (1.3491ms)
+✔ actual TOC unreviewed sample refuses; a clearly synthetic verified copy demonstrates downstream consumption without raw mutation (5.8834ms)
+✔ mounted router enforces authentication/scopes; provider error secrets remain private (106.1557ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 20
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1916.0709
+
+✖ failing tests:
+
+test at apps\api\src\knowledge-outputs\workbench.test.ts:240:1
+✖ actual T007 approval capability excludes raw WhatsApp and rechecks current source drift before output/export (25.0131ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /2026-10-14T10:00:00/u. Input:
+  
+  '# Application preparation\n' +
+    '\n' +
+    'AI draft — requires human review. Grounding checks are model assessments, not human verification.\n' +
+    '\n' +
+    'Purpose: Prepare admissions questions for Monday\n' +
+    'Revision: 1\n' +
+    'Generated using fixture\\-provider / fixture\\-model.\n' +
+    'Source coverage: ready; 0 claims excluded from eligible evidence.\n' +
+    'Policy: No matching policy; conservative internal-only default.\n' +
+    '\n' +
+    '## Questions and answers\n' +
+    '\n' +
+    'Q: What does this source state?\n' +
+    'A: Scholarship applications open Monday\\.\n' +
+    '\n' +
+    '> Scholarship applications open Monday\\.\n' +
+    '\n' +
+    '[session\\-a / turn\\-a](/sessions/session-a#turn-turn-a) · Expert (person\\-a) · Occurred at 2026\\-10\\-14T10:00:00\\.000Z\n'
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/knowledge-outputs/workbench.test.ts:269:12)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '# Application preparation\n\nAI draft — requires human review. Grounding checks are model assessments, not human verification.\n\nPurpose: Prepare admissions questions for Monday\nRevision: 1\nGenerated using fixture\\-provider / fixture\\-model.\nSource coverage: ready; 0 claims excluded from eligible evidence.\nPolicy: No matching policy; conservative internal-only default.\n\n...',
+    expected: /2026-10-14T10:00:00/u,
+    operator: 'match',
+    diff: 'simple'
+  }

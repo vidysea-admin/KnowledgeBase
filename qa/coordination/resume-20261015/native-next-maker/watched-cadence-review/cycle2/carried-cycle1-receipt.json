@@ -1,0 +1,48 @@
+{
+  "unit_slug": "watched-cadence-launcher",
+  "cycle_checked": 1,
+  "candidate_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "reviewers": [
+    {
+      "id": "/root/watched_cadence_independent_checker",
+      "token_metric": "actual_total",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 150,
+        "tokens": 20000,
+        "token_metric": "actual_total"
+      },
+      "status": "Review allocation charged conservatively; startup/whole-review actual telemetry unavailable. Includes no claimed measured runtime cap success."
+    },
+    {
+      "id": "/root/watched_cadence_independent_checker/finalization-cycle1",
+      "status": "Actual telemetry unknown; committed completion allocation retained from cycle1 completion-accounting, not measured usage",
+      "active_s": null,
+      "budget_debit": {
+        "active_s": 30,
+        "tokens": 4000,
+        "token_metric": "actual_total"
+      },
+      "cost": null,
+      "completion_reserve_id": "watched-cadence-launcher/1/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+      "phase_kind": "finalization",
+      "tokens": null,
+      "token_metric": "actual_total"
+    }
+  ],
+  "history_authority": {
+    "finalization_input_sha256": "ed25dbb6f04cf8c3bc2662725fd5a330a35bdfea21b4e33df1ef7c3c7aa0a148",
+    "completion_accounting_sha256": "319784474b08a344fd389d32107bd66a5a9af98099e0c0a0ef27c3f73638f614",
+    "verdict_snapshot_sha256": "e1ef42f08c8eeea54e59cf3ae4a3dd5cd268105ed2285654ca682a5c3e2d2d61"
+  },
+  "late60": "Arrived afterfinalization; denied/unused;no debit;not available allocation",
+  "allocation_retained": {
+    "active_s": 180,
+    "tokens": 24000,
+    "token_metric": "actual_total"
+  },
+  "actual_usage_unknown": true,
+  "broker_child_overhead": "Unknown within prior150review debit;0testprocesses/0contracts, no fabricated zero overhead"
+}

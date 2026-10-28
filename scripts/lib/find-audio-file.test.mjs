@@ -11,7 +11,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import { findAudioFile } from "./find-audio-file.mjs";
+import { findAudioFile, transcriptTenant } from "./find-audio-file.mjs";
 
 function fixture() {
   return mkdtempSync(join(tmpdir(), "lkb-find-audio-"));
@@ -75,5 +75,26 @@ test("falls back to TOC basename matching when source.json has no audioPath", ()
     assert.equal(filename, "23rd-May-UniAccess-ATLAS-Skilltech.m4a");
   } finally {
     rmSync(root, { recursive: true, force: true });
+  }
+});
+test("transcript tenant is source-derived and missing/malformed sources fail closed", () => {
+  const dir = fixture();
+  try {
+    const session = join(dir, "tenant-session");
+    mkdirSync(session, { recursive: true });
+    writeFileSync(join(session, "source.json"), JSON.stringify({ tenantId: "tenant-second" }));
+    assert.equal(transcriptTenant(dir, "tenant-session"), "tenant-second");
+    for (const source of [{}, { tenantId: null }, { tenantId: "" }, { tenantId: "   " }, { tenantId: 42 }]) {
+      writeFileSync(join(session, "source.json"), JSON.stringify(source));
+      assert.throws(() => transcriptTenant(dir, "tenant-session"), /source tenantId required/);
+    }
+    assert.throws(() => transcriptTenant(dir, "missing-session"), /ENOENT/);
+    writeFileSync(join(session, "source.json"), "{broken");
+    assert.throws(() => transcriptTenant(dir, "tenant-session"), SyntaxError);
+    for (const id of ["../escape", "..", "/absolute", "C:\\absolute", "bad/name", "bad\\name", "", "x".repeat(151)]) {
+      assert.throws(() => transcriptTenant(dir, id), /invalid sessionId/);
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
   }
 });

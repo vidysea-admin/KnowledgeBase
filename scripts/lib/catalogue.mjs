@@ -101,13 +101,22 @@ export function scrapeRoutes(root, read = (a) => readFileSync(a, "utf8")) {
   const dir = join(root, "apps", "api", "src", "routes");
   const live = new Set();
   const stubs = new Set();
-  for (const f of readdirSync(dir).filter((n) => n.endsWith(".ts") && !n.endsWith(".test.ts"))) {
-    const src = read(join(dir, f));
+  // Route files may live in feature subfolders (routes/ask/ask.ts): walk the tree, not one level.
+  const files = [];
+  const walk = (d) => {
+    for (const e of readdirSync(d, { withFileTypes: true })) {
+      if (e.isDirectory()) { if (e.name !== "node_modules") walk(join(d, e.name)); }
+      else if (e.name.endsWith(".ts") && !e.name.endsWith(".test.ts")) files.push(join(d, e.name));
+    }
+  };
+  walk(dir);
+  for (const p of files) {
+    const src = read(p);
     // `router.get("/x", …)` / `.post("/x/:id", …)` — the shape every route file uses.
     for (const m of src.matchAll(/\.(get|post|put|delete)\(\s*"([^"]+)"/g)) {
       live.add(`${m[1].toUpperCase()} ${m[2]}`);
     }
-    if (f === "stubs.ts") {
+    if (p === join(dir, "stubs.ts")) {
       // STUB_ROUTES rows are `{ method: "get", path: "/search", … }` — mounted, but answer 501.
       for (const m of src.matchAll(/method:\s*"(\w+)"\s*,\s*path:\s*"([^"]+)"/g)) {
         stubs.add(`${m[1].toUpperCase()} ${m[2]}`);

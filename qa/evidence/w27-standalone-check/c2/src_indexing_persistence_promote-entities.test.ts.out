@@ -1,0 +1,29 @@
+promoteAndPersistEntities(t/s1): promotion failed, indexing continues: boom
+✔ ISS-126: topics and orgs are UPSERTED — a mutation to upsert:false must not pass unnoticed (4.7125ms)
+✔ ISS-126: promotion NEVER deletes — a topic row spans sessions, so delete-then-insert would drop other sessions' evidence (0.8072ms)
+✔ ISS-156: the ORG body carries tenantId too — the topic assertion alone left orgs unpinned (0.7694ms)
+✔ ISS-126: the written topic carries the UNIONED sessionRefs, not just the indexed session (0.7905ms)
+✔ ISS-126/ISS-202: every write is tenant-scoped on filter AND body (1.1071ms)
+✔ ISS-126: promotion NEVER THROWS — a write failure must not strand the session (ISS-121's lesson) (1.3928ms)
+✔ ISS-126: tagClaims:false issues NO claims operation at all (the ISS-056 invariant) (0.6297ms)
+✔ ISS-126: an empty tree writes nothing rather than writing empty rows (0.4525ms)
+✔ ISS-126(4): tagClaims writes the session's REAL topicRefs onto each of its claims (1.5392ms)
+✔ ISS-126(4): a session whose tree surfaced NO topics clears topicRefs rather than leaving them stale (0.7806ms)
+✔ ISS-C-TARGETING: the claims read is scoped to THIS session, not the whole collection (0.8948ms)
+✔ ISS-C-TARGETING: each claim update targets ONE claim by _id, never an open filter (0.8403ms)
+✔ ISS-C-TARGETING: topic and org upserts target their own _id, not an open filter (0.4824ms)
+✔ ISS-C-TOPICREFS-ARG-001: a claim is tagged with the INDEXED session's topics, not the other session's (0.7555ms)
+✔ C6: two tenants promoting the SAME slug write to different _ids (0.7427ms)
+✔ C6: org ids are namespaced too — the same collision applies to orgs (0.7712ms)
+✔ C6: a topicRef resolves to a real topics._id — namespaced through the SAME helper (0.687ms)
+✔ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (46.4011ms)
+✔ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (7.5646ms)
+✔ ISS-155: the dry-run preview prints the NAMESPACED id the live path writes, not the bare slug (0.6486ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1153.5517

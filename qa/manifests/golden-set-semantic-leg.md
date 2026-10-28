@@ -61,3 +61,5 @@ Tier: 3 (roadmap — T-021/U0.10, deps done).
 - U1.4/U1.5 gate re-pointing (condition 4) may now cite this evidence; the >=0.85 exit criterion
   for hybrid remains NOT claimed (hybrid measured 0.870 vs vector 0.935 earlier; this unit did
   not re-run hybrid).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

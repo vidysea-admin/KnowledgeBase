@@ -1,0 +1,78 @@
+{
+  "schema": "local-milestone-commit/1",
+  "startedAt": "2026-10-15T23:20:49.6599270Z",
+  "authorization": "Explicit user local commit, root released LOCAL WIP milestone; no push",
+  "commands": [
+    {
+      "ownExit": 0,
+      "stderr": "qa/coordination/resume-20261015/commit-20261015T232049Z-head-before.stderr.txt",
+      "stdout": "qa/coordination/resume-20261015/commit-20261015T232049Z-head-before.stdout.txt",
+      "label": "head-before"
+    },
+    {
+      "ownExit": 0,
+      "stderr": "qa/coordination/resume-20261015/commit-20261015T232049Z-branch-before.stderr.txt",
+      "stdout": "qa/coordination/resume-20261015/commit-20261015T232049Z-branch-before.stdout.txt",
+      "label": "branch-before"
+    },
+    {
+      "ownExit": 0,
+      "stderr": "qa/coordination/resume-20261015/commit-20261015T232049Z-index-before.stderr.txt",
+      "stdout": "qa/coordination/resume-20261015/commit-20261015T232049Z-index-before.stdout.txt",
+      "label": "index-before"
+    },
+    {
+      "ownExit": 0,
+      "label": "actual-repository-verdict-cycle-parser"
+    },
+    {
+      "ownExit": 0,
+      "stderr": "qa/coordination/resume-20261015/commit-20261015T232049Z-add-exact-pathspec.stderr.txt",
+      "stdout": "qa/coordination/resume-20261015/commit-20261015T232049Z-add-exact-pathspec.stdout.txt",
+      "label": "add-exact-pathspec"
+    },
+    {
+      "ownExit": 0,
+      "stderr": "qa/coordination/resume-20261015/commit-20261015T232049Z-staged-names.stderr.txt",
+      "stdout": "qa/coordination/resume-20261015/commit-20261015T232049Z-staged-names.stdout.txt",
+      "label": "staged-names"
+    }
+  ],
+  "status": "STOPPED_INDEX_PRESERVED",
+  "commitSha": null,
+  "pushes": 0,
+  "configMutations": 0,
+  "stageMutations": 1,
+  "allowlistSha256": "9044f3b893ae18d1c3acebd0e4f4cb685f8798549f7f78b8545d75c760f03bff",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "branch": "codex/machine-migration-2026-10-09",
+  "verdict": {
+    "cycle": 0,
+    "status": "NEEDS_EXTRA_REVIEW",
+    "reviewedSha": "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+    "sha256": "610e7a0a151216cbf35eddf0fdd7a5bd97485bdfb852790a52023433c517863d",
+    "path": "qa/verdicts/t013-t037-t056-joined-source-slices.md",
+    "verdict": "HOLD"
+  },
+  "rawShaDrift": [],
+  "stagedPathMismatch": [
+    {
+      "InputObject": "apps/api/src/indexing/decisions-persist.test.ts",
+      "SideIndicator": "<="
+    },
+    {
+      "InputObject": "apps/api/src/indexing/decisions-persist.ts",
+      "SideIndicator": "<="
+    },
+    {
+      "InputObject": "apps/api/src/indexing/promote-entities.test.ts",
+      "SideIndicator": "<="
+    },
+    {
+      "InputObject": "apps/api/src/indexing/promote-entities.ts",
+      "SideIndicator": "<="
+    }
+  ],
+  "failure": "Staged name identity mismatch; index retained",
+  "finishedAt": "2026-10-15T23:20:51.3506132Z"
+}

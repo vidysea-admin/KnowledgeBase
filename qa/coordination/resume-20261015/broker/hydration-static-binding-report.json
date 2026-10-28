@@ -1,0 +1,24 @@
+{
+  "status": "METADATA_ONLY",
+  "closure": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48.json",
+    "sha256": "b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48",
+    "count": 208
+  },
+  "pinsReference": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\eval-pilot\\offline-hydration-audit\\pins.json",
+    "sha256": "4a51ef591b9875bbfd310902d0cea9a727b8f204489824ebba5daefab59fba7d"
+  },
+  "missingBindings": [
+    {
+      "path": "schema/whatsapp_candidates.schema.json",
+      "sha256": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16"
+    }
+  ],
+  "byteDrift": [],
+  "unsupportedStaticPackageSpecifiers": [],
+  "codeImportsExecuted": 0,
+  "testsExecuted": 0,
+  "auditExecuted": false,
+  "priorHoldPreserved": true
+}

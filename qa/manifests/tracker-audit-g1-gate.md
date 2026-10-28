@@ -103,3 +103,5 @@ criterion C7 explicitly permits this shape (only the CLI's own LOC budget and `l
 exit code are constrained, not a single-file requirement) — re-read to confirm before PASS.
 
 **Status: checked-PASS**
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

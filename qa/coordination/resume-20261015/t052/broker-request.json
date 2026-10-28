@@ -1,0 +1,59 @@
+{
+  "unit": "source-delivery-registration-retry",
+  "cycle": 2,
+  "tier": 3,
+  "status": "REQUESTED_ROOT_BROKER_ONLY",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "existingManifest": "qa/manifests/source-delivery-registration-retry.md",
+  "existingPacket": "qa/packets/source-delivery-registration-retry.md",
+  "policy": "Retain active existing unit policy and historical usage; no replacement packet or checker launch",
+  "pinsStableSinceReconciliation": false,
+  "drift": [
+    "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+  ],
+  "reuse": {
+    "pythonResult": "1 passed / 15 deselected, exit 0, 3182.7639 ms",
+    "python": "qa/goal-vectorless-2026-10-15/verification-registration-retry-python.json",
+    "node": "qa/goal-vectorless-2026-10-15/verification-registration-retry-node.json",
+    "basis": "All recorded source/dependency pins, executable hashes, command vectors and environment whitelist hashes matched at reconciliation. These remain maker evidence only.",
+    "nodeResult": "16/16 passed, exit 0, 3499.9275 ms"
+  },
+  "requests": [
+    {
+      "kind": "rerun-original-state-node-after-faithful-fixture-repair",
+      "program": "C:/Program Files/nodejs/node.exe",
+      "args": [
+        "--test",
+        "--test-concurrency=1",
+        "--import",
+        "tsx",
+        "--test-name-pattern=^registration attempt round-trips strictly and confirmation requires unique matching evidence$",
+        "packages/meeting-bot/src/calendar/state/schedule-state.test.ts"
+      ],
+      "timeoutMs": 30000,
+      "reason": "Original durable-state test plus existing lineage/tenant/source guards and added missing/stale/future receivedAt refusal boundaries in the same node. Fixture positive now uses exact checkedAt; no production change.",
+      "preflight": "Root broker validates source/import containment, existing dependencies and writable temporary parent before execution",
+      "knownFixtureGap": "Repaired only positive fixture receivedAt: checkedAt. Original failure and cycle-1 request retained; no green inferred."
+    }
+  ],
+  "sharedRootGates": [
+    "Reuse matching existing meeting-bot compiler receipt or run existing direct compiler under root integration grant",
+    "Reuse matching frozen-contract verifier receipt or execute once under root integration grant"
+  ],
+  "exclusions": [
+    "No repeated unrelated Node/Python greens",
+    "No real browser/registration/provider/database",
+    "No checker launch",
+    "No production or central tracker changes"
+  ],
+  "tokens": null,
+  "token_metric": "actual_total",
+  "cost": null,
+  "createdAt": "2026-10-15T20:26:36.4526232Z",
+  "candidateFile": {
+    "path": "packages/meeting-bot/src/calendar/state/schedule-state.test.ts",
+    "beforeSha256": "41dd61db3c524845eff2c55436893a5e4e0f07e86e806fc5e6c7b74667315577",
+    "sha256": "06dfe7814403a8232e6df4f4be0651580fdcaa86ea4ab54b34846acc130c7865",
+    "backup": "qa/coordination/resume-20261015/t052/cycle-2-schedule-state.before.raw"
+  }
+}

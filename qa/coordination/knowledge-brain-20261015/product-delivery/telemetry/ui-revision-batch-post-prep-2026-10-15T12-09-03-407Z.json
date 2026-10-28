@@ -1,0 +1,116 @@
+{
+  "kind": "CONTENT_FREE_UI_REVISION_BATCH_POST_PREP",
+  "captured_at": "2026-10-15T12:09:03.407Z",
+  "mapping": {
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T12-06-03-01a13f74-8363-7600-97e6-976d3b666409.jsonl",
+    "id": "01a13f74-8363-7600-97e6-976d3b666409",
+    "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+    "agent_path": "/root/product_delivery_coordinator/ui_revision_batch_checker"
+  },
+  "read_one": {
+    "read_completed_at": "2026-10-15T12:09:01.838Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T12-06-03-01a13f74-8363-7600-97e6-976d3b666409.jsonl",
+    "source_sha256": "08df3918bf831347ce647d17d210af547c39b4f4a35be1b187d419702ddd5686",
+    "meta": {
+      "id": "01a13f74-8363-7600-97e6-976d3b666409",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/ui_revision_batch_checker",
+      "timestamp": "2026-10-15T12:06:03.582Z"
+    },
+    "token_record_count": 4,
+    "latest": {
+      "timestamp": "2026-10-15T12:06:58.813Z",
+      "total_token_usage": {
+        "input_tokens": 222805,
+        "cached_input_tokens": 189568,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1892,
+        "reasoning_output_tokens": 158,
+        "total_tokens": 224697
+      },
+      "last_token_usage": {
+        "input_tokens": 72762,
+        "cached_input_tokens": 59904,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 542,
+        "reasoning_output_tokens": 92,
+        "total_tokens": 73304
+      }
+    }
+  },
+  "read_two": {
+    "read_completed_at": "2026-10-15T12:09:03.407Z",
+    "sourcepath": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T12-06-03-01a13f74-8363-7600-97e6-976d3b666409.jsonl",
+    "source_sha256": "08df3918bf831347ce647d17d210af547c39b4f4a35be1b187d419702ddd5686",
+    "meta": {
+      "id": "01a13f74-8363-7600-97e6-976d3b666409",
+      "parent_thread_id": "01a13ef5-cdb9-7f50-8b51-43aa650d0527",
+      "agent_path": "/root/product_delivery_coordinator/ui_revision_batch_checker",
+      "timestamp": "2026-10-15T12:06:03.582Z"
+    },
+    "token_record_count": 4,
+    "latest": {
+      "timestamp": "2026-10-15T12:06:58.813Z",
+      "total_token_usage": {
+        "input_tokens": 222805,
+        "cached_input_tokens": 189568,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 1892,
+        "reasoning_output_tokens": 158,
+        "total_tokens": 224697
+      },
+      "last_token_usage": {
+        "input_tokens": 72762,
+        "cached_input_tokens": 59904,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 542,
+        "reasoning_output_tokens": 92,
+        "total_tokens": 73304
+      }
+    }
+  },
+  "counter_stable": true,
+  "source_hash_stable": true,
+  "root_completion_attestation": "Root verifies actor COMPLETED/FINAL with no idle loop; one batch source/receipt turn. Metadata collector did not parse messages or independently infer completion.",
+  "root_checkpoint": "qa/coordination/knowledge-brain-20261015/product-delivery/checkers/ui-revision-batch-prep-checkpoint.json",
+  "root_checkpoint_status": "NEEDS_EXTRA_REVIEW; truncated source/receipt output;9pins/helpergate authenticated but receipt provenance/contract/epoch incomplete. Attributed root report, not parsed checkpoint body.",
+  "fresh_actual_total": 224697,
+  "fresh_actual_output": 1892,
+  "review_phase_caps": {
+    "actual_total": 120000,
+    "active_s": 30,
+    "allocated_output": 1100
+  },
+  "new_shared_caps": {
+    "actual_total": 200000,
+    "active_s": 60,
+    "allocated_output": 1800
+  },
+  "review_actual_total_overrun": 104697,
+  "review_output_overrun": 792,
+  "new_shared_actual_total_overrun": 24697,
+  "new_shared_output_overrun": 92,
+  "time_breach": "UNKNOWN: token_count telemetry cannot establish active time.",
+  "manual_final_reserve": {
+    "actual_total": 80000,
+    "active_s": 30,
+    "allocated_output": 700,
+    "admitted": false,
+    "borrowable_for_review": false
+  },
+  "prior_transcript_actual": 294849,
+  "prior_transcript_debit": {
+    "active_s": 40,
+    "allocated_output": 1000
+  },
+  "aggregate_checker_actual_total": 519546,
+  "cumulative_actual_ceiling": 494849,
+  "aggregate_cumulative_overrun": 24697,
+  "maker_comparable_total_tokens_frozen": 6052313,
+  "status": "NEEDS_EXTRA_REVIEW",
+  "qualifier": "Fresh recorded cumulative counters known/stable. Root completed/FINAL attestation separate; theoretical completion/residual unrecorded usage remains unknown. No per-unit allocation or10percent success inferred.",
+  "semantics": "input+output ACTUAL; cached input/reasoning output subsets not additive. All model calls count, no wait-token exclusions.",
+  "no_further_model_review_or_probe_authoring_admitted": true,
+  "shared_accounting_helper_cost": "Separate; excluded from maker denominators.",
+  "tests_gates_source_or_actor_resume": false
+}

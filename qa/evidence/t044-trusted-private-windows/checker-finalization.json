@@ -1,0 +1,25 @@
+{
+  "slug": "t044-trusted-private-windows",
+  "cycleChecked": 0,
+  "integrationVersion": 1,
+  "verdict": "PASS scoped source only",
+  "wholeParent": "HOLD",
+  "checkerLaunch": "2026-10-14T22:02:22Z",
+  "persistedMtimeUtc": "2026-10-14T22:36:01.7014655Z",
+  "confirmedAt": "2026-10-14T22:36:20.8395342Z",
+  "launchToConfirmedMs": 2038839.5342,
+  "sourceAndProbePinsMatched": 38,
+  "specSha256": "86f36ea5f3467b8ff5ad1d7bff40aa6419b9bb9401c2caa55b475d2e54016a2e",
+  "verdictPath": "qa/verdicts/t044-trusted-private-windows.md",
+  "verdictSha256": "4ce2a6b45a723ce8490c4160a9e7f56c4844722a1607377b84beaf5cf0966957",
+  "independentReceiptSha256": "403f71aa247368abb37c4ade20f29f668d6f5be90f4c10ef142e8e9f1b402b3d",
+  "missingPhaseMeasurements": [
+    "Exact human HOLD/resume message times",
+    "Earlier survey start/end",
+    "Approval phase not applicable",
+    "Individual resumed source-read phase start/end"
+  ],
+  "productMutation": false,
+  "nativeAclEnforcedByConsumer": false,
+  "trustedUpstreamProducerProtectedRootPrerequisite": true
+}

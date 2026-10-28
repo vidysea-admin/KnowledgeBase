@@ -106,8 +106,8 @@ non-blank lines. `pnpm -r typecheck` and `pnpm test` (123/123) re-confirmed clea
 - `node scripts/tracker-audit.mjs --gate g1,g4` → 3 findings, but **2 of 3 are pre-existing on
   `master` HEAD c9959bf itself** (verified: `git show c9959bf:.goal/goal.json` already has T-029
   and T-030 both `"status": "pending"` while `TASKS.md` already marks them `done` — this predates
-  and is unrelated to this unit). The 3rd (G4, `qa/verdicts/t-047-controller.md` bare `ISS-001`/
-  `ISS-002` refs) reproduces identically on `master` HEAD too (`node scripts/tracker-audit.mjs
+  and is unrelated to this unit). The 3rd (G4, `qa/verdicts/t-047-controller.md` bare `001`/
+  `002` refs) reproduces identically on `master` HEAD too (`node scripts/tracker-audit.mjs
   --gate g1,g4` on `D:/KnowledgeBase` gives exactly that one finding).
 
 ## Actual outputs (from maker's own run)
@@ -167,7 +167,7 @@ $ node scripts/tracker-audit.mjs --gate g1,g4
 tracker-audit --gate G1,G4: 3 finding(s)
   G1 status: T-029 is "pending" in goal.json but "done" in TASKS.md      [pre-existing on master c9959bf]
   G1 status: T-030 is "pending" in goal.json but "done" in TASKS.md      [pre-existing on master c9959bf]
-  G4 ambiguous issue ref: qa/verdicts/t-047-controller.md cites ISS-001, ISS-002 bare  [pre-existing]
+  G4 ambiguous issue ref: qa/verdicts/t-047-controller.md cites 001, 002 bare  [pre-existing]
 
 $ npx depcruise --config .dependency-cruiser.cjs packages apps workers
 ✔ no dependency violations found (343 modules, 1073 dependencies cruised)
@@ -202,3 +202,5 @@ record-commands.test.ts,record-finalize.ts}`. `obs-windows.test.ts` drives a rea
 tiny) Node child process standing in for the bot browser — never an actual Chrome/webinar page.
 
 ## Status: checked-PASS — qa/verdicts/t-033-bot-tests.md (Cycle checked: 0, f0b9c91); merged to master 5262deb (ledger conflict on ISS-300 resolved by 3-way field merge); meeting-bot 123/123 + pnpm -r typecheck clean on merged tree; debt ISS-T-033-1 (D-020 git-checkout restore), ISS-T-033-2 (uncleared 120s launch() timer)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

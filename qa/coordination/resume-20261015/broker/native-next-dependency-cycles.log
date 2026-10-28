@@ -1,0 +1,18 @@
+
+  error no-circular: apps/api/src/composition/integrations/source-jobs.ts → 
+      apps/api/src/composition/production.ts →
+      apps/api/src/composition/integrations/source-jobs.ts
+  error no-circular: apps/api/src/composition/integrations/routes.ts → 
+      apps/api/src/composition/integrations/hosting.ts →
+      apps/api/src/composition/production.ts →
+      apps/api/src/server.ts →
+      apps/api/src/composition/integrations/routes.ts
+  error no-circular: apps/api/src/composition/integrations/hosting.ts → 
+      apps/api/src/composition/production.ts →
+      apps/api/src/composition/integrations/hosting.ts
+  error apps-only-ask-ingest-index-ai-db-core: apps/api/src/capture-readiness/host-connector.ts → packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts
+  error apps-only-ask-ingest-index-ai-db-core: apps/api/src/capture-readiness/host-connector.ts → packages/meeting-bot/src/capture/workspace/capture-slot-readiness.ts
+  error apps-only-ask-ingest-index-ai-db-core: apps/api/src/capture-readiness/host-connector.ts → packages/meeting-bot/src/capture/workspace/capture-slot-acceptance.ts
+
+x 6 dependency violations (6 errors, 0 warnings). 1663 modules, 7491 dependencies cruised.
+

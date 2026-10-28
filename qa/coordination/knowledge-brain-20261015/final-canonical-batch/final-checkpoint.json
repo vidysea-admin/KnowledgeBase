@@ -1,0 +1,61 @@
+{
+  "checksExecutedBySchemaAuthor": false,
+  "files": [
+    {
+      "path": "schema/index.json",
+      "sha256": "C949FE2697E3CF735601CAEE4372378E108E0BF3855079D299CB6CFFDA1483E8"
+    },
+    {
+      "path": "schema/tree_index.schema.json",
+      "sha256": "2B03A2DFACB9C747725FF261E17B7139E418F13E1E9D165CF524A1DD876FE146"
+    },
+    {
+      "path": "schema/speaker_attributes.schema.json",
+      "sha256": "784BBECE740C2188ADB20463880918845A5CBC6677FAE9BA433BEA386C09567A"
+    },
+    {
+      "path": "schema/fixtures/speaker_attributes/valid.json",
+      "sha256": "91089BC53686ABCDFE01860236D332254AD4BD106772C3966254ED3D1D3F2C8B"
+    },
+    {
+      "path": "schema/fixtures/speaker_attributes/invalid.json",
+      "sha256": "3EF7CBDE1BF4F274B93A4E9402A6E93802B6970B49460C8573F865EE96FDF255"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "42A3854C5E15B297EE93BEAE7F840BB3976A114FD1C25EF6216502E3C905F231"
+    },
+    {
+      "path": "packages/core/src/generated/speaker_attributes.ts",
+      "sha256": "D20D6B907F863839A004479AC525849CDE3208C010797F4E7E14B57A33C7334D"
+    },
+    {
+      "path": "packages/core/src/generated/tree_index.ts",
+      "sha256": "25C40A65C844AB68187FD18519D3A6CBF92233C277D13043E1C127DC631963A3"
+    },
+    {
+      "path": "packages/db/src/index.ts",
+      "sha256": "89B52EB2EB2032798B762D92C25E1381665858E49034317DE1B92CB809E311F0"
+    },
+    {
+      "path": "packages/db/src/collections/speaker-attributes.ts",
+      "sha256": "90531AD79CA86B3D6AE8C799A0800CE792C7D8F6756DA35DE0EA23EE9A0A9497"
+    },
+    {
+      "path": "migrations/20261015130000-speaker-attributes.cjs",
+      "sha256": "91D0BDF51FA528FFF8DAC6B21EC2B69E0970730A83D457547560D8C69FD291DA"
+    },
+    {
+      "path": "scripts/gen-types.mjs",
+      "sha256": "810C7994B1A571F6E18DEA8D265A1E32DF14D717D2E8AA76CF1E17D663E61D5D"
+    },
+    {
+      "path": "structure.config.json",
+      "sha256": "6C99E5AF935B72B83FA16B1A6D6A728860AF3023C0DAE1B4458977260FE06A29"
+    }
+  ],
+  "generationReceipt": "qa/coordination/knowledge-brain-20261015/final-canonical-batch/generation-receipt.json",
+  "recordedUtc": "2026-10-15T10:41:41.6586926Z",
+  "tokensActual": null,
+  "recordedMonotonic": 249915567855
+}

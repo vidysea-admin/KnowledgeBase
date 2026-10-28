@@ -87,3 +87,5 @@ Zero collisions after the guard landed. The one collision that did occur (a muta
 production source) predates it and is what motivated it.
 
 **This gate is CLOSED.**
+
+**Gate status:** CLOSED — the file states This gate is CLOSED in its own closing line

@@ -193,3 +193,5 @@ task silently papered over.
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-009-developer-api.md (Cycle checked: 1, commit cb04252) — 8/8 criteria met; scoreFn scoping ruled legitimate (follow-up T-009b); shell:true command-injection fixed post-verdict (commit be86bf8), before push.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

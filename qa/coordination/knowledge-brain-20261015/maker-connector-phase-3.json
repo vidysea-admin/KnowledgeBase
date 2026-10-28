@@ -1,0 +1,16 @@
+{
+  "backup": "qa/coordination/knowledge-brain-20261015/connector-mongo-before.ts.txt",
+  "explicitWaitIntervals": [],
+  "actualTokens": null,
+  "phase": "connector-vectorless-consumer-fix",
+  "startedAt": "2026-10-15T08:05:12.7683428Z",
+  "baseHash": "135E9021EED64B5C8BC8800F2F28913F87BA2C61C81DBE1B8C765E59F6E8D6CB",
+  "actualCost": null,
+  "monotonicStart": 156026417118,
+  "monotonicFrequency": 10000000,
+  "monotonicEnd": 156195509889,
+  "activeSeconds": 16.9092771,
+  "endedAt": "2026-10-15T08:05:29.6861720Z",
+  "finalHash": "4F1C4BAC38FBB8F2C7D0E4BBBF891A1DCAAA2B03D520E667C74F05E5C05C842C",
+  "outcome": "Removed redundant vector-only consumer gate; exact verifier continues validating mode-specific manifests, source turn coverage retained. Regression authored by indexing maker, broker pending."
+}

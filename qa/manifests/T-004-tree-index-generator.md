@@ -44,3 +44,5 @@ tree_index.schema.json is a valid Draft2020-12 schema
 
 ## Status: checked-PASS
 Verdict: qa/verdicts/T-004-tree-index-generator.md (commit 222314a) — 8/8 criteria met.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -1,0 +1,37 @@
+{
+  "scope": "T043 frozen v3 consumer repair replay and focused identity guards",
+  "spec": "qa/evidence/goal-t043/v3-consumer-cycle1/replay-spec.json",
+  "specSHA256": "24f4e6edc4a3bd7da2161c7fdaab1b32ce7a63037ecd370d760800eb19beaa69",
+  "pid": 16648,
+  "startedAt": "2026-10-14T22:48:41.9139090Z",
+  "completedAt": "2026-10-14T22:48:43.9396604Z",
+  "elapsedMs": 2028.0,
+  "exitCode": 0,
+  "timedOut": false,
+  "before": {
+    "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs": "9ea8a3b811b71035746f70fb32b56a12e2cab69f68c69f8cfffb7b5190ad4527",
+    "packages/meeting-bot/src/workspace/index-proof-fixture.mjs": "01498ea293641a4df82ab472a0acb8ab0c9fdbb9f08ce38682055756ede2a844",
+    "packages/meeting-bot/src/workspace/index-proof-identity.test.mjs": "a33c5e184191cee231470fb74837a7e0de67bd1642ad64f86c574dca515d9bcf",
+    "packages/meeting-bot/src/workspace/index-proof-consumer.ts": "1568f08ec400844f885defd9db05d4b3b054a865bbb12911a2ecc7525b4b7e4a",
+    "scripts/webinar/sync-session.mjs": "9896eff9e8fdc9e6298aca5cf751c708c45e8c24cfd2acf8b42acb96fd5a4012",
+    "packages/meeting-bot/src/capture/record-finalize.ts": "2a65dfc82940ec5ee461e089c1852158ac0dbae3ab46e5ed070a196a281237b8",
+    "scripts/webinar/index-proof.mjs": "7e548f2c2f643d6d3f6afba6c2360aaf225a7b531b6dc7e2d0fb2439283843eb",
+    "packages/ingest/src/retention/production/private-summary.ts": "e78e427ab662036994c846b62f9b904334ffb7d1a8270956b40035b24af50181",
+    "packages/ingest/src/retention/production/private-summary-read.ts": "3f451bf9b51d76671f28a7ae132c84f99e8d370fe86f131564cf6c65ba5554f0"
+  },
+  "after": {
+    "packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs": "9ea8a3b811b71035746f70fb32b56a12e2cab69f68c69f8cfffb7b5190ad4527",
+    "packages/meeting-bot/src/workspace/index-proof-fixture.mjs": "01498ea293641a4df82ab472a0acb8ab0c9fdbb9f08ce38682055756ede2a844",
+    "packages/meeting-bot/src/workspace/index-proof-identity.test.mjs": "a33c5e184191cee231470fb74837a7e0de67bd1642ad64f86c574dca515d9bcf",
+    "packages/meeting-bot/src/workspace/index-proof-consumer.ts": "1568f08ec400844f885defd9db05d4b3b054a865bbb12911a2ecc7525b4b7e4a",
+    "scripts/webinar/sync-session.mjs": "9896eff9e8fdc9e6298aca5cf751c708c45e8c24cfd2acf8b42acb96fd5a4012",
+    "packages/meeting-bot/src/capture/record-finalize.ts": "2a65dfc82940ec5ee461e089c1852158ac0dbae3ab46e5ed070a196a281237b8",
+    "scripts/webinar/index-proof.mjs": "7e548f2c2f643d6d3f6afba6c2360aaf225a7b531b6dc7e2d0fb2439283843eb",
+    "packages/ingest/src/retention/production/private-summary.ts": "e78e427ab662036994c846b62f9b904334ffb7d1a8270956b40035b24af50181",
+    "packages/ingest/src/retention/production/private-summary-read.ts": "3f451bf9b51d76671f28a7ae132c84f99e8d370fe86f131564cf6c65ba5554f0"
+  },
+  "hashesUnchanged": true,
+  "stdoutPath": "qa/evidence/goal-t043/v3-consumer-cycle1/repair-replay.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t043/v3-consumer-cycle1/repair-replay.stderr.txt",
+  "terminal": true
+}

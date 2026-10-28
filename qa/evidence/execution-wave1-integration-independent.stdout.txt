@@ -1,0 +1,9 @@
+✔ actual optional wiring: OFF does not load rules or alert; degraded dryrun writes nothing; live trusted sink reaches API and recovers (120.9087ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1824.6623

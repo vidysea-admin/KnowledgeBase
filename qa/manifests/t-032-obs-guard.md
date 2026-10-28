@@ -176,3 +176,5 @@ different — confirmed via `git diff --stat` reporting no changes both times).
   is pre-existing, from a different unit, and out of this unit's edit scope (`qa/verdicts/` is
   never touched by the maker) — flagged here only so the checker doesn't attribute it to this
   commit.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

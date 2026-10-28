@@ -38,6 +38,9 @@
  * runtime via tsx's programmatic register() API — same mechanism seed-toc.mjs already uses.
  */
 import "dotenv/config";
+import { requireBackfillDatabase } from "./lib/transcript-provenance.mjs";
+import { loadSharedDb, assertConnected } from "./lib/shared-db.mjs";
+import {fileURLToPath} from "node:url";
 import { register } from "tsx/esm/api";
 
 const args = process.argv.slice(2);
@@ -45,8 +48,8 @@ const has = (f) => args.includes(f);
 const val = (f, d) => { const i = args.indexOf(f); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
 
 const SUBCOMMAND = args[0] && !args[0].startsWith("--") ? args[0] : "chunks";
-if (!["chunks", "entities"].includes(SUBCOMMAND)) {
-  console.error(`backfill: unknown subcommand "${SUBCOMMAND}" — expected "chunks" or "entities"`);
+if (!["chunks", "entities", "recovery-chunks"].includes(SUBCOMMAND)) {
+  console.error(`backfill: unknown subcommand "${SUBCOMMAND}" — expected "chunks", "entities" or "recovery-chunks"`);
   process.exit(2);
 }
 const DRY_RUN = has("--dry-run");
@@ -56,14 +59,23 @@ const LIMIT = Number(val("--limit", "0")) || 0;
 
 const unregister = register();
 try {
-  const { getDb, connect, close, scopedCollection } = await import("../packages/db/src/index.ts");
+  if (SUBCOMMAND === "recovery-chunks") {
+    const {runRecoveryEmbeddingBackfill} = await import("./lib/toc/toc-embedding-backfill.mjs");
+    await runRecoveryEmbeddingBackfill(args.slice(1), {root: fileURLToPath(new URL("../", import.meta.url))});
+  } else {
+  // The @lkb/db instance apps/api sees (not a relative-path copy): see scripts/lib/shared-db.mjs for the "Mongo not connected" cause.
+  const dbModule = await loadSharedDb();
+  const { getDb, connect, close, scopedCollection } = dbModule;
   const { buildChunks } = await import("../packages/index/src/index.ts");
   const { writeSessionChunks } = await import("../apps/api/src/indexing/session.ts");
   const { embed: routeEmbed } = await import("../packages/ai/src/index.ts");
-  const { buildRouting } = await import("../apps/api/src/production.ts");
+  const { buildRouting } = await import("../apps/api/src/composition/production.ts");
 
-  // Same env vars as migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
-  await connect(process.env.MONGODB_URL || "mongodb://localhost:27017", process.env.MONGODB_DB || "lkb");
+  // Same env vars as config/migrate-mongo-config.cjs and seed-toc.mjs — one convention, not a third.
+  // No default database (the old fallback was lkb): refuses unless an isolated work DB, or lkb_staging under the --legacy-unbound double opt-in.
+  const target = requireBackfillDatabase(process.env, { legacyUnbound: has("--legacy-unbound") });
+  await connect(target.url, target.dbName);
+  assertConnected(dbModule);
   const db = getDb();
   const sessionsColl = scopedCollection(db, "sessions");
   const turnsColl = scopedCollection(db, "turns");
@@ -80,7 +92,7 @@ try {
   // a per-session fact.
   if (SUBCOMMAND === "entities") {
     const { promoteTreeEntities } = await import("../packages/index/src/index.ts");
-    const { promoteAndPersistEntities } = await import("../apps/api/src/indexing/promote-entities.ts");
+    const { promoteAndPersistEntities, topicPreviewLine } = await import("../apps/api/src/indexing/persistence/promote-entities.ts");
     const { treeIndexRootFilter } = await import("../packages/index/src/index.ts");
 
     const root = await db.collection("tree_index").findOne(treeIndexRootFilter(TENANT));
@@ -97,7 +109,7 @@ try {
     console.log(`tenant=${TENANT} topics_before=${tBefore} orgs_before=${oBefore}${DRY_RUN ? "  [DRY RUN — no writes]" : ""}`);
     console.log(`  would write: ${planned.topics.length} topic(s), ${planned.orgs.length} org(s)`);
     if (DRY_RUN) {
-      for (const t of planned.topics.slice(0, 10)) console.log(`    topic ${t._id} <- ${t.sessionRefs.length} session(s)`);
+      for (const t of planned.topics.slice(0, 10)) console.log(`    ${topicPreviewLine(TENANT, t)}`); // ISS-155: the namespaced id the live path writes
       console.log(`
 DRY RUN: nothing written.`);
       await close();
@@ -152,7 +164,7 @@ ${failures.length} session(s) failed promotion:`);
       continue;
     }
 
-    const res = await writeSessionChunks(TENANT, s._id, turns, embed, db);
+    const res = await writeSessionChunks(TENANT, s._id, turns, embed, db, true, s.provenance?.status === "legacy-unbound" ? { status: "legacy-unbound", reason: s.provenance.reason } : undefined);
     totalWritten += res.written;
     // `writeSessionChunks` never throws — it returns why it skipped. Reporting that explicitly is
     // the point: a backfill that printed only successes would hide a provider outage as "done".
@@ -176,6 +188,7 @@ ${failures.length} session(s) failed promotion:`);
   // Exit non-zero when any session was skipped, so a partial backfill can never be mistaken for a
   // complete one by a caller that only checks the exit code.
   process.exit(failures.length > 0 ? 1 : 0);
+  }
 } finally {
   unregister();
 }

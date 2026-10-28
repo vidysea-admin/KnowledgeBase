@@ -1,0 +1,73 @@
+{
+  "phase": "maker-verification",
+  "scope": "Isolated installer exclusive-handle repair five cases: owned GUID fixtures only, DefinitionsOnly blocks canonical install",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "ed5228985907dad6213e79425d44a838bc73fcdb8ef43083caf0d0b3f62e0254",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Program Files/PowerShell/7/pwsh.exe",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "qa/coordination/checker-completion-reserve-20261015/test-installer-lock.ps1"
+  ],
+  "program": "C:/Program Files/PowerShell/7/pwsh.exe",
+  "runtime_version": "PowerShell 7.4.20",
+  "runtime_executable_sha256": "531688dd8bb58ca620dc324b013a65ce3450acf2af5f1e83252e81a1b561a787",
+  "runtime_identity": {
+    "executable": "C:/Program Files/PowerShell/7/pwsh.exe",
+    "version": "PowerShell 7.4.20",
+    "sandbox": "require_escalated auto-review; existing PowerShell subprocess; test-only GUID owned fixture writes; canonical helper read/hash only"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment_hash": "dc5041dd1ed1d4f36ee6a4f06ba7955e598cd0e5b1885d72f8d9cbf2ab089cff",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "LKB_RETRIEVAL_MODE": null,
+    "PYTHONDONTWRITEBYTECODE": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "wrong base untouched",
+    "successful install readback and backup",
+    "idempotent no-op",
+    "competing writer lock refuses",
+    "injected partial write restored under lock"
+  ],
+  "timeoutMs": 20000,
+  "startedAt": "2026-10-15T09:25:53.309Z",
+  "completedAt": "2026-10-15T09:25:54.404Z",
+  "elapsedMs": 1092.1338,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/coordination/checker-completion-reserve-20261015/install-canonical-helper.ps1": "ba16241a88e32e0b64cec0ea3740708cc43574044c9e97ced00a382e135066be",
+    "qa/coordination/checker-completion-reserve-20261015/test-installer-lock.ps1": "204001b889e3e24c1e3eadef72aec632a458e1a61e4ff4c5ad5cbc688bec145f",
+    "qa/coordination/checker-completion-reserve-20261015/installer-cycle1-packet.md": "b2414ea9ad685325e6aca80a44f53c887c3ee662da23ba0bee4b18e06740055f",
+    "qa/coordination/checker-completion-reserve-20261015/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "after": {
+    "qa/coordination/checker-completion-reserve-20261015/install-canonical-helper.ps1": "ba16241a88e32e0b64cec0ea3740708cc43574044c9e97ced00a382e135066be",
+    "qa/coordination/checker-completion-reserve-20261015/test-installer-lock.ps1": "204001b889e3e24c1e3eadef72aec632a458e1a61e4ff4c5ad5cbc688bec145f",
+    "qa/coordination/checker-completion-reserve-20261015/installer-cycle1-packet.md": "b2414ea9ad685325e6aca80a44f53c887c3ee662da23ba0bee4b18e06740055f",
+    "qa/coordination/checker-completion-reserve-20261015/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "C:/Users/product/.agents/skills/checker/scripts/review_budget.py": "f24a90da84e89a8a03e4a405997f6a0a9add3c4f9e1c282471d0bf9237542bbf",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+  },
+  "stdoutPath": "qa/coordination/checker-completion-reserve-20261015/verification-installer-lock-five-20261015T1110.stdout.txt",
+  "stderrPath": "qa/coordination/checker-completion-reserve-20261015/verification-installer-lock-five-20261015T1110.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review; existing PowerShell subprocess; test-only GUID owned fixture writes; canonical helper read/hash only"
+}

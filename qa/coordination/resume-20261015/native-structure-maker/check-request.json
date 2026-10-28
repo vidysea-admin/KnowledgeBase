@@ -1,0 +1,67 @@
+{
+  "maker": {
+    "active_s": null,
+    "actual_total_tokens": null,
+    "token_metric": "actual_total"
+  },
+  "acceptance": [
+    "Exact14 moves plus import and asset URL changes only; raw unrelated bytes preserved.",
+    "Unchanged dirsize policy, capture29/newnative14.",
+    "All relative module targets and runtime test extension URL resolve identically.",
+    "Typecheck and immediate consumer checks pass on new frozen combined candidate before independent verdict."
+  ],
+  "unit": "native-structure",
+  "status": "PENDING_BROKER_AND_INDEPENDENT_CHECKER",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "sourcePins": "qa/coordination/resume-20261015/native-structure-maker/candidate-pins.json",
+  "policy_version": "managed-review/1",
+  "candidateIdentity": "Uncommitted working candidate bound by candidate-pins.json; committed SHA required at review dispatch",
+  "cycle": 0,
+  "schema": "native-structure-check-request/1",
+  "candidateSha": null,
+  "readiness": "NOT_READY_FOR_CHECK: independent dispatch waits for broker evidence; no test execution or verdict claimed",
+  "requiredReviewBudget": "Unknown maker denominator: finite BOOTSTRAP_REVIEW with assess/validate before dispatch, preserve prior reviewer charges",
+  "commands": [
+    {
+      "reason": "Moved imports and source consumers compile",
+      "command": "tsc --noEmit -p tsconfig.json",
+      "cwd": "packages/meeting-bot"
+    },
+    {
+      "reason": "Combined phase A gate",
+      "command": "tsc --noEmit -p tsconfig.json",
+      "cwd": "apps/api"
+    },
+    {
+      "reason": "Preserve structure budgets, include newnative directory",
+      "command": "Actual exported lint-dirsize.check over affected capture/py roots plus moved LOC check",
+      "cwd": "."
+    },
+    {
+      "reason": "Moved tests, cyclic browser/runtime import boundary, finalizer command consumers, provider privacy and measurement consumers",
+      "argv": [
+        "node",
+        "--import",
+        "tsx",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=30000",
+        "src/capture/native/native-capture-runtime.test.ts",
+        "src/capture/native/native-clock-ledger.test.ts",
+        "src/capture/native/native-ivf.test.ts",
+        "src/capture/native/native-media-finalize.test.ts",
+        "src/capture/native/native-media-probe.test.ts",
+        "src/capture/native/native-spool.test.ts",
+        "src/capture/tab-browser.test.ts",
+        "src/capture/record-commands.test.ts",
+        "src/capture/record-consent/native-provider-audio.test.ts",
+        "src/capture/tiles/native-measurement.test.ts"
+      ],
+      "requires": "Broker exact grant and environment preflight; bounded execution",
+      "cwd": "packages/meeting-bot"
+    }
+  ],
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "preimages": "qa/coordination/resume-20261015/native-structure-maker/before.json",
+  "plan": "qa/coordination/resume-20261015/native-structure-plan.json"
+}

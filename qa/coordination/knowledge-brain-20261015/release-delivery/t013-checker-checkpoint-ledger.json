@@ -1,0 +1,45 @@
+{
+  "completion_reserve_id": "t013-avatar-context-loss/cycle0/2e9e352329632b6ae58b1fe113965b8223db359db9948fc4f66e081a68548830",
+  "escalation": null,
+  "next_phase": {
+    "kind": "review",
+    "active_s": 0,
+    "tokens": 0,
+    "cost": null
+  },
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "completion_reserve": true,
+  "bootstrap_scope": "t013-avatar-context-loss cycle0 current pinned candidate only: contract C1-C6 identity/source/consumer inspection and attributable single-test receipt assessment; no test rerun/browser/provider/source edits. No scoped reviewer has yet been dispatched; parent goal-t013 HOLD review is separate, not comparable scoped maker usage.",
+  "reviewers": [
+    {
+      "id": "t013-contextloss-checker-review-1",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 150,
+        "tokens": 5200
+      }
+    },
+    {
+      "id": "t013-contextloss-checker-checkpoint-finalization",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 30,
+        "tokens": 800
+      },
+      "phase_kind": "finalization",
+      "completion_reserve_id": "t013-avatar-context-loss/cycle0/2e9e352329632b6ae58b1fe113965b8223db359db9948fc4f66e081a68548830"
+    }
+  ],
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  }
+}

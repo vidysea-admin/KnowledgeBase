@@ -1,0 +1,67 @@
+{
+  "budget_debits": {
+    "active_s": {
+      "known_lower_bound": 0,
+      "value": 0
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 0,
+      "value": 0
+    }
+  },
+  "completion_reserve": {
+    "allocation": {
+      "active_s": 30,
+      "tokens": 800
+    },
+    "id": "product-setup-login-fencing/cycle0/236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a",
+    "phase_kind": "review",
+    "status": "protected"
+  },
+  "escalated": false,
+  "exceeded": [],
+  "limits": {
+    "active_s": 120,
+    "cost": null,
+    "tokens": 3000
+  },
+  "observed_at": "2026-10-15T10:47:32.016720+00:00",
+  "ratio_verified": false,
+  "ratios": {
+    "active_s": null,
+    "cost": null,
+    "tokens": null
+  },
+  "status": "BOOTSTRAP_REVIEW",
+  "target_missed": [],
+  "totals": {
+    "active_s": {
+      "known_lower_bound": 0,
+      "value": 0
+    },
+    "cost": {
+      "known_lower_bound": 0,
+      "value": null
+    },
+    "tokens": {
+      "known_lower_bound": 0,
+      "value": 0
+    }
+  },
+  "unknown": [
+    "active_s",
+    "tokens",
+    "cost"
+  ],
+  "execution": {
+    "exitCode": 0,
+    "wallTimeSeconds": 0.6060691,
+    "stdout": "{\"budget_debits\": {\"active_s\": {\"known_lower_bound\": 0, \"value\": 0}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 0, \"value\": 0}}, \"completion_reserve\": {\"allocation\": {\"active_s\": 30, \"tokens\": 800}, \"id\": \"product-setup-login-fencing/cycle0/236481551c092f4897a2e4415938dc4e2868232d6b958fc40e513189d827b60a\", \"phase_kind\": \"review\", \"status\": \"protected\"}, \"escalated\": false, \"exceeded\": [], \"limits\": {\"active_s\": 120, \"cost\": null, \"tokens\": 3000}, \"observed_at\": \"2026-10-15T10:47:32.016720+00:00\", \"ratio_verified\": false, \"ratios\": {\"active_s\": null, \"cost\": null, \"tokens\": null}, \"status\": \"BOOTSTRAP_REVIEW\", \"target_missed\": [], \"totals\": {\"active_s\": {\"known_lower_bound\": 0, \"value\": 0}, \"cost\": {\"known_lower_bound\": 0, \"value\": null}, \"tokens\": {\"known_lower_bound\": 0, \"value\": 0}}, \"unknown\": [\"active_s\", \"tokens\", \"cost\"]}\r\n"
+  },
+  "predispatchOnly": true,
+  "attemptNotes": "Node child_process launch denied EPERM before helper execution; PowerShell exec fallback used. Collections additionally had a successful initial assess at 2026-10-15T10:47:19.628286+00:00; this second successful assessment does not represent reviewer work."
+}

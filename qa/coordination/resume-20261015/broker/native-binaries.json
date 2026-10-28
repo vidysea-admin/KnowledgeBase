@@ -1,0 +1,10 @@
+[
+  {
+    "Name": "ffmpeg.exe",
+    "Source": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffmpeg.exe"
+  },
+  {
+    "Name": "ffprobe.exe",
+    "Source": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe"
+  }
+]

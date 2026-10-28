@@ -1,0 +1,32 @@
+{
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--import",
+    "tsx",
+    "scripts/qa/t035-lean-video-eof-probe.mjs",
+    "--phase",
+    "baseline"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 245000,
+  "startedAt": "2026-10-14T22:34:11.556Z",
+  "completedAt": "2026-10-14T22:34:14.953Z",
+  "elapsedMs": 3393.4354,
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-helper.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "scripts/qa/t035-lean-video-eof-probe.mjs": "73b652d83b71b0399821130e959af45290e7597a354395a07e31180769585788"
+  },
+  "after": {
+    "qa/evidence/t035-lean-video-measured-encode/pre-eof-helper.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "packages/meeting-bot/src/lean-video-ffmpeg.ts": "ace429c916c8326dcbdc56c21585fd51ef6cf7637255fc4d1e259393894202c0",
+    "scripts/qa/t035-lean-video-eof-probe.mjs": "73b652d83b71b0399821130e959af45290e7597a354395a07e31180769585788"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t035-eof-fixture-corrected-baseline.stderr.txt",
+  "hashesUnchanged": true
+}

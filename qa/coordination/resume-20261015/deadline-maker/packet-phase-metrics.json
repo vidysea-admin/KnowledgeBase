@@ -1,0 +1,9 @@
+{
+  "phase": "typed-fixture-scope-and-packet",
+  "monotonic_start_ns": 1653429597400,
+  "monotonic_end_ns": 1653553093300,
+  "active_seconds": 0.1234959,
+  "wait_seconds": 0,
+  "actual_total_tokens": null,
+  "token_metric": "actual_total"
+}

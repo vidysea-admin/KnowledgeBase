@@ -1,0 +1,173 @@
+✔ native release verifier delegates exact tenant, locator and quote to fresh authority (3.4549ms)
+✔ changed revision, withdrawal and changed exact passage refuse release (0.5179ms)
+✔ authority failures propagate as unavailable rather than release (0.7552ms)
+✔ graph hook revalidates again after generation and refuses revoked evidence (1.0408ms)
+✔ graph hook refuses a foreign node source/revision or quote node binding before authority (0.72ms)
+✔ native document and message hydration uses exact resolver passages without audio fields (12.4267ms)
+✔ exact admitted locator still goes through authority and never enumerates unrelated passages (1.1324ms)
+✔ wrong-source or wrong-revision inventory refuses before source text is loaded (1.1103ms)
+✔ changed, withdrawn or unavailable native authority cannot fall back to retrieval text (1.3243ms)
+✔ duplicate native locators and duplicate node identities refuse (0.9902ms)
+✔ native lexical ranking uses canonical text and emits no fabricated match (1.2945ms)
+✔ real shared resolver hydration cannot release immutable old page after same-content head epoch advances (2.7936ms)
+✔ label-free native passages retain Hindi combining marks and Hinglish tokens (12.9476ms)
+✔ optional label contributes no invented speaker evidence (0.8857ms)
+✔ English verb families preserve literal LED acronym and calendar-only year expansion (0.6859ms)
+✔ Unicode passage slices reconstruct exact text without splitting surrogate pairs (0.6826ms)
+✖ actual trusted tree reader admits current publisher head and resolver documents after transcript filtering (8.8719ms)
+✖ actual trusted tree reader prunes failed CAS physical candidates old heads and revocations (1.5467ms)
+✖ actual trusted tree reader rejects forged foreign branch and never revives transcript session without page proof (1.3165ms)
+✔ production native factory is pure; actual publication hydrates and revalidates through one current-head authority (17.0471ms)
+✔ replacement, restart and revocation reject old immutable evidence and current-head binding forgery (8.0015ms)
+✔ missing trusted message authority refuses message evidence without querying immutable documents (0.4316ms)
+✔ native registration requires explicit consent and server verified key attribution (8.6083ms)
+✔ native publication delegates exact immutable binding and CAS to tenant scoped head store (3.5128ms)
+✔ delete and revoke delegate distinct tombstones and require positive exact CAS revision (2.5885ms)
+✔ all native mutation routes enforce tenant authentication and ingest scope before delegation (3.3231ms)
+✔ store conflicts/unavailable/invalid bindings fail without publication claims or internal error disclosure (2.3275ms)
+✔ real producer indexes every page and UTF-16 passage; restart reads exact locators without vectors (14.2692ms)
+✔ candidate CAS retries preserve unrelated branches and competing candidate branches (5.0058ms)
+✔ bounded CAS exhaustion, malformed authority, incomplete readback and oversized roots fail closed (56.6912ms)
+✔ actual head publisher and resolver quarantine failed CAS and late timed-out index candidates (19.6496ms)
+✔ competing actual head CAS retains both complete candidate branches but authorizes only the winner (5.3998ms)
+✔ native page/message resolution preserves exact UTF16 slice/UTF8 hash without synthetic audio (4.076ms)
+✔ bad locators and tenants fail before source read; strict variants reject fabricated times (0.9908ms)
+✔ foreign/native identity mismatches, absent head and old immutable body never authorize (1.1574ms)
+✔ message thread/message identity checked independently of matching text (0.4926ms)
+✔ UTF16 offsets cannot split a source surrogate pair despite replacement-byte hash collision (0.572ms)
+✔ release revalidation reloads head/eligibility and rejects prior forged quote (0.6831ms)
+✔ locator is copied/frozen before awaiting loader; infrastructure remains unavailable (1.1937ms)
+✔ native citation route uses current bearer tenant and exact evidence envelope (117.8944ms)
+SyntaxError: Unexpected token 'n', "null" is not valid JSON
+    at JSON.parse (<anonymous>)
+    at createStrictSyntaxError (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:137:10)
+    at parse (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\types\json.js:86:15)
+    at C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\body-parser@2.3.0\node_modules\body-parser\lib\read.js:162:18
+    at AsyncResource.runInAsyncScope (node:async_hooks:227:14)
+    at invokeCallback (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:238:16)
+    at done (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:227:7)
+    at IncomingMessage.onEnd (C:\Users\product\Desktop\KnowledgeBase\node_modules\.pnpm\raw-body@3.0.2\node_modules\raw-body\index.js:287:7)
+    at IncomingMessage.emit (node:events:509:28)
+    at endReadableNT (node:internal/streams/readable:1736:12)
+✔ unauthorized/scope/client-tenant/malformed requests cannot load native source (68.8418ms)
+✔ deletion and infrastructure failures disclose fixed safe responses (21.2091ms)
+✔ GET /search?q=... with the search scope returns real hits (103.8624ms)
+✔ GET /search?q=... with no match returns an empty hits array, not an error (27.1854ms)
+✔ GET /search with no q param returns 400, not a stub 501 (15.7003ms)
+✔ GET /search without the search scope returns 403, never a silent 200 (15.0896ms)
+✔ actual Search route merges native references with legacy hits under one k and authenticated tenant (21.0047ms)
+✔ native provider failure returns safe Search unavailable without partial private evidence (12.5154ms)
+✔ missing native Search scope prevents inventory and transcript callbacks (14.0372ms)
+✔ EVERY query is tenant-confined — the filter's tenantId, not just its $or (ISS-078) (14.5356ms)
+✔ no other tenant's turn or session can ever be returned (3.176ms)
+✔ the filter sent to Mongo is a superset of what the scorer can score — over DERIVED queries (97.4311ms)
+✔ k is honoured — the store must not return more than asked (ISS-079, contract [I2]) (3.8489ms)
+✔ each hit carries ITS OWN turn and session, not another hit's (ISS-080) (1.8486ms)
+✔ hit.score matches what the scorer independently computes for that turn (ISS-083) (2.9258ms)
+✔ each hit's (turnId, sessionId) pair matches what the scorer actually ranked at that position (ISS-084) (3.4737ms)
+✔ candidate turns load once; current-proof reads are explicit and final session labels stay deduplicated (ISS-080/085) (1.3718ms)
+✔ a query with no usable tokens issues no database query at all (1.4182ms)
+✔ results still resolve through the injected handle end to end (0.9026ms)
+✔ production search retrieves corrected-only text and uses corrected scoring without changing originals (2.597ms)
+✔ source privacy filters before k-limited scoring; unapproved WhatsApp source cannot displace eligible guidance (1.5905ms)
+✔ unknown source provenance fails closed instead of returning tenant-matching text (1.1074ms)
+✖ native search reads actual tenant tree references and scores current Unicode quote only (8.44ms)
+✔ native search current head/revoke/delete/foreign changes invalidate an unchanged tree reference (0.7484ms)
+✖ native search refuses malformed/duplicate/deep/oversized inventories before source disclosure (0.9546ms)
+✔ native inventory cap includes release checks and honestly marks partial results (4.6289ms)
+✔ native search rechecks selected evidence immediately before release (0.4514ms)
+ℹ tests 67
+ℹ suites 0
+ℹ pass 62
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 11795.8587
+
+✖ failing tests:
+
+test at apps\api\src\composition\integrations\native-tree-reader.test.ts:1:2336
+✖ actual trusted tree reader admits current publisher head and resolver documents after transcript filtering (8.8719ms)
+  Error: native_document_head_conflict
+      at fail (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\head-store.ts:26:49)
+      at Object.publish (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\head-store.ts:109:45)
+      at async fixture (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-tree-reader.test.ts:28:3)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-tree-reader.test.ts:36:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)
+
+test at apps\api\src\composition\integrations\native-tree-reader.test.ts:1:3098
+✖ actual trusted tree reader prunes failed CAS physical candidates old heads and revocations (1.5467ms)
+  Error: native_document_head_conflict
+      at fail (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\head-store.ts:26:49)
+      at Object.publish (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\head-store.ts:109:45)
+      at async fixture (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-tree-reader.test.ts:28:3)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-tree-reader.test.ts:46:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\composition\integrations\native-tree-reader.test.ts:1:3890
+✖ actual trusted tree reader rejects forged foreign branch and never revives transcript session without page proof (1.3165ms)
+  Error: native_document_head_conflict
+      at fail (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\head-store.ts:26:49)
+      at Object.publish (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\native-evidence\head-store.ts:109:45)
+      at async fixture (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-tree-reader.test.ts:28:3)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\composition\integrations\native-tree-reader.test.ts:56:13)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+test at apps\api\src\search-store.test.ts:1:13219
+✖ native search reads actual tenant tree references and scores current Unicode quote only (8.44ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   hits: [],
+  -   hits: [
+  -     {
+  -       nativeSourceLocator: {
+  -         documentId: 'immutable-doc',
+  -         documentSourceId: 'immutable-source',
+  -         headRevision: 1,
+  -         kind: 'document-page',
+  -         pageNumber: 2,
+  -         passage: {
+  -           end: 23,
+  -           sha256: 'f6d3f95c62e20a8162404840f69500bb6c1210f7a010b5f81e662bd15bb9ff2f',
+  -           start: 0
+  -         },
+  -         revisionHash: 'a1d0579a3112dd19ea0d8ce3d3f965aa1babd29102268fe7ef1e12bef2bc59af',
+  -         sourceId: 'logical-source'
+  -       },
+  -       score: 1,
+  -       title: 'Authoritative document title'
+  -     }
+  -   ],
+      truncated: false
+    }
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\search-store.test.ts:297:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { hits: [], truncated: false },
+    expected: { hits: [ [Object] ], truncated: false },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at apps\api\src\search-store.test.ts:1:14504
+✖ native search refuses malformed/duplicate/deep/oversized inventories before source disclosure (0.9546ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\search-store.test.ts:327:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /invalid_native_inventory/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

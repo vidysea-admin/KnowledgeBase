@@ -1,6 +1,6 @@
 """
 packages/meeting-bot/py/sb_join.py — the real bot browser behind joiners/browser-joiner.ts
-(spawned by src/capture/obs-windows.ts). SeleniumBase 4, UC mode, HEADED (a headless Chrome
+(spawned by src/capture/obs/obs-windows.ts). SeleniumBase 4, UC mode, HEADED (a headless Chrome
 plays no audio), with a persistent profile the user logs into once so the bot attends "as him".
 
 It never records anything itself: OBS captures this window's audio + video. What it does:
@@ -13,7 +13,6 @@ It never records anything itself: OBS captures this window's audio + video. What
 
 Usage: python sb_join.py <url> --profile <dir> --title <title> --stop-file <path>
 """
-import argparse
 import json
 import os
 import sys
@@ -22,163 +21,22 @@ import time
 
 from seleniumbase import SB
 
-JOIN_TEXTS = [
-    "join now", "join webinar", "join from browser", "join via browser", "join from your browser",
-    "join in browser", "join", "join audio", "computer audio", "join with computer audio",
-    "listen only", "continue in browser", "continue", "watch now", "i agree", "accept",
-]
-END_PHRASES = [
-    "webinar has ended", "webinar has been ended", "session has ended", "meeting has ended",
-    "has ended the webinar", "the webinar is over", "thank you for attending", "event has ended",
-]
-MAX_CLICKS = 8
-CLICK_WINDOW_S = 15 * 60
-
-# T-029 auto-reconnect. Phrases are lowercase substrings matched against document.body.innerText.
-RECONNECT_PHRASES = [
-    "connection interrupted", "trying to reconnect", "reconnecting",
-    "connection lost", "attempting to reconnect", "you have been disconnected",
-]
-OFFLINE_PAGE_PHRASES = [  # a hard Chrome net-error interstitial, handled the same way as a banner
-    "this site can't be reached", "no internet", "err_internet_disconnected",
-    "err_connection", "err_network_changed",
-]
-RECONNECT_THRESHOLD_S = 20  # banner/offline must persist this long before we act (roadmap T-029)
-RECONNECT_COOLDOWN_S = 30  # minimum gap between successive reload attempts
-MAX_RECONNECTS = 5  # give up reloading after this many in one run; keep holding the window
-
-# ISS-U0-1: Zoom's web-client join UI (name field, Join button, "Join Audio by Computer",
-# waiting-for-host / end-of-webinar text) renders inside a same-origin <iframe> the top document
-# never contains directly. Both CLICK_JS and BODY_TEXT_JS below recurse into every same-origin
-# iframe (and iframes nested inside those, arbitrarily deep) via a shared `walk(doc)` helper.
-# `frame.contentDocument` throws (or returns null, depending on browser) for a cross-origin
-# frame — that access is wrapped in try/catch so a cross-origin ad/tracker iframe is silently
-# skipped rather than raising out of execute_script. Zoho/Meet pages that have no iframe at all
-# take the exact same code path: `doc.querySelectorAll('iframe')` returns an empty list, `walk`
-# recurses zero times, and behaviour is unchanged from before this fix.
-#
-# ISS-U0-4/ISS-U0-5 (checker cycle 1, fixed): the frame recursion above had no visibility gate on
-# the <iframe> ELEMENT itself in its parent document — a frame collapsed to zero size or hidden
-# via display:none/visibility:hidden (on itself OR any ancestor) still had its content visited,
-# clicked (ISS-U0-4) and merged into BODY_TEXT_JS (ISS-U0-5), because CLICK_JS's own
-# getBoundingClientRect check only ever looked at the clicked ELEMENT relative to ITS OWN
-# document — a browser lays out an iframe's inner content at natural size regardless of the
-# iframe's own collapsed CSS size, so that check can never see a collapsed/hidden container.
-#
-# ISS-U0-6/ISS-U0-7 (checker cycle 2, fixed here): the cycle-1 fix enumerated hiding TECHNIQUES
-# one at a time (self zero-size, self/ancestor display:none via getClientRects, ancestor
-# visibility:hidden) and cycle 2's own adversarial fixtures kept finding new techniques the
-# enumeration missed — an ancestor that clips its OWN box to zero size via overflow:hidden while
-# the iframe keeps an explicit nonzero width/height (ISS-U0-6, high: overflow:hidden only clips
-# rendering, it never removes the child from layout or zeros the child's own rect, so
-# getClientRects().length stays non-zero), plus opacity:0 and off-screen absolute positioning
-# (ISS-U0-7, medium). isFrameVisible() below stops enumerating techniques and instead computes
-# the frame's actual on-screen VISIBLE AREA: start from the frame's own
-# getBoundingClientRect() intersected with its owner document's viewport (frame.ownerDocument is
-# the PARENT document containing the <iframe> tag — not its nested contentDocument — so this is
-# exactly the coordinate space the ancestor walk below also lives in); walk every ancestor up to
-# documentElement, and whenever an ancestor's own overflow clips (overflow-x/-y not 'visible'),
-# intersect the running rect with that ancestor's own box too. display:none, visibility:hidden/
-# collapse and opacity:0 are checked directly (on the frame itself AND every ancestor) since those
-# hide the whole box regardless of geometry. The frame is visible iff the final intersected area
-# is at least 2x2px — an exact 0-width/0-height rect is unambiguously invisible; 2px is a
-# deliberate small margin above that so a 1px antialiasing/rounding sliver from getBoundingClientRect
-# floats never counts as "on screen" either. Because walkFrames only recurses into a frame once
-# its OWN isFrameVisible() call passes, and each call only looks at that frame's local ancestor
-# chain in its own parent document, nesting composes automatically — a nested frame's own geometry
-# is checked fresh against its own (already-visible) parent document, never assumed from the
-# outer frame's result. Zoho/Meet pages that have no iframe at all take the exact same code path
-# as always: `doc.querySelectorAll('iframe')` returns an empty list, isFrameVisible is never
-# called, and behaviour is unchanged from before ISS-U0-1.
-_IFRAME_WALK_JS = """
-function _rectIntersect(a, b) {
-  const left = Math.max(a.left, b.left);
-  const top = Math.max(a.top, b.top);
-  const right = Math.min(a.right, b.right);
-  const bottom = Math.min(a.bottom, b.bottom);
-  return { left, top, right, bottom, width: Math.max(0, right - left), height: Math.max(0, bottom - top) };
-}
-function _hiddenBySelfStyle(cs) {
-  return cs.display === 'none' || cs.visibility === 'hidden' || cs.visibility === 'collapse' ||
-    parseFloat(cs.opacity) === 0;
-}
-function isFrameVisible(frame) {
-  const csSelf = getComputedStyle(frame);
-  if (_hiddenBySelfStyle(csSelf)) return false;
-  const win = frame.ownerDocument.defaultView;
-  let r = _rectIntersect(frame.getBoundingClientRect(),
-    { left: 0, top: 0, right: win.innerWidth, bottom: win.innerHeight });
-  if (r.width < 2 || r.height < 2) return false;
-  let el = frame.parentElement;
-  while (el) {
-    const cs = getComputedStyle(el);
-    if (_hiddenBySelfStyle(cs)) return false;
-    if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') {
-      r = _rectIntersect(r, el.getBoundingClientRect());
-      if (r.width < 2 || r.height < 2) return false;
-    }
-    el = el.parentElement;
-  }
-  return true;
-}
-function walkFrames(doc, visit) {
-  visit(doc);
-  let frames;
-  try {
-    frames = [...doc.querySelectorAll('iframe')];
-  } catch (e) {
-    return;
-  }
-  for (const frame of frames) {
-    if (!isFrameVisible(frame)) continue;  // ISS-U0-4/ISS-U0-5: skip the whole hidden subtree
-    let inner;
-    try {
-      inner = frame.contentDocument;
-    } catch (e) {
-      inner = null;  // cross-origin: SecurityError — skip silently, never throw
-    }
-    if (!inner) continue;
-    walkFrames(inner, visit);
-  }
-}
-"""
-
-CLICK_JS = _IFRAME_WALK_JS + """
-const wanted = arguments[0];
-let hit = null;
-walkFrames(document, (doc) => {
-  if (hit) return;
-  let els;
-  try {
-    els = [...doc.querySelectorAll('button, a, [role=button], input[type=button], input[type=submit]')];
-  } catch (e) {
-    return;
-  }
-  for (const el of els) {
-    const t = (el.innerText || el.value || el.getAttribute('aria-label') || '').trim().toLowerCase();
-    if (!t || t.length > 40) continue;
-    const r = el.getBoundingClientRect();
-    if (r.width === 0 || r.height === 0 || el.disabled) continue;
-    if (wanted.includes(t)) { el.click(); hit = t; return; }
-  }
-});
-return hit;
-"""
-
-# ISS-U0-1: same traversal for the body-text read main() uses for END_PHRASES/RECONNECT_PHRASES/
-# OFFLINE_PAGE_PHRASES detection — text living only inside an iframe (e.g. "waiting for the host
-# to start this webinar") was previously invisible to those checks.
-BODY_TEXT_JS = _IFRAME_WALK_JS + """
-let parts = [];
-walkFrames(document, (doc) => {
-  try {
-    if (doc.body) parts.push(doc.body.innerText || '');
-  } catch (e) {
-    // ignore
-  }
-});
-return parts.join(' ');
-"""
+# Names below are re-exported: tests, scripts and the TS spawners import them from sb_join.
+from sb_join_cli import load_registration, managed_driver, parse_args
+from sb_join_detect import (  # noqa: F401
+    ADMISSION_TIMEOUT_S, CLICK_WINDOW_S, END_PHRASES, LOBBY_PHRASES, JOIN_TEXTS, MAX_CLICKS, MAX_RECONNECTS, OFFLINE_PAGE_PHRASES, RECONNECT_COOLDOWN_S,
+    RECONNECT_PHRASES, RECONNECT_THRESHOLD_S, AdmissionState, ReconnectState, apply_reload, classify_admission, classify_meet_state, click_gate, detect_trouble,
+    is_meet_url, platform_of, should_force_reload)
+from sb_join_loop import run_session
+from sb_join_onair import OnairRefused, onair_enabled, onair_play, onair_prepare  # noqa: F401
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "agent"))  # generic page agent lives in py/agent/ (dirsize budget)
+from sb_join_agent import agent_enabled, agent_prepare  # noqa: E402
+from sb_join_ownership import kill_orphans as _kill_orphans
+from sb_join_profile import existing_profile_directory, selected_uc_profile, validate_uc_profile_support
+from sb_join_recorder import recorder_link
+from sb_join_register import REGISTRATION_JS, register_form  # noqa: F401
+from sb_join_scripts import _IFRAME_WALK_JS, BODY_TEXT_JS, CLICK_JS, IN_CALL_JS, IN_CALL_JS_BY_PLATFORM  # noqa: F401
+from sb_join_tiles import tile_clock
 
 
 _EMIT_LOCK = threading.Lock()
@@ -203,149 +61,31 @@ def _bootstrap_progress(done, stage):
         emit("bootstrapping", stage=stage, seconds=int(waited))
 
 
-def click_gate(clicks, now, started, extra_click_until, last_click, no_click):
-    """Pure predicate for whether this tick may attempt a click (C2, meeting-bot-live-capture
-    contract): `clicks` is a single run-long counter — T-029's reload path only ever widens
-    *when* clicking is still allowed (`extra_click_until`), never *how many* clicks are allowed
-    (`MAX_CLICKS` stays the one global cap for the whole run, across any number of reloads)."""
-    return (not no_click and clicks < MAX_CLICKS
-            and (now - started < CLICK_WINDOW_S or now < extra_click_until)
-            and now - last_click > 5)
+def kill_orphans(profile, launch=False, expected_exe=None, profile_directory=None):
+    """Windows ownership is established before launch; cleanup never scans foreign processes."""
+    return _kill_orphans(profile, launch, expected_exe, profile_directory, os=os, time=time)
 
-
-def apply_reload(clicks, now):
-    """Called from main() on a T-029 "reload" action, after the page has been reloaded and
-    rejoined. Returns (clicks, extra_click_until). C2 requires MAX_CLICKS to bound the WHOLE
-    run: a reload widens the click time window (extra_click_until = now + CLICK_WINDOW_S) but
-    MUST return `clicks` unchanged — resetting it here would let a run with enough reloads click
-    past MAX_CLICKS total, one fresh allowance per reload instead of one for the whole run."""
-    return clicks, now + CLICK_WINDOW_S
-
-
-def detect_trouble(body_lower, online):
-    """Pure, browser-free: does this page state look like a dropped connection? `body_lower` is
-    document.body.innerText.lower() (the caller already computes it for the join/end-phrase
-    checks — no extra script eval here); `online` is navigator.onLine, or True if it couldn't be
-    read. Covers both the in-app "trying to reconnect" banner and a hard Chrome net-error page."""
-    if online is False:
-        return "offline"
-    for phrase in RECONNECT_PHRASES:
-        if phrase in body_lower:
-            return "banner"
-    for phrase in OFFLINE_PAGE_PHRASES:
-        if phrase in body_lower:
-            return "offline"
-    return None
-
-
-class ReconnectState:
-    """Pure state machine for T-029 — no Selenium object is touched here, so it's unit-testable
-    without a browser. `tick()` runs once per poll with the current trouble reason (or None from
-    detect_trouble) and returns (action, gap):
-      action: "none" (nothing happening) | "wait" (trouble seen, still under threshold) |
-              "cooldown" (over threshold, but reloaded too recently) | "reload" (act now, caller
-              reloads the page) | "give-up" (over max_reloads; keep holding the window, stop
-              reloading).
-      gap: a completed {start, end, reason, recovered} dict, returned only on the tick where
-           trouble clears (recovered=True) — see also close_at_end() for a gap still open when
-           the run itself ends (recovered=False).
-    """
-
-    def __init__(self, threshold_s=RECONNECT_THRESHOLD_S, cooldown_s=RECONNECT_COOLDOWN_S,
-                 max_reloads=MAX_RECONNECTS):
-        self.threshold_s = threshold_s
-        self.cooldown_s = cooldown_s
-        self.max_reloads = max_reloads
-        self.trouble_since = None
-        self.reason = None
-        self.last_reload = None
-        self.reload_count = 0
-
-    def tick(self, reason, now):
-        if reason is not None:
-            if self.trouble_since is None:
-                self.trouble_since = now
-                self.reason = reason
-                return "wait", None
-            if now - self.trouble_since <= self.threshold_s:
-                return "wait", None
-            if self.reload_count >= self.max_reloads:
-                return "give-up", None
-            if self.last_reload is not None and now - self.last_reload < self.cooldown_s:
-                return "cooldown", None
-            self.last_reload = now
-            self.reload_count += 1
-            return "reload", None
-        if self.trouble_since is not None:
-            gap = {"start": self.trouble_since, "end": now, "reason": self.reason, "recovered": True}
-            self.trouble_since = None
-            self.reason = None
-            return "recovered", gap
-        return "none", None
-
-    def close_at_end(self, now):
-        """Called once when the run is ending (stop-file seen / browser dead) so a gap that was
-        still open never goes unrecorded."""
-        if self.trouble_since is None:
-            return None
-        gap = {"start": self.trouble_since, "end": now, "reason": self.reason, "recovered": False}
-        self.trouble_since = None
-        self.reason = None
-        return gap
-
-
-def should_force_reload(reload_file):
-    """T-031: pure check for the audio-watchdog's forced-reload sentinel (docs/meeting-bot-
-    roadmap.md T-031) — a file the Node controller drops when the live OBS meter has read silence
-    past its own threshold, independent of this file's own T-029 DOM-banner detection (a muted-
-    but-connected tab shows no banner at all). main() removes the file itself right after acting,
-    so this has no side effect and is trivially testable with a real temp file, no browser."""
-    return bool(reload_file) and os.path.exists(reload_file)
-
-
-def kill_orphans(profile):
-    """A previous bot run that was killed leaves its Chrome holding the profile lock, and the
-    next launch then hangs silently. Kill only processes whose command line names this profile."""
-    import subprocess
-    needle = os.path.abspath(profile).replace("'", "''")
-    ps = ("Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'chrome.exe' -and "
-          f"$_.CommandLine -like '*{needle}*' }} | ForEach-Object {{ Stop-Process -Id $_.ProcessId -Force "
-          "-ErrorAction SilentlyContinue }")
-    subprocess.run(["powershell", "-NoProfile", "-Command", ps], capture_output=True, timeout=60)
-    for name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
-        try:
-            os.remove(os.path.join(profile, name))
-        except OSError:
-            pass
-    # A killed run leaves exit_type=Crashed + saved Sessions, and Chrome then restores old tabs
-    # (measured: the bot opened a stale YouTube tab and lost its own). Start from a clean session.
-    import shutil
-    shutil.rmtree(os.path.join(profile, "Default", "Sessions"), ignore_errors=True)
-    prefs = os.path.join(profile, "Default", "Preferences")
-    try:
-        with open(prefs, encoding="utf-8") as f:
-            p = json.load(f)
-        p.setdefault("profile", {})["exit_type"] = "Normal"
-        p["profile"]["exited_cleanly"] = True
-        with open(prefs, "w", encoding="utf-8") as f:
-            json.dump(p, f)
-    except (OSError, ValueError):
-        pass
 
 
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("url")
-    ap.add_argument("--profile", required=True)
-    ap.add_argument("--title", required=True)
-    ap.add_argument("--stop-file", required=True)
-    ap.add_argument("--reload-file", default=None,
-                     help="T-031: sentinel; if present, force an immediate reload/rejoin then delete it")
-    ap.add_argument("--no-click", action="store_true", help="never auto-click (login/dry-run mode)")
-    a = ap.parse_args()
+    a = parse_args()
+    a.profile_directory = existing_profile_directory(a.profile, a.profile_directory)
+    validate_uc_profile_support(a.profile_directory)
+    registration = load_registration(a)
+    if a.cleanup_only:
+        if not os.path.isabs(a.profile):
+            raise RuntimeError("Cleanup requires an absolute owned profile")
+        kill_orphans(a.profile, **({"profile_directory": a.profile_directory} if a.profile_directory is not None else {}))
+        emit("cleanup-complete")
+        return
 
-    os.makedirs(a.profile, exist_ok=True)
-    kill_orphans(a.profile)
+
+    driver_version = managed_driver(a, emit)
+
+    if os.name != "nt":
+        os.makedirs(a.profile, exist_ok=True)
+    ownership = kill_orphans(a.profile, launch=os.name == "nt", expected_exe=a.browser_executable,
+                             **({"profile_directory": a.profile_directory} if a.profile_directory is not None else {}))
     if os.name == "nt":  # keep the system + display awake while attending (idle sleep would kill the capture)
         import ctypes
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000000 | 0x00000001 | 0x00000002)
@@ -355,120 +95,61 @@ def main():
         "--deny-permission-prompts",  # mic/camera/notifications: every prompt auto-denied
         "--start-maximized",
     ])
+    import pathlib
+    policy_extension = a.capture_extension or str(pathlib.Path(__file__).parent / "tab-capture")
+    args += ",--enable-unsafe-extension-debugging"
+    if a.profile_directory is not None:
+        args += ",--profile-directory=" + a.profile_directory
     # ISS-324: tick while SB() brings the browser up. Daemon thread, so a failure inside SB()
     # needs no unwinding here -- __main__ emits "fatal" and the interpreter exits under it.
     boot_done = threading.Event()
     threading.Thread(target=_bootstrap_progress, args=(boot_done, "driver-bringup"), daemon=True).start()
-    with SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args) as sb:
+    with selected_uc_profile(a.profile_directory), SB(uc=True, headed=True, user_data_dir=a.profile, chromium_arg=args,
+            extension_dir=policy_extension, binary_location=a.browser_executable,
+            driver_version=driver_version.split(".")[0] if driver_version else None) as sb:
+        if ownership:
+            ownership["verify"](getattr(sb.driver, "browser_pid", None))
         boot_done.set()
         emit("driver-ready")
-        emit("navigating", url=a.url)
-        sb.uc_open_with_reconnect(a.url, 4)
-        emit("opened", url=sb.get_current_url())
-        started = time.time()
-        clicks = 0
-        last_click = 0.0
-        last_beat = 0.0
-        pinned = json.dumps(a.title)
-        errors = 0
-        reconnect = ReconnectState()  # T-029
-        extra_click_until = 0.0  # widened click window after a reload; MAX_CLICKS/JOIN_TEXTS unchanged
-        gave_up_emitted = False
-        while not os.path.exists(a.stop_file):
-            if errors >= 10:
-                # Only a browser with no windows left ends the run; a page that is merely
-                # unresponsive (redirect, interstitial, alert) must not cut a live webinar.
-                try:
-                    alive = bool(sb.driver.window_handles)
-                except Exception:
-                    alive = False
-                if not alive:
-                    break
-                errors = 0
-            try:
-                handles = sb.driver.window_handles
-                if handles and sb.driver.current_window_handle != handles[-1]:
-                    sb.driver.switch_to.window(handles[-1])
-                    emit("tab-switch", count=len(handles))
-                real_title = sb.execute_script("return document.title")
-                if real_title != a.title:
-                    sb.execute_script(f"document.title = {pinned};")
-                now = time.time()
-                if click_gate(clicks, now, started, extra_click_until, last_click, a.no_click):
-                    hit = sb.execute_script(CLICK_JS, JOIN_TEXTS)
-                    if hit:
-                        clicks += 1
-                        last_click = now
-                        emit("clicked", text=hit)
-                body = (sb.execute_script(BODY_TEXT_JS) or "").lower()
-                ended = next((p for p in END_PHRASES if p in body), None)
-                if ended:
-                    emit("ended", reason=ended)
-
-                # T-031: forced reload from the Node-side audio watchdog — independent of T-029's
-                # own DOM-banner detection below (silence has no banner). No gap is recorded here:
-                # silence is not necessarily a connectivity gap (the whole "muted tab" case).
-                if should_force_reload(a.reload_file):
-                    try:
-                        os.remove(a.reload_file)
-                    except OSError:
-                        pass
-                    emit("watchdog-reload", reason="audio-silence")
-                    try:
-                        sb.uc_open_with_reconnect(a.url, 4)
-                        clicks, extra_click_until = apply_reload(clicks, time.time())
-                        emit("watchdog-rejoined")
-                    except Exception as e:
-                        emit("warn", error=f"watchdog reload failed: {str(e)[:200]}")
-
-                # T-029 auto-reconnect: detect a "trying to reconnect" banner or a hard net-error
-                # page, and if it persists past the threshold, reload and rejoin. Recording a
-                # closed gap window (start/end/reason/recovered) is the whole point — the reload
-                # itself just reuses the same open + click path used at initial join.
-                try:
-                    online = bool(sb.execute_script("return navigator.onLine"))
-                except Exception:
-                    online = True
-                reason = detect_trouble(body, online)
-                action, gap = reconnect.tick(reason, now)
-                if action == "reload":
-                    emit("reconnect-reload", reason=reconnect.reason, attempt=reconnect.reload_count)
-                    try:
-                        sb.uc_open_with_reconnect(a.url, 4)
-                        clicks, extra_click_until = apply_reload(clicks, time.time())
-                        emit("reconnect-rejoined")
-                    except Exception as e:
-                        emit("warn", error=f"reload failed: {str(e)[:200]}")
-                elif action == "give-up" and not gave_up_emitted:
-                    emit("reconnect-giveup", reason=reconnect.reason, reloads=reconnect.reload_count)
-                    gave_up_emitted = True
-                if gap is not None:
-                    gave_up_emitted = False
-                    emit("gap", **gap)
-
-                if now - last_beat > 30:
-                    last_beat = now
-                    emit("heartbeat", url=sb.get_current_url(), page_title=real_title)
-                errors = 0
-            except Exception as e:  # page navigating / tab busy — keep holding the window
-                errors += 1
-                emit("warn", error=str(e)[:200])
-                try:  # current handle gone (tab closed) → reattach to whatever tab is left
-                    handles = sb.driver.window_handles
-                    if handles:
-                        sb.driver.switch_to.window(handles[-1])
-                except Exception:
-                    pass
-            time.sleep(2)
-        final_gap = reconnect.close_at_end(time.time())
-        if final_gap is not None:
-            emit("gap", **final_gap)
-        emit("closed")
+        if policy_extension:
+            with recorder_link(sb, a, registration, policy_extension, os=os, time=time) as link:
+                policy_check, command, extension_id = link.policy_check, link.command, link.extension_id
+                if registration:
+                    sb.driver.set_page_load_timeout(30)
+                    sb.driver.set_script_timeout(10)
+                    for method, arguments in (("Network.enable", {}), ("Network.setBypassServiceWorker", {"bypass": True})):
+                        if not isinstance(sb.driver.execute_cdp_cmd(method, arguments), dict):
+                            raise RuntimeError("Registration network isolation not acknowledged")
+                    sb.driver.execute_cdp_cmd("Emulation.setScriptExecutionDisabled", {"value": True})
+                    sb.driver.default_get(a.url)
+                    import registration_cdp
+                    emit("registration-result", **register_form(sb, registration, script_isolated=True, policy_check=policy_check, cdp_connect=registration_cdp.connect_page_cdp))
+                    return
+                sb.uc_open_with_reconnect(a.url, 4)
+                emit("opened", url=sb.get_current_url())
+                onair = onair_enabled(a.url)  # LKB_ONAIR_WATCH=1 + cloudonair.withgoogle.com only; otherwise untouched
+                if onair:
+                    if agent_enabled():  # LKB_PAGE_AGENT=1: the generic vision agent replaces the hard-coded Watch-now logic
+                        agent_prepare(sb, time=time, emit=emit)
+                    else:
+                        onair_prepare(sb, time=time, emit=emit, session=os.environ.get("LKB_ONAIR_SESSION"))
+                if a.capture_extension:
+                    link.arm(15)
+                    targets = command("Target.getTargets", {"filter": [{"type": "tab", "exclude": False}, {"exclude": True}]}).get("targetInfos", [])
+                    tabs = [item for item in targets if item.get("type") == "tab" and item.get("url") == sb.get_current_url()]
+                    if len(tabs) != 1:
+                        raise RuntimeError("Recorder current tab ownership mapping refused")
+                    command("Target.activateTarget", {"targetId": tabs[0]["targetId"]})
+                    command("Extensions.triggerAction", {"id": extension_id, "targetId": tabs[0]["targetId"]})
+                    emit("capture-invoked")
+                if onair:
+                    onair_play(sb, time=time, emit=emit)
+        run_session(sb, a, os=os, time=tile_clock(sb, os, time), emit=emit)
 
 
 if __name__ == "__main__":
     try:
         main()
     except Exception as e:
-        emit("fatal", error=str(e)[:500])
+        emit("fatal", error="Registration browser failed" if "--registration-stdin" in sys.argv else str(e)[:500])
         sys.exit(1)

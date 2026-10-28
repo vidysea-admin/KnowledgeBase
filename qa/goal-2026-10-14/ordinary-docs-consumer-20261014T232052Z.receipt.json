@@ -1,0 +1,52 @@
+{
+  "scope": "Root finite docs/refusal fixture affected five local synthetic mounted cases",
+  "freeze": "qa/goal-2026-10-14/t060-docs-fix-frozen-pins.json",
+  "freezeSHA256": "453b0a87527bebd991506a1fea4327f0a1225431f7518ce987b61a061e7eafd3",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=GET /docs-ui|webhooks-only|hosting and webhooks|lacking hosting scope",
+    "apps/api/src/routes/pages.test.ts",
+    "apps/api/src/server.test.ts"
+  ],
+  "pid": 8064,
+  "startedAt": "2026-10-14T23:20:52.3937765Z",
+  "completedAt": "2026-10-14T23:20:57.2194894Z",
+  "elapsedMs": 4826.0,
+  "exitCode": 0,
+  "timedOut": false,
+  "timeoutMs": 120000,
+  "before": {
+    "apps/api/src/routes/stubs.ts": "5b998aed46507f04d2cf9728eafa859d0ca82d04fd191508199eef9b09b4dcfd",
+    "apps/api/src/routes/pages.ts": "0a2c268a974b07cec4329717ffa669c4aeb71c62507adeeb8f212a05baca1144",
+    "apps/api/src/routes/pages.test.ts": "30f7af74cb62af2ba5ac74c42ff5078450bc122fc748c9302ec7c2225a51e8cf",
+    "apps/api/src/server.test.ts": "9067c703e326e22e7d139bd915aca8160ac566ce74632785164c19eab8be09a0",
+    "apps/api/src/server.ts": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "apps/api/src/fixtures.ts": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b",
+    "apps/api/src/testUtils.ts": "aedff13a23f522a89ae4029eea1fc2df5484811a79ad5cc105bf6858ba7f987b",
+    "apps/api/src/hosting/router.ts": "8e08315c1609ca07d2ad0737a9d3b49cbdbeea6adecea529cc1e59632778ae51",
+    "apps/api/src/hosting/config.ts": "67b41a15fba0f8f109d4b127ba1829dc5983cb533a6ca1acf3e384414763aadc",
+    "apps/api/src/hosting/types.ts": "8df6c9cf90f7835025496793183fe05342cb7d8e623c6fc001c952647e4318f4"
+  },
+  "after": {
+    "apps/api/src/routes/stubs.ts": "5b998aed46507f04d2cf9728eafa859d0ca82d04fd191508199eef9b09b4dcfd",
+    "apps/api/src/routes/pages.ts": "0a2c268a974b07cec4329717ffa669c4aeb71c62507adeeb8f212a05baca1144",
+    "apps/api/src/routes/pages.test.ts": "30f7af74cb62af2ba5ac74c42ff5078450bc122fc748c9302ec7c2225a51e8cf",
+    "apps/api/src/server.test.ts": "9067c703e326e22e7d139bd915aca8160ac566ce74632785164c19eab8be09a0",
+    "apps/api/src/server.ts": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+    "apps/api/src/auth.ts": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+    "apps/api/src/fixtures.ts": "3a6018a7f922f98fdcdd41cc284c8ca434fd987ab2b5bd50abff5c4cd418585b",
+    "apps/api/src/testUtils.ts": "aedff13a23f522a89ae4029eea1fc2df5484811a79ad5cc105bf6858ba7f987b",
+    "apps/api/src/hosting/router.ts": "8e08315c1609ca07d2ad0737a9d3b49cbdbeea6adecea529cc1e59632778ae51",
+    "apps/api/src/hosting/config.ts": "67b41a15fba0f8f109d4b127ba1829dc5983cb533a6ca1acf3e384414763aadc",
+    "apps/api/src/hosting/types.ts": "8df6c9cf90f7835025496793183fe05342cb7d8e623c6fc001c952647e4318f4"
+  },
+  "hashesUnchanged": true,
+  "stdoutPath": "qa/goal-2026-10-14/ordinary-docs-consumer-20261014T232052Z.stdout.txt",
+  "stderrPath": "qa/goal-2026-10-14/ordinary-docs-consumer-20261014T232052Z.stderr.txt",
+  "terminal": true
+}

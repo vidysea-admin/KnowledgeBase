@@ -1,0 +1,20 @@
+{
+  "kind": "CORRECTED_READ_ONLY_SUPPORT_COMMAND_NOT_REQUESTED_FOR_EXECUTION",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "script": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v2.mjs",
+  "script_sha256": "4c446b153acf1074201f53067a8e26cf39aa773211b509807184d048e957a7e2",
+  "spec": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec.json",
+  "spec_sha256": "bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de",
+  "command": "& 'C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe' 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight-v2.mjs' --root 'C:/Users/product/Desktop/KnowledgeBase' --spec 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-spec.json' --spec-sha 'bc45e853b950ad15cfa380067aa4e4a8d55fc86aa76f7f006e6adfbdfd9bf5de' --out 'C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-artifacts-v2'",
+  "outer_timeout_ms": 120000,
+  "expected_own_exit": "0 only if complete=true and all exact fingerprint/range/env/identity checks match; otherwise2/STOP. Ownexit mechanics only, never independentPASS.",
+  "output_policy": "Print only bounded summary/counts/mismatches/complete/payloadSHA. No sources/maps/rawstdout/env values. Complete privateQA payload only stored if allchecks pass, within65000source/5000metadata limits.",
+  "accounting": "Verification-support once, separate from maker/checker denominators; unknown resource cost stays unknown.",
+  "local_execution_performed": false,
+  "queued_existing_work": "No duplicate composition/helper/workflow5 request.",
+  "pre_relay_authoring_note": "Source inspection only; no syntax/test execution.",
+  "execution_authority": "ROOT_CAUSE_REPORT_FIRST; no execution requested or authorized by this artifact",
+  "change": "Only interpreter-specific runtime version probe replaces unconditional process.version. No source/contract/evidence policy changed; all real drift/env mismatches still fail.",
+  "original_failed_report": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-artifacts/mechanics-receipt.json",
+  "original_script": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-preflight.mjs"
+}

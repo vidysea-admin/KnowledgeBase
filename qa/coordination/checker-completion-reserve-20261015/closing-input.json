@@ -1,0 +1,53 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "canonical-adoption-checker",
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 180,
+        "tokens": 6000,
+        "cost": null
+      },
+      "shared_historical_id": "canonical-adoption-checker",
+      "prior_evidence": "../checker-efficiency-20261015/checker-accounting-checkpoint-input.json",
+      "scope_note": "Shared historical unknown overhead, deduplicate this ID centrally; not a fabricated review of this new unit"
+    },
+    {
+      "id": "completion-reserve-checker-prior",
+      "active_s": 110.6927,
+      "tokens": null,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 110.6927,
+        "tokens": 2500,
+        "cost": null
+      }
+    }
+  ],
+  "next_phase": {
+    "active_s": 90,
+    "tokens": 1500,
+    "cost": null
+  },
+  "bootstrap": {
+    "active_s": 180,
+    "tokens": 6000
+  },
+  "bootstrap_scope": "Fresh independent staged completion-reserve delta review only; first tool monotonic clock, at most60seconds investigation plus30seconds reserved for persistence/readback",
+  "escalation": {
+    "authority": "Root explicit closing-only authorization2026-10-15",
+    "reason": "Technical review completed; authenticate probe and pins, persist authoritative verdict/accounting and independently read back; preserve40seconds closing",
+    "limits": {
+      "active_s": 381,
+      "tokens": 10000,
+      "cost": null
+    }
+  }
+}

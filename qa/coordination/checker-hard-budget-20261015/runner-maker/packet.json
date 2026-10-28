@@ -1,0 +1,68 @@
+{
+  "policy_version": "managed-review/1",
+  "status": "HOLD",
+  "unit": "checker-scoped-runner",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_state": "uncommitted new files; requires byte fingerprints before review admission",
+  "changed_paths": [
+    "scripts/qa/scoped-check-runner.py",
+    "scripts/qa/test_scoped_check_runner.py"
+  ],
+  "acceptance": [
+    "immutable candidate and selected checks with reasons",
+    "mandatory/security omission refusal",
+    "atomic cumulative retry reservations",
+    "process tree deadline and raw own-exit receipts",
+    "unsupported LLM routes refuse without execution",
+    "no independent semantic PASS"
+  ],
+  "evidence": [
+    "test-output.txt",
+    "test-rerun-output.txt",
+    "test-setup-repaired-output.txt",
+    "test-setup-repaired-receipt.json",
+    "test-final-output.txt",
+    "test-final-receipt.json"
+  ],
+  "test_result": "6/6 focused tests green; final command exit 0; prior three failed attempts retained",
+  "known_limitations": [
+    "Deadline covers child startup and execution with reserved finalization, but supervisor itself and blocked filesystem/final receipt write have no external hard wall watchdog. Must not claim complete hard-wall enforcement.",
+    "Trusted caller supplies mandatory/security inventory. Completeness is not independently proven.",
+    "Reservations cumulative only within supplied ledger; caller can select another ledger. No global interception claim.",
+    "No dependency/import-containment preflight built into runner yet.",
+    "Measured maker-active and full actual-total tokens unavailable; no 10 percent efficiency proof.",
+    "Windows actual timeout probe now green: suspended Job Object launch, sleeping descendant termination, absent escape marker after 1.7s. This finite behavioral probe does not prove supervisor/finalization hard deadlines."
+  ],
+  "metrics": {
+    "maker_active_s": null,
+    "maker_actual_total_tokens": null,
+    "token_metric": "actual_total",
+    "command_phase_wall_s": [
+      8.1,
+      13.1,
+      0.4,
+      7.0,
+      8.6
+    ],
+    "test_command_wall_s": [
+      5.6049127,
+      2.7098744
+    ],
+    "scope_limit_s": 180,
+    "overrun_status": "unknown: no monotonic whole-turn start recorded; do not infer compliance",
+    "setup_repair_command_wall_s": [
+      0.5017332,
+      6.5140463,
+      6.3338616
+    ]
+  },
+  "checkpoint": "Runnable deterministic runner with six green focused tests; HOLD retained pending independent review and remaining stated limitations. No semantic PASS.",
+  "setup_cause": "TemporaryDirectory mode 0700 produced Windows ACLs inaccessible to sandbox subprocesses. Explicit Path.mkdir inherited accessible parent ACL. First repaired run proved runner cases but teardown hit WinError 32 shared-directory handle; final fixture retention preserves raw evidence and avoids cleanup race.",
+  "byte_fingerprints": {
+    "scripts/qa/scoped-check-runner.py": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "scripts/qa/test_scoped_check_runner.py": "82d86548b304cfe520bad0f049484ac26f204fcbc73a3b526b224b35b7abd3ab"
+  }
+}

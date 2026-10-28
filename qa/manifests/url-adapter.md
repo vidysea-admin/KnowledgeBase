@@ -68,3 +68,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration (109 lines, budget 200)
 - `packages/ingest/src/testUtils.ts` (new `fakeUrlFetcher` helper)
 - `packages/ingest/src/index.ts` (re-export)
 - `qa/contracts/url-adapter.md` (new contract, maker-drafted)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -1,0 +1,25 @@
+{
+  "task": "T-054",
+  "cycle": 1,
+  "state": "missing-selected-public-paths-only-not-acceptance-or-publication",
+  "extends": "qa/evidence/t054-review-completion/public-whitelist.json",
+  "files": [
+    {
+      "path": "qa/contracts/t054-transcript-review-planner-editor.md",
+      "sha256": "78316C4598E3CEC0E84BDD0FE05CD410440EF1BD8BE221263C30366E81F5ACD6",
+      "category": "checker-owned-scoped-foundation-contract"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t054-independent-race-diagnosis.json",
+      "sha256": "012AAF328195F3462015E180F524D5E7C48FB3ACC26F69B3BF378F3A890386A1",
+      "category": "selected-synthetic-independent-execution-receipt"
+    },
+    {
+      "path": "qa/evidence/goal-t051checker-broker-t054-independent-race-diagnosis.stdout.txt",
+      "sha256": "5A0E58D670729E9EB9EBE6A76D18D69F2B0DD0BCCB98C48F437B6E8E3CA765B6",
+      "category": "selected-synthetic-original-floor-and-causal-diagnosis-output"
+    }
+  ],
+  "qualification": "The existing whitelist already covers full contract, current manifest and packet, synthetic DOM/origin/race floors, checker diagnosis and current selected origin/reviewed-speech receipts. These three additional existing leaves contain contract prose or synthetic execution provenance, not private corpus text. No broad QA selection, dependency-only map, source-before backup, baseline diff, nonexistent verdict or queued/nonexistent proof is added. A receipt containing checked-file hashes is execution provenance; named dependency files are not selected by implication.",
+  "activeHandles": []
+}

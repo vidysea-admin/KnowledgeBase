@@ -1,0 +1,66 @@
+{
+  "utc": "2026-10-15T08:40:01.794Z",
+  "mode": "read-only-mongo",
+  "runtime": {
+    "executable": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "version": "v24.19.0",
+    "platform": "win32",
+    "arch": "x64"
+  },
+  "resources": {
+    "logicalCpus": 8,
+    "freeBytes": 18530430976,
+    "totalBytes": 34355990528,
+    "loadAverage": [
+      0,
+      0,
+      0
+    ],
+    "cpuActivityMeasured": false,
+    "note": "Windows load average is not a CPU lease or utilization sample; broker must serialize execution."
+  },
+  "sourcePins": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\package.json",
+      "sha256": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\transcript-review\\mongodb.integration.test.ts",
+      "sha256": "c63c81c2a454965ed99d4446ec6bed95b7554f9aa2648bd036d91818bb416324"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\safe-test-runtime\\register.mjs",
+      "sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644"
+    }
+  ],
+  "temp": {
+    "parent": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acceptance-preflight",
+    "writable": true
+  },
+  "mongodbPackage": {
+    "entry": "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\.pnpm\\mongodb@7.6.0\\node_modules\\mongodb\\lib\\index.js",
+    "sha256": "00b930052010d0198209f4768c01d3a87815ded0937e6a095327892e2155161b"
+  },
+  "mongo": {
+    "database": "lkb_staging",
+    "helloOk": true,
+    "replicaSet": false,
+    "writablePrimary": true,
+    "logicalSessions": true,
+    "maxWireVersion": 21,
+    "transactionPrerequisites": false,
+    "transactionActuallyExercised": false,
+    "writes": 0,
+    "existingKnownStagingCollections": [
+      "chunks",
+      "claims",
+      "graph_edges",
+      "session_pages",
+      "sessions",
+      "sources",
+      "tree_index",
+      "turns"
+    ],
+    "collectionNote": "Filtered schema names only; no documents/counts, database inventory, indexes or credentials were read."
+  }
+}

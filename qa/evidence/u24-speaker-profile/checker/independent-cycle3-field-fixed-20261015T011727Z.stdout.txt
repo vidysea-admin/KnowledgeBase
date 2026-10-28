@@ -1,0 +1,17 @@
+{"synthetic":true,"secondaryChecked":true,"withdrewBeforeFinalPrimaryCheck":true,"returnedTopicIds":[]}
+✔ actual store positive control retains only anchored knowledge and supported alias (23.4819ms)
+✔ same person row from another tenant cannot establish identity (2.13ms)
+✔ correct current hash cannot rescue wrong turn anchors and stale hash cannot rescue current ids (8.0756ms)
+✔ withdrawn primary source refuses all persona output (1.9795ms)
+✔ quoted self-name cannot restore legacy floor attribution (2.6689ms)
+✔ secondary contributing source withdrawal before final primary check withholds cached topic name (4.4839ms)
+✔ genuine SDK session propagates through every final authority reader and closes (6.79ms)
+✔ unsupported collection-only capability refuses rather than returning a sequential profile (1.9464ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 796.0208

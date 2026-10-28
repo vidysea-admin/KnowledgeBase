@@ -116,3 +116,5 @@ $ curl -o /dev/null -w '%{http_code}' http://localhost:8080/sessions    -> 200  
    with zero CORS errors, and that a direct `curl` to `/sessions` on the web container (not via
    client-side nav) returns 200.
 6. Confirm `TASKS.md`'s T-010 line now says `in_progress` with a real, specific status note.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

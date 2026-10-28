@@ -22,6 +22,11 @@
  * none was sufficient.
  */
 
+import { DEMONSTRATIVE_CUES, LOCATIVE_GOVERNORS, NEVER_A_PERSON } from "./speaker-rules/speaker-name-data.js";
+import { FUNCTION_FOLLOWERS, followedByNoun, opensAClause } from "./speaker-rules/speaker-following-rules.js";
+
+export { FUNCTION_FOLLOWERS };
+
 /**
  * Name particles that are legitimately lowercase INSIDE a name ("van der Berg", "de Souza").
  * Never valid as the first token, which is why `looksLikeAName` only allows them at i > 0.
@@ -95,47 +100,6 @@ export function containsNameVerbatim(text: string, name: string): boolean {
  *
  * These are fixed constants, never model-supplied, so a RegExp here carries no injection surface.
  */
-/**
- * Discourse words that are never a person, as a WHOLE candidate.
- *
- * ISS-093: the cue rule alone let 20 of 20 fabricated people through -- "Welcome Everyone" gave
- * `person:everyone`, "Hi Guys" gave `person:guys`, "Welcome To the conference" gave `person:to`.
- * The checker's diagnosis was exact: a cue evidences that the TURN names someone, never that the
- * CANDIDATE is a name. The two guards constrain different things and both are needed.
- *
- * I resisted a denylist in cycle 1 on the grounds that "everything that is not a name" is
- * unbounded. That objection was wrong-headed: this list is not that. It is the CLOSED class of
- * English function words, discourse markers and calendar terms -- pronouns, determiners,
- * prepositions, conjunctions, greetings, quantifiers, collective address nouns, days and months.
- * Closed classes are enumerable; "not a name" is not. Real names that happen to be ordinary nouns
- * ("Grace", "Hope", "Summer") are deliberately absent, because they are not function words.
- */
-const NEVER_A_PERSON = new Set([
-  // pronouns and quantifiers
-  "i", "you", "he", "she", "it", "we", "they", "me", "him", "her", "us", "them", "everyone",
-  "everybody", "somebody", "someone", "anyone", "nobody", "all", "both", "each", "every", "any",
-  "many", "most", "some", "none", "several", "few",
-  // collective address
-  "guys", "folks", "team", "everyone", "people", "friends", "members", "gentlemen", "ladies",
-  "audience", "participants", "attendees", "colleagues",
-  // greetings, discourse markers, fillers
-  "hi", "hello", "hey", "welcome", "thanks", "thank", "please", "sorry", "okay", "ok", "right",
-  "yeah", "yes", "no", "well", "now", "so", "just", "actually", "basically", "great", "good",
-  // negation and intensifier particles -- ISS-095. ISS-093's fix_direction named the target set as
-  // "prepositions/particles to/so/back/not"; to/so/back went in and `not` did not, so
-  // "I am Not sure about that." still shipped person:not through the `i am` cue.
-  "not", "nor", "never", "very", "really", "quite", "too", "also", "still", "even",
-  "morning", "afternoon", "evening", "night", "back", "again", "here", "there", "today",
-  "tomorrow", "yesterday", "next", "last", "first", "second",
-  // determiners, prepositions, conjunctions
-  "the", "a", "an", "and", "but", "or", "if", "then", "than", "that", "this", "these", "those",
-  "to", "from", "with", "without", "for", "of", "in", "on", "at", "by", "as", "about", "into",
-  "over", "under", "up", "down", "out", "off", "our", "your", "my", "his", "their", "its",
-  // calendar
-  "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday",
-  "january", "february", "march", "april", "may", "june", "july", "august", "september",
-  "october", "november", "december",
-]);
 
 /** Is every token of this candidate a discourse word? Then it is not a person, whatever the cue. */
 export function isDiscourseOnly(name: string): boolean {
@@ -176,47 +140,61 @@ const NAMING_CUES_BEFORE = [
  * (after-cues like `from`/`here`/`speaking`, greetings, demonstratives, address) is refused for
  * that occurrence.
  */
-const HANDOVER_MARKERS = [
+export const HANDOVER_MARKERS = [
   "invite", "invited", "inviting", "welcome our next speaker", "next speaker",
-  "next presenter", "next up", "hand over", "handing over", "over to",
+  // ISS-104: "Coming up next, Mumbai from the west zone." was read as a place bypass for six
+  // rounds. It is a handover — the person-valid twin "Coming up next, Nilesh from the west zone."
+  // must be refused for THIS label too, whoever the name belongs to.
+  "next presenter", "next up", "coming up next", "hand over", "handing over", "over to",
   "take us forward", "to take us through", "to take us into", "pass the mic",
 ];
 /** Cues whose subject is the SPEAKER THEMSELF — the only ones that survive a handover context. */
-const SELF_NAMING_CUES = ["my name is", "my name's", "i am", "i'm", "call me"];
-/**
- * Demonstratives point at anything -- "This is India calling.", "This is Wednesday.", "This is
- * Great news." A bare demonstrative plus ONE capitalised token is not evidence of a person, so it
- * counts only for a multi-token name ("This is Makrand Rajadhyaksha"). Single-token candidates
- * need a cue that is specifically about a person: an explicit self-naming, a handover, or a direct
- * address. This is the last of the ISS-093 attacks and the only one a closed-class list cannot
- * reach, since telling a country from a person is a gazetteer problem, not a pattern problem.
- */
-const DEMONSTRATIVE_CUES = ["this is", "that is", "that's"];
+export const SELF_NAMING_CUES = ["my name is", "my name's", "i am", "i'm", "call me"];
 /** Address greetings: only a cue when the name is followed by address punctuation (see below). */
 const ADDRESS_GREETINGS = ["good morning", "good afternoon", "good evening", "welcome", "hi", "hello", "hey", "thank you", "thanks"];
 const NAMING_CUES_AFTER = ["here", "speaking", "from", "with us", "joining us"];
 /** Interrogatives that follow a direct address: "Prasanti, what do you think?" */
 const ADDRESS_FOLLOWERS = ["what", "how", "would", "could", "do you", "can you", "any", "your", "please", "over to you"];
 
-/** Is the occurrence of `name` at `at` a person-directed act of naming, not a passing mention? */
 /**
- * Words that may follow `speaking` in the self-identification idiom: prepositions, conjunctions
- * and adverbs. Anything NOT here and not punctuation is taken to be a noun that `speaking` is
- * modifying, which makes it a participle rather than a cue (ISS-097 / ISS-098).
+ * Does `tail` END the clause rather than continue it? The `speaking` / `here` idiom discriminator.
  *
- * Stated as the complement on purpose: the first attempt allowlisted what may follow and refused
- * the rest, which is the opposite rule and cost ten recorded introductions.
+ * A following NOUN is the thing the word would be modifying, so it is a participle or a deictic; punctuation, end of
+ * clause, a conjunction, an adverb, any preposition or another naming cue all mean the self-identification idiom.
+ * The noun test itself lives in speaker-following-rules.ts (ISS-110).
  */
-const FUNCTION_FOLLOWERS = new Set([
-  "from", "on", "at", "for", "with", "to", "in", "of", "about", "as", "over", "after", "before",
-  "during", "via", "by", "into", "through", "under", "across", "per", "behalf", "alongside",
-  "and", "or", "but", "so", "yet", "then",
-  "here", "now", "today", "tonight", "again", "also", "too", "still", "just", "currently",
-  "live", "remotely", "briefly", "finally", "actually", "obviously",
-  "i", "we", "you", "my", "our", "this", "that",
-]);
+function endsTheClause(tail: string): boolean {
+  return !followedByNoun(tail, NAMING_CUES_AFTER);
+}
 
-function hasNamingCue(text: string, name: string, at: number): boolean {
+/**
+ * Does this turn use `name` as a PLACE or an ORGANISATION rather than as a person?
+ *
+ * D-052 ruling 2 (Approved-by: Umesh) chose a contextual signal and rejected a place-name lookup
+ * list, because a list wrongly refuses real people named India or Paris and never finishes. So this
+ * function knows no place names. It knows that a locative preposition cannot govern a person:
+ * "students in Mumbai" is a place reading of that string and "Mumbai said" is not — the ruling's own
+ * "I'm in Mumbai" vs "Mumbai said" distinction, made syntactically and candidate-independently.
+ *
+ * Two bounds keep the recall cost visible. Multi-token candidates are exempt, because
+ * "Mumbai Sharma" is a person whatever the turn says about Mumbai. And a possessive occurrence is
+ * not a place ("at Priya's desk" is a person's desk), so it is skipped.
+ *
+ * The cost is CONSTRUCTION-CONDITIONAL, not a flat percentage (ISS-104CC-3): ~0% outside a turn that
+ * mentions the same single-token string after a locative preposition AND relies on a weak after-cue
+ * (`here` / `from` / `speaking`); ~100% inside one, for ANY name, because nothing here is per-name.
+ * The earlier "3/20 = 15%" described one 20-case corpus's mix of such turns, not the mechanism.
+ */
+export function readsAsAPlaceOrOrg(text: string, name: string): boolean {
+  if (name.trim().split(/\s+/).filter(Boolean).length > 1) return false;
+  const governed = new RegExp(`(?:^|\\s)(?:${LOCATIVE_GOVERNORS.join("|")})$`, "iu");
+  return nameOccurrences(text, name).some((at) => {
+    if (/^['’]s\b/u.test(text.slice(at + name.length))) return false;
+    return governed.test(text.slice(Math.max(0, at - 24), at).trimEnd());
+  });
+}
+
+function hasNamingCue(text: string, name: string, at: number, place: boolean): boolean {
   const rawBefore = text.slice(Math.max(0, at - 40), at);
   const before = rawBefore.toLowerCase().replace(/[\s,:;."'\u2019()\u2014-]+$/u, "");
   // ISS-255: a handover marker in the before-context means the CURRENT speaker is introducing
@@ -232,26 +210,39 @@ function hasNamingCue(text: string, name: string, at: number): boolean {
 
   const rawAfter = text.slice(at + name.length, at + name.length + 28);
   const after = rawAfter.toLowerCase().replace(/^[\s,:;."'\u2019()\u2014-]+/u, "");
-  if (NAMING_CUES_AFTER.some((cue) => cue !== "speaking" && after.startsWith(cue))) return true;
-  // `speaking` is the self-identification idiom -- Ruby speaking. -- but it is also a plain
-  // participial modifier: English speaking students may apply would otherwise ship
-  // person:english (ISS-097). The distinction is syntactic and candidate-independent:
-  // Prasanti speaking students may apply is not a naming construction either.
-  //
-  // ISS-098: the first attempt inverted the rule. It ALLOWLISTED nine prepositions and refused
-  // everything else, dropping ten recorded self-introductions -- speaking here, speaking and I
-  // lead admissions, speaking again, speaking as the panel chair, speaking over Zoom -- and it
-  // did so with an unconditional early return that vetoed every LATER cue branch too.
-  //
-  // Both were wrong. The discriminator is a following NOUN (the thing speaking would modify);
-  // end of clause, punctuation, a conjunction, an adverb or ANY preposition all mean the idiom.
-  // And a non-match must fall through, never veto the predicate.
-  const SPEAKING_AT = /^[\s,:;.'"()\u2019-]*speaking\b/iu;
-  if (SPEAKING_AT.test(rawAfter)) {
-    const tail = rawAfter.replace(SPEAKING_AT, "");
-    const nextWord = /^\s*([\p{L}']+)/u.exec(tail);
-    if (!nextWord || FUNCTION_FOLLOWERS.has(nextWord[1]!.toLowerCase())) return true;
-    // A bare noun follows: participle, not a cue. Fall through; a later branch may supply one.
+  // The after-cues are the WEAK half of the evidence: `here` / `from` / `speaking` / `with us` are
+  // the affiliation idiom, and that is exactly the shape a place or an organisation mimics
+  // ("Mumbai from the west zone."). So a turn that reads its own candidate locatively loses all of
+  // them (D-052 ruling 2) and keeps only the explicit-naming and direct-address branches above and
+  // below \u2014 "my name is Paris" and "Paris, what do you think?" still resolve a real Paris.
+  if (!place) {
+    if (NAMING_CUES_AFTER.some((cue) => cue !== "speaking" && cue !== "here" && after.startsWith(cue))) return true;
+    // `X here` is the self-identification idiom only when nothing follows it -- "Ruby here." /
+    // "Ruby here, from admissions." A finite verb after it makes the turn a THIRD-PARTY deictic:
+    // "Ruby here has an announcement." is the moderator pointing AT Ruby, so binding that name to
+    // this turn's own label is the ISS-255 inversion whoever the name belongs to. That, not any
+    // place knowledge, is what closed ISS-104's "Google here has an announcement."
+    const HERE_AT = /^[\s,:;.'"()\u2019-]*here\b/iu;
+    if (HERE_AT.test(rawAfter) && endsTheClause(rawAfter.replace(HERE_AT, ""))) return true;
+    // `speaking` is the self-identification idiom -- Ruby speaking. -- but it is also a plain
+    // participial modifier: English speaking students may apply would otherwise ship
+    // person:english (ISS-097). The distinction is syntactic and candidate-independent:
+    // Prasanti speaking students may apply is not a naming construction either.
+    //
+    // ISS-098: the first attempt inverted the rule. It ALLOWLISTED nine prepositions and refused
+    // everything else, dropping ten recorded self-introductions -- speaking here, speaking and I
+    // lead admissions, speaking again, speaking as the panel chair, speaking over Zoom -- and it
+    // did so with an unconditional early return that vetoed every LATER cue branch too.
+    //
+    // Both were wrong. The discriminator is a following NOUN (the thing speaking would modify);
+    // end of clause, punctuation, a conjunction, an adverb or ANY preposition all mean the idiom.
+    // And a non-match must fall through, never veto the predicate.
+    const SPEAKING_AT = /^[\s,:;.'"()\u2019-]*speaking\b/iu;
+    // A bare noun after either word means participle or deictic, not a cue. Fall through rather than
+    // returning false: an unconditional veto here was ISS-098's second defect.
+    // ISS-104: and the name must OPEN its clause. "This is India speaking on the panel." has the same shape as
+    // "This is Rahul speaking on the panel.", so the weak cue is withheld inside a larger construction.
+    if (SPEAKING_AT.test(rawAfter) && opensAClause(text, at) && endsTheClause(rawAfter.replace(SPEAKING_AT, ""))) return true;
   }
 
   // Direct address takes a comma the greeting-of-an-object form does not: "Good morning Prasanti,"
@@ -266,7 +257,7 @@ function hasNamingCue(text: string, name: string, at: number): boolean {
 }
 
 /** Every whole-name occurrence of `name` in `text`, as start offsets. */
-function nameOccurrences(text: string, name: string): number[] {
+export function nameOccurrences(text: string, name: string): number[] {
   const isNameChar = (ch: string | undefined): boolean =>
     ch !== undefined && (/[\p{L}\p{N}]/u.test(ch) || NAME_JOINERS.has(ch));
   const out: number[] = [];
@@ -280,5 +271,11 @@ function nameOccurrences(text: string, name: string): number[] {
 
 /** Whole-name containment AND positive evidence that the turn is naming someone. */
 export function citesNameAsAnIntroduction(text: string, name: string): boolean {
-  return nameOccurrences(text, name).some((at) => hasNamingCue(text, name, at));
+  const place = readsAsAPlaceOrOrg(text, name);
+  return nameOccurrences(text, name).some((at) => hasNamingCue(text, name, at, place));
+}
+
+/** The naming-cue predicate at ONE occurrence, with the place-vs-person signal applied (relation rules). */
+export function hasNamingCueAt(text: string, name: string, at: number): boolean {
+  return hasNamingCue(text, name, at, readsAsAPlaceOrOrg(text, name));
 }

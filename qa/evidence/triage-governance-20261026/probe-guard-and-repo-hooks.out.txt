@@ -1,0 +1,7 @@
+﻿ISS-180 extended-length -> {"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"docs/DECISIONS.md is APPEND-ONLY (Lab Protocol). Direct Edit/Write is blocked -- append entr
+A035913-011 repo mc-precommit canonical-only -> []
+A035913-011 repo mc-precommit legacy ctrl   -> [WARN maker-checker: 1 unit(s) still awaiting /checker verdict. Commit should follow a PASS.]
+SS canonical-only  -> MAKER-CHECKER ACTIVE: substantive dev work routes through /maker (say 'normal' to opt out). Open issues: UNKNOWN (no ledger) | Checks pending: 1 [u] | PASS not closed out: 0 | Queue TODO: 0 | Last tick: NEVER | Last sweep: NEVER |
+ISS-267 FAIL@cycle -> MAKER-CHECKER ACTIVE: substantive dev work routes through /maker (say 'normal' to opt out). Open issues: UNKNOWN (no ledger) | Checks pending: 0 | PASS not closed out: 0 | Queue TODO: 0 | Last tick: NEVER | Last sweep: NEVER | Led
+temp=C:\Users\Lenovo\AppData\Local\Temp\triage-probe2-fb23360e
+

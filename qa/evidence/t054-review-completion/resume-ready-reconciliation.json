@@ -1,0 +1,26 @@
+{
+  "capturedUtc": "2026-10-14T22:31:54.9304897Z",
+  "cycle": 0,
+  "backendReceipt": "final-generation-focused-receipt.json",
+  "backendCases": 46,
+  "frontendCases": [
+    4,
+    7
+  ],
+  "backendObservedPinDelta": [
+    {
+      "path": "apps/api/src/composition/integrations/trusted-readers.ts",
+      "receipt": "D1AFA507BA6D1F426D1DA2C14F65178FB9D930E592CCA0EE4B8D61E493727042",
+      "current": "D66E2FFF6822C4CC2CB2F2FFAE8080115EB7E6BC3EFDBA6709D72FE93E147DE7",
+      "reason": "public claim/page/citation session projection strips private indexArtifact; unchanged overlay/eligibility logic",
+      "importedByScopedExecutedTests": false,
+      "proof": "read-only source/dependency reconciliation; no rerun/current production mount proof"
+    }
+  ],
+  "ownedCandidateDrift": false,
+  "frontendDrift": false,
+  "wholeParentVerified": false,
+  "rawCorpus": "private local source input/hash lineage only; no raw corpus publication",
+  "syntheticFixtures": "programme fee/admissions/source records are public-safe synthetic proof data",
+  "activeHandles": []
+}

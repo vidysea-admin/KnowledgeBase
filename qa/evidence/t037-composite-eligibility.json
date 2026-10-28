@@ -1,0 +1,36 @@
+{
+  "status": "PENDING_CLOSURE_AUTHENTICATION",
+  "scope": "Four old unchanged schedule-tick-rules-integration cases only; not whole failed batch",
+  "current_own_pins": "qa/evidence/t037-scheduled-dispatch-policy-pins.json",
+  "own_pin_drift": [],
+  "old_receipt": "qa/goal-vectorless-2026-10-15/verification-t037-dispatch-eleven.json",
+  "old_receipt_sha256": "48FF7C96BD86FC4221960B7D9E87F083C506BB7EFA83308436D819F3E10330A2",
+  "new_receipt": "qa/goal-vectorless-2026-10-15/verification-t037-valid-fixture-seven.json",
+  "new_receipt_sha256": "E041B6236A7D0B21305D108E80761369D5829CC0EFB2F4CA2210B452F64B8A67",
+  "old_batch_exit": 1,
+  "old_batch_pass": 9,
+  "old_batch_fail": 2,
+  "old_unchanged_neighbor_cases": 4,
+  "new_batch_exit": 0,
+  "new_batch_pass": 7,
+  "old_capture_pins": 118,
+  "new_capture_pins": 114,
+  "old_current_drift": [
+    "packages/meeting-bot/src/calendar/scheduled-dispatch.test.ts",
+    "scripts/webinar/start-record-detached.test.mjs"
+  ],
+  "drift_reason": "Only test fixture URL repairs; no product or four-neighbor test changes",
+  "same_runtime_executable": true,
+  "same_environment": true,
+  "same_lock": true,
+  "same_import_root": true,
+  "observed_source_closure": "All declared old production inputs and unchanged neighbor test hashes match current; no modified new test imported by neighbor test",
+  "limitations": [
+    "Static resolver @lkb/core/src alias and obs-websocket external identity reconciliation pending broker supplement.",
+    "Partial node success in an exit1 batch is not a standalone exit0 receipt.",
+    "No current native launcher floor execution or complete scoped PASS claimed."
+  ],
+  "fallback": "If actual scoped import closure cannot be authenticated, broker current four-neighbor refresh only; no7/11repeat",
+  "actual_total_tokens": null,
+  "actual_total_cost": null
+}

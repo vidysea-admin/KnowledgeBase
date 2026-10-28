@@ -1,0 +1,16 @@
+{
+  "queueWait": "starts after gate/send; ends on receipt delivery",
+  "tokens": null,
+  "monotonicStart": 181709480509,
+  "frequency": 10000000,
+  "utc": "2026-10-15T08:48:01.0659307Z",
+  "cost": null,
+  "actualPrior": null,
+  "queueStartTick": 181953070461,
+  "queueEndTick": 182495297770,
+  "endTick": 182842159373,
+  "activeSeconds": 61.3133143,
+  "brokerCommandSeconds": 2.2681588,
+  "limitSeconds": 60,
+  "efficiencyRatio": "UNVERIFIED"
+}

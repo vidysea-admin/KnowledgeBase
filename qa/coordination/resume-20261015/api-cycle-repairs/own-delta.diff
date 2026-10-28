@@ -1,0 +1,47 @@
+diff --git a/qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__visibility__knowledge.ts b/apps/api/src/visibility/knowledge.ts
+index 8253e260..1645e26c 100644
+--- a/qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__visibility__knowledge.ts
++++ b/apps/api/src/visibility/knowledge.ts
+@@ -4,8 +4,7 @@ import type { Claims, Sessions, Sources, TreeIndexNode, TreeIndexRootDocument, T
+ import { assertValidTenantId, withTenant } from "@lkb/db";
+ import { checkEvidence } from "../whatsapp/review/store.js";
+ import type { WhatsAppReviewCandidate } from "../whatsapp/review/detection.js";
+-import { WA_APPROVED_CLAIM_STATUS, WA_CLAIM_SOURCE, whatsAppClaimId } from "../whatsapp/review/materializer.js";
+-import { WHATSAPP_REVIEW_LOG } from "../whatsapp/review/invalidate.js";
++import { WA_APPROVED_CLAIM_STATUS, WA_CLAIM_SOURCE, whatsAppClaimId, WHATSAPP_REVIEW_LOG } from "../whatsapp/review/publication-contract.js";
+ import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
+ import { createHash } from "node:crypto";
+ import { parseNativeSourceLocator, type NativeEvidenceResolver } from "../native-evidence/resolver.js";
+diff --git a/qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__whatsapp__review__materializer.ts b/apps/api/src/whatsapp/review/materializer.ts
+index d2a8a269..c0ec1da9 100644
+--- a/qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__whatsapp__review__materializer.ts
++++ b/apps/api/src/whatsapp/review/materializer.ts
+@@ -5,12 +5,8 @@ import type { WhatsAppReviewCandidate } from "./detection.js";
+ import type { WhatsAppReviewMaterializer } from "./store.js";
+ import { publishApprovedMessage, revokeNativeMessage } from "../../native-evidence/message-publication.js";
+ 
+-/** ISS-WA-REVIEW-WIRE-005, decided by Umesh 2026-10-14: "mark it verified with soruce as whatsapp".
+- * The ONE place that decides how an approved chat claim is labelled; `source` lets consumers tell chat-verified from webinar-verified. */
+-export const WA_CLAIM_SOURCE = "whatsapp" as const;
+-export const WA_APPROVED_CLAIM_STATUS: "verified" | "needs-review" | "conflicting" = "verified";
+-
+-export const whatsAppClaimId = (candidateId: string): string => `wa-claim:${candidateId.replace(/^wa-review:/u, "")}`;
++import { WA_CLAIM_SOURCE, WA_APPROVED_CLAIM_STATUS, whatsAppClaimId } from "./publication-contract.js";
++export { WA_CLAIM_SOURCE, WA_APPROVED_CLAIM_STATUS, whatsAppClaimId } from "./publication-contract.js";
+ 
+ export const materializeWhatsAppClaim: WhatsAppReviewMaterializer = async ({ candidate, db, session }) => {
+   if (candidate.status !== "approved" || candidate.decision?.action !== "approved") throw new Error("WhatsApp review: only an approved candidate may be materialised");
+diff --git a/qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__whatsapp__review__invalidate.ts b/apps/api/src/whatsapp/review/invalidate.ts
+index 5ab91f9d..d579f2c3 100644
+--- a/qa/coordination/resume-20261015/api-cycle-repairs/rawbacks/apps__api__src__whatsapp__review__invalidate.ts
++++ b/apps/api/src/whatsapp/review/invalidate.ts
+@@ -7,7 +7,8 @@ import type { WhatsAppReviewCandidate } from "./detection.js";
+ import { revokeWhatsAppClaim } from "./materializer.js";
+ import { checkEvidence } from "./store.js";
+ 
+-export const WHATSAPP_REVIEW_LOG = "whatsapp_review_log";
++import { WHATSAPP_REVIEW_LOG } from "./publication-contract.js";
++export { WHATSAPP_REVIEW_LOG } from "./publication-contract.js";
+ /** Review-log ids are tenant-structured and length-prefixed, so two tenants (or tenantId/part boundaries) can never collide on a unique _id. */
+ export const whatsAppLogId = (tenantId: string, ...parts: string[]): string => `tenant:${tenantId.length}:${tenantId}:${parts.join(":")}`;
+ export const DEFAULT_MAX_DELETE_FRACTION = 0.5;

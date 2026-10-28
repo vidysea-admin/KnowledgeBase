@@ -1,0 +1,19 @@
+{
+  "_id": "pg1",
+  "tenantId": "toc",
+  "sessionId": "sess1",
+  "summary": "Session covered NZ visa updates.",
+  "evidence": [
+    {
+      "turnId": "t1",
+      "sessionId": "sess1"
+    }
+  ],
+  "indexArtifact": {
+    "version": 1,
+    "generation": "unbound",
+    "sessionId": "sess1",
+    "sourceId": "src1",
+    "turnDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

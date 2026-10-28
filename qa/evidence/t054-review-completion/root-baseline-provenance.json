@@ -1,0 +1,137 @@
+{
+  "at": "2026-10-14T21:32:23.4914659Z",
+  "head": "ed542fd01c870e5d5b64e1d72b413062d595f675",
+  "trackedDiff": "qa/evidence/t054-review-completion/root-baseline-diff.patch",
+  "candidate": [
+    {
+      "path": "apps/api/src/transcript-review/authorization.test.ts",
+      "sha256": "27925F4CAAA3A0E883D76AB6C03829D1448E0708E0764A75CA22A20B04A4A459",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "1CF35BEA72EB9C90138969966A58526A06D34892B316DED5066576D91A4B7168",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/memdb.testsupport.ts",
+      "sha256": "A616444C988E039E03E5D3A34F187F51B183B69DB440730DBAB3A10C237195F9",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/mongodb.integration.test.ts",
+      "sha256": "87859244340F453109CF9CF61CF67238A9B11CA2859E951FF0AC0397A77E4B0F",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/persist.test.ts",
+      "sha256": "305BA0E21AFD529C87BBAD08D2E3A0A3A8384698F23B2F59E8D21C8033A12DC7",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/persist.testkit.ts",
+      "sha256": "E9A7182B56C625E3D81A2C18D5189DFEB8E77C09CB07FFF9A6801F3F2D3EFB80",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.test.ts",
+      "sha256": "F39368DFB6DB6179CC2FE4AD706F39D2B016EA83F15C1A38FAAF4C4A35B7A049",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "sha256": "295CCF510EDF1006E1F9F77BB31FE66A24662E4A722F30CC9143457AA2794865",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.test.ts",
+      "sha256": "67AC591FC6543C92E1E7EB331567AFBED263610D2195C9A8C5637585F84EFECB",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.ts",
+      "sha256": "40B3AFC65279C0072CBA70755ED9EF8F853BAB559418FF05C997C7A4A786AC57",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+      "sha256": "EBE3DEF7A4F586E87AA1D9BCF389F5307E368318FDBB0A28180D189052887A1E",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh.test.ts",
+      "sha256": "63352F51445A5476EC459450C43DE88D59047C5EE5158E5C0BD0DC6382C50FEA",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/router.ts",
+      "sha256": "F900DF777D4BBD9F4124EDBE4B097752FD2C221497958AACC98FD4B6320D9061",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/search-reader.test.ts",
+      "sha256": "E59CAF8652857C0BC2FFA35C271851EE93A9B71FB247FEACEADB03AF2F96083E",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/search-reader.ts",
+      "sha256": "A4DEB46C574A5008D0228AD2E234A5D65EABFF27F3FDA26812B74E061697FF61",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.test.ts",
+      "sha256": "29D1650F5FC2DEFEB97B519DF8F21637CC1EC053684CB38808D11672E865A615",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "sha256": "1FA9A35EE5393F63E4E4A3F9EA2BFF4AE15F706376A9379D029CC91704E55B28",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/store.ts",
+      "sha256": "304F7DCF0E156E6D825B0D739793BC976409639EA6E4AE7375801227ECBB2C1D",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/transcript-review/transaction-db.ts",
+      "sha256": "36D426BDDA02C6D291BE4AF381701C182DA8954A6D6C0A9F206783AAB0F8E343",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx",
+      "sha256": "D06CE8509B7E678DAE5FF4D4834C1E012050026159119F465F66B464FEC241FC",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+      "sha256": "36D03CF4DC3CA4DC6212E95D5EACF9445CCF1AF04EE78676E3B41B680B4AC30C",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+      "sha256": "280CF8B85BA023DBD8DE49D1108DC4CF500EC15B72B59681C72FE9AF0EE2C851",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+      "sha256": "6DE42740B8231F5F7E5ABCAFE1FE6BC35B02183CA87FDF1F521718206C9F03BD",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+      "sha256": "EA1F6F01D60F75CD43DDE8C96725D46EB6A4FD1AD2B5F0753998E4A19299403E",
+      "base": "absent at ed542fd (new untracked candidate)"
+    },
+    {
+      "path": "apps/api/src/search-store.ts",
+      "sha256": "FA83C5F66D232E6F82ACB699132C1C4D3412C99D3A4B896C741193DAB644702C",
+      "base": "tracked at ed542fd"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/transcripts.ts",
+      "sha256": "0A611B32FC952F75FD3DCB80BDF9EAACF493F06FDA08CACA62532FA47E48BC62",
+      "base": "absent at ed542fd (new untracked candidate)"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "method": "All six source paths were absent at Add File application, which succeeded; no preexisting bytes overwritten.",
+  "before_files": [
+    {
+      "path": "packages/meeting-bot/src/capture/native-ivf.ts",
+      "state": "absent",
+      "raw_backup": null
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native-ivf.test.ts",
+      "state": "absent",
+      "raw_backup": null
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native-clock-ledger.ts",
+      "state": "absent",
+      "raw_backup": null
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native-clock-ledger.test.ts",
+      "state": "absent",
+      "raw_backup": null
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native-spool.ts",
+      "state": "absent",
+      "raw_backup": null
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/native-spool.test.ts",
+      "state": "absent",
+      "raw_backup": null
+    }
+  ],
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "actual_tokens": null,
+  "actual_active_s": null
+}

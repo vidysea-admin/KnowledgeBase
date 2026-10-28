@@ -1,0 +1,130 @@
+✔ production text routes bind distinct Cloud generators and verifiers without an embedding route (3.4357ms)
+✔ output verification cannot fall back to generation, even with an unsafe configured verifier chain (2.53ms)
+✔ Compose requires an explicit database and does not bake provider secrets into web builds (0.8435ms)
+✔ actual strict caller publishes only the persisted attempt and all generated artifacts carry its source generation (47.9179ms)
+✔ stale, foreign, missing and mixed artifact generation cannot survive a physically complete cached receipt (17.6197ms)
+✔ removing only the exact session tree artifact refuses cached consumption while unrelated nodes remain (8.0448ms)
+✔ strict preflight failure leaves prior artifacts intact and cannot return their generation as fresh (7.6204ms)
+✔ canonical reviewed paraphrase retains exact current source evidence and immutable review digest without acquiring generated status (26.3196ms)
+✔ ISS-154: a full indexSession run REACHES the entity writes (the fixture must not exempt them) (31.3635ms)
+✔ ISS-154: every entity write is tenant-scoped ON THE FILTER, not merely in the body (5.299ms)
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (37.8058ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (5.5617ms)
+✔ flag ON via env var (4.3846ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (5.4009ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (4.7674ms)
+✔ old behaviour is untouched: the default (non-strict) path writes a legacy page with no citedItems or qa (31.2897ms)
+✔ judge on: notes persisted, judge totals reported, every note citation resolves to a real turn and time (44.4091ms)
+✔ judge rejects a polarity-flipped decision: dropped from page and claims, never persisted (10.0424ms)
+✔ judge that throws fails closed: nothing persisted, existing notes untouched, status failed (3.9216ms)
+✖ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (4.0196ms)
+✔ a failing claims insert leaves every old claim in place (no delete is issued) (4.5658ms)
+✔ flag OFF: legacy delete-then-insert path and result shape are unchanged; a judge alone does not switch grounded mode on (10.811ms)
+✔ flag resolution: OFF unless the caller or KB_GROUNDED_NOTES=1 turns it on; cost cap parsing (0.3352ms)
+✔ GET /citations/:claimId renders a claim written by grounded indexSession with the cited turn id and times (81.6437ms)
+✖ when the judge rejects every fresh claim, old machine claims are kept (never replace notes with nothing) (9.4037ms)
+✔ a DEGRADED SUMMARIZE run does not take the claims write down with it — the two paths are independent (28.1045ms)
+✔ flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1 (1.4408ms)
+✔ suggest writes a status=suggested row with its quote, and NEVER a speakers row (16.8067ms)
+✔ a verifier that does not say yes yields no suggestion (2.6158ms)
+✔ an ungrounded name (quote not in the transcript) is not suggested (0.6372ms)
+✔ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (6.0434ms)
+✔ a model that throws never throws out of the hook and writes nothing (0.5363ms)
+✔ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (32.4688ms)
+✔ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (4.6451ms)
+✔ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (1.997ms)
+✔ ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw (1.624ms)
+✔ ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues (51.4456ms)
+✔ indexSession still completes when the suggestion hook fails (5.9477ms)
+✔ production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins (0.2769ms)
+✔ ISS-121: two tenants recording a gap for the same sessionId use DIFFERENT ids (5.5398ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (41.2327ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (0.9686ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (11.5665ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (15.2157ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (10.8872ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (10.8504ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.5874ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (12.8129ms)
+✔ route uses verified tenant, sessions scope, safe errors and private no-store (121.6512ms)
+✔ store errors hide credentials, transcript and raw exception (18.0432ms)
+✔ mounted knowledge route enforces scope, request bounds, tenant and safe DTO (33.1339ms)
+﹣ actual TOC deterministic persona traverses mounted API and produces a downstream response artifact (0.3025ms) # HOLD: private authentic TOC input requires explicit KB_U24_PRIVATE_TOC_TESTS=1
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (26.3898ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (5.5904ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (54.8362ms)
+✔ known-person profile and mounted API revoke source consent without a cached identity bypass (81.42ms)
+✔ unsupported snapshot capability cannot fall back to collection-only profile output (23.7533ms)
+✔ cached topic names require every contributing source session to remain visible (20.2329ms)
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (40.9915ms)
+✔ speaker metadata eligibility permits empty optional evidence and all-visible attribute references (1.3739ms)
+✔ speaker metadata eligibility checks withdrawn independent attribute references despite absent values (1.3912ms)
+✔ speaker metadata eligibility refuses malformed declared attribute references before source reads (2.0438ms)
+✔ speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads (1.0848ms)
+✔ speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source (3.922ms)
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (80.7584ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (33.3725ms)
+✔ review refresh refuses legacy/vector completion and missing lexical or provenance proof (42.2801ms)
+✖ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (13.438ms)
+✔ text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score (20.3809ms)
+✔ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (1.5334ms)
+✔ head audit remains readable after secondary history failure without another human correction (1.4486ms)
+✔ complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation (1.5344ms)
+✔ effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes (1.2354ms)
+﹣ retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection (0.3073ms) # SKIP
+ℹ tests 74
+ℹ suites 0
+ℹ pass 69
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 25553.3492
+
+✖ failing tests:
+
+test at apps\api\src\indexing\session-grounded-wire.test.ts:1:4750
+✖ re-run preserves verified claims, inserts before deleting, and deletes only machine rows by _id (4.0196ms)
+  Error: expected evidence text
+      at runtimeString (C:\Users\product\Desktop\KnowledgeBase\packages\index\src\pipeline\grounded.ts:33:11)
+      at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\index\src\pipeline\grounded.ts:131:121)
+      at Array.map (<anonymous>)
+      at runtimeEvidence (C:\Users\product\Desktop\KnowledgeBase\packages\index\src\pipeline\grounded.ts:130:42)
+      at <anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.ts:106:5)
+      at Array.map (<anonymous>)
+      at validatePreservedIndexClaims (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.ts:100:17)
+      at indexSessionWithinPublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:194:26)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-grounded-wire.test.ts:82:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+
+test at apps\api\src\indexing\session-grounded-wire.test.ts:1:9063
+✖ when the judge rejects every fresh claim, old machine claims are kept (never replace notes with nothing) (9.4037ms)
+  Error: index_artifact_generation_incomplete
+      at finishIndexAttempt (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\generation.ts:225:68)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async indexSessionWithinPublication (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session.ts:339:17)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\indexing\session-grounded-wire.test.ts:148:15)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    code: 'index_artifact_generation_incomplete'
+  }
+
+test at apps\api\src\transcript-review\refresh-executor.test.ts:1:6428
+✖ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (13.438ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'complete'
+  - 'failed'
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\transcript-review\refresh-executor.test.ts:95:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'complete',
+    expected: 'failed',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

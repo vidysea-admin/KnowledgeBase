@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "index": 33,
+  "originalIndex": 35,
+  "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+  "inputHash": "16e09e2e96f6cc26293ec074c079187872595de1d24c4402a29221dc34cd2f75",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "The original cited turn explicitly states all four Cs and their association with the Career Construction Inventory.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speakerRef is unknown; the name prefix in transcript text does not verify speaker identity.",
+      "Transcript entailment does not establish external factual truth.",
+      "Historical artifact hashes are supplied metadata only; exact bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+        "contextVersion": "originalMigration",
+        "quote": "And the 4Cs, uh as part of the Career Construction Inventory, are: Control, Concern, Curiosity, and Confidence.",
+        "textSha256": "e1d909055853eb2dad645182f36de4b8633b14c397312c87ca6f71a6cf6e1819",
+        "contextSha256": "0c302d7287cfe44d1a85dbf0c2bddc142c210bfd2c711afecc0ecbff0cc6c37a",
+        "artifactSha256": "f128e50c567ed7b450e437e9ff5e4fa5ce96e141da9fe624608495a8ed38f93c",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 3762,
+        "tEnd": 3797,
+        "supports": "Directly lists Control, Concern, Curiosity, and Confidence as the Career Construction Inventory 4Cs."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unresolvable",
+    "reason": "The only cited current turn t085 is absent, so none of the four Cs or their inventory association can be assessed from current supplied evidence.",
+    "missingReferences": [
+      {
+        "sessionId": "2026-06-30-exploring-identity-success-counseling",
+        "turnId": "2026-06-30-exploring-identity-success-counseling-t085",
+        "reason": "turn-absent; no current match supplied"
+      }
+    ],
+    "caveats": [
+      "Original support cannot substitute for the missing current citation.",
+      "Current raw artifact SHA256 and normalizedLfSha256 differ; neither on-disk bytes nor normalized bytes were verified.",
+      "No duplicate citation references are supplied; the missing current record prevents timing or content comparison."
+    ],
+    "citations": []
+  },
+  "sameIdContentChanged": false,
+  "shortReason": "Original t085 entails the complete claim; current t085 is absent. No same-ID changed-content flag is recorded. Hash checks pass; human factual adjudication remains open."
+}

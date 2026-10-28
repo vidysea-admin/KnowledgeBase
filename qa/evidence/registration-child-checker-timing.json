@@ -1,0 +1,9 @@
+{
+  "launchUtc": "2026-10-14T09:21:07.2989758+00:00",
+  "verdictPersistedUtc": "2026-10-14T09:33:31.1073163+00:00",
+  "confirmedPresentUtc": "2026-10-14T09:33:34.2540795Z",
+  "launchToPersistSeconds": 743.8083405,
+  "bytes": 7540,
+  "verdict": "PASS",
+  "cycle": 1
+}

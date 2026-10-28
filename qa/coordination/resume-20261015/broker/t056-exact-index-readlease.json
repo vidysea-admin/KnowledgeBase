@@ -1,0 +1,13 @@
+{
+  "authority": "root exact frozen readlease chunk-integrity.ts; only listed indexing/postcommit/transcripts files active",
+  "active_paths": [
+    "apps/api/src/indexing/types.ts",
+    "apps/api/src/indexing/session.ts",
+    "apps/api/src/indexing/post-commit.ts",
+    "apps/api/src/indexing/post-commit.test.ts",
+    "apps/api/src/indexing/vectorless-publication.test.ts",
+    "apps/api/src/composition/integrations/transcripts.ts",
+    "apps/api/src/grounded-postprocessing/transcripts.test.ts"
+  ],
+  "chunk_integrity_sha256": "e984e228e4b5873b7009c08d91b7b8491eb7a514887a70a725b2ddb4ee6547f0"
+}

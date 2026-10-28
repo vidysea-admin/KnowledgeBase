@@ -1,0 +1,17 @@
+{
+  "authority": "root latest two test-only overlays, all production pins unchanged; existing helper creates new protected UUID only",
+  "adoptions": [
+    {
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "before": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "after": "aae315a52c5afe0d2c72dcb6b1e2d932acd94876545d7550335594496edc99c1"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.test.ts",
+      "before": "fde28f6bb74bc97ccae57aa391c186f4fde8dc61325de5233b28ce28bad58f38",
+      "after": "b2b2b34951ecff623896258bb2318f3dcd6e2caa2d448b3e2a6e97696809f60f"
+    }
+  ],
+  "helper_sha256": "667560a2805af9e70c391d362e29306a98da20cb6a2cbb6f9af71048d152914b",
+  "adapter_sha256": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d"
+}

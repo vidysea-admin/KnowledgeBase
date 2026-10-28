@@ -1,0 +1,558 @@
+{
+  "tag": "u24regate-20261017",
+  "measuredAt": "2026-10-17T18:26:12.814Z",
+  "runs": [
+    1,
+    2,
+    3
+  ],
+  "tiers": {
+    "final": {
+      "outputs": 3,
+      "correct": 3,
+      "precision": 1,
+      "wrongLinks": 0,
+      "wrong": [],
+      "goldNamedLabelPersonPairs": 28,
+      "recoveredInAnyRun": 1,
+      "recoveredInEveryRun": 1,
+      "recallAnyRun": 0.0357,
+      "stableSessions": 11,
+      "sessionsWithMultipleRuns": 11,
+      "perSpeakerOutputs": [
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "speakerRef": "spk:0",
+          "displayName": "Jubin Thakkar",
+          "runsProduced": 3,
+          "runsCorrect": 3
+        }
+      ],
+      "goldPairs": [
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:0",
+          "person": "Rashi",
+          "blocks": 3,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:0",
+          "person": "Ruby",
+          "blocks": 4,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:1",
+          "person": "Kshitij",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:1",
+          "person": "Shagun",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:1",
+          "person": "Rashi",
+          "blocks": 6,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:2",
+          "person": "Ruby",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "label": "spk:0",
+          "person": "Priyanka",
+          "blocks": 10,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "label": "spk:1",
+          "person": "Priyanka",
+          "blocks": 11,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "blocks": 19,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:1",
+          "person": "Nikhil",
+          "blocks": 9,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:1",
+          "person": "Shithij",
+          "blocks": 9,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:2",
+          "person": "Nikhil",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:3",
+          "person": "Shithij",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:6",
+          "person": "Bhakti",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:0",
+          "person": "Nikhil",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-03-uk-beyond-offer-letters",
+          "label": "spk:4",
+          "person": "Bhakti",
+          "blocks": 3,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:1",
+          "person": "Sangeeta",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "blocks": 37,
+          "recoveredRuns": 3,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Alka",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Nupur",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Poonam",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Sangeeta",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Ritu",
+          "blocks": 3,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Ankit",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:3",
+          "person": "Sheetal",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:3",
+          "person": "Bhakti",
+          "blocks": 6,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:3",
+          "person": "Supriya",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-27-in-focus-4",
+          "label": "spk:0",
+          "person": "Bhakti",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        }
+      ]
+    },
+    "suggested": {
+      "outputs": 12,
+      "correct": 12,
+      "precision": 1,
+      "wrongLinks": 0,
+      "wrong": [],
+      "goldNamedLabelPersonPairs": 28,
+      "recoveredInAnyRun": 8,
+      "recoveredInEveryRun": 2,
+      "recallAnyRun": 0.2857,
+      "stableSessions": 8,
+      "sessionsWithMultipleRuns": 11,
+      "perSpeakerOutputs": [
+        {
+          "session": "2026-07-15-creative-futures",
+          "speakerRef": "spk:1",
+          "displayName": "Priyanka Roy",
+          "runsProduced": 1,
+          "runsCorrect": 1
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "speakerRef": "spk:0",
+          "displayName": "Priyanka Roy",
+          "runsProduced": 1,
+          "runsCorrect": 1
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "speakerRef": "spk:1",
+          "displayName": "Nikhil",
+          "runsProduced": 1,
+          "runsCorrect": 1
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "speakerRef": "spk:6",
+          "displayName": "Bhakti",
+          "runsProduced": 3,
+          "runsCorrect": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "speakerRef": "spk:2",
+          "displayName": "Nupur",
+          "runsProduced": 1,
+          "runsCorrect": 1
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "speakerRef": "spk:2",
+          "displayName": "Alka",
+          "runsProduced": 1,
+          "runsCorrect": 1
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "speakerRef": "spk:1",
+          "displayName": "Sangeeta",
+          "runsProduced": 1,
+          "runsCorrect": 1
+        },
+        {
+          "session": "2026-08-27-in-focus-4",
+          "speakerRef": "spk:0",
+          "displayName": "Bhakti",
+          "runsProduced": 3,
+          "runsCorrect": 3
+        }
+      ],
+      "goldPairs": [
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:0",
+          "person": "Rashi",
+          "blocks": 3,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:0",
+          "person": "Ruby",
+          "blocks": 4,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:1",
+          "person": "Kshitij",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:1",
+          "person": "Shagun",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:1",
+          "person": "Rashi",
+          "blocks": 6,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+          "label": "spk:2",
+          "person": "Ruby",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "label": "spk:0",
+          "person": "Priyanka",
+          "blocks": 10,
+          "recoveredRuns": 1,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "label": "spk:1",
+          "person": "Priyanka",
+          "blocks": 11,
+          "recoveredRuns": 1,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-15-creative-futures",
+          "label": "spk:1",
+          "person": "Sumit Saurabh",
+          "blocks": 19,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:1",
+          "person": "Nikhil",
+          "blocks": 9,
+          "recoveredRuns": 1,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:1",
+          "person": "Shithij",
+          "blocks": 9,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:2",
+          "person": "Nikhil",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:3",
+          "person": "Shithij",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:6",
+          "person": "Bhakti",
+          "blocks": 2,
+          "recoveredRuns": 3,
+          "runs": 3
+        },
+        {
+          "session": "2026-07-30-in-focus-3",
+          "label": "spk:0",
+          "person": "Nikhil",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-03-uk-beyond-offer-letters",
+          "label": "spk:4",
+          "person": "Bhakti",
+          "blocks": 3,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:1",
+          "person": "Sangeeta",
+          "blocks": 1,
+          "recoveredRuns": 1,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:0",
+          "person": "Jubin Thakkar",
+          "blocks": 37,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Alka",
+          "blocks": 1,
+          "recoveredRuns": 1,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Nupur",
+          "blocks": 1,
+          "recoveredRuns": 1,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Poonam",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Sangeeta",
+          "blocks": 1,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Ritu",
+          "blocks": 3,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:2",
+          "person": "Ankit",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:3",
+          "person": "Sheetal",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:3",
+          "person": "Bhakti",
+          "blocks": 6,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-24-uniaccess-leeds-arts-university",
+          "label": "spk:3",
+          "person": "Supriya",
+          "blocks": 2,
+          "recoveredRuns": 0,
+          "runs": 3
+        },
+        {
+          "session": "2026-08-27-in-focus-4",
+          "label": "spk:0",
+          "person": "Bhakti",
+          "blocks": 2,
+          "recoveredRuns": 3,
+          "runs": 3
+        }
+      ]
+    }
+  },
+  "degradedSessionRuns": [],
+  "providerCalls": 294
+}

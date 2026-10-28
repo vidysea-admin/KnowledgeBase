@@ -1,0 +1,53 @@
+{
+  "scope": "Independent authored-synthetic profile/store identity, anchors, tenant and secondary-source metadata withdrawal controls",
+  "spec": "qa/evidence/u24-speaker-profile/checker/independent-cycle2.spec.json",
+  "specSha256": "a3560d83430e222e648f39ff57366feab7c76f691b9d69b2a85f5d2d93254192",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-timeout=30000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts"
+  ],
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0"
+  },
+  "pid": 23408,
+  "startedAt": "2026-10-14T23:58:33.7216178Z",
+  "endedAt": "2026-10-14T23:58:34.6565442Z",
+  "elapsedMs": 935,
+  "exit": 1,
+  "timedOut": false,
+  "before": {
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts": "32b9cc8c0285612b4a3866c4488de9624354f4580a0369043839c113dfff1886",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/store.ts": "9837421b1939232080c400b8a272559014394b8516a49964dc7b0db357480e32",
+    "apps/api/src/knowledge/metadata-visibility.ts": "416a94a4f40ec2eb35fce91249b64633f828e65ebe97aa4b00de1b8c5329495b",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "packages/index/src/pipeline/speakers.ts": "233a92bb6b766f7ef381564cae2cd27353fab520d1564f319ceda2144fea4b65",
+    "packages/index/src/pipeline/speaker-name-rules.ts": "7c97b352b115c6317d412053b52047d1e84edcb8103f750fb84564ce9ce1ba98",
+    "packages/index/src/pipeline/speaker-rules/speaker-reported-rules.ts": "168d3fa8a30554cb293404fcf063cdc6416f909cc037c566629b3085ce4aa10a",
+    "qa/contracts/goal-U24.md": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f"
+  },
+  "after": {
+    "qa/evidence/u24-speaker-profile/checker/independent-cycle2.test.mts": "32b9cc8c0285612b4a3866c4488de9624354f4580a0369043839c113dfff1886",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6be5b7ede88b2887fe4c7a5e1adb4b573b2303a8422b2185f64080cf8d873386",
+    "apps/api/src/speaker-profiles/store.ts": "9837421b1939232080c400b8a272559014394b8516a49964dc7b0db357480e32",
+    "apps/api/src/knowledge/metadata-visibility.ts": "416a94a4f40ec2eb35fce91249b64633f828e65ebe97aa4b00de1b8c5329495b",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "packages/index/src/pipeline/speakers.ts": "233a92bb6b766f7ef381564cae2cd27353fab520d1564f319ceda2144fea4b65",
+    "packages/index/src/pipeline/speaker-name-rules.ts": "7c97b352b115c6317d412053b52047d1e84edcb8103f750fb84564ce9ce1ba98",
+    "packages/index/src/pipeline/speaker-rules/speaker-reported-rules.ts": "168d3fa8a30554cb293404fcf063cdc6416f909cc037c566629b3085ce4aa10a",
+    "qa/contracts/goal-U24.md": "9a8ee36e5eb78046c015bc8e32b71371b4784524e34a07d01e531c6fc608ef3f"
+  },
+  "drift": [],
+  "terminal": true,
+  "stdout": "qa/evidence/u24-speaker-profile/checker/independent-cycle2-20261014T235833Z.stdout.txt",
+  "stderr": "qa/evidence/u24-speaker-profile/checker/independent-cycle2-20261014T235833Z.stderr.txt"
+}

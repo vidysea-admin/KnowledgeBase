@@ -1,0 +1,66 @@
+{
+  "phase": "maker-verification",
+  "scope": "verification-token-metric-legacy-twenty",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "34f9c0e23f1dd0431f782b1bc3d8c46d17c35a11c2aaa0fca5150edca3430fa7",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy",
+    "-p",
+    "test_review_budget.py",
+    "-v"
+  ],
+  "program": "C:/Program Files/Python312/python.exe",
+  "runtime_version": "Python 3.12.10",
+  "runtime_executable_sha256": "4d6f5f81a4bca11191c4c7c6b43632694d0a4ce74e068619d8fdc161d469859a",
+  "runtime_identity": {
+    "executable": "C:/Program Files/Python312/python.exe",
+    "version": "Python 3.12.10",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment_hash": "536475920c6b56ea68847561b44e5b98ab84c903e1eeedcf66d0a42ef95d3277",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "PYTHONDONTWRITEBYTECODE": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "test_review_budget.py"
+  ],
+  "timeoutMs": 20000,
+  "startedAt": "2026-10-15T11:05:39.715Z",
+  "completedAt": "2026-10-15T11:05:40.040Z",
+  "elapsedMs": 321.71999999999997,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy/review_budget.py": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy/test_review_budget.py": "55164fe3aeb6127ef3740cac92a1fdfe060da65849a3e82711ef728d5cd96512"
+  },
+  "after": {
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy/review_budget.py": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "qa/coordination/checker-runtime-total-20261015/broker-legacy/test_review_budget.py": "55164fe3aeb6127ef3740cac92a1fdfe060da65849a3e82711ef728d5cd96512"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-token-metric-legacy-twenty.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-token-metric-legacy-twenty.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

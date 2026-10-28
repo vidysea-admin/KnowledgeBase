@@ -1,0 +1,330 @@
+{
+  "task": "T-054",
+  "cycle": 1,
+  "state": "public-curation-whitelist-only-not-acceptance",
+  "generatedUtc": "2026-10-14T23:13:26.7999468Z",
+  "rootBaseline": "ed542fd01c870e5d5b64e1d72b413062d595f675",
+  "files": [
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+      "sha256": "EA1F6F01D60F75CD43DDE8C96725D46EB6A4FD1AD2B5F0753998E4A19299403E",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+      "sha256": "6DE42740B8231F5F7E5ABCAFE1FE6BC35B02183CA87FDF1F521718206C9F03BD",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+      "sha256": "280CF8B85BA023DBD8DE49D1108DC4CF500EC15B72B59681C72FE9AF0EE2C851",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+      "sha256": "36D03CF4DC3CA4DC6212E95D5EACF9445CCF1AF04EE78676E3B41B680B4AC30C",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx",
+      "sha256": "D06CE8509B7E678DAE5FF4D4834C1E012050026159119F465F66B464FEC241FC",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/transaction-db.ts",
+      "sha256": "36D426BDDA02C6D291BE4AF381701C182DA8954A6D6C0A9F206783AAB0F8E343",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/store.ts",
+      "sha256": "304F7DCF0E156E6D825B0D739793BC976409639EA6E4AE7375801227ECBB2C1D",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "sha256": "1FA9A35EE5393F63E4E4A3F9EA2BFF4AE15F706376A9379D029CC91704E55B28",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.test.ts",
+      "sha256": "29D1650F5FC2DEFEB97B519DF8F21637CC1EC053684CB38808D11672E865A615",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/search-reader.ts",
+      "sha256": "D230430F55CBB9E8C4838953EB134B9E3F3DF554950320E49C0841F70E203DED",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/search-reader.test.ts",
+      "sha256": "E59CAF8652857C0BC2FFA35C271851EE93A9B71FB247FEACEADB03AF2F96083E",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/router.ts",
+      "sha256": "F900DF777D4BBD9F4124EDBE4B097752FD2C221497958AACC98FD4B6320D9061",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh.test.ts",
+      "sha256": "63352F51445A5476EC459450C43DE88D59047C5EE5158E5C0BD0DC6382C50FEA",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-testkit.ts",
+      "sha256": "A5D509A2CAA30CBF25982FACCCA1477F2171DBE0F0146ADE0C9F872586494244",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.ts",
+      "sha256": "40B3AFC65279C0072CBA70755ED9EF8F853BAB559418FF05C997C7A4A786AC57",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/refresh-executor.test.ts",
+      "sha256": "2A7A46B2EAEC1211A372A30D1D374A8C91E047A3F4288C44BF9761685B9EB600",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "sha256": "9D56EB0A585C78FAAA945E47CA5A4D6FBAEA16FBE95F3E975D5B3F8BBFE09ADE",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/planner.test.ts",
+      "sha256": "F39368DFB6DB6179CC2FE4AD706F39D2B016EA83F15C1A38FAAF4C4A35B7A049",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/persist.testkit.ts",
+      "sha256": "E9A7182B56C625E3D81A2C18D5189DFEB8E77C09CB07FFF9A6801F3F2D3EFB80",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/persist.test.ts",
+      "sha256": "305BA0E21AFD529C87BBAD08D2E3A0A3A8384698F23B2F59E8D21C8033A12DC7",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/origin.test.ts",
+      "sha256": "10C3C31BE05475EB8B8033554C1F2DC2C6085C5D0036E32D41F4C95C3978D9AB",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/mongodb.integration.test.ts",
+      "sha256": "8458A196C774FF6196F7E992CB512B15A22A551A3BCFBE2F051699C9A7C42536",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/memdb.testsupport.ts",
+      "sha256": "A616444C988E039E03E5D3A34F187F51B183B69DB440730DBAB3A10C237195F9",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/transcript-review/authorization.test.ts",
+      "sha256": "27925F4CAAA3A0E883D76AB6C03829D1448E0708E0764A75CA22A20B04A4A459",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/web/src/api/transcriptReview.ts",
+      "sha256": "945ED78EF8F94FE14031383DABB6FFE241C12E4303F5013FA8739E922BB4DEE7",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/web/src/api/transcriptReview.test.ts",
+      "sha256": "08317B2090CF35FA0302783505C6154729937E62C4FE71375CBF968C253EC9F6",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/search-store.ts",
+      "sha256": "FA83C5F66D232E6F82ACB699132C1C4D3412C99D3A4B896C741193DAB644702C",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/search-store.test.ts",
+      "sha256": "C088FFECAFD03FFC6F7B799CE886ECB295C7C62BB60607D648EF04ED4986D3A5",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "apps/api/src/composition/integrations/transcripts.ts",
+      "sha256": "0A611B32FC952F75FD3DCB80BDF9EAACF493F06FDA08CACA62532FA47E48BC62",
+      "category": "owned-source-or-test"
+    },
+    {
+      "path": "qa/manifests/t054-review-completion.md",
+      "sha256": "CBECEDF5851FB6DD7C8A736AD7D1811C603B85BADFFE4CFAB273ED7C1237E767",
+      "category": "public-scoped-handshake"
+    },
+    {
+      "path": "qa/packets/t054-review-completion.md",
+      "sha256": "CB275814DA6B1FEE4996438E506987FE20D114D647C1FC35E47E795C5E6F1FEC",
+      "category": "public-scoped-handshake"
+    },
+    {
+      "path": "qa/contracts/goal-T054.md",
+      "sha256": "439B0B1FA5130309AB7599F56789749719A9E977BD4E8E28A27E8BE4F60FA315",
+      "category": "checker-owned-public-contract-reference"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/history-dom.test.tsx",
+      "sha256": "DB0B7CF69884682F774B8EFC59B0901D8E6370A78C3DA11387E76E0F5C70939A",
+      "category": "public-synthetic-standing-floor"
+    },
+    {
+      "path": "qa/evidence/t054-transcript-review-planner-editor/checker-dom.test.tsx",
+      "sha256": "E46E1B8CF695E0E3755A9D518F2CFCDDD3C50AEE556D102C7716567DD3E18B94",
+      "category": "public-synthetic-standing-floor"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/checker-race-floor.test.ts",
+      "sha256": "A08893B89F6A031536D87008AB8971CAC14E2B2BE8336E7F756BECA08DAD5202",
+      "category": "public-synthetic-standing-floor"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/checker-race-diagnosis.md",
+      "sha256": "218E238FF9A8F6FB767B80A29C7C7B35B02FAFA2F50B5930953B618FF481F757",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/api-attempt1-receipt.json",
+      "sha256": "BB166A7747D9E67099013FB19BEC1AFDE90B60B1741DAB9CDEF90E587CCBC66A",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/api-attempt1.stdout.txt",
+      "sha256": "4E88E00930AA7BF89A812C5E574E7E59FC6B1CDE99EA548B77C4A057B87E6831",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/final-generation-focused-receipt.json",
+      "sha256": "8560B4C4C08AC58B9248A1250A16D2ED419DA70B478A3A0CE427FBCC8B3B077A",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/final-generation-focused.stdout.txt",
+      "sha256": "9E467AC83423EC0AC0E68CF75181C8319BA5F5831926C4643F3773AB9C48B00B",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/final-isolated-history-dom-receipt.json",
+      "sha256": "B47133B731F0B089F6A6FF32A3FFFD03DC4EFDE8F3CE8DCD04E756B5912FD84B",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/final-isolated-history-dom.stdout.txt",
+      "sha256": "27A489B9309018AB927625D69FF06106B242C1C2762BF9C838EF6A2B338092B6",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/final-isolated-editor-dom-standing-receipt.json",
+      "sha256": "BE06E156BFD7FFB5A00FB83A96E9035DE3B45F29E7138ABEAD60A4B4D7948147",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/final-isolated-editor-dom-standing.stdout.txt",
+      "sha256": "E1378FAF78ABFC3D798DF4A571726A842DF5FE2F7CC5BBF8E2D9FDB697C25EAB",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-probe.mjs",
+      "sha256": "C65DBD88AA39C7CD2F8E91A62C5DEFB46412393F5CFF6E6F87523FA333736F38",
+      "category": "public-synthetic-standing-floor"
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/ordinary-reviewed-speech-20261014T230947Z.receipt.json",
+      "sha256": "DF412A72AE0F30DAB10515439523354E3503EAAE576B7108B0567687A2405F9A",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t040-grounded-product-composition/ordinary-reviewed-speech-20261014T230947Z.stdout.txt",
+      "sha256": "1D45877B788EC79D34306CE81BE4848C5E96EE64584216F0624E86EF2B92318B",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/ordinary-origin-20261014T231332Z.receipt.json",
+      "sha256": "4B06F64B2000D70C3AC8FE395CA2FDDCCD736339572DCE93722577003D4261F6",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/ordinary-origin-20261014T231332Z.stdout.txt",
+      "sha256": "21272CD8D687E1CEB1DB679F75320EB09138E5E6A79F62FE6F3B1F19E2FECD8C",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t054-review-completion/cycle1-ready-consumption.json",
+      "sha256": "1150978EAFD9875A666E1BD0D934465B318CC2E510396D8109B6F6747DBF35F4",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.receipt.json",
+      "sha256": "1E9B87834D70E776031F0A70BCCD95D3A681AEFAF4B8A9E3B11253B74683310E",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/evidence/t041-searchable-time-aligned-ocr-checker/review-origin-current-20261014T233230Z.stdout.txt",
+      "sha256": "A3458325900169B9C7066B49F8E33643E55052B190EBFC88B98FADE626A2B8F4",
+      "category": "selected-public-receipt-or-diagnosis"
+    },
+    {
+      "path": "qa/verdicts/t054-review-completion.md",
+      "sha256": "FADE23F08EDC87624A43E920A39677DE71BC423560263A5D7456B0C878BD1188",
+      "category": "checker-owned-public-scoped-verdict"
+    }
+  ],
+  "exclusions": [
+    "data/toc-migrated/** and actual TOC corpus JSON files",
+    "raw/**, original corpus/transcript payloads and private source-prefix evidence",
+    "qa/evidence/t054-review-completion/service-test-attempt1-source.txt and all source-before/backups",
+    "qa/evidence/t054-review-completion/root-baseline-diff.patch and root-baseline-provenance.json",
+    "source-hashes.json, preflight-pins.json, requests/specs and other dependency-only pin maps",
+    "all evidence files not explicitly listed; no broad QA directory selection"
+  ],
+  "qualifications": [
+    "Private corpus is a local optional input; selected test code and receipts may reference its path/hash/count but contain no corpus text. Do not infer public fixture availability or whole-source acceptance.",
+    "Historical46API/4historyDOM/7editorDOM scopes retained. Current origin3 and shared independent origin floor passed. Origin receipt has one independently proven annotation-only Db to Pick<Db,collection> drift, no runtime/scoping delta; current map reconciled without retest.",
+    "Selected shared reviewed-SPEECH receipt executes exactly1 filtered case;3 other definitions were not executed, not runtime skipped. It is synthetic injected transaction proof, not actual Mongo/provider/browser.",
+    "Receipt before/after hashes are execution provenance; dependency-only files named inside those receipts are NOT whitelist entries.",
+    "Checker contract and shared synthetic floors/receipt retain their distinct owners; root must deduplicate and respect other lane leases.",
+    "235052 coherent checkpoint all4green/1940inputs0drift applies to frozen bytes; later U24 central repairs remain separately coherence-gated. Matchingcycle1 scoped PASS is source/synthetic/headless acceptance only; full T054 HOLD/in_progress."
+  ],
+  "activeHandles": [],
+  "currentReceiptConsumption": {
+    "origin": {
+      "path": "qa/evidence/t054-review-completion/ordinary-origin-20261014T231332Z.receipt.json",
+      "exitCode": 0,
+      "pass": 3,
+      "currentPinsChecked": 69,
+      "sha256": "4B06F64B2000D70C3AC8FE395CA2FDDCCD736339572DCE93722577003D4261F6",
+      "skip": 0,
+      "fail": 0,
+      "nodeDurationMs": 2387.9207,
+      "currentDrifts": [
+        {
+          "path": "packages/db/src/lib/tenantScope.ts",
+          "atRun": "F9AB2F8FA8D21DD661D9752CFA85912FA548255EF85A0018E048634BC95EE513",
+          "current": "C596FE4C7815A8C44AF31B7590988D3B9C011874991C19B7D2F0DEAEE8FCF443",
+          "applicability": "independently proven type-only annotation widening, unchanged runtime/scoping"
+        }
+      ]
+    },
+    "reviewedSpeech": {
+      "path": "qa/evidence/t040-grounded-product-composition/ordinary-reviewed-speech-20261014T230947Z.receipt.json",
+      "currentPinsChecked": 49,
+      "exitCode": 0,
+      "pass": 1,
+      "filteredDefinitionsNotExecuted": 3,
+      "sha256": "DF412A72AE0F30DAB10515439523354E3503EAAE576B7108B0567687A2405F9A",
+      "skip": 0,
+      "fail": 0,
+      "nodeDurationMs": 2465.9806,
+      "currentDrifts": []
+    },
+    "acceptance": "Scopedcycle1 checked-PASS after matching independent verdict and69currentpins0drift; full-parent Mongo/HTTP/mounted-browser HOLD",
+    "checkedUtc": "2026-10-15T00:20:11.3722663Z"
+  }
+}

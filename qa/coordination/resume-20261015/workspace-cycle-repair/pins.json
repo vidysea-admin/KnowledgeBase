@@ -1,0 +1,21 @@
+{
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "captured_at": "2026-10-15T22:52:11.8206348Z",
+  "files": [
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\workspace\\capture-slot-readiness.ts",
+      "before_sha256": "0a18ba7a1c8772909d36b32c413f6c2ca8a133a84f819a7338dcae7bd09ee3d2",
+      "after_sha256": "8085828e856598072ffcbda78fc5758bc629654acaef55999c2e9b8cf5221112"
+    },
+    {
+      "path": "packages\\meeting-bot\\src\\capture\\workspace\\tab-session-workspace.ts",
+      "before_sha256": "948fe17fb4b49c060a72d2682e87218b95480c3c9c892b18162881cb4eeadacb",
+      "after_sha256": "82477a51ae8a57fe3ec91b9610fb8e5b7c0580305002f85f823d494262a9f292"
+    },
+    {
+      "path": "packages/meeting-bot/src/capture/workspace/capture-workspace-types.ts",
+      "before_sha256": null,
+      "after_sha256": "95ed772cce4ad76cba089f5cfa6a5208fa6dbf406884b065a29b8ff670c773aa"
+    }
+  ]
+}

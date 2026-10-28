@@ -21,13 +21,13 @@ export interface MonthGridProps {
 
 export function MonthGrid(props: MonthGridProps): React.ReactElement {
   return (
-    <div className="card" data-testid="month-grid" style={{ padding: 0, overflow: "hidden" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", borderBottom: "1px solid var(--line)" }}>
+    <div className="card" data-testid="month-grid" style={{ padding: 0, minWidth: 0, overflow: "hidden" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", borderBottom: "1px solid var(--line)" }}>
         {WEEKDAYS.map((d) => (
           <div key={d} className="row-meta" style={{ padding: "0.4rem", textAlign: "center", fontWeight: 600 }}>{d}</div>
         ))}
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))" }}>
         {props.cells.map((cell) => {
           const dayEvents = eventsOnDay(props.events, cell.date);
           const isToday = isSameLocalDay(cell.date, props.today);
@@ -38,7 +38,7 @@ export function MonthGrid(props: MonthGridProps): React.ReactElement {
               data-in-month={cell.inMonth ? "true" : "false"}
               data-today={isToday ? "true" : "false"}
               style={{
-                minHeight: 96, borderRight: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
+                minHeight: 96, minWidth: 0, overflow: "hidden", borderRight: "1px solid var(--line)", borderBottom: "1px solid var(--line)",
                 padding: "0.25rem", background: cell.inMonth ? "var(--card)" : "var(--bg)",
                 display: "flex", flexDirection: "column", gap: "0.15rem",
               }}

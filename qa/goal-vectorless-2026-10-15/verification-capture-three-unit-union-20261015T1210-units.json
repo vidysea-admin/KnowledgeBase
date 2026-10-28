@@ -1,0 +1,16 @@
+{
+  "units": {
+    "obsSecurity": [
+      "packages/meeting-bot/src/lean-video-obs.test.ts"
+    ],
+    "ocrBoundary": [
+      "scripts/webinar/slides/slide-knowledge.test.mjs"
+    ],
+    "watcherFinalSource": [
+      "scripts/watch/lib/ingest-chain.test.mjs"
+    ]
+  },
+  "isolation": "Node default per-file process isolation;test-concurrency1;singleCPU",
+  "sharedCost": "Count once;no maker/checker denominator padding",
+  "staticResolutionCorrections": "obs-websocket-js resolved from meeting-bot;@lkb/core/src/domain/lean-video resolved to package/src/domain/lean-video.ts;explicit pins included"
+}

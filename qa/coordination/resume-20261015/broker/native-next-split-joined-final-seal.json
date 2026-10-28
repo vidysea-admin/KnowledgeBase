@@ -1,0 +1,65 @@
+{
+  "status": "FINITE_PHASE_COMPLETE_SOURCE_FREEZE_RELEASED",
+  "candidateManifest": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-genuine-phase-observer.json",
+  "candidateManifestSha256": "3c96de3e41b36c9839ff52a03ccce763df665ae6d19fb7096ce37484627139b1",
+  "candidatePathCount": 66,
+  "dependencyPinCount": 1890,
+  "allAdmittedBeforeAfterPinsStable": true,
+  "finalRawInventory": "qa/coordination/resume-20261015/broker/native-next-readonly-final-inventory.json",
+  "reconciliation": "qa/coordination/resume-20261015/broker/native-next-split-reconciled210.json",
+  "originalCases": 206,
+  "originalTitlesExactMatched": 205,
+  "originalTitleMaterialApprovedMapping": 1,
+  "mappingAuthority": "Root explicit adoption of atomic-api/stage3/packet.md T054clauses8/9; old durable-failed-refresh expectation changed to explicit refusal retaining committed correction/pending intent; not identical assertions",
+  "newCases": 4,
+  "floor": {
+    "executedThisPhase": {"tests": 209, "pass": 205, "fail": 0, "skip": 4},
+    "exactGenuineNodeReused": {"tests": 1, "pass": 1, "fail": 0, "skip": 0},
+    "joinedTerminal": {"tests": 210, "pass": 206, "fail": 0, "skip": 4},
+    "genuineReuseLogSha256": "3959af50396e05b73e09f4f9aa33d49d6e04252be13143e4a4f4bfe26aab239d"
+  },
+  "groups": [
+    {"id": "floor1", "tests": 71, "pass": 71, "fail": 0, "skip": 0, "seconds": 35.578},
+    {"id": "floor2", "tests": 99, "pass": 97, "fail": 0, "skip": 2, "seconds": 37.329},
+    {"id": "floor3a", "tests": 36, "pass": 34, "fail": 0, "skip": 2, "seconds": 21.093},
+    {"id": "floor3b", "tests": 3, "pass": 3, "fail": 0, "skip": 0, "seconds": 12.328}
+  ],
+  "actualExitFreshProcess": {
+    "tests": 1, "pass": 1, "fail": 0, "skip": 0, "ownExit": 0,
+    "testSeconds": 59.2705892, "nodeSeconds": 61.4043234, "supervisedSeconds": 62.328,
+    "receipt": "qa/coordination/resume-20261015/broker/native-next-split-exit-original-positive-receipt.json",
+    "assertions": "seal child exited before fresh distinct reopen PID; equal hash; 19200 samples; first source sample index3552; retained provider WAV guard",
+    "rawChildPidAndHashValuesPrinted": false
+  },
+  "readonlySpoolObserverOrder": {
+    "tests": 1, "pass": 1, "fail": 0, "skip": 0, "ownExit": 0,
+    "testSeconds": 40.4842545, "supervisedSeconds": 43.625,
+    "receipt": "qa/coordination/resume-20261015/broker/native-next-readonly-original-positive-receipt.json",
+    "assertions": "source bytes and modes unchanged; retained copies equal; throwing observer cannot alter five-stage completion order or ready/provider guard"
+  },
+  "standingSkippedGates": [
+    "actual native private-directory receipt prerequisite",
+    "actual POSIX private-root/tenant/artifact control",
+    "actual TOC deterministic persona traverses mounted API and produces a downstream response artifact: private authentic input requires explicit KB_U24_PRIVATE_TOC_TESTS=1",
+    "retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection"
+  ],
+  "historicalSetupSeconds": 4.344,
+  "historicalSetupNote": "Browser Windows path string spelling mismatch before tests; same physical file. Failed setup preserved, root exact reference string adopted, no test retry.",
+  "measuredTotalPhaseSeconds": 244.360,
+  "ownedUuidRootsFinallyCleanedAndAbsent": true,
+  "allOwnedJobTreesClosed": true,
+  "pending": [
+    "Tamper/revocation/hardlink/copied-orphan recovery corpus",
+    "Fair-page/quota/interrupted-journal recovery corpus",
+    "Remaining primitive/runtime/provider/downstream corpora",
+    "Earlier unavailable-versus-ready failure remains UNEXPLAINED OPEN; no causal/flakiness resolution",
+    "Real transaction replica-set race and standalone operational refusal proof",
+    "Native host/platform qualification and private transform/reproof corpus",
+    "Symlink privilege and inherited scripts/webinar34 release finding"
+  ],
+  "noFurtherDecodersThisPhase": true,
+  "noLiveDbProviderNetworkBrowserHostActivation": true,
+  "wholeUnitPASS": false,
+  "independentVerdict": null,
+  "actual_total_tokens": null
+}

@@ -1,0 +1,1 @@
+{"result": "PASS", "valid": 3, "invalid_refused": 2, "bound_produced_rows": 3}

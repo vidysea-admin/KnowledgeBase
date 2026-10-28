@@ -1,0 +1,7 @@
+src/visibility/standalone-publication.test.ts exit=0 ℹ pass 10 ℹ fail 0 
+src/visibility/standalone-mongo.test.ts exit=0 ℹ pass 11 ℹ fail 0 
+src/indexing/session.test.ts exit=0 ℹ pass 26 ℹ fail 0 
+src/indexing/vectorless-publication.test.ts exit=0 ℹ pass 12 ℹ fail 0 
+src/indexing/generation.test.ts exit=0 ℹ pass 8 ℹ fail 0 
+tsc apps/api exit=0
+tsc packages/db exit=0

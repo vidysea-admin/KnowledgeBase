@@ -1,0 +1,61 @@
+{
+  "ready": [
+    "u24-maker-cycle1"
+  ],
+  "skipped": [
+    {
+      "n": "t041-maker-cycle1",
+      "drift": [
+        [
+          "scripts/webinar/sync-session.mjs",
+          "d6a2d14b454651992b189cffbf612a8ac060679ae94640021b13c31bd3473a52"
+        ]
+      ]
+    },
+    {
+      "n": "t058-api-cycle1",
+      "drift": [
+        [
+          "apps/api/src/composition/integrations/routes.ts",
+          "151ff2101596257307cbe01f70d04adfc43e2eed5d9cba5c57bc772c88b02603"
+        ]
+      ]
+    },
+    {
+      "n": "t040-product",
+      "drift": [
+        [
+          "apps/api/src/composition/production.ts",
+          "E123B590FE3F0B27A0FAC6BBF0BA50ADFCB1FC0BDC51CEACFCEAD296B12243CE"
+        ]
+      ]
+    },
+    {
+      "n": "t054-api-current",
+      "drift": [
+        [
+          "apps/api/src/composition/production.ts",
+          "909275B057678736D2202C6296E090528E183FEC89F063DB050353596AB940BC"
+        ]
+      ]
+    },
+    {
+      "n": "t054-history-dom",
+      "drift": [
+        [
+          "apps/api/src/composition/production.ts",
+          "909275B057678736D2202C6296E090528E183FEC89F063DB050353596AB940BC"
+        ]
+      ]
+    },
+    {
+      "n": "t054-checker-dom",
+      "drift": [
+        [
+          "apps/api/src/composition/production.ts",
+          "909275B057678736D2202C6296E090528E183FEC89F063DB050353596AB940BC"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+indexSession(t/s): decisions left unchanged — decisions provider call failed: offline
+indexSession(t/s): decisions left unchanged — decisions response was not a JSON array
+indexSession(t/s): decisions left unchanged — decisions response contained unusable candidates or citations; replacement is incomplete
+indexSession(t/s): decisions left unchanged — decisions response contained unusable candidates or citations; replacement is incomplete
+indexSession(t/s): decisions left unchanged — decisions response contained unusable candidates or citations; replacement is incomplete
+indexSession(t/s): decisions left unchanged — decisions source identity, scope or time is invalid
+indexSession(t/s): decisions left unchanged — decisions source identity, scope or time is invalid
+✔ ISS-U25DECISIONS-001(a): clean re-extraction discards human-set status (verified/needs-review) — refused (4.8326ms)
+✔ partial failure leaves preexisting stable proposals byte-identical, even with cosmetic candidate changes (1.5787ms)
+✔ ISS-U25DECISIONS-001(b): failed insertMany after the delete loses the rows — prior loss refused on write failure (0.6242ms)
+✔ partial upsert failure may add proposals but never prunes any prior row (0.7688ms)
+✔ stable reruns deduplicate text/evidence and write before tightly scoped stale pruning (1.8082ms)
+✔ genuine empty response prunes proposed only; reviewed and other scopes survive (0.5421ms)
+✔ degraded, non-array, unusable and partial responses issue no collection operation (1.6143ms)
+✔ foreign target scope and invalid source refuse before provider and DB (0.4957ms)
+✔ review racing a refresh cannot be reverted to proposed or pruned (1.2575ms)
+✔ an omitted owner clears a prior proposal owner instead of preserving stale attribution (1.0532ms)
+﹣ actual In-Focus transcript exercises provenance persistence and downstream harness (scripted provider; no semantic acceptance) (0.1363ms) # HOLD: authentic TOC persistence sample requires explicit private-test opt-in
+indexSession(t/s1): decisions left unchanged — decisions provider call failed: provider down
+✔ flag OFF: no decisions job, no decisions collection op, no result key; same ops as before (40.6294ms)
+✔ flag ON: replaces the session's decisions, tenant-scoped, with timestamp span and evidence (6.4279ms)
+✔ flag ON via env var (2.8654ms)
+✔ flag ON, degraded extraction: existing decisions untouched, indexing still completes (3.7658ms)
+✔ flag ON, decisions persistence refusal is reported degraded while indexing completes (3.2753ms)
+✔ actual producer stamps generation binding and reader minimally projects every current citation without writes (17.28ms)
+✔ legacy unbound, mixed, missing, ambiguous, invalid status/time and invalid owners withhold whole rows (63.5536ms)
+✔ redacted cited or uncited generation siblings never disclose the earlier stored decision (22.2953ms)
+✔ genuinely regenerated effective inputs can be consumed despite different immutable originals (13.0849ms)
+✔ source and overlay withdrawal during the latest awaited decision query fail closed (14.4068ms)
+✔ candidate withdrawn during awaited current evidence resolution cannot survive as an old snapshot (43.174ms)
+✔ third live current-await withdrawal or changed publication is observed by final snapshot (23.7506ms)
+✔ snapshot boundary source/head/approval/publication changes fail closed (18.3356ms)
+✔ test-only snapshot model keeps all authority reads coherent after its first observation (5.9312ms)
+✔ unsupported snapshot capability has no collection-only fallback and mounted route returns generic503 (84.5373ms)
+✔ current raw source/time changes and privacy-ineligible sessions withhold all earlier text (14.0221ms)
+✔ stored statuses are preserved and absent owner remains absent; document positions are characters (19.601ms)
+✔ actual mounted authenticated route uses actor tenant, refuses missing/revoked/foreign/scope and ignores query tenant (48.9788ms)
+﹣ actual producer→root mounted route transport captured for shared client/panel; real source quote is not semantic gold (0.2539ms) # HOLD: authentic TOC transport generation requires explicit private-test opt-in
+✔ empty turns: no provider call, not degraded (2.2913ms)
+✔ job kind is decisions and the transcript carries real turn ids (0.7179ms)
+✔ keeps a decision with real citations; tStart/tEnd come from the cited turns, not the model (0.4046ms)
+✔ fabricated ids are removed; a decision with no real id is dropped entirely (0.3249ms)
+✔ invalid source identity, duplicate IDs, mixed scope and invalid times refuse before provider (0.5506ms)
+✔ unusable nonempty and partially filtered responses remain unknown, never genuine none (0.4739ms)
+✔ duplicate cited ids collapse (0.279ms)
+✔ owner kept only when it is a speaker of a cited turn (0.3626ms)
+✔ provider failure degrades with a reason, never throws (0.3915ms)
+✔ unparseable and non-array output degrade (1.0293ms)
+✔ an honest empty array is non-degraded (0.4036ms)
+✔ decisionsEnabled is OFF by default and for non-opt-in values (0.2743ms)
+✔ output is scorable by the U2.2 harness (filtered + persisted shapes); no labels, so nothing is measured (2.0007ms)
+✔ a tampered span is caught by the harness (the timestamps are checkable, not decorative) (0.4603ms)
+✔ PUBLIC synthetic actual persisted producer→authenticated mounted route capture for client/panel (114.87ms)
+ℹ tests 45
+ℹ suites 0
+ℹ pass 43
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 22347.8687

@@ -1,0 +1,72 @@
+✔ OBS state security refuses arbitrary profile authority and malformed snapshots (55.7845ms)
+✔ OBS state security refuses hardlink aliases without overwriting original bytes (11.9631ms)
+✔ OBS state security refuses same-byte replacement before restoration (12.3836ms)
+✔ OBS state security preserves a foreign replacement during restore cleanup (21.7724ms)
+✔ applyLeanVideoToObs sends the exact lean defaults: SetVideoSettings then VBitrate then ABitrate (1.916ms)
+✔ applyLeanVideoToObs honours overrides and reports a target-busting override without rewriting it (0.6265ms)
+✔ applyLeanVideoToObs is fail-soft: refused requests are listed, the rest are still sent, nothing throws (0.5375ms)
+✔ launch() with leanVideo {} applies lean settings after the scene is built and BEFORE GetVideoSettings and StartRecord (168.7553ms)
+✔ launch() with leanVideo overrides sends the overridden values (155.8694ms)
+✔ launch() with leanVideo undefined or false leaves OBS video settings untouched (today's behaviour) (240.1222ms)
+✔ launch() still records when OBS refuses the lean settings (fail-soft), StartRecord is reached (144.7549ms)
+✔ apply persists the previous values BEFORE the first Set call, restore puts every one back exactly and deletes the state (30.3406ms)
+✔ a parameter that was unset (null) is restored as null, not as a made-up value (37.1246ms)
+✔ restore does NOTHING while OBS is still recording and keeps the state; it restores once recording stopped (39.2352ms)
+✔ restore failure is loud (log + alert naming the failed keys) and keeps the state so a retry can finish (40.9984ms)
+✔ an unreadable state file is an alert, never a silent skip; no state file is a quiet no-op (14.717ms)
+✔ a leftover state from a crashed run keeps the ORIGINAL values: a second apply does not record the lean values as 'previous' (37.4194ms)
+✔ if the current video settings cannot be read or the state cannot be persisted, NOTHING is changed in OBS (2.7349ms)
+✔ Advanced output mode: bitrate keys are SKIPPED with a warning, canvas/fps still apply, the mode is never changed (17.5621ms)
+✔ Simple mode with RecQuality HQ: bitrate keys skipped with a warning naming the quality; RecQuality untouched (1.1179ms)
+✔ Simple mode + Stream quality, or both unset (OBS defaults): bitrates ARE sent; unreadable mode: sent with a warning (0.614ms)
+[bot] capture backend: obs
+✖ runRecord (OBS): apply -> record -> stop -> restore runs in exactly that order and leaves the operator's profile as found (10.2226ms)
+[bot] capture backend: obs
+✖ runRecord (OBS): a restore that fails raises the alert through the notifier (and the recording still finalizes) (6.3111ms)
+[bot] recording stopped → C:\Users\product\AppData\Local\Temp\lkb-lean-crash-iqBu9B\existing.mkv (8 bytes)
+[bot] lean video: previous OBS video settings and profile parameters restored
+[bot] OBS inputs unmuted; browser profile absent, cleanup skipped
+[bot] recording stopped → C:\Users\product\AppData\Local\Temp\lkb-lean-crash-wm25QV\existing.mkv (8 bytes)
+[bot] lean video: restore SimpleOutput/ABitrate failed (Error: stuck (simulated))
+[bot] lean video: OBS profile NOT restored (failed: SimpleOutput/ABitrate); the lean video values may still be in the OBS profile. Restore state kept at C:\Users\product\AppData\Local\Temp\lkb-lean-crash-wm25QV\record\.lean-video-restore.json; rerun lkb finalize --stop-obs or set them by hand.
+[bot] OBS inputs unmuted; browser profile absent, cleanup skipped
+✔ crash then `lkb finalize --stop-obs`: the leftover state restores the operator's profile after StopRecord; a stuck restore alerts (8187.7288ms)
+✔ record-commands.ts still passes leanVideo: {} to createObsBrowserDeps (the behaviour tests above fail without it; pin kept as a tripwire) (0.6102ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 23
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 16344.7088
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\lean-video-obs.test.ts:1:19953
+✖ runRecord (OBS): apply -> record -> stop -> restore runs in exactly that order and leaves the operator's profile as found (10.2226ms)
+  Error: Invalid or mismatched live capture consent receipt
+      at validateRecordConsent (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\context.ts:61:11)
+      at createRecordConsent (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\context.ts:85:19)
+      at prepareWorkspaceCaptureControls (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\workspace\tab-session-workspace.ts:87:3)
+      at runRecord (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-commands.ts:106:50)
+      at driveObsRecord (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\lean-video-obs.test.ts:385:11)
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\lean-video-obs.test.ts:410:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+
+test at packages\meeting-bot\src\lean-video-obs.test.ts:1:21064
+✖ runRecord (OBS): a restore that fails raises the alert through the notifier (and the recording still finalizes) (6.3111ms)
+  Error: Invalid or mismatched live capture consent receipt
+      at validateRecordConsent (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\context.ts:61:11)
+      at createRecordConsent (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-consent\context.ts:85:19)
+      at prepareWorkspaceCaptureControls (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\workspace\tab-session-workspace.ts:87:3)
+      at runRecord (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-commands.ts:106:50)
+      at driveObsRecord (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\lean-video-obs.test.ts:385:11)
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\lean-video-obs.test.ts:431:21)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)

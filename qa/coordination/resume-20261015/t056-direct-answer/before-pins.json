@@ -1,0 +1,37 @@
+[
+  {
+    "path": "apps/api/src/answer-policy/answer-workflow.ts",
+    "sha256": "E95B1A523A8B9AB9619A045944F686AE026547BDE3A86D8FD039B670E3AE88E5",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__api__src__answer-policy__answer-workflow.ts"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-workflow.test.ts",
+    "sha256": "3E4D0FE22A8DE67812D04D8B5EBD8CECD6579F1623C56E342850C80CC1B09583",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__api__src__answer-policy__answer-workflow.test.ts"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-router.test.ts",
+    "sha256": "DA244C5DA70AB85286D10DCD6BEE985701F74FA7E7607B121231644F141BE12D",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__api__src__answer-policy__answer-router.test.ts"
+  },
+  {
+    "path": "apps/web/src/pages/answer-policy/client.ts",
+    "sha256": "FBE49C33181BA7BA06906D9B5BFEA1BDA35C4AEAB8BB46C92448638028632F92",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__web__src__pages__answer-policy__client.ts"
+  },
+  {
+    "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+    "sha256": "46977064C63F011416A7218320FACEC8A20594F9FFBA6526967A6F73D62E8A4C",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__web__src__pages__answer-policy__PolicyAskPage.tsx"
+  },
+  {
+    "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+    "sha256": "BCCD4A98D004342A55F1B3FDA954C12F855B86C43102CD05F92160E7B7D4483D",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__web__src__pages__answer-policy__AnswerReviewPage.tsx"
+  },
+  {
+    "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+    "sha256": "0D426C3155B1EA088636F4D733BAACB09942D21929321DA5A11237CE363FE90F",
+    "backup": "qa/coordination/resume-20261015/t056-direct-answer/backups/apps__web__src__pages__answer-policy__PolicyAskPage.test.tsx"
+  }
+]

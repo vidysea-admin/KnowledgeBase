@@ -1,0 +1,142 @@
+{
+  "format": "hydration-snapshot-cause-v1",
+  "status": "STATIC_BOUNDARY_CAUSE_IDENTIFIED_NOT_RETESTED",
+  "observedAt": "2026-10-16T02:21:43.257Z",
+  "evidence": {
+    "sealPath": "qa/coordination/resume-20261015/broker/hydration-repair1-final-seal.json",
+    "sealSha256": "7194cb909351e9726f8109ce5ef6fa19e549acac23a40092c4bcee05b0510206",
+    "refusalsPath": "qa/coordination/resume-20261015/broker/hydration-repair1-refusals.json",
+    "refusalsSha256": "96323ed51dd60c8b2984d38e3b2622df73ebfb32ceaab91c9bc360b635251517"
+  },
+  "observedAudit": {
+    "hydrated": 80,
+    "refused": 12,
+    "empty": 0,
+    "questionCount": 92,
+    "candidateInventory": 29,
+    "expectedSessions": 23
+  },
+  "rootCause": "QA adapter compares production post-visibility snapshot with all raw source turns. Each of3affected sessions contains1finite tEnd<tStart turn; actual knowledge.currentTurn rejects it and filterTurns excludes it before source-context serializes {rows,chunks}. FrozenDb returns unchanged raw rows; no representation conversion identified. Audit raw snapshot comparator therefore mismatches legitimate filtered snapshot.",
+  "sessions": [
+    {
+      "sessionId": "2026-04-21-visa-blueprint-part2-italy-france-nz",
+      "turnFileSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+      "rawRowCount": 291,
+      "visiblePredicateRowCount": 290,
+      "excluded": [
+        {
+          "rowIndex": 140,
+          "turnIdSha256": "bc4736ea96770290c02c47d564318c394acacc06b8fe34b84f965b83acf1a7cd",
+          "fields": [
+            "tEnd"
+          ],
+          "tEndFinite": true,
+          "tStartFinite": true,
+          "endBeforeStart": true
+        }
+      ],
+      "rawSnapshotSha256": "401b4cfe3fa783c2e273e2386b70b2f9dd348ab53660bc6fc0c79b3f1964a636",
+      "visibilityFilteredSnapshotSha256": "cbcad412b8b48a3823d92ee57477085e94f67cd645b4f222cc0542c1c36be93d",
+      "differenceExplainedByVisibility": true,
+      "approvedDataHashMatches": true
+    },
+    {
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "turnFileSha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+      "rawRowCount": 90,
+      "visiblePredicateRowCount": 89,
+      "excluded": [
+        {
+          "rowIndex": 25,
+          "turnIdSha256": "8f709a70d9a09f0e3abe0e0a6c1b5cd74ffdcbeb5d48e2f248c362d5e090c7a0",
+          "fields": [
+            "tEnd"
+          ],
+          "tEndFinite": true,
+          "tStartFinite": true,
+          "endBeforeStart": true
+        }
+      ],
+      "rawSnapshotSha256": "9b16d3b1579a2fd96a810b125650419898248af65b87063a843d56577e023522",
+      "visibilityFilteredSnapshotSha256": "223a22a6c5e8860cd6fac3f55313bc81f6fc32eadda0cebf61ffa65dedc7bc1a",
+      "differenceExplainedByVisibility": true,
+      "approvedDataHashMatches": true
+    },
+    {
+      "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+      "turnFileSha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+      "rawRowCount": 230,
+      "visiblePredicateRowCount": 229,
+      "excluded": [
+        {
+          "rowIndex": 113,
+          "turnIdSha256": "df5ed316cc956e492dbd8c7e420915a280bb0f84d2bcdecf6e21703de46ab814",
+          "fields": [
+            "tEnd"
+          ],
+          "tEndFinite": true,
+          "tStartFinite": true,
+          "endBeforeStart": true
+        }
+      ],
+      "rawSnapshotSha256": "247863e8f195f760f8decec5da1263c2f94e75e720e4eabebd3b061a73eb8784",
+      "visibilityFilteredSnapshotSha256": "61a9751ca837d4303c1ce88ce503963054d02d8e570319cd2cac252607f17999",
+      "differenceExplainedByVisibility": true,
+      "approvedDataHashMatches": true
+    }
+  ],
+  "classification": {
+    "productionVisibilityExclusion": "correct existing invalid timestamp refusal",
+    "approvedData": "unchanged bytes contain3invalid timestamp rows; no stale version or credential/provider issue shown",
+    "frozenDbRepresentationBug": false,
+    "qaComparatorBoundaryBug": true,
+    "actualReturnedSnapshotHashesCapturedByOriginalAudit": false,
+    "derivedFilteredHashConfirmation": "requires separately admitted focused probe; no new actual hydration run performed"
+  },
+  "sourcePins": [
+    {
+      "path": "apps/api/src/ask/source-context.ts",
+      "sha256": "a64d64aaa1c9a07aefd9f3a0ccaa9e8cf1bb2eabd64426e545afdd70ca139566"
+    },
+    {
+      "path": "apps/api/src/visibility/knowledge.ts",
+      "sha256": "72b2e6bba78be2f3b5f0910006ce1148d4059c4299f77cdcdcad6ceec6634d19"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "sha256": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500"
+    },
+    {
+      "path": "apps/api/src/transcript-review/service.ts",
+      "sha256": "c30821512924a77420ad5917aa7df2575c9e32d234b0ad829394471f8d8eef87"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "8a236481011fad43fd570583cb2d1d16f641eae30cacd1f7adac8bdc68b534a8"
+    }
+  ],
+  "proposedRepair": {
+    "exclusivePaths": [
+      "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs"
+    ],
+    "currentOwner": "/root/quality_delivery_coordinator QA audit; root read-only diagnosis lease currently, repair needs root grant",
+    "productionPathsNeeded": [],
+    "approach": "Retain original raw source/data pins. Derive independently admitted current rows using existing readEffectiveTurns + createKnowledgeVisibility.filterTurns with unchanged frozenDb, then require snapshotSHA match those actual authorized rows. Keep exclusions metadata, reject quotes outside admitted rows, retain every quote/offset/consent/hash guard. Never accept arbitrary mismatch or edit corpus timestamps.",
+    "minimalProof": [
+      "One synthetic QA helper case: invalid timestamp row excluded from expected current snapshot; forged snapshot and quote pointing to excluded turn must still refuse.",
+      "Broker focused production hydration for one accepted question from each3affected session; capture actual returned snapshot hashes and compare exact derived hashes here, plus one unchanged healthy control.",
+      "Only after focused proof root may admit full92 downstream audit repair under same source/data/runtime pins; preserve original80/12result."
+    ],
+    "requiredDownstream": "Actual production hydrator consumes frozenDb/readers then QA citation verifier validates proof; this is source-hydration coverage only, never primary navigation/answer quality"
+  },
+  "newAuditTestsOrImportsExecuted": false,
+  "providerCallsThisDiagnosis": 0,
+  "paidLedgerMutation": false,
+  "originalResultsPreserved": true
+}

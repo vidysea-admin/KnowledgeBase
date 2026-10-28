@@ -1,18 +1,12 @@
 /**
  * apps/api/src/store.ts — T-009 C3. Real Mongo-backed `ApiKeyStore` and `TreeStore` (the
- * production side of the injected interfaces `auth.ts`/`routes/ask.ts` declare; tests never
- * import this file, they build fakes matching the same interfaces). No dedicated
- * `packages/db/collections/*` accessor exists for `api_keys` or `tree_index` yet (T-018 only
- * shipped `sources`/`sessions`/`turns`/`claims`, and an api-key lookup is deliberately NOT
- * tenant-scoped — the tenant is unknown until the key resolves it), so this reads via `@lkb/db`'s
- * `getDb()` directly, the same low-level accessor `packages/db/src/collections/*.ts` itself
- * wraps — no new cross-package pattern invented.
+ * production side of the injected `auth.ts`/`routes/ask.ts` interfaces). API key lookup resolves
+ * the initially unknown tenant; `api_keys` and `tree_index` use the existing `@lkb/db.getDb()`
+ * accessor while other collections use their tenant-scoped accessors.
  */
 import { randomUUID, randomBytes } from "node:crypto";
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import {
-  getDb, createEvalRun, recordScore as recordEvalRunScore,
+  getDb, assertValidTenantId, scopedCollection, jobs as jobsColl, createEvalRun, recordScore as recordEvalRunScore,
   sessions as sessionsColl, sources as sourcesColl, gaps as gapsColl,
   claims as claimsColl, turns as turnsColl, sessionPages as sessionPagesColl, graphEdges as graphEdgesColl,
   listAll as listAllMeetingCandidates, createIfNew as createMeetingCandidateIfNew,
@@ -22,8 +16,8 @@ import type { ApiKeys, Jobs, TreeIndexNode, TreeIndexRootDocument } from "@lkb/c
 import type { WriteJobFn } from "@lkb/ai";
 import { buildKnowledgeGraph, treeIndexRootFilter, type KnowledgeGraph } from "@lkb/index";
 import type { ApiKeyStore, VerifiedKey } from "./auth.js";
-import type { TreeStore } from "./routes/ask.js";
-import type { EvalRunStore } from "./routes/compete.js";
+import type { TreeStore } from "./routes/ask/ask.js";
+import type { EvalRunStore } from "./routes/compete/compete.js";
 import { createHash } from "node:crypto";
 import { createWatchedSource, listActive as listActiveWatchedSources, recordFetch as recordWatchedFetch } from "@lkb/db";
 import { createGuardedFetcher, resolveAll, httpRequest, runWatchedSources, type WatchedRunDeps } from "@lkb/ingest";
@@ -34,38 +28,43 @@ import type { HealthDeps } from "./routes/health.js";
 import { probeMongoHealth } from "./health-probe.js";
 import type { GraphReadDeps } from "./routes/graph.js";
 import type { ApiKeySummary, KeysDeps } from "./routes/keys.js";
-import type { CalendarReadDeps } from "./routes/calendar.js";
-import { listUpcomingGwsMeetings } from "./gws-calendar.js";
-import type { MeetingCandidatesDeps } from "./routes/meeting-candidates.js";
-import { scanGmailForMeetingCandidates } from "./gws-gmail.js";
+import { cleanGmailSummary, type MeetingCandidatesDeps, type MeetingCandidate } from "./routes/meeting-candidates.js";
+import type { GmailScanSummary } from "@lkb/core";
+import type { JoinRulesDeps } from "./join-rules/deps.js";
+import { evaluateJoinRules, normalizeDomain, normalizeEmail, validateJoinRuleSet, validateJoinRuleState } from "../../../packages/ingest/src/join-policy/join-rules.js";
+import { recognise } from "./join-rules/calendar-link-extract.js";
+import { scanGmailForMeetingCandidates } from "./gws/gws-gmail.js";
+import { isRefusedWorkDb } from "./db-name.js";
 import { sha256Hex } from "./hash.js";
+import { trustedBrainReads, trustedCitationReads, trustedTreeReads, trustedGraphReads } from './composition/integrations/trusted-readers.js';
 
 /** `schema/index.json`'s top-level keys ARE the canonical list of real Mongo collections (its
  * own comment excludes `features_event` deliberately — a JSONL-file schema, not a collection) —
  * reused here instead of a second hand-maintained list that could drift from it. */
-const SCHEMA_INDEX_PATH = fileURLToPath(new URL("../../../schema/index.json", import.meta.url));
+
+/** `tree_index` roots through the shared tenant scope (ISS-AUTHTENANT-002): the accessor validates the
+ * tenant and merges it into every filter, so a root can no longer be read for an unvalidated or missing tenant. */
+type TreeRoot = TreeIndexRootDocument & { _id: string };
+const treeIndexColl = (tenantId: string) => scopedCollection<TreeRoot>(getDb(), "tree_index")(tenantId);
+const apiKeysColl = (tenantId: string) => scopedCollection<ApiKeys>(getDb(), "api_keys")(tenantId);
 
 export function createMongoApiKeyStore(): ApiKeyStore {
   return {
     async verify(key: string): Promise<VerifiedKey | null> {
       const doc = await getDb().collection<ApiKeys>("api_keys").findOne({ keyHash: sha256Hex(key) });
       if (!doc || doc.revokedAt) return null;
-      return { tenantId: doc.tenantId, scopes: doc.scopes ?? [] };
+      return { tenantId: doc.tenantId, scopes: doc.scopes ?? [], keyId: doc._id };
     },
   };
 }
 
 /** One root node per tenant, `level: "tenant"`, `node_id` == tenantId (buildTree's output shape). */
-export function createMongoTreeStore(): TreeStore {
+export function createMongoTreeStore(nativeEvidence?: Parameters<typeof trustedTreeReads>[1]): TreeStore {
+  const guarded = trustedTreeReads(getDb, nativeEvidence);
+  const valid = (tenantId: string): boolean => { try { assertValidTenantId(tenantId, 'treeStore.load'); return true; } catch { return false; } };
   return {
-    async load(tenantId: string): Promise<TreeIndexNode | null> {
-      // treeIndexRootFilter (ISS-063) is the single source of the `tenant:<id>` convention this
-      // query used to hand-write -- that hand-written copy was the exact query that got the
-      // node_id shape wrong once, live, on 2026-09-04, before this file matched what buildTree
-      // actually produces. It now also matches on the real `tenantId` field (ISS-062) --
-      // TreeIndexRootDocument satisfies TreeStore's TreeIndexNode return type (it's a superset).
-      return getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
-    },
+    async load(tenantId) { return valid(tenantId) ? guarded.load(tenantId) : null; },
+    async loadWithExclusions(tenantId) { return valid(tenantId) ? guarded.loadWithExclusions!(tenantId) : { tree: null, excluded: { total: 0, reasons: {} } }; },
   };
 }
 
@@ -82,7 +81,8 @@ export function createMongoEvalRunStore(): EvalRunStore {
  * per-attempt writes in `production.ts`; both land in the same collection. */
 export function createMongoJobWriter(): WriteJobFn {
   return async (entry) => {
-    await getDb().collection<Jobs>("jobs").insertOne({ _id: randomUUID(), ...entry });
+    assertValidTenantId(entry?.tenantId, "jobWriter");
+    await jobsColl(entry.tenantId).insertOne({ _id: randomUUID(), ...entry });
   };
 }
 
@@ -91,7 +91,7 @@ export function createMongoJobWriter(): WriteJobFn {
  * field (claims relate via `evidence[].sessionId`; turns via their own `sessionId`), so the
  * session-detail join queries each accordingly rather than assuming a shared shape. */
 export function createMongoBrainReadDeps(): BrainReadDeps {
-  return {
+  return trustedBrainReads({
     async listSessions(tenantId) {
       return sessionsColl(tenantId).find({}).toArray();
     },
@@ -111,7 +111,7 @@ export function createMongoBrainReadDeps(): BrainReadDeps {
     async listGaps(tenantId) {
       return gapsColl(tenantId).find({}).toArray();
     },
-  };
+  }, getDb);
 }
 
 /** Real `CitationsDeps` (routes/citations.ts) — same composition-root pattern as the brain deps
@@ -119,22 +119,7 @@ export function createMongoBrainReadDeps(): BrainReadDeps {
  * thousands of rows), so resolving each turn/session in parallel is the right shape — no batching
  * layer needed at this scale. */
 export function createMongoCitationsDeps(): CitationsDeps {
-  return {
-    async getCitation(tenantId, claimId): Promise<Citation | null> {
-      const claim = await claimsColl(tenantId).findOne({ _id: claimId });
-      if (!claim) return null;
-      const evidence = await Promise.all(
-        claim.evidence.map(async (e): Promise<CitationEvidence> => {
-          const [turn, session] = await Promise.all([
-            turnsColl(tenantId).findOne({ _id: e.turnId }),
-            sessionsColl(tenantId).findOne({ _id: e.sessionId }),
-          ]);
-          return { turnId: e.turnId, sessionId: e.sessionId, turn: turn ?? null, session: session ?? null };
-        }),
-      );
-      return { claim, evidence };
-    },
-  };
+  return trustedCitationReads(getDb);
 }
 
 /** Real `GraphReadDeps` — unions the `tree_index` root (same `treeIndexRootFilter` as
@@ -142,67 +127,70 @@ export function createMongoCitationsDeps(): CitationsDeps {
  * `buildKnowledgeGraph`. Both new reads use `packages/db` `coll(tenantId)`, so [I1] holds by
  * construction; full disclosure of what is and is not read lives in `routes/graph.ts`. */
 export function createMongoGraphReadDeps(): GraphReadDeps {
-  return {
-    async loadGraph(tenantId): Promise<KnowledgeGraph | null> {
-      const treeRootP = getDb().collection<TreeIndexRootDocument>("tree_index").findOne(treeIndexRootFilter(tenantId));
-      const [treeRoot, entityEdges, sessionDocs] = await Promise.all([treeRootP, graphEdgesColl(tenantId).find({}).toArray(), sessionsColl(tenantId).find({}).toArray()]);
-      if (!treeRoot && entityEdges.length === 0) return null;
-      return buildKnowledgeGraph({ treeRoot, entityEdges, sessions: sessionDocs });
-    },
-  };
+  return trustedGraphReads(getDb);
 }
 
-/** Real `CalendarReadDeps` (routes/calendar.ts) — thin wrapper over the `gws`-backed adapter.
- * `tenantId` is accepted for interface parity with every other read-dep but unused today: `gws`
- * reads one calendar ("primary", Umesh's own), not a per-tenant mapping — a real, disclosed
- * limitation of this being a single-operator tool today, not a hosted multi-tenant one. */
-export function createGwsCalendarReadDeps(): CalendarReadDeps {
-  return {
-    async listUpcoming(_tenantId) {
-      return listUpcomingGwsMeetings();
-    },
-  };
-}
+export { createGwsCalendarReadDeps } from "./gws/gws-calendar.js";
 
-/** Real `MeetingCandidatesDeps` (routes/meeting-candidates.ts) — wraps the already-real
- * `@lkb/db` `meeting-candidates`/`trusted-senders` accessors plus the `gws`-backed Gmail scan.
- * `scanGmail`'s per-message trust check is why this composes the two collections here rather
- * than in the route: a candidate whose sender already crossed `AUTO_APPROVE_THRESHOLD` is filed
- * straight in as `auto_approved`, never sitting in the pending review queue Umesh has to clear
- * by hand for a sender he's already trusted three times over. */
-export function createMeetingCandidatesDeps(): MeetingCandidatesDeps {
+/** Acquisition, review and approval share canonical tenant policy; source rows remain private and unchanged. */
+export function createMeetingCandidatesDeps(owner = process.env.LKB_TENANT_ID, scan = scanGmailForMeetingCandidates, databaseName = () => getDb().databaseName,
+  persistence: {getTrustedSender: typeof getTrustedSender; createMeetingCandidateIfNew: typeof createMeetingCandidateIfNew} & {listAllMeetingCandidates?: (tenant:string)=>Promise<MeetingCandidate[]>; decideMeetingCandidate?: (tenant:string,id:string,status:"approved"|"rejected")=>Promise<boolean>; recordSenderApproval?: (tenant:string,domain:string)=>Promise<unknown>} = {getTrustedSender, createMeetingCandidateIfNew},
+  remoteScan?: (tenantId: string) => ReturnType<typeof scanGmailForMeetingCandidates>,
+  policy?: {joinRules?: Pick<JoinRulesDeps,"load">; ownedDomains?: (tenantId: string) => readonly string[]; gmailSummary?: (tenantId: string) => Promise<GmailScanSummary | undefined>}): MeetingCandidatesDeps {
+  const list = persistence.listAllMeetingCandidates ?? listAllMeetingCandidates, decide = persistence.decideMeetingCandidate ?? decideMeetingCandidate;
+  const approval = persistence.recordSenderApproval ?? recordSenderApproval;
+  async function eligibility(tenant: string) {
+    if (policy && !policy.joinRules) throw new Error("Candidate policy unavailable");
+    const loaded = policy?.joinRules ? await policy.joinRules.load(tenant) : {ruleSet:{version:1,ownDomains:[],rules:[]},state:{approvedSenders:[],approvedDomains:[],optedOutEventIds:[]}};
+    const ruleSet = validateJoinRuleSet(loaded.ruleSet), state = validateJoinRuleState(loaded.state);
+    const rawDomains = policy?.ownedDomains ? policy.ownedDomains(tenant) : [];
+    if (!Array.isArray(rawDomains) || rawDomains.length > 20 || rawDomains.some(d => !normalizeDomain(d))) throw new Error("Candidate domain policy unavailable");
+    const domains = [...ruleSet.ownDomains,...rawDomains].map(d => normalizeDomain(d)!);
+    const eligible = (row: Pick<MeetingCandidate,"subject"|"senderEmail"|"senderDomain"> & Partial<MeetingCandidate>) => {
+      const email=normalizeEmail(row.senderEmail), domain=email?.split("@")[1];
+      if (!email || domain !== normalizeDomain(row.senderDomain) || domains.some(d => domain === d || domain?.endsWith("."+d))) return false;
+      if (row.kind === "past-recording" || row.recordingUrl || (row.startTime && (!Number.isFinite(Date.parse(row.startTime)) || Date.parse(row.startTime) <= Date.now()))) return false;
+      const link = row.meetingUrl && recognise(row.meetingUrl)?.kind === "join" || row.registrationUrl && /^https:\/\//.test(row.registrationUrl) || row.youtubeWatch || row.meetingLinkIssue || row.youtubeWatchIssue || row.evidenceIssue;
+      const invite = /\b(?:invit(?:ation|ed|e)|you(?:['’]re| are)\s+(?:in|registered|on the list))\b/i.test(row.subject) || /\b(?:webinar|seminar|webcast|workshop|conference|meeting|session)\b/i.test(row.subject) && (/\b(?:join|register|attend|registration|reminder|confirmation|confirmed|reserve|watch live)\b/i.test(row.subject) || Boolean(row.meetingUrl && recognise(row.meetingUrl)?.kind === "join"));
+      if (!link || !(invite || row.startTime || row.registrationOnly) || /\b(?:newsletter|digest|roundup|promotional|weekly update|product update|recording|recap|watch again)\b/i.test(row.subject)) return false;
+      const decision=evaluateJoinRules({id:row._id ?? row.messageId ?? "",senderEmail:email,title:row.subject,meetingUrl:row.meetingUrl},ruleSet,state);
+      return !["deny-rule","meeting-opt-out","invalid-rule-set"].includes(decision.reason);
+    }; return Object.assign(eligible,{ownDomains:[...new Set(domains)]});
+  }
+  const refused = (r: Partial<MeetingCandidate>) => Boolean(r.evidenceIssue || r.meetingLinkIssue || r.youtubeWatchIssue || r.registrationOnly);
+  async function summary(tenant: string) { return cleanGmailSummary(await policy?.gmailSummary?.(tenant)); }
   return {
+    getWorkDatabase(tenantId) {
+      if (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId) return undefined;
+      const work = process.env.MONGO_WORK_DB?.trim(), actual = databaseName();
+      return work && !isRefusedWorkDb(work) && actual === work ? actual : undefined;
+    },
+    gmailSummary: summary,
     async scanGmail(tenantId) {
-      const found = await scanGmailForMeetingCandidates();
+      if (!remoteScan && (!owner || !/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(owner) || owner !== tenantId)) throw new Error("Connected Gmail owner mismatch");
+      const eligible=await eligibility(tenantId); let nativeSummary: GmailScanSummary | undefined;
+      const found=remoteScan ? await remoteScan(tenantId) : await scan(500,undefined,{aliases:process.env.LKB_GMAIL_ALIASES,labelIds:process.env.LKB_GMAIL_LABEL_IDS,ownDomains:eligible.ownDomains,onSummary:value=>{nativeSummary=cleanGmailSummary(value);}});
+      const gmailSummary=nativeSummary ?? await summary(tenantId); if(gmailSummary?.complete === false)throw new Error("Candidate acquisition incomplete");
       let created = 0, autoApproved = 0;
-      // U2: pass through every optional scan field the same way meetingUrl already was — present -> included.
-      const OPTIONAL_CANDIDATE_FIELDS = ["meetingUrl", "kind", "startTime", "endTime", "recordingUrl", "registrationOnly"] as const;
-      for (const candidate of found) {
-        const trusted = await getTrustedSender(tenantId, candidate.senderDomain);
-        const status = trusted?.autoApprove ? "auto_approved" : "pending";
-        const extra = Object.fromEntries(OPTIONAL_CANDIDATE_FIELDS.filter((k) => candidate[k] !== undefined).map((k) => [k, candidate[k]]));
-        const wrote = await createMeetingCandidateIfNew(tenantId, {
-          _id: randomUUID(),
-          messageId: candidate.messageId,
-          subject: candidate.subject,
-          senderEmail: candidate.senderEmail,
-          senderDomain: candidate.senderDomain,
-          status,
-          detectedAt: new Date().toISOString(),
-          ...extra,
-        });
-        if (wrote) { created += 1; if (status === "auto_approved") autoApproved += 1; }
+      const optional = ["meetingUrl","kind","startTime","endTime","recordingUrl","registrationOnly","registrationUrl","threadId","senderAuthenticated","receivedAt","youtubeWatch","youtubeWatchIssue","meetingLinkIssue","evidenceIssue"] as const;
+      for (const candidate of found.filter(eligible)) {
+        const trusted=candidate.senderAuthenticated === true && !refused(candidate) ? await persistence.getTrustedSender(tenantId,candidate.senderDomain) : undefined;
+        const status=trusted?.autoApprove ? "auto_approved" : "pending";
+        const extra=Object.fromEntries(optional.filter(k=>candidate[k]!==undefined).map(k=>[k,candidate[k]]));
+        const wrote=await persistence.createMeetingCandidateIfNew(tenantId,{_id:randomUUID(),messageId:candidate.messageId,subject:candidate.subject,senderEmail:candidate.senderEmail,senderDomain:candidate.senderDomain,status,detectedAt:new Date().toISOString(),...extra});
+        if(wrote){created++;if(status === "auto_approved")autoApproved++;}
       }
-      return { created, autoApproved };
+      return {created,autoApproved,...(gmailSummary ? {gmailSummary}: {})};
     },
-    listCandidates: (tenantId) => listAllMeetingCandidates(tenantId),
-    async approve(tenantId, id) {
-      const candidate = await listAllMeetingCandidates(tenantId).then((rows) => rows.find((r) => r._id === id));
-      const ok = await decideMeetingCandidate(tenantId, id, "approved");
-      if (ok && candidate) await recordSenderApproval(tenantId, candidate.senderDomain);
+    async listCandidates(tenantId) { const eligible=await eligibility(tenantId); return (await list(tenantId)).filter(eligible); },
+    async approve(tenantId,id) {
+      const eligible=await eligibility(tenantId), candidate=(await list(tenantId)).find(r=>r._id === id);
+      if(!candidate || !eligible(candidate) || refused(candidate) || candidate.status !== "pending")return false;
+      const ok=await decide(tenantId,id,"approved");
+      if(ok && candidate.senderAuthenticated === true)await approval(tenantId,candidate.senderDomain);
       return ok;
     },
-    reject: (tenantId, id) => decideMeetingCandidate(tenantId, id, "rejected"),
+    reject: (tenantId,id)=>decide(tenantId,id,"rejected"),
   };
 }
 
@@ -211,11 +199,10 @@ export function createMeetingCandidatesDeps(): MeetingCandidatesDeps {
  * relies on the caller to remember not to serialize it) so a masked list can never accidentally
  * leak the one thing that must never leave this function. */
 export function createMongoKeysDeps(): KeysDeps {
-  const coll = () => getDb().collection<ApiKeys>("api_keys");
-
   return {
     async listKeys(tenantId): Promise<ApiKeySummary[]> {
-      const docs = await coll().find({ tenantId }).toArray();
+      assertValidTenantId(tenantId, "apiKeys.list");
+      const docs = await apiKeysColl(tenantId).find({}).toArray();
       return docs.map((d) => ({
         _id: d._id,
         label: d.label ?? "(unlabeled)",
@@ -225,11 +212,11 @@ export function createMongoKeysDeps(): KeysDeps {
       }));
     },
     async createKey(tenantId, label, scopes) {
+      assertValidTenantId(tenantId, "apiKeys.create");
       const id = randomUUID();
       const rawKey = `lkb_${randomBytes(24).toString("hex")}`;
-      await coll().insertOne({
+      await apiKeysColl(tenantId).insertOne({
         _id: id,
-        tenantId,
         keyHash: sha256Hex(rawKey),
         label,
         scopes,
@@ -239,8 +226,9 @@ export function createMongoKeysDeps(): KeysDeps {
       return { id, rawKey };
     },
     async revokeKey(tenantId, id) {
-      const result = await coll().updateOne(
-        { _id: id, tenantId, revokedAt: null },
+      assertValidTenantId(tenantId, "apiKeys.revoke");
+      const result = await apiKeysColl(tenantId).updateOne(
+        { _id: id, revokedAt: null },
         { $set: { revokedAt: new Date().toISOString() } },
       );
       return result.matchedCount > 0;
@@ -249,30 +237,11 @@ export function createMongoKeysDeps(): KeysDeps {
 }
 
 /** Real `HealthDeps` (routes/health.ts). `db.command({ping: 1})` is the standard MongoDB
- * liveness probe — cheaper than a real query and works even against an empty database. Counts
- * are ACROSS ALL TENANTS deliberately (this is an ops signal, not a tenant-scoped read — the
- * route is unauthenticated for exactly that reason, so it must never leak tenant-scoped content,
- * only aggregate numbers). A ping failure returns `db: "error"` and empty counts rather than
- * throwing — the route's whole job is to report an unhealthy backend, not crash reporting it. */
+ * liveness probe. LIVENESS ONLY: no countDocuments here (ISS-T057SCREEN-001) — the route is
+ * unauthenticated, so it reports reachability and nothing about data. A ping failure returns
+ * `db: "error"` rather than throwing. */
 export function createMongoHealthDeps(): HealthDeps {
-  return {
-    checkHealth: () =>
-      probeMongoHealth(
-        () => getDb().command({ ping: 1 }),
-        async () => {
-          const db = getDb();
-          const index = JSON.parse(readFileSync(SCHEMA_INDEX_PATH, "utf8")) as Record<string, unknown>;
-          const names = Object.keys(index).filter((k) => !k.startsWith("$"));
-          const collections: Record<string, number> = {};
-          await Promise.all(
-            names.map(async (name) => {
-              collections[name] = await db.collection(name).countDocuments();
-            }),
-          );
-          return collections;
-        },
-      ),
-  };
+  return { checkHealth: () => probeMongoHealth(() => getDb().command({ ping: 1 })) };
 }
 
 /**

@@ -1,0 +1,61 @@
+{
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "id": "product-speaker-relation-workbench-checker-cycle-2-not-dispatched",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 40,
+    "tokens": 1000,
+    "cost": null
+  },
+  "completion_reserve": true,
+  "completion_reserve_id": "product-speaker-relation-workbench/cycle-2/4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146",
+  "bootstrap_scope": "Four-file integrated speaker profile relationship workbench, eight isolated and four mounted broker cases plus immediate server bootstrap DTO consumer. Prior cycle had no reviewer dispatch/debit. Require all broker evidence before dispatch. Prospective zero usage means no work yet. Finalization reserve 30 seconds/800 tokens.",
+  "bootstrap": {
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "escalation": null,
+  "staged_admission": {
+    "status": "PREDISPATCH_PREPARATION_ONLY",
+    "source_input": "product-delivery/speaker-review-budget-input-3.json",
+    "unit": "product-speaker-relation-workbench",
+    "cycle": 2,
+    "total": {
+      "active_s": 120,
+      "tokens": 3000
+    },
+    "next_review": {
+      "active_s": 40,
+      "tokens": 1000
+    },
+    "remaining_review": {
+      "active_s": 50,
+      "tokens": 1200
+    },
+    "protected_finalization": {
+      "active_s": 30,
+      "tokens": 800
+    },
+    "authority": "Root approved staged40s1000 + remaining50s1200 + final30s800 WITHIN same120s3000; no extra allocation.",
+    "prior_charges": "All existing reviewer rows preserved exactly; no reviewer launched. Unknown maker/cost values unchanged.",
+    "dispatch_authorized_by_this_file": false
+  },
+  "protected_finalization": {
+    "kind": "finalization",
+    "active_s": 30,
+    "tokens": 800,
+    "cost": null,
+    "note": "Protected inside same total120s3000; retain prior actual metrics/debits and assess before finalization."
+  }
+}

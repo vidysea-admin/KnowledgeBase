@@ -45,24 +45,31 @@ def main() -> int:
             ok = False
             continue
 
-        valid_doc = load(valid_fixture)
-        invalid_doc = load(invalid_fixture)
+        # valid.json / invalid.json are required; additional valid-*.json (must pass) and
+        # invalid-*.json (each must fail) fixtures are optional (T-040: new optional fields).
+        valid_files = [valid_fixture] + sorted((FIXTURES / collection).glob("valid-*.json"))
+        invalid_files = [invalid_fixture] + sorted((FIXTURES / collection).glob("invalid-*.json"))
+        collection_ok = True
 
-        valid_errors = list(validator.iter_errors(valid_doc))
-        invalid_errors = list(validator.iter_errors(invalid_doc))
+        for vf in valid_files:
+            valid_errors = list(validator.iter_errors(load(vf)))
+            if valid_errors:
+                print(f"FAIL: {collection}/{vf.name} unexpectedly failed validation:")
+                for e in valid_errors:
+                    print(f"  - {e.message} at {list(e.path)}")
+                collection_ok = False
 
-        if valid_errors:
-            print(f"FAIL: {collection}.valid.json unexpectedly failed validation:")
-            for e in valid_errors:
-                print(f"  - {e.message} at {list(e.path)}")
-            ok = False
-        elif not invalid_errors:
-            print(f"FAIL: {collection}.invalid.json unexpectedly PASSED validation "
-                  f"(schema is too permissive)")
-            ok = False
+        for inf in invalid_files:
+            if not list(validator.iter_errors(load(inf))):
+                print(f"FAIL: {collection}/{inf.name} unexpectedly PASSED validation "
+                      f"(schema is too permissive)")
+                collection_ok = False
+
+        if collection_ok:
+            print(f"OK: {collection} — {len(valid_files)} valid fixture(s) pass, "
+                  f"{len(invalid_files)} invalid fixture(s) correctly rejected")
         else:
-            print(f"OK: {collection} — valid fixture passes, "
-                  f"invalid fixture correctly rejected ({len(invalid_errors)} error(s))")
+            ok = False
 
     print()
     if ok:

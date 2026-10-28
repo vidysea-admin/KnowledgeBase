@@ -1,0 +1,79 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/native-next-readonly-final-seal.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "0a52d137de902686ec911511d9d27849a1456db90df88ee0f89127894fe90847",
+    "bytes": 1939290
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "elapsed_s": 50.32800000000134,
+    "priorGlobal_s": 194.032,
+    "totalGlobalIncludingPrior_s": 244.36000000000058,
+    "pinsUnchanged": true,
+    "pinCount": 1890,
+    "fixtureRemoved": true,
+    "environment": {
+      "LKB_NATIVE_TEST_FFMPEG": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffmpeg.exe",
+      "LKB_NATIVE_TEST_FFPROBE": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+      "LKB_NATIVE_TEST_BROWSER": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+      "LKB_NATIVE_TEST_PRIVATE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acl-fixtures\\1cd74624-2ce6-4614-be0f-cd54182875c6"
+    },
+    "accounting": "shared maker/integration, not checker",
+    "wholeFloorPASS": false,
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "eee42cac7431c173fdbc4d73bf392e18a1e1a58bb9d386161a9a6e8bd3f1c7ca",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-readonly-acl-create-receipt.json",
+        "rawBytes": 469113,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "80d922965b46ec0205475ee4e5166f57e65460671e7e32f085cf199120343956"
+      },
+      "logSha256": "39c514120edee060d35e69662971103ea5b719010ef33f6ccd76faa2a4d400a5",
+      "label": "native-next-readonly-acl-create",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-readonly-acl-create.log"
+    },
+    {
+      "canonicalJsonSha256": "6b66f81634c9b7727043e4de76af37dc80b37fd9264006b3e2e5b672165ef3a4",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-readonly-acl-verify-receipt.json",
+        "rawBytes": 469302,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "d171a91a69b914948eb54079c81c88a64da64c709fde02f8ec52254edfd66ff7"
+      },
+      "logSha256": "c66b6389bccb32c81c29944a178c896b4f2a3af5a2450d6f49ea70c4a57ede20",
+      "label": "native-next-readonly-acl-verify",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-readonly-acl-verify.log"
+    },
+    {
+      "canonicalJsonSha256": "b20b88b49e370362a6d1c34eb33feb331a42c4e6360e1719c6fd7c2790a78ed3",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-readonly-original-positive-receipt.json",
+        "rawBytes": 469540,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "91a9e546045c2700ef6c8f2ed00ff973d610dc8f5e10e08ff4307fbd44cf1832"
+      },
+      "logSha256": "1b3e020a0406fe8ddef4de1d2e51078225b5b244feed757edcc410defb154f83",
+      "label": "native-next-readonly-original-positive",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-readonly-original-positive.log"
+    },
+    {
+      "canonicalJsonSha256": "6a045a3a7c08ed60afe60d8737d8d1860a49e72a71220ce5be21210d0b03df74",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/native-next-readonly-acl-cleanup-receipt.json",
+        "rawBytes": 469188,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "63ea79f2dfea63d20b213fcba1206741b0513a508bd814ae309c44a095bdfa37"
+      },
+      "logSha256": "bee11e21850031ef332f2b88fbe972a0abc187752da1ae8fbf2cf05883fa941b",
+      "label": "native-next-readonly-acl-cleanup",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\native-next-readonly-acl-cleanup.log"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": "integration-type-repairs",
+  "fix_cycle": 1,
+  "status": "maker-repairs-awaiting-broker",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_identity": "dirty-worktree plus candidate-pins.json raw-byte hashes",
+  "token_metric": "actual_total",
+  "maker_usage": {
+    "cost": null,
+    "active_s": null,
+    "tokens": null
+  },
+  "remaining_gates": [
+    "broker package typechecks",
+    "broker targeted behavior tests",
+    "parent combined managed-review packet validation and independent checker"
+  ]
+}

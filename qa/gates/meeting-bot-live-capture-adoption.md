@@ -14,3 +14,5 @@
 ---
 
 **Answered:** 2026-09-25 — **Validate first, then adopt** — Umesh (AskUserQuestion, 2026-09-25): "validate and checker se approval lelo firr adopt krr lo". Not adopted yet. Next: the checker validates the T-024b draft criterion by criterion against the shipped code, records an explicit approval, and only then is it adopted. Until that approval is on disk, webinar units stay judged against meeting-bot-capture.md as extended.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-25 — **Validate first, then adopt** — Umesh (AskUserQuestion, 2026-09-25): "validate and checker se ap

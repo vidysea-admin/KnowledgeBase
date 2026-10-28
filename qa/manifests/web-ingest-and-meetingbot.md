@@ -86,3 +86,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration
 5. Visit `/meeting-bot` — confirm it reads as an honest disclosure, not a fake "connected" state.
 6. Read `packages/ingest/src/sources/document.ts`'s `splitIntoParagraphTurns` — confirm `tStart`/
    `tEnd` are indeed documented as character offsets, validating the manifest's bug explanation.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

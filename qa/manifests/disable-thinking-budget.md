@@ -118,3 +118,5 @@ in-focus-3: 124 turns, all speakerRef="unknown" (confirmed untouched, honestly p
 not a structural limitation) — a simple re-run of `node scripts/transcribe-toc-session.mjs
 2026-07-30-in-focus-3` once Gemini's load eases, then `node scripts/sync-real-turns.mjs` to push
 it to Mongo. This would complete T-003 at a genuine 23/23.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -1,0 +1,341 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { createMongoFlywheelStore } from "./store.js";
+import { FlywheelError, gapId, fingerprint } from "./types.js";
+import { rig, memoryDb, ORIGINAL, SOURCE, TURN } from "./test-fixture.js";
+const request = { sourceUrl: "https://example.org/session", requestId: "retry-1" };
+const reject = (p: Promise<unknown>, code: string) => assert.rejects(p, (e: unknown) => e instanceof FlywheelError && e.code === code);
+
+test("stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers", async () => {
+  const r = rig(), w = r.workflow(), before = structuredClone(r.tables.eval_runs![0]);
+  const a = await w.open("t", "loss"), b = await w.open("t", "loss");
+  assert.equal(a._id, b._id); assert.equal(r.tables.gaps!.length, 1);
+  assert.equal(a.flywheel.inputFingerprint, fingerprint(a.flywheel.loss));
+  const child = await w.retest("t", "loss", request), again = await r.workflow().retest("t", "loss", request);
+  assert.deepEqual(child, again); assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 });
+  assert.deepEqual(r.tables.eval_runs![0], before); assert.equal(r.tables.eval_runs!.length, 2);
+  assert.equal(child.score, undefined); assert.equal(child.credibility, "internal"); assert.equal(child.flywheel.comparison, "needs-review");
+  const current = await w.inspect("t", "loss"); assert.equal(current.status, "received"); assert.equal(current.flywheel.stage, "retested");
+  assert.equal(current.sourceRef, SOURCE._id); assert.deepEqual(current.flywheel.capture?.turnIds, [TURN._id]);
+  assert.equal(gapId("ab", "c"), gapId("ab", "c")); assert.notEqual(gapId("ab", "c"), gapId("a", "bc"));
+  assert.ok(r.calls.intake === 1, "already-ingested still ran required indexing once");
+});
+test("tie/win/missing/malformed finite score and foreign loss never write gaps", async () => {
+  for (const score of [{ ai: 4, counsellor: 4 }, { ai: 5, counsellor: 4 }, undefined, { ai: NaN, counsellor: 4 }, { ai: 1, counsellor: Infinity }, { ai: "1", counsellor: 4 }]) {
+    const r = rig(); r.tables.eval_runs![0]!.score = score;
+    await reject(r.workflow().open("t", "loss"), "not_loss"); assert.equal(r.tables.gaps?.length ?? 0, 0);
+  }
+  const r = rig(); await reject(r.workflow().open("b", "loss"), "not_found"); assert.equal(r.tables.gaps?.length ?? 0, 0);
+  await assert.rejects(r.workflow().open("", "loss")); assert.equal(r.tables.gaps?.length ?? 0, 0);
+});
+test("original input drift cannot silently bind a previously accepted gap", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  r.tables.eval_runs![0]!.question = "Different original question";
+  await reject(w.open("t", "loss"), "input_drift"); await reject(w.retest("t", "loss", request), "input_drift");
+  assert.deepEqual(r.calls, { intake: 0, index: 0, ask: 0 });
+});
+test("received requires actual scoped transcript/consent/source/session; forged receipts never index", async () => {
+  const changes = [
+    (r: ReturnType<typeof rig>) => { r.tables.turns!.splice(0); },
+    (r: ReturnType<typeof rig>) => { r.tables.turns![0]!.tenantId = "foreign"; },
+    (r: ReturnType<typeof rig>) => { r.tables.sessions![0]!.sourceId = "different"; },
+    (r: ReturnType<typeof rig>) => { r.tables.sources![0]!.consent.given = false; },
+    (r: ReturnType<typeof rig>) => { r.tables.turns![0]!.text = ""; },
+    (r: ReturnType<typeof rig>) => { r.tables.turns![0]!.tEnd = -1; },
+  ];
+  for (const change of changes) {
+    const r = rig(), w = r.workflow(); await w.open("t", "loss"); change(r);
+    await reject(w.retest("t", "loss", request), "unavailable");
+    const head = await w.inspect("t", "loss"); assert.equal(head.status, "open"); assert.equal(head.flywheel.failure?.stage, "capture"); assert.equal(r.calls.index, 0);
+  }
+});
+test("degraded/index mismatch/empty/incomplete output refuses Ask, while received remains honest", async () => {
+  for (const alter of [
+    (x: any) => { x.sessionId = "foreign"; }, (x: any) => { x.completion.complete = false; },
+    (x: any) => { x.completion.generation = ""; }, (x: any) => { x.completion.turnCount = 0; },
+    (x: any) => { delete x.completion; }, (x: any) => { x.summary.degraded = "SECRET provider error"; },
+    (x: any) => { x.chunks.skipped = "embedding-failed"; },
+  ]) {
+    const r = rig(), w = r.workflow(); await w.open("t", "loss"); const base = r.deps.index;
+    r.deps.index = async (t, s) => { const output = await base(t, s); alter(output); return output; };
+    await reject(w.retest("t", "loss", request), "unavailable");
+    const head = await w.inspect("t", "loss"); assert.equal(head.status, "received"); assert.equal(head.flywheel.stage, "captured"); assert.equal(head.flywheel.failure?.stage, "index"); assert.equal(r.calls.ask, 0);
+    assert.ok(!JSON.stringify(head).includes("SECRET"));
+  }
+});
+test("drift during indexing and foreign chunks cannot be mistaken for current capture", async () => {
+  for (const change of [
+    (r: ReturnType<typeof rig>) => { r.tables.turns![0]!.text = "changed"; },
+    (r: ReturnType<typeof rig>) => { r.tables.chunks![0]!.turnRefs = ["foreign-turn"]; },
+    (r: ReturnType<typeof rig>) => { r.tables.tree_index![0]!.children = []; },
+  ]) {
+    const r = rig(), w = r.workflow(); await w.open("t", "loss"); const base = r.deps.index;
+    r.deps.index = async (t, s) => { const result = await base(t, s); change(r); return result; };
+    await assert.rejects(w.retest("t", "loss", request)); assert.equal(r.calls.ask, 0); assert.equal(r.tables.eval_runs!.length, 1);
+  }
+});
+test("provider/index/Ask/child-write failures stay visible and valid retry reuses established capture/index", async () => {
+  for (const stage of ["intake", "index", "ask", "createRetest"] as const) {
+    const r = rig(), w = r.workflow(); await w.open("t", "loss");
+    const holder = stage === "createRetest" ? r.deps.store : r.deps;
+    const original = (holder as any)[stage]; (holder as any)[stage] = async () => { throw new Error("SECRET access-token"); };
+    await reject(w.retest("t", "loss", request), "unavailable");
+    const head = await w.inspect("t", "loss"); assert.ok(head.flywheel.failure); assert.ok(!JSON.stringify(head).includes("SECRET")); assert.equal(r.tables.eval_runs!.length, 1);
+    (holder as any)[stage] = original; await r.workflow().retest("t", "loss", request);
+    assert.equal((await w.inspect("t", "loss")).flywheel.failureHistory?.length, 1);
+    assert.equal(r.tables.eval_runs!.length, 2); assert.equal(r.calls.intake, 1); assert.equal(r.calls.index, 1); assert.equal(r.calls.ask, stage === "createRetest" ? 2 : 1);
+  }
+});
+test("concurrent attempt CAS and expired restart lock preserve exactly one accepted child", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  const results = await Promise.allSettled([w.retest("t", "loss", request), r.workflow().retest("t", "loss", request)]);
+  assert.equal(results.filter((x) => x.status === "fulfilled").length, 1); assert.equal(r.tables.eval_runs!.length, 2);
+  const r2 = rig(); await r2.workflow().open("t", "loss");
+  r2.tables.gaps![0]!.flywheel.lock = { token: "crashed", requestId: "old", expiresAt: "2026-10-14T01:10:00Z" };
+  await reject(r2.workflow().retest("t", "loss", request), "conflict"); r2.advance(600001);
+  await r2.workflow().retest("t", "loss", request); assert.equal(r2.tables.eval_runs!.length, 2);
+});
+test("crash after immutable child persistence resumes without repeating Ask", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  const base = r.deps.store.replaceGap;
+  r.deps.store.replaceGap = async (t, rev, row) => { if (row.flywheel.stage === "retested") throw new Error("storage down"); return base(t, rev, row); };
+  await reject(w.retest("t", "loss", request), "unavailable"); assert.equal(r.tables.eval_runs!.length, 2);
+  r.deps.store.replaceGap = base; await r.workflow().retest("t", "loss", request);
+  assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 }); assert.equal((await w.inspect("t", "loss")).flywheel.stage, "retested");
+});
+test("expired gap and source URL rebinding refuse; DB names remain bounded", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss"); r.tables.gaps![0]!.status = "expired";
+  await reject(w.retest("t", "loss", request), "conflict"); r.tables.gaps![0]!.status = "open";
+  await w.retest("t", "loss", request);
+  await reject(w.retest("t", "loss", { ...request, sourceUrl: "https://example.org/other" }), "input_drift");
+  for (const name of ["lkb", "LKB", "lkb_staging", "global_university_db", "", "lkb_t059_"]) assert.throws(() => createMongoFlywheelStore(memoryDb({}, name).db));
+  assert.ok(r.calls.intake === 1);
+});
+test("provider deadline returns honest failure and retains lease until expiry; late callback cannot advance head", async () => {
+  const r = rig(); r.deps.operationTimeoutMs = 10; const w = r.workflow(); await w.open("t", "loss");
+  let finish!: (value: any) => void; r.deps.intake = () => new Promise((resolve) => { finish = resolve; });
+  await reject(w.retest("t", "loss", request), "unavailable");
+  const head = await w.inspect("t", "loss"); assert.equal(head.status, "open"); assert.equal(head.flywheel.failure?.stage, "capture"); assert.ok(head.flywheel.lock);
+  await reject(w.retest("t", "loss", request), "conflict");
+  finish({ status: "already-ingested", sourceId: SOURCE._id, sessionId: "s1" }); await Promise.resolve();
+  assert.equal((await w.inspect("t", "loss")).flywheel.stage, "awaiting-source"); assert.equal(r.calls.index, 0);
+});
+test("idempotent retry preserves a later explicit internal child score without copying it to the original", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  const child = await w.retest("t", "loss", request);
+  r.tables.eval_runs!.find((row) => row._id === child._id)!.score = { ai: 2, counsellor: 4, notes: "manual internal score; calibration pending" };
+  const history = await w.retest("t", "loss", request);
+  assert.equal(history.score?.ai, 2); assert.equal(history.credibility, "internal"); assert.equal(history.flywheel.comparison, "needs-review");
+  assert.deepEqual(r.tables.eval_runs![0], ORIGINAL); assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 });
+});
+test("ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head", async () => {
+  const f = rig(); let headWrites = 0;
+  const replace = f.deps.store.replaceGap;
+  f.deps.store.replaceGap = async (...args) => { headWrites++; return replace(...args); };
+  const w = f.workflow(); await w.open('t', 'loss');
+  const firstRequest = { sourceUrl: 'https://example.org/session', requestId: 'first' };
+  const first = await w.retest('t', 'loss', firstRequest);
+  const second = await w.retest('t', 'loss', { ...firstRequest, requestId: 'second' });
+  assert.notEqual(first._id, second._id);
+  assert.equal((await w.inspect('t', 'loss')).flywheel.lastRetestId, second._id);
+  const before = await w.inspect('t', 'loss'), callsBefore = structuredClone(f.calls);
+  const writesBefore = headWrites;
+  assert.deepEqual(await w.retest('t', 'loss', firstRequest), first);
+  assert.equal((await w.inspect('t', 'loss')).flywheel.lastRetestId, second._id,
+    'replaying a completed historical request must not regress the current head to an older accepted child');
+  assert.deepEqual(await w.inspect('t', 'loss'), before);
+  assert.deepEqual(f.calls, callsBefore); assert.equal(headWrites, writesBefore);
+  assert.equal(f.tables.eval_runs!.length, 3); assert.deepEqual(f.tables.eval_runs![0], ORIGINAL);
+});
+test("newer interrupted child resumes promotion while completed historical replay leaves its recovery untouched", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  const first = await w.retest("t", "loss", { ...request, requestId: "first" });
+  const base = r.deps.store.replaceGap;
+  r.deps.store.replaceGap = async (t, rev, row) => {
+    if (row.flywheel.stage === "retested" && !row.flywheel.lock && !row.flywheel.failure) throw new Error("head write down");
+    return base(t, rev, row);
+  };
+  await reject(w.retest("t", "loss", { ...request, requestId: "second" }), "unavailable");
+  const interrupted = await w.inspect("t", "loss");
+  assert.equal(interrupted.flywheel.lastRetestId, first._id); assert.equal(interrupted.flywheel.failure?.requestId, "second");
+  assert.deepEqual(await w.retest("t", "loss", { ...request, requestId: "first" }), first);
+  assert.deepEqual(await w.inspect("t", "loss"), interrupted);
+  r.deps.store.replaceGap = base;
+  const second = await r.workflow().retest("t", "loss", { ...request, requestId: "second" });
+  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, second._id);
+  assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 2 }); assert.equal(r.tables.eval_runs!.length, 3);
+});
+
+test("storage read deadlines refuse without dispatch or recovery writes", { timeout: 2000 }, async () => {
+  for (const method of ["evaluation", "gap"] as const) {
+    const r = rig(); r.deps.operationTimeoutMs = 10;
+    const w = r.workflow(); await w.open("t", "loss");
+    const before = structuredClone(r.tables), original = r.deps.store[method];
+    r.deps.store[method] = () => new Promise<never>(() => {});
+    await reject(w.retest("t", "loss", request), "unavailable");
+    Object.assign(r.deps.store, { [method]: original });
+    assert.deepEqual(r.tables, before); assert.deepEqual(r.calls, { intake: 0, index: 0, ask: 0 });
+  }
+});
+
+test("source and index read deadlines keep the lease and never trigger index rebuild", { timeout: 2000 }, async () => {
+  for (const method of ["sourceRows", "indexedRows"] as const) {
+    const r = rig(); r.deps.operationTimeoutMs = 10;
+    const w = r.workflow(); await w.open("t", "loss");
+    // Establish an indexed checkpoint by failing Ask, then probe the freshness reader.
+    const ask = r.deps.ask; r.deps.ask = async () => { throw new Error("fixture refusal"); };
+    await reject(w.retest("t", "loss", request), "unavailable"); r.deps.ask = ask;
+    const original = r.deps.store[method], before = structuredClone(r.calls);
+    const pre = await w.inspect("t", "loss");
+    r.deps.store[method] = () => new Promise<never>(() => {});
+    await reject(w.retest("t", "loss", request), "unavailable");
+    Object.assign(r.deps.store, { [method]: original });
+    const head = await w.inspect("t", "loss"); assert.ok(head.flywheel.lock);
+    // A storage deadline must not run recovery writes: no failure record, no extra revision beyond lease acquisition.
+    assert.deepEqual(head.flywheel.failure, pre.flywheel.failure, "no recovery failure record");
+    assert.equal(head.flywheel.failureHistory?.length ?? 0, pre.flywheel.failureHistory?.length ?? 0, "failureHistory unchanged");
+    assert.equal(head.flywheel.revision, pre.flywheel.revision + 1, "only the lease acquisition wrote a revision");
+    assert.deepEqual(r.calls, before); assert.equal(head.flywheel.stage, "indexed");
+    await reject(w.retest("t", "loss", request), "conflict");
+  }
+});
+
+test("child readback deadline preserves the persisted child and retry never repeats Ask", { timeout: 2000 }, async () => {
+  const r = rig(); r.deps.operationTimeoutMs = 10;
+  const w = r.workflow(); await w.open("t", "loss");
+  const evaluation = r.deps.store.evaluation;
+  r.deps.store.evaluation = (t, id) => id !== "loss" && r.calls.ask > 0
+    ? new Promise<never>(() => {}) : evaluation(t, id);
+  await reject(w.retest("t", "loss", request), "unavailable");
+  r.deps.store.evaluation = evaluation;
+  assert.equal(r.tables.eval_runs!.length, 2); assert.ok((await w.inspect("t", "loss")).flywheel.lock);
+  r.advance(600001); const child = await r.workflow().retest("t", "loss", request);
+  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, child._id);
+  assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 }); assert.deepEqual(r.tables.eval_runs![0], ORIGINAL);
+});
+
+test("terminal CAS deadline preserves committed completion or fences a late CAS after recovery", { timeout: 2000 }, async () => {
+  for (const commitBeforeDeadline of [true, false]) {
+    const r = rig(); r.deps.operationTimeoutMs = 10;
+    const w = r.workflow(); await w.open("t", "loss");
+    const replace = r.deps.store.replaceGap;
+    let late!: () => Promise<boolean>, casRevision = -1;
+    r.deps.store.replaceGap = async (t, rev, row) => {
+      if (row.flywheel.stage !== "retested") return replace(t, rev, row);
+      casRevision = rev;
+      const snapshot = structuredClone(row);
+      if (commitBeforeDeadline) await replace(t, rev, snapshot);
+      else late = () => replace(t, rev, snapshot);
+      return new Promise<never>(() => {});
+    };
+    await reject(w.retest("t", "loss", request), "unavailable");
+    r.deps.store.replaceGap = replace;
+    const timedOut = await w.inspect("t", "loss");
+    assert.equal(timedOut.flywheel.stage, commitBeforeDeadline ? "retested" : "indexed");
+    assert.equal(Boolean(timedOut.flywheel.lock), !commitBeforeDeadline);
+    // No recovery write after the terminal CAS deadline: no failure record, no extra revision.
+    assert.equal(timedOut.flywheel.failure, undefined, "no recovery failure record");
+    assert.equal(timedOut.flywheel.failureHistory?.length ?? 0, 0, "failureHistory unchanged");
+    assert.equal(timedOut.flywheel.revision, commitBeforeDeadline ? casRevision + 1 : casRevision, "no extra revision written");
+    if (!commitBeforeDeadline) r.advance(600001);
+    const child = await r.workflow().retest("t", "loss", request);
+    const recovered = await w.inspect("t", "loss");
+    assert.equal(recovered.flywheel.lastRetestId, child._id); assert.equal(recovered.flywheel.failure, undefined);
+    if (!commitBeforeDeadline) {
+      assert.equal(await late(), false, "old revision cannot replace the recovered terminal head");
+      assert.deepEqual(await w.inspect("t", "loss"), recovered);
+    } else assert.deepEqual(recovered, timedOut, "committed completion is a read-only replay");
+    assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 });
+    assert.equal(r.tables.eval_runs!.length, 2); assert.deepEqual(r.tables.eval_runs![0], ORIGINAL);
+  }
+});
+
+
+async function canonicalLexicalRig() {
+  const r = rig();
+  const { indexSession } = await import("../indexing/session.js");
+  const evidence = { turnId: TURN._id, sessionId: "s1", quote: TURN.text };
+  r.deps.index = async (tenant, session) => {
+    r.calls.index++;
+    return indexSession(tenant, session, { db: r.db, strictWebinar: true, complete: (async (job: any) => {
+      const p = JSON.parse(job.messages[1].content);
+      const json = p.phase === "extract-summary"
+        ? { processed: p.inventory, items: [{ kind: "insight", text: TURN.text, origin: "speaker-statement", verification: "unverified", evidence: [evidence] }], qa: [] }
+        : p.phase === "extract-claims"
+          ? { processed: p.inventory, claims: [{ text: TURN.text, origin: "speaker-statement", verification: "unverified", evidence: [evidence] }] }
+          : { processed: p.inventory, complete: true, noContent: false, noClaims: false, verdicts: p.items.map((i: any) => ({ id: i.id, supported: true, categoryCorrect: true, answerRelevant: true })) };
+      return { text: JSON.stringify(json), usage: { inputTokens: 1, outputTokens: 1 }, provider: "offline", model: "fixture", costUsd: 0 };
+    }) as never });
+  };
+  return r;
+}
+
+test("canonical lexical indexing accepts initial retest and immutable replay", async () => {
+  const r = await canonicalLexicalRig(), w = r.workflow(); await w.open("t", "loss");
+  const child = await w.retest("t", "loss", request);
+  assert.equal(r.tables.sessions![0]!.indexAttempt.manifest.retrievalMode, "vectorless");
+  assert.ok(r.tables.chunks!.every(c => c.vector === undefined && c.dims === undefined && c.embeddingModel === undefined));
+  const before = structuredClone(r.tables.gaps), calls = structuredClone(r.calls);
+  assert.deepEqual(await w.retest("t", "loss", request), child);
+  assert.deepEqual(r.tables.gaps, before); assert.deepEqual(r.calls, calls);
+  assert.deepEqual(r.tables.eval_runs![0], ORIGINAL); assert.equal(r.tables.eval_runs!.length, 2);
+});
+
+test("canonical lexical replay rejects missing artifacts and mixed or stale generation", async () => {
+  for (const change of [
+    (r: ReturnType<typeof rig>) => { r.tables.chunks!.splice(0); },
+    (r: ReturnType<typeof rig>) => { r.tables.chunks![0]!.vector = [1, 0]; r.tables.chunks![0]!.dims = 2; r.tables.chunks![0]!.embeddingModel = "forged"; },
+    (r: ReturnType<typeof rig>) => { r.tables.sessions![0]!.indexAttempt.manifest.retrievalMode = "vector"; },
+    (r: ReturnType<typeof rig>) => { r.tables.sessions![0]!.indexAttempt.generation = "00000000-0000-4000-8000-000000000000"; },
+  ]) {
+    const r = await canonicalLexicalRig(), w = r.workflow(); await w.open("t", "loss"); await w.retest("t", "loss", request);
+    const before = structuredClone(r.tables.gaps), calls = structuredClone(r.calls); change(r);
+    await assert.rejects(w.retest("t", "loss", request));
+    assert.deepEqual(r.tables.gaps, before); assert.deepEqual(r.calls, calls); assert.equal(r.tables.eval_runs!.length, 2);
+  }
+});
+
+test("caller vectorless flags cannot replace persisted canonical mode", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss"); const index = r.deps.index;
+  r.deps.index = async (t, s) => { const result = await index(t, s); result.completion!.retrievalMode = "vectorless"; return result; };
+  await reject(w.retest("t", "loss", request), "unavailable");
+  assert.equal(r.calls.ask, 0); assert.equal(r.tables.eval_runs!.length, 1);
+});
+
+test("index artifact read rejects a changed source snapshot before Ask", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss"); const read = r.deps.store.indexedRows;
+  r.deps.store.indexedRows = async (...args) => { const rows = await read(...args); r.tables.sessions![0]!.title = "changed during artifact read"; return rows; };
+  await reject(w.retest("t", "loss", request), "input_drift");
+  assert.equal(r.calls.ask, 0); assert.equal(r.tables.eval_runs!.length, 1);
+});
+test("ISS-T059REPLAY-001 interrupted older request cannot replace a newer head; current update still advances", async () => {
+  const r = rig(), w = r.workflow(); await w.open("t", "loss");
+  const base = r.deps.store.replaceGap;
+  r.deps.store.replaceGap = async (t, rev, row) => {
+    if (row.flywheel.stage === "retested" && !row.flywheel.lock && !row.flywheel.failure) throw new Error("head write down");
+    return base(t, rev, row);
+  };
+  await reject(w.retest("t", "loss", { ...request, requestId: "first" }), "unavailable");
+  r.deps.store.replaceGap = base; r.advance(1000);
+  const second = await w.retest("t", "loss", { ...request, requestId: "second" });
+  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, second._id);
+  // Hand-built state: the older request is again marked interrupted while the newer head stands.
+  const gap = r.tables.gaps![0]!; gap.flywheel.failure = { stage: "persist", requestId: "first", at: "2026-10-14T01:00:00.000Z" };
+  const firstChild = await w.retest("t", "loss", { ...request, requestId: "first" });
+  assert.notEqual(firstChild._id, second._id);
+  const after = await w.inspect("t", "loss");
+  assert.equal(after.flywheel.lastRetestId, second._id); assert.equal(after.flywheel.failure, undefined); assert.equal(after.flywheel.lock, undefined);
+  r.advance(1000); const third = await w.retest("t", "loss", { ...request, requestId: "third" });
+  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, third._id);
+});
+test("ISS-T059REPLAY-001 concurrent historical replay and current update leave the newest head, repeated 15x", async () => {
+  for (let i = 0; i < 15; i++) {
+    const r = rig(), w = r.workflow(); await w.open("t", "loss");
+    const first = await w.retest("t", "loss", { ...request, requestId: "first" }); r.advance(1000);
+    const [replay, update] = await Promise.allSettled([w.retest("t", "loss", { ...request, requestId: "first" }), r.workflow().retest("t", "loss", { ...request, requestId: "second" })]);
+    assert.equal(replay.status, "fulfilled"); assert.deepEqual((replay as PromiseFulfilledResult<unknown>).value, first);
+    const head = await w.inspect("t", "loss");
+    if (update.status === "fulfilled") assert.equal(head.flywheel.lastRetestId, (update as PromiseFulfilledResult<{ _id: string }>).value._id);
+    else { await reject(Promise.reject((update as PromiseRejectedResult).reason), "conflict"); assert.equal(head.flywheel.lastRetestId, first._id); }
+  }
+});

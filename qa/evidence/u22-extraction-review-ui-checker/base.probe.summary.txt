@@ -1,0 +1,2 @@
+      Tests  1 passed | 5 skipped (6)
+exit=0

@@ -1,0 +1,40 @@
+✔ changed evidence or policy cannot authorize stale candidate approval; refusal cannot be approved (27.9882ms)
+✔ reported evidence uses server-cited sources, holds original, resolves with attribution and reruns without losing provenance (10.5713ms)
+✔ stored candidate and evidence digest corruption cannot release or expose review content (6.5351ms)
+✔ graph selector parser preserves absent legacy shape, deduplicates trimmed canonical IDs and bounds both dimensions (1.4551ms)
+✔ graph selector mounted durable Ask persists normalized selection in restart history without changing freshness guards (224.1185ms)
+✔ graph selector conflict replay refuses changed selection before provider calls (15.1244ms)
+✔ graph selector mounted policy simulation forwards normalized hints, never claimed tenant or top-level selectors (137.1717ms)
+✔ graph selector policy simulation rejects invalid filters before retrieval and preserves tenant authority on foreign hints (61.0635ms)
+✖ legacy vector opt-in HTTP composition gives request factory sole ownership of arms and shared embed (101.7873ms)
+✔ graph selector /ask forwards only normalized parsed hints with verified tenant (52.375ms)
+✔ graph selector /ask rejects malformed hints before tree or factory and fails closed without graph factory (58.8793ms)
+✔ graph selector /ask keeps foreign canonical hints inside verified tenant authority (16.4335ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8147.0728
+
+✖ failing tests:
+
+test at apps\api\src\routes\ask\ask.test.ts:1:1969
+✖ legacy vector opt-in HTTP composition gives request factory sole ownership of arms and shared embed (101.7873ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  503 !== 200
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\apps\api\src\routes\ask\ask.test.ts:86:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 503,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

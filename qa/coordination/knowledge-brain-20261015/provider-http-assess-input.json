@@ -1,0 +1,41 @@
+{
+  "maker": {
+    "tokens": null,
+    "active_s": null,
+    "cost": null
+  },
+  "reviewers": [
+    {
+      "note": "One shared historical review across four initial scopes; charge once, preserve unknown actuals, not a fresh reset.",
+      "budget_debit": {
+        "tokens": 6000,
+        "active_s": 180,
+        "cost": null
+      },
+      "id": "vectorless_checker-wip-shared",
+      "active_s": null,
+      "tokens": null,
+      "cost": null
+    }
+  ],
+  "next_phase": {
+    "tokens": 6000,
+    "active_s": 180,
+    "cost": null
+  },
+  "bootstrap_scope": "One coherent Ollama Cloud + real HTTP boundary review; exact source/identity, mandatory relevant independent probe, credential redirects/byte/time/abort and distinct verifier caller. Prior reviewer unknowns retained.",
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": {
+    "limits": {
+      "tokens": 12000,
+      "active_s": 360,
+      "cost": null
+    },
+    "authority": "Root explicit approval relaying user implementation scope, 2026-10-15",
+    "reason": "Required credential/redirect/independent-verifier security review; prior shared history unknown. Cumulative finite allocation, no ratio-success claim."
+  },
+  "ratio_claim": "UNVERIFIED; unknown maker/reviewer actual tokens and historical time"
+}

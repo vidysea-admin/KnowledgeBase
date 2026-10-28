@@ -1,0 +1,12 @@
+{
+  "requestSha256": "6d32f467fc6960f3c9c61feb611bdbb88ec2498f878ed48ab38dc4ce7e2e4a12",
+  "candidateSha": "9145dffcbed2696b96f472532b4d32174d54dbd930bba78868f9f2ee9fa2d16b",
+  "baseSha": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+  "pinCount": 536,
+  "localClosure": 446,
+  "unresolved": 0,
+  "computed": 0,
+  "readbackDrift": [],
+  "status": "REQUEST_READY_PREFLIGHT_HOLD",
+  "testsExecuted": 0
+}

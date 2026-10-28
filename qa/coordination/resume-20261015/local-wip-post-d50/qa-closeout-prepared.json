@@ -1,0 +1,685 @@
+{
+  "schema": "qa-only-local-closeout-candidate/1",
+  "state": "PREPARED_WAITING_REMAINING_NATIVE_GUARD_BROKER_RELEASE_NO_STAGE",
+  "head": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "metadata59Manifest": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+  "metadata59ManifestSha256": "2848080ed754707b9932d6dd7f8fe11314478df0abb9e583d8cf30bfc8513250",
+  "entries": [
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af",
+      "beforeEcBlob": null,
+      "bytes": 4128,
+      "path": "qa/coordination/resume-20261015/broker/pin-manifests/85865c9c6f07e05cf5f36643b362b7101cf1821fdf1a2f70e9a751b5c819c3af.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "2290c30407e826aaeceea43e386e5264e668d3cfb5625405ba132803cf4b844e",
+      "beforeEcBlob": null,
+      "bytes": 1502,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-boundary2-receipt.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "!!",
+      "mutation": "add",
+      "sha256": "b277fa6585c6e6cde77bbfe79f5d4d15ee98a330aa8fb1ec6929087c2144721a",
+      "beforeEcBlob": null,
+      "bytes": 325,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-boundary2.log",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "68dc4322bbd5159cac23612393986a106dcc8a49ac532ba9cc6af30ef76272da",
+      "beforeEcBlob": null,
+      "bytes": 1003,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-contracts-receipt.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "!!",
+      "mutation": "add",
+      "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8",
+      "beforeEcBlob": null,
+      "bytes": 79,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-contracts.log",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "88cecf58722913b5ad2097576dbd1736250334a63a154dc0b5ac61a2885eb677",
+      "beforeEcBlob": null,
+      "bytes": 3018,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-final-seal.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "c6175d16a10ef24250a27f447c993b769d85e234fa28b358c9aa202ec107353c",
+      "beforeEcBlob": null,
+      "bytes": 2200,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-identity-receipt.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "!!",
+      "mutation": "add",
+      "sha256": "8365a5ca3d812e358fc5d4af712549bf86109689b16922cad73a6c5cf292516e",
+      "beforeEcBlob": null,
+      "bytes": 654,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-identity.log",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "09f291914a447b92ec4ec1172783d46cf651bd098416d0fcedf2175391e987ff",
+      "beforeEcBlob": null,
+      "bytes": 6322,
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-run.py",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "1e1389c56ef2130c4e70bdc1fe2c2f541f5adfb4fd3961780984b326e89da0f8",
+      "beforeEcBlob": null,
+      "bytes": 1358,
+      "path": "qa/coordination/resume-20261015/broker/watched-independent-probe-unexecuted.md",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "f8c6af3bad2e324852fa611939723dcb78f44d520484090c9f6ec046abd367d0",
+      "beforeEcBlob": null,
+      "bytes": 1117,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "49e436155f10042ef7e4c388200471ca1e4d222ac5e7fe13440fbdc65a04b166",
+      "beforeEcBlob": null,
+      "bytes": 823,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/allocation-before-gitbind.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "1f35b8fbdffdabdc72fd27639ee76e48664726979dc618b436bf52882a288465",
+      "beforeEcBlob": null,
+      "bytes": 781,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/allocation-commit-admission-input.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": " M",
+      "mutation": "modify",
+      "sha256": "1f35b8fbdffdabdc72fd27639ee76e48664726979dc618b436bf52882a288465",
+      "beforeEcBlob": "6e8ca9c82054b676a11db99adbad1b18f7d7ca36",
+      "bytes": 781,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/allocation.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "550a18a1b6c6bd2d636ca4db7ea7057d5d7b912603666799bca595f52b43d89b",
+      "beforeEcBlob": null,
+      "bytes": 1037,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/assess-commit-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "38650256a4e05a47df14e427c56f452fdc3959dab09bae49d031e6e466f06331",
+      "beforeEcBlob": null,
+      "bytes": 1063,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/checker-cycle0/probe-request.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": " M",
+      "mutation": "modify",
+      "sha256": "128a018b2cb826e7d01a5f236f17d11856b128ff695fdb66cd0f4daee03ae836",
+      "beforeEcBlob": "d46d0f5dcbf9226bfe76774fb63d81998dd681da",
+      "bytes": 2483,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/checker-prompt.txt",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "dbacd9d17ed8a8e81dc3cefc9935ae3c410882240e58fa91dc282377556f9561",
+      "beforeEcBlob": null,
+      "bytes": 1167,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/manifest-before.raw",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "af0febd1380aa98ec61eacad60969ab9fe9b5c9795dfb9b5bc83b6c7df75af60",
+      "beforeEcBlob": null,
+      "bytes": 72,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/manifest-parser-readback.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "def37cba7f7dffec912ce1ebaee4b8e5ec0e26265236ed72645c9ec943fae709",
+      "beforeEcBlob": null,
+      "bytes": 3155,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/receipt.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "a96ca72454a5b25f1e622eaaac3a24847c8ec1bbc1621082ca666cc88dd06d43",
+      "beforeEcBlob": null,
+      "bytes": 3006,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/source-eight-git-proof.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "f0be5b00cdb14632bf20e9f8feed10f1f9034e133580a69f1fb4182e6b714b32",
+      "beforeEcBlob": null,
+      "bytes": 159,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/verdict-parser-readback.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "c62646c3b9b98ee07be336a876fb7d5a48fa2e8f31ee5abaad592c51ec5f524e",
+      "beforeEcBlob": null,
+      "bytes": 3276,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/committed-eight-blobs.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "02cadd45b13baf3996649f4f8e9c6e7038096420c14ef75e97375327a9bb6ca0",
+      "beforeEcBlob": null,
+      "bytes": 467,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/allocation.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "0281270e783d149ac0be3e97e107f70681586d7d3436a3af0276b8a2bf34d65b",
+      "beforeEcBlob": null,
+      "bytes": 1055,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/assess-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "64b4d1815d6a8495c964c0a9481ae3a45f7e7a03ac6d48704cbf2151d125c67e",
+      "beforeEcBlob": null,
+      "bytes": 1933,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/carried-cycle1-receipt.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "674ae6ef6856c941dce12d8256709738286e006a20b64d32333b059cd77c58fa",
+      "beforeEcBlob": null,
+      "bytes": 1239,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/checker-prompt.txt",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "e1ef42f08c8eeea54e59cf3ae4a3dd5cd268105ed2285654ca682a5c3e2d2d61",
+      "beforeEcBlob": null,
+      "bytes": 4908,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/evidence/cycle1-verdict.md",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "389b9dacd6155d8b4df143e31cbd053e99da2a11f4c1668b74dfb17ded7154e1",
+      "beforeEcBlob": null,
+      "bytes": 1055,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/assess-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "37eaa3d8995ee3f20624c8dc9ac062462fc20c158806a602f20b62c47f6be4ba",
+      "beforeEcBlob": null,
+      "bytes": 598,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/broker-pending-checkpoint.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "5bdbb1e61bad938fddf714a719710380cc021cb7fa96ce371784a14e36e70624",
+      "beforeEcBlob": null,
+      "bytes": 3703,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/completion-accounting.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "4fea58416d7bda0eff0b185387f9bf652643a92d9fdf00b30cc3dc1dc9db8858",
+      "beforeEcBlob": null,
+      "bytes": 1082,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/finalization-assess.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "3086d1693f3f4889dd62b719e74da98525bbbb4611a5dee68df2d029c916c455",
+      "beforeEcBlob": null,
+      "bytes": 3218,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/finalization-input.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "886b93e2c4d3b85e6fbb5d594b2ec4b97789bd1b37a0b2f14905edeb4c537c49",
+      "beforeEcBlob": null,
+      "bytes": 601,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/receipt-reconciliation.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "5c09d1a7f3bc3b2dd9122ab3bfb4fb152d65315968f4fb4c95155af48b7b8822",
+      "beforeEcBlob": null,
+      "bytes": 478,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/reuse-reconciliation.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "94b6b9b5e84cf7fb75e171579105361eebdf005c2b0d154f113cecdba96629cd",
+      "beforeEcBlob": null,
+      "bytes": 1207,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/validate-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "a0178d4606ffe2a1da0ada90d262be7b932d0f41612d57bcc6ef3f978510d7c3",
+      "beforeEcBlob": null,
+      "bytes": 79,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/verdict-parser-readback.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "92afe6c1483a6b41567e47622a5ab6b62ad172bade3f16d773ab7fd5d89fa8b3",
+      "beforeEcBlob": null,
+      "bytes": 2293,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/metrics.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "9ab0ee6b7252fd35355724fa584b528fe284c36da07a64ad030f53a017a83e6a",
+      "beforeEcBlob": null,
+      "bytes": 13134,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/packet.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "97002b66addc180ce0b835d619998d3f98ceaeeb2f5f09094b7c5299fd0e4d97",
+      "beforeEcBlob": null,
+      "bytes": 4250,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/packet.md",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "0c892bc46709baa7cbd5f9007d3de2ccd19b1968c15439f3a9ede835c2b418f4",
+      "beforeEcBlob": null,
+      "bytes": 4807,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/probe-contract-request.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "6507abe766f1e7ff27d635042496f95c3c1d48879cf21fb331e61b586d185a83",
+      "beforeEcBlob": null,
+      "bytes": 1207,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/validate-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "758a627e8a0615727c1239a2ea3dc2817e353e24df70eb248d28276fa80f81ec",
+      "beforeEcBlob": null,
+      "bytes": 1037,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/assess-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "319784474b08a344fd389d32107bd66a5a9af98099e0c0a0ef27c3f73638f614",
+      "beforeEcBlob": null,
+      "bytes": 1334,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/completion-accounting.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "16b103192c98a18ed563cf758df1fbfd655b096af1ad9fc037633d6b3cbbc957",
+      "beforeEcBlob": null,
+      "bytes": 1061,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/finalization-assess.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "ed25dbb6f04cf8c3bc2662725fd5a330a35bdfea21b4e33df1ef7c3c7aa0a148",
+      "beforeEcBlob": null,
+      "bytes": 1959,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/finalization-input.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "7d28f230c8f15d6e758e6770cde183213000f8c07df1fca1c232af0c01a570e4",
+      "beforeEcBlob": null,
+      "bytes": 5865,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/identity.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "c937ff8e95929bc54ed8b847f3c53fe99171506cc225bd4a49b52c25f0718ee4",
+      "beforeEcBlob": null,
+      "bytes": 1189,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/validate-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "37d235b9a99c1b6174ea0d8b82ec430262c2da033ae4fef68096a473525dfa74",
+      "beforeEcBlob": null,
+      "bytes": 79,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/independent-checker/verdict-parser-readback.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "6d490f8f4fb1f75f122803093584bd6e2847664b60e56d24045a805f01be8789",
+      "beforeEcBlob": null,
+      "bytes": 1436,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/metrics-before-gitbind.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "31e1ce43ff9574bda6ea54d41df61ead440f0336b4c397cfacb8e296a0fb68ef",
+      "beforeEcBlob": null,
+      "bytes": 1412,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/metrics-commit-admission-input.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": " M",
+      "mutation": "modify",
+      "sha256": "31e1ce43ff9574bda6ea54d41df61ead440f0336b4c397cfacb8e296a0fb68ef",
+      "beforeEcBlob": "50dd2ef73023e57c879d260410722e91bf3ccbc7",
+      "bytes": 1412,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/metrics.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "b616d4b09dfcbe13b9e4fcdcdd2de2051901c53cdae16d61e84fffffe74e6a95",
+      "beforeEcBlob": null,
+      "bytes": 10789,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/packet-before-gitbind.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "1444f02369351b9e4b98969de5f909ee5e78a01e7b01b4c8565e296258e6161c",
+      "beforeEcBlob": null,
+      "bytes": 11274,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/packet-commit-admission-input.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": " M",
+      "mutation": "modify",
+      "sha256": "1444f02369351b9e4b98969de5f909ee5e78a01e7b01b4c8565e296258e6161c",
+      "beforeEcBlob": "4576d1e7eae75bde9aea8f2943344297f58edb81",
+      "bytes": 11274,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/packet.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": " M",
+      "mutation": "modify",
+      "sha256": "05d6c72843c4fed96d8a2b0d6166bc92b183c456357241c0e8e338e541c62316",
+      "beforeEcBlob": "ac41419ed8c5e0323d6b31561e28b97789565603",
+      "bytes": 7158,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/packet.md",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "0615beddf7fb5f037c7c66893f683d37f369efaef73795a0e0caf1fa922a67ab",
+      "beforeEcBlob": null,
+      "bytes": 1189,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/validate-commit-admission.json",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "d8cdc13bd5817e69561f7af04ce7df381c33874339b87da82957547941c7bddb",
+      "beforeEcBlob": null,
+      "bytes": 1840,
+      "path": "qa/manifests/watched-cadence-launcher.md",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "555679b1fc4eb12808d227cf53a35edac481eb3882ec21857bb9d1e1cfe15764",
+      "beforeEcBlob": null,
+      "bytes": 5122,
+      "path": "qa/verdicts/watched-cadence-launcher.md",
+      "owner": "checked-PASS cycle2 exact metadata"
+    },
+    {
+      "origin": "Root exact local QA-only checkpoint grant",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "2848080ed754707b9932d6dd7f8fe11314478df0abb9e583d8cf30bfc8513250",
+      "beforeEcBlob": null,
+      "bytes": 14715,
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/final-metadata-paths.json",
+      "owner": "root-authorized explicit QA supplement"
+    },
+    {
+      "origin": "Root exact local QA-only checkpoint grant",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "afd430830b3d3ca622acc658258f8b88a8b62606d82ff811a336904dd5f3b5d1",
+      "beforeEcBlob": null,
+      "bytes": 2450,
+      "path": "qa/coordination/resume-20261015/local-wip-post-d50/local-commit-receipt.json",
+      "owner": "root-authorized explicit QA supplement"
+    },
+    {
+      "origin": "Root exact local QA-only checkpoint grant",
+      "status": "??",
+      "mutation": "add",
+      "sha256": "f33999d443226823a6ea345b1deb9a3910d2120e8dbac6e3e680c8aa6c6f565f",
+      "beforeEcBlob": null,
+      "bytes": 5137,
+      "path": "qa/coordination/resume-20261015/native-next-maker/remaining-native-guards-request.json",
+      "owner": "root-authorized explicit QA supplement"
+    }
+  ],
+  "unchangedOmitted": [],
+  "counts": {
+    "bytes": 174555,
+    "paths": 62
+  },
+  "guardRequest": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/remaining-native-guards-request.json",
+    "sha256": "f33999d443226823a6ea345b1deb9a3910d2120e8dbac6e3e680c8aa6c6f565f"
+  },
+  "source8Pins": [
+    {
+      "path": "apps/api/src/connector-workflow/watched.ts",
+      "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0"
+    },
+    {
+      "path": "scripts/native-capture/server-watched.test.ts",
+      "sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910"
+    },
+    {
+      "path": "scripts/native-capture/server.ts",
+      "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389"
+    },
+    {
+      "path": "scripts/watched-sources/host.test.ts",
+      "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae"
+    },
+    {
+      "path": "scripts/watched-sources/host.ts",
+      "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa"
+    },
+    {
+      "path": "scripts/watched-sources/README.md",
+      "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8"
+    },
+    {
+      "path": "scripts/watched-sources/supervisor.ts",
+      "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583"
+    },
+    {
+      "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+      "path": "scripts/webinar/scheduler/service.d.mts"
+    }
+  ],
+  "source8ContentIdentity": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "scan": {
+    "valuesPersisted": false,
+    "findingCount": 0,
+    "findings": []
+  },
+  "indexEmpty": true,
+  "actions": {
+    "push": 0,
+    "commit": 0,
+    "stage": 0
+  },
+  "openGates": "Parent39 remains in_progress. Contracts invocation green by vacuity. Four native prerequisite skips, unexplained intermittent recovery, live/human/host/Mongo/downstream/release gates and unknown10%metrics remain open. Source8 independentPASS is local implementation/offline slice only."
+}

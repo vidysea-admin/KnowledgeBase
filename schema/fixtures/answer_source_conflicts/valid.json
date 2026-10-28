@@ -1,0 +1,42 @@
+{
+  "_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "id": "conflict-1",
+  "tenantId": "fixture-tenant",
+  "runId": "answer-1",
+  "createdAt": "2026-10-14T00:00:00.000Z",
+  "by": {
+    "actor": "api-key:synthetic"
+  },
+  "explanation": "Synthetic disagreement",
+  "a": {
+    "id": "source-1",
+    "origin": "internal",
+    "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": {
+      "node_id": "synthetic-node",
+      "evidence": {
+        "sessionRef": "synthetic-session",
+        "turnId": "synthetic-turn",
+        "quote": "Synthetic quoted evidence"
+      }
+    },
+    "excerpt": "Synthetic quoted evidence"
+  },
+  "b": {
+    "id": "source-2",
+    "origin": "internal",
+    "fingerprint": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "source": {
+      "node_id": "synthetic-node",
+      "evidence": {
+        "sessionRef": "synthetic-session",
+        "turnId": "synthetic-turn",
+        "quote": "Synthetic quoted evidence"
+      }
+    },
+    "excerpt": "Synthetic quoted evidence"
+  },
+  "candidateDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "evidenceDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "status": "open"
+}

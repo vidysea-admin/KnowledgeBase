@@ -1,0 +1,316 @@
+{
+  "kind": "BOUNDED_UI_CHECKER_SOURCE_READ_TRUNCATION_DIAGNOSIS",
+  "recorded_at": "2026-10-15T12:15:15.667Z",
+  "authorized_exception": "Only exact ui_revision_batch_checker source-read tool-call arguments and matching tool-result inspected; no general messages or environment values.",
+  "session_path": "C:/Users/product/.codex/sessions/2026/10/15/rollout-2026-10-15T12-06-03-01a13f74-8363-7600-97e6-976d3b666409.jsonl",
+  "source_call": {
+    "call_id": "call_e9ac706c2f0146acac7de271e68fb3dd",
+    "timestamp": "2026-10-15T12:06:40.081Z",
+    "outer_tool": "functions.exec (serialized name exec)",
+    "outer_pragma": null,
+    "outer_max_output_tokens": "omitted: default10000",
+    "nested_tool": "tools.exec_command",
+    "nested_max_output_tokens": 23000,
+    "source_command_style": "PowerShell here-string Python emits raw receipt text/index plus diff/keyword fragments",
+    "requested_files": [
+      "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.json",
+      "qa/goal-vectorless-2026-10-15/independent-ui-twelve-perunit-attribution.json",
+      "qa/goal-vectorless-2026-10-15/verification-ui-history-three-repair.json",
+      "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json",
+      "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json",
+      "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json",
+      "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.json",
+      "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/index.json",
+      "qa/contracts/goal-t058.md",
+      "qa/contracts/goal-T054.md"
+    ],
+    "printed_pin_map_entries": {
+      "web_types_before": 1675,
+      "web_types_after": 1675,
+      "web_build_before": 1675,
+      "web_build_after": 1675,
+      "total_these_two_receipts": 6700,
+      "other_receipt_and_index_maps": "Additional, not recounted or copied."
+    }
+  },
+  "observed_result": {
+    "nested_original_token_count": 260779,
+    "nested_truncated": true,
+    "outer_original_token_count": 24611,
+    "outer_tokens_truncated": 14611,
+    "outer_effective_retained_token_budget": 10000,
+    "retained_largest_text_utf8_bytes": 40107,
+    "serialized_matching_result_utf8_bytes": 43268,
+    "full_original_printed_stdout_bytes": null,
+    "full_stdout_bytes_reason": "Tool retained original token count, not complete original byte count. No estimate manufactured.",
+    "markers": [
+      "Warning: truncated output (original token count:260779)",
+      "Warning: truncated output (original token count:24611)",
+      "14611 tokens truncated"
+    ],
+    "visible_sections": {
+      "index_marker": false,
+      "diff_marker": true,
+      "consumer_fragments": true,
+      "helper_identity_tail": true
+    },
+    "earlier_calls": [
+      {
+        "call_id": "call_b320bece5014455b95673d6a8c71b97a",
+        "max_output_tokens": 18000,
+        "outer_pragma": null,
+        "retained_result_bytes": 27881
+      },
+      {
+        "call_id": "call_6ea08b74b3ce4955a9f8d1fe8c27c54f",
+        "max_output_tokens": 16000,
+        "outer_pragma": null,
+        "nested_original_token_count": 8776,
+        "retained_result_bytes": 42562
+      }
+    ]
+  },
+  "cause": "Raw full receipt printing duplicated6700 fingerprint entries from two1675-pin semantic/build receipts, plus composite and entire index; nested23000 output ceiling truncated first, then unconfigured outer10000 ceiling truncated again. Source visibility mixed changed diff and noncontiguous keyword windows; pins/gate authentication is not complete logic/receipt provenance review.",
+  "unread_or_incomplete_critical_scope": [
+    {
+      "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+      "ranges": [
+        [
+          19,
+          45
+        ],
+        [
+          46,
+          67
+        ],
+        [
+          97,
+          97
+        ]
+      ],
+      "symbols": [
+        "login/sessionVersion generation reset/load effect",
+        "show(next) authoritative summary update",
+        "action ownership guard",
+        "create/open/save/validate continuation guards",
+        "Saved drafts summary consumer"
+      ],
+      "visibility": "Only changed show hunk/context was requested through git diff; unchanged full guards/handlers and saved-row consumer were not deliberately printed as complete anchored blocks."
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+      "ranges": [
+        [
+          17,
+          38
+        ],
+        [
+          78,
+          99
+        ]
+      ],
+      "symbols": [
+        "current identity and canonical load ownership",
+        "reloadAfterRefresh",
+        "pending/failed warning + ReviewHistory callback mount"
+      ],
+      "visibility": "Changed warning hunk appears in retained tail; full load/reload ownership is outside that changed hunk and was not explicitly printed."
+    },
+    {
+      "path": "apps/web/src/api/knowledge-outputs.ts",
+      "ranges": [
+        [
+          1,
+          21
+        ]
+      ],
+      "symbols": [
+        "exact get/update/revalidate client endpoint and revision arguments"
+      ],
+      "visibility": "Keyword hits around getDraft/updateDraft/summary may select no matching current symbol; no complete anchored client block was requested."
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+      "ranges": [
+        [
+          7,
+          35
+        ]
+      ],
+      "symbols": [
+        "identity/generation invalidation",
+        "perform refresh/history",
+        "await onRefreshed terminal receipt"
+      ],
+      "visibility": "Consumer keyword-window fragments are visible; complete logical block coverage was not established."
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+      "ranges": [
+        [
+          7,
+          23
+        ]
+      ],
+      "symbols": [
+        "session route/selection and keyed editor mount"
+      ],
+      "visibility": "Keyword-window selection is not a complete mount ownership proof."
+    },
+    {
+      "path": "apps/web/src/api/transcriptReview.ts",
+      "ranges": [
+        [
+          16,
+          32
+        ],
+        [
+          62,
+          70
+        ]
+      ],
+      "symbols": [
+        "getTranscriptReview strict snapshot/refresh parser",
+        "refreshTranscriptReview expectedRevision client"
+      ],
+      "visibility": "Consumer fragments visible; exact full parsing/ownership consumption remains unverified."
+    }
+  ],
+  "visibility_precision": "These are exact complete blocks not authenticated as read. Retained diff/warning and keyword fragments can show portions; do not claim every listed line was wholly absent.",
+  "concrete_future_read_scope": {
+    "fingerprints": "Compare ALL supplied receipt fingerprint maps programmatically for before==after, current scoped identity and relevant runtime/lock/environment/import/command/base/candidate coherence; print ONLY file/map counts plus mismatches. Never print entire before/after/effectivePins/index.",
+    "receipt_whitelist": [
+      "path",
+      "own exitCode",
+      "testIDs and exact selected/pass/skip counts",
+      "base_sha",
+      "candidate_sha",
+      "command",
+      "runtime_version",
+      "runtime_executable_sha256",
+      "lock_hash",
+      "environment_hash",
+      "import_root",
+      "elapsedMs",
+      "before/after count",
+      "hashesUnchanged",
+      "stdout/stderr artifact paths"
+    ],
+    "logic": [
+      {
+        "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+        "complete_line_ranges": [
+          [
+            19,
+            45
+          ],
+          [
+            46,
+            67
+          ],
+          [
+            97,
+            97
+          ]
+        ],
+        "symbols": [
+          "login/sessionVersion generation reset/load effect",
+          "show(next) authoritative summary update",
+          "action ownership guard",
+          "create/open/save/validate continuation guards",
+          "Saved drafts summary consumer"
+        ]
+      },
+      {
+        "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+        "complete_line_ranges": [
+          [
+            17,
+            38
+          ],
+          [
+            78,
+            99
+          ]
+        ],
+        "symbols": [
+          "current identity and canonical load ownership",
+          "reloadAfterRefresh",
+          "pending/failed warning + ReviewHistory callback mount"
+        ]
+      },
+      {
+        "path": "apps/web/src/api/knowledge-outputs.ts",
+        "complete_line_ranges": [
+          [
+            1,
+            21
+          ]
+        ],
+        "symbols": [
+          "exact get/update/revalidate client endpoint and revision arguments"
+        ]
+      },
+      {
+        "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+        "complete_line_ranges": [
+          [
+            7,
+            35
+          ]
+        ],
+        "symbols": [
+          "identity/generation invalidation",
+          "perform refresh/history",
+          "await onRefreshed terminal receipt"
+        ]
+      },
+      {
+        "path": "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+        "complete_line_ranges": [
+          [
+            7,
+            23
+          ]
+        ],
+        "symbols": [
+          "session route/selection and keyed editor mount"
+        ]
+      },
+      {
+        "path": "apps/web/src/api/transcriptReview.ts",
+        "complete_line_ranges": [
+          [
+            16,
+            32
+          ],
+          [
+            62,
+            70
+          ]
+        ],
+        "symbols": [
+          "getTranscriptReview strict snapshot/refresh parser",
+          "refreshTranscriptReview expectedRevision client"
+        ]
+      }
+    ],
+    "diff": "Print only exact two-unit scoped hunks, no whole App/modules/index/stdout. Include complete unchanged ownership functions via anchored ranges above, avoiding keyword slices.",
+    "outer_tool_output": "Set explicit bounded outer max_output_tokens >= sum of intentionally printed whitelist/ranges; nested output no larger than outer. Truncation marker => incomplete/HOLD, no retry/reviewer admitted by this diagnosis."
+  },
+  "accounting": {
+    "fresh_ui_checker_actual": 224697,
+    "prior_transcript_actual": 294849,
+    "aggregate": 519546,
+    "maker_frozen": 6052313,
+    "breaches_preserved": true,
+    "no_wait_token_exclusion": true,
+    "no_new_authority_or_gate": true
+  },
+  "quality_task_b": {
+    "status": "CANCELLED_BY_ROOT_BEFORE_EXECUTION",
+    "no_other_actor_metadata_read": true,
+    "existing_authoritative_counter_reference": "qa/coordination/knowledge-brain-20261015/review-runtime-current-batch.json"
+  },
+  "no_tests_gate_reviewer_resume_or_source_edits": true
+}

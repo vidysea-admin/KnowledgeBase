@@ -1,0 +1,73 @@
+{
+  "format": "offline-hydration-audit-request-v1",
+  "root": "C:/Users/product/Desktop/KnowledgeBase/",
+  "providerCallsAllowed": false,
+  "credentialReadsAllowed": false,
+  "dbConnectionsAllowed": false,
+  "cpuBrokerOnly": true,
+  "executeAfterRootRelease": true,
+  "executeAfterNativeTwoGuardDiagnostic": true,
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "commands": [
+    {
+      "kind": "minimal-synthetic-guard-test",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs"
+      ],
+      "expectedTests": 1,
+      "outerTimeoutSeconds": 10
+    },
+    {
+      "kind": "actual-production-hydration",
+      "argv": [
+        ".venv/Scripts/python.exe",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/watchdog.py"
+      ],
+      "hardJobObjectSeconds": 60
+    }
+  ],
+  "pinsFile": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/pins.json",
+  "pinsSha256": "4a51ef591b9875bbfd310902d0cea9a727b8f204489824ebba5daefab59fba7d",
+  "files": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "8a236481011fad43fd570583cb2d1d16f641eae30cacd1f7adac8bdc68b534a8"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "sha256": "ae5a6a4f32653799b4e24ffefa6504901bd9991e16144cadd5c02228c329f84d"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs",
+      "sha256": "90ff34867664c572fa3bd852e95fc3841d4477c606afbd951931f2f24f27912c"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/watchdog.py",
+      "sha256": "2986eba111164c7f54993d88553c695a359639b292e51ccd0b6558d1d819070a"
+    }
+  ],
+  "runtimeRequirements": {
+    "node": "existing Codex primary Node; record version/executable hash",
+    "tsx": "existing pinned runtime helpers+lockfile",
+    "python": "existing .venv Python+verified Tree helper; broker record interpreter identity"
+  },
+  "expectedScope": {
+    "questions": 92,
+    "candidatesInventoried": 29,
+    "expectedSessionsHydrated": 23,
+    "candidatesWithoutQuestion": 6,
+    "acceptedDataPins": 119
+  },
+  "qualityClaims": {
+    "expectedSourceConditionedOnly": true,
+    "navigation": false,
+    "answerAccuracy": false,
+    "primaryPASS": false,
+    "humanLabels": false
+  },
+  "noRetryOnTimeout": true,
+  "noEnvRewrite": true
+}

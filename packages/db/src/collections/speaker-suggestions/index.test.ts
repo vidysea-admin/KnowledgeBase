@@ -1,0 +1,303 @@
+// U2.4 (D-141): the suggestion accessor against a stateful fake Db (no Mongo). The real scopedCollection runs
+// on top, so these tests pin tenant isolation, the confirm/reject state machine, idempotency, and the "never final" boundary.
+import assert from "node:assert/strict";
+import test from "node:test";
+import type { SpeakerSuggestions } from "@lkb/core";
+import {
+  confirmSpeakerSuggestion, insertSuggestionsIfAbsent, listRejected, listSessionSuggestions, rejectSpeakerSuggestion, toSuggestionView, HUMAN_CONFIRMED,
+} from "./index.js";
+import { memoryDb } from "./testdb.js";
+
+const NOW = new Date("2026-10-13T09:00:00.000Z");
+function doc(tenantId: string, sessionId = "s1", name = "Priya Nair", speakerRef = "spk:1"): SpeakerSuggestions {
+  const personId = `person:${name.toLowerCase().replace(/ /g, "-")}`;
+  return {
+    _id: `${tenantId}-${sessionId}-${speakerRef}-${personId}`, tenantId, sessionId, speakerRef, personId, displayName: name, status: "suggested",
+    provenance: [{ turnId: "t0", evidenceQuote: `${name}, what do you think about the new rules`, evidenceKind: "called-on" }],
+    evidence: [{ turnId: "t0", sessionId }], blocks: [{ startTurnIndex: 1, endTurnIndex: 1 }], suggestedAt: "2026-10-13T08:00:00.000Z",
+  };
+}
+const A = doc("tenant-A"), B = doc("tenant-B");
+async function seeded() {
+  const m = memoryDb();
+  m.seed("sessions", { _id: "s1", tenantId: "tenant-A" });
+  m.seed("sessions", { _id: "s1", tenantId: "tenant-B" });
+  assert.equal(await insertSuggestionsIfAbsent("tenant-A", "s1", [A], m.db), 1);
+  assert.equal(await insertSuggestionsIfAbsent("tenant-B", "s1", [B], m.db), 1);
+  return m;
+}
+const finalRows = (m: ReturnType<typeof memoryDb>, tenantId: string) => m.rows("speakers").filter((r) => r.tenantId === tenantId);
+
+test("inserting a suggestion writes ONLY speaker_suggestions: nothing becomes a final speaker", async () => {
+  const m = await seeded();
+  assert.equal(m.rows("speakers").length, 0);
+  assert.equal(m.rows("speaker_suggestions").length, 2);
+});
+
+test("tenant B cannot list, confirm or reject tenant A's suggestion (same session id, same suggestion id)", async () => {
+  const m = await seeded();
+  assert.deepEqual((await listSessionSuggestions("tenant-B", "s1", m.db)).map((s) => s.id), [B._id], "B sees only its own");
+  assert.deepEqual(await listSessionSuggestions("tenant-C", "s1", m.db), []);
+  assert.deepEqual(await confirmSpeakerSuggestion("tenant-C", "s1", A._id, m.db, NOW), { result: "not_found" });
+  assert.deepEqual(await rejectSpeakerSuggestion("tenant-C", "s1", A._id, m.db, NOW), { result: "not_found" });
+  assert.deepEqual(await confirmSpeakerSuggestion("tenant-B", "s1", A._id, m.db, NOW), { result: "not_found" }, "A's id through B's scope");
+  assert.deepEqual(await rejectSpeakerSuggestion("tenant-B", "s1", A._id, m.db, NOW), { result: "not_found" });
+  assert.equal(m.rows("speaker_suggestions").find((r) => r._id === A._id)?.status, "suggested", "A's row untouched");
+  assert.equal(m.rows("speakers").length, 0, "no final row written by the foreign attempts");
+});
+
+test("a suggestion belongs to its session: the right id under another session is not found", async () => {
+  const m = await seeded();
+  assert.deepEqual(await confirmSpeakerSuggestion("tenant-A", "s2", A._id, m.db, NOW), { result: "not_found" });
+  assert.deepEqual(await rejectSpeakerSuggestion("tenant-A", "s2", A._id, m.db, NOW), { result: "not_found" });
+  assert.deepEqual(await listSessionSuggestions("tenant-A", "s2", m.db), []);
+});
+
+test("confirm makes the name final with the human-confirmed provenance, in the caller's tenant only", async () => {
+  const m = await seeded();
+  const r = await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  assert.equal(r.result, "ok");
+  assert.equal(r.result === "ok" && r.changed, true);
+  const s = m.rows("speaker_suggestions").find((x) => x._id === A._id)!;
+  assert.deepEqual([s.status, s.finalProvenance, s.decidedAt], ["confirmed", HUMAN_CONFIRMED, NOW.toISOString()]);
+  const finals = finalRows(m, "tenant-A");
+  assert.equal(finals.length, 1);
+  assert.deepEqual([finals[0]!.personId, finals[0]!.aliases, finals[0]!.provenance, finals[0]!._id], ["person:priya-nair", ["Priya Nair"], HUMAN_CONFIRMED, "tenant-A-person:priya-nair"]);
+  assert.deepEqual(finals[0]!.evidence, [{ turnId: "t0", sessionId: "s1" }]);
+  assert.equal(finalRows(m, "tenant-B").length, 0, "tenant B has no final speaker");
+  assert.equal(m.rows("speaker_suggestions").find((x) => x._id === B._id)?.status, "suggested");
+});
+
+test("confirm is idempotent: a repeat changes nothing and writes no duplicate final row", async () => {
+  const m = await seeded();
+  await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  const snapshot = JSON.stringify([m.rows("speakers"), m.rows("speaker_suggestions")]);
+  const again = await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m.db, new Date("2030-01-01"));
+  assert.equal(again.result === "ok" && again.changed, false);
+  assert.equal(JSON.stringify([m.rows("speakers"), m.rows("speaker_suggestions")]), snapshot);
+});
+
+test("confirm extends an existing final speaker instead of replacing it, and keeps its other evidence", async () => {
+  const m = await seeded();
+  m.seed("speakers", { _id: "tenant-A-person:priya-nair", tenantId: "tenant-A", personId: "person:priya-nair", aliases: ["Priya"], confidence: 0.9, evidence: [{ turnId: "tx", sessionId: "s9" }] });
+  await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  const f = finalRows(m, "tenant-A");
+  assert.equal(f.length, 1);
+  assert.deepEqual(f[0]!.aliases, ["Priya", "Priya Nair"]);
+  assert.equal((f[0]!.evidence as unknown[]).length, 2);
+  assert.equal(f[0]!.confidence, 0.9, "an existing confidence is not overwritten");
+  assert.equal((f[0]!.confirmations as unknown[]).length, 1);
+});
+
+test("reject stores the rejection, writes no final speaker, is idempotent, and is hidden from the list", async () => {
+  const m = await seeded();
+  const r = await rejectSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  assert.equal(r.result === "ok" && r.changed, true);
+  assert.equal(m.rows("speakers").length, 0);
+  const again = await rejectSpeakerSuggestion("tenant-A", "s1", A._id, m.db, new Date("2031-01-01"));
+  assert.equal(again.result === "ok" && again.changed, false);
+  assert.equal(m.rows("speaker_suggestions").find((x) => x._id === A._id)?.decidedAt, NOW.toISOString(), "first decision time is kept");
+  assert.deepEqual(await listSessionSuggestions("tenant-A", "s1", m.db), []);
+  assert.deepEqual(await listRejected("tenant-A", "s1", m.db), [{ speakerRef: "spk:1", personId: "person:priya-nair" }]);
+  assert.deepEqual(await listRejected("tenant-B", "s1", m.db), [], "B's rejections are B's");
+});
+
+test("a rejected name is not re-suggested: inserting the same suggestion again leaves the rejection untouched", async () => {
+  const m = await seeded();
+  await rejectSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  assert.equal(await insertSuggestionsIfAbsent("tenant-A", "s1", [A], m.db), 0);
+  assert.equal(m.rows("speaker_suggestions").find((x) => x._id === A._id)?.status, "rejected");
+  assert.deepEqual(await listSessionSuggestions("tenant-A", "s1", m.db), []);
+});
+
+test("re-suggesting after a confirm does not reset it either", async () => {
+  const m = await seeded();
+  await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  assert.equal(await insertSuggestionsIfAbsent("tenant-A", "s1", [A], m.db), 0);
+  assert.equal(m.rows("speaker_suggestions").find((x) => x._id === A._id)?.status, "confirmed");
+});
+
+test("confirm after reject, and reject after confirm, are conflicts and change nothing", async () => {
+  const m = await seeded();
+  await rejectSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW);
+  assert.deepEqual(await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m.db, NOW), { result: "conflict", status: "rejected" });
+  assert.equal(m.rows("speakers").length, 0, "a rejected name can never become final");
+  const m2 = await seeded();
+  await confirmSpeakerSuggestion("tenant-A", "s1", A._id, m2.db, NOW);
+  assert.deepEqual(await rejectSpeakerSuggestion("tenant-A", "s1", A._id, m2.db, NOW), { result: "conflict", status: "confirmed" });
+  assert.equal(m2.rows("speaker_suggestions").find((x) => x._id === A._id)?.status, "confirmed");
+});
+
+test("a malformed id or tenant is refused without touching anything", async () => {
+  const m = await seeded();
+  for (const bad of ["", "../x", "a b", { $ne: null } as never]) {
+    assert.deepEqual(await confirmSpeakerSuggestion("tenant-A", "s1", bad, m.db, NOW), { result: "not_found" });
+    assert.deepEqual(await rejectSpeakerSuggestion("tenant-A", "s1", bad, m.db, NOW), { result: "not_found" });
+  }
+  await assert.rejects(confirmSpeakerSuggestion("", "s1", A._id, m.db, NOW));
+  await assert.rejects(listSessionSuggestions({ $ne: null } as never, "s1", m.db));
+});
+
+test("insertSuggestionsIfAbsent refuses a non-suggested row and a row of another session", async () => {
+  const m = memoryDb();
+  await assert.rejects(insertSuggestionsIfAbsent("tenant-A", "s1", [{ ...A, status: "confirmed" }], m.db));
+  await assert.rejects(insertSuggestionsIfAbsent("tenant-A", "s2", [A], m.db));
+  assert.equal(m.rows("speaker_suggestions").length, 0);
+});
+
+test("the view carries quote and kind, calls the name `suggestedName`, and has no speakers-shaped fields", () => {
+  const v = toSuggestionView(A);
+  assert.deepEqual(v.quotes, [{ turnId: "t0", quote: "Priya Nair, what do you think about the new rules", kind: "called-on" }]);
+  assert.equal(v.suggestedName, "Priya Nair");
+  for (const k of ["aliases", "personId", "displayName", "tenantId", "confidence", "evidence", "finalProvenance"]) assert.equal(k in v, false, k);
+});
+
+test("a kind=tile suggestion (T-042, D-160) is stored as suggested, writes no final speaker, and only a human confirm makes it final", async () => {
+  const m = memoryDb();
+  const t: SpeakerSuggestions = { ...doc("tenant-A", "s1", "Asha Rao", "spk:2"), provenance: [{ turnId: "t5", evidenceQuote: 'Meet tile "Asha Rao" was highlighted while spk:2 spoke (tile-only, 0.0s to 40.0s)', evidenceKind: "tile" }] };
+  assert.equal(await insertSuggestionsIfAbsent("tenant-A", "s1", [t], m.db), 1);
+  assert.equal(m.rows("speakers").length, 0);
+  assert.deepEqual(await listSessionSuggestions("tenant-A", "s1", m.db), []);
+  seedNative(m, t);
+  const r = await confirmSpeakerSuggestion("tenant-A", "s1", t._id, m.db, NOW);
+  assert.equal(r.result, "ok");
+  assert.equal(m.rows("speakers").length, 1);
+  assert.equal(m.rows("speakers")[0]!.provenance, HUMAN_CONFIRMED);
+});
+
+
+const BINDING = { sourceId: "native-source", generation: "index-generation", turnDigest: "b".repeat(64), reviewRevision: null,
+  captureGeneration: "capture-generation", receiptSha256: "a".repeat(64) };
+function seedNative(m: ReturnType<typeof memoryDb>, suggestion: SpeakerSuggestions) {
+  m.seed("sessions", { _id: suggestion.sessionId, tenantId: suggestion.tenantId, sourceId: BINDING.sourceId,
+    status: { index: "done" }, indexAttempt: { sessionId: suggestion.sessionId, sourceId: BINDING.sourceId,
+      generation: BINDING.generation, turnDigest: BINDING.turnDigest, state: "complete" } });
+  m.seed("sources", { _id: BINDING.sourceId, tenantId: suggestion.tenantId, kind: "recording", hash: "c".repeat(64),
+    consent: { given: true }, captureConsent: { sessionId: suggestion.sessionId, generation: BINDING.captureGeneration,
+      receiptSha256: BINDING.receiptSha256, sanitizedAudioSha256: "c".repeat(64) } });
+  m.rows("speaker_suggestions").find(r => r._id === suggestion._id)!.nativePublication = { ...BINDING };
+}
+async function nativeSeeded() {
+  const m = memoryDb();
+  const row: SpeakerSuggestions = { ...A, provenance: [{ ...A.provenance[0]!, evidenceKind: "tile" }] };
+  await insertSuggestionsIfAbsent("tenant-A", "s1", [row], m.db);
+  seedNative(m, row);
+  return { m, row };
+}
+
+test("native pending and confirmed evidence fail closed after generation, capture, review or owner drift", async () => {
+  for (const drift of ["generation", "receipt", "review", "owner", "withdrawal", "hash"]) {
+    const { m, row } = await nativeSeeded();
+    assert.equal((await listSessionSuggestions("tenant-A", "s1", m.db)).length, 1);
+    if (drift === "generation") (m.rows("sessions")[0]!.indexAttempt as Record<string, unknown>).generation = "new-generation";
+    if (drift === "receipt") (m.rows("sources")[0]!.captureConsent as Record<string, unknown>).receiptSha256 = "d".repeat(64);
+    if (drift === "review") m.seed("transcript_reviews", { _id: "head", tenantId: "tenant-A", sessionId: "s1", revision: "r2" });
+    if (drift === "owner") m.seed("sessions", { _id: "second", tenantId: "tenant-A", sourceId: BINDING.sourceId });
+    if (drift === "withdrawal") m.rows("sources")[0]!.consent = { given: false };
+    if (drift === "hash") m.rows("sources")[0]!.hash = "e".repeat(64);
+    assert.deepEqual(await listSessionSuggestions("tenant-A", "s1", m.db), [], drift);
+    await assert.rejects(confirmSpeakerSuggestion("tenant-A", "s1", row._id, m.db), /native_publication/);
+    assert.equal(m.rows("speaker_suggestions")[0]!.status, "suggested");
+    assert.equal(m.rows("speakers").length, 0);
+    m.rows("speaker_suggestions")[0]!.status = "confirmed";
+    assert.deepEqual(await listSessionSuggestions("tenant-A", "s1", m.db), [], `confirmed ${drift}`);
+  }
+});
+
+test("callers cannot supply a machine publication binding", async () => {
+  const m = memoryDb();
+  await assert.rejects(insertSuggestionsIfAbsent("tenant-A", "s1", [{ ...A, nativePublication: BINDING }], m.db), /must be trusted/);
+});
+
+test("native final-write failure rolls back the decision and session fence", async () => {
+  const { m, row } = await nativeSeeded();
+  const original = m.db.collection.bind(m.db);
+  m.db.collection = ((name: string) => {
+    if (name === "speakers") return { updateOne: async () => { throw new Error("injected final write failure"); } };
+    return original(name);
+  }) as typeof m.db.collection;
+  await assert.rejects(confirmSpeakerSuggestion("tenant-A", "s1", row._id, m.db), /injected/);
+  assert.equal(m.rows("speaker_suggestions")[0]!.status, "suggested");
+  assert.equal(m.rows("sessions")[0]!.nativePublicationRevision, undefined);
+  assert.equal(m.rows("speakers").length, 0);
+});
+
+import { bumpNativePublicationRevision, nativePublicationTransactionView, runNativePublicationTransaction } from "../../lib/native-publication.js";
+
+test("publication fence uses a real increment and refuses malformed/exhausted counters without changes", async () => {
+  for (const revision of [undefined, 0, 4, -1, 1.5, "4", Number.MAX_SAFE_INTEGER]) {
+    const m = memoryDb();
+    m.seed("sessions", { _id: "s1", tenantId: "tenant-A", ...(revision === undefined ? {} : { nativePublicationRevision: revision }) });
+    const run = () => runNativePublicationTransaction(m.db, "tenant-A", tx => bumpNativePublicationRevision(tx, "tenant-A", "s1"));
+    if (revision === undefined || revision === 0 || revision === 4) {
+      assert.equal(await run(), Number(revision ?? 0) + 1);
+      assert.equal(m.rows("sessions")[0]!.nativePublicationRevision, Number(revision ?? 0) + 1);
+    } else {
+      await assert.rejects(run());
+      assert.equal(m.rows("sessions")[0]!.nativePublicationRevision, revision);
+    }
+  }
+});
+
+test("unknown commit retries only commit three times and never replays work or aborts", async () => {
+  const m = memoryDb();
+  let work = 0, commits = 0, aborts = 0;
+  const error = Object.assign(new Error("unknown commit"), { hasErrorLabel: (label: string) => label === "UnknownTransactionCommitResult" });
+  Object.assign(m.db.client, { startSession: () => ({ startTransaction() {}, inTransaction: () => true,
+    async commitTransaction() { commits++; throw error; }, async abortTransaction() { aborts++; }, async endSession() {} }) });
+  await assert.rejects(runNativePublicationTransaction(m.db, "tenant-A", async () => { work++; }), /unknown commit/);
+  assert.deepEqual([work, commits, aborts], [1, 3, 0]);
+});
+
+test("transaction view binds tenant/session, serializes operations and refuses nesting", async () => {
+  const m = memoryDb();
+  await runNativePublicationTransaction(m.db, "tenant-A", async tx => {
+    await assert.rejects(runNativePublicationTransaction(tx, "tenant-A", async () => {}), /transaction_required/);
+    await assert.rejects(tx.collection("sessions").findOne({ tenantId: "tenant-B" }), /tenant_mismatch/);
+    assert.equal(await tx.collection("sessions").findOne({ tenantId: "tenant-A" }), null,
+      "a refused local query never reaches Mongo or poisons later scoped operations");
+  });
+  assert.throws(() => nativePublicationTransactionView(m.db, { inTransaction: () => false } as never, "tenant-A"), /transaction_required/);
+});
+
+test("caught actual operation failure still poisons transaction and rolls back earlier writes", async () => {
+  const m = memoryDb();
+  m.seed("sessions", { _id: "s1", tenantId: "tenant-A", nativePublicationRevision: 0 });
+  await assert.rejects(runNativePublicationTransaction(m.db, "tenant-A", async tx => {
+    await bumpNativePublicationRevision(tx, "tenant-A", "s1");
+    await assert.rejects(tx.collection("sessions").updateOne({ _id: "s1" as never, tenantId: "tenant-A" },
+      { $unsupported: { retained: true } } as never), /unsupported update operator/);
+  }), /unsupported update operator/);
+  assert.equal(m.rows("sessions")[0]!.nativePublicationRevision, 0);
+});
+
+test("stale native suggestions can be rejected, including after source or session deletion", async () => {
+  for (const drift of ["generation", "source-deleted", "session-deleted"]) {
+    const { m, row } = await nativeSeeded();
+    if (drift === "generation") (m.rows("sessions")[0]!.indexAttempt as Record<string, unknown>).generation = "superseded";
+    if (drift === "source-deleted") m.rows("sources").splice(0);
+    if (drift === "session-deleted") m.rows("sessions").splice(0);
+    const result = await rejectSpeakerSuggestion("tenant-A", "s1", row._id, m.db, NOW);
+    assert.equal(result.result === "ok" && result.changed, true, drift);
+    assert.equal(m.rows("speaker_suggestions")[0]!.status, "rejected");
+    assert.equal(m.rows("speakers").length, 0);
+    if (drift !== "session-deleted") assert.equal(m.rows("sessions")[0]!.nativePublicationRevision, 1);
+    assert.equal((await rejectSpeakerSuggestion("tenant-A", "s1", row._id, m.db, NOW)).result, "ok");
+    assert.deepEqual(await rejectSpeakerSuggestion("tenant-B", "s1", row._id, m.db, NOW), { result: "not_found" });
+  }
+});
+
+test("historical confirmed native audit remains but stale confirmation repair adds no evidence", async () => {
+  for (const drift of ["generation", "source-deleted", "session-deleted"]) {
+    const { m, row } = await nativeSeeded();
+    await confirmSpeakerSuggestion("tenant-A", "s1", row._id, m.db, NOW);
+    if (drift === "generation") (m.rows("sessions")[0]!.indexAttempt as Record<string, unknown>).generation = "superseded";
+    if (drift === "source-deleted") m.rows("sources").splice(0);
+    if (drift === "session-deleted") m.rows("sessions").splice(0);
+    m.rows("speakers").splice(0); // A retry must not recreate deleted final evidence from stale binding.
+    await assert.rejects(confirmSpeakerSuggestion("tenant-A", "s1", row._id, m.db, NOW), /native_publication/);
+    assert.equal(m.rows("speaker_suggestions")[0]!.status, "confirmed", drift);
+    assert.equal(m.rows("speakers").length, 0);
+    assert.deepEqual(await listSessionSuggestions("tenant-A", "s1", m.db), []);
+  }
+});

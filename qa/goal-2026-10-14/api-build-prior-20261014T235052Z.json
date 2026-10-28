@@ -1,0 +1,19 @@
+{
+  "phase": "api-build",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+    "--filter",
+    "@lkb/api",
+    "build"
+  ],
+  "pid": 24560,
+  "exit": 0,
+  "signal": null,
+  "timedOut": false,
+  "startedAt": "2026-10-14T23:41:26.611Z",
+  "endedAt": "2026-10-14T23:41:28.762Z",
+  "elapsedMs": 2151,
+  "stdout": "\n> @lkb/api@0.0.0 build C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\n> node scripts/build.mjs\n\nbuilt apps\\api\\dist\\server.js (1304105 bytes)\nexternal packages: @langchain/langgraph, ajv/dist/2020.js, dotenv, express, express-rate-limit, mongodb, pdfjs-dist/legacy/build/pdf.mjs\n",
+  "stderr": ""
+}

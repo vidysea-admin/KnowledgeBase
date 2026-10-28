@@ -1,0 +1,16 @@
+✔ review authority unset configuration denies all and malformed input refuses startup (2.4007ms)
+✔ review authority rejects duplicate tenants keys actions and malformed records atomically (0.7872ms)
+✔ review authority configuration bounds tenant key and total inventories (5.0597ms)
+✔ review authority resolves immutable tenant and nonsecret key identity only (0.6204ms)
+✔ review authority refuses malformed verified principals without scope-based promotion (0.6325ms)
+✔ review authority answer adapter grants only configured human actions ignoring caller claims (1.1673ms)
+✔ review authority relationship adapter copies explicit policy without human inference (0.4386ms)
+✔ review authority adapters reject foreign resolver authority and propagate safe refusal failures (0.5888ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 494.2841

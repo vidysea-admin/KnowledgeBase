@@ -1,0 +1,11 @@
+{
+  "unit": "t040-grounded-product-composition",
+  "cycle": 1,
+  "capturedAt": "2026-10-14T22:38:59.7950130Z",
+  "testsExecuted": false,
+  "previousSpec": "F5698464FDB181FF97C44E9B2F29009B3085805A5F59F84309641B05A0105D6E",
+  "plannerPrevious": "295CCF510EDF1006E1F9F77BB31FE66A24662E4A722F30CC9143457AA2794865",
+  "plannerCurrent": "F2512AA5E2022F87EA4F9B9F6D71DDBABBB0ACC75D18598F3184BD11A6E3BE6F",
+  "sourceContextCurrent": "1F084B8F14764A097D4D826AB3AD431945FC35563C67D1EB9EDAB2B75009FB8F",
+  "review": "Planner forbids visual source speaker identity promotion and requires existing immutable visual prefix in corrections. Hydrator recognizes physical screenEvidence despite mutable labels, refuses unresolved screen marker and emits screen origin/unverified. Ordinary speech positive fixture behavior unchanged. T041/T054 own actual cross-seam proof separately required; this map is not execution."
+}

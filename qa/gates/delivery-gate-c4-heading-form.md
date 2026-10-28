@@ -64,3 +64,5 @@ ISS-205.
 ---
 
 **Answered:** 2026-09-25 — **A** — amend C4 to drop the heading form. Answered by Umesh in session (AskUserQuestion, 2026-09-25). Verdicts standardise on an own-line `**Cycle checked:** N`; both live sessions already do this. Next: DECISIONS entry carrying Approved-by: Umesh, then the checker amends C4.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-25 — **A** — amend C4 to drop the heading form. Answered by Umesh in session (AskUserQuestion, 2026-09

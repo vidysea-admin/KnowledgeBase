@@ -1,0 +1,37 @@
+[
+  {
+    "nonblank": 296,
+    "path": "packages/meeting-bot/src/capture/native/native-spool.ts",
+    "sha256": "4bf3ca520234980965f2507f591254b03bffabfff62971c5f45d49c3b2320b07"
+  },
+  {
+    "nonblank": 151,
+    "path": "packages/meeting-bot/src/capture/native/native-media-types.ts",
+    "sha256": "3a33f1f0135ea131b2a1132cdef91abe7cad90530d152c82b3e2c73bfd6413d0"
+  },
+  {
+    "nonblank": 155,
+    "path": "packages/meeting-bot/src/capture/native/native-tab-receiver.ts",
+    "sha256": "31cef23b8acac32cfe0359587e221537cc7b879f6345dece20d5264a3ae87c64"
+  },
+  {
+    "nonblank": 270,
+    "path": "packages/meeting-bot/src/capture/tab-browser.ts",
+    "sha256": "f149985b40a7e991a19e0bbcb1a6a1904d67f7b12215c6acebd7068097901fec"
+  },
+  {
+    "nonblank": 207,
+    "path": "packages/meeting-bot/src/capture/tiles/registry.ts",
+    "sha256": "be86f574b267e694d62fd469a385d317a2fd58b01400ae2c3f15be54a9e2f36a"
+  },
+  {
+    "nonblank": 171,
+    "path": "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "sha256": "0e31306c9dabfb3da1fa8e6cfcd5060358ddbb568415aa24ccc1b058d4cb13d7"
+  },
+  {
+    "nonblank": 28,
+    "path": "packages/meeting-bot/src/capture/tiles/registry-types.ts",
+    "sha256": "bbf5fd274fdf5414b6ee8078b0c439882cd8840b516f04f3ce80e5ab11b02e61"
+  }
+]

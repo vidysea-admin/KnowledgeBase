@@ -1,0 +1,5 @@
+   × individual extraction gold review > requires fresh affirmation and stores one native label against current revision/input 89ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+TestingLibraryElementError: Unable to find an element with the text: Authenticated review audit. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+      Tests  1 failed | 8 passed (9)
+exit=1

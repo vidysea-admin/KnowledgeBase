@@ -133,3 +133,5 @@ HEAD (empty diff) — this really was a pure test-coverage unit.
    Latent, not live (no real `$unset` call exists in `indexSession` today), and explicitly does not
    invalidate this unit's own claim — a distinct call shape, next in the queue.
 5. Full suite 335/335, typecheck 10/10 clean.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

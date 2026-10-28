@@ -1,0 +1,26 @@
+{
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "tokens": null,
+      "id": "canonical-adoption-checker",
+      "active_s": 35
+    }
+  ],
+  "next_phase": {
+    "cost": null,
+    "tokens": 4000,
+    "active_s": 90
+  },
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "bootstrap_scope": "Canonical adoption independent source, receipts, pins, focused probe and verdict review; earlier overhead reported separately pending coordinator accounting",
+  "escalation": null
+}

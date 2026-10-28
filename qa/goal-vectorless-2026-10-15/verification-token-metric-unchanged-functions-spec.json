@@ -1,0 +1,32 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "scope": "Staged budget all top-level functions except assess unchanged AST and exact raw line bytes",
+  "phase": "maker-verification",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change",
+  "program": "C:/Program Files/Python312/python.exe",
+  "args": [
+    "-B",
+    "-c",
+    "import ast,hashlib,json,pathlib\na=pathlib.Path('qa/coordination/checker-completion-reserve-20261015/broker-canonical20/review_budget.py');b=pathlib.Path('qa/coordination/checker-runtime-total-20261015/review_budget.py')\nab=a.read_bytes();bb=b.read_bytes();assert hashlib.sha256(ab).hexdigest()=='36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e';assert hashlib.sha256(bb).hexdigest()=='2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2'\ndef functions(raw):\n lines=raw.splitlines(keepends=True);tree=ast.parse(raw);return {n.name:(ast.dump(n,include_attributes=False),b''.join(lines[n.lineno-1:n.end_lineno])) for n in tree.body if isinstance(n,(ast.FunctionDef,ast.AsyncFunctionDef)) and n.name!='assess'}\naf=functions(ab);bf=functions(bb);assert af.keys()==bf.keys(); rows=[]\nfor name in af:\n astSame=af[name][0]==bf[name][0];rawSame=af[name][1]==bf[name][1];rows.append({'name':name,'astUnchanged':astSame,'rawBytesUnchanged':rawSame,'sha256':hashlib.sha256(af[name][1]).hexdigest()});assert astSame and rawSame,name\nprint(json.dumps({'kind':'top-level-functions-except-assess','baselineSha256':hashlib.sha256(ab).hexdigest(),'stagedSha256':hashlib.sha256(bb).hexdigest(),'functions':rows,'allUnchanged':True}))"
+  ],
+  "testIDs": [
+    "all top-level functions except assess"
+  ],
+  "expectedSelectedNames": [],
+  "expectedPrivateSkips": 0,
+  "env": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "timeoutMs": 10000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-token-metric-unchanged-functions",
+  "pins": {
+    "qa/coordination/checker-completion-reserve-20261015/broker-canonical20/review_budget.py": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+    "qa/coordination/checker-runtime-total-20261015/review_budget.py": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2"
+  }
+}

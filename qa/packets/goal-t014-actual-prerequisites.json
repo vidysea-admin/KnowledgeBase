@@ -1,0 +1,71 @@
+{
+  "$schema": "goal-t014-actual-input.schema.json",
+  "task": "T-014",
+  "packetKind": "actual-event-prerequisite-intake",
+  "asOf": "2026-10-15",
+  "authorizationState": "NOT_AUTHORIZED_TO_RUN",
+  "fullTask": "HOLD",
+  "softwareHandshake": { "cycle": 0, "status": "checked-PASS", "manifest": "qa/manifests/goal-t014.md", "verdict": "qa/verdicts/goal-t014.md" },
+  "acceptedBaseline": {
+    "reference": "brainstorms/2026-09-03-lkb-counsellor-assumptions.md#Q1 lines 35-40",
+    "comparison": "blind head-to-head on identical real questions, independent-human panel scored",
+    "win": "per-counsellor majority, >50% preferred, over 100+ real questions",
+    "internalStreakCount": null,
+    "tieMissingWithdrawalAggregationProtocol": null
+  },
+  "candidateSources": [
+    {
+      "kind": "toc",
+      "reference": "raw/TOC/TOC-Materials/Transcripts-v2/27th-August-In-Focus.diarized-transcript-v3.md",
+      "fileSha256": "cf64fa8f442c20fe77e9c97e6f69cc505f07af17aba649de59003555110db03a",
+      "locator": "line 71, Devesh question at 45:14; answer line 73 at 46:20; line 69 shares timestamp",
+      "topic": "preparation duration for university-specific entrance exams",
+      "status": "CANDIDATE_ONLY",
+      "exactText": null,
+      "humanReviewEvidence": null,
+      "aiExposure": "Transcript inspected by AI; cannot prove pre-exposure bank freeze. No adopted final bank claimed."
+    }
+  ],
+  "actualInputs": {
+    "eventTitle": null,
+    "acceptedQuestions": [],
+    "bankReviewer": null,
+    "bankApprovalReference": null,
+    "bankDigest": null,
+    "frozenAt": null,
+    "freezeReceiptReference": null,
+    "exposureCustodian": null,
+    "preExposureEvidenceReference": null,
+    "counsellors": [],
+    "judges": [],
+    "panelAcceptanceReference": null,
+    "rubric": null,
+    "conditionsReference": null,
+    "blindMappingCustodian": null,
+    "blindMappingReference": null,
+    "outcomeProtocolReference": null,
+    "qualifyingInternalRunReferences": [],
+    "t012RealAcceptanceReference": null,
+    "t013FullAcceptanceReference": null,
+    "mongoOperationalEvidenceReference": null,
+    "eventAuthorizationReference": null,
+    "scheduledAt": null,
+    "mediumOrVenue": null,
+    "publicationScopeReference": null,
+    "actualTrialReferences": [],
+    "actualPublicEventEvidenceReference": null
+  },
+  "gates": [
+    { "id": "authentic-reviewed-bank", "status": "UNRESOLVED", "required": "100+ adopted authentic questions, D-007 de-identification, named human approval of exact version/digest", "evidence": [] },
+    { "id": "freeze-before-ai-exposure", "status": "UNRESOLVED", "required": "Actual final-bank digest/freeze receipt and custodian exposure log; reconcile already AI-inspected candidate", "evidence": [] },
+    { "id": "real-counsellor-roster", "status": "UNRESOLVED", "required": "Umesh Q3 resolution, actual nomination/participation/public-identity consent records", "evidence": [] },
+    { "id": "independent-human-panel", "status": "UNRESOLVED", "required": "Named consenting independent judges, conflicts/independence and panel acceptance records", "evidence": [] },
+    { "id": "panel-rubric-and-blind-conditions", "status": "UNRESOLVED", "required": "Panel-owned rubric/version/digest, matched conditions, separate blind mapping custody and agreed protocol", "evidence": [] },
+    { "id": "internal-streak-and-outcome-protocol", "status": "UNRESOLVED", "required": "Keep Q1 majority/100+ baseline; resolve streak count, aggregation/ties/missing/withdrawals and real qualifying evidence", "evidence": [] },
+    { "id": "t012-t013-real-readiness", "status": "UNRESOLVED", "required": "Fresh real T012 downstream proof plus full actual T013 acceptance; existing T013 verdict HOLD", "evidence": [] },
+    { "id": "real-mongo-operational-installation", "status": "UNRESOLVED", "required": "Authorized validator/unique-index installation, real persistence/restart/concurrency evidence", "evidence": [] },
+    { "id": "public-event-authorization", "status": "UNRESOLVED", "required": "Actual event-specific Umesh authorization, schedule/medium/participants/protocol/provider-DB/publication scope", "evidence": [] },
+    { "id": "actual-trials-and-public-outcome", "status": "UNRESOLVED", "required": "Original paired responses/citations/per-judge scores, complete denominator, reproducible outcome and actual event proof", "evidence": [] }
+  ],
+  "evidenceBoundary": "No accounts, providers, browser/device, DB, invitations, publication or private export performed. No actor, approval, frozen bank or actual competition is fabricated. Structural intake does not confer permission."
+}

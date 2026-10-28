@@ -1,0 +1,24 @@
+import type { Db } from 'mongodb';
+import type { SessionPages, Sessions, TreeIndexRootDocument, Turns } from '@lkb/core';
+import { scopedCollection } from '@lkb/db';
+import { createKnowledgeVisibility } from '../visibility/knowledge.js';
+import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
+import { validateRuntimePage } from '@lkb/index';
+
+/** Remove unsafe contributing sessions before topics are sent to a provider or cached in a tree. */
+export async function eligibleTreeInput(db: Pick<Db, 'collection'>, tenant: string, sessions: Sessions[], pages: SessionPages[], root: TreeIndexRootDocument | null) {
+  const visibility = createKnowledgeVisibility(db), allowed = new Set<string>();
+  for (const session of sessions) if (await visibility.sessionVisible(tenant, session._id)) allowed.add(session._id);
+  const safePages: SessionPages[] = [];
+  for (const page of pages) {
+    if (page.tenantId !== tenant || !allowed.has(page.sessionId)) continue;
+    const rows = await readEffectiveTurns(db, tenant, await scopedCollection<Turns>(db as never, 'turns')(tenant).find({ sessionId: page.sessionId }).toArray(), page.sessionId);
+    const ids = new Set(rows.map(row => row._id));
+    if (!page.evidence.length || page.evidence.some(item => item.sessionId !== page.sessionId || !ids.has(item.turnId))) continue;
+    if (page.citedItems || page.qa) { try { validateRuntimePage(rows, page); } catch { continue; } }
+    safePages.push(page);
+  }
+  return { sessions: sessions.filter(row => allowed.has(row._id)), pages: safePages,
+    // A withheld contributor also invalidates mixed cached parent summaries.
+    existingRoot: allowed.size === sessions.length ? root ?? undefined : undefined };
+}

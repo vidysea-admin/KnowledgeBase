@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "owner": "/root/deploy_environment",
+  "task": "T050",
+  "scope": "Exact public handshakes, synthetic diagnostic floor and attributed synthetic core-stage receipt only",
+  "sourceEdits": false,
+  "cpuActions": false,
+  "gitActions": false,
+  "providerArtifactsExcluded": true,
+  "dependencyMapsExcluded": true,
+  "fullParentStatus": "in_progress; no full-parent PASS",
+  "count": 7,
+  "paths": [
+    "qa/contracts/goal-t050.md",
+    "qa/manifests/goal-t050.md",
+    "qa/packets/goal-t050.md",
+    "qa/evidence/goal-t050/checker-trailing-diagnostic.mjs",
+    "qa/evidence/goal-t051checker-broker-t050-core-A.json",
+    "qa/evidence/goal-t051checker-broker-t050-core-A.stdout.txt",
+    "qa/evidence/goal-t051checker-broker-t050-core-A.stderr.txt"
+  ]
+}

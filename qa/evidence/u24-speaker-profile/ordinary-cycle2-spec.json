@@ -1,0 +1,83 @@
+{
+  "unit": "u24-speaker-profile",
+  "fixCycle": 2,
+  "scope": "ordinary local synthetic consent/metadata/store/HTTP regressions; private authentic test explicitly skipped",
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--test",
+    "--test-timeout=60000",
+    "--test-concurrency=1",
+    "--import",
+    "tsx",
+    "apps/api/src/speaker-profiles/store.test.ts",
+    "apps/api/src/speaker-profiles/router.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "U24_EVIDENCE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\u24-speaker-profile\\ordinary-cycle2"
+  },
+  "timeoutMs": 60000,
+  "expected": {
+    "total": 9,
+    "pass": 8,
+    "fail": 0,
+    "privateSkip": 1
+  },
+  "expectedSkippedTest": "actual TOC deterministic persona traverses mounted API and produces a downstream response artifact",
+  "privateScope": {
+    "authenticInputRead": false,
+    "authenticOutputAllowed": false,
+    "privateFlagMustNotEqual": "1",
+    "sourceDataMutation": false,
+    "publication": false
+  },
+  "executionBoundaries": {
+    "liveProvider": false,
+    "liveMongo": false,
+    "browser": false,
+    "install": false,
+    "fullSuite": false,
+    "loopbackHttp": true,
+    "scriptedProvider": true,
+    "inMemoryDb": true
+  },
+  "beforeAfterPins": {
+    "apps/api/src/speaker-profiles/store.ts": "9837421B1939232080C400B8A272559014394B8516A49964DC7B0DB357480E32",
+    "apps/api/src/speaker-profiles/store.test.ts": "894A4B1236BBE0253C2103AEC8367B70D6083247B0C24D6FD1EB74921618A632",
+    "apps/api/src/speaker-profiles/router.ts": "18BAC45B3D9316CBD9FE7866AD79D8FE8148FEA4CC6DEA3D351F23883BFF37F7",
+    "apps/api/src/speaker-profiles/router.test.ts": "5A92A1DB666B947EC5099681E2687539D0BB8B320082691C7278DFDCC258304F",
+    "packages/index/src/pipeline/speaker-profiles/profile.ts": "6BE5B7EDE88B2887FE4C7A5E1ADB4B573B2303A8422B2185F64080CF8D873386",
+    "packages/index/src/pipeline/speaker-profiles/profile.test.ts": "F5040A6919995C1D8C7522EE3606D21CC7BF997D915E9CAAA1EDE2542BC38BD7",
+    "apps/api/src/indexing/speaker-suggest.ts": "2B58A82039C070F0BE158FED4DF349E31E485E37893A7F578F2BD4A1C4B16667",
+    "apps/api/src/knowledge/metadata-visibility.ts": "416A94A4F40EC2EB35FCE91249B64633F828E65EBE97AA4B00DE1B8C5329495B",
+    "apps/api/src/visibility/knowledge.ts": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04",
+    "apps/api/src/transcript-review/effective-reader.ts": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500",
+    "apps/api/src/server.ts": "5730F4AEB2086999EBE08E81A729055DB118D9A42EFD3E425AE7572EAA2328D2",
+    "apps/api/src/fixtures.ts": "3A6018A7F922F98FDCDD41CC284C8CA434FD987AB2B5BD50ABFF5C4CD418585B",
+    "packages/db/src/lib/tenantScope.ts": "F9AB2F8FA8D21DD661D9752CFA85912FA548255EF85A0018E048634BC95EE513",
+    "packages/db/src/collections/speaker-suggestions.ts": "515626D26A77E18970D7CEC8DF60179646DCD56478304758F985BB165B62129C",
+    "packages/db/src/collections/speaker-suggestions.testdb.ts": "BCE0534F0FD474788E97774DA274F8CFA186908A005876D7D1DABD8C95FEB000"
+  },
+  "coherentCheckpoint": {
+    "path": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261014T234014Z-verified.json",
+    "sha256": "E745EF9417B05042CE820705AA0EB2AE41367886CCBBA21C8C77E45C24F63E10",
+    "inputs": 1940,
+    "drift": 0,
+    "scope": "types+API worker/server and web build exit0; no container/provider or fulltask claim"
+  },
+  "sourceFreezeAck": true,
+  "notExecutedByMaker": true,
+  "evidenceRequirements": [
+    "Separate immutable ordinary cycle2 receipt/stdout/stderr with actual timing/exit/counts and current before-after pins",
+    "No private-input flag or authentic corpus reads",
+    "Preserve historical failed28/33 and corrected33/33 receipts",
+    "Synthetic producer output may emit to ordinary-cycle2; label fixture provenance and do not infer full live/persona acceptance"
+  ],
+  "remainingGates": [
+    "Independent current-cycle check",
+    "Actual T055 public synthetic direct-consumer replay with matching artifact/source pins",
+    "Private authentic current-reader proof only under separately explicit permission",
+    "Full parent live/persona/human/Mongo gates"
+  ]
+}

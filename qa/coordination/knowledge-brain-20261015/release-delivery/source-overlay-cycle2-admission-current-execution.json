@@ -1,0 +1,53 @@
+{
+  "gates": [
+    {
+      "label": "canonical",
+      "command": [
+        "C:\\Program Files\\Python312\\python.exe",
+        "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py",
+        "assess",
+        "--input",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\release-delivery\\source-overlay-cycle2-admission-current-canonical-metrics.json"
+      ],
+      "exit_code": 0,
+      "assessment": "source-overlay-cycle2-admission-current-canonical-assess.txt",
+      "helper_sha256": "36b1650cf7d65d0cb4416f558486df279a519c75d2dae44d3f64875d3dbef66e",
+      "input_sha256": "e387a06f131d504c3262b4cd7c371f71da1c092d58013aa7c42c4bb254e2e34c",
+      "readback_status": "BOOTSTRAP_REVIEW",
+      "readback_reserve": {
+        "allocation": null,
+        "id": null,
+        "phase_kind": null,
+        "status": "legacy_unreserved"
+      },
+      "token_metric": "canonical legacy unspecified"
+    },
+    {
+      "label": "actual-total",
+      "command": [
+        "C:\\Program Files\\Python312\\python.exe",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-total-20261015\\review_budget.py",
+        "assess",
+        "--input",
+        "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\knowledge-brain-20261015\\release-delivery\\source-overlay-cycle2-admission-current-actual-total-metrics.json"
+      ],
+      "exit_code": 0,
+      "assessment": "source-overlay-cycle2-admission-current-actual-total-assess.txt",
+      "helper_sha256": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+      "input_sha256": "bcb0736488ea92f6bede9f127b59411d88d4ed3ccf502e48fa45b281e3b407b2",
+      "readback_status": "BOOTSTRAP_REVIEW",
+      "readback_reserve": {
+        "allocation": {
+          "active_s": 30,
+          "tokens": 150000
+        },
+        "id": "source-overlay/cycle2/170a251ecf6409726231a853de5f41fc5e47f87192aee396a6c9df0e584f72f6",
+        "phase_kind": "review",
+        "status": "protected"
+      },
+      "token_metric": "actual_total"
+    }
+  ],
+  "review_resumed": false,
+  "ratio_verified": false
+}

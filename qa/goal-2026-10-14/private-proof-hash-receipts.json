@@ -1,0 +1,31 @@
+{
+  "at": "2026-10-14T22:01:59.3051802Z",
+  "purpose": "Hash-only provenance. No mail headers, recipients, transcript quotations, tokens, or original content are published here.",
+  "originals": [
+    {
+      "path": "qa/evidence/t052-real-mail-provenance.json",
+      "sha256": "44F6427742088C791D19EF1463E8F76728052647CDB5F3ECB285F1036E72533E",
+      "retention": "private immutable original; excluded from Git and Docker context"
+    },
+    {
+      "path": "qa/gates/t052-zoom-confirmation-and-brevo-resolution.md",
+      "sha256": "4F49CCC2144945908ED78332EF39EF2A9643D01699F02E51DD2176B08A780F3D",
+      "retention": "private immutable original; excluded from Git and Docker context"
+    },
+    {
+      "path": "qa/evidence/u24-speaker-profile/actual-toc-api-response.json",
+      "sha256": "DEDB7726376E3C4CE3E2D7644AA62E46BF115EA675DA55930ABB32A1AA29613D",
+      "retention": "private immutable original; excluded from Git and Docker context"
+    },
+    {
+      "path": "qa/evidence/u24-speaker-profile/broker-run-20261014T210625/actual-toc-api-response.json",
+      "sha256": "DEDB7726376E3C4CE3E2D7644AA62E46BF115EA675DA55930ABB32A1AA29613D",
+      "retention": "private immutable original; excluded from Git and Docker context"
+    },
+    {
+      "path": "qa/evidence/u24-speaker-profile/broker-run-20261014T211701/actual-toc-api-response.json",
+      "sha256": "DEDB7726376E3C4CE3E2D7644AA62E46BF115EA675DA55930ABB32A1AA29613D",
+      "retention": "private immutable original; excluded from Git and Docker context"
+    }
+  ]
+}

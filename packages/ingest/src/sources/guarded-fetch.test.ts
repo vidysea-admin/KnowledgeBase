@@ -14,6 +14,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 
 import { createGuardedFetcher, isBlockedAddress } from "./guarded-fetch.js";
 
@@ -192,6 +193,49 @@ test("ISS-007: an empty resolver answer fails CLOSED", async () => {
   const { f, seen } = fetcher({ lookup: { "void.example": [] } });
   await assert.rejects(() => f("https://void.example/"), /blocked|no addresses/i);
   assert.deepEqual(seen, []);
+});
+
+test("T036 documentation /20 refuses compressed, expanded and case-varied addresses at its exact boundary", () => {
+  for (const address of ["3fff::1", "3fff:0000:0000:0000:0000:0000:0000:0001", "3FFF:0000:0000:0000:0000:0000:0000:0001",
+    "3fff:fff:ffff::1", "3fff:0fff:ffff:ffff:ffff:ffff:ffff:ffff"]) {
+    assert.equal(isBlockedAddress(address), true, address);
+  }
+  assert.equal(isBlockedAddress("3fff:1000::1"), false, "the next /20 boundary is not broadened into the documentation block");
+  assert.equal(isBlockedAddress("2606:4700:4700::1111"), false);
+});
+
+test("T036 documentation /20 mixed DNS refuses every order before request", async () => {
+  for (const address of ["3fff::1", "3FFF:0000:0000:0000:0000:0000:0000:0001", "3fff:fff:ffff::1"]) {
+    for (const records of [["93.184.216.34", address], [address, "93.184.216.34"]]) {
+      const {f, seen} = fetcher({lookup: {"documentation.example": records}});
+      await assert.rejects(f("https://documentation.example/"), /blocked/i);
+      assert.deepEqual(seen, [], "no approved address can hide an unsafe second record");
+    }
+  }
+});
+
+test("T036 documentation /20 redirect is rechecked before the second request", async () => {
+  const {f, seen} = fetcher({lookup: {"public.example": "93.184.216.34", "documentation.example": "3fff::1"},
+    responses: {"https://public.example/": {status: 302, location: "https://documentation.example/"}}});
+  await assert.rejects(f("https://public.example/"), /blocked/i);
+  assert.deepEqual(seen, ["https://public.example/"], "the documentation-address hop has no transport call");
+});
+
+test("ISS-T036GUARD-001 replays all eight recorded ledger cases verbatim", async () => {
+  type Case = {name: string; operation: "isBlockedAddress"; input: string; expected: boolean} |
+    {name: string; operation: "createGuardedFetcher"; input: {url: string; lookup: string[]}; expected: {reject: boolean; requestCalls: number}};
+  const issue = readFileSync(new URL("../../../../qa/issues.T036GUARD.jsonl", import.meta.url), "utf8").split(/\r?\n/).filter(Boolean)
+    .map(line => JSON.parse(line)).find(row => row.id === "ISS-T036GUARD-001") as {reproductions: Case[]};
+  assert.equal(issue.reproductions.length, 8, "the original ledger floor is measured, never replaced with a maker-selected corpus");
+  for (const reproduction of issue.reproductions) {
+    if (reproduction.operation === "isBlockedAddress") assert.equal(isBlockedAddress(reproduction.input), reproduction.expected, reproduction.name);
+    else if (reproduction.operation === "createGuardedFetcher") {
+      assert.equal(reproduction.expected.reject, true);
+      const {f, seen} = fetcher({lookup: {[new URL(reproduction.input.url).hostname]: reproduction.input.lookup}});
+      await assert.rejects(f(reproduction.input.url), /blocked/i, reproduction.name);
+      assert.equal(seen.length, reproduction.expected.requestCalls, reproduction.name);
+    } else assert.fail("unknown recorded operation is not silently skipped");
+  }
 });
 
 test("ISS-009: an oversized body is refused on a REDIRECT hop too, not only the final one", async () => {

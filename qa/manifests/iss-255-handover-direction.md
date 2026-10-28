@@ -42,3 +42,5 @@ ISS-255's own live reproduction (the visa session, t205/t206): re-run AFTER the 
 - The 2-of-3 run-agreement requirement for the LLM path (ISS-255 fix_direction (2)) is recorded
   for the phase-3 gate re-run; it is NOT implemented in this unit (no further model wiring without
   the precision-gate unit).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

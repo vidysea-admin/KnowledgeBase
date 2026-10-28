@@ -1,0 +1,39 @@
+{
+  "status": "RECONCILED_NO_DATASET_CHANGE",
+  "observedAt": "2026-10-15T22:32:15.475Z",
+  "rawCorpusPath": "C:/Users/product/Desktop/KnowledgeBase/data/eval/golden-set.json",
+  "rawGoldenSha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "priorRawGoldenSha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "rawGoldenUnchanged": true,
+  "questions": 92,
+  "candidates": 29,
+  "selectedQuestionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "selectedQuestionStringSha256": "484335769f0957e252b9ae16e6372953344f0b951845b1598abcc51be83611c1",
+  "selectedQuestionRecordSha256": "05005109acbc8cccf0a236ec8ed7d8fb59d0fdb6c961c3451450608f7a34456f",
+  "selectedQuestionPriorEqualityEvidence": "Identical prior/current whole raw golden-set SHA; current digest derived from those same bound bytes, not a historical independently measured per-question digest.",
+  "orderedIDsSha256": "1163a4b86a71d78544234ef12157b6e16e60a41db2362acd1540093b9cfed091",
+  "priorOrderedIDsSha256": "1163a4b86a71d78544234ef12157b6e16e60a41db2362acd1540093b9cfed091",
+  "sortedIDSetSha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "priorSortedIDSetSha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "candidateIDsSha256": "033745a6e7b31dd23300281355fc87d57a156885fd0b4e65918e32b1cd53752c",
+  "hashDefinition": "SHA256(JSON.stringify({questions: JSON.parse(raw golden-set), candidateIds: ordered approved session IDs, bindings: ordered [{path,bytes,sha256}]})); SHA includes evaluator/runtime source bindings, not only dataset. Binding property order is path,bytes,sha256 as actual freezeInputs pushes; JSON.stringify is not key-sorted.",
+  "priorDerivedCorpusSha256": "cbd1c84d1caf3b2f4a0c07808e10705411196aa93e19b875a0f66ccc39c19ebe",
+  "priorRecordedCorpusSha256": "cbd1c84d1caf3b2f4a0c07808e10705411196aa93e19b875a0f66ccc39c19ebe",
+  "currentDerivedCorpusSha256": "5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162",
+  "currentAuthorizationCorpusSha256": "5b5649afd29834882dd31908a43dfcea879068b1213cc8807bafba052552d162",
+  "rawFileHashIsNotDerivedCorpusHash": true,
+  "changedBindings": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "beforeSha256": "5646b89f254a93f7d603ce8d6de7042c8b295a2babb0dd9c2d7d8f3b81f80915",
+      "afterSha256": "6ed14cd055a0701dfc689fdd173a142b535a95e205015779072a6e28024886b1"
+    }
+  ],
+  "currentBindingDrift": [],
+  "knownChangeOwner": "/root/quality_delivery_coordinator under root-granted evaluator diagnostic + grant2 source leases",
+  "sourceMtime": "2026-10-15T22:24:53.822Z",
+  "externalDatasetChangesObserved": false,
+  "normalizationCaveat": "First reconciliation computation used stored prior-pin serialization path,sha256,bytes and yielded df65...; corrected to exact production path,bytes,sha256 order reproduces cbd1... . No corpus/source edits or calls occurred.",
+  "paidCalls": 0,
+  "testsRun": false
+}

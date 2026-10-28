@@ -1,0 +1,12 @@
+{
+  "verdict": "qa/verdicts/t041-searchable-time-aligned-ocr.md",
+  "cycle": 1,
+  "scopeVerdict": "PASS",
+  "fullParent": "HOLD L1-L3",
+  "checkerLaunchUtc": "2026-10-14T23:45:38Z",
+  "persistedWriteUtc": "2026-10-14T23:50:19.0280703Z",
+  "confirmedUtc": "2026-10-14T23:50:20.3336526Z",
+  "launchToConfirmationMs": 282334.0,
+  "verdictSHA256": "d064a850f0761aead285a5aac73e1c59bca96a9aee346fdfae8c52b0eccc3f04",
+  "noActiveCheckerHandle": true
+}

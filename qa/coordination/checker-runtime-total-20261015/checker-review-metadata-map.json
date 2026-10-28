@@ -1,0 +1,24 @@
+{
+  "schema": "explicit-metadata-only-map/v1",
+  "source": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T11-10-22-01a13f41-8b04-7720-97a4-fc7d7430fa82.jsonl",
+  "thread": "01a13f41-8b04-7720-97a4-fc7d7430fa82",
+  "agent": "/root/checker_token_metric_fix/independent_runtime_checker",
+  "usage": {
+    "timestamp": "2026-10-15T11:21:26.973Z",
+    "tokens": {
+      "input_tokens": 1004313,
+      "cached_input_tokens": 960256,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 2708,
+      "reasoning_output_tokens": 125,
+      "total_tokens": 1007021
+    }
+  },
+  "lifecycle": {
+    "timestamp": "2026-10-15T11:10:23.13Z",
+    "type": "task_started"
+  },
+  "active_seconds": null,
+  "monetary_cost": null,
+  "note": "Checked telemetry parser does not accept intervening ordinal envelope key; explicit metadata map only; cached subset not additive"
+}

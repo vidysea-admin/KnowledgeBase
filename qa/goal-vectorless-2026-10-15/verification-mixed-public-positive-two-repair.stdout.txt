@@ -1,0 +1,10 @@
+✔ mixed transcript and native hydration stamps one combined proof including an empty transcript result (13.8111ms)
+✔ public Ask ignores explicit vector false and legacy ports while returning current exact cited source (109.365ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3803.2228

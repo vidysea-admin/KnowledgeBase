@@ -1,0 +1,10 @@
+{
+  "elapsedFromFormalReadySeconds": 431.0497522,
+  "reason": "current coherent compiler reserved centrally pending; no behavioral rerun required",
+  "preReviewAt": "2026-10-14T21:27:05Z",
+  "formalReadyPinCheckAt": "2026-10-14T21:28:48Z",
+  "verdictSHA256": "7fcf4eda6ca808d0ecfe2791f4c8e8a5f0f8799e173fc8857d501ed62cfb9955",
+  "completedAt": "2026-10-14T21:35:59.0497522Z",
+  "verdict": "HOLD",
+  "cycle": 1
+}

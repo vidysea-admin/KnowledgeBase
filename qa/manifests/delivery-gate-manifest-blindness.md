@@ -4,10 +4,10 @@
 (status `proposed`) covers the sibling guard; judge whether this belongs under it or needs its own.
 **Goal task:** none (tier 2 — open high issue).
 **Date:** 2026-09-09
-**Fix cycle:** 3 of max 3
+**Fix cycle:** 0 of max 3 (reset 2026-09-28 per D-041 ruling 5 — see "Cycle reset" below)
 **Dual check:** no
 **Issues addressed:** **ISS-176** (high) + **ISS-184**, **ISS-185**, **ISS-186**, **ISS-187**. Gates **ISS-183**. Cycle 3: **ISS-192**, **ISS-193**, **ISS-194**, **ISS-195**, **ISS-186**. Corrects the record on **ISS-177**.
-**Status:** STALLED (cycle 3 of max 3)
+**Status:** reset-awaiting-rebuild (was STALLED at cycle 3 of max 3; reset 2026-09-28 per D-041 ruling 5)
 
 ## Why
 
@@ -16,7 +16,7 @@ pending state and no `ScheduleWakeup` was made — the machine form of THE CONTI
 because the loop once died every turn while believing it was self-continuing.
 
 **It could not see the handshake it exists to guard.** Its manifest predicate is
-`Status:\s*ready-for-check`, which **cannot match `**Status:** ready-for-check`** — after the colon
+`Status:\s*ready-for-check`, which **cannot match `**Status:** superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block`** — after the colon
 comes `**`, and `\s*` will not consume it. That is the form **15** of this repo's manifests use.
 
 Measured against the live tree: the gate reported **1** pending check while **2** manifests sat
@@ -32,7 +32,7 @@ block for the first defect, not reported by anyone.
 ## The fixtures encoded the same blind spot
 
 `hook-fixtures.ps1:102` — and every other maker fixture — writes the **unbolded**
-`## Status: ready-for-check`, which is the one form the old regex could see. **The suite was green
+`## Status: superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block`, which is the one form the old regex could see. **The suite was green
 because the tests shared the bug.** That is why a gate this repo depends on shipped blind: it was
 never tested against the shape its own project actually writes.
 
@@ -44,7 +44,7 @@ never tested against the shape its own project actually writes.
 | `D:/ai_os/.claude/hooks/tests/hook-fixtures.ps1` | +2 fixtures: the bolded form, and a 3-cycle verdict. |
 
 Stripping emphasis *and then* anchoring to line start is deliberate: stripping alone would make the
-gate match prose that merely **quotes** `Status: ready-for-check` — which close-out sections in this
+gate match prose that merely **quotes** `Status: superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block` — which close-out sections in this
 repo do — turning a blind gate into a noisy one.
 
 ## How to verify
@@ -205,7 +205,7 @@ I invited a FAIL on Gap 4 and it landed. The checker cleared the other predicate
 `delivery-gate-stop.ps1` — they parse transcript JSONL, not markdown, so *"checked, not affected"* —
 but found the class alive in the two sibling hooks:
 
-- `mc-sessionstart.ps1:15` and `mc-precommit.ps1:43` still use the bare `Status: ready-for-check`
+- `mc-sessionstart.ps1:15` and `mc-precommit.ps1:43` still use the bare `Status: superseded-by ai_os ISS-416 Get-ManifestStatus rewrite (delivery-gate-stop.ps1:57-73); ISS-205 remains a fold-in for the next unit touching that block`
 - `mc-sessionstart.ps1:19` still ends in `Select-Object -First 1`
 
 **Live effect, measured this session:** the SessionStart directive reported
@@ -454,3 +454,17 @@ and is a small regex change for the next unit that touches this block.
 **[C1]** — `mc-sessionstart.ps1` and `mc-precommit.ps1` remain blind, gated on
 `qa/gates/mc-hooks-manifest-blindness.md`. The commit guard cannot see a pending handshake until the
 Approver rules.
+
+**Handshake status:** STALLED — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree
+
+## Cycle reset — 2026-09-28 (D-041 ruling 5)
+
+Counter reset per **D-041 ruling 5** (Approved-by: Umesh) — the Approver chose fresh attempts
+over closing these as not-pursued, so the max-cycle cap no longer holds this unit shut.
+
+**But a cycle 4 is NOT the recovery, and the reset does not make it one.** This unit's own stall
+diagnosis `qa/debug/delivery-gate-manifest-blindness-cycle3.md:106-110` names the smallest
+recovery as **ISS-205, the only real code defect** (require the digits on the same line —
+the same-line whitespace class instead of `\s*` — and reject a label whose value was erased by stripping), and says
+verbatim that it *"belongs to whatever unit next touches the block, **not** a cycle 4."*
+So: pullable again, but the path is a fold-in, not a re-run of the same unit.

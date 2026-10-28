@@ -1,0 +1,32 @@
+[
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-ivf.ts",
+    "sha256": "710a4f5c5bd205ea5eebff01dbe40090c294f9653f0ca3e476924f3d798b86d1",
+    "bytes": 3222
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-ivf.test.ts",
+    "sha256": "6d85fa1883d24d78ff31853cb87d1c3bf005afe90a89616c8ae01da43a73fd1d",
+    "bytes": 1582
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-clock-ledger.ts",
+    "sha256": "0407b157f220e178bff6ddfaaab48c727551d454416b5c1731fe7b77fb3fa2a4",
+    "bytes": 6129
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-clock-ledger.test.ts",
+    "sha256": "bc1e8ffd8bf263e6a82888d6428475ccbe6b79d431d569584705c2efef1eef3d",
+    "bytes": 2535
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-spool.ts",
+    "sha256": "58222ec89d811bbf9fee3727d85fdf0618dd81bb2b0bd043104d92ee0cded8f0",
+    "bytes": 21869
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native-spool.test.ts",
+    "sha256": "2c1e13d82777206a6329bca2e562e2d875c7b2ce8b441f15cf46ad5a23cfe167",
+    "bytes": 6240
+  }
+]

@@ -1,0 +1,1 @@
+Independent C4 fail-closed probes: no judge, foreign judge ID, exhausted budget: 3/3 PASS; no database/provider calls.

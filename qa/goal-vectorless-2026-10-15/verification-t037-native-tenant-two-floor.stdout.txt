@@ -1,0 +1,19 @@
+C:\Users\product\Desktop\KnowledgeBase\.cache\t037-dispatch-rc6tjm\scripts\webinar\start-record-detached.ps1 : launch 
+FAILED: recorder (pid 14740) exited within 30s with code  - nothing is recording.
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,start-record-detached.ps1
+ 
+C:\Users\product\Desktop\KnowledgeBase\.cache\t037-dispatch-uQlGu5\scripts\webinar\start-record-detached.ps1 : launch 
+FAILED: recorder (pid 18164) exited within 30s with code  - nothing is recording.
+    + CategoryInfo          : NotSpecified: (:) [Write-Error], WriteErrorException
+    + FullyQualifiedErrorId : Microsoft.PowerShell.Commands.WriteErrorException,start-record-detached.ps1
+ 
+✔ ISS-ALERTTENANT-001: actual PowerShell -Job path refuses untagged/foreign saved jobs through current checked module (2995.7702ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3148.0971

@@ -1,0 +1,23 @@
+{
+  "capturedAt": "2026-10-14T22:45:05.6964843Z",
+  "testsExecuted": false,
+  "phase": "finite-input-freeze-json-only-final-exception-reconciliation",
+  "changes": [
+    {
+      "path": "apps/api/src/transcript-review/planner.ts",
+      "previous": "F2512AA5E2022F87EA4F9B9F6D71DDBABBB0ACC75D18598F3184BD11A6E3BE6F",
+      "current": "9D56EB0A585C78FAAA945E47CA5A4D6FBAEA16FBE95F3E975D5B3F8BBFE09ADE"
+    },
+    {
+      "path": "apps/api/src/transcript-review/effective-reader.ts",
+      "previous": "1CF35BEA72EB9C90138969966A58526A06D34892B316DED5066576D91A4B7168",
+      "current": "4335CB7D6266DDF95F409D1606BA661E8B19A954CE0596098FC7591B684CD500"
+    },
+    {
+      "path": "apps/api/src/indexing/eligible-tree.ts",
+      "previous": "37D65473FFACE02688B278AE4DC4A87E8255A5222B764814709951215B72BF5E",
+      "current": "0DFC6E5CDC067C176E50EB44189D9EF860E14CDDAF8F8B537F7B5E3A71A88E8F"
+    }
+  ],
+  "review": "Legacy reviewed screen promotion refuses against scoped original physical rows. Ordinary speech/headless branches retain behavior. T054 source owner final ACK received; no source/test writes by T040 maker. Shared coherence pending."
+}

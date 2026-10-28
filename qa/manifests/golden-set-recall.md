@@ -88,3 +88,5 @@ Once ISS-015 (invalid Gemini key) is resolved, this exact golden set + harness s
 against `packages/ask`'s real `selectNodes` (an LLM-backed `RetrieveFn` implementation) to get an
 honest recall@5 number against the actual production pipeline — the 0.85 target belongs to that
 run, not this one.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

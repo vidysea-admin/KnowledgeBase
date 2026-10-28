@@ -1,0 +1,27 @@
+{
+  "readyCheckLaunch": "2026-10-14T21:37:50.4142418Z",
+  "persistedConfirmedAt": "2026-10-14T21:56:00.0769848+00:00",
+  "readyToPersistSeconds": 1089.662743,
+  "verdict": "qa/verdicts/t040-grounded-product-composition.md",
+  "verdictSHA256": "036F13F316449E10EA5E537FC9C419F847B85EFC6EE0544F326C0C1FE54B4DCA",
+  "result": "HOLD",
+  "checkedPins": 37,
+  "finalPinMismatches": [
+    "apps/api/src/visibility/knowledge.ts"
+  ],
+  "remainingScopedGate": "changed visibility dependency resubmission plus applicable coherent types/build",
+  "fullTask": "HOLD",
+  "unmeasuredPhases": [
+    "individual review boundaries",
+    "approval request/resolution",
+    "draft start",
+    "active subtotal"
+  ],
+  "includes": [
+    "INPUT_FREEZE",
+    "sole CPU queue",
+    "receipt delivery"
+  ],
+  "updatedVerdictConfirmedAt": "2026-10-14T21:56:46.9280451+00:00",
+  "changedVisibilitySHA256": "E97C65C1A29304B78257B6880CE27DE49BAFCEFA7D45D1F0CA5DA1182D70EA04"
+}

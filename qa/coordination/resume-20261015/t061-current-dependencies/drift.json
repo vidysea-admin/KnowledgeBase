@@ -1,0 +1,77 @@
+[
+  {
+    "path": "apps/api/src/composition/integrations/routes.ts",
+    "pinned": "d4c1a5c9a374225a08936b1d43d2f8ab3888bd0e5c51734e4cc7d17b3d342ace",
+    "current": "5008201fed89eaaeea6e52fcebc719ceb6ff34d00bef9632fdcc9a7ef585742e"
+  },
+  {
+    "path": "apps/api/src/composition/production.ts",
+    "pinned": "fabf236621196871d176327bea99d1c030fe5beb888829490b10f8e6373c0b5e",
+    "current": "86ec1d549ba0b0fa3c9017fae245c7237fde7cc3bcda90c4f534f3f0bc29f0fa"
+  },
+  {
+    "path": "apps/web/src/App.tsx",
+    "pinned": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+    "current": "5e547f5dc5fe736111c8347b497f66130ad16a286f71b01b2933b774ca6284b3"
+  },
+  {
+    "path": "packages/core/src/generated/answer_runs.ts",
+    "pinned": "6abcfad1a8020e334c3c904e32ea4738d9cf0872f90a5e317d4eb7a7bb8ee7ed",
+    "current": "c21b71a69c8e15fceace2a2126c19ae88b592494e35a89686b9ce4ae813cc110"
+  },
+  {
+    "path": "packages/core/src/generated/jobs.ts",
+    "pinned": "b1d05176e7a835682c2451e3711db57fbb71dcc99aa9e4d3d74d03e933b7f02f",
+    "current": "1d9a9eeda71f974e9bd247ef6a81bb1dbb6c94c8a48bf897f43a585e5ff39f2e"
+  },
+  {
+    "path": "packages/core/src/generated/sessions.ts",
+    "pinned": "3977b5aaf6c516512974f727322f82751b19a2415b1a500b88a752aa54ce5516",
+    "current": "67705753e1db14f35c2a0701e751396f155afaccb2b03353518943a3bc573637"
+  },
+  {
+    "path": "packages/core/src/generated/speaker_suggestions.ts",
+    "pinned": "311a6484b448971abbb30b61528361e4f5001f2a1eec0e029eb2144d9ba9d09f",
+    "current": "cca58f06dfdd3509bf6184488b68846a214c10d727a951781aced5556dc1d2ac"
+  },
+  {
+    "path": "packages/core/src/generated/tree_index.ts",
+    "pinned": "47f4514ba063718df6c7d1e05f0ebc09854b211ad536ab0d3d7a48c54e47f361",
+    "current": "25c40a65c844ab68187fd18519d3a6cbf92233c277d13043e1c127dc631963a3"
+  },
+  {
+    "path": "packages/core/src/index.ts",
+    "pinned": "b8823ba189d4c92ed4bdc44e9f654d317fa699654e5b0832f1ea7eacc5ce7174",
+    "current": "42a3854c5e15b297ee93beae7f840bb3976a114fd1c25ef6216502e3c905f231"
+  },
+  {
+    "path": "packages/db/src/collections/meeting-candidates.ts",
+    "pinned": "f5df62c1656f7733ffc280be56260bff4c49f18108bfd899e4bcb5aff56775d9",
+    "current": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.test.ts",
+    "pinned": "e9bbf6ea41005b377de8c69820f295ffb2fb781b3517e4cbb6f489e0136409c8",
+    "current": "MISSING"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "pinned": "bce0534f0fd474788e97774da274f8cfa186908a005876d7d1dabd8c95feb000",
+    "current": "MISSING"
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions.ts",
+    "pinned": "515626d26a77e18970d7cec8df60179646dcd56478304758f985bb165b62129c",
+    "current": "MISSING"
+  },
+  {
+    "path": "packages/db/src/index.ts",
+    "pinned": "6340dec275001d1887558da2ca067e0b90ae3f734b39a350f650a9e86e2b2189",
+    "current": "725504b6753f39e8d13107c8542513ae010db8d34c509c4cc05ce206081a9bac"
+  },
+  {
+    "path": "packages/db/src/lib/tenantScope.ts",
+    "pinned": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "current": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443"
+  }
+]

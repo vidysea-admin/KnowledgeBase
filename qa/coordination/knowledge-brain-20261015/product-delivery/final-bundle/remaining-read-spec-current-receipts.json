@@ -1,0 +1,475 @@
+{
+  "kind": "LOCAL_REMAINING_READ_PROTOCOL_ONLY_NOT_REVIEW_GRANT",
+  "recorded_at": "2026-10-15T12:42:19.112Z",
+  "units": [
+    {
+      "slug": "t058-saved-summary-refresh",
+      "cycle": 0
+    },
+    {
+      "slug": "product-transcript-refresh-warning",
+      "cycle": 1
+    }
+  ],
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "status": "STAGED_CURRENT_RECEIPTS_OWNEXIT0_MECHANICS_ONLY_NOT_REVIEW_ADMISSION",
+  "source_and_consumer_blocks": [
+    {
+      "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+      "whole_file_sha256": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080",
+      "ranges": [
+        [
+          19,
+          45
+        ],
+        [
+          46,
+          67
+        ],
+        [
+          97,
+          97
+        ]
+      ],
+      "symbols": [
+        "login/sessionVersion generation reset/load effect",
+        "show(next) authoritative summary update",
+        "action ownership guard",
+        "create/open/save/validate continuation guards",
+        "Saved drafts summary consumer"
+      ]
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+      "whole_file_sha256": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca",
+      "ranges": [
+        [
+          17,
+          38
+        ],
+        [
+          78,
+          99
+        ]
+      ],
+      "symbols": [
+        "current identity and canonical load ownership",
+        "reloadAfterRefresh",
+        "pending/failed warning + ReviewHistory callback mount"
+      ]
+    },
+    {
+      "path": "apps/web/src/api/knowledge-outputs.ts",
+      "whole_file_sha256": "40a2023787696bbafa67c91d78a8c356051800afa9beae467f79d1696a7af61d",
+      "ranges": [
+        [
+          1,
+          21
+        ]
+      ],
+      "symbols": [
+        "exact get/update/revalidate client endpoint and revision arguments"
+      ]
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/ReviewHistory.tsx",
+      "whole_file_sha256": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+      "ranges": [
+        [
+          7,
+          35
+        ]
+      ],
+      "symbols": [
+        "identity/generation invalidation",
+        "perform refresh/history",
+        "await onRefreshed terminal receipt"
+      ]
+    },
+    {
+      "path": "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx",
+      "whole_file_sha256": "ea1f6f01d60f75cd43dde8c96725d46eb6a4fd1ad2b5f0753998e4a19299403e",
+      "ranges": [
+        [
+          7,
+          23
+        ]
+      ],
+      "symbols": [
+        "session route/selection and keyed editor mount"
+      ]
+    },
+    {
+      "path": "apps/web/src/api/transcriptReview.ts",
+      "whole_file_sha256": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7",
+      "ranges": [
+        [
+          16,
+          32
+        ],
+        [
+          62,
+          70
+        ]
+      ],
+      "symbols": [
+        "getTranscriptReview strict snapshot/refresh parser",
+        "refreshTranscriptReview expectedRevision client"
+      ]
+    }
+  ],
+  "required_clauses": [
+    {
+      "path": "qa/contracts/goal-t058.md",
+      "whole_file_sha256": "ee75a3d73a2863d31c5f8d53f9e060af6e7ea7e286156a9c52d35eed84601cf7",
+      "clauses": [
+        {
+          "id": "C6",
+          "range": [
+            12,
+            12
+          ]
+        },
+        {
+          "id": "C8",
+          "range": [
+            14,
+            14
+          ]
+        },
+        {
+          "id": "C12",
+          "range": [
+            18,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "path": "qa/contracts/goal-T054.md",
+      "whole_file_sha256": "439b0b1fa5130309ab7599f56789749719a9e977bd4e8e28a27e8be4f60fa315",
+      "clauses": [
+        {
+          "id": "10",
+          "range": [
+            18,
+            18
+          ]
+        }
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "whole_file_sha256": "10d2f9048dfc5ab1dabca7117746f2921e0a5e6d0fe832327557e9a0c52e1e7b",
+      "clauses": [
+        {
+          "id": "definition-of-done",
+          "range": [
+            28,
+            33
+          ]
+        }
+      ]
+    }
+  ],
+  "scoped_diff": {
+    "path": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/scoped-tracked.diff",
+    "only_owned_paths": [
+      "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+      "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+      "apps/web/src/pages/transcript-review/TranscriptReview.tsx",
+      "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx",
+      "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx"
+    ],
+    "select": "Split by ^diff --git and include exact5owned paths only; never print unrelated hunks.",
+    "selected_utf8_bytes": 8170,
+    "selected_sha256": "47be517337ad24bc93face4b6e53789ee5faca5bc686809fabc3822b21361145"
+  },
+  "full_selected_payload": {
+    "source_clauses_scoped_diff_utf8_bytes": 27336,
+    "source_clauses_limit_bytes": 65000,
+    "metadata_initial_bytes": 3891,
+    "metadata_narrowing": "Current receipt projection deduplicates commands and prints only fingerprint counts/mismatches. All five actual current receipts audited internally; no raw maps printed.",
+    "metadata_final_utf8_bytes": 2889,
+    "metadata_limit_bytes": 5000,
+    "total_utf8_bytes": 30225,
+    "estimated_source_tokens": 9112,
+    "estimated_metadata_tokens": 963,
+    "estimated_total_tokens": 10075,
+    "estimate_method": "ceil(UTF8 bytes/3) conservative planning heuristic, not measured tokenizer count or guarantee; any truncation STOP.",
+    "source_payload_sha256": "affc257c48d510f83326fef6c9da77aa322b817e5c43056e065cd4e1af5f83b6",
+    "metadata_template_sha256": "65935a5a55696e37790551895ba438b5ea64274711b5bc0f6e3bdf7bb9410619",
+    "computed_without_printing_payload": true
+  },
+  "receipt_audit": {
+    "receipt_paths": [
+      "qa/goal-vectorless-2026-10-15/verification-ui2-output-independent-command.json",
+      "qa/goal-vectorless-2026-10-15/verification-ui2-transcript-independent-command.json",
+      "qa/goal-vectorless-2026-10-15/verification-web-types-combined-candidate.json",
+      "qa/goal-vectorless-2026-10-15/verification-web-build-combined-candidate.json",
+      "qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.json"
+    ],
+    "extra_attribution_paths": [],
+    "compare_all": [
+      "Every before/after pin key/value, exact key-set equality; no omitted field/key accepted as equal.",
+      "Every relevant current fingerprint against receipt: runtime executable/version, lock, environment, import root, command/node IDs, base/candidate and scoped source identity; policy reuse binding exact.",
+      "Per-case pass/fail/skip and own/shared exit remain distinct; verify composite provenance and no shared unhandled/setup failures.",
+      "Current own5/direct4 pins match exact known inventories; drift/missing/unknown prerequisite =>HOLD."
+    ],
+    "printing_whitelist": [
+      "receipt file",
+      "ownexit",
+      "casecounts",
+      "deduplicated exact command reference/argv",
+      "fingerprint/map counts",
+      "mismatches only"
+    ],
+    "never_print": [
+      "before/after/effectivePins maps",
+      "entire index.json",
+      "raw stdout/stderr",
+      "whole App",
+      "whole modules",
+      "environment values"
+    ],
+    "audit_not_executed_by_this_protocol_prep": true,
+    "metadata_template": {
+      "receipt_root": "qa/goal-vectorless-2026-10-15/",
+      "receipts": [
+        {
+          "file": "verification-ui2-output-independent-command.json",
+          "ownexit": 0,
+          "casecounts": "saved1passed",
+          "command": "C0",
+          "fingerprint": "F0",
+          "counts": {
+            "before": 17,
+            "after": 17
+          },
+          "mismatches": "COMPUTE_ALL"
+        },
+        {
+          "file": "verification-ui2-transcript-independent-command.json",
+          "ownexit": 0,
+          "casecounts": "editor2+history2=4passed/10filtered",
+          "command": "C1",
+          "fingerprint": "F1",
+          "counts": {
+            "before": 18,
+            "after": 18
+          },
+          "mismatches": "COMPUTE_ALL"
+        },
+        {
+          "file": "verification-web-types-combined-candidate.json",
+          "ownexit": 0,
+          "casecounts": "not-test",
+          "command": "C2",
+          "fingerprint": "F2",
+          "counts": {
+            "before": 1775,
+            "after": 1775
+          },
+          "mismatches": "COMPUTE_ALL"
+        },
+        {
+          "file": "verification-web-build-combined-candidate.json",
+          "ownexit": 0,
+          "casecounts": "not-test",
+          "command": "C3",
+          "fingerprint": "F2",
+          "counts": {
+            "before": 1775,
+            "after": 1775
+          },
+          "mismatches": "COMPUTE_ALL"
+        },
+        {
+          "file": "verification-contracts-combined-candidate.json",
+          "ownexit": 0,
+          "casecounts": "not-test",
+          "command": "C4",
+          "fingerprint": "F3",
+          "counts": {
+            "before": 2,
+            "after": 2
+          },
+          "mismatches": "COMPUTE_ALL"
+        }
+      ],
+      "commands": [
+        {
+          "id": "C0",
+          "argv": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "--test",
+            "--test-isolation=none",
+            "--test-concurrency=1",
+            "--test-timeout=30000",
+            "--test-name-pattern=^UI creates, cites, saves, reopens, revalidates and exports through authenticated API$",
+            "--import",
+            "./.cache/coordination/safe-test-runtime/register.mjs",
+            "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx"
+          ]
+        },
+        {
+          "id": "C1",
+          "argv": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--pool=forks",
+            "--maxWorkers=1",
+            "--minWorkers=1",
+            "--no-file-parallelism",
+            "--testNamePattern",
+            "a loaded .* refresh warns about stale answers until canonical reload completes|failed refresh exposes retry; successful refresh invokes canonical reload|late history and refresh cannot disclose old identity or trigger reload after unmount",
+            "src/pages/transcript-review/TranscriptReview.test.tsx",
+            "src/pages/transcript-review/ReviewHistory.test.tsx"
+          ]
+        },
+        {
+          "id": "C2",
+          "argv": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+            "--filter",
+            "@lkb/web",
+            "typecheck"
+          ]
+        },
+        {
+          "id": "C3",
+          "argv": [
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+            "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/pnpm/bin/pnpm.mjs",
+            "--filter",
+            "@lkb/web",
+            "build"
+          ]
+        },
+        {
+          "id": "C4",
+          "argv": [
+            "C:/Users/product/Desktop/KnowledgeBase/.venv/Scripts/python.exe",
+            "-B",
+            "contracts/verify_contracts.py"
+          ]
+        }
+      ],
+      "fingerprint_counts": {
+        "distinct": 4,
+        "values_not_printed": true
+      },
+      "mismatches": "COMPUTE_ALL_ENV_IDENTITY_AND_PIN_VALUES; missing=>HOLD",
+      "attribution_files": []
+    },
+    "mismatch_overflow_rule": "If mismatch output would exceed5000bytes, STOP with counts+artifact reference; do not print full maps or silently omit mismatches.",
+    "receipt_replacement_policy": "Only actual current same-source successful webtypes/build/vacuousvalidator plus actual current saved1/transcript4 probes are active. Old seven references retained HISTORICAL ONLY below. No required clause/comparison removed; independent checker alone decides policy-permitted reuse/provenance and verdict."
+  },
+  "planned_tool_settings": {
+    "outer_tool": "functions.exec",
+    "outer_first_line": "// @exec: {\"max_output_tokens\":20000}",
+    "outer_max_output_tokens": 20000,
+    "nested_tool": "tools.exec_command",
+    "nested_max_output_tokens": 18000,
+    "result_printing": "Use text(result.output), not text(result) or JSON.stringify(full wrapper); preflight actual selected payload bytes before invocation.",
+    "no_execution_by_this_artifact": true
+  },
+  "stop_rules": [
+    "STOP before read review if source+clauses+scoped diff >65000UTF8bytes or metadata>5000; narrow display, never drop required logic/comparisons.",
+    "STOP immediately on any nested/outer truncation marker, timeout, missing required logic/function boundary, or unread required receipt/provenance.",
+    "No repeat tool/model read, reviewer launch, probe authoring, gates, tests, or extra grant is authorized. Parent must explicitly admit later work."
+  ],
+  "accounting": {
+    "fresh_actual": 224697,
+    "prior_transcript_actual": 294849,
+    "aggregate_actual": 519546,
+    "maker_frozen": 6052313,
+    "prior_breaches_retained": true,
+    "final_reserve_unadmitted": true,
+    "helper_cost_separate": true
+  },
+  "existing_receipt_packet_updates": "None: no already-arrived new UI probe receipt identified; broker not polled.",
+  "source_tests_gate_reviewer_or_actor_resume": false,
+  "historical_receipt_references_only": [
+    "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.json",
+    "qa/goal-vectorless-2026-10-15/independent-ui-twelve-perunit-attribution.json",
+    "qa/goal-vectorless-2026-10-15/verification-ui-history-three-repair.json",
+    "qa/goal-vectorless-2026-10-15/ui-fourteen-targeted-composite.json",
+    "qa/goal-vectorless-2026-10-15/verification-web-types-fixture-repairs.json",
+    "qa/goal-vectorless-2026-10-15/verification-web-build-fixture-repairs.json",
+    "qa/goal-vectorless-2026-10-15/verification-final-frozen-contracts.json"
+  ],
+  "historical_failed_preflight": {
+    "broker": "qa/goal-vectorless-2026-10-15/verification-product-remaining-read-preflight.json",
+    "private_report": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/remaining-read-mechanics-artifacts/mechanics-receipt.json",
+    "preserved": true
+  },
+  "current_receipt_facts": [
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-ui2-output-independent-command.json",
+      "ownexit": 0,
+      "elapsed_ms": 2238.3887999999997,
+      "hashes_unchanged": true,
+      "before_count": 17,
+      "after_count": 17,
+      "casecounts": "saved1passed"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-ui2-transcript-independent-command.json",
+      "ownexit": 0,
+      "elapsed_ms": 4797.2125,
+      "hashes_unchanged": true,
+      "before_count": 18,
+      "after_count": 18,
+      "casecounts": "editor2+history2=4passed/10filtered"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-web-types-combined-candidate.json",
+      "ownexit": 0,
+      "elapsed_ms": 11511.0949,
+      "hashes_unchanged": true,
+      "before_count": 1775,
+      "after_count": 1775,
+      "casecounts": "not-test"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-web-build-combined-candidate.json",
+      "ownexit": 0,
+      "elapsed_ms": 15217.815,
+      "hashes_unchanged": true,
+      "before_count": 1775,
+      "after_count": 1775,
+      "casecounts": "not-test"
+    },
+    {
+      "path": "qa/goal-vectorless-2026-10-15/verification-contracts-combined-candidate.json",
+      "ownexit": 0,
+      "elapsed_ms": 211.4405,
+      "hashes_unchanged": true,
+      "before_count": 2,
+      "after_count": 2,
+      "casecounts": "not-test"
+    }
+  ],
+  "current_source_membership_epoch": {
+    "summary": "qa/goal-vectorless-2026-10-15/verification-combined-candidate-stage-summary.json",
+    "web_inventory_guards": [
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-web-types-combined-candidate-inventory-guard.json",
+        "pins": 1775,
+        "source_membership": 1573,
+        "sentinel_count": 4
+      },
+      {
+        "path": "qa/goal-vectorless-2026-10-15/verification-web-build-combined-candidate-inventory-guard.json",
+        "pins": 1775,
+        "source_membership": 1573,
+        "sentinel_count": 4
+      }
+    ],
+    "qualification": "Root/broker allsourcefrozen attestation; preflight still independently hashes every declared active receipt pin and end stability. Semantics/reuse remain checker decision."
+  }
+}

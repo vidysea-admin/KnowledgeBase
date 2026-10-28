@@ -1,0 +1,9 @@
+{
+  "startTick": 24018312,
+  "startUtc": "2026-10-15T10:25:28.4496252Z",
+  "earlierSetupActualUnknown": true,
+  "reviewDebit": {
+    "active_s": 150,
+    "tokens": 5200
+  }
+}

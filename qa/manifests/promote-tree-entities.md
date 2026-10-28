@@ -301,3 +301,5 @@ obligation it was set.
    `qa/gates/vector-retrieval-contract.md`; it is broader than I recorded there.
 2. **D-015 by-issue-id reproduction reporting is absent from this manifest** (ISS-134). I reported
    mutation counts, not per-issue reproduction counts against the ledger's own recorded cases.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

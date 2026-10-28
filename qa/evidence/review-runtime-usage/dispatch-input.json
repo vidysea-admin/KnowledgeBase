@@ -1,0 +1,12 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [{"id": "review-runtime-usage-checker-planned", "active_s": 0, "tokens": 0, "cost": null}],
+  "next_phase": {"kind": "review", "active_s": 40, "tokens": 80000, "cost": null},
+  "bootstrap_scope": "Explicit root finite actual-total-token exception:120s/200000 input+output total; prep40s/80000total,review50s/80000total,final30s/40000total. Output allocation3000 separate advisory only. Runtime context floor~41000 tokens; comparable maker phase unknown. Independent public fixture through sole broker; no live full-history audit.",
+  "bootstrap": {"active_s": 120, "tokens": 200000},
+  "allocated_output_budget": 3000,
+  "completion_reserve": false,
+  "manual_completion_reserve": {"active_s": 30, "tokens": 40000, "units": "actual_total_input_plus_output", "reason": "Explicit root finite staged allocation; canonical helper opt-in hardcodes800 tokens and cannot express40000TOTAL. External reserved phase, no helper edits; report legacy_unreserved helper status honestly."},
+  "completion_reserve_id": "review-runtime-usage/0/5f409c1c9cc2c5bcc46ebb3d8ed2b2c33d1831479b9dc7354eca88279badb399",
+  "escalation": {"authority": "root per direct user-task delegation", "reason": "Fresh subagent runtime context exceeds3000 actual TOTAL; finite exception preserves actual-total units and unverified10% ratio", "limits": {"active_s": 120, "tokens": 200000, "cost": null}}
+}

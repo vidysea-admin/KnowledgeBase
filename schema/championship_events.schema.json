@@ -1,0 +1,280 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://championship_events",
+  "title": "ChampionshipEvents",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 10000
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "enum": [
+                  "toc",
+                  "pathlynks",
+                  "counsellor"
+                ]
+              },
+              "reference": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              }
+            },
+            "required": [
+              "kind",
+              "reference"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "source"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 1000
+    },
+    "counsellors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "evidenceReference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "evidenceReference"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1,
+      "maxItems": 100
+    },
+    "judges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "evidenceReference": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "evidenceReference"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0,
+      "maxItems": 100
+    },
+    "rubric": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "reference": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2000
+        }
+      },
+      "required": [
+        "version",
+        "reference"
+      ],
+      "additionalProperties": false
+    },
+    "reviewReference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 2000
+    },
+    "bankDigest": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "frozenAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "counsellorId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evalRunId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1
+          },
+          "aiAnswer": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": true
+          },
+          "counsellorAnswer": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "text"
+            ],
+            "additionalProperties": false
+          },
+          "score": {
+            "type": "object",
+            "properties": {
+              "ai": {
+                "type": "number"
+              },
+              "counsellor": {
+                "type": "number"
+              },
+              "notes": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ai",
+              "counsellor"
+            ],
+            "additionalProperties": false
+          },
+          "credibility": {
+            "const": "internal"
+          },
+          "evalCreatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "capturedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "questionId",
+          "counsellorId",
+          "evalRunId",
+          "question",
+          "aiAnswer",
+          "counsellorAnswer",
+          "score",
+          "credibility",
+          "evalCreatedAt",
+          "capturedAt"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 0
+    },
+    "evidenceStatus": {
+      "const": "operator-supplied-unverified"
+    }
+  },
+  "required": [
+    "_id",
+    "tenantId",
+    "revision",
+    "createdAt",
+    "title",
+    "questions",
+    "counsellors",
+    "judges",
+    "rubric",
+    "reviewReference",
+    "bankDigest",
+    "trials",
+    "evidenceStatus"
+  ],
+  "additionalProperties": false
+}

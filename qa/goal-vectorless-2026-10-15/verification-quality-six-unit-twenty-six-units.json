@@ -1,0 +1,63 @@
+{
+  "units": [
+    {
+      "file": "scripts/eval/extraction-review-resume.test.mjs",
+      "names": [
+        "resume restores saved controls and original date, pending items stay empty, export validates",
+        "render binds exact input bytes, retains context and prevents script breakout",
+        "resume rejects stale, foreign, incomplete and promoted declarations through existing strict consumer"
+      ]
+    },
+    {
+      "file": "scripts/eval/human-calibration.test.mjs",
+      "names": [
+        "executed provenance binds local router adapters parser barrel lock resolver and runtime",
+        "executed provenance predecessor consumer refuses stale missing runtime or after-run bindings"
+      ]
+    },
+    {
+      "file": "scripts/eval/t022-offline-review.test.mjs",
+      "names": [
+        "dirty form retains edits across navigation, export and restore until explicit save or discard",
+        "async restore cannot overwrite edits or assertions made during file reading"
+      ]
+    },
+    {
+      "file": "scripts/eval/extraction-stage-receipts.test.mjs",
+      "names": [
+        "real bound source inventory retains acquisition and stage gaps without source text",
+        "requests reject malformed, duplicate and unknown stage names",
+        "alternate measurement and invalid CLI arguments fail closed without diagnostics"
+      ]
+    },
+    {
+      "file": "packages/index/src/eval/decisions-acquisition.test.ts",
+      "names": [
+        "actual extractor routes decisions; real readback survives into independent measurement consumer",
+        "fabricated citations remain in raw and parsed before actual filtering; degraded readback is skipped",
+        "actual JSON and literal text remain distinct; no raw text is manufactured from JSON",
+        "missing, inaccessible and malformed readback stay unknown; rows are never generated from proposals",
+        "provider failures and malformed output never become clean empty measurements",
+        "genuine provider empty remains distinct from empty source without a provider observation",
+        "scope refusal precedes provider/readback; actual invalid-source extraction remains degraded",
+        "captured stage snapshots resist later mutation and expose foreign storage citations"
+      ]
+    },
+    {
+      "file": "packages/index/src/eval/topic-run-evidence.test.ts",
+      "names": [
+        "records exact source and completion artifacts through actual tree and evaluation consumers",
+        "disabled, missing and empty pages preserve distinct unavailable extraction and actual tree evidence",
+        "actual producer fallback and valid-empty results remain distinguishable",
+        "unknown or malformed usage and unpriced zero never become measured aggregate cost",
+        "foreign, mismatched, duplicate and invalid inputs refuse before completion",
+        "returned evidence stays immutable after late timed-out completion and caller mutation",
+        "exact-byte identity changes and actual regeneration are retained",
+        "unchanged migrated sample bytes feed producer and actual searchable topic nodes"
+      ]
+    }
+  ],
+  "selected": 26,
+  "privateOptIn": "KB_T022_PRIVATE_REVIEW_TESTS removed in dispatch shell before node inheritance",
+  "sharedSetupChargedOnce": true
+}

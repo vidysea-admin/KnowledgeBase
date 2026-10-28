@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "unit": "native-tab-clock-reachable-production-join",
+  "status": "PLAN_ONLY_ROOT_LEASE_REQUIRED",
+  "date": "2026-10-15",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "authority": "Root authorized only this QA join artifact. Existing three native makers active; shared native-media-types rawSHA022057B6A629EEC111C3BAFC4D9FEFE39119DA55EE87A7F1F2EBA7C3EE7F1B77 frozen.",
+  "observedReachability": {
+    "creation": "runRecord in capture/record-commands.ts creates tabConfig without native. Therefore explicit native receiver branch is not reachable from current production entry.",
+    "receiver": "TabBrowserConfig.native accepts server identity/maxBytes/onClosed. Authenticated receiver close obtains codec receiver opaque capability then awaits onClosed(closedSpool, output). Browser wire identities are equality checks, not issuers.",
+    "nativeFinalizer": "finalizeNativeMedia accepts real ClosedNativeSpool and outputs decoded playback, exact lossless selected-provider.wav, video transform and canonical audio metadata.",
+    "currentProviderBypass": "finalizeRecordingWith currently extracts random public-*.m4a from prepared.publicVideo; that bypasses selected-provider.wav canonical origin. Existing runPrivateCaptureProvider checks receipt/generation/public audio ranges/sanitized artifact before runTranscription.",
+    "registry": "registry measureDecodedClock optional server capability remains absent; successful finishIndexAttempt in apps/api/src/indexing/session.ts has no native publication hook shown in inspected block. Native qualification cannot be inferred from a source metadata field."
+  },
+  "minimalSequence": [
+    {
+      "phase": "server invocation",
+      "behavior": "Add explicit default-off native selection in runRecord, scoped to tab backend. Read only trusted server/operator config. Validate consentControl receipt generation; issue independent capture/clock/sampler UUIDs server-side, bind actual tenant/session/meeting generation, producer installed asset digest and observed browser build. Sampler gets exactly the same sampler instance. No identity values taken from HTTP/request JSON. Reject incoherent native configuration before launching; ordinary default legacy path remains."
+    },
+    {
+      "phase": "receiver close and materialization",
+      "behavior": "Provide native.onClosed closure that captures invocation ownership and server policy, calls finalizeNativeMedia with configured finite quota/binary limits and measured playback offset. Await completion; verify physical hashes, exact owner/generation, decoder identities and no incomplete/poisoned spool. Publish playback candidate to the exact expected output via owned atomic no-clobber publication only after successful readback; retain private selected WAV/ledger/receipts in owned slot. Do not overwrite or evict originals. Avoid output substitution and double-finalization."
+    },
+    {
+      "phase": "privacy and canonical selected audio",
+      "behavior": "Pass receiver-owned NativeFinalizedMedia through an internal capability to finalizeRecordingWith; never reconstruct authority from source.json. Preserve first decoded selected WAV sample as canonical transcript t=0. If privacy windows exist, translate their actual capture timeline through qualified measured producer/host mapping and carry guards/uncertainty; produce lossless privacy-masked WAV, decode/readback it, and compose explicit sample/interval transform. Do not extract provider audio from lossy playback or claim an identity map after trim/resample/codec delay. No public STT until the actual private provider guard verifies this selected/masked artifact and current consent generation."
+    },
+    {
+      "phase": "STT and retained provenance",
+      "behavior": "Retain original selected audio privately; pass only allowed selected/masked WAV through runPrivateCaptureProvider and sealed runTranscription input. Bind audio SHA, receipt SHA, source SHA, capture generation and physical EOF. Keep transcript output on canonical selected audio timeline; no retimestamp from message arrival or recorder wall origin. Source metadata may reference private receipts by stable hash/path, never issuer/native readiness. Legacy audio extraction remains selected only for legacy capture."
+    },
+    {
+      "phase": "measured registry issuance after actual index commit",
+      "behavior": "Compose producer clocks, independently decoded IVF/mux/source WAV and every actual finalization/extraction map into canonical selected-audio zero. Require actual supported platform numeric bounds before a native clock measurement can exist. Add optional server-owned post-commit callback invoked only after finishIndexAttempt succeeds; callback revalidates tenant/session/attempt generation and exact committed page/artifact plus consent/effective transcript identity before registering actual private artifacts. Wire production registry readCommitted/measureDecodedClock from trusted capabilities. Missing qualification, pending/failed indexing, revision mismatch or unavailable native proof returns existing unavailable state, never synthetic constructor."
+    }
+  ],
+  "requestedExistingLeases": [
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/record-commands.ts",
+        "packages/meeting-bot/src/capture/record-commands.test.ts"
+      ],
+      "purpose": "Actual native option selection/server identity/onClosed creation and end-to-end invocation seam; root central reservation."
+    },
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/record-finalize.ts",
+        "packages/meeting-bot/src/capture/record-finalize.test.ts"
+      ],
+      "purpose": "Consume native selected WAV instead of legacy playback extraction; TRANSFER ONLY after native_finalizer_maker freezes these exact files."
+    },
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/finalizer-input.test.ts"
+      ],
+      "purpose": "Actual private media transformation/receipt binding; TRANSFER ONLY after native_finalizer_maker freeze."
+    },
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/record-consent/provider-input.ts",
+        "packages/meeting-bot/src/capture/record-consent/provider-input.test.ts"
+      ],
+      "purpose": "Selected canonical/masked audio proof joins through existing pre-upload consent guard."
+    },
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/tiles/registry.ts",
+        "packages/meeting-bot/src/capture/tiles/registry.test.ts"
+      ],
+      "purpose": "Bind trusted measured decoded-clock producer plus current committed native artifacts; reconcile previous capture-registry owner before transfer."
+    },
+    {
+      "paths": [
+        "apps/api/src/indexing/types.ts",
+        "apps/api/src/indexing/session.ts"
+      ],
+      "purpose": "Optional server-owned successful-commit hook carrying actual committed identity; preserve all failure paths and ordinary callers."
+    },
+    {
+      "paths": [
+        "apps/api/src/composition/integrations/transcripts.ts"
+      ],
+      "purpose": "Exact central composition wiring of trusted post-commit and native registry capabilities; root shared reservation requires explicit release."
+    }
+  ],
+  "proposedNewLeases": [
+    "packages/meeting-bot/src/capture/native-capture-runtime.ts",
+    "packages/meeting-bot/src/capture/native-capture-runtime.test.ts",
+    "packages/meeting-bot/src/capture/record-consent/native-provider-audio.ts",
+    "packages/meeting-bot/src/capture/record-consent/native-provider-audio.test.ts",
+    "packages/meeting-bot/src/capture/tiles/native-measurement.ts",
+    "packages/meeting-bot/src/capture/tiles/native-measurement.test.ts",
+    "apps/api/src/indexing/native-commit.test.ts"
+  ],
+  "conditionalLeaseOnly": [
+    {
+      "paths": [
+        "packages/meeting-bot/src/capture/workspace/tab-session-workspace.ts",
+        "packages/meeting-bot/src/capture/record-consent/runtime.ts",
+        "packages/meeting-bot/py/sb_join_tiles.py"
+      ],
+      "condition": "Only if actual launch/sampler generation cannot be passed coherently through record-commands and existing configuration; confirm current frozen maker exports before requesting."
+    },
+    {
+      "paths": [
+        "packages/meeting-bot/src/cli.ts"
+      ],
+      "condition": "Not required if runRecord parses exact explicit native switch; request only if central CLI command routing rejects it."
+    }
+  ],
+  "qualifications": [
+    "Native transport opt-in does not activate a host, approve a meeting, grant consent, satisfy provided-first capture or authorize a provider call.",
+    "Finite raw-spool plus candidate-output quota, bounded queues/timeout, private ACLs, no links/aliases and durable same-byte readback required. Final-output MB/hour target excludes raw private spool and remains separately measured.",
+    "Actual VP8/WebCodecs/canvas lineage and PCM AudioWorklet/getOutputTimestamp capability; pinned actual browser/build/producer asset, FFmpeg/ffprobe identities and supported codecs.",
+    "Measured audio-output estimation and source/sampler latency, bracket uncertainty and drift; actual host/browser clock mapping, suspension/epoch step refusal, no unjustified extrapolation.",
+    "Unknown host qualification can leave native speaker registry unavailable while safe all-public selected-WAV transcription remains possible under ordinary current consent guard. Private-window transcription must refuse if conservative canonical mapping cannot be established.",
+    "Source owner generation, sampler instance, finalizer transformations, actual selected provider audio origin, current private receipt and current committed index/effective transcript all must join. Neither browser JSON native flag nor persisted receipt alone creates authority.",
+    "Interrupted/restarted spool needs private receiver verified resume capability and identical generation/sequence/hash; absent recovery proof remains incomplete. Do not fabricate a capability by JSON/type cast.",
+    "Existing private EOF policy applies: short/truncated original or unmeasurable transforms cannot be padded into public coverage. Safe mask must cover whole held video-frame interval plus total uncertainty.",
+    "Actual measured supported platform acceptance and full T042 four-panelist/human confirmation remain open after synthetic integration."
+  ],
+  "futureBrokerScope": "After all primitive makers freeze, pin full dependency/consumer graph. Focused invocation→opaque spool→native finalizer→selected WAV→privacy/provider callback→actual successful commit→registry tests using synthetic files/fake provider only; existing legacy capture/privacy regression floor and same-owner restart/incomplete/refusal paths. Native media decoder fixtures require explicit broker execution grant; no tests requested or run in this plan.",
+  "excluded": "No source write, implementation, provider/browser/DB call, tests, new dependencies/schema/contracts/global/enforcement/architecture/tracker edits. No lease grant or native readiness/acceptance claim.",
+  "next": "Root reviews exact lease collisions; release minimal phases in order after makers freeze. Production path is not complete until actual runRecord and finalizer/provider/index/registry consumers are wired and checked."
+}

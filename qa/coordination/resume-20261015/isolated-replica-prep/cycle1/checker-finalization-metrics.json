@@ -1,0 +1,77 @@
+{
+  "escalation": {
+    "authority": "Root explicit cycle1 manual source-only continuation grant2026-10-16",
+    "limits": {
+      "active_s": 270,
+      "tokens": 36000,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "reason": "Actual security fix cycle1: additional120active seconds/16000allocated actual-total tokens INCLUDING30s/4000completion; preserve cycle0 conservative150s/20000debits and unknown actuals. Prior180s/24000was ceiling, never consumption."
+  },
+  "bootstrap_scope": "Exact offline launcher/config/ignore safety review; no activation or vendor execution",
+  "completion_reserve": true,
+  "next_phase": {
+    "kind": "finalization",
+    "token_metric": "actual_total",
+    "active_s": 30,
+    "cost": null,
+    "tokens": 4000
+  },
+  "completion_reserve_tokens": 4000,
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "cost": null,
+    "tokens": null
+  },
+  "completion_reserve_id": "isolated-replica-prep/1/eaecc9f5e2047ff7911a2074f69ca2b14f5c37574c39f79c7e1919eacac2cd37",
+  "reviewers": [
+    {
+      "budget_debit": {
+        "token_metric": "actual_total",
+        "tokens": 16000,
+        "active_s": 120
+      },
+      "id": "isolated_replica_source_checker",
+      "active_s": null,
+      "token_metric": "actual_total",
+      "tokens": null,
+      "cost": null
+    },
+    {
+      "cost": null,
+      "active_s": null,
+      "tokens": null,
+      "completion_reserve_id": "isolated-replica-prep/0/1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+      "token_metric": "actual_total",
+      "phase_kind": "finalization",
+      "id": "isolated_replica_source_checker-cycle0-finalization",
+      "budget_debit": {
+        "tokens": 4000,
+        "active_s": 30,
+        "cost": null,
+        "token_metric": "actual_total"
+      }
+    },
+    {
+      "cost": null,
+      "budget_debit": {
+        "token_metric": "actual_total",
+        "active_s": 90,
+        "tokens": 12000
+      },
+      "id": "isolated_replica_source_checker-cycle1-review",
+      "active_s": null,
+      "tokens": null,
+      "token_metric": "actual_total"
+    }
+  ],
+  "bootstrap": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "cost": null,
+    "tokens": 6000
+  },
+  "token_metric": "actual_total"
+}

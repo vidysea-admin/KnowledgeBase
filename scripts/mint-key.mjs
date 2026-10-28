@@ -8,7 +8,14 @@
  * exact bypass that made an earlier 'verified live' claim misleading). Minting a credential is
  * not seeding content, so this script exists to make `live-verify.mjs` runnable without it.
  *
- * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify]
+ * Usage: node scripts/mint-key.mjs [--tenant toc] [--label live-verify] [--with-scope send-now] [--with-scope join-rules]
+ *   Default keys never hold a dedicated write scope; ask for it by name (repeatable, or comma list). Unknown names exit 1.
+ *   send-now can launch a recording bot; join-rules lets a key edit the join rules (PUT/POST). Without it /join-rules opens read-only.
+ *   Database: no default. An isolated MONGO_WORK_DB (or lkb_staging with LKB_ALLOW_STAGING) is used without a flag; `lkb` needs
+ *   --i-know-this-is-production AND MONGODB_DB=lkb exactly (D-150); anything else is refused before connecting.
+ *   --scopes a,b,c adds any scope the API enforces (e.g. answer-policy:read,hosting,jobs) on top of the defaults; unknown names exit 1.
+ *   --all-scopes mints an operator ADMIN key with every scope (prints a warning to stderr). The key is still stored hashed and printed once.
+ *   Editor key:  node scripts/mint-key.mjs --tenant toc --label join-rules-editor --with-scope join-rules
  */
 import { randomUUID, randomBytes, createHash } from "node:crypto";
 import "dotenv/config";
@@ -16,24 +23,33 @@ import { register } from "tsx/esm/api";
 
 register();
 
-const ALL_SCOPES = [
-  "ask", "compete", "sources", "sessions", "search", "citations", "webhooks",
-  "gaps", "graph", "calendar", "gmail", "whatsapp", "keys", "ingest",
-];
+const { scopesFromArgv, wantsAllScopes, ADMIN_KEY_WARNING } = await import("./lib/mint-scopes.mjs");
+const { requireScriptDatabase } = await import("./lib/transcript-provenance.mjs");
 
 function argOf(name, fallback) {
   const i = process.argv.indexOf(`--${name}`);
   return i >= 0 && process.argv[i + 1] ? process.argv[i + 1] : fallback;
 }
 
+let scopes;
+try { scopes = scopesFromArgv(process.argv.slice(2)); }
+catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
+if (wantsAllScopes(process.argv.slice(2))) console.error(ADMIN_KEY_WARNING);
 const tenantId = argOf("tenant", "toc");
 const label = argOf("label", "live-verify");
 
-const { connect, getDb } = await import("../packages/db/src/index.ts");
+const { connect, getDb, assertValidTenantId } = await import("../packages/db/src/index.ts");
 
-const url = process.env.MONGODB_URL;
-if (!url) throw new Error("MONGODB_URL not set in environment/.env");
-await connect(url, process.env.MONGODB_DB ?? "lkb");
+// Same validator the data accessor uses (ISS-AUTHTENANT-002): refuse BEFORE connecting or touching api_keys, with a clean message and exit 1.
+try { assertValidTenantId(tenantId, "mint-key --tenant"); }
+catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
+
+// ISS-LEGACYSEED-002 (D-150): no lkb default. Work/staging DBs only, unless --i-know-this-is-production AND MONGODB_DB=lkb exactly.
+// Refuses (exit 1) BEFORE connecting or touching api_keys.
+let target;
+try { target = requireScriptDatabase(process.env, process.argv.slice(2), {allowProduction: true}); }
+catch (err) { console.error(`mint-key: ${err.message}`); process.exit(1); }
+await connect(target.url, target.dbName);
 
 const rawKey = `lv_${randomBytes(24).toString("hex")}`;
 const db = getDb();
@@ -44,7 +60,7 @@ await db.collection("api_keys").insertOne({
   _id: randomUUID(),
   tenantId,
   keyHash: createHash("sha256").update(rawKey, "utf8").digest("hex"),
-  scopes: ALL_SCOPES,
+  scopes,
   label,
   createdAt: new Date().toISOString(),
   revokedAt: null,

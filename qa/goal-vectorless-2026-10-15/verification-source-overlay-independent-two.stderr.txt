@@ -1,0 +1,15 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: case alias must refuse
+    at file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/release-delivery/source-overlay-checker-probe.mjs:24:9 {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.19.0

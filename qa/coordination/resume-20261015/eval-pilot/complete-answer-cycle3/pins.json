@@ -1,0 +1,33 @@
+{
+  "pair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "pins": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "6e75046459eefaddd5ee49bc78f9ca6e8c3cb41a16d98dbf81b6f4daeb49bcfa"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "2fbc28ac7f847776e5d911d69423c4905d6f4f5baf4d4c1f957b32c583cf48e1"
+    }
+  ],
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "rawCorpusSha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "questions": 92,
+  "candidates": 29,
+  "questionId": "2026-04-21-visa-blueprint-part2-italy-france-nz-gq01",
+  "questionSha256": "484335769f0957e252b9ae16e6372953344f0b951845b1598abcc51be83611c1",
+  "acceptedIdsSha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "candidateIdsSha256": "033745a6e7b31dd23300281355fc87d57a156885fd0b4e65918e32b1cd53752c",
+  "baselinePaths": [
+    "receipt.remaining-probe.json",
+    "provider-request-ledger.jsonl",
+    "grant2/provider-request-reservations.jsonl",
+    "grant2/actual-receipt.json"
+  ],
+  "baselineHashes": [
+    "a26d1609f4cfbde96638578529a96054799bff90b0de4bab396829b0a01beb3b",
+    "eded82c753e304ff453cce2905f39324a604c6a55fdc9c156c497924c4d083f6",
+    "c255070a6b4030537cf4276845f874d1657abb6741439874fa9ccdff9ac19dc7",
+    "5036012ac7670a680eee7a68762ae98dfc4709d51e02a82d88c58e8ddc37c394"
+  ]
+}

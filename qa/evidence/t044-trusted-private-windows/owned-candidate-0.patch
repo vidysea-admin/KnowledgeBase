@@ -1,0 +1,375 @@
+diff --git a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__lib__transcription__transcript-qa-generation.mjs b/scripts/lib/transcription/transcript-qa-generation.mjs
+index da35d5df..d77d4a1a 100644
+--- a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__lib__transcription__transcript-qa-generation.mjs
++++ b/scripts/lib/transcription/transcript-qa-generation.mjs
+@@ -42,6 +42,17 @@ export function assertQaGenerationShape(proof) {
+       !finite(proof.durationSec) || proof.durationSec <= 0 || !Array.isArray(proof.spans)) fail("unbound or malformed transcript generation");
+   assertQaReport(proof.merged);
+   if (proof.merged.durationSec !== proof.durationSec) fail("merged duration mismatch");
++  if (proof.privacy !== undefined) {
++    const p = proof.privacy;
++    if (!object(p) || !/^[0-9a-f]{64}$/.test(p.receiptSha256 ?? "") || !/^[0-9a-f]{64}$/.test(p.sanitizedAudioSha256 ?? "") ||
++        !Array.isArray(p.publicIntervals) || !p.publicIntervals.length) fail("invalid privacy generation binding");
++    let previousEnd = 0;
++    for (const window of p.publicIntervals) {
++      if (!object(window) || !finite(window.tStart) || !finite(window.tEnd) || window.tStart < previousEnd ||
++          window.tEnd <= window.tStart || window.tEnd > proof.durationSec) fail("invalid public privacy intervals");
++      previousEnd = window.tEnd;
++    }
++  }
+   const ids = new Set();
+   let accepted = 0;
+   let retainedOutputCount = 0;
+@@ -50,6 +61,20 @@ export function assertQaGenerationShape(proof) {
+         !finite(span.offsetSeconds) || span.offsetSeconds < 0) fail("invalid span attempt identity");
+     ids.add(span.id);
+     assertQaReport(span.report);
++    if (proof.privacy && (!span.providerReport || !span.privacy)) fail("privacy span lacks raw provider/exclusion evidence");
++    if (span.providerReport !== undefined) {
++      assertQaReport(span.providerReport);
++      if (span.providerReport.durationSec !== span.report.durationSec) fail("raw/public span duration mismatch");
++      if (span.privacy !== undefined && span.privacy !== null) {
++        const p = span.privacy;
++        if (!proof.privacy || !object(p) || p.receiptSha256 !== proof.privacy.receiptSha256 ||
++            !count(p.inputCount) || !count(p.outputCount) || p.inputCount !== span.providerReport.inputCount ||
++            p.outputCount !== span.report.inputCount || p.offsetSeconds !== span.offsetSeconds ||
++            !Array.isArray(p.excludedIndices) || p.inputCount !== p.outputCount + p.excludedIndices.length ||
++            p.excludedIndices.some(i => !count(i) || i >= p.inputCount) || new Set(p.excludedIndices).size !== p.excludedIndices.length ||
++            p.excludedIndices.some(i => span.providerReport.dropped.some(d => d.index === i))) fail("contradictory privacy exclusion counts/indices");
++      } else if (span.providerReport.inputCount !== span.report.inputCount) fail("raw/public input count changed without privacy evidence");
++    } else if (span.privacy !== undefined && span.privacy !== null) fail("privacy exclusions lack raw provider report");
+     if (span.accepted) {
+       accepted++;
+       retainedOutputCount += span.report.outputCount;
+@@ -61,8 +86,9 @@ export function assertQaGenerationShape(proof) {
+ }
+ 
+ /** Producer calls AFTER committing turns.json; bytes are read from that actual committed file. */
+-export function buildTranscriptQaGeneration({ turnsBytes, durationSec, spans, merged }) {
+-  const proof = structuredClone({ version: 1, turnsSha256: transcriptBytesSha256(turnsBytes), durationSec, spans, merged });
++export function buildTranscriptQaGeneration({ turnsBytes, durationSec, spans, merged, privacy }) {
++  const proof = structuredClone({ version: 1, turnsSha256: transcriptBytesSha256(turnsBytes), durationSec, spans, merged,
++    ...(privacy === undefined ? {} : { privacy }) });
+   assertQaGenerationShape(proof);
+   return proof;
+ }
+diff --git a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__lib__transcription__transcript-qa-generation.test.mjs b/scripts/lib/transcription/transcript-qa-generation.test.mjs
+index 834d89c0..f59dec70 100644
+--- a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__lib__transcription__transcript-qa-generation.test.mjs
++++ b/scripts/lib/transcription/transcript-qa-generation.test.mjs
+@@ -53,3 +53,23 @@ test("real repaired/past-end audit reports are retained without builder discardi
+   const input = args(); input.spans[0].report = r;
+   assert.equal(buildTranscriptQaGeneration(input).spans[0].report.hallucination.pastEndIndices.length, 1);
+ });
++
++test("privacy ledger conserves raw/public counts while keeping provider anomalies visible", () => {
++  const input = args();
++  input.privacy = { receiptSha256: "a".repeat(64), sanitizedAudioSha256: "b".repeat(64), publicIntervals: [{ tStart: 0, tEnd: 9 }] };
++  input.spans[0].providerReport = clampAndValidateTurns([...turns, { speakerRef: "s", tStart: 9, tEnd: 10, text: "protected" }], 10).report;
++  input.spans[0].privacy = { receiptSha256: input.privacy.receiptSha256, inputCount: 2, outputCount: 1, excludedIndices: [1], offsetSeconds: 0 };
++  assert.equal(buildTranscriptQaGeneration(input).spans[0].providerReport.inputCount, 2);
++  for (const patch of [{ inputCount: 3 }, { outputCount: 2 }, { excludedIndices: [0, 0] }, { offsetSeconds: 1 }, { receiptSha256: "c".repeat(64) }]) {
++    assert.throws(() => buildTranscriptQaGeneration({ ...input, spans: [{ ...input.spans[0], privacy: { ...input.spans[0].privacy, ...patch } }] }), /privacy exclusion/);
++  }
++  const bad = structuredClone(input);
++  bad.spans[0].providerReport = clampAndValidateTurns([...turns, { speakerRef: "s", tStart: 10, tEnd: 12, text: "past-end" }], 10).report;
++  assert.throws(() => buildTranscriptQaGeneration(bad), /privacy exclusion/, "privacy cannot remove a raw dropped/past-end index");
++});
++
++test("privacy generation intervals must be finite, ordered and inside audio", () => {
++  for (const publicIntervals of [[], [{ tStart: -1, tEnd: 9 }], [{ tStart: 0, tEnd: 11 }], [{ tStart: 0, tEnd: 5 }, { tStart: 4, tEnd: 9 }], [{ tStart: 0, tEnd: NaN }]]) {
++    assert.throws(() => buildTranscriptQaGeneration({ ...args(), privacy: { receiptSha256: "a".repeat(64), sanitizedAudioSha256: "b".repeat(64), publicIntervals } }), /privacy/);
++  }
++});
+diff --git a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__transcript-qa-binding.mjs b/scripts/webinar/validate/transcript-qa-binding.mjs
+index 70059f23..73b0b468 100644
+--- a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__transcript-qa-binding.mjs
++++ b/scripts/webinar/validate/transcript-qa-binding.mjs
+@@ -1,15 +1,23 @@
+ /** Validate generation-bound QA against one frozen transcript snapshot and probed audio duration. */
+ import { assertQaGenerationShape, qaReportFailureReasons, transcriptBytesSha256 } from "../../lib/transcription/transcript-qa-generation.mjs";
+ 
+-export function evaluateTranscriptQaGeneration({ proof, turnsBytes, turns, durationSec, clamp }) {
++export function evaluateTranscriptQaGeneration({ proof, turnsBytes, turns, durationSec, clamp, privacy = null }) {
+   const reasons = [];
+   try { assertQaGenerationShape(proof); } catch (error) { return { qa: null, reasons: [error.message] }; }
+   if (proof.turnsSha256 !== transcriptBytesSha256(turnsBytes)) reasons.push("QA report is stale: transcript generation hash mismatch");
+   if (proof.durationSec !== durationSec) reasons.push("QA report: independently probed audio duration mismatch");
+   if (proof.merged.outputCount !== turns.length) reasons.push(`QA report is stale: it covers ${proof.merged.outputCount} turns, turns.json has ${turns.length}`);
++  if (privacy) {
++    if (!proof.privacy || proof.privacy.receiptSha256 !== privacy.receiptSha256 ||
++        proof.privacy.sanitizedAudioSha256 !== privacy.sanitizedAudioSha256 ||
++        JSON.stringify(proof.privacy.publicIntervals) !== JSON.stringify(privacy.publicIntervals)) reasons.push("QA report: trusted privacy generation mismatch");
++  } else if (proof.privacy !== undefined) reasons.push("QA report: privacy binding lacks trusted recording evidence");
+   reasons.push(...qaReportFailureReasons(proof.merged, "QA merged"));
+   const selected = proof.spans.filter(span => span.accepted);
+-  for (const span of selected) reasons.push(...qaReportFailureReasons(span.report, `QA accepted span ${span.id}`));
++  for (const span of selected) {
++    reasons.push(...qaReportFailureReasons(span.report, `QA accepted span ${span.id}`));
++    if (span.providerReport) reasons.push(...qaReportFailureReasons(span.providerReport, `QA accepted provider ${span.id}`));
++  }
+   // The clamp snaps floating-point overshoot within its tolerance without counting a clamp.
+   // Admission checks the original committed timestamps, so even that uncounted overshoot refuses.
+   if (turns.some(t => !t || !Number.isFinite(t.tStart) || !Number.isFinite(t.tEnd) ||
+diff --git a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__transcript-qa-binding.test.mjs b/scripts/webinar/validate/transcript-qa-binding.test.mjs
+index c696e18d..201880ee 100644
+--- a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__transcript-qa-binding.test.mjs
++++ b/scripts/webinar/validate/transcript-qa-binding.test.mjs
+@@ -75,3 +75,27 @@ test("legacy/unbound/malformed proof and contradictory clamp/drop/overshoot clai
+   f.proof.merged.overshootSec = 400;
+   assert.ok(check(f).reasons.length);
+ });
++
++test("actual trusted privacy generation must match QA; same output with changed privacy refuses", () => {
++  const f = fixture();
++  f.privacy = { receiptSha256: "a".repeat(64), sanitizedAudioSha256: "b".repeat(64), publicIntervals: [{ tStart: 0, tEnd: 9 }] };
++  f.proof.privacy = structuredClone(f.privacy);
++  f.proof.spans[0].providerReport = structuredClone(f.proof.spans[0].report);
++  f.proof.spans[0].privacy = { receiptSha256: f.privacy.receiptSha256, inputCount: 1, outputCount: 1, excludedIndices: [], offsetSeconds: 0 };
++  assert.deepEqual(check(f).reasons, []);
++  assert.match(check({ ...f, privacy: null }).reasons.join("; "), /lacks trusted recording/);
++  for (const patch of [{ receiptSha256: "c".repeat(64) }, { sanitizedAudioSha256: "c".repeat(64) }, { publicIntervals: [{ tStart: 1, tEnd: 9 }] }]) {
++    assert.match(check({ ...f, privacy: { ...f.privacy, ...patch } }).reasons.join("; "), /privacy generation mismatch/);
++  }
++});
++
++test("accepted raw provider anomaly survives filtered public QA; discarded raw attempt is audit only", () => {
++  const f = fixture();
++  f.proof.spans[0].providerReport = clampAndValidateTurns([turn(0, 9), turn(10, 12)], 10).report;
++  // Equal original/public input counts are not claimed: no privacy exclusion of the invalid tail is allowed.
++  f.proof.spans[0].report = structuredClone(f.proof.spans[0].providerReport);
++  assert.match(check(f).reasons.join("; "), /accepted provider selected-1.*past the audio end/);
++  f.proof.spans[0].accepted = false;
++  f.proof.spans.push({ ...fixture().proof.spans[0], id: "selected-clean" });
++  assert.deepEqual(check(f).reasons, []);
++});
+diff --git a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__validate-session.mjs b/scripts/webinar/validate/validate-session.mjs
+index 42829093..43626e9b 100644
+--- a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__validate-session.mjs
++++ b/scripts/webinar/validate/validate-session.mjs
+@@ -35,6 +35,7 @@ import { flagOn, TRANSCRIPT_QA_FLAG, GAP_THRESHOLD_SECONDS, SHORTFALL_THRESHOLD_
+ import { validateTurns } from "../process-video.mjs";
+ import { loadWebinarSession } from "../session-rows.mjs";
+ import { evaluateTranscriptQaGeneration } from "./transcript-qa-binding.mjs";
++import { loadTrustedRecordingPrivacy, evaluateRecordingCoverage } from "../../lib/transcription/private-recording.mjs";
+ 
+ const DEFAULT_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
+ const sha = (bytes) => createHash("sha256").update(bytes).digest("hex");
+@@ -49,17 +50,18 @@ export function probeDurationSeconds(audioPath) {
+ }
+ 
+ /** QA evidence + failure reasons from transcript-qa.json (T-044). Counts only, never transcript text. */
+-async function qaEvidence(dir, turns, turnsBytes, durationSec, env) {
++async function qaEvidence(dir, turns, turnsBytes, durationSec, env, privacy) {
+   const path = join(dir, "transcript-qa.json");
+   if (!existsSync(path)) {
+-    return { qa: null, qaSha256: null, reasons: flagOn(env, TRANSCRIPT_QA_FLAG) ? [`${TRANSCRIPT_QA_FLAG}=1 but transcript-qa.json is missing`] : [] };
++    return { qa: null, qaSha256: null, reasons: privacy ? ["trusted captured privacy requires generation-bound transcript-qa.json"] :
++      flagOn(env, TRANSCRIPT_QA_FLAG) ? [`${TRANSCRIPT_QA_FLAG}=1 but transcript-qa.json is missing`] : [] };
+   }
+   let proof;
+   let qaBytes;
+   try { qaBytes = readFileSync(path); proof = JSON.parse(qaBytes.toString("utf8")); } catch { return { qa: null, qaSha256: null, reasons: ["transcript-qa.json is unreadable"] }; }
+   register();
+   const { clampAndValidateTurns } = await import("../../../packages/ai/src/stt/transcript-qa.ts");
+-  return { ...evaluateTranscriptQaGeneration({ proof, turnsBytes, turns, durationSec, clamp: clampAndValidateTurns }), qaSha256: sha(qaBytes) };
++  return { ...evaluateTranscriptQaGeneration({ proof, turnsBytes, turns, durationSec, clamp: clampAndValidateTurns, privacy }), qaSha256: sha(qaBytes) };
+ }
+ 
+ /**
+@@ -70,10 +72,18 @@ async function qaEvidence(dir, turns, turnsBytes, durationSec, env) {
+ export async function validateSession({ root = DEFAULT_ROOT, sessionId, durationSec, acceptPartial = false, dryRun = false, env = process.env, now = () => new Date(), findTimeGaps } = {}) {
+   const dataDir = join(root, "data", "toc-migrated"), dir = join(dataDir, sessionId);
+   const tenantId = transcriptTenant(dataDir, sessionId); // validates the sessionId shape too
+-  const duration = durationSec ?? probeDurationSeconds(findAudioFile(dataDir, join(root, "raw", "TOC", "TOC-Materials", "Audio"), sessionId).path);
++  const probedAudioPath = durationSec === undefined ? findAudioFile(dataDir, join(root, "raw", "TOC", "TOC-Materials", "Audio"), sessionId).path : undefined;
++  const duration = durationSec ?? probeDurationSeconds(probedAudioPath);
+   if (!findTimeGaps) { register(); findTimeGaps = (await import("../../../packages/ai/src/stt/chunk-audio.ts")).findTimeGaps; }
+ 
+   const reasons = [];
++  let source, sourceBytes, privacy = null;
++  try {
++    sourceBytes = readFileSync(join(dir, "source.json")); source = JSON.parse(sourceBytes.toString("utf8"));
++    register();
++    privacy = await loadTrustedRecordingPrivacy({ root, sessionId, source, audioPath: probedAudioPath, durationSeconds: duration });
++    if (privacy && privacy.sourceSha256 !== sha(sourceBytes)) throw new Error("Capture source snapshot changed during validation");
++  } catch (e) { reasons.push(`recording privacy evidence: ${e.message}`); }
+   let turns = [];
+   let turnsBytes = Buffer.alloc(0);
+   try { turnsBytes = readFileSync(join(dir, "turns.json")); turns = JSON.parse(turnsBytes.toString("utf8")); } catch (e) { reasons.push(`turns.json unreadable: ${e.message}`); }
+@@ -83,21 +93,35 @@ export async function validateSession({ root = DEFAULT_ROOT, sessionId, duration
+     step(() => { if (JSON.stringify(immutableTranscriptTurns(tenantId, sessionId, turns)) !== JSON.stringify(turns)) throw new Error("turns.json does not match its canonical transcript identity (not written by the transcription pipeline?)"); });
+     step(() => validateTurns(turns, duration, { tenantId, sessionId }));
+     step(() => assertTurnTimings(turns, sessionId));
++    if (privacy) step(() => {
++      if (turns.some(t => !t || !Number.isFinite(t.tStart) || !Number.isFinite(t.tEnd) ||
++          !(0 <= t.tStart && t.tStart <= t.tEnd && t.tEnd <= duration))) throw new Error("private recording transcript outside exact audio bounds");
++      if (privacy.filterSpanTurns(turns, 0, duration).privacy.excludedIndices.length) throw new Error("turns.json includes intentionally protected recording content");
++    });
+   }
+   const lastTEnd = turns.length ? Math.max(...turns.map((t) => (Number.isFinite(t.tEnd) ? t.tEnd : 0))) : 0;
+-  const gaps = turns.length ? findTimeGaps(turns, GAP_THRESHOLD_SECONDS) : [];
+-  const shortfallSec = duration - lastTEnd;
+-  const coverage = round(Math.min(lastTEnd / duration, 1), 4);
+-  const partial = turns.length > 0 && (gaps.length > 0 || shortfallSec > SHORTFALL_THRESHOLD_SECONDS);
++  const publicCoverage = privacy ? evaluateRecordingCoverage({ privacy, turns, durationSeconds: duration,
++    gapThresholdSeconds: GAP_THRESHOLD_SECONDS, tailThresholdSeconds: SHORTFALL_THRESHOLD_SECONDS }) : null;
++  const gaps = publicCoverage ? publicCoverage.gaps : turns.length ? findTimeGaps(turns, GAP_THRESHOLD_SECONDS) : [];
++  const shortfallSec = publicCoverage ? publicCoverage.tailShortfall : duration - lastTEnd;
++  const coverage = round(publicCoverage ? publicCoverage.coveredPublicSeconds / publicCoverage.expectedPublicSeconds : Math.min(lastTEnd / duration, 1), 4);
++  const partial = turns.length > 0 && (publicCoverage ? !publicCoverage.complete : gaps.length > 0 || shortfallSec > SHORTFALL_THRESHOLD_SECONDS);
+   if (partial && !acceptPartial) {
+     reasons.push(`partial coverage ${(coverage * 100).toFixed(1)}% (${gaps.length} internal gap(s) > ${GAP_THRESHOLD_SECONDS}s, tail shortfall ${round(shortfallSec, 1)}s > ${SHORTFALL_THRESHOLD_SECONDS}s); re-run with --accept-partial to record it as accepted`);
+   }
+-  const { qa, qaSha256, reasons: qaReasons } = await qaEvidence(dir, turns, turnsBytes, duration, env);
++  const { qa, qaSha256, reasons: qaReasons } = await qaEvidence(dir, turns, turnsBytes, duration, env, privacy);
+   reasons.push(...qaReasons);
++  if (privacy) { try { await privacy.verifyCurrent(); } catch (e) { reasons.push(`recording privacy evidence changed: ${e.message}`); } }
++  if (sourceBytes) step(() => {
++    if (!readFileSync(join(dir, "source.json")).equals(sourceBytes)) throw new Error("source.json changed during validation");
++  });
+ 
+   const passed = reasons.length === 0;
+   const evidence = { durationSec: duration, turnCount: turns.length, lastTEnd, coverage, partial, shortfallSec: round(shortfallSec, 3),
+-    gaps: gaps.map((g) => ({ start: g.gapStart, end: g.gapEnd })), qa, qaSha256, turnsSha256: turns.length ? sha(turnsBytes) : null,
++    gaps: gaps.map((g) => ({ start: g.gapStart, end: g.gapEnd, ...(g.gapSeconds === undefined ? {} : { unprotectedSeconds: g.gapSeconds }) })),
++    qa, qaSha256, turnsSha256: turns.length ? sha(turnsBytes) : null, sourceSha256: sourceBytes ? sha(sourceBytes) : null,
++    ...(privacy ? { privacy: { receiptSha256: privacy.receiptSha256, sanitizedAudioSha256: privacy.sanitizedAudioSha256,
++      publicIntervals: privacy.publicIntervals }, privacyCoverage: publicCoverage } : {}),
+     validatedAt: now().toISOString(), validator: "scripts/webinar/validate/validate-session.mjs" };
+   const report = passed
+     ? { status: "passed", transcriptValidated: true, ...evidence, ...(partial ? { partialAccepted: true } : {}) }
+diff --git a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__validate-session.test.mjs b/scripts/webinar/validate/validate-session.test.mjs
+index 42daa915..aa043658 100644
+--- a/qa/evidence/t044-trusted-private-windows/base-source-v0/scripts__webinar__validate__validate-session.test.mjs
++++ b/scripts/webinar/validate/validate-session.test.mjs
+@@ -11,11 +11,49 @@ import { writeTranscriptGeneration } from "../../lib/transcript-provenance.mjs";
+ import { loadWebinarSession } from "../session-rows.mjs";
+ import { buildTranscriptQaGeneration } from "../../lib/transcription/transcript-qa-generation.mjs";
+ import { clampAndValidateTurns } from "../../../packages/ai/src/stt/transcript-qa.ts";
++import { createHash } from "node:crypto";
++import { createRecordConsent } from "../../../packages/meeting-bot/src/capture/record-consent/context.ts";
++import { writeRecordConsent, readRecordConsent } from "../../../packages/meeting-bot/src/capture/record-consent/receipt-store.ts";
++import { loadTrustedRecordingPrivacy } from "../../lib/transcription/private-recording.mjs";
+ 
+ const SID = "fixture-webinar-p2", TENANT = "tenant-a", DURATION = 900;
+ const NOW = () => new Date("2026-10-14T07:00:00.000Z");
+ const FAILED = { stage: "transcript", status: "failed", durationSec: DURATION, error: "Error: Command failed: transcribe-long-session.mjs" };
+ const raw = (n, step = 12) => Array.from({ length: n }, (_, i) => ({ speakerRef: "spk:0", tStart: i * step, tEnd: i * step + step - 1, text: `turn ${i} about visas` }));
++const sha = bytes => createHash("sha256").update(bytes).digest("hex");
++
++// Durable protocol fixture, not a real codec/redaction/provider acceptance test.
++async function captured({ root, dir, put }, privateWindows = [{ tStart: 300, tEnd: 600 }]) {
++  const recordDir = join(root, "capture"), media = join(root, "media");
++  mkdirSync(recordDir, { recursive: true }); mkdirSync(media, { recursive: true });
++  const artifacts = { video: Buffer.from("synthetic public video"), audio: Buffer.from("synthetic sanitized audio"), original: Buffer.from("synthetic original private media") };
++  for (const [name, bytes] of Object.entries(artifacts)) writeFileSync(join(media, `${name}.fixture`), bytes);
++  const receipt = createRecordConsent(["--organizer-consent", "given", "--capture-approved-by", "Umesh", "--capture-approval-ref", "recording-fixture", "--recorded-by", "test"],
++    { tenantId: TENANT, sessionId: SID, meetingUrl: "https://meet.example.test/fixture" },
++    { LKB_CAPTURE_CONTROL_GENERATION: "10000000-0000-4000-8000-000000000001" }, NOW());
++  receipt.mediaStartedAt = NOW().getTime(); receipt.privateWindows = privateWindows;
++  writeRecordConsent(recordDir, receipt);
++  const checked = readRecordConsent(recordDir, receipt);
++  const source = { _id: `${SID}-src`, title: "Synthetic protected recording", tenantId: TENANT, captureMode: "silent", audioLevel: { silent: false },
++    createdAt: NOW().toISOString(),
++    captureGeneration: checked.generation,
++    path: "media/video.fixture", audioPath: "media/audio.fixture",
++    captureConsent: { sessionId: SID, meetingHash: checked.meetingHash, generation: checked.generation, recordDir: "capture", originalAudioPath: "media/original.fixture",
++      receiptSha256: sha(JSON.stringify(checked)), publicVideoSha256: sha(artifacts.video), sanitizedAudioSha256: sha(artifacts.audio) } };
++  put("source.json", source);
++  const privacy = await loadTrustedRecordingPrivacy({ root, sessionId: SID, source, durationSeconds: DURATION });
++  return { privacy, receipt: checked, source, recordDir };
++}
++
++function privateQa(dir, privacy, originalTurns) {
++  const turnsBytes = readFileSync(join(dir, "turns.json")), turns = JSON.parse(turnsBytes);
++  const filtered = privacy.filterSpanTurns(originalTurns, 0, DURATION);
++  return buildTranscriptQaGeneration({ turnsBytes, durationSec: DURATION,
++    privacy: { receiptSha256: privacy.receiptSha256, sanitizedAudioSha256: privacy.sanitizedAudioSha256, publicIntervals: privacy.publicIntervals },
++    merged: clampAndValidateTurns(turns, DURATION).report,
++    spans: [{ id: "trusted-selected", accepted: true, offsetSeconds: 0, providerReport: clampAndValidateTurns(originalTurns, DURATION).report,
++      report: clampAndValidateTurns(filtered.turns, DURATION).report, privacy: filtered.privacy }] });
++}
+ 
+ /** A session dir the way the pipeline leaves it after a FAILED first transcription. */
+ function fixture(run) {
+@@ -23,7 +61,7 @@ function fixture(run) {
+   const dir = join(root, "data", "toc-migrated", SID);
+   mkdirSync(dir, { recursive: true });
+   const put = (name, value) => writeFileSync(join(dir, name), JSON.stringify(value, null, 2));
+-  put("source.json", { _id: `${SID}-src`, tenantId: TENANT, title: "Webinar p2", createdAt: "2026-10-13T15:27:53Z", captureMode: "silent", audioLevel: { silent: false } });
++  put("source.json", { _id: `${SID}-src`, tenantId: TENANT, title: "Webinar p2", createdAt: "2026-10-13T15:27:53Z", captureMode: "provided", audioLevel: { silent: false } });
+   put("validation.json", FAILED);
+   const transcribe = (turns) => writeTranscriptGeneration(dir, TENANT, SID, turns); // what transcribe-long-session.mjs does
+   const validate = (opts = {}) => validateSession({ root, sessionId: SID, durationSec: DURATION, now: NOW, env: {}, ...opts });
+@@ -240,6 +278,70 @@ test("unsafe sessionId is refused", async () => {
+   await assert.rejects(validateSession({ root: tmpdir(), sessionId: "../x", durationSec: 1 }), /invalid sessionId/);
+ });
+ 
++test("known capture without durable receipt cannot waive missing speech or reuse public validation", () => fixture(async ({ dir, put, transcribe, validate }) => {
++  transcribe(raw(73));
++  for (const patch of [{ captureMode: "silent" }, { privateWindows: [{ tStart: 0, tEnd: DURATION }] }, { guardedPrivateWindows: [] }, { captureConsent: { sessionId: "foreign" } }]) {
++    put("source.json", { tenantId: TENANT, captureMode: "provided", ...patch });
++    const r = await validate({ acceptPartial: true });
++    assert.equal(r.passed, false);
++    assert.match(r.report.error, /privacy evidence/);
++    assert.match(r.report.sourceSha256, /^[a-f0-9]{64}$/);
++  }
++}));
++
++test("trusted durable private interval excuses only protected time and real consumer accepts public generation", () => fixture(async f => {
++  const { privacy } = await captured(f);
++  const publicTurns = [{ speakerRef: "spk:0", tStart: 0, tEnd: 299.8, text: "public opening" },
++    { speakerRef: "spk:0", tStart: 600.2, tEnd: 899, text: "public closing" }];
++  const original = [publicTurns[0], { speakerRef: "spk:0", tStart: 400, tEnd: 500, text: "private assertion" }, publicTurns[1]];
++  f.transcribe(publicTurns); f.put("transcript-qa.json", privateQa(f.dir, privacy, original));
++  const r = await f.validate({ env: { LKB_TRANSCRIPT_QA: "1" } });
++  assert.equal(r.passed, true, JSON.stringify(r.report)); assert.equal(r.gate, "accepts");
++  assert.equal(r.report.partial, false); assert.ok(r.report.privacyCoverage.expectedPublicSeconds < DURATION - 300);
++  assert.ok(r.report.privacyCoverage.coveredPublicSeconds > 598); assert.equal(f.gate().rawTurns.length, 2);
++  assert.equal(JSON.stringify(r.report).includes("private assertion"), false);
++}));
++
++test("durable privacy cannot admit protected canonical speech or waive a mixed public deficit", () => fixture(async f => {
++  await captured(f);
++  f.transcribe([{ speakerRef: "spk:0", tStart: 0, tEnd: 299.8, text: "public" },
++    { speakerRef: "spk:0", tStart: 400, tEnd: 500, text: "private" }, { speakerRef: "spk:0", tStart: 600.2, tEnd: 899, text: "closing" }]);
++  assert.match((await f.validate()).report.error, /intentionally protected/);
++  f.transcribe([{ speakerRef: "spk:0", tStart: 0, tEnd: 240, text: "public" },
++    { speakerRef: "spk:0", tStart: 650, tEnd: 899, text: "closing" }]);
++  const r = await f.validate();
++  assert.equal(r.passed, false); assert.equal(r.report.partial, true);
++  assert.ok(r.report.gaps[0].unprotectedSeconds > 109 && r.report.gaps[0].unprotectedSeconds < 110);
++}));
++
++test("same speech with changed source, consent receipt or media cannot reuse passed validation", () => fixture(async f => {
++  const { receipt, source, recordDir, privacy } = await captured(f);
++  const turns = [{ speakerRef: "spk:0", tStart: 0, tEnd: 299.8, text: "public opening" },
++    { speakerRef: "spk:0", tStart: 600.2, tEnd: 899, text: "public closing" }];
++  f.transcribe(turns); f.put("transcript-qa.json", privateQa(f.dir, privacy, turns));
++  assert.equal((await f.validate()).passed, true);
++  f.put("source.json", { ...source, title: "changed metadata" });
++  assert.throws(() => f.gate(), /source|privacy|validation/i);
++  f.put("source.json", source); assert.equal((await f.validate()).passed, true);
++  writeRecordConsent(recordDir, { ...receipt, privateWindows: [{ tStart: 200, tEnd: 600 }] });
++  assert.throws(() => f.gate(), /receipt|privacy|validation|capture/i);
++  assert.match((await f.validate()).report.error, /receipt changed/);
++  writeRecordConsent(recordDir, receipt); assert.equal((await f.validate()).passed, true);
++  writeFileSync(join(f.root, "media", "audio.fixture"), "changed sanitized media");
++  assert.throws(() => f.gate(), /media|privacy|validation|capture/i);
++  assert.match((await f.validate()).report.error, /media changed/);
++}));
++
++test("trusted captured privacy requires raw bound QA even with the public QA flag off", () => fixture(async f => {
++  const { privacy } = await captured(f);
++  const turns = [{ speakerRef: "spk:0", tStart: 0, tEnd: 299.8, text: "public opening" },
++    { speakerRef: "spk:0", tStart: 600.2, tEnd: 899, text: "public closing" }];
++  f.transcribe(turns);
++  assert.match((await f.validate({ env: {} })).report.error, /captured privacy requires generation-bound/);
++  f.put("transcript-qa.json", privateQa(f.dir, privacy, turns));
++  assert.equal((await f.validate({ env: {} })).passed, true);
++}));
++
+ // CLI argument parsing (webinarfix): a bare session id used to be dropped when --root was absent, so the tool always printed usage.
+ const DEF = resolve("default-root");
+ test("parseCliArgs: bare id, id with --root (either order), --dry-run, --accept-partial", () => {

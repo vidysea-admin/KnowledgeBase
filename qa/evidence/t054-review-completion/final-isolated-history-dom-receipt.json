@@ -1,0 +1,48 @@
+{
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register-react.mjs",
+    "qa/evidence/t054-review-completion/history-dom.test.tsx"
+  ],
+  "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 120000,
+  "startedAt": "2026-10-14T22:21:56.571Z",
+  "completedAt": "2026-10-14T22:21:58.638Z",
+  "elapsedMs": 2062.8364,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/src/api/transcriptReview.ts": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7",
+    "apps/web/src/pages/transcript-review/TranscriptReview.tsx": "6de42740b8231f5f7e5abcafe1fe6bc35b02183ca87fdf1f521718206c9f03bd",
+    "apps/web/src/pages/transcript-review/ReviewHistory.tsx": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+    "qa/evidence/t054-review-completion/history-dom.test.tsx": "db0b7cf69884682f774b8efc59b0901d8e6370a78c3da11387e76e0f5c70939a",
+    "qa/evidence/t054-transcript-review-planner-editor/checker-dom.test.tsx": "e46e1b8cf695e0e3755a9d518f2cfcddd3c50aee556d102c7716567dd3e18b94",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+    ".cache/coordination/safe-test-runtime/register-react.mjs": "ded9f20f16c15fcdc82e1b355eb13fefba7989f0294966936ed3660ea7b85f82",
+    ".cache/coordination/safe-test-runtime/react-harness.mjs": "3e4b648688fb8a2d643158a4995a76d8235ced1033a6d4aefeae242d9c6f5068",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e"
+  },
+  "after": {
+    "apps/web/src/api/client.ts": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+    "apps/web/src/api/transcriptReview.ts": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7",
+    "apps/web/src/pages/transcript-review/TranscriptReview.tsx": "6de42740b8231f5f7e5abcafe1fe6bc35b02183ca87fdf1f521718206c9f03bd",
+    "apps/web/src/pages/transcript-review/ReviewHistory.tsx": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+    "qa/evidence/t054-review-completion/history-dom.test.tsx": "db0b7cf69884682f774b8efc59b0901d8e6370a78c3da11387e76e0f5c70939a",
+    "qa/evidence/t054-transcript-review-planner-editor/checker-dom.test.tsx": "e46e1b8cf695e0e3755a9d518f2cfcddd3c50aee556d102c7716567dd3e18b94",
+    ".cache/coordination/safe-test-runtime/register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+    ".cache/coordination/safe-test-runtime/register-react.mjs": "ded9f20f16c15fcdc82e1b355eb13fefba7989f0294966936ed3660ea7b85f82",
+    ".cache/coordination/safe-test-runtime/react-harness.mjs": "3e4b648688fb8a2d643158a4995a76d8235ced1033a6d4aefeae242d9c6f5068",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t054-isolated-history-dom.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t054-isolated-history-dom.stderr.txt",
+  "hashesUnchanged": true
+}

@@ -1,0 +1,39 @@
+{
+  "format": "t022-current-form-content-free-readback-v1",
+  "scriptIdentifier": "t022-current-form-readback-node-repl-v1",
+  "startedAtUtc": "2026-10-15T10:40:32.964Z",
+  "finishedAtUtc": "2026-10-15T10:40:33.022Z",
+  "execution": "persistent node_repl direct function invocation; no shell subprocess",
+  "ownExit": 0,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "htmlPath": "data/eval/t022-offline-review.html",
+  "htmlBytes": 59977,
+  "htmlSha256": "918af50de6aad75e50729343faf0bb3556f738d97fc551a480776ba3c6d237f1",
+  "packetSha256": "799b2cc258ca3478565457c42110cbda9a4eeb6c97d55cf56ff8983c2f1e8eef",
+  "embeddedPacketSha256": "799b2cc258ca3478565457c42110cbda9a4eeb6c97d55cf56ff8983c2f1e8eef",
+  "packetSha256MatchesEmbedded": true,
+  "itemCount": 30,
+  "distinctItemCount": 30,
+  "neutralItemCount": 30,
+  "batchCount": 3,
+  "batchSizes": [
+    10,
+    10,
+    10
+  ],
+  "sourceBindingCount": 44,
+  "currentSourceBindingMatches": 44,
+  "currentSourceBindingMismatches": 0,
+  "humanJudgmentsGenerated": 0,
+  "independentAcceptance": false,
+  "scope": "Content-free metadata and current-byte binding readback only; no browser, DB, provider, labels or runtime-control checks",
+  "unknowns": [
+    "Genuine human review progress outside this form",
+    "Physical browser usability",
+    "Independent acceptance of current HTML",
+    "Maker/checker usage, monetary cost and efficiency ratios"
+  ],
+  "exactScriptPath": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/quality-delivery/t022-current-form-readback.node-repl.mjs",
+  "exactScriptSha256": "b5819a08703cf8178c0161d2b2071c9b8e23c49457e8a14586eaf1c4da4e62e7",
+  "precedingAttempt": "A node_repl JavaScript syntax error occurred before execution; no receipt or readback resulted from that attempt."
+}

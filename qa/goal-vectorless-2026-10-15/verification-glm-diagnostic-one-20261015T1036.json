@@ -1,0 +1,76 @@
+{
+  "phase": "authorized-paid-capability-diagnostic",
+  "scope": "Root-authorized ONE targeted paidGLM response-shape diagnostic after ambiguous refusal; max256output20s64KiB, no retries/fallback/privatecorpus",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "d06d541b06301368c5de47f05d8072c3500696446e16b7570411de4ee783a05f",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "qa/evidence/ollama-live-preflight/glm-diagnostic.mts",
+    "--dispatch-approved",
+    "--metadata-proof",
+    "qa/goal-vectorless-2026-10-15/verification-ollama-live-tags-20261015T1020.stdout.txt",
+    "--metadata-sha256",
+    "2f12c42bdf939d7de0559ac42b859e8712b3c2d8c55d44677c4e4c2ed1c26319"
+  ],
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "runtime_version": "v24.19.0",
+  "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "runtime_identity": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review; existingloader/key privately; narrow stable provider/HTTPdeps only, publication sourceepoch unrelated"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment_hash": "45d6e44ed6caba84c6ae1b149a644e661a567026bbac5c815b85328393c43ff7",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": null,
+    "LKB_RETRIEVAL_MODE": null
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "GLM HTTP category/truncation/thinking/validusage only"
+  ],
+  "timeoutMs": 20000,
+  "startedAt": "2026-10-15T09:05:43.465Z",
+  "completedAt": "2026-10-15T09:05:44.925Z",
+  "elapsedMs": 1457.2673000000002,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "qa/evidence/ollama-live-preflight/glm-diagnostic.mts": "036e569e35638aefeb464b04e9698b160b7d0f9ddb19646ab8cb934b0df9763c",
+    "qa/goal-vectorless-2026-10-15/verification-ollama-live-tags-20261015T1020.stdout.txt": "2f12c42bdf939d7de0559ac42b859e8712b3c2d8c55d44677c4e4c2ed1c26319",
+    "packages/ai/src/providers/ollama-cloud.ts": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+    "apps/api/src/ai-transport.ts": "ab266b7496f0b85c810a6c66cd3c5231598ea01e10acad741796e2c807e831f1",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "node_modules/dotenv/package.json": "7e57c7c7b3c5fe5dd127091aeacadec3e144fd290988c61c184876c1b8bda819",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "after": {
+    "qa/evidence/ollama-live-preflight/glm-diagnostic.mts": "036e569e35638aefeb464b04e9698b160b7d0f9ddb19646ab8cb934b0df9763c",
+    "qa/goal-vectorless-2026-10-15/verification-ollama-live-tags-20261015T1020.stdout.txt": "2f12c42bdf939d7de0559ac42b859e8712b3c2d8c55d44677c4e4c2ed1c26319",
+    "packages/ai/src/providers/ollama-cloud.ts": "65a9d83ab43e5b61083bc6924534abb281e357100958e5cebfa3a68957736809",
+    "apps/api/src/ai-transport.ts": "ab266b7496f0b85c810a6c66cd3c5231598ea01e10acad741796e2c807e831f1",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "node_modules/dotenv/package.json": "7e57c7c7b3c5fe5dd127091aeacadec3e144fd290988c61c184876c1b8bda819",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-glm-diagnostic-one-20261015T1036.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-glm-diagnostic-one-20261015T1036.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review; existingloader/key privately; narrow stable provider/HTTPdeps only, publication sourceepoch unrelated"
+}

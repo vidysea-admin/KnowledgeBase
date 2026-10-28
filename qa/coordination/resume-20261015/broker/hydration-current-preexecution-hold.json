@@ -1,0 +1,17 @@
+{
+  "status": "PREEXECUTION_HOLD",
+  "testCommandsLaunched": 0,
+  "reason": "static closure pin mismatch before any test/import execution; no retry",
+  "mismatches": [
+    {
+      "path": "schema/whatsapp_candidates.schema.json",
+      "expectedInventory": null,
+      "expectedExplicitFiles": null,
+      "actual": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16"
+    }
+  ],
+  "executedPreparationOwnExit": 1,
+  "candidateRequest": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/broker-request.json",
+  "providerCalls": 0,
+  "note": "No audit executed; no measured audit tripwire counts yet."
+}

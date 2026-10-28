@@ -1,0 +1,167 @@
+{
+  "unit": "ui-revision-batch-saved-summary-transcript-warning",
+  "cycle": "saved0+transcript1",
+  "candidate_sha": "0524e144cda950caee549c2ee824fc960e1bef71edcf319fa97171843dfd9404",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_identity": "SHA256 of exact proposal-unit slug TAB candidate LF records, same order; not Git commit.",
+  "candidate_units": [
+    {
+      "slug": "t058-saved-summary-refresh",
+      "cycle": 0,
+      "candidate_sha": "3b7d35f8801dd853b2898dd6302e5199ec8f2f4a8bd4bb8be4064f883876dc98",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a"
+    },
+    {
+      "slug": "product-transcript-refresh-warning",
+      "cycle": 1,
+      "candidate_sha": "cfb521695c119fb407eb240ba11e6b07aa4b4edee40683e9eeac44ae25cd3173",
+      "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a"
+    }
+  ],
+  "proposal": "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/review-batch-proposal.json",
+  "maker": {
+    "active_s": null,
+    "tokens": 6052313,
+    "cost": null,
+    "token_metric": "actual_total"
+  },
+  "reviewers": [
+    {
+      "id": "transcript_independent_checker-prior-whole-prep",
+      "active_s": null,
+      "tokens": 294849,
+      "cost": null,
+      "budget_debit": {
+        "active_s": 40,
+        "token_metric": "actual_total"
+      },
+      "note": "All prior transcript prep actual total retained; full active actual/cost unknown. Legacy1000 allocatedOUTPUT remains separate, not actual-token debit.",
+      "token_metric": "actual_total"
+    },
+    {
+      "id": "ui_revision_batch_checker-prospective-not-launched",
+      "active_s": 0,
+      "tokens": 0,
+      "cost": null,
+      "note": "ONE future fresh checker, no launch/work yet; saved-summary has no prior children per root.",
+      "token_metric": "actual_total"
+    }
+  ],
+  "next_phase": {
+    "kind": "review",
+    "active_s": 30,
+    "tokens": 120000,
+    "cost": null,
+    "token_metric": "actual_total",
+    "output_tokens": 1100
+  },
+  "bootstrap": {
+    "active_s": 100,
+    "tokens": 494849,
+    "cost": null,
+    "token_metric": "actual_total"
+  },
+  "bootstrap_scope": "Root-granted exact2-unit coherent UI saved/reloaded revision/freshness review; no other units. Current proposal pins/receipts fixed. Native helper is compatibility gate only; supplemental LOCAL stagedACTUAL reserve gate separately mandatory.",
+  "completion_reserve": true,
+  "completion_reserve_id": "ui-revision-batch/saved0+transcript1/c585ddc31b3e0305284519537725f9ae71836aa398a7ad1ab443a0e68b194635",
+  "escalation": {
+    "authority": "Root explicit exact2batch grant current dispatch, totalNEW200000ACTUAL/60s/1800OUTPUT shared once",
+    "reason": "Bounded independent mandatory source/receipt review and paired verdict parsing for coherent saved/reloaded UI changes, preserving prior transcript actual294849/debits and unknown full time/cost; manual80kACTUAL final reserve requires independently accepted supplemental helper.",
+    "limits": {
+      "active_s": 100,
+      "tokens": 494849,
+      "cost": null,
+      "token_metric": "actual_total"
+    }
+  },
+  "manual_staged_actual_reserve": {
+    "actual_total_tokens": 80000,
+    "active_s": 30,
+    "allocated_output_tokens": 700,
+    "within_same_new_cap": true,
+    "native_helper_protected": "To be confirmed by LOCAL assess; never canonical-native."
+  },
+  "legacy_output_allocation_ledger": {
+    "prior": 1000,
+    "new_review": 1100,
+    "new_final": 700,
+    "new_total": 1800,
+    "separate_from_actual_total": true
+  },
+  "historical_source": "qa/coordination/knowledge-brain-20261015/product-delivery/telemetry/content-free-token-snapshot-2026-10-15T10-55-06-953Z.json",
+  "root_authority": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-root-authority-30-30.json",
+  "supplemental_status": "PENDING_EXACT_LOCAL_ASSESS",
+  "no_dispatch_permission_from_canonical_result_alone": true,
+  "resource_accounting": "Shared coordination helper cost separate; maker denom originalsum6052313 fixed. No per-unit allocation or10-percent success claim.",
+  "exact_owned_sha256": {
+    "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080",
+    "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx": "5ec3d5f6568692749d2a0109b6037028e4877563b7ac849f8879420dcebc032f",
+    "apps/web/src/pages/transcript-review/TranscriptReview.tsx": "8c91418dbc94c51ae53d48927077e57e38a75abee7a5b12814144180275844ca",
+    "apps/web/src/pages/transcript-review/TranscriptReview.test.tsx": "cd93a30f56cb2302c779a5e4c2b89b4de0772d422ab62beec1840b959b4e1a55",
+    "apps/web/src/pages/transcript-review/ReviewHistory.test.tsx": "23e6b64a803228deebeeaa683db4375e7e8d358126e94220dd82bf337dffd4c5"
+  },
+  "exact_direct_consumer_sha256": {
+    "apps/web/src/api/knowledge-outputs.ts": "40a2023787696bbafa67c91d78a8c356051800afa9beae467f79d1696a7af61d",
+    "apps/web/src/pages/transcript-review/ReviewHistory.tsx": "36d03cf4dc3ca4dc6212e95d5eacf9445ccf1af04ee78676e3b41b680b4ac30c",
+    "apps/web/src/pages/transcript-review/TranscriptReviewPage.tsx": "ea1f6f01d60f75cd43dde8c96725d46eb6a4fd1ad2b5f0753998e4a19299403e",
+    "apps/web/src/api/transcriptReview.ts": "945ed78ef8f94fe14031383dabb6ffe241c12e4303f5013fa8739e922bb4dee7"
+  },
+  "applicable_clauses": {
+    "saved": [
+      "qa/contracts/goal-t058.md:C6",
+      "qa/contracts/goal-t058.md:C8",
+      "qa/contracts/goal-t058.md:C12"
+    ],
+    "transcript": [
+      "qa/contracts/goal-T054.md:10",
+      "AGENTS.md:affected-stage",
+      "AGENTS.md:immediate-downstream",
+      "AGENTS.md:contracts-verifier"
+    ]
+  },
+  "minimum_existing_harness_navigation": [
+    {
+      "unit": "t058-saved-summary-refresh",
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase",
+      "command": "node --test --test-isolation=none --test-concurrency=1 --test-timeout=30000 --test-name-pattern=\"^UI creates, cites, saves, reopens, revalidates and exports through authenticated API$\" --import ./.cache/coordination/safe-test-runtime/register.mjs apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+      "selected": 1,
+      "existing_receipt": "qa/goal-vectorless-2026-10-15/verification-saved-output-workbench.json",
+      "note": "Navigation only; actual receipt/runtime pinned in bundle. Existing workflow does not independently establish delayed old-session epoch refusal; reviewer must reason/hold if applicable evidence absent, never infer proof."
+    },
+    {
+      "unit": "product-transcript-refresh-warning",
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+      "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe node_modules/vitest/vitest.mjs run --pool=forks --maxWorkers=1 --minWorkers=1 --no-file-parallelism src/pages/transcript-review/TranscriptReview.test.tsx -t \"a loaded .* refresh warns about stale answers until canonical reload completes\"",
+      "selected": 2,
+      "existing_receipt": "qa/goal-vectorless-2026-10-15/independent-ui-twelve-perunit-attribution.json"
+    },
+    {
+      "unit": "product-transcript-refresh-warning",
+      "cwd": "C:/Users/product/Desktop/KnowledgeBase/apps/web",
+      "command": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe node_modules/vitest/vitest.mjs run --pool=forks --maxWorkers=1 --minWorkers=1 --no-file-parallelism src/pages/transcript-review/ReviewHistory.test.tsx -t \"failed refresh exposes retry; successful refresh invokes canonical reload\"",
+      "selected": 1,
+      "existing_receipt": "qa/goal-vectorless-2026-10-15/verification-ui-history-three-repair.json"
+    }
+  ],
+  "minimum_harness_not_execution_authority": true,
+  "supersedes_plan": {
+    "input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-input.json",
+    "result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-result.json",
+    "old_review_s": 40,
+    "old_final_s": 20,
+    "reason": "Root explicitly authorized30review+30final within same60 to meet LOCAL helper fixed30s final reserve. Tokens120k/80k and output1100/700 unchanged; not bypass or new grant."
+  },
+  "token_metric": "actual_total",
+  "completion_reserve_tokens": 80000,
+  "local_helper_authentication": {
+    "status": "EXACT_LOCAL_PASS_PIN_AUTHENTICATED_GATE_PENDING",
+    "path": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/checker-runtime-total-20261015/review_budget.py",
+    "raw_sha256": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+    "packet": "qa/packets/checker-runtime-total.md",
+    "verdict": "qa/verdicts/checker-runtime-total.md",
+    "verdict_cycle": 4,
+    "actual_reviewed_sha": "fbfa445ede6fd9c82138f24743f8cd0ea4f2f3c82f5b98dc71123e5a8cdc24b2",
+    "root_provided_reviewed_sha": "6a3d06d5ee21f5e83502d82d8326deb77dace24dd42a8df5c99685c2dd0c5948",
+    "identity_note": "Actual persisted PASS cycle4 ReviewedSHA matches current packet fbfa...; root supplied older/different aggregate. Exact requested helper rawSHA2b4fe0... matches packet and independently PASSed current artifact; local only, never installed claim."
+  }
+}

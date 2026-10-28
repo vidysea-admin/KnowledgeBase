@@ -1,0 +1,1225 @@
+{
+  "version": 1,
+  "batch": 6,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "humanGold": false,
+  "sourceSessions": [
+    {
+      "caseId": "2026-07-28-metrics-and-mingling",
+      "tenantId": "toc",
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "sourceBindingSha256": "ce2cc8581cd4402883d8f2594eaf57f2fa34524b59253674c006dac77b5bf678",
+      "sourceBinding": {
+        "caseId": "2026-07-28-metrics-and-mingling",
+        "tenantId": "toc",
+        "sessionId": "2026-07-28-metrics-and-mingling",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/claims.json",
+            "sha256": "f65d502ef2f33f2c9d34484d04b62848a8efa7ef216d844b961da22e81a3c299",
+            "normalizedLfSha256": "cee3b4bacef84a49933d7baa247262e4a747239287756379447020b686a84d11",
+            "bytes": 1243
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+            "sha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+            "normalizedLfSha256": "6b77117c6253c72f522d3290d26785e0a8bfad8d63ce198ec5483530aaa7d88a",
+            "bytes": 78842
+          }
+        }
+      },
+      "sourceTurns": 83,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+          "bytes": 95794
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "cee3b4bacef84a49933d7baa247262e4a747239287756379447020b686a84d11",
+          "bytes": 1203
+        }
+      }
+    },
+    {
+      "caseId": "2026-07-30-in-focus-3",
+      "tenantId": "toc",
+      "sessionId": "2026-07-30-in-focus-3",
+      "sourceBindingSha256": "76c872af4bdb4bd59a9e209447c03fa8a3abe729cdfa76da42539af4531cb717",
+      "sourceBinding": {
+        "caseId": "2026-07-30-in-focus-3",
+        "tenantId": "toc",
+        "sessionId": "2026-07-30-in-focus-3",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-07-30-in-focus-3/claims.json",
+            "sha256": "1c3adf08ae75c7680993bbf1a99d6553fb0754af0e6ce159a89f352f2b8ea412",
+            "normalizedLfSha256": "351b28b429e89d827a297e4f56f3964e7ac3f15864af03699481d86e326eacb3",
+            "bytes": 1204
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+            "sha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+            "normalizedLfSha256": "8a4db7b7e7a037566ac52371425f6c57ab973642006a0737fe3bbc1e298ff407",
+            "bytes": 74118
+          }
+        }
+      },
+      "sourceTurns": 96,
+      "sourceClaims": 3,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+          "bytes": 79353
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-07-30-in-focus-3/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "351b28b429e89d827a297e4f56f3964e7ac3f15864af03699481d86e326eacb3",
+          "bytes": 1164
+        }
+      }
+    },
+    {
+      "caseId": "2026-08-03-uk-beyond-offer-letters",
+      "tenantId": "toc",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "sourceBindingSha256": "77f02df30aa6adcd97561f35f5669619e69c969f7e113042d3d89280fbcadc9a",
+      "sourceBinding": {
+        "caseId": "2026-08-03-uk-beyond-offer-letters",
+        "tenantId": "toc",
+        "sessionId": "2026-08-03-uk-beyond-offer-letters",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/claims.json",
+            "sha256": "c5557e0c819c117ed8723838ec4aba3bee32af3f07f210fba64a2069ab3c1962",
+            "normalizedLfSha256": "a3246bf7e5e63030c485ac6e3c3177e2c9063037a2c555dc131fa23a8e74f421",
+            "bytes": 1015
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+            "sha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+            "normalizedLfSha256": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+            "bytes": 67917
+          }
+        }
+      },
+      "sourceTurns": 46,
+      "sourceClaims": 2,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+          "bytes": 93729
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "a3246bf7e5e63030c485ac6e3c3177e2c9063037a2c555dc131fa23a8e74f421",
+          "bytes": 984
+        }
+      }
+    },
+    {
+      "caseId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "tenantId": "toc",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "sourceBindingSha256": "849a215b68acbbf36043cb5edd173fe24f7c7014998faf879a90bd2f19a43c0e",
+      "sourceBinding": {
+        "caseId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "tenantId": "toc",
+        "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+        "artifacts": {
+          "persisted": {
+            "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/claims.json",
+            "sha256": "b8136e27f3cf8c600c2df2b84c126f737ef9b7e5cbf0879f42ef39f150cd0e42",
+            "normalizedLfSha256": "c6fa529ced6d8a0b9f58a81d57d6130ab0a3a6393d27b1aa43452b260608c628",
+            "bytes": 1051
+          },
+          "turns": {
+            "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+            "sha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+            "normalizedLfSha256": "d3929dbaa1aca0e909f66570924310c04b5cff0befc5b6a2fb4516081af8eeb9",
+            "bytes": 72008
+          }
+        }
+      },
+      "sourceTurns": 43,
+      "sourceClaims": 2,
+      "invalidTimeTurnIds": [],
+      "historicalArtifacts": {
+        "turns": {
+          "available": true,
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+          "bytes": 72585
+        },
+        "persisted": {
+          "available": true,
+          "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/claims.json",
+          "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+          "sha256": "c6fa529ced6d8a0b9f58a81d57d6130ab0a3a6393d27b1aa43452b260608c628",
+          "bytes": 1024
+        }
+      }
+    }
+  ],
+  "entries": [
+    {
+      "ordinal": 51,
+      "claimId": "2026-07-28-metrics-and-mingling-c01",
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "6a5ededd39dc0fa2d698f7b4fcd6ceb9220abe01f754942bc6e5ff818580ad9f",
+      "sourceBindingSha256": "ce2cc8581cd4402883d8f2594eaf57f2fa34524b59253674c006dac77b5bf678",
+      "persistedClaim": {
+        "_id": "2026-07-28-metrics-and-mingling-c01",
+        "tenantId": "toc",
+        "text": "About 80% of the room identified as introverted when discussing networking at conferences.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-28-metrics-and-mingling-t046",
+            "sessionId": "2026-07-28-metrics-and-mingling"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-28-metrics-and-mingling",
+          "turnId": "2026-07-28-metrics-and-mingling-t046",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+              "sha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+              "normalizedLfSha256": "6b77117c6253c72f522d3290d26785e0a8bfad8d63ce198ec5483530aaa7d88a",
+              "bytes": 78842
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-28-metrics-and-mingling-t046",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-28-metrics-and-mingling",
+                  "speakerRef": "Niraj",
+                  "tStart": 2237,
+                  "tEnd": 2244,
+                  "text": "I, I, I have a great tip. Just ask that person who is not shutting up to summarize."
+                },
+                "textSha256": "851312230fed1daf46878ee0cfab11ccbdc415f655b0be85a4b14194f1e397ea"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+              "bytes": 95794
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-28-metrics-and-mingling-t046",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-28-metrics-and-mingling",
+                  "speakerRef": "unknown",
+                  "tStart": 1286,
+                  "tEnd": 1318,
+                  "text": "Bhakti Shah: Thank you for sharing, Noopur. And I think in every—every time we do this session about networking, about conferences, I think 80% of the room—and it's an interesting find, it's a pattern—80% of the room says, \"We are introverts.\" And I think, Niraj, you've attended a lot of these conversations and you know what I'm talking about. Like most people are like, \"We are introverts.\" And I think maybe it's a little bit of a pattern with counselors because they really do want to spend more time with students and, you know, we understand that."
+                },
+                "textSha256": "0b6ff3f9b5ba528a40c2aa120071125eefd3408856855942574361baaa6a801f"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation recommends asking a talkative person to summarize; no introversion proportion appears.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 52,
+      "claimId": "2026-07-28-metrics-and-mingling-c02",
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "ee5a8a1166228837413d12fe6cdedbbef7097ff058cbecec0a68da0d5a259356",
+      "sourceBindingSha256": "ce2cc8581cd4402883d8f2594eaf57f2fa34524b59253674c006dac77b5bf678",
+      "persistedClaim": {
+        "_id": "2026-07-28-metrics-and-mingling-c02",
+        "tenantId": "toc",
+        "text": "The 'Plate Space' rule encourages inviting solo attendees standing alone to join an existing table or group.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-28-metrics-and-mingling-t060",
+            "sessionId": "2026-07-28-metrics-and-mingling"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-28-metrics-and-mingling",
+          "turnId": "2026-07-28-metrics-and-mingling-t060",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+              "sha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+              "normalizedLfSha256": "6b77117c6253c72f522d3290d26785e0a8bfad8d63ce198ec5483530aaa7d88a",
+              "bytes": 78842
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-28-metrics-and-mingling-t060",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-28-metrics-and-mingling",
+                  "speakerRef": "Bhakti",
+                  "tStart": 2494,
+                  "tEnd": 2549,
+                  "text": "See, when you're make made to feel unwanted, is different, where when you're trying to talk and people are like, \"You know, please,\" versus people are generally warm, smiling, laughing, chilling, and then you make an effort. There has to be effort on both sides, I feel, and وہ thoda initial awkwardness to hone hi wala hai. Matlab, when you're new to any space, thoda awkwardness to hoga. Ab aap Japan jaake aaye, aapki, ab aapka to pura matlab group ban گیا hai, you know? And so, it takes that one, exactly, one breakthrough, which is why I say, if you're an introvert, all the more reason attend at least one in-person event, at least, at least one, because that changes your entire experience of TOC. If, you know, anyone who's attended one in-person TOC experience, is going to have a completely different member experience."
+                },
+                "textSha256": "43f1a48acdd0cb2c178fbf56ee621d65721b85a7f880493ccde5b4c800828c6c"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+              "bytes": 95794
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-28-metrics-and-mingling-t060",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-28-metrics-and-mingling",
+                  "speakerRef": "unknown",
+                  "tStart": 1769,
+                  "tEnd": 1796,
+                  "text": "Niraj: Another funda which really works, you will see me adopt a lot of time, is called the \"Plate Space.\" So to what Anagha said, you will find people in groups, right? Either they are having coffee or they are having a plate in their hand. Always make room for the person who is just passing by. I've done it so many times. Somebody is passing by, I'll say, \"Why don't you join us?\" That plate space is the open space for a relationship."
+                },
+                "textSha256": "28788c6b67faa2ca45aa8833d989d20ee1c7fe572b3e6a4786fb87caa3e1b691"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation discusses mutual effort, awkwardness, and attending in-person events; it does not describe the Plate Space rule.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 53,
+      "claimId": "2026-07-28-metrics-and-mingling-c03",
+      "sessionId": "2026-07-28-metrics-and-mingling",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "4a1b65de8cf258011f183e74c1208e4580c94471a007d8e533bdcb6e6b178b38",
+      "sourceBindingSha256": "ce2cc8581cd4402883d8f2594eaf57f2fa34524b59253674c006dac77b5bf678",
+      "persistedClaim": {
+        "_id": "2026-07-28-metrics-and-mingling-c03",
+        "tenantId": "toc",
+        "text": "Participants recommended having a ready 30-second pitch prepared for brief conference encounters.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-28-metrics-and-mingling-t059",
+            "sessionId": "2026-07-28-metrics-and-mingling"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-28-metrics-and-mingling",
+          "turnId": "2026-07-28-metrics-and-mingling-t059",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+              "sha256": "563061dc16ba662af903ee283c8680dd50bb29bd1546cd099ffbc0347750bf16",
+              "normalizedLfSha256": "6b77117c6253c72f522d3290d26785e0a8bfad8d63ce198ec5483530aaa7d88a",
+              "bytes": 78842
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-28-metrics-and-mingling-t059",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-28-metrics-and-mingling",
+                  "speakerRef": "Anirudh",
+                  "tStart": 2490,
+                  "tEnd": 2494,
+                  "text": "No, that's a different matter. Of course, you are supposed to do that, right? That goes without saying."
+                },
+                "textSha256": "f186ec5a783ea89e1eb8a62a90d0b311d26aff68c2af1b08067b4ba5ffeb4ba5"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-28-metrics-and-mingling/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "cc75b76dfde8b588bf42e4e8a5207a1243c25821a8d62461c8924f8cf534e16a",
+              "bytes": 95794
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-28-metrics-and-mingling-t059",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-28-metrics-and-mingling",
+                  "speakerRef": "unknown",
+                  "tStart": 1716,
+                  "tEnd": 1769,
+                  "text": "Niraj: So I use a formula called 30 seconds, 3 minutes, and then if it leads to 30 minutes, that's fine. But I'll definitely try to get my 30-second pitch very ready, very crisp, very short, so that I don't take too much time explaining about me. If the other person tells me, \"Niraj, tell me more,\" only then I'll use my 3 minutes, because I can speak for 3 hours, right? But I want to just stick it to that 3 minutes. My target is to keep my 30 seconds ready and to keep my 3 minutes ready. Then the 30 minutes will be personalized, will be about that person, will be about the common interest. But I have to have my 30 seconds and I have to have my 3 minutes prepared well in advance, not because I want to say it, but because I want to save the group's time, I want to save the time of others as well, right?"
+                },
+                "textSha256": "92bcdb52e175821be044163282d744eebf8ee9b876d97e4c0696a413d55a9b5c"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "The isolated agreement does not identify a pitch, its duration, preparation, or conference encounters.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 54,
+      "claimId": "2026-07-30-in-focus-3-c01",
+      "sessionId": "2026-07-30-in-focus-3",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "b6278912aa92ffa2965a523dc083133294d7210abef9e95a5903fc7ed7271a3e",
+      "sourceBindingSha256": "76c872af4bdb4bd59a9e209447c03fa8a3abe729cdfa76da42539af4531cb717",
+      "persistedClaim": {
+        "_id": "2026-07-30-in-focus-3-c01",
+        "tenantId": "toc",
+        "text": "StarterSky's entrepreneurship accelerator costs INR 75,000 plus tax in a group format or INR 90,000 plus tax individually.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-30-in-focus-3-t030",
+            "sessionId": "2026-07-30-in-focus-3"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-30-in-focus-3",
+          "turnId": "2026-07-30-in-focus-3-t030",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+              "sha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+              "normalizedLfSha256": "8a4db7b7e7a037566ac52371425f6c57ab973642006a0737fe3bbc1e298ff407",
+              "bytes": 74118
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-30-in-focus-3-t030",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-30-in-focus-3",
+                  "speakerRef": "spk:1",
+                  "tStart": 2240,
+                  "tEnd": 2254,
+                  "text": "Thank you, Shithij. It was perfectly timed. Uh, thanks everyone for joining in. Yes, people. Questions? Astero is having a lot of questions. I'm pretty sure. Shithij has been my guy."
+                },
+                "textSha256": "8f26653b74a11e6482a4d4c8506e309915533830295617994c8bde9d5687e384"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+              "bytes": 79353
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-30-in-focus-3-t030",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-30-in-focus-3",
+                  "speakerRef": "unknown",
+                  "tStart": 838,
+                  "tEnd": 904,
+                  "text": "Anisha Parikh: Yeah, so that was our video that we had done it at BIS in their school. So these are some of the questions that a lot of people ask us: \"What if students don't have technical skills? Will they be able to create a website or a landing page?\" Totally fine. We help them, we use AI tools, we'll show them how to actually use it. \"Who do we work with at StarterSky?\" We work with schools, we work with counselors, we work with universities, students, parents, of course. \"Does this help in profile building?\" I think this is a big question that we constantly get. Yes, we do help you. I mean, this helps a lot because it just shows that difference in your profile, so definitely it's a standout that you can use. The cost is ₹75,000 plus tax if you do it in a group, and ₹90,000 plus tax if you do it individually. \"When can I start?\" You can start a one-on-one anytime; you just have to reach out to us, we would have a call with you. We have certain things that we would like to know about you before you start. And for a group..."
+                },
+                "textSha256": "c4f27252257d93fdfeba44429e272b8f4517e34a671538de14924bd5d34fd2e5"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation thanks a presenter and invites questions; it contains no accelerator pricing or delivery formats.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 55,
+      "claimId": "2026-07-30-in-focus-3-c02",
+      "sessionId": "2026-07-30-in-focus-3",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "920a92c31e05437502bff2e853fa00664289719cd3fc20b30d90341e651a5665",
+      "sourceBindingSha256": "76c872af4bdb4bd59a9e209447c03fa8a3abe729cdfa76da42539af4531cb717",
+      "persistedClaim": {
+        "_id": "2026-07-30-in-focus-3-c02",
+        "tenantId": "toc",
+        "text": "Estero Education cites a roughly 92% average New Zealand student-visa approval rate over the last 15 years.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-30-in-focus-3-t063",
+            "sessionId": "2026-07-30-in-focus-3"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-30-in-focus-3",
+          "turnId": "2026-07-30-in-focus-3-t063",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+              "sha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+              "normalizedLfSha256": "8a4db7b7e7a037566ac52371425f6c57ab973642006a0737fe3bbc1e298ff407",
+              "bytes": 74118
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-30-in-focus-3-t063",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-30-in-focus-3",
+                  "speakerRef": "spk:1",
+                  "tStart": 2917,
+                  "tEnd": 2932,
+                  "text": "uh pharmacists, psychologists, etc. So, these are pretty much the areas which are very, very high in demand. And the chances of getting a job in these areas are very, very high. Perfect. Anisha, I have a question to you. Probably,"
+                },
+                "textSha256": "000f99615d72b804a88c929cc76a22968f5e9698380d431041186591ee6d2fd8"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+              "bytes": 79353
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-30-in-focus-3-t063",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-30-in-focus-3",
+                  "speakerRef": "unknown",
+                  "tStart": 1659,
+                  "tEnd": 1705,
+                  "text": "Kshitij Garg: This has been our journey for the last 15 years. We span across nine physical offices across India, Nepal, as well as Dubai. In the last 15 years we have counseled more than 10,000 students. And what sets us apart is our student visa approval rate. For the last 15 years we have been averaging about 92% student visa approval rate. Last year when India was almost 53%, we were still clocking about 85% on our approval rates. We work with every university, every institution, every private college directly. In fact, we are a preferred partner for most of the institutions based out of New Zealand. In 2024 alone, which is an ongoing year, we have already helped students with scholarships worth more than 3.5 crore rupees."
+                },
+                "textSha256": "63c2fd4acdfcefc7063900110971b34cbae3f557bc27d59879b453f06f2adbab"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation discusses demand for pharmacists and psychologists, not visa approval rates or a fifteen-year period.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 56,
+      "claimId": "2026-07-30-in-focus-3-c03",
+      "sessionId": "2026-07-30-in-focus-3",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "47dff08059cecaa4e30f600b1a15a63a40371d36ac257bfa17d4ddb5497f6d02",
+      "sourceBindingSha256": "76c872af4bdb4bd59a9e209447c03fa8a3abe729cdfa76da42539af4531cb717",
+      "persistedClaim": {
+        "_id": "2026-07-30-in-focus-3-c03",
+        "tenantId": "toc",
+        "text": "A New Zealand bachelor's degree graduate is guaranteed a three-year post-study work visa with no conditions attached.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-07-30-in-focus-3-t094",
+            "sessionId": "2026-07-30-in-focus-3"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-07-30-in-focus-3",
+          "turnId": "2026-07-30-in-focus-3-t094",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+              "sha256": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+              "normalizedLfSha256": "8a4db7b7e7a037566ac52371425f6c57ab973642006a0737fe3bbc1e298ff407",
+              "bytes": 74118
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-30-in-focus-3-t094",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-30-in-focus-3",
+                  "speakerRef": "spk:2",
+                  "tStart": 3491,
+                  "tEnd": 3509,
+                  "text": "Perfect. Thank you, Kshitij. Thanks, Anisha, and uh just to give a quick insight for others who think InFocus is not for everyone or anything, is any doubts. InFocus is for everyone, so you just got to apply for that, and it happens every month. We pick up two uh credible applicants"
+                },
+                "textSha256": "f75b448a80f8de5541b5720cf0d0b95864a74a38044651e6132d9f3e7f99ae18"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-07-30-in-focus-3/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+              "bytes": 79353
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-07-30-in-focus-3-t094",
+                  "tenantId": "toc",
+                  "sessionId": "2026-07-30-in-focus-3",
+                  "speakerRef": "unknown",
+                  "tStart": 2784,
+                  "tEnd": 2818,
+                  "text": "Kshitij Garg: So in case of New Zealand, if a student is coming for a bachelor's degree, they will be given a three-year post-study work visa guaranteed. There are no ifs and buts about it; they don't even need an employer to support them. It's a three-year PSW given to every single student who's coming for a bachelor's. Similarly, where the number of applications for New Zealand are increasing is actually the master's, because New Zealand has a one-year master's just like the UK, and if a student is doing a one-year master's, they are still given a three-year post-study work visa. So, and a three-year post-study work visa is quite a lot of time for a student to find a job."
+                },
+                "textSha256": "e83ae7180505e3c7b5ccc66c41c9a594041aa5675457a3ad7e98c0195742f229"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citation describes monthly InFocus applications; it contains no New Zealand post-study visa assertion.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 57,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c01",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "e02d8d29b2a78e9c3589ed83f27a7ae95e3f567048522839aa9d70971a92e9ff",
+      "sourceBindingSha256": "77f02df30aa6adcd97561f35f5669619e69c969f7e113042d3d89280fbcadc9a",
+      "persistedClaim": {
+        "_id": "2026-08-03-uk-beyond-offer-letters-c01",
+        "tenantId": "toc",
+        "text": "Indian students studying abroad grew from about 131,000 in 2005 to over 1.3 million two decades later.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t013",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters"
+          },
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t015",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-08-03-uk-beyond-offer-letters",
+          "turnId": "2026-08-03-uk-beyond-offer-letters-t013",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+              "sha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+              "normalizedLfSha256": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+              "bytes": 67917
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-t013",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters",
+                  "speakerRef": "Bhavya",
+                  "tStart": 1967,
+                  "tEnd": 2013,
+                  "text": "Right. And just just a small question, Jasminder. I saw you smiling there. So, I I feel like, uh, you'll be able to have a lot of more experience in terms of the struggles of Indian students and parents when it comes to finances and financing their education. How do you see that playing in the Indian market, particularly? Because as counselors, I feel, um, we don't get so much access, school counselors do not get so much access to seeing how the parents are financing their education, uh, and you see how the market's going and how many providers are there, the ones which are, uh, obviously providing it the right way. So, how do you see that, this particular rules, affecting the finances for the students who are getting themselves help from the market?"
+                },
+                "textSha256": "d8553c8358b65c2110dc0b12547e3de3e5b6c0935edc424dd4e793dd304832fa"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+              "bytes": 93729
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-t013",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters",
+                  "speakerRef": "unknown",
+                  "tStart": 288,
+                  "tEnd": 330,
+                  "text": "Jasminder Khanna: But you know, if we look at the numbers, that will perhaps tell us the larger story here. So if I go back to the year 2005—not that I counted myself, but the Ministry of External Affairs in India tells us that 131,000 Indian students left India to study abroad in that year. Now, if we look at the breakdown of that 131,000 students, nearly 76,000 of those students were absorbed by the US because they have a large appetite given the large number of universities within the ecosystem. Of course, followed by Canada, which was the second largest destination for Indian students, followed by the UK. And then, of course, Australia was catching up with the other countries."
+                },
+                "textSha256": "e7952fbf898e641152447d1109f641ea36b1c83d0e50e589cc9fb970d6d6b283"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        },
+        {
+          "sessionId": "2026-08-03-uk-beyond-offer-letters",
+          "turnId": "2026-08-03-uk-beyond-offer-letters-t015",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+              "sha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+              "normalizedLfSha256": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+              "bytes": 67917
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-t015",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters",
+                  "speakerRef": "Bhavya",
+                  "tStart": 2261,
+                  "tEnd": 2311,
+                  "text": "Right. Right. Thank you, Jasminder. I think, um, absolutely, I I agree. I think this happens once, uh, in a decade, like again and again. But yes, I think it's also a good reminder for all of us who are working with our students so that we can keep informing ourselves and keep guiding the students in a certain way. Um, I I would like to now open the question to all of you. I think, YY, uh, had touched on this, but, uh, you know, for given the changes and the way the compliance monitoring has been happening on the university, what is the one thing, you know, counselors need to change this cycle? If there's just one thing that you'd all suggest, like so that it's not just about receiving an offer but the students can move smoothly through visa approval, enrollment, as well as their first year? What is that one recommendation from all of you?"
+                },
+                "textSha256": "c78d1040d1dbe8ded7df553eb3d6b696c1798606f4db8c462902da6cb78020a2"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+              "bytes": 93729
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-t015",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters",
+                  "speakerRef": "unknown",
+                  "tStart": 358,
+                  "tEnd": 375,
+                  "text": "Jasminder Khanna: Now, fast forward 20 years. Let's come to 2025 because I don't have the stats for 2026, so I'll talk about 2025. So last year, the same ministry in India which keeps an eye on students going abroad, they told us that that number from 131,000 has gone up to 1.3 million in 20 years' time."
+                },
+                "textSha256": "fd6de0ccc3c3833937450518d7866dac3da4eaf27e38276d508f447c8b4fa2a3"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unsupported",
+        "literalRationale": "Current citations ask about financing and counselor recommendations; neither supplies student-growth figures or dates.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 58,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "65c68bb531eba029bcb9d48bee247162df218832b4b63d32004671d30dc81682",
+      "sourceBindingSha256": "77f02df30aa6adcd97561f35f5669619e69c969f7e113042d3d89280fbcadc9a",
+      "persistedClaim": {
+        "_id": "2026-08-03-uk-beyond-offer-letters-c02",
+        "tenantId": "toc",
+        "text": "Universities such as Exeter have onboarded the Enroly CAS Shield platform to run pre-CAS financial and credibility checks.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-08-03-uk-beyond-offer-letters",
+          "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+          "current": {
+            "available": false,
+            "reason": "turn-absent",
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+              "sha256": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+              "normalizedLfSha256": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+              "bytes": 67917
+            },
+            "matches": []
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+              "bytes": 93729
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-t061",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters",
+                  "speakerRef": "unknown",
+                  "tStart": 1602,
+                  "tEnd": 1621,
+                  "text": "Nick Skeavington: At Exeter, that has led to some adjustments in how we approach things. So we have onboarded the Enroly CAS Shield platform, so we're using CAS Shield now to work through our CASes and our visa process. And we have some additional checks and assessments that are happening in the admissions process and in the enrollment process."
+                },
+                "textSha256": "40659e544b2819e5775e65820d46e3d82e8facfdb496325a8aea6ad0014ed772"
+              }
+            ]
+          },
+          "sameIdContentChanged": false
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "unavailable",
+        "literalRationale": "The current literal citation has no matching turn record.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 59,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "702f8513f491c1d255150b4ed220998b0bda4070eabc70087c31867137fbfdb3",
+      "sourceBindingSha256": "849a215b68acbbf36043cb5edd173fe24f7c7014998faf879a90bd2f19a43c0e",
+      "persistedClaim": {
+        "_id": "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+        "tenantId": "toc",
+        "text": "Indian students studying abroad grew from about 131,000 in 2005 to over a million within roughly two decades, per the Ministry of External Affairs figures cited in this recording.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+          "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+              "sha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+              "normalizedLfSha256": "d3929dbaa1aca0e909f66570924310c04b5cff0befc5b6a2fb4516081af8eeb9",
+              "bytes": 72008
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+                  "speakerRef": "Jasminder Khanna",
+                  "tStart": 202,
+                  "tEnd": 606,
+                  "text": "Oh, thank you for putting me on the spotlight right away. But thank you for the kind introduction as well, Bhavya. Lovely to be here. Lovely to interact with the very, very experienced community. I think we need to take a few steps back. I'll come to your second question later. I'll start with the first question first, what has changed. Whilst, you know, we all keep an eye on LinkedIn and we all keep an eye on news to understand what's happening in terms of the nitty-gritties policy changes every day, but, you know, largely, holistically, what has changed? I think we all need to take a few steps back and go in the history of the study abroad industry, especially from the South Asia perspective. And if I take you back to the year 2005, which was an era when I went to the UK to do my undergrad degree, which was nearly 20 years ago, it was a very different era where the numbers were less. We had four options when it came to destinations, largely four options. Not saying the other markets weren't open, but, you know, we were all, we were always programmed to only think of the English-speaking world when it came to study abroad. And, you know, there was a clear distinction between students going to the US and UK. People who could take the SATs and the GREs of the world always preferred the US. The ones who couldn't settled for the UK as a market. So, to me, it was never, never a question because I had most of my family, most of my cousins, my brother, already studying in the UK already. So, I was quite determined to go to the UK. But, you know, if we look at the numbers, that will perhaps tell us the larger story here. So, if I go back to the year 2005, not that I counted myself, but the Ministry of External Affairs in India tells us that 131,000 Indian students left India to study abroad in that year. Now, if we look at the breakdown of that 131,000 students, nearly 76,000 of those students were absorbed by the US because they have a large appetite, given the large number of universities within the ecosystem. Of course, followed by Canada, which was the second-largest destination for Indian students, followed by the UK, and then, of course, Australia was catching up with the other countries. Now, since 76,000 of those students are taken by US alone, what is left behind is about 55,000-56,000 students. And there are three destinations fighting for these 56,000 students. So, it was always the students in the driving seat. You know, students could demand. And that's why we saw the likes of post-study work visas, MOIs, English language waivers, because every destination was trying to attract more and more students. The demand was high, the supply was low 20 years ago. Now, fast forward 20 years, let's come to 2025, because I don't have the stats for 2026, so I'll talk about 2025. So, last year, the same ministry in India, which keeps an eye on students going abroad, they told us that that number from 131,000 has gone up to 1.3 million in 20 years' time. Whilst that number grew 10 times, what did not change is the number of universities in the English-speaking world, more or less. We haven't had a lot of additions. If you look at Australia, it's the same universities we had 20 years ago. Even in the UK, it's the same Russell Group, traditional modern universities that we had 20 years ago. Except, yeah, there are few private players which have come up in the last few years. But the number of universities has not significantly changed. Now, the number of students has gone up by 10 times. They're still chasing the same destinations. But now, I think, the tables have turned. The situation has slightly changed where the universities and the destinations are in the driving seat. They can, they can kind of control the quality of students that they want because there's 1.3 million students waiting to arrive. But then, I don't think the four countries put together have the capacity to accept or absorb 1.3 million students from South Asia, which has again given opportunity to other emerging destinations to kind of leverage the opportunity in the market. So, this is where the equation has changed from a time when the students were in the driving seat, they got everything from MOIs to English language waivers to, you know, installment and everything, everything else, which made those destinations very friendly to them, whereas now, the universities, yes, are being more picky. They're more, they're being more selective in the kind of students they want from India because, yes, the demand is still the same, the supply is, there's an oversupply of students right now. So, I think the universities are in a position where they can pick and choose the students that they want to come to the UK today. And that's why you see the change in regulations to, to create a better control over the quality of students that we want. The misconception that we have, I, I talk to a lot of people in the market, and often what I've been hearing is, \"the UK doesn't, UK government doesn't want Indian students to come.\" No, I think that's the, that's the biggest myth, that's a misconception. They still want Indian students to come, but the difference is they want better Indian students to come. And, and there is another perspective to this. It's not just a numbers game, you know, numbers is just one part of it. But the other part of it is the employability. Is, is how the industries have evolved, and how jobs have evolved. We all know what has happened since COVID. With evolving technologies, a lot of the blue-collar jobs, a lot of the low-level jobs, level three, four, five, are, are automated with the help of whether it's AI, whether it's machine learning, whether it's robotics, a lot of the jobs are automated. So, we don't have enough blue-collar jobs being created in the country. See, there were always two types of Indian students going to the UK. One who were more aspirational. They came, you know, with deeper pockets. They went to the right universities, and they, they knew, you know, they what they chasing. They're chasing white-collar jobs. They're chasing executive careers. Whereas there was always an audience which settled for mediocre universities, and, you know, who were very happy with, you know, blue-collar careers as well. But we don't have enough blue-collar jobs being produced in, in the English, in the developed regions of the world. And that's because of the evolving technologies. Now, when we don't have enough blue-collar jobs being produced, that means we can't really employ so many people coming to that route, coming through the back doors. And that is why you see, you know, a clampdown on the students trying to come to the UK through the back door, which, which has always been the case. And this is something that the UK government is trying to control now. So, that's where we see the shift. It's from a number perspective, and from an employability perspective as well. But the doors will always be open to people who are aspirational, people who can contribute to diversity, people who can contribute to research, contribute to, uh, economy, contribute to employment creation, entrepreneurship in the country. I think the UK government has been one of the most receptive, one of the most welcoming governments, uh, that, you know, I have ever seen. Um, so, that's I think a misconception that they don't want students. I think they, they want students, but they want the right students."
+                },
+                "textSha256": "cd6d27685f8c9b11eb7e428490a766f32c68771a3df8b712aae004fc29916876"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+              "bytes": 72585
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+                  "speakerRef": "unknown",
+                  "tStart": 204,
+                  "tEnd": 606,
+                  "text": "Jasminder Khanna: Well, thank you for putting me on the spotlight right away. But thank you for the kind introduction as well, Bhavya. Lovely to be here, lovely to interact with a very, very experienced community. I think we need to take a few steps back. I'll come to your second question later. I'll start with the first question first: what has changed? Whilst, you know, we all keep an eye on LinkedIn and we all keep an eye on news to understand what's happening in terms of the nitty-gritties, policy changes everyday, but you know, largely, holistically what has changed, I think we all need to take a few steps back and go in the history of the study abroad industry, especially from the South Asia perspective. And if I take you back to the year 2005, which was an era when I went to the UK to do my undergrad degree, which is nearly 20 years ago, it was a very different era where the numbers were less. We had four options when it came to destinations, largely four options. Not saying the other markets weren't open, but you know, we were all we were always programmed to only think of the English-speaking world when it came to study abroad. And you know, there was a clear distinction between students going to the US and UK. People who could take the SATs and the GMATs of the world always preferred the US. The ones who couldn't settled for the UK as a market. So to me it was never never a question because I had most of my family, most of my cousins, my brother Jaspreet studying in the UK already. So I was quite determined to go to the UK. But, you know, if we if we look at the numbers, that will perhaps tell us the larger story here. So if I go back to the year 2005, not that I counted myself, but the Ministry of External Affairs in India tells us that 131,000 Indian students left India to study abroad in that year. Now, if we look at the breakdown of that 131,000 students, nearly 76,000 of those students were absorbed by the US because they have a large appetite given the large number of universities within the ecosystem. Of course, followed by Canada, which was the second largest destination for Indian students, followed by the UK, and then, of course, Australia was catching up with the other countries. Now, since 76,000 of those students are taken by the US alone, what is left behind is about 55-56,000 students, and there are three destinations fighting for these 56,000 students. So it was always the students in the driving seat. You know, students could demand, and that's why we saw the likes of post-study work visas, MOIs, English language waivers, because every destination was trying to attract more and more students. The demand was high, the supply was low 20 years ago. Now, fast forward 20 years, let's come to 2025 because I don't have the stats for 2026, so I'll talk about 2025. So last year, the same ministry in India which keeps an eye on students going abroad, they told us that that number from 131,000 has gone up to 1.3 million in 20 years' time. Whilst that number grew 10 times, what did not change is the number of universities in the English-speaking world. More or less, we haven't had a lot of additions. If you look at Australia, it's the same universities we had 20 years ago. Even in the UK, it's the same Russell Group, traditional, modern universities that we had 20 years ago. Except, yeah, there are a few private private players which have come up in the last few years, but the number of universities has not significantly changed. Now, the number of students has gone up by 10 times. They're still chasing the same destinations. But now, I think the tables have turned. The situation has slightly changed where the universities and the destinations are in the driving seat. They can they can kind of control the quality of students that they want because there's 1.3 million students waiting to arrive, but then I don't think the four countries put together have the capacity to accept or absorb 1.3 million students from South Asia, which has again given opportunity to other emerging destinations to kind of leverage the opportunity in the market. So this is where the equation has changed from a time when the students were in the driving seat, they got everything from MOIs to English language waivers to, you know, installment and everything everything else, which made those destinations very friendly to them. Whereas now, the universities, yes, are being more picky, they're more they're being more selective in the kind of students they want from India because, yes, the demand is still the same, the supply is there's an oversupply of students right now. So I think the universities are in a position where they can pick and choose the students that they want to come to the UK today. And that's why you see the change in regulations to to create a better control over the quality of students that we want. The misconception that we have, I I talk to a lot of people in the market, and often what I've been hearing is the UK does the UK government doesn't want Indian students to come. No, I think that's the that's the biggest myth, that's a misconception. They still want Indian students to come, but the difference is they want better Indian students to come. And and there is another perspective to this. It's not just a numbers game. You know, numbers is just one part of it. But the other part of it is the employability is is how the industries have evolved and how jobs have evolved. We all know what has happened since COVID with evolving technologies. A lot of the blue-collar jobs, a lot of the low-level jobs—Level 3, 4, 5—are are automated with the help of whether it's AI, whether it's machine learning, whether it's robotics. A lot of the jobs are automated. So we don't have enough blue-collar jobs being created in the country. See, there were always two types of Indian students going to the UK: one who were more aspirational, they came, you know, with deeper pockets, they went to the right universities, and they they knew what they're chasing. They're chasing white-collar jobs, they're chasing executive careers. Whereas there was always an audience which settled for mediocre universities and, you know, who are very happy with, you know, blue-collar careers as well. But we don't have enough blue-collar jobs being produced in in the English in the developed regions of the world, and that's because of the evolving technologies. Now, when we don't have enough blue-collar jobs being produced, that means we can't really employ so many people coming through that route, coming through the back doors. And that is why you see, you know, a clampdown on the students trying to come to the UK through the back door, which has which has always been the case. And this is something that the UK government is trying to control now. So that's where we see the shift. It's from a numbers perspective and from an employability perspective as well. But the doors will always be open to people who are aspirational, people who can contribute to diversity, people who can contribute to research, contribute to economy, contribute to employment creation, entrepreneurship in the country. I think the UK government has been one of the most receptive, one of the most welcoming governments that, you know, I have ever seen. So that's, I think, a misconception that they don't want students. I think they they want students, but they want the right students."
+                },
+                "textSha256": "674430662ebdbffcb3f5c16a6d00018ff7b5ec3cc2bbdeb80f07a5d735b3d4a2"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "supported",
+        "literalRationale": "The speaker attributes 131,000 students in 2005 and 1.3 million in 2025 to the same Indian ministry.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    },
+    {
+      "ordinal": 60,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c02",
+      "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+      "sourcePacketSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+      "claimRecordSha256": "db3526f712e5094bb0ba97fa8be099aa625b1ce4ef34fac1bc45ddeddb89876f",
+      "sourceBindingSha256": "849a215b68acbbf36043cb5edd173fe24f7c7014998faf879a90bd2f19a43c0e",
+      "persistedClaim": {
+        "_id": "2026-08-03-uk-beyond-offer-letters-reupload-c02",
+        "tenantId": "toc",
+        "text": "Wai Wah Tsang uses a gym-membership analogy: accepting a university offer is like joining a gym -- the outcome still depends on how the student uses what is available.",
+        "topicRefs": [],
+        "status": "needs-review",
+        "evidence": [
+          {
+            "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload"
+          }
+        ]
+      },
+      "literalCitationContexts": [
+        {
+          "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+          "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+          "current": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+              "sha256": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+              "normalizedLfSha256": "d3929dbaa1aca0e909f66570924310c04b5cff0befc5b6a2fb4516081af8eeb9",
+              "bytes": 72008
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+                  "speakerRef": "Y.Y. Song",
+                  "tStart": 645,
+                  "tEnd": 1176,
+                  "text": "Um, thank you so much for the question. And, um, I'll, I'll break that question down, uh, so it's, uh, so it's more, you know, kind of digestible. And I think the first thing, you know, about, uh, that, uh, that age-old question that I, I receive from, you know, parents and from students, uh, about, you know, \"Will I get a job?\" or \"Will my child get a job?\" And I think whilst it's a really completely understandable question about the return of investments, I think that we have to be honest. And the most honest answer is, no university can guarantee, uh, that a student is guaranteed employment. Um, but I think what we can say, uh, especially from a Warwick perspective, is that universities can provide opportunities, they can support, um, support networks, and the relevant experiences, um, to significantly improve a student's, you know, chances and prospects and, and, and engagement. And when we look at things like around, you know, career and employability, I think, um, we need to move, you know, beyond, you know, the idea that the degree alone is actually going to be, uh, the, the guarantee to, to get a job. And when we're looking at the job market, you know, employers are actually not just looking for degrees that are linear, you know. They are looking for a bit more, uh, interdisciplinary. They are looking for, you know, uh, outside thinkers of the, of the normal discipline. And I think that having that combination, uh, of course, you know, students are going to need to continue to do well, uh, in terms of their academic achievements, um, but we're, we're seeing lots more degrees, you know, having, uh, practical elements, lot more placements, and a lot more internship opportunities, where students can continue to, uh, you know, develop their skills, um, and, you know, it's, it's the platform that we're trying to give and that support, so it allows students to, um, enhance, uh, their kind of ability and to articulate their strengths. Um, and I think that when we're looking at students, um, those who utilize, you know, those opportunities, you know, those who are actively, uh, engage with internships, placements, um, extracurricular activities whilst they're at university, but also, you know, utilize, um, rely on the strengths that they've, uh, they've had from school and bringing it forward, you know, demonstrating their leadership opportunities, and utilizing that support, they're the ones who are actually seen to be, um, you know, the most successful moving forward. And I think that, you know, universities like, uh, you know, like mine, like the University of Warwick, you know, one of our strengths is that, you know, the combination of having that academic excellence and having a strong employer reputation, uh, but also having, uh, extensive, uh, industry engagements. And I think that, you know, our engagement over the last 40 years, that we've had with employers, uh, and, and building those relationships across many sectors, um, I think that students can benefit, uh, or increase their chances of, of trying to get a successful, you know, career. And, you know, we, we try to do that through building good stories, building successful stories where we can, uh, and that could be across, you know, our, um, extensive global, uh, alumni network, where we've currently just surpassed 320,000, uh, students, and there are over 85,000, um, 8,500, uh, Indian alumni, who's, who's walked through those doors. So, I think it's really important that we continue to build the profile of the students and increase their chances of employability, but also whilst they're studying. Um, so, you asked, I think, you asked the question around kind of, you know, the right fit, what university is the right fit. And I think that, you know, we always encourage counselors, uh, to engage with the students and, and families, and, and to think about, yes, it's about the right fit, not always about which university is the highest-ranked. Um, and I think that giving the student, you know, the right opportunities, uh, to not just survive but also to thrive, um, that's where I think students are going to get the most of their academic education. You know, they, they need to be academically challenged, they need to be, uh, need to have that support system, whether it's through education or through the careers, whether it's through their personal tutor or through their professors, for example. But also they need to stay motivated as well. And also to make the most of the opportunities that are given to them. And I think that, you know, students need to ask themselves, \"Yes, this university might be the highest-ranked, but it's not a campus university, or it's a city-based university.\" And those things, you know, they need to ask themselves, \"Which environment am I going to, you know, is going to suit me the best?\" Um, and there's also, also other things as well, you know, looking at the, uh, interdisciplinary learning, you know, looking at the broad range of, uh, societies that are available. And I think it's really, really important to focus on that because what do societies have anything to do with employability? Well, employers are looking for, you know, your soft skills, and your communication skills, your networking skills and things like that. And these are easy wins. These are easy ways to learn a skill, learn an experience by doing something, but not being very, um, shall I say, you're not focused on it, because you're making, you know, friends. Those are transferable skills. And if you're getting jobs within societies, you know, you might be a treasurer, you might be the vice president or president, that's something that, uh, those skills and that networking, that they can transfer into, you know, the kind of the working world. So, it's, it's about building your profile as you go along. Um, and so, there's one thing that I, I normally say, um, to, to anyone is that, if students get an offer, and they have been accepted, I always use this gym analogy, that, if you go, if you've been accepted and enrolled at a university, you have to ask yourself, \"Okay, look at the, I need to get these opportunities now.\" So, if you go to the gym, you can basically go there and just be a member, and you can just do the bare minimum, and you can come out three or four years, and you can say, \"Okay, I was a member of that gym.\" But in order to stress yourself, in order to progress, you need to utilize the equipment that that, that's available there. And if you don't put in the work, you're not going to get the returns, and you're not going to achieve the goals that you're particularly looking for. Uh, so, that's my analogy. Hopefully, it's relatable to some people. Um, I think that when, when students are looking again at the, the rankings, I think it's really important for counselors and students to look at the rankings, but not just for the current year, and not even the last two or three years. In my opinion, I think that it's important to look at consistency. And we're looking at consistency, well, what comes with consistency? It comes with long-standing values, it comes, um, academic, uh, excellence, whether it's teaching excellence or research excellence or both, or a strong reputation. And I think that if you can combine all of that, then, what employers, uh, uh, looking for in their candidates, and all the opportunities that you get, hopefully, that's something that, uh, will make them stand out when that process comes. So, yeah, I think the, you know, the, the reality of today's, um, graduate market is that, you know, employers are looking for talented students, looking for well-rounded students from a whole host or a range of, uh, institutions. And I think, um, what makes them stand out, what makes them different is how they use their university experience. So, to, to, to summarize, it's not about, um, you know, \"will my child\" or \"will I get a job\" at the end of it, but I think it's, you know, \"what does the university offer for me\" or \"offer my child?\" What type of environment, what type of opportunities, and what support is there, you know, to develop, um, the, the, the graduate in a competitive market? And I think that finding the right university is, is really critical in this space. Um, so, hopefully, that answers the, the question in, in some way."
+                },
+                "textSha256": "37c10c900b92ebcc701620c9aa7f201ce0cc66ae723ba1277ff75c0be6f4bc96"
+              }
+            ]
+          },
+          "originalMigration": {
+            "available": true,
+            "reason": null,
+            "artifact": {
+              "available": true,
+              "path": "data/toc-migrated/2026-08-03-uk-beyond-offer-letters-reupload/turns.json",
+              "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+              "sha256": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+              "bytes": 72585
+            },
+            "matches": [
+              {
+                "record": {
+                  "_id": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+                  "tenantId": "toc",
+                  "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+                  "speakerRef": "unknown",
+                  "tStart": 645,
+                  "tEnd": 1177,
+                  "text": "Wai Wah Tsang: Um thank you so much for the question. And um I'll I'll break that question down uh so it's uh it's more, you know, kind of digestible. And I think the first thing, you know, about uh that uh that age-old question that I receive from, you know, parents and from students about, you know, \"Will I get a job?\" or \"Will my parent get a job?\" And I think whilst it's a really completely understandable question about the return of investments, I think that we have to be honest. And the most honest answer is no university can guarantee uh that a student is guaranteed employment. Uh but I think what we can say, uh especially from a Warwick perspective, is that universities can provide opportunities, they can support um provide support networks and the relevant experiences um to significantly improve a student's, you know, chances and prospects and and engagement. And when we look at things like around, you know, careers and employability, I think um we need to move, you know, beyond, you know, the idea that the degree alone is actually going to be uh the the guarantee to get a job. And when we're looking at the job market, you know, employers are actually not just looking for degrees that are linear, you know. They are looking for a bit more interdisciplinary, they are looking for, you know, outside thinkers of the of the normal discipline. And I think that having that combination—of course, you know, students are going to need to continue to do well in terms of their academic achievements—but we're we're seeing lots more degrees, you know, having practical elements, a lot more placements, and a lot more internship opportunities where students can continue to uh, you know, develop their skills. Um and you know, it's it's the platform that we're trying to give and that support. So it allows students to um enhance uh their kind of ability and to articulate their strengths. Um and I think that when we're looking at students, um those who utilize you know, those opportunities, you know, those who actively uh engage with internships, placements, um extracurricular activities whilst they're at university, but also you know, uh relying on the strengths that they've uh they've had from school and bringing it forward, you know, demonstrating their leadership opportunities and utilizing that support, they're the ones who are actually seen to be um, you know, the most successful moving forward. And I think that you know, universities like uh, you know, like mine, like the University of Warwick, you know, one of our strengths is that, you know, the combination of having that academic excellence and having a strong employer reputation, uh but also having extensive uh industry engagement. And I think that, you know, our engagement over the last 40 years that we've had with employers uh and and building those relationships across many sectors, um I think that students can benefit uh or increase their chances of trying to get a successful, you know, career. And you know, we we try to do that through building good stories, building successful stories where we can. And that could be across, you know, our um extensive global alumni network, where we've currently just surpassed 320,000 uh students and uh over 85,000 uh 8,500 uh Indian alumni who's who's walked through those doors. So I think it's really important that we continue to build the profile of the students and increase their chances of employability, but also whilst they're studying. Um so you asked I think you asked the question around kind of, you know, the right fit, what university is the right fit. And I think that, you know, we always encourage counselors uh to engage with the students and and families and and to think about, yes, it's about the right fit, not always about which university is the highest-ranked. Um and I think that giving the student, you know, the right opportunities uh to not just survive, but also to thrive, um that's where I think students are going to get the most out of their academic education. You know, they they need to be academically challenged, they need to be uh they need to have that support system, whether it's through education or through the careers, whether it's through their personal tutor or through their professors, for example. But they also need to stay motivated as well and also to make the most of the opportunities that are given to them. And I think that, you know, students need to ask themselves: yes, this university might be the highest-ranked, but it's not a campus university, or it's a city-based university. And those things, you know, they need to ask themselves, which environment am I going to, you know, is going to suit me the best. Um and there's also other things as well, you know, looking at the interdisciplinary learning, you know, looking at the broad range of uh societies that are available. And I think it's really, really important to focus on that, because what does societies have anything to do with employability? Well, employers are looking for, you know, your soft skills and your communication skills, your networking skills, and things like that. And these are easy wins. These are easy ways to learn a skill, learn an experience by doing something, but not being very um shall I say, you're not focused on it, cuz you're making, you know, friends. Those are transferable skills. And if you're getting jobs within societies, you know, you might be a treasurer, you might be the vice president or president, that's something that uh those skills and that networking that they can transfer into, you know, depend into the working world. So it's it's about building your profile as you go along. Um and so there's one thing that I I I normally say um to to anyone is that if students get an offer and they have been accepted, I always use this gym analogy that if you go if you've been accepted and enroll at a university, you have to ask yourself, okay, look at the I need to get these opportunities now. So if you go to the gym, you can basically go there and just be a member, and you can just do the bare minimum, and you can come out three or four years and you can say, okay, I was a member of that gym. But in order to stress yourself, in order to progress, you need to utilize the equipment that there that's available there. And if you don't put in the work, you're not going to get the returns and you're not going to achieve the goals that you're particularly looking for. Uh so that's my analogy, hopefully it's relatable to some people. [laughter] Um I think that when you when students looking again at the the the rankings, I think it's really important for counselors and students to look at the rankings, but not just for the current year, and not even the last two or three years. In my opinion, I think that it's important to look at consistency. And when we look at consistency, well, what comes with consistency? It comes with long-standing values, it comes with academic excellence, whether it's teaching excellence or research excellence, or both, or a strong reputation. And I think that if you can combine all of that, then what employers uh are looking for in their candidates, and all the opportunities that you get, hopefully that's something that will make them stand out when that process comes. So, yeah, I think the, you know, the the reality of today's um graduate market is that, you know, employers are looking for talented students, looking for well-rounded students from a whole host or a range of institutions. And I think what makes them stand out, what makes them different, is how they use their university experience. So to to to summarize, it's not about, you know, \"Will my child or will I get a job at the end of it?\" But I think it's, you know, what does the university offer for me or offer my child? What type of environment, what type of opportunities, and what support is there, you know, to develop the the the the graduate in a competitive market? And I think that finding the right university is is is really critical in this space. Um so hopefully that answers the the question in in in some form."
+                },
+                "textSha256": "5dd7c5ab14d9aae19b21b43f3f5c9108b5ef826ad8f371d06f4e41c1a9f53668"
+              }
+            ]
+          },
+          "sameIdContentChanged": true
+        }
+      ],
+      "replacementProposal": null,
+      "aiDraft": {
+        "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+        "literalCitationSupport": "partially_supported",
+        "literalRationale": "The gym analogy and dependence on using opportunities are explicit; current speakerRef is Y.Y. Song, leaving the claimed full-name attribution unestablished.",
+        "replacementCitationSupport": null,
+        "replacementRationale": null,
+        "factualTruth": "unknown",
+        "omissions": "unknown",
+        "topicPrecision": "unknown",
+        "personPrecision": "unknown",
+        "reviewBasis": "Current literal source passages only; replacement proposals rated separately. No full-transcript absence claim or external factual verification."
+      },
+      "humanReview": {
+        "status": "unreviewed",
+        "approvedBy": null,
+        "approvedAt": null,
+        "decision": null,
+        "sourcePacketSha256": null
+      },
+      "humanGold": false,
+      "bindingThresholds": null
+    }
+  ]
+}

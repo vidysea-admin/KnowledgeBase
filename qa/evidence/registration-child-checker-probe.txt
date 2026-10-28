@@ -1,0 +1,59 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"positive","result":{"status":"submitted","reason":"awaiting_confirmation"},"cleanup":false,"elapsedMs":122}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"nonzero","result":{"status":"uncertain","reason":"browser_failure"},"cleanup":true,"elapsedMs":230}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"signal","result":{"status":"uncertain","reason":"browser_failure"},"cleanup":true,"elapsedMs":278}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"fatal-before","result":{"status":"uncertain","reason":"browser_failure"},"cleanup":true,"elapsedMs":304}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"fatal-after","result":{"status":"uncertain","reason":"browser_failure"},"cleanup":true,"elapsedMs":299}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"duplicate","result":{"status":"uncertain","reason":"invalid_result"},"cleanup":true,"elapsedMs":278}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"conflicting","result":{"status":"uncertain","reason":"invalid_result"},"cleanup":true,"elapsedMs":332}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"invalid-after-valid","result":{"status":"uncertain","reason":"invalid_result"},"cleanup":true,"elapsedMs":338}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"invalid-before-valid","result":{"status":"uncertain","reason":"invalid_result"},"cleanup":true,"elapsedMs":304}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"missing","result":{"status":"uncertain","reason":"missing_result"},"cleanup":true,"elapsedMs":306}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"ordinary-progress","result":{"status":"submitted","reason":"awaiting_confirmation"},"cleanup":false,"elapsedMs":146}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"uncertain-positive","result":{"status":"uncertain","reason":"unsafe_form"},"cleanup":false,"elapsedMs":153}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"action-required-positive","result":{"status":"action_required","reason":"unsafe_form"},"cleanup":false,"elapsedMs":136}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"overflow","result":{"status":"uncertain","reason":"output_limit"},"cleanup":true,"elapsedMs":309}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"timeout","result":{"status":"uncertain","reason":"browser_timeout"},"cleanup":true,"elapsedMs":1127}
+
+stdout | data/registration-checker-probe.test.mjs > registration lifecycle independent real-child corpus
+{"name":"cleanup-failure","result":{"status":"uncertain","reason":"owned_cleanup_failed"},"cleanup":true,"elapsedMs":219}
+{"passed":16,"total":16,"fixtureRoot":"C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\registration-checker-fixtures-GaLngI"}
+
+ ✓ data/registration-checker-probe.test.mjs (1 test) 5035ms
+   ✓ registration lifecycle independent real-child corpus 5034ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  09:30:43
+   Duration  5.62s (transform 100ms, setup 0ms, collect 19ms, tests 5.04s, environment 0ms, prepare 245ms)

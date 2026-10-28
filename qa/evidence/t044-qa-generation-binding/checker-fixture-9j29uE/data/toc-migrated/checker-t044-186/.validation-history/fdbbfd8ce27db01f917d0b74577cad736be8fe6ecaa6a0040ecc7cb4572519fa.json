@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "transcriptValidated": true,
+  "durationSec": 186,
+  "turnCount": 1,
+  "lastTEnd": 186,
+  "coverage": 1,
+  "partial": false,
+  "shortfallSec": 0,
+  "gaps": [],
+  "qa": {
+    "version": 1,
+    "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+    "durationValid": true,
+    "inputCount": 1,
+    "outputCount": 1,
+    "clampedCount": 0,
+    "dropped": 0,
+    "overshootSec": 0,
+    "pastEnd": 0,
+    "repeatedRuns": 0,
+    "nonMonotonic": 0,
+    "acceptedSpans": 1,
+    "rejectedAttempts": 0
+  },
+  "qaSha256": "21c4a49b27b89e652efd9dd02b2f6eb7d32b4c4813969e130d9b7956f5c354d9",
+  "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+  "validatedAt": "2026-10-14T20:43:23.545Z",
+  "validator": "scripts/webinar/validate/validate-session.mjs"
+}

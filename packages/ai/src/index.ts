@@ -9,6 +9,7 @@ export * from "./providers/gemini.js";
 export * from "./providers/openai.js";
 export * from "./providers/anthropic.js";
 export * from "./providers/ollama.js";
+export * from "./providers/ollama-cloud.js";
 export * from "./providers/claude-code.js";
 
 export * from "./stt/transcribe.js";
@@ -16,3 +17,9 @@ export * from "./stt/whisper.js";
 export * from "./stt/gemini.js";
 export * from "./stt/gemini-file-upload.js";
 export * from "./stt/chunk-audio.js";
+export * from "./trace.js";
+export * from "./trace-registry.js";
+export * from "./trace-file-sink.js";
+export * from "./trace-langfuse/sink.js";
+export * from "./gemini-quota.js";
+export * from "./vision/chain.js";

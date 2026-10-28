@@ -1,0 +1,43 @@
+[
+  {
+    "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-passive-ast.log",
+    "active_s": 0.25,
+    "exit": 0,
+    "logHashMatches": true,
+    "pinsUnchanged": true,
+    "command": [
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+      "-B",
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\static_checks.py"
+    ],
+    "label": "isolated-replica-cycle1-passive-ast"
+  },
+  {
+    "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-fake-regressions.log",
+    "active_s": 0.5779999999977008,
+    "exit": 0,
+    "logHashMatches": true,
+    "pinsUnchanged": true,
+    "command": [
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+      "-B",
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\fake_regressions.py"
+    ],
+    "label": "isolated-replica-cycle1-fake-regressions"
+  },
+  {
+    "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\isolated-replica-cycle1-passive-ownership-parser.log",
+    "active_s": 1.7970000000022992,
+    "exit": 0,
+    "logHashMatches": true,
+    "pinsUnchanged": true,
+    "command": [
+      "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\cycle1\\parse-ownership.ps1"
+    ],
+    "label": "isolated-replica-cycle1-passive-ownership-parser"
+  }
+]

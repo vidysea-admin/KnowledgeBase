@@ -187,3 +187,5 @@ backend module (`lkb record`) with no UI surface.
   cross-process dedupe, which was not asked for.
 
 ## Status: checked-PASS — qa/verdicts/t-030-telegram-alerts.md (Cycle checked: 0, peer checker knowledgebase-ff, d3cefbf); merged to master; meeting-bot 115/115 + tsc clean on merged tree; live phone delivery + silence trigger (T-031) remain stated debt
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

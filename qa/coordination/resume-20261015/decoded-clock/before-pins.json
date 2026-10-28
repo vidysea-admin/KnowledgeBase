@@ -1,0 +1,97 @@
+{
+  "purpose": "Read-only source applicability checkpoint; no source writes made",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": null,
+  "files": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\native-clock-calibrator.ts",
+      "exists": false,
+      "length": null,
+      "sha256": null
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\native-clock-calibrator.test.ts",
+      "exists": false,
+      "length": null,
+      "sha256": null
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\registry.ts",
+      "exists": true,
+      "length": 19037,
+      "sha256": "B7E5DA4983192FBE4E029D35D36A523CC2D454EC25439B173F3CC3157B18F1A2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tiles\\sampler-clock.ts",
+      "exists": true,
+      "length": 3829,
+      "sha256": "3F583A0B203A5A6358019D39F97B0773471BE51F32A1CAD536105528168C6480"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\py\\tab-capture\\recorder.js",
+      "exists": true,
+      "length": 6367,
+      "sha256": "2124310057A5431D10F38254CF1BD39C405C04986C123A3C588CD28AD7D3A7B7"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tab-browser.ts",
+      "exists": true,
+      "length": 22268,
+      "sha256": "F2452F3279F186C46DF6B5FED311605098089830417929F723A5D00D9FC0A3A3"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\obs\\obs-windows.ts",
+      "exists": true,
+      "length": 16785,
+      "sha256": "773E098CC6B0CD98BF8CF133655F71627E722A67FD778A3A593CD29BEF7EA1D2"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\lean-video-ffmpeg.ts",
+      "exists": true,
+      "length": 16928,
+      "sha256": "79B11336471E503B3E028AE4D865759C569A73B3782CD78858F39561E089CABC"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-consent\\finalizer-input.ts",
+      "exists": true,
+      "length": 4715,
+      "sha256": "933F943B04176BCB6047FC6044C77459D6291D94659AFB620DD07A30DEE3BECB"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-finalize.ts",
+      "exists": true,
+      "length": 20852,
+      "sha256": "EE71C4F75157800F2B68E38FC9E83B1C0E4049F61A659FA7C9C29C7CE587AA53"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\tab-remux.ts",
+      "exists": true,
+      "length": 2121,
+      "sha256": "4995C04B088A1C67D6C6BA8F99BFE8236345308574E521FF460AB1B5B5A16FF7"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\t042-trusted-registry-integration.md",
+      "exists": true,
+      "length": 12223,
+      "sha256": "5DBAFD0000DE26AADF74AE0BEE0E707236E022E4D10D820042B59FF1A3BDC544"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\manifests\\t042-trusted-registry.md",
+      "exists": true,
+      "length": 7345,
+      "sha256": "D3B8691A29928ACCA61C38A8EFD2ED842D094D2C5B95FB12A1D9317AA9A5E67B"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\manifests\\t042-capture-clock-suggestions.md",
+      "exists": true,
+      "length": 10875,
+      "sha256": "8AAE145278E57FB442D0C0E94F0730BBDD1191533CD16B6214B572EB726BCFC0"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml",
+      "exists": true,
+      "length": 147579,
+      "sha256": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD"
+    }
+  ]
+}

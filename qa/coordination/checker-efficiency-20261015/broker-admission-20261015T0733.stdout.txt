@@ -1,0 +1,21 @@
+✔ measured 10% elapsed budget, bounded input estimate is explicitly not billing (26.8904ms)
+✔ unknown and zero maker timing refuse rather than manufacture ratio (10.408ms)
+✔ WIP, disagreeing status and wrong cycle refuse (40.0098ms)
+✔ source, evidence and manifest drift refuse admission (21.2532ms)
+✔ packet limit and duplicate pin refuse (19.3359ms)
+✔ path traversal and secrets never read (13.0965ms)
+✔ mandatory risk and check list cannot be empty (18.2229ms)
+✔ complete in-budget semantic request retained, incomplete/security omitted means HOLD (20.4095ms)
+✔ over-budget PASS becomes HOLD, proven FAIL stays FAIL (20.076ms)
+✔ post-review drift prevents finish (20.2564ms)
+✔ exclusive cycle reservation prevents duplicate dispatch; no automatic retry (52.9126ms)
+✔ one bounded command launch yields attributed receipt, duplicate rejected (154.2502ms)
+✔ hanging child timeout is captured without pass inference (231.5153ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 783.9689

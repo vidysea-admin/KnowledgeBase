@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "status": "AI_DRAFT_REQUIRES_INDIVIDUAL_UMESH_APPROVAL",
+  "authorization": "D-163",
+  "sourcePacket": {
+    "path": "data/eval/extraction-adjudication-packet.json",
+    "sha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175"
+  },
+  "ratingInputs": [
+    {
+      "path": "ratings-01-24.json",
+      "sha256": "d2d644b01e3a7bb6311e2da3b7469e2e2a738877d6be9c3f23a6a21defe4f373"
+    },
+    {
+      "path": "ratings-25-48.json",
+      "sha256": "22b4b8343fc97411feb7585595356abf8f96455ec5870dabfdaf9e6fb31c9f39"
+    },
+    {
+      "path": "ratings-49-72.json",
+      "sha256": "256fd7d35ab95549aa6b811c869e5e8f613b0a101fc2fee36420e860297e3615"
+    }
+  ],
+  "batches": [
+    {
+      "path": "batch-01.json",
+      "sha256": "d8419f5f193e267e2df8cec8f4e583182fa34bccbdb2db0d364b4a72c0a757c5",
+      "itemCount": 10,
+      "firstOrdinal": 1,
+      "lastOrdinal": 10
+    },
+    {
+      "path": "batch-02.json",
+      "sha256": "4ebb977cdc5915ce856fb958a17c94bb3d7323b9516411255a2df6d9d42cae1b",
+      "itemCount": 10,
+      "firstOrdinal": 11,
+      "lastOrdinal": 20
+    },
+    {
+      "path": "batch-03.json",
+      "sha256": "b88896c8b65f7bee7bb30f6226bce9773fbaf2450e1d0f3ce1538a00cf9bb264",
+      "itemCount": 10,
+      "firstOrdinal": 21,
+      "lastOrdinal": 30
+    },
+    {
+      "path": "batch-04.json",
+      "sha256": "ef02faa2b2678799535aeff092b4d6505bf77abd66753562a4553ca842f2fe74",
+      "itemCount": 10,
+      "firstOrdinal": 31,
+      "lastOrdinal": 40
+    },
+    {
+      "path": "batch-05.json",
+      "sha256": "7ee80de7384877ffc53096bec3e2fcca1fc140741671c25748f50c1e7a0ef9ea",
+      "itemCount": 10,
+      "firstOrdinal": 41,
+      "lastOrdinal": 50
+    },
+    {
+      "path": "batch-06.json",
+      "sha256": "918fafd572d498e0b4ab883c8af7fdd7131ad982dfd64ed5658ec83675ecb049",
+      "itemCount": 10,
+      "firstOrdinal": 51,
+      "lastOrdinal": 60
+    },
+    {
+      "path": "batch-07.json",
+      "sha256": "44427e1525be92cd9be9926421af0412c6d9238fa8c567065dd6b22215f2dac1",
+      "itemCount": 10,
+      "firstOrdinal": 61,
+      "lastOrdinal": 70
+    },
+    {
+      "path": "batch-08.json",
+      "sha256": "0f8b2d4aa9e20dbed92ee4343e8abeffa2304458aa929aa7aea27b6ff7084920",
+      "itemCount": 2,
+      "firstOrdinal": 71,
+      "lastOrdinal": 72
+    }
+  ],
+  "claimCount": 72,
+  "literalCitationOccurrences": 80,
+  "unresolvedReferences": [
+    {
+      "sessionId": "2026-05-20-telling-your-brand-story-better",
+      "claimId": "2026-05-20-telling-your-brand-story-better-c01",
+      "turnId": "2026-05-20-telling-your-brand-story-better-t049"
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c02",
+      "turnId": "2026-05-29-decoding-ever-expanding-cast-t161"
+    },
+    {
+      "sessionId": "2026-05-29-decoding-ever-expanding-cast",
+      "claimId": "2026-05-29-decoding-ever-expanding-cast-c03",
+      "turnId": "2026-05-29-decoding-ever-expanding-cast-t190"
+    },
+    {
+      "sessionId": "2026-06-03-dual-enrollment-pathway",
+      "claimId": "2026-06-03-dual-enrollment-pathway-c02",
+      "turnId": "2026-06-03-dual-enrollment-pathway-t092"
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c02",
+      "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t051"
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c03",
+      "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t060"
+    },
+    {
+      "sessionId": "2026-06-19-entrance-exams-pathways-india-part1",
+      "claimId": "2026-06-19-entrance-exams-pathways-india-part1-c04",
+      "turnId": "2026-06-19-entrance-exams-pathways-india-part1-t059"
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c01",
+      "turnId": "2026-06-30-exploring-identity-success-counseling-t085"
+    },
+    {
+      "sessionId": "2026-06-30-exploring-identity-success-counseling",
+      "claimId": "2026-06-30-exploring-identity-success-counseling-c02",
+      "turnId": "2026-06-30-exploring-identity-success-counseling-t073"
+    },
+    {
+      "sessionId": "2026-08-03-uk-beyond-offer-letters",
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+      "turnId": "2026-08-03-uk-beyond-offer-letters-t061"
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c01",
+      "turnId": "2026-08-12-uniaccess-ashoka-university-t106"
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c02",
+      "turnId": "2026-08-12-uniaccess-ashoka-university-t084"
+    },
+    {
+      "sessionId": "2026-08-12-uniaccess-ashoka-university",
+      "claimId": "2026-08-12-uniaccess-ashoka-university-c03",
+      "turnId": "2026-08-12-uniaccess-ashoka-university-t058"
+    },
+    {
+      "sessionId": "2026-08-27-in-focus-4",
+      "claimId": "2026-08-27-in-focus-4-c03",
+      "turnId": "2026-08-27-in-focus-4-t102"
+    }
+  ],
+  "draftLiteralSupportCounts": {
+    "supported": 2,
+    "partially_supported": 2,
+    "unsupported": 54,
+    "unavailable": 14
+  },
+  "replacementProposalCount": 7,
+  "humanGoldCount": 0,
+  "semanticGoldAccepted": false,
+  "bindingThresholds": null,
+  "acceptance": "Review preparation only. U2.2 remains gated on individual human approvals, gold/threshold acceptance and complete-corpus evidence."
+}

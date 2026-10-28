@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "index": 23,
+  "originalIndex": 25,
+  "claimId": "2026-06-03-dual-enrollment-pathway-c01",
+  "inputHash": "a3b6d17fcc096bd8f6b52e58eb97e8488366552f52027ddf9943ded05af4ae3c",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "Supports about 80% of US students having access to some type of dual enrollment, but does not specify high school students as the percentage denominator. The full narrower-population claim is unsupported.",
+    "missingReferences": [],
+    "caveats": [
+      "The original speakerRef is unknown; an embedded name does not establish speaker identity.",
+      "Now is relative to the utterance; session metadata does not independently establish the statistic date or external truth.",
+      "The same turn ID now contains different text, speakerRef and timings (336-355 versus 1029-1054)."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t015",
+        "contextVersion": "originalMigration",
+        "quote": "about 80% of US students now have access to some type of dual enrollment program.",
+        "textSha256": "cfa61dca091fa0140214637c7915d1557b313317b66d33c19135290c78f609b1",
+        "contextSha256": "3cb9f53e8f44258868710fd79f9f9b08a8dc38bd3e8457fb18a1628bad78e8c3",
+        "artifactSha256": "4bda921455d67089aaf4f242d2178f6ea6d1eb9280d10581ecede23369f23089",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 336,
+        "tEnd": 355,
+        "supports": "Supports approximate percentage, US scope and program access for US students; does not establish a high school denominator."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The cited current turn asks which students benefit from dual enrollment; it supplies no 80% statistic, US scope, high school denominator or access prevalence.",
+    "missingReferences": [],
+    "caveats": [
+      "The same turn ID has changed content, speakerRef and timings; original support cannot be substituted for current evidence.",
+      "Stored speakerRef is preserved without independent identity verification.",
+      "Raw artifact and normalized-LF hashes are distinct provided values; on-disk bytes were not verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-03-dual-enrollment-pathway",
+        "turnId": "2026-06-03-dual-enrollment-pathway-t015",
+        "contextVersion": "current",
+        "quote": "What kind of students actually benefit from the dual enrollment opportunities?",
+        "textSha256": "83ec426023ecc373725bfe5a1b1bf639ab420e95835ae9746236b9a45e3fe63a",
+        "contextSha256": "aa6a26e53e1a12c2b35ccbee83c0109f61a300e813cefa614c2de0b629dfef62",
+        "artifactSha256": "7b3ac6ef7c6b7bec82bbb2a78e04e05f96de20f4302513b8dc25d35b0c9df78e",
+        "revision": null,
+        "speakerRef": "Niharika Sondi",
+        "tStart": 1029,
+        "tEnd": 1054,
+        "supports": "Related topic only; does not support the claimed US high school access statistic."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original partially supports the statistic but omits the high school denominator; current citation is a different question with no statistic. All required supplied-context hashes and bindings pass; no external truth or artifact byte verification."
+}

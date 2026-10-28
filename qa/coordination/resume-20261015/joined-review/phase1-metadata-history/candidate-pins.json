@@ -1,0 +1,121 @@
+{
+  "identity_kind": "sha256 of UTF-8 canonical JSON sorted path/sha256 raw-byte map; NOT a Git commit",
+  "candidate_sha256": "6f58d169895c25c95e1c8fb6d9c24969ee08578fff66351bcff400a4ebb7eece",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "head": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "files": [
+    {
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.tsx",
+      "expected_sha256": "4b423684c18c67391b72a530952cc874084c83c65b96e98f38792f3823e0160b",
+      "current_sha256": "4b423684c18c67391b72a530952cc874084c83c65b96e98f38792f3823e0160b",
+      "match": true,
+      "git_status": "M apps/web/src/pages/counsellor/CounsellorPage.tsx"
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/voice.ts",
+      "expected_sha256": "b3f7f92b676a2a4a9e3ab301ac361dd157c8a8ad4a679962b52753fd488b431d",
+      "current_sha256": "b3f7f92b676a2a4a9e3ab301ac361dd157c8a8ad4a679962b52753fd488b431d",
+      "match": true,
+      "git_status": "M apps/web/src/pages/counsellor/voice.ts"
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/CounsellorPage.test.tsx",
+      "expected_sha256": "7221647db4d20a72fe600e1f20993a260f7dc44bb3f97fd881315e1069da138e",
+      "current_sha256": "7221647db4d20a72fe600e1f20993a260f7dc44bb3f97fd881315e1069da138e",
+      "match": true,
+      "git_status": "M apps/web/src/pages/counsellor/CounsellorPage.test.tsx"
+    },
+    {
+      "path": "apps/web/src/pages/counsellor/voice.test.ts",
+      "expected_sha256": "95a89b6af32087445b368de9bf5dc81ffd044031db73fc20a365700edcbbbf6a",
+      "current_sha256": "95a89b6af32087445b368de9bf5dc81ffd044031db73fc20a365700edcbbbf6a",
+      "match": true,
+      "git_status": "M apps/web/src/pages/counsellor/voice.test.ts"
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/auto-join.ts",
+      "expected_sha256": "f284aebd74bc3bf986bf641d196f3569a25d1068ff6e846e3006acaf038cc6c4",
+      "current_sha256": "f284aebd74bc3bf986bf641d196f3569a25d1068ff6e846e3006acaf038cc6c4",
+      "match": true,
+      "git_status": "M packages/meeting-bot/src/calendar/auto-join.ts"
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts",
+      "expected_sha256": "abd04693720fff428029d4bf38269e55fcf89696020e354691ab517870e44fcb",
+      "current_sha256": "abd04693720fff428029d4bf38269e55fcf89696020e354691ab517870e44fcb",
+      "match": true,
+      "git_status": "?? packages/meeting-bot/src/calendar/join-rules/join-rules-approved-trust-tick.test.ts"
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts",
+      "expected_sha256": "cd609ef57f2618e7714f7cb55dfed33d5a745aaa42452e7dacec7c9d1b80add3",
+      "current_sha256": "cd609ef57f2618e7714f7cb55dfed33d5a745aaa42452e7dacec7c9d1b80add3",
+      "match": true,
+      "git_status": "M packages/meeting-bot/src/calendar/join-rules/join-rules-enforce.ts"
+    },
+    {
+      "path": "packages/meeting-bot/src/calendar/schedule-tick.ts",
+      "expected_sha256": "6d6293f67d14706a003d1b9560e1df08841d0de95f7dd541ae2f13e6cba39ed9",
+      "current_sha256": "6d6293f67d14706a003d1b9560e1df08841d0de95f7dd541ae2f13e6cba39ed9",
+      "match": true,
+      "git_status": "M packages/meeting-bot/src/calendar/schedule-tick.ts"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.ts",
+      "expected_sha256": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb",
+      "current_sha256": "166a0e520b1b0b563583ee28c1245c9ad011fc9cb097a4da03aff6e6a26aedeb",
+      "match": true,
+      "git_status": "M apps/api/src/answer-policy/answer-workflow.ts"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-workflow.test.ts",
+      "expected_sha256": "22032514dcb6a61777f5dbbbc0cf428986e4127f82254416d685f9fd695f342d",
+      "current_sha256": "22032514dcb6a61777f5dbbbc0cf428986e4127f82254416d685f9fd695f342d",
+      "match": true,
+      "git_status": "M apps/api/src/answer-policy/answer-workflow.test.ts"
+    },
+    {
+      "path": "apps/api/src/answer-policy/answer-router.test.ts",
+      "expected_sha256": "d6739be8f1d76f6cf7946e287e51b1e292dc11cdaa3693df52489f77efd7a989",
+      "current_sha256": "d6739be8f1d76f6cf7946e287e51b1e292dc11cdaa3693df52489f77efd7a989",
+      "match": true,
+      "git_status": "M apps/api/src/answer-policy/answer-router.test.ts"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/client.ts",
+      "expected_sha256": "2d4a49a56b63471452173428c779a1c63c0b64be5099c4932a690e3259f40bbd",
+      "current_sha256": "2d4a49a56b63471452173428c779a1c63c0b64be5099c4932a690e3259f40bbd",
+      "match": true,
+      "git_status": "M apps/web/src/pages/answer-policy/client.ts"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.tsx",
+      "expected_sha256": "e4a4f648f6c20d195bae3156241c24ca176e108fb76c78f2e487124cfe849a6a",
+      "current_sha256": "e4a4f648f6c20d195bae3156241c24ca176e108fb76c78f2e487124cfe849a6a",
+      "match": true,
+      "git_status": "M apps/web/src/pages/answer-policy/PolicyAskPage.tsx"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/AnswerReviewPage.tsx",
+      "expected_sha256": "253db568c9a3ebefaaab5e950fd89de4313ea0804750cb043376dd4adaf37ee2",
+      "current_sha256": "253db568c9a3ebefaaab5e950fd89de4313ea0804750cb043376dd4adaf37ee2",
+      "match": true,
+      "git_status": "M apps/web/src/pages/answer-policy/AnswerReviewPage.tsx"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx",
+      "expected_sha256": "a0513fe77d9f1bcc1d1fe88e485bb2cc8a4fc38bca187588d1c2fc140b9c2a0d",
+      "current_sha256": "a0513fe77d9f1bcc1d1fe88e485bb2cc8a4fc38bca187588d1c2fc140b9c2a0d",
+      "match": true,
+      "git_status": "M apps/web/src/pages/answer-policy/PolicyAskPage.test.tsx"
+    },
+    {
+      "path": "apps/web/src/pages/answer-policy/directAnswer.test.ts",
+      "expected_sha256": "9f9d82c7ae77ddfa12cd33610cc40f060369558b4f455990ed85c86ef418f6d9",
+      "current_sha256": "9f9d82c7ae77ddfa12cd33610cc40f060369558b4f455990ed85c86ef418f6d9",
+      "match": true,
+      "git_status": "?? apps/web/src/pages/answer-policy/directAnswer.test.ts"
+    }
+  ],
+  "all_maker_pins_match": true
+}

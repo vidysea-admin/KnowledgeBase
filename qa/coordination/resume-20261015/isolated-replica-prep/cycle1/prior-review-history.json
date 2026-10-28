@@ -1,0 +1,37 @@
+{
+  "unit_slug": "isolated-replica-prep",
+  "cycle": 0,
+  "candidate": "1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "reviewers": [
+    {
+      "budget_debit": {
+        "token_metric": "actual_total",
+        "tokens": 16000,
+        "active_s": 120
+      },
+      "id": "isolated_replica_source_checker",
+      "active_s": null,
+      "token_metric": "actual_total",
+      "tokens": null,
+      "cost": null
+    },
+    {
+      "cost": null,
+      "active_s": null,
+      "tokens": null,
+      "completion_reserve_id": "isolated-replica-prep/0/1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+      "token_metric": "actual_total",
+      "phase_kind": "finalization",
+      "id": "isolated_replica_source_checker-cycle0-finalization",
+      "budget_debit": {
+        "tokens": 4000,
+        "active_s": 30,
+        "cost": null,
+        "token_metric": "actual_total"
+      }
+    }
+  ],
+  "basis": "Immutable cycle0 checker verdict: phase1 debit120s/16000tokens + finalization30s/4000tokens. Actuals unknown. No reviewer started this cycle.",
+  "verdict_path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\isolated-replica-prep\\checker-verdict.md",
+  "verdict_sha256": "1900a5066a57a8f7962e5cf95432e192ed85f647444961dcffd3f25c28db9ae9"
+}

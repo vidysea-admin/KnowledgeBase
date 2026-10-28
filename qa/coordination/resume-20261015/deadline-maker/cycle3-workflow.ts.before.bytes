@@ -1,0 +1,211 @@
+import { randomUUID } from "node:crypto";
+import { assertValidTenantId } from "@lkb/db";
+import type { EvalRuns } from "@lkb/core";
+import { captureReceipt, indexedDigests, assertIndexResult } from "./receipts.js";
+import { FlywheelError, fingerprint, gapId, retestId, type FlywheelDeps, type FlywheelGap,
+  type LossSnapshot, type RetestRun, type CaptureReceipt, type IndexedReceipt } from "./types.js";
+
+const fail = (code: FlywheelError["code"], status = 409): never => { throw new FlywheelError(code, status); };
+const validId = (x: unknown): x is string => typeof x === "string" && x.length > 0 && x.length <= 200 && x === x.trim();
+const same = (a: unknown, b: unknown): boolean => fingerprint(a) === fingerprint(b);
+function snapshot(row: EvalRuns): LossSnapshot {
+  const ai = row.score?.ai, human = row.score?.counsellor;
+  if (!Number.isFinite(ai) || !Number.isFinite(human) || !row.question?.trim()
+    || !row.aiAnswer?.text?.trim() || !row.counsellorAnswer?.text?.trim() || !row.counsellor?.name?.trim()
+    || !["internal", "independent-human", "calibrated-llm"].includes(row.credibility)
+    || !Number.isFinite(Date.parse(row.createdAt))) fail("not_loss");
+  if (ai! >= human!) fail("not_loss");
+  return structuredClone({ question: row.question, aiAnswer: { ...row.aiAnswer!, text: row.aiAnswer!.text! }, counsellor: row.counsellor,
+    counsellorAnswer: { ...row.counsellorAnswer!, text: row.counsellorAnswer!.text! }, score: { ...row.score!, ai: ai!, counsellor: human! }, credibility: row.credibility, createdAt: row.createdAt });
+}
+
+export function createEvaluationFlywheel(deps: FlywheelDeps) {
+  const now = deps.now ?? (() => new Date());
+  const iso = (): string => now().toISOString();
+  const token = deps.newToken ?? randomUUID;
+  const timeout = deps.operationTimeoutMs ?? 120_000;
+  if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 120_000) fail("invalid", 400);
+  class StageTimeout extends FlywheelError { constructor() { super("unavailable", 503); } }
+  class StorageTimeout extends StageTimeout {}
+  async function bounded<T>(call: () => Promise<T>, storage = false): Promise<T> {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    try { return await Promise.race([call(), new Promise<never>((_resolve, reject) => {
+      timer = setTimeout(() => reject(storage ? new StorageTimeout() : new StageTimeout()), timeout);
+    })]); } finally { if (timer) clearTimeout(timer); }
+  }
+  async function loss(t: string, id: string): Promise<{ row: EvalRuns; loss: LossSnapshot; fp: string }> {
+    assertValidTenantId(t, "evaluationFlywheel");
+    if (!validId(id)) fail("invalid", 400);
+    const row = await bounded(() => deps.store.evaluation(t, id), true);
+    if (!row || row.tenantId !== t || row._id !== id) fail("not_found", 404);
+    const s = snapshot(row!);
+    return { row: row!, loss: s, fp: fingerprint(s) };
+  }
+  async function load(t: string, id: string): Promise<FlywheelGap> {
+    const original = await loss(t, id);
+    const row = await bounded(() => deps.store.gap(t, gapId(t, id)), true);
+    if (!row || row.tenantId !== t || row._id !== gapId(t, id) || row.kind !== "source-pending"
+      || row.flywheel?.version !== 1 || row.flywheel.originalEvalRunId !== id) fail("not_found", 404);
+    if (row!.flywheel.inputFingerprint !== original.fp || !same(row!.flywheel.loss, original.loss)) fail("input_drift");
+    if (!Number.isSafeInteger(row!.flywheel.revision) || row!.flywheel.revision < 0) fail("unavailable", 503);
+    const h = row!.flywheel;
+    if (!["open", "received", "expired"].includes(row!.status) || !["awaiting-source", "captured", "indexed", "retested"].includes(h.stage)
+      || h.capture && (row!.sourceRef !== h.capture.sourceId || !h.sourceUrlFingerprint || row!.status === "open")
+      || !h.capture && (row!.status === "received" || h.stage !== "awaiting-source")
+      || ["indexed", "retested"].includes(h.stage) && !h.index
+      || h.lock && (!validId(h.lock.token) || !/^[a-zA-Z0-9_-]{1,80}$/.test(h.lock.requestId) || !Number.isFinite(Date.parse(h.lock.expiresAt)))) fail("input_drift");
+    return structuredClone(row!);
+  }
+  async function save(t: string, row: FlywheelGap, acceptedChild = false): Promise<FlywheelGap> {
+    const expected = row.flywheel.revision;
+    const next = structuredClone(row); next.flywheel.revision++;
+    const write = () => deps.store.replaceGap(t, expected, next);
+    // Only terminal promotion is deadline-safe: its immutable child already exists.
+    // Other writes require a durable uncertain-write protocol before they can time out.
+    if (!await (acceptedChild ? bounded(write, true) : write())) fail("conflict");
+    return next;
+  }
+  async function open(t: string, id: string): Promise<FlywheelGap> {
+    const original = await loss(t, id);
+    await deps.store.createGap(t, {
+      _id: gapId(t, id), tenantId: t, kind: "source-pending", status: "open",
+      description: "Evaluation loss awaiting additional source evidence", requestedAt: iso(),
+      flywheel: { version: 1, originalEvalRunId: id, inputFingerprint: original.fp, loss: original.loss,
+        revision: 0, stage: "awaiting-source" },
+    });
+    return load(t, id);
+  }
+  async function receipt(t: string, r: CaptureReceipt): Promise<CaptureReceipt> {
+    return captureReceipt(t, r.sourceId, r.sessionId, await bounded(() => deps.store.sourceRows(t, r.sourceId, r.sessionId), true));
+  }
+  async function verifyIndex(t: string, r: IndexedReceipt): Promise<void> {
+    if (!same(await receipt(t, r), (({ generation: _g, treeDigest: _t, chunksDigest: _c, completedAt: _a, ...capture }) => capture)(r))) fail("input_drift");
+    const digests = indexedDigests(t, r, await bounded(() => deps.store.indexedRows(t, r.sessionId), true));
+    if (digests.treeDigest !== r.treeDigest || digests.chunksDigest !== r.chunksDigest) fail("input_drift");
+  }
+  async function retest(t: string, id: string, request: { sourceUrl: string; requestId: string }): Promise<RetestRun> {
+    if (!request || typeof request.sourceUrl !== "string" || request.sourceUrl.length > 4096
+      || typeof request.requestId !== "string" || !/^[a-zA-Z0-9_-]{1,80}$/.test(request.requestId)) fail("invalid", 400);
+    try { const u = new URL(request.sourceUrl); if (!["https:", "http:"].includes(u.protocol) || u.username || u.password) fail("invalid", 400); }
+    catch { fail("invalid", 400); }
+    let head = await load(t, id);
+    if (head.status === "expired") fail("conflict");
+    if (head.flywheel.sourceUrlFingerprint && head.flywheel.sourceUrlFingerprint !== fingerprint(request.sourceUrl)) fail("input_drift");
+    const childId = retestId(t, head._id, request.requestId);
+    const existing = await bounded(() => deps.store.evaluation(t, childId), true);
+    const ownedChild = (row: EvalRuns | null): row is RetestRun => !!row && row.tenantId === t && row._id === childId
+      && (row.flywheel as RetestRun["flywheel"])?.originalEvalRunId === id
+      && (row.flywheel as RetestRun["flywheel"])?.gapId === head._id
+      && (row.flywheel as RetestRun["flywheel"])?.requestId === request.requestId
+      && (row.flywheel as RetestRun["flywheel"])?.inputFingerprint === head.flywheel.inputFingerprint
+      && row.question === head.flywheel.loss.question && row.credibility === "internal"
+      && (row.score === undefined || Number.isFinite(row.score.ai) && Number.isFinite(row.score.counsellor));
+    if (existing && !ownedChild(existing)) fail("input_drift");
+    if (ownedChild(existing) && (!head.flywheel.capture || existing.flywheel.index.sourceId !== head.flywheel.capture.sourceId
+      || existing.flywheel.index.sessionId !== head.flywheel.capture.sessionId || existing.flywheel.index.transcriptDigest !== head.flywheel.capture.transcriptDigest)) fail("input_drift");
+    // Completed historical requests are read-only. Only an interrupted request's
+    // persisted lease/failure may resume promotion over an already accepted child.
+    const interruptedRequest = head.flywheel.lock?.requestId === request.requestId
+      || head.flywheel.failure?.requestId === request.requestId;
+    if (ownedChild(existing) && (head.flywheel.lastRetestId === childId
+      || head.flywheel.lastRetestId && !interruptedRequest)) {
+      await verifyIndex(t, existing.flywheel.index);
+      return structuredClone(existing);
+    }
+    const lock = head.flywheel.lock;
+    if (lock && Date.parse(lock.expiresAt) > now().getTime()) fail("conflict");
+    const mine = token();
+    head.flywheel.lock = { token: mine, requestId: request.requestId, expiresAt: new Date(now().getTime() + 600_000).toISOString() };
+    head = await save(t, head);
+    let stage: "capture" | "index" | "retest" | "persist" = "capture";
+    async function checkLock(): Promise<void> {
+      const current = await load(t, id);
+      if (current.flywheel.lock?.token !== mine || current.flywheel.revision !== head.flywheel.revision
+        || Date.parse(current.flywheel.lock.expiresAt) <= now().getTime()) fail("conflict");
+    }
+    try {
+      if (!head.flywheel.capture) {
+        await checkLock();
+        const intake = await bounded(() => deps.intake({ tenantId: t, url: request.sourceUrl }));
+        if (!intake || !["created", "already-ingested"].includes(intake.status) || !validId(intake.sourceId) || !validId(intake.sessionId)) fail("unavailable", 503);
+        const rows = await bounded(() => deps.store.sourceRows(t, intake.sourceId, intake.sessionId), true);
+        const captured = captureReceipt(t, intake.sourceId, intake.sessionId, rows);
+        await checkLock();
+        head.status = "received"; head.sourceRef = captured.sourceId;
+        head.flywheel.capture = captured; head.flywheel.sourceUrlFingerprint = fingerprint(request.sourceUrl); head.flywheel.stage = "captured";
+        head = await save(t, head);
+      } else if (!same(await receipt(t, head.flywheel.capture), head.flywheel.capture)) fail("input_drift");
+      stage = "index";
+      if (ownedChild(existing)) {
+        await verifyIndex(t, existing.flywheel.index);
+        head.flywheel.index = existing.flywheel.index;
+      } else {
+        let current = false;
+        if (head.flywheel.index) {
+          try { await verifyIndex(t, head.flywheel.index); current = true; }
+          catch (error) {
+            if (error instanceof StorageTimeout) throw error;
+            /* retry rebuilds a stale output */
+          }
+        }
+        if (!current) {
+          await checkLock();
+          const captured = head.flywheel.capture!;
+          const indexed = await bounded(() => deps.index(t, captured.sessionId));
+          assertIndexResult(indexed, captured);
+          if (!same(await receipt(t, captured), captured)) fail("input_drift");
+          const rows = await bounded(() => deps.store.indexedRows(t, captured.sessionId), true);
+          if (rows.chunks.length !== indexed.chunks.written) fail("unavailable", 503);
+          const digests = indexedDigests(t, captured, rows);
+          await checkLock();
+          head.flywheel.index = { ...captured, generation: indexed.completion!.generation, ...digests, completedAt: iso() };
+          head.flywheel.stage = "indexed";
+          head = await save(t, head);
+        }
+      }
+      stage = "retest";
+      await checkLock(); await verifyIndex(t, head.flywheel.index!);
+      let child: RetestRun;
+      if (ownedChild(existing)) child = existing;
+      else {
+        const answer = await bounded(() => deps.ask(t, head.flywheel.loss.question, head.flywheel.index!));
+        if (!answer || typeof answer.text !== "string" || !answer.sources || typeof answer.sources !== "object") fail("unavailable", 503);
+        await verifyIndex(t, head.flywheel.index!); await checkLock();
+        child = { _id: childId, tenantId: t, question: head.flywheel.loss.question,
+          counsellor: head.flywheel.loss.counsellor, counsellorAnswer: head.flywheel.loss.counsellorAnswer,
+          aiAnswer: answer, credibility: "internal", createdAt: iso(),
+          flywheel: { version: 1, originalEvalRunId: id, gapId: head._id, requestId: request.requestId,
+            inputFingerprint: head.flywheel.inputFingerprint, index: head.flywheel.index!, comparison: "needs-review" } };
+        stage = "persist";
+        await deps.store.createRetest(t, child);
+        const written = await bounded(() => deps.store.evaluation(t, childId), true);
+        if (!same(written, child)) fail("input_drift");
+      }
+      await checkLock();
+      head.flywheel.lastRetestId = childId; head.flywheel.stage = "retested";
+      delete head.flywheel.lock; delete head.flywheel.failure;
+      await save(t, head, true);
+      return structuredClone(child);
+    } catch (error) {
+      // A read deadline or ambiguous terminal CAS must not start another recovery write.
+      // Leave ownership intact; retry rereads the deterministic child and current head.
+      // The timed-out CAS retains its original revision predicate, fencing late commits.
+      if (error instanceof StorageTimeout) throw error;
+      // Only the current lease can record failure/release; stale callbacks cannot regress a newer attempt.
+      try {
+        const current = await load(t, id);
+        if (current.flywheel.lock?.token === mine) {
+          current.flywheel.failure = { stage, requestId: request.requestId, at: iso() };
+          current.flywheel.failureHistory = [...(current.flywheel.failureHistory ?? []), current.flywheel.failure];
+          // A deadline cannot cancel these existing provider seams: retain the lease until expiry.
+          if (!(error instanceof StageTimeout)) delete current.flywheel.lock;
+          await save(t, current);
+        }
+      } catch { /* durable lock/state remains inspectable if recovery storage also fails */ }
+      if (error instanceof FlywheelError) throw error;
+      throw new FlywheelError("unavailable", 503);
+    }
+  }
+  return { open, inspect: load, retest };
+}
+export type EvaluationFlywheel = ReturnType<typeof createEvaluationFlywheel>;

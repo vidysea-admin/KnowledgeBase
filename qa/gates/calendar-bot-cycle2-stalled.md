@@ -1,0 +1,11 @@
+# Calendar code release: cycle2 gate
+Status: HUMAN_GATE / STALLED; no commit or push.
+Original parent: qa/manifests/calendar-bot-operational-completion.md. Existing CODE release: qa/manifests/calendar-bot-code-release.md. Product fix cycle2 of max2 is preserved, not reset.
+Independent data reviewer found P1: same join URL with conflicting MIME times drops fresh start/end but emits no evidenceIssue. Refresh keeps a legacy approved row's old time; real persistence/API/selector probe gives writes0,listed1,scheduled1,expected0. Detailed independent result: qa/.delivery/results/data-review.md.
+Completed latest repair: production default policy injection fixed; real mounted HTTP native defaults200 and enabled-invalid refusal controls,54 affected tests,680 passing selected tests/4 skips, API typecheck, LOC1809 files, prior web/bot typechecks and web build.
+Proposed next action for Umesh decision: authorize exactly one further targeted repair plus fresh recheck of this CODE unit, followed by commit/push only on independent code-push approval. Preserve all history/counters (next repair cycle3 under explicit exception), existing full C1-C8/live gates, no new feature/engine/schema/module, no production data writes.
+Proposed repair: apps/api/src/gws/gws-gmail.ts fetchOne at196-225 retains time-conflict uncertainty via the existing durable evidence-refusal field. Existing scanner regression separates same-URL time conflicts from link conflicts. Re-run the reviewer's exact scanner->API refresh->DB->selector reproduction against an old approved row; require persisted refusal and scheduled0, plus equal-time positive control. Use existing refusal/approval protections and validators; never invent a time or erase approvals.
+Push stays blocked until this is repaired and independently rechecked. Production deployment/runtime configuration and actual server capture/transcription remain unverified.
+
+## Umesh decision,2026-10-27
+PROCEED: direct asynchronous reply: "हाँ—targeted fix, recheck और push करो". Authorizes one additional targeted time-conflict repair and fresh independent recheck; push only after CODE approval. Product counter advances to3 under this explicit exception, never resets. Full live/semantic/production-data gates unchanged.

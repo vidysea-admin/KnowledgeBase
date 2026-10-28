@@ -11,9 +11,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import type { AutoRecordCandidateInput } from "./auto-join.js";
-import { readScheduledKeys, readScheduledJob } from "./schedule-state.js";
+import { readScheduledKeys, readScheduledJob, writeScheduledJob } from "./state/schedule-state.js";
 import { createHttpCandidateLoader, runScheduleTickOnce, type ScheduleTickDeps } from "./schedule-tick.js";
-import { JOB_KEY_RE, type TaskScheduler, type ScheduleOnceOptions } from "./task-scheduler.js";
+const TEN = "ten-t";
+import { JOB_KEY_RE, deriveJobKey, type TaskScheduler, type ScheduleOnceOptions } from "./task-scheduler.js";
 
 function withTempDir(fn: (dir: string) => void | Promise<void>) {
   const dir = mkdtempSync(path.join(tmpdir(), "lkb-schedule-tick-"));
@@ -34,7 +35,7 @@ function fakeScheduler(): { scheduler: TaskScheduler; calls: ScheduleOnceOptions
 
 const CANDIDATE: AutoRecordCandidateInput = {
   id: "c1", title: "TOC webinar", senderEmail: "ops@theoutreachcollective.in",
-  senderDomain: "theoutreachcollective.in", status: "auto_approved",
+  senderDomain: "theoutreachcollective.in", senderAuthenticated: true, status: "auto_approved",
   meetingUrl: "https://zoho.com/meeting/abc?tk=SECRET123",
   startTime: "2026-09-28T12:30:00Z", endTime: "2026-09-28T13:30:00Z", kind: "upcoming",
 };
@@ -45,6 +46,7 @@ function baseDeps(stateDir: string, overrides: Partial<ScheduleTickDeps> = {}): 
     loadCandidates: async () => [CANDIDATE],
     now: () => "2026-09-28T12:26:00Z",
     stateDir,
+    stateTenantId: TEN,
     scheduler: fakeScheduler().scheduler,
     log: () => {},
     ...overrides,
@@ -60,7 +62,7 @@ test("dry-run: lists what would be scheduled, calls the scheduler zero times, wr
 
     assert.equal(result.toSchedule.length, 1);
     assert.equal(calls.length, 0, "dry-run must never call the scheduler");
-    assert.deepEqual([...readScheduledKeys(dir)], [], "dry-run must never write dedup state");
+    assert.deepEqual([...readScheduledKeys(dir, TEN)], [], "dry-run must never write dedup state");
     assert.ok(logs.some((l) => l.includes("--dry-run")));
   });
 });
@@ -87,9 +89,11 @@ test("real (non-dry-run) run: schedules once via the injected scheduler and reco
     // ISS-317 fix (cycle 2): scheduleOnce now takes only jobKey/launcherPath/runAtIso — no
     // title/url/sessionId ever reaches it. jobKey is derived from the sessionKey and validated.
     assert.match(calls[0]!.jobKey, JOB_KEY_RE);
-    assert.equal(calls[0]!.jobKey, "gmail-c1");
+    // ISS-321: jobKey is now a hash-based derivation (task-scheduler.ts's deriveJobKey), not the
+    // old lossy-collapse literal — assert against the real derivation, not a hardcoded string.
+    assert.equal(calls[0]!.jobKey, deriveJobKey("gmail:c1"));
     assert.match(calls[0]!.launcherPath, /start-record-detached\.ps1$/);
-    assert.deepEqual([...readScheduledKeys(dir)], ["gmail:c1"]);
+    assert.deepEqual([...readScheduledKeys(dir, TEN)], ["gmail:c1"]);
   });
 });
 
@@ -97,8 +101,9 @@ test("real (non-dry-run) run: persists url/until/title/sessionId to a per-job JS
   await withTempDir(async (dir) => {
     const deps = baseDeps(dir);
     await runScheduleTickOnce(deps, false);
-    const job = readScheduledJob(dir, "gmail-c1");
-    assert.ok(job, "expected a job file to have been written for jobKey 'gmail-c1'");
+    const jobKey = deriveJobKey("gmail:c1")!;
+    const job = readScheduledJob(dir, jobKey, TEN);
+    assert.ok(job, `expected a job file to have been written for jobKey '${jobKey}'`);
     assert.equal(job!.url, CANDIDATE.meetingUrl);
     assert.equal(job!.title, CANDIDATE.title);
     assert.equal(job!.sessionId, "gmail:c1");
@@ -131,7 +136,7 @@ test("ISS-317: no title/url/sessionId text ever reaches the scheduler — hostil
     // The hostile text DID get persisted (safely, as JSON field values on disk) — that's the
     // intended "still remember the real title/url" half of the fix, just never as a Task
     // Scheduler argument.
-    const job = readScheduledJob(dir, call.jobKey);
+    const job = readScheduledJob(dir, call.jobKey, TEN);
     assert.equal(job!.title, hostileCandidate.title);
     assert.equal(job!.url, hostileCandidate.meetingUrl);
   });
@@ -152,7 +157,7 @@ test("ISS-319: a session crossing midnight keeps its full end datetime, which is
     const result = await runScheduleTickOnce(deps, false);
     assert.equal(result.toSchedule.length, 1);
 
-    const job = readScheduledJob(dir, "gmail-c-midnight");
+    const job = readScheduledJob(dir, deriveJobKey("gmail:c-midnight")!, TEN);
     assert.ok(job);
     // The regression this guards against: a bare local HH:mm ("00:45") resolved against the
     // START day landed ~23h in the past. The full ISO end datetime is unambiguous regardless of
@@ -162,6 +167,54 @@ test("ISS-319: a session crossing midnight keeps its full end datetime, which is
       new Date(job!.until).getTime() > new Date(midnightCandidate.startTime as string).getTime(),
       "the persisted end datetime must be AFTER the session's own start, even across midnight",
     );
+  });
+});
+
+test("ISS-321: a jobKey collision with a DIFFERENT session refuses loudly, skips only that item, " +
+  "and never overwrites the existing job file or crashes the tick", async () => {
+  await withTempDir(async (dir) => {
+    const jobKey = deriveJobKey("gmail:c1")!;
+    // Pre-seed a job file for this jobKey belonging to a DIFFERENT session — simulates the
+    // astronomically-unlikely-but-must-still-be-caught collision this guard exists for, without
+    // depending on ever finding a real SHA-256 collision.
+    writeScheduledJob(dir, jobKey, {
+      url: "https://zoho.com/meeting/other", until: "2026-09-28T13:00:00Z",
+      title: "Other webinar", sessionId: "gmail:some-other-session",
+    }, TEN);
+    const { scheduler, calls } = fakeScheduler();
+    const logs: string[] = [];
+    const deps = baseDeps(dir, { scheduler, log: (m) => logs.push(m) });
+    const result = await runScheduleTickOnce(deps, false);
+
+    assert.equal(result.toSchedule.length, 1, "selection itself is unaffected by the collision");
+    assert.equal(calls.length, 0, "the colliding item must never reach the scheduler");
+    assert.ok(
+      logs.some((l) => l.includes("refused to schedule") && l.includes("ISS-321")),
+      "expected a loud refusal log line naming the collision",
+    );
+    // The "never silently overwrite" guarantee itself: the other session's job file is untouched.
+    const stillThere = readScheduledJob(dir, jobKey, TEN);
+    assert.equal(stillThere!.sessionId, "gmail:some-other-session");
+    assert.equal(stillThere!.title, "Other webinar");
+  });
+});
+
+test("ISS-321: re-scheduling the SAME session is still allowed — not treated as a collision", async () => {
+  await withTempDir(async (dir) => {
+    const jobKey = deriveJobKey("gmail:c1")!;
+    // A job file already exists for this exact sessionKey (e.g. a previous tick's write) —
+    // rewriting it with fresher fields must succeed, not be refused as a collision.
+    writeScheduledJob(dir, jobKey, {
+      url: CANDIDATE.meetingUrl!, until: "2026-09-28T13:00:00Z",
+      title: "Stale title", sessionId: "gmail:c1",
+    }, TEN);
+    const { scheduler, calls } = fakeScheduler();
+    const deps = baseDeps(dir, { scheduler });
+    await runScheduleTickOnce(deps, false);
+
+    assert.equal(calls.length, 1, "a same-session rewrite must still reach the scheduler");
+    const job = readScheduledJob(dir, jobKey, TEN);
+    assert.equal(job!.title, CANDIDATE.title, "the job file must be overwritten with the fresh fields");
   });
 });
 
@@ -192,6 +245,15 @@ async function withFetch<T>(impl: typeof fetch, fn: () => Promise<T>): Promise<T
     globalThis.fetch = real;
   }
 }
+test("HTTP candidate mapping preserves original registration/message/thread evidence", async () => {
+  const row = {_id: "original", subject: "Webinar", senderEmail: "host@example.test", senderDomain: "example.test", status: "approved",
+    registrationOnly: true, registrationUrl: "https://example.test/register", messageId: "original-message", threadId: "original-thread"};
+  await withFetch((async () => new Response(JSON.stringify({candidates: [row]}), {status: 200})) as typeof fetch, async () => {
+    const result = await createHttpCandidateLoader("http://localhost:3300", "fixture", () => {}, true)();
+    assert.equal(result[0]!.id, row._id); assert.equal(result[0]!.registrationUrl, row.registrationUrl);
+    assert.equal(result[0]!.messageId, row.messageId); assert.equal(result[0]!.threadId, row.threadId);
+  });
+});
 
 test("createHttpCandidateLoader: no apiKey -> [] without attempting a fetch", async () => {
   let called = false;

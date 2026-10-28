@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "createdAt": "2026-10-09T15:39:30.427551+00:00",
+  "HEAD": "f42b605711fe485c026cc3293fc9b9d8e2313c9d",
+  "branch": "codex/machine-migration-2026-10-09",
+  "indexTree": "53a1bbcf2fae7f675c3e9f742eb4faf8f0987144",
+  "candidateInventoryPath": "qa/evidence/live-readiness/u41-reconciliation-publication-candidates.json",
+  "candidateInventorySHA256": "7d22dffc1f809a2a1f27a00398efa92c1c0f0d0d3018fa0f7558a7c71e5922d8",
+  "selectedPaths": 4,
+  "stagedPaths": 4,
+  "unrelatedStagedPaths": [],
+  "blobs": [
+    {
+      "path": "qa/manifests/u4.1-recording-upload-worker.md",
+      "mode": "100644",
+      "gitBlobOid": "c11af60c1e560bc81b29a2bda8ada29077d74411",
+      "approvedWorkingBytesSHA256": "29dd8dbdb6ee7010b204aaf04ff2e8b075a48e5d4e4c09bd6fc8d27f39eb3266",
+      "stagedBlobSHA256": "bf936effa5eab6f15e0af0ef14bfb76e3ba9cc3936efb995bfa3fb9eaa977b6e",
+      "stagedBlobBytes": 3736,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "qa/verdicts/u4.1-recording-upload-worker.md",
+      "mode": "100644",
+      "gitBlobOid": "5b6d2322121d8c37e753005a5ffdbf05096e1abf",
+      "approvedWorkingBytesSHA256": "6d614d1bdd59e7fbb9319d3f1d2bdc814eac4e36081cf95c5eb4c30307429503",
+      "stagedBlobSHA256": "2d8b9a97f01e770fbd731134a62b3cdc335bcc46c7ee7ae8ac39f2aea746485f",
+      "stagedBlobBytes": 21373,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    },
+    {
+      "path": "qa/contracts/upload-transcribe-worker.md",
+      "mode": "100644",
+      "gitBlobOid": "4ed3ccdad8df611dda6470b30cd392e428dd8073",
+      "approvedWorkingBytesSHA256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d",
+      "stagedBlobSHA256": "484d59803641e42e7340efb8d7e4b0e9ec0b505a00028d567d7e0e9c3150196d",
+      "stagedBlobBytes": 7143,
+      "byteRelation": "exact"
+    },
+    {
+      "path": "qa/contracts/gemini-audio-transcription.md",
+      "mode": "100644",
+      "gitBlobOid": "38459829a3765955943dc2e8811133abf87fa157",
+      "approvedWorkingBytesSHA256": "13f94c9a28e2a19dd30c00a8d6199becd67ba994ac0f780dc765a2cc3b71fa94",
+      "stagedBlobSHA256": "16697ed68764d3c1def144df473b3359328e49a6cae471e888a0e054e872d92e",
+      "stagedBlobBytes": 6824,
+      "byteRelation": "Git CRLF-to-LF normalization only"
+    }
+  ],
+  "pinMismatches": [],
+  "stagedBlobMismatches": [],
+  "sourcePinsVerifiedAgainstLiveAndHEAD": 18,
+  "sourceFilesStaged": 0,
+  "geminiContractD119Delta": {
+    "additions": 12,
+    "deletions": 0,
+    "authorization": "D119 Approved-by Umesh; existing canonical narrow exception only"
+  },
+  "diffCheckExit": 0,
+  "normalizedLFBlobCount": 3,
+  "scope": "QA-only reconciliation of already effective standalone U4.1 C1-C10 scoped cycle3 PASS/CLOSED; prior HOLD history preserved; no main Ask or Meet/global acceptance upgrade.",
+  "preservedHolds": [
+    "Main Ask BUILDING/HOLD; ranking excluded.",
+    "Meet full portable/live attendance activation/auth/received AV unverified.",
+    "Existing source LOC/global directory limits remain."
+  ],
+  "cachePrivateEvidencePublished": false,
+  "indexFrozenForIndependentAudit": true,
+  "commitOrPushPerformed": false
+}

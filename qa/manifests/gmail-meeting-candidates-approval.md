@@ -127,3 +127,5 @@ $ python -c "... db.trusted_senders.find_one(...) ..."
 7. Real browser: `/calendar`'s "Needs review (from Gmail)" section renders and Approve/Reject
    work (or verify via the maker's real evidence above if `gws` isn't reachable in the checker's
    environment — same disclosed limitation as the calendar unit).
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

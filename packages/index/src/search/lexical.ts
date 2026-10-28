@@ -21,7 +21,9 @@ export interface LexicalHit {
 }
 
 function tokenize(text: string): Set<string> {
-  return new Set(text.toLowerCase().split(/\W+/).filter(Boolean));
+  // Marks belong to their letters (Hindi vowel signs must not become separators).
+  // Keep the original normalization so datastore substring prefilters remain a superset.
+  return new Set(text.toLowerCase().match(/[\p{L}\p{M}\p{N}_]+/gu) ?? []);
 }
 
 /**

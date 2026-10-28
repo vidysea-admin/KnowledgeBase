@@ -1,0 +1,43 @@
+{
+  "unit": "goal-t022-offline-review",
+  "cycle": 0,
+  "status": "checked-PASS",
+  "scope": "Local offline capability and actual private emitted HTML only",
+  "verdictPath": "qa/verdicts/goal-t022-offline-review.md",
+  "verdictSha256": "5a5b281bfcdf35c17d9b1dc0c4d49650c25eb85719dc8a3245e411dca274c7b5",
+  "manifestSha256": "a65a1fd422fe45db3381611b808f0d3190d9b35d2c58f8a04183d04175e9968f",
+  "readyPinsReference": "qa/evidence/goal-t022-offline-review-ready-pins.json",
+  "readyPinCount": 69,
+  "readyHashesAndBytesMatched": 69,
+  "readyDrift": 0,
+  "artifactSha256": "2b617ff41ccc1fb1e3e68105d366da63b340237a9c8f1f263ddb585549d0c6e5",
+  "actualMakerTests": {
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "elapsedMs": 2301,
+    "exit": 0
+  },
+  "actualGeneration": {
+    "items": 30,
+    "sourceBindings": 44,
+    "elapsedMs": 160,
+    "exit": 0
+  },
+  "actualIndependentArtifact": {
+    "displayedItems": 30,
+    "sourceBindings": 44,
+    "pending": 30,
+    "elapsedMs": 1025,
+    "exit": 0,
+    "neutralDraftRejectedByLiveIntake": true
+  },
+  "genuineHumanJudgments": 0,
+  "fullParent": "HOLD/in_progress",
+  "authenticatedTransfer": "HOLD",
+  "verifiedHumanReceipt": "HOLD",
+  "liveCalibration": "HOLD",
+  "noActiveProcessHandle": true,
+  "publication": "Private artifact/input-bound receipt/pin metadata excluded; preserve original evidence",
+  "closedAt": "2026-10-15T01:34:16.5839851Z"
+}

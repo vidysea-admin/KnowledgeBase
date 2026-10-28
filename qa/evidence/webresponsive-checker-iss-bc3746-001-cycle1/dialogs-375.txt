@@ -1,0 +1,16 @@
+PASS join-rules 375 loaded scrollWidth 375 vs 375
+PASS confirm dialog inside viewport x=33 w=309
+PASS Confirm approval button inside viewport (53+118)
+PASS Cancel button inside viewport (179+58)
+PASS join-rules 375 dialog open scrollWidth 375 vs 375
+PASS confirm sends POST approvals: POST /calendar/join-rules/approvals
+PASS dialog closes after confirm
+PASS join-rules 375 after confirm scrollWidth 375 vs 375
+PASS domain dialog inside viewport x=33 w=309
+PASS join-rules 375 domain dialog scrollWidth 375 vs 375
+PASS cancel closes dialog
+PASS join-rules 375 optout dialog scrollWidth 375 vs 375
+PASS join-rules 375 menu open scrollWidth 375 vs 375
+PASS calendar 375 event selected (300px detail panel) scrollWidth 375 vs 375
+PASS calendar 375 opt-out confirm open scrollWidth 375 vs 375
+TOTAL 15 FAIL 0

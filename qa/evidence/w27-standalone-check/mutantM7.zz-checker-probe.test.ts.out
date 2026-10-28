@@ -1,0 +1,28 @@
+✖ PROBE standalone native view: foreign/missing tenant in read/update/delete filter refused (6.9626ms)
+✔ PROBE replacePageInsertFirst: reuses _id with ONE replaceOne, no insert (1.7877ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2686.2832
+
+✖ failing tests:
+
+test at src\visibility\zz-checker-probe.test.ts:1:739
+✖ PROBE standalone native view: foreign/missing tenant in read/update/delete filter refused (6.9626ms)
+  AssertionError [ERR_ASSERTION]: Missing expected rejection.
+      at async <anonymous> (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\apps\api\src\visibility\zz-checker-probe.test.ts:15:5)
+      at async runNativePublicationTransaction (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\packages\db\src\lib\native-publication.ts:23:26)
+      at async TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase-lanes\w27-standalone\apps\api\src\visibility\zz-checker-probe.test.ts:13:3)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: /tenant_mismatch/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

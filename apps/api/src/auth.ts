@@ -11,6 +11,8 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 export interface VerifiedKey {
   tenantId: string;
   scopes: string[];
+  /** Stored non-secret API-key document id, verified by the store, never request-derived. */
+  keyId?: string;
 }
 
 /** Injected dependency (C2) — production impl in `store.ts` is Mongo-backed; tests use a fake. */
@@ -27,6 +29,14 @@ declare global {
 }
 
 const BEARER = /^Bearer\s+(.+)$/i;
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHARS = /[\u0000-\u001f\u007f-\u009f\u2028\u2029]/;
+
+/** A tenant id a key may carry: a string, non-empty (schema/api_keys.schema.json: minLength 1), no leading or
+ * trailing whitespace, no control characters. No stricter pattern: real ids include "toc", "tenant-1", "tA". */
+export function isValidTenantId(v: unknown): v is string {
+  return typeof v === "string" && v.length > 0 && v === v.trim() && !CONTROL_CHARS.test(v);
+}
 
 export function requireAuth(store: ApiKeyStore): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {
@@ -37,18 +47,27 @@ export function requireAuth(store: ApiKeyStore): RequestHandler {
       return;
     }
     const verified = await store.verify(match[1]!);
-    if (!verified) {
+    // A record with no usable tenant is refused with the SAME 401 as an unknown key (ISS-AUTHSCOPE-001): there
+    // is no tenant to scope to, and the body must not reveal that the key exists.
+    if (!verified || typeof verified !== "object" || !isValidTenantId(verified.tenantId)) {
       res.status(401).json({ error: "unauthorized", message: "invalid or revoked API key" });
       return;
     }
-    req.auth = verified;
+    // Fail closed on a corrupted record: scopes that are not an array of strings authenticate as a key
+    // with NO scopes (every scoped route 403s). Never coerced (no splitting a string into scopes).
+    const scopes: unknown = verified.scopes;
+    const wellFormed = Array.isArray(scopes) && scopes.every((s) => typeof s === "string");
+    req.auth = wellFormed ? verified : { ...verified, scopes: [] };
     next();
   };
 }
 
 export function requireScope(scope: string): RequestHandler {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.auth || !req.auth.scopes.includes(scope)) {
+    // Exact match only: an ARRAY holding an element strictly equal to `scope`. A string value would
+    // substring-match under `.includes`, so never call it on an unvalidated value (ISS-TESTGAPS-001).
+    const held: unknown = req.auth?.scopes;
+    if (!Array.isArray(held) || !held.some((s) => typeof s === "string" && s === scope)) {
       res.status(403).json({ error: "forbidden", message: `this key is missing the required "${scope}" scope` });
       return;
     }

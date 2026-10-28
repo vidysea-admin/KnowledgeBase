@@ -1,0 +1,11 @@
+✔ actual child consumes sealed public bytes, excludes private turns before QA, ignores intentional silence (1710.2488ms)
+✔ actual recovery child refuses missing seal, foreign owner/raw reselection and captured QA-off with zero uploads (1912.9552ms)
+✔ actual child source/audio/receipt mutation after snapshot makes zero provider uploads (2796.2902ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7040.0192

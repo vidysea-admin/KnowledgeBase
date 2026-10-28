@@ -129,3 +129,5 @@ escapes `recordVectorGap`, which `session.ts` calls **before** the `tree_index` 
 **That is a silent indexing failure introduced by the unit whose entire purpose was to end a
 silent indexing failure.** Pulled immediately as the next unit under the severity gate's
 tenancy/data-write clause, not deferred.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

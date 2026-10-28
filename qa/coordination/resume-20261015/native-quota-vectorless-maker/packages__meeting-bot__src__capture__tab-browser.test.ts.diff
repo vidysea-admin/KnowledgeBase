@@ -1,0 +1,32 @@
+diff --git "a/qa\\coordination\\resume-20261015\\native-quota-vectorless-maker\\backups\\packages__meeting-bot__src__capture__tab-browser.test.ts" b/packages/meeting-bot/src/capture/tab-browser.test.ts
+index 44207678..2ac9fa38 100644
+--- "a/qa\\coordination\\resume-20261015\\native-quota-vectorless-maker\\backups\\packages__meeting-bot__src__capture__tab-browser.test.ts"
++++ b/packages/meeting-bot/src/capture/tab-browser.test.ts
+@@ -22,6 +22,27 @@ async function deferredNativeReceiver(directory:string,onClosed:NonNullable<Para
+   return {output,receiver,close:()=>post({op:'close',sequence:3,identity:nativeIdentity})};
+ }
+ 
++test('native 1 MB total quota clamps buffers and still refuses an oversized chunk', async () => {
++  const directory = mkdtempSync(path.join(tmpdir(), 'native-small-quota-'));
++  const output = path.join(directory, 'small.webm'); let finalized = 0;
++  const receiver = await createTabCaptureReceiver(output, () => {}, undefined, {
++    identity: nativeIdentity, maxBytes: 1_000_000, onClosed: async () => { finalized++; },
++  });
++  try {
++    const config = JSON.parse(readFileSync(path.join(`${output}.native`, 'producer-observations.jsonl'), 'utf8').split('\n')[0]!);
++    assert.equal(config.maxBytes, 1_000_000);
++    assert.equal(config.maxChunkBytes, 1_000_000); assert.equal(config.maxPendingBytes, 1_000_000);
++    const bytes = Buffer.alloc(1_000_001);
++    const response = await fetch(`${receiver.endpoint}/native`, { method: 'POST',
++      headers: { Origin: origin, Authorization: `Bearer ${receiver.token}` },
++      body: JSON.stringify({ op: 'audio', sequence: 0, identity: nativeIdentity, observation: {
++        blockId: 'oversized', startFrame: 0, frameCount: 1, sampleRate: 48000, channels: 1, format: 's16le', byteLength: bytes.length,
++      }, bytes: bytes.toString('base64') }),
++    });
++    assert.equal(response.status, 400); assert.equal(finalized, 0); assert.equal(existsSync(output), false);
++  } finally { await receiver.close(); rmSync(directory, { recursive: true, force: true }); }
++});
++
+ test('deferred native close ACK and identical retries retain one pending job; receiver close waits delayed playback',async()=>{
+   const directory=mkdtempSync(path.join(tmpdir(),'native-deferred-'));let release!:()=>void,calls=0;
+   const gate=new Promise<void>(resolve=>{release=resolve;});

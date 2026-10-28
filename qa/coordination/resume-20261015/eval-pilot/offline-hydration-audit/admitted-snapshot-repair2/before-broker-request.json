@@ -1,0 +1,100 @@
+{
+  "format": "offline-hydration-audit-request-v1",
+  "root": "C:/Users/product/Desktop/KnowledgeBase/",
+  "providerCallsAllowed": false,
+  "credentialReadsAllowed": false,
+  "dbConnectionsAllowed": false,
+  "cpuBrokerOnly": true,
+  "executeAfterRootRelease": true,
+  "executeAfterNativeTwoGuardDiagnostic": true,
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "commands": [
+    {
+      "kind": "minimal-synthetic-guard-test",
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs"
+      ],
+      "expectedTests": 1,
+      "outerTimeoutSeconds": 10
+    },
+    {
+      "kind": "actual-production-hydration",
+      "argv": [
+        ".venv/Scripts/python.exe",
+        "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/watchdog.py"
+      ],
+      "hardJobObjectSeconds": 60
+    }
+  ],
+  "pinsFile": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/pins.json",
+  "pinsSha256": "8f516190f02a6353da7680d204e0c72ec13311fce423970b3a9e80d63d32e86c",
+  "files": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "8a236481011fad43fd570583cb2d1d16f641eae30cacd1f7adac8bdc68b534a8"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "sha256": "ae5a6a4f32653799b4e24ffefa6504901bd9991e16144cadd5c02228c329f84d"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs",
+      "sha256": "90ff34867664c572fa3bd852e95fc3841d4477c606afbd951931f2f24f27912c"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/watchdog.py",
+      "sha256": "2986eba111164c7f54993d88553c695a359639b292e51ccd0b6558d1d819070a"
+    }
+  ],
+  "runtimeRequirements": {
+    "node": "existing Codex primary Node; record version/executable hash",
+    "tsx": "existing pinned runtime helpers+lockfile",
+    "python": "existing .venv Python+verified Tree helper; broker record interpreter identity"
+  },
+  "expectedScope": {
+    "questions": 92,
+    "candidatesInventoried": 29,
+    "expectedSessionsHydrated": 23,
+    "candidatesWithoutQuestion": 6,
+    "acceptedDataPins": 119
+  },
+  "qualityClaims": {
+    "expectedSourceConditionedOnly": true,
+    "navigation": false,
+    "answerAccuracy": false,
+    "primaryPASS": false,
+    "humanLabels": false
+  },
+  "noRetryOnTimeout": true,
+  "noEnvRewrite": true,
+  "baseHead": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "soleExecutionOwner": "/root/resume_cpu_broker",
+  "staticClosureEvidence": {
+    "owner": "/root/resume_cpu_broker",
+    "reportPath": "qa/coordination/resume-20261015/broker/hydration-static-binding-report.json",
+    "reportSha256": "3aac116018c1ceda6c8ef17186b355dbe78a8ab8a61f71636ccb67a9f0ddbc1e",
+    "closurePath": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/broker/pin-manifests/b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48.json",
+    "closureSha256": "b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48",
+    "closureCount": 208,
+    "missingBindingCountBeforeRepair": 1,
+    "byteDriftCount": 0,
+    "unsupportedStaticPackageSpecifiers": [],
+    "reason": "Previous inventory omitted a statically imported schema; actual bytes unchanged. Sole CPU broker208file closure selected;202file report preserved separately, not unioned.",
+    "computedAndExternalImportsCompleteClaim": false
+  },
+  "status": "METADATA_REPAIRED_READY_FOR_ROOT_ADMISSION",
+  "priorPreexecutionHoldPreserved": true,
+  "executionCounters": {
+    "auditExecutions": null,
+    "providerAttempts": null,
+    "reason": "Prior preexecution HOLD counters preserved; no execution inferred from static metadata. No new tests/audit dispatched by coordinator."
+  },
+  "schemaBinding": {
+    "path": "schema/whatsapp_candidates.schema.json",
+    "sha256": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16"
+  },
+  "rootAdmissionRequired": true
+}

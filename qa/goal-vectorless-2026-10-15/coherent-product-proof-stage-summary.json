@@ -1,0 +1,26 @@
+{
+  "web": [
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-types-coherent-current.json",
+      "exitCode": 0,
+      "elapsedMs": 12317.330899999999,
+      "pinCount": 1775,
+      "membership": 1573,
+      "guard": "qa/goal-vectorless-2026-10-15/verification-web-types-coherent-current-inventory-guard.json"
+    },
+    {
+      "receipt": "qa/goal-vectorless-2026-10-15/verification-web-build-coherent-current.json",
+      "exitCode": 0,
+      "elapsedMs": 14264.2211,
+      "pinCount": 1775,
+      "membership": 1573,
+      "guard": "qa/goal-vectorless-2026-10-15/verification-web-build-coherent-current-inventory-guard.json"
+    }
+  ],
+  "transcriptReceipt": "verification-transcript-four-current-absent-env.json",
+  "transcriptPrivateFlagAbsent": true,
+  "compositionDiagnosticReceipt": "verification-deadline-index-code-diagnostic-one.json",
+  "compositionPassed": false,
+  "preflightPendingFrozenSpecRebase": true,
+  "noReviewerOrVerdict": true
+}

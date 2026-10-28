@@ -1,0 +1,31 @@
+{
+  "status": "HOLD",
+  "sourcePacketValidation": "READY",
+  "runtimePreparation": "NOT_RUN: missing known prerequisite, no paid probe",
+  "candidate_content_manifest_sha256": "1c128c8554b21efd9c393c93f5bece2f35d38f1082a52a9cfea19ecf324b8948",
+  "sourceDriftCount": 0,
+  "missingMinimalArtifact": "Byte-bound startup_receipt for exact selected worker executable/provider/client-version/model/effective-policy/tool-controls/invocation, containing actual observed_input_tokens_floor and unchanged policy fingerprints. No same-fingerprint receipt is supplied in this packet.",
+  "workerExecutable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+  "workerExecutableSha256": "dd13bdb162a184fa04039488b234a8258ef9b76f84e926c505d5742b19249a6a",
+  "actualClientVersion": null,
+  "actualSelectedModel": null,
+  "observedSameFingerprintInputFloor": null,
+  "currentNextPhaseTotalTokens": 4000,
+  "protectedCompletionTotalTokens": 2000,
+  "currentBootstrapCumulativeTotalTokens": 6000,
+  "admissionInequality": "known observed_input_tokens_floor <= next_phase.tokens; current next_phase.tokens=4000 with2000 protected reserve. If observed floor exceeds4000, current6000 cumulative scope cannot admit unchanged; finite explicitly authorized escalation/reallocation and preserved history needed. Floor alone does not predict actual next usage.",
+  "minimumNumericIncrease": null,
+  "unknownReason": "Cannot compute numerical minimum from missing same-fingerprint startup floor; old/different-policy smoke numbers cannot be copied or relabelled.",
+  "readonlyProfileControlRequirement": "If root selects optional readonly-review profile, bind valid native-control evidence and control identity too; existing worker profile/control settings have not been invented.",
+  "noCalibrationAuthority": "No startup probe/calibration/model substitution has been authorized or executed by this lane",
+  "actualMakerActiveSeconds": null,
+  "actualMakerTotalTokens": null,
+  "reviewerLaunched": false,
+  "activationReady": false,
+  "mandatorySourceRisks": [
+    "listening socket exact child ownership",
+    "private creation/cleanup exception receipt persistence",
+    "disk monitor overshoot and native Job caps unproved",
+    "administrator/runtime/bootstrap behavior unproved"
+  ]
+}

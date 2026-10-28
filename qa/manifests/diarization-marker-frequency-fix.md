@@ -159,3 +159,5 @@ OK: docs/SNAPSHOT.md matches a fresh regeneration
    placeholder markers.
 5. `pnpm -r test` — expect exit 0, 251/251. `pnpm lint:structure` — expect exit 0.
 6. Confirm `TASKS.md`'s T-003 line says `done`.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

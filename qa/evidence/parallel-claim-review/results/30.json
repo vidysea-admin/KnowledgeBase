@@ -1,0 +1,103 @@
+{
+  "version": 1,
+  "index": 30,
+  "originalIndex": 32,
+  "claimId": "2026-06-25-in-focus-2-c01",
+  "inputHash": "8c59c8f9a4b605788edc71ff448dea07a872a67609f391dbdc96c2b222f97373",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "entailed",
+    "reason": "Original t007 explicitly describes Futurowise programs lasting 2-4 weeks, led by experts and professors, with a published project and certificate; t008 independently supports duration and instructor alternatives.",
+    "missingReferences": [],
+    "caveats": [
+      "Both original speakerRef values are unknown; embedded speaker names do not establish person identity.",
+      "This supports the transcript description only; external accuracy and continued applicability are unverified.",
+      "The same turn IDs have changed text, timings and speaker references in current contexts.",
+      "No supplied references are missing or duplicated."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t007",
+        "contextVersion": "originalMigration",
+        "quote": "Every program that we run is led by industry experts and professors, and students leave with a real skill and a published project and a certificate—all of that within a 2- to 4-week program.",
+        "textSha256": "a20cc10c1632b893367a4a2e8502b337747c7909a280f3c8fefc7fb9ce3bd1e5",
+        "contextSha256": "290a74ffdaaa85163cf2f127ae3f42ec644e707045be96ca8af290b4da5bb5b3",
+        "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 202,
+        "tEnd": 241,
+        "supports": "Futurowise program duration of 2-4 weeks, expert/professor instruction, and published project plus certificate on completion."
+      },
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t008",
+        "contextVersion": "originalMigration",
+        "quote": "these are 2- to 4-week-long courses—which are taught by professors from the university or industry experts.",
+        "textSha256": "07b38ef5cc8a11b44f695931a7c3ddce4cd09051db4e3fda9d065c8681c965f7",
+        "contextSha256": "fbdc3bca2b3bf190bf2167262cde1b92c040c457a81acbde9b0fc505a838b79a",
+        "artifactSha256": "fcbd3a1364cf2f44969fcd223fef7433a8c4fb7043b1bd4e9a79449e398f8afb",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 241,
+        "tEnd": 282,
+        "supports": "Courses last 2-4 weeks and are taught by university professors or industry experts."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "Current t007 is an acknowledgment and t008 praises projects and masterclass satisfaction. Neither states Futurowise course duration, professor/expert instruction, project publication or certification.",
+    "missingReferences": [],
+    "caveats": [
+      "Stored speaker references Devesh and Abha do not independently establish person identity.",
+      "t007 changed from 202-241 to 1062-1066 seconds; t008 changed from 241-282 to 1066-1073 seconds, with changed text.",
+      "No supplied references are missing or duplicated.",
+      "Raw artifact SHA256 differs from normalized-LF SHA256; neither artifact byte hash was independently verified."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t007",
+        "contextVersion": "current",
+        "quote": "Absolutely, I hear you, and I look forward to working on those.",
+        "textSha256": "8fc6b7064fcf660694fb88f078976aa10ca8f07c7acda67cb126b1f5065b0601",
+        "contextSha256": "3b38622ca80e2ea1ec3e408835d85b1c7237f50a75bc5730976cc2e95a884dd0",
+        "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+        "revision": null,
+        "speakerRef": "Devesh",
+        "tStart": 1062,
+        "tEnd": 1066,
+        "supports": "Unrelated acknowledgment; no course duration, instructors, publication or certificate."
+      },
+      {
+        "sessionId": "2026-06-25-in-focus-2",
+        "turnId": "2026-06-25-in-focus-2-t008",
+        "contextVersion": "current",
+        "quote": "your projects have been fantastic, and the students have been very happy with the masterclass, as well.",
+        "textSha256": "416b8e532e28674dbad594ffd470445d33a14005760bd5e585897d47e73c67ae",
+        "contextSha256": "2f3a8616178c125b48532d4ade13cd0a041f1065462e7b575d389a695dc54aaa",
+        "artifactSha256": "d19ccd48232af0ecdeba98343141b3323947787bbbe88ec6e234a08752a30257",
+        "revision": null,
+        "speakerRef": "Abha",
+        "tStart": 1066,
+        "tEnd": 1073,
+        "supports": "Praise for projects and masterclass satisfaction; no stated duration, instructor qualifications, published output or certificate."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original contexts support every claim component. Current same-ID records contain different later dialogue and provide insufficient support; no external factual or human adjudication is established."
+}

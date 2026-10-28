@@ -1,0 +1,22 @@
+{
+  "kind": "ATTRIBUTABLE_TARGETED_COMPOSITE_NOT_GLOBAL_GREEN_BATCH",
+  "initialReceipt": "qa/goal-vectorless-2026-10-15/verification-staged-token-metric-eleven.json",
+  "initialExit": 1,
+  "initialTenPassingNodesUnchanged": true,
+  "repairedNodeReceipt": "qa/goal-vectorless-2026-10-15/verification-token-metric-bootstrap-one.json",
+  "repairedNodeExit": 0,
+  "repairedNode": "test_bootstrap_and_escalation_do_not_reset_history",
+  "oldTestSha": "4ae3a5fa1fc7d8867520481cd88a67bc764179f2eba06e7cca0e3a33c12c1996",
+  "newTestSha": "155798c0edd741c44d16fa45e6034a8d867f6cd1c80ee136c86d307dffa8de0e",
+  "authenticatedExactDiff": "escalation.limits.cost None -> 10 in one known-cost fixture; assertions unchanged",
+  "helperSha": "2b4fe0b118269ef5cd63aa520df86f65d7d9453be2fbc1898ca73ceab3599ef2",
+  "environmentEqual": true,
+  "executableEqual": true,
+  "lockEqual": true,
+  "importRootDifference": "discover repo root versus selected-node cwd; both test files explicitly import sibling staged helper bytes",
+  "legacy20": "verification-token-metric-legacy-twenty.json",
+  "reserve14": "verification-token-metric-reserve-fourteen.json",
+  "legacyAmendment": "qa/coordination/checker-runtime-total-20261015/broker-legacy/amendment.json",
+  "legacyRawUnamendedRun": "NOT EXECUTED; one intended legacy ratio assertion amendment was applied prospectively under maker instruction; no raw failure fabricated",
+  "reviewerDecisionRequired": true
+}

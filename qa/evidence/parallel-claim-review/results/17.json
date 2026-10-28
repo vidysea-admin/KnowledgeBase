@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "index": 17,
+  "originalIndex": 19,
+  "claimId": "2026-05-28-in-focus-1-c01",
+  "inputHash": "aa279817f81751e8c0aa8634228a5e0ec9f6dfe348824f69624cbb1cfcd91cb8",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The original citation promises a solution to any education counselor in 48 hours, but neither specifies project matching nor identifies Innovique. Those components of the persisted claim are not directly supported by this exact cited context.",
+    "missingReferences": [],
+    "caveats": [
+      "The sole reference has exactly one supplied match; no missing or duplicate reference is reported.",
+      "Original speakerRef is unknown. The text contains a Makrand Rajadhyaksha prefix, which does not independently establish identity or Innovique affiliation.",
+      "The language describes a promise and belief about capability, not verified delivery within 48 hours.",
+      "The same turn ID now has different content, speaker metadata and timing: original 940-965 seconds; current 2284-2291 seconds.",
+      "Artifact bytes and historical revision were not independently verified. Raw current sha256 differs from normalizedLfSha256; neither is interchangeable with the historical artifact sha256."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "turnId": "2026-05-28-in-focus-1-t035",
+        "contextVersion": "originalMigration",
+        "quote": "we require just 48 hours to provide a solution to any education counselor in any complex domain.",
+        "textSha256": "e1ea1a9b4eb74aa359de879048720a010654414be823751c2177a4c25b2c1a17",
+        "contextSha256": "f91f2924d79f62c11962d3be6713a4d99059465cf77fb657e3ec223706a3633a",
+        "artifactSha256": "0ac457de7615bc242980485dca851754c20b6f0181bbe354f743489ed085062a",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 940,
+        "tEnd": 965,
+        "supports": "Supports a stated 48-hour solution promise to education counselors; does not establish project matching, Innovique attribution, or achieved delivery."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The current citation is a question about mentorship and coming up with ideas. It supplies no Innovique attribution, project-matching solution, counselor service or 48-hour commitment; it does not explicitly contradict the claim.",
+    "missingReferences": [],
+    "caveats": [
+      "The sole reference has exactly one supplied match; no missing or duplicate reference is reported.",
+      "Current speakerRef Yavya is a stored label, not independently verified person identity.",
+      "The same turn ID changed from a promise at 940-965 seconds to a mentorship question at 2284-2291 seconds. Original support cannot be substituted for the current citation.",
+      "Source and session date metadata do not prove factual truth or successful service delivery.",
+      "Artifact bytes were not verified; provided raw and normalized-LF hashes remain distinct."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-05-28-in-focus-1",
+        "turnId": "2026-05-28-in-focus-1-t035",
+        "contextVersion": "current",
+        "quote": "Could you maybe also talk a little bit about the mentorship you received and how you think that benefited you to come up with these ideas?",
+        "textSha256": "e2b510e75e5c6af062dc43f0882561e9d4c31f8cbf0e1c6e8c51ae06930de3c4",
+        "contextSha256": "43958597c0d9ab6a2b1ff4f9350c14513e90271af01ea2089c3e2db9b8947a87",
+        "artifactSha256": "3f7229899fd1a4a6d190e3c9d402b12dcae2ceb9dc66cbf697d18e698d9e6581",
+        "revision": null,
+        "speakerRef": "Yavya",
+        "tStart": 2284,
+        "tEnd": 2291,
+        "supports": "Unrelated mentorship question; supports none of the persisted service/attribution/timing components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original context partially supports a 48-hour counselor-solution promise but omits project matching and Innovique identity. Current same-ID context is unrelated; the entire claim is unsupported in both versions. External truth and human adjudication remain open."
+}

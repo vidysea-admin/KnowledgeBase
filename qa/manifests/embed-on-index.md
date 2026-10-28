@@ -239,3 +239,5 @@ ISS-112's evidence say the 12-turn fixture yields "12 chunks" — it yields **3*
 `buildChunks` packs them. Its own cycle-2 probe failed on that bad assertion before it caught it.
 Conclusions unaffected (3 chunks still make every index-1 shape reachable), and the verdict now
 says so wherever the figure appears.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 2 status statement(s) in this file, which agree

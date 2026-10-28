@@ -41,3 +41,13 @@ the unit is **not-applicable** for Mode D on the merits (changed set is one test
 with the instrument lock recorded separately as `LIVE-BROWSER: SKIP`. This gate exists so the next
 test-only unit does not have to re-derive that ruling by hand — it is a durability question, not a
 blocker.
+
+
+## Ruling (recorded 2026-10-10)
+
+**Answered:** 2026-10-10 - APPROVED - Umesh (Approver), answering a direct multiple-choice prompt in the orchestrating session; recorded by the orchestrating agent.
+**Ruled by:** Umesh (Approver).
+**Choice:** APPROVED as the checker recommended: exclude `*.test.*` files from the D-024 live-browser trigger (`qa/ui-surfaces.json`), with the whole-changed-set reasoning recorded in the file.
+**Limits:** the trigger is read by `D:/ai_os/.claude/hooks/delivery-gate-stop.ps1`, which does not exist on this machine; this ruling alone changes no file. Any edit to an enforcement path additionally needs a DECISIONS entry carrying `**Approved-by:** Umesh`.
+
+**Gate status:** ANSWERED - recorded inline: 2026-10-10 - approved - Umesh (Approver)

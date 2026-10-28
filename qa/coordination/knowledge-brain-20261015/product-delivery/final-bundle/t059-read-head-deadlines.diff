@@ -1,0 +1,207 @@
+diff --git a/apps/api/src/evaluation-flywheel/workflow.test.ts b/apps/api/src/evaluation-flywheel/workflow.test.ts
+index 8ce7d862..4bb16ebd 100644
+--- a/apps/api/src/evaluation-flywheel/workflow.test.ts
++++ b/apps/api/src/evaluation-flywheel/workflow.test.ts
+@@ -165,3 +165,77 @@ test("newer interrupted child resumes promotion while completed historical repla
+   assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, second._id);
+   assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 2 }); assert.equal(r.tables.eval_runs!.length, 3);
+ });
++
++test("storage read deadlines refuse without dispatch or recovery writes", { timeout: 2000 }, async () => {
++  for (const method of ["evaluation", "gap"] as const) {
++    const r = rig(); r.deps.operationTimeoutMs = 10;
++    const w = r.workflow(); await w.open("t", "loss");
++    const before = structuredClone(r.tables), original = r.deps.store[method];
++    r.deps.store[method] = () => new Promise<never>(() => {});
++    await reject(w.retest("t", "loss", request), "unavailable");
++    Object.assign(r.deps.store, { [method]: original });
++    assert.deepEqual(r.tables, before); assert.deepEqual(r.calls, { intake: 0, index: 0, ask: 0 });
++  }
++});
++
++test("source and index read deadlines keep the lease and never trigger index rebuild", { timeout: 2000 }, async () => {
++  for (const method of ["sourceRows", "indexedRows"] as const) {
++    const r = rig(); r.deps.operationTimeoutMs = 10;
++    const w = r.workflow(); await w.open("t", "loss");
++    // Establish an indexed checkpoint by failing Ask, then probe the freshness reader.
++    const ask = r.deps.ask; r.deps.ask = async () => { throw new Error("fixture refusal"); };
++    await reject(w.retest("t", "loss", request), "unavailable"); r.deps.ask = ask;
++    const original = r.deps.store[method], before = structuredClone(r.calls);
++    r.deps.store[method] = () => new Promise<never>(() => {});
++    await reject(w.retest("t", "loss", request), "unavailable");
++    Object.assign(r.deps.store, { [method]: original });
++    const head = await w.inspect("t", "loss"); assert.ok(head.flywheel.lock);
++    assert.deepEqual(r.calls, before); assert.equal(head.flywheel.stage, "indexed");
++    await reject(w.retest("t", "loss", request), "conflict");
++  }
++});
++
++test("child readback deadline preserves the persisted child and retry never repeats Ask", { timeout: 2000 }, async () => {
++  const r = rig(); r.deps.operationTimeoutMs = 10;
++  const w = r.workflow(); await w.open("t", "loss");
++  const evaluation = r.deps.store.evaluation;
++  r.deps.store.evaluation = (t, id) => id !== "loss" && r.calls.ask > 0
++    ? new Promise<never>(() => {}) : evaluation(t, id);
++  await reject(w.retest("t", "loss", request), "unavailable");
++  r.deps.store.evaluation = evaluation;
++  assert.equal(r.tables.eval_runs!.length, 2); assert.ok((await w.inspect("t", "loss")).flywheel.lock);
++  r.advance(600001); const child = await r.workflow().retest("t", "loss", request);
++  assert.equal((await w.inspect("t", "loss")).flywheel.lastRetestId, child._id);
++  assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 }); assert.deepEqual(r.tables.eval_runs![0], ORIGINAL);
++});
++
++test("terminal CAS deadline preserves committed completion or fences a late CAS after recovery", { timeout: 2000 }, async () => {
++  for (const commitBeforeDeadline of [true, false]) {
++    const r = rig(); r.deps.operationTimeoutMs = 10;
++    const w = r.workflow(); await w.open("t", "loss");
++    const replace = r.deps.store.replaceGap;
++    let late!: () => Promise<boolean>;
++    r.deps.store.replaceGap = async (t, rev, row) => {
++      if (row.flywheel.stage !== "retested") return replace(t, rev, row);
++      const snapshot = structuredClone(row);
++      if (commitBeforeDeadline) await replace(t, rev, snapshot);
++      else late = () => replace(t, rev, snapshot);
++      return new Promise<never>(() => {});
++    };
++    await reject(w.retest("t", "loss", request), "unavailable");
++    r.deps.store.replaceGap = replace;
++    const timedOut = await w.inspect("t", "loss");
++    assert.equal(timedOut.flywheel.stage, commitBeforeDeadline ? "retested" : "indexed");
++    assert.equal(Boolean(timedOut.flywheel.lock), !commitBeforeDeadline);
++    if (!commitBeforeDeadline) r.advance(600001);
++    const child = await r.workflow().retest("t", "loss", request);
++    const recovered = await w.inspect("t", "loss");
++    assert.equal(recovered.flywheel.lastRetestId, child._id); assert.equal(recovered.flywheel.failure, undefined);
++    if (!commitBeforeDeadline) {
++      assert.equal(await late(), false, "old revision cannot replace the recovered terminal head");
++      assert.deepEqual(await w.inspect("t", "loss"), recovered);
++    } else assert.deepEqual(recovered, timedOut, "committed completion is a read-only replay");
++    assert.deepEqual(r.calls, { intake: 1, index: 1, ask: 1 });
++    assert.equal(r.tables.eval_runs!.length, 2); assert.deepEqual(r.tables.eval_runs![0], ORIGINAL);
++  }
++});
+diff --git a/apps/api/src/evaluation-flywheel/workflow.ts b/apps/api/src/evaluation-flywheel/workflow.ts
+index b2bc73bc..b1eb6a31 100644
+--- a/apps/api/src/evaluation-flywheel/workflow.ts
++++ b/apps/api/src/evaluation-flywheel/workflow.ts
+@@ -26,23 +26,24 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+   const timeout = deps.operationTimeoutMs ?? 120_000;
+   if (!Number.isSafeInteger(timeout) || timeout < 1 || timeout > 120_000) fail("invalid", 400);
+   class StageTimeout extends FlywheelError { constructor() { super("unavailable", 503); } }
+-  async function bounded<T>(call: () => Promise<T>): Promise<T> {
++  class StorageTimeout extends StageTimeout {}
++  async function bounded<T>(call: () => Promise<T>, storage = false): Promise<T> {
+     let timer: ReturnType<typeof setTimeout> | undefined;
+     try { return await Promise.race([call(), new Promise<never>((_resolve, reject) => {
+-      timer = setTimeout(() => reject(new StageTimeout()), timeout);
++      timer = setTimeout(() => reject(storage ? new StorageTimeout() : new StageTimeout()), timeout);
+     })]); } finally { if (timer) clearTimeout(timer); }
+   }
+   async function loss(t: string, id: string): Promise<{ row: EvalRuns; loss: LossSnapshot; fp: string }> {
+     assertValidTenantId(t, "evaluationFlywheel");
+     if (!validId(id)) fail("invalid", 400);
+-    const row = await deps.store.evaluation(t, id);
++    const row = await bounded(() => deps.store.evaluation(t, id), true);
+     if (!row || row.tenantId !== t || row._id !== id) fail("not_found", 404);
+     const s = snapshot(row!);
+     return { row: row!, loss: s, fp: fingerprint(s) };
+   }
+   async function load(t: string, id: string): Promise<FlywheelGap> {
+     const original = await loss(t, id);
+-    const row = await deps.store.gap(t, gapId(t, id));
++    const row = await bounded(() => deps.store.gap(t, gapId(t, id)), true);
+     if (!row || row.tenantId !== t || row._id !== gapId(t, id) || row.kind !== "source-pending"
+       || row.flywheel?.version !== 1 || row.flywheel.originalEvalRunId !== id) fail("not_found", 404);
+     if (row!.flywheel.inputFingerprint !== original.fp || !same(row!.flywheel.loss, original.loss)) fail("input_drift");
+@@ -55,10 +56,13 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+       || h.lock && (!validId(h.lock.token) || !/^[a-zA-Z0-9_-]{1,80}$/.test(h.lock.requestId) || !Number.isFinite(Date.parse(h.lock.expiresAt)))) fail("input_drift");
+     return structuredClone(row!);
+   }
+-  async function save(t: string, row: FlywheelGap): Promise<FlywheelGap> {
++  async function save(t: string, row: FlywheelGap, acceptedChild = false): Promise<FlywheelGap> {
+     const expected = row.flywheel.revision;
+     const next = structuredClone(row); next.flywheel.revision++;
+-    if (!await deps.store.replaceGap(t, expected, next)) fail("conflict");
++    const write = () => deps.store.replaceGap(t, expected, next);
++    // Only terminal promotion is deadline-safe: its immutable child already exists.
++    // Other writes require a durable uncertain-write protocol before they can time out.
++    if (!await (acceptedChild ? bounded(write, true) : write())) fail("conflict");
+     return next;
+   }
+   async function open(t: string, id: string): Promise<FlywheelGap> {
+@@ -72,11 +76,11 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+     return load(t, id);
+   }
+   async function receipt(t: string, r: CaptureReceipt): Promise<CaptureReceipt> {
+-    return captureReceipt(t, r.sourceId, r.sessionId, await deps.store.sourceRows(t, r.sourceId, r.sessionId));
++    return captureReceipt(t, r.sourceId, r.sessionId, await bounded(() => deps.store.sourceRows(t, r.sourceId, r.sessionId), true));
+   }
+   async function verifyIndex(t: string, r: IndexedReceipt): Promise<void> {
+     if (!same(await receipt(t, r), (({ generation: _g, treeDigest: _t, chunksDigest: _c, completedAt: _a, ...capture }) => capture)(r))) fail("input_drift");
+-    const digests = indexedDigests(t, r, await deps.store.indexedRows(t, r.sessionId));
++    const digests = indexedDigests(t, r, await bounded(() => deps.store.indexedRows(t, r.sessionId), true));
+     if (digests.treeDigest !== r.treeDigest || digests.chunksDigest !== r.chunksDigest) fail("input_drift");
+   }
+   async function retest(t: string, id: string, request: { sourceUrl: string; requestId: string }): Promise<RetestRun> {
+@@ -88,7 +92,7 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+     if (head.status === "expired") fail("conflict");
+     if (head.flywheel.sourceUrlFingerprint && head.flywheel.sourceUrlFingerprint !== fingerprint(request.sourceUrl)) fail("input_drift");
+     const childId = retestId(t, head._id, request.requestId);
+-    const existing = await deps.store.evaluation(t, childId);
++    const existing = await bounded(() => deps.store.evaluation(t, childId), true);
+     const ownedChild = (row: EvalRuns | null): row is RetestRun => !!row && row.tenantId === t && row._id === childId
+       && (row.flywheel as RetestRun["flywheel"])?.originalEvalRunId === id
+       && (row.flywheel as RetestRun["flywheel"])?.gapId === head._id
+@@ -124,7 +128,7 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+         await checkLock();
+         const intake = await bounded(() => deps.intake({ tenantId: t, url: request.sourceUrl }));
+         if (!intake || !["created", "already-ingested"].includes(intake.status) || !validId(intake.sourceId) || !validId(intake.sessionId)) fail("unavailable", 503);
+-        const rows = await deps.store.sourceRows(t, intake.sourceId, intake.sessionId);
++        const rows = await bounded(() => deps.store.sourceRows(t, intake.sourceId, intake.sessionId), true);
+         const captured = captureReceipt(t, intake.sourceId, intake.sessionId, rows);
+         await checkLock();
+         head.status = "received"; head.sourceRef = captured.sourceId;
+@@ -138,7 +142,11 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+       } else {
+         let current = false;
+         if (head.flywheel.index) {
+-          try { await verifyIndex(t, head.flywheel.index); current = true; } catch { /* retry rebuilds a stale output */ }
++          try { await verifyIndex(t, head.flywheel.index); current = true; }
++          catch (error) {
++            if (error instanceof StorageTimeout) throw error;
++            /* retry rebuilds a stale output */
++          }
+         }
+         if (!current) {
+           await checkLock();
+@@ -146,7 +154,7 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+           const indexed = await bounded(() => deps.index(t, captured.sessionId));
+           assertIndexResult(indexed, captured);
+           if (!same(await receipt(t, captured), captured)) fail("input_drift");
+-          const rows = await deps.store.indexedRows(t, captured.sessionId);
++          const rows = await bounded(() => deps.store.indexedRows(t, captured.sessionId), true);
+           if (rows.chunks.length !== indexed.chunks.written) fail("unavailable", 503);
+           const digests = indexedDigests(t, captured, rows);
+           await checkLock();
+@@ -170,15 +178,19 @@ export function createEvaluationFlywheel(deps: FlywheelDeps) {
+             inputFingerprint: head.flywheel.inputFingerprint, index: head.flywheel.index!, comparison: "needs-review" } };
+         stage = "persist";
+         await deps.store.createRetest(t, child);
+-        const written = await deps.store.evaluation(t, childId);
++        const written = await bounded(() => deps.store.evaluation(t, childId), true);
+         if (!same(written, child)) fail("input_drift");
+       }
+       await checkLock();
+       head.flywheel.lastRetestId = childId; head.flywheel.stage = "retested";
+       delete head.flywheel.lock; delete head.flywheel.failure;
+-      await save(t, head);
++      await save(t, head, true);
+       return structuredClone(child);
+     } catch (error) {
++      // A read deadline or ambiguous terminal CAS must not start another recovery write.
++      // Leave ownership intact; retry rereads the deterministic child and current head.
++      // The timed-out CAS retains its original revision predicate, fencing late commits.
++      if (error instanceof StorageTimeout) throw error;
+       // Only the current lease can record failure/release; stale callbacks cannot regress a newer attempt.
+       try {
+         const current = await load(t, id);

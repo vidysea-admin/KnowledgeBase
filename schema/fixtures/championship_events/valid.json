@@ -1,0 +1,33 @@
+{
+  "_id": "synthetic-event",
+  "tenantId": "fixture-tenant",
+  "revision": 0,
+  "createdAt": "2026-10-14T00:00:00.000Z",
+  "title": "Synthetic event",
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Synthetic question?",
+      "source": {
+        "kind": "toc",
+        "reference": "synthetic-session"
+      }
+    }
+  ],
+  "counsellors": [
+    {
+      "id": "c1",
+      "name": "Synthetic counsellor",
+      "evidenceReference": "synthetic-reference"
+    }
+  ],
+  "judges": [],
+  "rubric": {
+    "version": "1",
+    "reference": "synthetic-rubric"
+  },
+  "reviewReference": "synthetic-review",
+  "bankDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "trials": [],
+  "evidenceStatus": "operator-supplied-unverified"
+}

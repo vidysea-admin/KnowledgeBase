@@ -1,0 +1,52 @@
+{"synthetic":true,"secondarySourceWithdrawnInBoth":true,"publicA":{"recordedConfidence":0.13,"withheldProfileFields":2},"publicB":{"recordedConfidence":0.93,"withheldProfileFields":0}}
+✔ healthy all-visible source allows supported attribute values and recorded metadata (36.2241ms)
+✖ public profile is invariant or refused when only withdrawn-source row metadata changes (13.9409ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 805.6963
+
+✖ failing tests:
+
+test at qa\evidence\u24-speaker-profile\checker\mixed-eligibility-cycle3.test.mts:1:6252
+✖ public profile is invariant or refused when only withdrawn-source row metadata changes (13.9409ms)
+  AssertionError [ERR_ASSERTION]: changing only withdrawn-source metadata must not change the public persona output
+  + actual - expected
+  ... Skipped lines
+  
+    {
+      aliases: [
+        'Priya Nair'
+      ],
+      ambiguity: null,
+  ...
+      personId: 'person:priya-nair',
+  +   recordedConfidence: 0.13,
+  -   recordedConfidence: 0.93,
+      roles: [],
+      sessions: [
+        {
+          date: '2026-10-14',
+          id: 's1',
+  ...
+        identityEvidence: 0,
+  +     profileFields: 2
+  -     profileFields: 0
+      }
+    }
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\qa\evidence\u24-speaker-profile\checker\mixed-eligibility-cycle3.test.mts:122:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: { personId: 'person:priya-nair', aliases: [ 'Priya Nair' ], identityStatus: 'human-confirmed', ambiguity: null, recordedConfidence: 0.13, identityEvidence: [ [Object] ], organizations: [], roles: [], unavailable: [ 'organizations', 'roles', 'topics' ], claims: [ [Object] ], topics: [], sessions: [ [Object] ], attribution: [ [Object] ], withheld: { claims: 1, identityEvidence: 0, blocks: 0, profileFields: 2 } },
+    expected: { personId: 'person:priya-nair', aliases: [ 'Priya Nair' ], identityStatus: 'human-confirmed', ambiguity: null, recordedConfidence: 0.93, identityEvidence: [ [Object] ], organizations: [], roles: [], unavailable: [ 'organizations', 'roles', 'topics' ], claims: [ [Object] ], topics: [], sessions: [ [Object] ], attribution: [ [Object] ], withheld: { claims: 1, identityEvidence: 0, blocks: 0, profileFields: 0 } },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+

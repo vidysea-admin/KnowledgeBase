@@ -1,0 +1,308 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 0,
+  "entries": [
+    {
+      "index": 0,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c01",
+      "inputHash": "54ca1c5f2eca687ba59374307696a74379493036807ac4da5dc85b8eba9b5730",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original supports 76% students/New Zealand visa approval and 27,000 by 2030, but does not directly state the Indian denominator, student-visa category or Immigration New Zealand target ownership. Its 2025 data/this year wording is temporally ambiguous. Current guest welcome supports none of these components. Same cited IDs have changed content/timing; stored speaker labels do not establish verified identity. No missing or duplicate supplied references were observed. These are transcript-support judgments only, with external truth and human adjudication open.",
+      "evidenceHashes": {
+        "inputHash": "54ca1c5f2eca687ba59374307696a74379493036807ac4da5dc85b8eba9b5730",
+        "claimRecordSha256": "6e64c35e9dd943a5d5a19a6906c23009dfd7b35caa4ae042df249d686aca7152",
+        "claimTextSha256": "c33ce8b1ff1b9e846771ef5138ae0efaee40b629583b1a3683001fa3842e81e1",
+        "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+            "textSha256": "5e5899569b643b0f7599454252673b080841589ecc32fc48531be4056985fa7c",
+            "providedTextSha256": "5e5899569b643b0f7599454252673b080841589ecc32fc48531be4056985fa7c",
+            "contextSha256": "689fc2236876457d34776f238b0c0675a87d25965eac4f3c430f97ddbe1fe9ee",
+            "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 594,
+            "tEnd": 660,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t011",
+            "textSha256": "1f16a07fca02363d7aad54ea2bc5298f3d9dea90f87fa0b59e292b606dfc64d5",
+            "providedTextSha256": "1f16a07fca02363d7aad54ea2bc5298f3d9dea90f87fa0b59e292b606dfc64d5",
+            "contextSha256": "1664835bc5c07355698d472e9e983e0643e300b6f997b4eb0f6100d4f6aeb545",
+            "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "revision": null,
+            "speakerRef": "spk:0",
+            "tStart": 99,
+            "tEnd": 106,
+            "sameIdContentChanged": true
+          }
+        ],
+        "hashFailures": [],
+        "identityBinding": true
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 1,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c03",
+      "inputHash": "a9b65fd0a4bb0194e5fdffb75c3bcd2cdc6834299311c4f7908de262955f8fc5",
+      "originalLabel": "contradicted",
+      "currentLabel": "unsupported",
+      "reason": "Original explicitly locates the capped Classes Internationales foundation year in an India-France initiative, incompatible with the persisted New Zealand attribution/equivalent program. The currency glyph is corrupted in the literal record. Current engineering/IT discussion is unrelated. Same cited IDs have changed content/timing; stored speaker labels do not establish verified identity. No missing or duplicate supplied references were observed. These are transcript-support judgments only, with external truth and human adjudication open.",
+      "evidenceHashes": {
+        "inputHash": "a9b65fd0a4bb0194e5fdffb75c3bcd2cdc6834299311c4f7908de262955f8fc5",
+        "claimRecordSha256": "ac1631803b24e0bf76ed41a5572a0cc13be7adc23e7df3afac1e884bcb2d6f86",
+        "claimTextSha256": "a11ea77de492708ccda28e7d854ac911c466199c27319013b17da1c115d2b61d",
+        "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+            "textSha256": "8d87fb1765e963f37a75e4f3443efd2c2432c170ac219d17415dea902279d4f9",
+            "providedTextSha256": "8d87fb1765e963f37a75e4f3443efd2c2432c170ac219d17415dea902279d4f9",
+            "contextSha256": "3aab5c14bf7fa76fcfc4d77c33882274445b4abb72a6068f8b1ce0c0eaad5f5c",
+            "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 2396,
+            "tEnd": 2463,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t044",
+            "textSha256": "fc9aa8cfdc919c906ea7b4e853c9a0aed4060af2ca53e4215cd46f911b329d5b",
+            "providedTextSha256": "fc9aa8cfdc919c906ea7b4e853c9a0aed4060af2ca53e4215cd46f911b329d5b",
+            "contextSha256": "2f48b4fbf0ce024c6101706333980f69e930aa1bfe421ed5c319048527b45f5b",
+            "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "revision": null,
+            "speakerRef": "Kshitij",
+            "tStart": 462,
+            "tEnd": 472,
+            "sameIdContentChanged": true
+          }
+        ],
+        "hashFailures": [],
+        "identityBinding": true
+      },
+      "reviewerLabels": {
+        "original": "contradicted",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 2,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c04",
+      "inputHash": "2c6cd2b9f39ae1a18e397c89de1b97625c787f69b051030de7f5975b9aac8f58",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": "Original directly supports Italy offering more than 700 courses entirely taught in English, but never says these are degree courses. Under the full-component rule, university-study context alone does not establish the degree-course qualifier. Current New Zealand employment discussion is unrelated. Same cited IDs have changed content/timing; stored speaker labels do not establish verified identity. No missing or duplicate supplied references were observed. These are transcript-support judgments only, with external truth and human adjudication open.",
+      "evidenceHashes": {
+        "inputHash": "2c6cd2b9f39ae1a18e397c89de1b97625c787f69b051030de7f5975b9aac8f58",
+        "claimRecordSha256": "747c51ff746b2edc864ed84f52f37715dccda4b4a4cc331fb7e940a18b3aeaba",
+        "claimTextSha256": "e807b96ce0c67f5408b4b6a0d8400494f3ec569ec9b6f88ed1f93cb06378dc90",
+        "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+            "textSha256": "4c420892a94051ae0a945e478d6a0cd27002433d3ad046a6998bef2dc5c628b5",
+            "providedTextSha256": "4c420892a94051ae0a945e478d6a0cd27002433d3ad046a6998bef2dc5c628b5",
+            "contextSha256": "1c71328df2ff682a4db3ed1175ccb864f3882c9253f5b589727ffaca16e37792",
+            "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3458,
+            "tEnd": 3520,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t064",
+            "textSha256": "d764c3e77915120c77d3cda2d552df2873eac2f5e6e986d5479baab5cc423213",
+            "providedTextSha256": "d764c3e77915120c77d3cda2d552df2873eac2f5e6e986d5479baab5cc423213",
+            "contextSha256": "58b5d43140db7a0e903e924e46ffff5fefcff8986fd864ecd4c116cd66d848c3",
+            "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "revision": null,
+            "speakerRef": "Kshitij",
+            "tStart": 777,
+            "tEnd": 794,
+            "sameIdContentChanged": true
+          }
+        ],
+        "hashFailures": [],
+        "identityBinding": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": false,
+      "disagreements": [
+        {
+          "contextVersion": "originalMigration",
+          "auditorLabel": "unsupported",
+          "reviewerLabel": "entailed",
+          "reason": "Reviewer accepts university-study context for degree courses; independent audit requires direct support for the persisted degree-course qualifier."
+        }
+      ]
+    },
+    {
+      "index": 3,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c05",
+      "inputHash": "46b6cf920958c63707a8b9527fa397d52a34d72f4e040f453975238086c7c83b",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original explicitly guarantees three-year post-study visas to Bachelors/Masters completers in New Zealand and says no employer sponsorship is required, supporting open wording. The August 2026 distinction concerns residence eligibility. Current embassy-representation text is unrelated. Same cited IDs have changed content/timing; stored speaker labels do not establish verified identity. No missing or duplicate supplied references were observed. These are transcript-support judgments only, with external truth and human adjudication open.",
+      "evidenceHashes": {
+        "inputHash": "46b6cf920958c63707a8b9527fa397d52a34d72f4e040f453975238086c7c83b",
+        "claimRecordSha256": "dded45f9c925c2e0bbefef2e1a456f1df6b5fda477f9ebdc4ae122914ce2bc70",
+        "claimTextSha256": "09dcc70f458f2c94ed245fe08a44616851ead431a1fb1c2fb421dcb34fee04a1",
+        "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+            "textSha256": "b84219354c03b0bc564dd7656971283f11dfe90f4682b12fc068426fae357fca",
+            "providedTextSha256": "b84219354c03b0bc564dd7656971283f11dfe90f4682b12fc068426fae357fca",
+            "contextSha256": "aefcf96b7669ca1f21064e2ae1db170b17f4fd0ca5e3ca0f24c13045e268638e",
+            "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 1341,
+            "tEnd": 1407,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t025",
+            "textSha256": "391949147ea5065296174840f0693be2258d6b1aa985ce86515c8238b537e450",
+            "providedTextSha256": "391949147ea5065296174840f0693be2258d6b1aa985ce86515c8238b537e450",
+            "contextSha256": "b4fd06abb976e636b6eba63b48bb03171f77c22a99fa74de8740020c60e31eed",
+            "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "revision": null,
+            "speakerRef": "spk:0",
+            "tStart": 217,
+            "tEnd": 229,
+            "sameIdContentChanged": true
+          }
+        ],
+        "hashFailures": [],
+        "identityBinding": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    },
+    {
+      "index": 4,
+      "claimId": "2026-04-21-visa-blueprint-part2-italy-france-nz-c06",
+      "inputHash": "4ecaa1800af3f88167c2e7fe9a41f9c72ae25240c1a20cc8fa7f9ad1996784e7",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": "Original t072 establishes Italy educational-document/state-verification context; t083 expressly refuses SDM attestation/apostille and requires designated officers in each state. Entailment is limited to the state stamp step: t072 separately assigns the later apostille to the Ministry of External Affairs. Current admission and e-visa records are unrelated. Same cited IDs have changed content/timing; stored speaker labels do not establish verified identity. No missing or duplicate supplied references were observed. These are transcript-support judgments only, with external truth and human adjudication open.",
+      "evidenceHashes": {
+        "inputHash": "4ecaa1800af3f88167c2e7fe9a41f9c72ae25240c1a20cc8fa7f9ad1996784e7",
+        "claimRecordSha256": "c0dd6ec9839e5bacc698adb16aa111ea0a46d697d654635738a5155b84cf741b",
+        "claimTextSha256": "06c4b9fd9d40ed3c80f16e947ab41cfdea18c3b9cb537bb2ae0f65ef99fade86",
+        "sourceBindingSha256": "0c44cbc7eac6c783b4c0d6c96bd9751b2a0490993692c8ef7cfb9445604d2928",
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+            "textSha256": "d37cb0220edf00b53985544ef4aba714e6f6580e4d74b92278f20b4fc1ddd6b5",
+            "providedTextSha256": "d37cb0220edf00b53985544ef4aba714e6f6580e4d74b92278f20b4fc1ddd6b5",
+            "contextSha256": "1b3ca60df112ff45201494a6eba89f094b2ef1fafad6ba91e5a0f0773b8180ac",
+            "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 3998,
+            "tEnd": 4184,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t072",
+            "textSha256": "84dab2536a639815a71b8617229d9a8cd777f947569fda082e1e540cfb22298f",
+            "providedTextSha256": "84dab2536a639815a71b8617229d9a8cd777f947569fda082e1e540cfb22298f",
+            "contextSha256": "3e0db64bcbac27d0261f343aad3dbd9de16ddabddf7d8f141fe9a36de725619e",
+            "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "revision": null,
+            "speakerRef": "Kshitij",
+            "tStart": 916,
+            "tEnd": 938,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "originalMigration",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+            "textSha256": "671847bdc72939905a1387b925a0b2339316809d1c97e886e7273e71a2697fcd",
+            "providedTextSha256": "671847bdc72939905a1387b925a0b2339316809d1c97e886e7273e71a2697fcd",
+            "contextSha256": "8369ae5f5e0cb656f1b8a732d791057ae8d0a01db0284d1247e4cd7c267234c0",
+            "artifactSha256": "e6fa76fafc1e3d239ddd8215b3cdb048e0d8da9211f2fe3b500e80924eabf8f6",
+            "normalizedLfSha256": null,
+            "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+            "speakerRef": "unknown",
+            "tStart": 4863,
+            "tEnd": 4933,
+            "sameIdContentChanged": true
+          },
+          {
+            "contextVersion": "current",
+            "turnId": "2026-04-21-visa-blueprint-part2-italy-france-nz-t083",
+            "textSha256": "32cd87437a5383e310fec7fd786834d132ce4661c50c9442021adae45a68ec11",
+            "providedTextSha256": "32cd87437a5383e310fec7fd786834d132ce4661c50c9442021adae45a68ec11",
+            "contextSha256": "2c3d5ef3b8267b4c054358ef6eeb341e48215dcfebb8cee62b1352383c663d39",
+            "artifactSha256": "1ff60cf4d8e1ffab7610cb2e9d9d951e17b8269dd8242fc6e8c421486d77da89",
+            "normalizedLfSha256": "9af4ed1d18c8fe2591d3c696dd09a4ab06dea7d688b4464ddd20f2c9890ce4c9",
+            "revision": null,
+            "speakerRef": "spk:1",
+            "tStart": 1104,
+            "tEnd": 1110,
+            "sameIdContentChanged": true
+          }
+        ],
+        "hashFailures": [],
+        "identityBinding": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": true,
+      "disagreements": []
+    }
+  ]
+}

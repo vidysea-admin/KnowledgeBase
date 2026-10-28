@@ -1,0 +1,3 @@
+scripts/native-capture/server-watched.test.ts(36,53): error TS2352: Conversion of type '{ drain(): Promise<{ pending: number; }>; }' to type 'NativeArchiveServerService' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ drain(): Promise<{ pending: number; }>; }' is missing the following properties from type 'NativeArchiveServerService': onIndexCommitted, sealCapture
+scripts/watched-sources/supervisor.ts(1,37): error TS7016: Could not find a declaration file for module '../webinar/scheduler/service.mjs'. 'C:/Users/product/Desktop/KnowledgeBase/scripts/webinar/scheduler/service.mjs' implicitly has an 'any' type.

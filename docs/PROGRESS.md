@@ -2,8 +2,8 @@
      Edit .goal/catalogue.json (probes / manual downgrades), then re-run. -->
 # Progress — what actually exists
 
-**28.1% of the 57-feature product catalogue.**
-Machine-derived alone: 39.5%. Scoring: REAL=1, PARTIAL=0.5, STUB=0, MISSING=0.
+**29.8% of the 57-feature product catalogue.**
+Machine-derived alone: 41.2%. Scoring: REAL=1, PARTIAL=0.5, STUB=0, MISSING=0.
 
 Denominator pinned to plan §4c (57 features; dropping one fails the run). Probe fingerprint `9d285be83601` —
 if that changes, a probe or a human downgrade was edited (the hash covers both) and the score is not comparable to the previous run.
@@ -15,7 +15,7 @@ Collection counts from `qa/evidence/live-2026-09-08-11-06-33/preflight.json` (ru
 
 | group | | score | REAL | PARTIAL | STUB | MISSING |
 |---|---|---|---|---|---|---|
-| **A. LEARN — ingestion** | `██████░░░░░░░░░░░░░░` | 30.8% | 2 | 4 | 1 | 6 |
+| **A. LEARN — ingestion** | `████████░░░░░░░░░░░░` | 38.5% | 3 | 4 | 1 | 5 |
 | **B. REMEMBER — knowledge model** | `████████░░░░░░░░░░░░` | 42.3% | 4 | 3 | 0 | 6 |
 | **C. REASON — ask & answer** | `██████░░░░░░░░░░░░░░` | 28.6% | 2 | 4 | 0 | 8 |
 | **D. IMPROVE — the living loop** | `████░░░░░░░░░░░░░░░░` | 18.8% | 0 | 3 | 0 | 5 |
@@ -28,7 +28,7 @@ Collection counts from `qa/evidence/live-2026-09-08-11-06-33/preflight.json` (ru
 |---|---|---|---|
 | A1 | Ingestion Hub (upload + metadata + consent + 5-step status) | **PARTIAL** _(auto: REAL, lowered)_ | route POST /ingest; page /ingest |
 | A2 | Transcription pipeline (diarize + timestamps + name-map) | **REAL** | collection sessions (26 docs); collection turns (2118 docs) |
-| A3 | Transcript Review & Speaker Mapping UI | **MISSING** | page /transcript-review (absent) |
+| A3 | Transcript Review & Speaker Mapping UI | **REAL** | page /transcript-review |
 | A4 | Sessions Library (filters, coverage %) | **PARTIAL** _(auto: REAL, lowered)_ | route GET /sessions; page /sessions |
 | A5 | Missing Recording Workflow (request, SLA, reminders) | **MISSING** | collection gaps (empty) |
 | A6 | Document/PDF/XLSX ingestion with page-level evidence | **PARTIAL** _(auto: REAL, lowered)_ | collection sources (26 docs) |

@@ -1,0 +1,13 @@
+✔ watched snapshot validation binds exact Unicode bytes, provenance and legacy media identity (5.2806ms)
+✔ durable snapshot reopens, consumes exact guarded bytes without refetch and publishes once (87.6967ms)
+✔ tampering, foreign/current-source mismatch and stale previous hash refuse before ingest (35.393ms)
+✔ partial index, missing physical proof and revoked actor never advance watched health (171.3256ms)
+✔ reachable durable watched route queues one guarded snapshot and requires authenticated ingestion (47.5424ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1577.9429

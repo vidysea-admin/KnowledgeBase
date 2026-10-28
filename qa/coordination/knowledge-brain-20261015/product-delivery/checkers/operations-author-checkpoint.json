@@ -1,0 +1,30 @@
+{
+  "status": "AUTHOR_ONLY_BROKER_QUEUE_WAIT",
+  "unit": "product-operations-evaluation",
+  "cycle": 0,
+  "candidate_sha": "2e566870a470392da307395afd070bfe31d3668e983953995444cf466e25de13",
+  "gateResultPath": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/product-operations-evaluation-actual-author-result.json",
+  "actualActive_s": 0.026,
+  "actualTokens": null,
+  "cost": null,
+  "tokenBaselineActualTotal": 477854,
+  "tokenPhaseLimitAdditionalActual": 100000,
+  "outputAllocation": 1200,
+  "reserve": "100000 ACTUAL/30s/800 OUTPUT untouched",
+  "priorDebit": "40s1000 OUTPUT preserved separately",
+  "probe": {
+    "unit": "product-operations-evaluation",
+    "cycle": 0,
+    "path": "C:/Users/product/Desktop/KnowledgeBase/apps/web/src/__checker_probes__/evaluation-child-lineage.test.tsx",
+    "sha256": "184a06fe208f0f93224b0bab7d87f6b0b587778840f4bb3d50df84369336bf8a",
+    "harnessSource": "C:/Users/product/Desktop/KnowledgeBase/apps/web/src/pages/operations/EvaluationFlywheelPanel.test.tsx",
+    "harnessSourceSha256": "f098890d6d46e8bfb9bdc13a2df5d15cd74550bc2f8cc6249ac4b99d1cdcaa52",
+    "command": "pnpm --filter @lkb/web exec vitest run src/__checker_probes__/evaluation-child-lineage.test.tsx -t \"checker rejects same-gap changed-question child without evidence or refresh\"",
+    "filter": "checker rejects same-gap changed-question child without evidence or refresh",
+    "expectedCases": 1,
+    "authority": "Exclusive new checker probe lease; author-only readiness exception; no production or pinned maker edit.",
+    "requiredEvidence": "Own exit, full stdout/stderr, per-file/named-case attribution, runtime/environment and before/after source hashes",
+    "priorExisting": false
+  },
+  "verdict": null
+}

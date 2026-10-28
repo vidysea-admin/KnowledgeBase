@@ -174,3 +174,5 @@ survive, so I am not leaning on it twice.
 *named* assertion, not an incidental crash) and the `tagClaims:false` branch. The C6 amendment's
 provenance under D-022 was checked and found sound — logged with date, class, reason and a verdict
 cite, and **committed** rather than left as a working-tree edit.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

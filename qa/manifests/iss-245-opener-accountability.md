@@ -28,3 +28,5 @@ from a fake REAL. Filed as ISS-256 (high), fixed + verified.
 - `import('scripts/demo-live.mjs')` is side-effect-free (imports PAGES/openPages/printChecklist).
 - `node scripts/demo-live.mjs --up` / demo:live path unchanged for the operator.
 - catalogue-cli: 13/13 after the ISS-256 restore.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -57,3 +57,5 @@ approval question in the live-browser trust-check session (recorded as what actu
 Runs must still use the explicit work database (`MONGO_WORK_DB`); production/default Mongo stays
 read-only. The T-021 semantic leg is unblocked but remains queued for the maker/eval flow, not run
 in this trust-check session.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-21 — **A (both)**. Umesh approved both bounded payloads — the U3.1 live-browser

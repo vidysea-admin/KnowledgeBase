@@ -1,0 +1,17 @@
+import {readFileSync,writeFileSync,existsSync,readdirSync,unlinkSync} from 'node:fs';
+import {createHash} from 'node:crypto';import {spawnSync} from 'node:child_process';import {resolve} from 'node:path';
+const hash=b=>createHash('sha256').update(b).digest('hex'),h=p=>hash(readFileSync(p)),stage='qa/coordination/knowledge-brain-20261015/final-canonical-batch';
+const inputs=JSON.parse(readFileSync(stage+'/source-candidate.json','utf8')).hashes;
+const script=stage+'/generate-targets.mjs';inputs.push({path:script,sha256:h(script)});
+for(const p of inputs)if(h(p.path)!==p.sha256.toLowerCase())throw Error('Frozen codegen input drift:'+p.path);
+const outputs=['speaker_attributes','tree_index'].map(n=>'packages/core/src/generated/'+n+'.ts');
+const before=Object.fromEntries(outputs.map(p=>[p,existsSync(p)?{exists:true,sha256:h(p),bytes:readFileSync(p).length}:{exists:false,sha256:null}]));
+const backups=new Map(outputs.map(p=>[p,existsSync(p)?readFileSync(p):null]));for(const [p,b]of backups)if(b)writeFileSync(stage+'/'+p.split('/').at(-1)+'.before-bytes',b);
+const inventory=()=>Object.fromEntries(readdirSync('packages/core/src/generated').filter(n=>n.endsWith('.ts')).map(n=>['packages/core/src/generated/'+n,h('packages/core/src/generated/'+n)]));
+const allBefore=inventory(),startedAt=new Date().toISOString(),start=performance.now();let child,success=false,unexpected=[],stable=false,after;
+try{child=spawnSync(process.execPath,[script],{cwd:process.cwd(),encoding:'utf8',timeout:30000,windowsHide:true,maxBuffer:1048576});
+const allAfter=inventory();unexpected=[...new Set([...Object.keys(allBefore),...Object.keys(allAfter)])].filter(p=>!outputs.includes(p)&&allBefore[p]!==allAfter[p]);stable=inputs.every(p=>h(p.path)===p.sha256.toLowerCase());
+after=Object.fromEntries(outputs.map(p=>[p,existsSync(p)?{exists:true,sha256:h(p),bytes:readFileSync(p).length}:{exists:false,sha256:null}]));success=child.status===0&&!child.error&&unexpected.length===0&&stable&&outputs.every(p=>after[p].exists);
+}finally{if(!success){for(const[p,b]of backups){if(b)writeFileSync(p,b);else if(existsSync(p))unlinkSync(p);}for(const[p,b]of backups)if(b?!readFileSync(p).equals(b):existsSync(p))throw Error('Own output rollback mismatch:'+p);}}
+const elapsedMs=performance.now()-start;writeFileSync(stage+'/generation.stdout.txt',child?.stdout??'');writeFileSync(stage+'/generation.stderr.txt',child?.stderr??'');
+const receipt={kind:'APPROVED_TWO_SOURCE_OUTPUT_MATERIALIZATION_NOT_TEST',startedAt,completedAt:new Date().toISOString(),elapsedMs,command:[process.execPath,script],runtime:process.version,runtimeSha256:h(process.execPath),root:process.cwd(),lockHash:h('pnpm-lock.yaml'),inputs,before,after,unexpectedGeneratedWrites:unexpected,inputsStable:stable,exitCode:child?.status??null,error:child?.error?.code??null,signal:child?.signal??null,success,ownOutputsRestoredOnFailure:!success,onlyAllowedSourceOutputs:outputs,environmentWhitelistHashes:Object.fromEntries(['NODE_ENV','NODE_OPTIONS','TEMP','TMP'].map(k=>[k,process.env[k]===undefined?null:hash(process.env[k])]))};writeFileSync(stage+'/generation-receipt.json',JSON.stringify(receipt,null,2));console.log(JSON.stringify({receipt:stage+'/generation-receipt.json',exitCode:receipt.exitCode,error:receipt.error,success,elapsedMs,unexpectedWrites:unexpected,outputs:after}));process.exitCode=success?0:1;

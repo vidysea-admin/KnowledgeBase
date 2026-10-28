@@ -1,0 +1,324 @@
+{
+  "schemaVersion": 1,
+  "reviewType": "AI-preliminary-independent-audit",
+  "humanAdjudication": null,
+  "batch": 10,
+  "entries": [
+    {
+      "index": 50,
+      "claimId": "2026-07-30-in-focus-3-c03",
+      "inputHash": "ad3ae59c157bd06448602b634500e84cf84502312b2c933598901f123c059055",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": {
+        "original": "The literal historical record asserts New Zealand bachelor students receive a guaranteed three-year PSW with no ifs and buts and no employer requirement. Graduate status is implicit in post-study. This is transcript support only, not verified visa eligibility.",
+        "current": "Same-ID current text concerns InFocus monthly applications and two applicants, supporting no visa component. Speaker/timing changed from unknown 2784-2818 to spk:2 3491-3509."
+      },
+      "evidenceHashes": {
+        "claimRecordSha256": "47dff08059cecaa4e30f600b1a15a63a40371d36ac257bfa17d4ddb5497f6d02",
+        "claimTextSha256": "7aa52111f8f348d1a626c08cb23b8c041ace4dc0cc6c333b35c777d07350dc8c",
+        "sourceBindingSha256": "76c872af4bdb4bd59a9e209447c03fa8a3abe729cdfa76da42539af4531cb717",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationIntegrity": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-07-30-in-focus-3",
+            "turnId": "2026-07-30-in-focus-3-t094",
+            "textSha256": "e83ae7180505e3c7b5ccc66c41c9a594041aa5675457a3ad7e98c0195742f229",
+            "contextSha256": "b95f5c077f3a0b98b7cea8847b815fdd51984c2409414ff5ea0d3c1dd9b9288e",
+            "textHashVerified": true,
+            "artifactSha256Provided": "e6c6449ba49f9ca5c2bd212667b7ce01a6339e744877c89f07e01333204a7da7",
+            "normalizedLfSha256Provided": null,
+            "revisionProvided": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-07-30-in-focus-3",
+            "turnId": "2026-07-30-in-focus-3-t094",
+            "textSha256": "f75b448a80f8de5541b5720cf0d0b95864a74a38044651e6132d9f3e7f99ae18",
+            "contextSha256": "b390f91f7a64e7fc6ce060d07515f20a3e4fb6cf95a77a52fb5ba02ac48c52be",
+            "textHashVerified": true,
+            "artifactSha256Provided": "ba7eb5554cd2fd310b840c73fa43b590028e5fe9d043556bea284e9b3f064ef6",
+            "normalizedLfSha256Provided": "8a4db7b7e7a037566ac52371425f6c57ab973642006a0737fe3bbc1e298ff407",
+            "revisionProvided": null
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 51,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c01",
+      "inputHash": "64a43d8c6104947a8e4457e5c2ee9520ced06f6f4119f81c21372b99701b64df",
+      "originalLabel": "unsupported",
+      "currentLabel": "unsupported",
+      "reason": {
+        "original": "2005 outbound count 131,000 and 2025 count 1.3 million over twenty years are supported; over 1.3 million is not. The text describes students leaving, not separately established stock abroad.",
+        "current": "Both current same-ID records are unrelated financing/compliance questions. Timings changed t013 288-330 to 1967-2013 and t015 358-375 to 2261-2311; original cannot substitute for current."
+      },
+      "evidenceHashes": {
+        "claimRecordSha256": "e02d8d29b2a78e9c3589ed83f27a7ae95e3f567048522839aa9d70971a92e9ff",
+        "claimTextSha256": "b77a1e75cf831650e59af8238cbdc5bd299e7e7b29e5004281df3ea3400bbcd0",
+        "sourceBindingSha256": "77f02df30aa6adcd97561f35f5669619e69c969f7e113042d3d89280fbcadc9a",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationIntegrity": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t013",
+            "textSha256": "e7952fbf898e641152447d1109f641ea36b1c83d0e50e589cc9fb970d6d6b283",
+            "contextSha256": "0fd815dab11fccad74ddbc8d8267d845ba82a51613d838354a5b34c82042b3cc",
+            "textHashVerified": true,
+            "artifactSha256Provided": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+            "normalizedLfSha256Provided": null,
+            "revisionProvided": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t013",
+            "textSha256": "d8553c8358b65c2110dc0b12547e3de3e5b6c0935edc424dd4e793dd304832fa",
+            "contextSha256": "66747fdacc32631ea7d0d69d034f655d89fcdab507dfebb98dcd444e877d47f1",
+            "textHashVerified": true,
+            "artifactSha256Provided": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+            "normalizedLfSha256Provided": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+            "revisionProvided": null
+          },
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t015",
+            "textSha256": "fd6de0ccc3c3833937450518d7866dac3da4eaf27e38276d508f447c8b4fa2a3",
+            "contextSha256": "9360e158d284d11bf1754551045c48da32d1a667f3674d53b32df2889b0dc725",
+            "textHashVerified": true,
+            "artifactSha256Provided": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+            "normalizedLfSha256Provided": null,
+            "revisionProvided": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t015",
+            "textSha256": "c78d1040d1dbe8ded7df553eb3d6b696c1798606f4db8c462902da6cb78020a2",
+            "contextSha256": "4d669d21d5db5975ade777f2bd417cfb8a430dea58f23622b5f57d5938f67982",
+            "textHashVerified": true,
+            "artifactSha256Provided": "775d6c096919385191ab8362ea7709a225b45e0b0268664d07bea015d7e1deaa",
+            "normalizedLfSha256Provided": "990ba09970e0b2f55fbf1ec3bf9cf20f6497d21a1d5f058f2a2a09d8fb773666",
+            "revisionProvided": null
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": true
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 52,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-c02",
+      "inputHash": "695810f1f6877592198816d65e4a93eba1c36d7ff319806e34e60b45d225f29a",
+      "originalLabel": "unsupported",
+      "currentLabel": "unresolvable",
+      "reason": {
+        "original": "Exeter onboarding Enroly CAS Shield for CAS and visa processing is supported; additional admissions/enrollment checks are generic and do not establish pre-CAS timing, financial or credibility checks.",
+        "current": "The sole current t061 reference is turn-absent with zero matches; necessary cited context is unavailable."
+      },
+      "evidenceHashes": {
+        "claimRecordSha256": "65c68bb531eba029bcb9d48bee247162df218832b4b63d32004671d30dc81682",
+        "claimTextSha256": "f7f7b189f3b8a1a646fff3095bdbe5031f8412b35049caae12f8f4419e6405b5",
+        "sourceBindingSha256": "77f02df30aa6adcd97561f35f5669619e69c969f7e113042d3d89280fbcadc9a",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationIntegrity": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-t061",
+            "textSha256": "40659e544b2819e5775e65820d46e3d82e8facfdb496325a8aea6ad0014ed772",
+            "contextSha256": "4007a55463ede7f1cd034c006b9ffec497dbdff42518ad213dbac7c340931570",
+            "textHashVerified": true,
+            "artifactSha256Provided": "5bb9aca4b53d64656b2b0515d9485424d042a099ce5fad916b8b6a69fa4d1d14",
+            "normalizedLfSha256Provided": null,
+            "revisionProvided": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": false
+      },
+      "reviewerLabels": {
+        "original": "unsupported",
+        "current": "unresolvable"
+      },
+      "agreement": {
+        "original": true,
+        "current": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 53,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c01",
+      "inputHash": "31fd5c015ef1fd9ccdfb88fcec482f8fe026fa242b485345a77d57adaedafe75",
+      "originalLabel": "entailed",
+      "currentLabel": "entailed",
+      "reason": {
+        "original": "Historical t002 explicitly attributes 131,000 in 2005 and 1.3 million in 2025 over twenty years to Ministry figures, supporting the claimed over-a-million recording summary. It describes departures and does not separately establish a stock of students abroad.",
+        "current": "Current t002 preserves the counts, years, growth interval and Ministry attribution. Source expressly lacks 2026 statistics. Same-ID text changed and start changed 204 to 202, ending 606. Figures are recording assertions only."
+      },
+      "evidenceHashes": {
+        "claimRecordSha256": "702f8513f491c1d255150b4ed220998b0bda4070eabc70087c31867137fbfdb3",
+        "claimTextSha256": "932b2385cc163b5940071b8a2310dd920c00d5adb12868baa1c51b495bacb419",
+        "sourceBindingSha256": "849a215b68acbbf36043cb5edd173fe24f7c7014998faf879a90bd2f19a43c0e",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationIntegrity": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+            "textSha256": "674430662ebdbffcb3f5c16a6d00018ff7b5ec3cc2bbdeb80f07a5d735b3d4a2",
+            "contextSha256": "bfc8d911003b637a425b7afe394092cfae673819c77b2ec82a8f01a9585e408e",
+            "textHashVerified": true,
+            "artifactSha256Provided": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+            "normalizedLfSha256Provided": null,
+            "revisionProvided": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t002",
+            "textSha256": "cd6d27685f8c9b11eb7e428490a766f32c68771a3df8b712aae004fc29916876",
+            "contextSha256": "af55f17c66127efcd6c028df22f74f3b4cd5f7c23dc36935f1cdae0fc79b7d99",
+            "textHashVerified": true,
+            "artifactSha256Provided": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+            "normalizedLfSha256Provided": "d3929dbaa1aca0e909f66570924310c04b5cff0befc5b6a2fb4516081af8eeb9",
+            "revisionProvided": null
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "entailed"
+      },
+      "agreement": {
+        "original": true,
+        "current": true
+      },
+      "disagreements": []
+    },
+    {
+      "index": 54,
+      "claimId": "2026-08-03-uk-beyond-offer-letters-reupload-c02",
+      "inputHash": "22fcc06d3a65d15418a02290bff9ff814c70c0932ca67972c0d4d76124a3a268",
+      "originalLabel": "entailed",
+      "currentLabel": "unsupported",
+      "reason": {
+        "original": "Literal historical prefix names Wai Wah Tsang, followed by accepted-university-offer gym analogy and outcomes depending on equipment use/effort. Stored speakerRef unknown means attribution is only transcript-level.",
+        "current": "Analogy and dependence on effort remain supported, but claimed Wai Wah Tsang attribution is absent and stored speakerRef is Y.Y. Song. No equivalence can be inferred. Same-ID text and ending changed 1177 to 1176."
+      },
+      "evidenceHashes": {
+        "claimRecordSha256": "db3526f712e5094bb0ba97fa8be099aa625b1ce4ef34fac1bc45ddeddb89876f",
+        "claimTextSha256": "22e61413821ca586ff169fb0bfe266302691cb40c200a2c0a68665a5b53c698e",
+        "sourceBindingSha256": "849a215b68acbbf36043cb5edd173fe24f7c7014998faf879a90bd2f19a43c0e",
+        "checks": {
+          "inputHash": true,
+          "claimRecordHash": true,
+          "claimTextHash": true,
+          "sourceBindingHash": true,
+          "identityBinding": true,
+          "contextTextHashes": true,
+          "reviewerInputHash": true,
+          "reviewerCitationIntegrity": true
+        },
+        "contexts": [
+          {
+            "contextVersion": "originalMigration",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+            "textSha256": "5dd7c5ab14d9aae19b21b43f3f5c9108b5ef826ad8f371d06f4e41c1a9f53668",
+            "contextSha256": "036b3bdd6fd259aeb7a7288c3bcf9a51059f4d5a6b2d147afa14d2e2bf19d381",
+            "textHashVerified": true,
+            "artifactSha256Provided": "e308ee4a56c1724b6844dbb407cef4ad6e9b1c22834992b2a5a12f1f00e147d6",
+            "normalizedLfSha256Provided": null,
+            "revisionProvided": "907c9c9434f474622181bbc179f6ac90d75853b9"
+          },
+          {
+            "contextVersion": "current",
+            "sessionId": "2026-08-03-uk-beyond-offer-letters-reupload",
+            "turnId": "2026-08-03-uk-beyond-offer-letters-reupload-t004",
+            "textSha256": "37c10c900b92ebcc701620c9aa7f201ce0cc66ae723ba1277ff75c0be6f4bc96",
+            "contextSha256": "79d72f8263c56d254883a5f18a0f6e4eb766f32868ede6cd6f2eaf5fdc1dbaf7",
+            "textHashVerified": true,
+            "artifactSha256Provided": "20edaf5a5efed3a6a1d24da6e55861ae0c51a6f5740db1cdcb2059a6541078e2",
+            "normalizedLfSha256Provided": "d3929dbaa1aca0e909f66570924310c04b5cff0befc5b6a2fb4516081af8eeb9",
+            "revisionProvided": null
+          }
+        ],
+        "artifactByteVerification": "not-performed-provided-context-only",
+        "sameIdContentChanged": true
+      },
+      "reviewerLabels": {
+        "original": "entailed",
+        "current": "unsupported"
+      },
+      "agreement": {
+        "original": true,
+        "current": true
+      },
+      "disagreements": []
+    }
+  ]
+}

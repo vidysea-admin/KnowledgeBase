@@ -10,28 +10,16 @@
  *  - the router's verdict / insufficient-coverage state is surfaced, so an answer the system
  *    itself judged weakly-covered does not read as a confident one.
  */
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext.js";
-import { ask } from "../api/ask.js";
-import { ApiError } from "../api/client.js";
-import type { AskResponse, AskInternalSource } from "../api/types.js";
+import { useAskHandoff } from "./search/AskHandoff.js";
+import { safeHttpUrl } from "../safe-url.js";
+import type { AskInternalSource } from "../api/types.js";
+import { AiUsageSummary } from "../components/AiUsageSummary.js";
+import { NativeEvidence } from "../components/NativeEvidence.js";
+import { parseNativeSourceLocator, type NativeSourceLocator } from "../api/nativeEvidence.js";
 
-/**
- * Web sources come from an external search provider and `WebSource` is an open index-signature
- * type (`packages/ask/src/router.ts`), so `url` is attacker-influenceable text, not a checked
- * URL. Only http(s) may become an `href` — a `javascript:` or `data:` URI in a citation would
- * otherwise execute on click. Anything else renders as inert text, never as a dead or unsafe link.
- */
-function safeHttpUrl(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const parsed = new URL(value);
-    return parsed.protocol === "http:" || parsed.protocol === "https:" ? value : null;
-  } catch {
-    return null; // not an absolute URL at all
-  }
-}
+// Web-source `url` comes from an external search provider (open index-signature `WebSource`), so
+// it is attacker-influenceable text: only http(s) may become an `href` (see ../safe-url.ts).
 
 /** The tree stores a session id on each node's evidence; that is what makes a citation clickable. */
 function sessionRefOf(source: AskInternalSource): string | null {
@@ -39,28 +27,48 @@ function sessionRefOf(source: AskInternalSource): string | null {
   return typeof ref === "string" && ref !== "" ? ref : null;
 }
 
-export function AskPage(): React.ReactElement {
-  const { apiKey } = useAuth();
-  const [query, setQuery] = useState("");
-  const [result, setResult] = useState<AskResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  function handleSubmit(event: React.FormEvent): void {
-    event.preventDefault();
-    const trimmed = query.trim();
-    if (trimmed === "" || loading) return;
-    setLoading(true);
-    setError(null);
-    setResult(null);
-    ask(apiKey, trimmed)
-      .then((res) => setResult(res))
-      .catch((err: unknown) => setError(err instanceof ApiError ? err.message : "failed to ask"))
-      .finally(() => setLoading(false));
+function nativeLocators(source: AskInternalSource): NativeSourceLocator[] {
+  const raw = source.evidence?.sourceQuotes;
+  const candidates = [source.evidence?.sourceLocator, ...(Array.isArray(raw) ? raw.map(q =>
+    q && typeof q === "object" ? (q as Record<string, unknown>).sourceLocator : null) : [])];
+  const unique = new Map<string, NativeSourceLocator>();
+  for (const candidate of candidates) {
+    const parsed = parseNativeSourceLocator(candidate);
+    if (parsed) unique.set(JSON.stringify(parsed), parsed);
   }
+  return [...unique.values()];
+}
+function hasNativeCitation(source: AskInternalSource): boolean {
+  const evidence = source.evidence, quotes = evidence?.sourceQuotes;
+  const native = (value: unknown) => value !== undefined && !(value && typeof value === "object" && (value as Record<string, unknown>).kind === "transcript");
+  return native(evidence?.sourceLocator) || Array.isArray(quotes) && quotes.some(q => q && typeof q === "object"
+    && (native((q as Record<string, unknown>).sourceLocator) || ["document-page", "message"].includes(String((q as Record<string, unknown>).origin))));
+}
+
+interface QuoteCitation { id: string; turnId: string; speakerRef: string; tStart: number; tEnd: number; quote: string; origin: string }
+function quoteCitations(source: AskInternalSource): QuoteCitation[] {
+  const quotes = source.evidence?.sourceQuotes;
+  if (!Array.isArray(quotes)) return [];
+  return quotes.filter((q): q is QuoteCitation => q !== null && typeof q === "object"
+    && typeof q.id === "string" && typeof q.turnId === "string" && q.turnId.length > 0
+    && typeof q.speakerRef === "string" && typeof q.quote === "string"
+    && typeof q.origin === "string" && Number.isFinite(q.tStart) && Number.isFinite(q.tEnd));
+}
+
+export function AskPage(): React.ReactElement {
+  const { query, setQuery, result, error, loading, handleSubmit } = useAskHandoff();
 
   const internal = result?.sources.internal ?? [];
+  const excluded = typeof result?.excludedSessions === "number" && result.excludedSessions > 0 ? result.excludedSessions : 0;
+  const removed = typeof result?.removedSentences === "number" && result.removedSentences > 0 ? result.removedSentences : 0;
   const web = result?.sources.web ?? [];
+  // ISS-274: the seam is now wired unconditionally (apps/api/src/production.ts), so
+  // `web_used: false` no longer means "no fallback was configured" -- it can also mean "the
+  // fallback was reached and honestly failed" (e.g. no GEMINI_API_KEY yet). ask-v2.ts logs that
+  // case as an `ask.web_fallback_unavailable` audit entry; without checking for it here, this
+  // page would keep telling the person "no web fallback is configured" even once one is wired,
+  // which is the exact "far from the DOM" UI regression this unit was told to watch for.
+  const webFallbackUnavailable = result?.auditLog.some((e) => e.step.startsWith("web_fallback_unavailable")) ?? false;
 
   return (
     <>
@@ -95,10 +103,25 @@ export function AskPage(): React.ReactElement {
           <div className="card">
             <div className="section-title">Answer</div>
             <p style={{ whiteSpace: "pre-wrap" }}>{result.answer}</p>
+            {removed > 0 && (
+              <div className="empty-note" data-testid="ask-removed-note">
+                {removed} unsupported {removed === 1 ? "sentence was" : "sentences were"} removed from this answer.
+              </div>
+            )}
+            <AiUsageSummary entries={result.auditLog} />
             {result.insufficient_coverage && (
               <div className="empty-note">
                 The router judged internal coverage insufficient for this question
-                {result.web_used ? " and fell back to the web." : "; no web fallback is configured."}
+                {result.web_used
+                  ? " and fell back to the web."
+                  : webFallbackUnavailable
+                    ? "; the web fallback was reached but is currently unavailable."
+                    : "; no web fallback is configured."}
+              </div>
+            )}
+            {excluded > 0 && (
+              <div className="empty-note" data-testid="ask-excluded-note">
+                {excluded} {excluded === 1 ? "session" : "sessions"} not yet indexed and excluded from answers
               </div>
             )}
             <div className="row-meta">
@@ -112,6 +135,13 @@ export function AskPage(): React.ReactElement {
             {internal.length === 0 && <div className="empty-note">None.</div>}
             <ul style={{ paddingLeft: "1.1rem", margin: 0 }}>
               {internal.map((source) => {
+                if (hasNativeCitation(source)) {
+                  const locators = nativeLocators(source);
+                  return <li key={source.node_id}><span>{source.node_id}</span>
+                    {locators.map(locator => <NativeEvidence key={JSON.stringify(locator)} sourceLocator={locator} />)}
+                    {!locators.length && <p>This source passage is unavailable.</p>}
+                  </li>;
+                }
                 const ref = sessionRefOf(source);
                 return (
                   <li key={source.node_id} style={{ marginBottom: "0.35rem" }}>
@@ -120,6 +150,13 @@ export function AskPage(): React.ReactElement {
                     ) : (
                       <span>{source.node_id}</span>
                     )}
+                    {ref && quoteCitations(source).map((q) => <div key={q.id}>
+                      <Link to={`/sessions/${encodeURIComponent(ref)}#turn-${encodeURIComponent(q.turnId)}`}>
+                        {q.speakerRef} · {q.tStart}–{q.tEnd}s
+                      </Link>
+                      <blockquote>{q.quote}</blockquote>
+                      <small>{q.origin === "speech" ? "Source statement; speaker label preserved" : q.origin}</small>
+                    </div>)}
                   </li>
                 );
               })}

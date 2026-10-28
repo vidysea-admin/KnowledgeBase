@@ -1,0 +1,11 @@
+✔ tree_index upsert: B's indexSession cannot overwrite A's colliding root; B gets its OWN stamped root (36.6496ms)
+✔ WhatsApp sources/sessions replaceOne and turns bulkWrite: B cannot overwrite A's rows that share B's exact ids (2.852ms)
+✔ WhatsApp legacy fallback read is tenant-scoped: A's legacy bare-hash source is not adopted by B (1.9978ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1186.2532

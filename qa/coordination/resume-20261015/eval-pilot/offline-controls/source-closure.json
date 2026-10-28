@@ -1,0 +1,53 @@
+{
+  "format": "offline-control-source-closure-v1",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "preparedAt": "2026-10-15T23:33:09.574Z",
+  "commit": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "commitMeaning": "Read-only .git/HEAD and loose-ref observation; uncommitted exact source hashes authoritative",
+  "sourcePair": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+  "files": [
+    {
+      "path": "scripts/eval/vectorless-production-eval.mjs",
+      "sha256": "c877644c102b4ea666ac2cfbcf6f15560144f2f41094c90d3e30bd930e0c118f"
+    },
+    {
+      "path": "scripts/eval/vectorless-production-eval.test.mjs",
+      "sha256": "3fe4d4cc5b8e3a9174bb64e5d45dcdf139ebd482e67d6c301c78975bec1a9ab9"
+    },
+    {
+      "path": "packages/index/src/search/lexical.ts",
+      "sha256": "c057af4895ab28f247a02c981c78aa28532006a184edb67d8e6e99f7202fe6c0"
+    },
+    {
+      "path": "packages/index/src/eval/baseline.ts",
+      "sha256": "958f9f9185d66aaf2909fb83f883c83c6e150207bcb5de94b4e946b114c67525"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd"
+    },
+    {
+      "path": "package.json",
+      "sha256": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778"
+    },
+    {
+      "path": "scripts/qa/scoped-check-runner.py",
+      "sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls/adapter.mjs",
+      "sha256": "6b7b494aeb63e4cbdea06bed8eebfaceacf47bf9cfe30e3528b0b70cf92a55bd"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls/watchdog.py",
+      "sha256": "a83daaae16c0577e6a3f2773cf87fa3ec2988e1b225911ee819bdf8d0b4ae6a9"
+    }
+  ],
+  "approvedDataPins": 119,
+  "sourceWriterClosure": {
+    "evaluatorPair": "root-authorized preflight-cycle2 source-frozen; must remain exact through brokerrun",
+    "lexicalAndBlind": "Read-only direct existing exports; this lane owns no write lease; no source edits requested",
+    "sharedChanges": "Any pinned-file drift or raw approved input drift refuses before control computation; no whole-checkout freeze claimed"
+  },
+  "globalNetworkControlClaim": false
+}

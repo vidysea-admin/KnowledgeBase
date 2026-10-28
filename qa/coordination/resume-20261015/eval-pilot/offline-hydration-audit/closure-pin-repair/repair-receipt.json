@@ -1,0 +1,38 @@
+{
+  "format": "hydration-static-closure-repair-v1",
+  "preparedAt": "2026-10-16T02:16:56.260Z",
+  "status": "READY_FOR_ROOT_ADMISSION",
+  "baseHead": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "originalPinsSha256": "4a51ef591b9875bbfd310902d0cea9a727b8f204489824ebba5daefab59fba7d",
+  "originalRequestSha256": "cb3faa8327c0ec0d40689c005afb7330d623d6ece1172866184d806caca9af98",
+  "currentPinsSha256": "8f516190f02a6353da7680d204e0c72ec13311fce423970b3a9e80d63d32e86c",
+  "currentRequestSha256": "e1403c9208030761330977ef27f14d2e83a76b91ef76cfec0c84073df8bcf0b7",
+  "schemaBinding": {
+    "path": "schema/whatsapp_candidates.schema.json",
+    "sha256": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16"
+  },
+  "closure": {
+    "owner": "/root/resume_cpu_broker",
+    "reportPath": "qa/coordination/resume-20261015/broker/hydration-static-binding-report.json",
+    "reportSha256": "3aac116018c1ceda6c8ef17186b355dbe78a8ab8a61f71636ccb67a9f0ddbc1e",
+    "closurePath": "C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/broker/pin-manifests/b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48.json",
+    "closureSha256": "b8259186597e3eeca8a98d6fc26db749db3423586b6dc2913561833d56396b48",
+    "closureCount": 208,
+    "missingBindingCountBeforeRepair": 1,
+    "byteDriftCount": 0,
+    "unsupportedStaticPackageSpecifiers": [],
+    "reason": "Previous inventory omitted a statically imported schema; actual bytes unchanged. Sole CPU broker208file closure selected;202file report preserved separately, not unioned.",
+    "computedAndExternalImportsCompleteClaim": false
+  },
+  "sourcePair": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "corpusSha256": "c8b1b1b8642110e744bcfc2cc091024d226dc9fed5c963d4a74a3e568aa6f846",
+  "dataPinCount": 119,
+  "adapterSourceSha256": "8a236481011fad43fd570583cb2d1d16f641eae30cacd1f7adac8bdc68b534a8",
+  "adapterUnchanged": true,
+  "productionAndDataEdits": false,
+  "priorHoldOverwritten": false,
+  "priorExecutionCountersPreserved": true,
+  "newAuditExecutionAuthorized": false,
+  "approvedPaidGrantState": "unchanged-awaiting-human",
+  "soleExecutionOwner": "/root/resume_cpu_broker"
+}

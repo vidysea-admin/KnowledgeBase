@@ -86,3 +86,5 @@ On A or C it becomes a normal unit for whoever next touches the lane tooling.
 ---
 
 **Answered:** 2026-09-25 — **D** — disclosure + targeted block. Answered by Umesh in session (AskUserQuestion, 2026-09-25). Every unit that writes carries a Shared-data disclosure section; a live write is blocked only when it touches a collection another in-flight unit is being judged against. Next: the checker encodes both halves as contract criteria.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-25 — **D** — disclosure + targeted block. Answered by Umesh in session (AskUserQuestion, 2026-09-25). 

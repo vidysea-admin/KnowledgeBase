@@ -1,0 +1,8 @@
+{
+  "receipt": "verification-message-lifecycle-three.json",
+  "intendedRemaining": 3,
+  "actualTotalPassed": 4,
+  "actualPositiveAlsoSelected": true,
+  "reason": "Negative name regex selected all four at runtime; do not relabel observed count, use exact positive remaining names for future selectors",
+  "noMoreRepeats": true
+}

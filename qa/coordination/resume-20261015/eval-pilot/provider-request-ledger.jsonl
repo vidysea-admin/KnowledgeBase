@@ -1,0 +1,6 @@
+{"event":"reserved","id":1,"kind":"historical-production-inference","inputBytes":724,"usage":null,"status":"failed-or-unknown","receipt":"receipt.probe-pilot-released.json"}
+{"event":"reserved","id":2,"kind":"authenticated-read-only-model-catalog","inputBytes":0,"usage":null,"startedAt":"2026-10-15T20:35:04.234Z"}
+{"event":"result","id":2,"httpStatus":200,"errorCode":null,"exactConfiguredModelPresent":true,"usage":null}
+{"event":"reserved","id":3,"kind":"actual-production-inference","inputBytes":724,"usage":null,"startedAt":"2026-10-15T20:35:08.643Z"}
+{"event":"http-result","id":3,"httpStatus":200,"usage":null}
+{"event":"usage-result","id":3,"httpStatus":200,"inputTokens":151,"outputTokens":256,"productionStatus":"source-or-graph-refusal","historicalRequest1Usage":null}

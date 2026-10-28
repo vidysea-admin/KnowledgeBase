@@ -1,0 +1,187 @@
+[
+  {
+    "path": "packages/db/src/collections/speaker-suggestions/index.ts",
+    "line": 174,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "packages/db/src/collections/speaker-suggestions/testdb.ts",
+    "line": 68,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "packages/db/src/lib/native-publication.ts",
+    "line": 149,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-original-positive.log",
+    "line": 17,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/genuine-seal-isolated-original-positive.log",
+    "line": 20,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log",
+    "line": 2,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log",
+    "line": 5,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log",
+    "line": 10,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-dependency-cycles.log",
+    "line": 18,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 286,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 294,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 309,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 311,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 326,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 328,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 385,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 387,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 403,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 405,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 422,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 450,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 467,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 474,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 491,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 497,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 513,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 515,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 531,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 533,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 549,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-atomic-consumer-floor.log",
+    "line": 551,
+    "type": "trailing whitespace."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage2-dependency-cycles.log",
+    "line": 3,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/native-next-stage3-dependency-cycles.log",
+    "line": 3,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/watched-current-helper-full-graph.log",
+    "line": 3,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/broker/watched-server-repair2-full-graph.log",
+    "line": 3,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.testdb.ts",
+    "line": 68,
+    "type": "new blank line at EOF."
+  },
+  {
+    "path": "qa/coordination/resume-20261015/native-next-maker/db-structure-maker/before-packages__db__src__collections__speaker-suggestions.ts",
+    "line": 174,
+    "type": "new blank line at EOF."
+  }
+]

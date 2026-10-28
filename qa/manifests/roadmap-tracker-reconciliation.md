@@ -308,3 +308,5 @@ check a claim of the form "I didn't break the other direction".
    Fixed here — an inaccurate claim in a test name is still an inaccurate claim.
 3. The concurrent session's monitor tick leaves `.goal/goal.json` dirty with timestamp and
    `progress` churn. Harmless, and not mine to commit.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -88,3 +88,5 @@ Packets: Sent = 2, Received = 0, Lost = 2 (100% loss)
 4. `git diff --stat packages/ask/src/router.ts packages/ask/src/router.test.ts` — expect empty.
 5. Read the 3 changed/new source files — confirm the design matches the contract.
 6. If Mongo is reachable by check time, a live `/ask` smoke test is a welcome bonus, not required.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

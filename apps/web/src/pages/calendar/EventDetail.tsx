@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import type { CalendarEvent } from "./calendar-model.js";
 import { formatTimeRange } from "./calendar-model.js";
 import { EVENT_COLOR } from "./EventChip.js";
+import { safeHttpUrl } from "../../safe-url.js";
 
 export interface EventDetailProps {
   event: CalendarEvent;
@@ -26,13 +27,18 @@ export function EventDetail(props: EventDetailProps): React.ReactElement {
         <span style={{ flex: 1 }} />
         <button type="button" onClick={props.onClose} aria-label="Close event details" style={{ border: "none", background: "none", cursor: "pointer", font: "inherit" }}>&times;</button>
       </div>
-      <div className="row-title">{event.title}</div>
+      <div className="row-title" style={{ overflowWrap: "anywhere" }}>{event.title}</div>
       <div className="row-meta">
         {event.start.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
         {" · "}
         {formatTimeRange(event)}
       </div>
 
+      {event.attendanceSkipReason === "office-internal" && <div className="row-meta" role="status">Skipped: office/internal. The bot will not join this event.</div>}
+      {event.status && <div className="row-meta">Event status: {event.status}</div>}
+      {event.responseStatus && <div className="row-meta">RSVP: {event.responseStatus}</div>}
+      {event.description && <div className="row-meta" style={{whiteSpace: "pre-wrap", overflowWrap: "anywhere"}}>{event.description}</div>}
+      {event.cancelled && <div className="row-meta" role="status">Status: cancelled. This event will not be joined.</div>}
       {event.org && <div className="row-meta" data-testid="detail-org">Org: {event.org}</div>}
       {event.organizer && <div className="row-meta" data-testid="detail-organizer">Organiser: {event.organizer}</div>}
       {event.participants && (
@@ -44,7 +50,10 @@ export function EventDetail(props: EventDetailProps): React.ReactElement {
           Open session &rarr;
         </Link>
       )}
-      {event.meetingUrl && (
+      {event.meetingUrl && !event.cancelled && !safeHttpUrl(event.meetingUrl) && (
+        <div className="row-meta" data-testid="detail-join-text" style={{ marginTop: "0.5rem" }}>{event.meetingUrl}</div>
+      )}
+      {event.meetingUrl && !event.cancelled && safeHttpUrl(event.meetingUrl) && (
         <a
           href={event.meetingUrl}
           target="_blank"

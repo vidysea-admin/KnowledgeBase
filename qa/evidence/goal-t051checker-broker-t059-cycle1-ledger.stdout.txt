@@ -1,0 +1,1 @@
+{"startedAt":"2026-10-14T21:20:52.448Z","completedAt":"2026-10-14T21:20:52.481Z","counts":{"factoryGuards":7,"completedChildDrift":6,"historicalReplay":4},"result":"PASS","externalCalls":0}

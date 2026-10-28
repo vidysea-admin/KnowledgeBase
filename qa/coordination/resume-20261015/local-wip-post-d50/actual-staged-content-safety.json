@@ -1,0 +1,12 @@
+{
+  "schema": "actual-staged-content-safety/1",
+  "files": 583,
+  "bytes": 76027170,
+  "findings": [],
+  "findingCount": 0,
+  "valuesPersisted": false,
+  "method": "git cat-file --batch actual staged blob map; exact framing/blob identity; existing helper scanner rules",
+  "stageMutations": 0,
+  "commit": 0,
+  "push": 0
+}

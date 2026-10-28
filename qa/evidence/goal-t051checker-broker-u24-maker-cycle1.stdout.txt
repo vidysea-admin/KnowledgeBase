@@ -1,0 +1,43 @@
+✔ flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1 (2.8718ms)
+✔ suggest writes a status=suggested row with its quote, and NEVER a speakers row (24.4959ms)
+✔ a verifier that does not say yes yields no suggestion (8.0488ms)
+✔ an ungrounded name (quote not in the transcript) is not suggested (1.0513ms)
+✔ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (9.751ms)
+✔ a model that throws never throws out of the hook and writes nothing (0.874ms)
+✔ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (13.3049ms)
+✔ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (3.3357ms)
+✔ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (3.207ms)
+✔ ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw (2.0202ms)
+✔ ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues (60.1296ms)
+✔ indexSession still completes when the suggestion hook fails (3.4358ms)
+✔ production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins (0.2653ms)
+✔ route uses verified tenant, sessions scope, safe errors and private no-store (159.2967ms)
+✔ store errors hide credentials, transcript and raw exception (27.1415ms)
+{"sample":"actual-toc-mounted-api","personId":"person:ruby","identityStatus":"deterministic","sourceSessionId":"2026-04-21-visa-blueprint-part2-italy-france-nz","sourceIdentityCitations":1,"fixtureAuthTenant":"toc","sourceDataTenant":"toc","databaseWrites":0,"providerCalls":0,"artifact":"C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\u24-speaker-profile\\actual-toc-api-response.json"}
+✔ actual TOC deterministic persona traverses mounted API and produces a downstream response artifact (37.4788ms)
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (7.1486ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (1.4133ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (60.2566ms)
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (115.7585ms)
+{"sample":"real-toc-migrated-deterministic-read-projection","sessions":29,"positionalTurns":1428,"positionalBlocks":494,"profiles":4,"identityCitations":5,"attributableTurns":88,"unresolvedPositionalTurns":1340,"corpusSha256":"bc164833db582849667e1da8faa5ce51777c8432c579fe40f3d57ffadc22ab46","corpusScope":"complete session.json+turns.json pairs in data/toc-migrated; incomplete directories reported separately","skipped":5,"excludedSources":[{"directoryId":"2026-10-13-zoom-webinar-p1","reason":"incomplete migrated session prerequisites; no session identity fabricated","missingFiles":["session.json"],"availableFiles":[{"name":"turns.json","sha256":"b72d9a8ecabd8e295f3e8c9930a3ccb52046d2d685152fad6e2805d496713080"}],"positionalTurns":55},{"directoryId":"2026-10-13-zoom-webinar-p2","reason":"incomplete migrated session prerequisites; no session identity fabricated","missingFiles":["session.json"],"availableFiles":[{"name":"turns.json","sha256":"01899d788e7461323a797d1871560a809112d327819d0c04645f4ebbed0bcb67"}],"positionalTurns":73},{"directoryId":"synthetic-controlled-1790797565149","reason":"incomplete migrated session prerequisites; no session identity fabricated","missingFiles":["session.json","turns.json"],"availableFiles":[],"positionalTurns":0},{"directoryId":"synthetic-controlled-1790798758779","reason":"incomplete migrated session prerequisites; no session identity fabricated","missingFiles":["session.json","turns.json"],"availableFiles":[],"positionalTurns":0},{"directoryId":"synthetic-controlled-1790799479728","reason":"incomplete migrated session prerequisites; no session identity fabricated","missingFiles":["session.json","turns.json"],"availableFiles":[],"positionalTurns":0}],"refusedFloor":[],"databaseWrites":0,"providerCalls":0}
+✔ confirmed suggestion rehydrates quote and blocks; knowledge never bleeds into recurring labels (4.5084ms)
+✔ suggested, rejected, forged confirmation and fabricated quote cannot establish identity (1.0477ms)
+✔ missing sessions, invalid ranges, mixed-label blocks and ambiguous chronological ties abstain (12.3171ms)
+✔ opposing confirmed block owners refuse overlapping scope (0.5036ms)
+✔ multi-speaker, unverified, visual, foreign and absent quotes cannot become this speaker's claim (0.7609ms)
+✔ org and role need accepted own attribute evidence, not just identity provenance (0.7085ms)
+✔ topic identifiers match exactly, never foreign/prefix labels (0.3486ms)
+✔ direct resolved refs require established identity; foreign speaker refused (0.4442ms)
+✔ old unanchored and stale re-indexed blocks never attribute another reused-label turn (0.5061ms)
+✔ same-named cross-session persona keeps merge ambiguity and recorded confidence (4.6832ms)
+✔ deterministic self-naming floor retains only its own block (0.3503ms)
+✔ quoted or reported legacy floor names cannot establish a live identity or spread into another block (0.6548ms)
+✔ real migrated TOC corpus identity citations survive the profile projection without writes (407.2857ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8706.902

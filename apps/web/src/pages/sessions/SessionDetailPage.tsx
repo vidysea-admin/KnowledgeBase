@@ -1,9 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
-import { getSession } from "../../api/sessions.js";
+import { getSession, getSessionMedia, streamSessionMedia } from "../../api/sessions.js";
 import { ApiError } from "../../api/client.js";
 import type { SessionDetail } from "../../api/types.js";
+import { SpeakerSuggestions } from "./SpeakerSuggestions.js";
+import { GroundedContentPanel } from "./grounded/GroundedContentPanel.js";
+import { SessionDecisionsPanel } from './decisions/SessionDecisionsPanel.js';
+import { TranscriptReview } from '../transcript-review/TranscriptReview.js';
 
 const MAX_TURNS_SHOWN = 200;
 
@@ -41,43 +45,127 @@ function speakerColor(ref: string): string {
 export function SessionDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
   const { hash } = useLocation();
-  const { apiKey } = useAuth();
-  const [detail, setDetail] = useState<SessionDetail | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const highlightedTurn = hash.startsWith("#turn-") ? decodeURIComponent(hash.slice("#turn-".length)) : null;
+  const { apiKey, sessionVersion } = useAuth();
+  const [revision, setRevision] = useState(0);
+  const [loaded, setLoaded] = useState<{ sessionId: string; key: string | null; version: number; data: SessionDetail } | null>(null);
+  const detail = loaded !== null && loaded.sessionId === id && loaded.key === apiKey && loaded.version === sessionVersion ? loaded.data : null;
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [streaming, setStreaming] = useState(false);
+  const [frameUrl, setFrameUrl] = useState<string | null>(null);
+  const [mediaError, setMediaError] = useState<string | null>(null);
+  const video = useRef<HTMLVideoElement>(null);
+  const streamController = useRef<ReturnType<typeof streamSessionMedia>>(null);
+  const pendingSeek = useRef<number | null>(null);
+  const assetGeneration = useRef(0);
+  useEffect(() => () => { if (mediaUrl) URL.revokeObjectURL(mediaUrl); }, [mediaUrl]);
+  useEffect(() => () => { if (frameUrl) URL.revokeObjectURL(frameUrl); }, [frameUrl]);
+  useEffect(() => { assetGeneration.current++; pendingSeek.current = null; setMediaUrl(null); setStreaming(false); setFrameUrl(null); setMediaError(null); return () => { assetGeneration.current++; }; }, [apiKey, sessionVersion, id]);
+  useEffect(() => {
+    if (!streaming || !video.current || !detail?.media) return;
+    const stop = streamSessionMedia(apiKey, id!, detail.media.mime, video.current, setMediaError);
+    streamController.current = stop;
+    if (stop && pendingSeek.current !== null) { stop.seek(pendingSeek.current); pendingSeek.current = null; }
+    if (!stop) { setStreaming(false); setMediaError("Streaming unsupported in this browser; playback limited to 200 MB"); }
+    return () => { stop?.(); streamController.current = null; };
+  }, [streaming, detail, apiKey, id]);
+  async function loadAsset(frameId?: string) {
+    const generation = assetGeneration.current;
+    const boundedRecording = detail?.media && Number.isFinite(detail.media.bytes) &&
+      detail.media.bytes > 0 && detail.media.bytes <= 200 * 1024 * 1024;
+    if (!frameId && !boundedRecording && detail?.media?.mime === "video/webm" && typeof MediaSource !== "undefined" &&
+      ['video/webm; codecs="vp8,opus"', 'video/webm; codecs="vp9,opus"'].some((mime) => MediaSource.isTypeSupported(mime))) {
+      setStreaming(true); return;
+    }
+    try {
+      const blob = await getSessionMedia(apiKey, id!, frameId);
+      if (generation !== assetGeneration.current) return;
+      const url = URL.createObjectURL(blob);
+      if (frameId) setFrameUrl(url); else setMediaUrl(url);
+    } catch (error) { if (generation === assetGeneration.current) setMediaError(error instanceof Error ? error.message : "Recording unavailable"); }
+  }
+  function seekTo(seconds: number) {
+    setMediaError(null); pendingSeek.current = seconds;
+    if (streamController.current) { streamController.current.seek(seconds); pendingSeek.current = null; }
+    else if (mediaUrl && video.current) {
+      video.current.currentTime = seconds;
+      if (video.current.readyState > 0) pendingSeek.current = null;
+    } else void loadAsset();
+  }
+  const [loadFailure, setLoadFailure] = useState<{ sessionId: string; key: string | null; version: number; message: string } | null>(null);
+  const error = loadFailure !== null && loadFailure.sessionId === id && loadFailure.key === apiKey && loadFailure.version === sessionVersion ? loadFailure.message : null;
+  let highlightedTurn: string | null = null;
+  if (hash.startsWith("#turn-")) {
+    try { highlightedTurn = decodeURIComponent(hash.slice("#turn-".length)) || null; } catch { /* unresolved citation */ }
+  }
 
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    setDetail(null);
-    setError(null);
+    setLoadFailure(null);
     getSession(apiKey, id)
-      .then((data) => { if (!cancelled) setDetail(data); })
-      .catch((err: unknown) => { if (!cancelled) setError(err instanceof ApiError ? err.message : "failed to load session"); });
+      .then((data) => { if (!cancelled) setLoaded({ sessionId: id, key: apiKey, version: sessionVersion, data }); })
+      .catch((err: unknown) => { if (!cancelled) setLoadFailure({ sessionId: id, key: apiKey, version: sessionVersion, message: err instanceof ApiError ? err.message : "failed to load session" }); });
     return () => { cancelled = true; };
-  }, [apiKey, id]);
+  }, [apiKey, sessionVersion, id, revision]);
 
   // Runs after the transcript has rendered, which is why it depends on `detail`: the anchor does
   // not exist at mount time, so a browser's own hash handling lands on nothing.
   useEffect(() => {
     if (!detail || !highlightedTurn) return;
     document.getElementById(turnDomId(highlightedTurn))?.scrollIntoView({ block: "center" });
+    const turn = detail.turns.find((turn) => turn._id === highlightedTurn);
+    if (detail.media && turn && timeUnitLabel(turn.speakerRef) === "s") seekTo(turn.tStart);
   }, [detail, highlightedTurn]);
 
   if (error) return <div className="card error-note">{error}</div>;
   if (!detail) return <div className="card empty-note">Loading&hellip;</div>;
+  const citedIndex = highlightedTurn === null ? -1 : detail.turns.findIndex((turn) => turn._id === highlightedTurn);
+  const windowStart = citedIndex >= MAX_TURNS_SHOWN
+    ? Math.max(0, Math.min(citedIndex - Math.floor(MAX_TURNS_SHOWN / 2), detail.turns.length - MAX_TURNS_SHOWN)) : 0;
+  const visibleTurns = detail.turns.slice(windowStart, windowStart + MAX_TURNS_SHOWN);
 
   return (
     <>
       <div className="page-header">
         <h1>{detail.session.title}</h1>
         <p>{detail.session.date}{detail.session.org ? ` · ${detail.session.org}` : ""}</p>
+        <p>Transcript: {detail.session.status.transcribe} · Index: {detail.session.status.index}</p>
       </div>
 
       <div className="card">
         <div className="section-title">Overview</div>
         <p>{detail.page ? detail.page.summary : "(no summary yet)"}</p>
       </div>
+
+      <SpeakerSuggestions apiKey={apiKey} sessionId={detail.session._id} />
+      <GroundedContentPanel apiKey={apiKey} sessionId={detail.session._id} />
+      <SessionDecisionsPanel apiKey={apiKey} sessionId={detail.session._id} sessionVersion={sessionVersion} revision={revision} />
+      <TranscriptReview key={`${sessionVersion}:${detail.session._id}`} apiKey={apiKey} sessionId={detail.session._id} onCommitted={() => setRevision(value => value + 1)} />
+
+      {detail.media && <div className="card">
+        <div className="section-title">Recording</div>
+        {!mediaUrl && !streaming && <button onClick={() => void loadAsset()}>Load recording</button>}
+        <video ref={video} src={mediaUrl ?? undefined} controls onError={() => setMediaError("Recording format cannot be played by this browser")}
+          onLoadedMetadata={() => { if (mediaUrl && video.current && pendingSeek.current !== null) { video.current.currentTime = pendingSeek.current; pendingSeek.current = null; } }}
+          style={{ width: "100%", display: mediaUrl || streaming ? "block" : "none" }} />
+        {streaming && <p>Evidence navigation loads the requested timestamp automatically.</p>}
+        {!streaming && detail.media.bytes > 200 * 1024 * 1024 && <p>Browsers without WebM streaming support have a 200 MB playback limit.</p>}
+      </div>}
+      {mediaError && <p role="alert">{mediaError}</p>}
+      {detail.notes && <div className="card">
+        <div className="section-title">Evidence notes</div>
+        {detail.notes.map((note, i) => <div className="row-card" key={i}>
+          <p>{note.text}</p><small>{note.kind} · source statement, unverified</small>
+          <button onClick={() => seekTo(note.tStart)}>Seek to {note.tStart}s</button>
+          {note.turnId && <a href={`#${turnDomId(note.turnId)}`} onClick={() => seekTo(note.tStart)}>Transcript evidence</a>}
+          {note.frameId && <button onClick={() => void loadAsset(note.frameId)}>View screen evidence</button>}
+        </div>)}
+      </div>}
+      {detail.frames && <div className="card">
+        <div className="section-title">Screen evidence</div>
+        {detail.frames.map((frame) => <button key={frame.id} onClick={() => { void loadAsset(frame.id); seekTo(frame.tStart); }}>{frame.tStart}s · {frame.text || "Screen frame"}</button>)}
+        {frameUrl && <img src={frameUrl} alt="Selected screen evidence" style={{ maxWidth: "100%" }} />}
+      </div>}
 
       <div className="card">
         <div className="section-title">Claims ({detail.claims.length})</div>
@@ -93,12 +181,13 @@ export function SessionDetailPage(): React.ReactElement {
       <div className="card">
         <div className="section-title">Transcript ({detail.turns.length} turns)</div>
         {detail.turns.length === 0 && <div className="empty-note">No turns for this session.</div>}
+        {hash.startsWith("#turn-") && citedIndex < 0 && <p role="status">This cited passage was not found in this session.</p>}
         {/* Real turns with a resolved speakerLabel (currently: WhatsApp) get a chat-style
             rendering -- real sender name + real send time, closer to how the source itself
             looks, instead of a raw personId hash and a relative-offset timestamp. */}
-        {detail.turns.slice(0, MAX_TURNS_SHOWN).some((t) => t.speakerLabel) ? (
+        {visibleTurns.some((t) => t.speakerLabel) ? (
           <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-            {detail.turns.slice(0, MAX_TURNS_SHOWN).map((t) => (
+            {visibleTurns.map((t) => (
               <div
                 key={t._id}
                 id={turnDomId(t._id)}
@@ -114,6 +203,7 @@ export function SessionDetailPage(): React.ReactElement {
                 <div style={{ fontWeight: 600, fontSize: "0.85rem", color: speakerColor(t.speakerRef) }}>
                   {t.speakerLabel ?? t.speakerRef}
                 </div>
+                <div className="row-meta">{t.tStart}{timeUnitLabel(t.speakerRef)}–{t.tEnd}{timeUnitLabel(t.speakerRef)}</div>
                 <div>{t.text}</div>
                 {t.occurredAt && (
                   <div className="row-meta" style={{ textAlign: "right", marginTop: "0.15rem" }}>
@@ -124,7 +214,7 @@ export function SessionDetailPage(): React.ReactElement {
             ))}
           </div>
         ) : (
-          detail.turns.slice(0, MAX_TURNS_SHOWN).map((t) => {
+          visibleTurns.map((t) => {
             const unit = timeUnitLabel(t.speakerRef);
             return (
               <div
@@ -141,7 +231,7 @@ export function SessionDetailPage(): React.ReactElement {
           })
         )}
         {detail.turns.length > MAX_TURNS_SHOWN && (
-          <div className="empty-note">&hellip; and {detail.turns.length - MAX_TURNS_SHOWN} more turns (truncated for this view).</div>
+          <div className="empty-note">Showing turns {windowStart + 1}–{windowStart + visibleTurns.length} of {detail.turns.length}.</div>
         )}
       </div>
     </>

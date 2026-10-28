@@ -1,0 +1,30 @@
+✖ genuine live seal precedes source ingestion; retained public recovery does not invent a clock (42694.0962ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 49898.2881
+
+✖ failing tests:
+
+test at scripts\native-capture\production.test.ts:49:1
+✖ genuine live seal precedes source ingestion; retained public recovery does not invent a clock (42694.0962ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 'unavailable'
+  - 'ready'
+  
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/scripts/native-capture/production.test.ts:86:16)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'unavailable',
+    expected: 'ready',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -164,3 +164,87 @@ Verbatim selection: "Run the InFocus repair, U5 fully automatic, Write DECISIONS
 
 ## 2026-09-27T08:15:37+05:30 — Umesh: Zoom bot account
 Verbatim: "so take umeshsugara@vidysea for now". The bot's Chrome profile signs in with umeshsugara@vidysea.com for now; a dedicated bot account (e.g. recorder@vidysea.com) is deferred, not rejected. Follow-ups for maker: (1) session-expiry detection + alert asking for re-login before a scheduled join; (2) server deploy note: copy data/bot-profile/ or sign in once on the server; (3) later: switch to a dedicated bot account. Recorded by /checker knowledgebase-7a.
+
+## 2026-09-28 — maker (iss-274-wire-web-fallback unit, lane wave/iss-274-web-fallback-wire) — CONTRACT CONFLICT, checker to reconcile
+This unit implements D-041 ruling 2 (docs/DECISIONS.md, Umesh/Approver, verbatim): "WEB FALLBACK:
+build it, do not amend the north star. ISS-274 is resolved as wire-it, not sign-the-honest-limit.
+The Phase-1 exit clause stands as written and off-corpus questions must reach a web search path."
+The maker brief for this unit was explicit that it may READ `qa/contracts/ask-web-fallback-tavily.md`
+but may NEVER edit it, and must append any conflict here verbatim for the checker to resolve.
+
+**The conflict, verbatim from the existing contract:**
+- Criterion 1 (line 32): "When `tavilySearchFn` is omitted (today's production default), behavior
+  is byte-identical to before this unit."
+- Disclosed limitation section (lines 55, 59-61): "`TAVILY_API_KEY` is empty in `.env` — no real
+  Tavily account exists yet... `production.ts` omits `tavilySearchFn` entirely in this state, so
+  `/ask`'s current, already-shipped behavior (`insufficient_coverage: true` on ambiguous/incorrect
+  with no fallback) is completely unchanged until Umesh adds a real key."
+
+That is precisely the state ISS-274 was filed against (qa/issues.jsonl id ISS-274): an omitted
+`tavilySearchFn` means the seam is never even ATTEMPTED for an off-corpus question in production
+today, which the checker-sweep note on that issue and .goal/goal.json's Phase-1 exit clause both
+name as a goal-vs-contract conflict only the Approver could settle. D-041 ruling 2 is that
+settlement, and it says wire it — not "ship the byte-identical no-fallback default and call that
+the honest limit."
+
+**What this unit built instead (contradicts the contract's stated criterion 1 and disclosed
+limitation, by design, per the ruling above):**
+- `apps/api/src/ask-web-fallback.ts` — `createTavilySearchFn()` NO LONGER returns `undefined` when
+  `TAVILY_API_KEY` is unset. It always returns a real function. With no key, that function throws
+  a new `TavilyUnavailableError` on every call — it is reached, not absent.
+- `apps/api/src/production.ts` — `tavilySearchFn` is now wired into `askDeps` UNCONDITIONALLY (the
+  old `...(tavilySearchFn ? { tavilySearchFn } : {})` spread-conditional is gone). Production no
+  longer omits it in any state.
+- `packages/ask/src/ask-v2.ts` — the `tavilySearchFn` call is now wrapped in try/catch. A thrown
+  error (no key, or a real Tavily HTTP/network failure) is caught, logged via a new
+  `ask.web_fallback_unavailable` audit entry (`recordJob` `status: "failed"`, real `error` message
+  attached) and `insufficient_coverage`/`web_used` are left exactly as `ask()` computed them —
+  never silently flipped to a false "resolved", never left to crash `askV2` (verified: removing
+  the try/catch makes the new ISS-274 test in `ask-v2.test.ts` throw uncaught).
+- Net effect: with no real `TAVILY_API_KEY` (today's actual state), an off-corpus question now
+  REACHES the web-fallback seam on every request and gets an honestly-logged "unavailable" outcome,
+  instead of the seam being invisible to the request entirely. `insufficient_coverage` can still end
+  up `true` in that state (there genuinely was no web result), which is NOT the same claim as
+  "the fallback path was never reached" — the audit log now distinguishes the two, which it could
+  not before.
+
+**Ask of the checker:** the contract's criterion 1 line and its "Disclosed limitation" section (as
+quoted above) now describe behavior this unit deliberately does NOT preserve, on the Approver's own
+instruction (D-041 ruling 2). Per this repo's contract-ownership rule, only /checker may amend
+`qa/contracts/ask-web-fallback-tavily.md` — I have not touched it. Please reconcile it: either amend
+those lines to describe the new "always-wired, honest-unavailable-on-no-key" behavior, or explain
+why the old wording should stand alongside the new code if I've misread the ruling's scope. Full
+capability-coverage table + isolating falsifications are in
+`qa/manifests/iss-274-wire-web-fallback.md`.
+
+## T-052 complete registration acceptance gap — 2026-10-05 (pending checker fold-in)
+Source: original full grouped goal G1/R1 plus D077-D099 and concrete ISS374 evidence. Existing gmail contract Amendments2-4 explicitly certify intake/acquisition/persistence slices only; they do not define or PASS complete executable registration. Maker does not amend qa/contracts. At completed feature-ready boundary, checker must reconcile this additive acceptance scope in the existing contract; no initial-newcontract or weakened invariant is proposed.
+Preserve complete goal: approved mailbox/public webinar discovery -> explicit configured operator/organizer registration -> fresh exact confirmation correlation -> owned join/record -> process/index -> cited Ask, Windows operational and separately Ubuntu verified. Native HTML currently implemented; required custom-JavaScript organizer support remains remaining, not silently excluded.
+Current registration criteria needing explicit contract mapping: tenant/owner/work boundaries; literalregistrationevidence only; submitting persisted beforebrowser; restart uncertainty neverresubmits; exactfreshoriginal/thread/message/organizer/time/join proof; cancellation/reschedule/rejected/unrelated source lineage; one nativePOST with consent/challenge refusal and cookie/hiddenCSRF preserved; exactapprovedhost/scheme/port confinement across307/308/resources/newtargets/controlloss; installedlegacySWnonobservation positivecontrol; privilegedpolicyreceipt identity/config/API/readbackfailclosed beforevalues; profile/Job concurrency/crash/timeout cleanup; persistentpolicy restart/relaunch+recordingrestoration; fullnative runner+confirmation downstream integration; actualsupportedorganizer/mailbox and workdurability evidence; overallstructure/test/type/contract gate disclosure; external/live activation remains separate authorized action.
+Concrete attacks retained as acceptance floors: ISS374 original307/308 two identicalbody unapprovedlocalhost cases; D097 approvedPOST HTML img src unapprovedlocalhost/leak?email fixture disclosure; D098 installedworkerbodyobserverpositive and CDPclosed-before-heldresponse release browseralive. Do not substitute successstatus/count from narrowed fixtures for completeflow. Independent checker derives its own criterion instruments and falsifiers at readiness; maker current BUILDING is not a bypass, no intermediate checker dispatch requested.
+
+
+2026-10-05 U2.2 feedback: current local migrated artifact citation audit has14unresolved references/80 evidence, exact cases and input hashes in webinar-portable-release manifest final baseline. Independently normalize/verify IDs before filing or repairing; source/DB parity and semantic truth unproved. Harness must distinguish raw completion invalid citations, sanitized output, valid-ID unsupported claims, omissions and attribution. No guessed IDs or fabricated gold labels.
+
+## Zoho canonical-media timestamp boundary check
+Current trimmed audio ffprobe exit0: duration3705.018s,42394012bytes,SHA256a7a3356b33474dc4d5aae09718c094c9b8d3236361a556871b57f268c126412f. Legacy turn t080 spans3694..3724,18.982s beyond trimmed duration. Actual current process-video validateTurns over the same80rows refuses trimmed3705.018 but accepts originalaudio4703.082. Therefore validator behavior is already protective when the correct media duration is supplied; do not rebuild or weaken it. This is a canonical-media/time-origin lineage gap in the legacy artifact, not proof that all80turns lack support or that current capture validation is broken. D028 describes trimmedaudio80turn inference, while source.json still names missing originalMKV. Correct worklane repair needs explicit original/derivative binding, trim offsets and boundary disposition, preserving cited turn IDs and evidence. No row rewrite or guessed clipping performed; current liveDB parity remains unverified.
+D110 fresh senior PROPOSED HIGH security findings (building-feature plan review, not formal checker ledger closure):
+1. sb_join.py624/946 CSP wildcardport and DNR optionalanyport accept default443 organizer444/8443 in actualAST-derivedregex probe, contraryD098/D099currentport scope. Native secondport browser disclosure remains unrun. Independent exact-origin plan approved.
+2. run-pipeline.mjs285 actualsynthetic runPipelineWatch probe prints registration/join token values fromrawoperations; explicit operational projection required, private durable state must remain byte-identical. No realtoken/content used in repro.
+These findings are acted on inside currentBUILDINGsecurityfeature; no PASS, no globalgate downgrade.
+
+
+## ISS-T055COLLECTIONS-001 — original static feedback, no executed RED
+
+Privacy static review found one remaining write-boundary blocker: GET /knowledge/collections sanitizes hidden members and disables UI edit, but PUT with the visible member subset (or []) plus current expectedRevision still replaces the entire stored members array. Neither route nor writeCollection checks the existing collection for unavailable members. Thus an API client submitting the sanitized GET representation can silently delete withheld private references while returning 200, violating the stated preservation/fail-closed partial-edit policy. Before any update, inspect the persisted current row under tenant+revision and refuse replacement when any existing member is unavailable, or explicitly preserve hidden memberships using an approved policy. Full intentional collection DELETE can remain separate. Add mounted API test: mixed safe/private saved members → GET omits private ID → PUT sanitized members/current revision → refused and stored original members/revision unchanged. Source metadata filtering/visible aggregate logic otherwise appears correct statically; no tests/verdict.
+
+
+## ISS-T059REPLAY-001 — verbatim independent executed feedback
+
+T059 independent checker cycle0: FAIL — ISS-T059REPLAY-001 HIGH/data-write.
+Exact actual corpus: first accepted child -> second accepted child -> retry exact first request. The historical first child is returned, but head.lastRetestId is rewritten from newer second to older first. Broker isolated probe exit1 (2488.129ms), assertion77, all18 expanded pins unchanged. Original floor1/1 reproducedRED,0/1fixed in cycle0. Canonical produced rows separately PASS3valid+2invalid-refused (429.0843ms).
+Required repair evidence: replay verbatim original ledger reproduction/script/argv, count against ISS-T059REPLAY-001; verify the historical return does not alter current newer head/revision/lock or reprocess intake/index/Ask; preserve durable interrupted-child promotion and original crash-after-child-write recovery. Additions supplement, never substitute the original floor. Cycle1 source/test must be frozen and independently verified through the sole broker before PASS.
+Current mounted caller evidence remains gated by explicit ROUTE_FREEZE; T022 human calibration/T043 live index+cited Ask and full live flywheel remain HOLD. No human approval or parent completion is granted by source tests.
+
+
+Architecture feedback for checker adoption — public Ask vectorless boundary (root-authorized 2026-10-15): active public /ask must never invoke embedding, vector-storage or legacy retrieval ports, including when configured vectorless:false and with an installed embedding port. Canonical current-authority HTTP acceptance requires 200, exact source citation and zero embedding/vector/legacy-factory counters. Pure low-level vector adapter implementations/tests may remain dormant. The preserved qa/evidence/ask-graph-selection/legacy-http-diagnostic.test.ts keeps its original expected-one-embedding assertion and is an architecture-incompatible historical diagnostic, never evidence of current architecture PASS. Only checker may adopt this feedback into contracts; maker changed no qa/contracts file.

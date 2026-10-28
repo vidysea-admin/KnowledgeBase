@@ -130,3 +130,5 @@ Pure refactor plus tests; read-only against the database; response shape and ran
 unchanged (live parity on 6 queries). Reversible by `git revert`.
 
 **Status: checked-PASS** — PASS from `qa/verdicts/search-prefilter-coverage.md` (Cycle checked: 1, matching Fix cycle 1), committed `af8a346`. Closed out on the 2026-09-08 reconcile tick.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

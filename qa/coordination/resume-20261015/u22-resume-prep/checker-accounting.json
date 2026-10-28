@@ -1,0 +1,28 @@
+{
+  "token_metric": "actual_total",
+  "maker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "checker": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "known_broker_phase_s": 2.078,
+  "review_budget_debit": {
+    "token_metric": "actual_total",
+    "active_s": 150,
+    "tokens": 20000
+  },
+  "finalization_budget_debit": {
+    "token_metric": "actual_total",
+    "active_s": 30,
+    "tokens": 4000
+  },
+  "ratio": "UNVERIFIED",
+  "children": [],
+  "retries": [],
+  "persisted_utc": "2026-10-16T02:22:21.317295+00:00"
+}

@@ -1,0 +1,20 @@
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+false !== true
+
+    at file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/goal-t040-acceptance/checker-probes.mjs:21:10
+    at check (file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/goal-t040-acceptance/checker-probes.mjs:18:31)
+    at file:///C:/Users/product/Desktop/KnowledgeBase/qa/evidence/goal-t040-acceptance/checker-probes.mjs:19:1 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+
+Node.js v24.21.0

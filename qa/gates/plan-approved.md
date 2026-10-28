@@ -11,3 +11,5 @@ Correction (2026-09-26T23:55:07+05:30): the intent Answered line above names the
 Confirmed: 2026-09-26T23:56:41+05:30 — Umesh first-hand in maker session knowledgebase-ed (AskUserQuestion: 'Run the InFocus repair, U5 fully automatic, Write DECISIONS entries') — acting on it
 Answered: 2026-09-27T07:26:00+05:30 — spec — Umesh first-hand in maker session knowledgebase-ed (AskUserQuestion "Approve both (Recommended)", answered ~2026-09-27T00:06; recorded after rate-limit pause). DECISIONS: D-035.
 Answered: 2026-09-27T07:26:00+05:30 — plan — Umesh first-hand in maker session knowledgebase-ed (AskUserQuestion "Approve both (Recommended)", answered ~2026-09-27T00:06; recorded after rate-limit pause). DECISIONS: D-035.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-26T23:53:04+05:30 — intent — Umesh in chat to checker session knowledgebase-ff, verbatim "go on i appr

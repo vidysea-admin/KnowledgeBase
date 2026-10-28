@@ -1,0 +1,40 @@
+{
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--import",
+    "tsx",
+    "--input-type=module",
+    "-e",
+    "import assert from 'node:assert/strict'; import {isBlockedAddress} from './packages/ingest/src/sources/guarded-fetch.ts'; import {discoverPublicWebinars} from './apps/api/src/gws/public-webinars.ts'; for (const [ip, expected] of [['3fff:0fff::',true],['3fff:1000::',false],['3fff:ffff::1',false]]) assert.equal(isBlockedAddress(ip),expected,ip); let lookups=0, requests=0; const r=await discoverPublicWebinars([{id:'owned',url:'https://publisher.example/events'}],{lookup:async()=>++lookups===1?['93.184.216.34']:['93.184.216.34','3FFF:0FFF::1'],request:async()=>{requests++;return {status:302,location:'/next',body:''};}},new Date('2026-10-14T12:00:00Z')); assert.equal(requests,1); assert.equal(lookups,2); assert.equal(r.complete,false); assert.deepEqual(r.candidates,[]); assert.deepEqual(r.gaps,[{sourceId:'owned',reason:'unavailable'}]); process.stdout.write('T036 independent: address boundary3/3; actual public caller redirected mixed-DNS refusal1/1; no second transport\\n');"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 30000,
+  "startedAt": "2026-10-14T21:18:49.686Z",
+  "completedAt": "2026-10-14T21:18:49.991Z",
+  "elapsedMs": 301.5871,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/ingest/src/sources/guarded-fetch.ts": "9fa6ef04a97db7096f30d1de0f1f9ead40fb54694f48a16071eaf387d7c9f914",
+    "packages/ingest/src/sources/guarded-fetch.test.ts": "2d7b6b9dd1797edd647c990d376755c287b01d4051f5236cd0dd4ea9568b5bea",
+    "qa/issues.T036GUARD.jsonl": "2189a1b0cf4a0adae86046a9df30d00ff87beb544e6effdb974cf5f1a99a562e",
+    "apps/api/src/gws/public-webinars.ts": "7d2dca798771c2d5cbfbbe3a30b6117c213f53f70aecf51d6f7bbb6becc2b170",
+    "packages/ingest/src/sources/node-transport.ts": "61d0c702beafc166b8111f53c5e6b639b55b48642c863854b2cee8a97b2bea10",
+    "packages/ingest/src/source-acquisition/onair.ts": "7418a4757f6bec15edd016c76d69553f26000c2bec88504f0acb3f2a798e7033",
+    "packages/ingest/src/index.ts": "bd6eff48332d6a650610a2f097f8fe30801b8668d002ec3060689a41105a43a6"
+  },
+  "after": {
+    "packages/ingest/src/sources/guarded-fetch.ts": "9fa6ef04a97db7096f30d1de0f1f9ead40fb54694f48a16071eaf387d7c9f914",
+    "packages/ingest/src/sources/guarded-fetch.test.ts": "2d7b6b9dd1797edd647c990d376755c287b01d4051f5236cd0dd4ea9568b5bea",
+    "qa/issues.T036GUARD.jsonl": "2189a1b0cf4a0adae86046a9df30d00ff87beb544e6effdb974cf5f1a99a562e",
+    "apps/api/src/gws/public-webinars.ts": "7d2dca798771c2d5cbfbbe3a30b6117c213f53f70aecf51d6f7bbb6becc2b170",
+    "packages/ingest/src/sources/node-transport.ts": "61d0c702beafc166b8111f53c5e6b639b55b48642c863854b2cee8a97b2bea10",
+    "packages/ingest/src/source-acquisition/onair.ts": "7418a4757f6bec15edd016c76d69553f26000c2bec88504f0acb3f2a798e7033",
+    "packages/ingest/src/index.ts": "bd6eff48332d6a650610a2f097f8fe30801b8668d002ec3060689a41105a43a6"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t036-independent.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t036-independent.stderr.txt",
+  "hashesUnchanged": true
+}

@@ -1,0 +1,65 @@
+/** U2.3: tenant-scoped preparation for the synchronous build/regenerate extractFn seam.
+ * No persistence or provider construction. Semantic quality and rollout remain gated by U2.2.
+ */
+import type { SessionPages, Sessions, TreeIndexNode } from "@lkb/core";
+import { buildTree, treeIndexRootFilter } from "./build.js";
+import { regenerate } from "./regenerate.js";
+import { isLlmTopicsEnabled, prepareTopicExtractFn, type TopicExtraction, type TopicsCompleteFn } from "./extract-topics-llm.js";
+
+export interface TopicIndexOptions {
+  existingRoot?: TreeIndexNode;
+  changedSessionIds?: string[];
+  enabled?: boolean;
+  timeoutMs?: number;
+}
+
+/** Refuse a foreign or unresolvable existing subtree before inference or rebuilding. */
+function assertScopedRoot(root: TreeIndexNode, tenantId: string, sessionIds: Set<string>): void {
+  const stampedTenant = (root as TreeIndexNode & { tenantId?: unknown }).tenantId;
+  if (root.level !== "tenant" || root.node_id !== treeIndexRootFilter(tenantId).node_id ||
+      (stampedTenant !== undefined && stampedTenant !== tenantId)) throw new Error("topic index: foreign root");
+  const visit = (node: TreeIndexNode): void => {
+    if (node !== root && !node.node_id.startsWith(`${tenantId}/`)) throw new Error("topic index: foreign subtree");
+    const nodeTenant = (node as TreeIndexNode & { tenantId?: unknown }).tenantId;
+    if (nodeTenant !== undefined && nodeTenant !== tenantId) throw new Error("topic index: foreign subtree stamp");
+    if (node.level === "session" && ![...sessionIds].some((id) => node.node_id.endsWith(`/session:${id}`)))
+      throw new Error("topic index: unresolved session node");
+    if ((node.level === "topic" || node.level === "org") &&
+        ![...sessionIds].some((id) => node.node_id.includes(`/session:${id}/${node.level}:`)))
+      throw new Error("topic index: unresolved entity parent");
+    const refs = node.evidence?.sessionRefs;
+    if (refs !== undefined && (!Array.isArray(refs) || refs.some((id) => typeof id !== "string" || !sessionIds.has(id))))
+      throw new Error("topic index: unresolved session evidence");
+    const ref = node.evidence?.sessionRef;
+    if (ref !== undefined && !sessionIds.has(ref)) throw new Error("topic index: unresolved session evidence");
+    for (const child of node.children) visit(child);
+  };
+  visit(root);
+}
+
+export async function buildTopicIndex(tenantId: string, sessions: Sessions[], pages: SessionPages[],
+  complete: TopicsCompleteFn, opts: TopicIndexOptions = {}):
+  Promise<{ root: TreeIndexNode | undefined; results: Map<string, TopicExtraction> }> {
+  const scopedSessions = sessions.filter((session) => session.tenantId === tenantId);
+  const sessionIds = new Set(scopedSessions.map((session) => session._id));
+  if (sessionIds.size !== scopedSessions.length) throw new Error("topic index: duplicate session identity");
+  const scopedPages = pages.filter((page) => page.tenantId === tenantId && sessionIds.has(page.sessionId));
+  const pageSessionIds = new Set<string>();
+  const pageIds = new Set<string>();
+  for (const page of scopedPages) {
+    if (pageSessionIds.has(page.sessionId)) throw new Error("topic index: ambiguous session page");
+    if (pageIds.has(page._id)) throw new Error("topic index: duplicate page identity");
+    pageSessionIds.add(page.sessionId);
+    pageIds.add(page._id);
+  }
+  if (opts.existingRoot) assertScopedRoot(opts.existingRoot, tenantId, sessionIds);
+  const enabled = opts.enabled ?? isLlmTopicsEnabled();
+  const prepared = await prepareTopicExtractFn(scopedPages, complete, { enabled, timeoutMs: opts.timeoutMs });
+  // Refresh every existing year when enabled: mixing old heuristic years with newly inferred
+  // years would make shared topic evidence depend on which session happened to trigger indexing.
+  const changed = enabled ? [...sessionIds] : opts.changedSessionIds ?? [...sessionIds];
+  const root = opts.existingRoot
+    ? regenerate(opts.existingRoot, changed, scopedSessions, scopedPages, prepared.extractFn)
+    : buildTree(scopedSessions, scopedPages, undefined, prepared.extractFn)[tenantId];
+  return { root, results: prepared.results };
+}

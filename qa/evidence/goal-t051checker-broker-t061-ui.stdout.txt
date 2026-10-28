@@ -1,0 +1,10 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ✓ src/pages/automation/ApplicationFormsPage.test.tsx (3 tests) 341ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  21:28:14
+   Duration  2.54s (transform 136ms, setup 313ms, collect 469ms, tests 341ms, environment 896ms, prepare 199ms)
+

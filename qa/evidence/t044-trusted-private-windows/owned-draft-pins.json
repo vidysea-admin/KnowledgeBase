@@ -1,0 +1,8 @@
+{
+  "scripts/lib/transcription/transcript-qa-generation.mjs": "a632689f058ba86cf98a643144531b9feb1656d910cd6c3e0e11fc198285451b",
+  "scripts/lib/transcription/transcript-qa-generation.test.mjs": "d02b16107d4797980f207487171990a503e4e5955dbbbfba506dfa3888fc39f3",
+  "scripts/webinar/validate/transcript-qa-binding.mjs": "a432b8d6c3691374e1bb86b99a0ecf2c4e1b2140c214a62c6a561e9861555bb6",
+  "scripts/webinar/validate/transcript-qa-binding.test.mjs": "1f4901d22c5657e30583357562524a635949c01ac8c4ee047ae4f692e5770d3b",
+  "scripts/webinar/validate/validate-session.mjs": "2b34daf2504128162d4c329e702d4745d167fbe4c5dcad2d204b192d909cf8f9",
+  "scripts/webinar/validate/validate-session.test.mjs": "d7e354859665acaba65356275128e3a074b69f5256891d0f47dbac5eba16b4ab"
+}

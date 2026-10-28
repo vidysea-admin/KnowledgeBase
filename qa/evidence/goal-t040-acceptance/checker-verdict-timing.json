@@ -1,0 +1,20 @@
+{
+  "resumedCheckLaunch": "2026-10-14T19:14:39.2568542Z",
+  "finalCandidatePinsRead": "2026-10-14T20:03:11.7557712Z",
+  "finalValidatorPinsRead": "2026-10-14T20:04:02.3365118Z",
+  "persistedConfirmedAt": "2026-10-14T20:05:23.4867654+00:00",
+  "resumedToPersistSeconds": 3044.2299112,
+  "verdict": "qa/verdicts/goal-t040-acceptance.md",
+  "verdictSHA256": "10A2803E1CDB79B4C6891BCD18E51E3600FF0BB08EB84A84BD91313F6E10B30E",
+  "scope": "inspector-only; full T-040 HOLD",
+  "unmeasuredPhases": [
+    "individual review boundaries",
+    "grant request/resolution",
+    "draft start",
+    "active-work subtotal"
+  ],
+  "elapsedIncludes": [
+    "sole CPU queue",
+    "separate product-composition assignment"
+  ]
+}

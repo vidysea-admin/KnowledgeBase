@@ -1,0 +1,65 @@
+{
+  "label": "deadline-repaired-original-composition",
+  "old_vector": [
+    "original runtime",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=^(actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child)$",
+    "--import",
+    "tsx",
+    "apps/api/src/evaluation-flywheel/composition.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "actual_total_tokens": null,
+  "authority": "root authorized compatible vector repair; maker evidence only",
+  "new_vector": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test-isolation=none",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=^(actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child)$",
+    "--import",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\safe-test-runtime\\register.mjs",
+    "apps/api/src/evaluation-flywheel/composition.test.ts"
+  ],
+  "change": "bundled working Node; in-process isolation; same graph synchronous safe bootstrap; original test selection retained",
+  "env_selected": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0",
+    "T054_AUTHENTIC_INPUT_OPT_IN": "0",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "0",
+    "TMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp",
+    "TEMP": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\repaired-temp"
+  },
+  "runtime_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "bootstrap_sha256": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+  "lock_sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "pins_before": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "7fb3b763a65b6c4ee2ba82b9ed822d116d111ebca352e3d92b5a3a7fcf06b279",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "82059ce5f050b28ea7ca09b10354d9ea4425701ef75c418b1d0649fa5de1d47e",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "exit": 7,
+  "counts": {},
+  "rows_restored": true,
+  "duration_s": 1.2349999999996726,
+  "pins_after": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "7fb3b763a65b6c4ee2ba82b9ed822d116d111ebca352e3d92b5a3a7fcf06b279",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "82059ce5f050b28ea7ca09b10354d9ea4425701ef75c418b1d0649fa5de1d47e",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+    "apps/api/src/evaluation-flywheel/workflow.test.ts": "94563bffce039a5158c834899ec4db17e28e24164536c4182d7429aaa47700d8",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "qa/contracts/goal-t059.md": "aa2cbf36698158f5a92dad3386ad9a8c41e0b31420f38f27968c5e11c17ae1bd",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426"
+  },
+  "pins_unchanged": true
+}

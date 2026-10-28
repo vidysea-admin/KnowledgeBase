@@ -1,0 +1,47 @@
+{
+  "ready": [
+    "t015-cycle1-stale",
+    "t059-independent-isolated",
+    "t059-independent-rows"
+  ],
+  "skipped": [
+    {
+      "n": "t056-api",
+      "drift": [
+        [
+          "apps/api/src/visibility/knowledge.ts",
+          "D5E451C463D275D499EA56A62CC434002531617FD05D32DC68A2ABBE7EA482A8"
+        ]
+      ]
+    },
+    {
+      "n": "t053-api",
+      "drift": [
+        [
+          "apps/api/src/source-intake/store.ts",
+          "5c8197ae98b558e5b45131660b13bdf8595c0c71e025951a85da75c1917ea0e1"
+        ],
+        [
+          "apps/api/src/source-intake/jobs/types.ts",
+          "f989ea509df99f0b80bf9471cd85fe6a8db1e1d920e72f81da125b309d2ab59c"
+        ],
+        [
+          "apps/api/src/source-intake/jobs/store.ts",
+          "677319c73124da30f60da3322f2dae2e1a83e18d48514e1985f6d5d6adf72fa8"
+        ],
+        [
+          "apps/api/src/source-intake/jobs/worker.ts",
+          "7a91ead1039834b43422e2458bd1dc355d23924f9071ea3d19afcf76f72309e9"
+        ],
+        [
+          "apps/api/src/composition/integrations/source-jobs.ts",
+          "8a62f468831cebe14b2b56d2d1b249fb59b7ba13263e2adde64b4f36eb218e59"
+        ],
+        [
+          "apps/api/src/composition/integrations/routes.ts",
+          "151ff2101596257307cbe01f70d04adfc43e2eed5d9cba5c57bc772c88b02603"
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "fields": {
+    "Verdict": [
+      "HOLD"
+    ],
+    "Cycle checked": [
+      "0"
+    ],
+    "Reviewed SHA": [
+      "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de"
+    ]
+  },
+  "sha256": "aabce1a7b63c9e16e994d32bb5a3ecd0871c4f1f5ad43fc9c74b7bee2e8a61ba",
+  "parser": "unambiguous anchored field parse; authoritative single fields"
+}

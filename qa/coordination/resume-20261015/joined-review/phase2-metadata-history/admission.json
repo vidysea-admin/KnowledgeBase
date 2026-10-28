@@ -1,0 +1,39 @@
+{
+  "status": "METADATA_REBOUND_PENDING_TWO_FOCUSED_REFRESHES",
+  "dispatch_allowed": false,
+  "semantic_verdict": null,
+  "created_utc": "2026-10-15T22:47:44.933138+00:00",
+  "candidate_sha256": "eebad8d658fad78a678eae50252909b44c567f0184feda35bdbc3df97be122de",
+  "candidate_kind": "dirty-source-content-sha256-not-Git",
+  "required_pending": [
+    "Current T03713+2 broker receipts on exact current93path closure; retain old archive-spool mismatch historically",
+    "Current smallest PolicyAskPage timestamp-fixture rerun receipt; retain previous21 UI receipt historically",
+    "Fresh helper validate after exact focused refresh binding; helper assess before next phase",
+    "Root manual native checker allocation/instruction admission; no managed launcher controls/startup assurance or hardcap claimed"
+  ],
+  "source_pin_mismatches": [],
+  "dependency_pin_mismatches": [
+    {
+      "path": "packages/meeting-bot/src/capture/native/native-archive-spool.ts",
+      "receipt_sha256": "119d23af7c90dfea17b4de7512b0c5427b75cb385d083202f0afc245e34aef16",
+      "current_sha256": "20fc2be5cf6c5eca87d7549c3d0dc4668c3f6940bcde2b387641e228b5290470",
+      "match": false
+    }
+  ],
+  "historical_usage": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-runtime-validation-20261015\\independent-telemetry.json",
+    "classification": "shared prior control-validation review; preserved not reset or charged to this new unit",
+    "actual_total_tokens": 133880,
+    "prior_limit": 51981,
+    "actual_active_s": null,
+    "breach": true
+  },
+  "ratio_status": "UNVERIFIED",
+  "native_hard_total_token_cap_established": false,
+  "helper_results": "helper-results.json",
+  "pure_validate_status": "INVALID_OR_BLOCKED exit2: incomplete maker packet",
+  "pure_assess_status": "BOOTSTRAP_REVIEW exit0, ratio unverified",
+  "updated_utc": "2026-10-15T22:57:59.904030+00:00",
+  "central_gate_binding": "central-gates.json",
+  "historical_phase": "phase1-metadata-history"
+}

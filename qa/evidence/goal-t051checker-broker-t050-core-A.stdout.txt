@@ -1,0 +1,41 @@
+✔ graph order: nodes run in the definition's dependency order and the job finishes (146.7707ms)
+✔ ISS-T050GRAPH-001 skip-screen: skipping screen while index runs is refused (record-commands.ts:90 --index requires --process-video) (1.9049ms)
+✔ a skipped optional LEAF stage (nothing depends on it) is still skipped cleanly and the job finishes (84.203ms)
+✔ ISS-T050GRAPH-001 screen-failed: a failed screen is failed-terminal and index never runs (66.6561ms)
+✔ graph order: with the optional node enabled all five run in order, each fed its upstream's output fingerprint (73.1133ms)
+✔ resume after a crash mid-graph: finished stages are not re-run, the interrupted one resumes with lease-expired, downstream inputs match an uncrashed run (131.4619ms)
+✔ resume after a crash inside a node (handler never returns): the next worker re-runs only that node (54.0715ms)
+✔ a completed run is idempotent: running the graph again on the same lease runs no node (60.447ms)
+✔ a node failure stops downstream nodes: a non-retryable code ends the run and nothing after it runs (34.241ms)
+✔ a retryable failure retries the SAME node with a rising attempt number, then stops downstream when attempts run out; a transient failure recovers (118.8364ms)
+✔ a throwing handler is a failed attempt (node-threw, non-retryable), not an executor crash, and its message is not recorded (38.0952ms)
+✔ tenant isolation: the same run key in two tenants runs separately; a failure in one never touches the other; handlers only see their own tenant (64.7928ms)
+✔ a worker whose lease was superseded is refused before any node runs (6.9278ms)
+✔ a live attempt elsewhere reports waiting and runs nothing (9.2592ms)
+✔ buildGraph validates against the definition: missing, unknown and non-optional skips are refused; inherited handlers do not count (0.4624ms)
+✔ the iteration cap stops a graph that never settles (20.2174ms)
+✔ cap boundaries preserve zero work and require a final planner step after the last stage (93.1802ms)
+✔ long retry workflows use the caller cap rather than LangGraph's default recursion ceiling (223.0847ms)
+✔ workflow stage names remain independent of library reserved names (62.3702ms)
+✔ real-file cancellation survives reopening, isolates tenants, and requires explicit resume (79.8295ms)
+✔ corrupt control is refused byte-for-byte instead of overwritten by cancel or resume (26.1762ms)
+✔ real process restart: committed checkpoint uses at-least-once replay without losing downstream output (5764.8019ms)
+✔ real process restart: unacknowledged checkpoint uses at-least-once replay without losing downstream output (5076.2329ms)
+✔ a handler outlasting the real lease is actively heartbeated and no worker can reclaim it (738.0559ms)
+✔ durable cancellation aborts the running handler, fails the job, and never starts downstream (94.097ms)
+✔ superseded holder cannot acknowledge a stage result after another worker claims the expired lease (8.2427ms)
+✔ a queue id forgotten by retention cannot certify new input using an old complete checkpoint (14.6714ms)
+✔ a session runs capture -> media -> transcript -> screen -> index and finishes the job as done (82.7255ms)
+✔ D-139: a terminal stage failure is outcome failed-terminal and the queue job is dead; a resubmit is a NEW generation that re-runs (64.0846ms)
+✔ a finished run is idempotent: a second call claims nothing and runs no handler (39.7789ms)
+✔ tenants are isolated: tenant B's session never claims tenant A's job (89.3297ms)
+✔ a handler set that does not match the workflow is refused before anything is queued (0.7412ms)
+✔ the heartbeat decorator beats while a handler runs and stops when the stage settles (275.8477ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38249.7195

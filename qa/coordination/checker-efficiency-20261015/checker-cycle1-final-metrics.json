@@ -1,0 +1,36 @@
+{
+  "start_monotonic": 144079631073,
+  "end_monotonic": 144919726327,
+  "frequency": 10000000,
+  "started_at": "2026-10-15T07:45:18.0836957Z",
+  "ended_at": "2026-10-15T07:46:42.1065921Z",
+  "active_s": 84.0095254,
+  "wait_s": 0,
+  "wait_intervals": [],
+  "tokens": null,
+  "cost": null,
+  "allocation": {
+    "tokens": 3000,
+    "active_s": 120
+  },
+  "historical_actual": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "historical_debit": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "children": [],
+  "cycle1_command_attempts": [
+    "checker-cycle1-tests",
+    "checker-cycle1-workspace-tests",
+    "checker-cycle1-probe"
+  ],
+  "limits": {
+    "tokens": 9000,
+    "active_s": 300
+  },
+  "ratio_verified": false
+}

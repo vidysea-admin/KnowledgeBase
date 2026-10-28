@@ -1,0 +1,60 @@
+{
+  "status": "checked-PASS",
+  "unit": "watched-cadence-launcher",
+  "fix_cycle": 2,
+  "candidate_git_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+  "base_git_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "authoritative_verdict": "PASS",
+  "parser_exit": 0,
+  "scope": "ONLY8filelocalimplementation/offline slice",
+  "source_count": 8,
+  "source_content_digest": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+  "evidence": [
+    {
+      "path": "qa/verdicts/watched-cadence-launcher.md",
+      "sha256": "555679b1fc4eb12808d227cf53a35edac481eb3882ec21857bb9d1e1cfe15764"
+    },
+    {
+      "path": "qa/manifests/watched-cadence-launcher.md",
+      "sha256": "d8cdc13bd5817e69561f7af04ce7df381c33874339b87da82957547941c7bddb"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/source-eight-git-proof.json",
+      "sha256": "a96ca72454a5b25f1e622eaaac3a24847c8ec1bbc1621082ca666cc88dd06d43"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/verdict-parser-readback.json",
+      "sha256": "f0be5b00cdb14632bf20e9f8feed10f1f9034e133580a69f1fb4182e6b714b32"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/completion-accounting.json",
+      "sha256": "5bdbb1e61bad938fddf714a719710380cc021cb7fa96ce371784a14e36e70624"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/evidence/cycle1-verdict.md",
+      "sha256": "e1ef42f08c8eeea54e59cf3ae4a3dd5cd268105ed2285654ca682a5c3e2d2d61"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/cycle2/independent-checker/broker-pending-checkpoint.json",
+      "sha256": "37eaa3d8995ee3f20624c8dc9ac062462fc20c158806a602f20b62c47f6be4ba"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/watched-checker-cycle2-final-seal.json",
+      "sha256": "88cecf58722913b5ad2097576dbd1736250334a63a154dc0b5ac61a2885eb677"
+    }
+  ],
+  "independent_probe": "2pass0fail0skip",
+  "contracts": "Actualexit0; nofrozencontracts/PASSbyvacuity; invocationonly, notallcontracts/data-stagePASS",
+  "parent_T053": "in_progress unchanged",
+  "parent_gates": "live/human/provider/native/Mongo/deployment/integration/release OPEN; no39countincrease",
+  "accounting": "Prior180s/24000 +90s/12000 cumulative270s/36000 retained; actualmaker/checkerunknownnull; ratioUNVERIFIED;late60unused",
+  "source_edits": 0,
+  "task_or_decision_edits": 0,
+  "staging_or_commit": 0,
+  "handshake_parser": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/watched-cadence-review/closeout/manifest-parser-readback.json",
+    "exit": 0,
+    "sha256": "af0febd1380aa98ec61eacad60969ab9fe9b5c9795dfb9b5bc83b6c7df75af60"
+  },
+  "metadata_parser_repair": "InitialcanonicalHandshakeStatusreturnednull forlegacyStatusonly; addedcanonicalboldHandshake status field matchingchecked-PASS, thenexistingparserpassed. No source/testexecution."
+}

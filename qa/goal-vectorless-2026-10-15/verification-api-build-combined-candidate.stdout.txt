@@ -1,0 +1,6 @@
+
+> @lkb/api@0.0.0 build C:\Users\product\Desktop\KnowledgeBase\apps\api
+> node scripts/build.mjs
+
+built apps\api\dist\server.js (1521847 bytes)
+external packages: @langchain/langgraph, ajv/dist/2020.js, dotenv, express, express-rate-limit, mongodb, pdfjs-dist/legacy/build/pdf.mjs

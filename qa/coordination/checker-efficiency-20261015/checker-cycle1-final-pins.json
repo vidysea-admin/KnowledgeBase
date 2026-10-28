@@ -1,0 +1,22 @@
+[
+  {
+    "Algorithm": "SHA256",
+    "Hash": "F24A90DA84E89A8A03E4A405997F6A0A9ADD3C4F9E1C282471D0BF9237542BBF",
+    "Path": "C:\\Users\\product\\.agents\\skills\\checker\\scripts\\review_budget.py"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "45B1FD647CEF4612D12A8ECB333129A8CF6DDEB2A78823F0CFAF4772A5D9A2D0",
+    "Path": "C:\\Users\\product\\.agents\\skills\\checker\\SKILL.md"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "C46EABF72AB8A75B2214925430AE71F402D0618B0953E2CF13BB63FF5AC4CEBC",
+    "Path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\checker-efficiency-20261015\\canonical-candidate\\test_review_budget.py"
+  },
+  {
+    "Algorithm": "SHA256",
+    "Hash": "5135F571E81EFB4B37C21E9E2B42305EEB6DD40167462AC0615A6A25482A700B",
+    "Path": "C:\\Users\\product\\.codex\\AGENTS.md"
+  }
+]

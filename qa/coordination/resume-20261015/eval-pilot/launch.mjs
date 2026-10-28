@@ -1,0 +1,24 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const root=process.cwd(), out=resolve(root,'qa/coordination/resume-20261015/eval-pilot');
+const e=await import(pathToFileURL(resolve(root,'scripts/eval/vectorless-production-eval.mjs')).href);
+await mkdir(out,{recursive:true});
+const startedAt=new Date().toISOString();
+const corpus=e.freezeInputs();
+const id=corpus.questions.map(q=>q.id).sort()[0];
+const config={execution:'real-provider',mode:'pilot',dispatchReal:true,model:'glm-5.3-flash',questionIds:[id],grant:{scope:'single-question-pilot',id:'root-user-approved-ollama-single-question-20261015'},limits:{maxAttempts:3,maxSeconds:60,callTimeoutMs:20000,maxInputBytes:32000,maxRequestBytes:32000,maxResponseBytes:262144,outputLimit:256,maxKnownInputTokens:32768,maxKnownOutputTokens:768}};
+e.validateConfig(config);
+const providerPath='packages/ai/src/providers/ollama-cloud.ts';
+const providerBytes=await readFile(resolve(root,providerPath));
+const metadata=providerBytes.toString('utf8');
+if(!metadata.includes('OLLAMA_CLOUD_PRIMARY_MODEL = "glm-5.3-flash"'))throw Error('configured model drift');
+const grant={format:'root-single-question-pilot-binding-v1',actor:'root acting on explicit user-approved goal',id:config.grant.id,scope:config.grant.scope,approvedAt:startedAt,expiresAt:new Date(Date.parse(startedAt)+3600000).toISOString(),corpusSha256:corpus.sha256,sourceCandidateSha256:e.sourcePairIdentity(),configSha256:e.digest(config),selection:'first approved question ID in deterministic lexical sort',questionId:id,budget:config.limits,evidenceReference:'parent root explicit single-question Ollama grant; no Umesh signature asserted',usagePolicy:'observed-tokens-stop-on-unknown-no-strict-input-token-cap',providerMetadata:{path:providerPath,sha256:e.digest(providerBytes),configuredModel:'glm-5.3-flash',availability:'configured-access-unverified'}};
+await writeFile(resolve(out,'config.json'),JSON.stringify(config,null,2)+'\n');
+await writeFile(resolve(out,'grant-binding.json'),JSON.stringify(grant,null,2)+'\n');
+const before=corpus.bindings.map(({path,sha256,bytes})=>({path,sha256,bytes}));
+await writeFile(resolve(out,'before-pins.json'),JSON.stringify(before,null,2)+'\n');
+// Existing metadata explicitly labels model access unverified; root forbids guessing model availability.
+const refusal={status:'BLOCKED_MODEL_AVAILABILITY_UNVERIFIED',ownExit:2,startedAt,completedAt:new Date().toISOString(),productionEntrypoint:'scripts/eval/vectorless-production-eval.mjs#evaluate',configuredModel:config.model,questionId:id,corpusQuestions:corpus.questions.length,candidates:corpus.candidateIds.length,corpusSha256:corpus.sha256,sourceCandidateSha256:grant.sourceCandidateSha256,configSha256:grant.configSha256,rootGrantId:grant.id,providerAttempts:0,credentialRead:false,promptsPrinted:false,sourcePins:before.length,beforeAfterPinsMatch:e.bindingsMatch(root,corpus),modelAvailabilityEvidence:'Provider listModels() explicitly labels configured models access unverified; no existing account-available metadata supplied',requiredNextJoin:'Reuse authentic credential-bound available-model metadata, or root-authorize bounded availability discovery; do not guess/provision a model',humanLabels:0,full92:false,usage:null,citations:[],latencyMs:Date.now()-Date.parse(startedAt),acceptance:'HOLD'};
+await writeFile(resolve(out,'receipt.json'),JSON.stringify(refusal,null,2)+'\n');
+console.log(JSON.stringify(refusal));process.exitCode=2;

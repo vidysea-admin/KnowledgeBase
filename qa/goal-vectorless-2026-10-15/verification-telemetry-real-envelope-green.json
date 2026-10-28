@@ -1,0 +1,70 @@
+{
+  "phase": "maker-verification",
+  "scope": "Telemetry real-envelope repair plus original four regressions",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "base_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate_sha": "72a3514fbc8f65187af387d124c5cc28d711da3f807ba6169753af83318f16c8",
+  "candidateIdentityKind": "SHA256 of ordered scoped final-file pins; not a Git commit",
+  "command": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "scripts/qa/review-runtime-usage.test.mjs"
+  ],
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "runtime_version": "v24.19.0",
+  "runtime_executable_sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+  "runtime_identity": {
+    "executable": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "version": "v24.19.0",
+    "sandbox": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+  },
+  "lock_hash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "import_root": "C:/Users/product/Desktop/KnowledgeBase",
+  "environment_hash": "1f6b045ea8ea78388b899ea4c9e324c4cb6e81929b685d030acc40df41e48bac",
+  "environmentWhitelistHashes": {
+    "NODE_ENV": null,
+    "NODE_OPTIONS": null,
+    "TSX_TSCONFIG_PATH": null,
+    "TEMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "TMP": "506822de3f02be25beab9d9d6dea758bb2d6ceb586efbd7ee097f23a13fbc19a",
+    "KB_U24_PRIVATE_TOC_TESTS": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_RETRIEVAL_MODE": null,
+    "T054_AUTHENTIC_INPUT_OPT_IN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+  },
+  "environmentValuesOmitted": true,
+  "testIDs": [
+    "all five telemetry fixture cases"
+  ],
+  "timeoutMs": 15000,
+  "startedAt": "2026-10-15T11:27:34.035Z",
+  "completedAt": "2026-10-15T11:27:34.475Z",
+  "elapsedMs": 438.0818,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "scripts/qa/review-runtime-usage.test.mjs": "7e6c7e26f0d25b0247c39c779068d1d63b4341f7e1c6cc91d5e214e78c65d2bc",
+    "scripts/qa/review-runtime-usage.mjs": "694c7971c24abf1d0534808fa77772acae3d9b49ddc08ee03ddacbcad75582cb",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "qa/fixtures/review-runtime-usage-ordinal.jsonl": "6dca42de2cb7e706102eae9463d8ca540558ffc831d085b82e0af71b8941f2e9"
+  },
+  "after": {
+    "scripts/qa/review-runtime-usage.test.mjs": "7e6c7e26f0d25b0247c39c779068d1d63b4341f7e1c6cc91d5e214e78c65d2bc",
+    "scripts/qa/review-runtime-usage.mjs": "694c7971c24abf1d0534808fa77772acae3d9b49ddc08ee03ddacbcad75582cb",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "node_modules/tsx/package.json": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+    "node_modules/tsx/dist/esm/index.mjs": "206f38b4bddcbc686dab39ff37df516eedfb1b2d58afbc3c47ea5b9417d3ad54",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "qa/fixtures/review-runtime-usage-ordinal.jsonl": "6dca42de2cb7e706102eae9463d8ca540558ffc831d085b82e0af71b8941f2e9"
+  },
+  "stdoutPath": "qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-green.stdout.txt",
+  "stderrPath": "qa/goal-vectorless-2026-10-15/verification-telemetry-real-envelope-green.stderr.txt",
+  "hashesUnchanged": true,
+  "executionContext": "require_escalated auto-review approved; Windows host; one serial CPU command; only ignored dist/cache build artifacts may change"
+}

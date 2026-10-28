@@ -1,0 +1,42 @@
+{
+  "next_phase": {
+    "cost": null,
+    "tokens": 2200,
+    "active_s": 90,
+    "kind": "review"
+  },
+  "bootstrap_scope": "One source-reader exact candidate security review; readiness HOLD until runtime barrel dependency identity authenticated",
+  "completion_reserve": true,
+  "completion_reserve_id": "source-connectors-vectorless/cycle0/3ae4340d09fa543d3bf968c4d4d671699c9dd37d46fb4c91b3c3c45eee12bbce",
+  "reviewers": [
+    {
+      "cost": null,
+      "id": "vectorless_checker-wip-shared",
+      "budget_debit": {
+        "cost": null,
+        "tokens": 6000,
+        "active_s": 180
+      },
+      "tokens": null,
+      "active_s": null
+    }
+  ],
+  "maker": {
+    "cost": null,
+    "tokens": null,
+    "active_s": null
+  },
+  "bootstrap": {
+    "tokens": 6000,
+    "active_s": 180
+  },
+  "escalation": {
+    "reason": "Mandatory source resource/credential boundary review; historical shared debit preserved and centrally deduplicated; ratio unverified",
+    "limits": {
+      "cost": null,
+      "tokens": 9000,
+      "active_s": 300
+    },
+    "authority": "Root explicit finite cumulative admission 2026-10-15"
+  }
+}

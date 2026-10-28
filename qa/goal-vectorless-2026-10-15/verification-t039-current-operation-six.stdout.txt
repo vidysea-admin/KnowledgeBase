@@ -1,0 +1,14 @@
+✔ canonical queued/recording operations without scheduled files block their own meeting across restart (81.2843ms)
+✔ readLiveJobs: missing state is no jobs; corrupt or wrong-shape state throws (cannot tell) (81.7021ms)
+✔ all durable routes require exact scope and owning tenant; forged body/query/path cannot control jobs (231.1809ms)
+✔ managed adapter does not disclose base reader paths or tokens in planner refusals (0.8203ms)
+✔ default authority is canonical operations: expired scheduled file cannot hide an active operation (56.559ms)
+✔ duplicate through the REAL live-job reader: a scheduled job file for the meeting -> 409; a corrupt one -> 503 (cannot tell), nothing launched (26.9621ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5175.1699

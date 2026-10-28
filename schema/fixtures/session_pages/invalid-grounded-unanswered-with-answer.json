@@ -1,0 +1,1 @@
+{"_id":"pg3","tenantId":"toc","sessionId":"sess1","summary":"x","evidence":[{"turnId":"t1","sessionId":"sess1"}],"qa":[{"id":"q2","question":"What is the fee?","questionEvidence":[{"turnId":"t5","sessionId":"sess1","quote":"What is the fee?"}],"answer":"It is free.","answerEvidence":[],"status":"unanswered"}]}

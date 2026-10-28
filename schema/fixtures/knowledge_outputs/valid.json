@@ -1,0 +1,52 @@
+{
+  "_id": "a4510c58-343f-4874-a31f-2734d8ef1851",
+  "tenantId": "isolated-t058-fixture",
+  "kind": "faq",
+  "title": "Applications FAQ",
+  "purpose": "Prepare admissions questions",
+  "sessionIds": ["session-fixture"],
+  "revision": 1,
+  "createdAt": "2026-10-14T12:00:00.000Z",
+  "updatedAt": "2026-10-14T12:00:00.000Z",
+  "sourceDigest": "0000000000000000000000000000000000000000000000000000000000000000",
+  "sourceCoverage": { "status": "partial", "withheldClaims": 0 },
+  "provider": "fixture-provider",
+  "model": "fixture-model",
+  "reviewState": "draft",
+  "policy": {
+    "policyId": "faq-policy",
+    "version": 1,
+    "questionClass": "faq",
+    "mode": "internal-only",
+    "style": "concise",
+    "onInsufficient": "review",
+    "citations": "required"
+  },
+  "sections": [{
+    "key": "faq",
+    "title": "Questions and answers",
+    "missing": "",
+    "items": [{
+      "id": "faq-1",
+      "kind": "fact",
+      "text": "Q: When do applications open?\nA: Applications open Monday.",
+      "citationIds": ["e1"],
+      "validation": "needs-review",
+      "assessmentDigest": ""
+    }]
+  }],
+  "citations": [{
+    "id": "e1",
+    "claimId": "claim-fixture",
+    "turnId": "turn-fixture",
+    "sessionId": "session-fixture",
+    "speakerRef": "speaker:1",
+    "speakerLabel": "Admissions expert",
+    "start": 3,
+    "end": 9,
+    "unit": "seconds",
+    "quote": "Applications open Monday.",
+    "href": "/sessions/session-fixture#turn-turn-fixture",
+    "claimStatus": "needs-review"
+  }]
+}

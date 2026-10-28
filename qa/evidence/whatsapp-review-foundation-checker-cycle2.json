@@ -1,0 +1,133 @@
+{
+  "slug": "whatsapp-review-foundation-20261014",
+  "cycle": 2,
+  "verdict": "PASS (unmounted foundation only)",
+  "run": {
+    "command": "node --input-type=module -e \"import {spawn} from 'node:child_process'; const p=spawn(process.execPath,['--test','--test-isolation=none','--test-concurrency=1','--test-timeout=30000','--import','./.cache/coordination/safe-test-runtime/register.mjs','qa/evidence/whatsapp-review-foundation-checker.test.ts'],{stdio:'inherit'}); const t=setTimeout(()=>{p.kill();process.exitCode=124},120000); p.once('exit',c=>{clearTimeout(t);process.exitCode=c??124})\"",
+    "start": {
+      "current_time": "2026-10-14 09:27:13 UTC"
+    },
+    "end": {
+      "current_time": "2026-10-14 09:27:16 UTC"
+    },
+    "chunk_id": "7ca3c0",
+    "wall_time_seconds": 1.9888947,
+    "exit_code": 0,
+    "original_token_count": 239,
+    "output": "✔ exact provenance edits acquire new identities even when duplicate hashes agree (6.2161ms)\n✔ failed materialisation removes approval and partial writes; retry preserves siblings (30.3062ms)\n✔ missing materializer and excluded source fail closed; rejection remains durable (2.9002ms)\n✔ tenant and stale source evidence cannot become publishable (1.4643ms)\n✔ unresolvable batch evidence cannot leave a partial proposal (1.0138ms)\n✔ idempotent decision responses refuse source evidence that has subsequently vanished (1.427ms)\n✔ valid-hash invented content and stripped personal/sensitive exclusions cannot be inserted (1.1578ms)\n✔ canonical lifecycle rejects impossible timestamps and excluded approved candidates (0.5128ms)\n✔ invalid injected decision time cannot persist a row outside the canonical lifecycle (0.9342ms)\nℹ tests 9\nℹ suites 0\nℹ pass 9\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1413.0113\n"
+  },
+  "pins": [
+    {
+      "path": "schema/whatsapp_candidates.schema.json",
+      "expected": "B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F",
+      "actual": "B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F"
+    },
+    {
+      "path": "schema/fixtures/whatsapp_candidates/valid.json",
+      "expected": "DDFFDD73DE29E477735F7EA450BAB0CB965DDE5E1AA0DF0138AFA379A23C7683",
+      "actual": "DDFFDD73DE29E477735F7EA450BAB0CB965DDE5E1AA0DF0138AFA379A23C7683"
+    },
+    {
+      "path": "schema/fixtures/whatsapp_candidates/invalid.json",
+      "expected": "DC51F56060864B87C009A8E000A0819D3EAB397B488F232AF0387BBBB430004B",
+      "actual": "DC51F56060864B87C009A8E000A0819D3EAB397B488F232AF0387BBBB430004B"
+    },
+    {
+      "path": "packages/core/src/generated/whatsapp_candidates.ts",
+      "expected": "32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10",
+      "actual": "32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/detection.ts",
+      "expected": "865228AC8A2F37AB82946BDC2BB08CFC618F40E3C1C7A8BED631024C3EA646AF",
+      "actual": "865228AC8A2F37AB82946BDC2BB08CFC618F40E3C1C7A8BED631024C3EA646AF"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/detection.test.ts",
+      "expected": "94D2F2ED357D0778712DF1B0C7E52DDC45CFEA3048FFB2A0EBE234E86608A0B5",
+      "actual": "94D2F2ED357D0778712DF1B0C7E52DDC45CFEA3048FFB2A0EBE234E86608A0B5"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/store.ts",
+      "expected": "C58FCD2581C75ACA47DA03974FD3093109392D4D14956763AE27C1F61479374C",
+      "actual": "C58FCD2581C75ACA47DA03974FD3093109392D4D14956763AE27C1F61479374C"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/store.test.ts",
+      "expected": "2D67FA67C0EE0AB2C87A48505D4E8FC3D72CE5144EDFA7F18C2BD71B932F7E22",
+      "actual": "2D67FA67C0EE0AB2C87A48505D4E8FC3D72CE5144EDFA7F18C2BD71B932F7E22"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/router.ts",
+      "expected": "0F3DD50960B9BDBBA4712FCDBBEA72EA25839D2BA257AE914BD3C0CB3EBE573A",
+      "actual": "0F3DD50960B9BDBBA4712FCDBBEA72EA25839D2BA257AE914BD3C0CB3EBE573A"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/router.test.ts",
+      "expected": "E3E46D08C63C958E460444D3D5F10571D4F73B5F29B3A1A070BD8C901BA8D033",
+      "actual": "E3E46D08C63C958E460444D3D5F10571D4F73B5F29B3A1A070BD8C901BA8D033"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/validation.ts",
+      "expected": "E7020BCD04CD3E6D82C1515EF088DE3C0DA91D74D09B707252F6BD120D89FF3F",
+      "actual": "E7020BCD04CD3E6D82C1515EF088DE3C0DA91D74D09B707252F6BD120D89FF3F"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/validation.test.ts",
+      "expected": "EF682D8303B0FAC122DA79B5F6716A576DC39136D87BE5D9981ACB3C1163CAB1",
+      "actual": "EF682D8303B0FAC122DA79B5F6716A576DC39136D87BE5D9981ACB3C1163CAB1"
+    },
+    {
+      "path": "apps/api/src/whatsapp/review/test-fixtures.ts",
+      "expected": "396AE050309DC64581EEFD937F3305331D90D6D5E2441E06C43D4F72DE0C4449",
+      "actual": "396AE050309DC64581EEFD937F3305331D90D6D5E2441E06C43D4F72DE0C4449"
+    },
+    {
+      "path": "qa/evidence/whatsapp-review-foundation-20261014-typecheck.mjs",
+      "expected": "F9933E92C864F0DBA237F01F502D63A588B95B89FAFA03CBA1B2D0E0826F6488",
+      "actual": "F9933E92C864F0DBA237F01F502D63A588B95B89FAFA03CBA1B2D0E0826F6488"
+    }
+  ],
+  "finalPinRead": {
+    "chunk_id": "556615",
+    "wall_time_seconds": 0.5374584,
+    "exit_code": 0,
+    "original_token_count": 986,
+    "output": "[\r\n  {\r\n    \"path\": \"schema/whatsapp_candidates.schema.json\",\r\n    \"expected\": \"B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F\",\r\n    \"actual\": \"B49E9681890DA26E7DECC89D5FB17D00B94735581F9C79E209DAD48CF415308F\"\r\n  },\r\n  {\r\n    \"path\": \"schema/fixtures/whatsapp_candidates/valid.json\",\r\n    \"expected\": \"DDFFDD73DE29E477735F7EA450BAB0CB965DDE5E1AA0DF0138AFA379A23C7683\",\r\n    \"actual\": \"DDFFDD73DE29E477735F7EA450BAB0CB965DDE5E1AA0DF0138AFA379A23C7683\"\r\n  },\r\n  {\r\n    \"path\": \"schema/fixtures/whatsapp_candidates/invalid.json\",\r\n    \"expected\": \"DC51F56060864B87C009A8E000A0819D3EAB397B488F232AF0387BBBB430004B\",\r\n    \"actual\": \"DC51F56060864B87C009A8E000A0819D3EAB397B488F232AF0387BBBB430004B\"\r\n  },\r\n  {\r\n    \"path\": \"packages/core/src/generated/whatsapp_candidates.ts\",\r\n    \"expected\": \"32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10\",\r\n    \"actual\": \"32F31FD21F6CFD72E3D819528878EC4C9BE659BA16C53779DD1F2EE896E60F10\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/detection.ts\",\r\n    \"expected\": \"865228AC8A2F37AB82946BDC2BB08CFC618F40E3C1C7A8BED631024C3EA646AF\",\r\n    \"actual\": \"865228AC8A2F37AB82946BDC2BB08CFC618F40E3C1C7A8BED631024C3EA646AF\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/detection.test.ts\",\r\n    \"expected\": \"94D2F2ED357D0778712DF1B0C7E52DDC45CFEA3048FFB2A0EBE234E86608A0B5\",\r\n    \"actual\": \"94D2F2ED357D0778712DF1B0C7E52DDC45CFEA3048FFB2A0EBE234E86608A0B5\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/store.ts\",\r\n    \"expected\": \"C58FCD2581C75ACA47DA03974FD3093109392D4D14956763AE27C1F61479374C\",\r\n    \"actual\": \"C58FCD2581C75ACA47DA03974FD3093109392D4D14956763AE27C1F61479374C\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/store.test.ts\",\r\n    \"expected\": \"2D67FA67C0EE0AB2C87A48505D4E8FC3D72CE5144EDFA7F18C2BD71B932F7E22\",\r\n    \"actual\": \"2D67FA67C0EE0AB2C87A48505D4E8FC3D72CE5144EDFA7F18C2BD71B932F7E22\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/router.ts\",\r\n    \"expected\": \"0F3DD50960B9BDBBA4712FCDBBEA72EA25839D2BA257AE914BD3C0CB3EBE573A\",\r\n    \"actual\": \"0F3DD50960B9BDBBA4712FCDBBEA72EA25839D2BA257AE914BD3C0CB3EBE573A\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/router.test.ts\",\r\n    \"expected\": \"E3E46D08C63C958E460444D3D5F10571D4F73B5F29B3A1A070BD8C901BA8D033\",\r\n    \"actual\": \"E3E46D08C63C958E460444D3D5F10571D4F73B5F29B3A1A070BD8C901BA8D033\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/validation.ts\",\r\n    \"expected\": \"E7020BCD04CD3E6D82C1515EF088DE3C0DA91D74D09B707252F6BD120D89FF3F\",\r\n    \"actual\": \"E7020BCD04CD3E6D82C1515EF088DE3C0DA91D74D09B707252F6BD120D89FF3F\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/validation.test.ts\",\r\n    \"expected\": \"EF682D8303B0FAC122DA79B5F6716A576DC39136D87BE5D9981ACB3C1163CAB1\",\r\n    \"actual\": \"EF682D8303B0FAC122DA79B5F6716A576DC39136D87BE5D9981ACB3C1163CAB1\"\r\n  },\r\n  {\r\n    \"path\": \"apps/api/src/whatsapp/review/test-fixtures.ts\",\r\n    \"expected\": \"396AE050309DC64581EEFD937F3305331D90D6D5E2441E06C43D4F72DE0C4449\",\r\n    \"actual\": \"396AE050309DC64581EEFD937F3305331D90D6D5E2441E06C43D4F72DE0C4449\"\r\n  },\r\n  {\r\n    \"path\": \"qa/evidence/whatsapp-review-foundation-20261014-typecheck.mjs\",\r\n    \"expected\": \"F9933E92C864F0DBA237F01F502D63A588B95B89FAFA03CBA1B2D0E0826F6488\",\r\n    \"actual\": \"F9933E92C864F0DBA237F01F502D63A588B95B89FAFA03CBA1B2D0E0826F6488\"\r\n  }\r\n]\r\n\r\nAlgorithm       Hash                                                                   Path\r\n---------       ----                                                                   ----\r\nSHA256          CFC47D33E4044ADDA0FC76008F625476D51CCAA0ECF53C579D8F53A8E4C1010A       C:\\Users\\product\\Desktop\\Knowle…\r\n# Manifest — whatsapp-review-foundation-20261014\r\n\r\n**Handshake status:** ready-for-check\r\nStatus: ready-for-check\r\nFix cycle: 2\r\nTask: T-007\r\nIssues: ISS-377, ISS-378 (high data-write findings; original corpus replayed verbatim).\r\n2026-10-14T09:27:35.4966870+00:00\r\n\r\n"
+  },
+  "originalProbePath": "qa/evidence/whatsapp-review-foundation-checker.test.ts",
+  "originalProbeSHA256": "CFC47D33E4044ADDA0FC76008F625476D51CCAA0ECF53C579D8F53A8E4C1010A",
+  "reproductions": {
+    "ISS-377": {
+      "recorded": 2,
+      "refused": 2,
+      "omitted": 0,
+      "inputs": [
+        "Personal medical details: password=abc123",
+        "Private medical details"
+      ]
+    },
+    "ISS-378": {
+      "recorded": 1,
+      "refused": 1,
+      "omitted": 0,
+      "input": "2026-02-30T10:00:00Z injected now, rejection transition",
+      "unchangedStatus": "needs-review"
+    }
+  },
+  "reusedMakerEvidence": {
+    "path": "qa/evidence/whatsapp-review-foundation-20261014.md",
+    "finalByteCombinedTests": 32,
+    "passed": 32,
+    "toolSeconds": 2.1825909,
+    "compilerRoots": 9,
+    "compilerSourceFiles": 258,
+    "compilerDiagnostics": 0,
+    "compilerToolSeconds": 3.1023783,
+    "schemaCollections": 30,
+    "schemaUnchanged": true,
+    "frozenContractCheck": "PASS by vacuity"
+  },
+  "runtimeSlot": "1, released after run",
+  "persistStarted": "2026-10-14 09:29:00 UTC"
+}

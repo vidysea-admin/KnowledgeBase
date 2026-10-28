@@ -1,0 +1,182 @@
+{
+  "version": 1,
+  "task": "T-057",
+  "status": "implementation-ready",
+  "implementationAuthorized": true,
+  "feature": "read-only application provider audit jobs",
+  "endpoint": {
+    "method": "GET",
+    "path": "/jobs"
+  },
+  "scope": {
+    "required": "jobs",
+    "authorization": "Root explicitly approved dedicated new jobs resource scope for the new read-only provider ledger. Existing arbitrary-string key schema and requireScope mechanism remain unchanged. sessions/keys privileges are not expanded.",
+    "independentReviewer": "/root/compete_tenancy_checker",
+    "keyIssuance": "Existing POST /keys accepts any nonempty array of string scopes under keys permission; no key was minted. Existing Settings checkbox choices omit jobs and require central integration."
+  },
+  "proposedResponse": {
+    "type": "object",
+    "required": [
+      "jobs",
+      "limit",
+      "truncated"
+    ],
+    "additionalProperties": false,
+    "properties": {
+      "jobs": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": [
+            "_id",
+            "kind",
+            "status",
+            "createdAt"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "_id": {
+              "type": "string"
+            },
+            "kind": {
+              "type": "string"
+            },
+            "status": {
+              "enum": [
+                "pending",
+                "processing",
+                "done",
+                "failed"
+              ]
+            },
+            "provider": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        }
+      },
+      "limit": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 100
+      },
+      "truncated": {
+        "type": "boolean"
+      }
+    }
+  },
+  "proposedQuery": {
+    "allowedKeys": [
+      "limit"
+    ],
+    "defaultLimit": 50,
+    "hardCap": 100,
+    "limitSyntax": "one scalar ASCII decimal matching ^[1-9][0-9]{0,2}$ and numeric range 1..100",
+    "invalidBehavior": "400 fixed error; reject duplicate, array/object, unknown keys and every tenant selector; no dependency call"
+  },
+  "proposedRead": {
+    "tenant": "only verified req.auth.tenantId; never URL/body/header tenant selector",
+    "database": "existing @lkb/db application database only; dedicated UPLOAD_QUEUE_DB excluded",
+    "sort": {
+      "createdAt": -1,
+      "_id": -1
+    },
+    "fetchLimit": "limit+1",
+    "truncated": "observed extra result exists; no count claim about all records",
+    "projection": "explicit whitelisted fields only; both DB projection and defensive HTTP projection",
+    "forbiddenFields": [
+      "tenantId",
+      "request",
+      "response",
+      "error",
+      "claimToken",
+      "leaseUntilMs",
+      "credentials",
+      "paths",
+      "costUsd",
+      "maxCost"
+    ],
+    "malformedRecord": "generic503, never silently label healthy or serialize raw row",
+    "cache": "private, no-store",
+    "statusSemantics": "provider-call audit entries; not end-to-end pipeline completion, aggregate cost or upload queue status",
+    "scope": "requireScope(\"jobs\") after existing requireAuth and rate limiter"
+  },
+  "owners": {
+    "dbBuilder": [
+      "packages/db/src/collections/jobs.ts",
+      "packages/db/src/collections/jobs.test.ts"
+    ],
+    "apiBuilder": [
+      "apps/api/src/jobs/router.ts",
+      "apps/api/src/jobs/router.test.ts",
+      "apps/api/src/jobs/store.ts",
+      "apps/api/src/jobs/store.test.ts"
+    ],
+    "webBuilder": [
+      "apps/web/src/api/jobs.ts",
+      "apps/web/src/api/jobs.test.ts",
+      "apps/web/src/pages/jobs/JobsPage.tsx",
+      "apps/web/src/pages/jobs/JobsPage.test.tsx"
+    ],
+    "singleIntegrator": [
+      "packages/db/src/index.ts",
+      "apps/api/src/server.ts",
+      "apps/api/src/fixtures.ts",
+      "apps/api/src/production.ts",
+      "apps/web/src/App.tsx",
+      "apps/web/src/layout/NavSidebar.tsx",
+      "apps/web/src/pages/SettingsPage.tsx",
+      "apps/web/src/pages/SettingsPage.test.tsx"
+    ]
+  },
+  "budgetsObserved": {
+    "packages/db/src/collections": {
+      "files": 20,
+      "cap": 30
+    },
+    "apps/api/src": {
+      "files": 33,
+      "cap": 31
+    },
+    "apps/api/src/routes": {
+      "files": 32,
+      "cap": 30
+    },
+    "apps/web/src/api": {
+      "files": 16,
+      "cap": 30
+    },
+    "apps/web/src/pages": {
+      "files": 20,
+      "cap": 30
+    }
+  },
+  "newJobsReadSeamPriorPASS": 0,
+  "constraints": [
+    "Root may dispatch implementation under approved dedicated jobs scope and machine spec; only independent checker can PASS",
+    "Do not edit schemas, frozen contracts, auth helper, Ask, upload worker, Meet, Sources explorer or existing session/dashboard pages",
+    "No DB, provider, browser, full suite, deployment or production changes in planning",
+    "qa/contracts belongs to independent checker"
+  ],
+  "frontendIsolation": {
+    "keyChange": "Immediately reset rows, loading/error and local stale-result generation on key change/logout. Late previous-key success or rejection cannot render under replacement key.",
+    "responseValidation": "Refuse malformed jobs/limit/truncated or whitelisted summary shapes, unknown statuses and poisoned extra properties; no silent partial success.",
+    "errors": "Fixed sanitized UI errors; never display a key string or backend raw error.",
+    "sourceLabel": "Application provider-audit records only; not dedicated upload queue or generalized pipeline completion."
+  },
+  "builderInterfaces": {
+    "ProviderJobSummary": "{_id:string,kind:string,status:\"pending\"|\"processing\"|\"done\"|\"failed\",createdAt:string,provider?:string,updatedAt?:string}",
+    "JobsReadResponse": "{jobs:ProviderJobSummary[],limit:number,truncated:boolean}",
+    "JobsReadDeps": "{listJobs(tenantId:string,limit:number):Promise<JobsReadResponse>}",
+    "dbAccessor": "jobs(tenantId:string) wrapping scopedCollection<Jobs>; single integrator exports barrel",
+    "storeContract": "createMongoJobsReadDeps(reader=jobs): JobsReadDeps; bounds limit before query; scoped find with explicit projection/sort/limit+1; validate/project result; test injected fake cursor without DB"
+  }
+}

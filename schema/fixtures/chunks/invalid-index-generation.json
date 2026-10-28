@@ -1,0 +1,24 @@
+{
+  "_id": "chk1",
+  "tenantId": "toc",
+  "sourceRef": "src1",
+  "turnRefs": [
+    "t1",
+    "t2"
+  ],
+  "chunkIndex": 0,
+  "vector": [
+    0.01,
+    -0.02,
+    0.03
+  ],
+  "dims": 3,
+  "embeddingModel": "gemini-embedding-001",
+  "indexArtifact": {
+    "version": 1,
+    "generation": "unbound",
+    "sessionId": "sess1",
+    "sourceId": "src1",
+    "turnDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  }
+}

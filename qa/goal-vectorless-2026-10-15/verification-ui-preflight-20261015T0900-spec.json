@@ -1,0 +1,31 @@
+{
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web",
+  "scope": "Installed UI runtime actual dependency imports and OS temporary directory writability preflight; no test suite",
+  "phase": "shared-integration-preflight",
+  "baseSha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "lockHash": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+  "executionContext": "require_escalated auto-review approved; Windows host; temporary probe only",
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "../../qa/goal-vectorless-2026-10-15/ui-preflight.mjs"
+  ],
+  "testIDs": [
+    "runtime/module-import/temp-writability"
+  ],
+  "env": {},
+  "timeoutMs": 20000,
+  "output": "qa/goal-vectorless-2026-10-15/verification-ui-preflight-20261015T0900",
+  "pins": {
+    "qa/goal-vectorless-2026-10-15/ui-preflight.mjs": "c7b343997287d9db2f2deecc590ce7e1c9c12e0614a87c53a502c62c70fb788d",
+    "qa/goal-vectorless-2026-10-15/verification-runner-v2.mjs": "473cf1ed4a8548ddfca09b9e1d7286ea798cbaafc4d1acf3fd5e815a45e4d297",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "apps/web/package.json": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+    "apps/web/vitest.config.ts": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+    "apps/web/node_modules/vitest/package.json": "f05ffa7018dadfad8ab2ca184b0b33fc4cb4be97b7bd93cddaef29d4d955df3c",
+    "apps/web/node_modules/vite/package.json": "59da0b2ed89adbcf6488810159915984f25338d5ce3c1b8534b3c493b8dcbd99",
+    "apps/web/node_modules/jsdom/package.json": "a6c20d5b30fe842827dcad2866ba234d5c98e9f901d84ea35939f14167e2ea27",
+    "apps/web/node_modules/react/package.json": "d4e68a5c96babb20cad1daafea8b78822eae45b341552cf5418d06a5304fa64c",
+    "apps/web/node_modules/@testing-library/react/package.json": "ea0085c08e11190e85ad706d64c145645c1aba18c63b1e920cfaf415d9bab31d"
+  }
+}

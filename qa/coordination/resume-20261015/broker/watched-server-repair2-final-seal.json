@@ -1,0 +1,89 @@
+{
+  "unitManifest": {
+    "path": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-watched-server-join-repair2.json",
+    "sha256": "1ad28fd36efe8eb92c454949ed2305a29dac8c6760f51d0e4dbea2dfabb4c797",
+    "count": 73
+  },
+  "canonicalPins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\83d54f4a5669c216d3330a3a42472c2fe8ed806466807c65ae2a73a5cc0e2363.json",
+    "sha256": "83d54f4a5669c216d3330a3a42472c2fe8ed806466807c65ae2a73a5cc0e2363",
+    "count": 1688
+  },
+  "commandReceipts": [
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-preflight-receipt.json",
+      "sha256": "f5ce2ea6c8b52bc44f32cbe13b21edb21d758e919bd22d04f1b0f9f11db73485",
+      "label": "watched-server-repair2-preflight",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.8430000000007567
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-root-types-receipt.json",
+      "sha256": "e1e424f20d2b6e67eda1ed1e51ba102cbdc1ff10cb06dbebd4ba8f7165b9a9a8",
+      "label": "watched-server-repair2-root-types",
+      "exit": 0,
+      "counts": {},
+      "active_s": 10.625
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-full-graph-receipt.json",
+      "sha256": "3bcbf025343b369730a649d66b0165698e069e3215bb26cd3695d973f7f9382e",
+      "label": "watched-server-repair2-full-graph",
+      "exit": 0,
+      "counts": {},
+      "active_s": 8.389999999999418
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-scoped-structure-receipt.json",
+      "sha256": "78b6c359ec23da0f083f0c2b71fea43e232250c868064ea6a3cd15e4ea76bdf0",
+      "label": "watched-server-repair2-scoped-structure",
+      "exit": 0,
+      "counts": {},
+      "active_s": 0.8600000000005821
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-server-repair2-focused16-receipt.json",
+      "sha256": "97800897d9165f5031ace4c752ec98ca2bd70cf895e03fee32f2207b9f111411",
+      "label": "watched-server-repair2-focused16",
+      "exit": 0,
+      "counts": {
+        "tests": 16,
+        "pass": 16,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "active_s": 13.90599999999904
+    }
+  ],
+  "upstreamReuse": [
+    {
+      "receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-cadence-new7-receipt.json",
+        "sha256": "5cc7877620195f1cb053265c4a267aae4aed4c33a5cb64efc5075da8798c5fef"
+      },
+      "tests": 7,
+      "eligible": true,
+      "scope": "only source-identical upstream test file; original flags retained in receipt"
+    },
+    {
+      "receipt": {
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-cadence-existing5-receipt.json",
+        "sha256": "74093d1804b3b8736a617416510f9ddb80482508d813f383ab0a780b499319f1"
+      },
+      "tests": 5,
+      "eligible": true,
+      "scope": "only source-identical upstream test file; original flags retained in receipt"
+    }
+  ],
+  "failure": null,
+  "elapsed_s": 35.68799999999828,
+  "finalPinsMatch": true,
+  "unit73PinsFinalMatch": true,
+  "sourceFreezeReleased": true,
+  "noNativeDecoderOrActivation": true,
+  "actual_total_tokens": null,
+  "independentVerdict": null
+}

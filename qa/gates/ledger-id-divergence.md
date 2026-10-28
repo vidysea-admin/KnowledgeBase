@@ -155,3 +155,5 @@ carefully, and the sweep proved that a second careful reader gets a different an
 fix measurable only if the id it cites resolves to the right row, so a rotting map silently weakens
 every measurement built on it — while still looking authoritative. The derivation and its test are
 the actual remedy; this table is just its output.
+
+**Gate status:** ANSWERED — recorded inline: 2026-09-08 — **option 2, "per-lane ledgers, merged on land"** — recorded as **D-019**

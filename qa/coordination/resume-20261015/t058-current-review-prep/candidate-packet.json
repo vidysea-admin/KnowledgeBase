@@ -1,0 +1,56 @@
+{
+  "policy_version": "managed-review/1",
+  "packet_kind": "candidate preparation fragment; not a validated launch envelope",
+  "unit": {
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "t058-saved-summary-refresh",
+    "cycle": 0,
+    "base_git_sha": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+    "current_git_head": "dbb719a5e0895f874aa4fb7cc9fcc23b460ec1c9",
+    "candidate_content_manifest_sha256": "3b7d35f8801dd853b2898dd6302e5199ec8f2f4a8bd4bb8be4064f883876dc98",
+    "candidate_identity_kind": "SHA256(path TAB raw-file SHA256 LF) over owned paths; not Git SHA",
+    "files": [
+      {
+        "path": "apps/web/src/pages/knowledge-outputs/KnowledgeOutputsPage.tsx",
+        "sha256": "f200db8eaec33a42daef1c41cc0949484358b3d62721501bdb00ce073df53080"
+      },
+      {
+        "path": "apps/web/src/pages/knowledge-outputs/workbench.ui.test.tsx",
+        "sha256": "5ec3d5f6568692749d2a0109b6037028e4877563b7ac849f8879420dcebc032f"
+      }
+    ]
+  },
+  "readiness": {
+    "complete": false,
+    "mutation_required": false
+  },
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "bootstrap_proposal": {
+    "token_metric": "actual_total",
+    "active_s": 180,
+    "tokens": 6000,
+    "authority": "proposal only; cannot reset historical UI2 charges"
+  },
+  "historical_accounting": [
+    "qa/coordination/knowledge-brain-20261015/product-delivery/outputs-review-assess-input.json",
+    "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-actual-manual-ledger-30-30.json",
+    "qa/coordination/knowledge-brain-20261015/product-delivery/final-bundle/ui2-current-independent-receipts-metadata.json"
+  ],
+  "historical_ui2_actual_total": 519546,
+  "historical_ui2_status": "NEEDS_EXTRA_REVIEW",
+  "usage_reconciliation": "Shared UI2 scope includes transcript; preserve complete immutable history and unknowns; do not charge all519546 exclusively to this tiny unit or reset it to zero.",
+  "dispatch_allowed": false,
+  "blockers": [
+    "manifest remains building, not ready-for-check",
+    "receipt base differs from current HEAD; explicit same-content execution-base reconciliation required",
+    "shared UI2 accounting/admission unresolved; finite future authority and runtime/startup bindings required",
+    "contract-derived epoch/refusal probe and independent source review remain required",
+    "validate and assess final complete managed-review/1 envelope before any launch"
+  ]
+}

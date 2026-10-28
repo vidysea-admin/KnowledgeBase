@@ -302,3 +302,5 @@ lines, the rules 218.
 3. **Non-Latin scripts are refused wholesale** by the shape guard's `\p{Lu}` requirement — a real
    limit, not just the particle list.
 4. **`"J"` from `"My name is J. Smith."`** ships as `person:j`. Carried from cycle 2, uncharged.
+
+**Handshake status:** superseded — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

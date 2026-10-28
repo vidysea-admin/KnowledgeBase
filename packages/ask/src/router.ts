@@ -30,7 +30,7 @@ export interface AskResult {
   sources: { internal: InternalSource[]; web: WebSource[] };
 }
 
-function internalSource(node: TreeIndexNode): InternalSource {
+export function internalSource(node: TreeIndexNode): InternalSource {
   const src: InternalSource = { node_id: node.node_id };
   if (node.evidence) src.evidence = node.evidence;
   return src;

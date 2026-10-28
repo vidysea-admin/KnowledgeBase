@@ -1,0 +1,15 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "import {check} from './scripts/lint-dirsize.mjs';import {loadConfig} from './scripts/lib/walk.mjs';import {readFileSync} from 'node:fs';import path from 'node:path';const c=loadConfig(process.cwd()),names=JSON.parse(readFileSync(process.argv[1],'utf8'));const dirs=[...new Set(names.map(p=>path.posix.dirname(p)))].sort();c.roots=dirs.filter(d=>!dirs.some(p=>p!==d&&d.startsWith(p+'/')));const result=check(process.cwd(),c);console.log(JSON.stringify({scopeRoots:c.roots,...result},null,2));process.exitCode=result.violations.length?1:0;",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\phase-a-structure-paths.json"
+  ],
+  "actual_total_tokens": null,
+  "pid": 23480,
+  "exit": 1,
+  "tree_close_completed": true,
+  "active_s": 0.10900000000037835,
+  "log_sha256": "e1d815007464d611d5262e3125967b450f06ad5e6cce9b8b2e431cc1494af83a"
+}

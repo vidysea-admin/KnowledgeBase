@@ -1,0 +1,19 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [{
+    "id": "canonical-adoption-checker",
+    "active_s": null, "tokens": null, "cost": null,
+    "budget_debit": {"active_s": 180, "tokens": 6000, "cost": null},
+    "shared_historical_id": "canonical-adoption-checker",
+    "prior_evidence": "../checker-efficiency-20261015/checker-accounting-checkpoint-input.json",
+    "scope_note": "Shared historical unknown overhead, deduplicate this ID centrally; not a fabricated review of this new unit"
+  }],
+  "next_phase": {"active_s": 90, "tokens": 2500, "cost": null},
+  "bootstrap": {"active_s": 180, "tokens": 6000},
+  "bootstrap_scope": "Fresh independent staged completion-reserve delta review only; first tool monotonic clock, at most60seconds investigation plus30seconds reserved for persistence/readback",
+  "escalation": {
+    "authority": "Root explicit finite review allocation2026-10-15:90active seconds2500allocated tokens; historical180seconds6000tokens conserved, cumulative270seconds8500tokens",
+    "reason": "Quality review of systemwide budget-control improvement; comparable total maker active time/tokens unknown,99.531seconds is only one implementation segment",
+    "limits": {"active_s": 270, "tokens": 8500, "cost": null}
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "schema": "raw-aggregate-projection/1",
+  "original": {
+    "rawOnDiskUnmodified": true,
+    "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-final-seal.json",
+    "availability": "EXTERNAL_LOCAL_RAW_FILE_NOT_IN_LEAN_COMMIT",
+    "sha256": "605f3ff6774600f7221ad09efb97420a4f46eaad2af945042785dda17ed4cd5d",
+    "bytes": 3879256
+  },
+  "transformation": "Retain all non-results fields; replace repeated embedded result objects with independently equal canonical-JSON digests of retained atomic raw receipts. Projection is derived, never the original receipt.",
+  "metadata": {
+    "elapsed_s": 89.60900000000038,
+    "pinsUnchanged": true,
+    "pinCount": 1890,
+    "fixtureRemoved": true,
+    "environment": {
+      "LKB_NATIVE_TEST_FFMPEG": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffmpeg.exe",
+      "LKB_NATIVE_TEST_FFPROBE": "C:\\Users\\product\\AppData\\Local\\Microsoft\\WinGet\\Packages\\Gyan.FFmpeg_Microsoft.Winget.Source_8wekyb3d8bbwe\\ffmpeg-9.0.2-full_build\\bin\\ffprobe.exe",
+      "LKB_NATIVE_TEST_BROWSER": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+      "LKB_NATIVE_TEST_PRIVATE_DIR": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\evidence\\native-acl-fixtures\\f5c28d68-4fb6-4411-bedb-7df3f1325295"
+    },
+    "accounting": "shared maker/integration, not checker",
+    "wholeFloorPASS": false,
+    "actual_total_tokens": null,
+    "independent_verdict": null
+  },
+  "resultReferences": [
+    {
+      "canonicalJsonSha256": "8b7da721454528ca13b8f075bed5a2d67f8dc87036c5f822962015fe7a3c621d",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-bot-types-receipt.json",
+        "rawBytes": 468815,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "922ccb878f0794ee003a4d216d12914f96777d7f7cfb6e13a2680a244c53dddb"
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "label": "genuine-phase-observer-bot-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-bot-types.log"
+    },
+    {
+      "canonicalJsonSha256": "a9d35d264a26cd05f95cb06b79f3d29aa76004b8ca7d783a4c4a8ba96f8da5de",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-root-fixture-types-receipt.json",
+        "rawBytes": 468916,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "b1056026547958e5ccf34e437d20932aec4c5a5c6ce2036a2c26639a55536ce7"
+      },
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "label": "genuine-phase-observer-root-fixture-types",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-root-fixture-types.log"
+    },
+    {
+      "canonicalJsonSha256": "c93f2aee0039a0240d2707782bcf1e6cb76606c53989dcd1f525cda73e46bf9c",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-scoped-loc-receipt.json",
+        "rawBytes": 470254,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "b15b236fb92d5c70881825542ff3bc10a2f84f3d2fc935e00fdbf94ada15fc73"
+      },
+      "logSha256": "1339388c708adbfefb704dbb928df30249461bc0c1ba3c891817b56eac0a648a",
+      "label": "genuine-phase-observer-scoped-loc",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-scoped-loc.log"
+    },
+    {
+      "canonicalJsonSha256": "922483cd734e7ff556d607dc5bf5f2b0a27684ed9907f5b2a5913718f2299ce8",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-acl-create-receipt.json",
+        "rawBytes": 469117,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "2ef59c86535441de4d2228f038238c035218f3dbb038c6c6e320d9916c151697"
+      },
+      "logSha256": "f6070bcdf2d3622ec8c91aa6ab08dc85c3b986adcc9d86ba564e403bfdde5959",
+      "label": "genuine-phase-observer-acl-create",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-acl-create.log"
+    },
+    {
+      "canonicalJsonSha256": "d816bc4d94090a1920263687f7bf15d5b39cb32654fddf67bc602a2686034744",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-acl-verify-receipt.json",
+        "rawBytes": 469320,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "6996d2ab16f00f29a025baac82036e79bcefefd0c1e66596da192a943213cd5b"
+      },
+      "logSha256": "c66b6389bccb32c81c29944a178c896b4f2a3af5a2450d6f49ea70c4a57ede20",
+      "label": "genuine-phase-observer-acl-verify",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-acl-verify.log"
+    },
+    {
+      "canonicalJsonSha256": "15f17d68fa457abdfc1082e316a3d02d3146c7e8c5a9d75961227806090fb32e",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-throwing-order-regression-receipt.json",
+        "rawBytes": 469611,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "dcf8740c49de1210984ef8ae9f0a083b4922b988e8d2d0b8099f98feeb5ac3e6"
+      },
+      "logSha256": "6cb28c8f653a023b50c24f31f42a117aebc859385a377f6218ad0f0cd12e9432",
+      "label": "genuine-phase-observer-throwing-order-regression",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-throwing-order-regression.log"
+    },
+    {
+      "canonicalJsonSha256": "c432bfce7bff7281c0970fee1fa16cfcd0ac4ebcd25b96b6502a2b785a7c21d5",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-original-positive-receipt.json",
+        "rawBytes": 470717,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "5860922c300887013b8fc17998e72cf63d6129de7b2a207c01ba75164e8c1011"
+      },
+      "logSha256": "3959af50396e05b73e09f4f9aa33d49d6e04252be13143e4a4f4bfe26aab239d",
+      "label": "genuine-phase-observer-original-positive",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-original-positive.log"
+    },
+    {
+      "canonicalJsonSha256": "4adca86a45a7f6b1b28aedef661fad8ca57aa8122e061d33a59685fd5f37eb5e",
+      "canonicalAtomicReceipt": {
+        "path": "qa/coordination/resume-20261015/broker/genuine-phase-observer-acl-cleanup-receipt.json",
+        "rawBytes": 469206,
+        "availability": "RETAINED_IN_LEAN_PROPOSAL",
+        "rawSha256": "8dccf7185c5793adaa04c09dcb21da5c087a67c7af681fd01829458a9a897a07"
+      },
+      "logSha256": "263236aaea972b5c80390ade258a9139e5b46f85daeb0a9f13717e25609eb6ae",
+      "label": "genuine-phase-observer-acl-cleanup",
+      "log": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\genuine-phase-observer-acl-cleanup.log"
+    }
+  ]
+}

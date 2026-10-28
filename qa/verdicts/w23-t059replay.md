@@ -1,0 +1,20 @@
+# Verdict: w23-t059replay (ISS-T059REPLAY-001)
+
+VERDICT: PASS
+Cycle checked: 0
+Reviewed SHA: 6c16c9dc501e5dbf2c533e3a74cc07ee489197bd
+Base SHA: 3c99337f
+Files reviewed: apps/api/src/evaluation-flywheel/workflow.ts (final blob 5101233c132efee07cd667c851895a6c20ce7ef3, `-c core.autocrlf=true` hash equals HEAD), workflow.test.ts.
+
+## Findings
+1. createdAt ordering (workflow.ts:184, 196). createdAt is `iso()` from the server-side `deps.now` clock, millisecond resolution. The client supplies only requestId, which feeds the child id, so a client cannot influence it. Two children can share a ms only in a fixed-clock fixture or by sub-ms lease handoff. A tie makes `>` false, so the child being promoted wins. That never blocks a legitimate update. A tied older replay would win, but that is unreachable in practice because the lease serialises children per gap. Verified by mutation M1: with `>=`, two existing tests fail because fixed-clock sequential updates tie and are wrongly blocked. Residual, non-blocking: a backward server clock step or multi-instance skew can order a legitimately newer child as older, so the head would not advance. A monotonic tie-break (a per-gap child sequence or the gap revision recorded on the child) would be stronger. No test pins a tie-with-older-replay. Low severity, so a note only.
+2. Guard placement. The guard runs after `checkLock()` at line 192. That check compares the lease token and the revision against the in-memory head. The guard then feeds `save(t, head, true)`, which calls `replaceGap(t, expected, next)` predicated on revision. A concurrent head change bumps the revision, so the CAS yields "conflict". The historical branch still releases lease and failure and leaves lastRetestId and stage untouched. Fail-open edge: a dangling head pointer or an unparsable createdAt gives NaN or null, which falls through to the old overwrite behaviour. Low severity.
+3. D-015. ISS-T059REPLAY-001 has 1 recorded reproduction (historical-request-replay-regresses-current-head). I re-ran its historicalReplay section verbatim (first, then second, then replay first, then assert head == second) from a lane-local script: exit 0, "REPRO PASS". It also passes at base, because the early return at workflow.ts:119-120 is unchanged in the diff. Count: ISS-T059REPLAY-001: 1/1 held. The candidate additionally closes the interrupted-older-request path through the new test. The rest of the reproduction_script (mount auth, factory guards, drift) is outside the recorded reproduction and was not rerun.
+4. Tests (timeout 600 each, all exit 0): workflow.test.ts 24/24 pass; router.test.ts and composition.test.ts 5/5 pass; `tsc --noEmit -p apps/api/tsconfig.json` exit 0. Raw outputs are in the checker scratchpad (w23-wf.txt, w23-rc.txt, w23-tsc.txt, w23-repro.txt, w23-mut.txt).
+5. Mutation M1 (checker-run): `>` changed to `>=`. Applied with `python -I` byte replacement, per-mutation backup, and timeout 600. Result: pass 22, fail 2. The killed tests were "ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head" and "newer interrupted child resumes promotion while completed historical replay leaves its recovery untouched". The new tests do not kill this mutant, because they advance the clock. Process note: my trap restored from a relative path after a `cd`, so the first restore failed and the mutant stayed on disk until I restored it manually. Final state: `cmp` against the backup is identical, and `git -c core.autocrlf=true hash-object` equals `git rev-parse 6c16c9dc:<file>` (5101233c...). `git status` shows no tracked modification.
+
+## Not verified
+Real multi-process races (the in-memory fixture is single-threaded), lint-loc, and the full suites. The checker spent no token or time telemetry beyond this single pass; the ratio is unverified.
+
+ISSUES-WRITTEN: none
+LEDGER: ISS-T059REPLAY-001 may flip open -> verified (high, data-write; the interrupted-older-request path and the recorded reproduction are both covered). Tie-break and clock-skew are non-blocking notes.

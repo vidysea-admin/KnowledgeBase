@@ -133,3 +133,5 @@ Closed out late: I read the PASS and chained straight into fixing the two issues
 `ready-for-check` while three more units shipped. The maker-checker cycle's step 0 is *reconcile
 disk state before starting new work* — a PASS is not closed until the manifest says so, and I
 skipped that four times running. Caught by the pre-commit guard, not by me.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -1,0 +1,257 @@
+{
+  "policy_version": "managed-review/1",
+  "unit": {
+    "cycle": 2,
+    "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+    "slug": "watched-cadence-launcher",
+    "candidate_sha": "ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+    "candidate_content_manifest_sha256": "6bf34891db9aae674d6842c7929c92ba28cb13da8ac7e2dbb24a0ef53307dfec",
+    "candidate_identity_kind": "actualGitcommit-sourceunchanged;legitimatepacket-evidence-planfixcycle",
+    "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+    "files": [
+      {
+        "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\connector-workflow\\watched.ts"
+      },
+      {
+        "sha256": "ce43fd5d9b623144e91e0dd9d13caa86511a648bfb29d8fa2c9cdf195f2df910",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server-watched.test.ts"
+      },
+      {
+        "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\native-capture\\server.ts"
+      },
+      {
+        "sha256": "8c888811dddb5222b3dfd1434fedd3eeb9c3928418c7ec78fec24c509ac8fbae",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.test.ts"
+      },
+      {
+        "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\host.ts"
+      },
+      {
+        "sha256": "7caf1f0569aaada0dfc3c9530700b96ca78cb63d599f4a481dc02b1f48ab48e8",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\README.md"
+      },
+      {
+        "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\watched-sources\\supervisor.ts"
+      },
+      {
+        "sha256": "1c075b645c37554a0e77937084e99e75ee00ba31ddf835a518db1e2402ed6315",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\webinar\\scheduler\\service.d.mts"
+      }
+    ],
+    "repair_scope": "QA executableplan/manifest only;exact2independentboundaries+contracts;nosourceedits"
+  },
+  "metrics": {
+    "token_metric": "actual_total",
+    "maker": {
+      "active_s": null,
+      "tokens": null,
+      "cost": null,
+      "token_metric": "actual_total"
+    },
+    "reviewers": [
+      {
+        "id": "/root/watched_cadence_independent_checker",
+        "token_metric": "actual_total",
+        "active_s": null,
+        "tokens": null,
+        "cost": null,
+        "budget_debit": {
+          "active_s": 150,
+          "tokens": 20000,
+          "token_metric": "actual_total"
+        },
+        "status": "Review allocation charged conservatively; startup/whole-review actual telemetry unavailable. Includes no claimed measured runtime cap success."
+      },
+      {
+        "id": "/root/watched_cadence_independent_checker/finalization-cycle1",
+        "status": "Actual telemetry unknown; committed completion allocation retained from cycle1 completion-accounting, not measured usage",
+        "active_s": null,
+        "budget_debit": {
+          "active_s": 30,
+          "tokens": 4000,
+          "token_metric": "actual_total"
+        },
+        "cost": null,
+        "completion_reserve_id": "watched-cadence-launcher/1/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+        "phase_kind": "finalization",
+        "tokens": null,
+        "token_metric": "actual_total"
+      }
+    ],
+    "next_phase": {
+      "active_s": 60,
+      "tokens": 8000,
+      "token_metric": "actual_total",
+      "cost": null,
+      "kind": "review"
+    },
+    "completion_reserve": true,
+    "completion_reserve_id": "watched-cadence-launcher/2/ec143c9e57a1b2bb13ee66a0b127e720fdf2dca6",
+    "completion_reserve_tokens": 4000,
+    "bootstrap_scope": "Cycle2 actualevidence-planrepair only; exact2boundary tests+contracts.py and reconcile unchanged prior independent sourceproof",
+    "bootstrap": {
+      "active_s": 180,
+      "tokens": 6000,
+      "token_metric": "actual_total",
+      "cost": null
+    },
+    "escalation": {
+      "reason": "Cycle1 HOLD missing2probes+contracts; real executablepacket repair allocates identity10+commands45+reconcile5 before final30; preserve allpriorcharges and unusedlate60",
+      "limits": {
+        "active_s": 270,
+        "tokens": 36000,
+        "token_metric": "actual_total",
+        "cost": null
+      },
+      "authority": "Root once additional90s/12000 incl30s/4000completion; cumulative270s/36000, no reset"
+    }
+  },
+  "worker": {
+    "runtime_identity": {
+      "invocation": "manual-native-review-not-optional-managed-launcher",
+      "model": "inherit-root-approved-settings-no-substitution",
+      "native_control": "No optional managed runtime execution requested"
+    },
+    "executable": "C:/Users/product/AppData/Local/Programs/OpenAI/Codex/bin/codex.exe",
+    "provider": "codex",
+    "prompt": {
+      "sha256": "674ae6ef6856c941dce12d8256709738286e006a20b64d32333b059cd77c58fa",
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\cycle2\\checker-prompt.txt"
+    },
+    "timeout_s": 60,
+    "max_turns": 8,
+    "phase_id": "watched-cadence-launcher-cycle2-mandatory-evidence"
+  },
+  "readiness": {
+    "meaning": "Readyfor independent plannedexecution;missing2tests/contracts NOTclaimed executed;mustfinishbeforeverdict",
+    "mutation_required": false,
+    "complete": true,
+    "receipts": [
+      {
+        "sha256": "8ee3243083406afb20db669507b31fe017793457411a02c0d8a84c13d5c08ef3",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-final-seal.json",
+        "role": "environment"
+      },
+      {
+        "sha256": "bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac.json",
+        "role": "current-canonical-inputs"
+      },
+      {
+        "sha256": "5b0fa4756e2a5fdb6714b0270fc32a46a4989c32ba233129f6a7ca2e33f79ed1",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-preflight-receipt.json",
+        "role": "fresh-command"
+      },
+      {
+        "sha256": "2ff0c1e3bc22f657bd580e32a38afb0809c5bc960d17e6b73b656ce1b162b67c",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-root-types-receipt.json",
+        "role": "fresh-command"
+      },
+      {
+        "sha256": "4e8d8c71201f301bd3ace1e16dea73fe30481be04bb9ef21e3af408e76e7997c",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-full-graph-receipt.json",
+        "role": "fresh-command"
+      },
+      {
+        "sha256": "aac2964b6072bc7bd825d4c33b9fe024be4a8c1ef55155805cce08a9998c28c8",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-scoped-structure-receipt.json",
+        "role": "fresh-command"
+      },
+      {
+        "sha256": "ea33c924fee8e838cdac4b5ac667f58b48cd985f216df12d7694b5d78d70f092",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-all28-receipt.json",
+        "role": "fresh-command"
+      },
+      {
+        "sha256": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\broker_lib.py",
+        "role": "actual-current-helper"
+      },
+      {
+        "sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\scoped-check-runner.py",
+        "role": "actual-current-helper"
+      },
+      {
+        "sha256": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-alias-repair\\register.mjs",
+        "role": "actual-current-helper"
+      },
+      {
+        "sha256": "afd430830b3d3ca622acc658258f8b88a8b62606d82ff811a336904dd5f3b5d1",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\local-wip-post-d50\\local-commit-receipt.json",
+        "role": "identity-or-context"
+      },
+      {
+        "sha256": "c62646c3b9b98ee07be336a876fb7d5a48fa2e8f31ee5abaad592c51ec5f524e",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\committed-eight-blobs.json",
+        "role": "identity-or-context"
+      },
+      {
+        "sha256": "8de51421af2c76cbbee113ee5ac035fe7e4b54b426202ca9ca316a31f2d6bb21",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\contracts\\goal-t053.md",
+        "role": "identity-or-context"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\cycle2\\carried-cycle1-receipt.json",
+        "sha256": "64b4d1815d6a8495c964c0a9481ae3a45f7e7a03ac6d48704cbf2151d125c67e"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\cycle2\\packet.md",
+        "sha256": "97002b66addc180ce0b835d619998d3f98ceaeeb2f5f09094b7c5299fd0e4d97"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\cycle2\\probe-contract-request.json",
+        "sha256": "0c892bc46709baa7cbd5f9007d3de2ccd19b1968c15439f3a9ede835c2b418f4"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\cycle2\\evidence\\cycle1-verdict.md",
+        "sha256": "e1ef42f08c8eeea54e59cf3ae4a3dd5cd268105ed2285654ca682a5c3e2d2d61"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\independent-checker\\identity.json",
+        "sha256": "7d28f230c8f15d6e758e6770cde183213000f8c07df1fca1c232af0c01a570e4"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\independent-checker\\finalization-input.json",
+        "sha256": "ed25dbb6f04cf8c3bc2662725fd5a330a35bdfea21b4e33df1ef7c3c7aa0a148"
+      },
+      {
+        "role": "cycle2-repair-history-or-plan",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\independent-checker\\completion-accounting.json",
+        "sha256": "319784474b08a344fd389d32107bd66a5a9af98099e0c0a0ef27c3f73638f614"
+      },
+      {
+        "role": "contract-verifier-input",
+        "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\contracts\\verify_contracts.py",
+        "sha256": "1240059fc2abc63cde58472ef8f7964978e74ba5bc2f5156a30379ddae391db3"
+      }
+    ]
+  },
+  "selected_checks": [
+    {
+      "reason": "Actualchecker-selected C2/C7 contamination and currentstoredkeyrevocation/scopes/overlap boundaryexecution missingin cycle1",
+      "boundary": "tenant/auth/write",
+      "node": "scripts/watched-sources/host.test.ts :: ^(?:whole result tenant/ID corruption refuses before acquisition, even past batch boundary|host defaults disabled, rechecks revoked/scoped identity, resets rotation and refuses overlap)$"
+    },
+    {
+      "reason": "Mandatory project DefinitionofDone contractverifier, actualexecutionmissingincycle1",
+      "boundary": "mandatory-contract",
+      "node": "C:/Program Files/Python312/python.exe -B contracts/verify_contracts.py --repo-root C:/Users/product/Desktop/KnowledgeBase"
+    }
+  ],
+  "previous_receipt": {
+    "sha256": "64b4d1815d6a8495c964c0a9481ae3a45f7e7a03ac6d48704cbf2151d125c67e",
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\native-next-maker\\watched-cadence-review\\cycle2\\carried-cycle1-receipt.json"
+  }
+}

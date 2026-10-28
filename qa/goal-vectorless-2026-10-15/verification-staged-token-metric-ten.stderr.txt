@@ -1,0 +1,48 @@
+test_actual_reserve_required_positive_and_inside_total (test_review_budget.TokenMetricTests.test_actual_reserve_required_positive_and_inside_total) ... FAIL
+test_actual_total_is_not_output_allocation (test_review_budget.TokenMetricTests.test_actual_total_is_not_output_allocation) ... ok
+test_bootstrap_and_escalation_do_not_reset_history (test_review_budget.TokenMetricTests.test_bootstrap_and_escalation_do_not_reset_history) ... ok
+test_commensurate_max_actual_debit_and_child_identity (test_review_budget.TokenMetricTests.test_commensurate_max_actual_debit_and_child_identity) ... ok
+test_finalization_bound_and_once_only (test_review_budget.TokenMetricTests.test_finalization_bound_and_once_only) ... FAIL
+test_known_actual_compliance_and_misses_preserve_dimension_results (test_review_budget.TokenMetricTests.test_known_actual_compliance_and_misses_preserve_dimension_results) ... ok
+test_legacy_arithmetic_and_reserve_remain_unverified (test_review_budget.TokenMetricTests.test_legacy_arithmetic_and_reserve_remain_unverified) ... FAIL
+test_missing_and_mixed_tags_refuse (test_review_budget.TokenMetricTests.test_missing_and_mixed_tags_refuse) ... ok
+test_output_bound_validation_and_unknown_output (test_review_budget.TokenMetricTests.test_output_bound_validation_and_unknown_output) ... ok
+test_unknown_actual_stays_unknown_and_prior_debits_accumulate (test_review_budget.TokenMetricTests.test_unknown_actual_stays_unknown_and_prior_debits_accumulate) ... ok
+
+======================================================================
+FAIL: test_actual_reserve_required_positive_and_inside_total (test_review_budget.TokenMetricTests.test_actual_reserve_required_positive_and_inside_total)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\qa\coordination\checker-runtime-total-20261015\test_review_budget.py", line 77, in test_actual_reserve_required_positive_and_inside_total
+    self.assertEqual(budget.assess(data)["status"], "WITHIN_ALLOCATION")
+AssertionError: 'NEEDS_EXTRA_REVIEW' != 'WITHIN_ALLOCATION'
+- NEEDS_EXTRA_REVIEW
++ WITHIN_ALLOCATION
+
+
+======================================================================
+FAIL: test_finalization_bound_and_once_only (test_review_budget.TokenMetricTests.test_finalization_bound_and_once_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\qa\coordination\checker-runtime-total-20261015\test_review_budget.py", line 85, in test_finalization_bound_and_once_only
+    self.assertEqual(budget.assess(data)["status"], "WITHIN_ALLOCATION")
+AssertionError: 'NEEDS_EXTRA_REVIEW' != 'WITHIN_ALLOCATION'
+- NEEDS_EXTRA_REVIEW
++ WITHIN_ALLOCATION
+
+
+======================================================================
+FAIL: test_legacy_arithmetic_and_reserve_remain_unverified (test_review_budget.TokenMetricTests.test_legacy_arithmetic_and_reserve_remain_unverified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Users\product\Desktop\KnowledgeBase\qa\coordination\checker-runtime-total-20261015\test_review_budget.py", line 40, in test_legacy_arithmetic_and_reserve_remain_unverified
+    self.assertEqual(result["status"], "WITHIN_ALLOCATION")
+AssertionError: 'NEEDS_EXTRA_REVIEW' != 'WITHIN_ALLOCATION'
+- NEEDS_EXTRA_REVIEW
++ WITHIN_ALLOCATION
+
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.004s
+
+FAILED (failures=3)

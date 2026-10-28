@@ -1,0 +1,24 @@
+✔ sanity: the fake is tenant-blind and the bait outscores the real row (a missing filter WOULD leak) (21.3145ms)
+✔ tree load: tenant A gets A's root, never B's, with every query carrying A's filter (29.7756ms)
+✔ tree load: empty / undefined tenant matches no root and returns null (1.639ms)
+✔ arms: tenant A's vector + lexical arms return only A's nodes, in A-only order, though B outscores A on shared session ids (3.6455ms)
+✔ arms: the ranking is the A-only ranking even when B's rows would reorder it (B score would win unscoped) (2.1294ms)
+✔ arms: a factory bound to tenant B never reads A and vice versa (two arm sets, one db) (4.0288ms)
+✔ arms: empty / undefined tenant issues NO query (both arms degrade, nothing is read unscoped) (1.2136ms)
+✔ hydrator: tenant A's quotes only, though B has the same sessionId with higher-scoring text and chunks (18.7992ms)
+✔ hydrator: asked for a session that exists only for B it refuses (no source rows) and leaks nothing (1.6081ms)
+✔ hydrator: mixed ask (A's shared id + B-only id) refuses wholesale rather than serving B's session (2.274ms)
+✔ hydrator: empty / undefined tenant fails before any query (1.0521ms)
+✔ HTTP /ask as tenant A: tree is A's, quotes are A's, nothing of B in body / prompts / job rows / logs, every query carries tA (376.1749ms)
+✔ HTTP /ask: tenant-like body fields, query string and headers cannot override the key-derived tenant (98.0902ms)
+✔ HTTP /ask as tenant B is symmetric: B sees B and never A (non-vacuity for the isolation claim) (35.2397ms)
+✔ HTTP /ask with an empty or undefined resolved tenant: no tenant data, no turns/chunks query, nothing unscoped (63.5873ms)
+✔ HTTP /answer-policy/simulate legacy arms path (extraCandidateArmsFor): arms are built per request from the key tenant only (39.3005ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4824.4694

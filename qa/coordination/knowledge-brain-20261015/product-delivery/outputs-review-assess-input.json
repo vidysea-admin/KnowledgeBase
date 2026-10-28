@@ -1,0 +1,10 @@
+{
+  "maker": {"active_s": null, "tokens": null, "cost": null},
+  "reviewers": [],
+  "completion_reserve": true,
+  "completion_reserve_id": "t058-saved-summary-refresh/cycle0/F200DB8EAEC33A42DAEF1C41CC0949484358B3D62721501BDB00CE073DF53080+5EC3D5F6568692749D2A0109B6037028E4877563B7AC849F8879420DCEBC032F",
+  "next_phase": {"kind": "review", "active_s": 90, "tokens": 2200, "cost": null},
+  "bootstrap_scope": "Only t058-saved-summary-refresh cycle0 exact source/test pins; inspect saved summary state and immediate reopen/export consumer; one focused independent probe and mandatory current-validator evidence. No whole-parent acceptance.",
+  "bootstrap": {"active_s": 120, "tokens": 3000},
+  "escalation": null
+}

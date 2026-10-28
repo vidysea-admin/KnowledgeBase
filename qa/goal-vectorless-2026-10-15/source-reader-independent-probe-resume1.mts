@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {createSourceReader} from '../../apps/api/src/source-intake/source-reader.ts';
+let cancelled=false;
+await assert.rejects(createSourceReader({maxBytes:1,fetcher:async()=>new Response(new TextEncoder().encode('é'))})('https://public.example/'),/^Error: source reader acquisition failed$/);
+const started=performance.now();
+const read=createSourceReader({timeoutMs:5,fetcher:async()=>{await new Promise(r=>setTimeout(r,30));return new Response(new ReadableStream({cancel(){cancelled=true;}}));}});
+await assert.rejects(read('https://public.example/'),/^Error: source reader acquisition failed$/);
+assert.ok(performance.now()-started<500,'independent deadline failed');
+await new Promise(r=>setTimeout(r,60));assert.equal(cancelled,true,'late response body must cancel');
+console.log('independent-source-reader: 2/2 byte-cap and late-body-cancellation passed');

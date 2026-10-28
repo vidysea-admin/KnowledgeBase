@@ -1,0 +1,150 @@
+{
+  "format": "offline-hydration-terminal-report-v1",
+  "status": "SCOPED_ENGINEERING_PROOF_COMPLETE_NO_INDEPENDENT_PASS",
+  "preparedAt": "2026-10-16T02:33:30.625Z",
+  "qaCandidate": "a666f51df7ed8b49d54e5e9b6076468ac7f430eb6ec45cb8a06673e5911b5a3e",
+  "sourceFiles": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/adapter.mjs",
+      "sha256": "4c3661b659c4dfacfdcd07144b8de659a406b0b657166f6e1d3dcfb5142a9851"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.mjs",
+      "sha256": "a0cc779e50ed05a9361aa36500a68ccc42c86b7f21ad318d767321770f02c2a0"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/audit-guards.test.mjs",
+      "sha256": "1ced3773c03ad443e3396a7983a1c09d729c39902f91ae4d28140c93ce7973c4"
+    }
+  ],
+  "evaluatorPairUnchanged": "d3c60680d1f9039661639863ae62f48f87b7bc6db044fc16e11a1df01780bd87",
+  "productionRepaired": false,
+  "repairDescription": "QA oracle corrected from raw-turn hash to independently admitted current-row snapshot. Original80/12 was QA oracle-stage error, not repaired production behavior.",
+  "proof": {
+    "synthetic": {
+      "passed": 2,
+      "total": 2
+    },
+    "focused": {
+      "hydrated": 4,
+      "total": 4
+    },
+    "all92": {
+      "hydrated": 92,
+      "total": 92,
+      "uniqueIds": 92,
+      "empty": 0,
+      "refused": 0,
+      "verifiedQuoteProofs": 238,
+      "allReturnedSnapshotsMatchIndependentExpected": true
+    },
+    "tripwireCountersEachPhaseAllZero": true,
+    "rawTurns": 3427,
+    "admittedTurns": 3424,
+    "dataQualityOpen": {
+      "count": 3,
+      "status": "DATAQUALITYOPEN",
+      "turnSuffixes": [
+        "t141",
+        "t026",
+        "t114"
+      ],
+      "rawTimestampsUnchanged": true,
+      "exactIdsAndHashesReference": "qa/coordination/resume-20261015/broker/hydration-repair2-final-seal.json#audit.dataQualityOpen",
+      "humanDispositionRequired": true
+    },
+    "questionReferencedSessions": 23,
+    "candidateInventory": 29,
+    "unreferencedInventoryOnly": 6,
+    "approvedDataPinsStable": 119,
+    "actualImportedSources": 202,
+    "phaseSeconds": 52.469,
+    "focusedJobSeconds": 21.5,
+    "all92JobSeconds": 29.062
+  },
+  "originalAudit": {
+    "path": "qa/coordination/resume-20261015/eval-pilot/offline-hydration-audit/result.json",
+    "sha256": "bb009a95474c7d555f4025e4c601649f1411147e42551402296bd2388e44725f",
+    "unchanged": true,
+    "hydrated": 80,
+    "refused": 12,
+    "interpretation": "Historical QA boundary-comparison false positives retained"
+  },
+  "directProofReferences": [
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-final-seal.json",
+      "sha256": "221f2a9758c69c33bc4578abcce3124f82ae818717fbd7eb43a911bce50a8558"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-compact-results.json",
+      "sha256": "707420f4aeb43397d248abe9c6ff35ac1f7253aea16fd9153104c4c79800904c"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-synthetic2-receipt.json",
+      "sha256": "f4733597fe642c5d9840ee798d33b993aa8a6d627dc8a977bf195c88356bb26b"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-focused4-receipt.json",
+      "sha256": "fdd7635210dcbfa3a0ba8c98e39b10e12370bd93163df27b24e7dd2947520cfd"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/broker/hydration-repair2-all92-receipt.json",
+      "sha256": "b2669e1e4378397c477d0931fdce636c8bf3ca56a2a33afccf8750606c539ee5"
+    }
+  ],
+  "scopedPinManifestReference": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91.json",
+    "sha256": "939af2e2ce53ed31b2d6a469cfbd6913a05e5ff1f96012de709b24db22b91b91",
+    "count": 351
+  },
+  "currentHelperPins": [
+    {
+      "path": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "sha256": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237",
+      "identityBasis": "broker actual phase sealed executable identity; not redundantly rehashed by coordinator"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.venv\\Scripts\\python.exe",
+      "sha256": "0b471133e110cfb53a061cad528ce8e517d7b9ac41a0a396c39ad795a487fc14",
+      "identityBasis": "broker actual phase sealed executable identity; not redundantly rehashed by coordinator"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\tsx\\dist\\esm\\api\\index.mjs",
+      "sha256": "8fb32f8842dff630c0b54aba648a1a49de7bd8769ef4bea6f841fa954041504d",
+      "identityBasis": "current bytes match actual sealed phase"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\node_modules\\tsx\\package.json",
+      "sha256": "3ace2493a0acd26fc72a8433a38113ee04d5a1976910a3f40815f9e779d5c426",
+      "identityBasis": "current bytes match actual sealed phase"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\pnpm-lock.yaml",
+      "sha256": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+      "identityBasis": "current bytes match actual sealed phase"
+    },
+    {
+      "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\qa\\scoped-check-runner.py",
+      "sha256": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+      "identityBasis": "current bytes match actual sealed phase"
+    }
+  ],
+  "fullSourceInventoryCopied": false,
+  "duplicateResultsCopied": false,
+  "paidRequestsSpent": 5,
+  "newPaidRequests": false,
+  "unknownLifetimeUsagePreserved": true,
+  "pilotAuthorizationStateUnchanged": "awaiting_human",
+  "primaryNavigationPASS": false,
+  "RAGOrAnswerPASS": false,
+  "humanQualityPASS": false,
+  "parentClausesClosed": false,
+  "independentVerdict": null,
+  "makerActualUsage": {
+    "tokens": null,
+    "activeSeconds": null,
+    "cost": null
+  },
+  "metadataReadCorrection": "One pin-dictionary extraction initially assumed array; corrected metadata-only, no tests/imports/calls retried",
+  "wipStatus": "PREPARED_ONLY_NOT_STAGED_WAITING_ROOT_NATIVE_HEAD_HOLD_RELEASE"
+}

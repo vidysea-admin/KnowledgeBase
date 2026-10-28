@@ -1,0 +1,15 @@
+{
+  "accepted": 0,
+  "correct": 0,
+  "precision": null,
+  "wrongIdentities": 0,
+  "wrongPairs": 0,
+  "wrongPairsRelational": 0,
+  "floorTurns": 2,
+  "floorCoveredTurns": 42,
+  "floorLabels": 2,
+  "contradicted": 0,
+  "stableAll": true,
+  "additions": 0,
+  "ISS255": "4/4"
+}

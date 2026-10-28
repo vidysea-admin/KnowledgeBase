@@ -1,0 +1,27 @@
+{
+  "schema": "selected-runtime-baseline/v1",
+  "unit": "review-runtime-usage",
+  "cycle": 0,
+  "phase": "narrow-probe-authoring",
+  "boundary": "baseline",
+  "thread_id": "01a13f32-e99c-7183-a6aa-3436fe3b5542",
+  "agent_path": "/root/parallelism_snapshot/runtime_usage_checker",
+  "observed_at": "2026-10-15T10:57:36.4672461+00:00",
+  "usage_timestamp": "2026-10-15T10:55:01.181Z",
+  "cumulative_tokens": {
+    "input_tokens": 209052,
+    "cached_input_tokens": 175488,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 748,
+    "reasoning_output_tokens": 35,
+    "total_tokens": 209800
+  },
+  "idle_confirmation": "collaboration.list_agents returned interrupted; parent interrupt settled; no resume yet",
+  "lifecycle_completion": "interrupted, not task_complete; explicit root manual continuation baseline, unaccepted tool itself would conservatively mark unknown",
+  "counter_scope": "Dedicated checker lifetime, all prior usage preserved; prospective manual delta",
+  "active_seconds": null,
+  "monetary_cost": null,
+  "source_path": "C:\\Users\\product\\.codex\\sessions\\2026\\10\\15\\rollout-2026-10-15T10-54-23-01a13f32-e99c-7183-a6aa-3436fe3b5542.jsonl",
+  "source_line": 37,
+  "broker_confirmed_no_prior_probe": true
+}

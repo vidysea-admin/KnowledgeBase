@@ -1,0 +1,42 @@
+[
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-cycle1-standing.json",
+    "sha256": "dc6403c58389fe4305e0a48ba8f34702707c4fcb8c192c2beb123a188b220203",
+    "exitCode": 0,
+    "elapsedMs": 4305.3803,
+    "startedAt": "2026-10-14T21:06:07.518Z",
+    "completedAt": "2026-10-14T21:06:11.829Z",
+    "stdoutSha256": "916e8e72144cb5738b250fd851bad1ef13f90f4198ae9f3beb5e7cad7d48e447",
+    "stderrBytes": 0
+  },
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-cycle1-ledger.json",
+    "sha256": "ccccd326f61541f49c1795aeb0b5a59a97c142bcff306414dc9ae65b1381142c",
+    "exitCode": 0,
+    "elapsedMs": 131.5082,
+    "startedAt": "2026-10-14T21:06:14.951Z",
+    "completedAt": "2026-10-14T21:06:15.087Z",
+    "stdoutSha256": "819139c165e3099097d0f83168ae19a5fb17fff3d841ba06d08013706d0f5067",
+    "stderrBytes": 0
+  },
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-cycle1-plan.json",
+    "sha256": "dc675009c78805c75a69d3707e2bb4c10438699431944331bef9c1bebae3281e",
+    "exitCode": 0,
+    "elapsedMs": 139.87189999999998,
+    "startedAt": "2026-10-14T21:06:18.403Z",
+    "completedAt": "2026-10-14T21:06:18.548Z",
+    "stdoutSha256": "66d0ffd15d7bac3f8a98ce5c0e427bdf8ea18c5f5db59fa987cae48b9f258f7c",
+    "stderrBytes": 0
+  },
+  {
+    "path": "qa/evidence/goal-t051checker-broker-t015-cycle1-validate.json",
+    "sha256": "2ff7872ba4f1633785a0a2f6beb3001e363038a19382abc1d38abd0d10d40cf2",
+    "exitCode": 0,
+    "elapsedMs": 127.6873,
+    "startedAt": "2026-10-14T21:06:22.587Z",
+    "completedAt": "2026-10-14T21:06:22.72Z",
+    "stdoutSha256": "cd711d1f243918c3e4c3203f776592406c30db58086dd339a24b23d6dab986ff",
+    "stderrBytes": 0
+  }
+]

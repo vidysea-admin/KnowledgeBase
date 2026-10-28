@@ -1,0 +1,17 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "--import",
+    "./.cache/coordination/safe-test-runtime/register.mjs",
+    "--test-name-pattern=^real confirmation consumer requires fresh exact lineage, authenticated evidence and literal direct join$",
+    "packages/meeting-bot/src/calendar/registration-workflow.test.ts"
+  ],
+  "outerDeadline_s": 15,
+  "executeAfterAssessOnly": true,
+  "accounting": "CHECKER, separate from maker; immediately after admitted assess alongside source/consumer review; queued =>checkpoint FINAL no polling",
+  "privateOptInsDisabled": true
+}

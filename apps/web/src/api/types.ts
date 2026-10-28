@@ -39,14 +39,22 @@ export interface SessionDetail {
   page: { summary: string } | null;
   claims: Claim[];
   turns: Turn[];
+  media?: { available: boolean; bytes: number; mime: string };
+  notes?: { text: string; kind: string; tStart: number; turnId?: string; frameId?: string }[];
+  frames?: { id: string; tStart: number; text: string }[];
 }
+export interface WebinarOperation {
+  id: string; title: string; status: "queued" | "recording" | "processing" | "failed" | "ready" | "action_required";
+  attempts: number; reason?: string; updatedAt?: string; startTime?: string; endTime?: string;
+}
+export interface WebinarDiscoveryHealth { status: "healthy" | "failed"; checkedAt: string; lastSuccessAt?: string }
 
 export interface Source {
   _id: string;
   kind: string;
   captureMode: string;
-  path?: string;
   url?: string;
+  hash?: string;
   createdAt: string;
 }
 
@@ -103,12 +111,23 @@ export interface GraphStats {
 }
 
 export interface UpcomingMeeting {
+  /** Derived by the authenticated operator inventory, never source scheduling authority. */
+  attendanceSkipReason?: "office-internal";
   id: string;
   title: string;
+  description?: string;
+  status?: "confirmed" | "tentative" | "cancelled";
+  responseStatus?: "accepted" | "declined" | "tentative" | "needsAction";
   startTime: string;
   endTime: string;
   meetingUrl?: string;
   organizer?: string;
+  cancelled?: boolean;
+}
+
+export interface GmailSummary {
+  listed: number; fetched: number; candidates: number; excludedNonMeeting: number; excludedInternal: number;
+  refusedSender: number; incompleteMessages: number; complete: boolean;
 }
 
 export interface MeetingCandidate {
@@ -118,6 +137,12 @@ export interface MeetingCandidate {
   senderEmail: string;
   senderDomain: string;
   meetingUrl?: string;
+  evidenceIssue?: "unresolved-body" | "unsupported-attachment";
+  meetingLinkIssue?: "ambiguous" | "registration-only" | "host-start-link";
+  youtubeWatchIssue?: "ambiguous";
+  registrationOnly?: boolean;
+  startTime?: string;
+  endTime?: string;
   status: "pending" | "approved" | "rejected" | "auto_approved";
   detectedAt: string;
   decidedAt?: string;
@@ -159,5 +184,10 @@ export interface AskResponse {
   web_used: boolean;
   insufficient_coverage: boolean;
   sources: { internal: AskInternalSource[]; web: AskWebSource[] };
-  auditLog: { step: string; provider?: string; model?: string; costUsd?: number }[];
+  auditLog: { step: string; provider?: string; model?: string; costUsd?: number; costStatus?: "unknown" | "reported"; inputTokens?: number; outputTokens?: number }[];
+  /** D-190: sessions left out of the answer as ineligible; counts only. */
+  excludedSessions?: number;
+  /** D-191: answer sentences removed by the grounding judge; count only. */
+  removedSentences?: number;
+  exclusionReasons?: Record<string, number>;
 }

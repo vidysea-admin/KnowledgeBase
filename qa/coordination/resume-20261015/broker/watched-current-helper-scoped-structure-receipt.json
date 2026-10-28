@@ -1,0 +1,39 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--input-type=module",
+    "-e",
+    "import {countLoc,loadConfig} from './scripts/lib/walk.mjs';import {check} from './scripts/lint-dirsize.mjs';const c=loadConfig(process.cwd()),names=['scripts/native-capture/server.ts','scripts/native-capture/server-watched.test.ts','scripts/watched-sources/host.ts','scripts/watched-sources/supervisor.ts','scripts/webinar/scheduler/service.d.mts'];const rows=names.map(p=>{const n=countLoc(p),limit=p.endsWith('.test.ts')?c.loc.testMax:c.loc.max;return {path:p,nonblank:n,limit,ok:n<=limit}});c.roots=['scripts/native-capture','scripts/watched-sources','scripts/webinar/scheduler'];const directory=check(process.cwd(),c);console.log(JSON.stringify({rows,directory},null,2));process.exitCode=rows.some(r=>!r.ok)||directory.violations.length?1:0;"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "canonicalManifest": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac.json",
+    "sha256": "bc8dee0b303ed4a3cce8cacbdb49775e79e2c08ae37d4b78372e18202250a1ac",
+    "sourceCount": 1691,
+    "runtimeCount": 2
+  },
+  "requiredHelpersBefore": {
+    "qa/coordination/resume-20261015/broker/broker_lib.py": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+    "scripts/qa/scoped-check-runner.py": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "qa/coordination/resume-20261015/runtime-alias-repair/register.mjs": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d"
+  },
+  "allPinsBeforeMatch": true,
+  "ownRunnerSha256": "0f24ba02114d2a693da9be9c9a487c05c53fe88b5ff554b810f5eb572292c532",
+  "maxCommandExecutionSeconds": 10,
+  "maxTreeCleanupSeconds": 5,
+  "pid": 25604,
+  "exit": 0,
+  "ownedTreeClosed": true,
+  "allPinsAfterMatch": true,
+  "requiredHelpersAfter": {
+    "qa/coordination/resume-20261015/broker/broker_lib.py": "580ee50c6203c1bac2245ad3fa630cc7692292d7017ec72c9745a35ed84f5e9f",
+    "scripts/qa/scoped-check-runner.py": "d99983ba54d43ecf22bae2e2bad0dad7a57156d9bb16c36cc38d05d3cce3fc6a",
+    "qa/coordination/resume-20261015/runtime-alias-repair/register.mjs": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d"
+  },
+  "active_s": 0.5,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\watched-current-helper-scoped-structure.log",
+    "sha256": "7a300e01db4166eb9634ad5f9f3ad19cf563a91bbc14c11662eefde1c8fbd5a3"
+  },
+  "counts": {}
+}

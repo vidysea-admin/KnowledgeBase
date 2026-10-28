@@ -1,0 +1,42 @@
+{
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--import",
+    "tsx",
+    "qa/evidence/t036-provenance-refresh-independent-20261015.mjs"
+  ],
+  "timeoutMs": 60000,
+  "environment": {
+    "KB_U24_PRIVATE_TOC_TESTS": "0"
+  },
+  "expectedTests": 3,
+  "classification": "Root-authorized active-check exception: independent actual Gmail factory/scoped writer/reconstructed public model/actual mocked HTTP loader/pure selector. No Mongo/network/provider/browser/private data.",
+  "pins": {
+    "packages/db/src/collections/meeting-candidates.ts": "8e2b87123b24b46dd03edcafd7021fbea15459d1b9075b48537133dbae4a1e3e",
+    "packages/db/src/collections/meeting-candidates.test.ts": "5149cac7dafe33a82157b538e0f973efc85194302d62ce9e31ce852f57a0f793",
+    "packages/db/src/lib/tenantScope.ts": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+    "packages/db/src/client.ts": "eb83337493ace4486c03847bac59ac478b4c6bf84862ec5c9ea7d48b463ba5eb",
+    "packages/core/src/generated/meeting_candidates.ts": "d6a4f5be963d022bbe07bf768ac20c59295df4724279c92a2a9ca71e316aa626",
+    "schema/meeting_candidates.schema.json": "9d3b6b5d6176c29bad4bc7fc4c5c2afc4eee5f9227af8d9e7b02be399ea8203d",
+    "packages/db/package.json": "77f9a2f02b29062d3272b633e0a6cf583a48a653c2441956a1785dd5aee83e24",
+    "packages/core/package.json": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+    "pnpm-lock.yaml": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+    "qa/contracts/t036-candidate-provenance-refresh.md": "7ec8f6dc93320403f8bafe875652802b1b6ce11d5b7f36a582e54940a3bb2eb0",
+    "apps/api/src/store.ts": "9D976378610A30D56AE12842F2D5024A1363206923DD56325F8E839BEAF45907",
+    "apps/api/src/routes/meeting-candidates.ts": "10A5F6457B4405308F68D83B972F3D41DA0AE58EEF159CD749B96CB063125E21",
+    "apps/api/src/gws/gws-gmail.ts": "81385D2E023C40BF9E5B75FD592BBF901327FFF08A985CEC160281D42E28C455",
+    "apps/api/src/composition/production.ts": "FABF236621196871D176327BEA99D1C030FE5BEB888829490B10F8E6373C0B5E",
+    "apps/api/src/server.ts": "5730F4AEB2086999EBE08E81A729055DB118D9A42EFD3E425AE7572EAA2328D2",
+    "packages/core/src/domain/sender-authentication.ts": "D2475FC7FE1D79C593993AFB069E8329052B9BC18469570F8A04C590D4A040E4",
+    "packages/core/src/index.ts": "B8823BA189D4C92ED4BDC44E9F654D317FA699654E5B0832F1EA7EACC5CE7174",
+    "packages/core/src/domain/webinar-types.ts": "B0D4489E833E2734F3034356ADD7D2F1C96714895DB7F19888176160D4709760",
+    "packages/meeting-bot/src/calendar/schedule-loaders.ts": "D87F073C1B78CF13630F063CDC897DE7F5E27294487E236A2AA49DE8830F8F35",
+    "packages/meeting-bot/src/calendar/auto-join.ts": "AFAE8BFA9C7501EE6C86517122D87C3C72142C5DBF546454BF7DD2F1611D9C89",
+    "packages/meeting-bot/src/calendar/auto-record-policy.ts": "2172C66CF00CE07444D56043BF2422CE2D4B4963DA6717D42E0BF886FEA537A6",
+    "qa/evidence/t036-provenance-refresh-independent-20261015.mjs": "6DE80FBBD074BC348019F9F0B442F95A326FE3662E054442C4774AC3550133A4"
+  },
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase"
+}

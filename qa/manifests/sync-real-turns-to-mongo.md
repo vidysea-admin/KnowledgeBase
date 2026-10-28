@@ -100,3 +100,5 @@ transcription progress: 19 sessions with real diarized speaker turns, 4 honestly
 placeholder pending the disclosed follow-up work (audio chunking, STOP-empty-text investigation).
 `session_pages` (23/23), `sources`/`sessions`/`claims` (23/23 each) remain as previously synced —
 this unit only touched `turns`, the one collection T-003's work actually changes.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

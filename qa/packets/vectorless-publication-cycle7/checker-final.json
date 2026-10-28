@@ -1,0 +1,33 @@
+{
+  "budget_debit": {
+    "tokens": 3000,
+    "active_s": 180
+  },
+  "cumulative_allocated_active_s": 810,
+  "tokens": null,
+  "cycle": 7,
+  "verdict": "PASS",
+  "unit": "vectorless-publication",
+  "candidate_sha": "59316179f26032191c6c11cbf7d87e540a66d1722bb9379f3b1eca2f64629066",
+  "active_s": null,
+  "utc_start": "2026-10-15T09:18:57.2030518Z",
+  "monotonic_frequency": 10000000,
+  "wait_intervals": [
+    {
+      "kind": "collaboration.wait_agent",
+      "max_requested_s": 10,
+      "duration_s": null,
+      "reason": "Mailbox returned broker completion; exact duration not recorded, cannot fabricate active time"
+    }
+  ],
+  "monotonic_end_ticks": 201862506184,
+  "broker_independent_command_s": 1.2849139,
+  "prior_history_preserved": true,
+  "ratio_verified": false,
+  "measured_elapsed_s": 159.1679875,
+  "current_pin_drift": [],
+  "cost": null,
+  "cumulative_allocated_tokens": 20000,
+  "utc_end": "2026-10-15T09:21:36.4449389Z",
+  "monotonic_start_ticks": 200270826309
+}

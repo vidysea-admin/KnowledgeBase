@@ -1,0 +1,21 @@
+{
+  "slug": "t044-qa-generation-binding",
+  "fixCycle": 0,
+  "readbackStartedAt": "2026-10-14T20:50:54Z",
+  "pinsReadbackConfirmedBy": "2026-10-14T20:50:57Z",
+  "matchedSourceDependencyContractPins": 16,
+  "probeUnchanged": true,
+  "validatorRegistryUnchanged": true,
+  "firstVerdictPersistenceStartedAt": "2026-10-14T20:46:26Z",
+  "firstVerdictPersistenceCompletedAt": "2026-10-14T20:46:27Z",
+  "firstCycleCheckStartedAt": "2026-10-14T20:14:38Z",
+  "firstLaunchToVerdictSeconds": 1909,
+  "timeResolution": "one second",
+  "timingAmendmentCompletedBy": "2026-10-14T20:51:58Z",
+  "unknownTiming": "Original assignment launch; earlier survey elapsed; exact HOLD/RESUME and CPU request dispatch; earlier draft start; unmeasured read intervals",
+  "verdictSHA256": "93dbd276ca10e5073471439f821ee1e14616726c2e7f8a52eedcc9c3204834aa",
+  "fullParentVerdict": "HOLD",
+  "newTestsRun": 0,
+  "activeHandles": "NONE",
+  "capturedAt": "2026-10-14T20:52:38.1276912Z"
+}

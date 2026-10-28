@@ -237,3 +237,5 @@ depcruise: no violations (316 modules, 981 deps)
   wiring (`isControllerAlive` passed by reference) is unchanged.
 
 ## Status: checked-PASS — cycle 1 PASS by /checker (8c1cfc1, own diff-derived mutants 79/3 + 81/1); merged to master 2026-09-25
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

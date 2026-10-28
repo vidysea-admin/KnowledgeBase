@@ -1,0 +1,33 @@
+{
+  "program": "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+  "args": [
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "skills/checker-efficient/scripts/checker-admission.test.mjs"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {},
+  "timeoutMs": 30000,
+  "startedAt": "2026-10-15T07:29:00.787Z",
+  "completedAt": "2026-10-15T07:29:01.685Z",
+  "elapsedMs": 895.3652,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "skills/checker-efficient/scripts/checker-admission.mjs": "b3576e5456ac0255fd4a0ae10b4d6e3326ff142e32e23abb4e6abce6d3e9684f",
+    "skills/checker-efficient/scripts/checker-admission.test.mjs": "5faeaf632b99bb062f7f36fec5ef17d909a1dfe5182674cd5dfcaf40a85e992a",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778"
+  },
+  "after": {
+    "skills/checker-efficient/scripts/checker-admission.mjs": "b3576e5456ac0255fd4a0ae10b4d6e3326ff142e32e23abb4e6abce6d3e9684f",
+    "skills/checker-efficient/scripts/checker-admission.test.mjs": "5faeaf632b99bb062f7f36fec5ef17d909a1dfe5182674cd5dfcaf40a85e992a",
+    "qa/evidence/goal-t051checker-broker-run.mjs": "d8f34fb44d02413197a0aea28125400eeaa464665f03c8703c24b7b580004876",
+    "package.json": "390796f4fb84efb09f72ce233564a05e1a69e4c2b0b6806415e9677ef6234778"
+  },
+  "stdoutPath": "qa/coordination/checker-efficiency-20261015/broker-admission-20261015T0733.stdout.txt",
+  "stderrPath": "qa/coordination/checker-efficiency-20261015/broker-admission-20261015T0733.stderr.txt",
+  "hashesUnchanged": true
+}

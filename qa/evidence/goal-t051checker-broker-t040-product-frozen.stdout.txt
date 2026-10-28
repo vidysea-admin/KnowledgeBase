@@ -1,0 +1,28 @@
+✖ apps\api\src\grounded-postprocessing\composition.test.ts (1.8157ms)
+✔ real transcript factory is lazy and enforces D168 exact production database opt-in (1.8849ms)
+✔ actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction (63.586ms)
+✔ unsupported transactions remain a durable failed refresh without publishing derived knowledge or calling providers (1.4746ms)
+✔ actual review factory judge outage retains the correction and rolls back all derived targets (15.4623ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5093.7055
+
+✖ failing tests:
+
+test at apps\api\src\grounded-postprocessing\composition.test.ts:1:1
+✖ apps\api\src\grounded-postprocessing\composition.test.ts (1.8157ms)
+  file:///C:/Users/product/Desktop/KnowledgeBase/apps/api/src/composition/integrations/capture-policy.ts:2
+  import { createJoinPolicyDeps } from "@lkb/ingest";
+           ^^^^^^^^^^^^^^^^^^^^
+  SyntaxError: The requested module '@lkb/ingest' does not provide an export named 'createJoinPolicyDeps'
+      at #asyncInstantiate (node:internal/modules/esm/module_job:327:21)
+      at async ModuleJob.run (node:internal/modules/esm/module_job:431:5)
+      at async node:internal/modules/esm/loader:643:26
+      at async node:internal/test_runner/runner:1071:15
+      at async runFiles (node:internal/test_runner/runner:1037:9)
+      at async runChain (node:internal/test_runner/runner:1115:5)

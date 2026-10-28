@@ -1,0 +1,30 @@
+{
+  "args": [
+    "qa/evidence/goal-t015-cycle2-import-probe.mjs"
+  ],
+  "pins": {
+    "scripts/training/plan.mjs": "14df232bde2f320c4937dbe733a6fdc235c3e2dc8c6e0b852ccb33f61b68669f",
+    "scripts/training/prepare.mjs": "512163b25449684030e4e0a45d8d53e1a9119fb1d2e36683173df85a928ad18b",
+    "scripts/training/validate.mjs": "eb5cd898eba524c3b1d7093dbd914b92eedf6c98ddb8f2e9f33ba66f33691869",
+    "scripts/training/export.mjs": "1b64ef97817e59702257ea53ba8530ddf7b7d8a1600c6dac711cf51d47fc20d9",
+    "scripts/training/train.mjs": "2bda09076bdd17a60d4c6710eff684b4466e56a1e741c57d5ec9a51254807f64",
+    "scripts/training/private-path.mjs": "bd7692baf6175dcf5541b0184c8380631fe298d3f2bb0d8bef7335274b10ec4c",
+    "scripts/training/file-hash.mjs": "aa7a76c7395ee9ac9d588f5dd5de86c55f3c4564628fcae63f3458bd8ffef271",
+    "scripts/training/prepare.test.mjs": "d9e78b897ca675f4596f27ad86ae1dc2c63b0c9d0e24a8547a41e3aa4e2e12f1",
+    "docs/own-model-training.md": "45ab58bac88d6823928db68fbf2f95b9ed037e51db5cc1a78ddec540206e8403",
+    "qa/evidence/goal-t015-real-config.json": "feeacf2108125c304c53267066477d5e03209f2289f36cb8247af4ecd82f7f84",
+    "qa/evidence/goal-t015-cycle1-ledger-replay.mjs": "9a0405d0ff0ce0e39f6b6311ee19851f784a16fed34b0bcbb85e303e6256933b",
+    "scripts/lib/transcript-provenance.mjs": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301",
+    "scripts/lib/turn-timing.mjs": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e",
+    "scripts/webinar/session-rows.mjs": "684a6d3c5e6fafdd9879ce232d5b0703d6a1e7d667415e2be2b0543b70de8081",
+    "scripts/webinar/process-video.mjs": "27e1ec624bfa31395de400feaa992431256fc5362095ba87a4327c396e2d6ed7",
+    "scripts/webinar/slides/slide-knowledge.mjs": "e541aefe83efdba59cf78d3bad29820816da441cf5b8294d2dfc81288a470eef",
+    "scripts/webinar/vision/routed-vision.mjs": "522486beff669eaa8e49f2ec6d85cebaf0fba7ecd1578d80ca84a318a287acc5",
+    "scripts/lib/transcription/private-recording.mjs": "7ebf6101dd88fa7ea0dc083c3a8d2b9013495959ec90274043ee03d159663c0e",
+    "scripts/lib/transcription/transcript-qa-generation.mjs": "a632689f058ba86cf98a643144531b9feb1656d910cd6c3e0e11fc198285451b",
+    "qa/evidence/goal-t015-cycle2-import-probe.mjs": "259d939881c3aedb3c694e925b53d90510791f2ab60b2a5385038a85b6211de1",
+    "qa/evidence/goal-t015-cycle1-real-plan.json": "f1c5b3f5a4e056ba6950f8748e81447e0515cf9da1845e29337f2300bd701566"
+  },
+  "timeoutMs": 30000,
+  "output": "qa/evidence/goal-t051checker-broker-t015-cycle2-import-current"
+}

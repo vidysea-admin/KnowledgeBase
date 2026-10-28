@@ -1,0 +1,229 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://answer_policy_review_items",
+  "title": "StoredPolicyReviewItem",
+  "type": "object",
+  "properties": {
+    "_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "tenantId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "change",
+        "conflict"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "approved",
+        "rejected",
+        "acknowledged",
+        "dismissed",
+        "superseded"
+      ]
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "conflict": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "questionClass": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimension": {
+          "type": "string",
+          "enum": [
+            "mode",
+            "style",
+            "onInsufficient"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium"
+          ]
+        },
+        "a": {
+          "type": "object",
+          "properties": {
+            "policyId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+            },
+            "version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "policyId",
+            "version",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        "b": {
+          "type": "object",
+          "properties": {
+            "policyId": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+            },
+            "version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "value": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "policyId",
+            "version",
+            "value"
+          ],
+          "additionalProperties": false
+        },
+        "explanation": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "questionClass",
+        "dimension",
+        "severity",
+        "a",
+        "b",
+        "explanation"
+      ],
+      "additionalProperties": false
+    },
+    "change": {
+      "type": "object",
+      "properties": {
+        "policyId": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{0,63}$"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "previousVersion": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "changedFields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 0
+        }
+      },
+      "required": [
+        "policyId",
+        "version",
+        "previousVersion",
+        "changedFields"
+      ],
+      "additionalProperties": false
+    },
+    "resolution": {
+      "type": "object",
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": [
+            "open",
+            "approved",
+            "rejected",
+            "acknowledged",
+            "dismissed",
+            "superseded"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500
+        },
+        "by": {
+          "type": "object",
+          "properties": {
+            "actor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "claimedBy": {
+              "type": "string",
+              "maxLength": 200
+            }
+          },
+          "required": [
+            "actor"
+          ],
+          "additionalProperties": false
+        },
+        "at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "decision",
+        "note",
+        "by",
+        "at"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "_id",
+    "tenantId",
+    "kind",
+    "status",
+    "createdAt",
+    "key",
+    "summary"
+  ],
+  "additionalProperties": false
+}

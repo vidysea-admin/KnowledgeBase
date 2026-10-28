@@ -1,0 +1,1 @@
+T036 independent: address boundary3/3; actual public caller redirected mixed-DNS refusal1/1; no second transport

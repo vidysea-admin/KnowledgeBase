@@ -1,0 +1,50 @@
+[
+  {
+    "path": "qa/contracts/goal-t056.md",
+    "sha256": "C100DA8C60316B12C910C85E02914AD335133C06741FE7F67A44213A533BB1E8"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-router.ts",
+    "sha256": "FD11C33E891ED2AE6CC01548A6FDCFDC9587FBE960B95C0E47095DCE04C5EFF7"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-mongo-store.ts",
+    "sha256": "3D69D7CDEF77A5D411F177D7B25D35081C5043CF8AC45C06A6D6163F746F399C"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-record-store.ts",
+    "sha256": "C01786804E32D37EA536146AF09AD592E98479BC3AAD2E09F680D535411B60C3"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-records.ts",
+    "sha256": "0053D1173601395863FA1D878B7E845BEE1FE8DA322764B09D8E12FA35B65CAA"
+  },
+  {
+    "path": "apps/api/src/answer-policy/answer-evidence.ts",
+    "sha256": "EC94116F478AADFBEC8F4CF9968A9E2224858733E5F32E652188AB0EA9BA10C7"
+  },
+  {
+    "path": "apps/web/src/auth/AuthContext.tsx",
+    "sha256": "196181DC165208A35CB23C9D7F9B7AE5E293A7EB40135A7CD90686DDB4EC3E1C"
+  },
+  {
+    "path": "apps/web/src/pages/search/AskHandoff.tsx",
+    "sha256": "E695F45700A1D067B04C66ADF68D6186E9D7F4B13D6AF572D17EF6B84E985418"
+  },
+  {
+    "path": "apps/web/src/api/client.ts",
+    "sha256": "854F0BC3301E097B83E2CAEFCD01A8EAE19530E3A6390ADD4DD6C9CFAF429802"
+  },
+  {
+    "path": "pnpm-lock.yaml",
+    "sha256": "2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD"
+  },
+  {
+    "path": "apps/api/package.json",
+    "sha256": "678346DCCCC8310496005A777FD289CCB4FBE5CAE08B529F717D7259D7578EDE"
+  },
+  {
+    "path": "apps/web/package.json",
+    "sha256": "DF657C35FF929F98BBA82399F616C5B201A02A2C07C66D71905CA55CB720528E"
+  }
+]

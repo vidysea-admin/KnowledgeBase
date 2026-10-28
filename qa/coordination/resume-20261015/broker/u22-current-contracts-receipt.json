@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "C:/Program Files/Python312/python.exe",
+    "-B",
+    "contracts/verify_contracts.py"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4.json",
+    "sha256": "5073e116b619d155591e7613642d6f360c3d5851987bca9043190070e1af8ee4",
+    "count": 21
+  },
+  "beforeMatch": true,
+  "maxJobSeconds": 10,
+  "accounting": "MAKER ACCEPTANCE, not watched checker",
+  "pid": 28044,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 0.25,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\u22-current-contracts.log",
+    "sha256": "81494edffc921ee45da0965775db137b8cf18b0643f776d736a7f513799120b8"
+  },
+  "counts": {}
+}

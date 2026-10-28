@@ -58,3 +58,5 @@ Not UI-touching — no surface changed: both changed paths are `packages/index/s
   then re-verifying (76/76 recorded above).
 
 ## Status: checked-PASS (qa/verdicts/iss-262-lint-loc-split.md, Cycle checked: 0, commit baeb66f)
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

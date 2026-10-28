@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "review": "independent-staged-WIP-publication-audit",
+  "head": "87858c734f4928df7a141e8f17691f170719c76b",
+  "inventorySHA256": "a312f1399a887e1f7cc06c827165d1e24610715a1d22f690447e8bcd8df897eb",
+  "baseApprovedInventorySHA256": "bcff92843e6e0a4809748ded0d4a838b395b0616ae329fa82bba9242e8a6199f",
+  "stagerReportSHA256": "4a5e1a5f8ebf6d2d190686857c613ebc600027c0cd80fb02771de009d48c93c3",
+  "indexTree": "8f9dfe5b05437c79e1ee2d5c8e6953679b650a34",
+  "indexStageListingSHA256": "c9bb789e92e5ba6903f3f438d65359f4b69a977a4e500bef1a7b2946121f032b",
+  "selected": 96,
+  "staged": 96,
+  "codeSupport": 67,
+  "QA": 29,
+  "allowlistExact": true,
+  "indexMatchesFrozenTree": true,
+  "exactWorkingBlobMatches": 68,
+  "CRLFtoLFOnlyMatches": 28,
+  "pinErrors": [],
+  "forbiddenStagedPaths": [],
+  "credentialPatternCandidatePaths": [],
+  "recoveryCloseoutCycle1Verified": true,
+  "recoveryHistoricalHashPreserved": "63528b78028de976942619837edfed3188e38d18470c541efbfacbeb72bcafbf",
+  "mainAskBuildingPreserved": true,
+  "mainAskHoldRankingExcludedPreserved": true,
+  "staticClosure": {
+    "method": "HEAD index overlay only; Git index blobs, TS AST import/export/literal dynamic/require and relative URL; Python local import statements; workspace main resolution; no dirty working source used",
+    "visitedModules": 253,
+    "localEdges": 693,
+    "missing": [],
+    "unacceptedDirtyDependencies": [],
+    "syntaxDiagnostics": [],
+    "computedModuleLoads": [],
+    "externalModuleCount": 51,
+    "supportConfigs": [
+      {
+        "path": "workers/transcribe/package.json",
+        "kind": "valid package JSON",
+        "name": "@lkb/transcribe"
+      },
+      {
+        "path": "workers/transcribe/requirements.txt",
+        "kind": "requirements text present",
+        "nonempty": true
+      }
+    ],
+    "initialURLDirectoryAndInstalledPackageFalsePositives": [
+      {
+        "from": "apps/api/src/production.ts",
+        "reference": "../../../",
+        "classification": "relative URL directory resolves in HEAD/index overlay; not a missing module"
+      },
+      {
+        "from": "scripts/upload/queue.mjs",
+        "reference": "../../packages/db/node_modules/mongodb/lib/index.js",
+        "classification": "declared locked external mongodb7.6.0 dependency under DB package; installed-runtime file exists locally; fresh-clone install remains required"
+      },
+      {
+        "from": "scripts/upload/submit.mjs",
+        "reference": "../../",
+        "classification": "relative URL directory resolves in HEAD/index overlay; not a missing module"
+      },
+      {
+        "from": "scripts/upload/real-proof.mjs",
+        "reference": "../../",
+        "classification": "relative URL directory resolves in HEAD/index overlay; not a missing module"
+      },
+      {
+        "from": "scripts/upload/queue.test.mjs",
+        "reference": "../../",
+        "classification": "relative URL directory resolves in HEAD/index overlay; not a missing module"
+      },
+      {
+        "from": "scripts/backfill.mjs",
+        "reference": "../",
+        "classification": "relative URL directory resolves in HEAD/index overlay; not a missing module"
+      },
+      {
+        "from": "apps/api/src/ask/source-context.test.ts",
+        "reference": "../../../../data/toc-migrated/",
+        "classification": "relative URL directory resolves in HEAD/index overlay; not a missing module"
+      }
+    ],
+    "status": "PASS"
+  },
+  "blockers": [],
+  "limitations": [
+    "WIP source preparation only; scoped QA verdicts do not grant main Ask, ranking, full feature, global structure, provider/runtime or release acceptance.",
+    "No tests, services, provider/DB/browser actions, source/index edits or publication performed.",
+    "Credential-format pattern scan is bounded evidence, not exhaustive secret certification.",
+    "Static closure validates tracked source and declared external dependencies, not dependency installation, executing dynamic runtime file reads, all tests, provider/model availability or runtime acceptance. Corpus directory already exists in HEAD; no new private corpus files are staged."
+  ],
+  "recoverySourcePinsMatched": 9,
+  "recoverySourcePinFailures": [],
+  "indexStillFrozen": true,
+  "stagedDiffCheckExit": 0,
+  "verdict": "PASS-WIP-PUBLICATION-SAFETY",
+  "scopedQACycleReview": [
+    {
+      "unit": "parallel-compete-bounded-context",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "0",
+      "verdictCycle": "0",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "parallel-heartbeat-tenancy",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "0",
+      "verdictCycle": "0",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "parallel-jobs-api",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "1",
+      "verdictCycle": "1",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "parallel-jobs-db",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "0",
+      "verdictCycle": "0",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "parallel-jobs-web",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "1",
+      "verdictCycle": "1",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "parallel-meeting-fixture-tenancy",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "0",
+      "verdictCycle": "0",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "parallel-sources-explorer",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "0",
+      "verdictCycle": "0",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "bounded-ask-context-packing",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "1",
+      "verdictCycle": "1",
+      "latestVerdict": "PASS",
+      "matchingScopedPASS": true
+    },
+    {
+      "unit": "recovery-embedding-backfill",
+      "manifestStatus": "checked-PASS",
+      "manifestCycle": "1",
+      "verdictCycle": "1",
+      "latestVerdict": "PASS (scoped source and execution boundary; live corpus vectors remain pending)",
+      "matchingScopedPASS": true
+    }
+  ],
+  "scopedQAMatchingCycles": 9,
+  "reviewToolInfrastructure": "Node static Git child spawn sandbox EPERM; identical read-only AST audit auto-approved with escalation; no product/runtime execution"
+}

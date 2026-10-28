@@ -1,0 +1,40 @@
+{
+  "format": "qa-offline-controls-broker-request-v1",
+  "candidate": "68228503e2083924bca997560f5c0c8697f6afd609e787f96956ad451fda7b6e",
+  "pins": [
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls/adapter.mjs",
+      "sha256": "6b7b494aeb63e4cbdea06bed8eebfaceacf47bf9cfe30e3528b0b70cf92a55bd"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls/watchdog.py",
+      "sha256": "a83daaae16c0577e6a3f2773cf87fa3ec2988e1b225911ee819bdf8d0b4ae6a9"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls/source-closure.json",
+      "sha256": "debd8c5c632657995774fa4def9350c21930f65959344d861cc5cd1b624e3aa6"
+    },
+    {
+      "path": "qa/coordination/resume-20261015/eval-pilot/offline-controls/approved-data-pins.json",
+      "sha256": "f270f0bbd43269586f687123010d37ef9696c6e01ebda9daa235bf2f59ab7b4c"
+    }
+  ],
+  "sourcePair": "73299875b1da4b9bc8b2406cfce5179f4747e17ed5f07fc5fe5f51712186c52c",
+  "sourceClosure": "qa/coordination/resume-20261015/eval-pilot/offline-controls/source-closure.json",
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "command": [
+    ".venv/Scripts/python.exe",
+    "qa/coordination/resume-20261015/eval-pilot/offline-controls/watchdog.py"
+  ],
+  "allocationSeconds": 60,
+  "finalizationReserveSeconds": 5,
+  "providerNetworkAuthorization": false,
+  "cpuSlot": "SOLE_BROKER_ONLY_AFTER_ROOT_RELEASE",
+  "noRetryAfterTimeout": true,
+  "expectedQuestionCount": 92,
+  "expectedCandidateCount": 29,
+  "rawGoldenSha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be",
+  "sortedIDSetSha256": "49881f7e8f47896c9a104c908d089a15cf3fe5908ea7a69e6bff61cc31f526b6",
+  "runtimeMemory": "Unmeasured until execution;256MiBV8oldspace is not totalRSS bound",
+  "scope": "Existing offline lexical and questionblind controls only; all92rows/hits/misses; no primary/answer/humanPASS"
+}

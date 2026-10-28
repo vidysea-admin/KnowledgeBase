@@ -1,0 +1,347 @@
+[
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\file-store.ts",
+    "bytes": 8461,
+    "sha256": "c0fd3ec5b75a8be3f2e1635c3e677f042ad1e57010d4dc6dac2fa8797d7d0ff3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\persistence.ts",
+    "bytes": 706,
+    "sha256": "21940ec318aeae31190520ca9f8d94c60923b08b0d52695be5074695f8e7dc40"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\README.md",
+    "bytes": 4300,
+    "sha256": "f94e1c7bf4049661220da287389ff2d32223a51f711c5ae38706f38e688ad2c5"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\router.test.ts",
+    "bytes": 11861,
+    "sha256": "451135a42ef9c9468b3e3d21b89d363b4d666253be81e5a8a7baa624fba424cd"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\router.ts",
+    "bytes": 1761,
+    "sha256": "09a5c167cfea810e542633861e399b24034075cc16fdc299d70610352aa84283"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\seed.ts",
+    "bytes": 6176,
+    "sha256": "6d003368b0f6ea7739812cf62fc2d8593235305d7dab1f278db44084b1e09ef9"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\calibration-review\\types.ts",
+    "bytes": 2245,
+    "sha256": "41b6c165da56f7f77a27d135ebf3c2690318ab8707ee48b160587cd952a3e277"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\composition\\integrations\\evaluation.ts",
+    "bytes": 3997,
+    "sha256": "56cfdc180b4610cff0216a14461524ca9f4a000cd3e3d0a7be92468e84197d28"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api\\src\\score.ts",
+    "bytes": 3776,
+    "sha256": "ca1992ebbc963c6b18a05f7ca42aeea7a4fc313d6b014acec3394406cbbc6d78"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\package.json",
+    "bytes": 763,
+    "sha256": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\CalibrationReviewPage.test.tsx",
+    "bytes": 4958,
+    "sha256": "2e987823262345288a6516b54d790b8db1b01ca32e5be43a6abf106bc5e36f4b"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\CalibrationReviewPage.tsx",
+    "bytes": 6636,
+    "sha256": "0f46b49e67e7a79379ddc96e1531bf2c44f115584bcc7a4da193a935144f8001"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\web\\src\\pages\\calibration-review\\client.ts",
+    "bytes": 1348,
+    "sha256": "09f37e72727492df554d72854acf1600012609cc27d6dd556e7eba8f01596b3a"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\calibration-human-review.json",
+    "bytes": 55652,
+    "sha256": "392086efc282a21bb62ea04e20f9e0893fb6e6a5aa48451092ba19768c225288"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\golden-set-sibling-semantic.json",
+    "bytes": 69561,
+    "sha256": "ad4179f1d2c2b6a97de0a2adccd01b5887525ad03f180104be4b05b8c5fd63d3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\golden-set.json",
+    "bytes": 23581,
+    "sha256": "07e507d5b1b297c97242d3d4f727f66227267378a4a8806006e533aac78e94be"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\eval\\t022-review-package.html",
+    "bytes": 36726,
+    "sha256": "931e0a88ea74b6fe420eb4176c280b32a00b82f71e8e674b63d3fbbdef84e335"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-04-21-visa-blueprint-part2-italy-france-nz\\session_page.json",
+    "bytes": 2794,
+    "sha256": "2076d4a2d33aeb41128d7a97983ee291e38f911e3d77f2e4c84f351dfaec43d2"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-04-21-visa-blueprint-part2-italy-france-nz\\session.json",
+    "bytes": 414,
+    "sha256": "8173493e589652601c546bf4413db8f33ede95de9b3e278b13c0988e6617cbd0"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-08-funding-dreams-loans-forex\\session_page.json",
+    "bytes": 2313,
+    "sha256": "bbea50dd11338f1e7d91ad1094de0d138658c6f005eed9cd3d1e30f9d265279e"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-08-funding-dreams-loans-forex\\session.json",
+    "bytes": 396,
+    "sha256": "97772c95d49746f238e92f99c78f59f885691e23e31f81775768c4c73676292e"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-20-telling-your-brand-story-better\\session_page.json",
+    "bytes": 1551,
+    "sha256": "2bf6fb55dc584a5b422161a82e87e10623f34422a2ff1be19320fcd515d85b80"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-20-telling-your-brand-story-better\\session.json",
+    "bytes": 386,
+    "sha256": "5face5a01f5284f964549aa6af786fe3537e360abf16cf651e779969941c471c"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-22-uniaccess-xavier-university\\session_page.json",
+    "bytes": 1450,
+    "sha256": "3c1362da4cb3d6fc118d5aad1f0f53dff809c7ab5029064fb3528c05adc8f572"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-22-uniaccess-xavier-university\\session.json",
+    "bytes": 380,
+    "sha256": "c2ad607870a60f9736d6b8094e006fe496e6e09603f7864e30bbe04637720de3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-23-uniaccess-atlas-skilltech\\session_page.json",
+    "bytes": 1406,
+    "sha256": "7f040d398224840b2eea644929a301ef873c7a2df7aef0c740364ae4004e1fe3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-23-uniaccess-atlas-skilltech\\session.json",
+    "bytes": 385,
+    "sha256": "25dfc1a10d20688a2825f3db19c1a8c025c0991ea9d522888b026d0819c3ae19"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-28-in-focus-1\\session_page.json",
+    "bytes": 1272,
+    "sha256": "6c8be92c0089ad4274967c5de7ce70f824fb0fa1a0d2a1af6dbb209589dbbcc6"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-28-in-focus-1\\session.json",
+    "bytes": 336,
+    "sha256": "2be04cc901ddc93eec32a09ec4d06fa433e6c41e18681153019c9a6e8e5baefc"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-29-decoding-ever-expanding-cast\\session_page.json",
+    "bytes": 1547,
+    "sha256": "c08ab7ae683f810333f1c51827252deb0e90f9c09f168fdc3a43ca017647c8d2"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-05-29-decoding-ever-expanding-cast\\session.json",
+    "bytes": 381,
+    "sha256": "33bdcfbe7122a333eb73033ae37470e251cbc951e989a92d70e417cef93e70cb"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-03-dual-enrollment-pathway\\session_page.json",
+    "bytes": 1548,
+    "sha256": "e3df87ed5b28e302e6f1f3bdff1810c2a74ee348cb553d5afdd8cda2cc127ddd"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-03-dual-enrollment-pathway\\session.json",
+    "bytes": 367,
+    "sha256": "efba67b814534fb995ce362479777a803c4cde124bf1532a94d8f87017a6ca58"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-19-entrance-exams-pathways-india-part1\\session_page.json",
+    "bytes": 2182,
+    "sha256": "5c263891b7e7d348758150257f4f03b2d6a68abe28e76c84ba38aa8431bec59f"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-19-entrance-exams-pathways-india-part1\\session.json",
+    "bytes": 405,
+    "sha256": "a0f77a51ac568546cc7e2469fb9125ed8488c01d98d4ecba3dac72d979728a94"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-25-in-focus-2\\session_page.json",
+    "bytes": 1491,
+    "sha256": "d6bfe403c57acd8e9ef035f5417be7436cd45d5087f6520a3df033e68a47512e"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-06-25-in-focus-2\\session.json",
+    "bytes": 324,
+    "sha256": "c775881bee0def98cb9c8b8642bdb16843661a8fd233b7cc02de3fbc500c92f9"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-03-inside-the-uc-session\\session_page.json",
+    "bytes": 1443,
+    "sha256": "7fba04b518f0f600e8901f5f946569fb101f5427002d28dd0034f1746feee320"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-03-inside-the-uc-session\\session.json",
+    "bytes": 382,
+    "sha256": "e375fb0139fd48bfa364c2c2038fa12c59171c40e222b1ac7556fdddf9583068"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-08-beyond-black-robes-law-careers\\session_page.json",
+    "bytes": 1743,
+    "sha256": "401400c770109662d2c027e1932a4135ebc1ba542af2234e324504572e618da4"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-08-beyond-black-robes-law-careers\\session.json",
+    "bytes": 398,
+    "sha256": "effcf2a4c9e58f5a4faab460cbb862d182b1cb5737c01caa510b3359478b7a13"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-15-creative-futures\\session_page.json",
+    "bytes": 1735,
+    "sha256": "972d1a575a88dcbcfd4f03265745d95394a3b830ca0c527ecf5a9bd63d1167f3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-15-creative-futures\\session.json",
+    "bytes": 341,
+    "sha256": "44bb754579548203c514fc678c78e67f82d611deb8d8fabfe2698c1c55c7d325"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-22-uniaccess-cept-university\\session_page.json",
+    "bytes": 1562,
+    "sha256": "11b675ccae9436436a5e7c77d6b6e091df5e2871cef17a3ee8618fbf70fc2c5c"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-22-uniaccess-cept-university\\session.json",
+    "bytes": 374,
+    "sha256": "8e7fdb7d989df12862bfce331f3b154889d352f5bb903e37c3021c59d240e43f"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-30-in-focus-3\\session_page.json",
+    "bytes": 1256,
+    "sha256": "634a4d4a34162e27a8fdf001ebf49e562a85f755b667024a76eb1fd016849a21"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-07-30-in-focus-3\\session.json",
+    "bytes": 324,
+    "sha256": "b9c9d462cb984fbfd0b9eef02161bad39d965b6b42a38c5b04aee0507f581ba5"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters-reupload\\session_page.json",
+    "bytes": 1550,
+    "sha256": "25c7344d89e47a6754a9a1557dabdb77537120e928a85b0d5e3c25d021e3c243"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters-reupload\\session.json",
+    "bytes": 400,
+    "sha256": "56dd00887567ccd6c1e61eace3a43587ccfe4fb8efcfafbdc8a7b8a811986568"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters\\session_page.json",
+    "bytes": 1959,
+    "sha256": "ad807fb09ca168c2bc6f089649204b36ceb0451824ec260a063bc3b9f04fb2bf"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-03-uk-beyond-offer-letters\\session.json",
+    "bytes": 363,
+    "sha256": "68ef29bec8a388537c30aac7300bb2bf487e9d05f563f2cb2049555e6e369910"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-10-ucas-what-changed-what-matters\\session_page.json",
+    "bytes": 1715,
+    "sha256": "12cc18a7d7950cae298d3f44cc6d3c9a2ee850695cca8bd081b35ed39c0daba1"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-10-ucas-what-changed-what-matters\\session.json",
+    "bytes": 415,
+    "sha256": "4385dd1bdf1ff41ef04feadc9f0c92dea49da0d4c022a91b470271776ef1977b"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-24-uniaccess-leeds-arts-university\\session_page.json",
+    "bytes": 1299,
+    "sha256": "13c772d6ff035b25c6dccb22ecdadecfc1ffaad3a5117a7940653f0ebcd1d4e3"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-24-uniaccess-leeds-arts-university\\session.json",
+    "bytes": 397,
+    "sha256": "99929ae2ce65ffda12698c8f7544d71c47b6ed07e174eb59f7fc58d2a11d0e1f"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-27-in-focus-4\\session_page.json",
+    "bytes": 1576,
+    "sha256": "fa11fedf4e5c7a25208390ea187cbd5455bea226701d5046483868f0c99a6060"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\data\\toc-migrated\\2026-08-27-in-focus-4\\session.json",
+    "bytes": 324,
+    "sha256": "9f865e523c37261bd6c92dba149e86fa6693988631511e7005caad2e12a8dd8d"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\ask\\src\\eval\\calibration.ts",
+    "bytes": 1793,
+    "sha256": "d020cea126f1be037034c6cf7228958371defe2fa2ecf53985fbc4a167fa57d4"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\index\\src\\tree\\build.ts",
+    "bytes": 8086,
+    "sha256": "a4c2dfb4b2c3d5677b196804b12f93ca621778582c073ca84b7924934aad7085"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\calibration-review.mjs",
+    "bytes": 9197,
+    "sha256": "5deab61e9d8606682a21e0044792997af7c4cc0abbac1e706d0e46f84c1de013"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\human-calibration.mjs",
+    "bytes": 19954,
+    "sha256": "58359234135f080f19e7647c3aade7659e606ee3cddc27a4731ffcc187550ecf"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\human-calibration.test.mjs",
+    "bytes": 11501,
+    "sha256": "c904299b6cd55522bd3f527ba945d4f072183f575200ba90414e74173898b9db"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\llm-eval.mjs",
+    "bytes": 9787,
+    "sha256": "23b4bac82c841d13ef397794f680846690426a8771ed249a5a91498c1b50ef30"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\t022-offline-review.mjs",
+    "bytes": 15790,
+    "sha256": "48ab7207f4164a82d6fbc6af013706895db037c4fa0cf06b6ec7747b9c7b6201"
+  },
+  {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\scripts\\eval\\t022-offline-review.test.mjs",
+    "bytes": 14423,
+    "sha256": "6d52afa30862d3193faa0a961a22d05db116c9c358cb1dcedca962728df85ea9"
+  },
+  {
+    "path": "data/eval/t022-offline-review.html",
+    "bytes": 58708,
+    "sha256": "2b617ff41ccc1fb1e3e68105d366da63b340237a9c8f1f263ddb585549d0c6e5"
+  },
+  {
+    "path": "qa/manifests/goal-t022-offline-review.md",
+    "bytes": 7790,
+    "sha256": "bcc02b054ea605e800a84773465ed65fc296e8fca7b12f0b04f7045d615fca12"
+  },
+  {
+    "path": "qa/packets/goal-t022-offline-review.md",
+    "bytes": 8493,
+    "sha256": "3133736da9fee2d6684bad888e7894973e48de83e09eb77f8b20345a957fadaa"
+  },
+  {
+    "path": "qa/contracts/goal-t022-offline-review.md",
+    "bytes": 8576,
+    "sha256": "e6a24a9598d33f9fd0de9bed41b85572fee69e6a7a87fe0ac306be3e769097e1"
+  }
+]

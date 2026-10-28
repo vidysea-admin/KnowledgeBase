@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "turnsSha256": "fb4d4bf733710192ea2edc5ea21f0d0f49301d3e98e1637f8f06611fd2867b67",
+  "durationSec": 186,
+  "spans": [
+    {
+      "id": "selected",
+      "accepted": true,
+      "offsetSeconds": 0,
+      "report": {
+        "durationSec": 186,
+        "durationValid": true,
+        "inputCount": 1,
+        "outputCount": 1,
+        "clampedCount": 0,
+        "clampedIndices": [],
+        "dropped": [],
+        "totalTurnSec": 186,
+        "overshootSec": 0,
+        "maxInputEndSec": 186,
+        "nonMonotonicIndices": [],
+        "hallucination": {
+          "pastEndIndices": [],
+          "repeatThreshold": 3,
+          "repeatedRuns": []
+        }
+      }
+    }
+  ],
+  "merged": {
+    "durationSec": 186,
+    "durationValid": true,
+    "inputCount": 1,
+    "outputCount": 1,
+    "clampedCount": 0,
+    "clampedIndices": [],
+    "dropped": [],
+    "totalTurnSec": 186,
+    "overshootSec": 0,
+    "maxInputEndSec": 186,
+    "nonMonotonicIndices": [],
+    "hallucination": {
+      "pastEndIndices": [],
+      "repeatThreshold": 3,
+      "repeatedRuns": []
+    }
+  }
+}

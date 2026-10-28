@@ -223,3 +223,5 @@ purpose is being un-inflatable:**
 
 Both are addressed in the immediately following unit (`catalogue-input-integrity`) rather than
 tacked onto this PASSed one.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

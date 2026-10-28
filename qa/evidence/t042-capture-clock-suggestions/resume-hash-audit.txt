@@ -1,0 +1,23 @@
+Resume audit, 2026-10-14. Read-only commands: Get-FileHash SHA256 and rg of adapter callers.
+Own source/test/evidence hashes still match the preserved candidate/evidence:
+apps/api/src/indexing/tile-speaker-suggest.ts D3473147AB4010F533CAC8AE5BB36918A6020F33DEE2CA3EBB55B1D59EC5EDDE
+apps/api/src/indexing/tile-speaker-suggest.test.ts 8600237450FF563FECA024CC7D0A2A28CF56A7FD1C20C76F04279287BE413F91
+qa/evidence/t042-capture-clock-suggestions/maker-test.txt 7B92C4FB11B485D7CA4EA2A351CC2BF41C88490688A7AC4BF51A72BF94375F55
+
+Current immediate dependency/pin snapshot (not a historical comparison or complete dependency graph):
+packages/index/src/pipeline/speaker-tile-suggestions.ts 14425C1410D234C0839184443B3FA1075F1374A6B253048D93D7982F8A45EEAF
+packages/index/src/pipeline/speaker-rules/speaker-tile-fusion.ts 5EA93427AF55A60B5606D8427639A4664B7544782C96AB7BCD8BA76309BF5958
+packages/index/src/pipeline/speakers.ts 233A92BB6B766F7EF381564CAE2CD27353FAB520D1564F319CEDA2144FEA4B65
+packages/db/src/collections/speaker-suggestions.ts 515626D26A77E18970D7CEC8DF60179646DCD56478304758F985BB165B62129C
+packages/db/src/lib/tenantScope.ts F9AB2F8FA8D21DD661D9752CFA85912FA548255EF85A0018E048634BC95EE513
+packages/core/src/domain/speaker-tile-alignment.ts 3A8A28C448C59C11E25D47267616FC1C2F81729861AF28DE6494BFE7ADA5D8BA
+packages/core/src/domain/speaker-tile-names.ts 74CB25EA1DFE5FCDD906E1900709E477612A36517D8EAC92E84F3BFDC258C4BB
+pnpm-lock.yaml 376EB619300784FDD364F1A55084104D4F149F3CBA38F2C4DFFBFF3403C31318
+apps/api/package.json 678346DCCCC8310496005A777FD289CCB4FBE5CAE08B529F717D7259D7578EDE
+
+The earlier 12/12 maker run did not capture complete dependency pins. It remains historical evidence
+for these unchanged own-source bytes, but cannot certify unchanged transitive dependencies or the
+post-install runtime. Fresh independent execution/pins after runtime installation are still required.
+No new tests, providers, browser, full suites, deployment or publication were run in this resume.
+rg confirms adapter references remain only its own source/test; no production indexing caller exists.
+Central integration still owns the hook and trusted capture/media registry producer.

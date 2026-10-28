@@ -1,0 +1,5 @@
+[
+  "packages/db/src/collections/speaker-suggestions.ts",
+  "packages/db/src/collections/speaker-suggestions.test.ts",
+  "packages/db/src/collections/speaker-suggestions.testdb.ts"
+]

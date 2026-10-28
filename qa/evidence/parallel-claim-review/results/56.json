@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "index": 56,
+  "originalIndex": 62,
+  "claimId": "2026-08-10-ucas-what-changed-what-matters-c03",
+  "inputHash": "34ef3bd88dbe5babb5931b74a138495394c6309d8be75254e5db50c2885957fe",
+  "packetSha256": "1cbc8cb5cf4894b72a9ac0a5ffff2a310cdf2da0c6d5811bcdadc66e2ca0b175",
+  "reviewType": "AI-preliminary",
+  "humanAdjudication": null,
+  "checks": {
+    "claimRecordHash": true,
+    "claimTextHash": true,
+    "sourceBindingHash": true,
+    "identityBinding": true,
+    "contextTextHashes": true,
+    "artifactByteVerification": "not-performed-provided-context-only",
+    "failures": []
+  },
+  "original": {
+    "assessment": "unsupported",
+    "reason": "The cited speaker advises avoiding external links under UCAS guidance, but expresses uncertainty about admission officers' available time; it does not state they will not click links or establish plural panelist advice.",
+    "missingReferences": [],
+    "caveats": [
+      "The original speakerRef is unknown; the embedded name is not verified identity.",
+      "Original timing is 1237-1260; the current same-ID record has changed text, speakerRef and timing.",
+      "Transcript support does not establish external factual truth.",
+      "Provided artifact SHA256 values are raw-byte hashes; normalized-LF hashes are distinct and have not been substituted."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "turnId": "2026-08-10-ucas-what-changed-what-matters-t069",
+        "contextVersion": "originalMigration",
+        "quote": "ideally we should not include external links, because I'm not sure how much time an admission officer would have to review external links.",
+        "textSha256": "3a87fe8b1b80fb6ec2c89a64feb59566b64f4ebca5a2c6e128d6f58933420023",
+        "contextSha256": "157c69bf3dcce30544ec283d40ffcca072d9f00cbd48da1b2acff1d401cc773d",
+        "artifactSha256": "8aa7123b2862c2896763b7f675a477cece264fcb5441b675c519bdf28025fae8",
+        "revision": "907c9c9434f474622181bbc179f6ac90d75853b9",
+        "speakerRef": "unknown",
+        "tStart": 1237,
+        "tEnd": 1260,
+        "supports": "Supports advice against external links in a UCAS context; the reason is uncertain available review time, not a categorical refusal to click."
+      }
+    ]
+  },
+  "current": {
+    "assessment": "unsupported",
+    "reason": "The cited current record only says something is not useful or relevant; it identifies neither external links, UCAS submissions nor admissions officers and does not support the stated advice or click behavior.",
+    "missingReferences": [],
+    "caveats": [
+      "The current speakerRef Ikra is a stored label, not verified identity or proof of plural panelist advice.",
+      "Current timing is 1202-1207 versus original 1237-1260; identical turn ID does not preserve the evidence.",
+      "Transcript support does not establish external factual truth.",
+      "Current raw artifact hash differs from its provided normalized-LF hash; neither was verified against artifact bytes."
+    ],
+    "citations": [
+      {
+        "sessionId": "2026-08-10-ucas-what-changed-what-matters",
+        "turnId": "2026-08-10-ucas-what-changed-what-matters-t069",
+        "contextVersion": "current",
+        "quote": "It's not It's not useful for us. Not relevant, um, yeah.",
+        "textSha256": "8215598c353ae23988488435d36cf92002a1542cd3a80806a5a1d61f703bde28",
+        "contextSha256": "b7cb0c429854b3f1172e7fde3c610957f72ce2a2aaf2c866a10ce47377b62853",
+        "artifactSha256": "d2078954432f8d780c84bdbf62fa5dab4454b07b173fa375a78fd940278cd416",
+        "revision": null,
+        "speakerRef": "Ikra",
+        "tStart": 1202,
+        "tEnd": 1207,
+        "supports": "Only expresses an unspecified lack of usefulness/relevance; does not support the claim components."
+      }
+    ]
+  },
+  "sameIdContentChanged": true,
+  "shortReason": "Original supports avoiding links but not the categorical no-click rationale or plural attribution; current citation is nonspecific. The same turn ID changed text and timing. No missing or duplicate supplied references."
+}

@@ -1,0 +1,36 @@
+{
+  "ready": [
+    "t011-native-modulepath-experiment",
+    "t011-native-modulepath-proof",
+    "u25-third-await-original-red",
+    "t048-private-driver-corrected",
+    "t015-cycle2-import-current",
+    "t015-cycle2-validate-current",
+    "t013-web",
+    "t014-web"
+  ],
+  "skipped": [
+    {
+      "n": "u23-cached-root-original-red",
+      "drift": [
+        [
+          "apps/api/src/visibility/knowledge.ts",
+          "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada"
+        ]
+      ]
+    },
+    {
+      "n": "t055-web-current",
+      "drift": [
+        [
+          "apps/web/src/pages/meeting-bot/readiness/CaptureReadinessControls.tsx",
+          "775aa694e245d172adb39779072c498abee2cc1d90d1c11e11947534f52f65db"
+        ],
+        [
+          "apps/api/src/visibility/knowledge.ts",
+          "4ed89b000892c5d55291add50cf80b9d060e1997a5a309495ae648ad17e84ada"
+        ]
+      ]
+    }
+  ]
+}

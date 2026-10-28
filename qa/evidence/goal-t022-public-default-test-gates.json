@@ -1,0 +1,70 @@
+{
+  "scope": "ROOT finite TESTONLY public-default privacy gates; no product/source behavior change",
+  "status": "FROZEN_UNVALIDATED_UNTIL_HUMAN_RESUME",
+  "gates": {
+    "literal": "KB_T022_PRIVATE_REVIEW_TESTS=1",
+    "beforePrivateHook": true,
+    "beforePrivateCallbacks": true,
+    "beforeSyntheticHelperAuthenticPreparation": true
+  },
+  "router": {
+    "path": "apps/api/src/calibration-review/router.test.ts",
+    "sha256": "1718121232f1f3b15866edaeccc343183558e3f7b270ec56794a7dbdfdaa2e73",
+    "privateCases": [
+      "current neutral corpus has30items,15pairedquestions,44bindings and pending export",
+      "real auth/scope/foreign routes refuse without exposing or writing labels",
+      "fractional submission commits attributable revision/audit and survives a fresh store",
+      "invalid numeric/rationale/reviewer/time/body submissions never add approvals",
+      "cross-process stores cannot overwrite one item with a competing stale revision",
+      "every single missing approval blocks export; all30 synthetic assertions export their original audit",
+      "changed source and seed input invalidate effective approvals, preserve audit bytes",
+      "audit corruption and occupied write lock fail closed without state changes",
+      "real filesystem write and rename failures preserve existing accepted state/audit bytes"
+    ],
+    "publicCases": []
+  },
+  "human": {
+    "path": "scripts/eval/human-calibration.test.mjs",
+    "sha256": "d74b893584320362dc982002907cade0527171a7383b0c8666db619870d6b500",
+    "privateCases": [
+      "real neutral packet has no labels and cannot reach a live judge",
+      "explicit synthetic authenticated references feed real asynchronous MAE without changing scores",
+      "each missing human confirmation, forged score, audit actor, source and typed humanGold is refused",
+      "fallback and unscored results never become final calibration",
+      "typed confirmations cannot reach live calibration without independently operator-bound proof",
+      "D164 model ordering requires full same-human-corpus predecessor receipts, never legacy proxies"
+    ],
+    "publicCases": [
+      "existing evidence path is refused before any provider module or key access",
+      "physical transport refuses other origins and caps retries without forwarding credentials"
+    ]
+  },
+  "preservation": {
+    "originalByteBackups": [
+      {
+        "source": "apps/api/src/calibration-review/router.test.ts",
+        "backup": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\t022-public-default-test-backup-20261015\\router.test.ts",
+        "sha256": "451135a42ef9c9468b3e3d21b89d363b4d666253be81e5a8a7baa624fba424cd"
+      },
+      {
+        "source": "scripts/eval/human-calibration.test.mjs",
+        "backup": "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\t022-public-default-test-backup-20261015\\human-calibration.test.mjs",
+        "sha256": "c904299b6cd55522bd3f527ba945d4f072183f575200ba90414e74173898b9db"
+      }
+    ],
+    "originalAssertionsRetained": true,
+    "embeddedActualCorpusNamesOrPayloadsFound": false,
+    "newOfflineHelperUnchanged": "48ab7207f4164a82d6fbc6af013706895db037c4fa0cf06b6ec7747b9c7b6201",
+    "newOfflineTestUnchanged": "6d52afa30862d3193faa0a961a22d05db116c9c358cb1dcedca962728df85ea9",
+    "privateOfflineArtifactUnchanged": "2b617ff41ccc1fb1e3e68105d366da63b340237a9c8f1f263ddb585549d0c6e5"
+  },
+  "earlierOfflineCheckedPass": "Earned and closed before this separately authorized legacy-test change; old69pins not silently reticked or promoted over new test bytes",
+  "executions": 0,
+  "privateCorpusExecution": 0,
+  "providerCalls": 0,
+  "databaseCalls": 0,
+  "browserCalls": 0,
+  "gitActions": 0,
+  "noActiveProcessHandle": true,
+  "publication": "Raw backups/oracles/private HTML/input-bound provenance excluded; publication itself held"
+}

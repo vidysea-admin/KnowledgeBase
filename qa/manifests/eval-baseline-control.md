@@ -176,3 +176,5 @@ Mongo. `recall.ts` and the golden set are unmodified — this unit only adds the
 make their output readable. Reversible by `git revert`.
 
 **Status: checked-PASS** — PASS from `qa/verdicts/eval-baseline-control.md` (Cycle checked: 1, matching Fix cycle 1), committed `fcc2863`. Closed out on the 2026-09-08 reconcile tick.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

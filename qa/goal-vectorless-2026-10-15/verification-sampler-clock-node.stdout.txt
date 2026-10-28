@@ -1,0 +1,26 @@
+✔ off means no authority or filesystem I/O; absent real measurement stays unavailable (38.4253ms)
+✔ production refuses synthetic facts; explicit fixture resolution binds actual private files (137.0721ms)
+✔ foreign owner, uncommitted generation and changed capture/source binding refuse (33.6358ms)
+✔ wall epoch, copied media proof, different sampler and missing clock cannot certify measurement (207.6052ms)
+✔ uncertainty and drift are bounded; upper clock offset consumes the existing lag allowance (102.9284ms)
+✔ contiguous trim maps privacy to the same retained media timeline; private names are released (94.4965ms)
+✔ all-private observations yield releases only; malformed/duplicate metadata refuses (89.5507ms)
+✔ exact changed bytes, same-name replacement and hardlinked artifacts refuse (118.4244ms)
+✔ escaping path and changed-during-measurement files cannot reach a ready result (62.5042ms)
+✔ revocation, measurement withdrawal and privacy revision invalidate already resolved capabilities (234.9119ms)
+✔ complete measured sampler stream strips private clock witnesses from derived rows (2.7117ms)
+✔ old streams, substituted identity, missing witnesses and late invalidations fail closed (0.556ms)
+✔ wall jumps, backwards monotonic, forged elapsed time and excessive uncertainty refuse (0.6628ms)
+✔ actual Python producer bytes enter strict ingestion, without a browser or asserted decoded authority (246.3362ms)
+✔ registry consumes witnesses before privacy output; missing witness cannot reach suggestion input (126.5763ms)
+SYNTHETIC registry downstream: 4 suggestions/review rows, auto-final0, human-final1, invented-blocks0; native producer/mount unproven
+✔ synthetic actual filesystem receipt/source/media/clock -> registry -> existing adapter -> review and human confirm (145.5962ms)
+✔ revoked native-readback seam refuses before adapter insertion; persisted suggestions need central revocation/confirmation policy (63.0986ms)
+ℹ tests 17
+ℹ suites 0
+ℹ pass 17
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3744.5736

@@ -1,4 +1,4 @@
-# ARCHITECTURE — current ground truth (as of: 2026-09-03, last change: D-008)
+# ARCHITECTURE — current ground truth (as of: 2026-10-28, last change: D-199)
 
 <!-- Lab Protocol STATE file. Mutable, but SURGICALLY: only sections listed in an
      authorizing DECISIONS entry's Changes-authorized field may change, and only
@@ -11,12 +11,13 @@
 Vidysea's own `/brain` (operating-brain `INDEX.md` → deep pages → raw transcripts), moved from
 markdown-on-disk into MongoDB with an API. It ingests session recordings, documents, and
 messages (starting with TOC community webinars, then WhatsApp expert groups), transcribes and
-attributes every fact to a speaker + timestamp, indexes them as a vectorless tree (structured
-sessions) plus a vector index (unstructured chat), and answers questions through a CRAG-style
+attributes every fact to a speaker + timestamp, indexes every source type vectorless (provenance-
+bound trees + keyword retrieval + graph, D-173), and answers questions through a CRAG-style
 router that trusts internal knowledge first and falls back to the web only when internal
 coverage is insufficient, always citing sources separately. Output = a queryable, cited
 knowledge base served via a Developer API, and ultimately an **AI virtual counsellor** built as
 a client of that API — with the long-range goal of beating top human counsellors head-to-head.
+Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (data model, API, flows).
 
 ## 2. FROZEN CONTRACTS (machine-checked — do not edit here)
 The authoritative versions live in contracts/contracts.json and are enforced by
@@ -26,20 +27,22 @@ contracts/verify_contracts.py. This section only lists them:
 
 ## 3. WORKING HYPOTHESES (current best understanding; may change via /landplane)
 
-- **H1 — Two indexes, not one.** Structured sessions get a **vectorless LLM tree index**
-  (PageIndex pattern: no embeddings, LLM reasons over a JSON tree, returns a path + citations).
-  Unstructured text (WhatsApp threads, notes) gets a **vector index** (chunk + embed). Since D-000.
+- **H1 — Vectorless for every source type.** Provenance-bound trees (PageIndex pattern), keyword
+  retrieval over turns/chunks and graph relationships, with bounded LLM navigation; no embedding
+  step on ingest (`retrievalMode: "vectorless"`). Vector code stays dormant. D-173 superseded the
+  original two-index split (D-000, D-021).
 - **H2 — Internal-first, web-fallback, CRAG-shaped.** tree-search → retrieval evaluator (score
-  per candidate; verdict correct/ambiguous/incorrect) → internal-only answer on `correct`, else
-  web search → refine → merged answer with web sources cited separately. Since D-000.
+  per candidate) → internal answer, or Tavily web search → refine → merged answer when coverage is
+  insufficient (`insufficient_coverage`), web sources cited separately. Since D-000.
 - **H3 — No fact without provenance.** Every claim carries `evidence[]` pointing to a turn
   (speaker, timestamp, session). LLMs write knowledge; deterministic code validates schema
-  before it lands. Since D-000; basis of a future frozen contract (D-002).
+  before it lands. New claims land `needs-review`; answers/outputs may cite them with a visible
+  unverified label (D-199 ruling; implementation pending). Since D-000; basis of a future frozen
+  contract (D-002).
 - **H4 — Speaker identity is alias-based, never a single string.** Mirrors
   `sources/whatsapp_msg/src/wa/identity.ts`'s LID/PN alias pattern. Since D-000.
 - **H5 — MongoDB, matching the existing stack.** New collections extend the Mongo + per-tenant
-  scoping that `sources/whatsapp_msg/` already runs. Since D-000. Revisit if vector search
-  outgrows Atlas Vector Search.
+  scoping that `sources/whatsapp_msg/` already runs. Since D-000. Live DB `lkb_prod` (D-186).
 - **H6 — Sub-projects are sources, not separate products.** `raw/TOC/` (data) and
   `sources/whatsapp_msg/` (submodule with its own Lab Protocol) feed one root knowledge base.
 - **H7 — The counsellor is a client of the API, not a separate brain.** Since D-000.
@@ -48,13 +51,14 @@ contracts/verify_contracts.py. This section only lists them:
   exists. Silent full capture stays a supported capability (default `consent_policies` row
   `silent-full`) but is the last resort. Every captured fact is diarized and cited (who / when /
   which session). Since D-002, reworded by D-008.
-- **H9 — Pluggable STT.** Self-hosted Vexa + Whisper diarization is the default behind a
-  `packages/ai/stt` seam (`transcribe(audio, opts) → turns[]`); an API key for an advanced
-  model (e.g. `gemini-3.5-transcribe`) can be dropped in and preferred. Since D-004.
+- **H9 — Pluggable STT.** `packages/ai/stt` seam (`transcribe(audio, opts) → turns[]`); Gemini
+  is the active transcriber (audio-capable adapter), Whisper remains a supported alternative.
+  Since D-004, current per D-173 and `config/ai-routing.yaml`.
 - **H10 — Multi-provider AI chain.** Five adapters from day one (gemini, anthropic API-key +
   OAuth/Claude-Code modes, openai, ollama, claude-code), each exposing `listModels()` for a
-  per-provider model dropdown; the chain per jobKind is a user-editable ordered list (len ≥ 1),
-  Gemini first by default. No single-AI dependency. Since D-005, reworded by D-008.
+  per-provider model dropdown; the chain per jobKind is a user-editable ordered list (len ≥ 1) in
+  `config/ai-routing.yaml`. Current: transcribe → gemini; summarize/claims/decisions/ask →
+  ollama-cloud (D-173); speakers → local ollama. No single-AI dependency. Since D-005.
 
 ## 4. Directory map (D-003 monorepo tree — pnpm workspaces, ONE working tree, never a 2nd checkout)
 
@@ -123,9 +127,8 @@ unilaterally; they resolve only through /checkpoint verdicts)
   eval-harness work (T-012) starts. Question bank sources fixed by D-007.
 - **Q4:** ~~Consent rule~~ **CLOSED by D-002 → D-008:** provided-first capture (H8); silent
   capture last resort; provenance frozen. Legal exposure recorded once in D-002 and accepted.
-- **Q5:** ~~Dedicated vector DB?~~ **CLOSED by D-003 → D-021:** brute-force exact cosine in
-  `packages/index/src/vector/` over `chunks`, behind `vectorSearchFn`. Atlas Vector Search is
-  unavailable (self-hosted mongod, no `+srv`), and at 1452×3072 an exhaustive scan is exact.
+- **Q5:** ~~Dedicated vector DB?~~ **CLOSED by D-021, then moot by D-173:** retrieval is
+  vectorless; the brute-force cosine retriever in `packages/index/src/vector/` is dormant.
 - **Q6 (gated purge level):** what "processed to a defined level" means before media purge —
   D-008 fixes the gate (all citing claims verified + retained ±15 s evidence clips); the
   concrete retention values and purge job design are T-026, not yet decided.

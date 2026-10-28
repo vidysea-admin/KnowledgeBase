@@ -1,0 +1,66 @@
+/**
+ * scripts/webinar/join-rules-api-host.ts — T-037 unit `t037-join-rules-api-host`.
+ * Starts the API exactly as apps/api/src/index.ts does (repo-root .env, MONGODB_URL/MONGODB_DB,
+ * startServer with PORT, same listening log) but with the real join-rules store injected, so
+ * /calendar/join-rules stops answering 503. Run: node --import tsx scripts/webinar/join-rules-api-host.ts
+ * Mongo target (ISS-LEGACYSEED-004, no localhost or database default): MONGODB_URL is required, plus either
+ * MONGODB_DB=lkb with the --i-know-this-is-production argument (production), or MONGO_WORK_DB=<isolated db>
+ * (MONGODB_DB, if set, must equal it). Anything else is refused before the first connection.
+ * Differences from index.ts, deliberately: a state-directory check + single-host pid file first, and
+ * lock release on exit/SIGINT/SIGTERM (index.ts has no shutdown handling).
+ */
+import { fileURLToPath, pathToFileURL } from "node:url";
+import path from "node:path";
+import { config as loadEnv } from "dotenv";
+import { connect } from "../../packages/db/src/index.js";
+import { startServer } from "../../apps/api/src/server.js";
+import { requireScriptDatabase } from "../lib/transcript-provenance.mjs";
+import { buildProductionDeps } from "../../apps/api/src/composition/production.js";
+import { createManagedSendNowDeps } from "./manual-jobs/host.js";
+import { createBotEventsDeps } from "../watch/bot-events-host.js";
+import { acquireHostLock, createJoinRulesDeps, prepareStateDir, resolveStateDir } from "./join-rules-host.js";
+import { runOperationsSupervisor } from '../operations/supervisor.js';
+
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+// Same file index.ts loads: apps/api/src/../../../.env == repo root.
+loadEnv({ path: path.resolve(HERE, "../../.env") });
+
+async function main(): Promise<void> {
+  const stateDir = prepareStateDir(resolveStateDir());
+  const release = acquireHostLock(stateDir);
+  process.on("exit", release);
+  const abort = new AbortController();
+  let operationsDone: Promise<void> = Promise.resolve();
+  try {
+    console.log(`join-rules state directory: ${stateDir}`);
+    // ISS-LEGACYSEED-004: no localhost URL and no database default; refuses before any connection.
+    const target = requireScriptDatabase(process.env, process.argv.slice(2), { allowProduction: true });
+    await connect(target.url, target.dbName);
+    const prod = buildProductionDeps();
+    // T-039: POST /calendar/send-now is live only through this host (needs the "send-now" scope on the key).
+    const server = startServer({ ...prod, calendar: { ...prod.calendar, sendNow: createManagedSendNowDeps() }, joinRules: createJoinRulesDeps({ stateDir }), botEvents: createBotEventsDeps({ stateDir }) });
+    server.on("listening", () => {
+      const addr = server.address();
+      const port = typeof addr === "object" && addr ? addr.port : addr;
+      console.log(`@lkb/api listening on :${port}`);
+      if (process.env.LKB_OPERATIONS_WORKER_ENABLED === '1') {
+        if (!prod.operationsSchedules) console.error('Operations supervisor unavailable: required runtime is not configured');
+        else operationsDone = runOperationsSupervisor({ ...prod.operationsSchedules, keyStore: prod.keyStore, env: process.env, signal: abort.signal })
+          .catch(() => { console.error('Operations supervisor stopped; operator attention required'); });
+      }
+    });
+    server.on('close', () => { abort.abort(); void operationsDone.finally(release); });
+    for (const sig of ['SIGINT', 'SIGTERM'] as const) process.once(sig, () => {
+      abort.abort(); server.close();
+      const force = setTimeout(() => { release(); process.exit(sig === 'SIGINT' ? 130 : 143); }, 10000);
+      void operationsDone.finally(() => { clearTimeout(force); release(); process.exit(sig === 'SIGINT' ? 130 : 143); });
+    });
+  } catch (e) { release(); throw e; }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error("@lkb/api failed to start:", err);
+    process.exitCode = 1;
+  });
+}

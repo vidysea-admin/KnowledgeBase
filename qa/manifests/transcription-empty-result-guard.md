@@ -91,3 +91,5 @@ Large/long audio files (60MB+) may need chunking or a different call strategy â€
 WHY the 62.7MB file produced no usable output is not solved here, only made loud instead of
 silent. The batch scale-up (remaining 20 sessions + a retry of this one) resumes after this fix
 lands, now safe against this failure mode.
+
+**Handshake status:** checked-PASS â€” derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

@@ -1,0 +1,31 @@
+{
+  "recordedAt": "2026-10-15T23:11:05.4332137Z",
+  "stageCommitPush": 0,
+  "findings": [],
+  "allowlistSha256": "9044f3b893ae18d1c3acebd0e4f4cb685f8798549f7f78b8545d75c760f03bff",
+  "exactAddedPaths": [
+    "packages/meeting-bot/src/capture/workspace/tab-session-workspace.test.ts"
+  ],
+  "checked": [
+    {
+      "beforeSha256": "75a3e02cbc5cdaa57101856c8cd2c6174fee7f1c56f2424ba686fcdedf6c41fb",
+      "expectedSha256": "aae315a52c5afe0d2c72dcb6b1e2d932acd94876545d7550335594496edc99c1",
+      "expectedMatch": true,
+      "sha256": "aae315a52c5afe0d2c72dcb6b1e2d932acd94876545d7550335594496edc99c1",
+      "path": "apps/api/src/grounded-postprocessing/transcripts.test.ts",
+      "nulBytes": false
+    },
+    {
+      "beforeSha256": null,
+      "expectedSha256": "b2b2b34951ecff623896258bb2318f3dcd6e2caa2d448b3e2a6e97696809f60f",
+      "expectedMatch": true,
+      "sha256": "b2b2b34951ecff623896258bb2318f3dcd6e2caa2d448b3e2a6e97696809f60f",
+      "path": "packages/meeting-bot/src/capture/workspace/tab-session-workspace.test.ts",
+      "nulBytes": false
+    }
+  ],
+  "indexEmpty": true,
+  "secretValuesPersisted": false,
+  "testsBuilds": 0,
+  "schema": "local-commit-content-safety-latest2/1"
+}

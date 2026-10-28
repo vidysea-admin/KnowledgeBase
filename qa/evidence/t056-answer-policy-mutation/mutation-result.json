@@ -1,0 +1,189 @@
+{
+ "results": [
+  {
+   "id": "M1 drop fingerprint check",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "tampered or hollow stored bindings are refused",
+    "tampered or hollow stored bindings are refused"
+   ]
+  },
+  {
+   "id": "M2 drop empty-bindings refusal",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "tampered or hollow stored bindings are refused",
+    "tampered or hollow stored bindings are refused"
+   ]
+  },
+  {
+   "id": "M3 web without verifier accepted",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory",
+    "one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory"
+   ]
+  },
+  {
+   "id": "M4 drop missing-session refusal",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "1",
+   "fail": "2",
+   "failing": [
+    "stale citation baseline is accepted, then each withdrawal path is refused",
+    "tampered or hollow stored bindings are refused",
+    "stale citation baseline is accepted, then each withdrawal path is refused",
+    "tampered or hollow stored bindings are refused"
+   ]
+  },
+  {
+   "id": "M5 session lookup not tenant-bound",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "stale citation baseline is accepted, then each withdrawal path is refused",
+    "stale citation baseline is accepted, then each withdrawal path is refused"
+   ]
+  },
+  {
+   "id": "M6 WhatsApp eligibility not required",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory",
+    "one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory"
+   ]
+  },
+  {
+   "id": "M7 drop per-turn eligibility call",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory",
+    "one stale binding among current ones refuses the whole set; web proof and WhatsApp eligibility are mandatory"
+   ]
+  },
+  {
+   "id": "M8 drop turn text hash check",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "stale citation baseline is accepted, then each withdrawal path is refused",
+    "stale citation baseline is accepted, then each withdrawal path is refused"
+   ]
+  },
+  {
+   "id": "M9 drop turn-exists refusal",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "stale citation baseline is accepted, then each withdrawal path is refused",
+    "stale citation baseline is accepted, then each withdrawal path is refused"
+   ]
+  },
+  {
+   "id": "M10 drop empty-quotes refusal",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "2",
+   "fail": "1",
+   "failing": [
+    "tampered or hollow stored bindings are refused",
+    "tampered or hollow stored bindings are refused"
+   ]
+  },
+  {
+   "id": "M11 workflow ignores verifier",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "1",
+   "fail": "1",
+   "failing": [
+    "changed evidence or policy cannot authorize stale candidate approval; refusal cannot be approved",
+    "changed evidence or policy cannot authorize stale candidate approval; refusal cannot be approved"
+   ]
+  },
+  {
+   "id": "M13 workflow ignores candidate digest",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "1",
+   "fail": "1",
+   "failing": [
+    "stored candidate or evidence bytes altered after storage are stale and cannot be approved",
+    "stored candidate or evidence bytes altered after storage are stale and cannot be approved"
+   ]
+  },
+  {
+   "id": "M12 workflow ignores evidence digest",
+   "applied": true,
+   "killed": true,
+   "status": 1,
+   "timedOut": false,
+   "pass": "1",
+   "fail": "1",
+   "failing": [
+    "stored candidate or evidence bytes altered after storage are stale and cannot be approved",
+    "stored candidate or evidence bytes altered after storage are stale and cannot be approved"
+   ]
+  }
+ ],
+ "fidelity": [
+  {
+   "file": "apps/api/src/answer-policy/answer-evidence.ts",
+   "head": "a399498c96c9995d28c6392f4ad54797a7dafde1",
+   "now": "a399498c96c9995d28c6392f4ad54797a7dafde1",
+   "equal": true
+  },
+  {
+   "file": "apps/api/src/answer-policy/answer-workflow.ts",
+   "head": "4629efacc4dab5ffcb17b1d3476055f0986fdc7a",
+   "now": "4629efacc4dab5ffcb17b1d3476055f0986fdc7a",
+   "equal": true
+  }
+ ]
+}

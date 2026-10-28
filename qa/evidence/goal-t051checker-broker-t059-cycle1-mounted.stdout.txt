@@ -1,0 +1,7 @@
+{"requestId":"f950b8b3-5896-4ac1-8771-70a1d590db7c","method":"GET","path":"/evaluations/loss/flywheel","status":401,"durationMs":16.35,"time":"2026-10-14T21:26:11.321Z","level":"warn","msg":"request"}
+{"requestId":"0de6937c-12bf-4cb1-a7bf-4fa818050701","method":"GET","path":"/evaluations/loss/flywheel","status":403,"durationMs":3.59,"tenantId":"t","time":"2026-10-14T21:26:11.345Z","level":"warn","msg":"request"}
+{"requestId":"a8c01a51-a2a0-4aed-8fe4-31b6a9be0a39","method":"GET","path":"/evaluations/loss/flywheel","status":404,"durationMs":1.66,"tenantId":"b","time":"2026-10-14T21:26:11.350Z","level":"warn","msg":"request"}
+{"requestId":"5c54739d-6bd4-4067-8fd3-5e9f16c6c057","method":"GET","path":"/gaps","status":200,"durationMs":3.67,"tenantId":"t","time":"2026-10-14T21:26:11.357Z","level":"info","msg":"request"}
+{"requestId":"7dd6858d-a626-4a3e-affa-1e8b43022273","method":"GET","path":"/evaluations/loss/flywheel","status":200,"durationMs":3.38,"tenantId":"t","time":"2026-10-14T21:26:11.364Z","level":"info","msg":"request"}
+{"requestId":"3ff56b91-ad45-4d00-a1a8-5287a9cee717","method":"POST","path":"/evaluations/loss/retest","status":400,"durationMs":27.51,"tenantId":"t","time":"2026-10-14T21:26:11.399Z","level":"warn","msg":"request"}
+{"startedAt":"2026-10-14T21:26:11.198Z","completedAt":"2026-10-14T21:26:11.490Z","counts":{"currentMountAuthPrivacy":14,"factoryGuards":7,"completedChildDrift":6,"historicalReplay":4},"result":"PASS","externalCalls":0}

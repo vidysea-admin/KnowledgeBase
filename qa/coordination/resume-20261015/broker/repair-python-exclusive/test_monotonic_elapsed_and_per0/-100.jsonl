@@ -1,0 +1,4 @@
+{"kind": "meta", "startedAtEpoch": 1000.0, "source": "meet-dom", "samplerClock": {"version": 1, "captureGeneration": "11111111-1111-4111-8111-111111111111", "hostId": "5b283c111f5215eeaeeaabef756e325fdab5b32f2502d591806559166765d0b6", "samplerInstance": "5e419912-f8e6-45e6-a709-36c745a276e9", "epochBeforeSec": 1000.0, "epochAfterSec": 1000.0, "monotonicSec": 100.0}}
+{"tSec": 0.0, "displayName": "Priya Nair", "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1000.0, "epochAfterSec": 1000.0, "monotonicSec": 100.0}}
+{"tSec": 4.0, "displayName": "Priya Nair", "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1004.1, "epochAfterSec": 1004.1, "monotonicSec": 104}}
+{"kind": "sampler-clock-invalid", "source": "meet-dom"}

@@ -1,0 +1,45 @@
+✖ actual current sync v3 producer output is consumed by the actual finalizer (61.8119ms)
+✖ actual selected speech-only producer input is consumed with its current passed validation (48.9322ms)
+✔ legacy v2 combined proof remains supported with its existing core guarantees (46.4986ms)
+✔ v3 refuses wrong source, database, bytes, generation, selected count and stage status (104.2294ms)
+✔ v3 refuses changed source/session metadata and foreign selected turns (64.3057ms)
+✔ v3 database binding is independently expected and test-data sources remain staging only (63.7152ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 4
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1029.2706
+
+✖ failing tests:
+
+test at packages\meeting-bot\src\workspace\index-proof-consumer.test.mjs:8:1
+✖ actual current sync v3 producer output is consumed by the actual finalizer (61.8119ms)
+  Error: required fresh strict index proof unavailable
+      at validateIndexProof (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-finalize.ts:306:11)
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs:11:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at packages\meeting-bot\src\workspace\index-proof-consumer.test.mjs:14:1
+✖ actual selected speech-only producer input is consumed with its current passed validation (48.9322ms)
+  Error: ENOENT: no such file or directory, open 'C:\Users\product\AppData\Local\Temp\t043-producer-consumer-6gmXHy\knowledge-turns.json'
+      at Object.openSync (node:fs:621:18)
+      at readFileSync (node:fs:487:35)
+      at validateIndexProof (C:\Users\product\Desktop\KnowledgeBase\packages\meeting-bot\src\capture\record-finalize.ts:302:49)
+      at TestContext.<anonymous> (file:///C:/Users/product/Desktop/KnowledgeBase/packages/meeting-bot/src/workspace/index-proof-consumer.test.mjs:16:16)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    errno: -4058,
+    code: 'ENOENT',
+    syscall: 'open',
+    path: 'C:\\Users\\product\\AppData\\Local\\Temp\\t043-producer-consumer-6gmXHy\\knowledge-turns.json'
+  }

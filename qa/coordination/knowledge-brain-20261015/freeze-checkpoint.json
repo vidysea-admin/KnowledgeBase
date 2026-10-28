@@ -1,0 +1,184 @@
+{
+  "recordedAt": "2026-10-15T07:26:30.4056261Z",
+  "state": "frozen-priority-override",
+  "reason": "Root relayed user priority override: systemwide checker efficiency fix first; explicit root resume required",
+  "goalStatus": "active; reprioritized, not completed or cancelled",
+  "centralOwner": "/root/integration_control",
+  "centralPaths": [
+    "apps/api/src/composition/production.ts",
+    "apps/api/src/composition/integrations/transcripts.ts",
+    "apps/api/src/composition/vectorless-routing.test.ts",
+    "config/ai-routing.yaml",
+    "docker-compose.yml",
+    "docs/docker-deployment.md",
+    "scripts/qa/container-workflows/run.sh",
+    "packages/ai/src/provider.ts",
+    "packages/ai/src/jobs.ts",
+    "packages/ai/src/router.ts",
+    "packages/ai/src/index.ts",
+    "packages/ai/src/router-cost.test.ts",
+    "packages/index/src/index.ts",
+    "schema/jobs.schema.json",
+    "schema/sessions.schema.json",
+    "schema/answer_runs.schema.json",
+    "packages/core/src/generated/jobs.ts",
+    "packages/core/src/generated/sessions.ts",
+    "packages/core/src/generated/answer_runs.ts",
+    "TASKS.md",
+    ".goal/goal.json",
+    "docs/DECISIONS.md"
+  ],
+  "brokerState": "T038 bounded check finished 14/15 FAIL (root report); no next suite authorized",
+  "hazards": [
+    "Knowledge-output factory temporarily requires fourth verifier callback not yet integrated; build is not claimed green",
+    "D173 broad Supersedes error corrected semantically by append-only D174; computed index still SUPERSEDED per D130 limitation",
+    "Central routing/accounting/schema focused tests not run; only provider mocks broker 19/19 PASS",
+    "No task closed; human/live/host/7day gates remain"
+  ],
+  "lanes": [
+    {
+      "owner": "indexing_maker",
+      "note": "Grounding expansion completed before freeze; source pins/manifest may require refresh; untested",
+      "state": "frozen",
+      "paths": [
+        "apps/api/src/indexing/session.ts",
+        "apps/api/src/indexing/types.ts",
+        "apps/api/src/indexing/generation.ts",
+        "apps/api/src/indexing/chunk-write.ts",
+        "apps/api/src/indexing/vector-gap.ts",
+        "apps/api/src/indexing/vectorless-grounding.ts",
+        "apps/api/src/indexing/session.test.ts",
+        "apps/api/src/indexing/vector-gap.test.ts",
+        "apps/api/src/indexing/vectorless-publication.test.ts",
+        "apps/api/src/indexing/session-decisions.test.ts",
+        "apps/api/src/indexing/speaker-suggest.test.ts",
+        "apps/api/src/indexing/promote-entities.test.ts",
+        "apps/api/src/indexing/session-grounded-notes.test.ts",
+        "apps/api/src/indexing/session-grounded-wire.test.ts",
+        "qa/manifests/vectorless-publication.md"
+      ]
+    },
+    {
+      "owner": "speaker_graph_maker",
+      "note": "Cycle1 building, nine tests pending",
+      "state": "frozen",
+      "paths": [
+        "packages/index/src/graph/speaker-knowledge.ts",
+        "packages/index/src/graph/speaker-knowledge.test.ts",
+        "qa/manifests/speaker-knowledge-vectorless.md"
+      ]
+    },
+    {
+      "owner": "whatsapp_maker",
+      "note": "Cycle1 in_progress; consent guard untested, sourceCAS and reingest consent issues unresolved",
+      "state": "frozen",
+      "paths": [
+        "apps/api/src/whatsapp/review/store.ts",
+        "apps/api/src/whatsapp/review/store.test.ts",
+        "qa/manifests/whatsapp-vectorless-integration.md",
+        "qa/packets/whatsapp-vectorless-integration.md",
+        "qa/issues.WAVECTORLESS.jsonl"
+      ]
+    },
+    {
+      "owner": "knowledge_profiles_maker",
+      "note": "Cycle0 implementation-ready-awaiting-broker",
+      "state": "frozen",
+      "paths": [
+        "apps/api/src/speaker-profiles/store.ts",
+        "apps/api/src/speaker-profiles/router.ts",
+        "apps/api/src/speaker-profiles/store.test.ts",
+        "apps/api/src/speaker-profiles/router.test.ts",
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.ts",
+        "apps/web/src/pages/knowledge/speakers/speakerProfileClient.test.ts",
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx",
+        "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx",
+        "qa/manifests/speaker-profile-vectorless-consumer.md"
+      ]
+    },
+    {
+      "owner": "answer_policy_maker",
+      "note": "Three freshness tests authored, unrun; no manifest yet",
+      "state": "frozen",
+      "paths": [
+        "apps/api/src/answer-policy/answer-workflow.ts",
+        "apps/api/src/answer-policy/answer-workflow.test.ts"
+      ]
+    },
+    {
+      "owner": "outputs_maker",
+      "note": "Temporary central compile join fourth verify callback pending; tests unrun",
+      "state": "frozen",
+      "paths": [
+        "apps/api/src/knowledge-outputs/types.ts",
+        "apps/api/src/knowledge-outputs/synthesis.ts",
+        "apps/api/src/knowledge-outputs/wiring.ts",
+        "apps/api/src/knowledge-outputs/workbench.test.ts"
+      ]
+    },
+    {
+      "owner": "capture_maker",
+      "note": "Startup files frozen, exact capture/ paths corrected from maker acknowledgement; separate EOF helper resumed by root.",
+      "state": "frozen",
+      "paths": [
+        "packages/meeting-bot/src/capture/tab-browser.ts",
+        "packages/meeting-bot/src/capture/tab-startup-cleanup.test.ts",
+        "qa/issues.capturemaker.jsonl",
+        "qa/manifests/t034-startup-owned-cleanup.md"
+      ]
+    },
+    {
+      "owner": "vectorless_checker",
+      "note": "Contracts amended; no tests or verdicts executed",
+      "state": "frozen",
+      "paths": [
+        "qa/contracts/ollama-cloud-vectorless.md",
+        "qa/contracts/vectorless-tree-retrieval.md",
+        "qa/contracts/vectorless-publication.md",
+        "qa/contracts/speaker-knowledge-vectorless.md",
+        "qa/contracts/goal-t008.md",
+        "qa/contracts/ai-provider-seam.md",
+        "qa/checker-probes/vectorless-boundaries.test.ts"
+      ]
+    },
+    {
+      "owner": "manual_jobs_maker",
+      "requestedOnly": [
+        "scripts/webinar/send-now-host.ts",
+        "scripts/webinar/send-now-host.test.ts",
+        "packages/meeting-bot/src/send-now-command.ts",
+        "packages/meeting-bot/src/send-now-command.test.ts"
+      ],
+      "note": "No edits, lease unconfirmed; operation-path drift found",
+      "state": "frozen-readonly",
+      "paths": []
+    }
+  ],
+  "awaitingAcknowledgement": [],
+  "acknowledgement": "All 20 root lanes acknowledged frozen/done via root relay; direct confirmations retained in lane records where received. No active feature tool believed. Only checker-efficiency work authorized.",
+  "acknowledgedOwners": [
+    "provider_maker",
+    "retrieval_maker",
+    "indexing_maker",
+    "speaker_graph_maker",
+    "candidate_provenance_maker",
+    "hosting_docs_maker",
+    "usage_cost_maker",
+    "vectorless_checker",
+    "capture_maker",
+    "scheduler_maker",
+    "source_connectors_maker",
+    "whatsapp_maker",
+    "knowledge_profiles_maker",
+    "pipeline_maker",
+    "transcript_review_maker",
+    "retention_maker",
+    "manual_jobs_maker",
+    "answer_policy_maker",
+    "outputs_maker",
+    "verification_broker"
+  ],
+  "efficiencyDecision": "D-175 appended after feature freeze under root-approved efficiency-only scope; no feature source changed.",
+  "resumedScope": "Root explicitly resumed KnowledgeBrain after independent checker-efficiency cycle1 PASS. Central coherent integration, specified capture/manual jobs/scheduler/consent lanes only; combined typecheck/build awaits source freeze.",
+  "currentFeatureState": "implemented candidates; no complete parent acceptance; no live provider or production write"
+}

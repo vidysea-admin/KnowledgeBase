@@ -1,0 +1,24 @@
+{
+  "args": [
+    "--import",
+    "tsx",
+    "qa/evidence/goal-live-toc/staging-read-only.mjs"
+  ],
+  "pins": {
+    "qa/evidence/goal-live-toc/staging-read-only.mjs": "4aa0567a7264669c4305a17d854811736b93bf35b9a0eb6f70c4759787a3f4ca",
+    "qa/evidence/goal-live-toc/one-call-receipt.json": "548a0b1de6e380849028811658c42a127823741e981fdc40ea9e917d2e701d9d",
+    "scripts/lib/transcript-provenance.mjs": "bd2570803ffbea67db375efb16d02f7374533ad2b27c4f700f7543b60745b301",
+    "scripts/lib/turn-timing.mjs": "84a24c63cc90ef24799c1f1fc36df9dfe21f2cd2f927eba428ae36a9a46d9c0e",
+    "scripts/webinar/session-rows.mjs": "684a6d3c5e6fafdd9879ce232d5b0703d6a1e7d667415e2be2b0543b70de8081",
+    "apps/api/src/visibility/knowledge.ts": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+    "apps/api/src/transcript-review/effective-reader.ts": "1cf35bea72eb9c90138969966a58526a06d34892b316ded5066576d91a4b7168",
+    "apps/api/src/whatsapp/review/store.ts": "f987af4e47cbbc3e27c565be8f8f8e462a099cf738e81d88ea60ca7b6f2839b3",
+    "apps/api/src/whatsapp/review/materializer.ts": "d626438881f6926543016c1f4a1ce100d6e4d5d5058364cfdd296bc077f7dd2a",
+    "apps/api/src/whatsapp/review/invalidate.ts": "7512f739429b9bfb8848e35ac6673037f3a3b5ec20a2aa5dd0f5ae965cbe7214",
+    "packages/db/src/lib/tenantScope.ts": "f9ab2f8fa8d21dd661d9752cfa85912fa548255ef85a0018e048634bc95ee513",
+    "qa/evidence/goal-live-toc/staging-read-only-pins.json": "49a175f1a7ae12ab77f5f6fa549874e995583f2e5d3629b53894f24b707cbbaa",
+    "qa/evidence/goal-live-toc/ordinary-argv-run.mjs": "195242ad1b9fdfdf33b2d5580faa185e3fd21de23c75a6125017910fa276823b"
+  },
+  "timeoutMs": 45000,
+  "output": "qa/evidence/goal-live-toc/ordinary-staging-20261014T224019Z"
+}

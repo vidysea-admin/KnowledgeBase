@@ -1,0 +1,106 @@
+{
+  "schema": "review-runtime-usage/v1",
+  "unit": "native_vertical_delivery-postbaseline",
+  "cycle": 0,
+  "phase": "maker-postbaseline",
+  "boundary": "baseline",
+  "agent_prefix": "/root/native_vertical_delivery",
+  "observed_at": "2026-10-16T02:57:07.798Z",
+  "coverage": "explicit_session_files_only",
+  "records": [
+    {
+      "identity": {
+        "thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+        "parent_thread_id": "01a13e51-3417-7781-a3e2-75f087ff957b",
+        "agent_path": "/root/native_vertical_delivery"
+      },
+      "usage_timestamp": "2026-10-16T02:57:02.915Z",
+      "lifecycle": {
+        "type": "task_started",
+        "timestamp": "2026-10-16T02:55:08.021Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 70307146,
+        "cached_input_tokens": 69684352,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 169886,
+        "reasoning_output_tokens": 56425,
+        "total_tokens": 70477032
+      },
+      "status": "unknown",
+      "reasons": [
+        "inflight_or_unconfirmed_completion"
+      ]
+    },
+    {
+      "identity": {
+        "thread_id": "01a141e1-f089-7f62-98ef-1e9debbcf6f1",
+        "parent_thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+        "agent_path": "/root/native_vertical_delivery/native_a"
+      },
+      "usage_timestamp": "2026-10-16T00:11:17.730Z",
+      "lifecycle": {
+        "type": "task_complete",
+        "timestamp": "2026-10-16T00:11:17.795Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 6110954,
+        "cached_input_tokens": 5971328,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 22980,
+        "reasoning_output_tokens": 3922,
+        "total_tokens": 6133934
+      },
+      "status": "known",
+      "reasons": []
+    },
+    {
+      "identity": {
+        "thread_id": "01a141e2-121d-7dc0-a109-b44e67009c7b",
+        "parent_thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+        "agent_path": "/root/native_vertical_delivery/native_b"
+      },
+      "usage_timestamp": "2026-10-16T02:52:15.126Z",
+      "lifecycle": {
+        "type": "task_started",
+        "timestamp": "2026-10-16T02:57:02.781Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 23986489,
+        "cached_input_tokens": 23720064,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 57405,
+        "reasoning_output_tokens": 12449,
+        "total_tokens": 24043894
+      },
+      "status": "unknown",
+      "reasons": [
+        "inflight_or_unconfirmed_completion"
+      ]
+    },
+    {
+      "identity": {
+        "thread_id": "01a141e2-3767-7563-b775-563a704aab11",
+        "parent_thread_id": "01a141e1-1edd-7c30-bb6b-3b6cc0a8c2f7",
+        "agent_path": "/root/native_vertical_delivery/native_c"
+      },
+      "usage_timestamp": "2026-10-16T02:52:40.848Z",
+      "lifecycle": {
+        "type": "task_complete",
+        "timestamp": "2026-10-16T02:52:40.884Z"
+      },
+      "cumulative_tokens": {
+        "input_tokens": 27315456,
+        "cached_input_tokens": 27026944,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 76928,
+        "reasoning_output_tokens": 21516,
+        "total_tokens": 27392384
+      },
+      "status": "known",
+      "reasons": []
+    }
+  ],
+  "active_seconds": null,
+  "monetary_cost": null
+}

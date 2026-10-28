@@ -1,0 +1,37 @@
+{
+  "_id": "toc-sess1-spk:1-person:rashi-sharma",
+  "tenantId": "toc",
+  "sessionId": "sess1",
+  "speakerRef": "spk:1",
+  "personId": "person:rashi-sharma",
+  "displayName": "Rashi Sharma",
+  "status": "suggested",
+  "provenance": [
+    {
+      "turnId": "t4",
+      "evidenceQuote": "Over to you, Rashi Sharma.",
+      "evidenceKind": "handover"
+    }
+  ],
+  "evidence": [
+    {
+      "turnId": "t4",
+      "sessionId": "sess1"
+    }
+  ],
+  "blocks": [
+    {
+      "startTurnIndex": 5,
+      "endTurnIndex": 6
+    }
+  ],
+  "suggestedAt": "2026-10-12T10:00:00Z",
+  "nativePublication": {
+    "receiptSha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "reviewRevision": null,
+    "sourceId": "source-a",
+    "generation": "generation-a",
+    "turnDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "captureGeneration": "capture-a"
+  }
+}

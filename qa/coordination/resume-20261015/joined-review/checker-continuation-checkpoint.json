@@ -1,0 +1,7 @@
+{
+  "status": "NEEDS_EXTRA_REVIEW",
+  "assess_exit": 2,
+  "reason": "same identity finalization already committed",
+  "verdict_sha256": "610e7a0a151216cbf35eddf0fdd7a5bd97485bdfb852790a52023433c517863d",
+  "utc": 1792106440.9879634
+}

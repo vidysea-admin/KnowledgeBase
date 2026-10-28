@@ -1,0 +1,40 @@
+{
+  "status": "STATIC_READY_AWAITING_BROKER_GRANT",
+  "utc": "2026-10-15T23:02:25.252411+00:00",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "argv": [
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+    "--test",
+    "--test-isolation=none",
+    "--test-concurrency=1",
+    "--test-timeout=10000",
+    "--import",
+    "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-alias-repair\\required-cases.test.mjs"
+  ],
+  "pins": {
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-alias-repair\\register.mjs": "e2af4f52f525032e808eae5452804fe7f83c51869ed427d106a3b128dd22999d",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\runtime-alias-repair\\required-cases.test.mjs": "6fb56964e13699bac9cb25757abc6b7fa954d5dd88912c9b54639488ea4ea16f",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\.cache\\coordination\\safe-test-runtime\\register.mjs": "fe80c5a2c766a6a20ad2532f434541d381e45ef77c90d9c7f485c939a11af644",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\package.json": "c0ae8fa51154bf6661f1bfade45ac2b650925f9447364f43b57a3b4bafede999",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core\\src\\domain\\lean-video.ts": "6cd05771849a03f7462015ecf636a5775d17958c6643b816d2d6a69aec453d94",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\native\\native-capture-runtime.ts": "af219341f09d497c4e646be82420e91db338fb4c8e510c3f63890e4168d0035e",
+    "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe": "3602f2bb1a10f2cbab4c36886218a33c1ab3db87290e73b033c46c77147d0237"
+  },
+  "observed_workspace_junction_target": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core",
+  "expected_core_realpath": "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\core",
+  "package_name": "@lkb/core",
+  "exports_present": false,
+  "node_version": "not executed in this phase; binary pinned",
+  "executed_tests": false,
+  "required_cases": [
+    "actual deep workspace alias resolves and TS source loads",
+    "normal resolution and package export denial retain original semantics",
+    "traversal, foreign packages and outside-workspace importers refuse fallback"
+  ],
+  "source_evidence": [
+    "qa/coordination/resume-20261015/broker/integrated-final-checkpoint.md",
+    "qa/coordination/resume-20261015/broker/integrated-native-runtime.log"
+  ],
+  "limits": "No production, canonical bootstrap, dependencies or global enforcement edits. No independent PASS or hard-budget claim."
+}

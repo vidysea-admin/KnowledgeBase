@@ -1,0 +1,237 @@
+{
+  "agent": "/root/quality_delivery_coordinator/mjs_four_checker",
+  "settledActualTotal": 950992,
+  "input": 945086,
+  "cachedInputSubset": 883712,
+  "output": 5906,
+  "callCount": 11,
+  "totalToolOutputChars": 204838,
+  "calls": [
+    {
+      "id": "call_8e99e79933084335b57b7b73b03590bc",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:04:42.665Z",
+      "argChars": 148,
+      "paths": [],
+      "explicitMax": [
+        12000
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 11790,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_79655bed539d405d94c557731ad5418d",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:04:51.832Z",
+      "argChars": 662,
+      "paths": [
+        "qa/coordination/checker-runtime-total-20261015/SKILL.md",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/proposal.md",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/readiness-and-identity.json",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/legacy-compatibility-input.json",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/staged-actual-total-input.json"
+      ],
+      "explicitMax": [
+        14500
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 36260,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_7e1af09fe9dd42ee8da352927d04740b",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:04:59.629Z",
+      "argChars": 938,
+      "paths": [
+        "scripts/review_budget.py",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/legacy-compatibility-input.json",
+        "qa/coordination/checker-runtime-total-20261015/review_budget.py",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/staged-actual-total-input.json",
+        "qa/packets/u22-extraction-review-resume.md",
+        "qa/packets/t022-executed-provenance.md",
+        "qa/packets/extraction-stage-receipts.md",
+        "qa/packets/t022-review-dirty-guard.md",
+        "qa/coordination/knowledge-brain-20261015/quality-delivery/review-budget-prep/batch-four-current/recorded-environment-closure.json"
+      ],
+      "explicitMax": [
+        14500
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 41842,
+      "truncationMarkers": [
+        "4667 tokens truncated"
+      ]
+    },
+    {
+      "id": "call_689e306842cc4636a6b2005296bd99c4",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:05:06.801Z",
+      "argChars": 555,
+      "paths": [
+        "scripts/eval/extraction-review-resume.mjs",
+        "scripts/eval/extraction-stage-receipts.mjs",
+        "scripts/eval/human-calibration.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "qa/contracts/goal-u22.md",
+        "qa/contracts/goal-t022.md",
+        "qa/contracts/goal-t022-offline-review.md",
+        "qa/contracts/parallel-extraction-adjudication.md"
+      ],
+      "explicitMax": [
+        15000
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 40528,
+      "truncationMarkers": [
+        "229 tokens truncated"
+      ]
+    },
+    {
+      "id": "call_895f0a47b7a34048aeb6f4e4d7a47fd9",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:05:15.201Z",
+      "argChars": 618,
+      "paths": [
+        "scripts/eval/human-calibration.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "scripts/eval/extraction-review-resume.test.mjs",
+        "scripts/eval/t022-offline-review.test.mjs",
+        "scripts/eval/human-calibration.test.mjs",
+        "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.json"
+      ],
+      "explicitMax": [
+        13000
+      ],
+      "hasSlice": true,
+      "fullDump": true,
+      "outputChars": 42273,
+      "truncationMarkers": [
+        "output\\\":\\\"Warning: truncated output (original ",
+        "3499 tokens truncated"
+      ]
+    },
+    {
+      "id": "call_4532c767a3cf43e998568866d8b1e762",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:05:23.044Z",
+      "argChars": 607,
+      "paths": [
+        "scripts/eval/extraction-review-resume.test.mjs",
+        "scripts/eval/t022-offline-review.test.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "scripts/eval/extraction-review.mjs",
+        "qa/goal-vectorless-2026-10-15/verification-quality-six-unit-twenty-six.json",
+        "qa/goal-vectorless-2026-10-15/verification-extraction-stage-current-refusal.stdout.txt"
+      ],
+      "explicitMax": [
+        7500
+      ],
+      "hasSlice": true,
+      "fullDump": true,
+      "outputChars": 30825,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_260e1a9402e948e89e0366e89388ef66",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:05:44.499Z",
+      "argChars": 2529,
+      "paths": [
+        "scripts/review_budget.py",
+        "qa/coordination/checker-runtime-total-20261015/review_budget.py"
+      ],
+      "explicitMax": [
+        1000
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 361,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_38a236a4f7e245d18605abd381bf2543",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:06:27.996Z",
+      "argChars": 7700,
+      "paths": [
+        "scripts/eval/extraction-review.mjs",
+        "scripts/eval/extraction-review-resume.mjs",
+        "scripts/eval/extraction-stage-receipts.mjs",
+        "scripts/eval/human-calibration.mjs",
+        "scripts/eval/t022-offline-review.mjs",
+        "apps/api/src/score.ts",
+        "packages/ai/src/index.ts",
+        "packages/ai/src/router.ts",
+        "packages/ai/src/providers/ollama.ts",
+        "packages/ai/src/providers/gemini.ts",
+        "packages/ai/src/json.ts",
+        "qa/goal-vectorless-2026-10-15/verification-extraction-stage-current-refusal.stdout.txt",
+        "qa/evidence/quality-mjs-four-checker/probe.mjs"
+      ],
+      "explicitMax": [
+        200
+      ],
+      "hasSlice": true,
+      "fullDump": true,
+      "outputChars": 575,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_1d2bf645ea7644fa9729835fb74c1eac",
+      "name": "exec",
+      "type": "custom_tool_call",
+      "time": "2026-10-15T12:07:00.034Z",
+      "argChars": 4786,
+      "paths": [
+        "qa/evidence/quality-mjs-four-checker/probe.mjs"
+      ],
+      "explicitMax": [
+        200
+      ],
+      "hasSlice": false,
+      "fullDump": true,
+      "outputChars": 384,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_5dcb961da14940d4997bde8a54b93dab",
+      "name": "send_message",
+      "type": "function_call",
+      "time": "2026-10-15T12:07:07.361Z",
+      "argChars": 1003,
+      "paths": [],
+      "explicitMax": [],
+      "hasSlice": false,
+      "fullDump": false,
+      "outputChars": 0,
+      "truncationMarkers": []
+    },
+    {
+      "id": "call_d74e1aec36d54fd99ac8f8953329bd79",
+      "name": "send_message",
+      "type": "function_call",
+      "time": "2026-10-15T12:07:13.936Z",
+      "argChars": 1224,
+      "paths": [],
+      "explicitMax": [],
+      "hasSlice": false,
+      "fullDump": false,
+      "outputChars": 0,
+      "truncationMarkers": []
+    }
+  ]
+}

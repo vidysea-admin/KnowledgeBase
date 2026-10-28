@@ -1,0 +1,412 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {writeFileSync, readFileSync, existsSync} from 'node:fs';
+import {join, resolve} from 'node:path';
+import {runPipelineTick, validateRunGate, createPipelineDeps} from './run-pipeline.mjs';
+const {runWebinarRegistrations, activeWebinarStopReason, webinarSessionKey, webinarIdentity} = await import('../../packages/meeting-bot/src/calendar/auto-record-policy.ts');
+const {prepareWebinarSourceState, validateWebinarRegistration, confirmWebinarRegistration} = await import('../../packages/meeting-bot/src/calendar/state/schedule-state.ts');
+const {reconcileWebinarSources} = await import('../../packages/meeting-bot/src/calendar/calendar-client.ts');
+
+import {NOW, event, withFixture, proof, completed} from './run-pipeline-fixtures.mjs';
+const receipt = new Date(NOW).toISOString();
+const nativeRegistrationConfig = (host, root = resolve('fixture-registration-runtime')) => ({
+  python: join(root, 'fixture-python'), profileDir: join(root, 'fixture-profile'), allowedHosts: [host],
+  operator: {firstName: 'Test', lastName: 'Operator', email: 'operator@example.test'},
+  form: {mode: 'native-html', formSelector: 'form', submitSelector: 'button[type=submit]',
+    fields: {firstName: '#first', lastName: '#last', email: '#email'}},
+});
+test('registration persistence rejection prevents any browser side effect', async () => {
+  const candidate = {id: 'original', title: 'Webinar', senderEmail: 'host@example.test', senderDomain: 'example.test', status: 'approved',
+    senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+    registrationOnly: true, registrationUrl: 'https://example.test/register', messageId: 'message', threadId: 'thread',
+    startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+  let submissions = 0;
+  const acquisition = reconcileWebinarSources({tenantId: 'fixture', checkedAt: receipt, calendarEvents: [], candidates: [candidate],
+    acquisition: {complete: true, historyComplete: true}});
+  assert.equal(acquisition.inventory[0].classification, 'webinar');
+  assert.equal(acquisition.state.occurrences[acquisition.inventory[0].occurrenceKey].accepted, true);
+  await assert.rejects(runWebinarRegistrations({state: {operations: {}}, tenantId: 'fixture', candidates: [candidate], now: () => NOW,
+    acquisition, config: () => nativeRegistrationConfig('example.test'),
+    register: async () => {submissions++;}, update: async (_id, changes) => {
+      assert.equal(changes.registration?.phase, 'submitting', 'failure must exercise the durable attempt boundary');
+      throw new Error('disk failure');
+    }, validate: validateWebinarRegistration, confirm: confirmWebinarRegistration,
+    createUUID: () => '12345678-1234-4123-8123-123456789abc'}), /disk failure/);
+  assert.equal(submissions, 0);
+});
+test('registration saves submitting before browser and never resubmits after result or interrupted restart', async () => {
+  for (const outcome of ['submitted', 'uncertain', 'action_required', 'throw']) await withFixture(async f => {
+    const candidate = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      status: 'approved', registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [candidate];
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+    let submitted = 0;
+    f.deps.registerWebinar = async () => {
+      submitted++;
+      const saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+      const row = Object.values(saved.operations).find(row => row.registration);
+      assert.equal(row.registration.phase, 'submitting'); assert.equal(row.registration.sourceId, 'original');
+      assert.equal(existsSync(join(f.stateDir, 'poller.lock')), true);
+      if (outcome === 'throw') throw new Error('browser failure');
+      return {status: outcome};
+    };
+    await runPipelineTick(f.deps, true);
+    assert.equal(submitted, 1);
+    let saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+    const row = Object.values(saved.operations).find(row => row.registration);
+    assert.equal(row.registration.phase, outcome === 'submitted' ? 'awaiting-confirmation' : outcome === 'action_required' ? 'action_required' : 'uncertain');
+    await runPipelineTick(f.deps, true); assert.equal(submitted, 1);
+    row.registration.phase = 'submitting'; writeFileSync(join(f.stateDir, 'operations.json'), JSON.stringify(saved));
+    await runPipelineTick(f.deps, true); assert.equal(submitted, 1);
+    saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+    assert.equal(Object.values(saved.operations).find(row => row.registration).registration.phase, 'uncertain');
+  }, true);
+});
+test('confirmed registration preserves original source and raw barrier and schedules once', () => withFixture(async f => {
+  const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+    senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+    registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+    startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+  let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
+  f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+  let submissions = 0; f.deps.registerWebinar = async () => {submissions++; return {status: 'submitted'};};
+  f.deps.launch = async args => completed(f.root, args[args.indexOf('--session-id') + 1]);
+  await runPipelineTick(f.deps, true); assert.equal(submissions, 1); assert.equal(f.calls.length, 0);
+  const confirmation = {...original, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
+    registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt};
+  rows = [original, confirmation];
+  const native = f.deps.loadCalendarAcquisition;
+  f.deps.loadCalendarAcquisition = async (...args) => ({...await native(...args), version: 2});
+  await assert.rejects(runPipelineTick(f.deps, true), /acquisition validation/);
+  assert.equal(Object.values(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations).find(row => row.registration).registration.phase, 'awaiting-confirmation');
+  f.deps.loadCalendarAcquisition = native;
+  const confirmed = await runPipelineTick(f.deps, true);
+  assert.equal(confirmed.toRecord.length, 1); assert.equal(confirmed.toRecord[0].sourceId, 'original');
+  const saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+  const raw = Object.values(saved.source.reconciliation.occurrences).find(row => row.snapshot.id === 'original');
+  assert.equal(raw.snapshot.registrationOnly, true); assert.equal(raw.snapshot.meetingUrl, undefined);
+  assert.equal(Object.values(saved.operations).find(row => row.registration).registration.phase, 'confirmed');
+  const projectedId = webinarSessionKey(webinarIdentity(confirmation.meetingUrl, original.startTime));
+  for (const change of [{cancelled: true}, {endTime: '2026-09-30T13:01:00.000Z'}]) {
+    const stamp = new Date(NOW).toISOString();
+    const prepared = prepareWebinarSourceState(saved, await native(saved.source.coverage.calendarSyncToken, stamp),
+      [{...original, ...change, providerUpdated: stamp}, confirmation], stamp);
+    assert.equal(activeWebinarStopReason(projectedId, original.endTime, prepared), change.cancelled ? 'cancelled' : 'rescheduled');
+    const refused = prepareWebinarSourceState(saved, await native(saved.source.coverage.calendarSyncToken, stamp),
+      [{...original, ...change, status: 'rejected', providerUpdated: stamp}, confirmation], stamp);
+    assert.equal(activeWebinarStopReason(projectedId, original.endTime, refused), undefined, 'rejected original cannot control projected capture');
+  }
+  assert.equal((await runPipelineTick(f.deps, true)).toRecord.length, 0);
+}, true));
+test('missing profile or thread never invokes registration, preview never persists an attempt', async () => {
+  for (const missing of ['profile', 'thread', 'preview']) await withFixture(async f => {
+    const row = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    if (missing === 'thread') delete row.threadId;
+    f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [row];
+    f.deps.registrationConfig = () => ({...nativeRegistrationConfig('organizer.example', f.root),
+      ...(missing === 'profile' ? {profileDir: undefined} : {})});
+    let submissions = 0; f.deps.registerWebinar = async () => {submissions++; return {status: 'submitted'};};
+    await runPipelineTick(f.deps, missing !== 'preview'); assert.equal(submissions, 0);
+    if (missing === 'preview') assert.equal(existsSync(join(f.stateDir, 'operations.json')), false);
+    else assert.equal(Object.values(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations).some(row => row.registration), false);
+  }, true);
+});
+test('unresolved registration blocks correlated wrong confirmation but preserves unrelated invitations', async () => {
+  for (const wrong of ['organizer', 'time', 'unrelated', 'same-thread-unrelated']) await withFixture(async f => {
+    const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+    f.deps.registerWebinar = async () => ({status: 'submitted'});
+    f.deps.launch = async () => {};
+    await runPipelineTick(f.deps, true);
+    const change = wrong === 'organizer' ? {senderEmail: 'other@organizer.example'} : wrong === 'time' ?
+      {endTime: '2026-09-30T13:01:00.000Z'} : wrong === 'same-thread-unrelated' ?
+      {senderEmail: 'other@organizer.example', endTime: '2026-09-30T13:01:00.000Z'} : {threadId: 'other-thread'};
+    rows = [original, {...original, ...change, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
+      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt}];
+    const result = await runPipelineTick(f.deps, true);
+    assert.equal(result.toRecord.length, ['unrelated', 'same-thread-unrelated'].includes(wrong) ? 1 : 0, wrong);
+  }, true);
+});
+
+test('registration confirmation cannot bypass missing, rejected, cancelled or changed original source', async () => {
+  for (const changed of ['missing', 'rejected', 'cancelled', 'time', 'organizer']) await withFixture(async f => {
+    const original = {id: 'original', title: 'University webinar', senderEmail: 'host@organizer.example', senderDomain: 'organizer.example', status: 'approved',
+      senderAuthenticated: true, receivedAt: '2026-09-30T11:59:00.000Z',
+      registrationOnly: true, registrationUrl: 'https://organizer.example/register', messageId: 'mail-original', threadId: 'thread-original',
+      startTime: '2026-09-30T12:01:00.000Z', endTime: '2026-09-30T13:00:00.000Z'};
+    let rows = [original]; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => rows;
+    f.deps.registrationConfig = () => nativeRegistrationConfig('organizer.example', f.root);
+    f.deps.registerWebinar = async () => ({status: 'submitted'});
+    let captures = 0; f.deps.launch = async () => {captures++;};
+    await runPipelineTick(f.deps, true);
+    const confirmation = {...original, id: 'confirmation', messageId: 'mail-confirmation', registrationOnly: false,
+      registrationUrl: undefined, meetingUrl: 'https://meet.google.com/abc-defg-hij', receivedAt: receipt};
+    const alteration = changed === 'rejected' ? {status: 'rejected'} : changed === 'cancelled' ? {cancelled: true} :
+      changed === 'time' ? {endTime: '2026-09-30T13:01:00.000Z'} : {senderEmail: 'other@organizer.example'};
+    rows = changed === 'missing' ? [confirmation] : [{...original, ...alteration}, confirmation];
+    const result = await runPipelineTick(f.deps, true);
+    assert.equal(result.toRecord.length, 0, changed); assert.equal(captures, 0, changed);
+  }, true);
+});
+
+test('terminal notifications are sanitized, awaited and deduplicated across retry/restart', () => withFixture(async (f) => {
+    const notices = [];
+    f.deps.notifyOperation = async (notice) => {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      notices.push(notice); return 'sent';
+    };
+    f.deps.launch = async (_args, _env, onLine) => {
+      const artifact = join(f.root, 'artifact.webm'); writeFileSync(artifact, 'retained media');
+      onLine(`audio/video recording started: ${artifact}`);
+      throw new Error('private-credential https://provider.invalid/path?token=secret');
+    };
+    const first = await runPipelineTick(f.deps, true);
+    const id = Object.keys(first.operations)[0];
+    assert.deepEqual(notices, [{sessionId: id, status: 'failed', reason: 'pipeline-failed'}]);
+    assert.equal(first.operations[id].status, 'failed');
+    assert.equal(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations[id].notification.status, 'sent');
+    await runPipelineTick(f.deps, true);
+    assert.equal(notices.length, 1, 'same failure on restart must not notify again');
+    f.deps.launch = async () => completed(f.root, id);
+    await runPipelineTick(f.deps, true);
+    assert.deepEqual(notices[1], {sessionId: id, status: 'ready', reason: ''});
+    assert.ok(!JSON.stringify(notices).includes('secret'));
+    assert.ok(!JSON.stringify(notices).includes('private-credential'));
+    assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false);
+}, true));
+
+test('disabled and failed notifications retain the actual operation and retry delivery', async () => {
+  for (const outcome of ['disabled', 'throw', 'invalid']) {
+    await withFixture(async (f) => {
+      let calls = 0;
+      f.deps.launch = async (_args, _env, onLine) => {
+        const artifact = join(f.root, 'artifact.webm'); writeFileSync(artifact, 'retained media');
+        onLine(`audio/video recording started: ${artifact}`); throw new Error('pipeline failed');
+      };
+      f.deps.notifyOperation = async () => { calls++; if (outcome === 'throw') throw new Error('token-secret'); return outcome; };
+      const result = await runPipelineTick(f.deps, true), id = Object.keys(result.operations)[0];
+      const saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations[id];
+      assert.equal(saved.status, 'failed');
+      assert.equal(saved.notification.status, outcome === 'disabled' ? 'disabled' : 'failed');
+      assert.equal(saved.notification.acknowledged, undefined);
+      assert.ok(!f.logs.join(' ').includes('token-secret'));
+      f.deps.notifyOperation = async () => { calls++; return 'sent'; };
+      await runPipelineTick(f.deps, true);
+      assert.equal(calls, 2);
+      assert.equal(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).operations[id].notification.status, 'sent');
+    }, true);
+  }
+});
+
+test('preview and refused ownership/live gates never invoke the alert callback', () => withFixture(async (f) => {
+    let alerts = 0;
+    f.deps.notifyOperation = async () => { alerts++; return 'sent'; };
+    await runPipelineTick(f.deps, false);
+    await assert.rejects(runPipelineTick(f.deps, true), /Manual live/);
+    proof(f);
+    writeFileSync(join(f.stateDir, 'operations.json'), JSON.stringify({version: 1, tenantId: 'foreign', operations: {}}));
+    await assert.rejects(runPipelineTick(f.deps, true), /ownership/);
+    assert.equal(alerts, 0);
+}));
+
+test('unchanged action-required and ready operations retry failed or disabled alerts on restart', async () => {
+  for (const status of ['action_required', 'ready']) for (const delivery of ['failed', 'disabled']) {
+    await withFixture(async (f) => {
+      const notices = [];
+      const id = 'saved-operation';
+      writeFileSync(join(f.stateDir, 'operations.json'), JSON.stringify({version: 1, tenantId: 'fixture', operations: {
+        [id]: {tenantId: 'fixture', status, reason: status === 'action_required' ? 'needs-registration' : undefined,
+          notification: {status: delivery, retryable: delivery === 'failed'}},
+      }}));
+      f.deps.loadCalendarEvents = async () => [];
+      f.deps.notifyOperation = async (notice) => { notices.push(notice); return 'sent'; };
+      const result = await runPipelineTick(f.deps, true);
+      assert.equal(result.operations[id].status, status);
+      assert.equal(notices.length, 1);
+      assert.equal(result.operations[id].notification.status, 'sent');
+      await runPipelineTick(f.deps, true);
+      assert.equal(notices.length, 1, 'acknowledged unchanged terminal state must not send again');
+      assert.equal(f.calls.length, 0);
+    }, true);
+  }
+});
+
+test('a stuck alert reaches the overall deadline and releases the lane without losing failure state', {timeout: 12000}, () => withFixture(async (f) => {
+    f.deps.launch = async () => { throw new Error('capture failed'); };
+    f.deps.notifyOperation = async () => new Promise(() => {});
+    const started = Date.now(), result = await runPipelineTick(f.deps, true);
+    assert.ok(Date.now() - started >= 8900);
+    const row = Object.values(result.operations)[0];
+    assert.equal(row.status, 'failed');
+    assert.equal(row.notification.status, 'failed');
+    assert.equal(row.notification.retryable, true);
+    assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false);
+}, true));
+test('preview deduplicates cross-source token rotation and writes/captures nothing', () => withFixture(async (f) => {
+    f.deps.loadCandidates = async () => [{id: 'mail-one', status: 'pending', senderAuthenticated: true, title: 'University webinar',
+      senderEmail: 'speaker@university.edu', senderDomain: 'university.edu', startTime: event().startTime,
+      endTime: event().endTime, meetingUrl: 'https://meeting.zoho.com/meeting/123?token=rotated'}];
+    const result = await runPipelineTick(f.deps);
+    assert.equal(result.status, 'preview'); assert.equal(result.toRecord.length, 1);
+    assert.equal(result.skipped.filter((item) => item.reason === 'duplicate-session').length, 1);
+    assert.ok(!JSON.stringify(result).includes('private')); assert.ok(!JSON.stringify(result).includes('rotated'));
+    assert.equal(f.calls.length, 0); assert.equal(existsSync(f.stateDir), false);
+}));
+test('run refuses missing proof/production database before discovery or child launch', () => withFixture(async (f) => {
+    let reads = 0;
+    f.deps.loadCalendarEvents = async () => { reads++; return []; };
+    await assert.rejects(runPipelineTick(f.deps, true), /Manual live audio\/video proof/);
+    proof(f); f.deps.env.MONGO_WORK_DB = 'lkb';
+    await assert.rejects(runPipelineTick(f.deps, true), /production writes refused/);
+    assert.equal(reads, 0); assert.equal(f.calls.length, 0);
+    f.deps.env.MONGO_WORK_DB = 'lkb_work_release';
+    const marker = JSON.parse(readFileSync(join(f.stateDir, 'live-proof.json')));
+    marker.platform = process.platform === 'win32' ? 'linux' : 'win32';
+    writeFileSync(join(f.stateDir, 'live-proof.json'), JSON.stringify(marker));
+    assert.throws(() => validateRunGate(f.root, f.deps.env), /different operating system/);
+}));
+test('single capture reaches ready only with index marker and never duplicates next tick', () => withFixture(async (f) => {
+    f.deps.launch = async (args, env, onLine) => {
+      f.calls.push(args); assert.equal(env.MONGO_WORK_DB, 'lkb_work_release');
+      assert.equal(args[0], 'record'); assert.ok(args.includes('--backend')); assert.ok(args.includes('--process-video')); assert.ok(args.includes('--index'));
+      const id = args[args.indexOf('--session-id') + 1];
+      assert.match(id, /^webinar-[a-f0-9]{24}$/);
+      onLine('[pipeline] processing'); completed(f.root, id);
+    };
+    const first = await runPipelineTick(f.deps, true);
+    assert.equal(Object.values(first.operations)[0].status, 'ready');
+    await runPipelineTick(f.deps, true); assert.equal(f.calls.length, 1);
+    assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false);
+}, true));
+
+test('corrected discovery reconsiders prerequisite barriers without duplicate capture', async () => {
+  for (const [reason, before] of [
+    ['needs-registration', {registrationOnly: true}],
+    ['needs-review', {title: 'University information update'}],
+    ['invalid-time', {endTime: '2026-09-30T12:00:00Z'}],
+  ]) {
+    await withFixture(async (f) => {
+      let candidate = {...event(), id: 'mail-one', status: 'pending', senderAuthenticated: true, senderEmail: 'host@example.org', senderDomain: 'example.org', providerUpdated: '2026-09-30T11:00:00.000Z', ...before};
+      f.deps.loadCalendarEvents = async () => [];
+      f.deps.loadCandidates = async () => [candidate];
+      const first = await runPipelineTick(f.deps, true);
+      assert.equal(first.skipped[0].reason, reason);
+      const id = Object.keys(first.operations)[0];
+      assert.equal(first.operations[id].status, 'action_required');
+      await runPipelineTick(f.deps, true);
+      assert.equal(f.calls.length, 0, 'unchanged prerequisite must remain blocked');
+      candidate = {...candidate, ...event(), registrationOnly: false, providerUpdated: '2026-09-30T11:10:00.000Z'};
+      f.deps.launch = async args => { f.calls.push(args); completed(f.root, args[args.indexOf('--session-id') + 1]); };
+      const corrected = await runPipelineTick(f.deps, true);
+      const expected = reason === 'needs-registration' ? 0 : 1;
+      assert.equal(f.calls.length, expected, 'toggling the same registration flag cannot bypass a standing barrier');
+      assert.equal(corrected.operations[id].status, expected ? 'ready' : 'action_required');
+      if (expected) assert.equal(corrected.operations[id].reason, undefined, 'resolved prerequisite is not a current failure');
+      candidate = {...candidate, status: 'rejected', providerUpdated: '2026-09-30T11:20:00.000Z'};
+      await runPipelineTick(f.deps, true); assert.equal(f.calls.length, expected);
+      candidate = {...candidate, status: 'pending', providerUpdated: '2026-09-30T11:30:00.000Z'};
+      await runPipelineTick(f.deps, true);
+      assert.equal(f.calls.length, expected, 'explicit rejection cannot be reopened by a pending snapshot');
+    }, true);
+  }
+});
+
+test('only explicit prerequisite reasons reopen; terminal and coverage barriers stay blocked', async () => {
+  for (const reason of ['unsafe-join-link', 'retry-limit', 'interrupted-no-recording-artifact',
+    'missed-coverage', 'cancelled', 'overlap-lost', 'missed-while-processing', 'operator-rejected']) {
+    await withFixture(async (f) => {
+      const id = (await runPipelineTick(f.deps)).toRecord[0].sessionKey;
+      writeFileSync(join(f.stateDir, 'operations.json'), JSON.stringify({version: 1, tenantId: 'fixture',
+        operations: {[id]: {tenantId: 'fixture', status: 'action_required', reason, attempts: 0}}}));
+      f.deps.launch = async args => { f.calls.push(args); completed(f.root, id); };
+      const result = await runPipelineTick(f.deps, true);
+      assert.equal(f.calls.length, reason === 'unsafe-join-link' ? 1 : 0, reason);
+      assert.equal(result.operations[id].status, reason === 'unsafe-join-link' ? 'ready' : 'action_required', reason);
+    }, true);
+  }
+});
+test('zero exit without index proof stays failed; restart resumes saved artifact with finalize', () => withFixture(async (f) => {
+    const artifact = join(f.root, 'saved.webm'); writeFileSync(artifact, 'partial media');
+    f.deps.launch = async (args, _env, onLine) => {
+      f.calls.push(args);
+      if (args[0] === 'record') onLine(`audio/video recording started: ${artifact}`);
+      else completed(f.root, args[args.indexOf('--session-id') + 1]);
+    };
+    const first = await runPipelineTick(f.deps, true);
+    assert.equal(Object.values(first.operations)[0].status, 'failed');
+    const second = await runPipelineTick(f.deps, true);
+    assert.equal(Object.values(second.operations)[0].status, 'ready');
+    assert.deepEqual(f.calls.map((args) => args[0]), ['record', 'finalize']);
+    assert.ok(f.calls[1].includes(artifact));
+}, true));
+test('overlapping webinar is explicit action required and personal meeting is excluded', () => withFixture(async (f) => {
+    f.deps.loadCalendarEvents = async () => [event(), event({id: 'second', meetingUrl: 'https://meeting.zoho.com/meeting/456', startTime: '2026-09-30T12:02:00Z'}),
+      event({id: 'personal', title: 'Team meeting', meetingUrl: 'https://meeting.zoho.com/meeting/789'})];
+    f.deps.launch = async (args) => { f.calls.push(args); completed(f.root, args[args.indexOf('--session-id') + 1]); };
+    const result = await runPipelineTick(f.deps, true);
+    assert.equal(f.calls.length, 1);
+    assert.ok(Object.values(result.operations).some((row) => row.status === 'action_required' && row.reason === 'overlap-lost'));
+    assert.ok(result.skipped.some((row) => row.reason === 'not-webinar'));
+    assert.ok(!f.logs.join('\n').includes('private'));
+}, true));
+test('failed Gmail HTTP discovery cannot masquerade as healthy empty feed', async () => {
+  const original = globalThis.fetch;
+  try {
+    globalThis.fetch = async () => ({ok: false, status: 503});
+    const deps = createPipelineDeps({LKB_API_KEY: 'fixture-key', LKB_API_URL: 'http://fixture.invalid'});
+    await assert.rejects(deps.loadCandidates(), /discovery unavailable/);
+  } finally { globalThis.fetch = original; }
+});
+
+test('either failed feed blocks capture, persists health and alerts once until recovery', async () => {
+  for (const [feed, loader] of [['gmail', 'loadCandidates'], ['calendar', 'loadCalendarEvents']]) {
+    await withFixture(async f => {
+      let failed = true; const notices = [];
+      f.deps[loader] = async () => { if (failed) throw new Error('private-token'); return []; };
+      f.deps.notifyOperation = async notice => { notices.push(notice); return 'sent'; };
+      for (let i = 0; i < 2; i++) await assert.rejects(runPipelineTick(f.deps, true), error => error.code === 'WEBINAR_DISCOVERY_UNAVAILABLE' && /discovery unavailable/.test(error.message));
+      const saved = JSON.parse(readFileSync(join(f.stateDir, 'operations.json')));
+      assert.equal(saved.discovery[feed].status, 'failed'); assert.equal(f.calls.length, 0);
+      assert.deepEqual(notices, [{feed, status: 'failed'}]);
+      assert.deepEqual(saved.operations, {}); assert.equal(existsSync(join(f.stateDir, 'poller.lock')), false);
+      failed = false; f.deps.loadCalendarEvents = async () => []; f.deps.loadCandidates = async () => [];
+      await runPipelineTick(f.deps, true); await runPipelineTick(f.deps, true);
+      assert.deepEqual(notices, [{feed, status: 'failed'}, {feed, status: 'healthy'}]);
+      assert.equal(JSON.parse(readFileSync(join(f.stateDir, 'operations.json'))).discovery[feed].status, 'healthy');
+      assert.ok(!f.logs.join(' ').includes('private-token'));
+    }, true);
+  }
+});
+
+
+test('unapproved Gmail authentication stays refused through the real pipeline', async () => {
+  for (const senderAuthenticated of [undefined, false]) await withFixture(async f => {
+    f.deps.loadCalendarEvents = async () => [];
+    f.deps.loadCandidates = async () => [{...event(), id: 'unverified-mail', status: 'pending', senderEmail: 'host@example.org', senderDomain: 'example.org', senderAuthenticated}];
+    const result = await runPipelineTick(f.deps);
+    assert.equal(result.toRecord.length, 0); assert.equal(f.calls.length, 0);
+    assert.equal(result.skipped[0]?.reason, senderAuthenticated === false ? 'untrusted-sender' : 'needs-review');
+  });
+});
+
+test('cycle1 running publisher retains literal all-day and full mirror cancellation with no capture',()=>withFixture(async f=>{
+  const allDay=event({id:'all-day',startTime:'2026-10-28',endTime:'2026-10-29'}), cancelled={id:'outside',title:'Cancelled webinar',cancelled:true,providerUpdated:receipt};
+  f.deps.loadCalendarAcquisition=async(_token,checkedAt)=>({version:1,tenantId:'fixture',scope:'available-connected-source-state',complete:true,mode:'baseline',checkedAt,syncToken:'full-source',sourceEvents:[allDay,cancelled],meetings:[allDay]});
+  let sent;f.deps.publishWorkerState=async value=>{sent=value;}; await runPipelineTick(f.deps,true);assert.deepEqual(sent.meetings,[allDay]);assert.deepEqual(sent.sourceEvents,[allDay,cancelled]);assert.equal(f.calls.length,0);
+  f.deps.loadCalendarAcquisition=async(token,checkedAt)=>({version:1,tenantId:'fixture',scope:'available-connected-source-state',complete:true,mode:'sync',checkedAt,requestedSyncToken:token,syncToken:'next-source',sourceEvents:[allDay],meetings:[allDay]});await runPipelineTick(f.deps,true);assert.deepEqual(sent.sourceEvents,[allDay,cancelled]);assert.deepEqual(sent.meetings,[allDay]);assert.equal(f.calls.length,0);
+},true));
+test('cycle1 rejected upload retains previous source checkpoint and grants no capture',()=>withFixture(async f=>{
+  f.deps.loadCalendarEvents=async()=>[]; await runPipelineTick(f.deps,true);
+  const file=join(f.stateDir,'operations.json'), before=JSON.parse(readFileSync(file)).source;
+  f.deps.loadCalendarEvents=async()=>[event()];f.deps.publishWorkerState=async()=>{throw Error('fixture upload refused');};
+  await assert.rejects(runPipelineTick(f.deps,true),/acquisition validation/);assert.deepEqual(JSON.parse(readFileSync(file)).source,before);assert.equal(f.calls.length,0);
+},true));

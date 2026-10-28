@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "unit": "t044-trusted-private-windows",
+  "fixCycle": 0,
+  "integrationVersion": 1,
+  "comparedWhitelist": "qa/evidence/t044-trusted-private-windows/public-whitelist.json",
+  "checkedAt": "2026-10-14T23:17:09.8932157Z",
+  "paths": [],
+  "files": [],
+  "missingExactPublicPathsCount": 0,
+  "explanation": "The maker16-path whitelist already covers both checker contracts, both scoped verdicts and the current runnable synthetic checker probe/fixture floor. No additional public paths are required. The original QA-binding probe is historical and does not serve as the current privacy fixture.",
+  "scopedPassesUnchanged": true,
+  "fullParent": "HOLD: approved native protected root, live privacy/watcher/finalizer and real audio/provider acceptance remain separate.",
+  "excluded": "Dependency-only pinmaps, raw/private artifacts, actual TOC data, source-before backups, real receipt/media payloads and broad QA directories are not selected."
+}

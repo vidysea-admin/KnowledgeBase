@@ -240,3 +240,5 @@ Command (detached, main tree root, lane code 87df8e8): `run-watch.mjs --reingest
 - Remaining to finish the repair: index `toc / 2026-09-24-in-focus` from a checkout where both imports resolve to one instance (e.g. after this branch merges, `node scripts/watch/run-watch.mjs --reingest 1mJI5wuOvDuNu7A_sBj191Pe6-Olm18ri` from D:/KnowledgeBase — idempotent). A one-off indexing script was refused by the auto-mode classifier on 2026-09-27; not re-routed.
 
 Status unchanged: BLOCKED (live proof incomplete: chunks still 0).
+
+**Handshake status:** checked-PASS — this file's 3 status statements DISAGREE (checked-PASS, BLOCKED); hand-adjudicated: `git log -S` shows the checked-PASS field was introduced by 14f5771 (the close-out), which is LATER than 9f6b784 that wrote the BLOCKED evidence; the file itself says the history below is kept as written. ISS-304/305/306 remain OPEN in the ledger regardless - unit status and issue status are different things

@@ -1,0 +1,2 @@
+{"kind": "meta", "startedAtEpoch": 1000, "source": "meet-dom", "samplerClock": {"version": 1, "captureGeneration": "11111111-1111-4111-8111-111111111111", "hostId": "5b283c111f5215eeaeeaabef756e325fdab5b32f2502d591806559166765d0b6", "samplerInstance": "f1a09610-d615-4577-b9b9-532f8dd5edd0", "epochBeforeSec": 1000, "epochAfterSec": 1000, "monotonicSec": 100}}
+{"tSec": 0, "displayName": null, "source": "meet-dom", "samplerClock": {"epochBeforeSec": 1000, "epochAfterSec": 1000, "monotonicSec": 100}}

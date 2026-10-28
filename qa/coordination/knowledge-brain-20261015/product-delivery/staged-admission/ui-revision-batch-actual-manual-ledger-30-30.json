@@ -1,0 +1,41 @@
+{
+  "kind": "UI_REVISION_SHARED_ACTUAL_MANUAL_LEDGER",
+  "root_authority": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-root-authority-30-30.json",
+  "canonical_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-30-30-input.json",
+  "prior_actual_total": 294849,
+  "prior_active_debit": 40,
+  "prior_allocated_output": 1000,
+  "new_future_phase": {
+    "actual_total": 120000,
+    "active_s": 30,
+    "allocated_output": 1100
+  },
+  "reserved_final": {
+    "actual_total": 80000,
+    "active_s": 30,
+    "allocated_output": 700
+  },
+  "new_shared_total": {
+    "actual_total": 200000,
+    "active_s": 60,
+    "allocated_output": 1800
+  },
+  "cumulative_ceiling": {
+    "actual_total": 494849,
+    "active_s": 100
+  },
+  "new_checker_actual_total": 0,
+  "new_checker_not_launched": true,
+  "allocation_not_measured_actual": true,
+  "all_prior_unknowns_preserved": true,
+  "supplemental_status": "GATE_PENDING",
+  "canonical_native_reserve": false,
+  "local_supplemental_input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-local-actual-30-30-input.json",
+  "supersedes_plan": {
+    "input": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-input.json",
+    "result": "qa/coordination/knowledge-brain-20261015/product-delivery/staged-admission/ui-revision-batch-canonical-result.json",
+    "old_review_s": 40,
+    "old_final_s": 20,
+    "reason": "Root explicitly authorized30review+30final within same60 to meet LOCAL helper fixed30s final reserve. Tokens120k/80k and output1100/700 unchanged; not bypass or new grant."
+  }
+}

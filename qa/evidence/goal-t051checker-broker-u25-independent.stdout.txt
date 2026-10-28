@@ -1,0 +1,1 @@
+{"startedAt":"2026-10-14T20:11:17.419Z","completedAt":"2026-10-14T20:11:20.032Z","elapsedMs":2609.1719,"exitCode":0,"error":null,"counts":{"tests":4,"pass":4,"fail":0,"cancelled":0,"skipped":0,"todo":0},"hashChanges":[]}

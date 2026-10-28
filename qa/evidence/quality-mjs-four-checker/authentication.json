@@ -1,0 +1,8 @@
+{
+  "observed_utc": "2026-10-15T12:05:46.200598+00:00",
+  "candidate_inventories": "4/4 exact",
+  "proof_hashes": "3/3 exact; stdout exact",
+  "helper_hashes": "2/2 exact",
+  "current_environment_equivalence": null,
+  "scope": "recorded evidence authentication only"
+}

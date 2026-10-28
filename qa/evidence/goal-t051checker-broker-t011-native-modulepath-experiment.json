@@ -1,0 +1,35 @@
+{
+  "program": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+  "args": [
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\product\\Desktop\\KnowledgeBase\\packages\\meeting-bot\\src\\capture\\record-consent\\private-acl.ps1",
+    "-TargetPath",
+    "C:\\Users\\product\\AppData\\Local\\Temp\\t011-broker-acl-aOu3AQ"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "PSModulePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\Modules"
+  },
+  "timeoutMs": 5000,
+  "startedAt": "2026-10-14T21:51:56.872Z",
+  "completedAt": "2026-10-14T21:51:58.127Z",
+  "elapsedMs": 1252.7076,
+  "exitCode": 0,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ts": "073bfa2de3471ca812c1957c72d7eb0a0683f05344090d2293cbdefe266c1239",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ps1": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.test.ts": "f3f7c92ed3826fe3d27d5b3e1e0b2d3e5a5937324e9fe32e0cddd110a048359a"
+  },
+  "after": {
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ts": "073bfa2de3471ca812c1957c72d7eb0a0683f05344090d2293cbdefe266c1239",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ps1": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.test.ts": "f3f7c92ed3826fe3d27d5b3e1e0b2d3e5a5937324e9fe32e0cddd110a048359a"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-experiment.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-experiment.stderr.txt",
+  "hashesUnchanged": true
+}

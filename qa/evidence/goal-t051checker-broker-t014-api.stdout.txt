@@ -1,0 +1,17 @@
+✔ durable adapter refuses uninstalled schema before writes (3.7637ms)
+✔ Mongo seam reloads copies and atomic tenant revision filter refuses mutation of fixed plans (2.546ms)
+✔ unique eval association duplicate-key is a conflict across distinct event snapshots (2.9203ms)
+✔ source snapshot preserves exact digest/answers/citations and downstream report denominator (7.7446ms)
+✔ incomplete scheduled pairs remain visible without inventing wins (0.6343ms)
+✔ malformed bank, unsupported source, duplicated identity/text and forged approval refuse or remain unverified (0.9617ms)
+✔ frozen bank drift, duplicate trial, wrong pair and pre-freeze eval timestamps refuse (1.7429ms)
+✔ reloaded corrupted snapshots refuse aggregation; missing source arrays are disclosed (1.1568ms)
+✔ authenticated create/freeze/trial/report workflow persists original snapshot, scopes tenant and CAS (160.5537ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1577.313

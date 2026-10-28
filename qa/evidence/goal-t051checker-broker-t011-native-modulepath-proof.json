@@ -1,0 +1,37 @@
+{
+  "program": "C:\\Users\\product\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+  "args": [
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=30000",
+    "--test-name-pattern=explicit real Windows ACL probe",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "environment": {
+    "LKB_PRIVATE_ACL_PROBE_DIR": "C:\\Users\\product\\AppData\\Local\\Temp\\t011-broker-acl-aOu3AQ",
+    "PSModulePath": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\Modules"
+  },
+  "timeoutMs": 45000,
+  "startedAt": "2026-10-14T21:51:58.265Z",
+  "completedAt": "2026-10-14T21:51:59.420Z",
+  "elapsedMs": 1151.8968,
+  "exitCode": 1,
+  "signal": null,
+  "error": null,
+  "before": {
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ts": "073bfa2de3471ca812c1957c72d7eb0a0683f05344090d2293cbdefe266c1239",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ps1": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.test.ts": "f3f7c92ed3826fe3d27d5b3e1e0b2d3e5a5937324e9fe32e0cddd110a048359a"
+  },
+  "after": {
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ts": "073bfa2de3471ca812c1957c72d7eb0a0683f05344090d2293cbdefe266c1239",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.ps1": "47047e4d914122a3ada2313c457d13ae60f283333122b162e9e092f9be4894dd",
+    "packages/meeting-bot/src/capture/record-consent/private-acl.test.ts": "f3f7c92ed3826fe3d27d5b3e1e0b2d3e5a5937324e9fe32e0cddd110a048359a"
+  },
+  "stdoutPath": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-proof.stdout.txt",
+  "stderrPath": "qa/evidence/goal-t051checker-broker-t011-native-modulepath-proof.stderr.txt",
+  "hashesUnchanged": true
+}

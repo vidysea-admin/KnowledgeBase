@@ -1,0 +1,250 @@
+✔ authenticated review uses verified actor/current roles transaction; observed metadata excludes paths and credentials (114.2027ms)
+✔ missing scopes/auth/actor and body tenant/actor injection never issue acceptance; unrelated paths stay reachable (55.7003ms)
+✔ authoritative role refusal and stale reviewer result cannot report acceptance or leak exceptions (15.4886ms)
+✔ host bridge is constructor-lazy and requires its authoritative transaction for mutations (2.4734ms)
+✔ constructing real scoped readers is lazy and operations use the current Mongo receiver (1.0377ms)
+✔ optional policy-gated properties evaluate actual current authority at access and never cache it (0.358ms)
+✔ real transcript factory is lazy and enforces D168 exact production database opt-in (1.3806ms)
+✔ actual factory refresh consumes corrected view and publishes canonical cited categories in one transaction (60.8518ms)
+✔ unsupported transactions explicitly refuse refresh and retain committed correction/pending intent without derived knowledge or provider calls (1.6409ms)
+✔ actual review factory judge outage retains the correction and rolls back all derived targets (8.1771ms)
+✔ refresh notifies only after its outer commit and hook failure preserves completed knowledge (15.9803ms)
+✔ failed refresh never calls the archive hook (5.3233ms)
+✔ actual index and post-commit readback join source/effective transcript/current capture (13.9188ms)
+✔ missing source remains pending and changed receipt/generation never gains read authority (33.2226ms)
+✔ capture readback race and incomplete review refuse after a valid index (5.8824ms)
+✔ real batch accessor commits a stamped suggestion and a real session increment; duplicate leaves row intact (10.7579ms)
+✔ concurrent actual first review insert wins; entire publication rolls back (7.8942ms)
+✔ replacement and every refresh state update participate in the same session fence (7.2022ms)
+✔ DB-first consent revocation conflicts with in-flight publication; callback failure restores prior source (7.1035ms)
+✔ second batch insert failure, stale binding, malformed/overflow fence, shared owner and unsupported transaction refuse (24.7811ms)
+✔ caller-forged reserved publication metadata is refused before insertion (8.0673ms)
+✔ source swap refuses caller reset of server-owned revision and rolls back (9.0701ms)
+✔ unconfigured post-commit hook performs no persistence reads (0.2669ms)
+✔ pending, missing and foreign index generations never notify archive consumers (1.2376ms)
+✔ public exact T040 reviewed fee paraphrase survives actual grounded writer and current generation reader (11.4326ms)
+✔ public current-bound invalid reviewed evidence refuses while a detached foreign row stays unconsumed (15.7162ms)
+✔ public completed reviewed receipt refuses edited canonical digest and changed current source provenance (10.6562ms)
+✔ public freshly generated fee paraphrase fails the extractive gate despite synthetic same judge (3.2452ms)
+✔ flag helper: OFF unless exactly KB_SPEAKER_SUGGEST=1 (0.3764ms)
+✔ suggest writes a status=suggested row with its quote, and NEVER a speakers row (16.7139ms)
+✔ a verifier that does not say yes yields no suggestion (2.2505ms)
+✔ an ungrounded name (quote not in the transcript) is not suggested (0.5833ms)
+✔ re-run is idempotent, a REJECTED name is not resurrected, a CONFIRMED row is untouched (6.3444ms)
+✔ a model that throws never throws out of the hook and writes nothing (0.6248ms)
+✔ indexSession with the flag ABSENT/false: no speakers-route call, no speaker collection touched, no result key (12.8986ms)
+✔ indexSession with suggestSpeakers:true calls the speakers route and reports the outcome; never writes `speakers` (3.2118ms)
+✔ a confirmed label is not given a second AI name on re-index (confirmed list is honoured, not just row idempotence) (3.6519ms)
+✔ ISS-WU24-001: a failing generation is logged as a structured warning with ids only, and does not throw (1.7135ms)
+✔ ISS-WU24-002: a hung hook times out, logs, and returns so indexing continues (51.3755ms)
+✔ indexSession still completes when the suggestion hook fails (4.4697ms)
+✔ production default: suggestions OFF unless KB_SPEAKER_SUGGEST=1; an explicit caller option wins (0.2414ms)
+✔ default/off performs no capture or database access; env opt-in is exact (1.174ms)
+T-042 adapter sample: 4/4 suggestions; review consumed 4; auto-final 0; explicit confirmation final 1 (synthetic)
+✔ four synthetic panelists: measured offset -> suggestions -> review -> explicit human confirmation (19.9312ms)
+✔ tile/introduction agreement stays suggested; transcript text and timing unchanged (11.4956ms)
+✔ confirmed and rejected decisions survive rerun; no new names for confirmed labels/people (8.1405ms)
+✔ foreign tenant/session/media/capture instance refuses sidecar before any writes (3.2056ms)
+✔ populated foreign tenant with colliding session/label/person stays byte-identical (7.8068ms)
+✔ second upsert failure reports unknown partial writes; idempotent retry recovers and review reads all rows (4.5364ms)
+✔ unknown clock, bad origins and foreign turns refuse before loader/database access (1.215ms)
+✔ exact digest, sole first metadata, source, monotonic time and confidence validation (2.8939ms)
+✔ pre-recording samples clipped, confidence preserved, samples beyond recording discarded (0.3033ms)
+✔ low-confidence, no overlap, conflicting tiles and tile-intro disagreement do not guess names (35.031ms)
+✔ loader cannot change trusted origins; thrown failures return fixed safe reasons (7.2546ms)
+✔ native publication rechecks current registry after async lookups and inside writer (7.7615ms)
+✔ native publication writes only through trusted transaction and leaves names unconfirmed (2.2558ms)
+✔ strict default publishes current lexical/tree evidence with zero embedding calls and no vector backlog (8.066ms)
+✔ ordinary source-bound publication refuses foreign evidence and forged supplied quotes (0.8095ms)
+✔ reviewed substring cannot bypass meaning verification of full negated source context (0.6628ms)
+✔ source-native paraphrase ordinary publication is consumed without embeddings and refuses tampered inventory (8.2373ms)
+✔ corrected effective source invalidates old receipt; reindex pins new source without vectors (10.808ms)
+✔ legacy vector rows are replaced on vectorless publication; failed preflight preserves prior artifacts (13.3768ms)
+✔ native transaction boundary rolls back a mid-write failure and preserves the accepted generation (15.9554ms)
+✔ unsupported native transactions fail closed without a non-atomic retry (0.667ms)
+✔ unknown commit retries cannot replay paid model calls or duplicate physical completion (13.6359ms)
+✔ index hook runs after acknowledged commit and callback failure cannot replay publication (6.6669ms)
+✔ caller-owned index transaction does not notify before its outer commit (4.0292ms)
+✔ failed outer index commit never invokes post-commit work (3.866ms)
+✔ ISS-274: buildProductionDeps wires tavilySearchFn into askDeps even with no TAVILY_API_KEY set (7.6583ms)
+✔ ISS-274: buildProductionDeps constructs without throwing or requiring a live Mongo/network connection (1.3234ms)
+✔ production native/review readers bind before connection while DB-name policies remain deferred (1.2118ms)
+✔ production buildIndexer forwards trusted callback after acknowledged outer commit (10.2419ms)
+✔ enqueue is immutable/durable/idempotent and cannot execute intake; tenant isolation survives reconstruction (164.9511ms)
+✔ claimed worker consumes actual complete fixture receipt before publishing; safe receipt survives restart (117.4199ms)
+✔ two reconstructed workers cannot claim the same queued source concurrently (85.2455ms)
+✔ incomplete downstream index never publishes success and never blindly retries (100.6403ms)
+✔ expired/crashed attempt fences late writes and cannot be reclaimed by another worker (87.5693ms)
+✔ current authorization refusal and thrown execution retain safe uncertainty with no diagnostic leakage (150.4057ms)
+✔ secret/ambiguous URLs and absent approval refuse before journal persistence (5.5874ms)
+✔ abandoned journal lock fails closed; another process cannot ignore a crash lock (18.2264ms)
+✔ production HTTP source wiring refuses configured inline SDK transcription without explicit worker composition (0.4654ms)
+✔ API queue factory is lazy/pure and protects database, trusted tenants and private authority roots (2.7238ms)
+▶ ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model)
+  ✔ WINACL-ROOT-ALLOW-OTHER: On Windows, source spool root ACL owner=current identity, current identity FullControl, unrelated SID Allow Read; enqueue tenant-a/actor-a URL https://zoom.us/rec/share/fixturebearer with idempotencyKey windows-acl-root and server approval matching actor-a. (1.9136ms)
+  ✔ WINACL-TENANT-ALLOW-OTHER: Root privately owned; pre-existing hashed tenant-a directory permits unrelated SID Read. Same approved URL, idempotencyKey windows-acl-tenant. (5.0009ms)
+  ✔ WINACL-FILE-ALLOW-OTHER: Root and hashed tenant directory private; existing audit.jsonl ACL permits unrelated SID Read. Poll/claim/next enqueue must not trust that journal. (13.7875ms)
+  ✔ WINACL-OWNER-OTHER: Spool or tenant artifact owner is unrelated SID even if only current identity has an explicit Allow rule. (2.0059ms)
+✔ ISS-T045WORKER-001: all four exact filed ACL reproductions refuse before bearer append/read/execution (native-reader model) (24.2757ms)
+▶ ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls
+  ✔ ONAIR-FOREIGN-TENANT: Trusted worker tenants [tenant-a,tenant-b], global OnAir cookie representing account-a; tenant-b/actor-b submits https://cloudonair.withgoogle.com/events/account-a-only and receives ordinary server approval. (72.8953ms)
+  ✔ ONAIR-UNBOUND-ACCOUNT: tenant-a valid ingest actor and event approval exist, but OnAir session account has no explicit trusted owner/binding. (73.2695ms)
+  ✔ ONAIR-UNAPPROVED-EVENT: OnAir session owner explicitly tenant-a, but request event is different from the immutable approved event set or event-specific approval. (69.9225ms)
+  ✔ ONAIR-BINDING-CHANGED: Queue approved under account-a/tenant-a/event-one binding; before execution trusted binding is removed, changes account/tenant or no longer authorizes event-one. (69.5188ms)
+✔ ISS-T045WORKER-002: all four exact filed OnAir cases produce zero page/tool/provider calls (287.2532ms)
+✔ OnAir owned-event/public-no-cookie controls and rotated session/event permission fences (56.4593ms)
+﹣ actual native private-directory receipt prerequisite (0.1589ms) # SKIP
+﹣ actual POSIX private-root/tenant/artifact control (0.1098ms) # SKIP
+✔ permission loss after acquisition blocks each provider processing request while allowing scoped cleanup (0.5634ms)
+{"requestId":"ba32495e-90ac-4909-aa36-1d683d3d2260","method":"GET","path":"/speaker-profiles/person%3Apriya","status":401,"durationMs":1.09,"time":"2026-10-16T00:22:06.138Z","level":"warn","msg":"request"}
+{"requestId":"9cf5b53b-e592-4bb5-80db-5b0750a4a59d","method":"GET","path":"/speaker-profiles/person%3Apriya","status":401,"durationMs":0.51,"time":"2026-10-16T00:22:06.141Z","level":"warn","msg":"request"}
+{"requestId":"e8496b67-739f-45a8-ba51-f06a6e3045a3","method":"GET","path":"/speaker-profiles/person%3Apriya","status":403,"durationMs":3.39,"tenantId":"A","time":"2026-10-16T00:22:06.147Z","level":"warn","msg":"request"}
+{"requestId":"9a0ec6df-3b05-4b2b-a037-4e20f5b91bfc","method":"GET","path":"/speaker-profiles/person%3Apriya","status":200,"durationMs":2.07,"tenantId":"A","time":"2026-10-16T00:22:06.150Z","level":"info","msg":"request"}
+{"requestId":"d941fc30-ae66-4c84-a4eb-b81a69d0ecdf","method":"GET","path":"/speaker-profiles/person%3Apriya","status":404,"durationMs":0.89,"tenantId":"B","time":"2026-10-16T00:22:06.153Z","level":"warn","msg":"request"}
+{"requestId":"cae5a942-caa6-4252-b633-f15c143c6512","method":"GET","path":"/speaker-profiles/spk%3A1","status":400,"durationMs":1.36,"tenantId":"A","time":"2026-10-16T00:22:06.158Z","level":"warn","msg":"request"}
+✔ route uses verified tenant, sessions scope, safe errors and private no-store (55.7106ms)
+{"requestId":"4c025018-ea46-4557-b19f-97452c950a24","method":"GET","path":"/speaker-profiles/person:priya","status":503,"durationMs":1.92,"tenantId":"A","time":"2026-10-16T00:22:06.174Z","level":"error","msg":"request"}
+✔ store errors hide credentials, transcript and raw exception (16.1517ms)
+{"requestId":"d6409aae-e3a1-465d-b1b1-c9b1ce95ed36","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":403,"durationMs":1.45,"tenantId":"A","time":"2026-10-16T00:22:06.185Z","level":"warn","msg":"request"}
+{"requestId":"6cc1600d-a6fc-4d05-8dbd-03956faae3ae","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":400,"durationMs":1.24,"tenantId":"A","time":"2026-10-16T00:22:06.188Z","level":"warn","msg":"request"}
+{"requestId":"a8f95a1e-d52b-491b-b7fa-a0979596cd99","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":400,"durationMs":1.4,"tenantId":"A","time":"2026-10-16T00:22:06.194Z","level":"warn","msg":"request"}
+{"requestId":"1a043031-926b-4609-a9e3-af8037ea8d6d","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":200,"durationMs":4.04,"tenantId":"A","time":"2026-10-16T00:22:06.200Z","level":"info","msg":"request"}
+{"requestId":"63ef0c52-c86e-47f2-ba56-181d4722518d","method":"GET","path":"/speaker-profiles/person:priya/knowledge","status":503,"durationMs":1.01,"tenantId":"B","time":"2026-10-16T00:22:06.204Z","level":"error","msg":"request"}
+✔ mounted knowledge route enforces scope, request bounds, tenant and safe DTO (28.7536ms)
+﹣ actual TOC deterministic persona traverses mounted API and produces a downstream response artifact (0.1895ms) # HOLD: private authentic TOC input requires explicit KB_U24_PRIVATE_TOC_TESTS=1
+✔ real scoped read predicates isolate identical person/session/turn ids across tenants (31.6288ms)
+✔ suggestions are not promoted and malformed tenant cannot reach a database read (6.1853ms)
+✔ truncated transcript refuses the whole profile rather than changing block interpretation (28.4156ms)
+{"requestId":"35f03a0c-9e1b-4546-a135-157f23d1f648","method":"GET","path":"/speaker-profiles/person:priya","status":404,"durationMs":0.97,"tenantId":"A","time":"2026-10-16T00:22:06.285Z","level":"warn","msg":"request"}
+✔ known-person profile and mounted API revoke source consent without a cached identity bypass (18.2597ms)
+{"requestId":"2c62ab45-2d97-43e5-8721-12af6287931e","method":"GET","path":"/speaker-profiles/person:priya","status":503,"durationMs":0.94,"tenantId":"A","time":"2026-10-16T00:22:06.301Z","level":"error","msg":"request"}
+✔ unsupported snapshot capability cannot fall back to collection-only profile output (11.2383ms)
+✔ cached topic names require every contributing source session to remain visible (13.3084ms)
+{"requestId":"b26d59a1-f5b8-48a2-a1c1-ffe9a1a0347b","method":"GET","path":"/speaker-profiles/person:priya-nair","status":404,"durationMs":1.9,"tenantId":"A","time":"2026-10-16T00:22:06.330Z","level":"warn","msg":"request"}
+{"requestId":"be5c82fd-0eb8-408c-894e-845474e8e3bb","method":"GET","path":"/speaker-profiles/person:priya-nair","status":200,"durationMs":2.39,"tenantId":"A","time":"2026-10-16T00:22:06.334Z","level":"info","msg":"request"}
+{"requestId":"b44f7f36-724a-4498-9d0a-e6864292f020","method":"GET","path":"/speaker-profiles/person:priya-nair","status":200,"durationMs":2.88,"tenantId":"A","time":"2026-10-16T00:22:06.341Z","level":"info","msg":"request"}
+✔ actual suggestion producer -> durable confirm link -> profile consumes anchored scope (26.5694ms)
+✔ speaker metadata eligibility permits empty optional evidence and all-visible attribute references (1.3108ms)
+✔ speaker metadata eligibility checks withdrawn independent attribute references despite absent values (1.2272ms)
+✔ speaker metadata eligibility refuses malformed declared attribute references before source reads (0.8369ms)
+✔ speaker metadata eligibility enforces the combined contributor bound and tenant guard before reads (0.9356ms)
+✔ speaker knowledge uses the same authoritative tenant snapshot and revokes withdrawn source (3.9969ms)
+✔ source-only authority is session-free and relation-independent with exact effective transcript hashes (2.0857ms)
+✔ optional accepted relationship reader runs only inside existing source snapshot (3.2058ms)
+✔ source-only attribute authority exposes exact confirmed blocks without recursive accepted attributes (2.4672ms)
+✔ accepted attributes update profile and graph in the same source snapshot and clear revoked cached fields (7.7691ms)
+✔ writeSpeakerDocs re-run after CONFIRM leaves the human-confirmed row untouched (2.2394ms)
+✔ writeSpeakerDocs still replaces an ordinary (non-confirmed) row and writes new people (0.5133ms)
+✔ full extractor + writer re-run after CONFIRM: no re-suggestion, no second name for the label, confirmed row intact (2.4194ms)
+✔ a floor result for a confirmed label with a DIFFERENT person is dropped; the same person is kept (0.5969ms)
+✔ re-index after REJECT: writer, extractor and re-insert leave the tombstone and create no final row (2.3818ms)
+✔ types: a confirmed suggestion row is still schema-shaped (0.9123ms)
+✔ confirming a name that already had an AUTO row (no row-level provenance) is still protected from the writer (1.082ms)
+{"requestId":"59f31933-48d2-42a8-ae80-63c68203ff15","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":401,"durationMs":0.48,"time":"2026-10-16T00:22:06.386Z","level":"warn","msg":"request"}
+{"requestId":"95d5306d-f944-4caa-a6a0-1991b9d6e160","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":403,"durationMs":0.75,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.388Z","level":"warn","msg":"request"}
+{"requestId":"71025578-5fca-46ec-a0ed-ef7da77cd766","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":401,"durationMs":0.87,"time":"2026-10-16T00:22:06.392Z","level":"warn","msg":"request"}
+{"requestId":"c504962b-7e5c-44ed-a4dd-35fede95b8cb","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":403,"durationMs":0.85,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.394Z","level":"warn","msg":"request"}
+{"requestId":"eb742e50-9d5c-41c3-b0bb-4d08c1e81c91","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":401,"durationMs":0.43,"time":"2026-10-16T00:22:06.396Z","level":"warn","msg":"request"}
+{"requestId":"b87a786d-1cac-4ddc-842a-44c345638a1c","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":403,"durationMs":0.91,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.400Z","level":"warn","msg":"request"}
+✔ auth: no key 401, wrong scope 403, and nothing is written (23.3079ms)
+{"requestId":"0858d05a-71dc-4fb1-815e-33ef0de7c2ae","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.19,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.410Z","level":"info","msg":"request"}
+✔ GET lists the caller's suggestions with quote and kind, no-store, as `suggestedName` (not a speaker identity) (9.5431ms)
+{"requestId":"f817bdac-d515-4590-a24b-401e19d341b1","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.14,"tenantId":"tenant-B","time":"2026-10-16T00:22:06.421Z","level":"info","msg":"request"}
+{"requestId":"cdafb6de-aca9-4c0b-b937-a71d34a2bbdf","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":404,"durationMs":1.05,"tenantId":"tenant-B","time":"2026-10-16T00:22:06.425Z","level":"warn","msg":"request"}
+{"requestId":"af5c77cc-0dd1-4794-a82c-3ab46e28d185","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":404,"durationMs":1.89,"tenantId":"tenant-B","time":"2026-10-16T00:22:06.430Z","level":"warn","msg":"request"}
+✔ tenant B cannot list, confirm or reject tenant A's suggestions (20.5753ms)
+{"requestId":"fc6584ce-e42d-4e7e-997d-80cd4d8d88e9","method":"POST","path":"/sessions/session-2/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":404,"durationMs":2.46,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.464Z","level":"warn","msg":"request"}
+{"requestId":"bf7fc38f-8e63-4516-9386-5e98348970d2","method":"POST","path":"/sessions/session-2/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":404,"durationMs":1.12,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.469Z","level":"warn","msg":"request"}
+{"requestId":"d8c57162-767d-407c-8653-528f7e381b62","method":"GET","path":"/sessions/session-2/speaker-suggestions","status":200,"durationMs":1.06,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.472Z","level":"info","msg":"request"}
+✔ a suggestion is bound to its session: right id under another session is 404 (40.8883ms)
+{"requestId":"1363ec12-e1eb-44a2-874f-4d87c32e4010","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":200,"durationMs":2.08,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.485Z","level":"info","msg":"request"}
+{"requestId":"1fc8df4a-437e-4a26-a6e3-0c56da1effe0","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":200,"durationMs":1.61,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.489Z","level":"info","msg":"request"}
+{"requestId":"6f574f6a-6244-462c-a365-631aa2440214","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.45,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.494Z","level":"info","msg":"request"}
+✔ confirm makes the name final with human-confirmed provenance; a repeat is 200 changed:false and writes nothing more (22.643ms)
+{"requestId":"d1e5bb79-f232-4f4d-b8a1-a84d8069cf4c","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":200,"durationMs":2.01,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.509Z","level":"info","msg":"request"}
+{"requestId":"cc8abbb0-f29e-46bd-b398-7f6e062030b7","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":200,"durationMs":0.85,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.513Z","level":"info","msg":"request"}
+{"requestId":"5478c8c6-12fa-43b1-bae1-990da3b13cd7","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.42,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.517Z","level":"info","msg":"request"}
+{"requestId":"71c0983f-2679-448b-a7df-51a10d37691c","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":409,"durationMs":1.72,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.526Z","level":"warn","msg":"request"}
+✔ reject stores the rejection (no final row), is idempotent, hides the row, and blocks a later confirm with 409 (29.5232ms)
+{"requestId":"8ac5592a-92c6-4bd9-86f0-8ec5a0936344","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/confirm","status":200,"durationMs":3.79,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.539Z","level":"info","msg":"request"}
+{"requestId":"ef79cfe8-0d1a-441b-9bd7-43275e80049a","method":"POST","path":"/sessions/session-1/speaker-suggestions/tenant-A-session-1-spk:1-person:zorbaxia-quillfeather/reject","status":409,"durationMs":1.02,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.545Z","level":"warn","msg":"request"}
+✔ reject after confirm is 409 and the confirmed name stays final (19.4809ms)
+{"requestId":"79b51325-1805-435c-81c6-992439ddd103","method":"GET","path":"/sessions","status":200,"durationMs":1.27,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.558Z","level":"info","msg":"request"}
+{"requestId":"16591c04-4a2f-49ea-b85c-38b785f5f5d0","method":"GET","path":"/sessions/session-1","status":200,"durationMs":1.29,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.562Z","level":"info","msg":"request"}
+{"requestId":"e241220d-3349-48a1-b8b3-9c1fa9980bf3","method":"GET","path":"/search","status":200,"durationMs":1.71,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.567Z","level":"info","msg":"request"}
+{"requestId":"6d1ad379-ca13-4b30-b5d5-42d5cf5c39cd","method":"POST","path":"/ask","status":200,"durationMs":5.52,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.576Z","level":"info","msg":"request"}
+{"requestId":"8516d080-bb97-4552-9914-58c3d2ea5ed7","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":200,"durationMs":1.03,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.581Z","level":"info","msg":"request"}
+✔ a SUGGESTION never appears as a final name: not in /sessions, /ask answer or sources, /search, nor with the final marker (35.442ms)
+{"requestId":"fdbf89d3-3844-4e01-9c73-e7602ad34be4","method":"POST","path":"/sessions/session-1/speaker-suggestions/..%2Fx/confirm","status":400,"durationMs":0.9,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.589Z","level":"warn","msg":"request"}
+{"requestId":"0fa5a5fc-a66e-4b7d-aef5-bff742b4bba8","method":"GET","path":"/sessions/a%20b/speaker-suggestions","status":400,"durationMs":0.71,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.592Z","level":"warn","msg":"request"}
+{"requestId":"28abfbb0-2364-4424-a62b-b613b9f8035a","method":"GET","path":"/sessions/session-1/speaker-suggestions","status":503,"durationMs":1.01,"tenantId":"tenant-A","time":"2026-10-16T00:22:06.601Z","level":"error","msg":"request"}
+✔ malformed ids are 400 with no store access; an unavailable store is a generic 503 (20.0155ms)
+✔ actual source visibility denies every maintenance endpoint before raw/history/precondition/write access (16.4166ms)
+✔ verified tenant controls eligibility; recording review remains accessible and source withdrawal is rechecked (7.5184ms)
+✔ auth: no key 401, wrong scope 403, nothing written (31.7204ms)
+✔ GET serves the effective transcript with a strong ETag = revision, no-store, no tenant field (5.3892ms)
+✔ POST commits durably: receipt shape, new ETag, original turns untouched, overlay served, history row with before/after (19.5687ms)
+✔ history is append-only across revisions and the chain links parent to child (15.6397ms)
+✔ preconditions: missing If-Match 428; malformed or body-mismatched 400; stale 412; nothing written on any (41.1942ms)
+✔ tenant isolation: cross-tenant read, write, history and refresh all answer 404; the owner's data is unchanged (28.3601ms)
+✔ same session id in two tenants stays separate; a tenant cannot name A's turn ids or smuggle a tenant/actor/time (46.1201ms)
+✔ invalid requests: bad body 400, unknown turn / no-op 422, bad session id 400; nothing written (26.1517ms)
+✔ atomic: two saves racing on one ETag - exactly one commits, the loser is 409/412, one head, no lost update (384.7747ms)
+✔ a failed history write does not turn a durable commit into an error, and the next commit heals the gap (23.2225ms)
+✔ audit distinguishes verified keys within one tenant, and refresh refuses a stale loaded revision (23.7048ms)
+✔ a store failure answers 503 with no internal message and no partial write (16.0228ms)
+✔ sample sanity: helper turn() carries extra fields that survive, uncorrected, through an overlay (39.6093ms)
+✔ ISS-T054-PERSIST-001: both tenants commit on the SAME session id: two heads, two history rows, neither disturbs the other (36.7816ms)
+✔ ISS-T054-PERSIST-001: head and history ids differ per tenant for the same session/revision (0.365ms)
+✔ ISS-T054-PERSIST-001: recording the same revision id for two tenants keeps both rows (store level) (9.7624ms)
+✔ ISS-T054-PERSIST-001: tenant comes from the key only - a ?tenantId= query never switches tenant (19.9704ms)
+✔ ISS-T054-PERSIST-002: history rows are insert-once: a second record of the same id does not overwrite the first (3.419ms)
+✔ real indexer refresh consumes corrections and atomically publishes all targets, preserves reviewed claims/originals (9.4032ms)
+✔ superseding review before publication aborts every derived write and leaves newer refresh pending (7.2488ms)
+✔ correction publication never replays paid work on transient body or commit errors (14.5025ms)
+✔ correction unknown commit retries only commit with bounded uncertainty and paid work once (15.1546ms)
+✔ runRefresh reconciles unknown committed head without downgrade or superseded revision leakage (18.8374ms)
+✔ review refresh refuses legacy/vector completion and missing lexical or provenance proof (26.754ms)
+✔ current generation refuses an unsupported preserved human claim without deleting its row or publishing partial knowledge (4.9696ms)
+✔ text-only review preserves uncertain speaker confidence and graph inference; new mappings invent no score (17.8186ms)
+✔ unsupported Mongo and disappeared reviewed ids fail closed with durable correction truth (1.3721ms)
+✔ head audit remains readable after secondary history failure without another human correction (1.055ms)
+✔ complete source disappearance invalidates completed refresh but preserves accessible audit/reconciliation (1.4479ms)
+✔ effective reader preserves source extras and rejects wrong tenant; transaction view forbids original writes (0.7342ms)
+﹣ retained TOC literal valid prefix commits one overlay and actual chunk consumer uses corrected projection (0.0828ms) # SKIP
+✔ no executor configured: 503 and the refresh stays pending (never reported complete) (13.5779ms)
+✔ success: every target runs once, in order, for the committed revision; state becomes complete (19.9265ms)
+✔ failure is recorded (failed + failedTarget), earlier targets are kept, retry resumes at the failed target (29.0566ms)
+✔ a newer correction supersedes an in-flight refresh: the old run cannot overwrite the new revision's state (67.7841ms)
+✔ cross-tenant refresh cannot run or observe another tenant's refresh (18.1309ms)
+✔ racing writers (insertHead unique _id): exactly one commit, the loser gets a conflict, no lost update (27.7401ms)
+✔ racing writers (replaceHead CAS): exactly one commit, the loser gets a conflict, no lost update (66.6291ms)
+✔ revision of an untouched transcript changes when the source turns change; a committed head no longer depends on them (0.9598ms)
+✔ an overlay entry for a turn that no longer exists is ignored, not an error (0.9674ms)
+✔ snapshot/head re-read race (initial): stale writer cannot CAS a newer head (1.6586ms)
+✔ snapshot/head re-read race (reviewed): stale writer cannot CAS a newer head (1.813ms)
+✔ inserting a suggestion writes ONLY speaker_suggestions: nothing becomes a final speaker (0.2676ms)
+✔ tenant B cannot list, confirm or reject tenant A's suggestion (same session id, same suggestion id) (0.4176ms)
+✔ a suggestion belongs to its session: the right id under another session is not found (0.2624ms)
+✔ confirm makes the name final with the human-confirmed provenance, in the caller's tenant only (0.7326ms)
+✔ confirm is idempotent: a repeat changes nothing and writes no duplicate final row (0.7108ms)
+✔ confirm extends an existing final speaker instead of replacing it, and keeps its other evidence (0.4929ms)
+✔ reject stores the rejection, writes no final speaker, is idempotent, and is hidden from the list (0.6768ms)
+✔ a rejected name is not re-suggested: inserting the same suggestion again leaves the rejection untouched (0.6685ms)
+✔ re-suggesting after a confirm does not reset it either (0.4656ms)
+✔ confirm after reject, and reject after confirm, are conflicts and change nothing (0.7951ms)
+✔ a malformed id or tenant is refused without touching anything (0.5107ms)
+✔ insertSuggestionsIfAbsent refuses a non-suggested row and a row of another session (0.2358ms)
+✔ the view carries quote and kind, calls the name `suggestedName`, and has no speakers-shaped fields (0.1716ms)
+✔ a kind=tile suggestion (T-042, D-160) is stored as suggested, writes no final speaker, and only a human confirm makes it final (1.0379ms)
+✔ native pending and confirmed evidence fail closed after generation, capture, review or owner drift (4.0092ms)
+✔ callers cannot supply a machine publication binding (0.2907ms)
+✔ native final-write failure rolls back the decision and session fence (0.8162ms)
+✔ publication fence uses a real increment and refuses malformed/exhausted counters without changes (0.6915ms)
+✔ unknown commit retries only commit three times and never replays work or aborts (0.357ms)
+✔ transaction view binds tenant/session, serializes operations and refuses nesting (0.4631ms)
+✔ caught actual operation failure still poisons transaction and rolls back earlier writes (0.3799ms)
+✔ stale native suggestions can be rejected, including after source or session deletion (1.2577ms)
+✔ historical confirmed native audit remains but stale confirmation repair adds no evidence (2.0093ms)
+✔ production refuses network/outside roots and enabled native writes without platform authority before I/O (0.9697ms)
+✔ real private empty store drains boundedly without DB/providers/host qualification (7975.9283ms)

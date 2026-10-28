@@ -1,0 +1,40 @@
+{
+  "phase": "read-only-release-prerequisites",
+  "startedAt": "2026-10-15T22:25:54.868723Z",
+  "completedAt": "2026-10-15T22:26:10.3626109Z",
+  "ghPath": "C:\\Program Files\\GitHub CLI\\gh.exe",
+  "authentication": {
+    "exitCode": 1,
+    "timedOut": false,
+    "authenticated": false,
+    "errorType": null,
+    "sanitizedSummary": "Raw authentication output intentionally omitted; own exit and timeout retained",
+    "failureClassification": "configured-authentication-token-invalid",
+    "diagnosticRetryExitCode": 1,
+    "diagnosticRetryTimedOut": false
+  },
+  "workflows": null,
+  "wsl": {
+    "exitCode": 1,
+    "timedOut": false,
+    "distroNames": [],
+    "errorType": null,
+    "errorSummary": "WSL listing failed; raw output omitted"
+  },
+  "futureRemoteCiMetadataAvailable": false,
+  "fullRemoteCiExecuted": false,
+  "approvedUbuntuHostAvailable": "not established: distro listing alone does not prove approval or usable Ubuntu host",
+  "acceptance": false,
+  "actions": {
+    "workflowDispatches": 0,
+    "pushes": 0,
+    "externalWrites": 0,
+    "distroStarts": 0,
+    "servicesStarted": 0,
+    "installs": 0,
+    "downloads": 0,
+    "providerCalls": 0,
+    "databaseActions": 0
+  },
+  "scope": "Each discovered child bounded at 15 seconds with owned-process cleanup; credentials/raw auth output not persisted"
+}

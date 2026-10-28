@@ -1,0 +1,27 @@
+[
+  {
+    "Path": "apps/web/src/api/search/semanticClient.ts",
+    "Sha256": "BDCC85685F01CE7CCD2FD6642EECB458AE2365ABA712413CF0779CF26ED873BE",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/api/search/semanticClient.test.ts",
+    "Sha256": "645F3FBD693DAC6F72BFD32BB7346C128455BC491B02F9CF62151CAC29B5E991",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/search/semantic/SemanticResults.tsx",
+    "Sha256": "21DC97E5C1D2840FB8BB19C9DD10D445270A514CE6D63DBBB616509BCFCEB5CE",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/search/semantic/SemanticResults.test.tsx",
+    "Sha256": "4B32865B5CA4A88EC24E29F9C77C4942F7037BA153C229AED888A104B6E54176",
+    "Match": true
+  },
+  {
+    "Path": "apps/web/src/pages/search/semantic/SemanticSearchIntegration.test.tsx",
+    "Sha256": "82CB0CC57B4D063502694667D37202549F4665C666933F4075FADB3230AD64E8",
+    "Match": true
+  }
+]

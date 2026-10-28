@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "unit": "resume-t053-watched-receipt",
+  "cycle": 0,
+  "status": "REQUESTED_ROOT_SOLE_CPU_BROKER",
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase\\apps\\api",
+  "candidate": "cbbacea0338163b35553cececabf773ebff05d6168c9e3eef07e3ad683ece138",
+  "pins": "qa/coordination/resume-20261015/t053/pins.json",
+  "command": "node --test --test-concurrency=1 --import tsx src/connector-workflow/watched-job.test.ts",
+  "timeout_s": 60,
+  "expected_tests": 5,
+  "selected_checks": [
+    {
+      "reason": "bounded immutable payload integrity and unchanged media input hashing",
+      "boundary": "security/input",
+      "node": "watched snapshot validation binds exact Unicode bytes, provenance and legacy media identity"
+    },
+    {
+      "reason": "affected journal-worker-snapshot stage and injected immediate consumer",
+      "boundary": "durability/idempotency",
+      "node": "durable snapshot reopens, consumes exact guarded bytes without refetch and publishes once"
+    },
+    {
+      "reason": "tenant/source authority and stale snapshot refusal before writes",
+      "boundary": "security/data-write",
+      "node": "tampering, foreign/current-source mismatch and stale previous hash refuse before ingest"
+    },
+    {
+      "reason": "failed or unauthorized consumption cannot mark healthy",
+      "boundary": "failure/authority",
+      "node": "partial index, missing physical proof and revoked actor never advance watched health"
+    },
+    {
+      "reason": "reachable caller, server auth, snapshot provenance and repeated queue key",
+      "boundary": "auth/idempotency",
+      "node": "reachable durable watched route queues one guarded snapshot and requires authenticated ingestion"
+    }
+  ],
+  "prerequisites": [
+    "Root CPU lease and compatible existing Node/tsx runtime/import containment preflight",
+    "Rehash leased files and read dependencies against pins.json; stop on drift",
+    "Environment receipt records executable/version/import-root/lock hash and safe variable names only; no secrets",
+    "Public synthetic fixtures only; synthetic ACL verifier is not native ACL evidence"
+  ],
+  "exclusions": [
+    "workflow.test.ts stays privacy/import HOLD; no private opt-in",
+    "No providers/network/browser/real feeds/native DB or production activation",
+    "No checker/reviewer/children/full suite"
+  ],
+  "output_directory": "qa/coordination/resume-20261015/t053",
+  "receipts_required": [
+    "complete stdout/stderr",
+    "own exit code/counts/duration",
+    "exact command and environment/candidate fingerprints"
+  ],
+  "readiness_complete": false
+}

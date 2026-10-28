@@ -1,0 +1,10 @@
+
+ RUN  v2.1.8 C:/Users/product/Desktop/KnowledgeBase/apps/web
+
+ ↓ src/pages/sessions/decisions/SessionDecisionsPanel.test.tsx (1 test | 1 skipped)
+
+ Test Files  1 skipped (1)
+      Tests  1 skipped (1)
+   Start at  01:32:41
+   Duration  28.09s (transform 545ms, setup 5.34s, collect 6.31s, tests 0ms, environment 15.09s, prepare 951ms)
+

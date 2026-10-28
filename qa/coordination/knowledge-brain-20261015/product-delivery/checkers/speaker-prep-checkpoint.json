@@ -1,0 +1,47 @@
+{
+  "status": "PREP_CHECKPOINT_BROKER_WAIT",
+  "unit": "product-speaker-relation-workbench",
+  "cycle": 2,
+  "base": "5c4cbade2d1a8aa4815de13d587db8de3b01cc4a",
+  "candidate": "same HEAD plus uncommitted packet hashes",
+  "hashes": {
+    "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.tsx": "4352bc29341a64b3a624984b927b0a8c9d04afa657c9a164c70c46b26c445146",
+    "apps/web/src/pages/knowledge/speakers/KnowledgeSpeakerProfilePage.test.tsx": "580559708c9759a7f7b81b76a593f595d198da32b96955eacde188e5dcadead5",
+    "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.tsx": "84bdba270594482d9b96b52b0731cfb6d286210f54485a16533dc1b8ee0af0e5",
+    "apps/web/src/pages/knowledge/speaker-relations/SpeakerRelationWorkbench.test.tsx": "402bb7b08ee1b72a9af886ffd8bb8bec5b03022eadc21b685b9d47cacf93f7e2"
+  },
+  "phase_kind": "review",
+  "actual": {
+    "active_s": null,
+    "tokens": null,
+    "cost": null
+  },
+  "budget_debit": {
+    "active_s": 40,
+    "tokens": 1000
+  },
+  "remaining_review": {
+    "active_s": 50,
+    "tokens": 1200
+  },
+  "protected_finalization": {
+    "active_s": 30,
+    "tokens": 800
+  },
+  "ratio_verified": false,
+  "gate": "../staged-admission/product-speaker-relation-workbench-prep-input.json",
+  "gate_reassessment": "assess executed exit 0 at 2026-10-15T10:49:16.210275+00:00; BOOTSTRAP_REVIEW; 30/800 protected",
+  "independent_probe": {
+    "spec": "Use packet React scaffold in isolated copy, select only auth test and CHANGE context action to sessionVersion=2 while apiKey stays old-key; fetch source first request deferred, second source request 503 even same key. Assert refused UI remains after late old authorized source resolves, no proposal/review buttons, zero POST. This specifically isolates authSession invalidation from key changes.",
+    "command": "pnpm --filter @lkb/web test src/pages/knowledge/speakers/SpeakerRelationshipContext.probe.test.tsx --testNamePattern 'late source cannot grant actions'",
+    "cases": 1
+  },
+  "remaining": [
+    "Independent probe receipt",
+    "Four-file test/contract inspection and server bootstrap contract",
+    "Composite exact fingerprint reuse decision",
+    "Required shared typecheck/validator",
+    "Ready handshake and phase gate"
+  ],
+  "verdict": null
+}

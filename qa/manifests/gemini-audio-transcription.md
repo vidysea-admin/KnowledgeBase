@@ -123,3 +123,5 @@ Scaling to the remaining 21 sessions (`raw/TOC/TOC-Materials/Audio/*.m4a`, rangi
 repeated `node scripts/transcribe-toc-session.mjs <sessionId>` invocations — real recurring cost
 (cheap per session per the plan's own $0.20-0.40/session estimate, ~$5-10 total), sequenced
 deliberately per TASKS.md's own existing language, not run unattended in this cycle.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

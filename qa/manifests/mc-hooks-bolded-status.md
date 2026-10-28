@@ -17,7 +17,7 @@ defect in `mc-sessionstart.ps1`).
 ## Why
 
 `mc-sessionstart.ps1` (the SessionStart AUTO-CONTINUE directive) and `mc-precommit.ps1` (the commit
-guard) both matched manifest Status lines with the bare literal `Status: ready-for-check`. Every
+guard) both matched manifest Status lines with the bare literal `Status: checked-PASS`. Every — closed out 2026-10-26 (resume reconcile) citing qa/verdicts/mc-hooks-bolded-status.md
 line the pre-fix hooks could see one of `## Status: ready-for-check` (heading form); everything else
 — `**Status:** ready-for-check` (bold), `- **Status:** ready-for-check` (bulleted+bold), and
 `Status: ready-for-check` sitting mid-sentence in prose containing the phrase "ready-for-check" —
@@ -209,3 +209,5 @@ Status line, and the close-out then demonstrated it by editing the one bolded li
 was never a status at all — destroying the record of which forms used to be invisible, inside the
 document whose only job was to record them. The real status line was closed out correctly later; it
 was only the evidence that stayed corrupted, which is why the sweep could still see it at 13:47.
+
+**Handshake status:** checked-PASS — derived by the ISS-350 backfill from all 1 status statement(s) in this file, which agree

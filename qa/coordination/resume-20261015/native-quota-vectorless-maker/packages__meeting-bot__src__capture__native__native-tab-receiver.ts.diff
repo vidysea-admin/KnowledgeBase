@@ -1,0 +1,16 @@
+diff --git "a/qa\\coordination\\resume-20261015\\native-quota-vectorless-maker\\backups\\packages__meeting-bot__src__capture__native__native-tab-receiver.ts" b/packages/meeting-bot/src/capture/native/native-tab-receiver.ts
+index 3f5eefca..a4db7183 100644
+--- "a/qa\\coordination\\resume-20261015\\native-quota-vectorless-maker\\backups\\packages__meeting-bot__src__capture__native__native-tab-receiver.ts"
++++ b/packages/meeting-bot/src/capture/native/native-tab-receiver.ts
+@@ -13,8 +13,10 @@ export async function createTabCaptureReceiver(output: string, onEvent: (event:
+   const chunkCap = guard ? Math.min(MAX_CHUNK, guard.maxChunkBytes) : MAX_CHUNK;
+   const token = randomBytes(32).toString("hex");
+   const fd = native ? undefined : openSync(output, "wx");
++  const nativePendingBytes = native ? Math.min(16 * 1024 * 1024, native.maxBytes) : 0;
++  const nativeChunkBytes = Math.min(MAX_CHUNK, nativePendingBytes);
+   const spool = native ? await createNativeSpoolReceiver({directory: `${output}.native`, identity: native.identity,
+-    width: 1280, height: 720, sampleRate: 48000, maxBytes: native.maxBytes, maxChunkBytes: MAX_CHUNK, maxPendingBytes: 16 * 1024 * 1024}) : undefined;
++    width: 1280, height: 720, sampleRate: 48000, maxBytes: native.maxBytes, maxChunkBytes: nativeChunkBytes, maxPendingBytes: nativePendingBytes}) : undefined;
+   let transportSequence = 0, persistedSequence = 0, nativeClosed = false, nativePoisoned = false;
+   let finalization:Promise<void>|undefined;const finalizationControl=new AbortController();
+   let lastTransportHash = '';

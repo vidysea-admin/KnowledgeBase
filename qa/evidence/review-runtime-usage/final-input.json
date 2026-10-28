@@ -1,0 +1,50 @@
+{
+  "manual_completion_reserve": {
+    "active_s": 30,
+    "units": "actual_total_input_plus_output",
+    "tokens": 200000
+  },
+  "allocated_output_budget": 800,
+  "reviewers": [
+    {
+      "budget_debit": {
+        "active_s": 180,
+        "tokens": 340760
+      },
+      "active_s": null,
+      "cost": null,
+      "id": "same-checker-all-prior",
+      "tokens": 340760
+    }
+  ],
+  "completion_reserve": false,
+  "prior_actual_output_tokens": 1682,
+  "prior_probe_phase_cap": 100000,
+  "ratio_verified": false,
+  "prior_probe_phase_total": 130960,
+  "bootstrap": {
+    "active_s": 210,
+    "tokens": 540760
+  },
+  "escalation": {
+    "authority": "Root explicit conditional finalization now green independent receipt",
+    "limits": {
+      "active_s": 210,
+      "cost": null,
+      "tokens": 540760
+    },
+    "reason": "Required receipt/sourcehash/verdict/parser work; prior130960actual stage breach retained, lost69040 reserve insufficient for runtimecontext"
+  },
+  "maker": {
+    "active_s": null,
+    "cost": null,
+    "tokens": null
+  },
+  "next_phase": {
+    "kind": "finalization",
+    "active_s": 30,
+    "cost": null,
+    "tokens": 200000
+  },
+  "bootstrap_scope": "Explicit root finite final-only200000actualTOTAL/800output/30active seconds, SAMEchecker; authenticate actual independent receipt,current pins,write verdict+canonical parser/readback in oneexec; no source reread/retests"
+}

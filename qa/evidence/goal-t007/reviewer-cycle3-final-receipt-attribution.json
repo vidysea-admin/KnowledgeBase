@@ -1,0 +1,1001 @@
+{
+  "checkedAt": "2026-10-15T01:28:13.6276043Z",
+  "scope": "Read-only current pin and latest coherent compiler/build attribution; fixture QA corpus need not be in compiler inventory",
+  "specs": [
+    {
+      "spec": "qa/evidence/goal-t007/reviewer-api9-cycle3-final-scalar-fixture-spec.json",
+      "sha256": "1D1626478C936E0A2483C9801326586B73F6ED08B692E4D5750A944E67348205",
+      "count": 19,
+      "currentDrift": 0,
+      "rows": [
+        {
+          "path": "apps/api/src/whatsapp-review/review-source.ts",
+          "expected": "0c028641e96055e9dac51fbd2b7c4684cb5f0c990dd08061d4bf7f29f9a12eea",
+          "current": "0c028641e96055e9dac51fbd2b7c4684cb5f0c990dd08061d4bf7f29f9a12eea",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp-review/review-source.test.ts",
+          "expected": "a22b92267c01c507fbec15afef665fdc519b66076dd69d16483d0f4d61480921",
+          "current": "a22b92267c01c507fbec15afef665fdc519b66076dd69d16483d0f4d61480921",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/visibility/read-snapshot.ts",
+          "expected": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+          "current": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/visibility/knowledge.ts",
+          "expected": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+          "current": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/test-fixtures.ts",
+          "expected": "f104cedfb1a68af13d80bdd9426314028c746695f88ae9530a6842222c80dbe8",
+          "current": "f104cedfb1a68af13d80bdd9426314028c746695f88ae9530a6842222c80dbe8",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/store.ts",
+          "expected": "f987af4e47cbbc3e27c565be8f8f8e462a099cf738e81d88ea60ca7b6f2839b3",
+          "current": "f987af4e47cbbc3e27c565be8f8f8e462a099cf738e81d88ea60ca7b6f2839b3",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/detection.ts",
+          "expected": "61e135ad831895c210ed387f94a2d55327fef25091efb7364aff34f422cecdd8",
+          "current": "61e135ad831895c210ed387f94a2d55327fef25091efb7364aff34f422cecdd8",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/validation.ts",
+          "expected": "84f0f3117473952d1255e730d8256714eea9f697b2b84874ee552874246570b2",
+          "current": "84f0f3117473952d1255e730d8256714eea9f697b2b84874ee552874246570b2",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/materializer.ts",
+          "expected": "d626438881f6926543016c1f4a1ce100d6e4d5d5058364cfdd296bc077f7dd2a",
+          "current": "d626438881f6926543016c1f4a1ce100d6e4d5d5058364cfdd296bc077f7dd2a",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/transcript-review/effective-reader.ts",
+          "expected": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+          "current": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/transcript-review/service.ts",
+          "expected": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+          "current": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/transcript-review/store.ts",
+          "expected": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+          "current": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/auth.ts",
+          "expected": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+          "current": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "packages/db/src/lib/tenantScope.ts",
+          "expected": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+          "current": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "schema/whatsapp_candidates.schema.json",
+          "expected": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16",
+          "current": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/server.ts",
+          "expected": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+          "current": "5730f4aeb2086999ebe08e81a729055db118d9a42efd3e425ae7572eaa2328d2",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/composition/integrations/knowledge.ts",
+          "expected": "d23f176d9524ceef0245b00ca843eb5ff063cbcf1fc761ee8f6e155a7f2e1239",
+          "current": "d23f176d9524ceef0245b00ca843eb5ff063cbcf1fc761ee8f6e155a7f2e1239",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "expected": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+          "current": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/package.json",
+          "expected": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede",
+          "current": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "spec": "qa/evidence/goal-t007/reviewer-web28-cycle2-current-spec.json",
+      "sha256": "C6F51519B3469F0057E8FEED88D639F5F2DCB40120615BC46180E3F437C84C1D",
+      "count": 15,
+      "currentDrift": 0,
+      "rows": [
+        {
+          "path": "apps/web/src/pages/WhatsAppPage.tsx",
+          "expected": "885f1af68ed4d21b00d141bb8ddd8631f732071621ed4471c5fbab7693b651cb",
+          "current": "885f1af68ed4d21b00d141bb8ddd8631f732071621ed4471c5fbab7693b651cb",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/WhatsAppPage.test.tsx",
+          "expected": "f10cf5883bfaa5b87b670aae119b3c950af077bd12864fdaad751fcc53070e61",
+          "current": "f10cf5883bfaa5b87b670aae119b3c950af077bd12864fdaad751fcc53070e61",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/whatsapp/ReviewQueue.tsx",
+          "expected": "1006c17696b628e5bbd156f1d20a7b730ca7aacfd12825a5292a967384e20614",
+          "current": "1006c17696b628e5bbd156f1d20a7b730ca7aacfd12825a5292a967384e20614",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/whatsapp/ReviewQueue.test.tsx",
+          "expected": "6a837c0bde141928c680f362d2299cf819173398d518652cc8820713d0cf5b1f",
+          "current": "6a837c0bde141928c680f362d2299cf819173398d518652cc8820713d0cf5b1f",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/whatsapp-review/client.ts",
+          "expected": "a761b2cb887bbf572045b8baeb804590a7030a2840d8d5c984c2fa99f61974ed",
+          "current": "a761b2cb887bbf572045b8baeb804590a7030a2840d8d5c984c2fa99f61974ed",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/whatsapp-review/ReviewSourcePage.tsx",
+          "expected": "136b04a65a1e65b5257e03c4857e9d0c4c263b21bf4d45de599b4c5c15359c58",
+          "current": "136b04a65a1e65b5257e03c4857e9d0c4c263b21bf4d45de599b4c5c15359c58",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/pages/whatsapp-review/ReviewSourcePage.test.tsx",
+          "expected": "857bf7f8861b070fe8ea9adccc31d42909e6459bb52cd15ebf592bf4bb5a4781",
+          "current": "857bf7f8861b070fe8ea9adccc31d42909e6459bb52cd15ebf592bf4bb5a4781",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/api/whatsapp.ts",
+          "expected": "be1b77720ea928402845728502dce314931ab07970b55dcc3cf0daa534e8210a",
+          "current": "be1b77720ea928402845728502dce314931ab07970b55dcc3cf0daa534e8210a",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/api/client.ts",
+          "expected": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "current": "854f0bc3301e097b83e2caefcd01a8eae19530e3a6390add4dd6c9cfaf429802",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/auth/AuthContext.tsx",
+          "expected": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "current": "196181dc165208a35cb23c9d7f9b7ae5e293a7eb40135a7cd90686ddb4ec3e1c",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/setupTests.ts",
+          "expected": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+          "current": "2fddd90ff11bed9cda8302206eb123480fa8873e8ffd3b30bbd8e070973adc08",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/vitest.config.ts",
+          "expected": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+          "current": "7f76b80c8e788cbd3ea649db2596b69852ca0719b7f6d483cadd6dfec88300f8",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/src/App.tsx",
+          "expected": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+          "current": "eef7af89eb3c3c261678aed701f309d9399e0f77921b73e3b9ce97b1055571ea",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/web/package.json",
+          "expected": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+          "current": "df657c35ff929f98bba82399f616c5b201a02a2c07c66d71905ca55cb720528e",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "expected": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+          "current": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "spec": "qa/evidence/goal-t007/reviewer-snapshot-exact-floor-cycle3-current-spec.json",
+      "sha256": "A9351F786578F6BBBE921BDD1CC3EDA0E39529285035653450B6CACC23DBDDAC",
+      "count": 19,
+      "currentDrift": 0,
+      "rows": [
+        {
+          "path": "apps/api/src/whatsapp-review/review-source.ts",
+          "expected": "0c028641e96055e9dac51fbd2b7c4684cb5f0c990dd08061d4bf7f29f9a12eea",
+          "current": "0c028641e96055e9dac51fbd2b7c4684cb5f0c990dd08061d4bf7f29f9a12eea",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp-review/review-source.test.ts",
+          "expected": "a22b92267c01c507fbec15afef665fdc519b66076dd69d16483d0f4d61480921",
+          "current": "a22b92267c01c507fbec15afef665fdc519b66076dd69d16483d0f4d61480921",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/visibility/read-snapshot.ts",
+          "expected": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+          "current": "1b97ff09d53b7c0f7fe10f13c23803290864e2f5d43c6f57568876ab281030cf",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/visibility/knowledge.ts",
+          "expected": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+          "current": "e97c65c1a29304b78257b6880ce27de49bafcefa7d45d1f0ca5da1182d70ea04",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/test-fixtures.ts",
+          "expected": "f104cedfb1a68af13d80bdd9426314028c746695f88ae9530a6842222c80dbe8",
+          "current": "f104cedfb1a68af13d80bdd9426314028c746695f88ae9530a6842222c80dbe8",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/store.ts",
+          "expected": "f987af4e47cbbc3e27c565be8f8f8e462a099cf738e81d88ea60ca7b6f2839b3",
+          "current": "f987af4e47cbbc3e27c565be8f8f8e462a099cf738e81d88ea60ca7b6f2839b3",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/detection.ts",
+          "expected": "61e135ad831895c210ed387f94a2d55327fef25091efb7364aff34f422cecdd8",
+          "current": "61e135ad831895c210ed387f94a2d55327fef25091efb7364aff34f422cecdd8",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/validation.ts",
+          "expected": "84f0f3117473952d1255e730d8256714eea9f697b2b84874ee552874246570b2",
+          "current": "84f0f3117473952d1255e730d8256714eea9f697b2b84874ee552874246570b2",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/whatsapp/review/materializer.ts",
+          "expected": "d626438881f6926543016c1f4a1ce100d6e4d5d5058364cfdd296bc077f7dd2a",
+          "current": "d626438881f6926543016c1f4a1ce100d6e4d5d5058364cfdd296bc077f7dd2a",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/transcript-review/effective-reader.ts",
+          "expected": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+          "current": "4335cb7d6266ddf95f409d1606ba661e8b19a954ce0596098fc7591b684cd500",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/transcript-review/service.ts",
+          "expected": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+          "current": "1fa9a35ee5393f63e4e4a3f9ea2bff4ae15f706376a9379d029cc91704e55b28",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/transcript-review/store.ts",
+          "expected": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+          "current": "304f7dcf0e156e6d825b0d739793bc976409639ea6e4ae7375801227ecbb2c1d",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/src/auth.ts",
+          "expected": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+          "current": "7492213e222053bb1e1120f0b5affc92639e4f913fceaf7ee866cdb65fd62cf1",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "packages/db/src/lib/tenantScope.ts",
+          "expected": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+          "current": "c596fe4c7815a8c44af31b7590988d3b9c011874991c19b7d2f0deaee8fcf443",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "schema/whatsapp_candidates.schema.json",
+          "expected": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16",
+          "current": "6caf632d53474472485713a9c89bb598f011f1236d8e49942d1ee9dbb335bf16",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "qa/evidence/goal-t007/review-source-checker-snapshot.test.ts",
+          "expected": "f600541f8c0ee4e22a6eaa2f8c6553450f270d725b9b497b2c8990bfa625087d",
+          "current": "f600541f8c0ee4e22a6eaa2f8c6553450f270d725b9b497b2c8990bfa625087d",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 0,
+              "matches": false
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 0,
+              "matches": false
+            }
+          ]
+        },
+        {
+          "path": "pnpm-lock.yaml",
+          "expected": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+          "current": "2af3aada247f31436a28f46f4803dc8b4294956c21825f7421ca37faf07d83dd",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "apps/api/package.json",
+          "expected": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede",
+          "current": "678346dcccc8310496005a777fd289ccb4fbe5cae08b529f717d7259d7578ede",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 1,
+              "matches": true
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 1,
+              "matches": true
+            }
+          ]
+        },
+        {
+          "path": "qa/evidence/goal-t007/review-source-checker.test.ts",
+          "expected": "30d3d3b6720332fb1e993aa7f35d3a6ac25350a5a6e1e5dfc931e03ae9ad3f5a",
+          "current": "30d3d3b6720332fb1e993aa7f35d3a6ac25350a5a6e1e5dfc931e03ae9ad3f5a",
+          "currentMatches": true,
+          "snapshots": [
+            {
+              "snapshot": "qa/goal-2026-10-14/ordinary-types-20261015T011935Z-before.json",
+              "found": 0,
+              "matches": false
+            },
+            {
+              "snapshot": "qa/goal-2026-10-14/web-build-inputs-20261015T011935Z-after.json",
+              "found": 0,
+              "matches": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "receipts": [
+    {
+      "path": "qa/evidence/goal-t007/reviewer-api9-cycle3-final-scalar-fixture-20261015T012553Z.receipt.json",
+      "sha256": "74B5A6B4B97FFC2E6BDE066352FEA8C441D6919BE20C8B3474480412816BA02A"
+    },
+    {
+      "path": "qa/evidence/goal-t007/reviewer-snapshot-exact-floor-cycle3-current-20261015T012622Z.receipt.json",
+      "sha256": "2B141C5E1D41C052DFF8A8F454B8A573635CE2A89FA665F0F89F2DBA718CF4BE"
+    },
+    {
+      "path": "qa/goal-2026-10-14/ordinary-current-build-checkpoint-20261015T011935Z-verified.json",
+      "sha256": "53A5CFB891DAA746F88DC6AB8068AB9A3F6A3E89B4FCAFE48247380BA504C9EE"
+    }
+  ],
+  "validator": "1240059FC2ABC63CDE58472EF8F7964978E74BA5BC2F5156A30379DDAE391DB3",
+  "registry": "D31DAD4C1FCE135238169F48C18BC5EF68EA0DEFF7978D9323441330778CC940",
+  "snapshotFormat": "Latest011935 snapshots are direct path/hash objects, not older file arrays; matcher corrected before attribution credit."
+}

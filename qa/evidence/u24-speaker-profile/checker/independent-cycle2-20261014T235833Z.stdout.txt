@@ -1,0 +1,45 @@
+{"synthetic":true,"secondaryChecked":true,"withdrewBeforeFinalPrimaryCheck":true,"returnedTopicIds":["topic"]}
+✔ actual store positive control retains only anchored knowledge and supported alias (8.7155ms)
+✔ same person row from another tenant cannot establish identity (0.437ms)
+✔ correct current hash cannot rescue wrong turn anchors and stale hash cannot rescue current ids (3.5054ms)
+✔ withdrawn primary source refuses all persona output (0.4437ms)
+✔ quoted self-name cannot restore legacy floor attribution (2.0081ms)
+✖ secondary contributing source withdrawal before final primary check withholds cached topic name (5.893ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 782.6127
+
+✖ failing tests:
+
+test at qa\evidence\u24-speaker-profile\checker\independent-cycle2.test.mts:1:5846
+✖ secondary contributing source withdrawal before final primary check withholds cached topic name (5.893ms)
+  AssertionError [ERR_ASSERTION]: a withdrawn secondary source cannot supply cached topic metadata
+  + actual - expected
+  
+  + [
+  +   {
+  +     claimIds: [
+  +       'safe'
+  +     ],
+  +     id: 'topic',
+  +     name: 'SECONDARY SOURCE METADATA'
+  +   }
+  + ]
+  - []
+  
+      at TestContext.<anonymous> (C:\Users\product\Desktop\KnowledgeBase\qa\evidence\u24-speaker-profile\checker\independent-cycle2.test.mts:93:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: [ { id: 'topic', name: 'SECONDARY SOURCE METADATA', claimIds: [Array] } ],
+    expected: [],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+

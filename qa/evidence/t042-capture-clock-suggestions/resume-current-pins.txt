@@ -1,0 +1,25 @@
+Latest root resume reconciliation, 2026-10-14. No test/runtime process launched.
+Own source SHA256 D3473147AB4010F533CAC8AE5BB36918A6020F33DEE2CA3EBB55B1D59EC5EDDE
+Own test SHA256 8600237450FF563FECA024CC7D0A2A28CF56A7FD1C20C76F04279287BE413F91
+pnpm-lock.yaml SHA256 2AF3AADA247F31436A28F46F4803DC8B4294956C21825F7421CA37FAF07D83DD
+apps/api/package.json SHA256 678346DCCCC8310496005A777FD289CCB4FBE5CAE08B529F717D7259D7578EDE
+packages/db/src/collections/speaker-suggestions.ts SHA256 515626D26A77E18970D7CEC8DF60179646DCD56478304758F985BB165B62129C
+packages/index/src/pipeline/speaker-profiles/profile.ts SHA256 6BE5B7EDE88B2887FE4C7A5E1ADB4B573B2303A8422B2185F64080CF8D873386
+packages/index/src/pipeline/speaker-tile-suggestions.ts SHA256 14425C1410D234C0839184443B3FA1075F1374A6B253048D93D7982F8A45EEAF
+packages/index/src/pipeline/speaker-rules/speaker-tile-fusion.ts SHA256 5EA93427AF55A60B5606D8427639A4664B7544782C96AB7BCD8BA76309BF5958
+packages/core/src/domain/speaker-tile-alignment.ts SHA256 3A8A28C448C59C11E25D47267616FC1C2F81729861AF28DE6494BFE7ADA5D8BA
+packages/index/src/pipeline/speakers.ts SHA256 233A92BB6B766F7EF381564CAE2CD27353FAB520D1564F319CEDA2144FEA4B65
+
+Lock differs from the earlier resume snapshot 376EB619300784FDD364F1A55084104D4F149F3CBA38F2C4DFFBFF3403C31318.
+Historical 12/12 evidence cannot serve as a fresh runtime/dependency proof. Independent checker was
+reactivated with followup_task to obtain a fresh broker grant and current-pinned focused proof.
+
+Read-only source search: only the adapter's own source/test call suggestTileSpeakersForSession;
+indexSession/buildIndexer and current speaker-suggest hook still invoke only the model path.
+No trusted capture registry/media-clock producer was found. Those shared integration paths remain central.
+
+U24 producer coordination: the profile consumer grants numeric turn/claim attribution only to grounded
+blocks with exact turnIds/current whole-session speakerTranscriptHash, surviving quoted-name evidence
+and the durable explicit human-confirmed suggestion link. Current tile suggestions have quoted capture
+provenance, no pinned model-grounded blocks: human confirmation can support the quoted identity but
+does not grant numeric profile block claims. Do not invent blocks or use sidecar assertions as authority.

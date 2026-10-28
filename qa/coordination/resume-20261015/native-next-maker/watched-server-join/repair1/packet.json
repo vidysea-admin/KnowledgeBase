@@ -1,0 +1,68 @@
+{
+  "validation_contract": "managed-review/1",
+  "role": "maker-fragment",
+  "unit": "watched-native-server-join",
+  "fix_cycle": 1,
+  "root": "C:/Users/product/Desktop/KnowledgeBase",
+  "base_sha": "d50a25c200dcbcf574ecade0aa205f5fcb45c5f8",
+  "candidate_sha": null,
+  "status": "source-frozen-not-executed",
+  "source_pins": [
+    {
+      "path": "scripts/native-capture/server.ts",
+      "sha256": "c7b50ec307d9b59d385a9248e16087b1529ae6d2558cc75858ceeda1af16d389",
+      "nonblank_lines": 208
+    },
+    {
+      "path": "scripts/native-capture/server-watched.test.ts",
+      "sha256": "6e8a30515800404ebeccdd465be524979eb813c74f267a23c60c9d1dfc15c7c0",
+      "nonblank_lines": 163
+    }
+  ],
+  "preimage_pins": [
+    {
+      "path": "backups/server.ts",
+      "sha256": "af7a4657c4d85f6c42c63760aeca436c273cf65ebb3abb8acf70af6d63c8d678",
+      "execution": "NEVER_RUN"
+    },
+    {
+      "path": "backups/server-watched.test.ts",
+      "sha256": "038f8c217e6980896156292d3a48c2a6e542129f1fb7ad42747635b490411f57",
+      "execution": "NEVER_RUN"
+    }
+  ],
+  "dependency_pins": [
+    {
+      "path": "scripts/watched-sources/supervisor.ts",
+      "sha256": "54c1cbe9be01e07cd6feb8b2a66b3bdf96b7850662fbb60303e58c80bd8b0583"
+    },
+    {
+      "path": "scripts/watched-sources/host.ts",
+      "sha256": "a27af996fbd57d2cfc844954beb94f1391c61a088d285506cdd18797fca7dcaa"
+    },
+    {
+      "path": "apps/api/src/connector-workflow/watched.ts",
+      "sha256": "6cde78465071ec704ba0ce5b385a81c50bedf90d5eb3f042862e4c0358dc54f0"
+    }
+  ],
+  "authorization": "Root explicit30SECOND CLI watchdog/ownedprocess finish grant",
+  "token_metric": "actual_total",
+  "maker": {
+    "token_metric": "actual_total",
+    "tokens": null,
+    "cost": null,
+    "active_s": null
+  },
+  "authored_counts": {
+    "new_watched_join_and_cli_tests": 10,
+    "total_launcher_tests": 16,
+    "existing_server_tests": 6
+  },
+  "required_checks": [
+    "Existing server.test.ts6 + server-watched.test.ts10; actual imported supervisor/auth/drain plus fake CLI deadline/failure/secondsignal cleanup",
+    "Upstreamwatch7/job5 sourceidentical evidence reuse only ifbrokerpermits",
+    "Affected explicitroottypes/fullgraph/scopedLOC"
+  ],
+  "execution": "No tests/build/DB/ACL/provider/browser/decoder commands executed.",
+  "lifecycle": "CLI only: drainedsuccess0, failure/deadline1, secondSIGINT130/secondSIGTERM143. Library neverprocess.exit/sharedDBdisconnect. 30s deadline may terminate pending durable work, not guaranteed graceful drain."
+}

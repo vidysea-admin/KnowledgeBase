@@ -1,0 +1,20 @@
+﻿import test from 'node:test';
+import assert from 'node:assert/strict';
+import {join} from 'node:path';
+import {runPipelineTick} from '../run-pipeline.mjs';
+import {withFixture} from '../run-pipeline-fixtures.mjs';
+test('probe: persistence failure inside artifact-start callback is not swallowed by path catch', () => withFixture(async f => {
+  const stop = new AbortController(); let armed = false;
+  f.deps.env.LKB_JOIN_RULES_ENFORCE = 'last-valid';
+  f.deps.captureSlots = ['career-a', 'career-b']; f.deps.validateCaptureSlots = async () => {};
+  f.deps.captureSlotSupports = () => true; f.deps.validateCaptureSlot = async () => {}; f.deps.refreshSchedulerPolicy = async () => true;
+  f.deps.flushSchedulerAlerts = async () => {}; f.deps.applyJoinRules = async s => s;
+  f.deps.autojoin = {cfg: {discovery: true, webinarAutoJoin: true, careerPriority: true, testDataRouting: true},
+    topic: {keywords: ['career'], weights: {title: 3, description: 1, sender: 2}, minScore: 3}, tagsDir: join(f.root, 'raw/webinars/capture-tags'), raise: async () => {}};
+  f.deps.log = line => {f.logs.push(line); if (armed) {armed = false; throw new Error('persist-fixture-failure');}};
+  f.deps.launch = async (args, env, onLine) => {armed = true; onLine('audio/video recording started: ' + join(f.root, 'proof.webm'));};
+  f.deps.schedulerWait = async () => new Promise(r => setTimeout(r, 50)).then(() => stop.abort());
+  const result = await runPipelineTick(f.deps, true, {watch: true, signal: stop.signal});
+  const row = Object.values(result.operations)[0];
+  assert.equal(row.status, 'failed'); assert.match(String(row.reason), /persist-fixture-failure/);
+}, true));

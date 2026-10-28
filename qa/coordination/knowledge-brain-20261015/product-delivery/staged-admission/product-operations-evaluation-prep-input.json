@@ -1,0 +1,66 @@
+{
+  "unit": "product-operations-evaluation",
+  "cycle": 0,
+  "candidate_sha": "2e566870a470392da307395afd070bfe31d3668e983953995444cf466e25de13",
+  "completion_reserve": true,
+  "completion_reserve_id": "product-operations-evaluation/cycle0/2e566870a470392da307395afd070bfe31d3668e983953995444cf466e25de13",
+  "maker": {
+    "cost": null,
+    "active_s": null,
+    "tokens": null
+  },
+  "reviewers": [
+    {
+      "cost": null,
+      "active_s": 0,
+      "tokens": 0,
+      "id": "prospective-not-launched",
+      "note": "No checker has been dispatched for this unique unit. Zero active seconds and tokens represent truthful absence of prior reviewer work, not measured dispatched usage."
+    }
+  ],
+  "next_phase": {
+    "cost": null,
+    "active_s": 40,
+    "tokens": 1000,
+    "kind": "review"
+  },
+  "bootstrap_scope": "Only product-operations-evaluation cycle0 five-file UI/model/mount candidate: verify exact identity, source/write/auth boundaries, immediate consumers and current broker receipts, plus one independent contract-derived probe. Parent T059/live/human/native gates remain HOLD. Reserve final30s800 inside total120s3000.",
+  "bootstrap": {
+    "cost": null,
+    "active_s": 120,
+    "tokens": 3000
+  },
+  "escalation": null,
+  "staged_admission": {
+    "status": "PREDISPATCH_PREPARATION_ONLY",
+    "source_input": "qa/coordination/knowledge-brain-20261015/product-delivery/operations-assess-dispatch-input.json",
+    "unit": "product-operations-evaluation",
+    "cycle": 0,
+    "total": {
+      "active_s": 120,
+      "tokens": 3000
+    },
+    "next_review": {
+      "active_s": 40,
+      "tokens": 1000
+    },
+    "remaining_review": {
+      "active_s": 50,
+      "tokens": 1200
+    },
+    "protected_finalization": {
+      "active_s": 30,
+      "tokens": 800
+    },
+    "authority": "Root approved staged40s1000 + remaining50s1200 + final30s800 WITHIN same120s3000; no extra allocation.",
+    "prior_charges": "All existing reviewer rows preserved exactly; no reviewer launched. Unknown maker/cost values unchanged.",
+    "dispatch_authorized_by_this_file": false
+  },
+  "protected_finalization": {
+    "kind": "finalization",
+    "active_s": 30,
+    "tokens": 800,
+    "cost": null,
+    "note": "Protected inside same total120s3000; retain prior actual metrics/debits and assess before finalization."
+  }
+}

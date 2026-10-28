@@ -1,0 +1,18 @@
+{
+  "status": "AUTOMATIC_APPROVAL_REJECTED_BEFORE_LAUNCH",
+  "cpuSlotReturned": true,
+  "grant2ProviderRequestsDispatched": 0,
+  "cumulativePriorProviderRequests": 3,
+  "remainingGrant2Requests": 2,
+  "preparationFilesWritten": false,
+  "sourceConfigAuthorizationModified": false,
+  "reasons": [
+    "Proposed terminal checkpoint redaction would irreversibly remove audit/citation fields without explicit authorization",
+    "Launch review requires sufficiently explicit approval for exact private evaluation payload and Ollama destination"
+  ],
+  "noRetryOrWorkaround": true,
+  "requiredNextDecision": "Explicit human approval covering exact payload/destination and checkpoint disposition, or safer reviewed plan; root coordinates",
+  "priorUnknownUsagePreserved": true,
+  "priorWallOverrunMs": 22214,
+  "observedAt": "2026-10-15T22:36:50.975Z"
+}

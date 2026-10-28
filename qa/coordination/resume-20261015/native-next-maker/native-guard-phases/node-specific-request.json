@@ -1,0 +1,87 @@
+{
+  "status": "NODE_SPECIFIC_REQUEST_ONLY_ROOT_ADMISSION_REQUIRED",
+  "unit": "native-guard-phases",
+  "expected_current_head": "d0f6f2eff242f98a85ba4ccde483db08030ba3c8",
+  "candidate_git_sha": null,
+  "dirty_source_identity": "Unchangedtestaa1de524/helper099b181c;raw74manifestnotGitSHA",
+  "manifest": "qa/coordination/resume-20261015/native-next-maker/combined-source-pins-native-guard-phases.json",
+  "manifest_sha256": "c2049221f58de313bb0a2b90984337c413232ecbb8b4c1a3683f0e966daf4df7",
+  "cases": [
+    {
+      "node_id": 1,
+      "title": "retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse",
+      "selected_tests": 1,
+      "job_max_s": 150,
+      "proposed_phase_max_s": 180,
+      "setup_reserve_s": 15,
+      "cleanup_reserve_s": 15,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=140000",
+        "--test-name-pattern=^retained artifact tampering, copied orphan, owner/current changes and revoked proof refuse$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+        "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+      ],
+      "fixture": "OwnNEWprotectedUUIDpercase,bothtraceenvexplicit,fixednative-guard-phases.jsonl",
+      "expected_complete_trace_records": 64,
+      "execution": "SeparateROOTadmission;noselfdispatch/retry;keepalloriginalcases"
+    },
+    {
+      "node_id": 2,
+      "title": "fair bounded pages, quota-before-allocation and interrupted journal refuse",
+      "selected_tests": 1,
+      "job_max_s": 150,
+      "proposed_phase_max_s": 180,
+      "setup_reserve_s": 15,
+      "cleanup_reserve_s": 15,
+      "argv": [
+        "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+        "--test",
+        "--test-concurrency=1",
+        "--test-timeout=140000",
+        "--test-name-pattern=^fair bounded pages, quota-before-allocation and interrupted journal refuse$",
+        "--import",
+        "file:///C:/Users/product/Desktop/KnowledgeBase/qa/coordination/resume-20261015/runtime-alias-repair/register.mjs",
+        "packages/meeting-bot/src/capture/native/native-archive-recovery.test.ts"
+      ],
+      "fixture": "OwnNEWprotectedUUIDpercase,bothtraceenvexplicit,fixednative-guard-phases.jsonl",
+      "expected_complete_trace_records": 12,
+      "execution": "SeparateROOTadmission;noselfdispatch/retry;keepalloriginalcases"
+    }
+  ],
+  "default_file_isolation": true,
+  "concurrency": 1,
+  "reuse_prerequisite_only": "Currentmatchingbottypes16.953s/helper5pass receipts;NOToriginalguardPASS,checkbeforeusing",
+  "trace_contract": {
+    "maximum_bytes": 65536,
+    "catalog": "qa/coordination/resume-20261015/native-next-maker/native-guard-phases/stage-catalog.json",
+    "fields": [
+      "stageId",
+      "elapsedMs"
+    ],
+    "node2_records": 12,
+    "collection": "Afterallownedchildprocessesclosed,BEFOREfinallyownedUUIDcleanup evenontimeout;copyrawtrace+hash+parsefixedschema+recordlaststage",
+    "root_env": "LKB_NATIVE_TEST_PRIVATE_DIR",
+    "expected_complete_records": 76,
+    "on_failure": "missing/refused/partial/nonmonotonic/unknownpayload trace=DIAGNOSTIC_INCOMPLETE,neversemanticPASS;emptytracecannotprove no mutations",
+    "path": "EXACTbrokerNEWprotectedUUID/native-guard-phases.jsonl,outsideallnestedarchiveproducerroots",
+    "both_envs_required": true,
+    "filename": "native-guard-phases.jsonl",
+    "path_env": "LKB_NATIVE_GUARD_PHASE_LOG",
+    "exclusive_sink": "absentbeforechild;wx0600oneheldmodulefd sharednodes",
+    "test_guard_sinks": "EachhelperguardusesownNEWtemporarydirectory/reset+restorefinally;neveractualbatchsidecar",
+    "maximum_records": 256,
+    "node1_records": 64
+  },
+  "trace_limitation": "HelperelapsedMsremainsclamped75000;laterstageIDsrecordprogressbuttimestampsatcaparelowerbounds,notspecifictimesafter75s",
+  "process_deadline": "Authoredtests240s/individualdecoderlimitsdonotenlarge150sJob;closeownedprocesstreewithinhardJobbound",
+  "collection": "PreserveandhashtraceAFTERtreecloseBEFOREfinallyownedUUIDcleanup,onPASS/failure/timeout",
+  "rationale": "Trace32validrowsprogressedthroughall7bindingsandartifact0/1,lastartifact2start66.722s;remaining9artifactsextrapolate23.076..29.430s+7unmeasuredgroups. Separate150sfinitewindowbasedoncumulativework,notclaimeddeadlockfix/guarantee",
+  "node2_first_attempt": "Neverstartedpreviously;onefixture/fourserialseals,existingmux600s/probe120s/test240s canexceed150window",
+  "unbounded_io": "native-capture-archive.tsfilesystempromisesandcurrentbindingcallbacksnoapplicationdeadline;externalJobboundsobservation",
+  "no_source_edits": true,
+  "no_tests_dispatched": true
+}

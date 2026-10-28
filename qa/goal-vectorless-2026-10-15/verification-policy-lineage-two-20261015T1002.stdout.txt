@@ -1,0 +1,10 @@
+✔ reported evidence uses server-cited sources, holds original, resolves with attribution and reruns without losing provenance (29.0648ms)
+✔ all reported conflicts must be resolved and every rejected canonical source is excluded (11.0225ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 834.1174

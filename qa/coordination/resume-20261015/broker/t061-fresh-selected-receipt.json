@@ -1,0 +1,52 @@
+{
+  "argv": [
+    "C:/Users/product/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe",
+    "--import",
+    "tsx",
+    "--test",
+    "--test-concurrency=1",
+    "--test-timeout=20000",
+    "apps/api/src/automation/factory.test.ts",
+    "apps/api/src/automation/mounted.test.ts"
+  ],
+  "cwd": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "pins": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\pin-manifests\\33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7.json",
+    "sha256": "33b45e9e5244086b94a2159f08a37866ad99cae4b7027649d6a5ee8c1e1220a7",
+    "count": 544
+  },
+  "environmentWhitelistSha256": "09ffbb912f998a41e3232f4f306d963810eefe3e794b2f837d63b89656b57267",
+  "environmentNames": [
+    "KB_T022_PRIVATE_REVIEW_TESTS",
+    "KB_U24_PRIVATE_TOC_TESTS",
+    "LKB_APPLICATION_FORMS_ENABLED",
+    "LKB_AUTOMATION_ENABLED",
+    "LKB_WHATSAPP_CONSENT_MONGO_RUN",
+    "NODE_OPTIONS",
+    "PYTHONDONTWRITEBYTECODE",
+    "T054_AUTHENTIC_INPUT_OPT_IN",
+    "TEMP",
+    "TMP",
+    "TSX_TSCONFIG_PATH"
+  ],
+  "beforeMatch": true,
+  "maxJobSeconds": 90.0,
+  "accounting": "SHARED INTEGRATION, not checker",
+  "pid": 32560,
+  "exit": 0,
+  "treeClosed": true,
+  "afterMatch": true,
+  "active_s": 21.562000000001717,
+  "log": {
+    "path": "C:\\Users\\product\\Desktop\\KnowledgeBase\\qa\\coordination\\resume-20261015\\broker\\t061-fresh-selected.log",
+    "sha256": "cdbb2c5fef2d2abfd336a07c48543bf0aeecdeb3d6e694ffc17d073e3bd6af1e"
+  },
+  "counts": {
+    "tests": 2,
+    "pass": 2,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  }
+}

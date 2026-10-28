@@ -1,0 +1,53 @@
+{
+  "tenantId": "toc",
+  "node_id": "tenant:toc",
+  "title": "toc",
+  "level": "tenant",
+  "summary": "",
+  "children": [
+    {
+      "node_id": "toc/year:2026",
+      "title": "2026",
+      "level": "year",
+      "summary": "",
+      "children": [
+        {
+          "node_id": "toc/year:2026/month:08",
+          "title": "08",
+          "level": "month",
+          "summary": "",
+          "children": [
+            {
+              "node_id": "toc/year:2026/month:08/session:sess1",
+              "title": "27th-August-In-Focus",
+              "level": "session",
+              "summary": "In Focus session summary.",
+              "evidence": {
+                "sessionRef": "sess1"
+              },
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "tenant:toc/session:sess1",
+      "title": "Synthetic session",
+      "level": "session",
+      "summary": "",
+      "children": [],
+      "evidence": {
+        "sessionRef": "sess1"
+      },
+      "indexArtifact": {
+        "version": 1,
+        "generation": "11111111-1111-4111-8111-111111111111",
+        "sessionId": "sess1",
+        "sourceId": "src1",
+        "turnDigest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  ],
+  "indexRevision": 1
+}

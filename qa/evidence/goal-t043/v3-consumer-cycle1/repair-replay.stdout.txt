@@ -1,0 +1,18 @@
+✔ actual current sync v3 producer output is consumed by the actual finalizer (107.9737ms)
+✔ actual selected speech-only producer input is consumed with its current passed validation (105.8703ms)
+✔ legacy v2 combined proof remains supported with its existing core guarantees (70.6061ms)
+✔ v3 refuses wrong source, database, bytes, generation, selected count and stage status (237.8937ms)
+✔ v3 refuses changed source/session metadata and foreign selected turns (126.1099ms)
+✔ v3 database binding is independently expected and test-data sources remain staging only (75.4782ms)
+✔ matching rewritten hashes cannot admit foreign, duplicate or malformed selected rows (235.3255ms)
+✔ current combined and speech gates must remain passed and hash-bound (240.6158ms)
+✔ test-data source remains staging-only even when caller and proof agree on another database (66.0419ms)
+✔ legacy v2 still refuses count mismatch and non-string generation (79.5143ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1838.0198

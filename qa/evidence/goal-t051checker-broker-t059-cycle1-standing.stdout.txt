@@ -1,0 +1,26 @@
+✔ actual source intake -> grounded indexSession -> request-bound source hydration/askV2 -> immutable child (83.6605ms)
+✔ actual authenticated routes enforce all write scopes, tenant scope, body validation and gaps compatibility (264.9369ms)
+✔ unconfigured flywheel answers safe503 after scope validation, with no writes (21.5186ms)
+✔ actual shared createServer mount invokes the flywheel using the verified tenant (31.4136ms)
+✔ stored loss creates stable tenant-linked gap; separate unscored retest preserves original and consumers (20.2779ms)
+✔ tie/win/missing/malformed finite score and foreign loss never write gaps (3.0077ms)
+✔ original input drift cannot silently bind a previously accepted gap (2.0358ms)
+✔ received requires actual scoped transcript/consent/source/session; forged receipts never index (16.1241ms)
+✔ degraded/index mismatch/empty/incomplete output refuses Ask, while received remains honest (24.9689ms)
+✔ drift during indexing and foreign chunks cannot be mistaken for current capture (14.2075ms)
+✔ provider/index/Ask/child-write failures stay visible and valid retry reuses established capture/index (31.8031ms)
+✔ concurrent attempt CAS and expired restart lock preserve exactly one accepted child (11.1081ms)
+✔ crash after immutable child persistence resumes without repeating Ask (9.5473ms)
+✔ expired gap and source URL rebinding refuse; DB names remain bounded (9.1705ms)
+✔ provider deadline returns honest failure and retains lease until expiry; late callback cannot advance head (16.2193ms)
+✔ idempotent retry preserves a later explicit internal child score without copying it to the original (5.0885ms)
+✔ ISS-T059REPLAY-001 recorded historical-request replay returns first without changing newer head (8.2334ms)
+✔ newer interrupted child resumes promotion while completed historical replay leaves its recovery untouched (12.1178ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6317.0917

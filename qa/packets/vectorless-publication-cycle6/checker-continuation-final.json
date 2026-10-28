@@ -1,0 +1,17 @@
+{
+  "earlier_actual_active_s": 161.0335024,
+  "allocated_tokens": 2000,
+  "allocated_active_s": 90,
+  "utc_end": "2026-10-15T08:59:41.7164738Z",
+  "checker": "publication_checker-continuation",
+  "wait_intervals": [],
+  "verdict": "HOLD",
+  "utc_start": "2026-10-15T08:58:21.3769628Z",
+  "active_s": 80.338956,
+  "ratio_verified": false,
+  "monotonic_start_ticks": 187912546439,
+  "monotonic_frequency": 10000000,
+  "cost": null,
+  "tokens": null,
+  "monotonic_end_ticks": 188715935999
+}

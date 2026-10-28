@@ -1,0 +1,15 @@
+{
+  "privateArtifactNotForPublication": true,
+  "bindings": 44,
+  "humanReviews": 0,
+  "unit": "T022 local private HTML generation",
+  "rawReceiptSha256": "8a4bec63ddb14c134b2e234933b8afa297c078de1f6fb5d84025fdda29c8c5dc",
+  "items": 30,
+  "drift": 0,
+  "timedOut": false,
+  "exit": 0,
+  "artifactBytes": 58708,
+  "elapsedMs": 160,
+  "artifactSha256": "2b617ff41ccc1fb1e3e68105d366da63b340237a9c8f1f263ddb585549d0c6e5",
+  "pinCount": 65
+}

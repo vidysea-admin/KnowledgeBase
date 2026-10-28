@@ -1,0 +1,21 @@
+✔ full population has IDs even for duplicate question text; downstream arithmetic/control and no overwrite (280.8983ms)
+✔ cap stops partial ranking; resume reuses verified individual receipts and completes all IDs (252.3402ms)
+✔ fallback HTTP failure contaminates a whole ranked question; pure subset gets its own control (211.4881ms)
+✔ deadline, cancellation and secret-bearing transport failures stay bounded and sanitized (308.3475ms)
+✔ corrupt/drift/conflicting resume and live owner refuse before scorer factory (494.2969ms)
+✔ inflight attempt recovers as unknown; completed cells cannot be rewritten in deltas (291.6071ms)
+✔ pending human references and invalid caps refuse before paid I/O; model order refuses missing predecessor (1.3611ms)
+✔ unknown provider host and credential-bearing URLs refuse before corpus/provider transport (46.4014ms)
+✔ historical Ollama reports remain partial; derived calibration never becomes human gold (8.2919ms)
+✔ real corpus current inputs freeze29candidates and92distinct questions; pending actual human packet refuses (213.7125ms)
+✔ actual production scorer and provider use fakeHTTP through the exact bounded paid path, with no key persistence (372.9467ms)
+✔ complete verified Ollama predecessors permit Gemini LAST; actual Gemini adapter receives bounded fakeHTTP (775.9266ms)
+✔ SYNTHETIC fractional approvals export exact30pairs and actual computeMAE consumes live-shaped scoring output (958.3605ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4298.0939

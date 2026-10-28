@@ -102,3 +102,5 @@ puts them through the right door.
 checker-owned and read-only to the maker, and this gate exists precisely because a component
 widened its own mandate by editing a contract. Fixing that by having the *maker* edit a contract
 would repeat the error in mirror image. The correction is dispatched to a checker.
+
+**Gate status:** ANSWERED — recorded inline: SUPERSEDED by the line below — this stale `_(pending)_` predates the real answer and is corrected here by the 

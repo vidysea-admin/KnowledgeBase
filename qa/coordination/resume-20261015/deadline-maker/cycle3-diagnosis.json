@@ -1,0 +1,66 @@
+{
+  "status": "PRODUCTION_COMPATIBILITY_DEFECT_NEEDS_CENTRAL_LEASE_NO_SOURCE_EDITS",
+  "cycle": 3,
+  "root": "C:\\Users\\product\\Desktop\\KnowledgeBase",
+  "evidence": "qa/coordination/resume-20261015/broker/deadline-cycle2-original-composition.log",
+  "exact_cause": {
+    "observed": "Original composition reaches indexedDigests receipts.ts:34 after indexSession succeeds; helper3/3 and workflow4/4 green reported by broker.",
+    "producer": "indexing/session.ts:113 defaults deps.retrievalMode to vectorless; unchanged original composition omits retrievalMode. chunk-write.ts writeSessionLexicalChunks intentionally creates _id/tenantId/sourceRef/turnRefs/chunkIndex/indexArtifact only, no vector/dims/embeddingModel.",
+    "verified_generation_contract": "generation.ts actualArtifacts vectorless branch requires exact content IDs, ordered source refs and chunk indices AND vector/dims/embeddingModel absent. Indexing success therefore positively establishes deliberately lexical chunks.",
+    "consumer": "evaluation-flywheel/receipts.ts indexedDigests unconditionally requires Array.isArray(c.vector), vector.length>0, finite coordinates, dims==length and present embeddingModel; absence reaches line34 unavailable503.",
+    "expected_vs_actual_metadata": {
+      "index_mode": "vectorless",
+      "actual_vector_field_present": false,
+      "actual_dims_field_present": false,
+      "actual_embeddingModel_field_present": false,
+      "receipt_guard_requires_vector_present": true,
+      "receipt_guard_requires_dims_and_embeddingModel": true
+    },
+    "classification": "Production flywheel receipt reader predates vectorless indexing and rejects valid canonical lexical artifacts. Not missing mock operator/DB semantics.",
+    "why_testonly_inappropriate": "Injecting vectors in fixture would violate actualArtifacts canonical vectorless guard and fabricate persisted facts; forcing original composition to vector mode would bypass intended actual vectorless integration."
+  },
+  "minimal_direction_for_root": {
+    "needed_production_lease": [
+      "apps/api/src/evaluation-flywheel/receipts.ts",
+      "apps/api/src/evaluation-flywheel/types.ts",
+      "apps/api/src/evaluation-flywheel/workflow.ts"
+    ],
+    "possible_additional_store_lease": "apps/api/src/evaluation-flywheel/store.ts if root chooses loading persisted canonical generation/mode there instead of passing verified mode/receipt metadata",
+    "regression_lease": [
+      "apps/api/src/evaluation-flywheel/receipts.test.ts",
+      "apps/api/src/evaluation-flywheel/workflow.test.ts"
+    ],
+    "direction": "Mode-aware indexed artifact validation backed by canonical verified generation/mode binding across initial verification and replay freshness. Keep existing vector validation in vector mode; require exact accepted lexical inventory and absent vector metadata in vectorless mode. Preserve tenant/source/turn checks, digests, immutable child and fail-closed malformed/unknown/stale mode. Do not infer success merely because vector fields absent. Exact minimal implementation depends on existing persisted receipt schema authorization.",
+    "scope_note": "New lease required; do not edit frozen contracts/schema or protected paths. Root should decide any schema work separately."
+  },
+  "seam_cap": {
+    "same_fixture_seam_specific_pass_verdicts": 0,
+    "broader_historical_goal_t059_passes": 1,
+    "current_unit_has_no_new_PASS": true,
+    "new_class": "Production artifact validation/tenant-bound read and downstream child data-write correctness; guards remain authoritative, no cap bypass claim."
+  },
+  "no_source_edits": true,
+  "no_tests_run": true,
+  "private_data_recorded": false,
+  "pins": {
+    "apps/api/src/evaluation-flywheel/test-fixture.ts": "4715f0d803840bd5ea4a25de9efc59d3d71c98ec0a3919474270102ed7950175",
+    "apps/api/src/evaluation-flywheel/test-fixture.test.ts": "b173a8fc29efae214ca06a2e7f97a0f99b73cd11036d1ef4b6e8961ddd98180a",
+    "apps/api/src/evaluation-flywheel/composition.test.ts": "120e75a52297bf12eca8377a3114169e8e6746bcb0895b2c1eb473d5efe01784",
+    "apps/api/src/evaluation-flywheel/receipts.ts": "a6eb0492e8382288cf142c3848726d01bc3a3fc1ab93d90817c36e8d30ff38f3",
+    "apps/api/src/evaluation-flywheel/workflow.ts": "487ebc2b08d128f17b27b9c6b6a8df21a6fb85dd1db1517e32281f7865af3fe2",
+    "apps/api/src/evaluation-flywheel/types.ts": "c1b031c9964dc26a835c410b3034760f6f2a307a73938015bc091e9c41b7003f",
+    "apps/api/src/evaluation-flywheel/store.ts": "bc5896226b0dab2f27d2e808a3153d7fd8bd62109abd93ab575b25115104ea8a",
+    "apps/api/src/indexing/session.ts": "ce0a64b509dc3c9ac1e85ff7d9d8c0eae6774e097e7fafcf2a3c2c5888ad69ad",
+    "apps/api/src/indexing/chunk-write.ts": "79f549a0ba42e4604bf94cb23776941548a69ae92b14a6287c3e340edbb333ae",
+    "apps/api/src/indexing/generation.ts": "f03c53bf95eeb6bb440a483815a622b5e355313628385ede1a4c6ffddc42dd8b"
+  },
+  "usage": {
+    "actual_total_tokens": null,
+    "actual_active_seconds": null,
+    "token_metric": "actual_total"
+  },
+  "write_phase": {
+    "monotonic_start_ns": 9961979058100,
+    "monotonic_end_ns": 9961981987400
+  }
+}

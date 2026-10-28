@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "unit": "u24-speaker-profile",
+  "fixCycle": 2,
+  "handshakeStatus": "ready-for-check",
+  "parentTaskStatus": "HOLD",
+  "checkerVerdict": "FAIL",
+  "publicationStatus": "Whitelist candidate only; no publication or parent acceptance claimed",
+  "selectedPublicQa": [
+    "qa/contracts/goal-U24.md",
+    "qa/verdicts/u24-speaker-profile.md",
+    "qa/evidence/u24-speaker-profile/public-whitelist.json",
+    "qa/evidence/u24-speaker-profile/checker-public-whitelist.json"
+  ],
+  "publicHandshake": {
+    "scope": "Cited speaker persona projection, source-anchor producer and tenant-scoped API reader",
+    "currentCycle": 2,
+    "status": "ready-for-check",
+    "verdictExists": true,
+    "wholeTaskAccepted": false,
+    "note": "The submitted cycle-2 candidate received independent FAIL for a synthetic secondary-source consent withdrawal reproduction. The public-safe scoped verdict now exists; the full private-derived manifest remains excluded."
+  },
+  "requiredSyntheticFloor": [
+    "packages/db/src/collections/speaker-suggestions.testdb.ts",
+    "apps/api/src/indexing/testutils.ts"
+  ],
+  "excluded": [
+    "qa/manifests/u24-speaker-profile.md",
+    "qa/evidence/u24-speaker-profile/actual-toc-api-response.json",
+    "qa/evidence/u24-speaker-profile/corpus-accounting.json",
+    "qa/evidence/u24-speaker-profile/scripted-producer-profile-responses.json",
+    "qa/evidence/u24-speaker-profile/broker-run-*/**",
+    "qa/evidence/goal-t051checker-broker-u24-maker*",
+    "data/toc-migrated/**",
+    "raw/TOC/**",
+    "Private transcript and identity payloads, producer archives, corpus artifacts and source-before backups",
+    "Dependency-only pins, unrelated QA and broad validation artifacts"
+  ],
+  "evidenceQualifiers": [
+    "Authentic corpus evidence remains private and is not selected by this whitelist.",
+    "Producer artifacts remain excluded even where their fixture is synthetic.",
+    "Listed synthetic-floor files are dependency names, not an assertion that a current command passed.",
+    "Default private-input skips preserve authentic assertions; a skip does not satisfy private acceptance.",
+    "Central schema/generated files and API/web composition remain under their existing owners' selection."
+  ],
+  "remainingGates": [
+    "Repair ISS-U24PROFILECHECK-001 in a new maker cycle and replay its original six-case floor verbatim",
+    "Proof that private-input cases skip before input access by default",
+    "Actual T-055 direct downstream consumer replay on applicable current pins",
+    "New-cycle READY packet and independent checker acceptance after the failed cycle-2 privacy check",
+    "Full U2.4 live model precision, real persistence and human confirmation, and semantic persona acceptance"
+  ],
+  "requestExecution": {
+    "sourceEdits": false,
+    "testLaunches": false,
+    "providerCalls": false,
+    "databaseCalls": false,
+    "gitOperations": false,
+    "publication": false,
+    "writeScope": "This JSON only"
+  }
+}

@@ -7,7 +7,7 @@
  * `routes/brain.ts`/`routes/citations.ts` — tests never touch Mongo.
  */
 import { Router, type Request, type Response } from "express";
-import type { Sessions, Turns } from "@lkb/core";
+import type { NativeSourceLocator, Sessions, Turns } from "@lkb/core";
 import { requireScope } from "../auth.js";
 
 export interface SearchHit {
@@ -20,7 +20,11 @@ export interface SearchHit {
 
 export interface SearchDeps {
   search(tenantId: string, query: string, k: number): Promise<SearchHit[]>;
+  searchNative?(tenantId: string, query: string, k: number): Promise<NativeSearchResult>;
 }
+/** Native identity only; no synthetic session/turn IDs, timestamps or unrechecked quote. */
+export interface NativeSearchHit { nativeSourceLocator: NativeSourceLocator; score: number; title?: string }
+export interface NativeSearchResult { hits: NativeSearchHit[]; truncated: boolean }
 
 const DEFAULT_K = 10;
 const MAX_K = 50;
@@ -36,8 +40,13 @@ export function createSearchRouter(deps: SearchDeps): Router {
     }
     const kParam = Number(req.query.k);
     const k = Number.isFinite(kParam) && kParam > 0 ? Math.min(Math.floor(kParam), MAX_K) : DEFAULT_K;
-    const hits = await deps.search(req.auth!.tenantId, q, k);
-    res.status(200).json({ query: q, hits });
+    try {
+      const [transcripts, native] = await Promise.all([
+        deps.search(req.auth!.tenantId, q, k), deps.searchNative?.(req.auth!.tenantId, q, k),
+      ]);
+      const hits = native ? [...transcripts, ...native.hits].sort((a, b) => b.score - a.score).slice(0, k) : transcripts;
+      res.status(200).json({ query: q, hits, ...(native ? { nativeTruncated: native.truncated } : {}) });
+    } catch { res.status(503).json({ error: "search_unavailable" }); }
   });
 
   return router;

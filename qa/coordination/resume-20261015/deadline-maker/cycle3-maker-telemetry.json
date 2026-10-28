@@ -1,0 +1,14 @@
+{
+  "schema": "deadline-cycle3-maker-telemetry/1",
+  "observed_at": "2026-10-15T22:11:44.214Z",
+  "agent_path": "/root/deadline_repair_readiness",
+  "bounded_files": 30,
+  "matches": [],
+  "actual_total_tokens": null,
+  "actual_active_seconds": null,
+  "attribution": "Orchestrator identifies all lifetime work as T059 deadline fixture and canonical receipt seam; historical phase relevance remains unverified from metadata only.",
+  "accounting": "Latest cumulative lifetime input plus output once; prior reactivations preserved. Cached input and reasoning output subsets never added again. Shared support overhead separate.",
+  "known_previous_checker_children": null,
+  "checker_child_reason": "No existing unit packet inspected; cannot establish absence from metadata-only scope.",
+  "native_hard_total_token_cap_established": false
+}

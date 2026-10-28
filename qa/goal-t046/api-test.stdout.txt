@@ -1,0 +1,12 @@
+✔ strict allowlist rejects malformed counts, identities, timestamps and inconsistent state (3.1164ms)
+✔ reader uses only authenticated tenant directory; absent, invalid and foreign state fail honestly (65.6894ms)
+✔ reader refuses hardlinked files and tenant junctions without traversing foreign state (19.7682ms)
+✔ real auth+route+store: scopes, client overrides, no writes and sanitized unavailable (164.6462ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 958.6843
