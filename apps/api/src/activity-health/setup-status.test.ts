@@ -26,7 +26,7 @@ test("all configured: exact shape, literal booleans, no secret text anywhere in 
     const res = await get(url, "good-ask-key");
     const text = await res.text();
     assert.equal(res.status, 200);
-    assert.deepEqual(JSON.parse(text), { configured: { gemini: true, tavily: true, langfuse: true } });
+    assert.deepEqual(JSON.parse(text), { configured: { gemini: true, webSearch: true, langfuse: true } });
     for (const v of Object.values(SECRETS)) assert.ok(!text.includes(v) && !JSON.stringify([...res.headers]).includes(v), `leaked ${v}`);
     assert.equal(res.headers.get("cache-control"), "private, no-store");
   });
@@ -34,10 +34,10 @@ test("all configured: exact shape, literal booleans, no secret text anywhere in 
 
 test("nothing configured: all false; blank/whitespace values count as not configured", async () => {
   await withEnv({}, async (url) => {
-    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, tavily: false, langfuse: false } });
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, webSearch: false, langfuse: false } });
   });
   await withEnv({ GEMINI_API_KEY: "   ", TAVILY_API_KEY: "" }, async (url) => {
-    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, tavily: false, langfuse: false } });
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: false, webSearch: false, langfuse: false } });
   });
 });
 
@@ -62,4 +62,15 @@ test("source shape: mounted after requireAuth; reads only env presence, no reque
   assert.ok(server.indexOf("createSetupStatusRouter()") > server.indexOf("requireAuth(deps.keyStore)"));
   const route = readFileSync(fileURLToPath(new URL("./setup-status.ts", import.meta.url)), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.doesNotMatch(route, /req\.(query|body|params|headers)/);
+});
+
+test("[C5] webSearch follows GEMINI_API_KEY alone (Gemini grounded web fallback); a Tavily key no longer counts", async () => {
+  await withEnv({ GEMINI_API_KEY: SECRETS.GEMINI_API_KEY }, async (url) => {
+    assert.deepEqual(await (await get(url, "good-ask-key")).json(), { configured: { gemini: true, webSearch: true, langfuse: false } });
+  });
+  await withEnv({ TAVILY_API_KEY: SECRETS.TAVILY_API_KEY }, async (url) => {
+    const body = await (await get(url, "good-ask-key")).json() as { configured: Record<string, boolean> };
+    assert.equal(body.configured.webSearch, false);
+    assert.equal("tavily" in body.configured, false);
+  });
 });

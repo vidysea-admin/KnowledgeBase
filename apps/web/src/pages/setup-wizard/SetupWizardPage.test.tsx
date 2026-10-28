@@ -12,7 +12,7 @@ const VIEW_STORED = { ruleSet: { version: 1, ownDomains: ["vidysea.com"], rules:
 const VIEW_EMPTY = { ruleSet: { version: 1, ownDomains: [], rules: [] }, state: { approvedSenders: [], approvedDomains: [], optedOutEventIds: [] } };
 const HEALTHY: Record<string, Reply> = {
   "/system-status": { status: 200, body: { db: "ok", collections: { sessions: 3 } } },
-  "/setup/status": { status: 200, body: { configured: { gemini: true, tavily: true, langfuse: true } } },
+  "/setup/status": { status: 200, body: { configured: { gemini: true, webSearch: true, langfuse: true } } },
   "/calendar/join-rules": { status: 200, body: VIEW_STORED },
   "/watched-sources": { status: 200, body: { sources: [{ _id: "a" }, { _id: "b" }] } },
 };
@@ -37,7 +37,7 @@ describe("Setup wizard: item states", () => {
   test("configured integrations: checkable items Ready; runtime readiness, scopes and Google remain Unknown", async () => {
     route(); renderPage();
     expect(screen.getByText("Running setup checks…")).toBeInTheDocument();
-    for (const id of ["api", "db", "key", "gemini", "tavily", "langfuse", "join-rules", "sources"]) expect((await item(id)).dataset.status).toBe("ok");
+    for (const id of ["api", "db", "key", "gemini", "web-search", "langfuse", "join-rules", "sources"]) expect((await item(id)).dataset.status).toBe("ok");
     expect((await item("join-rules")).textContent).toContain("1 rule(s) and 1 own domain(s)");
     expect((await item("sources")).textContent).toContain("2 active watched source(s)");
     const scopes = await item("scopes");
@@ -90,15 +90,15 @@ describe("Setup wizard: item states", () => {
   });
 
   test("missing integrations are optional To do and cannot establish AI unavailability", async () => {
-    route({ "/setup/status": { status: 200, body: { configured: { gemini: false, tavily: false, langfuse: false } } } });
+    route({ "/setup/status": { status: 200, body: { configured: { gemini: false, webSearch: false, langfuse: false } } } });
     renderPage();
     const g = await item("gemini");
     expect(g.dataset.status).toBe("todo");
     expect(g.textContent).toContain("GEMINI_API_KEY");
     expect(g.textContent).toContain("Other configured providers may support AI jobs");
     expect(g.textContent).not.toContain("summaries are unavailable");
-    expect((await item("tavily")).dataset.status).toBe("todo");
-    expect((await item("tavily")).textContent).toContain("TAVILY_API_KEY");
+    expect((await item("web-search")).dataset.status).toBe("todo");
+    expect((await item("web-search")).textContent).toContain("GEMINI_API_KEY");
     const lf = await item("langfuse");
     expect(lf.dataset.status).toBe("todo");
     expect(lf.textContent).toContain("LANGFUSE_SECRET_KEY");
@@ -107,7 +107,7 @@ describe("Setup wizard: item states", () => {
   test("older API without /setup/status (404): integrations are Unknown, never reported as configured or missing", async () => {
     route({ "/setup/status": { status: 404, body: {} } });
     renderPage();
-    for (const id of ["gemini", "tavily", "langfuse"]) {
+    for (const id of ["gemini", "web-search", "langfuse"]) {
       const el = await item(id);
       expect(el.dataset.status).toBe("unknown");
       expect(el.textContent).toContain("does not offer this check");
@@ -173,7 +173,7 @@ describe("Setup wizard: no secrets, only existing read endpoints", () => {
   });
 
   test("hostile extra fields in /setup/status are never rendered (booleans are read, nothing else)", async () => {
-    route({ "/setup/status": { status: 200, body: { configured: { gemini: true, tavily: false, langfuse: false, geminiKey: "AIzaLEAK" }, secret: "sk-LEAK" } } });
+    route({ "/setup/status": { status: 200, body: { configured: { gemini: true, webSearch: false, langfuse: false, geminiKey: "AIzaLEAK" }, secret: "sk-LEAK" } } });
     const { container } = renderPage();
     await item("gemini");
     expect(container.textContent).not.toContain("LEAK");
