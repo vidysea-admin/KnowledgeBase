@@ -2631,3 +2631,15 @@ fourth would have left real decisions idle behind an unrelated unit.
 - tests for the above
 **Approved-by:** Umesh (chat ruling 2026-10-28, "Let needs-review be used"; "if really needed go with /maker continue")
 **Links:** D-199, D-173, T-013, T-058, references/portals/lkb-live.knowledge.md
+
+## D-201 | 2026-10-28 | type: session | status: ACTIVE
+**Title:** Narrow D-200 to knowledge outputs after root-cause pass; authorize additive citations[].claimStatus; refuse policy stays strict
+**What:** A read-only root-cause pass found D-200's premise partly wrong. Knowledge outputs 422 is caused by the verified-only gate at packages/core/src/knowledge-outputs/evidence-builder.ts:108 (confirmed). The counsellor's 0 sources is NOT a claim-status problem: /ask cites tree nodes and turns, and apps/api/src/ask/graph-context.ts:77 already admits needs-review. Umesh rulings (chat, 2026-10-28, qa/gates/claims-citable-needs-review.md): (1) build the knowledge-outputs change end to end first; leave the 200-claim cap (reader.ts:18, evidence.ts:27) untouched for now and revisit after ("phle properly build krr lo end to end firr dekengee"); (2) onInsufficient=refuse treats needs-review citations as insufficient (stay strict); (3) add optional citations[].claimStatus ("verified"|"needs-review") to schema/knowledge_outputs.schema.json and regenerate types; (4) the counsellor gets a separate read-only diagnosis, no counsellor code in this unit.
+**Why:** Building D-200 as written would have changed the counsellor path for no effect. The schema field keeps the label in the stored citation, so a later status flip still changes sourceDigest and staleness detection keeps working.
+**Result:** Pending: maker unit claims-citable-needs-review.
+**Supersedes:** D-200 -- narrows its scope to knowledge outputs; the counsellor half rested on a refuted premise, while the label rule for outputs stands
+**Changes-authorized:**
+- schema/knowledge_outputs.schema.json (additive optional citations[].claimStatus) and its generated types and fixtures
+- packages/core/src/knowledge-outputs/*, apps/api/src/knowledge-outputs/*, apps/web knowledge-outputs page and api type, and their tests
+**Approved-by:** Umesh (chat rulings 2026-10-28, gate file above)
+**Links:** D-200, D-199, qa/gates/claims-citable-needs-review.md, T-058

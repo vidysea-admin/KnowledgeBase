@@ -13,3 +13,8 @@ Q1 scope: outputs-only unit (status gate + label + schema field) | also raise/pa
 Q2 refuse policy: needs-review citations count as insufficient under onInsufficient=refuse (stay strict) | allowed under refuse too
 Q3 schema: authorize additive optional citations[].claimStatus (new D-entry) | no schema change
 Q4 counsellor: separate diagnosis (one authed live POST /ask, read-only) before any counsellor code | drop for now
+
+Answered: 2026-10-28 — Q1 "cap ki need kyu hai like cap lagaaya kyu gaya hai phle properly build krr lo end to end firr dekengee" -> build outputs unit end to end now; cap untouched; explain cap origin; revisit after — chat
+Answered: 2026-10-28 — Q2 Stay strict (refuse policy treats needs-review citations as insufficient) — chat
+Answered: 2026-10-28 — Q3 Yes, additive optional citations[].claimStatus — chat, D-201
+Answered: 2026-10-28 — Q4 Diagnose counsellor separately (read-only live POST /ask) — chat
