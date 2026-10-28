@@ -51,4 +51,4 @@ Pre-check[C2]: 53b498e4 cd packages/meeting-bot && node --test --import tsx src/
 Pre-check[C3]: 53b498e4 cd packages/meeting-bot && node --test --import tsx src/capture/finalize-original-eof.test.mjs -> exit 0 (7 tests pass, incl. unknown-clock refusal) t=27
 Pre-check[C4]: 53b498e4 cd packages/meeting-bot && node --test --import tsx src/capture/workspace/original-capture.test.ts ; node --test --import tsx src/capture/workspace/record-stop-regression.test.ts -> exit 0 (2 + 4 tests pass, two invocations) t=30
 Metrics: start=2026-10-28T15:05:00Z end=2026-10-28T16:05:00Z wall_min=60 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=6 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=0 mutants=0 defects_unit=0 defects_6c=0 builder_min=60
-Status: ready-for-check
+Status: checked-PASS (qa/verdicts/w7-capture-consent-clock.md, 4622c6a9, cycle 0)
