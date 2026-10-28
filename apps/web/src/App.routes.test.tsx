@@ -42,4 +42,11 @@ describe("App route table", () => {
     expect(shell!.querySelector("nav, .nav-sidebar, aside")).not.toBeNull();
     expect(shell!.querySelector("main.app-main")!.contains(screen.getByLabelText("Question"))).toBe(true);
   });
+  test("[C3] /knowledge/profiles is a declared route and renders the profiles page, not a blank shell", () => {
+    const paths = [...appSource.matchAll(/<Route\s+path="([^"]+)"/g)].map((m) => m[1]);
+    expect(paths).toContain("/knowledge/profiles");
+    localStorage.setItem("lkbApiKey", "test-key");
+    renderAt("/knowledge/profiles");
+    expect(screen.getByRole("heading", { name: "Topic and speaker profiles" })).toBeInTheDocument();
+  });
 });

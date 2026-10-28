@@ -111,3 +111,15 @@ test("usage panel: a malformed or network-failed response is an error, never a f
   cleanup(); route({ "/usage": new Error("network down") }); mount(); await screen.findByText(/2 sessions;/);
   expect(await screen.findByRole("region", { name: "Usage: questions and searches" })).toHaveTextContent("Unable to load usage.");
 });
+test("[C4] /graph 404 (no tree index yet) is an empty state in Citation coverage, not an error", async () => {
+  route({ "/graph": 404 }); mount(); await screen.findByText(/2 sessions;/);
+  const region = screen.getByRole("region", { name: "Citation coverage" });
+  expect(region).toHaveTextContent("No knowledge graph has been indexed for this tenant yet.");
+  expect(region).not.toHaveTextContent("Unable to load");
+  expect(region.querySelector("[role=alert]")).toBeNull();
+  expect(document.body.textContent).not.toMatch(/NaN|Infinity|undefined/);
+});
+test("[C5] a non-404 graph failure still shows the error alert", async () => {
+  route({ "/graph": 503 }); mount(); await screen.findByText(/2 sessions;/);
+  expect(screen.getByRole("region", { name: "Citation coverage" })).toHaveTextContent("Unable to load the graph.");
+});

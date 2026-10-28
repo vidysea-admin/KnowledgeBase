@@ -19,6 +19,8 @@ export interface AuthContextValue {
   apiKey: string | null;
   /** Changes on explicit login/logout, including when the credential string is reused. */
   sessionVersion: number;
+  /** Why the last key was rejected (the server's 401 message), shown on the login form; null otherwise. */
+  authError: string | null;
   setApiKey: (key: string) => void;
   clearApiKey: () => void;
 }
@@ -45,6 +47,7 @@ function removeStoredKey(): void {
 export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
   const [apiKey, setApiKeyState] = useState<string | null>(readStoredKey);
   const [sessionVersion, setSessionVersion] = useState(0);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // This tab's CURRENT key, updated synchronously with every state change (never in an effect),
   // so the 401 handler never compares against a stale render closure.
@@ -59,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
       // non-fatal: the key still works for this tab's session from memory
     }
     keyRef.current = key;
+    setAuthError(null);
     setApiKeyState(key);
   }, []);
 
@@ -68,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
     setSessionVersion((version) => version + 1);
     removeStoredKey();
     keyRef.current = null;
+    setAuthError(null);
     setApiKeyState(null);
   }, []);
 
@@ -77,12 +82,14 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
   //  2. remove the stored key only if it equals the failed key (compare-and-clear).
   // A tab never adopts a stored key it did not itself receive from the user.
   const handleAuthInvalidated = useCallback((event: Event) => {
-    const failed = (event as CustomEvent<AuthInvalidationEventDetail | null>).detail?.apiKey;
+    const detail = (event as CustomEvent<AuthInvalidationEventDetail | null>).detail;
+    const failed = detail?.apiKey;
     // No usable key on the event: relevance cannot be established, so ignore it.
     if (typeof failed !== "string" || failed === "") return;
     if (readStoredKey() === failed) removeStoredKey();
     if (keyRef.current === failed) {
       keyRef.current = null;
+      setAuthError(typeof detail?.message === "string" && detail.message !== "" ? detail.message : "That API key was not accepted.");
       setApiKeyState(null);
     }
   }, []);
@@ -94,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }): ReactNode {
     };
   }, [handleAuthInvalidated]);
 
-  const value = useMemo(() => ({ apiKey, sessionVersion, setApiKey, clearApiKey }), [apiKey, sessionVersion, setApiKey, clearApiKey]);
+  const value = useMemo(() => ({ apiKey, sessionVersion, authError, setApiKey, clearApiKey }), [apiKey, sessionVersion, authError, setApiKey, clearApiKey]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

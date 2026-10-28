@@ -35,6 +35,7 @@ import { KnowledgeExplorerPage } from "./pages/explorer/KnowledgeExplorerPage.js
 import { ConfidenceGraphPage } from "./pages/graph-confidence/ConfidenceGraphPage.js";
 import { KnowledgeGapsPage } from "./pages/gaps/KnowledgeGapsPage.js";
 import { ActivityHealthPage } from "./pages/activity-health/ActivityHealthPage.js";
+import { KnowledgeProfilesPage } from "./pages/knowledge/KnowledgeProfilesPage.js";
 import { AnalyticsPage } from "./pages/analytics/AnalyticsPage.js";
 import { JoinRulesPage } from "./pages/join-rules/JoinRulesPage.js";
 import { SetupWizardPage } from "./pages/setup-wizard/SetupWizardPage.js";
@@ -77,6 +78,7 @@ export function App(): React.ReactElement {
               <Route path="/knowledge/topics" element={<KnowledgeTopicsPage />} />
               <Route path="/knowledge/topics/:id" element={<KnowledgeTopicsPage />} />
               <Route path="/knowledge/resources" element={<KnowledgeResourcesPage />} />
+              <Route path="/knowledge/profiles" element={<KnowledgeProfilesPage />} />
               <Route path="/knowledge/speakers" element={<KnowledgeSpeakerProfilePage />} />
               <Route path="/knowledge/speakers/:personId" element={<KnowledgeSpeakerProfilePage />} />
               <Route path="/knowledge-outputs" element={<KnowledgeOutputsPage />} />
