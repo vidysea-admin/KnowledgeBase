@@ -1,45 +1,40 @@
-# Verdict - claims-citable-needs-review (Mode A, cycle 0)
+# Verdict - claims-citable-needs-review (Mode A + Mode D, cycle 0, browser re-dispatch)
 Cycle checked: 0
-Checked head: 23abaab127258d5044cc04c18248b3e5c4bce153 (code commit 6d2d9366; base 4a94d2115ded94f0b21d1a9e3c7be3b531cadeb1 = merge-base with docs/devops-golive-2026-10-26)
+Checked head: 23abaab127258d5044cc04c18248b3e5c4bce153 (code commit 6d2d9366; base 4a94d2115ded94f0b21d1a9e3c7be3b531cadeb1). Branch HEAD at check 93becc4e differs from 23abaab1 only in qa/verdicts + qa/checkpoints (verified `git diff --stat 23abaab1 HEAD`: 2 qa files, 0 product/test files).
 Policy-Version: proportional-verification/2026-10-19.17
+Prior verdict (BLOCKED-CAPABILITY, browser) kept at qa/verdicts/claims-citable-needs-review.r0-1.md.
 
 ## Check plan (step 0)
-Logic changed -> affected tests + falsification floor. UI changed (KnowledgeOutputsPage label) -> Mode D live browser. Schema changed -> gen:types --check + tsc. Persona walk: skip (additive label, no new screen/flow/user type). No L trigger in changed non-test files (no auth/tenancy/write/migration; reader.ts, repository.ts, migrations, ask/, whatsapp/, visibility/ diff empty - I ran `git diff --stat`, 0 lines).
+Scope of this dispatch: only the Mode D live-browser check was missing. Criteria C1-C6 and I1-I2 reuse the cycle-0 checkpoint under evidence identity: every product/test input is unchanged since 23abaab1 (git diff above), no config/dependency change, same node/vitest environment, original checker attribution claude-sonnet-subagent, results in qa/checkpoints/claims-citable-needs-review.md (45/45 + 27/27 + web 1/1, gen:types OK, tsc x3 0, 7 falsifications red-after with hash-verified restores, digest differential identical). Nothing invalidated, nothing rerun. Mode D instrument: own visible Google Chrome (non-headless) driven over CDP with real mouse events, fresh profile (the playwright MCP and claude-in-chrome were not connected; per the dispatch a self-owned driver is the capability).
 
-VERDICT: BLOCKED-CAPABILITY
-SCOREBOARD: 6/6 criteria evidenced at code/test level, 2/2 invariants hold; the mandatory Mode D live-browser check could not run, so no PASS
+VERDICT: PASS
+SCOREBOARD: 6/6 criteria + 2/2 invariants evidenced; Mode D live-browser check completed (C3 web half now independently verified in a real browser)
 TIER: M (multi-file behaviour, public API shape, additive schema field; no concrete L trigger cited)
-FAILURES: none (no defect found)
-CAPABILITY-COVERAGE: 6/6 floor falsifications reproduced by the checker (see below)
-LIVE-BROWSER: BLOCKED-CAPABILITY (playwright MCP failed to connect; claude-in-chrome `tabs_context_mcp` -> "Browser extension is not connected", `list_connected_browsers` -> []). Blocks: render of the "Unverified (needs review)" marker on apps/web KnowledgeOutputsPage in a real browser (C3 web half) and console-error count. Only the jsdom test covers it, which is not Mode D.
+FAILURES: none
+CAPABILITY-COVERAGE: 6/6 floor falsifications (reused, identity unchanged) + live browser interaction on the changed UI surface
+LIVE-BROWSER: qa/evidence/browser-claims-citable-needs-review-2026-10-28-checker/report.json (screenshots 01-03 alongside; driver.mjs, harness-server.ts, pids.txt). Console errors: 0 on knowledge-outputs, 0 on session (citation target) page, 0 on reopen; the first of two runs logged exactly 1 `favicon.ico` 404 from the vite dev server (not product code), the final recorded run 0.
 ISSUES-WRITTEN: none
 EXECUTOR: claude-sonnet-subagent (manifest: claude-sonnet-subagent)
 
-## Re-run by checker (head 23abaab1, worktree untouched)
-- `node --test --import tsx packages/core/src/knowledge-outputs/evidence-builder.test.ts apps/api/src/knowledge-outputs/workbench.test.ts` -> tests 45 pass 45 fail 0
-- `node --test --import tsx apps/api/src/ask/graph-context.test.ts apps/api/src/visibility/read-side-quarantine.test.ts` -> 27/27 (C6, unmodified tests)
-- `cd apps/web && npx vitest run src/pages/knowledge-outputs/workbench.ui.test.tsx` -> 1 passed
-- `pnpm gen:types --check` -> OK, 46 generated type files match schema
-- `npx tsc --noEmit` in apps/api, packages/core, apps/web -> exit 0 each
-- Step 4c diff read in full (13 files, product + tests): no removed assertion on a pinned C6 test, no file outside the manifest "What changed", no config/dependency change.
+## Mode D (checker-run, head 23abaab1 product code)
+Stack: REAL apps/web KnowledgeOutputsPage + SessionDetailPage served by vite (:5191, VITE_API_BASE_URL -> :3391). API: a checker-owned harness (harness-server.ts) mounting the REAL requireAuth + createOutputRouter + createOutputService (evidence builder, synthesis, validator, markdown) with an in-memory repository, a synthetic 3-claim source reader (c1 verified, c2 needs-review, c3 conflicting; 3 turns, 3 speakers) and a fake model provider. No Mongo, no lkb_prod, no live server, localhost only. Disclosed substitution: the repository/reader/provider are fakes (as in the accepted u22 Mode D); the code under test for C1-C5 is real.
+Interactions performed and asserted (real mouse click on "Generate draft" and on the citation link):
+1. Create form: source session listed, title/purpose filled, session ticked -> Generate draft -> draft rendered (status "AI draft . revision 1 ...", "Coverage is partial", "1 source claims were excluded" = the conflicting claim c3; its text "Transcripts are waived" is NOT shown).
+2. Two citations rendered. e(verified, c1): "Admissions expert . 3-9 seconds" -> hasMarker=false. e(needs-review, c2): "Financial aid officer . 40-52 seconds **Unverified (needs review)**" -> hasMarker=true. Page-wide marker count = 1. Verified cited first (C4 order). Screenshot 02.
+3. Real Download Markdown click (blob captured): markdown has exactly 1 line with "Unverified (needs review)" = the c2 citation line; the verified citation line carries none (C3 markdown half, end to end through the real export route).
+4. Real click on the needs-review citation link -> /sessions/s1#turn-t2: session page shows the transcript with the cited turn t2 highlighted (border rgb(183,121,31) vs rgb(229,229,224) for others), in viewport, no "cited passage was not found" note, showing speaker "Financial aid officer", timestamp "40s-52s" and verbatim "Scholarship forms are due on the fifteenth. Bring two references." Screenshot 03.
+5. Reopen from Saved drafts: marker count 1 (persisted citations keep claimStatus).
+Network log (harness `__seen`) shows only the expected routes; no request to any host but 127.0.0.1.
 
-## Falsification (throwaway copy of `git archive HEAD` outside the worktree; baseline 55 pass / 0 fail; each restore verified by `git hash-object` == `git rev-parse HEAD:<file>`)
-| Crit | My falsifying edit | Result |
-|---|---|---|
-| C1 | evidence-builder gate admits every status except `rejected` | RED: fail 2 (conflicting/withheld tests) |
-| C2 | schema property `claimStatus` renamed away (additionalProperties:false) | RED: 8+ failures incl. validator and all-kinds synthesis |
-| C3 api | marker expression removed from markdown.ts | RED: fail 1 (needs-review markdown test) |
-| C3 web | marker removed from KnowledgeOutputsPage.tsx | RED in vitest (jsdom only) |
-| C4 | rank `.sort(...)` removed | RED: fail 2 (core + api rank tests) |
-| C5 | early refuse check removed from evidence.ts | RED: fail 2 (refuse test + TOC test) |
-| C6 | graph-context.ts:77 status filter narrowed to verified | RED: fail 3 (unmodified C6 pins) |
-Differential for the manifest's backward-compat claim: same fixture `create()` at base 4a94d211 and at head gives identical `sourceDigest` 8f28f542...976c, so pre-D-201 stored verified drafts keep their digest.
+## Falsification (reused, cycle 0 checkpoint; inputs unchanged)
+C1 gate widened -> RED fail 2; C2 schema field removed -> RED 8+; C3 api marker removed -> RED 1; C3 web marker removed -> RED (jsdom); C4 rank sort removed -> RED 2; C5 early refuse removed -> RED 2; C6 graph-context filter narrowed -> RED 3 (unmodified pins). Restores hash-verified in cycle 0. Mode D adds a browser-level red/green for C3 web: the marker appears for needs-review only and is absent for verified in the live DOM.
 
-## Notes (non-blocking, low; filed as notes only, no ledger write)
-1. Mutants that SURVIVED (tests do not pin them): (a) digest canonical without `withoutDefaultStatus` (evidence.ts digest line) - the "legacy citations" test builds its legacy draft from a head-computed digest, so it does not prove digest-compat; (b) `withoutDefaultStatus` stripping needs-review too - a verified<->needs-review flip is still caught only because coverage flips; a draft that already has withheld claims would not go stale on a flip under that mutant (the real code is correct); (c) removing `hasUnverifiedCitation` from `refusesDraft` in service.ts - redundant with the coverage-partial check (equivalent behaviour today, defense in depth). Real code is correct for all three; these are test-strength gaps only.
-2. Manifest says "Live browser evidence: SKIP" and acknowledges the gap; consistent with this verdict.
+## Notes (non-blocking, low; carried from the prior verdict, no ledger write)
+1. Surviving mutants (test-strength only, real code correct): digest-compat form not pinned by the "legacy citations" test; `withoutDefaultStatus` stripping needs-review not independently pinned; `hasUnverifiedCitation` in service `refusesDraft` redundant with coverage check (defense in depth).
+2. Mode D used a harness API (fake repository/reader/provider) rather than a Mongo-backed demo stack; production reader paths are untouched by this diff (reader.ts diff empty).
+3. The manifest "Live browser evidence: SKIP" line is superseded by this verdict's LIVE-BROWSER evidence.
 
-EXPLANATION: Every acceptance criterion and both invariants are evidenced by my own re-runs and one red-after falsification each. I found no defect. The verdict cannot be PASS because the UI surface (KnowledgeOutputsPage) requires an independent live-browser check (Mode D) and neither browser instrument is connected in this session. Re-dispatch once claude-in-chrome (or playwright MCP) is connected; only Mode D remains (start apps/web via vite against a local stub/seeded API with one needs-review and one verified citation, confirm the marker shows on the needs-review citation only, console errors 0). Everything else may be reused under evidence identity (head 23abaab1, test blobs in manifest).
+EXPLANATION: All six acceptance criteria and both invariants are evidenced: C1-C6/I1-I2 by my own cycle-0 re-runs and red-after falsifications, still valid because no product or test input changed since 23abaab1, and the UI half of C3 (plus the end-to-end export marker, the verified/needs-review contrast, ordering and the citation-to-evidence-turn click) by a live visible Chrome run I drove myself with real input events and 0 product console errors. Nothing was found that violates a contract line. PASS.
 
-Metrics: start=2026-10-28T12:09:00+05:30 end=2026-10-28T12:27:00+05:30 wall_min=18 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=10 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=1080 mutants=0 defects_unit=0 defects_6c=0
-slow: setup-and-differential 8 (copy needed data/toc-migrated restore, base-copy digest probe)
+Metrics: start=2026-10-28T13:00:00+05:30 end=2026-10-28T13:25:00+05:30 wall_min=25 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=0 cycle=0 resumes=0 tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=1500 mutants=0 defects_unit=0 defects_6c=0
+slow: harness-and-driver-authoring 12 (no browser tool connected; own CDP driver, vite and API harness written and run twice)

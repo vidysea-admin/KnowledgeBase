@@ -7,3 +7,9 @@ Completed (reusable only if head blobs unchanged):
 - Falsifications C1,C2,C3api,C3web,C4,C5,C6 red-after, restores hash-verified
 - Digest differential base vs head identical (8f28f542a0b13584ddbc5c9b25d7c4b67f88fa6a4c62ac5b08c763f49377976c)
 Remaining: Mode D live browser check of KnowledgeOutputsPage (capability missing: playwright MCP failed; claude-in-chrome extension not connected).
+
+## Cycle 0 browser re-dispatch (2026-10-28) - COMPLETED, PASS
+Head checked: 23abaab1 (branch HEAD 93becc4e; only qa/verdicts + qa/checkpoints differ, 0 product/test files).
+- Mode D live browser: visible Chrome over CDP, real vite web + checker harness API (real router/service/evidence builder, in-memory repo/reader/provider, localhost only). Needs-review citation shows "Unverified (needs review)", verified citation does not, markdown export has 1 marker line, citation click lands on session turn t2 (speaker, 40s-52s, verbatim text), conflicting claim withheld. Console errors 0 (final run; the first run had 1 vite favicon 404). Evidence: qa/evidence/browser-claims-citable-needs-review-2026-10-28-checker/report.json. Env: win32, node v24.13.1, Chrome (Program Files), vite 6.0.5. Checker: claude-sonnet-subagent.
+- Reused (inputs unchanged since 23abaab1): all earlier entries above.
+Remaining: none.
