@@ -90,6 +90,10 @@ Set in `.env` (names only; get values from the owner):
   T-028: the five names of section 9. Compose forwards all of these from `.env` as value-less
   pass-through: a name that is absent stays UNDEFINED in the container. Never leave a blank `NAME=`
   line in `.env` for them (a blank line defines an empty string); comment the line out instead.
+  Check before every `docker compose up` (it must print nothing; servers whose `.env` was copied from an
+  older `.env.example` still carry blank `WHATSAPP_*=` lines):
+  `grep -nE '^(LKB_HOSTING_[A-Z_]+|LKB_COUNSELLOR_STATE_DIR|WHATSAPP_[A-Z_]+)=$' .env`
+  Also never export these names as empty strings in the shell that runs compose.
 The remaining names in `.env.example` belong to the meeting bot and scripts, not to
 the api/web containers (compose forwards only the names it lists).
 

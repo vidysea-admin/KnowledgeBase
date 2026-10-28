@@ -2,7 +2,7 @@
 **Contract:** none (config unit; acceptance = gate answers in qa/gates/golive-decisions-2026-10-28.md batch 2: Q1 T-028 vars "main .env mai hi rakho"; Q4 WhatsApp must ship at launch)
 **Goal task:** T-028 (env wiring only)
 **Date:** 2026-10-28
-**Status:** ready-for-check
+**Status:** checked-PASS (qa/verdicts/t028-env-compose.md, efa24fe4, cycle 0)
 **Fix cycle:** 0 of max 2
 **Hold fix cycles:** 0 of 2
 **Hold-reopens:** 0
