@@ -14,7 +14,7 @@ const bearer = "https://zoom.us/rec/share/fixturebearer";
 const input: SourceJobInput = { tenantId: "tenant-a", actorKeyId: "actor-a", url: bearer, idempotencyKey: "redact-1" };
 const approve = async (value: Readonly<SourceJobInput>) => ({ approvedBy: value.actorKeyId, approvalRef: "fixture-approval" });
 const result = (): SourceIntakeResult => ({ status: "created", sessionId: "s", sourceId: "tenant-a:hash", turnCount: 1,
-  indexing: { status: "done", receipt: { sessionId: "s", summary: { degraded: null }, claims: { degraded: null }, entities: null,
+  indexing: { status: "done", receipt: { sessionId: "s", summary: { degraded: null }, claims: { degraded: null }, entities: null, gapRecorded: true,
     chunks: { written: 1, skipped: null }, completion: { version: 2, strict: true, complete: true, treeWritten: true, generation: "g", turnCount: 1 } } } });
 function setup(t: { after(fn: () => void): void }) {
   const root = mkdtempSync(join(tmpdir(), "lkb-source-redact-test-")); chmodSync(root, 0o700);

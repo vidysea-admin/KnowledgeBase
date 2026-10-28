@@ -100,7 +100,7 @@ function completeIntakeIndex(receipt: IndexSessionResult, sessionId: string): bo
 function safeIntakeIndexReceipt(receipt: IndexSessionResult): IndexSessionResult {
   // Optional provider-stage diagnostics can contain secrets even when required indexing succeeded.
   return { sessionId: receipt.sessionId, summary: { degraded: null }, claims: { degraded: null },
-    chunks: { written: receipt.chunks.written, skipped: null }, entities: null,
+    chunks: { written: receipt.chunks.written, skipped: null }, entities: null, gapRecorded: receipt.gapRecorded,
     completion: { version: 2, strict: receipt.completion!.strict === true, complete: true,
       generation: receipt.completion!.generation, turnCount: receipt.completion!.turnCount, treeWritten: true } };
 }

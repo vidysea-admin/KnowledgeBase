@@ -180,7 +180,7 @@ test("owner gap inventory pagination keeps all requests reachable and excludes o
 test("public indexing degradation is a source-linked gap and successful retry resolves it", async () => {
   const f = connectorFixture();
   const realIndex = f.deps.indexSession!;
-  f.deps.indexSession = async (_tenantId, sessionId) => ({ sessionId, summary: { degraded: "fixture-provider-failed" }, chunks: { written: 0, skipped: "embedding-failed" }, entities: null });
+  f.deps.indexSession = async (_tenantId, sessionId) => ({ sessionId, summary: { degraded: "fixture-provider-failed" }, chunks: { written: 0, skipped: "embedding-failed" }, entities: null, gapRecorded: true });
   const failed = await f.call("POST", "/connector-workflow/intake", { url: "https://public.example/visa?token=private-fixture" });
   assert.equal(failed.status, 502); assert.ok(failed.body.gapId);
   assert.ok(f.rows("gaps")[0]!.sourceUrlHash); assert.ok(!JSON.stringify(failed.body).includes("private-fixture"));

@@ -106,7 +106,7 @@ export function rig() {
   const deps: FlywheelDeps = {
     store: createMongoFlywheelStore(mem.db), now: () => clock,
     intake: async ({ tenantId }) => { assert.equal(tenantId, "t"); calls.intake++; return { status: "already-ingested", sourceId: SOURCE._id, sessionId: "s1" }; },
-    index: async (t, s) => { assert.equal(t, "t"); assert.equal(s, "s1"); calls.index++; return { sessionId: s, summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null,
+    index: async (t, s) => { assert.equal(t, "t"); assert.equal(s, "s1"); calls.index++; return { sessionId: s, summary: { degraded: null }, claims: { degraded: null }, chunks: { written: 1, skipped: null }, entities: null, gapRecorded: true,
       completion: { version: 2, strict: true, complete: true, generation: `index-${calls.index}`, turnCount: 1, treeWritten: true } }; },
     ask: async (t, q) => { assert.equal(t, "t"); assert.equal(q, ORIGINAL.question); calls.ask++; return { text: TURN.text, sources: { internal: [], web: [] }, insufficient_coverage: true }; },
   };
