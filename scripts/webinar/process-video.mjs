@@ -8,7 +8,7 @@ import { resolve, relative, join, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { spawn } from 'node:child_process';
 import { visionPlan, flagOff } from './vision/plan.mjs';
-import { slideFrameSpans, buildScreenEvidenceTurns, analyzeSlideFrame } from './slides/slide-knowledge.mjs';
+import { slideFrameSpans, buildScreenEvidenceTurns, analyzeSlideFrame, NOTES_VERSION, buildNotes as buildNotesFor } from './slides/slide-knowledge.mjs';
 
 const VERSION = 3;
 const OUTPUTS = ['screen-evidence.json', 'notes.json', 'knowledge-turns.json'];
@@ -96,30 +96,7 @@ export const routedVision = (lib, backends, o = {}) => (frame) => makeRoutedVisi
   backends.map((backend) => ({ ...backend, call: (request, context) => backend.call(request, { ...context, signal: frame.signal }) })),
   { prompt: VISION_PROMPT, validate: validateVision, schema: VISION_SCHEMA, ...o })(frame);
 export { visionOrderFromYaml };
-export function buildNotes(sessionId, frames, turns, ocrErrors = []) {
-  const excerpt = (text) => text.length > 280 ? `${text.slice(0, 277)}…` : text;
-  const nonempty = turns.filter((t) => t.text.trim());
-  const sampled = [...new Set([0, Math.floor(nonempty.length / 3), Math.floor(2 * nonempty.length / 3), nonempty.length - 1])]
-    .map((i) => nonempty[i]).filter(Boolean);
-  const speech = sampled.map((turn) => ({
-    kind: 'speaker-statement', text: excerpt(turn.text), verified: false,
-    evidence: [{ sessionId, turnId: turn._id, tStart: turn.tStart, tEnd: turn.tEnd,
-      ...(turn.speakerRef ? { speakerRef: turn.speakerRef } : {}) }],
-  }));
-  const screen = frames.flatMap((frame) => {
-    if (!frame.analysis?.readable) return [];
-    const evidence = [{ sessionId, frameId: frame.id, tStart: frame.tStart, file: frame.file }];
-    return [
-      ...(frame.analysis.ocrText ? [{ kind: 'screen-text', text: excerpt(frame.analysis.ocrText), verified: false, evidence }] : []),
-      ...(frame.analysis.visualDescription ? [{ kind: 'visual-observation', text: excerpt(frame.analysis.visualDescription), verified: false, evidence }] : []),
-    ];
-  });
-  const highlights = [...speech, ...screen.slice(0, 4)];
-  return { version: VERSION, sessionId, method: 'deterministic-extractive-highlights', notes: highlights,
-    summary: { method: 'extractive', highlights },
-    decisions: [], actionItems: [], gaps: [...frames.filter((f) => !f.analysis?.readable)
-      .map((f) => ({ frameId: f.id, tStart: f.tStart, reason: 'unreadable-screen' })), ...ocrErrors] };
-}
+export const buildNotes = (sessionId, frames, turns, ocrErrors = []) => buildNotesFor(sessionId, frames, turns, ocrErrors, VERSION);
 export function screenEvidenceTurns(sessionId, tenantId, evidence) {
   return buildScreenEvidenceTurns(sessionId, tenantId, evidence, validateVision);
 }
@@ -195,8 +172,13 @@ export async function processVideo({ root, sessionId, recording, tenantId, dryRu
       existsSync(join(dir, f)) && digest(readFileSync(confined(root, join(dir, f)))) === state.outputs?.[f]) &&
       load(join(dir, 'screen-evidence.json')).frames.every((f) => existsSync(join(dir, f.file)) &&
         digest(readFileSync(confined(root, join(dir, f.file)))) === f.hash)) {
-      if (!slideAlignment) return { ...state, reused: true };
-      return { ...state, reused: true, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) };
+      let current = state; // pre-NOTES_VERSION outputs lack decisions/actions/Q&A: rebuild notes from stored evidence (no vision call), re-pin digest
+      if (load(join(dir, 'notes.json')).notesVersion !== NOTES_VERSION) {
+        atomic(join(dir, 'notes.json'), buildNotes(sessionId, load(join(dir, 'screen-evidence.json')).frames, turns, []));
+        atomic(statePath, current = { ...state, outputs: { ...state.outputs, 'notes.json': digest(readFileSync(join(dir, 'notes.json'))) } });
+      }
+      if (!slideAlignment) return { ...current, reused: true };
+      return { ...current, reused: true, slideAlignment: await runSlideAlignment(slideAlignment, { dir, media, sessionId, turns, duration }) };
     }
   }
   const lock = join(dir, '.video-stage.lock');
