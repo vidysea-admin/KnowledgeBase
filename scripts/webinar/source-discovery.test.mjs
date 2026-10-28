@@ -68,7 +68,7 @@ test("each classifier-positive vocabulary form is discoverable without a known h
                 return JSON.stringify({ messages: matched ? [{ id: "title-only" }] : [] });
             }
             return JSON.stringify({ id: "title-only", payload: { headers: [{ name: "From", value: "new@unknown.org" },
-                        { name: "Subject", value: title }], body: { data: Buffer.from("Details https://events.unknown.org/live").toString("base64url") } } });
+                        { name: "Subject", value: title }], body: { data: Buffer.from("Register https://events.unknown.org/register").toString("base64url") } } });
         });
         assert.equal(rows.length, 1, `search must discover classifier-positive title ${title}`);
         assert.equal(rows[0]?.subject, title);
@@ -80,13 +80,14 @@ test("each classifier-positive vocabulary form is discoverable without a known h
 test("discovery retains old invitations and unknown platforms without fabricating launch evidence", async () => {
     const messages = [
         { id: "old", subject: "Student visa webinar", body: "Join https://meet.google.com/abc-defg-hij", date: "Mon, 1 Jan 2024 00:00:00 +0000" },
-        { id: "unknown", subject: "Webinar invitation", body: "Join https://events.example.org/session" },
+        { id: "unknown", subject: "Webinar invitation", body: "Register https://events.example.org/register" },
         { id: "personal", subject: "Team meeting invitation", body: "Invitation attached; see invite.ics" },
     ];
     const candidates = await scanGmailForMeetingCandidates(100, async (args) => {
         const params = JSON.parse(args[args.indexOf("--params") + 1]);
         if (args.includes("list")) {
-            assert.doesNotMatch(params.q, /newer_than:|after:|older_than:|before:/);
+            assert.match(params.q, /newer_than:30d$/); // bounded recency lookback is part of the f6bf0597 acquisition contract
+            assert.doesNotMatch(params.q, /after:|older_than:|before:/);
             for (const term of ['webinar', 'webcast', '"online seminar"', '"virtual conference"', 'invitation', 'filename:ics', 'meet.google.com', 'from:theoutreachcollective.in'])
                 assert.ok(params.q.includes(term));
             return JSON.stringify({ messages: messages.map(({ id }) => ({ id })) });
@@ -97,9 +98,10 @@ test("discovery retains old invitations and unknown platforms without fabricatin
                     { name: "Date", value: message.date ?? "Wed, 30 Sep 2026 00:00:00 +0000" },
                 ], body: { data: Buffer.from(message.body).toString("base64url") } } });
     });
-    assert.deepEqual(candidates.map(row => row.messageId), ["old", "unknown", "personal"]);
+    // "personal" (no recognised join/registration/YouTube link) is now filtered as a non-meeting invitation.
+    assert.deepEqual(candidates.map(row => row.messageId), ["old", "unknown"]);
     assert.equal(candidates[0]?.meetingUrl, "https://meet.google.com/abc-defg-hij");
-    for (const row of candidates.slice(1)) {
+    for (const row of candidates.slice(1)) { // unknown platform: registration evidence only, no launch evidence
         assert.equal(row.meetingUrl, undefined);
         assert.equal(row.startTime, undefined);
         assert.equal(row.endTime, undefined);
@@ -108,7 +110,7 @@ test("discovery retains old invitations and unknown platforms without fabricatin
             id: row.messageId, title: row.subject, status: "pending" })), now: "2026-09-30T09:59:00Z",
         leadMinutes: 5, trustedSenders: { emails: [], domains: [] }, alreadyScheduled: [], everyWebinar: true });
     assert.equal(selection.toSchedule.length, 0);
-    assert.equal(selection.skipped.find(row => row.sessionKey === "gmail:personal")?.reason, "not-webinar");
+    assert.equal(selection.skipped.some(row => row.sessionKey === "gmail:personal"), false);
 });
 
 test("actual Calendar adapter failures cross HTTP as failed discovery, while empty success stays healthy", async () => {
@@ -179,7 +181,7 @@ test("authenticated Calendar discovery retains tombstones while default UI exclu
     try {
         const normal = await fetch(`${server.baseUrl}/calendar/upcoming`, { headers });
         const normalBody = await normal.json();
-        assert.deepEqual(normalBody.meetings.map(r => r.id), ["live"]);
+        assert.deepEqual(normalBody.meetings.map(r => r.id), ["deleted", "registration", "live"]); // default inventory retains missing-link and cancelled rows (calendar.test.ts "default Calendar inventory retains...")
         const events = await createHttpCalendarLoader(server.baseUrl, "cal-key")();
         assert.deepEqual(events.map(r => r.id), ["deleted", "registration", "live"]);
         assert.equal(events[0].cancelled, true);
