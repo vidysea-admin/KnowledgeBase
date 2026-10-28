@@ -35,7 +35,7 @@ import { resolveWorkDb } from "../watch/test-data-route.mjs";
  *   promotion, status.index -> done. With --dry-run it prints the plan and connects to nothing.
  *
  * Production (D-204): lkb_prod is refused unless ALL THREE hold - this script passes allowProduction to requireScriptDatabase, argv carries
- *   --i-know-this-is-production, and MONGODB_DB=lkb_prod (with MONGO_WORK_DB=lkb_prod, not a testData source). Any part missing keeps the
+ *   --i-know-this-is-production, and MONGODB_DB=lkb_prod (with MONGO_WORK_DB=lkb_prod). Any part missing keeps the
  *   isProtectedWorkDbName refusal below unchanged. The production path logs one "PRODUCTION WRITE ENABLED (D-204)" line.
  *
  * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]
@@ -163,8 +163,8 @@ if (!DRY_RUN) {
   route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
   workDb = route.workDb;
   if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
-  // D-204: the three-part production opt-in (same shape as mint-key.mjs). A testData source can never reach it (resolveWorkDb above).
-  const productionOptIn = !route.testData && process.argv.includes(PRODUCTION_FLAG) && workDb === "lkb_prod" && process.env.MONGODB_DB?.trim() === "lkb_prod";
+  // D-204: the three-part production opt-in (same shape as mint-key.mjs). A testData source already routed to lkb_staging above, so it never matches.
+  const productionOptIn = process.argv.includes(PRODUCTION_FLAG) && workDb === "lkb_prod" && process.env.MONGODB_DB?.trim() === "lkb_prod";
   if (productionOptIn) {
     target = requireScriptDatabase(process.env, process.argv.slice(2), { allowProduction: true });
     console.log(`  PRODUCTION WRITE ENABLED (D-204): target database ${target.dbName} (${PRODUCTION_FLAG} + MONGODB_DB=lkb_prod + MONGO_WORK_DB=lkb_prod)`);

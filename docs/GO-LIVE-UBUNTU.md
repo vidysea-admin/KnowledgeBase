@@ -283,7 +283,7 @@ At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 champions
 `scripts/webinar/sync-session.mjs` writes `lkb_prod` only through a three-part opt-in (the same one as `mint-key.mjs`,
 `recover-index-attempt.mjs` and `backfill-document-consent.mjs`): the script passes `allowProduction`, the command line
 carries `--i-know-this-is-production`, and the environment has `MONGODB_DB=lkb_prod`. It also requires
-`MONGO_WORK_DB=lkb_prod` (a disagreement between the two is refused), and a `testData` source never takes this path.
+`MONGO_WORK_DB=lkb_prod` (a disagreement between the two is refused), (a `testData` source routes to `lkb_staging` first, so it never takes this path).
 With any part missing the old refusal ("MONGO_WORK_DB must name an isolated work database; production writes refused")
 applies unchanged. A run that does take the production path prints one `PRODUCTION WRITE ENABLED (D-204)` line.
 
