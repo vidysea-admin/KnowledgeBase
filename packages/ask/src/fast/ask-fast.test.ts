@@ -1,14 +1,14 @@
 /**
- * packages/ask/src/ask-fast.test.ts — ask-fast-rag C1/C3/C4/C5/C6. `askFastV2` is the default /ask path:
+ * packages/ask/src/fast/ask-fast.test.ts — ask-fast-rag C1/C3/C4/C5/C6. `askFastV2` is the default /ask path:
  * arms-only retrieval -> hydrate -> ONE answer call (+ at most ONE grounding call). Fake providers only.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import type { TreeIndexNode } from "@lkb/core";
-import type { CompleteFn } from "./select-nodes.js";
-import { askFastV2, type AskV2Deps } from "./ask-v2.js";
-import type { SourceQuote } from "./source-context.js";
+import type { CompleteFn } from "../select-nodes.js";
+import { askFastV2, type AskV2Deps } from "../ask-v2.js";
+import type { SourceQuote } from "../source-context.js";
 
 const sha = (s: string) => createHash("sha256").update(s).digest("hex");
 const TEXT = "Visa requires a form.";
@@ -114,7 +114,7 @@ test("[C6] total deadline returns a degraded answer instead of hanging", async (
 });
 
 test("[C6] default deadline is 20 s and is configurable", async () => {
-  const { FAST_DEADLINE_MS } = await import("./ask-v2.js");
+  const { FAST_DEADLINE_MS } = await import("../ask-v2.js");
   assert.equal(FAST_DEADLINE_MS, 20_000);
 });
 
@@ -144,4 +144,93 @@ test("[F1] topic/native-passage nodes (not reachable by the session arms) reach 
   const gated = fixture({ extraCandidateArmsFn: async () => ({ arms: [[]], degraded: null }), treeSearchFn: () => [], tavilySearchFn: undefined });
   const none = await askFastV2("visa form", withNative, gated.deps, { treeLexicalIds: () => [native.node_id] });
   assert.equal(none.insufficient_coverage, true); assert.deepEqual(none.sources.internal, []);
+});
+
+// ---- ask-trust (W-AFR): ISS-AFR-001..004 --------------------------------------------------------------------------------
+type Round = { kinds: string[]; systems: string[] };
+/** Scripted provider. `draft(sourceIds)` is the answer-call JSON; `keep(id)` is the grounding verdict for sentence `id`. */
+function scripted(draft: (ids: string[]) => unknown, keep: (id: string) => boolean): { complete: CompleteFn } & Round {
+  const kinds: string[] = [], systems: string[] = [];
+  const complete: CompleteFn = async (job) => {
+    kinds.push(job.kind);
+    const user = JSON.parse(job.messages.find((m) => m.role === "user")!.content);
+    if (job.kind === "ask.answer_grounding") return result({ decisions: user.sentences.map((s: { id: string }) => ({ id: s.id, supported: keep(s.id), answersQuery: keep(s.id) })) });
+    systems.push(job.messages.find((m) => m.role === "system")?.content ?? "");
+    return result(draft(user.context.sources.map((s: { sourceId: string }) => s.sourceId)));
+  };
+  return { complete, kinds, systems };
+}
+const oneSentence = (ids: string[]) => ({ sentences: [{ text: "A visa requires a form.", sourceIds: [ids[0]!] }] });
+
+test("[ISS-AFR-001] the verdict reflects the grounding check: dropped sentences make it 'ambiguous', not a hard-coded 'correct'", async () => {
+  const two = (ids: string[]) => ({ sentences: [{ text: "A visa requires a form.", sourceIds: [ids[0]!] }, { text: "It costs 90 euros.", sourceIds: [ids[0]!] }] });
+  const partial = await askFastV2("visa form", tree, fixture({ complete: scripted(two, (id) => id === "sentence-0").complete }).deps);
+  assert.equal(partial.verdict, "ambiguous"); assert.equal(partial.removedSentences, 1);
+  assert.equal(partial.insufficient_coverage, false); assert.match(partial.reason, /1 .*sentence/i);
+  assert.match(partial.answer, /visa requires a form/i); assert.ok(!/90 euros/.test(partial.answer));
+  const full = await askFastV2("visa form", tree, fixture({ complete: scripted(two, () => true).complete }).deps);
+  assert.equal(full.verdict, "correct"); assert.equal(full.removedSentences, undefined);
+});
+
+test("[ISS-AFR-003] irrelevant top-k yields an honest insufficient answer, not a thrown refusal; a model abstain (sentences: []) is the same channel", async () => {
+  const none = scripted(oneSentence, () => false);
+  const out = await askFastV2("unrelated", tree, fixture({ complete: none.complete, tavilySearchFn: undefined }).deps);
+  assert.equal(out.insufficient_coverage, true); assert.equal(out.verdict, "incorrect"); assert.equal(out.web_used, false);
+  assert.deepEqual(out.sources, { internal: [], web: [] });
+  assert.match(out.answer, /do not support|no supported/i); assert.match(out.reason, /do not support|no supported/i);
+  assert.ok(out.auditLog.some((e) => e.jobKind === "ask.answer_abstained"));
+  assert.deepEqual(none.kinds, ["ask.answer", "ask.answer_grounding"]);
+  const abstain = scripted(() => ({ sentences: [] }), () => true);
+  const out2 = await askFastV2("unrelated", tree, fixture({ complete: abstain.complete, tavilySearchFn: undefined }).deps);
+  assert.equal(out2.insufficient_coverage, true); assert.deepEqual(out2.sources, { internal: [], web: [] });
+  assert.deepEqual(abstain.kinds, ["ask.answer"], "an abstain needs no grounding call");
+  assert.match(abstain.systems[0]!, /sentences\s*:\s*\[\]/, "the fast path tells the model how to abstain");
+  const { answer } = await import("../answer.js");
+  let deepSystem = "";
+  await answer("q", JSON.stringify([]), {}, async (job) => { deepSystem = job.messages[0]!.content; return result({}); }, { boundedSources: [] }).catch(() => {});
+  assert.ok(!/sentences\s*:\s*\[\]/.test(deepSystem), "deep/shared prompt is unchanged unless abstain is requested");
+  const malformed = scripted(() => ({ nope: 1 }), () => true);
+  await assert.rejects(askFastV2("q", tree, fixture({ complete: malformed.complete, tavilySearchFn: undefined }).deps), /bounded source context/i);
+});
+
+test("[ISS-AFR-002] irrelevant top-k falls back to web when sources allow it, and never when web is withheld", async () => {
+  let round = 0;
+  const s = scripted((ids) => { round++; return oneSentence(ids); }, () => round > 1);
+  const f = fixture({ complete: s.complete });
+  const out = await askFastV2("visa form", tree, f.deps);
+  assert.equal(f.counts().tavily, 1);
+  assert.equal(out.web_used, true); assert.equal(out.insufficient_coverage, false);
+  assert.equal(out.sources.web.length, 1); assert.deepEqual(out.sources.internal, []);
+  assert.match(out.answer, /visa requires a form/i);
+  assert.deepEqual(s.kinds, ["ask.answer", "ask.answer_grounding", "ask.answer", "ask.answer_grounding"]);
+  assert.ok(out.auditLog.some((e) => e.jobKind === "ask.web_fallback"));
+  assert.ok(f.writes.some((w) => w.kind === "ask.web_fallback"));
+  // sources=internal / internal-only policy withhold tavilySearchFn: no web call, honest abstain.
+  const held = fixture({ complete: scripted(oneSentence, () => false).complete, tavilySearchFn: undefined });
+  assert.equal((await askFastV2("visa form", tree, held.deps)).web_used, false); assert.equal(held.counts().tavily, 0);
+  // Web that also fails grounding ends in the same honest abstain, not a throw.
+  const both = fixture({ complete: scripted(oneSentence, () => false).complete });
+  const nothing = await askFastV2("visa form", tree, both.deps);
+  assert.equal(nothing.insufficient_coverage, true); assert.deepEqual(nothing.sources, { internal: [], web: [] });
+});
+
+test("[ISS-AFR-004] after the deadline the orphaned run starts no further provider call and cannot mutate the returned auditLog", async () => {
+  let release!: () => void; const gate = new Promise<void>((r) => { release = r; });
+  const calls: string[] = []; let tavily = 0;
+  const complete: CompleteFn = async (job) => {
+    calls.push(job.kind);
+    if (job.kind === "ask.answer_grounding") return result({ decisions: [{ id: "sentence-0", supported: true, answersQuery: true }] });
+    const ctx = JSON.parse(job.messages[1]!.content).context as { sources: { sourceId: string }[] };
+    await gate;
+    return result(oneSentence([ctx.sources[0]!.sourceId]));
+  };
+  const f = fixture({ complete, tavilySearchFn: async () => { tavily++; return []; } });
+  const out = await askFastV2("visa form", tree, f.deps, { deadlineMs: 40 });
+  assert.match(out.reason, /deadline/i); assert.ok(out.auditLog.some((e) => e.jobKind === "ask.fast_deadline"));
+  const snapshot = JSON.stringify(out.auditLog), before = [...calls];
+  release();
+  await new Promise((r) => setTimeout(r, 80));
+  assert.deepEqual(calls, before, "the loser must not start the grounding call after the deadline");
+  assert.equal(tavily, 0);
+  assert.equal(JSON.stringify(out.auditLog), snapshot, "the returned auditLog is a snapshot, not the loser's live array");
 });
