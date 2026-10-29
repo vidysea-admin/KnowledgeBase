@@ -14,3 +14,6 @@ Asked in the KB session (AskUserQuestion) after the VC session relayed VC D-134.
 Umesh: "Fix both, minimal (Recommended)". Visa (2026-04-21-visa-blueprint-part2-italy-france-nz) turn t141 tEnd 213 -> 2013;
 UCAS (2026-08-10-ucas-what-changed-what-matters) turn t114 tStart -> tEnd of t113 (text kept). mongodump backup of the
 affected prod rows first; fix the files and the prod rows; dry-run; reindex non-destructively (--index-existing).
+
+## Answered 2026-10-29 (UCAS timing value)
+The approved UCAS repair was a no-op (t114 already starts at t113 end 1883). Umesh picked: "113 ends 1853, 114 = 1853-1868 (Recommended)". Text unchanged.
