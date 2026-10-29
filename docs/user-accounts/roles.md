@@ -1,7 +1,6 @@
 # User-accounts role table
 
-**Status:** PROPOSED by unit `ua-session-core` (D-206, spec UA-9). **Not approved.** Plan item H-6 reserves approval to
-Umesh before this unit merges; widening to `send-now` or narrowing `ingest` is his call. The table in code
+**Status:** APPROVED by Umesh, D-207 (2026-10-29). Proposed by unit `ua-session-core` (D-206, spec UA-9). The table in code
 (`apps/api/src/user-accounts/roles.ts`) must match this file; a test asserts the structural rules below.
 
 ## Role to scope
@@ -51,4 +50,4 @@ A key never acts as a user and a session never carries a `keyId`.
 
 ## Approval
 
-Approver: Umesh. Record the approval by appending the decision entry, then change the Status line above.
+Approver: Umesh. Approved by D-207 (2026-10-29); the table above is unchanged since the proposal.

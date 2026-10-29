@@ -17,8 +17,14 @@ export function isReadLikePost(method: string, path: string): boolean {
   return READ_LIKE_POSTS.has(`${method.toUpperCase()} ${path.length > 1 ? path.replace(/\/+$/, "") : path}`);
 }
 
+/** The path as the CLIENT addressed it, relative to the app root. `req.path` alone is mount-relative: under `app.use("/admin", ...)` Express strips the prefix, so guards must use baseUrl + path (fix cycle 1). */
+export function fullPath(req: Request): string {
+  return `${req.baseUrl}${req.path}`;
+}
+
 export function activeGuard(req: Request, res: Response, next: NextFunction): void {
-  if (req.auth?.principal === "session" && req.auth.notActive === true && req.path !== "/auth" && !req.path.startsWith("/auth/")) {
+  const path = fullPath(req);
+  if (req.auth?.principal === "session" && req.auth.notActive === true && path !== "/auth" && !path.startsWith("/auth/")) {
     res.status(403).json({ error: "account_not_active", message: "this account is not active" });
     return;
   }
@@ -27,7 +33,7 @@ export function activeGuard(req: Request, res: Response, next: NextFunction): vo
 
 export function viewerGuard(req: Request, res: Response, next: NextFunction): void {
   const a = req.auth;
-  if (a?.principal === "session" && a.userRole === "viewer" && !SAFE_METHODS.has(req.method.toUpperCase()) && !isReadLikePost(req.method, req.path)) {
+  if (a?.principal === "session" && a.userRole === "viewer" && !SAFE_METHODS.has(req.method.toUpperCase()) && !isReadLikePost(req.method, fullPath(req))) {
     res.status(403).json({ error: "read_only_role", message: "viewers have read-only access" });
     return;
   }
