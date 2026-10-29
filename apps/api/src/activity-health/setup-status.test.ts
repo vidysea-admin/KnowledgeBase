@@ -59,7 +59,7 @@ test("authentication required: no key and a bad key get 401 with no configuratio
 
 test("source shape: mounted after requireAuth; reads only env presence, no request input", () => {
   const server = readFileSync(fileURLToPath(new URL("../server.ts", import.meta.url)), "utf8");
-  assert.ok(server.indexOf("createSetupStatusRouter()") > server.indexOf("requireAuth(deps.keyStore)"));
+  assert.ok(server.indexOf("createSetupStatusRouter()") > server.indexOf("requireAuth(deps.keyStore"));
   const route = readFileSync(fileURLToPath(new URL("./setup-status.ts", import.meta.url)), "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
   assert.doesNotMatch(route, /req\.(query|body|params|headers)/);
 });
