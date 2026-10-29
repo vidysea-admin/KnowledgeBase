@@ -295,3 +295,106 @@ test('D-204 source: the opt-in is the shared requireScriptDatabase with allowPro
   assert.match(s, /if \(isProtectedWorkDbName\(workDb, process\.env\)\) throw new Error\("MONGO_WORK_DB must name an isolated work database; production writes refused"\);/);
   assert.match(code('scripts/lib/transcript-provenance.mjs'), /\["lkb", "lkb_prod", "global_university_db"\]\.includes\(n\.toLowerCase\(\)\) \|\| stagingRefused\(n, env\)/);
 });
+
+// D-207 (reindex-sync-fix): the migrated source shape and --index-existing go through the SAME D-204 guard; nothing about it is weakened.
+// Synthetic fixtures only. The real script runs; a fake TCP listener stands in for Mongo (it never answers), so no database is touched.
+async function runScript(args, extraEnv = {}, {fixture, listener = true} = {}) {
+  const sid = `zz-d207-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, dir = join(root, 'data', 'toc-migrated', sid);
+  const attempts = [];
+  const server = createServer(sock => { attempts.push(sock.remoteAddress); sock.destroy(); });
+  await new Promise(r => server.listen(0, '127.0.0.1', r));
+  try {
+    if (fixture) {
+      mkdirSync(dir, {recursive: true});
+      for (const [name, doc] of Object.entries(fixture(sid))) writeFileSync(join(dir, name), JSON.stringify(doc));
+    }
+    const env = {...process.env, ...(listener ? {MONGODB_URL: `mongodb://127.0.0.1:${server.address().port}/?serverSelectionTimeoutMS=1500&connectTimeoutMS=1500`} : {}), ...extraEnv};
+    delete env.LKB_ALLOW_STAGING;
+    for (const k of ['MONGODB_DB', 'MONGO_WORK_DB']) if (!(k in extraEnv)) delete env[k];
+    const child = spawn(process.execPath, ['--import', 'tsx', join(root, 'scripts/webinar/sync-session.mjs'), sid, ...args], {env, cwd: root});
+    let out = '', err = '';
+    child.stdout.on('data', d => { out += d; });
+    child.stderr.on('data', d => { err += d; });
+    const exit = await new Promise(r => { const t = setTimeout(() => child.kill(), 120000); child.on('close', c => { clearTimeout(t); r(c); }); });
+    return {exit, out, err, attempts, sid};
+  } finally {
+    server.close();
+    rmSync(dir, {recursive: true, force: true});
+  }
+}
+const migratedFixture = sid => ({
+  'source.json': {_id: `${sid}-src`, tenantId: 't-guard', kind: 'document', captureMode: 'provided', path: 'raw/x.md', hash: 'h', consent: {given: true}, createdAt: '2026-09-03T06:13:39.454Z'},
+  'session.json': {_id: sid, tenantId: 't-guard', sourceId: `${sid}-src`, title: 'Synthetic Migrated Title', date: '2026-01-02', org: 'Synthetic Org', status: {transcribe: 'done', diarize: 'pending', summarize: 'done', index: 'pending'}},
+  'turns.json': [0, 1].map(i => ({_id: `${sid}-t00${i + 1}`, tenantId: 't-guard', sessionId: sid, speakerRef: 'Speaker A', tStart: i * 5, tEnd: i * 5 + 4, text: `synthetic line ${i}`})),
+});
+const titledFixture = sid => ({
+  'source.json': {_id: `${sid}-src`, tenantId: 't-guard', title: 'guard fixture', createdAt: '2026-10-14T00:00:00Z'},
+  'turns.json': [{_id: `${sid}-t001`, tenantId: 't-guard', sessionId: sid, speakerRef: 'spk:0', tStart: 0, tEnd: 5, text: 'hello'}],
+});
+test('D-207: --dry-run --index passes for BOTH source shapes (migrated: title from session.json; titled: unchanged) and connects to nothing', async () => {
+  for (const [label, fixture, title] of [['migrated', migratedFixture, /Synthetic Migrated Title|turns 2/], ['titled', titledFixture, /turns 1/]]) {
+    const r = await runScript(['--dry-run', '--index'], {}, {fixture});
+    assert.equal(r.exit, 0, `${label}: ${r.err.slice(0, 400)}`);
+    assert.match(r.out, title, label);
+    assert.match(r.out, /index plan: .*lexical chunk/, label);
+    assert.match(r.out, /No Mongo connection attempted \(--dry-run\)/, label);
+    assert.deepEqual(r.attempts, [], `${label}: a Mongo connection was attempted`);
+  }
+});
+test('D-207 falsification: a title-less source with no matching session.json is still refused by the dry run', async () => {
+  const r = await runScript(['--dry-run', '--index'], {}, {fixture: sid => { const f = migratedFixture(sid); delete f['session.json']; return f; }});
+  assert.notEqual(r.exit, 0);
+  assert.match(r.err, /invalid\/silent webinar source/);
+});
+test('D-207: --index-existing --dry-run prints the plan, needs no local directory, connects to nothing', async () => {
+  const r = await runScript(['--index-existing', '--tenant', 'vidysea', '--dry-run']);
+  assert.equal(r.exit, 0, r.err.slice(0, 300));
+  assert.match(r.out, /--index-existing: indexes the rows already in the target database/);
+  assert.match(r.out, /No Mongo connection attempted \(--dry-run\)/);
+  assert.deepEqual(r.attempts, []);
+});
+test('D-207: --index-existing needs a valid --tenant and refuses --emit-files (usage error, no connection)', async () => {
+  for (const args of [['--index-existing'], ['--index-existing', '--tenant'], ['--index-existing', '--tenant', '--dry-run'], ['--index-existing', '--tenant', 'a b'],
+    ['--index-existing', '--tenant', 'vidysea', '--emit-files']]) {
+    const r = await runScript(args, {MONGO_WORK_DB: 'lkb_work_x'});
+    assert.notEqual(r.exit, 0, args.join(' '));
+    assert.match(r.err, /usage: node scripts\/webinar\/sync-session\.mjs/, args.join(' '));
+    assert.deepEqual(r.attempts, [], args.join(' '));
+  }
+});
+test('D-207: the D-204 refusal matrix is unchanged for --index-existing (each missing part refuses, NO production line, NO connection) and all three parts pass the guard', async () => {
+  const existing = ['--index-existing', '--tenant', 't-guard'];
+  const cases = [
+    ['flag missing', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'}, [], REFUSED_PROTECTED],
+    ['MONGODB_DB unset', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: ''}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGODB_DB=lkb', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGODB_DB wrong case', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'LKB_PROD'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGO_WORK_DB=lkb (protected, no opt-in)', {MONGO_WORK_DB: 'lkb', MONGODB_DB: 'lkb'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['MONGO_WORK_DB unset', {MONGODB_DB: 'lkb_prod'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['flag spelled as =true', {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'}, [`${PROD_FLAG}=true`], REFUSED_PROTECTED],
+    ['global_university_db with all flags', {MONGO_WORK_DB: 'global_university_db', MONGODB_DB: 'lkb_prod'}, [PROD_FLAG], REFUSED_PROTECTED],
+    ['work db + prod MONGODB_DB', {MONGO_WORK_DB: 'lkb_work_x', MONGODB_DB: 'lkb_prod'}, [PROD_FLAG], /explicit isolated work database and Mongo URL required; production writes refused/],
+  ];
+  for (const [label, env, flags, refusal] of cases) {
+    const r = await runScript([...existing, ...flags], env);
+    assert.notEqual(r.exit, 0, `${label}: must exit non-zero`);
+    assert.match(r.err, refusal, `${label}: ${r.err.slice(0, 300)}`);
+    assert.doesNotMatch(r.out, PROD_LINE, label);
+    assert.deepEqual(r.attempts, [], `${label}: a Mongo connection was attempted`);
+  }
+  const all = await runScript([...existing, PROD_FLAG], {MONGO_WORK_DB: 'lkb_prod', MONGODB_DB: 'lkb_prod'});
+  assert.match(all.out, PROD_LINE, all.err.slice(0, 300));
+  assert.equal(all.out.match(/PRODUCTION WRITE ENABLED/g).length, 1);
+  assert.doesNotMatch(all.err, /production writes refused/);
+  assert.ok(all.attempts.length > 0, 'all three parts: the guard passed, so the script tried to connect to the (fake) Mongo');
+  assert.notEqual(all.exit, 0, 'the fake Mongo never answers, so the run fails after the guard (nothing written)');
+});
+test('D-207 source: both paths call the one guardDatabase(); the migrated and existing paths add no second opt-in and no weaker check', () => {
+  const s = code('scripts/webinar/sync-session.mjs');
+  assert.equal(s.match(/\bguardDatabase\(/g).length, 3, 'definition + sync call + index-existing call');
+  assert.equal(s.match(/allowProduction: true/g).length, 1, 'exactly one production opt-in');
+  assert.equal(s.match(/isProtectedWorkDbName\(/g).length, 1, 'exactly one protected-name gate, inside guardDatabase');
+  assert.match(s, /if \(connected && INDEX\) await recordIndexFailure\(sessions\(tenantId\), sessionId, error\)/, 'the sync path persists the failure reason after it has connected');
+  assert.ok(s.indexOf('function guardDatabase') < s.indexOf('guardDatabase(undefined)'));
+  assert.match(code('scripts/lib/transcript-provenance.mjs'), /\["lkb", "lkb_prod", "global_university_db"\]\.includes\(n\.toLowerCase\(\)\) \|\| stagingRefused\(n, env\)/);
+});

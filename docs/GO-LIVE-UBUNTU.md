@@ -444,22 +444,47 @@ At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 champions
 - T-013 avatar: no environment flag exists; leave it unannounced. The `/counsellor` page
   ships in the web bundle either way.
 
-## Cutover: reindex the two FAILED sessions in lkb_prod (D-204, devops step)
+## Cutover: reindex the 3 FAILED sessions in lkb_prod (D-204 opt-in, D-207 fix; devops step)
 `scripts/webinar/sync-session.mjs` writes `lkb_prod` only through a three-part opt-in (the same one as `mint-key.mjs`,
 `recover-index-attempt.mjs` and `backfill-document-consent.mjs`): the script passes `allowProduction`, the command line
 carries `--i-know-this-is-production`, and the environment has `MONGODB_DB=lkb_prod`. It also requires
 `MONGO_WORK_DB=lkb_prod` (a disagreement between the two is refused; a `testData` source routes to `lkb_staging` first, so it never takes this path).
 With any part missing the old refusal ("MONGO_WORK_DB must name an isolated work database; production writes refused")
-applies unchanged. A run that does take the production path prints one `PRODUCTION WRITE ENABLED (D-204)` line.
+applies unchanged. A run that does take the production path prints one `PRODUCTION WRITE ENABLED (D-204)` line. D-207 added no second opt-in:
+`--index-existing` calls the same guard function.
+
+The three sessions (Funding Dreams is NOT part of this cutover and is not touched):
+
+| session | tenant | how |
+|---|---|---|
+| `2026-04-21-visa-blueprint-part2-italy-france-nz` | toc | `--index`: re-syncs the rows from `data/toc-migrated/<id>/` (migrated source shape; title comes from `session.json`), then indexes |
+| `2026-08-10-ucas-what-changed-what-matters` | toc | same as above |
+| `2026-10-13-zoom-webinar-p2` | vidysea | `--index-existing --tenant vidysea`: no local directory; indexes the rows already in `lkb_prod` (it never creates or replaces rows) |
 
 Run on the Ubuntu server, one session at a time, dry run first (a dry run connects to nothing):
 ```
 node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-france-nz --dry-run --index
-node scripts/webinar/sync-session.mjs 2026-05-08-funding-dreams-loans-forex --dry-run --index
+node scripts/webinar/sync-session.mjs 2026-08-10-ucas-what-changed-what-matters --dry-run --index
+node scripts/webinar/sync-session.mjs 2026-10-13-zoom-webinar-p2 --index-existing --tenant vidysea --dry-run
 # live, with MONGODB_URL (the lkb_app user, section 6a) already in the environment:
 MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-france-nz --index --i-know-this-is-production
-MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-05-08-funding-dreams-loans-forex --index --i-know-this-is-production
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-08-10-ucas-what-changed-what-matters --index --i-know-this-is-production
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-10-13-zoom-webinar-p2 --index-existing --tenant vidysea --i-know-this-is-production
 ```
+
+Read before the live run:
+- **Both TOC dry runs currently stop at `invalid turn timing, write refused`** (UCAS t114: tStart 1883 > tEnd 1868; Visa t141: tEnd 213 < tStart 2008).
+  That is a data defect in the migrated `turns.json` (the same inversion is what the strict indexer rejects as `invalid transcript ownership/identity/time`),
+  not a code bug: the loader never swaps or clamps timings. The turns need a human-approved repair first; the dry run is the check that it is done.
+- Re-running `--index` on the TOC pair REPLACES their turn rows (generation swap: rows with an older `syncGen` are deleted). Compare turn ids against `lkb_prod` first.
+  If the production rows are verified intact and only the index is missing, `--index-existing --tenant toc` is the non-destructive alternative.
+  Before the run record `db.turns.countDocuments({sessionId: '<id>'})` and take a `mongodump` of `lkb_prod` (the swap is upsert-then-delete on a standalone Mongo: a failure between the two leaves old and new rows mixed).
+  If a `--index` run FAILS, fix the cause and re-run the SAME `--index` command; do NOT use `--index-existing` on the mixed row set (the completion gate also checks the indexed turn count equals the rows present, so a partial set is refused, but the clean re-sync is the repair).
+  Rows with no `syncGen` that are not in the new set are deleted by the swap (intended).
+- Migrated sources (and `--index-existing`) have no capture proof (no `validation.json`), so they skip the retention/processed-proof bookkeeping and instead
+  require the indexer's own completion (tree written, chunks written, retrieval mode ready, no degraded summary/claims) before reporting success.
+- A failed run now keeps its reason: `sessions.<id>.indexFailure` = `{at, via, reason, generation, state, phase}` (the closed `indexAttempt` shape is unchanged; a successful run unsets it).
+  Read it with `db.sessions.findOne({_id: '<id>'}, {indexFailure: 1, indexAttempt: 1, 'status.index': 1})`.
 If an index attempt is stuck as `uncertain`, recover it first (next section). Not run by the build agent: this is a
 production write and stays a human/devops action.
 

@@ -2,44 +2,32 @@
 import { isProtectedWorkDbName, bindDerivedArtifacts, requireScriptDatabase, PRODUCTION_FLAG } from "../lib/transcript-provenance.mjs";
 import { resolveWorkDb } from "../watch/test-data-route.mjs";
 /**
- * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24,
- * fix cycle 1 — lint-dirsize budget: scripts/ was 33/32, this was the only new file in the diff,
- * ISS-285) — pushes ONE bot-captured webinar session into Mongo and builds its knowledge-graph
- * edges (2026-09-24, first live run; D-027). The TOC sessions came in through seed-toc.mjs +
- * sync-real-turns.mjs; a webinar also carries people, orgs, countries and a capture user, so it
- * gets its own idempotent sync.
+ * scripts/webinar/sync-session.mjs (moved from scripts/sync-webinar-session.mjs 2026-09-24, ISS-285) - pushes ONE webinar
+ * session into Mongo and builds its knowledge-graph edges (D-027). Inputs: data/toc-migrated/<id>/{source.json, turns.json,
+ * meta.json}; meta.json is the hand-checked people/org/country/topic list. Writes, tenant-scoped via the packages/db accessors:
+ *   sources · sessions · turns (speakerRef -> personId, speakerLabel, occurredAt) · speakers · orgs · topics · graph_edges
+ * Graph edges are DETERMINISTIC (no LLM); each carries evidence[] (turn ids + timestamps; H3 "no fact without provenance"), sessionRef,
+ * date and confidence. Edge types: person-spoke_in-session · person-represents-org · org-located_in-country · org-partner_of-org ·
+ * session-covers-country/topic · person-discussed-topic/country · session-held_on-date · date-in_month-month · user-captured-session.
+ * Re-running replaces this session's turns and edges only, as a generation swap (ISS-291, session-rows.mjs): new rows are upserted
+ * first and the old generation deleted only after every write succeeded. (The Mongo is standalone - no transactions.)
  *
- * Inputs: data/toc-migrated/<id>/{source.json, turns.json, meta.json}. meta.json is the
- * hand-checked people/org/country/topic list for the session.
- * Writes, tenant-scoped via the packages/db coll(tenantId) accessors:
- *   sources · sessions · turns (speakerRef → personId, speakerLabel, occurredAt) · speakers ·
- *   orgs · topics · graph_edges
- *
- * Graph edges are DETERMINISTIC (no LLM). Each edge carries evidence[] with the turn ids and
- * timestamps that support it (H3 "no fact without provenance"), plus sessionRef, date and
- * confidence. Edge types:
- *   person-spoke_in-session · person-represents-org · org-located_in-country ·
- *   org-partner_of-org · session-covers-country · session-covers-topic ·
- *   person-discussed-topic · person-discussed-country · session-held_on-date ·
- *   date-in_month-month · user-captured-session
- * Re-running replaces this session's turns and edges; it never touches other sessions. The
- * replace is a generation swap (ISS-291, `session-rows.mjs`): new rows are upserted first and the
- * old generation is deleted only after every write succeeded, so a crash never leaves the session
- * partially deleted. (The Mongo is standalone — no transactions.)
- *
- * --emit-files (ISS-294): writes session.json / session_page.json / claims.json into the session
- *   dir, derived from meta/source/turns — the files every other data/toc-migrated/<id>/ carries.
- * --index (ISS-296): after the sync, runs the SAME `indexSession` every live-ingested session goes
- *   through (apps/api/src/indexing/session.ts, bound by production.ts's `buildIndexer`): LLM
- *   summary -> session_pages, claims, lexical source chunks, incremental tree_index, entity
- *   promotion, status.index -> done. With --dry-run it prints the plan and connects to nothing.
+ * --emit-files (ISS-294): writes session.json / session_page.json / claims.json into the session dir, derived from meta/source/turns.
+ * --index (ISS-296): after the sync, runs the SAME `indexSession` every live-ingested session goes through (apps/api/src/indexing/session.ts,
+ *   bound by production.ts's `buildIndexer`): LLM summary -> session_pages, claims, lexical chunks, tree_index, entity promotion,
+ *   status.index -> done. With --dry-run it prints the plan and connects to nothing.
+ * Migrated provided documents (D-207): a source.json without `title` is accepted only when session.json states the matching title/date
+ *   (session-rows.mjs providedSessionRow); such a session has no capture artifacts, so --index writes no index-proof/retention files.
+ * --index-existing --tenant <t> (D-207): index a session whose rows ALREADY exist in the target database (e.g. a live capture with no local
+ *   directory). Reads the rows, runs the same buildIndexer, never creates/replaces session, source or turn rows. Same guard, same opt-in.
+ * An index failure's reason is persisted on the session row as `indexFailure` (indexAttempt is a closed schema); cleared on success.
  *
  * Production (D-204): lkb_prod is refused unless ALL THREE hold - this script passes allowProduction to requireScriptDatabase, argv carries
  *   --i-know-this-is-production, and MONGODB_DB=lkb_prod (with MONGO_WORK_DB=lkb_prod). Any part missing keeps the
- *   isProtectedWorkDbName refusal below unchanged. The production path logs one "PRODUCTION WRITE ENABLED (D-204)" line.
+ *   isProtectedWorkDbName refusal unchanged. The production path logs one "PRODUCTION WRITE ENABLED (D-204)" line.
  *
  * Usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]
- *
+ *        node scripts/webinar/sync-session.mjs <sessionId> --index-existing --tenant <tenantId> [--dry-run] [--grounded-notes]
  * --grounded-notes (T-040, D-162): with --index, also writes grounded notes and Q&A (every item cited to a verified
  *   quote in a real turn, judge + rules, ungrounded items dropped). OFF by default; KB_GROUNDED_NOTES=1 does the same.
  *   Existing verified claims are preserved on re-run; see apps/api/src/indexing/grounded-write.ts.
@@ -51,7 +39,7 @@ import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 import "dotenv/config";
 import { register } from "tsx/esm/api";
-import { replaceSessionRows, buildSessionFiles, loadWebinarSession } from "./session-rows.mjs";
+import { replaceSessionRows, buildSessionFiles, loadWebinarSession, assertIndexComplete, recordIndexFailure, clearIndexFailure, indexExistingInDb, productionIndexer } from "./session-rows.mjs";
 import { enrichSlideKnowledgeTurns } from './slides/slide-knowledge.mjs';
 import { prepareWebinarIndexProof } from './index-proof.mjs';
 
@@ -59,15 +47,56 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const sessionId = process.argv[2];
 const DRY_RUN = process.argv.includes("--dry-run");
 const EMIT_FILES = process.argv.includes("--emit-files");
-const INDEX = process.argv.includes("--index");
+const INDEX_EXISTING = process.argv.includes("--index-existing"); // D-207: index rows already in the target DB, no local session dir
+const tenantFlag = process.argv.indexOf("--tenant"), TENANT = tenantFlag > 2 ? process.argv[tenantFlag + 1] : undefined;
+const INDEX = INDEX_EXISTING || process.argv.includes("--index");
 const GROUNDED_NOTES = process.argv.includes("--grounded-notes");
-if (!sessionId) {
-  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]");
+if (!sessionId || (INDEX_EXISTING && (EMIT_FILES || !/^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(TENANT ?? "")))) {
+  console.error("usage: node scripts/webinar/sync-session.mjs <sessionId> [--dry-run] [--emit-files] [--index] [--grounded-notes]\n" +
+    "       node scripts/webinar/sync-session.mjs <sessionId> --index-existing --tenant <tenantId> [--dry-run] [--grounded-notes]");
   process.exit(1);
 }
+
+/** The D-204 database guard, shared by the sync path and --index-existing so both honour exactly one opt-in. Nothing below may run when it throws. */
+function guardDatabase(testData) {
+  // Test-data routing (2026-10-14): a source tagged testData:true goes to lkb_staging only (scripts/watch/test-data-route.mjs).
+  const route = resolveWorkDb({ testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
+  const workDb = route.workDb;
+  let target;
+  if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
+  // D-204: the three-part production opt-in (same shape as mint-key.mjs). A testData source already routed to lkb_staging above, so it never matches.
+  const productionOptIn = process.argv.includes(PRODUCTION_FLAG) && workDb === "lkb_prod" && process.env.MONGODB_DB?.trim() === "lkb_prod";
+  if (productionOptIn) {
+    target = requireScriptDatabase(process.env, process.argv.slice(2), { allowProduction: true });
+    console.log(`  PRODUCTION WRITE ENABLED (D-204): target database ${target.dbName} (${PRODUCTION_FLAG} + MONGODB_DB=lkb_prod + MONGO_WORK_DB=lkb_prod)`);
+  } else {
+    if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
+    // ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
+    // resolved work database, refuses here, before any retention state or Mongo connection.
+    const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
+    if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
+    target = requireScriptDatabase(guardEnv, process.argv.slice(2));
+  }
+  return { workDb, target };
+}
+
+if (INDEX_EXISTING) {
+  console.log(`session ${sessionId} (tenant ${TENANT}) --index-existing: indexes the rows already in the target database; no session, source or turn row is created or replaced`);
+  if (DRY_RUN) {
+    console.log("  index plan: verify session/source/turns exist; summarize + claims (LLM, routed per config/ai-routing.yaml); lexical chunks; tree_index; entity promotion; status.index -> done");
+    console.log("No Mongo connection attempted (--dry-run).");
+    process.exit(0);
+  }
+  const { workDb, target } = guardDatabase(undefined);
+  register();
+  console.log(`  indexed: ${JSON.stringify((await indexExistingInDb({ target, workDb, tenantId: TENANT, sessionId, root: ROOT, groundedNotes: GROUNDED_NOTES })).completion)}`);
+  process.exit(0);
+}
 const dir = join(ROOT, "data", "toc-migrated", sessionId);
-const { source, rawTurns, meta, screenEvidence, notes } = loadWebinarSession(dir, sessionId);
-const finalizeIndexProof = INDEX && !DRY_RUN ? prepareWebinarIndexProof({ dir, sessionId, tenantId: meta.tenantId,
+const { source, rawTurns, meta, screenEvidence, notes, legacyProvided } = loadWebinarSession(dir, sessionId);
+// A migrated provided document (D-207) has no capture artifacts (no validation.json, no raw media): no index-proof / retention files.
+const localState = INDEX && !legacyProvided;
+const finalizeIndexProof = localState && !DRY_RUN ? prepareWebinarIndexProof({ dir, sessionId, tenantId: meta.tenantId,
   inputArtifact: screenEvidence ? 'knowledge-turns.json' : 'turns.json', selectedTurns: rawTurns, retrievalMode: 'vectorless' }) : undefined;
 const tenantId = meta.tenantId;
 const t0 = new Date(meta.t0).getTime();
@@ -93,7 +122,7 @@ const sessionNode = `session:${sessionId}`;
 const dateNode = `date:${meta.date}`;
 addEdge(sessionNode, "held_on", dateNode, null, { confidence: 1 });
 addEdge(dateNode, "in_month", `month:${meta.date.slice(0, 7)}`, null, { confidence: 1 });
-addEdge(meta.capturedBy.id, "captured", sessionNode, null, { confidence: 1, via: meta.capturedBy.via });
+if (meta.capturedBy.id) addEdge(meta.capturedBy.id, "captured", sessionNode, null, { confidence: 1, via: meta.capturedBy.via }); // a provided transcript has no capture user
 
 for (const p of meta.people) {
   const own = turns.filter((t) => t.speakerRef === p.personId);
@@ -127,11 +156,11 @@ const sessionDoc = {
   sourceId: source._id,
   title: meta.title,
   date: meta.date,
-  org: meta.orgs.filter((o) => !o.partnerOf).map((o) => o.name).join(" · "),
+  org: meta.orgs.filter((o) => !o.partnerOf).map((o) => o.name).join(" · ") || (meta.org ?? ""),
   participants,
   platform: meta.platform,
   capturedBy: meta.capturedBy,
-  status: { transcribe: "done", diarize: "done", summarize: "pending", index: "pending" },
+  status: { ...(meta.sessionStatus ?? { transcribe: "done", diarize: "done", summarize: "pending" }), index: "pending" },
   ...(screenEvidence ? { screenEvidence, notes } : {}),
 };
 const sourceDoc = { ...source, tenantId: undefined };
@@ -157,28 +186,9 @@ console.log(`  turns ${turns.length} · speakers ${speakerDocs.length} · orgs $
 console.log(`  graph_edges ${edgeList.length}: ${JSON.stringify(byType)}`);
 
 // DB guard first: nothing below (file emission included) may run when the Mongo target is refused. A dry run touches no DB.
-let route, workDb, target;
-if (!DRY_RUN) {
-  // Test-data routing (2026-10-14): a source tagged testData:true goes to lkb_staging only (scripts/watch/test-data-route.mjs).
-  route = resolveWorkDb({ testData: sourceDoc.testData, workDb: process.env.MONGO_WORK_DB?.trim(), env: process.env });
-  workDb = route.workDb;
-  if (route.testData) console.log(`  testData source: routed to ${workDb}${route.rerouted ? " (not the configured work database)" : ""}`);
-  // D-204: the three-part production opt-in (same shape as mint-key.mjs). A testData source already routed to lkb_staging above, so it never matches.
-  const productionOptIn = process.argv.includes(PRODUCTION_FLAG) && workDb === "lkb_prod" && process.env.MONGODB_DB?.trim() === "lkb_prod";
-  if (productionOptIn) {
-    target = requireScriptDatabase(process.env, process.argv.slice(2), { allowProduction: true });
-    console.log(`  PRODUCTION WRITE ENABLED (D-204): target database ${target.dbName} (${PRODUCTION_FLAG} + MONGODB_DB=lkb_prod + MONGO_WORK_DB=lkb_prod)`);
-  } else {
-    if (isProtectedWorkDbName(workDb, process.env)) throw new Error("MONGO_WORK_DB must name an isolated work database; production writes refused");
-    // ISS-LEGACYSEED-007: no localhost URL fallback. A missing/blank MONGODB_URL, or a MONGODB_DB that disagrees with the
-    // resolved work database, refuses here, before any retention state or Mongo connection.
-    const guardEnv = { ...process.env, MONGO_WORK_DB: workDb, MONGODB_DB: route.rerouted ? undefined : process.env.MONGODB_DB };
-    if (workDb !== "lkb_staging") delete guardEnv.LKB_ALLOW_STAGING;
-    target = requireScriptDatabase(guardEnv, process.argv.slice(2));
-  }
-}
+const { workDb, target } = DRY_RUN ? {} : guardDatabase(sourceDoc.testData);
 register();
-const retentionWrites = !DRY_RUN && (INDEX || EMIT_FILES) ? await import("../../packages/ingest/src/retention/production/retention-processed-proof.ts") : undefined;
+const retentionWrites = !DRY_RUN && (localState || EMIT_FILES) ? await import("../../packages/ingest/src/retention/production/retention-processed-proof.ts") : undefined;
 if (EMIT_FILES) {
   const files = buildSessionFiles({ sessionId, tenantId, sessionDoc, meta, turns });
   for (const [name, doc] of [["session.json", files.session], ["session_page.json", files.sessionPage], ["claims.json", files.claims]]) {
@@ -223,15 +233,17 @@ const strip = ({ tenantId: _t, ...rest }) => rest;
 
 const gen = `gen-${Date.now()}`;
 const retentionIdentity = { tenantId, sessionId, sourceId: source._id };
-const retentionIo = INDEX ? await import("../../packages/ingest/src/retention/production/private-summary.ts") : undefined;
-const retentionSourceBytes = INDEX ? retentionIo.readRetentionBytes(join(dir, "source.json"), 1024 * 1024) : undefined;
+const retentionIo = localState ? await import("../../packages/ingest/src/retention/production/private-summary.ts") : undefined;
+const retentionSourceBytes = localState ? retentionIo.readRetentionBytes(join(dir, "source.json"), 1024 * 1024) : undefined;
+let connected = false;
 try {
-  if (INDEX) {
+  if (localState) {
     if (!isDeepStrictEqual(JSON.parse(retentionSourceBytes), source)) throw new Error("source changed before actual indexing");
     const processing = retentionWrites.setSessionIndexStatus(dir, retentionIdentity, "processing");
     if (!processing.ok) throw new Error(`retention processing state refused: ${processing.reason}`);
   }
   await connect(target.url, target.dbName);
+  connected = true;
   const priorSource = await sources(tenantId).findOne({ _id: source._id });
   const priorSession = await sessions(tenantId).findOne({ _id: sessionId });
   const nativeSwap = sourceDoc.captureConsent !== undefined || priorSource?.captureConsent !== undefined ||
@@ -265,30 +277,29 @@ try {
   console.log(`written (${gen}): turns ${tw.upserted} upserted/${tw.removedStale} stale removed, ` +
     `graph_edges ${ew.upserted} upserted/${ew.removedStale} stale removed`);
   if (INDEX) {
-    const { buildIndexer } = await import("../../apps/api/src/composition/production.ts");
-    const { configuredNativeArchiveService } = await import("../native-capture/server.ts");
-    const nativeArchive = await configuredNativeArchiveService(process.env, getDb(), ROOT);
-    if (nativeArchive) await nativeArchive.drain({ limit: 100 });
-    const res = await buildIndexer(undefined, { strictWebinar: true,
-      ...(nativeArchive ? { onIndexCommitted: binding => nativeArchive.onIndexCommitted(binding) } : {}),
-      ...(GROUNDED_NOTES ? { groundedNotes: true } : {}) })(tenantId, sessionId);
-    const baseProof = finalizeIndexProof(res);
-    if (!retentionIo.readRetentionBytes(join(dir, "source.json"), 1024 * 1024).equals(retentionSourceBytes)) throw new Error("source changed during actual indexing");
-    const proof = { ...baseProof, version: baseProof.retrievalMode === 'vectorless' ? 4 : 3, sourceId: source._id, workDb,
-      sourceHash: createHash("sha256").update(retentionSourceBytes).digest("hex") };
-    retentionIo.writeRetentionAtomic(join(dir, "index-proof.json"), JSON.stringify(proof) + "\n");
-    const indexed = retentionWrites.setSessionIndexStatus(dir, retentionIdentity, "done");
-    if (!indexed.ok) throw new Error(`retention indexed state refused: ${indexed.reason}`);
-    const stamped = retentionWrites.markSessionProcessedFromProof(dir, { ...retentionIdentity, workDb,
-      generation: res.completion.generation, inputArtifact: baseProof.inputArtifact,
-      ...(baseProof.retrievalMode === 'vectorless' ? { retrievalMode: 'vectorless' } : {}) }, Date.now());
-    if (!stamped.ok) throw new Error(`retention processing stamp refused: ${stamped.reason}`);
+    const res = await (await productionIndexer({ root: ROOT, groundedNotes: GROUNDED_NOTES }))(tenantId, sessionId);
+    if (legacyProvided) assertIndexComplete(res, sessionId, rawTurns.length); // no capture artifacts to prove: the DB session row is the state
+    else {
+      const baseProof = finalizeIndexProof(res);
+      if (!retentionIo.readRetentionBytes(join(dir, "source.json"), 1024 * 1024).equals(retentionSourceBytes)) throw new Error("source changed during actual indexing");
+      const proof = { ...baseProof, version: baseProof.retrievalMode === 'vectorless' ? 4 : 3, sourceId: source._id, workDb,
+        sourceHash: createHash("sha256").update(retentionSourceBytes).digest("hex") };
+      retentionIo.writeRetentionAtomic(join(dir, "index-proof.json"), JSON.stringify(proof) + "\n");
+      const indexed = retentionWrites.setSessionIndexStatus(dir, retentionIdentity, "done");
+      if (!indexed.ok) throw new Error(`retention indexed state refused: ${indexed.reason}`);
+      const stamped = retentionWrites.markSessionProcessedFromProof(dir, { ...retentionIdentity, workDb,
+        generation: res.completion.generation, inputArtifact: baseProof.inputArtifact,
+        ...(baseProof.retrievalMode === 'vectorless' ? { retrievalMode: 'vectorless' } : {}) }, Date.now());
+      if (!stamped.ok) throw new Error(`retention processing stamp refused: ${stamped.reason}`);
+    }
     if (res.groundedNotes) console.log(`grounded notes: ${JSON.stringify({ dropped: { summary: res.summary?.dropped ?? 0, claims: res.claims?.dropped ?? 0 }, ...res.groundedNotes })}`);
     console.log(`indexed: chunks ${res.chunks.written}${res.chunks.skipped ? ` (skipped: ${res.chunks.skipped})` : ""}` +
       `${res.entities ? `, entities ${JSON.stringify(res.entities)}` : ""}`);
+    await clearIndexFailure(sessions(tenantId), sessionId).catch(() => undefined);
   }
 } catch (error) {
-  if (INDEX) {
+  if (connected && INDEX) await recordIndexFailure(sessions(tenantId), sessionId, error).catch(() => undefined); // D-207: persist WHY, not only the state flag
+  if (localState) {
     const failed = retentionWrites.setSessionIndexStatus(dir, retentionIdentity, "failed");
     if (!failed.ok) throw new Error(`retention failed-state write refused: ${failed.reason}`, { cause: error });
   }
