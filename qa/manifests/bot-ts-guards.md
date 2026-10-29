@@ -1,6 +1,6 @@
 # Manifest — bot-ts-guards
-Status: ready-for-check
-Handshake status: ready-for-check
+Status: checked-PASS
+Handshake status: checked-PASS
 Policy-Version: proportional-verification/2026-10-19.17
 Fix cycle: 0
 Tier: L (capture lock = concurrency path; one checker)
