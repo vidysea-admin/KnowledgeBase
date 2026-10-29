@@ -3,8 +3,8 @@
 **Contract:** none specific (D-205; survey `qa/evidence/bot-linux-survey-2026-10-29.md` blocker 5, file `py/sb_join.py`)
 **Date:** 2026-10-29
 **Fix cycle:** 0
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 Policy-Version: proportional-verification/2026-10-19.17
 Tier: S (one product line pair in one file plus one test; no suite widening)
 Dual check: no — no auth/tenancy/prod-write: a Chrome launch argument gated by an env flag that is unset on Windows.
