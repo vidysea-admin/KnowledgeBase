@@ -2,8 +2,8 @@
 **Contract:** none specific; scope is `docs/features/user-accounts/plan.md` row A2 and section "A2 ua-credentials" (spec UA-2, UA-3, UA-10, UA-11). Authorization: D-206.
 **Goal task:** user-accounts A2 (wave 1, tier 3 roadmap feature; plan approval and A1 run in parallel, this unit depends on nothing)
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: auth apps/api/src/user-accounts/password.ts:38
