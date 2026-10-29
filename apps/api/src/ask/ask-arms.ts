@@ -18,10 +18,13 @@
 import type { Db } from "mongodb";
 import { getDb, scopedCollection } from "@lkb/db";
 import type { Chunks, TreeIndexNode, Turns } from "@lkb/core";
-import { rankSessionsByCosine, lexicalSearchTurns } from "@lkb/index";
+import { rankSessionsByCosine } from "@lkb/index";
 import type { EmbedJob, EmbedResult } from "@lkb/ai";
 import { readEffectiveTurns } from '../transcript-review/effective-reader.js';
-import { createKnowledgeVisibility } from '../visibility/knowledge.js';
+import { createKnowledgeVisibility, newVisibilityRequestMemo, withDeadline } from '../visibility/knowledge.js';
+import { buildTurnPrefilter } from '../search-prefilter.js';
+import { readSearchCandidateTurns } from '../transcript-review/search-reader.js';
+import { rankVisibleTurns } from '../search-store.js';
 import { chunkContentMatches } from '../indexing/chunk-integrity.js';
 
 export type ArmsEmbedFn = (job: EmbedJob) => Promise<EmbedResult>;
@@ -35,7 +38,10 @@ export interface AskArmsDeps {
   /** How many sessions each arm proposes. Deliberately small: the arms feed a candidate set the
    * evaluator then re-scores, so a long tail costs LLM tokens without adding recall. */
   k?: number;
+  /** Hard ceiling for the visibility step of one arms call (D-206 K1). Past it the arm reports a degradation; it never hangs. */
+  visibilityDeadlineMs?: number;
 }
+const DEFAULT_VISIBILITY_DEADLINE_MS = 5000;
 
 /**
  * Maps a `sessions._id` to the tree node that represents it.
@@ -82,10 +88,14 @@ export function createAskArmsFor(deps: AskArmsDeps = {}) {
       const bySession = sessionNodesById(tree);
       const arms: TreeIndexNode[][] = [];
       const failures: string[] = [];
-      const sourceTurns = async () => createKnowledgeVisibility(db).filterTurns(tenantId,
-        await readEffectiveTurns(db, tenantId, await scopedCollection<Turns>(db as never, 'turns')(tenantId).find({}).toArray()));
-      let turnPromise: ReturnType<typeof sourceTurns> | undefined;
-      const currentTurns = () => turnPromise ??= sourceTurns();
+      // D-206 K1/K2: /ask no longer loads and visibility-filters EVERY tenant turn. One request-scoped memo and deadline serve both arms;
+      // the lexical arm scores prefiltered candidates first and proves visibility only on the best, the vector arm proves visibility
+      // only for the sessions whose chunks can still reach the top k.
+      const visibility = createKnowledgeVisibility(db), memo = newVisibilityRequestMemo();
+      const deadlineAt = Date.now() + (deps.visibilityDeadlineMs ?? DEFAULT_VISIBILITY_DEADLINE_MS);
+      const visibleTurnsOf = (sessionIds: readonly string[]): Promise<Turns[]> => withDeadline(deadlineAt, async () => visibility.filterTurns(tenantId,
+        await readEffectiveTurns(db, tenantId, await scopedCollection<Turns>(db as never, 'turns')(tenantId).find({ sessionId: { $in: [...sessionIds] } } as never).toArray()),
+        { memo, deadlineAt }));
 
       // ---- vector arm -------------------------------------------------------------------------
       if (deps.embed) {
@@ -95,15 +105,31 @@ export function createAskArmsFor(deps: AskArmsDeps = {}) {
           if (!qv || qv.length === 0 || !embedded.model?.trim()) throw new Error("embedder returned no query vector or model identity");
           // Tenant-scoped read: `scopedCollection` merges the tenantId, so this cannot see another
           // tenant's chunks even if one somehow shared a sessionId.
-          const chunks = await scopedCollection<Chunks>(db as never, "chunks")(tenantId)
+          const chunks = await withDeadline(deadlineAt, () => scopedCollection<Chunks>(db as never, "chunks")(tenantId)
             .find({})
-            .toArray();
-          const byTurn = new Map((await currentTurns()).map(turn => [turn._id, turn]));
-          const compatible = chunks.filter(chunk => chunk.embeddingModel === embedded.model && chunkContentMatches(chunk, byTurn, tenantId)
-            && Array.isArray(chunk.vector) && chunk.vector.length === qv.length && chunk.vector.every(Number.isFinite));
-          if (compatible.length !== chunks.length) failures.push('vector: source changed, model differs, or content-bound reindexing is required');
-          const hits = rankSessionsByCosine(qv, compatible as (Chunks & { vector: number[] })[], k, { skipMismatched: true });
-          arms.push(hits.map((h) => bySession.get(h.sessionId)).filter((n): n is TreeIndexNode => n !== undefined));
+            .toArray());
+          const shaped = chunks.filter(chunk => chunk.embeddingModel === embedded.model
+            && Array.isArray(chunk.vector) && chunk.vector.length === qv.length && chunk.vector.every(Number.isFinite)) as (Chunks & { vector: number[] })[];
+          let unusable = chunks.length - shaped.length;
+          // Sessions in order of their best RAW chunk. A session's best VALID chunk can only be lower, so the raw order is an upper bound.
+          const order = rankSessionsByCosine(qv, shaped, shaped.length, { skipMismatched: true });
+          const chunksOf = new Map<string, (Chunks & { vector: number[] })[]>();
+          for (const chunk of shaped) chunksOf.set(chunk.sourceRef, [...(chunksOf.get(chunk.sourceRef) ?? []), chunk]);
+          const valid: (Chunks & { vector: number[] })[] = [];
+          let top = [] as ReturnType<typeof rankSessionsByCosine>, processed = 0, slice = Math.max(k * 3, 8);
+          while (processed < order.length) {
+            const part = order.slice(processed, processed + slice).map(hit => hit.sessionId);
+            processed += part.length; slice *= 2;
+            const byTurn = new Map((await visibleTurnsOf(part)).map(turn => [turn._id, turn]));
+            for (const sessionId of part) for (const chunk of chunksOf.get(sessionId) ?? []) {
+              if (chunkContentMatches(chunk, byTurn, tenantId)) valid.push(chunk); else unusable++;
+            }
+            top = rankSessionsByCosine(qv, valid, k, { skipMismatched: true });
+            // Stop only when the k-th VALID session STRICTLY beats the best unexamined session (ties keep going: chunk-id tie-break decides).
+            if (top.length >= k && processed < order.length && top[k - 1]!.score > order[processed]!.score) break;
+          }
+          if (unusable > 0) failures.push('vector: source changed, model differs, or content-bound reindexing is required');
+          arms.push(top.map((h) => bySession.get(h.sessionId)).filter((n): n is TreeIndexNode => n !== undefined));
         } catch (err) {
           failures.push(`vector: ${err instanceof Error ? err.message : String(err)}`);
         }
@@ -111,11 +137,12 @@ export function createAskArmsFor(deps: AskArmsDeps = {}) {
 
       // ---- lexical arm ------------------------------------------------------------------------
       try {
-        const turns = await currentTurns();
-        const hits = lexicalSearchTurns(query, turns as never, k);
+        const prefilter = buildTurnPrefilter(query);
+        const candidates = prefilter === null ? [] : await withDeadline(deadlineAt, () => readSearchCandidateTurns(db, tenantId, prefilter));
+        const { scored: hits } = await rankVisibleTurns(visibility, tenantId, query, candidates, k, { memo, deadlineAt, throwOnError: true });
         const seen = new Set<string>();
         const nodes: TreeIndexNode[] = [];
-        for (const h of hits as unknown as { sessionId: string }[]) {
+        for (const h of hits) {
           if (seen.has(h.sessionId)) continue;
           seen.add(h.sessionId);
           const node = bySession.get(h.sessionId);

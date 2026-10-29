@@ -53,8 +53,17 @@ export function withVisibleTranscripts(base: Pick<Db, "collection">, turns: () =
   };
   return { collection(name: string) {
     const collection = base.collection(name) as unknown as Row;
-    if (typeof collection.findOne === "function") return collection;
-    return { ...collection, async findOne(filter: Row = {}) {
+    // D-206 K1: the visibility gate fetches raw turns with ONE batched `find({ tenantId, _id: { $in } })`. Older fakes only
+    // model `sessionId`-keyed finds, so that one shape is answered from the fixture's own rows; every other find is the fake's.
+    const baseFind = collection.find as ((filter: Row) => unknown) | undefined;
+    const find = name === "turns" ? (filter: Row = {}) => {
+      const ids = (filter._id as { $in?: unknown[] } | undefined)?.$in;
+      if (!Array.isArray(ids)) return baseFind?.call(collection, filter);
+      const rows = turns().filter(candidate => matches(candidate, filter));
+      return { toArray: async () => structuredClone(rows), limit() { return this; } };
+    } : baseFind;
+    if (typeof collection.findOne === "function") return find === baseFind ? collection : { ...collection, find };
+    return { ...collection, ...(find ? { find } : {}), async findOne(filter: Row = {}) {
       const row = rowsFor(name).find(candidate => matches(candidate, filter));
       return row ? structuredClone(row) : null;
     } };

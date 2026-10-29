@@ -173,8 +173,9 @@ test("hydrator: tenant A's quotes only, though B has the same sessionId with hig
   assert.equal(quotes[0]!.quote, "Visa forms open in October.");
   assert.deepEqual(leaks(out), []);
   assert.deepEqual(unscoped(db.queries, A), []);
-  // The review overlay / visibility gate add scoped findOne lookups; the corpus reads are the two finds.
-  assert.deepEqual(db.queries.filter((q) => q.op === "find").map((q) => [q.coll, q.returned]), [["turns", 1], ["chunks", 1]], "turns and chunks each returned only A's single row");
+  // The review overlay adds scoped findOne lookups. D-206 K1: the visibility gate re-reads the candidate turns in ONE batched
+  // tenant-scoped `find({ _id: { $in } })`, so the finds are the corpus turns read, that batch, and chunks - each A's single row.
+  assert.deepEqual(db.queries.filter((q) => q.op === "find").map((q) => [q.coll, q.returned]).sort(), [["chunks", 1], ["turns", 1], ["turns", 1]], "every find returned only A's single row");
 });
 
 test("hydrator: asked for a session that exists only for B it refuses (no source rows) and leaks nothing", async () => {

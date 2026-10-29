@@ -13,33 +13,9 @@ import type { TreeIndexNode } from "@lkb/core";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore, fakeTreeStore, fakeAskDeps } from "../fixtures.js";
 import { withVisibleTranscripts } from "../visibility/read-fixture.js";
-import { chunkContentId } from "../indexing/chunk-integrity.js";
+import { chunkContentId, chunkContentMatches } from "../indexing/chunk-integrity.js";
 
-const TREE: TreeIndexNode = {
-  node_id: "tenant:t1", title: "t1", level: "tenant", summary: "", children: [
-    { node_id: "tenant:t1/year:2026", title: "2026", level: "year", summary: "", children: [
-      { node_id: "tenant:t1/year:2026/month:06/session:s1", title: "S1", level: "session", summary: "Visas.", children: [] },
-      { node_id: "tenant:t1/year:2026/month:06/session:s2", title: "S2", level: "session", summary: "Funding.", children: [] },
-    ] },
-  ],
-};
-
-type Row = Record<string, unknown>;
-/**
- * Completes the shorthand rows to what the production read gate accepts (whole turns, content-bound chunks): the
- * visibility gate drops partial turns and goal-t008 drops chunks whose id does not bind them to their source text.
- */
-function completeRows(rows: { chunks?: unknown[]; turns?: unknown[] }, tenantId = "t1") {
-  const turns: Row[] = ((rows.turns ?? []) as Row[]).map(t => ({ tenantId, speakerRef: "spk:0", tStart: 0, tEnd: 1, ...t }));
-  const chunks = ((rows.chunks ?? []) as Row[]).map(c => {
-    const tenant = (c.tenantId as string | undefined) ?? tenantId;
-    const source = turns.filter(t => t.tenantId === tenant && t.sessionId === c.sourceRef);
-    const turnRefs = source.map(t => t._id as string);
-    return { ...c, tenantId: tenant, turnRefs, embeddingModel: "fake",
-      _id: chunkContentId(tenant, c.sourceRef as string, turnRefs, source.map(t => (t.text as string).trim()).join(" ")) };
-  });
-  return { turns, chunks };
-}
+import { TREE, applyFilter, cursor, completeRows, type Row } from "./ask-arms.testsupport.js";
 
 /** Records every tenantId the arms actually queried with. */
 function fakeDb(shorthand: { chunks?: unknown[]; turns?: unknown[] } = {}) {
@@ -48,14 +24,12 @@ function fakeDb(shorthand: { chunks?: unknown[]; turns?: unknown[] } = {}) {
   const db = {
     collection(name: string) {
       return {
-        find: (filter?: Record<string, unknown>) => ({
-          toArray: async () => {
-            if (filter && typeof filter.tenantId === "string") queriedTenants.push(`${name}:${filter.tenantId}`);
-            // A real scoped Mongo query never returns another tenant's rows; the effective-turn reader refuses if one does.
-            const all = ((name === "chunks" ? rows.chunks : rows.turns) ?? []) as Record<string, unknown>[];
-            return typeof filter?.tenantId === "string" ? all.filter(row => row.tenantId === filter.tenantId) : all;
-          },
-        }),
+        find: (filter?: Record<string, unknown>) => {
+          if (filter && typeof filter.tenantId === "string") queriedTenants.push(`${name}:${filter.tenantId}`);
+          // A real scoped Mongo query never returns another tenant's rows; the effective-turn reader refuses if one does.
+          const all = (name === "chunks" ? rows.chunks : name === "turns" ? rows.turns : []) as Row[];
+          return cursor(applyFilter(all, filter));
+        },
       };
     },
   } as unknown as Pick<Db, "collection">;
@@ -109,14 +83,13 @@ test("C6: tenant B's arms return only tenant B's session — ONE corpus, both te
   const db = {
     collection(name: string) {
       return {
-        find: (filter?: Record<string, unknown>) => ({
-          toArray: async () => {
-            const t = filter && typeof filter.tenantId === "string" ? filter.tenantId : undefined;
-            seen.push(`${name}:${t ?? "UNSCOPED"}`);
-            const all = (name === "chunks" ? rows.chunks : rows.turns) as { tenantId: string }[];
-            return t === undefined ? all : all.filter((r) => r.tenantId === t);
-          },
-        }),
+        find: (filter?: Record<string, unknown>) => {
+          const t = filter && typeof filter.tenantId === "string" ? filter.tenantId : undefined;
+          seen.push(`${name}:${t ?? "UNSCOPED"}`);
+          // Unscoped reads return EVERYONE's rows, so a missing tenant filter is a visible leak, not a silent skip.
+          const all = (name === "chunks" ? rows.chunks : name === "turns" ? rows.turns : []) as Row[];
+          return cursor(applyFilter(all, filter));
+        },
       };
     },
   } as unknown as Pick<Db, "collection">;

@@ -9,8 +9,12 @@ function values(value: unknown, path: string[]): unknown[] {
 }
 export function matchesFixture(row: FixtureRow, filter: FixtureRow): boolean {
   return Object.entries(filter).every(([key, expected]) => {
+    // D-206: the lexical candidate read uses an `$or` of case-insensitive `$regex` clauses.
+    if (key === "$or" && Array.isArray(expected)) return expected.some(branch => matchesFixture(row, branch as FixtureRow));
     const actual = values(row, key.split("."));
     if (expected && typeof expected === "object") {
+      const rx = expected as { $regex?: unknown; $options?: unknown };
+      if (typeof rx.$regex === "string") return actual.some(value => typeof value === "string" && new RegExp(rx.$regex as string, typeof rx.$options === "string" ? rx.$options : "").test(value));
       if ("$in" in expected) return actual.some(value => (expected as { $in: unknown[] }).$in.includes(value));
       if ("$exists" in expected) return actual.some(value => value !== undefined) === (expected as { $exists: boolean }).$exists;
     }
@@ -22,7 +26,9 @@ export function corpusFixtureDb(rows: Record<string, FixtureRow[]>, calls: Fixtu
   return { collection: (name: string) => ({
     find: (filter: FixtureRow) => {
       calls.push({ coll: name, op: "find", filter });
-      return { toArray: async () => structuredClone((rows[name] ?? []).filter(row => matchesFixture(row, filter))) };
+      let max = Infinity; const cursor = { limit(n: number) { max = n; return cursor; },
+        toArray: async () => structuredClone((rows[name] ?? []).filter(row => matchesFixture(row, filter)).slice(0, max)) };
+      return cursor;
     },
     findOne: async (filter: FixtureRow) => {
       calls.push({ coll: name, op: "findOne", filter });
@@ -55,7 +61,9 @@ export function corpusSnapshotModel(rows: Record<string, FixtureRow[]>, calls: F
         if (!options?.session?.active || !options.session.snapshot) throw new Error("Snapshot model requires active transaction session");
         calls.push({ coll: name, op: "find", filter });
         const state = options.session.snapshot;
-        return { toArray: async () => structuredClone((state[name] ?? []).filter(row => matchesFixture(row, filter))) };
+        let max = Infinity; const cursor = { limit(n: number) { max = n; return cursor; },
+          toArray: async () => structuredClone((state[name] ?? []).filter(row => matchesFixture(row, filter)).slice(0, max)) };
+        return cursor;
       },
       findOne: async (filter: FixtureRow, options?: { session?: ModelSession }) => {
         if (!options?.session?.active || !options.session.snapshot) throw new Error("Snapshot model requires active transaction session");
