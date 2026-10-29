@@ -8,7 +8,7 @@
     "testMax": 400,
     "testPatterns": ["\\.test\\.ts$", "^test_.*\\.py$", "\\.test\\.mjs$"]
   },
-  "dirsize": { "$comment": "D-180: schema/ allows 46 canonical collection schemas plus index.json and validate.py (D-176/D-177 speaker relationships and attributes, D-180 registration link approvals); other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 48 } },
+  "dirsize": { "$comment": "D-180: schema/ allows 46 canonical collection schemas plus index.json and validate.py (D-176/D-177 speaker relationships and attributes, D-180 registration link approvals); D-206 whatsapp-multiuser W1 adds whatsapp_links, whatsapp_sync_runs, whatsapp_events (schema 51) and the whatsapp-links accessor module (packages/db/src/collections 32); other directory budgets remain unchanged.", "maxFiles": 30, "overrides": { "scripts": 32, "apps/api/src": 31, "schema": 51, "packages/db/src/collections": 32 } },
   "root": {
     "maxLooseFiles": 16,
     "architectureFile": "ARCHITECTURE.md",

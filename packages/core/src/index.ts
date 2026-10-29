@@ -46,6 +46,9 @@ export * from "./generated/watch_reports.js";
 export * from "./generated/watch_state.js";
 export * from "./generated/watched_sources.js";
 export * from "./generated/whatsapp_candidates.js";
+export * from "./generated/whatsapp_events.js";
+export * from "./generated/whatsapp_links.js";
+export * from "./generated/whatsapp_sync_runs.js";
 
 export * from "./domain/automation-monitor.js";
 export * from "./domain/keyframe-dedupe.js";

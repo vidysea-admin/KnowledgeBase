@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://whatsapp_links",
+  "title": "WhatsappLinks",
+  "description": "whatsapp-multiuser W1 (R-1..R-10, R-24, R-36). One link binds one KB user (userId) in one tenant to one archiver owner (archiverOwnerId), with a lifecycle: requested -> approved -> active <-> suspended; requested -> rejected; requested|approved|active|suspended -> unlinked|revoked (terminal). Health flags (needs-relink, stale, error, quiet) live in health.flags, never in state. userId is null only for a legacy link seeded once from WHATSAPP_TENANT_OWNER_MAP (R-24). live is derived from state (true for requested/approved/active/suspended, false for the terminal three) and exists so the unique partial index can enforce one non-terminal link per (tenantId, userId) (R-2). archiverOwnerId is unique across ALL tenants and states (R-2, never reused); it is redacted in logs and never returned to non-admins. studentData is the admin classification (R-4/R-32): per D-206 the default is no (WhatsApp-derived knowledge may reach external AI paths); the field stays so it can be tightened later. No message text, group subject, jid, phone number or QR data is ever stored here.",
+  "type": "object",
+  "required": ["_id", "tenantId", "userId", "label", "state", "live", "studentData", "createdAt", "updatedAt"],
+  "properties": {
+    "_id": { "type": "string", "pattern": "^[0-9a-f]{24}$", "description": "Link id (24-hex, R-45). Also the archiver ownerRef (R-11)." },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "userId": { "type": ["string", "null"], "minLength": 1, "maxLength": 200, "description": "The users-collection id of the person who owns the link; null only for a legacy env-seeded link until an admin binds it (R-24)." },
+    "label": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "state": { "type": "string", "enum": ["requested", "approved", "active", "suspended", "rejected", "unlinked", "revoked"] },
+    "live": { "type": "boolean", "description": "Derived: true exactly for requested|approved|active|suspended. Keyed by the unique partial index." },
+    "archiverOwnerId": { "type": "string", "pattern": "^[0-9a-f]{24}$", "description": "Archiver owner (users row there), stored by the KB after ensureOwner (R-11). Absent until provisioned." },
+    "noticeVersion": { "type": "string", "minLength": 1, "maxLength": 128, "description": "Hash of the notice text the person saw (R-3, R-49)." },
+    "noticeShownAt": { "type": "string", "format": "date-time" },
+    "studentData": { "type": "string", "enum": ["yes", "no", "unknown"] },
+    "requestedAt": { "type": "string", "format": "date-time" },
+    "approvedBy": { "type": "string", "minLength": 1, "maxLength": 200, "description": "Admin user id; system:env-seed for a legacy seeded link." },
+    "approvedAt": { "type": "string", "format": "date-time" },
+    "approvalExpiresAt": { "type": "string", "format": "date-time", "description": "Approved but never scanned links expire to unlinked/connect_timeout (R-5)." },
+    "activatedAt": { "type": "string", "format": "date-time" },
+    "suspendedAt": { "type": "string", "format": "date-time" },
+    "suspendedBy": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "suspendedReason": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$", "description": "Code, never free text (for example account_inactive)." },
+    "rejectedAt": { "type": "string", "format": "date-time" },
+    "rejectedBy": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "rejectedReason": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+    "unlinkedAt": { "type": "string", "format": "date-time" },
+    "unlinkedBy": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "unlinkedReason": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$", "description": "Code, for example owner_request or connect_timeout." },
+    "revokedAt": { "type": "string", "format": "date-time" },
+    "revokedBy": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "revokedReason": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+    "blocksNewRequests": { "type": "boolean", "description": "R-8: a revoked link sets this; the person cannot request a new link until an admin clears it." },
+    "health": {
+      "type": "object",
+      "description": "Last observed archiver/run health (R-34, R-35). Counts and codes only.",
+      "properties": {
+        "lastStatus": { "type": "string", "enum": ["connecting", "awaiting_qr", "connected", "reconnecting", "logged_out", "closed"] },
+        "lastStatusAt": { "type": "string", "format": "date-time" },
+        "lastRunAt": { "type": "string", "format": "date-time" },
+        "lastSuccessAt": { "type": "string", "format": "date-time" },
+        "lastMessageAt": { "type": "string", "format": "date-time" },
+        "flags": { "type": "array", "uniqueItems": true, "items": { "type": "string", "enum": ["needs-relink", "stale", "error", "quiet"] } }
+      },
+      "additionalProperties": false
+    },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "anyOf": [
+        { "properties": { "state": { "enum": ["requested", "approved", "active", "suspended"] }, "live": { "enum": [true] } } },
+        { "properties": { "state": { "enum": ["rejected", "unlinked", "revoked"] }, "live": { "enum": [false] } } }
+      ]
+    },
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["approved"] } } } }, { "required": ["approvedBy", "approvedAt"] } ] },
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["active"] } } } }, { "required": ["approvedBy", "approvedAt", "activatedAt", "archiverOwnerId"] } ] },
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["suspended"] } } } }, { "required": ["suspendedAt", "suspendedReason"] } ] },
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["rejected"] } } } }, { "required": ["rejectedAt", "rejectedBy"] } ] },
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["unlinked"] } } } }, { "required": ["unlinkedAt", "unlinkedBy", "unlinkedReason"] } ] },
+    { "anyOf": [ { "properties": { "state": { "not": { "enum": ["revoked"] } } } }, { "required": ["revokedAt", "revokedBy", "revokedReason"] } ] }
+  ],
+  "additionalProperties": false
+}

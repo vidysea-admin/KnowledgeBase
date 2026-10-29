@@ -255,6 +255,21 @@
       }
     }
   ],
+  "whatsapp_links": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "userId": 1 }, "name": "whatsapp_links_live_user", "unique": true, "partialFilterExpression": { "live": true, "userId": { "$type": "string" } } },
+    { "keys": { "archiverOwnerId": 1 }, "name": "whatsapp_links_archiver_owner", "unique": true, "partialFilterExpression": { "archiverOwnerId": { "$type": "string" } } },
+    { "keys": { "tenantId": 1, "state": 1 } }
+  ],
+  "whatsapp_sync_runs": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "linkId": 1, "startedAt": -1 } }
+  ],
+  "whatsapp_events": [
+    { "keys": { "tenantId": 1, "_id": 1 }, "unique": true },
+    { "keys": { "tenantId": 1, "at": 1, "_id": 1 } },
+    { "keys": { "tenantId": 1, "linkId": 1, "at": 1 } }
+  ],
   "trusted_senders": [
     {
       "keys": {

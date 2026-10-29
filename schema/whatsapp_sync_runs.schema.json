@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://whatsapp_sync_runs",
+  "title": "WhatsappSyncRuns",
+  "description": "whatsapp-multiuser W1 (R-33). One row per sync run of one link. errorCode is from a closed list; upstream free text is never stored. No message text. Retention is the repo retention module's concern (assumed 180 days, R-36).",
+  "type": "object",
+  "required": ["_id", "tenantId", "linkId", "startedAt", "status"],
+  "properties": {
+    "_id": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "linkId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "endedAt": { "type": "string", "format": "date-time" },
+    "status": { "type": "string", "enum": ["ok", "partial", "failed", "skipped"] },
+    "errorCode": {
+      "type": ["string", "null"],
+      "enum": ["archive_unreachable", "archiver_api_unreachable", "not_configured", "link_inactive", "store_transaction_unavailable", "snapshot_shrink_refused", "unknown", null]
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["groupJid", "fetched", "newTurns", "candidatesCreated", "skippedDeleted"],
+        "properties": {
+          "groupJid": { "type": "string", "pattern": "^[0-9A-Za-z._-]{1,64}@g\\.us$" },
+          "fetched": { "type": "integer", "minimum": 0 },
+          "newTurns": { "type": "integer", "minimum": 0 },
+          "candidatesCreated": { "type": "integer", "minimum": 0 },
+          "skippedDeleted": { "type": "integer", "minimum": 0 },
+          "errorCode": {
+            "type": ["string", "null"],
+            "enum": ["archive_unreachable", "archiver_api_unreachable", "not_configured", "link_inactive", "store_transaction_unavailable", "snapshot_shrink_refused", "unknown", null]
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

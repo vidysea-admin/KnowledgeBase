@@ -1,0 +1,15 @@
+{
+  "_id": "6a8d0c692fcc75f0e911b8b1",
+  "tenantId": "toc",
+  "eventType": "link.exploded",
+  "at": "2026-10-29T10:00:00.000Z",
+  "linkId": "6a8d0c692fcc75f0e911b801",
+  "actorKind": "user",
+  "actorId": "admin-1",
+  "data": {
+    "fromState": "requested",
+    "toState": "approved",
+    "requesterId": "user-1",
+    "approverId": "admin-1"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://whatsapp_events",
+  "title": "WhatsappEvents",
+  "description": "whatsapp-multiuser W1 (R-29, R-38, R-39). Append-only domain events. Payload rule (R-39): ids, timestamps, counts and codes ONLY. Never message text, names, phone numbers, group subjects, jids, QR data or archiver owner ids. Enforced structurally: the event and its data object are closed (additionalProperties false) and every data value is an id pattern, a code, a count or an enum, so a free-text field cannot be added without a schema change. The data-key allowlist is mirrored in packages/db/src/collections/whatsapp-links.ts (a test pins the two together). admin.raw_read is added to the R-38 list for the R-29 audit of an admin reading another person's raw content (W7). The collection exposes insert and read only (no update, no delete).",
+  "type": "object",
+  "required": ["_id", "tenantId", "eventType", "at", "actorKind"],
+  "properties": {
+    "_id": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "eventType": {
+      "type": "string",
+      "enum": ["link.requested", "link.approved", "link.rejected", "link.connected", "link.suspended", "link.resumed", "link.unlinked", "link.revoked", "link.needs_relink", "selection.changed", "sync.completed", "sync.failed", "candidate.created", "candidate.approved", "candidate.rejected", "admin.raw_read"]
+    },
+    "at": { "type": "string", "format": "date-time" },
+    "linkId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+    "actorKind": { "type": "string", "enum": ["user", "key", "system"] },
+    "actorId": { "type": "string", "pattern": "^[A-Za-z0-9_.:@-]{1,200}$", "description": "User id or key fingerprint (UA-29); absent for system." },
+    "data": {
+      "type": "object",
+      "properties": {
+        "fromState": { "type": "string", "enum": ["requested", "approved", "active", "suspended", "rejected", "unlinked", "revoked"] },
+        "toState": { "type": "string", "enum": ["requested", "approved", "active", "suspended", "rejected", "unlinked", "revoked"] },
+        "reason": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+        "errorCode": { "type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$" },
+        "requesterId": { "type": "string", "pattern": "^[A-Za-z0-9_.:@-]{1,200}$" },
+        "approverId": { "type": "string", "pattern": "^[A-Za-z0-9_.:@-]{1,200}$" },
+        "targetUserId": { "type": "string", "pattern": "^[A-Za-z0-9_.:@-]{1,200}$" },
+        "runId": { "type": "string", "pattern": "^[0-9a-f]{24}$" },
+        "candidateId": { "type": "string", "pattern": "^[A-Za-z0-9_.:-]{1,200}$" },
+        "groupCount": { "type": "integer", "minimum": 0 },
+        "markedCount": { "type": "integer", "minimum": 0 },
+        "fetched": { "type": "integer", "minimum": 0 },
+        "newTurns": { "type": "integer", "minimum": 0 },
+        "candidatesCreated": { "type": "integer", "minimum": 0 },
+        "count": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

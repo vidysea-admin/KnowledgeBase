@@ -144,6 +144,9 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
 | watched_sources | _id, tenantId, url, reputationTier, checkIntervalHours, active | no |
 | whatsapp_candidates | _id, tenantId, sourceId, groupJid, sessionId, kind, text, contentHash, evidence, flags, status, createdAt | yes |
+| whatsapp_events | _id, tenantId, eventType, at, actorKind | no |
+| whatsapp_links | _id, tenantId, userId, label, state, live, studentData, createdAt, updatedAt | no |
+| whatsapp_sync_runs | _id, tenantId, linkId, startedAt, status | no |
 
 ## Recent feature events (last 20)
 

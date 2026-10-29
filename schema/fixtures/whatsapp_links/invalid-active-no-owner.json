@@ -1,0 +1,23 @@
+{
+  "_id": "6a8d0c692fcc75f0e911b801",
+  "tenantId": "toc",
+  "userId": "user-1",
+  "label": "My phone",
+  "state": "active",
+  "live": true,
+  "studentData": "no",
+  "requestedAt": "2026-10-29T10:00:00.000Z",
+  "noticeVersion": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "noticeShownAt": "2026-10-29T10:00:00.000Z",
+  "createdAt": "2026-10-29T10:00:00.000Z",
+  "updatedAt": "2026-10-29T10:00:00.000Z",
+  "approvedBy": "admin-1",
+  "approvedAt": "2026-10-29T10:00:00.000Z",
+  "approvalExpiresAt": "2026-11-12T10:00:00.000Z",
+  "activatedAt": "2026-10-29T10:00:00.000Z",
+  "health": {
+    "lastStatus": "connected",
+    "lastStatusAt": "2026-10-29T10:00:00.000Z",
+    "flags": []
+  }
+}
