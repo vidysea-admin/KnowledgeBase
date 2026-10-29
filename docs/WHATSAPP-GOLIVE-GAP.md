@@ -44,7 +44,7 @@ Databases: archiver data lives in its OWN Mongo (container `whatsapp-msg-mongo`,
 ## 3. Not built or broken
 | # | Gap | Evidence | Size |
 |---|---|---|---|
-| 1 | compose does not forward any `WHATSAPP_*` name to api, so even a correct server `.env` never reaches the container | `docker-compose.yml:50-71` api `environment` has none; `env_file` is only `.env.t028` | S (3 lines) |
+| 1 | CLOSED 2026-10-29 for the single-owner names: compose now forwards `WHATSAPP_MONGO_URL`, `WHATSAPP_MONGO_DB`, `WHATSAPP_TENANT_OWNER_MAP` to api as value-less pass-through (`docker-compose.yml:83-85`, api `environment`), and `env_file` is gone. Any name a server needs beyond these (the multi-user archiver API URL and token) is added by unit W3 of the plan of record, `docs/features/whatsapp-multiuser/plan.md` (gate G-2 there is this gap; the multi-user design is `spec.md` and `intent.md` in the same folder, built after `docs/features/user-accounts/`). Server `.env` must not carry blank `WHATSAPP_*=` lines: `docs/GO-LIVE-UBUNTU.md` section 2 | S (done) |
 | 2 | No server deployment of the archiver. It needs an always-on host, a persistent `sessions/` dir (linked-device auth), `media/`, its own Mongo, and a one-time QR scan by the phone owner. No Dockerfile or compose in the submodule; README runs it with `npm run dev` + a local docker Mongo | `sources/whatsapp_msg/README.md` "Running it"; `ls` shows no Dockerfile; local `sessions/` and `.env` present | M-L |
 | 3 | Archiver Mongo must be reachable from the api container and not exposed to the internet (same ransom-attack risk as section 0 item 1 of GO-LIVE-UBUNTU) | `docs/GO-LIVE-UBUNTU.md:30-35` | S-M |
 | 4 | Live `/api/whatsapp/groups` is 500 today; `lkb-live.knowledge.md` finding (WHATSAPP_MONGO_URL unset). Deployed build predates 83c7b50e, so master needs this branch merged to give an honest 503 | `references/portals/lkb-live.knowledge.md` Findings + page matrix `/whatsapp`; `git branch --contains 83c7b50e` excludes master | S (merge) |
@@ -66,7 +66,7 @@ Option B (WhatsApp live at launch), in order:
 1. Merge 83c7b50e to master (gap 4). S.
 2. Decide archiver host. Simplest: keep it on the existing always-on machine that already holds the linked-device
    session and its Mongo; expose that Mongo only to the app server by firewall plus credentials (gaps 2-3). M.
-3. Add `WHATSAPP_MONGO_URL`, `WHATSAPP_MONGO_DB`, `WHATSAPP_TENANT_OWNER_MAP` to compose api `environment` (gap 1) and the
+3. Compose already forwards `WHATSAPP_MONGO_URL`, `WHATSAPP_MONGO_DB`, `WHATSAPP_TENANT_OWNER_MAP` (gap 1, closed); add them to the
    server `.env` (values from the owner); `docker compose up -d --build api`. S.
 4. Make `lkb_prod` a replica set or confirm it is one (gap 5). M. Verify with `curl -H "Authorization: Bearer <key>"
    https://<server>/api/whatsapp/groups` returning 200 with groups.

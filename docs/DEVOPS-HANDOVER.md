@@ -16,6 +16,8 @@ and the exceptions are listed in section 2.
 | Server and Mongo security | Devops owns it. Mongo hardening comes FIRST (section 3). |
 | T-028 hosting vars | All five go in the main `.env` (not `.env.t028`). See section 2. |
 | Pipeline | Runs on the same Ubuntu server. Deployed by `git pull` of the repo. See section 8. |
+| Meeting bot | Runs on the Ubuntu server as the compose `bot` service (profile `bot`, D-205): Docker, Xvfb, tab capture. Section 8a and `docs/GO-LIVE-UBUNTU.md` section 5. Native privacy-window masking is not available on Ubuntu (accepted). |
+| Base path | The product is served at `https://vidysea.com/knowledgebase` via runtime `APP_BASE_PATH`. Section 4a. |
 | WhatsApp | Ships at launch. Required vars and remaining work: `docs/WHATSAPP-GOLIVE-GAP.md` (being written in parallel; follow that file, this one does not repeat it). |
 | Domain name | PENDING from Umesh. Shown below as `<DOMAIN-PLACEHOLDER>`. See section 4. |
 | Live database | `lkb_prod`, user `lkb_app` (guide sections 6a, 8). `lkb_staging` is the pipeline's current target until cutover. |
@@ -24,9 +26,9 @@ and the exceptions are listed in section 2.
 ## 2. The five T-028 variables (all five or none)
 
 T-028 turns on counsellor accounts, `/keys`, `/hosting`, `/webhooks`. Set all five in the main
-`.env`. A compose change is being built so the `api` container reads them from `.env`. Until it is
-merged to the branch you deploy, the compose file reads them only from `.env.t028`
-(`docker-compose.yml` lines 72-77); check with the owner which version you are deploying.
+`.env`. Compose (merged) forwards them to the `api` container from `.env` as value-less pass-through; the old
+`.env.t028` file is retired and compose no longer reads it (`docker-compose.yml`, comment above the api
+`environment`). If a server still has a `.env.t028`, move its five lines into `.env` and delete it.
 
 | Name | Value shape |
 |---|---|
@@ -101,7 +103,7 @@ machine, load the UI and confirm no CORS errors in the console.
 
 ### G. Operations (owner: devops)
 - [ ] Log retention for `docker compose logs` (section 6) and alerting on `/health`.
-- [ ] Backup of the Docker volumes `lkb-hosting-state`, `lkb-counsellor-state`, `lkb-join-rules-state`, and the encryption key.
+- [ ] Backup of the Docker volumes `lkb-hosting-state`, `lkb-counsellor-state`, `lkb-join-rules-state`, the bot volumes `lkb-bot-profile` (signed-in Chrome profile), `lkb-bot-data`, `lkb-bot-gws`, `lkb-bot-recordings`, and the encryption key.
 
 ## 4. Domain (PLACEHOLDER)
 
@@ -115,7 +117,8 @@ one. When it arrives it feeds four places, and changing it later means a web reb
 | `LKB_HOSTING_WEBHOOK_ORIGINS` | https origins allowed for webhooks (T-028). |
 | TLS certificate and proxy config | `certbot -d` / Caddy site name. |
 
-Also `LKB_API_URL=https://<DOMAIN-PLACEHOLDER>/api` on any bot or worker machine.
+Also `LKB_API_URL` on any bot or worker machine, including the `bot` container: `https://<DOMAIN-PLACEHOLDER>/api`, or with
+the vidysea.com layout of section 4a `https://vidysea.com/knowledgebase/api`.
 
 ## 4a. Base path: vidysea.com/knowledgebase (APP_BASE_PATH)
 
@@ -176,12 +179,16 @@ embeddings), `GEMINI_STT_MODEL`, `OLLAMA_VISION_MODELS`, `WEBINAR_VISION_MODEL`,
 **WhatsApp**: `WHATSAPP_MONGO_URL`, `WHATSAPP_MONGO_DB`, `WHATSAPP_TENANT_OWNER_MAP`; the
 authoritative list and what remains is `docs/WHATSAPP-GOLIVE-GAP.md`.
 
-**Meeting bot and autojoin (pipeline host)**: `LKB_CAPTURE_BACKEND` (use `tab` on Linux),
-`LKB_TENANT_ID`, `LKB_API_URL`, `LKB_API_KEY`, `LKB_BOT_PROFILE_DIR`, `LKB_BROWSER_EXECUTABLE`,
-`LKB_PYTHON`, `LKB_GWS_PATH`, `LKB_FFPROBE`, `LKB_RECORD_DIR`, `LKB_JOIN_RULES_ENFORCE`,
-`LKB_AUTOJOIN_DISCOVERY`, `LKB_AUTOJOIN_WEBINARS`, `LKB_AUTOJOIN_CAREER_PRIORITY`,
-`LKB_AUTOJOIN_TEST_DATA_ROUTING`, `LKB_AUTOJOIN_CONFIG`, `LKB_CAREER_TOPICS_FILE`,
-`LKB_WEBINAR_REGISTRATION_CONFIG`.
+**Meeting bot container (compose `bot` service)**: the names compose forwards are the database and tenant group
+(`MONGODB_URL`, `MONGO_WORK_DB`, `LKB_TENANT_ID`, `LKB_API_URL`, `LKB_API_KEY`), the scheduler gates
+(`LKB_JOIN_RULES_ENFORCE`, `LKB_AUTOJOIN_DISCOVERY`, `LKB_AUTOJOIN_WEBINARS`, `LKB_AUTOJOIN_CAREER_PRIORITY`,
+`LKB_AUTOJOIN_TEST_DATA_ROUTING`, `LKB_AUTOJOIN_CONFIG`, `LKB_CAREER_TOPICS_FILE`, `LKB_WEBINAR_REGISTRATION_CONFIG`),
+the intake names (`AUTO_RECORD_TRUSTED_EMAILS`, `AUTO_RECORD_TRUSTED_DOMAINS`, `LKB_GMAIL_ALIASES`, `LKB_GMAIL_LABEL_IDS`),
+the alert names below, `GEMINI_API_KEY`, `OLLAMA_API_KEY`, and the container-only `VNC_PASSWORD` (login mode) and
+`LKB_CHROME_NO_SANDBOX` (image default `1`). The image sets `LKB_CAPTURE_BACKEND=tab`, `LKB_BOT_PROFILE_DIR`,
+`LKB_BROWSER_EXECUTABLE`, `LKB_PYTHON`, `LKB_GWS_PATH`, `LKB_RECORD_DIR` and `TZ` itself; do not set them. Exact list and
+rules: `docs/GO-LIVE-UBUNTU.md` section 5.4. On the existing Windows bot host the path overrides (`LKB_FFPROBE`,
+`LKB_GWS_PATH`, `LKB_PYTHON`) still apply.
 
 **Alerts and notifications**: `LKB_ALERT_EMAIL`, `LKB_ALERT_DASHBOARD`, `LKB_ALERT_CALENDAR`,
 `LKB_ALERT_EMAIL_TO`, `LKB_ALERT_EMAIL_TEST_DATA`, `LKB_ALERT_EMAIL_PER_HOUR`,
@@ -229,10 +236,23 @@ problem, restore the previous `.env` and `docker compose up -d --build api`.
 
 Decision: the pipeline already runs on the Ubuntu server; code is pushed to git and the server
 runs `git pull`, then runs everything. Notes:
-- The compose stack runs only `api` and `web`. The scheduler, watchers, meeting bot, capture and the Python transcription worker are separate processes run from the repo with Node/pnpm, Python, ffmpeg and the `gws` CLI (guide section 5).
-- Guide section 5 still says a headless Linux bot run is UNTESTED and the bot lived on a Windows host. Linux needs a display (`xvfb-run` or a desktop session), `LKB_CAPTURE_BACKEND=tab`, and path overrides (`LKB_PYTHON`, `LKB_GWS_PATH`, `LKB_FFPROBE`). Confirm with the owner what is already running before changing it.
+- The default compose stack runs only `api` and `web`. The meeting bot, scheduler, watchers and capture run in the `bot` service (profile `bot`, section 8a). The Python transcription worker and other scripts are still run from the repo with Node/pnpm, Python and ffmpeg. Confirm with the owner what is already running on the server before changing it.
 - The pipeline currently writes `lkb_staging`. Cutover to `lkb_prod` (owner decision: three-part production opt-in in `scripts/webinar/sync-session.mjs`, decision entry first) is a separate gated change; do not point pipeline processes at `lkb_prod` until the owner confirms it landed.
 - Keep one `.env` per process owner; the pipeline user and the Docker `api` should use different Mongo users where possible.
+
+## 8a. Meeting bot (compose profile `bot`)
+
+Procedure and exact commands: `docs/GO-LIVE-UBUNTU.md` section 5 (build, doctor, smoke, env names, login, gws, live proof, run, limits).
+Evidence it is built and works up to the fake-meeting smoke: `qa/manifests/bot-image.md`, `bot-gws-install.md`, `bot-smoke.md`.
+Devops order:
+- [ ] `docker compose --profile bot build bot`, then `docker compose --profile bot run --rm -e BOT_MODE=doctor bot` must exit 0.
+- [ ] `BOT_IMAGE=lkb-bot bash scripts/qa/container-workflows/bot-smoke.sh` ends `SMOKE RESULT PASS` (needs `docker build -f docker/meeting-bot/Dockerfile -t lkb-bot .` first; layers are cached).
+- [ ] Bot `.env` values from the owner (guide 5.4). `MONGO_WORK_DB` is an isolated work database, never `lkb` or `lkb_prod`.
+- [ ] HUMAN, with the owner: one-time Google sign-in through VNC over an SSH tunnel (guide 5.5; VNC is loopback-only, never open a port for it), then gws OAuth (5.6).
+- [ ] HUMAN, with the owner: the Linux live proof `data/webinar-release/live-proof.json` (5.7). Run mode refuses to start without it. A Windows proof is refused on Linux.
+- [ ] `docker compose --profile bot up -d bot`; `docker compose --profile bot ps` shows `healthy`; `docker compose --profile bot logs -f bot` for the pipeline output.
+- Limits the owner accepted (D-205): no native privacy-window masking on Ubuntu, `--native-tab-clock` unsupported, tab capture only, no OBS.
+- Do not: publish port 5900 beyond `127.0.0.1`; run login mode and run mode together (one Chrome per profile); put `VNC_PASSWORD` or any key in git or chat; use `down -v`.
 
 ## 9. What NOT to do
 
