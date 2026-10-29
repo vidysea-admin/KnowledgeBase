@@ -172,7 +172,7 @@ test("ISS-427 every Mongo read of a /route call carries maxTimeMS derived from t
   const { deps, calls } = setup();
   await deps.route("toc", "visa requirements for Germany", 5, { deadlineAt: Date.now() + 900 });
   assert.ok(calls.some((c) => c.coll === "turns") && calls.some((c) => c.coll === "sessions"));
-  for (const c of calls) {
+  for (const c of calls.filter((x) => x.op !== "replaceOne")) { // reads only: the D-208 route_index write-through is a write, bounded by its own timer
     const ms = c.options?.maxTimeMS as number | undefined;
     assert.ok(typeof ms === "number" && ms >= 1 && ms <= 900, `${c.coll} maxTimeMS=${ms}`);
   }

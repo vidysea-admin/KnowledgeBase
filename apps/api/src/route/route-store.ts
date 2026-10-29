@@ -6,19 +6,23 @@
  *      sessions only (withdrawn / index-failed dropped AFTER selection), `safeCitationSession` labels.
  * The tree only routes: answer text is always a `turns` row. The tree is read through the injected trusted `TreeStore`
  * (ineligible sessions already excluded) and cached per tenant; the cache only ever holds routing text.
+ * D-208 item 2: the index is also PERSISTED (collection `route_index`, one document per tenant of the API's own database). A cold
+ *   in-memory cache first reads that document and serves it only if its stamp (the shared visibility fingerprint + the tree root's
+ *   `indexRevision`, both read first) equals the current one; otherwise the tree is rebuilt and the document overwritten. Every
+ *   persisted read/write is bounded and best-effort: failure or timeout means the build below, never a hang and never a stale serve.
  */
 import type { Db } from "mongodb";
 import type { Sessions, TreeIndexNode, Turns } from "@lkb/core";
 import type { CompleteResult, Job } from "@lkb/ai";
 import { selectNodes } from "@lkb/ask";
-import { assertValidTenantId, getDb, scopedCollection } from "@lkb/db";
-import { treeSearch } from "@lkb/index";
+import { assertValidTenantId, getDb, routeIndex, scopedCollection, withTenant } from "@lkb/db";
+import { treeIndexRootFilter, treeSearch } from "@lkb/index";
 import { visibilityFingerprint, withReadDeadline, type VisibilityState } from "../search-cache/search-cache.js";
 import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
 import { createKnowledgeVisibility, type KnowledgeVisibility } from "../visibility/knowledge.js";
 import type { SearchHit } from "../routes/search.js";
 import { bm25Ceiling, bm25Scores, buildBm25, tokenize } from "./bm25.js";
-import { buildRouteIndex, frontierRoot, refsOf, routeStepA, MAX_SESSIONS, type RouteIndex } from "./bm25-router.js";
+import { buildRouteIndex, frontierRoot, refsOf, routeIndexFromDoc, routeIndexToDoc, routeStepA, MAX_SESSIONS, type RouteIndex, type RouteStamp } from "./bm25-router.js";
 
 /** `signal` fires when the request's hard deadline passes (or it failed): route() stops reading and the step B model call is aborted. */
 export interface RouteControl { deadlineAt: number; signal?: AbortSignal }
@@ -31,6 +35,9 @@ export interface RouteDeps {
 export class RouteTimeout extends Error { constructor() { super("route_timeout"); } }
 export class RouteNoTree extends Error { constructor() { super("no_tree"); } }
 
+/** Observable outcome of one persisted-index step (D-208): metrics and tests; never an input to routing. */
+export type PersistEvent = "persisted-hit" | "persisted-miss" | "persisted-stale" | "persisted-invalid" | "read-failed" | "written" | "write-failed" | "skipped-oversize";
+
 export interface RouteStoreDeps {
   db?: Pick<Db, "collection">;
   /** Trusted tree reader (production: `createMongoTreeStore`). */
@@ -41,9 +48,30 @@ export interface RouteStoreDeps {
   now?: () => number;
   stepBTimeoutMs?: number;
   indexTtlMs?: number;
+  /** Persist the index in `route_index` (default true). False -> the pre-D-208 behaviour: memory only. */
+  persist?: boolean;
+  /** Largest serialized document written (default 12 MB, under BSON's 16 MB); a bigger index stays memory-only. */
+  maxDocBytes?: number;
+  onPersist?: (event: PersistEvent) => void;
   observe?: (stats: RouteStats) => void;
 }
 const STEP_B_TIMEOUT_MS = 1200, INDEX_TTL_MS = 60_000, CANDIDATE_SESSIONS = 6, MAX_ROUNDS = 3;
+const PERSIST_READ_MS = 1000, PERSIST_WRITE_MS = 5000, MAX_DOC_BYTES = 12_000_000;
+
+type Settled<T> = { ok: true; value: T } | { ok: false };
+/** Runs `run` for at most `ms`. NEVER rejects: a throw, a rejection or a timeout is `{ ok: false }` (the caller falls back). */
+function settle<T>(run: () => Promise<T>, ms: number): Promise<Settled<T>> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve({ ok: false }), Math.max(1, ms));
+    Promise.resolve().then(run).then((value) => { clearTimeout(timer); resolve({ ok: true, value }); }, () => { clearTimeout(timer); resolve({ ok: false }); });
+  });
+}
+/** `indexRevision` of the tenant's tree_index root (null when absent): changes whenever the tree is rewritten, which the visibility fingerprint cannot see. */
+async function treeRevision(db: Pick<Db, "collection">, tenantId: string): Promise<number | null> {
+  const row = await db.collection<{ tenantId: string; indexRevision?: number }>("tree_index").findOne(withTenant<{ tenantId: string; indexRevision?: number }>(tenantId, treeIndexRootFilter(tenantId)), { projection: { _id: 1, tenantId: 1, indexRevision: 1 } });
+  if (row && row.tenantId !== tenantId) throw new Error("tree revision scope mismatch");
+  return Number.isSafeInteger(row?.indexRevision) ? row!.indexRevision! : null;
+}
 
 /** Rejects with RouteTimeout when `ms` elapse OR `abort` fires, and aborts `abort` on the timeout, so the pending model call is cancelled, not abandoned. */
 function withTimeout<T>(p: Promise<T>, ms: number, abort: AbortController): Promise<T> {
@@ -60,17 +88,45 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
   const now = deps.now ?? Date.now, ttl = deps.indexTtlMs ?? INDEX_TTL_MS;
   const cache = new Map<string, { index: RouteIndex | null; flight?: Promise<RouteIndex> }>(); // key = tenantId, never shared
 
-  const load = async (tenantId: string): Promise<RouteIndex> => {
+  const persist = deps.persist !== false, emit = (e: PersistEvent) => { try { deps.onPersist?.(e); } catch { /* an observer never breaks routing */ } };
+  /** Persisted index if its stamp is current, else a tree rebuild that is written back. `deadlineAt` only bounds the persisted reads. */
+  const load = async (tenantId: string, deadlineAt: number): Promise<RouteIndex> => {
+    const raw = deps.db ?? getDb();
+    let stamp: RouteStamp | null = null;
+    if (persist) {
+      // The stamp is read BEFORE the tree, so a change racing the build leaves the stored stamp older, never newer: the next reader rebuilds.
+      const db = withReadDeadline(raw, deadlineAt, now), budget = Math.min(PERSIST_READ_MS, Math.floor((deadlineAt - now()) / 2));
+      // Two independent bounded reads: a route_index read that fails still leaves a usable stamp, so the rebuild is written back.
+      const [state, stored] = await Promise.all([
+        settle(async () => { const [fp, revision] = await Promise.all([visibilityFingerprint(db, tenantId), treeRevision(db, tenantId)]); return { fingerprint: fp.fingerprint, treeRevision: revision } as RouteStamp; }, budget),
+        settle(() => routeIndex(tenantId, db as Db).findOne({ _id: tenantId }), budget),
+      ]);
+      if (state.ok) stamp = state.value;
+      if (!state.ok || !stored.ok) emit("read-failed");
+      if (stamp && stored.ok) {
+        const hit = stored.value ? routeIndexFromDoc(stored.value, tenantId, stamp, now()) : null;
+        if (hit) { emit("persisted-hit"); return hit; }
+        const row = stored.value as { fingerprint?: unknown; treeRevision?: unknown } | null;
+        emit(!row ? "persisted-miss" : row.fingerprint !== stamp.fingerprint || row.treeRevision !== stamp.treeRevision ? "persisted-stale" : "persisted-invalid");
+      }
+    }
     const tree = await deps.tree.load(tenantId);
     if (!tree) throw new RouteNoTree();
-    return buildRouteIndex(tree, tenantId, now());
+    const index = buildRouteIndex(tree, tenantId, now());
+    if (stamp) {
+      // Best-effort write-through on the API's normal handle; the request never waits for it and never fails because of it.
+      const doc = routeIndexToDoc(index, tenantId, stamp);
+      if (Buffer.byteLength(JSON.stringify(doc)) > (deps.maxDocBytes ?? MAX_DOC_BYTES)) emit("skipped-oversize");
+      else void settle(() => routeIndex(tenantId, raw as Db).replaceOne({ _id: tenantId }, doc, { upsert: true }), PERSIST_WRITE_MS).then((w) => emit(w.ok ? "written" : "write-failed"));
+    }
+    return index;
   };
   /** Fresh index, or the stale one while a single-flight refresh runs (a failed refresh keeps serving the stale index). */
-  const indexFor = async (tenantId: string): Promise<RouteIndex> => {
+  const indexFor = async (tenantId: string, deadlineAt: number): Promise<RouteIndex> => {
     const entry = cache.get(tenantId) ?? { index: null };
     cache.set(tenantId, entry);
     if (entry.index && now() - entry.index.builtAt < ttl) return entry.index;
-    entry.flight ??= load(tenantId).then((i) => { entry.index = i; return i; }).finally(() => { entry.flight = undefined; });
+    entry.flight ??= load(tenantId, deadlineAt).then((i) => { entry.index = i; return i; }).finally(() => { entry.flight = undefined; });
     if (entry.index) { entry.flight.catch(() => undefined); return entry.index; }
     return entry.flight;
   };
@@ -100,7 +156,7 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
       return new Set(checked.filter(([, ok]) => ok).map(([id]) => id));
     };
 
-    const index = await indexFor(tenantId);
+    const index = await indexFor(tenantId, ctl.deadlineAt);
     check();
     const a = routeStepA(index, query);
     const stepAMs = now() - t0;

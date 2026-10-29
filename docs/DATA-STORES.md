@@ -29,7 +29,7 @@ Store counts (rows of section 2, base 63bdc87e):
 | Other Mongo databases (D1-D8) | 8 | - | 3 (D1 reconcile, D3 calendar collections, D5 upload queue) | - | 5 (staging, codex work, archiver, vc, ransom-note-named DB) |
 | File-backed stores (F1-F34) | 34 | - | 19 move whole (F1-F6, F8-F12, F14, F15, F22-F27) | 3 stay with Mongo metadata or proofs (F16, F17, F21); 2 split (F30 lock stays, digest drops; F32 token stays, quota moves); 9 stay as file only (F7, F13, F18, F19, F20, F28, F29, F31, F33) | 1 (F34) |
 | Docker volumes (V1-V8) | 8 | - | 3 empty out and go (V1-V3) | 2 shrink to media/staging only (V4, V5); 2 stay (V6, V7) | 1 (V8 dev Mongo) |
-| In-memory structures (R1-R5) | 5 | - | 1 (R1 route index) | 4 stay in memory (R2-R5) | plus 1 client-side (C1) |
+| In-memory structures (R1-R5) | 5 | - | 1 (R1 route index; now persisted in `route_index`, unit `route-index-persist`) | 4 stay in memory (R2-R5) | plus 1 client-side (C1) |
 
 Student or personal data: 17 of the 34 file stores (F2, F6, F7, F8, F16, F17, F19, F20, F21, F26, F28, F29, F31, F32, F33 are `y`; F14, F25 are `y?`).
 
@@ -122,7 +122,7 @@ Out of scope (not KB runtime state), recorded so the list is complete: dev ledge
 
 | ID | Store | Holds | Writer | Reader | Rebuilt | Proposal |
 |---|---|---|---|---|---|---|
-| R1 | route index (BM25 terms, facets, session list) per tenant | derived from the tree | `apps/api/src/route/route-store.ts:51-57` (`buildRouteIndex`, `apps/api/src/route/bm25-router.ts:25`; facets `apps/api/src/route/facets.ts:10,25`) | `route-store.ts:59-66,88-90` | on first request after start and every 60 s (`route-store.ts:40`); a cold build also re-reads and re-filters sessions, pages and the tree (`trusted-readers.ts:89-118`), the roughly 4.5 s D-208 cites | move to collection `route_index` (D-208 item 2) |
+| R1 | route index (BM25 terms, facets, session list) per tenant | derived from the tree | `apps/api/src/route/route-store.ts:51-57` (`buildRouteIndex`, `apps/api/src/route/bm25-router.ts:25`; facets `apps/api/src/route/facets.ts:10,25`) | `route-store.ts:59-66,88-90` | on first request after start and every 60 s (`route-store.ts:40`); a cold build also re-reads and re-filters sessions, pages and the tree (`trusted-readers.ts:89-118`), the roughly 4.5 s D-208 cites | DONE (unit `route-index-persist`): persisted in collection `route_index` of the API's own database (`lkb_prod` in production), one document per tenant (`_id` = tenantId), written through after every rebuild and read first on a cold start. The document carries a stamp (the shared visibility fingerprint plus the tree root's `indexRevision`, both read before the build); a reader serves it only if the stamp equals the current one, otherwise it rebuilds and overwrites. Memory stays as the hot layer (60 s) above it. Code: `apps/api/src/route/route-store.ts` (`load`), codec `apps/api/src/route/bm25-router.ts` (`routeIndexToDoc`, `routeIndexFromDoc`), accessor `packages/db/src/collections/route-index.ts`, schema `schema/route_index.schema.json` |
 | R2 | search result cache (per tenant, TTL, visibility fingerprint) | previous `/search` hits | `apps/api/src/search-store.ts:178,214`; class `apps/api/src/search-cache/search-cache.ts:19-48` | same | lost on restart, harmless | keep in memory: results are visibility-bound, persisting them adds a withdrawal-leak surface (`search-cache.ts:10-13`) |
 | R3 | request visibility memo | per-request gate results | `apps/api/src/visibility/knowledge.ts` (`newVisibilityRequestMemo`, used `apps/api/src/search-store.ts:12`) | same request | per request | keep in memory |
 | R4 | rate-limit counters | per-key request counts | `apps/api/src/rate-limit.ts:17-29` | same | per process | keep in memory (multi-instance would need Mongo; one api container today) |
@@ -143,10 +143,10 @@ Retrieval is vectorless: manifests record `retrievalMode: "vectorless"` (`apps/a
 | Topic entities | promoted topic rows (111) | collection `topics`; write `apps/api/src/indexing/persistence/promote-entities.ts:66`, `scripts/webinar/sync-session.mjs:258` | yes |
 | Graph | edges between entities | `graph_edges` (3) | yes |
 | Eligible tree (view) | tree filtered per call to eligible, visible sessions | NOT stored: recomputed in `trusted-readers.ts:89-118` (reads sessions, pages, tree) on each load | derived |
-| Route index | BM25 terms, facets, session ids | memory only, `route-store.ts:51`; nothing persisted | NO (R1) |
+| Route index | BM25 terms, facets, session ids | collection `route_index` (one document per tenant, about 64 KB at 22 sessions / 132 nodes), plus the 60 s in-memory layer in `route-store.ts`; the collection is created by the API on its first write (no migration: only `_id` lookups) | YES after the first request following deploy (R1, unit `route-index-persist`) |
 | Search cache | recent `/search` results | memory only, `search-store.ts:178` | NO, stays memory (R2) |
 
-So everything that carries information is already in `lkb_prod`; the single missing piece is the derived route index. Sizing: the tree is about 5 KB per session; the cap in the reader is 10,000 nodes (`apps/api/src/search-store.ts:108`) and BSON caps a document at 16 MB.
+So everything that carries information is already in `lkb_prod`; the derived route index was the single missing piece and is now persisted in `route_index` (unit `route-index-persist`; the collection appears in `lkb_prod` when the API first writes it). Sizing: the tree is about 5 KB per session; the cap in the reader is 10,000 nodes (`apps/api/src/search-store.ts:108`) and BSON caps a document at 16 MB.
 
 ## 4. Proposed unit list for the moves (ordered)
 
@@ -155,7 +155,7 @@ Rules for every unit: one store per unit (D-208 item 3), edit in place, TDD firs
 | # | Unit | Store (row) | Changes-authorized (besides schema/collection/migration) | Depends on | Effort |
 |---|---|---|---|---|---|
 | 0 | `state-db-access-decision` | Q1, Q2 (no code) | decision text for a new D entry; then `apps/api/src/db-name.ts`, `scripts/lib/transcript-provenance.mjs` only if the decision says so (`isProtectedWorkDbName` is never weakened, D-208 item 6) | none | S |
-| 1 | `route-index-persist` | R1 | `apps/api/src/route/*` (already authorised) | 0 only for the migration gate | M |
+| 1 | `route-index-persist` (built, awaiting check) | R1 | `apps/api/src/route/*` (already authorised); no migration needed (collection is created on first write, lookups are by `_id`) | none | M |
 | 2 | `state-live-proof` | F23 | `scripts/webinar/run-pipeline.mjs:46`, `scripts/webinar/calendar-attendance-source.mjs:145`, `scripts/webinar/run-pipeline-fixtures.mjs:31` | 0 | S |
 | 3 | `state-alert-state` | F4 | `packages/meeting-bot/src/autojoin/alerts.ts` | 0 | S |
 | 4 | `state-bot-events` | F5 | `packages/meeting-bot/src/autojoin/bot-events.ts`, `scripts/watch/bot-events-host.ts`, `apps/api/src/bot-events/router.ts` | 0 | S |
