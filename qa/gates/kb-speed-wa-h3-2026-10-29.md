@@ -17,3 +17,6 @@ affected prod rows first; fix the files and the prod rows; dry-run; reindex non-
 
 ## Answered 2026-10-29 (UCAS timing value)
 The approved UCAS repair was a no-op (t114 already starts at t113 end 1883). Umesh picked: "113 ends 1853, 114 = 1853-1868 (Recommended)". Text unchanged.
+
+## Answered 2026-10-29 (index mode)
+Strict mode without drop failed Visa on one negative judge verdict (not a credential issue). Umesh: "Yes, grounded-notes for all 3 (Recommended)" - Visa, UCAS, Zoom p2 indexed with --grounded-notes (unverified items dropped), one at a time, no time limit; report dropped counts; add the flag to the runbook.
