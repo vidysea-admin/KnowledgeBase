@@ -2,8 +2,8 @@
 **Contract:** none specific (D-208 item 2 + D-209: the single KB database is the existing `lkb_prod`; qa/gates/single-db-2026-10-29.md). Consent is out of scope (D-210): no consent code was touched.
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: tenancy apps/api/src/route/bm25-router.ts:79
