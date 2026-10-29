@@ -2,8 +2,8 @@
 **Contract:** none specific (D-205 U6, docs only; D-206 for the user-accounts and whatsapp-multiuser plan pointers; survey qa/evidence/bot-linux-survey-2026-10-29.md)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** merged-no-check (docs-lane)
+**Handshake status:** merged-no-check (docs-lane)
 **Fix cycle:** 0
 **Dual check:** no (docs and an `.env.example` comment block only: no code, no auth, tenancy or data write; no secret value written)
 **Persona walk:** skip (no screen, flow or user type)
