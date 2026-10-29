@@ -12,7 +12,7 @@ import { csrfTokenFor } from "./csrf.js";
 import { createSessionAuth } from "./principal.js";
 import { createSessionService } from "./sessions.js";
 import { fakeClock, memorySessionStore, memoryUsers, user } from "./sessions.testsupport.js";
-import { isReadLikePost } from "./viewer-guard.js";
+import { isReadLikePost, READ_LIKE_POSTS } from "./viewer-guard.js";
 
 const ORIGIN = "https://kb.example.org", SECRET = "k".repeat(48), UNSAFE = ["post", "put", "patch", "delete"];
 /** Prefixes whose routers authenticate themselves (public /auth, self-authenticating /admin); the guard is not the control there. */
@@ -103,4 +103,10 @@ test("the detector bites: a write route mounted BEFORE the perimeter is reported
     assert.ok(bad.some((b) => b.includes("/__throwaway") && b.includes("200")), `unguarded route detected: ${JSON.stringify(bad)}`);
     assert.ok(!bad.some((b) => b.includes("__late_throwaway")), "a route added after the perimeter is guarded by construction");
   } finally { await rig.close(); }
+});
+
+test("the read-like POST allowlist is pinned to exactly the two documented routes (roles.md); widening it needs a deliberate edit here too", () => {
+  assert.deepEqual([...READ_LIKE_POSTS].sort(), ["POST /ask", "POST /citations/native/resolve"]);
+  for (const [m, p] of [["POST", "/ingest"], ["POST", "/ask/extra"], ["PUT", "/ask"], ["POST", "/Ask"]] as const) assert.equal(isReadLikePost(m, p), false, `${m} ${p}`);
+  assert.equal(isReadLikePost("POST", "/ask/"), true, "a trailing slash is the same route");
 });
