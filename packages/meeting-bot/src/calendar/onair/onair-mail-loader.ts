@@ -71,9 +71,10 @@ export function withOnairMailCandidates(base: Loader, deps: OnairLoaderDeps): Lo
 
 /** Production wiring used by buildRealScheduleTickDeps; builds the gws runner only when the lane is on. */
 export function withOnairMailFromEnv(base: Loader, env: NodeJS.ProcessEnv, repoRoot: string, log: (msg: string) => void,
-  loadCalendarEvents?: () => Promise<CalendarEvent[]>): Loader {
+  loadCalendarEvents?: () => Promise<CalendarEvent[]>, inject: Partial<Pick<OnairLoaderDeps, "loadMails" | "resolve">> = {}): Loader {
   applyOnairWatchDefault(env, repoRoot);
   const config = loadOnairConfig(repoRoot, env, log);
   if (!config.mail) return base;
-  return withOnairMailCandidates(base, { env, log, loadCalendarEvents, config, loadMails: createOnairGmailLoader(createGwsRunner(repoRoot, env)) });
+  return withOnairMailCandidates(base, { env, log, loadCalendarEvents, config, resolve: inject.resolve,
+    loadMails: inject.loadMails ?? createOnairGmailLoader(createGwsRunner(repoRoot, env)) });
 }

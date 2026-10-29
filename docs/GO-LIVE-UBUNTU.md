@@ -290,9 +290,9 @@ because of it (2026-10-29). It is now DEFAULT ON.
 - Live-proof requirement: the section 5.7 proof (`live-proof.json`) still blocks run mode, and it does not cover OnAir. Treat OnAir as unproven
   on Ubuntu until one real registered event has been recorded end to end (mail read, candidate scheduled, page joined, audio and video checked), then record it
   in the section 5.7 evidence. Do not rely on it for a must-not-miss event before that.
-- Known gap (see `qa/manifests/onair-default-on.md`): the Linux driver `scripts/webinar/run-pipeline-deps.mjs` builds its candidate loader with
-  `createHttpCandidateLoader` directly and does not yet call `withOnairMailFromEnv`, so on the Ubuntu bot the mail lane stays idle until that
-  one wiring change is made (it needs its own authorization: the file is outside D-207).
+- Wiring: the Ubuntu driver (`scripts/webinar/run-pipeline-deps.mjs`, authorized by D-208 item 6) wraps its candidate loader with the mail lane, so the mails
+  are read on every discovery pass, and sets `LKB_ONAIR_WATCH=1` in the environment of the record child unless it is set to `0`. A failed mail read is logged
+  and costs only the OnAir candidates for that pass; it never fails the Gmail discovery. The Windows schedule tick wires the same lane separately.
 
 ## 6. First-run database step
 Compose never migrates by itself. After separate human approval for the specific
