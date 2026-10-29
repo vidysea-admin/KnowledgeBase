@@ -27,6 +27,8 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
 - `data/`
   - `data/eval/`
   - `data/toc-migrated/`
+- `docker/`
+  - `docker/meeting-bot/`
 - `docs/`
   - `docs/adr/`
   - `docs/archive/`
