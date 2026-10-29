@@ -2,8 +2,8 @@
 **Contract:** none specific (D-207 item 4; qa/gates/kb-speed-wa-h3-2026-10-29.md "onair default-on go")
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (no trigger applies: no auth, tenancy, data write or cross-tenant read. The change only flips a default for a read-only Gmail list/get lane whose sender-authentication gate (DMARC on google.com, one From, topmost authserv-id) is untouched and still tested; no new external service, no secret, no DB access)
 **Persona walk:** skip (no screen, flow or user type)
