@@ -2,8 +2,8 @@
 **Contract:** none (owner gate qa/gates/golive-batch4-2026-10-28.md, Answered 2026-10-29T07:09:09+05:30: 1b, product lives at https://vidysea.com/knowledgebase, base path must be runtime-configurable)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 Fix cycle: 0
 **Dual check:** no (no auth, tenancy or production-write change: web routing/config plus the web container's nginx; the API client's auth code path is untouched, only the base URL string it prefixes)
