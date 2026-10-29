@@ -31,6 +31,7 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
   - `docker/meeting-bot/`
 - `docs/`
   - `docs/adr/`
+  - `docs/api/`
   - `docs/archive/`
   - `docs/features/`
   - `docs/whatsapp/`
