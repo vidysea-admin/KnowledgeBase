@@ -47,7 +47,7 @@ const plugin = {
     });
     build.onLoad({ filter: /\.ts$/ }, (args) => {
       if (args.path.includes(`${path.sep}node_modules${path.sep}`) || keepRealUrls.has(path.resolve(args.path))) return undefined;
-      const src = readFileSync(args.path, 'utf8').replace(/new URL\((['"])([^'"\r\n]+\.ps1)\1,\s*import\.meta\.url\)/g, (_match, _quote, name) => {
+      const src = readFileSync(args.path, 'utf8').replace(/new URL\((['"])([^'"\r\n]+\.(?:ps1|txt))\1,\s*import\.meta\.url\)/g, (_match, _quote, name) => {
         const asset = path.resolve(path.dirname(args.path), name), relAsset = path.relative(root, asset);
         if (relAsset.startsWith('..') || path.isAbsolute(relAsset)) throw new Error('Runtime asset outside workspace');
         const filename = createHash('sha256').update(relAsset.split(path.sep).join('/')).digest('hex').slice(0, 12) + '-' + path.basename(asset);

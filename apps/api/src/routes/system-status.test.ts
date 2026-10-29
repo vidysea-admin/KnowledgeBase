@@ -109,7 +109,7 @@ test("source shape: tenant-scoped store uses scopedCollection and no bare count;
   assert.match(store, /scopedCollection/);
   assert.doesNotMatch(store.replace(/\/\*[\s\S]*?\*\//g, ""), /\.collection\(/);
   const server = readFileSync(SERVER, "utf8");
-  assert.ok(server.indexOf("createSystemStatusRouter(deps") > server.indexOf("requireAuth(deps.keyStore)"));
+  assert.ok(server.indexOf("createSystemStatusRouter(deps") > server.indexOf("requireAuth(deps.keyStore"));
   const route = readFileSync(ROUTE, "utf8");
   assert.match(route, /req\.auth\?\.tenantId/);
   assert.doesNotMatch(route, /req\.(query|body|params|headers)/);
@@ -120,5 +120,5 @@ test("source shape: tenant-scoped store uses scopedCollection and no bare count;
 // unit that closes them must update this test deliberately.
 test("recorded reproduction 1 (still open, named): /health is mounted before requireAuth", () => {
   const server = readFileSync(SERVER, "utf8");
-  assert.ok(server.indexOf("createHealthRouter(deps.health)") < server.indexOf("requireAuth(deps.keyStore)"));
+  assert.ok(server.indexOf("createHealthRouter(deps.health)") < server.indexOf("requireAuth(deps.keyStore"));
 });

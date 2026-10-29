@@ -57,6 +57,7 @@ import { logger as defaultLogger, type Logger } from "./composition/logger.js";
 import { requestLogger } from "./composition/request-log.js";
 import { bodyParserErrorHandler } from "./composition/body-parser-error.js";
 import { mountIntegratedWorkflows, type IntegratedWorkflows } from './composition/integrations/routes.js';
+import { applyTrustProxy, mountUserAccounts, type UserAccountsDeps } from './composition/integrations/user-accounts.js';
 
 export interface ServerDeps extends IntegratedWorkflows {
   keyStore: ApiKeyStore;
@@ -101,6 +102,10 @@ export interface ServerDeps extends IntegratedWorkflows {
   speakerSuggestions?: SpeakerSuggestionDeps;
   speakerProfiles?: SpeakerProfileDeps;
   rateLimit?: RateLimitOptions;
+  /** D-206 user accounts (cookie sessions beside API keys). Optional: absent -> the cookie is ignored and `/auth`, `/admin` are not mounted. */
+  userAccounts?: UserAccountsDeps;
+  /** Number of reverse proxies in front of the API (UA-23). Default: env TRUST_PROXY_HOPS; unset/invalid -> none trusted. */
+  trustProxyHops?: string;
   /** apps/web's real origin(s) in dev/prod (e.g. "http://localhost:5173") — no default, an
    * empty list means no cross-origin browser call succeeds, which is the safe default until a
    * caller explicitly opts a frontend origin in. */
@@ -112,6 +117,7 @@ export interface ServerDeps extends IntegratedWorkflows {
 export function createServer(deps: ServerDeps): Express {
   const app = express();
   const log = deps.logger ?? defaultLogger;
+  applyTrustProxy(app, deps.trustProxyHops ?? process.env.TRUST_PROXY_HOPS, log);
   app.use(requestLogger(log)); // first: every response (incl. body-parser/auth failures) gets X-Request-Id + an access line
   app.use(express.json({ limit: '1mb' }));
   app.use(createCors(deps.corsOrigins ?? []));
@@ -126,7 +132,8 @@ export function createServer(deps: ServerDeps): Express {
   app.use(createCompetePageRouter());
   app.use(createPagesRouter());
   app.use(createHealthRouter(deps.health));
-  app.use(requireAuth(deps.keyStore));
+  mountUserAccounts(app, deps.userAccounts, deps.keyStore); // public /auth + self-authenticating /admin, BEFORE the shared perimeter
+  app.use(requireAuth(deps.keyStore, deps.userAccounts?.session));
   app.use(createRateLimiter(deps.rateLimit));
   app.use(usageRecorder(deps.usage, log)); // T-057 D4: fire-and-forget, after the response; never fails or delays a request
   mountIntegratedWorkflows(app, deps);
