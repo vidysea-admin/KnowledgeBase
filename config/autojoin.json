@@ -1,9 +1,13 @@
 {
-  "$comment": "Deployment defaults for automatic discovery, webinar auto-join and bot alerts (Umesh decision 2026-10-14). Non-secret. Every key can be overridden by the LKB_AUTOJOIN_* / LKB_ALERT_* env vars documented in .env.example. Delete this file to restore the pre-autojoin schedule-tick behaviour.",
+  "$comment": "Deployment defaults for automatic discovery, webinar auto-join and bot alerts (Umesh decision 2026-10-14). Non-secret. Every key can be overridden by the LKB_AUTOJOIN_* / LKB_ALERT_* / LKB_ONAIR_* env vars documented in .env.example. Delete this file to restore the pre-autojoin schedule-tick behaviour.",
   "discovery": true,
   "webinarAutoJoin": true,
   "careerPriority": true,
   "testDataRouting": true,
+  "onair": {
+    "mail": true,
+    "watch": true
+  },
   "alerts": {
     "email": true,
     "dashboard": true,

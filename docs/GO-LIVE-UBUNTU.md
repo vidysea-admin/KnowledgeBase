@@ -274,6 +274,26 @@ Update: `git pull && docker compose --profile bot build bot && docker compose --
 - The Windows calendar and Gmail worker described in the last section (D-192) is separate and unaffected.
 - Real-meeting behaviour on Ubuntu (lobby, platform UI changes, long recordings) is unproven until the live proof of 5.7 passes.
 
+### 5.10 Cloud OnAir auto-join (D-207)
+Google Cloud OnAir events (`cloudonair.withgoogle.com/events/<slug>`) are joined from the "You're registered" mails Google sends after a
+registration. This used to run only when `LKB_ONAIR_MAIL=1` was set, which was undocumented and off, and an InfraMod webinar was missed
+because of it (2026-10-29). It is now DEFAULT ON.
+- Switch: `config/autojoin.json` key `onair` (`mail`, `watch`, both `true`). A missing file or key also means on. Override per deployment
+  with `LKB_ONAIR_MAIL` (read the mails and schedule the events) and `LKB_ONAIR_WATCH` (the bot browser opens the OnAir page and presses
+  Watch now): `1`/`true`/`on` force on, `0`/`false`/`off` force off, empty or unrecognised = use the file. Both names are forwarded by the compose `bot`
+  service as value-less pass-through (comment the lines out in `.env` rather than leaving them blank).
+- How the mails are read: through `gws` (section 5.6), read-only (`gmail users messages list` and `get`; no send, modify or delete), only mails whose
+  sender passes the Google DMARC check. The gws account must therefore be the mailbox the registrations arrive in. Each mail is resolved to one
+  event link, then added to the candidate list beside the Gmail and Calendar candidates; a mail failure is logged and costs only that tick.
+- Recording on Ubuntu: tab capture only (`--backend tab`, pinned by the scheduler); OBS is refused off Windows. The bot profile (section 5.5)
+  must be signed in to a Google account that is registered for the event.
+- Live-proof requirement: the section 5.7 proof (`live-proof.json`) still blocks run mode, and it does not cover OnAir. Treat OnAir as unproven
+  on Ubuntu until one real registered event has been recorded end to end (mail read, candidate scheduled, page joined, audio and video checked), then record it
+  in the section 5.7 evidence. Do not rely on it for a must-not-miss event before that.
+- Wiring: the Ubuntu driver (`scripts/webinar/run-pipeline-deps.mjs`, authorized by D-208 item 6) wraps its candidate loader with the mail lane, so the mails
+  are read on every discovery pass, and sets `LKB_ONAIR_WATCH=1` in the environment of the record child unless it is set to `0`. A failed mail read is logged
+  and costs only the OnAir candidates for that pass; it never fails the Gmail discovery. The Windows schedule tick wires the same lane separately.
+
 ## 6. First-run database step
 Compose never migrates by itself. After separate human approval for the specific
 migration and target database, run it deliberately:

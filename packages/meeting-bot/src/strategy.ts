@@ -33,6 +33,8 @@ export function selectJoinStrategy(platform: Platform): JoinStrategy {
       // Not in Vexa's supported list — joined by the local bot browser (joiners/browser-joiner.ts
       // with capture/obs/obs-windows.ts deps). Zoho/cloudonair added 2026-09-24: no open-source bot
       // supports them, and both are plain web clients.
+      // This is a label, not the capture backend: recordingBackend (capture/record-commands.ts) picks tab or OBS, the Linux scheduler pins
+      // `--backend tab` (scripts/webinar/scheduler/dispatch.mjs) and OBS is refused off Windows. OnAir on Linux therefore records via tab capture (D-207).
       return "browser";
     case "unknown":
       // Grill's blindspot resolution: system-audio is the universal fallback.
