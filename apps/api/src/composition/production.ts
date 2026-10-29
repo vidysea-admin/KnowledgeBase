@@ -14,6 +14,7 @@ import { createMongoApiKeyStore, createMongoEvalRunStore, createMongoJobWriter, 
 import { createMongoIngestDeps } from "../ingest-store.js";
 import { buildSourceIntakeDeps } from "../source-intake/wiring.js";
 import { createMongoSearchDeps } from "../search-store.js";
+import { createRouteDeps } from "../route/route-store.js";
 import { createSessionDecisionsDeps } from '../session-decisions/reader.js';
 import type { WatchState } from "@lkb/core";
 import { buildCalendarWorkerIntegrations, buildCapturePolicyIntegrations } from './integrations/capture-policy.js';
@@ -212,6 +213,7 @@ export function buildProductionDeps(options: { onIndexCommitted?: IndexCommitted
     // surface GET /watch-state serves (routes/watched-sources.ts).
     watchedSources: { ...createMongoWatchedSourceDeps(), ...createMongoWatchStateReadDeps() },
     search: createMongoSearchDeps({ nativeEvidence: native.resolver }),
+    route: createRouteDeps({ tree: createMongoTreeStore(native.resolver), complete: (job, tenantId) => routeComplete("ask", job, { chains, providers, write: jobWrite, tenantId }) }), // D-206 vectorless /route
     // D-173: dormant semantic routes cannot be enabled through an old environment flag.
     semanticSearch: undefined,
     graph: createMongoGraphReadDeps(),
