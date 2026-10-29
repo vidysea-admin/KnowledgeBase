@@ -3,9 +3,9 @@
 One doc, one path: API (port 3300) + web (nginx, port 80) from the root `Dockerfile`.
 Deeper reference: `docs/docker-deployment.md`. No secrets belong in this file or in git.
 
-Status of this guide: written from a static review of `Dockerfile`, `docker-compose.yml`
-and the package scripts. The images were NOT built or run on the machine that wrote it
-(no Docker there). Run the checks below once and report anything that fails.
+Status of this guide: the api and web sections were written from a static review of `Dockerfile`, `docker-compose.yml`
+and the package scripts; run the checks below once and report anything that fails. The meeting-bot section (5) is
+different: its image, doctor mode and container smoke were built and run, see the status line there.
 
 ## 0. Live deployment: state and remaining DevOps steps (as of 2026-10-26)
 The app is deployed and reachable over HTTPS; nginx serves the UI and proxies the API under `/api`
@@ -26,7 +26,7 @@ Remaining, in this order:
    with no credentials, and contained a database named `READ__ME_TO_RECOVER_YOUR_DATA` holding a
    ransom note (an automated attack on open MongoDB). Do not pay or contact the sender. Do:
    firewall port 27017 to the app server and office IPs only; create the `lkb_app` user and enable
-   authorization (section 6a); update `MONGODB_URL` on the server and on the bot machine; check
+   authorization (section 6a); update `MONGODB_URL` on the server (api and bot `.env`) and on any other machine that connects, such as the existing Windows bot host; check
    every database on that host for missing data and restore from backup where needed. The same
    host holds other Vidysea databases, so their owners must be told.
 2. **Hosting (T-028), optional.** Without it, Settings → Keys and the Dashboard key tile show
@@ -75,7 +75,7 @@ Set in `.env` (names only; get values from the owner):
   caller `allowProduction`, `--i-know-this-is-production`, and explicit canonical
   `MONGODB_DB=lkb` or `MONGODB_DB=lkb_prod`. These select a capability; approval to
   execute a production write is still a separate human gate (section 6).
-- `OLLAMA_API_KEY` required. Copy it from the bot machine's `.env` into the server `.env`
+- `OLLAMA_API_KEY` required. Copy it from the existing Windows bot host's `.env` into the server `.env`
   by hand; never commit it, paste it in chat or print it. Runtime only, never a build arg.
 - `CORS_ORIGINS` the exact browser origin(s) of the web UI, with scheme,
   e.g. `http://<server-ip>`. nginx does not proxy the API, so the browser calls the API
@@ -94,8 +94,8 @@ Set in `.env` (names only; get values from the owner):
   older `.env.example` still carry blank `WHATSAPP_*=` lines):
   `grep -nE '^(LKB_HOSTING_[A-Z_]+|LKB_COUNSELLOR_STATE_DIR|WHATSAPP_[A-Z_]+)=$' .env`
   Also never export these names as empty strings in the shell that runs compose.
-The remaining names in `.env.example` belong to the meeting bot and scripts, not to
-the api/web containers (compose forwards only the names it lists).
+The remaining names in `.env.example` belong to the meeting bot (section 5.4 lists the ones the `bot` service forwards) and
+scripts, not to the api/web containers (compose forwards only the names it lists).
 
 ## 3. Build and start
 ```sh
@@ -151,20 +151,128 @@ Owner decision (gate 2026-10-29): the product lives at `https://vidysea.com/know
   curl -fsS http://localhost:8080/knowledgebase/api/health                                  # 200 from the api
   ```
 
-## 5. Chrome / meeting-bot worker (not in the compose stack)
-The compose stack does NOT run the meeting bot, scheduler, watchers, OBS capture or the
-Python transcription worker. They need their own host:
-- The bot drives a real Chrome that must be signed in with a persistent profile
-  (`LKB_BOT_PROFILE_DIR`, `LKB_BROWSER_EXECUTABLE`), run from the repo with Node/pnpm,
-  Python, ffmpeg and the `gws` CLI (calendar/mail discovery).
-- On Linux it needs a display: a desktop session or `xvfb-run`. OBS capture is
-  Windows-only; use `LKB_CAPTURE_BACKEND=tab`.
-- Honest status: it has only been operated on the existing Windows host. Several
-  defaults point at `.exe` and `.venv/Scripts` paths. A headless Linux run is
-  UNTESTED; expect path overrides (`LKB_PYTHON`, `LKB_GWS_PATH`, `LKB_FFPROBE`) and a
-  one-time manual sign-in of the profile (CAPTCHA / 2FA cannot be automated).
-- Recommendation: go live with api + web first; keep the bot on the current host,
-  with an isolated `MONGO_WORK_DB` selected for capture children, until Linux is proven.
+## 5. Meeting bot (Docker, compose profile `bot`)
+Status: the Linux bot image and the compose `bot` service are merged (D-205). The image build, the doctor mode and the
+container recording smoke (fake meeting page, no real meeting) PASSED on a developer machine (`qa/manifests/bot-image.md`,
+`bot-gws-install.md`, `bot-smoke.md`). NOT yet proven: a real meeting join on Ubuntu, the one-time Google sign-in, gws OAuth in the
+container, and the Linux live proof (5.5, 5.6 and 5.7 are human steps). Survey and design: `qa/evidence/bot-linux-survey-2026-10-29.md`.
+
+What it is: `docker/meeting-bot/Dockerfile` (node:24-slim, headed Chrome for Testing under Xvfb :99, PulseAudio null sink, tab
+capture to `.webm`, pinned `gws` 0.22.5 with a sha256 check, runs as uid 1000, no `.env` baked in). The entrypoint
+(`docker/meeting-bot/entrypoint.sh`) takes `BOT_MODE=run` (default) | `doctor` | `login`. The service is `bot` in `docker-compose.yml`
+with `profiles: ["bot"]`, so a plain `docker compose up -d api web` never starts it. No ports are published. The scheduler and
+watchers run inside the bot container (`run-pipeline.mjs --run --watch`). OBS capture is Windows-only and is not used here
+(`LKB_CAPTURE_BACKEND=tab`, set by the image).
+
+Needs: Docker with at least 4 GB RAM for the Docker VM or host (the build and a 1280x720 recording ran without OOM at 4 GB),
+outbound HTTPS for the build and for the smoke (the smoke runs `apt` to add `libnss3-tools` to its throwaway container), and the
+host `.env` from section 2. Every `docker compose` command below needs the `--profile bot` flag.
+
+### 5.1 Build
+```sh
+docker compose --profile bot build bot
+# or, to get a stable tag for the smoke test (layers are shared, so a second build is cached):
+docker build -f docker/meeting-bot/Dockerfile -t lkb-bot .
+```
+A cold build takes about 4 minutes (image about 700 MiB of content, about 2.8 GB unpacked disk). The Linux `gws` archive is fetched
+from the official googleworkspace/cli v0.22.5 release and checked against a pinned sha256; the build FAILS on a mismatch. To move versions,
+override all three of `GWS_VERSION`, `GWS_URL`, `GWS_SHA256` together (shell or `.env`).
+
+### 5.2 Doctor (checks the image and the display; needs no meeting and no login)
+```sh
+docker compose --profile bot run --rm -e BOT_MODE=doctor bot
+```
+It starts PulseAudio and Xvfb, runs `node scripts/webinar/setup.mjs --doctor` (pnpm, Node 24, ffmpeg, ffprobe, the venv with
+SeleniumBase and PyAutoGUI, Chrome for Testing present with its major version equal to the UC driver's, DISPLAY) and exits 0 only when
+the doctor exits 0 and prints no `MISSING` line. Run mode applies the same gate before it starts, so a broken image restarts in a loop
+(`restart: unless-stopped`) instead of running half-configured.
+
+### 5.3 Smoke test (records a fixture page inside the image; no real meeting)
+```sh
+BOT_IMAGE=lkb-bot bash scripts/qa/container-workflows/bot-smoke.sh
+```
+(`scripts/qa/container-workflows/bot-smoke.sh`; fixture `scripts/qa/container-workflows/fixtures/bot-smoke-meeting.html`.) It starts one
+throwaway container, serves a canvas and 440 Hz tone page over local HTTPS, records it with the same `cli.ts record ... --backend tab`
+call the pipeline uses, and always removes the container. It takes about 2 minutes and ends with `SMOKE RESULT PASS` (exit 0) or
+`SMOKE RESULT FAIL` (nonzero). Checks: (a) a non-empty `tab-*.webm`, (b) exactly one video and one audio stream, (c) audio peak above
+-40 dB, (d) the record process exited 0 and no chrome process remains. Reference run: 5.0 MB webm, audio peak -3.4 dB. It uses no
+secrets and writes nothing to MongoDB.
+
+### 5.4 Configure the server `.env` (names only; values from the owner)
+Compose forwards these to the `bot` service as value-less pass-through (an absent name stays undefined in the container; never leave a
+blank `NAME=` line, comment it out):
+- Database and tenant: `MONGODB_URL`, `MONGO_WORK_DB` (an isolated work database, never `lkb` or `lkb_prod`; run mode refuses a protected name),
+  `LKB_TENANT_ID`, `LKB_API_URL`, `LKB_API_KEY` (the bot's own key; with the vidysea.com layout of section 4a the URL is
+  `https://vidysea.com/knowledgebase/api`).
+- Scheduler gates (run mode refuses to start without them): `LKB_JOIN_RULES_ENFORCE` (`last-valid` or `fail-closed`), and
+  `LKB_AUTOJOIN_DISCOVERY`, `LKB_AUTOJOIN_WEBINARS`, `LKB_AUTOJOIN_CAREER_PRIORITY`, `LKB_AUTOJOIN_TEST_DATA_ROUTING` all `1`.
+  Also forwarded: `LKB_AUTOJOIN_CONFIG`, `LKB_CAREER_TOPICS_FILE`, `LKB_WEBINAR_REGISTRATION_CONFIG`, `AUTO_RECORD_TRUSTED_EMAILS`,
+  `AUTO_RECORD_TRUSTED_DOMAINS`, `LKB_GMAIL_ALIASES`, `LKB_GMAIL_LABEL_IDS`.
+- Alerts: `LKB_ALERT_EMAIL`, `LKB_ALERT_DASHBOARD`, `LKB_ALERT_CALENDAR`, `LKB_ALERT_EMAIL_TO`, `LKB_ALERT_EMAIL_TEST_DATA`,
+  `LKB_ALERT_EMAIL_PER_HOUR`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `NOTIFY_CHANNELS`, `NOTIFY_CHANNELS_DIGEST`, `NOTIFY_CHANNELS_BOT_STATUS`.
+- Providers: `GEMINI_API_KEY`, `OLLAMA_API_KEY`.
+- Container-only: `VNC_PASSWORD` (login mode only) and `LKB_CHROME_NO_SANDBOX` (the image already sets it to `1`; leave it out of `.env`).
+
+Set by the image, not by you: `DISPLAY=:99`, `LKB_PYTHON`, `LKB_BROWSER_EXECUTABLE=cft`, `LKB_CAPTURE_BACKEND=tab`,
+`LKB_BOT_PROFILE_DIR=/data/bot-profile`, `LKB_RECORD_DIR=/app/raw/webinars`, `LKB_FFMPEG_PATH`, `LKB_GWS_PATH`, `TZ=Asia/Kolkata`.
+`LKB_RECORD_DIR` must stay inside the repo tree (`/app`): the recorder refuses a path outside it. Validate the compose file before
+every start with `docker compose --profile bot config --quiet` (it must print nothing).
+
+Volumes (named; back them up, and never `docker compose down -v`): `lkb-bot-profile` (`/data/bot-profile`, the signed-in Chrome profile),
+`lkb-bot-recordings` (`/app/raw/webinars`), `lkb-bot-data` (`/app/data`: scheduler state and `data/webinar-release/live-proof.json`),
+`lkb-bot-gws` (`/home/node/.config/gws`, the gws OAuth state).
+
+### 5.5 One-time Google sign-in of the bot profile (login mode, human step)
+Login mode opens Chrome on the bot profile inside the container and exposes it through x11vnc. VNC is never published to the network:
+it is published to the server's loopback only, and you reach it through an SSH tunnel.
+1. Put `VNC_PASSWORD=<a strong password you choose>` in the server `.env` (mode 600). The container reads it into a 0600 file; it is not put on any command line.
+2. Stop the run-mode bot if it is running (one Chrome per profile): `docker compose --profile bot stop bot`.
+3. On the server: `docker compose --profile bot run --rm -p 127.0.0.1:5900:5900 -e BOT_MODE=login bot`
+4. On your own machine: `ssh -N -L 5900:127.0.0.1:5900 <user>@<server>`, then connect a VNC client to `localhost:5900` with that password.
+5. In the Chrome window (it opens on `https://accounts.google.com/`) sign in with the bot's Google account (CAPTCHA and 2FA are manual), then CLOSE the Chrome window.
+   The container exits and `--rm` removes it; the session stays in the `lkb-bot-profile` volume.
+6. Remove `VNC_PASSWORD` from `.env` (or comment it out) once done.
+
+### 5.6 gws OAuth on the server (human step, owner-approved Google account)
+`gws` (calendar and mail alerts and discovery) authenticates from its own state in the `lkb-bot-gws` volume. The commands exist
+(`gws auth status`, `gws auth login`; see `apps/web/src/pages/setup-wizard/setupModel.ts` line 105 and `docs/webinar-release.md`) and the
+binary is proven to start in the image; the full OAuth login inside the container has NOT been exercised. Check the state with:
+```sh
+docker compose --profile bot run --rm --entrypoint gws bot auth status
+```
+If it is not signed in, run `gws auth login` the same way with the account and scopes the owner approves (`--readonly --services gmail,calendar`
+is the least privilege the CLI offers). Tell the owner if the headless callback cannot complete.
+
+### 5.7 Linux live proof (human step; blocks run mode)
+`run-pipeline --run` refuses to start without `data/webinar-release/live-proof.json` saying `status: passed`, `backend: tab`,
+`platform: linux`, `audio: true`, `video: true`, with a non-empty recording inside the repo tree (`scripts/webinar/run-pipeline.mjs`,
+`validateRunGate`). A Windows proof is refused on Linux. Procedure (`docs/webinar-release.md`, live proof): after 5.5, join one real meeting
+and record it with
+`node --import tsx packages/meeting-bot/src/cli.ts record <url> --backend tab --until <ISO-end> --session-id <safe-id> --title <title>`
+run inside the container (`docker compose --profile bot run --rm --entrypoint sh bot`), check audio and video with ffprobe and playback, then
+write the marker into the `lkb-bot-data` volume (`/app/data/webinar-release/live-proof.json`) with `recording` relative to `/app`, for example
+`raw/webinars/tab-<id>.webm`. The marker is a human assertion; build agents never write it.
+
+### 5.8 Run mode, health and logs
+```sh
+docker compose --profile bot up -d bot
+docker compose --profile bot ps                 # STATUS becomes "healthy" (90 s start period)
+docker compose --profile bot logs -f --tail 200 bot
+```
+The container runs `node scripts/webinar/run-pipeline.mjs --run --watch` (one poll per minute when idle, capture and processing
+serialised). The healthcheck (`docker/meeting-bot/healthcheck.sh`, every 30 s, 3 retries) requires Xvfb `:99` to answer, the run-pipeline
+process to be alive and the profile directory to be writable. `restart: unless-stopped` restarts it after a crash or reboot; the entrypoint
+clears stale X and tab-capture locks first. The time zone is `Asia/Kolkata` (the recorder's "today" uses local time).
+Update: `git pull && docker compose --profile bot build bot && docker compose --profile bot up -d bot`.
+
+### 5.9 Limits (accepted)
+- No native privacy-window masking on Ubuntu: it needs the Windows-only clock and WASAPI path (D-205: accepted as unavailable for now, filed for later).
+  Do not pass `--native-tab-clock`; it is unsupported on Linux.
+- Linux recording is the tab backend only (Chrome extension tab capture to `.webm`); OBS is not available.
+- Windows `schtasks` and PowerShell scheduling is not used; `run-pipeline --run --watch` is the Linux driver.
+- `--assisted` capture is not part of the supported Linux path.
+- The Windows calendar and Gmail worker described in the last section (D-192) is separate and unaffected.
+- Real-meeting behaviour on Ubuntu (lobby, platform UI changes, long recordings) is unproven until the live proof of 5.7 passes.
 
 ## 6. First-run database step
 Compose never migrates by itself. After separate human approval for the specific
@@ -288,8 +396,8 @@ confirm pages load with no CORS errors in the console (if they appear, fix
    point a test deploy at it.
 4. MongoDB network: accept only the server's IP. Mongo is not run by this compose file
    (the `local-dev` profile is an empty throwaway DB only).
-5. The bot stays on the current Windows machine (section 5), pointed at the same
-   `MONGODB_URL`/`MONGODB_DB`; the team owns the signed-in Chrome profile.
+5. The bot runs on this Ubuntu server as the compose `bot` service (section 5, D-205), using `MONGODB_URL` with an isolated
+   `MONGO_WORK_DB`; the team owns the signed-in Chrome profile (volume `lkb-bot-profile`) and the Linux live proof.
 
 ## 9. Launch feature flags (D-189)
 At launch only T-028 counsellor accounts is on; T-013 avatar and T-014 championship wait.
