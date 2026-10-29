@@ -37,7 +37,7 @@ Exactly the `/search` shape: `{ "query": "<q as sent>", "hits": SearchHit[] }`.
 | 400 | `{error:"bad_request", message}` | missing/blank/oversized `q` |
 | 401 / 403 | auth middleware | no or bad key / key lacks `search` scope |
 | 404 | `{error:"not_found", message}` | the tenant has no tree index yet (fall back to `/search`) |
-| 503 | `{error:"route_timeout"}` | the 3 s hard deadline was exceeded (never a hang; the work is aborted) |
+| 503 | `{error:"route_timeout"}` | the 3 s hard deadline was exceeded. The timer starts before the first await, so every wait (the cache fingerprint read included) is inside it; the work is aborted |
 | 503 | `{error:"route_unavailable"}` | any other failure (tree or database unavailable) |
 
 Failures are never cached.
@@ -69,7 +69,8 @@ Failures are never cached.
   WhatsApp link therefore takes effect on the **very next** `/route` and `/search` call; the TTL no longer bounds withdrawal. The TTL
   only bounds what the fingerprint cannot see (for example turns appended to an existing session).
   - If the fingerprint cannot be read (database slow or down) the cache is bypassed, never replaced by a constant: nothing is served
-    from or stored in the cache for that request.
+    from or stored in the cache for that request. The read gets at most half of the time left to the deadline (also in `/search`), so a hung
+    read costs a cache bypass, not the request; the remaining budget is left for the real work.
   - A result that touches a WhatsApp-batch session is never cached (its approval can be withdrawn through claims/candidates the
     fingerprint does not read).
   - `/search` hides a withdrawn session; it does not hide an index-failed one (it never has), `/route` hides both. Either way the

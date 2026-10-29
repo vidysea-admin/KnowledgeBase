@@ -77,7 +77,7 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
 
   return {
     /** The same visibility fingerprint /search binds its cache to (ISS-420); read under the request deadline (ISS-427). */
-    fingerprint: (tenantId, ctl) => visibilityFingerprint(withReadDeadline(deps.db ?? getDb(), ctl.deadlineAt, now), tenantId),
+    fingerprint: async (tenantId, ctl) => visibilityFingerprint(withReadDeadline(deps.db ?? getDb(), ctl.deadlineAt, now), tenantId),
     async route(tenantId, query, k, ctl): Promise<SearchHit[]> {
     assertValidTenantId(tenantId, "route");
     const t0 = now();
@@ -109,6 +109,7 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
       usedLlm = true;
       try {
         const root = frontierRoot(index, a, await gate(index.sessionIds), tenantId);
+        check(); // a request abort that landed during the gate must not start the model call (the listener below would never fire)
         if (!root.children.length) llmFailed = true;
         else {
           const stepB = new AbortController(), onAbort = () => stepB.abort();

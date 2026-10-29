@@ -2,6 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createMongoSearchDeps } from "../search-store.js";
+import { withReadDeadline } from "./search-cache.js";
 import { headId } from "../transcript-review/store.js";
 import { detectWhatsAppReviewCandidates, type WhatsAppReviewCandidate } from "../whatsapp/review/detection.js";
 import { whatsAppClaimId } from "../whatsapp/review/materializer.js";
@@ -174,4 +175,28 @@ test("ISS-427 every Mongo read of a /search call carries maxTimeMS derived from 
     const ms = c.options?.maxTimeMS as number | undefined;
     assert.ok(typeof ms === "number" && ms >= 1 && ms <= 900, `${c.coll} ${c.op} maxTimeMS=${ms}`);
   }
+});
+
+test("cycle 1: a never-resolving fingerprint read is bounded by the call's deadline in the store itself; the cache is bypassed", async () => {
+  const { db, calls } = capturingDb();
+  const hung = { collection: (name: string) => { const c = (db as never as { collection: (n: string) => Record<string, unknown> }).collection(name);
+    return name === "transcript_reviews" ? { ...c, find: (f: unknown, o?: unknown) => ((o as { projection?: unknown } | undefined)?.projection ? { toArray: () => new Promise(() => undefined) } : (c.find as (f: unknown, o?: unknown) => unknown)(f, o)) } : c; } };
+  const deps = createMongoSearchDeps({ db: hung as never, cacheTtlMs: 600_000 });
+  for (let i = 0; i < 2; i++) {
+    const t0 = Date.now(), hits = await deps.search("toc", "visa", 10, { deadlineAt: Date.now() + 150 });
+    assert.ok(Date.now() - t0 < 1000, `took ${Date.now() - t0} ms`);
+    assert.deepEqual(hits.map((h) => h.turnId), ["t1"]);
+  }
+  assert.ok(turnReads(calls) >= 2, "both calls recomputed: nothing was cached");
+});
+
+test("cycle 1: withReadDeadline keeps the LOWER of the caller's own maxTimeMS/timeoutMS and the time left", async () => {
+  const seen: Array<Record<string, unknown> | undefined> = [];
+  const raw = { collection: () => ({ find: (_f: unknown, o?: Record<string, unknown>) => { seen.push(o); return { toArray: async () => [] }; },
+    findOne: async (_f: unknown, o?: Record<string, unknown>) => { seen.push(o); return null; } }) };
+  const db = withReadDeadline(raw as never as { collection(n: string): never }, 10_000, () => 0) as never as { collection(n: string): { find(f: object, o?: object): unknown; findOne(f: object, o?: object): unknown } };
+  const c = db.collection("x");
+  c.find({}, { maxTimeMS: 50 }); c.find({}, { maxTimeMS: 60_000 }); c.find({}); c.findOne({}, { maxTimeMS: 50, timeoutMS: 70 }); c.findOne({}, { timeoutMS: 60_000 });
+  assert.deepEqual(seen.map((o) => o?.maxTimeMS), [50, 10_000, 10_000, 50, 10_000], "a lower caller maxTimeMS wins, a higher one is clamped to the time left");
+  assert.deepEqual(seen.map((o) => o?.timeoutMS), [undefined, undefined, undefined, 70, 10_000], "timeoutMS is clamped the same way");
 });

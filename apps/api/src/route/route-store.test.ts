@@ -10,6 +10,7 @@ import { createMongoSearchDeps } from "../search-store.js";
 import { createRouteDeps, RouteNoTree, RouteTimeout, type RouteStats } from "./route-store.js";
 import { NATURAL_QUESTIONS, fakeRouteDb, sessionIdOf, syntheticTree } from "./route.testsupport.js";
 import { queryFacetTokens } from "./facets.js";
+import { createKnowledgeVisibility } from "../visibility/knowledge.js";
 
 const far = () => ({ deadlineAt: Date.now() + 60_000 });
 const sessionNode = (tenant: string, i: number) => `${tenant}/year:2026/month:03/session:${sessionIdOf(i)}`;
@@ -182,4 +183,13 @@ test("ISS-427 the fingerprint read is also deadline-bounded and tenant-confined"
   const state = await deps.fingerprint!("toc", { deadlineAt: Date.now() + 700 });
   assert.match(state.fingerprint, /^[0-9a-f]{64}$/);
   assert.ok(calls.length === 4 && calls.every((c) => c.filter.tenantId === "toc" && typeof c.options?.maxTimeMS === "number" && (c.options.maxTimeMS as number) <= 700));
+});
+
+test("cycle 1 (C6 low): a request abort that lands while the step B frontier is being gated never starts the model call", async () => {
+  const f = fakeRouteDb(), ctl = new AbortController(), real = createKnowledgeVisibility(f.db);
+  let started = 0;
+  const visibility = { ...real, sessionVisible: async (t: string, id: string) => { ctl.abort(new RouteTimeout()); return real.sessionVisible(t, id); } };
+  const deps = createRouteDeps({ db: f.db, tree: { load: async (t) => syntheticTree({ tenantId: t }) }, visibility, complete: async () => { started++; return reply([]); } });
+  await assert.rejects(deps.route("toc", "campus orientation panel", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
+  assert.equal(started, 0, "the model call must not start for an already-aborted request");
 });

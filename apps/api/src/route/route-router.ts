@@ -11,7 +11,7 @@ import { Router, type Request, type Response } from "express";
 import { requireScope } from "../auth.js";
 import { RouteNoTree, RouteTimeout, type RouteDeps } from "./route-store.js";
 import type { SearchHit } from "../routes/search.js";
-import { searchCacheKey, TenantSearchCache, type VisibilityState } from "../search-cache/search-cache.js";
+import { fingerprintWithin, searchCacheKey, TenantSearchCache, type VisibilityState } from "../search-cache/search-cache.js";
 
 export const ROUTE_DEFAULT_K = 5;
 export const ROUTE_MAX_K = 20;
@@ -32,18 +32,19 @@ export function createRouteRouter(deps: RouteDeps, opts: RouteRouterOptions = {}
     const k = Number.isFinite(kParam) && kParam > 0 ? Math.min(Math.floor(kParam), ROUTE_MAX_K) : ROUTE_DEFAULT_K;
     const tenantId = req.auth!.tenantId, key = searchCacheKey(q, k);
     const deadlineAt = now() + deadlineMs, controller = new AbortController();
-    // Cache rule (ISS-420): serve only a same-tenant entry younger than the TTL whose visibility fingerprint, read NOW, is
-    // unchanged. Deps without a fingerprint reader (fakes) use a constant; a reader that FAILS bypasses the cache, never a guess.
-    let state: VisibilityState | null = { fingerprint: "", waSessions: new Set() };
-    if (cache.enabled && deps.fingerprint) state = await deps.fingerprint(tenantId, { deadlineAt }).catch(() => null);
-    const cached = state ? cache.get(tenantId, key, state.fingerprint) : undefined;
-    if (cached) { res.status(200).json({ query: q, hits: cached }); return; }
+    // The deadline timer starts BEFORE anything else is awaited (cycle 1): the fingerprint read is inside the same race and try.
     let timer: NodeJS.Timeout | undefined;
+    const expired = new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new RouteTimeout()), deadlineMs); });
+    expired.catch(() => undefined); // the race below owns the rejection; this only prevents an unhandled-rejection if it loses
     try {
-      const hits = await Promise.race([
-        deps.route(tenantId, q, k, { deadlineAt, signal: controller.signal }),
-        new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new RouteTimeout()), deadlineMs); }),
-      ]);
+      // Cache rule (ISS-420): serve only a same-tenant entry younger than the TTL whose visibility fingerprint, read NOW, is
+      // unchanged. Deps without a fingerprint reader (fakes) use a constant; a reader that FAILS, throws or is still pending at the
+      // half-deadline bypasses the cache (`null`), never a guess; the rest of the budget is left for the real work.
+      let state: VisibilityState | null = { fingerprint: "", waSessions: new Set() };
+      if (cache.enabled && deps.fingerprint) state = await fingerprintWithin(() => deps.fingerprint!(tenantId, { deadlineAt }), deadlineAt, now);
+      const cached = state ? cache.get(tenantId, key, state.fingerprint) : undefined;
+      if (cached) { res.status(200).json({ query: q, hits: cached }); return; }
+      const hits = await Promise.race([deps.route(tenantId, q, k, { deadlineAt, signal: controller.signal }), expired]);
       if (state && !hits.some((h) => state!.waSessions.has(h.sessionId))) cache.set(tenantId, key, state.fingerprint, hits);
       res.status(200).json({ query: q, hits });
     } catch (e) {

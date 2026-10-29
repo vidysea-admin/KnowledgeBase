@@ -86,6 +86,19 @@ export async function visibilityFingerprint(db: Pick<Db, "collection">, tenantId
 }
 
 /**
+ * Cycle 1: the fingerprint read bounded by the request's deadline. Resolves to the state, or to `null` (= bypass the cache, store
+ * nothing) when the read fails, throws synchronously, or is still pending after HALF of the time left to `deadlineAt` (a cache
+ * lookup must not spend the budget the real work needs).
+ * NEVER rejects and never outlives the deadline: `maxTimeMS` only bounds server time, a driver-side wait (server selection, pool exhaustion) needs this race.
+ */
+export function fingerprintWithin(read: () => Promise<VisibilityState>, deadlineAt: number | undefined, now: () => number = Date.now): Promise<VisibilityState | null> {
+  return new Promise((resolve) => {
+    const timer = deadlineAt === undefined ? undefined : setTimeout(() => resolve(null), Math.max(0, Math.floor((deadlineAt - now()) / 2)));
+    Promise.resolve().then(read).then((state) => { clearTimeout(timer); resolve(state); }, () => { clearTimeout(timer); resolve(null); });
+  });
+}
+
+/**
  * ISS-427: a db handle whose every `find`/`findOne` carries `maxTimeMS` = the time left until `deadlineAt` (floor 1 ms), so the
  * server stops working when the request's hard deadline passes instead of burning on after the 503. An already-lower
  * `maxTimeMS`/`timeoutMS` on the call wins. Everything else on the collection is forwarded untouched. No deadline -> the db itself.

@@ -11,7 +11,7 @@ import type { NativeSourceLocator, Turns } from "@lkb/core";
 import { buildTurnPrefilter } from "./search-prefilter.js";
 import { readSearchCandidateTurns } from "./transcript-review/search-reader.js";
 import { createKnowledgeVisibility, newVisibilityRequestMemo, withDeadline, type FilterTurnsOptions } from "./visibility/knowledge.js";
-import { searchCacheKey, TenantSearchCache, visibilityFingerprint, withReadDeadline, type VisibilityState } from "./search-cache/search-cache.js";
+import { searchCacheKey, TenantSearchCache, fingerprintWithin, visibilityFingerprint, withReadDeadline, type VisibilityState } from "./search-cache/search-cache.js";
 import type { NativeSearchHit, NativeSearchResult, SearchCallOptions, SearchDeps, SearchHit } from "./routes/search.js";
 import { parseNativeSourceLocator, type NativeEvidenceResolver, type ResolvedNativeEvidence } from "./native-evidence/resolver.js";
 
@@ -168,7 +168,7 @@ export function createMongoSearchDeps(deps: SearchStoreDeps = {}): SearchDeps {
       let state: VisibilityState | null = null;
       const key = searchCacheKey(query, k);
       if (cache.enabled) {
-        try { state = await visibilityFingerprint(db, tenantId); } catch { state = null; }
+        state = await fingerprintWithin(() => visibilityFingerprint(db, tenantId), options.deadlineAt);
         const cached = state ? cache.get(tenantId, key, state.fingerprint) : undefined;
         if (cached) return cached;
       }

@@ -230,3 +230,51 @@ test("ISS-420 e2e: with nothing changed the second /route call is served from ca
     assert.equal(turnReads(), before, "no turns read on a cache hit");
   } finally { await L.server.close(); }
 });
+
+// ---- fix cycle 1 (checker B, C3): a hung fingerprint read must not outlive the hard deadline ------------------------------
+const NEVER = (): Promise<never> => new Promise<never>(() => undefined);
+
+test("cycle 1: a never-resolving fingerprint read is bounded by the hard deadline; the cache is bypassed and nothing is stored", async () => {
+  let calls = 0;
+  const route: RouteDeps = { route: async (t) => { calls++; return [hitFor(t)]; }, fingerprint: NEVER };
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 100, cacheTtlMs: 600_000 } }));
+  try {
+    for (let i = 0; i < 2; i++) {
+      const t0 = Date.now(), res = await get(s.baseUrl, "/route?q=hello", "a-key");
+      assert.ok(Date.now() - t0 < 700, `answered after ${Date.now() - t0} ms`);
+      assert.equal(res.status, 200);
+    }
+    assert.equal(calls, 2, "nothing was cached while the fingerprint could not be read");
+  } finally { await s.close(); }
+});
+
+test("cycle 1: a hung fingerprint read plus work that cannot finish in the remaining time answers 503 route_timeout within the deadline", async () => {
+  const route: RouteDeps = { route: () => NEVER(), fingerprint: NEVER };
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 100 } }));
+  try {
+    const t0 = Date.now(), res = await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.ok(Date.now() - t0 < 700, `answered after ${Date.now() - t0} ms`);
+    assert.equal(res.status, 503);
+    assert.deepEqual(await res.json(), { error: "route_timeout" });
+  } finally { await s.close(); }
+});
+
+test("cycle 1: a database handle that throws synchronously (getDb() not ready) answers 503 route_unavailable, never 500", async () => {
+  const route = createRouteDeps({ get db(): never { throw new Error("mongo not configured"); } } as never);
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 1_000, cacheTtlMs: 600_000 } }));
+  try {
+    const res = await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.equal(res.status, 503);
+    assert.deepEqual(await res.json(), { error: "route_unavailable" });
+  } finally { await s.close(); }
+});
+
+test("cycle 1: a fingerprint dependency that throws synchronously is a cache bypass, and a failing route work answers 503 route_unavailable", async () => {
+  const route: RouteDeps = { route: async () => { throw new Error("boom"); }, fingerprint: () => { throw new Error("sync"); } };
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 1_000, cacheTtlMs: 600_000 } }));
+  try {
+    const res = await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.equal(res.status, 503);
+    assert.deepEqual(await res.json(), { error: "route_unavailable" });
+  } finally { await s.close(); }
+});
