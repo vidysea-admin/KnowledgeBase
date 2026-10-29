@@ -13,8 +13,9 @@ async function run(env, {mails = async () => [f.registered, f.onDemand], refresh
   try {
     const deps = createPipelineDeps({LKB_API_URL: 'http://api.invalid', LKB_API_KEY: 'k', LKB_TENANT_ID: 't', ...env},
       {loadOnairMails: async () => { mailCalls++; return mails(); }, resolveOnair: f.fakeResolver()});
+    const watchAtStart = deps.env.LKB_ONAIR_WATCH; // before any discovery pass: the record child must not depend on one having run
     const rows = await deps.loadCandidates(refresh);
-    return {rows, mailCalls, deps};
+    return {rows, mailCalls, deps, watchAtStart};
   } finally { globalThis.fetch = real; }
 }
 
@@ -38,7 +39,7 @@ test('a failing OnAir mail read never loses the Gmail candidates, and its error 
 });
 
 test('the record child env gets LKB_ONAIR_WATCH=1 by default and an explicit 0 is kept', async () => {
-  assert.equal((await run({})).deps.env.LKB_ONAIR_WATCH, '1');
-  assert.equal((await run({LKB_ONAIR_WATCH: 'true'})).deps.env.LKB_ONAIR_WATCH, '1');
-  assert.equal((await run({LKB_ONAIR_WATCH: '0'})).deps.env.LKB_ONAIR_WATCH, '0');
+  assert.equal((await run({})).watchAtStart, '1');
+  assert.equal((await run({LKB_ONAIR_WATCH: 'true'})).watchAtStart, '1');
+  assert.equal((await run({LKB_ONAIR_WATCH: '0'})).watchAtStart, '0');
 });
