@@ -2,8 +2,8 @@
 **Contract:** none specific; criteria C1-C7 below, taken verbatim from the unit brief (D-206 KB speed fix K1 + K2 + K5, plus the K3/K4 decision; docs/DECISIONS.md D-206; evidence qa/evidence/vc-kb-speed/kb-slowness-analysis.md and kb-vectorless-design.md; no qa/contracts file, the maker never edits qa/contracts/)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: tenancy apps/api/src/search-cache/search-cache.ts:30
