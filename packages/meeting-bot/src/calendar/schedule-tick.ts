@@ -234,7 +234,13 @@ export function parseScheduleTickArgs(rest: string[]): { dryRun: boolean } {
   return { dryRun: rest.includes("--dry-run") };
 }
 
-export async function runScheduleTick(rest: string[]): Promise<void> {
+/** schtasks + the PowerShell launcher exist on Windows only; elsewhere the pipeline driver is the scheduler. */
+export function assertScheduleTickPlatform(platform: NodeJS.Platform = process.platform): void {
+  if (platform !== "win32") throw new Error(`schedule-tick uses Windows Task Scheduler and PowerShell and is not supported on ${platform}; run the pipeline driver instead: node scripts/webinar/run-pipeline.mjs --run --watch`);
+}
+
+export async function runScheduleTick(rest: string[], platform: NodeJS.Platform = process.platform): Promise<void> {
+  assertScheduleTickPlatform(platform);
   const { dryRun } = parseScheduleTickArgs(rest);
   const deps = buildRealScheduleTickDeps();
   const autojoinOff = deps.autojoin !== undefined && !deps.autojoin.cfg.webinarAutoJoin;

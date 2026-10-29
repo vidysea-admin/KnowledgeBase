@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { assistedFlag } from "./assisted-wiring.js";
+import { resolveAssistedChrome } from "./assisted-cdp.js";
 import { createAssistedDeps, isEnded, isPlaying, type AssistedPage, type AssistedMediaState } from "./assisted-record.js";
 
 const st = (o: Partial<AssistedMediaState> = {}): AssistedMediaState => ({ hasVideo: true, paused: false, ended: false, currentTime: 0, duration: 100, readyState: 4, ...o });
@@ -104,4 +105,26 @@ test("--assisted with a non-tab backend is refused, not ignored", () => {
   assert.throws(() => assistedFlag(["u", "--assisted"], { LKB_CAPTURE_BACKEND: "obs" }), /tab backend only/);
   assert.equal(assistedFlag(["u", "--assisted"], {}), true);
   assert.equal(assistedFlag(["u"], { LKB_CAPTURE_BACKEND: "obs" }), false);
+});
+
+// bot-ts-guards (D-205, survey blocker 9): Linux Chrome discovery for --assisted, with a clear refusal otherwise.
+const CFT = "/app/.venv/lib/python3.12/site-packages/seleniumbase/drivers/cft_drivers/chrome-linux64/chrome";
+test("resolveAssistedChrome: win32 keeps the Windows candidates", () => {
+  const win = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";
+  assert.equal(resolveAssistedChrome({ platform: "win32", env: {}, exists: (f) => f === win }), win);
+  assert.throws(() => resolveAssistedChrome({ platform: "win32", env: {}, exists: () => false }), /Chrome not found.*LKB_BROWSER_EXECUTABLE/);
+});
+test("resolveAssistedChrome: linux finds the CfT build beside LKB_PYTHON, then google-chrome, then chromium", () => {
+  const env = { LKB_PYTHON: "/app/.venv/bin/python" };
+  const listDir = (d: string) => (d === "/app/.venv/lib" ? ["python3.12", "site-packages-x"] : []);
+  assert.equal(resolveAssistedChrome({ platform: "linux", env, exists: (f) => f === CFT || f === "/usr/bin/google-chrome", listDir }), CFT);
+  assert.equal(resolveAssistedChrome({ platform: "linux", env, exists: (f) => f === "/usr/bin/google-chrome" || f === "/usr/bin/chromium", listDir }), "/usr/bin/google-chrome");
+  assert.equal(resolveAssistedChrome({ platform: "linux", env: {}, exists: (f) => f === "/usr/bin/chromium" }), "/usr/bin/chromium");
+});
+test("resolveAssistedChrome: explicit executable wins, 'cft' maps to the managed build on linux, unresolved refuses clearly", () => {
+  const env = { LKB_PYTHON: "/app/.venv/bin/python" }, listDir = () => ["python3.12"];
+  assert.equal(resolveAssistedChrome({ platform: "linux", executable: "/opt/x/chrome", env: {}, exists: () => false }), "/opt/x/chrome");
+  assert.equal(resolveAssistedChrome({ platform: "linux", executable: "cft", env, exists: (f) => f === CFT, listDir }), CFT);
+  assert.throws(() => resolveAssistedChrome({ platform: "linux", executable: "cft", env: {}, exists: () => false }), /managed Chrome|cft/i);
+  assert.throws(() => resolveAssistedChrome({ platform: "linux", env: {}, exists: () => false }), /Chrome not found.*LKB_BROWSER_EXECUTABLE/);
 });

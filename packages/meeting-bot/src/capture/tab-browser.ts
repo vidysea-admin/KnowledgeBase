@@ -9,7 +9,7 @@ export { createTabCaptureReceiver } from "./native/native-tab-receiver.js";
 import { closeSync, copyFileSync, existsSync, lstatSync, fsyncSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync, writeSync, statSync, renameSync } from "node:fs";
 import path from "node:path";
 import type { BrowserJoinerDeps } from "../joiners/browser-joiner.js";
-import { getProcessStartTime } from "./controller-state.js";
+import { controllerMatchesIdentity, getProcessStartTime, parseCaptureLock } from "./controller-state.js";
 import { browserProfileArgs } from "./browser/browser-profile.js";
 import type { BotEvent } from "./obs/obs-windows.js";
 import { assertInsideDir, assertSafeCaptureFileName, assertSafeCaptureId, type TabReceiverGuard } from "./tab-receiver-guard.js";
@@ -58,6 +58,36 @@ export function writeOwnedTabStatus(file: string, identity: Record<string, any>,
   } finally {if(fd !== undefined)closeSync(fd);if(created && existsSync(temporary))rmSync(temporary);}
 }
 
+export interface CaptureLockProbes {
+  pidAlive?: (pid: number) => boolean;
+  startTime?: (pid: number) => string | undefined;
+  ownPid?: number;
+}
+/** New locks record the owner's start time so a recycled PID (container restart) is not mistaken for a live controller. */
+export function formatCaptureLock(pid: number, startTime: string | undefined): string {
+  return startTime && !/[\r\n]/.test(startTime) ? `${pid}\n${startTime}` : String(pid);
+}
+const defaultPidAlive = (pid: number) => {
+  try { process.kill(pid, 0); return true; } catch (error) { return (error as NodeJS.ErrnoException).code !== "ESRCH"; }
+};
+/** Refuse a live holder, replace a dead or PID-recycled one, then create the lock exclusively. Returns the exact body written. */
+export function claimCaptureLock(lock: string, probes: CaptureLockProbes = {}): () => void {
+  const pidAlive = probes.pidAlive ?? defaultPidAlive, startTime = probes.startTime ?? getProcessStartTime, ownPid = probes.ownPid ?? process.pid;
+  if (existsSync(lock)) {
+    if (lstatSync(lock).isSymbolicLink()) throw new Error("Capture lock symlink refused");
+    const text = readFileSync(lock, "utf8"), previous = parseCaptureLock(text);
+    if (!previous) throw new Error("Invalid capture lock; inspect before retrying");
+    // Alive is a blocker unless the stored start time PROVES another process now owns the pid. Legacy locks and unknown probes keep pid-only trust.
+    if (pidAlive(previous.pid) && controllerMatchesIdentity(previous.startTime, previous.startTime ? startTime(previous.pid) : undefined))
+      throw new Error("Persistent browser profile already has an active capture controller");
+    if (readFileSync(lock, "utf8") !== text) throw new Error("Capture lock changed during stale inspection");
+    rmSync(lock);
+  }
+  const body = formatCaptureLock(ownPid, startTime(ownPid));
+  const lockFd = openSync(lock, "wx"); writeSync(lockFd, body); closeSync(lockFd);
+  return () => { if (existsSync(lock) && !lstatSync(lock).isSymbolicLink() && readFileSync(lock, "utf8") === body) rmSync(lock); };
+}
+
 export interface TabBrowserConfig {
   /** Server composition only; explicit opt-in. No native qualification is implied. */
   native?: NativeTabCaptureConfig;
@@ -74,6 +104,8 @@ export interface TabBrowserConfig {
   /** T-034 hardening (id/filename validation + size caps). Undefined = unchanged behaviour. */
   guard?: TabReceiverGuard;
   startupTimeoutMs?: number;
+  /** Test seam for the stale-lock decision (pid liveness and process start time). */
+  lockProbes?: CaptureLockProbes;
   onEvent?: (handle: string, event: BotEvent) => void;
   log?: (message: string) => void;
 }
@@ -98,7 +130,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       mkdirSync(cfg.recordDir, {recursive: true}); mkdirSync(cfg.profileDir, {recursive: true});
       const lock = path.join(cfg.profileDir, ".lkb-tab-capture.lock");
       const recoveryLock = path.join(cfg.profileDir, ".lkb-recovery.lock");
-      let locked = false;
+      let locked = false, releaseLock = () => {};
       let receiver: Awaited<ReturnType<typeof createTabCaptureReceiver>> | undefined;
       const extension = path.join(cfg.recordDir, `.extension-${handle}`);
       const output = path.join(cfg.recordDir, `${handle}.webm`);
@@ -115,17 +147,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
       }}) : undefined;
       try {
         if (existsSync(recoveryLock)) throw new Error("Profile recovery active or requires inspection");
-        if (existsSync(lock)) {
-          if (lstatSync(lock).isSymbolicLink()) throw new Error("Capture lock symlink refused");
-          const previousPid = Number(readFileSync(lock, "utf8"));
-          if (!Number.isInteger(previousPid) || previousPid <= 0) throw new Error("Invalid capture lock; inspect before retrying");
-          let alive = true;
-          try { process.kill(previousPid, 0); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ESRCH") alive = false; }
-          if (alive) throw new Error("Persistent browser profile already has an active capture controller");
-          if (readFileSync(lock, "utf8") !== String(previousPid)) throw new Error("Capture lock changed during stale inspection");
-          rmSync(lock);
-        }
-        const lockFd = openSync(lock, "wx"); writeSync(lockFd, String(process.pid)); closeSync(lockFd); locked = true;
+        releaseLock = claimCaptureLock(lock, cfg.lockProbes); locked = true;
         if (existsSync(recoveryLock)) throw new Error("Profile recovery claimed during capture startup");
         let ready = false, failure: string | undefined;
         let admittedSeen = false; // ISS-CAPTUREFIX-001: status says "recording" only once the bot is admitted (the recorder starts in the lobby)
@@ -204,7 +226,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
             finally { if (!run.done) run.child.kill(); }
           },
           async () => { await receiver?.close(); },
-          async () => { if (locked && existsSync(lock) && !lstatSync(lock).isSymbolicLink() && readFileSync(lock, "utf8") === String(process.pid)) rmSync(lock); },
+          async () => { if (locked) releaseLock(); },
           async () => { rmSync(extension, {recursive: true, force: true}); },
         ];
         for (const action of cleanup) {
@@ -248,7 +270,7 @@ export function createTabBrowserDeps(cfg: TabBrowserConfig) {
         }
         await attempt(() => {
           if (!run.done) throw new Error("Owned capture child shutdown unconfirmed; lock retained");
-          if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && readFileSync(run.lock, "utf8") === String(process.pid)) rmSync(run.lock);
+          if (existsSync(run.lock) && !lstatSync(run.lock).isSymbolicLink() && parseCaptureLock(readFileSync(run.lock, "utf8"))?.pid === process.pid) rmSync(run.lock);
         });
         await attempt(() => { rmSync(run.stopFile, {force: true}); });
         await attempt(() => { rmSync(run.reloadFile, {force: true}); });
