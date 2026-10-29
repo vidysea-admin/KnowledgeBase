@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { routerBasename } from "./config/runtime.js";
 import { AuthProvider } from "./auth/AuthContext.js";
 import { LoginGate } from "./auth/LoginGate.js";
 import { AppShell } from "./layout/AppShell.js";
@@ -54,7 +55,7 @@ export function App(): React.ReactElement {
   return (
     <AuthProvider>
       <LoginGate>
-        <BrowserRouter>
+        <BrowserRouter basename={routerBasename}>
           <AppShell>
             <Routes>
               <Route path="/" element={<DashboardPage />} />

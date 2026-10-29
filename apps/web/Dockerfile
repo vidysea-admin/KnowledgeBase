@@ -28,9 +28,16 @@ ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 RUN pnpm --filter @lkb/web build
 
 FROM nginx:1.27-alpine AS runtime
+# Same runtime contract as the root Dockerfile's `web` target: APP_BASE_PATH / APP_API_BASE / API_UPSTREAM.
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/web/nginx.conf /etc/nginx/templates/default.conf.template
+COPY apps/web/docker/18-lkb-base-path.envsh /docker-entrypoint.d/18-lkb-base-path.envsh
+COPY apps/web/docker/40-lkb-runtime-config.sh /docker-entrypoint.d/40-lkb-runtime-config.sh
+RUN sed -i 's/\r$//' /etc/nginx/templates/default.conf.template /docker-entrypoint.d/18-lkb-base-path.envsh /docker-entrypoint.d/40-lkb-runtime-config.sh \
+  && chmod 0755 /docker-entrypoint.d/18-lkb-base-path.envsh /docker-entrypoint.d/40-lkb-runtime-config.sh \
+  && rm -f /etc/nginx/conf.d/default.conf
+ENV PORT=80 APP_BASE_PATH=/ API_UPSTREAM=http://api:3300
 EXPOSE 80
 # nginx:alpine ships busybox wget. 127.0.0.1 (not localhost) avoids an IPv6 ::1 miss.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -q --spider http://127.0.0.1:80/ || exit 1
+  CMD ["sh", "-c", "wget -q --spider http://127.0.0.1:${PORT}/healthz || exit 1"]

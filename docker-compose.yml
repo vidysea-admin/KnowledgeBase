@@ -53,8 +53,8 @@ services:
       MONGODB_DB: ${MONGODB_DB:?set MONGODB_DB explicitly (use an approved staging database for acceptance)}
       LKB_I_KNOW_THIS_IS_PRODUCTION: ${LKB_I_KNOW_THIS_IS_PRODUCTION:-}
       LKB_ALLOW_STAGING: ${LKB_ALLOW_STAGING:-}
-      # The web origin (WEB_PORT) must be listed here: nginx has no /api proxy, so the browser
-      # calls api directly (cross-origin).
+      # CORS_ORIGINS only matters when the browser calls api cross-origin (VITE_API_BASE_URL / APP_API_BASE set);
+      # the default path is same-origin through the web container (<base>/api).
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:8080,http://127.0.0.1:8080}
       # Text uses Ollama Cloud; Gemini remains optional until an audio task needs it.
       OLLAMA_API_KEY: ${OLLAMA_API_KEY:?set OLLAMA_API_KEY}
@@ -93,8 +93,11 @@ services:
       - lkb-join-rules-state:/var/lib/lkb/join-rules
     restart: unless-stopped
 
-  # Static SPA behind nginx (root Dockerfile's `web` target). VITE_API_BASE_URL is BAKED INTO THE BUNDLE at
-  # build time, so it must be the URL the BROWSER uses to reach api (not the compose-internal name).
+  # Static SPA behind nginx (root Dockerfile's `web` target). ONE image serves any base path, chosen at
+  # CONTAINER START (no rebuild): APP_BASE_PATH=/knowledgebase serves the app at <host>/knowledgebase/ and
+  # proxies <host>/knowledgebase/api/* to the api service with the prefix stripped. The browser reaches the
+  # API through that same-origin proxy, so VITE_API_BASE_URL is no longer needed (it stays a build-time
+  # override: set it, or APP_API_BASE at runtime, only to point the browser at an API on another origin).
   # OWNER DECISIONS (placeholders, not decided here): public hostnames, exposed ports, TLS.
   web:
     build:
@@ -102,7 +105,11 @@ services:
       dockerfile: Dockerfile
       target: web
       args:
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3300}
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+    environment:
+      APP_BASE_PATH: ${APP_BASE_PATH:-/}
+      APP_API_BASE: ${APP_API_BASE:-}
+      API_UPSTREAM: ${API_UPSTREAM:-http://api:3300}
     depends_on:
       - api
     ports:

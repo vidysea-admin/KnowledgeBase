@@ -1,28 +1,22 @@
 /**
- * apps/web/src/api/client.ts — one shared fetch wrapper. Reads the API base URL from Vite's env
- * (`VITE_API_BASE_URL`, defaults to same-origin `""` for the Docker/prod case where apps/web is
- * served behind the same reverse proxy as apps/api; dev mode points it at apps/api's real port).
+ * apps/web/src/api/client.ts — one shared fetch wrapper. The API base URL comes from
+ * config/runtime.ts (`<basePath>/api` by default, an explicit runtime `apiBase`, or the
+ * `VITE_API_BASE_URL` build override; dev mode points it at apps/api's real port).
  * Attaches Authorization: Bearer, throws a typed ApiError on any non-2xx so callers can render a
  * real error state instead of guessing from a thrown generic Error.
  */
-function normalizeBaseUrl(raw: string | undefined): string {
-  if (!raw) return "";
-  const trimmed = raw.trim();
-  if (!trimmed) return "";
-  return trimmed.replace(/\/+$/, "");
-}
+import { hasRuntimeConfig, resolveApiBase, runtimeConfig } from "../config/runtime.js";
 
 function resolveApiBaseUrl(): string {
-  const configured = normalizeBaseUrl(import.meta.env.VITE_API_BASE_URL);
-  if (configured) return configured;
+  return resolveApiBase({ config: runtimeConfig, viteOverride: import.meta.env.VITE_API_BASE_URL, devFallback: devApiFallback(), configPresent: hasRuntimeConfig() });
+}
 
-  if (typeof window === "undefined") return "";
-
+/** Dev mode only (vite on localhost): web on :5173, API on :3300. Null everywhere else. */
+function devApiFallback(): string | null {
+  if (typeof window === "undefined") return null;
   const { hostname, protocol } = window.location;
-  if (hostname !== "localhost" && hostname !== "127.0.0.1") return "";
-  if (import.meta.env.PROD) return "";
-
-  // Dev mode default: web runs on Vite (usually :5173), API on :3300.
+  if (hostname !== "localhost" && hostname !== "127.0.0.1") return null;
+  if (import.meta.env.PROD) return null;
   return `${protocol}//${hostname}:3300`;
 }
 

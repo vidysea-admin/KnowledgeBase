@@ -70,3 +70,8 @@ data/toc-migrated/2026-08-27-in-focus-4/turns.json  text eol=crlf
 
 # Preserve the independently approved recovery review bytes across Windows/Linux checkouts.
 data/eval/extraction-reconciliation-reviewed.json  text eol=crlf
+
+# Web container runtime files are executed/rendered inside a Linux image: a CRLF checkout on Windows
+# would break the shebang and the envsubst template (APP_BASE_PATH, unit subpath-web).
+apps/web/docker/*      text eol=lf
+apps/web/nginx.conf    text eol=lf

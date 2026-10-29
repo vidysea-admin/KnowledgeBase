@@ -36,6 +36,7 @@
  * the alert already fired on as silent.
  */
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext.js";
 import { listWatchedSources, runWatchedSources, type WatchedSource, type WatchedSourcesRunSummary } from "../api/watched-sources.js";
 import { listMeetingCandidates } from "../api/meeting-candidates.js";
@@ -257,7 +258,7 @@ export function WatchPage(): React.ReactElement {
       <div className="section-title">Next up (read-only)</div>
       <p className="row-meta" style={{ marginTop: "-0.4rem" }}>
         Meetings that will be auto-recorded. There is no cancel or force here &mdash; use{" "}
-        <a href="/calendar">Calendar</a> to change a decision before it is acted on.
+        <Link to="/calendar">Calendar</Link> to change a decision before it is acted on.
       </p>
       {candidatesError && (
         <div className="empty-note" data-testid="watch-next-up-degraded">

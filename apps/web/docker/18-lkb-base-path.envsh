@@ -1,0 +1,59 @@
+# apps/web/docker/18-lkb-base-path.envsh -- SOURCED by the nginx entrypoint (not executed) before the
+# envsubst template step. Normalizes APP_BASE_PATH and exports the variables apps/web/nginx.conf and
+# 40-lkb-runtime-config.sh use. POSIX sh (busybox ash). Fails the container start on an unsafe value.
+#
+#   APP_BASE_PATH  default "/"; "/knowledgebase", "knowledgebase/" and "//knowledgebase//" all mean the same
+#   APP_API_BASE   optional explicit API base for the browser (https://... or /path); default <base>/api
+#   API_UPSTREAM   where nginx proxies <base>/api/*; default http://api:3300
+
+_lkb_raw="${APP_BASE_PATH:-/}"
+_lkb_trim="$(printf '%s' "$_lkb_raw" | sed -e 's#^[[:space:]/]*##' -e 's#[[:space:]/]*$##')"
+case "$_lkb_trim" in
+  *[!A-Za-z0-9._~/-]*|*//*|.|..|./*|../*|*/.|*/..|*/./*|*/../*)
+    echo "lkb: APP_BASE_PATH='$_lkb_raw' is not a safe path (allowed: letters, digits, . _ ~ - and single /; no . or .. segments)" >&2
+    return 1 2>/dev/null || exit 1 ;;
+esac
+
+if [ -z "$_lkb_trim" ]; then LKB_BASE_PATH=""; else LKB_BASE_PATH="/$_lkb_trim"; fi
+export LKB_BASE_PATH
+export LKB_BASE_HREF="${LKB_BASE_PATH}/"
+
+LKB_API_UPSTREAM="$(printf '%s' "${API_UPSTREAM:-http://api:3300}" | sed -e 's#/*$##')"
+case "$LKB_API_UPSTREAM" in
+  http://*|https://*) ;;
+  *) echo "lkb: API_UPSTREAM must start with http:// or https:// (got '$LKB_API_UPSTREAM')" >&2
+     return 1 2>/dev/null || exit 1 ;;
+esac
+case "$LKB_API_UPSTREAM" in
+  *[!A-Za-z0-9._~:/@-]*) echo "lkb: API_UPSTREAM contains unsafe characters" >&2; return 1 2>/dev/null || exit 1 ;;
+esac
+export LKB_API_UPSTREAM
+
+# Explicit browser-side API base (optional). Empty = the app uses <base>/api.
+LKB_APP_API_BASE="$(printf '%s' "${APP_API_BASE:-}" | sed -e 's#^[[:space:]]*##' -e 's#[[:space:]/]*$##')"
+case "$LKB_APP_API_BASE" in
+  "") ;;
+  http://*|https://*|/*) ;;
+  *) echo "lkb: APP_API_BASE must be empty, start with / or http(s):// (got '$LKB_APP_API_BASE')" >&2
+     return 1 2>/dev/null || exit 1 ;;
+esac
+case "$LKB_APP_API_BASE" in
+  *[!A-Za-z0-9._~:/@%?=\&-]*) echo "lkb: APP_API_BASE contains unsafe characters" >&2; return 1 2>/dev/null || exit 1 ;;
+esac
+export LKB_APP_API_BASE
+
+# Document root: the built bundle lives in /usr/share/nginx/html. Under a base path the same files must
+# appear at <root><base>/..., so build a tiny root whose <base> entry is a symlink to the bundle.
+LKB_HTML_DIR="${LKB_HTML_DIR:-/usr/share/nginx/html}"
+LKB_SITE_DIR="${LKB_SITE_DIR:-/usr/share/nginx/lkb-site}"
+export LKB_HTML_DIR LKB_SITE_DIR
+if [ -z "$LKB_BASE_PATH" ]; then
+  LKB_DOC_ROOT="$LKB_HTML_DIR"
+else
+  LKB_DOC_ROOT="$LKB_SITE_DIR"
+  rm -rf "$LKB_SITE_DIR"
+  mkdir -p "$(dirname "$LKB_SITE_DIR$LKB_BASE_PATH")"
+  ln -s "$LKB_HTML_DIR" "$LKB_SITE_DIR$LKB_BASE_PATH"
+fi
+export LKB_DOC_ROOT
+unset _lkb_raw _lkb_trim
