@@ -64,6 +64,8 @@ test("Compose requires an explicit database and does not bake provider secrets i
   assert.match(api, /MONGODB_DB: \$\{MONGODB_DB:\?/);
   assert.doesNotMatch(api, /MONGODB_DB:\s+lkb\b/);
   assert.match(api, /OLLAMA_API_KEY: \$\{OLLAMA_API_KEY:\?/);
-  const web = source.slice(source.indexOf("  web:"));
+  const webStart = source.indexOf("  web:");
+  const web = source.slice(webStart, source.indexOf("\n  bot:", webStart));
+  assert.ok(web.length > 0 && !web.includes("  bot:"), "web service slice is bounded");
   assert.doesNotMatch(web, /OLLAMA_API_KEY|GEMINI_API_KEY/);
 });

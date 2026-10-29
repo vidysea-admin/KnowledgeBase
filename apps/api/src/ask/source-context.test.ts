@@ -122,7 +122,7 @@ test("all 23 original + six additional dated sources can hydrate genuine scoped 
       assert.equal(turn.text.slice(q.charStart, q.charEnd), q.quote, id);
     }
   }
-  assert.equal(retained, 3424);
+  assert.equal(retained, 3426); // +2 after the 2026-10-29 Visa t141 / UCAS t113 timing repairs (34d60c8f, 84d3ffdc)
 });
 test("large individual turn hydrates a late exact Unicode span without fabricated sub-turn times", async () => {
   const text = "A long introduction. ".repeat(400) + "The rare Atlas capstone uses an industry jury. 世界 😀";
