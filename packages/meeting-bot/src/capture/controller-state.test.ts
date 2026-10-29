@@ -276,7 +276,8 @@ test("first-source normalize/probe/extract failures retain stopped and interrupt
     writeOwnedTabStatus(statusPath,identity,{state,captureStartedAt:started,controlGaps:[gap]});
     if(state==="recording") {
       writeControllerState(recordDir,sample({pid:identity.pid,sessionId,obsOutputDir:recordDir,controllerStartedAt:started,until}));
-      writeFileSync(path.join(profileDir,".lkb-tab-capture.lock"),String(identity.pid));
+      // bot-ts-guards: recovery must accept both lock bodies (legacy bare pid, and pid + start time written by claimCaptureLock)
+      writeFileSync(path.join(profileDir,".lkb-tab-capture.lock"),failure==="extract" ? `${identity.pid}\nlinux:boot:1` : String(identity.pid));
       mkdirSync(path.join(recordDir,".extension-"+handle));
     }
     // The finalizer requires a current consent receipt for the session; this test is about control evidence only.
