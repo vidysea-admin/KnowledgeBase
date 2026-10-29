@@ -2,8 +2,8 @@
 **Contract:** none specific; criteria C1..C9 below (D-206; docs/features/user-accounts/plan.md row A3 and the "A3 ua-session-core" acceptance list; spec.md UA-9, UA-9a, UA-9b, UA-13..UA-19, UA-23 trust proxy, UA-27, UA-28, UA-29; no qa/contracts file, the maker never edits qa/contracts/)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Dual check:** required
 dual-trigger: auth apps/api/src/auth.ts:76
