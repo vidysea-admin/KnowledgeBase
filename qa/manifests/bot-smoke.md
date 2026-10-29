@@ -2,8 +2,8 @@
 **Contract:** none specific (D-205 survey unit U5; qa/gates/golive-batch4-2026-10-28.md Answered lines; survey qa/evidence/bot-linux-survey-2026-10-29.md)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (no auth, tenancy or production write: a throwaway local container records a local fixture page; no secrets, no network beyond an apt install in that container)
 **Persona walk:** skip (no screen, flow or user type)
