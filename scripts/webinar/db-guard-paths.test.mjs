@@ -394,6 +394,7 @@ test('D-207 source: both paths call the one guardDatabase(); the migrated and ex
   assert.equal(s.match(/\bguardDatabase\(/g).length, 3, 'definition + sync call + index-existing call');
   assert.equal(s.match(/allowProduction: true/g).length, 1, 'exactly one production opt-in');
   assert.equal(s.match(/isProtectedWorkDbName\(/g).length, 1, 'exactly one protected-name gate, inside guardDatabase');
+  assert.match(s, /if \(connected && INDEX\) await recordIndexFailure\(sessions\(tenantId\), sessionId, error\)/, 'the sync path persists the failure reason after it has connected');
   assert.ok(s.indexOf('function guardDatabase') < s.indexOf('guardDatabase(undefined)'));
   assert.match(code('scripts/lib/transcript-provenance.mjs'), /\["lkb", "lkb_prod", "global_university_db"\]\.includes\(n\.toLowerCase\(\)\) \|\| stagingRefused\(n, env\)/);
 });
