@@ -2,8 +2,8 @@
 **Contract:** none specific; criteria C1-C6 below, taken from the unit brief (D-207 in docs/DECISIONS.md; Umesh's answers in qa/gates/kb-speed-wa-h3-2026-10-29.md; the D-204 text in qa/gates/d-entry-prod-optin-sync.md). No qa/contracts file; the maker never edits qa/contracts/.
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: prod-write scripts/webinar/sync-session.mjs:90
