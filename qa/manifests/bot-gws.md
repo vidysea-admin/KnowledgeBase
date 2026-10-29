@@ -2,8 +2,8 @@
 **Contract:** none specific (D-205 go-live batch 4; survey qa/evidence/bot-linux-survey-2026-10-29.md blocker 8, unit U4)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (no auth, tenancy or production write: resolves a CLI binary path only)
 **Persona walk:** skip (no screen, flow or user type)
