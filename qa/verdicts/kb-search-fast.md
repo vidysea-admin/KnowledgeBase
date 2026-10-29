@@ -1,0 +1,42 @@
+# Verdict — kb-search-fast (coordinator A, blind dual check)
+Cycle checked: 0
+Policy-Version: proportional-verification/2026-10-19.17
+Checked state: HEAD b98dc4fc (code 26c2e401 + 6ea3f8d7; b98dc4fc touches only qa/). Base 1c864477.
+
+## Check plan
+Identity: pre-checks pinned at 6ea3f8d7; `git diff 6ea3f8d7..HEAD` = qa/ only (manifest + bench.ts), so maker pre-check evidence is identity-valid, and I re-ran the suites myself anyway. Read the full source diff (knowledge.ts, request-deadline.ts, search-store.ts, search-cache.ts, routes/search.ts, ask-arms.ts) and the unchanged callees it leans on (effective-reader.ts, search-reader.ts, lexical.ts, cosine.ts). Falsifications ran in a COPY (git archive HEAD under the scratchpad, node_modules junctioned), per-mutation byte backup, restore in `finally`, `git hash-object` == `git rev-parse HEAD:<file>` after every run (all 10: equal). Bound tree never edited (git status: only untracked qa/.delivery/context/).
+
+## Evidence per criterion
+| Criterion | Evidence | Result |
+|---|---|---|
+| C1 batched visibility, memo, deadline | Read `filterBatch`: 1 `$in` read per 500 ids, 1 `readEffectiveTurns`, context once per distinct session via request memo, `withDeadline`. Equivalence to the old per-row loop checked line by line (tenant eq, raw sessionId pairing, effective shape, text ===, speaker/occurredAt, same `context()`, per-turn WA proof kept). knowledge-batch (rc 0), ask-arms-fast (rc 0). Bench: 200 rows/4 sessions O(sessions). | MET |
+| C2 score first, top-k visibility, bounded refill | `rankVisibleTurns`: scorer is pure per turn (lexical.ts:57-69, no corpus stats) and sort is stable, so score-first = filter-first. Vector arm upper-bound stop is strict `>` and session score = best chunk (cosine.ts:113-125), so the raw order is a true upper bound. search-store, ask-arms, ask-arms-fast rc 0. F4, F10 killed; F9 killed. | MET |
+| C3 deadline, 503 with code | routes/search.ts race + `search_timeout`, store-side `VisibilityDeadlineError` mapped to the same code, other errors `search_unavailable`, env clamp 50..60000. Choice (503, not empty 200) is stated and justified. routes/search.test rc 0. F5 killed. | MET |
+| C4 per-tenant cache | `Map<tenant, Map<key,...>>` structural isolation; fingerprint (sources/sessions/heads/WA candidates) read on every cached request; WA-touching results never cached; fingerprint failure bypasses. Rule is stated in manifest. search-cache.test rc 0. F3 killed (see P1 for the one survivor). I found no cross-tenant or stale-after-withdrawal path: fingerprint is read BEFORE compute and stored with the result, so a change during compute only produces a miss. | MET |
+| C5 semantics identical, per-reason regressions | knowledge-batch (25) + knowledge, ask-tenant-hostile, ask-tenant-isolation, source-exclusion, source-context all rc 0. F1 (drop WA per-turn proof) killed, F6 (vector arm skips content/visibility match) killed in 3 suites. Fakes were upgraded, not loosened: the isolation test still asserts each scoped find returns exactly the caller's row. A read error still fails closed to [] by default; search opts into throw (503), which is stricter. | MET |
+| C6 measurement | Reproduced in the copy with the maker's bench.ts and a base-commit copy of search-store, ask-arms AND knowledge (a first attempt that left the new knowledge.ts under the old store showed 148 calls, so the old gate must be included; with it the maker's numbers reproduce exactly). Before: 20,944 / 18,410 / 19,768 / 16,121 / 14,497 calls (5.4-10.0 s on this loaded host). After: 115 / 123 / 111 / 111 / 131 calls (32-69 ms), same 5 hits. /ask arm: 21,026 -> 96/104/112 calls. Warm repeat 4 fingerprint calls. In-memory only, no live server. | MET |
+| C7 K3/K4 decision | Deferred, prefilter/scorer untouched (`git diff 1c864477 -- search-prefilter.ts` empty; search-prefilter.test rc 0). Consequence (5,000-candidate ceiling now on /ask) is pinned by a test and disclosed. | MET (see P2) |
+
+Other floors: `tsc --noEmit` (apps/api) rc 0; `pnpm lint:structure` OK (10 stages, 0 failed); 12 test files run one per invocation under `timeout 150`, all rc 0.
+
+## Falsifications (mine, in the copy)
+F1 C5 drop WA per-turn proof: KILLED. F2 C5 drop raw sessionId pairing: SURVIVED (equivalent: the survivors check `turn.sessionId === row.sessionId` repeats it). F3 C4 cache ignores fingerprint: KILLED. F4 C2 push hits without visibility: KILLED. F5 C3 remove deadline race: KILLED. F6 C5 vector arm skips chunkContentMatches: KILLED. F7 C4 drop `consent` from fingerprint projection: SURVIVED (P1). F8 C5 drop raw-row tenant re-check: SURVIVED (redundant: readEffectiveTurns throws on a foreign tenant row; low). F9 C2 vector stop `>` to `>=`: KILLED (ask-arms.test). F10 C2 refill loop stops after first slice: KILLED. Restores: all hash == HEAD blob.
+
+## Adversarial tenancy hunt
+Cache: tenant bucket is structural, key excludes tenant by design, values structuredClone'd; withdrawal/relabel/new WA link/transcript revision change the fingerprint and miss at once; WA results never cached. Race read-compute-store only yields misses. `filterBatch` re-verifies tenant and id on every returned raw row and every candidate; `readEffectiveTurns` independently throws on a foreign-tenant row. Vector arm reads chunks and turns through `scopedCollection`. No bypass found.
+
+VERDICT: PASS
+SCOREBOARD: 7/7 criteria met, tenancy/visibility invariants hold
+TIER: L (tenancy: visibility gate and per-tenant cache; dual)
+FAILURES: none
+CAPABILITY-COVERAGE: not-applicable (API read path, no screen)
+LIVE-BROWSER: not-applicable (apps/api only)
+ISSUES-WRITTEN: none (dual coordinator: proposals below, maker mints ids)
+EXECUTOR: claude-sonnet-subagent (checker: claude-sonnet-subagent)
+EXPLANATION: Every criterion is evidenced by my own runs and a line-level read; the batched gate keeps every old per-row condition, the score-first ranking is provably equal to filter-first, and the cache cannot cross tenants or outlive a visibility change the fingerprint can see. Two non-blocking gaps are filed below (an unpinned fingerprint projection, and the 5,000-candidate cliff for /ask).
+
+PROPOSED-ISSUE: {"id":"P1","severity":"medium","class":"test-strength","title":"Cache fingerprint projection is not pinned: dropping consent from the sources projection survives all tests","evidence":"F7 in a copy: search-store.ts visibilityFingerprint read(\"sources\",{_id,tenantId,kind,consent}) -> without consent: search-cache.test.ts rc 0. Cause: the fake find() in search-cache/search-fixture.testsupport.ts:49 ignores its projection argument, real Mongo applies it, so a projection typo would make consent withdrawal wait up to the 45 s TTL.","fix_direction":"make the fake honour projection (or assert the projection object sent for sources/sessions/transcript_reviews/whatsapp_candidates) and add a case that fails when consent, status, revision or sourceId/sessionId is missing"}
+PROPOSED-ISSUE: {"id":"P2","severity":"medium","class":"capacity","title":"/ask lexical arm now inherits the 5,000-candidate / 20,000-row / 5 s read ceiling while the prefilter is almost non-selective","evidence":"bench: natural questions match 2,065-2,986 of 3,000 turns; search-reader.ts MAX_CANDIDATES=5000 throws 'candidate limit exceeded' (ask-arms.ts lexical arm now degrades visibly, was unbounded). A tenant near ~5,000 turns loses the lexical arm and gets 503 on /search for common questions. Disclosed and pinned by ask-arms-fast test; not a visibility defect.","fix_direction":"K3 follow-up before any tenant passes ~4,000 turns: a selective /ask prefilter needs a scorer-side token change plus a recall proof, or a paged candidate read"}
+PROPOSED-ISSUE: {"id":"P3","severity":"low","class":"process","title":"A timed-out /search keeps running in the background","evidence":"withDeadline and the route race bound the caller's wait only (documented in request-deadline.ts); a pending Mongo call is not cancelled, so repeated slow queries can stack work after each 503.","fix_direction":"pass maxTimeMS derived from deadlineAt to the candidate and visibility reads when a later unit touches them"}
+
+Metrics: start=2026-10-29T05:39:00Z end=2026-10-29T05:55:00Z wall_min=16 agent_min=unavailable blocked_min=0 suite_runs=0 repeat_runs=0 mutations=10 cycle=0 resumes=0 tokens=unavailable builder_min=170 check_min=16 maker_tokens=unavailable checker_tokens=unavailable policy=proportional-verification/2026-10-19.17 check_s=960 mutants=10 defects_unit=0 defects_6c=0
