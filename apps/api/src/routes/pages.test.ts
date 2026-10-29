@@ -8,6 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
+import vm from "node:vm";
+import { CLIENT_AUTH_JS } from "./ui-shell.js";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps } from "../fixtures.js";
 
@@ -127,5 +129,24 @@ test("pages still resolve correctly when the API is deployed with no proxy prefi
     assert.equal(new URL("../dashboard-ui", "http://host/sessions-ui/some-id").pathname, "/dashboard-ui");
   } finally {
     await server.close();
+  }
+});
+
+test("the shared client apiFetch resolves every API call against API_ROOT (executed, not pattern-matched) (ISS-408)", async () => {
+  const urls: string[] = [];
+  for (const [root, pageUrl, want] of [
+    ["./", "http://host/knowledgebase/api/sessions-ui", "/knowledgebase/api/sessions"],
+    ["../", "http://host/knowledgebase/api/sessions-ui/some-id", "/knowledgebase/api/sessions/x"],
+  ] as const) {
+    const ctx = vm.createContext({
+      localStorage: { getItem: () => "k", setItem: () => {} },
+      document: { getElementById: () => null },
+      fetch: async (u: string) => { urls.push(u); return { ok: true, json: async () => ({}) }; },
+    });
+    vm.runInContext(`const API_ROOT = ${JSON.stringify(root)};\n${CLIENT_AUTH_JS};globalThis.apiFetch = apiFetch;`, ctx);
+    await (ctx as { apiFetch: (p: string) => Promise<unknown> }).apiFetch(want.endsWith("/x") ? "/sessions/x" : "/sessions");
+    const sent = urls.at(-1)!;
+    assert.doesNotMatch(sent, /^\//, "never root-absolute");
+    assert.equal(new URL(sent, pageUrl).pathname, want);
   }
 });
