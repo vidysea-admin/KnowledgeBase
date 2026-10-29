@@ -2,8 +2,8 @@
 **Contract:** none specific (D-206 authorizes; docs/features/user-accounts/plan.md row A1 and section "A1 ua-schema"; spec.md UA-2, UA-13, UA-25, UA-27)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required (new tenant-scoped auth data model: tenancy, sessions, credential-token storage, append-only audit log)
 **Dual-trigger:** dual-trigger: tenancy packages/db/src/collections/users.ts:28
