@@ -2,8 +2,8 @@
 **Contract:** none specific; criteria C1, C2, C3, C4, C5 below (D-205/D-206; docs/features/whatsapp-multiuser/plan.md row W1 and its per-unit acceptance, spec.md R-2, R-29, R-33, R-36; no qa/contracts file, the maker never edits qa/contracts/)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: tenancy packages/db/src/collections/whatsapp-links.ts:44
