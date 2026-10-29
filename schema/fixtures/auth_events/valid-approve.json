@@ -1,0 +1,14 @@
+{
+  "_id": "e-0001",
+  "tenantId": "toc",
+  "at": "2026-10-29T10:00:00.000Z",
+  "type": "approved",
+  "subjectHash": "9999999999999999999999999999999999999999999999999999999999999999",
+  "ipPrefix": "203.0.113.0/24",
+  "userAgentSummary": "Firefox on Windows",
+  "outcome": "ok",
+  "detail": "admin_action",
+  "purgeAt": "2028-10-29T10:00:00.000Z",
+  "actorUserId": "u-0001",
+  "targetUserId": "u-0002"
+}

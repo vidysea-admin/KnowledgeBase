@@ -1,0 +1,10 @@
+{
+  "_id": "th-0001",
+  "tenantId": "toc",
+  "subjectHash": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "failures": 5,
+  "lockCount": 1,
+  "windowStartedAt": "2026-10-29T10:00:00.000Z",
+  "lastFailureAt": "2026-10-29T10:00:00.000Z",
+  "purgeAt": "2026-10-30T10:00:00.000Z"
+}

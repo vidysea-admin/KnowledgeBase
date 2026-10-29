@@ -1,0 +1,10 @@
+{
+  "_id": "t-0001",
+  "userId": "u-0001",
+  "purpose": "verify_email",
+  "tokenHash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "issuedVia": "mail",
+  "createdAt": "2026-10-29T10:00:00.000Z",
+  "expiresAt": "2026-10-30T10:00:00.000Z",
+  "purgeAt": "2026-11-06T10:00:00.000Z"
+}

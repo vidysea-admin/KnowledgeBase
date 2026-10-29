@@ -1,0 +1,12 @@
+{
+  "_id": "u-0001",
+  "tenantId": "toc",
+  "emailNormalized": "alice@example.com",
+  "displayName": "Alice",
+  "passwordHash": "$argon2id$v=19$m=19456,t=2,p=1$c29tZXNhbHRzYWx0$aGFzaGhhc2hoYXNoaGFzaGhhc2g",
+  "status": "active",
+  "role": "superuser",
+  "emailVerifiedAt": "2026-10-29T10:00:00.000Z",
+  "createdAt": "2026-10-29T10:00:00.000Z",
+  "updatedAt": "2026-10-29T10:00:00.000Z"
+}
