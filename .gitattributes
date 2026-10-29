@@ -75,3 +75,8 @@ data/eval/extraction-reconciliation-reviewed.json  text eol=crlf
 # would break the shebang and the envsubst template (APP_BASE_PATH, unit subpath-web).
 apps/web/docker/*      text eol=lf
 apps/web/nginx.conf    text eol=lf
+
+# Shell scripts run on Linux (bot image entrypoint/healthcheck, container smoke): a CRLF checkout on
+# Windows breaks the shebang and `set -eu`. Index copies are already LF; this pins the checkout EOL.
+*.sh                   text eol=lf
+docker/meeting-bot/*   text eol=lf

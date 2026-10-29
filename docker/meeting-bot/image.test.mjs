@@ -19,7 +19,7 @@ test('Dockerfile pins the toolchain and runs as uid 1000', () => {
   assert.match(d, /pnpm install --frozen-lockfile/);
   assert.match(d, /seleniumbase get cft/);
   assert.match(d, /seleniumbase get uc_driver stable/);
-  for (const pkg of ['xvfb', 'pulseaudio', 'ffmpeg', 'tini', 'python3-tk', 'python3-xlib', 'xdotool', 'x11vnc', 'fonts-noto-color-emoji'])
+  for (const pkg of ['xvfb', 'pulseaudio', 'ffmpeg', 'tini', 'python3-tk', 'python3-xlib', 'xdotool', 'x11vnc', 'fonts-noto-color-emoji', 'libnss3-tools'])
     assert.ok(d.includes(pkg), `missing apt package ${pkg}`);
   assert.match(d, /^USER node$/m);
   assert.match(d, /^ARG GWS_VERSION=0\.22\.5$/m);
@@ -60,6 +60,40 @@ test('entrypoint doctor gate does not fail open and the VNC password never reach
   assert.match(e, /-passwdfile "rm:\$VNC_PASSFILE"/);
   assert.match(e, /umask 077/);
   assert.match(e, /unset VNC_PASSWORD/);
+});
+
+test('entrypoint takes the VNC password out of the environment BEFORE any daemon starts (ISS-409)', () => {
+  const e = entry();
+  const at = (re) => { const m = re.exec(e); assert.ok(m, `entrypoint missing ${re}`); return m.index; };
+  const unset = at(/^\s*unset VNC_PASSWORD/m);
+  assert.ok(unset < at(/^pulseaudio -D/m), 'unset VNC_PASSWORD must come before pulseaudio');
+  assert.ok(unset < at(/^Xvfb :99/m), 'unset VNC_PASSWORD must come before Xvfb');
+  assert.ok(unset < at(/^\s*x11vnc /m), 'unset VNC_PASSWORD must come before x11vnc');
+  // The only reader of the value is the step that writes the 0600 pass file, and it precedes the unset.
+  const reads = [...e.matchAll(/\$\{?VNC_PASSWORD\b/g)].map((m) => m.index);
+  assert.ok(reads.length > 0 && reads.every((i) => i < unset), 'VNC_PASSWORD must not be read after the unset');
+  assert.ok(at(/umask 077/) < unset, 'pass file is written before the unset');
+});
+
+test('entrypoint removes the VNC pass file when x11vnc fails (ISS-410)', () => {
+  const e = entry();
+  const trap = /trap 'rm -f "\$VNC_PASSFILE"' EXIT/.exec(e);
+  assert.ok(trap, 'missing EXIT trap that removes the pass file');
+  assert.ok(trap.index < /^\s*x11vnc /m.exec(e).index, 'trap must be armed before x11vnc runs');
+});
+
+test('container smoke needs no network: no apt step and the container runs on an --internal network', () => {
+  const s = read('scripts/qa/container-workflows/bot-smoke.sh');
+  assert.doesNotMatch(s, /apt-get|apt install/, 'smoke must not install packages at run time');
+  assert.match(s, /docker network create --internal "\$net"/);
+  assert.match(s, /docker run -d --name "\$name" --network "\$net" /);
+  assert.match(s, /docker network rm "\$net"/, 'the throwaway network must be removed');
+});
+
+test('shell scripts are pinned to LF in the checkout (.gitattributes)', () => {
+  const a = read('.gitattributes');
+  assert.match(a, /^\*\.sh\s+text eol=lf$/m);
+  assert.match(a, /^docker\/meeting-bot\/\*\s+text eol=lf$/m);
 });
 
 test('.dockerignore keeps secrets and local state out of the build context', () => {
@@ -105,6 +139,11 @@ test('built image: gws is the pinned 0.22.5 binary', {skip: process.env.LKB_DOCK
   const r = spawnSync('docker', ['run', '--rm', '--entrypoint', 'gws', image, '--version'], {encoding: 'utf8'});
   assert.equal(r.status, 0, r.stdout + r.stderr);
   assert.match(r.stdout, /0\.22\.5/);
+});
+
+test('built image: certutil (libnss3-tools) is present so the smoke needs no network', {skip: process.env.LKB_DOCKER_TESTS !== '1' || !image}, () => {
+  const r = spawnSync('docker', ['run', '--rm', '--entrypoint', 'certutil', image, '-H'], {encoding: 'utf8'});
+  assert.match(r.stdout + r.stderr, /certutil/i, r.stdout + r.stderr);
 });
 
 test('built image: doctor gate fails closed when node itself fails', {skip: process.env.LKB_DOCKER_TESTS !== '1' || !image}, () => {
