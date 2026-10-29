@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://user_sessions",
+  "title": "user_sessions",
+  "description": "Server-side session behind the httpOnly cookie (UA-13/UA-14). The token exists only in the cookie; this row holds sha256(token) (tokenHash, globally unique) and never the token. Scopes are NOT stored here: they are derived from the user's role on every request, so a role change applies at once. There is no absolute expiry; idle expiry (365 d since lastUsedAt) is evaluated by the API. Rotation keeps the previous hash for a 30 s grace (previousTokenHash/previousValidUntil) and the last 5 retired hashes (retiredTokenHashes) so a replayed old token is recognised as reuse and the whole familyId is revoked. A revoked or expired row carries revokedAt + revokedReason + purgeAt (30 days later) all together; an ACTIVE row carries none of the three, so Mongo's TTL index never removes it. purgeAt is a BSON Date (TTL indexes ignore every other type); JSON fixtures show it as an ISO string. ipPrefix is a truncated /24 or /48, userAgentSummary a coarse 'browser family + OS' - never the full address or raw User-Agent.",
+  "type": "object",
+  "required": ["_id", "tenantId", "userId", "familyId", "tokenHash", "createdAt", "lastUsedAt", "rotatedAt"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "tenantId": { "type": "string", "minLength": 1, "description": "The user's tenant; A3 checks it equals the user row's tenant on every lookup (UA-27)." },
+    "userId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "familyId": { "type": "string", "minLength": 1, "maxLength": 64, "description": "Constant across rotations; reuse detection revokes the whole family." },
+    "tokenHash": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "sha256 of the 256-bit cookie token." },
+    "previousTokenHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "previousValidUntil": { "type": "string", "format": "date-time" },
+    "retiredTokenHashes": { "type": "array", "maxItems": 5, "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" } },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "lastUsedAt": { "type": "string", "format": "date-time" },
+    "rotatedAt": { "type": "string", "format": "date-time" },
+    "ipPrefix": { "type": "string", "maxLength": 64, "pattern": "^[0-9A-Fa-f:.]+/(24|48)$" },
+    "userAgentSummary": { "type": "string", "maxLength": 80, "pattern": "^[A-Za-z0-9 ._+-]*$" },
+    "revokedAt": { "type": "string", "format": "date-time" },
+    "revokedReason": { "type": "string", "enum": ["logout", "admin", "password_change", "password_reset", "disabled", "reuse_detected", "idle_expired"] },
+    "purgeAt": { "type": "string", "format": "date-time", "tsType": "Date", "x-bsonType": "date", "description": "BSON Date, set with revokedAt (revoke time + 30 days); drives the TTL index." }
+  },
+  "dependentRequired": {
+    "revokedAt": ["revokedReason", "purgeAt"],
+    "revokedReason": ["revokedAt", "purgeAt"],
+    "purgeAt": ["revokedAt", "revokedReason"]
+  },
+  "additionalProperties": false
+}

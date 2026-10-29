@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://auth_events",
+  "title": "auth_events",
+  "description": "Append-only authentication audit log (UA-25). The store exposes insert and read only; no update or delete helper exists. Never a password, token, cookie, free text from the client, or the raw email of an unknown account (subjectHash, a salted hash, stands in). `detail` is a CLOSED vocabulary. purgeAt (BSON Date, at + 2 years) drives the TTL retention index.",
+  "type": "object",
+  "required": ["_id", "tenantId", "at", "type", "outcome", "detail", "purgeAt"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "at": { "type": "string", "format": "date-time" },
+    "type": { "type": "string", "enum": ["signup", "email_verified", "login_ok", "login_failed", "locked", "unlocked", "logout", "session_revoked", "reuse_detected", "approved", "rejected", "role_changed", "disabled", "enabled", "password_changed", "password_reset", "link_issued", "admin_bootstrap"] },
+    "actorUserId": { "type": "string", "minLength": 1, "maxLength": 64, "description": "Acting userId, or 'bootstrap-script'." },
+    "targetUserId": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "subjectHash": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Salted hash standing in for the email of an account that does not exist." },
+    "ipPrefix": { "type": "string", "maxLength": 64, "pattern": "^[0-9A-Fa-f:.]+/(24|48)$" },
+    "userAgentSummary": { "type": "string", "maxLength": 80, "pattern": "^[A-Za-z0-9 ._+-]*$" },
+    "outcome": { "type": "string", "enum": ["ok", "failed", "denied"] },
+    "detail": { "type": "string", "enum": ["none", "new_account", "existing_account", "invalid_credentials", "unknown_account", "locked", "not_active", "token_invalid", "token_reused", "family_revoked", "admin_action", "self_action", "last_admin_guard", "bootstrap", "mail_not_sent", "rate_limited"] },
+    "purgeAt": { "type": "string", "format": "date-time", "tsType": "Date", "x-bsonType": "date", "description": "BSON Date; TTL (2-year retention, H-3)." }
+  },
+  "additionalProperties": false
+}

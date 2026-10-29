@@ -35,3 +35,9 @@ export * from "./collections/application-operations.js";
 export * from "./collections/operations-schedules.js";
 export * from "./lib/native-publication.js";
 export * from "./lib/topology.js";
+// user-accounts A1 (D-206): tenant-scoped stores for users, sessions, single-use tokens, login throttles and the append-only audit log.
+export * from "./collections/users.js";
+export * from "./collections/user-sessions.js";
+export * from "./collections/user-tokens.js";
+export * from "./collections/auth-throttles.js";
+export * from "./collections/auth-events.js";

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kb://auth_throttles",
+  "title": "auth_throttles",
+  "description": "Failed-login counters per normalised email (UA-24). A row is kept even for an email with no account, so a lock never reveals existence; for that reason the key is subjectHash, a salted hash of the normalised email (the salt is a server secret held by the caller), never the address itself. 5 failures in 15 min lock the subject for 15 min, each further lock doubles up to 24 h (lockCount drives the schedule); a success or an admin unlock clears the lock state. purgeAt (BSON Date, at least 24 h after the last activity and never before lockedUntil) drives the TTL index so counters expire on their own.",
+  "type": "object",
+  "required": ["_id", "tenantId", "subjectHash", "failures", "lockCount", "windowStartedAt", "lastFailureAt", "purgeAt"],
+  "properties": {
+    "_id": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "tenantId": { "type": "string", "minLength": 1 },
+    "subjectHash": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Salted hash of the normalised email; unique per tenant." },
+    "failures": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+    "lockCount": { "type": "integer", "minimum": 0, "maximum": 64 },
+    "windowStartedAt": { "type": "string", "format": "date-time" },
+    "lastFailureAt": { "type": "string", "format": "date-time" },
+    "lockedUntil": { "type": "string", "format": "date-time" },
+    "purgeAt": { "type": "string", "format": "date-time", "tsType": "Date", "x-bsonType": "date", "description": "BSON Date; TTL." }
+  },
+  "additionalProperties": false
+}

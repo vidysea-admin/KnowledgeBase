@@ -104,6 +104,8 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
 | answer_source_conflicts | _id, id, tenantId, runId, createdAt, by, explanation, a, b, candidateDigest, evidenceDigest, status | yes |
 | api_keys | _id, tenantId, keyHash, createdAt | no |
 | application_operations |  | no |
+| auth_events | _id, tenantId, at, type, outcome, detail, purgeAt | no |
+| auth_throttles | _id, tenantId, subjectHash, failures, lockCount, windowStartedAt, lastFailureAt, purgeAt | no |
 | automation_runs |  | no |
 | championship_events | _id, tenantId, revision, createdAt, title, questions, counsellors, judges, rubric, reviewReference, bankDigest, trials, evidenceStatus | yes |
 | chunks | _id, tenantId, sourceRef, turnRefs, chunkIndex | no |
@@ -139,6 +141,9 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
 | trusted_senders | _id, tenantId, senderDomain, approvalCount, autoApprove | no |
 | turns | _id, tenantId, sessionId, speakerRef, tStart, tEnd, text | yes |
 | usage_events | _id, tenantId, kind, at, day, outcome, latencyMs | no |
+| user_sessions | _id, tenantId, userId, familyId, tokenHash, createdAt, lastUsedAt, rotatedAt | no |
+| user_tokens | _id, tenantId, userId, purpose, tokenHash, issuedVia, createdAt, expiresAt, purgeAt | no |
+| users | _id, tenantId, emailNormalized, displayName, passwordHash, status, createdAt, updatedAt | no |
 | watch_heartbeat | _id, tenantId, sourceType, lastHeartbeatAt | no |
 | watch_reports | _id, tenantId, runAt, mode, digestPath | no |
 | watch_state | _id, tenantId, sourceType, sourceId, status, seenAt | no |
