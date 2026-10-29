@@ -2,8 +2,8 @@
 **Contract:** none specific (docs/features/whatsapp-multiuser/plan.md unit W2a; spec section 7; D-205, D-206)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** merged-no-check (docs-lane)
+**Handshake status:** merged-no-check (docs-lane)
 **Fix cycle:** 0
 **Dual check:** no (docs only: no code, no auth or data write is built; the archiver implementation W2b carries its own dual check)
 **Persona walk:** skip (no screen, flow or user type)
