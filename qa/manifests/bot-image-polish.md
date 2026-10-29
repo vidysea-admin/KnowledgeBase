@@ -2,8 +2,8 @@
 **Contract:** none specific (D-205 follow-ups from the bot-smoke checker verdict qa/verdicts/bot-smoke.md; D-206 context; ISS-409, ISS-410 low)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (image/CI scripts only; no auth, tenancy or production write; the VNC password handling is hardened, not widened; no secrets read)
 **Persona walk:** skip (no screen, flow or user type)
