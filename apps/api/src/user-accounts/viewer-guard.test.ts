@@ -78,10 +78,11 @@ async function viewerRig(opts: RigOpts | ((app: Express) => void) = {}) {
 }
 
 /** Routes that are neither guarded for viewers, allowlisted, nor under a self-guarded prefix. */
-async function unclassified(rig: Awaited<ReturnType<typeof viewerRig>>): Promise<string[]> {
+async function unclassified(rig: Awaited<ReturnType<typeof viewerRig>>, checked: string[] = []): Promise<string[]> {
   const bad: string[] = [];
   for (const f of rig.routes) {
     if (SELF_GUARDED_PREFIXES.some((p) => f.path === p || f.path.startsWith(`${p}/`))) continue;
+    checked.push(f.path);
     const res = await rig.send(f);
     const readLike = isReadLikePost(f.method, concrete(f.path));
     if (readLike ? res.error === "read_only_role" : res.error !== "read_only_role") bad.push(`${f.method} ${f.path} -> ${res.status} ${res.error ?? ""}`);
@@ -94,8 +95,9 @@ test("every mounted write route (including every /admin one) answers a viewer 40
   try {
     assert.ok(rig.routes.length >= 40, `enumerated ${rig.routes.length} write routes (the walker must really see the app)`);
     assert.ok(rig.routes.some((r) => r.method === "POST" && r.path === "/ask"), "mount-less router routes are found");
-    assert.ok(rig.routes.filter((r) => r.path.startsWith("/admin/")).length >= 6, "the /admin write routes are enumerated, not exempted");
-    assert.deepEqual(await unclassified(rig), []);
+    const checked: string[] = [];
+    assert.deepEqual(await unclassified(rig, checked), []);
+    assert.ok(checked.filter((p) => p.startsWith("/admin/")).length >= 6, `the /admin write routes are actually exercised, not exempted (${checked.length} checked)`);
   } finally { await rig.close(); }
 });
 
