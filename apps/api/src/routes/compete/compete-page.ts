@@ -7,6 +7,7 @@
  * `server.ts` requires auth on every route including this one — no special-cased public page.
  */
 import { Router, type Request, type Response } from "express";
+import { relRoot } from "../ui-shell.js";
 
 const PAGE = `<!doctype html>
 <html>
@@ -108,6 +109,9 @@ const PAGE = `<!doctype html>
 </div>
 
 <script>
+  // Relative path back to the API root, injected per request (see ui-shell.ts relRoot): the page
+  // is served under <APP_BASE_PATH>/api/ behind the web proxy, so "/compete/start" would miss it.
+  const API_ROOT = "__API_ROOT__";
   let evalRunId = null;
 
   function key() {
@@ -195,7 +199,7 @@ const PAGE = `<!doctype html>
           org: document.getElementById("counsellorOrg").value || undefined,
         },
       };
-      const res = await fetch("/compete/start", {
+      const res = await fetch(API_ROOT + "compete/start", {
         method: "POST",
         headers: { "content-type": "application/json", authorization: "Bearer " + key() },
         body: JSON.stringify(body),
@@ -230,7 +234,7 @@ const PAGE = `<!doctype html>
       },
       notes: document.getElementById("notes").value || undefined,
     };
-    const res = await fetch("/compete/" + evalRunId + "/score", {
+    const res = await fetch(API_ROOT + "compete/" + evalRunId + "/score", {
       method: "POST",
       headers: { "content-type": "application/json", authorization: "Bearer " + key() },
       body: JSON.stringify(body),
@@ -246,8 +250,8 @@ const PAGE = `<!doctype html>
 
 export function createCompetePageRouter(): Router {
   const router = Router();
-  router.get("/compete", (_req: Request, res: Response) => {
-    res.type("html").send(PAGE);
+  router.get("/compete", (req: Request, res: Response) => {
+    res.type("html").send(PAGE.replace("__API_ROOT__", relRoot(req)));
   });
   return router;
 }

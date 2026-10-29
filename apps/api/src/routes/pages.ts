@@ -8,7 +8,7 @@
  * the same XSS guard `compete-page.ts` was flagged on applies here).
  */
 import { Router, type Request, type Response } from "express";
-import { renderPage, CLIENT_AUTH_JS, escapeHtmlAttr } from "./ui-shell.js";
+import { renderPage, relRoot, CLIENT_AUTH_JS, escapeHtmlAttr } from "./ui-shell.js";
 import { STUB_ROUTES } from "./stubs.js";
 
 interface RealRoute { label: string; scope: string; status?: string; qualification?: string; }
@@ -35,8 +35,9 @@ const REAL_ROUTES: RealRoute[] = [
 export function createPagesRouter(): Router {
   const router = Router();
 
-  router.get("/", (_req: Request, res: Response) => {
+  router.get("/", (req: Request, res: Response) => {
     res.type("html").send(renderPage({
+      rootRel: relRoot(req),
       activePath: "/",
       title: "Vidysea Living Knowledge Base",
       heading: "Living Knowledge Base",
@@ -50,8 +51,9 @@ export function createPagesRouter(): Router {
     }));
   });
 
-  router.get("/sessions-ui", (_req: Request, res: Response) => {
+  router.get("/sessions-ui", (req: Request, res: Response) => {
     res.type("html").send(renderPage({
+      rootRel: relRoot(req),
       activePath: "/sessions-ui",
       title: "Sessions — Living Knowledge Base",
       heading: "Sessions",
@@ -68,7 +70,7 @@ export function createPagesRouter(): Router {
         function sessionCard(s) {
           const div = document.createElement("a");
           div.className = "row-card";
-          div.href = "/sessions-ui/" + encodeURIComponent(s._id);
+          div.href = apiUrl("sessions-ui/") + encodeURIComponent(s._id);
           div.style.display = "block";
           div.style.textDecoration = "none";
           div.style.color = "inherit";
@@ -115,6 +117,7 @@ export function createPagesRouter(): Router {
   router.get("/sessions-ui/:id", (req: Request, res: Response) => {
     const id = req.params.id as string;
     res.type("html").send(renderPage({
+      rootRel: relRoot(req),
       activePath: "/sessions-ui",
       title: "Session detail — Living Knowledge Base",
       heading: "Session detail",
@@ -192,8 +195,9 @@ export function createPagesRouter(): Router {
     }));
   });
 
-  router.get("/dashboard-ui", (_req: Request, res: Response) => {
+  router.get("/dashboard-ui", (req: Request, res: Response) => {
     res.type("html").send(renderPage({
+      rootRel: relRoot(req),
       activePath: "/dashboard-ui",
       title: "Dashboard — Living Knowledge Base",
       heading: "Knowledge health",
@@ -261,7 +265,7 @@ export function createPagesRouter(): Router {
     }));
   });
 
-  router.get("/docs-ui", (_req: Request, res: Response) => {
+  router.get("/docs-ui", (req: Request, res: Response) => {
     const realRows = REAL_ROUTES.map((r) =>
       `<tr><td><code class="inline">${r.label}</code></td><td><span class="badge badge-good">${r.status ?? "live"}</span>${r.qualification ? `<p>${r.qualification}</p>` : ""}</td><td>${r.scope}</td></tr>`,
     ).join("\n");
@@ -269,6 +273,7 @@ export function createPagesRouter(): Router {
       `<tr><td><code class="inline">${r.label}</code></td><td><span class="badge badge-warn">501 not_implemented</span></td><td>${r.scope}</td></tr>`,
     ).join("\n");
     res.type("html").send(renderPage({
+      rootRel: relRoot(req),
       activePath: "/docs-ui",
       title: "API Docs — Living Knowledge Base",
       heading: "Developer API",
