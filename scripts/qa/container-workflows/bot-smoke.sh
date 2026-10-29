@@ -13,8 +13,9 @@
 # Why HTTPS: record consent (record-consent/context.ts recordMeetingHash) refuses non-https meeting URLs,
 # and detectPlatform() reports a localhost URL as "unknown" (accepted: no platform logic is bypassed).
 # Chrome must trust the fixture certificate, so the smoke imports it into the node user's NSS db
-# (certutil, package libnss3-tools). The image does not ship certutil, so the host step installs it into
-# the throwaway container as root; the image itself is never modified.
+# (certutil, package libnss3-tools, shipped in the image). The throwaway container runs with
+# `--network none`: everything the smoke touches is loopback or already in the image, so the run needs
+# no network (building the image does).
 # Modes (internal): --inside (runs in the container), --check <rec_dir> <record_exit> (criteria a-d only).
 set -uo pipefail
 
@@ -152,10 +153,9 @@ host_main() {
   cleanup() { docker rm -f -v "$name" >/dev/null 2>&1 || true; }
   trap cleanup EXIT INT TERM
   echo "SMOKE container $name from $image"
-  docker run -d --name "$name" --shm-size 1g --entrypoint /usr/bin/tini "$image" -s -- sleep 900 >/dev/null || return 2
-  # certutil is not in the image: install it into this throwaway container only (needs network).
-  docker exec -u root "$name" sh -c 'command -v certutil >/dev/null || { apt-get update -qq >/dev/null && apt-get install -y --no-install-recommends libnss3-tools >/dev/null; }' \
-    || { echo "SMOKE FAIL could not install libnss3-tools in the container (network?)" >&2; return 1; }
+  docker run -d --name "$name" --network none --shm-size 1g --entrypoint /usr/bin/tini "$image" -s -- sleep 900 >/dev/null || return 2
+  docker exec "$name" sh -c 'command -v certutil >/dev/null' \
+    || { echo "SMOKE FAIL certutil missing from the image (libnss3-tools); rebuild the image" >&2; return 1; }
   docker exec -i "$name" sh -c 'mkdir -p /tmp/bot-smoke-work && cat > /tmp/bot-smoke-work/bot-smoke-meeting.html' < <(tr -d "\r" < "$here/fixtures/bot-smoke-meeting.html") || return 1
   docker exec -i "$name" sh -c 'cat > /tmp/bot-smoke-work/bot-smoke.sh' < <(tr -d "\r" < "${BASH_SOURCE[0]}") || return 1
   docker exec "$name" bash /tmp/bot-smoke-work/bot-smoke.sh --inside
