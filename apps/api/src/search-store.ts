@@ -126,7 +126,7 @@ async function treeNativeLocators(db: Pick<Db, "collection">, tenantId: string):
 
 /**
  * Everything that decides what a tenant may see, hashed: source kind + consent, session -> source binding and index status,
- * and every transcript-review head revision. Read on EVERY cached request (three small tenant-scoped reads), so a consent
+ * every transcript-review head revision and every WhatsApp review candidate link (a candidate over a non-WhatsApp source hides it). Read on EVERY cached request (four small tenant-scoped reads), so a consent
  * withdrawal, relabel, new session or transcript correction invalidates the cache immediately instead of after the TTL.
  * `waSessions` are sessions whose source is a whatsapp-batch: results touching them are never cached, because WhatsApp
  * visibility also depends on per-candidate approvals this fingerprint does not read.
@@ -139,13 +139,13 @@ async function visibilityFingerprint(db: Pick<Db, "collection">, tenantId: strin
     return rows;
   };
   // tenantId is part of every projection so the scope check above is a real check, not a vacuous one.
-  const [sources, sessions, heads] = await Promise.all([
+  const [sources, sessions, heads, candidates] = await Promise.all([
     read("sources", { _id: 1, tenantId: 1, kind: 1, consent: 1 }), read("sessions", { _id: 1, tenantId: 1, sourceId: 1, status: 1 }),
-    read("transcript_reviews", { _id: 1, tenantId: 1, revision: 1 }),
+    read("transcript_reviews", { _id: 1, tenantId: 1, revision: 1 }), read("whatsapp_candidates", { _id: 1, tenantId: 1, sourceId: 1, sessionId: 1 }),
   ]);
   const byId = (rows: Record<string, unknown>[]) => [...rows].sort((a, b) => String(a._id).localeCompare(String(b._id)));
   const waSources = new Set(sources.filter(row => row.kind === "whatsapp-batch").map(row => String(row._id)));
-  const fingerprint = createHash("sha256").update(JSON.stringify([byId(sources), byId(sessions), byId(heads)])).digest("hex");
+  const fingerprint = createHash("sha256").update(JSON.stringify([byId(sources), byId(sessions), byId(heads), byId(candidates)])).digest("hex");
   return { fingerprint, waSessions: new Set(sessions.filter(row => waSources.has(String(row.sourceId))).map(row => String(row._id))) };
 }
 

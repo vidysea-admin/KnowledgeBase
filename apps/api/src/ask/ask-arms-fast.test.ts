@@ -115,3 +115,11 @@ test("K1 deadline: a store that never answers degrades the arms with a reason in
   assert.ok(Date.now() - started < 8000);
   assert.ok(res.degraded !== null, "a hung store must be reported as a degradation");
 });
+
+test("K2 bound: above the 5000-candidate read ceiling the lexical arm degrades VISIBLY (a `lexical:` reason), never silently empty", async () => {
+  const turns = Array.from({ length: 5001 }, (_, i) => ({ _id: `t${i}`, sessionId: `s${i % 3}`, text: `visa guidance ${i}` }));
+  const f = armsFixture({ turns });
+  const res = await createAskArmsFor({ db: f.db })("t1")("visa", bigTree(["s0", "s1", "s2"]));
+  assert.match(res.degraded ?? "", /lexical: .*candidate limit exceeded/);
+  assert.deepEqual(res.arms.flat(), []);
+});

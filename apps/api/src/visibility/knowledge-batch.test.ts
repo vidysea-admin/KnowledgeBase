@@ -85,6 +85,7 @@ const EXCLUSIONS: [string, Mutate][] = [
   ["source belongs to another tenant", f => { (f.rows.sources![1] as Row).tenantId = "tenant-b"; }],
   ["live turn no longer exists", f => { f.rows.turns = f.rows.turns!.filter(r => r.sessionId !== "s1"); }],
   ["live turn text changed since the candidate was read", f => { for (const r of f.rows.turns!) if (r.sessionId === "s1") r.text = "edited after read"; }],
+  ["live turn text now CONTAINS the candidate text (edited after read)", f => { for (const r of f.rows.turns!) if (r.sessionId === "s1") r.text = `${r.text} and an appended claim`; }],
   ["live turn moved to a different session", f => { for (const r of f.rows.turns!) if (r.sessionId === "s1") r.sessionId = "s0"; }],
   ["live turn is malformed (no speaker)", f => { for (const r of f.rows.turns!) if (r.sessionId === "s1") delete r.speakerRef; }],
   ["live turn has inverted times", f => { for (const r of f.rows.turns!) if (r.sessionId === "s1") { r.tStart = 9; r.tEnd = 1; } }],

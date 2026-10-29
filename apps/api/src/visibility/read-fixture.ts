@@ -53,14 +53,17 @@ export function withVisibleTranscripts(base: Pick<Db, "collection">, turns: () =
   };
   return { collection(name: string) {
     const collection = base.collection(name) as unknown as Row;
-    // D-206 K1: the visibility gate fetches raw turns with ONE batched `find({ tenantId, _id: { $in } })`. Older fakes only
-    // model `sessionId`-keyed finds, so that one shape is answered from the fixture's own rows; every other find is the fake's.
-    const baseFind = collection.find as ((filter: Row) => unknown) | undefined;
+    // D-206 K1: the visibility gate fetches raw turns with ONE batched `find({ tenantId, _id: { $in } })`. The fake's own `find` is
+    // used first (so tests that log reads still see this query); older fakes that only model `sessionId`-keyed finds throw on it,
+    // and that one shape is then answered from the fixture's own rows. The gate re-checks tenant and id locally either way.
+    const baseFind = collection.find as ((filter: Row) => { toArray(): Promise<unknown[]>; limit?(n: number): unknown }) | undefined;
     const find = name === "turns" ? (filter: Row = {}) => {
       const ids = (filter._id as { $in?: unknown[] } | undefined)?.$in;
       if (!Array.isArray(ids)) return baseFind?.call(collection, filter);
-      const rows = turns().filter(candidate => matches(candidate, filter));
-      return { toArray: async () => structuredClone(rows), limit() { return this; } };
+      const fallback = async () => structuredClone(turns().filter(candidate => matches(candidate, filter)));
+      let cursor: ReturnType<NonNullable<typeof baseFind>> | undefined;
+      try { cursor = baseFind?.call(collection, filter); } catch { cursor = undefined; }
+      return { limit() { return this; }, toArray: async () => { try { if (cursor) return await cursor.toArray(); } catch { /* fall through */ } return fallback(); } };
     } : baseFind;
     if (typeof collection.findOne === "function") return find === baseFind ? collection : { ...collection, find };
     return { ...collection, ...(find ? { find } : {}), async findOne(filter: Row = {}) {

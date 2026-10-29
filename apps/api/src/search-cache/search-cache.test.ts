@@ -63,6 +63,14 @@ test("K5 cache: source relabelled to whatsapp-batch and transcript correction bo
   assert.deepEqual(await deps.search("toc", "new zealand", 10), []);
 });
 
+test("K5 cache: a WhatsApp review-candidate link added over a recording session hides it on the very next request", async () => {
+  const { db, data } = capturingDb({ more: { whatsapp_candidates: [] } });
+  const deps = createMongoSearchDeps({ db, cacheTtlMs: 600_000 });
+  assert.deepEqual((await deps.search("toc", "visa", 10)).map((h) => h.turnId), ["t1"]);
+  data.whatsapp_candidates!.push({ _id: "cand", tenantId: "toc", sessionId: "s1", sourceId: "src1" });
+  assert.deepEqual(await deps.search("toc", "visa", 10), [], "a candidate link over the source makes the session invisible");
+});
+
 test("K5 cache: entries expire after the TTL", async () => {
   const { db, calls } = capturingDb();
   const deps = createMongoSearchDeps({ db, cacheTtlMs: 30 });
