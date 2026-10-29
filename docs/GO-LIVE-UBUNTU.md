@@ -114,6 +114,43 @@ The first build downloads dependencies and takes several minutes. Plain
 - If the container is unhealthy: `docker compose logs api` first. The entrypoint prints
   which required variables are `set` or `MISSING`, never the values.
 
+## 4a. Base path (APP_BASE_PATH): serving at vidysea.com/knowledgebase
+The web image is built once and mounted at any path chosen when the container STARTS (no rebuild).
+Owner decision (gate 2026-10-29): the product lives at `https://vidysea.com/knowledgebase`.
+- `.env`: `APP_BASE_PATH=/knowledgebase` (default `/`; `knowledgebase`, `/knowledgebase/` mean the same).
+  Then `docker compose up -d web` (a restart is enough; changing the path needs no `build`).
+- The web container serves the UI at `<base>/` (also `<base>` without the slash and deep links such as
+  `<base>/sessions/abc`) and proxies `<base>/api/*` to the api service with the prefix stripped
+  (`/knowledgebase/api/health` reaches the api's `/health`). The browser therefore calls the API
+  same-origin; leave `VITE_API_BASE_URL` empty (a rebuild is only needed if you still set it).
+- Optional: `APP_API_BASE` (browser-side API base, only if the API is on another origin; then also add
+  that web origin to `CORS_ORIGINS`) and `API_UPSTREAM` (where the web container proxies, default
+  `http://api:3300`; it must resolve when the container starts, which compose guarantees).
+- Not covered by the prefix: pages the API itself serves as HTML (`/compete`, `/docs-ui`). They open from
+  the sidebar via `<base>/api/compete` and `<base>/api/docs-ui`, but links INSIDE those pages are
+  root-relative and break under a prefix. Known limitation.
+- The one rule the vidysea.com team needs (nginx, on the vidysea.com front proxy). Pass the FULL path
+  through: no rewrite and no prefix stripping, because the web container already expects `/knowledgebase/...`.
+  ```nginx
+  location /knowledgebase/ {
+      proxy_pass http://<LKB-SERVER>:<WEB_PORT>;   # NO path after the port: the original URI is forwarded unchanged
+      proxy_set_header Host $host;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      client_max_body_size 1g;
+      proxy_read_timeout 300s;
+  }
+  ```
+  Without the trailing-slash form (`/knowledgebase`) the container also answers, so no redirect rule is needed;
+  a `location = /knowledgebase { return 301 /knowledgebase/; }` is optional. Keep the main site's own
+  `location /` as is. `<LKB-SERVER>:<WEB_PORT>` is the host and `WEB_PORT` (default 8080) of the compose `web` service.
+- Smoke test after start (replace host/port):
+  ```sh
+  curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:8080/knowledgebase/          # 200 (UI)
+  curl -fsS -o /dev/null -w '%{http_code}\n' http://localhost:8080/knowledgebase/watch     # 200 (SPA deep link)
+  curl -fsS http://localhost:8080/knowledgebase/api/health                                  # 200 from the api
+  ```
+
 ## 5. Chrome / meeting-bot worker (not in the compose stack)
 The compose stack does NOT run the meeting bot, scheduler, watchers, OBS capture or the
 Python transcription worker. They need their own host:

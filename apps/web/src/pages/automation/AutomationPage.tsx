@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext.js";
 import { apiFetch } from "../../api/client.js";
 
@@ -31,7 +32,7 @@ export function AutomationPage(): React.ReactElement {
   if (!apiKey || boundSession.current.apiKey !== apiKey || boundSession.current.sessionVersion !== sessionVersion) return <section><h1>Application automation</h1><p>{apiKey ? "Loading your automation…" : "Sign in to manage automation."}</p></section>;
   return <section>
     <h1>Application automation</h1>
-    <p><a href="/automation/forms">Application forms</a></p>
+    <p><Link to="/automation/forms">Application forms</Link></p>
     <p>Check application document readiness, monitor work and handle exceptions. This routine does not submit applications externally.</p>
     {!apiKey && <p>Sign in to manage your tenant's automation.</p>}
     {error && <p role="alert">{error}</p>}

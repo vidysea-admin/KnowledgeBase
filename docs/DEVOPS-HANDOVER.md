@@ -117,6 +117,37 @@ one. When it arrives it feeds four places, and changing it later means a web reb
 
 Also `LKB_API_URL=https://<DOMAIN-PLACEHOLDER>/api` on any bot or worker machine.
 
+## 4a. Base path: vidysea.com/knowledgebase (APP_BASE_PATH)
+
+Decision (owner gate 2026-10-29): the product is served at `https://vidysea.com/knowledgebase`. The web
+image is the same for every path; the path is a runtime setting, so changing it never needs `docker compose build`.
+
+| Setting | Meaning |
+|---|---|
+| `APP_BASE_PATH=/knowledgebase` | in the main `.env`; default `/`. Compose passes it to the `web` container. |
+| `APP_API_BASE` (optional) | browser-side API base, only when the API is on another origin. Default `<base>/api`. |
+| `API_UPSTREAM` (optional) | where the web container proxies `<base>/api/*`; default `http://api:3300`. |
+
+What the vidysea.com front proxy must do: forward `/knowledgebase/` to the compose `web` port
+(`WEB_PORT`, default 8080) and pass the FULL original path unchanged (no rewrite, no prefix stripping):
+
+```nginx
+location /knowledgebase/ {
+    proxy_pass http://<LKB-SERVER>:<WEB_PORT>;   # no path after the port
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    client_max_body_size 1g;
+    proxy_read_timeout 300s;
+}
+```
+
+`/knowledgebase` without the trailing slash is also answered by the container. The API is reached at
+`https://vidysea.com/knowledgebase/api/...`, so with this setup `LKB_API_URL` (bot/worker machines, section 4)
+is `https://vidysea.com/knowledgebase/api`, and `CORS_ORIGINS` / `LKB_HOSTING_WEBHOOK_ORIGINS` use the origin
+`https://vidysea.com`. `VITE_API_BASE_URL` stays empty (it is now only a build-time override).
+Details and smoke test: `docs/GO-LIVE-UBUNTU.md` section 4a.
+
 ## 5. `.env` variable names by feature (names only)
 
 Source: `.env.example` and `docker-compose.yml`. Compose forwards only the names it lists to the
