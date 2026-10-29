@@ -2,8 +2,8 @@
 **Contract:** none specific (D-205 survey unit U1; docs/DECISIONS.md D-205 at main commit ae9c204e; survey qa/evidence/bot-linux-survey-2026-10-29.md)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (no auth, tenancy or production write: build files only; secrets are value-less env pass-through; the image holds no credentials)
 **Persona walk:** skip (no screen, flow or user type)
