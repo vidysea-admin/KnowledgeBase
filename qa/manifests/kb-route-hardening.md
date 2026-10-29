@@ -2,8 +2,8 @@
 **Contract:** none specific (D-207 Changes-authorized list; ISS-420, ISS-417, ISS-421 abort part; ISS-425 and ISS-427 as numbered in the unit brief, not yet rows in qa/issues.jsonl; flash-lite per qa/gates/kb-speed-wa-h3-2026-10-29.md)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 1
 **Dual check:** required
 dual-trigger: tenancy apps/api/src/search-cache/search-cache.ts:73
