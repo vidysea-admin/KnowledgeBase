@@ -278,7 +278,7 @@ try {
     `graph_edges ${ew.upserted} upserted/${ew.removedStale} stale removed`);
   if (INDEX) {
     const res = await (await productionIndexer({ root: ROOT, groundedNotes: GROUNDED_NOTES }))(tenantId, sessionId);
-    if (legacyProvided) assertIndexComplete(res, sessionId); // no capture artifacts to prove: the DB session row is the state
+    if (legacyProvided) assertIndexComplete(res, sessionId, rawTurns.length); // no capture artifacts to prove: the DB session row is the state
     else {
       const baseProof = finalizeIndexProof(res);
       if (!retentionIo.readRetentionBytes(join(dir, "source.json"), 1024 * 1024).equals(retentionSourceBytes)) throw new Error("source changed during actual indexing");
@@ -295,7 +295,7 @@ try {
     if (res.groundedNotes) console.log(`grounded notes: ${JSON.stringify({ dropped: { summary: res.summary?.dropped ?? 0, claims: res.claims?.dropped ?? 0 }, ...res.groundedNotes })}`);
     console.log(`indexed: chunks ${res.chunks.written}${res.chunks.skipped ? ` (skipped: ${res.chunks.skipped})` : ""}` +
       `${res.entities ? `, entities ${JSON.stringify(res.entities)}` : ""}`);
-    await clearIndexFailure(sessions(tenantId), sessionId);
+    await clearIndexFailure(sessions(tenantId), sessionId).catch(() => undefined);
   }
 } catch (error) {
   if (connected && INDEX) await recordIndexFailure(sessions(tenantId), sessionId, error).catch(() => undefined); // D-207: persist WHY, not only the state flag

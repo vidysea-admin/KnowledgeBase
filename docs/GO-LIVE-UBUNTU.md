@@ -458,6 +458,9 @@ Read before the live run:
   not a code bug: the loader never swaps or clamps timings. The turns need a human-approved repair first; the dry run is the check that it is done.
 - Re-running `--index` on the TOC pair REPLACES their turn rows (generation swap: rows with an older `syncGen` are deleted). Compare turn ids against `lkb_prod` first.
   If the production rows are verified intact and only the index is missing, `--index-existing --tenant toc` is the non-destructive alternative.
+  Before the run record `db.turns.countDocuments({sessionId: '<id>'})` and take a `mongodump` of `lkb_prod` (the swap is upsert-then-delete on a standalone Mongo: a failure between the two leaves old and new rows mixed).
+  If a `--index` run FAILS, fix the cause and re-run the SAME `--index` command; do NOT use `--index-existing` on the mixed row set (the completion gate also checks the indexed turn count equals the rows present, so a partial set is refused, but the clean re-sync is the repair).
+  Rows with no `syncGen` that are not in the new set are deleted by the swap (intended).
 - Migrated sources (and `--index-existing`) have no capture proof (no `validation.json`), so they skip the retention/processed-proof bookkeeping and instead
   require the indexer's own completion (tree written, chunks written, retrieval mode ready, no degraded summary/claims) before reporting success.
 - A failed run now keeps its reason: `sessions.<id>.indexFailure` = `{at, via, reason, generation, state, phase}` (the closed `indexAttempt` shape is unchanged; a successful run unsets it).

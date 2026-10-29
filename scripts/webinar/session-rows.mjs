@@ -202,11 +202,12 @@ export function buildSessionFiles({ sessionId, tenantId, sessionDoc, meta, turns
 
 /** D-207: the same completeness gate prepareWebinarIndexProof applies, for sessions that have no capture artifacts to prove
  *  (migrated provided documents, index-existing). Throws "index incomplete: <every reason>"; returns the result when complete. */
-export function assertIndexComplete(res, sessionId) {
+export function assertIndexComplete(res, sessionId, expectedTurns) {
   const c = res?.completion, why = [];
   if (!c) why.push("no completion");
   else {
-    if (c.version !== 2 || c.complete !== true) why.push("completion not complete");
+    if (c.version !== 2 || c.strict !== true || c.complete !== true) why.push("completion not complete or not strict");
+    if (expectedTurns !== undefined && c.turnCount !== expectedTurns) why.push(`indexed ${c.turnCount} turns, expected ${expectedTurns}`);
     if (c.treeWritten !== true) why.push("tree not written");
     if (!c.generation || !Number.isInteger(c.turnCount) || c.turnCount <= 0) why.push("no generation/turn count");
     const mode = c.retrievalMode;
@@ -223,7 +224,7 @@ export function assertIndexComplete(res, sessionId) {
 /** D-207: the previous failures were only a state flag (indexAttempt.state=failed, phase=preflight) with no reason. indexAttempt is a
  *  closed schema, so the reason goes on a sibling `indexFailure` field of the session row (sessions allow extra fields). */
 export async function recordIndexFailure(sessionsScoped, sessionId, error, via = "sync-session") {
-  const reason = String(error instanceof Error ? error.message : error).replace(/mongodb(?:\+srv)?:\/\/\S+/gi, "mongodb://[redacted]").replace(/\s+/g, " ").slice(0, 1000);
+  const reason = String(error instanceof Error ? error.message : error).replace(/mongodb(?:\+srv)?:\/\/\S+/gi, "mongodb://[redacted]").replace(/(?:sk|pk|key|AIza)[-_][A-Za-z0-9_-]{12,}|Bearer\s+\S+|(?:api[_-]?key|key|token|secret|password)=\S+/gi, "[redacted]").replace(/\s+/g, " ").slice(0, 1000);
   const attempt = (await sessionsScoped.findOne({ _id: sessionId }))?.indexAttempt;
   const doc = { at: new Date().toISOString(), via, reason, ...(attempt ? { generation: attempt.generation, state: attempt.state, phase: attempt.phase } : {}) };
   await sessionsScoped.updateOne({ _id: sessionId }, { $set: { indexFailure: doc } });
@@ -245,8 +246,8 @@ export async function indexExistingRows({ tenantId, sessionId, workDb, sessions,
   const prior = session.indexAttempt;
   log(`  existing rows in ${workDb}: turns ${count}, status.index ${session.status?.index}, prior attempt ${prior ? `${prior.state}/${prior.phase}` : "none"}${session.indexFailure ? `, last failure: ${session.indexFailure.reason}` : ""}`);
   try {
-    const res = assertIndexComplete(await indexer(tenantId, sessionId), sessionId);
-    await clearIndexFailure(sessions, sessionId);
+    const res = assertIndexComplete(await indexer(tenantId, sessionId), sessionId, count);
+    await clearIndexFailure(sessions, sessionId).catch(() => undefined); // a cosmetic marker must not turn a completed index into a failure
     return res;
   } catch (error) {
     await recordIndexFailure(sessions, sessionId, error, "index-existing").catch(() => undefined);

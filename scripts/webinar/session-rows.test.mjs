@@ -143,8 +143,10 @@ test("D-207: assertIndexComplete accepts a complete result and names every reaso
     [ok({ summary: { degraded: "llm down" } }), /summary degraded: llm down/], [ok({ claims: { degraded: "bad" } }), /claims degraded: bad/],
     [ok({ completion: { ...ok().completion, complete: false } }), /complete/], [ok({ completion: { ...ok().completion, treeWritten: false } }), /tree/],
     [ok({ completion: { ...ok().completion, lexicalWritten: false } }), /retrieval mode/], [ok({ completion: undefined }), /completion/], [undefined, /completion/],
+    [ok({ completion: { ...ok().completion, strict: false } }), /not strict/], [ok({ completion: { ...ok().completion, turnCount: 1 } }), /indexed 1 turns, expected 2/],
   ];
-  for (const [res, re] of bad) assert.throws(() => assertIndexComplete(res, "s"), (e) => /^index incomplete:/.test(e.message) && re.test(e.message), String(re));
+  assertIndexComplete(ok(), "s", 2);
+  for (const [res, re] of bad) assert.throws(() => assertIndexComplete(res, "s", 2), (e) => /^index incomplete:/.test(e.message) && re.test(e.message), String(re));
 });
 
 /** In-memory session accessor with findOne + $set/$unset, enough for the index-failure helpers. */
@@ -164,6 +166,8 @@ test("D-207: recordIndexFailure persists why (redacted, bounded) beside the atte
   assert.match(doc.reason, /^strict webinar index incomplete: bad turn at mongodb:\/\/\[redacted\]/);
   assert.doesNotMatch(doc.reason, /user:pw|\n/);
   assert.ok(doc.reason.length <= 1000);
+  const leaked = await recordIndexFailure(c, "s", new Error("provider 401 Bearer abc.def-123 key=SECRETVALUE sk-live_ABCDEFGHIJKLMNOP"));
+  assert.doesNotMatch(leaked.reason, /abc.def|SECRETVALUE|ABCDEFGHIJKLMNOP/);
   assert.deepEqual([doc.via, doc.generation, doc.state, doc.phase], ["sync-session", "gen-1", "failed", "preflight"]);
   assert.ok(Number.isFinite(Date.parse(doc.at)));
   await clearIndexFailure(c, "s");
@@ -177,7 +181,7 @@ const deps = (over = {}) => {
   const sessions = sessionColl(over.session === null ? undefined : { _id: "s", sourceId: "src", status: { index: "failed" }, ...over.session });
   return { calls, sessions, args: { tenantId: "vidysea", sessionId: "s", workDb: "lkb_work_x", sessions,
     sources: { async findOne() { return over.source === null ? null : { _id: "src", ...over.source }; } },
-    turns: { async countDocuments() { return over.turns ?? 5; } },
+    turns: { async countDocuments() { return over.turns ?? 2; } },
     indexer: async (t, s) => { calls.push([t, s]); if (over.fail) throw over.fail; return over.result ?? ok(); },
     log: () => {} } };
 };
@@ -199,6 +203,8 @@ test("D-207: indexExistingRows records the failure reason on throw and on an inc
   const e = deps({ result: ok({ summary: { degraded: "llm down" } }), session: { indexFailure: { reason: "old" } } });
   await assert.rejects(indexExistingRows(e.args), /index incomplete: summary degraded: llm down/);
   assert.match(e.sessions.store.get("s").indexFailure.reason, /summary degraded: llm down/);
+  const g = deps({ result: ok({ completion: { ...ok().completion, turnCount: 1 } }) });
+  await assert.rejects(indexExistingRows(g.args), /indexed 1 turns, expected 2/, "a partial index over a mixed row set is not success");
   const f = deps({ session: { indexFailure: { reason: "old" } } });
   const res = await indexExistingRows(f.args);
   assert.equal(res.completion.complete, true);
@@ -253,7 +259,7 @@ test("D-207: --index-existing on a real (throwaway) Mongo: a failed-at-preflight
     assert.deepEqual((await db.admin().listDatabases()).databases.map((d) => d.name).filter((n) => !["admin", "config", "local"].includes(n)), [dbName], "nothing outside the throwaway DB");
     // A repaired transcript + a (fake) completing indexer: the failure marker is cleared.
     await db.collection("turns").updateOne({ _id: `${S}-t003` }, { $set: { tEnd: 12 } });
-    await run({ indexer: async () => ok({ sessionId: S }) });
+    await run({ indexer: async () => ok({ sessionId: S, completion: { ...ok().completion, turnCount: 3 } }) });
     assert.equal((await db.collection("sessions").findOne({ _id: S })).indexFailure, undefined);
     // Another tenant's session id is not found (tenant scoping), and a missing session writes nothing.
     await assert.rejects(run({ tenantId: "toc", sessions: scopedCollection(db, "sessions")("toc"), sources: scopedCollection(db, "sources")("toc"), turns: scopedCollection(db, "turns")("toc") }), /not found/);
