@@ -42,7 +42,7 @@ export function createRouteRouter(deps: RouteDeps, opts: RouteRouterOptions = {}
     try {
       const hits = await Promise.race([
         deps.route(tenantId, q, k, { deadlineAt, signal: controller.signal }),
-        new Promise<never>((_, reject) => { timer = setTimeout(() => { const e = new RouteTimeout(); controller.abort(e); reject(e); }, deadlineMs); }),
+        new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new RouteTimeout()), deadlineMs); }),
       ]);
       if (state && !hits.some((h) => state!.waSessions.has(h.sessionId))) cache.set(tenantId, key, state.fingerprint, hits);
       res.status(200).json({ query: q, hits });
