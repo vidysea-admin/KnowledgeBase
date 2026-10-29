@@ -10,3 +10,4 @@ Answer format: "1a/1b, 2a/2b, 3 ok|changes".
 Answered: 2026-10-29T07:09:09+05:30 — 1b (vidysea.com/knowledgebase; already live, stays; base path must be dynamic/configurable, not hard-coded); 2 and 3 still open — chat
 Answered: 2026-10-29T07:09:38+05:30 — 2b (bot on Ubuntu now, run via Docker); 3 still open — chat
 Answered: 2026-10-29T07:28:23+05:30 — bot go (U1-U6 per bot-linux survey); masking ok (no native privacy-window masking on Ubuntu for now, filed for later); 3 ok (WhatsApp multi-user: intent/spec/plan + mini-grill before build) — chat
+Answered: 2026-10-29 — gws Linux binary: "khud dekh lee and do the best and solve it" — find the official Linux release online, verify checksum, pin in the bot image — chat
