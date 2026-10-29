@@ -1,10 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync, existsSync, symlinkSync, readdirSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync, existsSync, symlinkSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createTabBrowserDeps, createTabCaptureReceiver, writeOwnedTabStatus, tabCaptureAssetSha256 } from "./tab-browser.js";
+import { createTabBrowserDeps, createTabCaptureReceiver, writeOwnedTabStatus, tabCaptureAssetSha256, claimCaptureLock, formatCaptureLock } from "./tab-browser.js";
+import { parseCaptureLock } from "./controller-state.js";
 import type {NativeCaptureIdentity} from './native/native-media-types.js';
 
 const origin = "chrome-extension://aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -245,3 +246,85 @@ for (const [label, json, expected] of STOP_TABLE) {
     assert.match(String(r.outcome), expected); assert.equal(r.status.state, "failed"); assert.equal(r.media, "partial-media");
   });
 }
+
+// bot-ts-guards (D-205, survey blocker 2): a PID recycled after a container restart must not block every capture.
+function lockFixture() {
+  const dir = mkdtempSync(path.join(tmpdir(), "tab-lock-")), lock = path.join(dir, ".lkb-tab-capture.lock");
+  return { dir, lock, done: () => rmSync(dir, { recursive: true, force: true }) };
+}
+const OLD = "linux:boot-a:1000", NEW = "linux:boot-b:2000";
+
+test("lock format: new locks carry pid and start time; parse accepts legacy bare pid and refuses junk", () => {
+  assert.equal(formatCaptureLock(42, OLD), `42\n${OLD}`);
+  assert.equal(formatCaptureLock(42, undefined), "42");
+  assert.deepEqual(parseCaptureLock("42"), { pid: 42, startTime: undefined });
+  assert.deepEqual(parseCaptureLock(`42\n${OLD}`), { pid: 42, startTime: OLD });
+  for (const bad of ["", "0", "-3", "4.5", "abc", "42\n", "42\n\n", "42\na\nb", " 42", "42 "]) assert.equal(parseCaptureLock(bad), undefined, JSON.stringify(bad));
+});
+
+test("lock: a recycled PID (alive, different start time) no longer blocks and the stale lock is replaced", () => {
+  const f = lockFixture();
+  try {
+    writeFileSync(f.lock, formatCaptureLock(777, OLD));
+    const release = claimCaptureLock(f.lock, { pidAlive: () => true, startTime: (pid) => (pid === 777 ? NEW : "linux:boot-b:own"), ownPid: 5 });
+    assert.equal(readFileSync(f.lock, "utf8"), formatCaptureLock(5, "linux:boot-b:own"));
+    release();
+    assert.equal(existsSync(f.lock), false);
+  } finally { f.done(); }
+});
+
+test("lock: a live PID with the SAME start time still blocks and leaves the lock untouched", () => {
+  const f = lockFixture();
+  try {
+    writeFileSync(f.lock, formatCaptureLock(777, OLD));
+    assert.throws(() => claimCaptureLock(f.lock, { pidAlive: () => true, startTime: () => OLD, ownPid: 5 }), /already has an active capture controller/);
+    assert.equal(readFileSync(f.lock, "utf8"), formatCaptureLock(777, OLD));
+  } finally { f.done(); }
+});
+
+test("lock: legacy bare-pid lock keeps today's behaviour (alive blocks, dead is replaced) and an unknown start time never implies stale", () => {
+  const f = lockFixture();
+  try {
+    writeFileSync(f.lock, "777");
+    assert.throws(() => claimCaptureLock(f.lock, { pidAlive: () => true, startTime: () => NEW, ownPid: 5 }), /active capture controller/);
+    writeFileSync(f.lock, formatCaptureLock(777, OLD));
+    assert.throws(() => claimCaptureLock(f.lock, { pidAlive: () => true, startTime: () => undefined, ownPid: 5 }), /active capture controller/);
+    writeFileSync(f.lock, "777");
+    claimCaptureLock(f.lock, { pidAlive: () => false, startTime: () => undefined, ownPid: 5 })();
+    assert.equal(existsSync(f.lock), false);
+  } finally { f.done(); }
+});
+
+test("lock: invalid contents and a symlinked lock are refused", () => {
+  const f = lockFixture();
+  try {
+    writeFileSync(f.lock, "not-a-pid");
+    assert.throws(() => claimCaptureLock(f.lock, { pidAlive: () => false, ownPid: 5 }), /Invalid capture lock/);
+    rmSync(f.lock);
+    const target = path.join(f.dir, "target"); writeFileSync(target, "777");
+    try { symlinkSync(target, f.lock); } catch { return; } // symlink creation needs privilege on some Windows hosts
+    assert.throws(() => claimCaptureLock(f.lock, { pidAlive: () => false, ownPid: 5 }), /symlink refused/);
+    assert.equal(readFileSync(target, "utf8"), "777");
+  } finally { f.done(); }
+});
+
+test("lock: launch() through createTabBrowserDeps honours the injected probes (recycled proceeds, same-identity blocks)", { timeout: 20000 }, async () => {
+  const f = lockFixture(), script = path.join(f.dir, "child.mjs");
+  writeFileSync(script, "console.log(JSON.stringify({event:'fatal',error:'fixture startup refused'}));setTimeout(()=>{},200);");
+  const profileDir = path.join(f.dir, "profile"), recordDir = path.join(f.dir, "record");
+  const mk = (startTime: (pid: number) => string | undefined) => createTabBrowserDeps({ python: process.execPath, joinScript: script, recordDir, profileDir,
+    sessionId: "fixture", tenantId: "fixture", startupTimeoutMs: 3000, lockProbes: { pidAlive: () => true, startTime },
+    extensionDir: fileURLToPath(new URL("../../py/tab-capture", import.meta.url)), log: () => {} });
+  const lock = path.join(profileDir, ".lkb-tab-capture.lock");
+  const seed = () => { mkdirSync(profileDir, { recursive: true }); writeFileSync(lock, formatCaptureLock(777, OLD)); };
+  let tab = mk((pid) => (pid === 777 ? NEW : "own"));
+  try {
+    seed();
+    await assert.rejects(tab.deps.launch("http://127.0.0.1/", { tenantId: "fixture", consentNote: "fixture only" }), /fixture startup refused/);
+    assert.equal(existsSync(lock), false); // replaced, then released on the failed start
+    await tab.disconnect();
+    tab = mk(() => OLD); seed();
+    await assert.rejects(tab.deps.launch("http://127.0.0.1/", { tenantId: "fixture", consentNote: "fixture only" }), /active capture controller/);
+    assert.equal(readFileSync(lock, "utf8"), formatCaptureLock(777, OLD));
+  } finally { await tab.disconnect(); f.done(); }
+});

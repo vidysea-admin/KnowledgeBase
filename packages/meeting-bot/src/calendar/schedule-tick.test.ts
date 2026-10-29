@@ -12,7 +12,7 @@ import path from "node:path";
 
 import type { AutoRecordCandidateInput } from "./auto-join.js";
 import { readScheduledKeys, readScheduledJob, writeScheduledJob } from "./state/schedule-state.js";
-import { createHttpCandidateLoader, runScheduleTickOnce, type ScheduleTickDeps } from "./schedule-tick.js";
+import { assertScheduleTickPlatform, createHttpCandidateLoader, runScheduleTick, runScheduleTickOnce, type ScheduleTickDeps } from "./schedule-tick.js";
 const TEN = "ten-t";
 import { JOB_KEY_RE, deriveJobKey, type TaskScheduler, type ScheduleOnceOptions } from "./task-scheduler.js";
 
@@ -311,4 +311,14 @@ test("createHttpCandidateLoader: a network throw degrades to [] rather than cras
       assert.deepEqual(result, []);
     },
   );
+});
+
+// bot-ts-guards (D-205, survey blocker 1): schtasks + PowerShell launcher exist on Windows only.
+test("schedule-tick refuses off win32 with a message pointing at run-pipeline --watch", async () => {
+  for (const platform of ["linux", "darwin"] as const) {
+    assert.throws(() => assertScheduleTickPlatform(platform), /node scripts\/webinar\/run-pipeline\.mjs --run --watch/);
+    // the real entry refuses before building deps or touching state (no env, no network, no scheduler)
+    await assert.rejects(runScheduleTick(["--dry-run"], platform), /node scripts\/webinar\/run-pipeline\.mjs --run --watch/);
+  }
+  assert.doesNotThrow(() => assertScheduleTickPlatform("win32"));
 });
