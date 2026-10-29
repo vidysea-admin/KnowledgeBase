@@ -3,6 +3,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import argon2 from "argon2";
 import { hash, verify, needsRehash, PASSWORD_HASH_PARAMS } from "./password.js";
 
@@ -107,4 +108,11 @@ test("passwords are NFKC-normalised: composed and decomposed spellings of one pa
 test("the module surface is exactly hash, verify, needsRehash (plus the published parameters)", async () => {
   const mod = await import("./password.js");
   assert.deepEqual(Object.keys(mod).sort(), ["PASSWORD_HASH_PARAMS", "hash", "needsRehash", "verify"]);
+});
+
+test("the argon2 dependency is exactly pinned (no range) and ships prebuilt linux-x64 glibc + musl binaries (the API image base needs no compile step)", () => {
+  const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")) as { dependencies: Record<string, string> };
+  assert.match(pkg.dependencies.argon2 ?? "", /^\d+\.\d+\.\d+$/, "argon2 must be an exact version");
+  const dir = new URL("../../node_modules/argon2/prebuilds/linux-x64/", import.meta.url);
+  for (const f of ["argon2.glibc.node", "argon2.musl.node"]) assert.ok(readFileSync(new URL(f, dir)).length > 1000, f);
 });
