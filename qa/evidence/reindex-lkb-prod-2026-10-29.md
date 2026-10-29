@@ -41,10 +41,14 @@ After-state: status.index failed; turns 73 (unchanged); session_pages 0; chunks 
 - Real `--index` run NOT executed: it needs the same LLM summarize provider (ollama-cloud) that just failed with unavailable credentials, and it would rewrite the 291 prod turn rows before failing. Prod Visa rows untouched (still t141 2008/213, status.index failed).
 - Confirmed right before: prod participants/platform are still none/none.
 
-## UCAS
-Not touched. Parked pending Umesh's choice of the t114/t113 timing value.
+## UCAS (tenant toc) - prepared, live run waits for OLLAMA_API_KEY
+Umesh picked the values (gate commit eb6609b0): t113 tEnd 1883 -> 1853 and t114 tStart 1883 -> 1853 (t114 tEnd stays 1868); text unchanged.
+- Compare: turns.json (230) vs lkb_prod (230): same ids, text, tStart/tEnd, speakerRef, tenantId, 0 differences before the fix. Prod participants/platform: none/none.
+- Fix applied to data/toc-migrated/2026-08-10-ucas-what-changed-what-matters/turns.json lines 1016 (t113 tEnd) and 1024 (t114 tStart); exactly those 2 lines changed.
+- Dry run `node scripts/webinar/sync-session.mjs 2026-08-10-ucas-what-changed-what-matters --dry-run --index`: PASSED (turns 230, 111 lexical chunks planned, no timing refusal).
+- Live `--index` NOT run (needs OLLAMA_API_KEY). Prod UCAS rows untouched (t114 still 1883/1868, status.index failed).
 
 ## To finish
 1. Put OLLAMA_API_KEY into this environment (not committed, not printed).
 2. Re-run zoom `--index-existing --tenant vidysea` and Visa `--index` (commands above / runbook), then read the after-state (status.index done, indexFailure unset, turns 73 / 291, session_pages and chunks non-zero).
-3. Umesh picks the UCAS value, repair turns.json, dry run, real run.
+3. Run UCAS `--index` (same three-part opt-in) once the key is in place.
