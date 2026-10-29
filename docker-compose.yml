@@ -132,9 +132,11 @@ services:
       context: .
       dockerfile: docker/meeting-bot/Dockerfile
       args:
-        GWS_VERSION: ${GWS_VERSION:-0.22.5}
-        GWS_URL: ${GWS_URL:-}
-        GWS_SHA256: ${GWS_SHA256:-}
+        # Unset here = the Dockerfile's pinned official v0.22.5 musl URL + sha256 apply. Override all three
+        # together (shell or main .env) to move versions; the build fails on a sha256 mismatch.
+        GWS_VERSION:
+        GWS_URL:
+        GWS_SHA256:
     init: true
     shm_size: 2gb
     restart: unless-stopped

@@ -18,20 +18,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-noto-core fonts-noto-color-emoji fonts-indic fonts-liberation \
   && rm -rf /var/lib/apt/lists/*
 
-# Pinned Linux gws (calendar/mail alerts). The repo carries no verified Linux release URL/sha, so the
-# step is skipped cleanly when GWS_URL is empty; to install, pass all three:
-#   --build-arg GWS_URL=<release tar.gz> --build-arg GWS_SHA256=<sha256 of that archive>
+# Pinned Linux gws (calendar/mail alerts): official googleworkspace/cli release v0.22.5, x86_64 musl build
+# (fully static, no glibc/libssl coupling). The archive is checked against GWS_SHA256 (the release's
+# published .sha256); the build FAILS on a mismatch or an empty URL/digest. No login and no credentials
+# are baked in: gws OAuth on the server is a human step (volume lkb-bot-gws).
 ARG GWS_VERSION=0.22.5
-ARG GWS_URL=""
-ARG GWS_SHA256=""
-RUN if [ -n "$GWS_URL" ]; then \
-      [ -n "$GWS_SHA256" ] || { echo "GWS_URL set without GWS_SHA256" >&2; exit 1; }; \
-      curl -fsSL "$GWS_URL" -o /tmp/gws.archive \
-      && echo "$GWS_SHA256  /tmp/gws.archive" | sha256sum -c - \
-      && mkdir /tmp/gws && tar -xf /tmp/gws.archive -C /tmp/gws \
-      && install -m 0755 "$(find /tmp/gws -type f -name gws | head -n 1)" /usr/local/bin/gws \
-      && rm -rf /tmp/gws /tmp/gws.archive; \
-    else echo "GWS_URL empty: gws not installed (gws features unavailable until supplied)"; fi
+ARG GWS_URL=https://github.com/googleworkspace/cli/releases/download/v0.22.5/google-workspace-cli-x86_64-unknown-linux-musl.tar.gz
+ARG GWS_SHA256=4db473dde4b1ab872e4ff35d769b0d4af1f1a6441a605e79d5cf8ada9c87e920
+RUN set -eu; \
+    [ -n "$GWS_URL" ] && [ -n "$GWS_SHA256" ] || { echo "GWS_URL and GWS_SHA256 must both be set" >&2; exit 1; }; \
+    curl -fsSL "$GWS_URL" -o /tmp/gws.archive; \
+    echo "$GWS_SHA256  /tmp/gws.archive" | sha256sum -c -; \
+    mkdir /tmp/gws; tar -xf /tmp/gws.archive -C /tmp/gws; \
+    install -m 0755 "$(find /tmp/gws -type f -name gws | head -n 1)" /usr/local/bin/gws; \
+    rm -rf /tmp/gws /tmp/gws.archive; \
+    gws --version | grep -F "$GWS_VERSION"
 
 COPY docker/meeting-bot/entrypoint.sh /usr/local/bin/bot-entrypoint
 COPY docker/meeting-bot/healthcheck.sh /usr/local/bin/bot-healthcheck

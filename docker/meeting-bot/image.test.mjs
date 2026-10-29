@@ -22,10 +22,11 @@ test('Dockerfile pins the toolchain and runs as uid 1000', () => {
   for (const pkg of ['xvfb', 'pulseaudio', 'ffmpeg', 'tini', 'python3-tk', 'python3-xlib', 'xdotool', 'x11vnc', 'fonts-noto-color-emoji'])
     assert.ok(d.includes(pkg), `missing apt package ${pkg}`);
   assert.match(d, /^USER node$/m);
-  assert.match(d, /ARG GWS_URL=""/);
-  assert.match(d, /ARG GWS_SHA256=""/);
-  assert.match(d, /ARG GWS_VERSION=/);
+  assert.match(d, /^ARG GWS_VERSION=0\.22\.5$/m);
+  assert.match(d, /^ARG GWS_URL=https:\/\/github\.com\/googleworkspace\/cli\/releases\/download\/v0\.22\.5\/google-workspace-cli-x86_64-unknown-linux-musl\.tar\.gz$/m);
+  assert.match(d, /^ARG GWS_SHA256=[0-9a-f]{64}$/m);
   assert.match(d, /sha256sum -c/);
+  assert.doesNotMatch(d, /GWS_URL empty|gws not installed/, 'gws install must not be skippable');
   assert.match(d, /ENTRYPOINT \["\/usr\/bin\/tini", "-s", "--", "\/usr\/local\/bin\/bot-entrypoint"\]/);
 });
 
@@ -47,6 +48,18 @@ test('entrypoint has run, doctor and login modes and cleans stale state', () => 
     assert.ok(e.includes(needle), `entrypoint missing ${needle}`);
   assert.match(e, /exec node scripts\/webinar\/run-pipeline\.mjs --run --watch/);
   assert.ok(existsSync(join(root, 'docker/meeting-bot/healthcheck.sh')));
+});
+
+test('entrypoint doctor gate does not fail open and the VNC password never reaches argv', () => {
+  const e = entry();
+  assert.doesNotMatch(e, /--doctor[^\n]*\|\s*tee/, 'a pipe to tee hides the doctor exit status');
+  assert.match(e, /doctor_rc=\$\?/);
+  assert.match(e, /\[ "\$doctor_rc" -ne 0 \]/);
+  assert.match(e, /grep -q '\^MISSING'/);
+  assert.doesNotMatch(e, /-passwd "\$VNC_PASSWORD"|-passwd '?\$VNC_PASSWORD/, 'password on argv');
+  assert.match(e, /-passwdfile "rm:\$VNC_PASSFILE"/);
+  assert.match(e, /umask 077/);
+  assert.match(e, /unset VNC_PASSWORD/);
 });
 
 test('.dockerignore keeps secrets and local state out of the build context', () => {
@@ -86,4 +99,15 @@ test('built image: uid 1000, no .env, doctor passes', {skip: process.env.LKB_DOC
   const doc = spawnSync('docker', ['run', '--rm', '-e', 'BOT_MODE=doctor', image], {encoding: 'utf8'});
   assert.equal(doc.status, 0, doc.stdout + doc.stderr);
   assert.doesNotMatch(doc.stdout, /MISSING/);
+});
+
+test('built image: gws is the pinned 0.22.5 binary', {skip: process.env.LKB_DOCKER_TESTS !== '1' || !image}, () => {
+  const r = spawnSync('docker', ['run', '--rm', '--entrypoint', 'gws', image, '--version'], {encoding: 'utf8'});
+  assert.equal(r.status, 0, r.stdout + r.stderr);
+  assert.match(r.stdout, /0\.22\.5/);
+});
+
+test('built image: doctor gate fails closed when node itself fails', {skip: process.env.LKB_DOCKER_TESTS !== '1' || !image}, () => {
+  const r = spawnSync('docker', ['run', '--rm', '-e', 'BOT_MODE=doctor', '-e', 'NODE_OPTIONS=--require=/nonexistent.js', image], {encoding: 'utf8'});
+  assert.notEqual(r.status, 0, r.stdout + r.stderr);
 });
