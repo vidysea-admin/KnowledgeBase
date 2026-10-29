@@ -467,15 +467,17 @@ node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-fran
 node scripts/webinar/sync-session.mjs 2026-08-10-ucas-what-changed-what-matters --dry-run --index
 node scripts/webinar/sync-session.mjs 2026-10-13-zoom-webinar-p2 --index-existing --tenant vidysea --dry-run
 # live, with MONGODB_URL (the lkb_app user, section 6a) already in the environment:
-MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-france-nz --index --i-know-this-is-production
-MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-08-10-ucas-what-changed-what-matters --index --i-know-this-is-production
-MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-10-13-zoom-webinar-p2 --index-existing --tenant vidysea --i-know-this-is-production
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-04-21-visa-blueprint-part2-italy-france-nz --index --grounded-notes --i-know-this-is-production
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-08-10-ucas-what-changed-what-matters --index --grounded-notes --i-know-this-is-production
+MONGO_WORK_DB=lkb_prod MONGODB_DB=lkb_prod node scripts/webinar/sync-session.mjs 2026-10-13-zoom-webinar-p2 --index-existing --tenant vidysea --grounded-notes --i-know-this-is-production
 ```
 
 Read before the live run:
-- **Both TOC dry runs currently stop at `invalid turn timing, write refused`** (UCAS t114: tStart 1883 > tEnd 1868; Visa t141: tEnd 213 < tStart 2008).
-  That is a data defect in the migrated `turns.json` (the same inversion is what the strict indexer rejects as `invalid transcript ownership/identity/time`),
-  not a code bug: the loader never swaps or clamps timings. The turns need a human-approved repair first; the dry run is the check that it is done.
+- **Turn timing repaired (2026-10-29, Umesh-approved):** the TOC dry runs used to stop at `invalid turn timing, write refused`. Fixed in the
+  migrated `turns.json`: Visa t141 tEnd 213 -> 2013; UCAS t113 tEnd 1883 -> 1853 and t114 tStart 1883 -> 1853 (evidence:
+  `qa/evidence/reindex-lkb-prod-2026-10-29.md`). The loader never swaps or clamps timings; any new inversion needs the same human-approved repair.
+- **`--grounded-notes` (Umesh-approved for these 3 sessions):** without it the strict summary mode fails the whole session on one negative
+  grounding verdict; with it, unverified items are dropped and the rest is indexed. Record the dropped-item count from the run log.
 - Re-running `--index` on the TOC pair REPLACES their turn rows (generation swap: rows with an older `syncGen` are deleted). Compare turn ids against `lkb_prod` first.
   If the production rows are verified intact and only the index is missing, `--index-existing --tenant toc` is the non-destructive alternative.
   Before the run record `db.turns.countDocuments({sessionId: '<id>'})` and take a `mongodump` of `lkb_prod` (the swap is upsert-then-delete on a standalone Mongo: a failure between the two leaves old and new rows mixed).
@@ -496,7 +498,7 @@ and any artifacts tagged with that generation. Then add `--apply --reason "<why>
 fresh index run can claim it (one conditional update; a changed attempt gives `conflict` and writes nothing; who/when/why
 are stored in `sessions.indexRecovery`). A `running` attempt under 30 min old is refused unless `--force-running`.
 Database rules are the usual script guard (`lkb_staging` with `MONGO_WORK_DB`/`LKB_ALLOW_STAGING`; production only with
-`--i-know-this-is-production` and `MONGODB_DB=lkb`). Nothing is deleted: leftover artifacts of the abandoned generation
+`--i-know-this-is-production`, `MONGODB_DB=lkb_prod` and `MONGO_WORK_DB=lkb_prod`, per D-204/D-209). Nothing is deleted: leftover artifacts of the abandoned generation
 stay invisible and the next index run rewrites them.
 
 ## Update / rollback
