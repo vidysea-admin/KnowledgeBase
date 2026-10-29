@@ -34,14 +34,25 @@ done
 
 if [ "$MODE" = "login" ]; then
   [ -n "${VNC_PASSWORD:-}" ] || { echo "login mode needs VNC_PASSWORD (value-less env pass-through)" >&2; exit 1; }
-  x11vnc -display :99 -forever -shared -rfbport 5900 -passwd "$VNC_PASSWORD" -bg -o /tmp/x11vnc.log >/dev/null
+  # The password goes through a 0600 file read by x11vnc (rm: deletes it after reading), never argv:
+  # `ps` and /proc/*/cmdline must not show it. printf is a shell builtin, so no process carries it either.
+  VNC_PASSFILE="$XDG_RUNTIME_DIR/vnc.pass"
+  ( umask 077; printf '%s
+' "$VNC_PASSWORD" > "$VNC_PASSFILE" )
+  x11vnc -display :99 -forever -shared -rfbport 5900 -passwdfile "rm:$VNC_PASSFILE" -bg -o /tmp/x11vnc.log >/dev/null
+  unset VNC_PASSWORD  # do not leak it into the environment of Chrome and other children
   CHROME="$("$LKB_PYTHON" -c 'import pathlib,seleniumbase; print(pathlib.Path(seleniumbase.__file__).parent/"drivers"/"cft_drivers"/"chrome-linux64"/"chrome")')"
   SANDBOX=""; [ "${LKB_CHROME_NO_SANDBOX:-}" = "1" ] && SANDBOX="--no-sandbox"
   exec "$CHROME" $SANDBOX --user-data-dir="${LKB_BOT_PROFILE_DIR:-/data/bot-profile}" --no-first-run --window-size=1920,1080 https://accounts.google.com/
 fi
 
-node scripts/webinar/setup.mjs --doctor | tee /tmp/doctor.log
-if grep -q '^MISSING' /tmp/doctor.log; then echo "doctor failed" >&2; exit 1; fi
+# Doctor gate: capture the exit status WITHOUT a pipe (`| tee` would hide it and fail open), then fail on
+# a nonzero exit as well as on any MISSING line.
+doctor_rc=0
+node scripts/webinar/setup.mjs --doctor >/tmp/doctor.log 2>&1 || doctor_rc=$?
+cat /tmp/doctor.log
+if [ "$doctor_rc" -ne 0 ]; then echo "doctor failed (exit $doctor_rc)" >&2; exit 1; fi
+if grep -q '^MISSING' /tmp/doctor.log; then echo "doctor failed (MISSING)" >&2; exit 1; fi
 [ "$MODE" = "doctor" ] && exit 0
 
 exec node scripts/webinar/run-pipeline.mjs --run --watch
