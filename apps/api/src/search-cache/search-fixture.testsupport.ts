@@ -19,7 +19,19 @@ export const CORPUS = [
   { _id: "t9", tenantId: "other", sessionId: "s9", speakerRef: "spk:0", tStart: 0, tEnd: 1, text: "Another tenant private 2026 visa transcript." },
 ];
 
-export interface Call { coll: string; op: "find" | "findOne"; filter: Record<string, unknown> }
+export interface Call { coll: string; op: "find" | "findOne"; filter: Record<string, unknown>; options?: Record<string, unknown> }
+
+/** Mongo inclusion projection (`{ a: 1, b: 1 }`; `_id` kept unless `_id: 0`). ISS-425: the old fake ignored `projection`, so a field
+ * dropped from the visibility fingerprint's projection still reached the hash and every test stayed green. */
+export function project(doc: Record<string, unknown>, projection: Record<string, unknown> | undefined): Record<string, unknown> {
+  if (!projection) return doc;
+  const keep = Object.keys(projection).filter((key) => projection[key] === 1 || projection[key] === true);
+  if (!keep.length) return doc;
+  const out: Record<string, unknown> = {};
+  if (projection._id !== 0 && "_id" in doc) out._id = doc._id;
+  for (const key of keep) if (key in doc) out[key] = doc[key];
+  return out;
+}
 
 /** Applies a filter the way Mongo would, so id-keyed and tenant-keyed resolution are falsifiable.
  * The old fake ignored the filter entirely, which is why 5A/5C/5D could not be caught. */
@@ -46,15 +58,16 @@ export function capturingDb(extra: { turns?: Record<string, unknown>[]; heads?: 
   const rows = (name: string): Record<string, unknown>[] => name in data ? data[name]! : [];
   const db = {
     collection: (name: string) => ({
-      find: (filter: Record<string, unknown>) => {
-        calls.push({ coll: name, op: "find", filter });
+      find: (filter: Record<string, unknown>, options?: Record<string, unknown>) => {
+        calls.push({ coll: name, op: "find", filter, ...(options ? { options } : {}) });
         let limit = Number.POSITIVE_INFINITY;
-        const cursor = { limit(value: number) { limit = value; return cursor; }, toArray: async () => structuredClone(rows(name).filter((d) => matches(filter, d)).slice(0, limit)) };
+        const cursor = { limit(value: number) { limit = value; return cursor; }, toArray: async () => structuredClone(rows(name).filter((d) => matches(filter, d)).slice(0, limit).map((d) => project(d, options?.projection as Record<string, unknown> | undefined))) };
         return cursor;
       },
-      findOne: async (filter: Record<string, unknown>) => {
-        calls.push({ coll: name, op: "findOne", filter });
-        return structuredClone(rows(name).find((d) => matches(filter, d)) ?? null);
+      findOne: async (filter: Record<string, unknown>, options?: Record<string, unknown>) => {
+        calls.push({ coll: name, op: "findOne", filter, ...(options ? { options } : {}) });
+        const found = rows(name).find((d) => matches(filter, d));
+        return structuredClone(found ? project(found, options?.projection as Record<string, unknown> | undefined) : null);
       },
     }),
   };

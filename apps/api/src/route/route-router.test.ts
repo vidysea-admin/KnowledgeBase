@@ -6,8 +6,11 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { startTestServer } from "../testUtils.js";
 import { buildTestDeps, fakeKeyStore } from "../fixtures.js";
-import { RouteNoTree, type RouteDeps } from "./route-store.js";
+import { RouteNoTree, RouteTimeout, type RouteDeps } from "./route-store.js";
 import type { SearchHit } from "../routes/search.js";
+import { createMongoSearchDeps } from "../search-store.js";
+import { createRouteDeps } from "./route-store.js";
+import { fakeRouteDb, syntheticTree } from "./route.testsupport.js";
 
 const KEYS = fakeKeyStore({
   "a-key": { tenantId: "tenant-a", scopes: ["search"] }, "b-key": { tenantId: "tenant-b", scopes: ["search"] },
@@ -110,4 +113,120 @@ test("cache isolation: tenant B never receives tenant A's cached hits for the id
     await get(s.baseUrl, "/route?q=hello", "a-key");
     assert.deepEqual(calls, ["tenant-a", "tenant-b"], "A is still cached");
   } finally { await s.close(); }
+});
+
+// ---- ISS-420: the result cache is bound to the shared visibility fingerprint; ISS-421: the deadline aborts the work ---------------
+function withFingerprint(state: { fp: string; wa: string[]; fail: boolean; reads: number }, onCall?: () => void): RouteDeps {
+  return { route: async (tenantId, q, k) => { onCall?.(); return [hitFor(tenantId)]; },
+    fingerprint: async () => { state.reads++; if (state.fail) throw new Error("fingerprint down"); return { fingerprint: state.fp, waSessions: new Set(state.wa) }; } };
+}
+
+test("ISS-420 cache: a changed visibility fingerprint drops the cached entry on the very next request, no TTL wait", async () => {
+  const state = { fp: "v1", wa: [] as string[], fail: false, reads: 0 };
+  let calls = 0;
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route: withFingerprint(state, () => calls++), routeOptions: { cacheTtlMs: 600_000 } }));
+  try {
+    await get(s.baseUrl, "/route?q=hello", "a-key"); await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.equal(calls, 1, "same fingerprint -> served from cache");
+    state.fp = "v2"; // consent withdrawn / index failed / relabel / review edit
+    await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.equal(calls, 2, "changed fingerprint -> recomputed immediately");
+    assert.equal(state.reads, 3, "the fingerprint is read on every request that could be cached");
+  } finally { await s.close(); }
+});
+
+test("ISS-420 cache: an unreadable fingerprint bypasses the cache (never a constant), and nothing is stored meanwhile", async () => {
+  const state = { fp: "v1", wa: [] as string[], fail: true, reads: 0 };
+  let calls = 0;
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route: withFingerprint(state, () => calls++), routeOptions: { cacheTtlMs: 600_000 } }));
+  try {
+    for (let i = 0; i < 3; i++) assert.equal((await get(s.baseUrl, "/route?q=hello", "a-key")).status, 200);
+    assert.equal(calls, 3, "no caching while the fingerprint cannot be read");
+    state.fail = false;
+    await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.equal(calls, 4, "nothing was stored during the outage, so the first healthy request recomputes");
+  } finally { await s.close(); }
+});
+
+test("ISS-420 cache: a result touching a WhatsApp-batch session is never cached (its approval can be withdrawn)", async () => {
+  const state = { fp: "v1", wa: ["s1"], fail: false, reads: 0 };
+  let calls = 0;
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route: withFingerprint(state, () => calls++), routeOptions: { cacheTtlMs: 600_000 } }));
+  try {
+    await get(s.baseUrl, "/route?q=hello", "a-key"); await get(s.baseUrl, "/route?q=hello", "a-key");
+    assert.equal(calls, 2);
+  } finally { await s.close(); }
+});
+
+test("ISS-420 cache: the fingerprint is read for the verified tenant only", async () => {
+  const seen: string[] = [];
+  const route: RouteDeps = { route: async (t) => [hitFor(t)], fingerprint: async (t) => { seen.push(t); return { fingerprint: "x", waSessions: new Set() }; } };
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route }));
+  try { await get(s.baseUrl, "/route?q=a&tenantId=tenant-b", "a-key"); await get(s.baseUrl, "/route?q=a", "b-key"); assert.deepEqual(seen, ["tenant-a", "tenant-b"]); } finally { await s.close(); }
+});
+
+test("ISS-421 deadline: after the hard deadline the in-flight route() work is told to stop (AbortSignal fires)", async () => {
+  let signal: AbortSignal | undefined, deadlineAt = 0;
+  const route: RouteDeps = { route: (_t, _q, _k, ctl) => { signal = ctl.signal; deadlineAt = ctl.deadlineAt; return new Promise(() => undefined); } };
+  const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 50 } }));
+  try {
+    const before = Date.now();
+    const res = await get(s.baseUrl, "/route?q=slow", "a-key");
+    assert.equal(res.status, 503);
+    assert.ok(signal, "route() received a signal");
+    assert.equal(signal!.aborted, true, "the signal is aborted once the 503 is sent");
+    assert.ok(signal!.reason instanceof RouteTimeout);
+    assert.ok(deadlineAt >= before + 40 && deadlineAt <= before + 200);
+  } finally { await s.close(); }
+});
+
+// ---- ISS-420 end to end: the REAL stores behind the REAL router, long TTLs, no clock tricks ---------------------------------
+async function liveServer(o: Parameters<typeof fakeRouteDb>[0] = {}) {
+  const f = fakeRouteDb(o), trees = { "tenant-a": syntheticTree({ tenantId: "tenant-a" }) } as Record<string, ReturnType<typeof syntheticTree>>;
+  for (const name of ["sessions", "sources", "turns"]) f.data[name] = f.data[name]!.map((r) => (r.tenantId === "toc" ? { ...r, tenantId: "tenant-a", ...(typeof r.sourceId === "string" ? { sourceId: String(r.sourceId).replace("toc:", "tenant-a:") } : {}),
+    ...(name === "sources" ? { _id: String(r._id).replace("toc:", "tenant-a:") } : {}), ...(name === "turns" ? { _id: String(r._id).replace("toc-", "tenant-a-") } : {}) } : r));
+  const route = createRouteDeps({ db: f.db, tree: { load: async (t) => trees[t] ?? null } });
+  const search = createMongoSearchDeps({ db: f.db, cacheTtlMs: 600_000 });
+  const server = await startTestServer(buildTestDeps({ keyStore: KEYS, route, search, routeOptions: { cacheTtlMs: 600_000 } }));
+  const ask = async (path: string) => (await (await get(server.baseUrl, path, "a-key")).json()) as { hits: SearchHit[] };
+  return { ...f, server, ask };
+}
+const sessionsOf = (r: { hits: SearchHit[] }) => [...new Set(r.hits.map((h) => h.sessionId))];
+
+test("ISS-420 e2e: consent withdrawn between two identical calls -> the very next /route AND /search exclude that session (no TTL wait)", async () => {
+  const L = await liveServer();
+  try {
+    const q = "visa%20requirements%20for%20Germany";
+    assert.ok(sessionsOf(await L.ask(`/route?q=${q}`)).includes("s04"), "precondition: s04 is routed and served");
+    assert.ok(sessionsOf(await L.ask(`/search?q=blocked%20account`)).includes("s04"), "precondition: /search serves s04");
+    await L.ask(`/route?q=${q}`); // second identical call is the cached one
+    const src = L.data.sources!.find((r) => r.tenantId === "tenant-a" && String(r._id).endsWith(":s04")) as Record<string, unknown>;
+    assert.ok(src, "fixture: s04's source row exists for tenant-a");
+    src.consent = { given: false };
+    assert.ok(!sessionsOf(await L.ask(`/route?q=${q}`)).includes("s04"), "/route served a withdrawn session from cache");
+    assert.ok(!sessionsOf(await L.ask(`/search?q=blocked%20account`)).includes("s04"), "/search served a withdrawn session from cache");
+  } finally { await L.server.close(); }
+});
+
+test("ISS-420 e2e: a session whose index turns failed vanishes from the very next /route call; /search is refreshed (its label shows the new status)", async () => {
+  const L = await liveServer();
+  try {
+    const q = "visa%20requirements%20for%20Germany";
+    assert.ok(sessionsOf(await L.ask(`/route?q=${q}`)).includes("s04"));
+    await L.ask(`/route?q=${q}`);
+    const ses = L.data.sessions!.find((r) => r.tenantId === "tenant-a" && r._id === "s04") as { status: { index: string } };
+    ses.status.index = "failed";
+    assert.ok(!sessionsOf(await L.ask(`/route?q=${q}`)).includes("s04"), "/route served an index-failed session from cache");
+  } finally { await L.server.close(); }
+});
+
+test("ISS-420 e2e: with nothing changed the second /route call is served from cache (the fingerprint does not defeat the cache)", async () => {
+  const L = await liveServer();
+  try {
+    const q = "visa%20requirements%20for%20Germany";
+    await L.ask(`/route?q=${q}`);
+    const turnReads = () => L.calls.filter((c) => c.coll === "turns").length, before = turnReads();
+    await L.ask(`/route?q=${q}`);
+    assert.equal(turnReads(), before, "no turns read on a cache hit");
+  } finally { await L.server.close(); }
 });

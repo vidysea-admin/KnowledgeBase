@@ -121,3 +121,57 @@ test("K5 deadline: an already-expired deadline fails the search instead of retur
   const { db } = capturingDb();
   await assert.rejects(createMongoSearchDeps({ db, cacheTtlMs: 0 }).search("toc", "2026", 10, { deadlineAt: Date.now() - 1 }), /deadline/);
 });
+
+// ---- ISS-420 / ISS-425: the fingerprint's own pins (fake now honours find() projections) ----------------------------
+test("ISS-425 fake honours projections: a field outside the projection never reaches the caller", async () => {
+  const { db } = capturingDb();
+  const rows = await (db as never as { collection: (n: string) => { find: (f: object, o: object) => { toArray(): Promise<Record<string, unknown>[]> } } })
+    .collection("sources").find({ tenantId: "toc" }, { projection: { _id: 1, tenantId: 1, kind: 1 } }).toArray();
+  assert.ok(rows.length > 0 && rows.every((r) => !("consent" in r) && !("path" in r) && "kind" in r));
+});
+
+test("ISS-425 fingerprint reads sources WITH consent, sessions WITH status, heads and candidates, each under a projection", async () => {
+  const { db, calls } = capturingDb({ more: { whatsapp_candidates: [] } });
+  await createMongoSearchDeps({ db, cacheTtlMs: 600_000 }).search("toc", "visa", 10);
+  const projected = (coll: string) => calls.find((c) => c.coll === coll && (c.options?.projection as object | undefined))?.options!.projection as Record<string, unknown> | undefined;
+  assert.equal(projected("sources")?.consent, 1, "consent must be in the sources projection");
+  assert.equal(projected("sessions")?.status, 1, "status (index done/failed) must be in the sessions projection");
+  assert.equal(projected("sessions")?.sourceId, 1);
+  assert.equal(projected("transcript_reviews")?.revision, 1);
+  assert.ok(projected("whatsapp_candidates"));
+});
+
+test("ISS-420 index failure: a session status change invalidates the cached /search result on the very next request (sessions are in the fingerprint)", async () => {
+  const { db, data, calls } = capturingDb();
+  const deps = createMongoSearchDeps({ db, cacheTtlMs: 600_000 });
+  const first = await deps.search("toc", "visa", 10);
+  assert.deepEqual(first.map((h) => h.turnId), ["t1"]);
+  assert.equal(first[0]!.session?.status.index, "done");
+  const reads = turnReads(calls);
+  ((data.sessions.find((s) => s._id === "s1") as { status: { index: string } }).status).index = "failed";
+  const second = await deps.search("toc", "visa", 10);
+  assert.ok(turnReads(calls) > reads, "the stale entry must be recomputed, not served");
+  assert.equal(second[0]?.session?.status.index, "failed", "the fresh label, not the cached one (/search itself does not hide index-failed sessions; /route does)");
+});
+
+test("ISS-425 a fingerprint that cannot be read is NOT replaced by a constant: two failing reads never serve the cached result", async () => {
+  const { db, calls, data } = capturingDb();
+  const failing = { collection: (name: string) => { const c = (db as never as { collection: (n: string) => Record<string, unknown> }).collection(name);
+    return name === "transcript_reviews" ? { ...c, find: (f: unknown, o?: unknown) => ((o as { projection?: unknown } | undefined)?.projection ? { toArray: async () => { throw new Error("down"); } } : (c.find as (f: unknown, o?: unknown) => unknown)(f, o)) } : c; } };
+  const deps = createMongoSearchDeps({ db: failing as never, cacheTtlMs: 600_000 });
+  assert.deepEqual((await deps.search("toc", "visa", 10)).map((h) => h.turnId), ["t1"]);
+  const reads = turnReads(calls);
+  (data.sources.find((s) => s._id === "src1") as Record<string, unknown>).consent = { given: false, recordedBy: "owner" };
+  assert.deepEqual(await deps.search("toc", "visa", 10), [], "with the fingerprint unreadable, a withdrawn source must still vanish");
+  assert.ok(turnReads(calls) > reads, "bypassed, not served");
+});
+
+test("ISS-427 every Mongo read of a /search call carries maxTimeMS derived from the deadline", async () => {
+  const { db, calls } = capturingDb();
+  await createMongoSearchDeps({ db, cacheTtlMs: 600_000 }).search("toc", "visa", 10, { deadlineAt: Date.now() + 900 });
+  assert.ok(calls.length > 0);
+  for (const c of calls) {
+    const ms = c.options?.maxTimeMS as number | undefined;
+    assert.ok(typeof ms === "number" && ms >= 1 && ms <= 900, `${c.coll} ${c.op} maxTimeMS=${ms}`);
+  }
+});

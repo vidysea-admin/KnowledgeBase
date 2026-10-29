@@ -13,15 +13,21 @@ import type { CompleteResult, Job } from "@lkb/ai";
 import { selectNodes } from "@lkb/ask";
 import { assertValidTenantId, getDb, scopedCollection } from "@lkb/db";
 import { treeSearch } from "@lkb/index";
+import { visibilityFingerprint, withReadDeadline, type VisibilityState } from "../search-cache/search-cache.js";
 import { readEffectiveTurns } from "../transcript-review/effective-reader.js";
 import { createKnowledgeVisibility, type KnowledgeVisibility } from "../visibility/knowledge.js";
 import type { SearchHit } from "../routes/search.js";
 import { bm25Ceiling, bm25Scores, buildBm25, tokenize } from "./bm25.js";
 import { buildRouteIndex, frontierRoot, refsOf, routeStepA, MAX_SESSIONS, type RouteIndex } from "./bm25-router.js";
 
-export interface RouteControl { deadlineAt: number }
+/** `signal` fires when the request's hard deadline passes (or it failed): route() stops reading and the step B model call is aborted. */
+export interface RouteControl { deadlineAt: number; signal?: AbortSignal }
 export interface RouteStats { stepAMs: number; confident: boolean; usedLlm: boolean; llmFailed: boolean; selectedSessions: string[]; totalMs: number }
-export interface RouteDeps { route(tenantId: string, query: string, k: number, ctl: RouteControl): Promise<SearchHit[]> }
+export interface RouteDeps {
+  route(tenantId: string, query: string, k: number, ctl: RouteControl): Promise<SearchHit[]>;
+  /** The shared visibility fingerprint (`search-cache.ts`) the HTTP result cache is bound to (ISS-420). Absent -> constant (fakes only). */
+  fingerprint?(tenantId: string, ctl: { deadlineAt: number }): Promise<VisibilityState>;
+}
 export class RouteTimeout extends Error { constructor() { super("route_timeout"); } }
 export class RouteNoTree extends Error { constructor() { super("no_tree"); } }
 
@@ -39,10 +45,14 @@ export interface RouteStoreDeps {
 }
 const STEP_B_TIMEOUT_MS = 1200, INDEX_TTL_MS = 60_000, CANDIDATE_SESSIONS = 6, MAX_ROUNDS = 3;
 
-function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+/** Rejects with RouteTimeout when `ms` elapse OR `abort` fires, and aborts `abort` on the timeout, so the pending model call is cancelled, not abandoned. */
+function withTimeout<T>(p: Promise<T>, ms: number, abort: AbortController): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    const t = setTimeout(() => reject(new RouteTimeout()), ms);
-    p.then((v) => { clearTimeout(t); resolve(v); }, (e) => { clearTimeout(t); reject(e); });
+    const stop = () => { clearTimeout(t); abort.signal.removeEventListener("abort", onAbort); };
+    const onAbort = () => { stop(); reject(new RouteTimeout()); };
+    const t = setTimeout(() => { stop(); abort.abort(); reject(new RouteTimeout()); }, ms);
+    abort.signal.addEventListener("abort", onAbort, { once: true });
+    p.then((v) => { stop(); resolve(v); }, (e) => { stop(); reject(e); });
   });
 }
 
@@ -65,12 +75,17 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
     return entry.flight;
   };
 
-  return { async route(tenantId, query, k, ctl): Promise<SearchHit[]> {
+  return {
+    /** The same visibility fingerprint /search binds its cache to (ISS-420); read under the request deadline (ISS-427). */
+    fingerprint: (tenantId, ctl) => visibilityFingerprint(withReadDeadline(deps.db ?? getDb(), ctl.deadlineAt, now), tenantId),
+    async route(tenantId, query, k, ctl): Promise<SearchHit[]> {
     assertValidTenantId(tenantId, "route");
     const t0 = now();
-    const db = deps.db ?? getDb(), visibility = deps.visibility ?? createKnowledgeVisibility(db);
+    // ISS-427: every read below carries maxTimeMS derived from the deadline. ISS-421: `ctl.signal` stops the work after it.
+    const db = withReadDeadline(deps.db ?? getDb(), ctl.deadlineAt, now), visibility = deps.visibility ?? createKnowledgeVisibility(db);
     const left = () => ctl.deadlineAt - now();
-    const check = () => { if (left() <= 0) throw new RouteTimeout(); };
+    const check = () => { if (ctl.signal?.aborted || left() <= 0) throw new RouteTimeout(); };
+    check();
     const gates = new Map<string, Promise<boolean>>(); // per-request memo: one gate per session
     const gate = async (ids: readonly string[]): Promise<Set<string>> => {
       const missing = ids.filter((id) => !gates.has(id));
@@ -96,13 +111,17 @@ export function createRouteDeps(deps: RouteStoreDeps): RouteDeps {
         const root = frontierRoot(index, a, await gate(index.sessionIds), tenantId);
         if (!root.children.length) llmFailed = true;
         else {
-          const complete = (job: Job) => deps.complete!(job, tenantId);
-          const budget = Math.min(deps.stepBTimeoutMs ?? STEP_B_TIMEOUT_MS, Math.max(50, left() - 200));
-          const nodes = await withTimeout(selectNodes(query, root, complete, treeSearch), budget);
-          const chosen = nodes.flatMap(refsOf);
-          if (chosen.length) order = [...new Set([...chosen, ...order])]; else llmFailed = true;
+          const stepB = new AbortController(), onAbort = () => stepB.abort();
+          ctl.signal?.addEventListener("abort", onAbort, { once: true });
+          try {
+            const complete = (job: Job) => deps.complete!({ ...job, signal: stepB.signal }, tenantId);
+            const budget = Math.min(deps.stepBTimeoutMs ?? STEP_B_TIMEOUT_MS, Math.max(50, left() - 200));
+            const nodes = await withTimeout(selectNodes(query, root, complete, treeSearch), budget, stepB);
+            const chosen = nodes.flatMap(refsOf);
+            if (chosen.length) order = [...new Set([...chosen, ...order])]; else llmFailed = true;
+          } finally { ctl.signal?.removeEventListener("abort", onAbort); }
         }
-      } catch { llmFailed = true; } // timeout / provider error / garbage -> step A's result, never a hang
+      } catch { llmFailed = true; } // timeout / provider error / garbage -> step A's result, never a hang (a request abort is re-raised by check())
     }
     check();
     const live = await gate(order.slice(0, Math.max(CANDIDATE_SESSIONS, MAX_SESSIONS * 2)));

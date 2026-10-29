@@ -12,6 +12,7 @@ export const GEMINI_MODELS: ModelInfo[] = [
   { id: "gemini-2.5-pro", label: "Gemini 2.5 Pro" },
   { id: "gemini-2.5-flash", label: "Gemini 2.5 Flash" },
   { id: "gemini-2.5-flash-lite", label: "Gemini 2.5 Flash-Lite" },
+  { id: "gemini-3.5-flash-lite", label: "Gemini 3.5 Flash-Lite" },
 ];
 
 const DEFAULT_MODEL = "gemini-2.5-flash";
@@ -27,15 +28,21 @@ export interface GeminiConfig {
   model?: string;
   /** Overrides DEFAULT_EMBED_MODEL; `model` selects the generation model and is unrelated. */
   embedModel?: string;
+  /** Gemini 3.x reasoning depth (`generationConfig.thinkingConfig.thinkingLevel`). Unset -> the field is not sent (provider default). D-207 item 3. */
+  thinkingLevel?: "minimal" | "low" | "medium" | "high";
+  /** Registered provider name when a second instance (e.g. `gemini-flash-lite`) sits beside the default `gemini`. */
+  name?: string;
 }
 
 export class GeminiProvider implements Provider {
-  readonly name = "gemini";
+  readonly name: string;
 
   constructor(
     private readonly transport: Transport,
     private readonly config: GeminiConfig,
-  ) {}
+  ) {
+    this.name = config.name ?? "gemini";
+  }
 
   private requireCredentials(): void {
     if (typeof this.config.apiKey !== "string" || !this.config.apiKey.trim()) {
@@ -62,7 +69,9 @@ export class GeminiProvider implements Provider {
         systemInstruction: systemMessages.length
           ? { parts: systemMessages.map((m) => ({ text: m.content })) }
           : undefined,
+        ...(this.config.thinkingLevel ? { generationConfig: { thinkingConfig: { thinkingLevel: this.config.thinkingLevel } } } : {}),
       },
+      ...(job.signal ? { signal: job.signal } : {}),
     });
 
     if (res.status < 200 || res.status >= 300) {

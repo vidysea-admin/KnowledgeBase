@@ -139,3 +139,47 @@ test("no-LLM end to end on the synthetic 22-session / 110-topic corpus (warm ind
   }
   console.log("ROUTE-TIMINGS " + timings.join(" | "));
 });
+
+// ---- ISS-421 abort / ISS-427 maxTimeMS ------------------------------------------------------------------------------------
+test("ISS-421 step B: the model call receives an AbortSignal that fires when the step B budget runs out", async () => {
+  let signal: AbortSignal | undefined;
+  const { deps, stats } = setup({}, { complete: (job) => { signal = (job as Job & { signal?: AbortSignal }).signal; return new Promise<CompleteResult>(() => undefined); }, stepBTimeoutMs: 40 });
+  await deps.route("toc", "orientation panel counsellor", 5, far());
+  assert.ok(signal, "the job carries a signal");
+  assert.equal(signal!.aborted, true, "the pending model call was aborted when step B gave up");
+  assert.ok(stats[0]!.llmFailed);
+});
+
+test("ISS-421 deadline: aborting the request signal mid step B aborts the model call and rejects with RouteTimeout", async () => {
+  let signal: AbortSignal | undefined;
+  const ctl = new AbortController();
+  const { deps } = setup({}, { complete: (job) => { signal = (job as Job & { signal?: AbortSignal }).signal; setTimeout(() => ctl.abort(new RouteTimeout()), 20); return new Promise<CompleteResult>(() => undefined); }, stepBTimeoutMs: 5_000 });
+  const t0 = Date.now();
+  await assert.rejects(deps.route("toc", "orientation panel counsellor", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
+  assert.ok(Date.now() - t0 < 1500, "did not wait for the 5 s step B budget");
+  assert.equal(signal!.aborted, true);
+});
+
+test("ISS-421 deadline: an already-aborted signal stops before any read", async () => {
+  const { deps, calls } = setup();
+  const ctl = new AbortController(); ctl.abort(new RouteTimeout());
+  await assert.rejects(deps.route("toc", "visa requirements for Germany", 5, { deadlineAt: Date.now() + 60_000, signal: ctl.signal }), RouteTimeout);
+  assert.ok(!calls.some((c) => c.coll === "turns"));
+});
+
+test("ISS-427 every Mongo read of a /route call carries maxTimeMS derived from the deadline", async () => {
+  const { deps, calls } = setup();
+  await deps.route("toc", "visa requirements for Germany", 5, { deadlineAt: Date.now() + 900 });
+  assert.ok(calls.some((c) => c.coll === "turns") && calls.some((c) => c.coll === "sessions"));
+  for (const c of calls) {
+    const ms = c.options?.maxTimeMS as number | undefined;
+    assert.ok(typeof ms === "number" && ms >= 1 && ms <= 900, `${c.coll} maxTimeMS=${ms}`);
+  }
+});
+
+test("ISS-427 the fingerprint read is also deadline-bounded and tenant-confined", async () => {
+  const { deps, calls } = setup();
+  const state = await deps.fingerprint!("toc", { deadlineAt: Date.now() + 700 });
+  assert.match(state.fingerprint, /^[0-9a-f]{64}$/);
+  assert.ok(calls.length === 4 && calls.every((c) => c.filter.tenantId === "toc" && typeof c.options?.maxTimeMS === "number" && (c.options.maxTimeMS as number) <= 700));
+});

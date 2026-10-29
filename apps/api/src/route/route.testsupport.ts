@@ -4,6 +4,7 @@
  * and id scoping are falsifiable). Not a test file; never touches a real database or provider.
  */
 import type { TreeIndexNode } from "@lkb/core";
+import { project } from "../search-cache/search-fixture.testsupport.js";
 
 export const NATURAL_QUESTIONS = [
   { q: "cost of living in Toronto for students", session: "s01" },
@@ -72,7 +73,7 @@ function matches(filter: Record<string, unknown>, doc: Record<string, unknown>):
 }
 /** Two tenants live in the same fake db (`toc` and `other`) so an unscoped query is DETECTABLE. */
 export function fakeRouteDb(opts: FakeDbOpts = {}) {
-  const calls: { coll: string; filter: Record<string, unknown> }[] = [];
+  const calls: { coll: string; filter: Record<string, unknown>; options?: Record<string, unknown> }[] = [];
   const data: Record<string, Record<string, unknown>[]> = { sessions: [], sources: [], turns: [], transcript_reviews: [], whatsapp_candidates: [], ...opts.extra };
   for (const tenantId of ["toc", "other"]) {
     for (let i = 0; i < 22; i++) {
@@ -83,13 +84,18 @@ export function fakeRouteDb(opts: FakeDbOpts = {}) {
     data.turns!.push(...syntheticTurns({ ...opts, tenantId }));
   }
   const db = { collection: (coll: string) => ({
-    find: (filter: Record<string, unknown>) => {
-      calls.push({ coll, filter });
+    // Honours `projection` (ISS-425) and records the options of every read (maxTimeMS, ISS-427).
+    find: (filter: Record<string, unknown>, options?: Record<string, unknown>) => {
+      calls.push({ coll, filter, ...(options ? { options } : {}) });
       let limit = Number.POSITIVE_INFINITY;
-      const cursor = { limit(n: number) { limit = n; return cursor; }, toArray: async () => structuredClone((data[coll] ?? []).filter((d) => matches(filter, d)).slice(0, limit)) };
+      const cursor = { limit(n: number) { limit = n; return cursor; }, toArray: async () => structuredClone((data[coll] ?? []).filter((d) => matches(filter, d)).slice(0, limit).map((d) => project(d, options?.projection as Record<string, unknown> | undefined))) };
       return cursor;
     },
-    findOne: async (filter: Record<string, unknown>) => { calls.push({ coll, filter }); return structuredClone((data[coll] ?? []).find((d) => matches(filter, d)) ?? null); },
+    findOne: async (filter: Record<string, unknown>, options?: Record<string, unknown>) => {
+      calls.push({ coll, filter, ...(options ? { options } : {}) });
+      const found = (data[coll] ?? []).find((d) => matches(filter, d));
+      return structuredClone(found ? project(found, options?.projection as Record<string, unknown> | undefined) : null);
+    },
   }) };
   return { db: db as never, calls, data };
 }
