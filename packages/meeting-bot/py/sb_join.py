@@ -98,6 +98,8 @@ def main():
     import pathlib
     policy_extension = a.capture_extension or str(pathlib.Path(__file__).parent / "tab-capture")
     args += ",--enable-unsafe-extension-debugging"
+    if os.environ.get("LKB_CHROME_NO_SANDBOX") == "1":  # D-205 Linux container only (root/unprivileged userns); unset elsewhere
+        args += ",--no-sandbox"
     if a.profile_directory is not None:
         args += ",--profile-directory=" + a.profile_directory
     # ISS-324: tick while SB() brings the browser up. Daemon thread, so a failure inside SB()

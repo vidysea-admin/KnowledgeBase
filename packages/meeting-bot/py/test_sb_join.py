@@ -277,6 +277,24 @@ def test_main_passes_verified_installed_driver_to_actual_sb_launch_seam(managed_
     assert managed_main.cleanup == [(managed_main.profile, {"launch": os.name == "nt", "expected_exe": launched["binary_location"]})]
 
 
+def test_main_chrome_args_add_no_sandbox_only_when_env_flag_is_exactly_1(monkeypatch, managed_main):
+    managed_main.argv[-1] = "cft"
+    monkeypatch.delenv("LKB_CHROME_NO_SANDBOX", raising=False)
+    with pytest.raises(RuntimeError, match="fixture stopped"): sb_join.main()
+    baseline = managed_main.launched.pop()["chromium_arg"]
+    assert "--no-sandbox" not in baseline.split(",")
+    assert baseline.split(",")[:3] == ["--autoplay-policy=no-user-gesture-required", "--deny-permission-prompts", "--start-maximized"]
+    for value in ("", "0", "true", "yes", "1 "):
+        monkeypatch.setenv("LKB_CHROME_NO_SANDBOX", value)
+        with pytest.raises(RuntimeError, match="fixture stopped"): sb_join.main()
+        assert managed_main.launched.pop()["chromium_arg"] == baseline
+    monkeypatch.setenv("LKB_CHROME_NO_SANDBOX", "1")
+    with pytest.raises(RuntimeError, match="fixture stopped"): sb_join.main()
+    flagged = managed_main.launched.pop()["chromium_arg"].split(",")
+    assert flagged.count("--no-sandbox") == 1
+    assert [a for a in flagged if a != "--no-sandbox"] == baseline.split(",")
+
+
 def test_main_cdp_requires_owned_transport_process_extension_worker_and_tab(monkeypatch, managed_main):
     profile, binary, extension, stop = managed_main.profile, managed_main.binary, managed_main.extension, managed_main.stop
     extension_id = "a" * 32
