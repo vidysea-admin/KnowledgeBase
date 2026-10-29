@@ -33,6 +33,7 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
   - `docs/adr/`
   - `docs/archive/`
   - `docs/features/`
+  - `docs/user-accounts/`
   - `docs/whatsapp/`
 - `migrations/`
 - `packages/` — Application logic, one exported symbol per concept
