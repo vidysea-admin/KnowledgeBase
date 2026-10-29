@@ -2,8 +2,8 @@
 **Contract:** none specific (D-206 "vectorless /route"; scope brief from Umesh: "make /route work like the operating brain's own retrieval"; evidence qa/evidence/vc-kb-speed/kb-slowness-analysis.md and kb-vectorless-design.md)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** required
 dual-trigger: tenancy apps/api/src/route/route-store.ts:113
