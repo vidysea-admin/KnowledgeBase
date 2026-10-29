@@ -269,12 +269,12 @@ test("cycle 1: a database handle that throws synchronously (getDb() not ready) a
   } finally { await s.close(); }
 });
 
-test("cycle 1: a fingerprint dependency that throws synchronously is a cache bypass, and a failing route work answers 503 route_unavailable", async () => {
-  const route: RouteDeps = { route: async () => { throw new Error("boom"); }, fingerprint: () => { throw new Error("sync"); } };
+test("cycle 1: a fingerprint dependency that throws synchronously is a cache bypass (200, nothing stored), not an error", async () => {
+  let calls = 0;
+  const route: RouteDeps = { route: async (t) => { calls++; return [hitFor(t)]; }, fingerprint: () => { throw new Error("sync"); } };
   const s = await startTestServer(buildTestDeps({ keyStore: KEYS, route, routeOptions: { deadlineMs: 1_000, cacheTtlMs: 600_000 } }));
   try {
-    const res = await get(s.baseUrl, "/route?q=hello", "a-key");
-    assert.equal(res.status, 503);
-    assert.deepEqual(await res.json(), { error: "route_unavailable" });
+    for (let i = 0; i < 2; i++) assert.equal((await get(s.baseUrl, "/route?q=hello", "a-key")).status, 200);
+    assert.equal(calls, 2, "nothing was cached while the fingerprint could not be read");
   } finally { await s.close(); }
 });
