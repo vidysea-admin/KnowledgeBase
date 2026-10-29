@@ -74,13 +74,13 @@ test("a persisted index routes exactly like a freshly built one (step A parity)"
   assert.deepEqual(back.docs.map((d) => d.nodeId), built.docs.map((d) => d.nodeId));
 });
 
-test("visibility change (a consent withdrawal) -> the stored stamp is stale: rebuilt and OVERWRITTEN, never served", async () => {
+test("visibility state change (a session's index status) -> the stored stamp is stale: rebuilt and OVERWRITTEN, never served", async () => {
   const f = setup();
   await f.deps.route("toc", "cost of living in Toronto for students", 3, far());
   await until(() => f.events.includes("written"), "the first write");
   const first = String(rows(f)[0]!.fingerprint);
-  const source = f.data.sources!.find((s) => s.tenantId === "toc" && s._id === "src-toc:s01")!;
-  source.consent = { given: false };
+  const session = f.data.sessions!.find((s) => s.tenantId === "toc" && s._id === "s01")!;
+  session.status = { transcribe: "done", index: "failed" };
   f.events.length = 0;
   const restarted = f.boot(), loadsBefore = f.loads.length;
   await restarted.route("toc", "cost of living in Toronto for students", 3, far());
