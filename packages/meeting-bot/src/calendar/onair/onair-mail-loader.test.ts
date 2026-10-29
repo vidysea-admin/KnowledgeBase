@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import type { AutoRecordCandidateInput } from "../auto-join.js";
-import { onairMailEnabled, withOnairMailCandidates, withOnairMailFromEnv } from "./onair-mail-loader.js";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { applyOnairWatchDefault, loadOnairConfig, onairMailEnabled, withOnairMailCandidates, withOnairMailFromEnv } from "./onair-mail-loader.js";
 import { createOnairGmailLoader } from "./onair-gmail-fetch.js";
 import * as f from "./onair-mail.fixtures.js";
 
@@ -15,14 +19,102 @@ const mk = (env: NodeJS.ProcessEnv, base: AutoRecordCandidateInput[], extra: Par
   return { logs, baseLoader, loader };
 };
 
-test("flag: only the exact value 1 enables the hook; otherwise the base loader is returned untouched", async () => {
-  for (const env of [{}, { LKB_ONAIR_MAIL: "0" }, { LKB_ONAIR_MAIL: "true" }, { LKB_ONAIR_MAIL: "" }, { LKB_ONAIR_MAIL: " 1" }]) {
+test("flag: DEFAULT ON with no env; 0/false/off turns it off; 1 forces on; unknown values fall back to the default", async () => {
+  assert.equal(onairMailEnabled({}), true);
+  for (const env of [{ LKB_ONAIR_MAIL: "0" }, { LKB_ONAIR_MAIL: "false" }, { LKB_ONAIR_MAIL: "off" }, { LKB_ONAIR_MAIL: " 0 " }]) {
     const m = mk(env, [baseRow()]);
     assert.equal(m.loader, m.baseLoader);
     assert.equal(onairMailEnabled(env), false);
     assert.equal(withOnairMailFromEnv(m.baseLoader, env, "C:/nope", () => {}), m.baseLoader);
   }
-  assert.equal(onairMailEnabled({ LKB_ONAIR_MAIL: "1" }), true);
+  for (const env of [{ LKB_ONAIR_MAIL: "1" }, { LKB_ONAIR_MAIL: "true" }, {}, { LKB_ONAIR_MAIL: "" }, { LKB_ONAIR_MAIL: "maybe" }]) {
+    const m = mk(env, [baseRow()]);
+    assert.notEqual(m.loader, m.baseLoader, JSON.stringify(env));
+    assert.equal(onairMailEnabled(env), true);
+  }
+  assert.equal(onairMailEnabled({ LKB_ONAIR_MAIL: "1" }, { mail: false }), true, "env 1 beats a config that says off");
+  assert.equal(onairMailEnabled({ LKB_ONAIR_MAIL: "0" }, { mail: true }), false, "env 0 beats a config that says on");
+  assert.equal(onairMailEnabled({}, { mail: false }), false, "config off with no env");
+  assert.equal(onairMailEnabled({ LKB_ONAIR_MAIL: "maybe" }, { mail: false }), false, "garbage env falls back to the config");
+});
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../../..");
+const withConfig = (json: string | undefined, run: (root: string) => void) => {
+  const root = mkdtempSync(path.join(tmpdir(), "onair-default-on-"));
+  try {
+    if (json !== undefined) { mkdirSync(path.join(root, "config")); writeFileSync(path.join(root, "config", "autojoin.json"), json); }
+    run(root);
+  } finally { rmSync(root, { recursive: true, force: true }); }
+};
+
+test("config: the committed config/autojoin.json has onair.mail and onair.watch on", () => {
+  assert.deepEqual(loadOnairConfig(repoRoot, {}), { mail: true, watch: true });
+  assert.deepEqual(JSON.parse(readFileSync(path.join(repoRoot, "config", "autojoin.json"), "utf8")).onair, { mail: true, watch: true });
+});
+
+test("config: file keys are read, missing or unreadable files and keys default ON, env overrides each key", () => {
+  withConfig(undefined, root => assert.deepEqual(loadOnairConfig(root, {}), { mail: true, watch: true }));
+  withConfig("{not json", root => {
+    const warns: string[] = [];
+    assert.deepEqual(loadOnairConfig(root, {}, m => warns.push(m)), { mail: true, watch: true });
+    assert.equal(warns.length, 1);
+  });
+  withConfig('{"onair":{"mail":false}}', root => {
+    assert.deepEqual(loadOnairConfig(root, {}), { mail: false, watch: true });
+    assert.deepEqual(loadOnairConfig(root, { LKB_ONAIR_MAIL: "1" }), { mail: true, watch: true });
+  });
+  withConfig('{"onair":{"mail":true,"watch":false}}', root => {
+    assert.deepEqual(loadOnairConfig(root, {}), { mail: true, watch: false });
+    assert.deepEqual(loadOnairConfig(root, { LKB_ONAIR_WATCH: "1", LKB_ONAIR_MAIL: "0" }), { mail: false, watch: true });
+  });
+  withConfig('{"onair":"nope"}', root => assert.deepEqual(loadOnairConfig(root, {}), { mail: true, watch: true }));
+  withConfig(undefined, root => {
+    const alt = path.join(root, "alt.json");
+    writeFileSync(alt, '{"onair":{"mail":false,"watch":false}}');
+    assert.deepEqual(loadOnairConfig(root, { LKB_AUTOJOIN_CONFIG: alt }), { mail: false, watch: false });
+  });
+});
+
+test("config drives the production wiring: file off returns the base loader, file on or no file does not", () => {
+  const base = async () => [] as AutoRecordCandidateInput[];
+  withConfig('{"onair":{"mail":false}}', root => assert.equal(withOnairMailFromEnv(base, {}, root, () => {}), base));
+  withConfig('{"onair":{"mail":false}}', root => assert.notEqual(withOnairMailFromEnv(base, { LKB_ONAIR_MAIL: "1" }, root, () => {}), base));
+  withConfig(undefined, root => assert.notEqual(withOnairMailFromEnv(base, {}, root, () => {}), base));
+});
+
+test("watch default: unset env takes the config value ('1' when on), an explicit env wins", () => {
+  withConfig('{"onair":{"watch":true}}', root => {
+    const env: NodeJS.ProcessEnv = {};
+    applyOnairWatchDefault(env, root);
+    assert.deepEqual(env, { LKB_ONAIR_WATCH: "1" });
+    const off: NodeJS.ProcessEnv = { LKB_ONAIR_WATCH: "0" };
+    applyOnairWatchDefault(off, root);
+    assert.deepEqual(off, { LKB_ONAIR_WATCH: "0" });
+    const on: NodeJS.ProcessEnv = { LKB_ONAIR_WATCH: "true" };
+    applyOnairWatchDefault(on, root);
+    assert.deepEqual(on, { LKB_ONAIR_WATCH: "1" }, "sb_join_onair.py and onair-watch.ts accept only the exact 1");
+  });
+  withConfig('{"onair":{"watch":false}}', root => {
+    const env: NodeJS.ProcessEnv = {};
+    applyOnairWatchDefault(env, root);
+    assert.deepEqual(env, {});
+    const on: NodeJS.ProcessEnv = { LKB_ONAIR_WATCH: "1" };
+    applyOnairWatchDefault(on, root);
+    assert.deepEqual(on, { LKB_ONAIR_WATCH: "1" });
+  });
+  withConfig(undefined, root => {
+    const env: NodeJS.ProcessEnv = {};
+    applyOnairWatchDefault(env, root);
+    assert.deepEqual(env, { LKB_ONAIR_WATCH: "1" });
+  });
+});
+
+test("production wiring applies the watch default to the env it was given", () => {
+  withConfig('{"onair":{"mail":false,"watch":true}}', root => {
+    const env: NodeJS.ProcessEnv = {};
+    withOnairMailFromEnv(async () => [], env, root, () => {});
+    assert.equal(env.LKB_ONAIR_WATCH, "1");
+  });
 });
 
 test("enabled: base candidates stay and one OnAir candidate per event is appended", async () => {
