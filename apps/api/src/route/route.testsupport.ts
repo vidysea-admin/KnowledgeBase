@@ -61,7 +61,9 @@ export function syntheticTurns(opts: SynthOpts = {}): Record<string, unknown>[] 
   return rows;
 }
 
-export interface FakeDbOpts extends SynthOpts { failed?: string[]; withdrawn?: string[]; extra?: Record<string, Record<string, unknown>[]> }
+/** D-208 route_index fault injection: `read` fails/hangs every route_index read, `write` fails every route_index write. */
+export interface RouteIndexFaults { read?: "fail" | "hang"; write?: "fail" }
+export interface FakeDbOpts extends SynthOpts { failed?: string[]; withdrawn?: string[]; extra?: Record<string, Record<string, unknown>[]>; routeIndex?: RouteIndexFaults }
 function matches(filter: Record<string, unknown>, doc: Record<string, unknown>): boolean {
   return Object.entries(filter).every(([key, cond]) => {
     if (key === "$or") return (cond as Record<string, unknown>[]).some((b) => matches(b, doc));
@@ -73,8 +75,9 @@ function matches(filter: Record<string, unknown>, doc: Record<string, unknown>):
 }
 /** Two tenants live in the same fake db (`toc` and `other`) so an unscoped query is DETECTABLE. */
 export function fakeRouteDb(opts: FakeDbOpts = {}) {
-  const calls: { coll: string; filter: Record<string, unknown>; options?: Record<string, unknown> }[] = [];
-  const data: Record<string, Record<string, unknown>[]> = { sessions: [], sources: [], turns: [], transcript_reviews: [], whatsapp_candidates: [], ...opts.extra };
+  const calls: { coll: string; filter: Record<string, unknown>; options?: Record<string, unknown>; op?: string }[] = [];
+  const faults: RouteIndexFaults = { ...opts.routeIndex };
+  const data: Record<string, Record<string, unknown>[]> = { sessions: [], sources: [], turns: [], transcript_reviews: [], whatsapp_candidates: [], tree_index: [], route_index: [], ...opts.extra };
   for (const tenantId of ["toc", "other"]) {
     for (let i = 0; i < 22; i++) {
       const sid = sessionIdOf(i), full = `${tenantId}:${sid}`;
@@ -93,9 +96,20 @@ export function fakeRouteDb(opts: FakeDbOpts = {}) {
     },
     findOne: async (filter: Record<string, unknown>, options?: Record<string, unknown>) => {
       calls.push({ coll, filter, ...(options ? { options } : {}) });
+      if (coll === "route_index" && faults.read === "fail") throw new Error("route_index read failed");
+      if (coll === "route_index" && faults.read === "hang") return new Promise<never>(() => undefined);
       const found = (data[coll] ?? []).find((d) => matches(filter, d));
       return structuredClone(found ? project(found, options?.projection as Record<string, unknown> | undefined) : null);
     },
+    /** Applies the filter and honours `upsert` (the inserted document is the replacement, as Mongo does for a replacement upsert). */
+    replaceOne: async (filter: Record<string, unknown>, replacement: Record<string, unknown>, options?: { upsert?: boolean }) => {
+      calls.push({ coll, filter, op: "replaceOne", ...(options ? { options: options as Record<string, unknown> } : {}) });
+      if (coll === "route_index" && faults.write === "fail") throw new Error("route_index write failed");
+      const rows = (data[coll] ??= []), at = rows.findIndex((d) => matches(filter, d));
+      if (at >= 0) rows[at] = structuredClone({ _id: rows[at]!._id, ...replacement });
+      else if (options?.upsert) rows.push(structuredClone(replacement));
+      return { matchedCount: at >= 0 ? 1 : 0, modifiedCount: at >= 0 ? 1 : 0, upsertedCount: at >= 0 || !options?.upsert ? 0 : 1 };
+    },
   }) };
-  return { db: db as never, calls, data };
+  return { db: db as never, calls, data, faults };
 }

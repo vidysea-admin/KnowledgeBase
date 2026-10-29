@@ -76,7 +76,22 @@ Failures are never cached.
   - `/search` hides a withdrawn session; it does not hide an index-failed one (it never has), `/route` hides both. Either way the
     cache never serves a stale label or hit.
 - Routing index cache: per tenant, built from the trusted tree reader (ineligible sessions already excluded), 60 s TTL,
-  single-flight refresh, stale index served while refreshing. It holds routing text only. A session withdrawn inside that
+  single-flight refresh, stale index served while refreshing. It holds routing text only. It is the hot layer above the
+  persisted index (next bullet): a refresh or a cold start reads `route_index` first and only rebuilds from the tree when that
+  document is missing, stale or unreadable.
+- Persisted routing index (D-208 item 2): collection `route_index` of the API's own database (`lkb_prod` in production), one
+  document per tenant (`_id` = tenantId, `tenantId` on the document, every read and write tenant-scoped). Schema:
+  `schema/route_index.schema.json`; accessor `packages/db/src/collections/route-index.ts`. It stores the session and topic
+  nodes, the BM25 postings and the session ids (routing text only, about 64 KB at 22 sessions) plus a **stamp**: the shared
+  visibility fingerprint of `search-cache.ts` and the tree root's `indexRevision`, both read BEFORE the build. On a cold or expired
+  in-memory index the store reads the stamp and the document together (each bounded to half of the time left, at most 1 s):
+  equal stamp -> the persisted index is served and the tree is not read; missing, stale (any difference, so a withdrawal, an
+  index-status change, a relabel, a correction or a tree rewrite) or structurally invalid (wrong tenant, damaged) -> the tree is
+  rebuilt and the document overwritten (`replaceOne` upsert on `_id`, idempotent). The write is best-effort and is not awaited by the
+  request. A slow, failing or hanging `route_index` read costs one bounded wait and then the in-memory build exactly as before the
+  persisted index existed (and the 3 s deadline / 503 rules above are unchanged); a failing write never fails a request. An index
+  larger than 12 MB is not persisted (BSON caps a document at 16 MB). The persisted index is refreshed lazily, on the next read after the
+  stamp changes; indexing code does not write it. Cold-start measurements: see the manifest `qa/manifests/route-index-persist.md`. A session withdrawn inside that
   window is still removed by step C (which re-checks the gate on every uncached request) and is not offered to the model in step B.
 - Every read goes through the tenant-scoped collection accessors; the tests assert the tenant filter on every query.
 
@@ -97,7 +112,8 @@ Failures are never cached.
 | Whole request, confident (no LLM), warm index | well under 1 s (dominated by the turn reads and visibility) |
 | Whole request, step B | step A + at most 1.2 s model budget |
 | Hard ceiling | 3 s, then 503 `route_timeout` |
-| First request after a cold start or index expiry with no stale copy | pays the trusted tree read (the same cost `/graph` pays, seconds) and may hit the ceiling; later requests are warm |
+| First request after a cold start, persisted index current | two small bounded reads (stamp, document) and a deserialise, tens of milliseconds; no tree read |
+| First request after a cold start or index expiry with no stale copy and no current persisted index (first deploy, or the stamp changed) | pays the trusted tree read (the same cost `/graph` pays, seconds) and may hit the ceiling; the build keeps running after the 503 and is written back, so the next request is warm |
 
 ## Wiring
 

@@ -128,6 +128,7 @@ Read next: `docs/HLD.md` (pipeline stage status, deployment) and `docs/LLD.md` (
 | orgs | _id, tenantId, name | no |
 | programs | _id, tenantId, name | no |
 | registration_link_approvals | _id, tenantId, decisionId, linkHash, scopeHash, policyHash, approvedBy, approvedAt, expiresAt | no |
+| route_index | _id, tenantId, schemaVersion, fingerprint, treeRevision, builtAt, sessionIds, docs, bm25 | no |
 | session_pages | _id, tenantId, sessionId, summary, evidence | yes |
 | sessions | _id, tenantId, sourceId, title, date, status | no |
 | sources | _id, tenantId, kind, hash, consent, createdAt, captureMode | no |

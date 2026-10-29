@@ -4,7 +4,7 @@
  * title + summary (+ derived facet tokens) decides WHERE to look, and only then are 1-3 sessions read in full.
  * Deterministic, no LLM, no I/O; the tree only routes, answer text always comes from `turns` rows.
  */
-import type { TreeIndexNode } from "@lkb/core";
+import type { RouteIndexDoc, TreeIndexNode } from "@lkb/core";
 import { bm25Scores, buildBm25, tokenize, type Bm25Index } from "./bm25.js";
 import { facetTokens, facetsOf, queryFacetTokens, type Facets } from "./facets.js";
 
@@ -51,6 +51,56 @@ export function buildRouteIndex(tree: TreeIndexNode, tenantId: string, now = Dat
   }
   const bm25 = buildBm25(docs.map((d, i) => [...tokenize(texts[i]!), ...facetTokens(d.facets)]));
   return { docs, bm25, sessionIds: [...sessionIds], builtAt: now };
+}
+
+/** What a persisted index was built from: the shared visibility fingerprint (search-cache) and the tree root's `indexRevision`. */
+export interface RouteStamp { fingerprint: string; treeRevision: number | null }
+
+/** D-208 item 2: the `route_index` document for one tenant (JSON-safe: postings become [term, pairs] entries, builtAt an ISO string). */
+export function routeIndexToDoc(index: RouteIndex, tenantId: string, stamp: RouteStamp): RouteIndexDoc {
+  return {
+    _id: tenantId, tenantId, schemaVersion: 1, fingerprint: stamp.fingerprint, treeRevision: stamp.treeRevision, builtAt: new Date(index.builtAt).toISOString(),
+    sessionIds: [...index.sessionIds],
+    docs: index.docs.map((d) => ({ nodeId: d.nodeId, title: d.title, level: d.level, sessionIds: d.sessionIds, facets: d.facets, node: d.node })),
+    bm25: { n: index.bm25.n, avgLen: index.bm25.avgLen, lens: index.bm25.lens, postings: [...index.bm25.postings].map(([term, pairs]) => [term, pairs]) },
+  } as unknown as RouteIndexDoc;
+}
+
+const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+const isStrings = (v: unknown): v is string[] => Array.isArray(v) && v.every((s) => typeof s === "string");
+const isCount = (v: unknown): v is number => Number.isInteger(v) && (v as number) >= 0;
+
+/**
+ * The persisted document back into a RouteIndex, or `null` when it must NOT be served: wrong tenant (document or any node), another
+ * schema version, a stamp that differs from the CURRENT one (the stale-index guard), or any structural damage. `null` always means
+ * "rebuild from the tree"; this never throws and never returns a partly valid index.
+ */
+export function routeIndexFromDoc(raw: unknown, tenantId: string, current: RouteStamp, now: number): RouteIndex | null {
+  if (!isObj(raw) || raw._id !== tenantId || raw.tenantId !== tenantId || raw.schemaVersion !== 1) return null;
+  if (raw.fingerprint !== current.fingerprint || raw.treeRevision !== current.treeRevision) return null;
+  const { docs, bm25, sessionIds } = raw;
+  if (!Array.isArray(docs) || !isObj(bm25) || !isStrings(sessionIds) || docs.length > MAX_NODES) return null;
+  const out: RouteDoc[] = [];
+  for (const d of docs) {
+    if (!isObj(d) || typeof d.nodeId !== "string" || typeof d.title !== "string" || (d.level !== "session" && d.level !== "topic")) return null;
+    const { facets, node } = d;
+    if (!isStrings(d.sessionIds) || d.sessionIds.length === 0 || !isObj(facets) || !isStrings(facets.countries) || !isStrings(facets.axes) || !isStrings(facets.universities)) return null;
+    if (!isObj(node) || typeof node.node_id !== "string" || !Array.isArray(node.children) || (node.tenantId !== undefined && node.tenantId !== tenantId)) return null;
+    out.push({ nodeId: d.nodeId, title: d.title, level: d.level, sessionIds: d.sessionIds, facets: { countries: facets.countries, axes: facets.axes, universities: facets.universities }, node: node as unknown as TreeIndexNode });
+  }
+  const { n, avgLen, lens, postings } = bm25;
+  if (n !== out.length || !isCount(n) || typeof avgLen !== "number" || !Number.isFinite(avgLen) || !Array.isArray(lens) || lens.length !== n || !lens.every(isCount) || !Array.isArray(postings)) return null;
+  const map = new Map<string, [number, number][]>();
+  for (const entry of postings) {
+    if (!Array.isArray(entry) || entry.length !== 2 || typeof entry[0] !== "string" || !Array.isArray(entry[1]) || map.has(entry[0])) return null;
+    const pairs: [number, number][] = [];
+    for (const p of entry[1] as unknown[]) {
+      if (!Array.isArray(p) || p.length !== 2 || !isCount(p[0]) || p[0] >= n || !isCount(p[1]) || p[1] < 1) return null;
+      pairs.push([p[0], p[1]]);
+    }
+    map.set(entry[0], pairs);
+  }
+  return { docs: out, bm25: { n, avgLen, lens: lens as number[], postings: map }, sessionIds: [...sessionIds], builtAt: now };
 }
 
 /** BM25 over the page index; sessions ranked by their best-scoring node. No LLM. */
