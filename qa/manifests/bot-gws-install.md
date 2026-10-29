@@ -2,8 +2,8 @@
 **Contract:** none specific (D-205 U1 follow-up; qa/gates/golive-batch4-2026-10-28.md Answered lines; survey qa/evidence/bot-linux-survey-2026-10-29.md; bot-image verdict findings entrypoint.sh:44-46 MEDIUM and :38 LOW)
 **Goal task:** none
 **Date:** 2026-10-29
-**Status:** ready-for-check
-**Handshake status:** ready-for-check
+**Status:** checked-PASS
+**Handshake status:** checked-PASS
 **Fix cycle:** 0
 **Dual check:** no (no auth, tenancy or production write: build files; no credentials created, no gws login; the VNC fix removes a secret from argv)
 **Persona walk:** skip (no screen, flow or user type)
