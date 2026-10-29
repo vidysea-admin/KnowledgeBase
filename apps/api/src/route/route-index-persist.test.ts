@@ -174,7 +174,8 @@ test("a failing route_index read falls back to the in-memory build and still ans
 test("a HANGING route_index read cannot hang the request: it is abandoned at half the budget and the build answers inside the deadline", async () => {
   const f = setup({ routeIndex: { read: "hang" } });
   const t0 = Date.now(), deadlineAt = t0 + 1500;
-  const hits = await f.deps.route("toc", "visa requirements for Germany", 3, { deadlineAt });
+  const guard = sleep(1400).then((): never => { throw new Error("route() was still waiting on the hung route_index read at 1400 ms"); }); // fail by assertion, not by suite timeout
+  const hits = await Promise.race([f.deps.route("toc", "visa requirements for Germany", 3, { deadlineAt }), guard]);
   const took = Date.now() - t0;
   assert.ok(hits.length > 0);
   assert.ok(took < 1500, `answered in ${took} ms, inside the 1500 ms deadline`);
