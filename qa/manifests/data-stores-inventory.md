@@ -3,7 +3,7 @@
 **Contract:** none (docs lane). Authorization: D-208 item 1 (`qa/gates/d-entry-208.md`), gate `qa/gates/single-db-2026-10-29.md`; target database per D-209 is the existing `lkb_prod`.
 **Date:** 2026-10-29
 **Fix cycle:** 0
-**Status:** docs-lane-ready
+**Status:** merged-no-check (docs-lane)
 
 ## What changed
 - `docs/DATA-STORES.md` (new): inventory of every place KB state is persisted. Sections: summary counts, the table (Mongo in `lkb_prod`, other Mongo databases, 34 file stores, 8 compose volumes, in-memory structures), vectorless RAG data, an ordered list of 23 move units with Changes-authorized paths, 14 open questions.
