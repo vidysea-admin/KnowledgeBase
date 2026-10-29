@@ -24,8 +24,11 @@ function values(value: unknown, path: string[]): unknown[] {
 }
 function matches(row: Row, filter: Row): boolean {
   return Object.entries(filter).every(([key, expected]) => {
+    // D-206: the lexical candidate read uses an `$or` of case-insensitive `$regex` clauses.
+    if (key === "$or" && Array.isArray(expected)) return expected.some(branch => matches(row, branch as Row));
     const actual = values(row, key.split("."));
     if (record(expected)) {
+      if (typeof expected.$regex === "string") return actual.some(value => typeof value === "string" && new RegExp(expected.$regex as string, typeof expected.$options === "string" ? expected.$options : "").test(value));
       if ("$exists" in expected) return actual.some(value => value !== undefined) === expected.$exists;
       if (Array.isArray(expected.$in)) return actual.some(value => (expected.$in as unknown[]).includes(value));
       if (Array.isArray(expected.$nin)) return actual.every(value => !(expected.$nin as unknown[]).includes(value));
@@ -69,7 +72,8 @@ export function publicPreservedReviewFixture(options: { preserveReview?: boolean
   };
   const db = { collection(name: string) {
     return {
-      find(filter: Row = {}) { return { toArray: async () => structuredClone(rows(name).filter(row => matches(row, filter))) }; },
+      find(filter: Row = {}) { let max = Infinity; const cursor = { limit(n: number) { max = n; return cursor; },
+        toArray: async () => structuredClone(rows(name).filter(row => matches(row, filter)).slice(0, max)) }; return cursor; },
       findOne: async (filter: Row = {}) => structuredClone(rows(name).find(row => matches(row, filter)) ?? null),
       async insertOne(doc: Row) { insert(name, doc); writes.push(name); return { acknowledged: true }; },
       async insertMany(docs: Row[]) { docs.forEach(doc => insert(name, doc)); writes.push(name); return { acknowledged: true }; },

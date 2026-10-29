@@ -104,3 +104,66 @@ test("missing native Search scope prevents inventory and transcript callbacks", 
     assert.equal(response.status, 403); assert.equal(calls, 0);
   } finally { await server.close(); }
 });
+
+// ---- D-206 K5: hard server-side deadline -----------------------------------------------------------------------------
+import { resolveSearchDeadlineMs, DEFAULT_SEARCH_DEADLINE_MS } from "./search.js";
+
+async function withDeadlineEnv<T>(ms: string | undefined, run: () => Promise<T>): Promise<T> {
+  const prior = process.env.KB_SEARCH_DEADLINE_MS;
+  if (ms === undefined) delete process.env.KB_SEARCH_DEADLINE_MS; else process.env.KB_SEARCH_DEADLINE_MS = ms;
+  try { return await run(); } finally { if (prior === undefined) delete process.env.KB_SEARCH_DEADLINE_MS; else process.env.KB_SEARCH_DEADLINE_MS = prior; }
+}
+
+test("K5: a search that never finishes is answered 503 search_timeout at the deadline, not left hanging", async () => {
+  await withDeadlineEnv("150", async () => {
+    const deps = buildTestDeps({ keyStore: fakeKeyStore({ "k": { tenantId: "tenant-1", scopes: ["search"] } }) });
+    let deadlineAt: number | undefined;
+    deps.search = { search: (_t, _q, _k, options) => { deadlineAt = options?.deadlineAt; return new Promise(() => undefined); } };
+    const server = await startTestServer(deps);
+    try {
+      const started = Date.now();
+      const res = await fetch(`${server.baseUrl}/search?q=hello`, { headers: { authorization: "Bearer k" } });
+      const elapsed = Date.now() - started;
+      assert.equal(res.status, 503);
+      assert.deepEqual(await res.json(), { error: "search_timeout" });
+      assert.ok(elapsed >= 100 && elapsed < 2000, `answered after ${elapsed}ms`);
+      assert.ok(deadlineAt !== undefined && deadlineAt >= started && deadlineAt <= started + 1000, "the store receives the same absolute deadline");
+    } finally { await server.close(); }
+  });
+});
+
+test("K5: a store-side visibility deadline surfaces as search_timeout, other failures stay search_unavailable", async () => {
+  const deps = buildTestDeps({ keyStore: fakeKeyStore({ "k": { tenantId: "tenant-1", scopes: ["search"] } }) });
+  let mode: "deadline" | "boom" = "deadline";
+  deps.search = { search: async () => { const e = new Error("visibility"); e.name = mode === "deadline" ? "VisibilityDeadlineError" : "Error"; throw e; } };
+  const server = await startTestServer(deps);
+  try {
+    const first = await fetch(`${server.baseUrl}/search?q=x`, { headers: { authorization: "Bearer k" } });
+    assert.deepEqual([first.status, await first.json()], [503, { error: "search_timeout" }]);
+    mode = "boom";
+    const second = await fetch(`${server.baseUrl}/search?q=x`, { headers: { authorization: "Bearer k" } });
+    assert.deepEqual([second.status, await second.json()], [503, { error: "search_unavailable" }]);
+  } finally { await server.close(); }
+});
+
+test("K5: a fast search is unaffected by the deadline", async () => {
+  await withDeadlineEnv("5000", async () => {
+    const server = await startTestServer(buildTestDeps({ keyStore: fakeKeyStore({ "k": { tenantId: "tenant-1", scopes: ["search"] } }) }));
+    try {
+      const res = await fetch(`${server.baseUrl}/search?q=hello`, { headers: { authorization: "Bearer k" } });
+      assert.equal(res.status, 200);
+    } finally { await server.close(); }
+  });
+});
+
+test("K5: the deadline is configurable, bounded, and garbage never disables it", () => {
+  assert.equal(resolveSearchDeadlineMs(undefined, undefined), DEFAULT_SEARCH_DEADLINE_MS);
+  assert.equal(DEFAULT_SEARCH_DEADLINE_MS, 5000);
+  assert.equal(resolveSearchDeadlineMs(undefined, "2500"), 2500);
+  assert.equal(resolveSearchDeadlineMs(undefined, "0"), DEFAULT_SEARCH_DEADLINE_MS);
+  assert.equal(resolveSearchDeadlineMs(undefined, "-5"), DEFAULT_SEARCH_DEADLINE_MS);
+  assert.equal(resolveSearchDeadlineMs(undefined, "abc"), DEFAULT_SEARCH_DEADLINE_MS);
+  assert.equal(resolveSearchDeadlineMs(undefined, ""), DEFAULT_SEARCH_DEADLINE_MS);
+  assert.equal(resolveSearchDeadlineMs(undefined, "99999999"), 60_000);
+  assert.equal(resolveSearchDeadlineMs(1, undefined), 50);
+});

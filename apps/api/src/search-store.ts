@@ -5,13 +5,15 @@
  * rather than a new one.
  */
 import type { Db } from "mongodb";
-import { assertValidTenantId, getDb, scopedCollection } from "@lkb/db";
-import { lexicalQueryTokens, lexicalSearchTurns, treeIndexRootFilter } from "@lkb/index";
-import type { NativeSourceLocator } from "@lkb/core";
+import { assertValidTenantId, getDb, scopedCollection, withTenant } from "@lkb/db";
+import { lexicalQueryTokens, lexicalSearchTurns, treeIndexRootFilter, type LexicalHit } from "@lkb/index";
+import type { NativeSourceLocator, Turns } from "@lkb/core";
 import { buildTurnPrefilter } from "./search-prefilter.js";
 import { readSearchCandidateTurns } from "./transcript-review/search-reader.js";
-import { createKnowledgeVisibility } from "./visibility/knowledge.js";
-import type { NativeSearchHit, NativeSearchResult, SearchDeps, SearchHit } from "./routes/search.js";
+import { createKnowledgeVisibility, newVisibilityRequestMemo, withDeadline, type FilterTurnsOptions } from "./visibility/knowledge.js";
+import { searchCacheKey, TenantSearchCache } from "./search-cache/search-cache.js";
+import { createHash } from "node:crypto";
+import type { NativeSearchHit, NativeSearchResult, SearchCallOptions, SearchDeps, SearchHit } from "./routes/search.js";
 import { parseNativeSourceLocator, type NativeEvidenceResolver, type ResolvedNativeEvidence } from "./native-evidence/resolver.js";
 
 /**
@@ -52,6 +54,8 @@ export interface SearchStoreDeps {
    * real db; production callers pass nothing. */
   db?: Pick<Db, "collection">;
   nativeEvidence?: NativeEvidenceResolver;
+  /** Per-tenant result cache lifetime in ms; 0 disables it. Default 45s (D-206 K5). Rules: `search-cache.ts`. */
+  cacheTtlMs?: number;
   /** Current source inventory owned by central publication/head authority. Text/labels are never trusted here. */
   listNativeLocators?(tenantId: string): Promise<{ locators: readonly NativeSourceLocator[]; truncated: boolean }>;
 }
@@ -119,38 +123,96 @@ async function treeNativeLocators(db: Pick<Db, "collection">, tenantId: string):
   return { locators, truncated: false };
 }
 
+
+/**
+ * Everything that decides what a tenant may see, hashed: source kind + consent, session -> source binding and index status,
+ * every transcript-review head revision and every WhatsApp review candidate link (a candidate over a non-WhatsApp source hides it). Read on EVERY cached request (four small tenant-scoped reads), so a consent
+ * withdrawal, relabel, new session or transcript correction invalidates the cache immediately instead of after the TTL.
+ * `waSessions` are sessions whose source is a whatsapp-batch: results touching them are never cached, because WhatsApp
+ * visibility also depends on per-candidate approvals this fingerprint does not read.
+ */
+async function visibilityFingerprint(db: Pick<Db, "collection">, tenantId: string): Promise<{ fingerprint: string; waSessions: Set<string> }> {
+  assertValidTenantId(tenantId, "search.cache");
+  const read = async (name: string, projection: Record<string, 1>): Promise<Record<string, unknown>[]> => {
+    const rows = await db.collection<Record<string, unknown> & { tenantId: string }>(name).find(withTenant<Record<string, unknown> & { tenantId: string }>(tenantId, {}), { projection }).toArray();
+    if (rows.some(row => row.tenantId !== tenantId)) throw new Error("fingerprint scope mismatch");
+    return rows;
+  };
+  // tenantId is part of every projection so the scope check above is a real check, not a vacuous one.
+  const [sources, sessions, heads, candidates] = await Promise.all([
+    read("sources", { _id: 1, tenantId: 1, kind: 1, consent: 1 }), read("sessions", { _id: 1, tenantId: 1, sourceId: 1, status: 1 }),
+    read("transcript_reviews", { _id: 1, tenantId: 1, revision: 1 }), read("whatsapp_candidates", { _id: 1, tenantId: 1, sourceId: 1, sessionId: 1 }),
+  ]);
+  const byId = (rows: Record<string, unknown>[]) => [...rows].sort((a, b) => String(a._id).localeCompare(String(b._id)));
+  const waSources = new Set(sources.filter(row => row.kind === "whatsapp-batch").map(row => String(row._id)));
+  const fingerprint = createHash("sha256").update(JSON.stringify([byId(sources), byId(sessions), byId(heads), byId(candidates)])).digest("hex");
+  return { fingerprint, waSessions: new Set(sessions.filter(row => waSources.has(String(row.sourceId))).map(row => String(row._id))) };
+}
+
+const DEFAULT_CACHE_TTL_MS = 45_000;
+/** Visibility is judged on the best-scoring candidates first: the first slice is a few multiples of k, then it doubles. */
+const FIRST_SLICE_FACTOR = 4, MIN_FIRST_SLICE = 24;
+
+/**
+ * K2 (D-206): score candidates first, judge visibility only on the best ones. Scoring is a pure per-turn function (no corpus
+ * statistics), so ranking ALL candidates first and walking down the ranking in growing slices until `k` visible hits are
+ * found (or the ranking is exhausted) returns exactly what filter-then-score returned: the ranking is stable, visibility
+ * only removes rows, and nothing is ever dropped by a cap, only by visibility. Shared by /search and the /ask lexical arm.
+ */
+export async function rankVisibleTurns(visibility: ReturnType<typeof createKnowledgeVisibility>, tenantId: string, query: string,
+  candidates: readonly Turns[], k: number, options: FilterTurnsOptions = {}): Promise<{ scored: LexicalHit[]; turnById: Map<string, Turns> }> {
+  const ranked = lexicalSearchTurns(query, candidates.map((t) => ({ _id: t._id, sessionId: t.sessionId, text: t.text })), candidates.length);
+  const candidateById = new Map(candidates.map((t) => [t._id, t]));
+  const turnById = new Map<string, Turns>(), scored: LexicalHit[] = [];
+  let cursor = 0, slice = Math.max(k * FIRST_SLICE_FACTOR, MIN_FIRST_SLICE);
+  while (scored.length < k && cursor < ranked.length) {
+    const part = ranked.slice(cursor, cursor + slice);
+    cursor += part.length; slice *= 2;
+    for (const turn of await visibility.filterTurns(tenantId, part.map((hit) => candidateById.get(hit.turnId)!), options)) turnById.set(turn._id, turn);
+    for (const hit of part) if (turnById.has(hit.turnId) && scored.length < k) scored.push(hit);
+  }
+  return { scored, turnById };
+}
+
 export function createMongoSearchDeps(deps: SearchStoreDeps = {}): SearchDeps {
+  const cache = new TenantSearchCache<SearchHit[]>({ ttlMs: deps.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS });
   return {
     ...(deps.nativeEvidence ? { searchNative: createNativeSearch({
       nativeEvidence: deps.nativeEvidence, listNativeLocators: deps.listNativeLocators ?? (tenantId => treeNativeLocators(deps.db ?? getDb(), tenantId)),
     }) } : {}),
-    async search(tenantId, query, k): Promise<SearchHit[]> {
+    async search(tenantId, query, k, options: SearchCallOptions = {}): Promise<SearchHit[]> {
       // Resolved per call, not at construction: production builds these deps at boot, before
       // connect(). Tenant-scoping still runs through scopedCollection on the injected handle.
       const db = deps.db ?? getDb();
-      const visibility = createKnowledgeVisibility(db);
       // buildTurnPrefilter owns the superset invariant and is pinned by search-prefilter.test.ts
       // (ISS-072: this construction previously lived inline here, where no test could fail on it).
       const prefilter = buildTurnPrefilter(query);
       if (prefilter === null) return [];
-      const candidates = await readSearchCandidateTurns(db, tenantId, prefilter);
-      const turns = await visibility.filterTurns(tenantId, candidates);
-      const scored = lexicalSearchTurns(
-        query,
-        turns.map((t) => ({ _id: t._id, sessionId: t.sessionId, text: t.text })),
-        k,
-      );
-      const turnById = new Map(turns.map((t) => [t._id, t]));
+      // Cache rule (D-206 K5): serve only a same-tenant entry younger than the TTL whose visibility fingerprint, read NOW,
+      // is unchanged. A failure to compute the fingerprint bypasses the cache; it never serves on a guess.
+      let state: { fingerprint: string; waSessions: Set<string> } | null = null;
+      const key = searchCacheKey(query, k);
+      if (cache.enabled) {
+        try { state = await visibilityFingerprint(db, tenantId); } catch { state = null; }
+        const cached = state ? cache.get(tenantId, key, state.fingerprint) : undefined;
+        if (cached) return cached;
+      }
+      const visibility = createKnowledgeVisibility(db);
+      const candidates = await withDeadline(options.deadlineAt, () => readSearchCandidateTurns(db, tenantId, prefilter));
+      const { scored, turnById } = await rankVisibleTurns(visibility, tenantId, query, candidates, k,
+        { memo: newVisibilityRequestMemo(), throwOnError: true, ...(options.deadlineAt === undefined ? {} : { deadlineAt: options.deadlineAt }) });
       const sessionIds = [...new Set(scored.map((s) => s.sessionId))];
       const sessions = await Promise.all(sessionIds.map((id) => visibility.safeCitationSession(tenantId, id)));
       const sessionById = new Map(sessionIds.map((id, i) => [id, sessions[i] ?? null]));
-      return scored.map((hit) => ({
+      const hits = scored.map((hit) => ({
         turnId: hit.turnId,
         sessionId: hit.sessionId,
         score: hit.score,
         turn: turnById.get(hit.turnId) ?? null,
         session: sessionById.get(hit.sessionId) ?? null,
       }));
+      if (state && !hits.some((h) => state!.waSessions.has(h.sessionId))) cache.set(tenantId, key, state.fingerprint, hits);
+      return hits;
     },
   };
 }

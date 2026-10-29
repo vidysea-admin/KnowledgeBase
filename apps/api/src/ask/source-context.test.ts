@@ -25,9 +25,10 @@ const node: TreeIndexNode = { node_id: "tenant:toc/session:s", title: "Visa form
 function fakeDb(rows: { turns?: Turns[]; chunks?: unknown[] }, enforce = true) {
   const filters: { name: string; filter: Record<string, unknown> }[] = [];
   const db = { collection: (name: string) => ({ find: (filter: Record<string, unknown>) => ({
+    limit() { return this; }, // D-206: the lexical arm reads its candidates through the bounded `.limit()` cursor
     toArray: async () => {
       filters.push({ name, filter });
-      const data = name === "turns" ? rows.turns ?? [] : rows.chunks ?? [];
+      const data = name === "turns" ? rows.turns ?? [] : name === "chunks" ? rows.chunks ?? [] : []; // any other collection (e.g. transcript_reviews heads) is empty
       return data.filter((row) => {
         const r = row as { tenantId: string; sessionId?: string; sourceRef?: string };
         if (!enforce) return true;
